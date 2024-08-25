@@ -1,5 +1,5 @@
 .idea/
 .gradle/
-app/build
+lib/build/
 /*.png
 temp/
