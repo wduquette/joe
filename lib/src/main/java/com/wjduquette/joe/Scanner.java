@@ -12,15 +12,13 @@ public class Scanner {
 
     static {
         keywords = new HashMap<>();
-        keywords.put("and",    AND);
         keywords.put("class",  CLASS);
         keywords.put("else",   ELSE);
         keywords.put("false",  FALSE);
         keywords.put("for",    FOR);
         keywords.put("fun",    FUN);
         keywords.put("if",     IF);
-        keywords.put("nil",    NIL);
-        keywords.put("or",     OR);
+        keywords.put("null",   NULL);
         keywords.put("print",  PRINT);
         keywords.put("return", RETURN);
         keywords.put("super",  SUPER);
@@ -84,6 +82,20 @@ public class Scanner {
                     addToken(SLASH);
                 }
                 break;
+            case '&':
+                if (match('&')) {
+                    addToken(AND);
+                } else {
+                    Joe.error(line, "Expected '&'.");
+                }
+                break;
+            case '|':
+                if (match('|')) {
+                    addToken(OR);
+                } else {
+                    Joe.error(line, "Expected '|'.");
+                }
+                break;
             case ' ':
             case '\r':
             case '\t':
@@ -101,7 +113,7 @@ public class Scanner {
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    Joe.error(line, "Unexpected character.");
+                    Joe.error(line, "Unexpected character: '" + peek() + "'.");
                 }
                 break;
         }
