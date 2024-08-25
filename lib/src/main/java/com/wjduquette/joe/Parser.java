@@ -143,7 +143,7 @@ class Parser {
 
     private ParseError error(Token token, String message) {
         Joe.error(token, message);
-        return new ParseError();
+        return new ParseError(message);
     }
 
     // Discard tokens until we are at the beginning of the next statement.
