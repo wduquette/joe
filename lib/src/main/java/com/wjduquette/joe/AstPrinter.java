@@ -13,6 +13,7 @@ public class AstPrinter {
                 expr.value() == null ? "null" : expr.value().toString();
             case Unary expr ->
                     parenthesize(expr.op().lexeme(), expr.right());
+            default -> throw new UnsupportedOperationException("Not yet supported");
         };
     }
 
