@@ -20,20 +20,48 @@ class Interpreter {
                     case BANG_EQUAL -> !isEqual(left, right);
                     case EQUAL_EQUAL -> isEqual(left, right);
                     case GREATER -> {
-                        checkNumberOperands(expr.op(), left, right);
-                        yield (double)left > (double)right;
+                        if (left instanceof Double a && right instanceof Double b) {
+                            yield a > b;
+                        }
+
+                        if (left instanceof String a && right instanceof String b) {
+                            yield a.compareTo(b) > 0;
+                        }
+
+                        throw notSimilar(expr.op());
                     }
                     case GREATER_EQUAL -> {
-                        checkNumberOperands(expr.op(), left, right);
-                        yield (double)left >= (double)right;
+                        if (left instanceof Double a && right instanceof Double b) {
+                            yield a >= b;
+                        }
+
+                        if (left instanceof String a && right instanceof String b) {
+                            yield a.compareTo(b) >= 0;
+                        }
+
+                        throw notSimilar(expr.op());
                     }
                     case LESS -> {
-                        checkNumberOperands(expr.op(), left, right);
-                        yield (double)left < (double)right;
+                        if (left instanceof Double a && right instanceof Double b) {
+                            yield a < b;
+                        }
+
+                        if (left instanceof String a && right instanceof String b) {
+                            yield a.compareTo(b) < 0;
+                        }
+
+                        throw notSimilar(expr.op());
                     }
                     case LESS_EQUAL -> {
-                        checkNumberOperands(expr.op(), left, right);
-                        yield (double)left <= (double)right;
+                        if (left instanceof Double a && right instanceof Double b) {
+                            yield a <= b;
+                        }
+
+                        if (left instanceof String a && right instanceof String b) {
+                            yield a.compareTo(b) <= 0;
+                        }
+
+                        throw notSimilar(expr.op());
                     }
                     case MINUS -> {
                         checkNumberOperands(expr.op(), left, right);
@@ -48,20 +76,15 @@ class Interpreter {
                         yield (double)left * (double)right;
                     }
                     case PLUS -> {
-                        if (left instanceof Double a &&
-                            right instanceof Double b)
-                        {
+                        if (left instanceof Double a && right instanceof Double b) {
                             yield a + b;
                         }
 
-                        if (left instanceof String a &&
-                            right instanceof String b) {
+                        if (left instanceof String a && right instanceof String b) {
                             yield a + b;
                         }
 
-                        // Error handling needed
-                        throw new RuntimeError(expr.op(),
-                            "Operands must be two numbers or two strings.");
+                        throw notSimilar(expr.op());
                     }
                     default -> throw new IllegalStateException(
                         "Unexpected operator: " + expr.op());
@@ -126,6 +149,11 @@ class Interpreter {
         if (left instanceof Double && right instanceof Double) return;
 
         throw new RuntimeError(operator, "Operands must be numbers.");
+    }
+
+    private RuntimeError notSimilar(Token operator) {
+        return new RuntimeError(operator,
+            "Operands must both be numbers or both be strings.");
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
