@@ -18,7 +18,7 @@ class Interpreter {
 
     public Object interpret(Expr expression) throws RuntimeError {
         Object value = evaluate(expression);
-        System.out.println(stringify(value));
+        System.out.println(joe.stringify(value));
         return value;
     }
 
@@ -29,8 +29,8 @@ class Interpreter {
                 Object right = evaluate(expr.right());
 
                 yield switch (expr.op().type()) {
-                    case BANG_EQUAL -> !isEqual(left, right);
-                    case EQUAL_EQUAL -> isEqual(left, right);
+                    case BANG_EQUAL -> !Joe.isEqual(left, right);
+                    case EQUAL_EQUAL -> Joe.isEqual(left, right);
                     case GREATER -> {
                         if (left instanceof Double a && right instanceof Double b) {
                             yield a > b;
@@ -108,7 +108,7 @@ class Interpreter {
                 Object right = evaluate(expr.right());
 
                 yield switch (expr.op().type()) {
-                    case BANG -> !isTruthy(right);
+                    case BANG -> !Joe.isTruthy(right);
                     case MINUS -> {
                         checkNumberOperand(expr.op(), right);
                         yield -(double)right;
@@ -122,33 +122,6 @@ class Interpreter {
 
     //-------------------------------------------------------------------------
     // Predicates
-
-    private String stringify(Object object) {
-        if (object == null) return "null";
-
-        if (object instanceof Double) {
-            String text = object.toString();
-            if (text.endsWith(".0")) {
-                text = text.substring(0, text.length() - 2);
-            }
-            return text;
-        }
-
-        return object.toString();
-    }
-
-    private boolean isTruthy(Object object) {
-        if (object == null) return false;
-        if (object instanceof Boolean) return (boolean)object;
-        return true;
-    }
-
-    private boolean isEqual(Object a, Object b) {
-        if (a == null && b == null) return true;
-        if (a == null) return false;
-
-        return a.equals(b);
-    }
 
     //-------------------------------------------------------------------------
     // Error Checking

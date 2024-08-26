@@ -25,7 +25,7 @@ public class Joe {
     }
 
     //-------------------------------------------------------------------------
-    // Public API
+    // Script Execution
 
     @SuppressWarnings("UnusedReturnValue")
     public Object runFile(String path) throws IOException {
@@ -69,6 +69,9 @@ public class Joe {
         }
     }
 
+    //-------------------------------------------------------------------------
+    // Output and Error Handling
+
     private void runtimeError(RuntimeError error) {
         System.err.println(error.getMessage() +
             "\n[line " + error.line() + "]");
@@ -94,7 +97,69 @@ public class Joe {
     }
 
     //-------------------------------------------------------------------------
-    // Main: This will be extracted as JoeApp
+    // Services provided to the rest of the implementation
+
+    /**
+     * Stringify converts an object to its string representation,
+     * <b>as visible at the scripting layer</b>. Normally, this is the same
+     * as {@code object.toString()}, but there are special cases.
+     *
+     * <ul>
+     * <li>The null value stringifies as "null".</li>
+     * <li>Doubles with integer values stringify without the ".0".</li>
+     * <li>Instances of Joe classes can provide a stringifier.</li>
+     * <li>Java class bindings can provide a stringifier.</li>
+     * </ul>
+     *
+     * <p>This method would be static except that it will need to reference
+     * the engine's data for non-standard types.</p>
+     * @param value The value being stringified.
+     * @return The string
+     */
+    public String stringify(Object value) {
+        if (value == null) return "null";
+
+        if (value instanceof Double) {
+            String text = value.toString();
+            if (text.endsWith(".0")) {
+                text = text.substring(0, text.length() - 2);
+            }
+            return text;
+        }
+
+        return value.toString();
+    }
+
+    /**
+     * Returns true if the object is "truthy", i.e., boolean {@code true} or
+     * non-null, and false otherwise.
+     * @param value The value
+     * @return true or false
+     */
+    public static boolean isTruthy(Object value) {
+        if (value == null) return false;
+        if (value instanceof Boolean) return (boolean)value;
+        return true;
+    }
+
+    /**
+     * Returns true if the two values are equal, and false otherwise.
+     * This is essentially equivalent to {@code Objects.equals(a, b)}.
+     * @param a The first value
+     * @param b The second value
+     * @return true or false
+     */
+    public static boolean isEqual(Object a, Object b) {
+        if (a == null && b == null) return true;
+        if (a == null) return false;
+
+        return a.equals(b);
+    }
+
+    //-------------------------------------------------------------------------
+    // Main
+    //
+    // This will be extracted as JoeApp
 
     public static void main(String[] args) throws IOException {
         var joe = new Joe();
