@@ -1,13 +1,25 @@
 package com.wjduquette.joe;
 
 class Interpreter {
-    void interpret(Expr expression) {
-        try {
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
-        } catch (RuntimeError error) {
-            Joe.runtimeError(error);
-        }
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
+    private final Joe joe;
+
+    //-------------------------------------------------------------------------
+    // Constructor
+
+    public Interpreter(Joe joe) {
+        this.joe = joe;
+    }
+
+    //-------------------------------------------------------------------------
+    // Public API
+
+    public Object interpret(Expr expression) throws RuntimeError {
+        Object value = evaluate(expression);
+        System.out.println(stringify(value));
+        return value;
     }
 
     Object evaluate(Expr expression) {
@@ -160,5 +172,4 @@ class Interpreter {
         if (operand instanceof Double) return;
         throw new RuntimeError(operator, "Operand must be a number.");
     }
-
 }

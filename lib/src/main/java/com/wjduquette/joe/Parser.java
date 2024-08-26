@@ -4,14 +4,25 @@ import java.util.List;
 import static com.wjduquette.joe.TokenType.*;
 
 class Parser {
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
+    private final Joe joe;
     private final List<Token> tokens;
     private int current = 0;
 
-    Parser(List<Token> tokens) {
+    //-------------------------------------------------------------------------
+    // Constructor
+
+    Parser(Joe joe, List<Token> tokens) {
+        this.joe = joe;
         this.tokens = tokens;
     }
 
-    Expr parse() {
+    //-------------------------------------------------------------------------
+    // Public API
+
+    public Expr parse() {
         try {
             return expression();
         } catch (ParseError error) {
@@ -142,7 +153,7 @@ class Parser {
     }
 
     private ParseError error(Token token, String message) {
-        Joe.error(token, message);
+        joe.error(token, message);
         return new ParseError(message);
     }
 

@@ -9,31 +9,37 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Joe {
-    private static final Interpreter interpreter = new Interpreter();
-    static boolean hadError = false;
-    static boolean hadRuntimeError = false;
+    //-------------------------------------------------------------------------
+    // Instance Variables
 
-    public static void main(String[] args) throws IOException {
-        if (args.length > 1) {
-            System.out.println("Usage: joe [script]");
-            System.exit(64);
-        } else if (args.length == 1) {
-            runFile(args[0]);
-        } else {
-            runPrompt();
-        }
+    // The actual interpreter.  Not sure why we need to retain it.
+    private final Interpreter interpreter;
+    boolean hadError = false;
+    boolean hadRuntimeError = false;
+
+    //-------------------------------------------------------------------------
+    // Constructor
+
+    public Joe() {
+        interpreter = new Interpreter(this);
     }
 
-    private static void runFile(String path) throws IOException {
+    //-------------------------------------------------------------------------
+    // Public API
+
+    @SuppressWarnings("UnusedReturnValue")
+    public Object runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
-        run(new String(bytes, Charset.defaultCharset()));
+        var result = run(new String(bytes, Charset.defaultCharset()));
 
         // Indicate an error in the exit code.
         if (hadError) System.exit(65);
         if (hadRuntimeError) System.exit(70);
+
+        return result;
     }
 
-    private static void runPrompt() throws IOException {
+    private void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
@@ -46,36 +52,40 @@ public class Joe {
         }
     }
 
-    private static void run(String source) {
-        Scanner scanner = new Scanner(source);
+    private Object run(String source) {
+        Scanner scanner = new Scanner(this, source);
         List<Token> tokens = scanner.scanTokens();
-        Parser parser = new Parser(tokens);
+        Parser parser = new Parser(this, tokens);
         Expr expression = parser.parse();
 
         // Stop if there was a syntax error.
-        if (hadError) return;
+        if (hadError) return null;
 
-        interpreter.interpret(expression);
+        try {
+            return interpreter.interpret(expression);
+        } catch (RuntimeError ex) {
+            runtimeError(ex);
+            return null;
+        }
     }
 
-    static void runtimeError(RuntimeError error) {
+    private void runtimeError(RuntimeError error) {
         System.err.println(error.getMessage() +
             "\n[line " + error.line() + "]");
         hadRuntimeError = true;
     }
 
-    static void error(int line, String message) {
+    void error(int line, String message) {
         report(line, "", message);
     }
 
-    private static void report(int line, String where,
-                               String message) {
+    private void report(int line, String where, String message) {
         System.err.println(
                 "[line " + line + "] Error" + where + ": " + message);
         hadError = true;
     }
 
-    static void error(Token token, String message) {
+    void error(Token token, String message) {
         if (token.type() == TokenType.EOF) {
             report(token.line(), " at end", message);
         } else {
@@ -83,4 +93,19 @@ public class Joe {
         }
     }
 
+    //-------------------------------------------------------------------------
+    // Main: This will be extracted as JoeApp
+
+    public static void main(String[] args) throws IOException {
+        var joe = new Joe();
+
+        if (args.length > 1) {
+            System.out.println("Usage: joe [script]");
+            System.exit(64);
+        } else if (args.length == 1) {
+            joe.runFile(args[0]);
+        } else {
+            joe.runPrompt();
+        }
+    }
 }

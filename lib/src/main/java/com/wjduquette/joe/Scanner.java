@@ -28,15 +28,26 @@ public class Scanner {
         keywords.put("while",  WHILE);
     }
 
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
+    private final Joe joe;
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
     private int start = 0;
     private int current = 0;
     private int line = 1;
 
-    Scanner(String source) {
+    //-------------------------------------------------------------------------
+    // Constructor
+
+    Scanner(Joe joe, String source) {
+        this.joe = joe;
         this.source = source;
     }
+
+    //-------------------------------------------------------------------------
+    // Public API
 
     List<Token> scanTokens() {
         while (!isAtEnd()) {
@@ -78,14 +89,14 @@ public class Scanner {
                 if (match('&')) {
                     addToken(AND);
                 } else {
-                    Joe.error(line, "Expected '&'.");
+                    joe.error(line, "Expected '&'.");
                 }
             }
             case '|' -> {
                 if (match('|')) {
                     addToken(OR);
                 } else {
-                    Joe.error(line, "Expected '|'.");
+                    joe.error(line, "Expected '|'.");
                 }
             }
             case ' ', '\r', '\t' -> {
@@ -99,7 +110,7 @@ public class Scanner {
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    Joe.error(line, "Unexpected character: '" + peek() + "'.");
+                    joe.error(line, "Unexpected character: '" + peek() + "'.");
                 }
             }
         }
@@ -137,7 +148,7 @@ public class Scanner {
         }
 
         if (isAtEnd()) {
-            Joe.error(line, "Unterminated string.");
+            joe.error(line, "Unterminated string.");
             return;
         }
 
