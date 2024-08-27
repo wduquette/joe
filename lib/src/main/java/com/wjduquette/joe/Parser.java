@@ -188,7 +188,7 @@ class Parser {
     /**
      * An error found while parsing Joe code.
      */
-    private class SyntaxError extends RuntimeException {
+    private static class SyntaxError extends RuntimeException {
         SyntaxError(String message) {
             super(message);
         }
