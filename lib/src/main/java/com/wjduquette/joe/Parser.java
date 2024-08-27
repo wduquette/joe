@@ -25,7 +25,7 @@ class Parser {
     public Expr parse() {
         try {
             return expression();
-        } catch (ParseError error) {
+        } catch (SyntaxError error) {
             return null;
         }
     }
@@ -152,9 +152,9 @@ class Parser {
         return tokens.get(current - 1);
     }
 
-    private ParseError error(Token token, String message) {
+    private SyntaxError error(Token token, String message) {
         joe.error(token, message);
-        return new ParseError(message);
+        return new SyntaxError(message);
     }
 
     // Discard tokens until we are at the beginning of the next statement.
@@ -182,6 +182,15 @@ class Parser {
 
             // Discard this token.
             advance();
+        }
+    }
+
+    /**
+     * An error found while parsing Joe code.
+     */
+    private class SyntaxError extends RuntimeException {
+        SyntaxError(String message) {
+            super(message);
         }
     }
 }
