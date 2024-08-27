@@ -145,7 +145,7 @@ public class Joe {
      */
     public String codify(Object value) {
         if (value instanceof String string) {
-            return "\"" + value + "\"";
+            return "\"" + string + "\"";
         } else {
             return stringify(value);
         }
