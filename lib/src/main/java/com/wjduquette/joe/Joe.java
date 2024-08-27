@@ -100,7 +100,7 @@ public class Joe {
     }
 
     // Converts the expression into something that looks like code.
-    String codify(Expr expr) {
+    String recodify(Expr expr) {
         return ASTPrinter.codify(this, expr);
     }
 
