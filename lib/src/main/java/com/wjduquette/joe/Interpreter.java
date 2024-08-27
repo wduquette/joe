@@ -18,7 +18,6 @@ class Interpreter {
 
     public Object interpret(Expr expression) throws RuntimeError {
         Object value = evaluate(expression);
-        System.out.println(joe.stringify(value));
         return value;
     }
 

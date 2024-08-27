@@ -47,7 +47,10 @@ public class Joe {
             System.out.print("> ");
             String line = reader.readLine();
             if (line == null) break;
-            run(line);
+            var result = run(line);
+            if (!hadError) {
+                System.out.println("-> " + stringify(result));
+            }
             hadError = false;
         }
     }
@@ -96,6 +99,11 @@ public class Joe {
         }
     }
 
+    // Converts the expression into something that looks like code.
+    String codify(Expr expr) {
+        return ASTPrinter.codify(this, expr);
+    }
+
     //-------------------------------------------------------------------------
     // Services provided to the rest of the implementation
 
@@ -128,6 +136,19 @@ public class Joe {
         }
 
         return value.toString();
+    }
+
+    /**
+     * Converts a value to a string as it would appear in Monica code.
+     * @param value The value
+     * @return The value
+     */
+    public String codify(Object value) {
+        if (value instanceof String string) {
+            return "\"" + value + "\"";
+        } else {
+            return stringify(value);
+        }
     }
 
     /**
