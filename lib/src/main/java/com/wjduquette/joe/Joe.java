@@ -39,7 +39,7 @@ public class Joe {
         return result;
     }
 
-    private void runPrompt() throws IOException {
+    public void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
@@ -55,7 +55,7 @@ public class Joe {
         }
     }
 
-    private Object run(String source) {
+    public Object run(String source) {
         Scanner scanner = new Scanner(this, source);
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(this, tokens);

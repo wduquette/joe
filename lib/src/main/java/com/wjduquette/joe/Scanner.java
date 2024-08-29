@@ -142,8 +142,35 @@ public class Scanner {
     }
 
     private void string() {
+        var buff = new StringBuilder();
+
         while (peek() != '"' && !isAtEnd()) {
-            if (peek() == '\n') line++;
+            var c = peek();
+
+            switch (c) {
+                case '\\' -> {
+                    advance(); // Skip past the backslash
+                    if (!isAtEnd()) {
+                        switch (peek()) {
+                            case '\\' -> buff.append('\\');
+                            case 't' -> buff.append('\t');
+                            case 'b' -> buff.append('\b');
+                            case 'n' -> buff.append('\n');
+                            case 'r' -> buff.append('\r');
+                            case 'f' -> buff.append('\f');
+                            case '"' -> buff.append('"');
+                            default -> joe.error(line,
+                                "Unexpected escape: \\" + peek());
+                        }
+                    }
+                }
+                case '\n' -> {
+                    line++;
+                    buff.append(c);
+                }
+                default -> buff.append(c);
+            }
+
             advance();
         }
 
@@ -155,9 +182,8 @@ public class Scanner {
         // The closing quote
         advance();
 
-        // Trim the surrounding quotes.
-        String value = source.substring(start + 1, current - 1);
-        addToken(STRING, value);
+        // Add the unescaped string.
+        addToken(STRING, buff.toString());
     }
 
     private boolean match(char expected) {
