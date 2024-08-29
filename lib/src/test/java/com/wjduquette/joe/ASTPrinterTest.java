@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static com.wjduquette.joe.TokenType.*;
 import static com.wjduquette.joe.Expr.*;
+import static com.wjduquette.joe.checker.Checker.check;
 import static org.junit.Assert.assertEquals;
 
 public class ASTPrinterTest extends Ted {
@@ -18,12 +19,16 @@ public class ASTPrinterTest extends Ted {
         joe = new Joe();
     }
 
+    //
+    // NOTE: Joe::recodify() just calls ASTPrinter.codify().
+    //
+
     @Test
     public void testLiteral() {
         test("testLiteral");
-        assertEquals("2", joe.recodify(two));
-        assertEquals("2.5", joe.recodify(decimal));
-        assertEquals("\"abc\"", joe.recodify(string));
+        check(joe.recodify(two)).eq("2");
+        check(joe.recodify(decimal)).eq("2.5");
+        check(joe.recodify(string)).eq("\"abc\"");
     }
 
     @Test
@@ -33,14 +38,14 @@ public class ASTPrinterTest extends Ted {
             new Token(MINUS, "-", null, 1),
             two
         );
-        assertEquals("-2", joe.recodify(unary));
+        check(joe.recodify(unary)).eq("-2");
     }
 
     @Test
     public void testGrouping() {
         test("testGrouping");
         var group = new Grouping(decimal);
-        assertEquals("(2.5)", joe.recodify(group));
+        check(joe.recodify(group)).eq("(2.5)");
     }
 
     @Test
@@ -51,7 +56,7 @@ public class ASTPrinterTest extends Ted {
             new Token(STAR, "*", null, 1),
             two
         );
-        assertEquals("1*2", joe.recodify(bin));
+        check(joe.recodify(bin)).eq("1*2");
     }
 
     @Test
@@ -62,7 +67,7 @@ public class ASTPrinterTest extends Ted {
             new Token(SLASH, "/", null, 1),
             two
         );
-        assertEquals("1/2", joe.recodify(bin));
+        check(joe.recodify(bin)).eq("1/2");
     }
 
     @Test
@@ -73,6 +78,6 @@ public class ASTPrinterTest extends Ted {
             new Token(PLUS, "+", null, 1),
             two
         );
-        assertEquals("1 + 2", joe.recodify(bin));
+        check(joe.recodify(bin)).eq("1 + 2");
     }
 }

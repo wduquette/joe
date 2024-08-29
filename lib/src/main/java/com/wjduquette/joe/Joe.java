@@ -140,15 +140,35 @@ public class Joe {
 
     /**
      * Converts a value to a string as it would appear in Monica code.
+     * This is intended primarily for use in error messages, but
+     * could also be used during code generation.
      * @param value The value
      * @return The value
      */
     public String codify(Object value) {
         if (value instanceof String string) {
-            return "\"" + string + "\"";
+            return "\"" + escape(string) + "\"";
         } else {
             return stringify(value);
         }
+    }
+
+    /**
+     * Given an arbitrary string, escapes all typical control characters as
+     * they would appear in Java or Joe code.
+     * TODO: Handle unicode escapes
+     * @param string
+     * @return The string with escapes
+     */
+    public static String escape(String string){
+        return string
+            .replace("\\", "\\\\")
+            .replace("\t", "\\t")
+            .replace("\b", "\\b")
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+            .replace("\f", "\\f")
+            .replace("\"", "\\\"");
     }
 
     /**
