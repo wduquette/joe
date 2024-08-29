@@ -161,14 +161,29 @@ public class Joe {
      * @return The string with escapes
      */
     public static String escape(String string){
-        return string
-            .replace("\\", "\\\\")
-            .replace("\t", "\\t")
-            .replace("\b", "\\b")
-            .replace("\n", "\\n")
-            .replace("\r", "\\r")
-            .replace("\f", "\\f")
-            .replace("\"", "\\\"");
+        var buff = new StringBuilder();
+
+        for (int i = 0; i < string.length(); i++) {
+            var c = string.charAt(i);
+            switch (c) {
+                case '\\' -> buff.append("\\\\");
+                case '\t' -> buff.append("\\t");
+                case '\b' -> buff.append("\\b");
+                case '\n' -> buff.append("\\n");
+                case '\r' -> buff.append("\\r");
+                case '\f' -> buff.append("\\f");
+                case '"' -> buff.append("\\\"");
+                default -> {
+                    if (c < 256) {
+                        buff.append(c);
+                    } else {
+                        var hex = (int)c;
+                        buff.append(String.format("\\u%04X", hex));
+                    }
+                }
+            }
+        }
+        return buff.toString();
     }
 
     /**
