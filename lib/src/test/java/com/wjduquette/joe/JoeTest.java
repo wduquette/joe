@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import static com.wjduquette.joe.checker.Checker.*;
 
+@SuppressWarnings("ConstantValue")
 public class JoeTest extends Ted {
     private Joe joe;
 

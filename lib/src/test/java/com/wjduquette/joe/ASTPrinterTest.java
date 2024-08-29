@@ -5,7 +5,6 @@ import org.junit.Test;
 import static com.wjduquette.joe.TokenType.*;
 import static com.wjduquette.joe.Expr.*;
 import static com.wjduquette.joe.checker.Checker.check;
-import static org.junit.Assert.assertEquals;
 
 public class ASTPrinterTest extends Ted {
     Joe joe;

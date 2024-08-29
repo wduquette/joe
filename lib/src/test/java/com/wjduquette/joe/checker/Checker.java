@@ -2,7 +2,7 @@ package com.wjduquette.joe.checker;
 
 import java.util.Objects;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class Checker<Value> {
     //-------------------------------------------------------------------------
     // Static Methods
