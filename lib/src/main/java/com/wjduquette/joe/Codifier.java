@@ -20,28 +20,41 @@ public class Codifier {
      * @return The "code" string
      */
     static String codify(Joe joe, List<Stmt> statements) {
+        return codify(joe, 0, statements);
+    }
+
+    static String codify(Joe joe, int indent, List<Stmt> statements) {
         return statements.stream()
-            .map(s -> codify(joe, s))
+            .map(s -> codify(joe, indent, s))
             .collect(Collectors.joining("\n"));
     }
 
     /**
      * Codifies a complete statement.
      * @param joe The engine
+     * @param indent The number of indents
      * @param statement The statement
      * @return The "code" string
      */
-    static String codify(Joe joe, Stmt statement) {
-        return switch (statement) {
-            case Stmt.Block stmt -> "{TODO}";
+    static String codify(Joe joe, int indent, Stmt statement) {
+        var code = switch (statement) {
+            case Stmt.Block stmt ->
+                "{\n" + codify(joe, indent + 1, stmt.statements()) + "\n"
+                + leading(indent) +"}";
             case Stmt.Expression stmt -> codify(joe, stmt.expr()) + ";";
             case Stmt.Print stmt ->
                 "print " + codify(joe, stmt.expr()) + ";";
             case Stmt.Var stmt -> stmt.initializer() != null
                 ? "var " + stmt.name().lexeme() + " = " +
-                  codify(joe, stmt.initializer()) + ";"
+                codify(joe, stmt.initializer()) + ";"
                 : "var " + stmt.name().lexeme() + ";";
         };
+
+        return leading(indent) + code;
+    }
+
+    private static String leading(int indent) {
+        return "    ".repeat(indent);
     }
 
     /**

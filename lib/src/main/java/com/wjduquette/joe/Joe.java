@@ -60,6 +60,7 @@ public class Joe {
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(this, tokens);
         var statements = parser.parse();
+        System.out.println("<<<\n" + recodify(statements) + "\n>>>");
 
         // Stop if there was a syntax error.
         if (hadError) return null;
@@ -106,7 +107,7 @@ public class Joe {
 
     // Converts the statement into something that looks like code.
     String recodify(Stmt statement) {
-        return Codifier.codify(this, statement);
+        return recodify(List.of(statement));
     }
 
     // Converts the statements into something that looks like code.
