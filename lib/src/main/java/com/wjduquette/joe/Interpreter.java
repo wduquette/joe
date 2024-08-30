@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import java.util.List;
+
 class Interpreter {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -16,9 +18,26 @@ class Interpreter {
     //-------------------------------------------------------------------------
     // Public API
 
-    public Object interpret(Expr expression) throws RuntimeError {
-        Object value = evaluate(expression);
-        return value;
+    public Object interpret(List<Stmt> statements) throws RuntimeError {
+        Object result = null;
+        for (Stmt statement : statements) {
+            result = execute(statement);
+        }
+        return result;
+    }
+
+    private Object execute(Stmt statement) {
+        switch (statement) {
+            case Stmt.Expression stmt -> {
+                return evaluate(stmt.expr());
+            }
+            case Stmt.Print stmt -> {
+                var value = evaluate(stmt.expr());
+                System.out.println(joe.stringify(value));
+            }
+        }
+
+        return null;
     }
 
     Object evaluate(Expr expression) {

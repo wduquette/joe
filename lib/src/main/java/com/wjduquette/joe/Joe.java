@@ -48,7 +48,7 @@ public class Joe {
             String line = reader.readLine();
             if (line == null) break;
             var result = run(line);
-            if (!hadError) {
+            if (!hadError && result != null) {
                 System.out.println("-> " + stringify(result));
             }
             hadError = false;
@@ -59,13 +59,13 @@ public class Joe {
         Scanner scanner = new Scanner(this, source);
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(this, tokens);
-        Expr expression = parser.parse();
+        var statements = parser.parse();
 
         // Stop if there was a syntax error.
         if (hadError) return null;
 
         try {
-            return interpreter.interpret(expression);
+            return interpreter.interpret(statements);
         } catch (RuntimeError ex) {
             runtimeError(ex);
             return null;

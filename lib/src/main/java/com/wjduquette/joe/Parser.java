@@ -1,4 +1,5 @@
 package com.wjduquette.joe;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.wjduquette.joe.TokenType.*;
@@ -22,13 +23,39 @@ class Parser {
     //-------------------------------------------------------------------------
     // Public API
 
-    public Expr parse() {
-        try {
-            return expression();
-        } catch (SyntaxError error) {
-            return null;
+    public List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+
+        while (!isAtEnd()) {
+            statements.add(statement());
         }
+
+        return statements;
     }
+
+    //-------------------------------------------------------------------------
+    // Statements
+
+    private Stmt statement() {
+        if (match(PRINT)) return printStatement();
+
+        return expressionStatement();
+    }
+
+    private Stmt printStatement() {
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt expressionStatement() {
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(value);
+    }
+
+    //-------------------------------------------------------------------------
+    // Expressions
 
     private Expr expression() {
         return equality();
