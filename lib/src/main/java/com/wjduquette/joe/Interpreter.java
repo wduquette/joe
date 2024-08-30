@@ -7,6 +7,7 @@ class Interpreter {
     // Instance Variables
 
     private final Joe joe;
+    private Environment environment = new Environment();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -34,6 +35,13 @@ class Interpreter {
             case Stmt.Print stmt -> {
                 var value = evaluate(stmt.expr());
                 System.out.println(joe.stringify(value));
+            }
+            case Stmt.Var stmt -> {
+                Object value = null;
+                if (stmt.initializer() != null) {
+                    value = evaluate(stmt.initializer());
+                }
+                environment.define(stmt.name().lexeme(), value);
             }
         }
 
@@ -135,6 +143,7 @@ class Interpreter {
                         "Unexpected operator: " + expr.op());
                 };
             }
+            case Expr.Variable expr -> environment.get(expr.name());
         };
     }
 

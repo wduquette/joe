@@ -12,7 +12,7 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The actual interpreter.  Not sure why we need to retain it.
+    // The actual interpreter.  Retained because it owns the global environment.
     private final Interpreter interpreter;
     boolean hadError = false;
     boolean hadRuntimeError = false;

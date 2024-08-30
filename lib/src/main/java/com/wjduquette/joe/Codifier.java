@@ -36,6 +36,10 @@ public class Codifier {
             case Stmt.Expression stmt -> codify(joe, stmt.expr()) + ";";
             case Stmt.Print stmt ->
                 "print(" + codify(joe, stmt.expr()) + ");";
+            case Stmt.Var stmt -> stmt.initializer() != null
+                ? "var " + stmt.name().lexeme() + " = " +
+                  codify(joe, stmt.initializer()) + ";"
+                : "var " + stmt.name().lexeme() + ";";
         };
     }
 
@@ -59,6 +63,7 @@ public class Codifier {
             case Grouping expr -> "(" + codify(joe, expr.expr()) + ")";
             case Literal expr -> joe.codify(expr.value());
             case Unary expr -> expr.op().lexeme() + codify(joe, expr.right());
+            case Variable expr -> expr.name().lexeme();
         };
     }
 }

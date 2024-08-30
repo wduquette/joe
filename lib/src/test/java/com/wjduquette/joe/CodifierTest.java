@@ -12,6 +12,7 @@ public class CodifierTest extends Ted {
     Literal two = new Literal(2.0);
     Literal decimal = new Literal(2.5);
     Literal string  = new Literal("abc");
+    Variable variable  = new Variable(new Token(IDENTIFIER, "counter", null, 1));
 
     @Before
     public void setup() {
@@ -24,31 +25,6 @@ public class CodifierTest extends Ted {
 
     //-------------------------------------------------------------------------
     // Expressions
-
-    @Test
-    public void testExprLiteral() {
-        test("testExprLiteral");
-        check(joe.recodify(two)).eq("2");
-        check(joe.recodify(decimal)).eq("2.5");
-        check(joe.recodify(string)).eq("\"abc\"");
-    }
-
-    @Test
-    public void testExprUnary() {
-        test("testExprUnary");
-        var unary = new Unary(
-            new Token(MINUS, "-", null, 1),
-            two
-        );
-        check(joe.recodify(unary)).eq("-2");
-    }
-
-    @Test
-    public void testExprGrouping() {
-        test("testExprGrouping");
-        var group = new Grouping(decimal);
-        check(joe.recodify(group)).eq("(2.5)");
-    }
 
     @Test
     public void testExprBinary_star() {
@@ -81,6 +57,37 @@ public class CodifierTest extends Ted {
             two
         );
         check(joe.recodify(bin)).eq("1 + 2");
+    }
+
+    @Test
+    public void testExprGrouping() {
+        test("testExprGrouping");
+        var group = new Grouping(decimal);
+        check(joe.recodify(group)).eq("(2.5)");
+    }
+
+    @Test
+    public void testExprLiteral() {
+        test("testExprLiteral");
+        check(joe.recodify(two)).eq("2");
+        check(joe.recodify(decimal)).eq("2.5");
+        check(joe.recodify(string)).eq("\"abc\"");
+    }
+
+    @Test
+    public void testExprUnary() {
+        test("testExprUnary");
+        var unary = new Unary(
+            new Token(MINUS, "-", null, 1),
+            two
+        );
+        check(joe.recodify(unary)).eq("-2");
+    }
+
+    @Test
+    public void testExprVariable() {
+        test("testExprVariable");
+        check(joe.recodify(variable)).eq("counter");
     }
 
     //-------------------------------------------------------------------------
