@@ -23,6 +23,9 @@ public class ScannerTest extends Ted {
         check(scanString("\"-\\r-\"")).eq("-\r-");
         check(scanString("\"-\\f-\"")).eq("-\f-");
         check(scanString("\"-\\\"-\"")).eq("-\"-");
+        check(scanString("\"-\\u2192-\"")).eq("-→-");
+
+        check(scanString("\"-\\\"")).eq(null);
     }
 
     private String scanString(String input) {
