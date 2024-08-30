@@ -35,7 +35,7 @@ public class Codifier {
         return switch (statement) {
             case Stmt.Expression stmt -> codify(joe, stmt.expr()) + ";";
             case Stmt.Print stmt ->
-                "print(" + codify(joe, stmt.expr()) + ");";
+                "print " + codify(joe, stmt.expr()) + ";";
             case Stmt.Var stmt -> stmt.initializer() != null
                 ? "var " + stmt.name().lexeme() + " = " +
                   codify(joe, stmt.initializer()) + ";"
@@ -51,6 +51,8 @@ public class Codifier {
      */
     static String codify(Joe joe, Expr expression) {
         return switch (expression) {
+            case Assign expr ->
+                expr.name().lexeme() + " = " + codify(joe, expr.value());
             case Binary expr -> {
                 var type = expr.op().type();
                 // Let * and / bind visually tighter.

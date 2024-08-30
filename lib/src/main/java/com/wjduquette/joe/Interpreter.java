@@ -50,6 +50,11 @@ class Interpreter {
 
     Object evaluate(Expr expression) {
         return switch (expression) {
+            case Expr.Assign expr -> {
+                Object value = evaluate(expr.value());
+                environment.assign(expr.name(), value);
+                yield value;
+            }
             case Expr.Binary expr -> {
                 Object left = evaluate(expr.left());
                 Object right = evaluate(expr.right());

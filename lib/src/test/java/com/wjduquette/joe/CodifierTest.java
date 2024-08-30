@@ -27,6 +27,16 @@ public class CodifierTest extends Ted {
     // Expressions
 
     @Test
+    public void testExprAssign() {
+        test("testExprAssign");
+        var expr = new Assign(
+            new Token(IDENTIFIER, "x", null, 1),
+            two
+        );
+        check(joe.recodify(expr)).eq("x = 2");
+    }
+
+    @Test
     public void testExprBinary_star() {
         test("testExprBinary_star");
         var bin = new Binary(
@@ -103,9 +113,20 @@ public class CodifierTest extends Ted {
 
     @Test
     public void testStmtPrint() {
-        test("testStmtExpr");
+        test("testStmtPrint");
 
         var stmt = new Stmt.Print(two);
-        check(joe.recodify(stmt)).eq("print(2);");
+        check(joe.recodify(stmt)).eq("print 2;");
+    }
+
+    @Test
+    public void testStmtVar() {
+        test("testStmtVar");
+
+        var stmt = new Stmt.Var(
+            new Token(IDENTIFIER, "x", null, 1),
+            two
+        );
+        check(joe.recodify(stmt)).eq("var x = 2;");
     }
 }
