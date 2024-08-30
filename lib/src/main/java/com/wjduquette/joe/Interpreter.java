@@ -7,7 +7,7 @@ class Interpreter {
     // Instance Variables
 
     private final Joe joe;
-    private Environment environment = new Environment();
+    private final Environment environment = new Environment();
 
     //-------------------------------------------------------------------------
     // Constructor
