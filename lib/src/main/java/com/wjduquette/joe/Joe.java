@@ -101,7 +101,17 @@ public class Joe {
 
     // Converts the expression into something that looks like code.
     String recodify(Expr expr) {
-        return ASTPrinter.codify(this, expr);
+        return Codifier.codify(this, expr);
+    }
+
+    // Converts the statement into something that looks like code.
+    String recodify(Stmt statement) {
+        return Codifier.codify(this, statement);
+    }
+
+    // Converts the statements into something that looks like code.
+    String recodify(List<Stmt> statements) {
+        return Codifier.codify(this, statements);
     }
 
     //-------------------------------------------------------------------------
