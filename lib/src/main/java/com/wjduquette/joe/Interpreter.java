@@ -7,7 +7,7 @@ class Interpreter {
     // Instance Variables
 
     private final Joe joe;
-    private final Environment environment = new Environment();
+    private Environment environment = new Environment();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -29,6 +29,9 @@ class Interpreter {
 
     private Object execute(Stmt statement) {
         switch (statement) {
+            case Stmt.Block stmt -> {
+                return executeBlock(stmt.statements(), new Environment(environment));
+            }
             case Stmt.Expression stmt -> {
                 return evaluate(stmt.expr());
             }
@@ -47,6 +50,26 @@ class Interpreter {
 
         return null;
     }
+
+    Object executeBlock(List<Stmt> statements, Environment environment) {
+        Environment previous = this.environment;
+        Object result = null;
+
+        try {
+            this.environment = environment;
+
+            for (Stmt statement : statements) {
+                result = execute(statement);
+            }
+        } finally {
+            this.environment = previous;
+        }
+
+        return result;
+    }
+
+    //------------------------------------------------------------------------
+    // Expressions
 
     Object evaluate(Expr expression) {
         return switch (expression) {

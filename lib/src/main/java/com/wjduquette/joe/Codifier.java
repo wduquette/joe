@@ -33,6 +33,7 @@ public class Codifier {
      */
     static String codify(Joe joe, Stmt statement) {
         return switch (statement) {
+            case Stmt.Block stmt -> "{TODO}";
             case Stmt.Expression stmt -> codify(joe, stmt.expr()) + ";";
             case Stmt.Print stmt ->
                 "print " + codify(joe, stmt.expr()) + ";";
