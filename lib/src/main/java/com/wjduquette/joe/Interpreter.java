@@ -35,6 +35,16 @@ class Interpreter {
             case Stmt.Expression stmt -> {
                 return evaluate(stmt.expr());
             }
+            case Stmt.For stmt -> {
+                if (stmt.init() != null) {
+                    execute(stmt.init());
+                }
+
+                while (Joe.isTruthy(evaluate(stmt.condition()))) {
+                    execute(stmt.body());
+                    evaluate(stmt.incr());
+                }
+            }
             case Stmt.If stmt -> {
                 if (Joe.isTruthy(evaluate(stmt.condition()))) {
                     return execute(stmt.thenBranch());

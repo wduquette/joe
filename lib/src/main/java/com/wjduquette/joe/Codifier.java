@@ -45,6 +45,35 @@ class Codifier {
             case Stmt.Block stmt ->
                 "{\n" + recodify(indent + 1, stmt.statements()) + "\n"
                 + leading(indent) +"}";
+            case Stmt.For stmt -> {
+                var buff = new StringBuilder();
+                buff.append("for (");
+
+                if (stmt.init() != null) {
+                    buff.append(recodify(0, stmt.init()));
+                }
+
+                if (stmt.condition() != null) {
+                    buff.append(" ")
+                        .append(recodify(stmt.condition()))
+                        .append(";");
+                }
+
+                if (stmt.incr() != null) {
+                    buff.append(" ")
+                        .append(recodify(stmt.incr()));
+                }
+
+                buff.append(")");
+
+                if (stmt.body() instanceof Stmt.Block block) {
+                    buff.append(block(indent, block));
+                } else {
+                    buff.append("\n")
+                        .append(recodify(indent + 1, stmt.body()));
+                }
+                yield buff.toString();
+            }
             case Stmt.If stmt -> {
                 var buff = new StringBuilder();
                 buff.append("if (")

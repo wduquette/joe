@@ -60,12 +60,47 @@ class Parser {
     }
 
     private Stmt statement() {
+        if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
         if (match(WHILE)) return whileStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
+    }
+
+    private Stmt forStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+        // Initializer
+        Stmt init;
+        if (match(SEMICOLON)) {
+            init = null;
+        } else if (match(VAR)) {
+            init = varDeclaration();
+        } else {
+            init = expressionStatement();
+        }
+
+        // Condition
+        Expr condition = null;
+        if (!check(SEMICOLON)) {
+            System.out.println("B1");
+            condition = expression();
+        }
+        consume(SEMICOLON, "Expect ';' after loop condition.");
+
+        // Increment
+        Expr incr = null;
+        if (!check(RIGHT_PAREN)) {
+            incr = expression();
+        }
+        consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+
+        // Body
+        Stmt body = statement();
+
+        return new Stmt.For(init, condition, incr, body);
     }
 
     private Stmt ifStatement() {
