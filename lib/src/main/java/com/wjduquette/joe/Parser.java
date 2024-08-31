@@ -4,7 +4,10 @@ import java.util.List;
 
 import static com.wjduquette.joe.TokenType.*;
 
+@SuppressWarnings("ThrowableNotThrown")
 class Parser {
+    private static final int MAX_CALL_ARGUMENTS = 255;
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -38,6 +41,7 @@ class Parser {
 
     private Stmt declaration() {
         try {
+            if (match(FUNCTION)) return functionDeclaration("function");
             if (match(VAR)) return varDeclaration();
 
             return statement();
@@ -60,11 +64,78 @@ class Parser {
     }
 
     private Stmt statement() {
+        if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
+        if (match(RETURN)) return returnStatement();
+        if (match(WHILE)) return whileStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
+    }
+
+    private Stmt expressionStatement() {
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(value);
+    }
+
+    private Stmt forStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+        // Initializer
+        Stmt init;
+        if (match(SEMICOLON)) {
+            init = null;
+        } else if (match(VAR)) {
+            init = varDeclaration();
+        } else {
+            init = expressionStatement();
+        }
+
+        // Condition
+        Expr condition = null;
+        if (!check(SEMICOLON)) {
+            System.out.println("B1");
+            condition = expression();
+        }
+        consume(SEMICOLON, "Expect ';' after loop condition.");
+
+        // Increment
+        Expr incr = null;
+        if (!check(RIGHT_PAREN)) {
+            incr = expression();
+        }
+        consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+
+        // Body
+        Stmt body = statement();
+
+        return new Stmt.For(init, condition, incr, body);
+    }
+
+    private Stmt.Function functionDeclaration(String kind) {
+        Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
+
+        consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+
+        List<Token> parameters = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (parameters.size() >= MAX_CALL_ARGUMENTS) {
+                    error(peek(), "Expected no more than " + MAX_CALL_ARGUMENTS +
+                        " parameters.");
+                }
+
+                parameters.add(
+                    consume(IDENTIFIER, "Expected parameter name."));
+            } while (match(COMMA));
+        }
+        consume(RIGHT_PAREN, "Expected ')' after parameter list.");
+
+        consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
+        List<Stmt> body = block();
+        return new Stmt.Function(kind, name, parameters, body);
     }
 
     private Stmt ifStatement() {
@@ -87,10 +158,25 @@ class Parser {
         return new Stmt.Print(value);
     }
 
-    private Stmt expressionStatement() {
-        Expr value = expression();
-        consume(SEMICOLON, "Expect ';' after expression.");
-        return new Stmt.Expression(value);
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr value = null;
+
+        if (!check(SEMICOLON)) {
+            value = expression();
+        }
+
+        consume(SEMICOLON, "Expected ';' after return value.");
+        return new Stmt.Return(keyword, value);
+    }
+
+    private Stmt whileStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'while'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after condition.");
+        Stmt body = statement();
+
+        return new Stmt.While(condition, body);
     }
 
     private List<Stmt> block() {
@@ -208,7 +294,39 @@ class Parser {
             return new Expr.Unary(operator, right);
         }
 
-        return primary();
+        return call();
+    }
+
+    private Expr call() {
+        Expr expr = primary();
+
+        while (true) {
+            if (match(LEFT_PAREN)) {
+                expr = finishCall(expr);
+            } else {
+                break;
+            }
+        }
+
+        return expr;
+    }
+
+    private Expr finishCall(Expr callee) {
+        List<Expr> arguments = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (arguments.size() >= MAX_CALL_ARGUMENTS) {
+                    error(peek(), "Call has more than " +
+                        MAX_CALL_ARGUMENTS + " arguments.");
+                }
+                arguments.add(expression());
+            } while (match(COMMA));
+        }
+
+        Token paren = consume(RIGHT_PAREN,
+            "Expect ')' after arguments.");
+
+        return new Expr.Call(callee, paren, arguments);
     }
 
     private Expr primary() {
@@ -293,13 +411,14 @@ class Parser {
             // statement, return.
             switch (peek().type()) {
                 case CLASS:
-                case FUN:
-                case VAR:
                 case FOR:
+                case FUNCTION:
                 case IF:
-                case WHILE:
+                case METHOD:
                 case PRINT:
                 case RETURN:
+                case VAR:
+                case WHILE:
                     return;
             }
 

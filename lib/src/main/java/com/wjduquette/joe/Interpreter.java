@@ -1,19 +1,41 @@
 package com.wjduquette.joe;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-class Interpreter {
+public class Interpreter {
     //-------------------------------------------------------------------------
     // Instance Variables
 
     private final Joe joe;
-    private Environment environment = new Environment();
+    final Environment globals = new Environment();
+    private Environment environment = globals;
+    private final Map<Expr, Integer> locals = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
 
     public Interpreter(Joe joe) {
         this.joe = joe;
+
+        globals.define("stringify",
+            new NativeFunction("stringify", this::_stringify));
+        globals.define("typeName",
+            new NativeFunction("typeName", this::_typeName));
+    }
+
+    // TODO: Define embedding API in Joe, standard library
+    private Object _stringify(Interpreter interp, List<Object> args) {
+        Joe.exactArity(args, 1, "stringify(value)");
+
+        return joe.stringify(args.get(0));
+    }
+    private Object _typeName(Interpreter interp, List<Object> args) {
+        Joe.exactArity(args, 1, "typeName(value)");
+
+        return joe.typeName(args.get(0));
     }
 
     //-------------------------------------------------------------------------
@@ -35,6 +57,20 @@ class Interpreter {
             case Stmt.Expression stmt -> {
                 return evaluate(stmt.expr());
             }
+            case Stmt.For stmt -> {
+                if (stmt.init() != null) {
+                    execute(stmt.init());
+                }
+
+                while (Joe.isTruthy(evaluate(stmt.condition()))) {
+                    execute(stmt.body());
+                    evaluate(stmt.incr());
+                }
+            }
+            case Stmt.Function stmt -> {
+                var function = new JoeFunction(stmt, environment);
+                environment.define(stmt.name().lexeme(), function);
+            }
             case Stmt.If stmt -> {
                 if (Joe.isTruthy(evaluate(stmt.condition()))) {
                     return execute(stmt.thenBranch());
@@ -46,12 +82,23 @@ class Interpreter {
                 var value = evaluate(stmt.expr());
                 System.out.println(joe.stringify(value));
             }
+            case Stmt.Return stmt -> {
+                Object value = null;
+                if (stmt.value() != null) value = evaluate(stmt.value());
+
+                throw new Return(value);
+            }
             case Stmt.Var stmt -> {
                 Object value = null;
                 if (stmt.initializer() != null) {
                     value = evaluate(stmt.initializer());
                 }
                 environment.define(stmt.name().lexeme(), value);
+            }
+            case Stmt.While stmt -> {
+                while (Joe.isTruthy(evaluate(stmt.condition()))) {
+                    execute(stmt.body());
+                }
             }
         }
 
@@ -75,6 +122,10 @@ class Interpreter {
         return result;
     }
 
+    void resolve(Expr expr, int depth) {
+        locals.put(expr, depth);
+    }
+
     //------------------------------------------------------------------------
     // Expressions
 
@@ -82,7 +133,13 @@ class Interpreter {
         return switch (expression) {
             case Expr.Assign expr -> {
                 Object value = evaluate(expr.value());
-                environment.assign(expr.name(), value);
+                var distance = locals.get(expr);
+
+                if (distance != null) {
+                    environment.assignAt(distance, expr.name(), value);
+                } else {
+                    globals.assign(expr.name(), value);
+                }
                 yield value;
             }
             case Expr.Binary expr -> {
@@ -163,6 +220,23 @@ class Interpreter {
                         "Unexpected operator: " + expr.op());
                 };
             }
+            case Expr.Call expr -> {
+                Object callee = evaluate(expr.callee());
+
+                var args = new ArrayList<>();
+                for (var arg : expr.arguments()) {
+                    args.add(evaluate(arg));
+                }
+
+                if (callee instanceof JoeCallable callable) {
+                    // TODO: Should pass Joe, not Interpreter
+                    // TODO: Check function arity in JoeFunction!
+                    yield callable.call(this, args);
+                } else {
+                    // TODO add recodify(expr.callee()) as a stack frame!
+                    throw joe.expected("a callable", callee);
+                }
+            }
             case Expr.Grouping expr -> evaluate(expr.expr());
             case Expr.Literal expr -> expr.value();
             case Expr.Logical expr -> {
@@ -189,8 +263,17 @@ class Interpreter {
                         "Unexpected operator: " + expr.op());
                 };
             }
-            case Expr.Variable expr -> environment.get(expr.name());
+            case Expr.Variable expr -> lookupVariable(expr.name(), expr);
         };
+    }
+
+    private Object lookupVariable(Token name, Expr expr) {
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+            return environment.getAt(distance, name.lexeme());
+        } else {
+            return globals.get(name);
+        }
     }
 
     //-------------------------------------------------------------------------

@@ -9,6 +9,12 @@ import static com.wjduquette.joe.TokenType.*;
 /**
  * Given the AST for a list of statements, a single statement, or a single
  * expression, converts it back to (badly formatted) code.
+ *
+ * <p><b>NOTE:</b> Recodifying expressions is useful in producing high-quality
+ * error messages.  Recodifying statements accurately means that statements
+ * can't easily be implemented using desugaring techniques.  It remains to
+ * be seen whether recodifying statements provides enough value to be retained.
+ * </p>
  */
 class Codifier {
     private final Joe joe;
@@ -27,69 +33,108 @@ class Codifier {
         return recodify(0, statements);
     }
 
-    String recodify(int indent, List<Stmt> statements) {
+    // Recodifies a list of statements with the desired indent level
+    private String recodify(int indent, List<Stmt> statements) {
         return statements.stream()
             .map(s -> recodify(indent, s))
             .collect(Collectors.joining("\n"));
     }
 
-    /**
-     * Codifies a complete statement.
-     *
-     * @param indent    The number of indents
-     * @param statement The statement
-     * @return The "code" string
-     */
-    String recodify(int indent, Stmt statement) {
+    // Recodifies a single statement with the desired indent level.
+    private String recodify(int indent, Stmt statement) {
         var code = switch (statement) {
             case Stmt.Block stmt ->
                 "{\n" + recodify(indent + 1, stmt.statements()) + "\n"
                 + leading(indent) +"}";
+            case Stmt.For stmt -> {
+                var buff = new StringBuilder();
+                buff.append("for (");
+
+                if (stmt.init() != null) {
+                    buff.append(recodify(0, stmt.init()));
+                }
+
+                if (stmt.condition() != null) {
+                    buff.append(" ")
+                        .append(recodify(stmt.condition()))
+                        .append(";");
+                }
+
+                if (stmt.incr() != null) {
+                    buff.append(" ")
+                        .append(recodify(stmt.incr()));
+                }
+
+                buff.append(")")
+                    .append(body(indent, stmt.body()));
+                yield buff.toString();
+            }
+            case Stmt.Function stmt -> {
+                var params = stmt.params().stream()
+                    .map(Token::lexeme)
+                    .collect(Collectors.joining(", "));
+                yield stmt.name().lexeme() +
+                    "(" + params + ")" +
+                    body(indent, stmt.body());
+            }
             case Stmt.If stmt -> {
                 var buff = new StringBuilder();
                 buff.append("if (")
                     .append(recodify(stmt.condition()))
-                    .append(")");
-
-                if (stmt.thenBranch() instanceof Stmt.Block block) {
-                    buff.append(" {\n")
-                        .append(recodify(indent + 1, block.statements()))
-                        .append("\n")
-                        .append(leading(indent))
-                        .append("}\n");
-                } else {
-                    buff.append(" ")
-                        .append(recodify(0, stmt.thenBranch()))
-                        .append("\n");
-                }
+                    .append(")")
+                    .append(body(0, stmt.thenBranch()))
+                    ;
 
                 if (stmt.elseBranch() != null) {
-                    buff.append(leading(indent))
-                        .append("else");
-
-                    if (stmt.elseBranch() instanceof Stmt.Block block) {
-                        buff.append(" {\n")
-                            .append(recodify(indent + 1, block.statements()))
-                            .append("\n")
-                            .append(leading(indent))
-                            .append("}\n");
-                    } else {
-                        buff.append(" ")
-                            .append(recodify(0, stmt.elseBranch()));
-                    }
+                    buff.append("\n")
+                        .append(leading(indent))
+                        .append("else")
+                        .append(body(0, stmt.elseBranch()));
                 }
                 yield buff.toString();
             }
             case Stmt.Expression stmt -> recodify(stmt.expr()) + ";";
+            case Stmt.Return stmt ->
+                "return" +
+                    (stmt.value() != null ? " " + recodify(stmt.value()) : "")
+                    + ";";
             case Stmt.Print stmt ->
                 "print " + recodify(stmt.expr()) + ";";
             case Stmt.Var stmt -> stmt.initializer() != null
                 ? "var " + stmt.name().lexeme() + " = " +
                 recodify(stmt.initializer()) + ";"
                 : "var " + stmt.name().lexeme() + ";";
+            case Stmt.While stmt ->
+                    "while (" + recodify(stmt.condition()) + ")" +
+                    body(indent, stmt.body());
         };
 
         return leading(indent) + code;
+    }
+
+    // Recodifies a block with the given indent level.  The opening
+    // brace is on the current line, the statements are indented an
+    // additional level, and the close brace is on a line by itself
+    // at the given indent level.
+    private String body(int indent, Stmt stmt) {
+        if (stmt instanceof Stmt.Block block) {
+            return body(indent, block.statements());
+        } else {
+            return "\n" + recodify(indent + 1, stmt);
+        }
+    }
+
+    // Recodifies a block's statements with the given indent level.  The opening
+    // brace is on the current line, the statements are indented an
+    // additional level, and the close brace is on a line by itself
+    // at the given indent level.
+    private String body(int indent, List<Stmt> statements) {
+        return
+            " {\n" +
+            recodify(indent + 1, statements) +
+            "\n" +
+            leading(indent) +
+            "}";
     }
 
     private String leading(int indent) {
@@ -114,6 +159,12 @@ class Codifier {
                 yield recodify(expr.left()) +
                     space + expr.op().lexeme() + space +
                     recodify(expr.right());
+            }
+            case Call expr -> {
+                var args = expr.arguments().stream()
+                    .map(this::recodify)
+                    .collect(Collectors.joining(", "));
+                yield recodify(expr.callee()) + "(" + args + ")";
             }
             case Grouping expr -> "(" + recodify(expr.expr()) + ")";
             case Literal expr -> joe.codify(expr.value());

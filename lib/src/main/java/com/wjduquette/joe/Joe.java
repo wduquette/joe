@@ -62,14 +62,21 @@ public class Joe {
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(this, tokens);
         var statements = parser.parse();
-        System.out.println("<<<\n" + recodify(statements) + "\n>>>");
 
         // Stop if there was a syntax error.
         if (hadError) return null;
 
+        System.out.println("<<<\n" + recodify(statements) + "\n>>>");
+
+        Resolver resolver = new Resolver(this, interpreter);
+        resolver.resolve(statements);
+
+        // Stop if there was a resolution error.
+        if (hadError) return null;
+
         try {
             return interpreter.interpret(statements);
-        } catch (RuntimeError ex) {
+        } catch (JoeError ex) {
             runtimeError(ex);
             return null;
         }
@@ -78,9 +85,13 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Output and Error Handling
 
-    private void runtimeError(RuntimeError error) {
-        System.err.println(error.getMessage() +
-            "\n[line " + error.line() + "]");
+    private void runtimeError(JoeError error) {
+        if (error.line() >= 0) {
+            System.err.println(error.getMessage() +
+                "\n[line " + error.line() + "]");
+        } else {
+            System.err.println(error.getMessage());
+        }
         hadRuntimeError = true;
     }
 
@@ -166,6 +177,22 @@ public class Joe {
         }
     }
 
+    // Returns the type of the value, for use in error messages.
+
+    /**
+     * Gets the script-level type of the value, or null if null.
+     * This is primarily for use in error messages.
+     * @param value The value
+     * @return The type string, or null.
+     */
+    public String typeName(Object value) {
+        return switch (value) {
+            case null -> null;
+            case JoeFunction function -> toInitialCap(function.kind());
+            default -> value.getClass().getSimpleName();
+        };
+    }
+
     /**
      * Given an arbitrary string, escapes all typical control characters as
      * they would appear in Java or Joe code.
@@ -224,6 +251,46 @@ public class Joe {
 
         return a.equals(b);
     }
+
+    private String toInitialCap(String string) {
+        if (string != null && !string.isEmpty()) {
+            return Character.toUpperCase(string.charAt(0)) +
+                string.substring(1);
+        } else {
+            return string;
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    // Argument parsing and error handling helpers
+
+    /**
+     * Throws an arity check failure if the arguments list contains the wrong
+     * number of arguments.
+     * @param args The argument list
+     * @param arity The expected arity
+     * @param signature The signature string.
+     * @throws JoeError on failure
+     */
+    public static void exactArity(List<Object> args, int arity, String signature) {
+        if (args.size() != arity) {
+            throw new JoeError("Wrong number of arguments, expected: " + signature);
+        }
+    }
+
+    /**
+     * Factory, constructs a JoeError to be thrown by the caller.
+     * @param what What kind of value the caller expected
+     * @param got The value the caller got
+     * @return The error
+     */
+    public JoeError expected(String what, Object got) {
+        var message = "Expected " + what + ", got " +
+            (got != null ? typeName(got) + " " : "") +
+            "'"  + codify(got) + "'.";
+        return new JoeError(message);
+    }
+
 
     //-------------------------------------------------------------------------
     // Main

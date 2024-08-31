@@ -10,7 +10,8 @@ public class RuntimeError extends JoeError {
         this.lexeme = token.lexeme();
     }
 
-    int line() {
+    @Override
+    public int line() {
         return line;
     }
 }
