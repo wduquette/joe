@@ -4,7 +4,6 @@ import com.wjduquette.joe.tools.ReplTool;
 import com.wjduquette.joe.tools.RunTool;
 import com.wjduquette.joe.tools.ToolLauncher;
 
-import java.io.IOException;
 import java.util.List;
 
 public class App {
