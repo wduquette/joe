@@ -14,6 +14,7 @@ public class Joe {
 
     // The actual interpreter.  Retained because it owns the global environment.
     private final Interpreter interpreter;
+    private final Codifier codifier;
     boolean hadError = false;
     boolean hadRuntimeError = false;
 
@@ -22,6 +23,7 @@ public class Joe {
 
     public Joe() {
         interpreter = new Interpreter(this);
+        codifier = new Codifier(this);
     }
 
     //-------------------------------------------------------------------------
@@ -102,7 +104,7 @@ public class Joe {
 
     // Converts the expression into something that looks like code.
     String recodify(Expr expr) {
-        return Codifier.codify(this, expr);
+        return codifier.recodify(expr);
     }
 
     // Converts the statement into something that looks like code.
@@ -112,7 +114,7 @@ public class Joe {
 
     // Converts the statements into something that looks like code.
     String recodify(List<Stmt> statements) {
-        return Codifier.codify(this, statements);
+        return codifier.recodify(statements);
     }
 
     //-------------------------------------------------------------------------
