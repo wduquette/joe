@@ -1,5 +1,6 @@
 package com.wjduquette.joe;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class Interpreter {
@@ -177,6 +178,26 @@ class Interpreter {
                     default -> throw new IllegalStateException(
                         "Unexpected operator: " + expr.op());
                 };
+            }
+            case Expr.Call expr -> {
+                Object callee = evaluate(expr.callee());
+
+                var args = new ArrayList<>();
+                for (var arg : expr.arguments()) {
+                    args.add(evaluate(arg));
+                }
+
+                if (callee instanceof JoeCallable callable) {
+                    // TODO: Should pass Joe, not Interpreter
+                    // TODO: Check function arity in JoeFunction!
+                    yield callable.call(this, args);
+                } else {
+                    // TODO add expr.callee() as a stack frame!
+                    throw new RuntimeError(expr.paren(),
+                        "Expected a callable, got '" +
+                        // TODO Include typeOf(callee)!
+                        joe.stringify(callee) + "'.");
+                }
             }
             case Expr.Grouping expr -> evaluate(expr.expr());
             case Expr.Literal expr -> expr.value();
