@@ -1,10 +1,13 @@
 package com.wjduquette.joe;
 
+import java.util.List;
+
 class Interpreter {
     //-------------------------------------------------------------------------
     // Instance Variables
 
     private final Joe joe;
+    private Environment environment = new Environment();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -16,13 +19,72 @@ class Interpreter {
     //-------------------------------------------------------------------------
     // Public API
 
-    public Object interpret(Expr expression) throws RuntimeError {
-        Object value = evaluate(expression);
-        return value;
+    public Object interpret(List<Stmt> statements) throws RuntimeError {
+        Object result = null;
+        for (Stmt statement : statements) {
+            result = execute(statement);
+        }
+        return result;
     }
+
+    private Object execute(Stmt statement) {
+        switch (statement) {
+            case Stmt.Block stmt -> {
+                return executeBlock(stmt.statements(), new Environment(environment));
+            }
+            case Stmt.Expression stmt -> {
+                return evaluate(stmt.expr());
+            }
+            case Stmt.If stmt -> {
+                if (Joe.isTruthy(evaluate(stmt.condition()))) {
+                    return execute(stmt.thenBranch());
+                } else if (stmt.elseBranch() != null) {
+                    return execute(stmt.elseBranch());
+                }
+            }
+            case Stmt.Print stmt -> {
+                var value = evaluate(stmt.expr());
+                System.out.println(joe.stringify(value));
+            }
+            case Stmt.Var stmt -> {
+                Object value = null;
+                if (stmt.initializer() != null) {
+                    value = evaluate(stmt.initializer());
+                }
+                environment.define(stmt.name().lexeme(), value);
+            }
+        }
+
+        return null;
+    }
+
+    Object executeBlock(List<Stmt> statements, Environment environment) {
+        Environment previous = this.environment;
+        Object result = null;
+
+        try {
+            this.environment = environment;
+
+            for (Stmt statement : statements) {
+                result = execute(statement);
+            }
+        } finally {
+            this.environment = previous;
+        }
+
+        return result;
+    }
+
+    //------------------------------------------------------------------------
+    // Expressions
 
     Object evaluate(Expr expression) {
         return switch (expression) {
+            case Expr.Assign expr -> {
+                Object value = evaluate(expr.value());
+                environment.assign(expr.name(), value);
+                yield value;
+            }
             case Expr.Binary expr -> {
                 Object left = evaluate(expr.left());
                 Object right = evaluate(expr.right());
@@ -103,6 +165,17 @@ class Interpreter {
             }
             case Expr.Grouping expr -> evaluate(expr.expr());
             case Expr.Literal expr -> expr.value();
+            case Expr.Logical expr -> {
+                Object left = evaluate(expr.left());
+
+                if (expr.op().type() == TokenType.OR) {
+                    if (Joe.isTruthy(left)) yield left;
+                } else {
+                    if (!Joe.isTruthy(left)) yield left;
+                }
+
+                yield evaluate(expr.right());
+            }
             case Expr.Unary expr -> {
                 Object right = evaluate(expr.right());
 
@@ -116,6 +189,7 @@ class Interpreter {
                         "Unexpected operator: " + expr.op());
                 };
             }
+            case Expr.Variable expr -> environment.get(expr.name());
         };
     }
 

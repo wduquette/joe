@@ -58,12 +58,14 @@ public class JoeTest extends Ted {
     @Test
     public void testEscape() {
         test("testEscape");
+        check(Joe.escape("-abcd-")).eq("-abcd-");
         check(Joe.escape("-\\-")).eq("-\\\\-");
         check(Joe.escape("-\t-")).eq("-\\t-");
         check(Joe.escape("-\b-")).eq("-\\b-");
         check(Joe.escape("-\n-")).eq("-\\n-");
         check(Joe.escape("-\f-")).eq("-\\f-");
         check(Joe.escape("-\"-")).eq("-\\\"-");
+        check(Joe.escape("-→-")).eq("-\\u2192-");
     }
 
     @Test

@@ -142,9 +142,36 @@ public class Scanner {
     }
 
     private void string() {
+        var buff = new StringBuilder();
+
         while (peek() != '"' && !isAtEnd()) {
-            if (peek() == '\n') line++;
-            advance();
+            var c = peek();
+
+            switch (c) {
+                case '\\' -> {
+                    if (!isAtEnd()) {
+                        advance(); // Skip past the backslash
+                        var escape = advance();
+                        switch (escape) {
+                            case '\\' -> buff.append('\\');
+                            case 't' -> buff.append('\t');
+                            case 'b' -> buff.append('\b');
+                            case 'n' -> buff.append('\n');
+                            case 'r' -> buff.append('\r');
+                            case 'f' -> buff.append('\f');
+                            case '"' -> buff.append('"');
+                            case 'u' -> unicode(buff);
+                            default -> joe.error(line,
+                                "Unexpected escape: \\" + peek());
+                        }
+                    }
+                }
+                case '\n' -> {
+                    line++;
+                    buff.append(advance());
+                }
+                default -> buff.append(advance());
+            }
         }
 
         if (isAtEnd()) {
@@ -155,9 +182,24 @@ public class Scanner {
         // The closing quote
         advance();
 
-        // Trim the surrounding quotes.
-        String value = source.substring(start + 1, current - 1);
-        addToken(STRING, value);
+        // Add the unescaped string.
+        addToken(STRING, buff.toString());
+    }
+
+    private void unicode(StringBuilder buff) {
+        var mark = current;
+
+        while (current - mark < 4 && isHexDigit(peek())) {
+            advance();
+        }
+
+        if (current - mark == 4) {
+            var hexCode = source.substring(mark, current);
+            var hex = Integer.parseInt(hexCode, 16);
+            buff.append((char)hex);
+        } else {
+            joe.error(line, "Incomplete Unicode escape");
+        }
     }
 
     private boolean match(char expected) {
@@ -190,6 +232,12 @@ public class Scanner {
 
     private boolean isDigit(char c) {
         return c >= '0' && c <= '9';
+    }
+
+    private boolean isHexDigit(char c) {
+        return (c >= '0' && c <= '9')
+            || (c >= 'A' && c <= 'F')
+            || (c >= 'a' && c <= 'f');
     }
 
     private boolean isAtEnd() {

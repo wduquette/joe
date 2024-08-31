@@ -12,8 +12,9 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The actual interpreter.  Not sure why we need to retain it.
+    // The actual interpreter.  Retained because it owns the global environment.
     private final Interpreter interpreter;
+    private final Codifier codifier;
     boolean hadError = false;
     boolean hadRuntimeError = false;
 
@@ -22,6 +23,7 @@ public class Joe {
 
     public Joe() {
         interpreter = new Interpreter(this);
+        codifier = new Codifier(this);
     }
 
     //-------------------------------------------------------------------------
@@ -39,7 +41,7 @@ public class Joe {
         return result;
     }
 
-    private void runPrompt() throws IOException {
+    public void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
@@ -48,24 +50,25 @@ public class Joe {
             String line = reader.readLine();
             if (line == null) break;
             var result = run(line);
-            if (!hadError) {
+            if (!hadError && result != null) {
                 System.out.println("-> " + stringify(result));
             }
             hadError = false;
         }
     }
 
-    private Object run(String source) {
+    public Object run(String source) {
         Scanner scanner = new Scanner(this, source);
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(this, tokens);
-        Expr expression = parser.parse();
+        var statements = parser.parse();
+        System.out.println("<<<\n" + recodify(statements) + "\n>>>");
 
         // Stop if there was a syntax error.
         if (hadError) return null;
 
         try {
-            return interpreter.interpret(expression);
+            return interpreter.interpret(statements);
         } catch (RuntimeError ex) {
             runtimeError(ex);
             return null;
@@ -101,7 +104,17 @@ public class Joe {
 
     // Converts the expression into something that looks like code.
     String recodify(Expr expr) {
-        return ASTPrinter.codify(this, expr);
+        return codifier.recodify(expr);
+    }
+
+    // Converts the statement into something that looks like code.
+    String recodify(Stmt statement) {
+        return recodify(List.of(statement));
+    }
+
+    // Converts the statements into something that looks like code.
+    String recodify(List<Stmt> statements) {
+        return codifier.recodify(statements);
     }
 
     //-------------------------------------------------------------------------
@@ -161,14 +174,29 @@ public class Joe {
      * @return The string with escapes
      */
     public static String escape(String string){
-        return string
-            .replace("\\", "\\\\")
-            .replace("\t", "\\t")
-            .replace("\b", "\\b")
-            .replace("\n", "\\n")
-            .replace("\r", "\\r")
-            .replace("\f", "\\f")
-            .replace("\"", "\\\"");
+        var buff = new StringBuilder();
+
+        for (int i = 0; i < string.length(); i++) {
+            var c = string.charAt(i);
+            switch (c) {
+                case '\\' -> buff.append("\\\\");
+                case '\t' -> buff.append("\\t");
+                case '\b' -> buff.append("\\b");
+                case '\n' -> buff.append("\\n");
+                case '\r' -> buff.append("\\r");
+                case '\f' -> buff.append("\\f");
+                case '"' -> buff.append("\\\"");
+                default -> {
+                    if (c < 256) {
+                        buff.append(c);
+                    } else {
+                        var hex = (int)c;
+                        buff.append(String.format("\\u%04X", hex));
+                    }
+                }
+            }
+        }
+        return buff.toString();
     }
 
     /**

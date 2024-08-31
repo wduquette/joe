@@ -1,0 +1,6 @@
+var flag = false;
+print flag;
+if (flag)
+    print "It's true!";
+else
+    print "Oh, snap!";
