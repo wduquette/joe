@@ -9,6 +9,12 @@ import static com.wjduquette.joe.TokenType.*;
 /**
  * Given the AST for a list of statements, a single statement, or a single
  * expression, converts it back to (badly formatted) code.
+ *
+ * <p><b>NOTE:</b> Recodifying expressions is useful in producing high-quality
+ * error messages.  Recodifying statements accurately means that statements
+ * can't easily be implemented using desugaring techniques.  It remains to
+ * be seen whether recodifying statements provides enough value to be retained.
+ * </p>
  */
 class Codifier {
     private final Joe joe;
@@ -27,20 +33,15 @@ class Codifier {
         return recodify(0, statements);
     }
 
-    String recodify(int indent, List<Stmt> statements) {
+    // Recodifies a list of statements with the desired indent level
+    private String recodify(int indent, List<Stmt> statements) {
         return statements.stream()
             .map(s -> recodify(indent, s))
             .collect(Collectors.joining("\n"));
     }
 
-    /**
-     * Codifies a complete statement.
-     *
-     * @param indent    The number of indents
-     * @param statement The statement
-     * @return The "code" string
-     */
-    String recodify(int indent, Stmt statement) {
+    // Recodifies a single statement with the desired indent level.
+    private String recodify(int indent, Stmt statement) {
         var code = switch (statement) {
             case Stmt.Block stmt ->
                 "{\n" + recodify(indent + 1, stmt.statements()) + "\n"
@@ -64,40 +65,23 @@ class Codifier {
                         .append(recodify(stmt.incr()));
                 }
 
-                buff.append(")");
-
-                if (stmt.body() instanceof Stmt.Block block) {
-                    buff.append(block(indent, block));
-                } else {
-                    buff.append("\n")
-                        .append(recodify(indent + 1, stmt.body()));
-                }
+                buff.append(")")
+                    .append(body(indent, stmt.body()));
                 yield buff.toString();
             }
             case Stmt.If stmt -> {
                 var buff = new StringBuilder();
                 buff.append("if (")
                     .append(recodify(stmt.condition()))
-                    .append(")");
-
-                if (stmt.thenBranch() instanceof Stmt.Block block) {
-                    buff.append(block(indent, block));
-                } else {
-                    buff.append("\n")
-                        .append(recodify(indent + 1, stmt.thenBranch()));
-                }
+                    .append(")")
+                    .append(body(0, stmt.thenBranch()))
+                    ;
 
                 if (stmt.elseBranch() != null) {
                     buff.append("\n")
                         .append(leading(indent))
-                        .append("else");
-
-                    if (stmt.elseBranch() instanceof Stmt.Block block) {
-                        buff.append(block(indent, block));
-                    } else {
-                        buff.append(" ")
-                            .append(recodify(0, stmt.elseBranch()));
-                    }
+                        .append("else")
+                        .append(body(0, stmt.elseBranch()));
                 }
                 yield buff.toString();
             }
@@ -112,14 +96,10 @@ class Codifier {
                 var buff = new StringBuilder();
                 buff.append("while (")
                     .append(recodify(stmt.condition()))
-                    .append(")");
+                    .append(")")
+                    .append(body(indent, stmt.body()))
+                    ;
 
-                if (stmt.body() instanceof Stmt.Block block) {
-                    buff.append(block(indent, block));
-                } else {
-                    buff.append("\n")
-                        .append(recodify(indent + 1, stmt.body()));
-                }
                 yield buff.toString();
             }
         };
@@ -127,13 +107,21 @@ class Codifier {
         return leading(indent) + code;
     }
 
-    private String block(int indent, Stmt.Block block) {
-        return
-            " {\n" +
-            recodify(indent + 1, block.statements()) +
-            "\n" +
-            leading(indent) +
-            "}";
+    // Recodifies a block with the given indent level.  The opening
+    // brace is on the current line, the statements are indented an
+    // additional level, and the close brace is on a line by itself
+    // at the given indent level.
+    private String body(int indent, Stmt stmt) {
+        if (stmt instanceof Stmt.Block block) {
+            return
+                " {\n" +
+                recodify(indent + 1, block.statements()) +
+                "\n" +
+                leading(indent) +
+                "}";
+        } else {
+            return "\n" + recodify(indent + 1, stmt);
+        }
     }
 
     private String leading(int indent) {
