@@ -290,23 +290,4 @@ public class Joe {
             "'"  + codify(got) + "'.";
         return new JoeError(message);
     }
-
-
-    //-------------------------------------------------------------------------
-    // Main
-    //
-    // This will be extracted as JoeApp
-
-    public static void main(String[] args) throws IOException {
-        var joe = new Joe();
-
-        if (args.length > 1) {
-            System.out.println("Usage: joe [script]");
-            System.exit(64);
-        } else if (args.length == 1) {
-            joe.runFile(args[0]);
-        } else {
-            joe.runPrompt();
-        }
-    }
 }
