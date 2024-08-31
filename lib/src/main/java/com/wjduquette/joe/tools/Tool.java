@@ -5,6 +5,7 @@ import java.util.Deque;
 /**
  * Base type for tools.  Provides default methods for standard helpers.
  */
+@SuppressWarnings("unused")
 public interface Tool {
     /**
      * Returns the tool's metadata.

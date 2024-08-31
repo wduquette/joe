@@ -38,7 +38,7 @@ public class RunTool implements Tool {
     private void run(String[] args) {
         var argq = new ArrayDeque<>(List.of(args));
 
-        if (argq.isEmpty() || argq.size() > 1) {
+        if (argq.size() != 1) {
             printUsage(App.NAME);
             System.exit(64);
         }

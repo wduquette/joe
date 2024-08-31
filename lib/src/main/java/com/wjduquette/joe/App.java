@@ -6,7 +6,6 @@ import com.wjduquette.joe.tools.ToolLauncher;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 public class App {
     public static final String NAME = "joe";
@@ -14,7 +13,7 @@ public class App {
     //-------------------------------------------------------------------------
     // Main
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         var launcher = new ToolLauncher(NAME, List.of(
             RunTool.INFO,
             ReplTool.INFO

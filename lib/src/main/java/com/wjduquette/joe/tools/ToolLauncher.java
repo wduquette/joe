@@ -31,10 +31,12 @@ public class ToolLauncher {
     //-------------------------------------------------------------------------
     // Configuration
 
+    @SuppressWarnings("unused")
     public boolean isVerbose() {
         return verbose;
     }
 
+    @SuppressWarnings("unused")
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }

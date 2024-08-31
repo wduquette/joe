@@ -16,7 +16,7 @@ public class ReplTool implements Tool {
         "",
         "Invokes a simple Joe REPL.",
         """
-        Invokes the REPL.  
+        Invokes the REPL.
         
         - To exit, press ^D.
         - To execute a statement, enter it as it would appear in a
@@ -25,7 +25,7 @@ public class ReplTool implements Tool {
         
             > 1 + 1;
             -> 2
-            > 
+            >
         
         NOTE: At present, the REPL doesn't offer history, multi-line
         input, etc.
