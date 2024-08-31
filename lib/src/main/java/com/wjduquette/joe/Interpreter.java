@@ -3,12 +3,12 @@ package com.wjduquette.joe;
 import java.util.ArrayList;
 import java.util.List;
 
-class Interpreter {
+public class Interpreter {
     //-------------------------------------------------------------------------
     // Instance Variables
 
     private final Joe joe;
-    private Environment globals = new Environment();
+    private final Environment globals = new Environment();
     private Environment environment = globals;
 
     //-------------------------------------------------------------------------
