@@ -1,3 +1,6 @@
-var abc = "abc";
-print "abc is a " + typeName(abc);
+function greet(first, last) {
+    print first + " " + last + "!";
+}
+greet("Hello", "World");
+print stringify(greet) + " is a " + typeName(greet);
 print "Done";

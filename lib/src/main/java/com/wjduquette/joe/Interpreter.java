@@ -8,7 +8,7 @@ public class Interpreter {
     // Instance Variables
 
     private final Joe joe;
-    private final Environment globals = new Environment();
+    final Environment globals = new Environment();
     private Environment environment = globals;
 
     //-------------------------------------------------------------------------
@@ -17,16 +17,20 @@ public class Interpreter {
     public Interpreter(Joe joe) {
         this.joe = joe;
 
+        globals.define("stringify",
+            new NativeFunction("stringify", this::_stringify));
         globals.define("typeName",
             new NativeFunction("typeName", this::_typeName));
     }
 
     // TODO: Define embedding API in Joe, standard library
+    private Object _stringify(Interpreter interp, List<Object> args) {
+        Joe.exactArity(args, 1, "stringify(value)");
+
+        return joe.stringify(args.get(0));
+    }
     private Object _typeName(Interpreter interp, List<Object> args) {
-        if (args.size() != 1) {
-            // TODO Add Joe arity checkers
-            throw new JoeError("Expected 1 argument");
-        }
+        Joe.exactArity(args, 1, "typeName(value)");
 
         return joe.typeName(args.get(0));
     }
@@ -59,6 +63,10 @@ public class Interpreter {
                     execute(stmt.body());
                     evaluate(stmt.incr());
                 }
+            }
+            case Stmt.Function stmt -> {
+                var function = new JoeFunction(stmt);
+                environment.define(stmt.name().lexeme(), function);
             }
             case Stmt.If stmt -> {
                 if (Joe.isTruthy(evaluate(stmt.condition()))) {

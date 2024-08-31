@@ -4,6 +4,7 @@ import java.util.List;
 
 import static com.wjduquette.joe.TokenType.*;
 
+@SuppressWarnings("ThrowableNotThrown")
 class Parser {
     private static final int MAX_CALL_ARGUMENTS = 255;
 
@@ -40,6 +41,7 @@ class Parser {
 
     private Stmt declaration() {
         try {
+            if (match(FUNCTION)) return functionDeclaration("function");
             if (match(VAR)) return varDeclaration();
 
             return statement();
@@ -69,6 +71,12 @@ class Parser {
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
+    }
+
+    private Stmt expressionStatement() {
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(value);
     }
 
     private Stmt forStatement() {
@@ -105,6 +113,30 @@ class Parser {
         return new Stmt.For(init, condition, incr, body);
     }
 
+    private Stmt.Function functionDeclaration(String kind) {
+        Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
+
+        consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+
+        List<Token> parameters = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (parameters.size() >= MAX_CALL_ARGUMENTS) {
+                    error(peek(), "Expected no more than " + MAX_CALL_ARGUMENTS +
+                        " parameters.");
+                }
+
+                parameters.add(
+                    consume(IDENTIFIER, "Expected parameter name."));
+            } while (match(COMMA));
+        }
+        consume(RIGHT_PAREN, "Expected ')' after parameter list.");
+
+        consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
+        List<Stmt> body = block();
+        return new Stmt.Function(kind, name, parameters, body);
+    }
+
     private Stmt ifStatement() {
         consume(LEFT_PAREN, "Expect '(' after 'if'.");
         Expr condition = expression();
@@ -132,12 +164,6 @@ class Parser {
         Stmt body = statement();
 
         return new Stmt.While(condition, body);
-    }
-
-    private Stmt expressionStatement() {
-        Expr value = expression();
-        consume(SEMICOLON, "Expect ';' after expression.");
-        return new Stmt.Expression(value);
     }
 
     private List<Stmt> block() {
@@ -372,13 +398,14 @@ class Parser {
             // statement, return.
             switch (peek().type()) {
                 case CLASS:
-                case FUN:
-                case VAR:
                 case FOR:
+                case FUNCTION:
                 case IF:
-                case WHILE:
+                case METHOD:
                 case PRINT:
                 case RETURN:
+                case VAR:
+                case WHILE:
                     return;
             }
 

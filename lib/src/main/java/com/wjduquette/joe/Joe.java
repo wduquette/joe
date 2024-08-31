@@ -70,7 +70,7 @@ public class Joe {
 
         try {
             return interpreter.interpret(statements);
-        } catch (RuntimeError ex) {
+        } catch (JoeError ex) {
             runtimeError(ex);
             return null;
         }
@@ -79,9 +79,13 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Output and Error Handling
 
-    private void runtimeError(RuntimeError error) {
-        System.err.println(error.getMessage() +
-            "\n[line " + error.line() + "]");
+    private void runtimeError(JoeError error) {
+        if (error.line() >= 0) {
+            System.err.println(error.getMessage() +
+                "\n[line " + error.line() + "]");
+        } else {
+            System.err.println(error.getMessage());
+        }
         hadRuntimeError = true;
     }
 
@@ -176,12 +180,11 @@ public class Joe {
      * @return The type string, or null.
      */
     public String typeName(Object value) {
-        // For now, just return its simple class name.
-        if (value != null) {
-            return value.getClass().getSimpleName();
-        } else {
-            return null;
-        }
+        return switch (value) {
+            case null -> null;
+            case JoeFunction function -> toInitialCap(function.kind());
+            default -> value.getClass().getSimpleName();
+        };
     }
 
     /**
@@ -243,8 +246,31 @@ public class Joe {
         return a.equals(b);
     }
 
+    private String toInitialCap(String string) {
+        if (string != null && !string.isEmpty()) {
+            return Character.toUpperCase(string.charAt(0)) +
+                string.substring(1);
+        } else {
+            return string;
+        }
+    }
+
     //-------------------------------------------------------------------------
     // Argument parsing and error handling helpers
+
+    /**
+     * Throws an arity check failure if the arguments list contains the wrong
+     * number of arguments.
+     * @param args The argument list
+     * @param arity The expected arity
+     * @param signature The signature string.
+     * @throws JoeError on failure
+     */
+    public static void exactArity(List<Object> args, int arity, String signature) {
+        if (args.size() != arity) {
+            throw new JoeError("Wrong number of arguments, expected: " + signature);
+        }
+    }
 
     /**
      * Factory, constructs a JoeError to be thrown by the caller.

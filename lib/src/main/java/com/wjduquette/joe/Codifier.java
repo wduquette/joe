@@ -69,6 +69,14 @@ class Codifier {
                     .append(body(indent, stmt.body()));
                 yield buff.toString();
             }
+            case Stmt.Function stmt -> {
+                var params = stmt.params().stream()
+                    .map(Token::lexeme)
+                    .collect(Collectors.joining(", "));
+                yield stmt.name().lexeme() +
+                    "(" + params + ")" +
+                    body(indent, stmt.body());
+            }
             case Stmt.If stmt -> {
                 var buff = new StringBuilder();
                 buff.append("if (")
@@ -106,15 +114,23 @@ class Codifier {
     // at the given indent level.
     private String body(int indent, Stmt stmt) {
         if (stmt instanceof Stmt.Block block) {
-            return
-                " {\n" +
-                recodify(indent + 1, block.statements()) +
-                "\n" +
-                leading(indent) +
-                "}";
+            return body(indent, block.statements());
         } else {
             return "\n" + recodify(indent + 1, stmt);
         }
+    }
+
+    // Recodifies a block's statements with the given indent level.  The opening
+    // brace is on the current line, the statements are indented an
+    // additional level, and the close brace is on a line by itself
+    // at the given indent level.
+    private String body(int indent, List<Stmt> statements) {
+        return
+            " {\n" +
+            recodify(indent + 1, statements) +
+            "\n" +
+            leading(indent) +
+            "}";
     }
 
     private String leading(int indent) {
