@@ -19,10 +19,19 @@ public class JoeFunction implements JoeCallable {
         this.signature = declaration.name().lexeme() + "(" + params + ")";
     }
 
+    /**
+     * Return the name of the function.
+     * @return The name
+     */
+    @SuppressWarnings("unused")
     public String name() {
         return declaration.name().lexeme();
     }
 
+    /**
+     * Returns the "kind" of the function, e.g., "function", "method"
+     * @return The kind
+     */
     public String kind() {
         return declaration.kind();
     }
