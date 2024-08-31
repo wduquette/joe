@@ -6,9 +6,12 @@ import java.util.Map;
 import java.util.Stack;
 
 class Resolver {
+    private enum FunctionType { NONE, FUNCTION }
+
     private final Joe joe;
     private final Interpreter interpreter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
+    private FunctionType currentFunction = FunctionType.NONE;
 
     Resolver(Joe joe, Interpreter interpreter) {
         this.joe = joe;
@@ -39,7 +42,7 @@ class Resolver {
                 declare(stmt.name());
                 define(stmt.name());
 
-                resolveFunction(stmt);
+                resolveFunction(stmt, FunctionType.FUNCTION);
             }
             case Stmt.If stmt -> {
                 resolve(stmt.condition());
@@ -48,6 +51,10 @@ class Resolver {
             }
             case Stmt.Print stmt -> resolve(stmt.expr());
             case Stmt.Return stmt -> {
+                if (currentFunction == FunctionType.NONE) {
+                    joe.error(stmt.keyword(),
+                        "Attempted 'return' from top-level code.");
+                }
                 if (stmt.value() != null) resolve(stmt.value());
             }
             case Stmt.While stmt -> {
@@ -109,7 +116,9 @@ class Resolver {
         }
     }
 
-    private void resolveFunction(Stmt.Function function) {
+    private void resolveFunction(Stmt.Function function, FunctionType type) {
+        FunctionType enclosingFunction = currentFunction;
+        currentFunction = type;
         beginScope();
         for (Token param : function.params()) {
             declare(param);
@@ -117,6 +126,7 @@ class Resolver {
         }
         resolve(function.body());
         endScope();
+        currentFunction = enclosingFunction;
     }
 
     private void beginScope() {
@@ -131,6 +141,10 @@ class Resolver {
         if (scopes.isEmpty()) return;
 
         Map<String, Boolean> scope = scopes.peek();
+        if (scope.containsKey(name.lexeme())) {
+            joe.error(name,
+                "Already a variable with this name in this scope.");
+        }
         scope.put(name.lexeme(), false);
     }
 

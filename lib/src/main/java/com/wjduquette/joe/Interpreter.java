@@ -1,7 +1,9 @@
 package com.wjduquette.joe;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Interpreter {
     //-------------------------------------------------------------------------
@@ -10,6 +12,7 @@ public class Interpreter {
     private final Joe joe;
     final Environment globals = new Environment();
     private Environment environment = globals;
+    private final Map<Expr, Integer> locals = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -119,6 +122,10 @@ public class Interpreter {
         return result;
     }
 
+    void resolve(Expr expr, int depth) {
+        locals.put(expr, depth);
+    }
+
     //------------------------------------------------------------------------
     // Expressions
 
@@ -126,7 +133,13 @@ public class Interpreter {
         return switch (expression) {
             case Expr.Assign expr -> {
                 Object value = evaluate(expr.value());
-                environment.assign(expr.name(), value);
+                var distance = locals.get(expr);
+
+                if (distance != null) {
+                    environment.assignAt(distance, expr.name(), value);
+                } else {
+                    globals.assign(expr.name(), value);
+                }
                 yield value;
             }
             case Expr.Binary expr -> {
@@ -250,8 +263,17 @@ public class Interpreter {
                         "Unexpected operator: " + expr.op());
                 };
             }
-            case Expr.Variable expr -> environment.get(expr.name());
+            case Expr.Variable expr -> lookupVariable(expr.name(), expr);
         };
+    }
+
+    private Object lookupVariable(Token name, Expr expr) {
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+            return environment.getAt(distance, name.lexeme());
+        } else {
+            return globals.get(name);
+        }
     }
 
     //-------------------------------------------------------------------------

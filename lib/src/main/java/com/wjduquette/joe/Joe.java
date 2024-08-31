@@ -68,6 +68,12 @@ public class Joe {
 
         System.out.println("<<<\n" + recodify(statements) + "\n>>>");
 
+        Resolver resolver = new Resolver(this, interpreter);
+        resolver.resolve(statements);
+
+        // Stop if there was a resolution error.
+        if (hadError) return null;
+
         try {
             return interpreter.interpret(statements);
         } catch (JoeError ex) {
