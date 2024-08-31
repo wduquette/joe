@@ -46,17 +46,39 @@ class Codifier {
                 "{\n" + recodify(indent + 1, stmt.statements()) + "\n"
                 + leading(indent) +"}";
             case Stmt.If stmt -> {
-                // This is not right; the right answer is tricky.
-                var thenCode = "if (" + recodify(stmt.condition()) + ")\n" +
-                    recodify(indent + 1, stmt.thenBranch())
-                ;
+                var buff = new StringBuilder();
+                buff.append("if (")
+                    .append(recodify(stmt.condition()))
+                    .append(")");
+
+                if (stmt.thenBranch() instanceof Stmt.Block block) {
+                    buff.append(" {\n")
+                        .append(recodify(indent + 1, block.statements()))
+                        .append("\n")
+                        .append(leading(indent))
+                        .append("}\n");
+                } else {
+                    buff.append(" ")
+                        .append(recodify(0, stmt.thenBranch()))
+                        .append("\n");
+                }
 
                 if (stmt.elseBranch() != null) {
-                    yield thenCode + "\n" +
-                        "else " + recodify(indent + 1, stmt.elseBranch());
-                } else {
-                    yield thenCode;
+                    buff.append(leading(indent))
+                        .append("else");
+
+                    if (stmt.elseBranch() instanceof Stmt.Block block) {
+                        buff.append(" {\n")
+                            .append(recodify(indent + 1, block.statements()))
+                            .append("\n")
+                            .append(leading(indent))
+                            .append("}\n");
+                    } else {
+                        buff.append(" ")
+                            .append(recodify(0, stmt.elseBranch()));
+                    }
                 }
+                yield buff.toString();
             }
             case Stmt.Expression stmt -> recodify(stmt.expr()) + ";";
             case Stmt.Print stmt ->

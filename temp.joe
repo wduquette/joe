@@ -1,7 +1,6 @@
 var flag = false;
 print flag;
-if (flag) {
+if (flag)
     print "It's true!";
-} else {
+else
     print "Oh, snap!";
-}
