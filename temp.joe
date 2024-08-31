@@ -1,6 +1,0 @@
-function greet(first, last) {
-    first + " " + last + "!";
-}
-print greet("Hello", "World");
-print stringify(greet) + " is a " + typeName(greet);
-print "Done";
