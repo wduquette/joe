@@ -82,7 +82,7 @@ class Resolver {
                 }
             }
             case Expr.Grouping expr -> resolve(expr.expr());
-            case Expr.Literal expr -> {}
+            case Expr.Literal ignored -> {}
             case Expr.Logical expr -> {
                 resolve(expr.left());
                 resolve(expr.right());
@@ -120,7 +120,7 @@ class Resolver {
     }
 
     private void beginScope() {
-        scopes.push(new HashMap<String, Boolean>());
+        scopes.push(new HashMap<>());
     }
 
     private void endScope() {
