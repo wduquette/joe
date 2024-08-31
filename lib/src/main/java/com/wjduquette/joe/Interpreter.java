@@ -79,6 +79,12 @@ public class Interpreter {
                 var value = evaluate(stmt.expr());
                 System.out.println(joe.stringify(value));
             }
+            case Stmt.Return stmt -> {
+                Object value = null;
+                if (stmt.value() != null) value = evaluate(stmt.value());
+
+                throw new Return(value);
+            }
             case Stmt.Var stmt -> {
                 Object value = null;
                 if (stmt.initializer() != null) {

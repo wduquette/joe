@@ -1,6 +1,6 @@
 function greet(first, last) {
-    print first + " " + last + "!";
+    first + " " + last + "!";
 }
-greet("Hello", "World");
+print greet("Hello", "World");
 print stringify(greet) + " is a " + typeName(greet);
 print "Done";

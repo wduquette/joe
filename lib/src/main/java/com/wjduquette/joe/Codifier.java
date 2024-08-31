@@ -94,6 +94,10 @@ class Codifier {
                 yield buff.toString();
             }
             case Stmt.Expression stmt -> recodify(stmt.expr()) + ";";
+            case Stmt.Return stmt ->
+                "return" +
+                    (stmt.value() != null ? " " + recodify(stmt.value()) : "")
+                    + ";";
             case Stmt.Print stmt ->
                 "print " + recodify(stmt.expr()) + ";";
             case Stmt.Var stmt -> stmt.initializer() != null

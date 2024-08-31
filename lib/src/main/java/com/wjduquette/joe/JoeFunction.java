@@ -47,8 +47,11 @@ public class JoeFunction implements JoeCallable {
                 args.get(i));
         }
 
-        interpreter.executeBlock(declaration.body(), environment);
-        return null;
+        try {
+            return interpreter.executeBlock(declaration.body(), environment);
+        } catch (Return returnValue) {
+            return returnValue.value;
+        }
     }
 
     @Override
