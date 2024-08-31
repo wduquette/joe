@@ -6,16 +6,18 @@ enum TokenType {
     COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
 
     // One or two character tokens.
+    AND,
     BANG, BANG_EQUAL,
     EQUAL, EQUAL_EQUAL,
     GREATER, GREATER_EQUAL,
     LESS, LESS_EQUAL,
+    OR,
 
     // Literals.
     IDENTIFIER, STRING, NUMBER,
 
     // Keywords.
-    AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NULL, OR,
+    CLASS, ELSE, FALSE, FUN, FOR, IF, NULL,
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
 
     EOF

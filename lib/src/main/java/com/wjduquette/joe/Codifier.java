@@ -117,6 +117,11 @@ class Codifier {
             }
             case Grouping expr -> "(" + recodify(expr.expr()) + ")";
             case Literal expr -> joe.codify(expr.value());
+            case Logical expr -> {
+                yield recodify(expr.left()) +
+                    " " + expr.op().lexeme() + " " +
+                    recodify(expr.right());
+            }
             case Unary expr -> expr.op().lexeme() + recodify(expr.right());
             case Variable expr -> expr.name().lexeme();
         };

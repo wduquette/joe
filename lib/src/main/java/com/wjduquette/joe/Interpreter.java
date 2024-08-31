@@ -165,6 +165,17 @@ class Interpreter {
             }
             case Expr.Grouping expr -> evaluate(expr.expr());
             case Expr.Literal expr -> expr.value();
+            case Expr.Logical expr -> {
+                Object left = evaluate(expr.left());
+
+                if (expr.op().type() == TokenType.OR) {
+                    if (joe.isTruthy(left)) yield left;
+                } else {
+                    if (!joe.isTruthy(left)) yield left;
+                }
+
+                yield evaluate(expr.right());
+            }
             case Expr.Unary expr -> {
                 Object right = evaluate(expr.right());
 
