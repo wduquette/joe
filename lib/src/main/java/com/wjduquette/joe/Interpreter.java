@@ -53,6 +53,11 @@ class Interpreter {
                 }
                 environment.define(stmt.name().lexeme(), value);
             }
+            case Stmt.While stmt -> {
+                while (Joe.isTruthy(evaluate(stmt.condition()))) {
+                    execute(stmt.body());
+                }
+            }
         }
 
         return null;

@@ -1,6 +1,7 @@
-var flag = false;
-print flag;
-if (flag)
-    print "It's true!";
-else
-    print "Oh, snap!";
+var limit = 10;
+
+while (limit >= 0) {
+    print limit;
+    limit = limit - 1;
+}
+print "Done";

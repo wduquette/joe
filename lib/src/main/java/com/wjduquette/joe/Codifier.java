@@ -52,27 +52,19 @@ class Codifier {
                     .append(")");
 
                 if (stmt.thenBranch() instanceof Stmt.Block block) {
-                    buff.append(" {\n")
-                        .append(recodify(indent + 1, block.statements()))
-                        .append("\n")
-                        .append(leading(indent))
-                        .append("}\n");
+                    buff.append(block(indent, block));
                 } else {
-                    buff.append(" ")
-                        .append(recodify(0, stmt.thenBranch()))
-                        .append("\n");
+                    buff.append("\n")
+                        .append(recodify(indent + 1, stmt.thenBranch()));
                 }
 
                 if (stmt.elseBranch() != null) {
-                    buff.append(leading(indent))
+                    buff.append("\n")
+                        .append(leading(indent))
                         .append("else");
 
                     if (stmt.elseBranch() instanceof Stmt.Block block) {
-                        buff.append(" {\n")
-                            .append(recodify(indent + 1, block.statements()))
-                            .append("\n")
-                            .append(leading(indent))
-                            .append("}\n");
+                        buff.append(block(indent, block));
                     } else {
                         buff.append(" ")
                             .append(recodify(0, stmt.elseBranch()));
@@ -87,9 +79,32 @@ class Codifier {
                 ? "var " + stmt.name().lexeme() + " = " +
                 recodify(stmt.initializer()) + ";"
                 : "var " + stmt.name().lexeme() + ";";
+            case Stmt.While stmt ->  {
+                var buff = new StringBuilder();
+                buff.append("while (")
+                    .append(recodify(stmt.condition()))
+                    .append(")");
+
+                if (stmt.body() instanceof Stmt.Block block) {
+                    buff.append(block(indent, block));
+                } else {
+                    buff.append("\n")
+                        .append(recodify(indent + 1, stmt.body()));
+                }
+                yield buff.toString();
+            }
         };
 
         return leading(indent) + code;
+    }
+
+    private String block(int indent, Stmt.Block block) {
+        return
+            " {\n" +
+            recodify(indent + 1, block.statements()) +
+            "\n" +
+            leading(indent) +
+            "}";
     }
 
     private String leading(int indent) {

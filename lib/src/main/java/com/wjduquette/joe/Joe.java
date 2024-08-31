@@ -62,10 +62,11 @@ public class Joe {
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(this, tokens);
         var statements = parser.parse();
-        System.out.println("<<<\n" + recodify(statements) + "\n>>>");
 
         // Stop if there was a syntax error.
         if (hadError) return null;
+
+        System.out.println("<<<\n" + recodify(statements) + "\n>>>");
 
         try {
             return interpreter.interpret(statements);
