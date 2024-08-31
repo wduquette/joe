@@ -143,12 +143,8 @@ class Codifier {
             case Call expr -> {
                 var args = expr.arguments().stream()
                     .map(this::recodify)
-                    .collect(Collectors.joining(", ")));
-                var buff = new StringBuilder();
-                buff.append(recodify(expr.callee()))
-                    .append("(")
-                    .append(args)
-                    .append(")");
+                    .collect(Collectors.joining(", "));
+                yield recodify(expr.callee()) + "(" + args + ")";
             }
             case Grouping expr -> "(" + recodify(expr.expr()) + ")";
             case Literal expr -> joe.codify(expr.value());

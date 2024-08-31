@@ -167,6 +167,23 @@ public class Joe {
         }
     }
 
+    // Returns the type of the value, for use in error messages.
+
+    /**
+     * Gets the script-level type of the value, or null if null.
+     * This is primarily for use in error messages.
+     * @param value The value
+     * @return The type string, or null.
+     */
+    public String typeName(Object value) {
+        // For now, just return its simple class name.
+        if (value != null) {
+            return value.getClass().getSimpleName();
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Given an arbitrary string, escapes all typical control characters as
      * they would appear in Java or Joe code.
@@ -225,6 +242,23 @@ public class Joe {
 
         return a.equals(b);
     }
+
+    //-------------------------------------------------------------------------
+    // Argument parsing and error handling helpers
+
+    /**
+     * Factory, constructs a JoeError to be thrown by the caller.
+     * @param what What kind of value the caller expected
+     * @param got The value the caller got
+     * @return The error
+     */
+    public JoeError expected(String what, Object got) {
+        var message = "Expected " + what + ", got " +
+            (got != null ? typeName(got) + " " : "") +
+            "'"  + codify(got) + "'.";
+        return new JoeError(message);
+    }
+
 
     //-------------------------------------------------------------------------
     // Main

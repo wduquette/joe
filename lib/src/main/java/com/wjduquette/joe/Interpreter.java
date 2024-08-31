@@ -8,13 +8,27 @@ class Interpreter {
     // Instance Variables
 
     private final Joe joe;
-    private Environment environment = new Environment();
+    private Environment globals = new Environment();
+    private Environment environment = globals;
 
     //-------------------------------------------------------------------------
     // Constructor
 
     public Interpreter(Joe joe) {
         this.joe = joe;
+
+        globals.define("typeName",
+            new NativeFunction("typeName", this::_typeName));
+    }
+
+    // TODO: Define embedding API in Joe, standard library
+    private Object _typeName(Interpreter interp, List<Object> args) {
+        if (args.size() != 1) {
+            // TODO Add Joe arity checkers
+            throw new JoeError("Expected 1 argument");
+        }
+
+        return joe.typeName(args.get(0));
     }
 
     //-------------------------------------------------------------------------
@@ -192,11 +206,8 @@ class Interpreter {
                     // TODO: Check function arity in JoeFunction!
                     yield callable.call(this, args);
                 } else {
-                    // TODO add expr.callee() as a stack frame!
-                    throw new RuntimeError(expr.paren(),
-                        "Expected a callable, got '" +
-                        // TODO Include typeOf(callee)!
-                        joe.stringify(callee) + "'.");
+                    // TODO add recodify(expr.callee()) as a stack frame!
+                    throw joe.expected("a callable", callee);
                 }
             }
             case Expr.Grouping expr -> evaluate(expr.expr());
