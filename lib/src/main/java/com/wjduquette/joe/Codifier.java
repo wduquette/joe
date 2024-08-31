@@ -41,6 +41,19 @@ public class Codifier {
             case Stmt.Block stmt ->
                 "{\n" + codify(joe, indent + 1, stmt.statements()) + "\n"
                 + leading(indent) +"}";
+            case Stmt.If stmt -> {
+                // This is not right; the right answer is tricky.
+                var thenCode = "if (" + codify(joe, stmt.condition()) + ")\n" +
+                    codify(joe, indent + 1, stmt.thenBranch())
+                ;
+
+                if (stmt.elseBranch() != null) {
+                    yield thenCode + "\n" +
+                        "else " + codify(joe, indent + 1, stmt.elseBranch());
+                } else {
+                    yield thenCode;
+                }
+            }
             case Stmt.Expression stmt -> codify(joe, stmt.expr()) + ";";
             case Stmt.Print stmt ->
                 "print " + codify(joe, stmt.expr()) + ";";

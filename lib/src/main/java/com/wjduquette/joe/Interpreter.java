@@ -35,6 +35,13 @@ class Interpreter {
             case Stmt.Expression stmt -> {
                 return evaluate(stmt.expr());
             }
+            case Stmt.If stmt -> {
+                if (joe.isTruthy(evaluate(stmt.condition()))) {
+                    return execute(stmt.thenBranch());
+                } else if (stmt.elseBranch() != null) {
+                    return execute(stmt.elseBranch());
+                }
+            }
             case Stmt.Print stmt -> {
                 var value = evaluate(stmt.expr());
                 System.out.println(joe.stringify(value));
