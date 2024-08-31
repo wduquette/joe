@@ -92,16 +92,9 @@ class Codifier {
                 ? "var " + stmt.name().lexeme() + " = " +
                 recodify(stmt.initializer()) + ";"
                 : "var " + stmt.name().lexeme() + ";";
-            case Stmt.While stmt ->  {
-                var buff = new StringBuilder();
-                buff.append("while (")
-                    .append(recodify(stmt.condition()))
-                    .append(")")
-                    .append(body(indent, stmt.body()))
-                    ;
-
-                yield buff.toString();
-            }
+            case Stmt.While stmt ->
+                    "while (" + recodify(stmt.condition()) + ")" +
+                    body(indent, stmt.body());
         };
 
         return leading(indent) + code;
