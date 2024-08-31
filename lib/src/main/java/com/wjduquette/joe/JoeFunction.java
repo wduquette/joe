@@ -9,9 +9,11 @@ import java.util.stream.Collectors;
 public class JoeFunction implements JoeCallable {
     private final Stmt.Function declaration;
     private final String signature;
+    private final Environment closure;
 
-    JoeFunction(Stmt.Function declaration) {
+    JoeFunction(Stmt.Function declaration, Environment closure) {
         this.declaration = declaration;
+        this.closure = closure;
 
         var params = declaration.params().stream()
             .map(Token::lexeme)
@@ -40,7 +42,7 @@ public class JoeFunction implements JoeCallable {
     public Object call(Interpreter interpreter, List<Object> args) {
         Joe.exactArity(args, declaration.params().size(), signature);
 
-        Environment environment = new Environment(interpreter.globals);
+        Environment environment = new Environment(closure);
 
         for (int i = 0; i < declaration.params().size(); i++) {
             environment.define(declaration.params().get(i).lexeme(),

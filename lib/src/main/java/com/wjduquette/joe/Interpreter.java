@@ -65,7 +65,7 @@ public class Interpreter {
                 }
             }
             case Stmt.Function stmt -> {
-                var function = new JoeFunction(stmt);
+                var function = new JoeFunction(stmt, environment);
                 environment.define(stmt.name().lexeme(), function);
             }
             case Stmt.If stmt -> {
