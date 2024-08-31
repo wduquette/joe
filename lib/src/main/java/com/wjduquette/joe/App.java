@@ -1,22 +1,30 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.tools.ReplTool;
+import com.wjduquette.joe.tools.RunTool;
+import com.wjduquette.joe.tools.ToolLauncher;
+
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class App {
+    public static final String NAME = "joe";
 
     //-------------------------------------------------------------------------
     // Main
 
     public static void main(String[] args) throws IOException {
-        var joe = new Joe();
+        var launcher = new ToolLauncher(NAME, List.of(
+            RunTool.INFO,
+            ReplTool.INFO
+        ));
 
-        if (args.length > 1) {
-            System.out.println("Usage: joe [script]");
-            System.exit(64);
-        } else if (args.length == 1) {
-            joe.runFile(args[0]);
-        } else {
-            joe.runPrompt();
+        try {
+            launcher.launch(args);
+        } catch (Exception ex) {
+            System.err.println("Unexpected exception: " + ex);
+            ex.printStackTrace(System.err);
         }
     }
 }

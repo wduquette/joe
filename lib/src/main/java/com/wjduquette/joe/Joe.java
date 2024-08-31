@@ -32,7 +32,8 @@ public class Joe {
     @SuppressWarnings("UnusedReturnValue")
     public Object runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
-        var result = run(new String(bytes, Charset.defaultCharset()));
+        var script = new String(bytes, Charset.defaultCharset());
+        var result = run(script);
 
         // Indicate an error in the exit code.
         if (hadError) System.exit(65);
