@@ -36,7 +36,7 @@ class Interpreter {
                 return evaluate(stmt.expr());
             }
             case Stmt.If stmt -> {
-                if (joe.isTruthy(evaluate(stmt.condition()))) {
+                if (Joe.isTruthy(evaluate(stmt.condition()))) {
                     return execute(stmt.thenBranch());
                 } else if (stmt.elseBranch() != null) {
                     return execute(stmt.elseBranch());
@@ -169,9 +169,9 @@ class Interpreter {
                 Object left = evaluate(expr.left());
 
                 if (expr.op().type() == TokenType.OR) {
-                    if (joe.isTruthy(left)) yield left;
+                    if (Joe.isTruthy(left)) yield left;
                 } else {
-                    if (!joe.isTruthy(left)) yield left;
+                    if (!Joe.isTruthy(left)) yield left;
                 }
 
                 yield evaluate(expr.right());
