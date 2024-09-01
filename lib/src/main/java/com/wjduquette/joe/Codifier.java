@@ -46,7 +46,27 @@ class Codifier {
             case Stmt.Block stmt ->
                 "{\n" + recodify(indent + 1, stmt.statements()) + "\n"
                 + leading(indent) +"}";
-            case Stmt.Class stmt -> "class " + stmt.name().lexeme() + ": TODO!";
+            case Stmt.Class stmt -> {
+                var buff = new StringBuilder();
+                buff.append("class ")
+                    .append(stmt.name().lexeme());
+
+                if (stmt.superclass() != null) {
+                    buff.append(" extends ")
+                        .append(recodify(stmt.superclass()));
+                }
+
+                buff.append(" {\n");
+
+                for (var method : stmt.methods()) {
+                    buff.append(recodify(indent + 1, method))
+                        .append("\n");
+                }
+
+                buff.append(leading(indent)).append("}");
+
+                yield buff.toString();
+            }
             case Stmt.For stmt -> {
                 var buff = new StringBuilder();
                 buff.append("for (");
