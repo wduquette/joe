@@ -6,9 +6,12 @@
  */
 
 plugins {
-    // Apply the java-library plugin for API and implementation separation.
-    id 'java-library'
+    // Apply the application plugin for API and implementation separation.
+    id 'application'
 }
+
+archivesBaseName = 'joe'
+version = "0.1.0"
 
 repositories {
     // Use Maven Central for resolving dependencies.
@@ -25,4 +28,9 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'com.wjduquette.joe.App'
 }
