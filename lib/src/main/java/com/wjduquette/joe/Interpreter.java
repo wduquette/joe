@@ -36,6 +36,15 @@ public class Interpreter {
 
     private Object execute(Stmt statement) {
         switch (statement) {
+            case Stmt.Assert stmt -> {
+                var condition = evaluate(stmt.condition());
+                if (!Joe.isTruthy(condition)) {
+                    var message = (stmt.message() != null)
+                        ? joe.stringify(evaluate(stmt.message()))
+                        : "Assertion unmet: " + joe.recodify(stmt.condition());
+                    throw new AssertError(message);
+                }
+            }
             case Stmt.Block stmt -> {
                 return executeBlock(stmt.statements(), new Environment(environment));
             }

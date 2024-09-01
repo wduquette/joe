@@ -28,6 +28,10 @@ class Resolver {
 
     private void resolve(Stmt statement) {
         switch (statement) {
+            case Stmt.Assert stmt -> {
+                resolve(stmt.condition());
+                if (stmt.message() != null) resolve(stmt.message());
+            }
             case Stmt.Block stmt -> {
                 beginScope();
                 resolve(stmt.statements());

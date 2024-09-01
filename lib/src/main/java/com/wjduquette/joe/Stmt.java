@@ -3,9 +3,19 @@ package com.wjduquette.joe;
 import java.util.List;
 
 public sealed interface Stmt
-    permits Stmt.Block, Stmt.Class, Stmt.Expression, Stmt.Function, Stmt.For,
-            Stmt.If, Stmt.Print, Stmt.Return, Stmt.Var, Stmt.While
+    permits Stmt.Assert, Stmt.Block, Stmt.Class, Stmt.Expression,
+            Stmt.Function, Stmt.For, Stmt.If, Stmt.Print, Stmt.Return,
+            Stmt.Var, Stmt.While
 {
+    /**
+     * Asserts that the condition is truthy, throwing an AssertError
+     * otherwise.  If the message is omitted, a generated message will
+     * be used.
+     * @param condition The condition to test
+     * @param message The failure message, or null for the default
+     */
+    record Assert(Expr condition, Expr message) implements Stmt {}
+
     /**
      * A block of statements, surrounded by braces.
      * @param statements The statements

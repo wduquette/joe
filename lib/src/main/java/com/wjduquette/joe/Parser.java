@@ -94,6 +94,7 @@ class Parser {
     }
 
     private Stmt statement() {
+        if (match(ASSERT)) return assertStatement();
         if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
@@ -102,6 +103,19 @@ class Parser {
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
+    }
+
+    private Stmt assertStatement() {
+        Expr condition = expression();
+        Expr message = null;
+
+        if (match(COMMA)) {
+            message = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after assertion.");
+
+        return new Stmt.Assert(condition, message);
     }
 
     private Stmt expressionStatement() {
