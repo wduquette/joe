@@ -92,11 +92,16 @@ class Resolver {
                     resolve(arg);
                 }
             }
+            case Expr.Get expr -> resolve(expr.object());
             case Expr.Grouping expr -> resolve(expr.expr());
             case Expr.Literal ignored -> {}
             case Expr.Logical expr -> {
                 resolve(expr.left());
                 resolve(expr.right());
+            }
+            case Expr.Set expr -> {
+                resolve(expr.value());
+                resolve(expr.object());
             }
             case Expr.Unary expr -> resolve(expr.right());
             case Expr.Variable expr -> {

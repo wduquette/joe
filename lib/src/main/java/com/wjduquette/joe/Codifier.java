@@ -167,12 +167,16 @@ class Codifier {
                     .collect(Collectors.joining(", "));
                 yield recodify(expr.callee()) + "(" + args + ")";
             }
+            case Get expr -> recodify(expr.object()) + "." + expr.name().lexeme();
             case Grouping expr -> "(" + recodify(expr.expr()) + ")";
             case Literal expr -> joe.codify(expr.value());
             case Logical expr ->
                 recodify(expr.left()) +
                 " " + expr.op().lexeme() + " " +
                 recodify(expr.right());
+            case Set expr ->
+                recodify(expr.object()) + "." + expr.name().lexeme() + " = " +
+                recodify(expr.value());
             case Unary expr -> expr.op().lexeme() + recodify(expr.right());
             case Variable expr -> expr.name().lexeme();
         };

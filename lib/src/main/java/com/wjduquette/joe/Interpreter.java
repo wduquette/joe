@@ -243,6 +243,14 @@ public class Interpreter {
                     throw joe.expected("a callable", callee);
                 }
             }
+            case Expr.Get expr -> {
+                Object object = evaluate(expr.object());
+                if (object instanceof JoeInstance) {
+                    yield ((JoeInstance) object).get(expr.name());
+                }
+
+                throw joe.expected("object", object);
+            }
             case Expr.Grouping expr -> evaluate(expr.expr());
             case Expr.Literal expr -> expr.value();
             case Expr.Logical expr -> {
@@ -255,6 +263,18 @@ public class Interpreter {
                 }
 
                 yield evaluate(expr.right());
+            }
+            case Expr.Set expr -> {
+                Object object = evaluate(expr.object());
+
+                if (object instanceof JoeInstance instance) {
+                    Object value = evaluate(expr.value());
+                    instance.set(expr.name(), value);
+                    yield value;
+                } else {
+                    throw joe.expected("object", object);
+                }
+
             }
             case Expr.Unary expr -> {
                 Object right = evaluate(expr.right());
