@@ -38,6 +38,12 @@ public class JoeFunction implements JoeCallable {
         return declaration.kind();
     }
 
+    JoeFunction bind(JoeInstance instance) {
+        Environment environment = new Environment(closure);
+        environment.define("this", instance);
+        return new JoeFunction(declaration, environment);
+    }
+
     @Override
     public Object call(Interpreter interpreter, List<Object> args) {
         Joe.exactArity(args, declaration.params().size(), signature);

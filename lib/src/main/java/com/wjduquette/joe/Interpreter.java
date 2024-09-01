@@ -280,8 +280,8 @@ public class Interpreter {
                 } else {
                     throw joe.expected("object", object);
                 }
-
             }
+            case Expr.This expr -> lookupVariable(expr.keyword(), expr);
             case Expr.Unary expr -> {
                 Object right = evaluate(expr.right());
 

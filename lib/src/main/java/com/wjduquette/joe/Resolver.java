@@ -7,11 +7,13 @@ import java.util.Stack;
 
 class Resolver {
     private enum FunctionType { NONE, FUNCTION, METHOD }
+    private enum ClassType { NONE, CLASS }
 
     private final Joe joe;
     private final Interpreter interpreter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
+    private ClassType currentClass = ClassType.NONE;
 
     Resolver(Joe joe, Interpreter interpreter) {
         this.joe = joe;
@@ -32,12 +34,20 @@ class Resolver {
                 endScope();
             }
             case Stmt.Class stmt -> {
+                ClassType enclosingClass = currentClass;
+                currentClass = ClassType.CLASS;
+
                 declare(stmt.name());
                 define(stmt.name());
+                beginScope();
+                scopes.peek().put("this", true);
                 for (Stmt.Function method : stmt.methods()) {
                     FunctionType declaration = FunctionType.METHOD;
                     resolveFunction(method, declaration);
                 }
+                endScope();
+
+                currentClass = enclosingClass;
             }
             case Stmt.Expression stmt -> resolve(stmt.expr());
             case Stmt.For stmt -> {
@@ -106,6 +116,13 @@ class Resolver {
             case Expr.Set expr -> {
                 resolve(expr.value());
                 resolve(expr.object());
+            }
+            case Expr.This expr -> {
+                if (currentClass == ClassType.NONE) {
+                    joe.error(expr.keyword(),
+                        "Attempted to use 'this' outside of any class.");
+                }
+                resolveLocal(expr, expr.keyword());
             }
             case Expr.Unary expr -> resolve(expr.right());
             case Expr.Variable expr -> {
