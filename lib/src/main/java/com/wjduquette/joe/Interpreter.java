@@ -69,6 +69,13 @@ public class Interpreter {
 
                 // The class itself
                 environment.define(stmt.name().lexeme(), null);
+
+                if (stmt.superclass() != null) {
+                    // Push a new environment to contain "super"
+                    environment = new Environment(environment);
+                    environment.define("super", superclass);
+                }
+
                 Map<String, JoeFunction> methods = new HashMap<>();
                 for (Stmt.Function method : stmt.methods()) {
                     JoeFunction function = new JoeFunction(method, environment,
@@ -78,6 +85,12 @@ public class Interpreter {
 
                 JoeClass klass =
                     new JoeClass(stmt.name().lexeme(), superclass, methods);
+
+                if (superclass != null) {
+                    // Pop the "super" environment.
+                    environment = environment.enclosing;
+                }
+
                 environment.assign(stmt.name(), klass);
                 return null;
             }
@@ -295,6 +308,23 @@ public class Interpreter {
                 } else {
                     throw joe.expected("object", object);
                 }
+            }
+            case Expr.Super expr -> {
+                int distance = locals.get(expr);
+                JoeClass superclass = (JoeClass)environment.getAt(
+                    distance, "super");
+                JoeInstance instance = (JoeInstance)environment.getAt(
+                    distance - 1, "this");
+                JoeFunction method =
+                    superclass.findMethod(expr.method().lexeme());
+
+                if (method == null) {
+                    throw new RuntimeError(expr.method(),
+                        "Undefined property '" +
+                            expr.method().lexeme() + "'.");
+                }
+
+                yield method.bind(instance);
             }
             case Expr.This expr -> lookupVariable(expr.keyword(), expr);
             case Expr.Unary expr -> {

@@ -7,7 +7,7 @@ import java.util.Stack;
 
 class Resolver {
     private enum FunctionType { NONE, FUNCTION, INITIALIZER, METHOD }
-    private enum ClassType { NONE, CLASS }
+    private enum ClassType { NONE, CLASS, SUBCLASS }
 
     private final Joe joe;
     private final Interpreter interpreter;
@@ -50,7 +50,15 @@ class Resolver {
                 }
 
                 if (stmt.superclass() != null) {
+                    currentClass = ClassType.SUBCLASS;
                     resolve(stmt.superclass());
+                }
+
+                if (stmt.superclass() != null) {
+                    // Create a scope to put "super" in, for access
+                    // by all methods defined directly on this class.
+                    beginScope();
+                    scopes.peek().put("super", true);
                 }
 
                 beginScope();
@@ -62,6 +70,8 @@ class Resolver {
                     resolveFunction(method, declaration);
                 }
                 endScope();
+
+                if (stmt.superclass() != null) endScope();
 
                 currentClass = enclosingClass;
             }
@@ -138,6 +148,16 @@ class Resolver {
             case Expr.Set expr -> {
                 resolve(expr.value());
                 resolve(expr.object());
+            }
+            case Expr.Super expr -> {
+                if (currentClass == ClassType.NONE) {
+                    joe.error(expr.keyword(),
+                        "Attempted to use 'super' outside of a class.");
+                } else if (currentClass != ClassType.SUBCLASS) {
+                    joe.error(expr.keyword(),
+                        "Attempted to use 'super' in a class with no superclass.");
+                }
+                resolveLocal(expr, expr.keyword());
             }
             case Expr.This expr -> {
                 if (currentClass == ClassType.NONE) {

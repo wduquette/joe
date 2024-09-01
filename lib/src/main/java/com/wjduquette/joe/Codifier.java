@@ -177,6 +177,7 @@ class Codifier {
             case Set expr ->
                 recodify(expr.object()) + "." + expr.name().lexeme() + " = " +
                 recodify(expr.value());
+            case Super expr -> "super." + expr.method().lexeme();
             case This ignored -> "this";
             case Unary expr -> expr.op().lexeme() + recodify(expr.right());
             case Variable expr -> expr.name().lexeme();
