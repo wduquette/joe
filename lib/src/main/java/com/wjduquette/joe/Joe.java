@@ -12,7 +12,7 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The actual interpreter.  Retained because it owns the global environment.
+    private final GlobalEnvironment globalEnvironment;
     private final Interpreter interpreter;
     private final Codifier codifier;
     boolean hadError = false;
@@ -22,8 +22,16 @@ public class Joe {
     // Constructor
 
     public Joe() {
+        globalEnvironment = new GlobalEnvironment();
         interpreter = new Interpreter(this);
         codifier = new Codifier(this);
+    }
+
+    //-------------------------------------------------------------------------
+    // Configuration and Embedding
+
+    public GlobalEnvironment getGlobalEnvironment() {
+        return globalEnvironment;
     }
 
     //-------------------------------------------------------------------------

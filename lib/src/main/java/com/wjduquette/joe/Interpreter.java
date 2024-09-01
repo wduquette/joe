@@ -10,8 +10,8 @@ public class Interpreter {
     // Instance Variables
 
     private final Joe joe;
-    final Environment globals = new Environment();
-    private Environment environment = globals;
+    final Environment globals;
+    private Environment environment;
     private final Map<Expr, Integer> locals = new HashMap<>();
 
     //-------------------------------------------------------------------------
@@ -19,6 +19,8 @@ public class Interpreter {
 
     public Interpreter(Joe joe) {
         this.joe = joe;
+        this.globals = joe.getGlobalEnvironment();
+        this.environment = globals;
 
         globals.define("stringify",
             new NativeFunction("stringify", this::_stringify));
