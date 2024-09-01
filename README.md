@@ -7,8 +7,11 @@ provide bindings to Java methods and types, but the runtime has no automatic
 access to the Java class hierarchy, to the operating system, or to any kind of
 I/O other than simple output (all of which can be redirected by the client).
 
-NOTE: Joe is still in its earliest phases.
-be taken as aspirational.
+## Current Status
+
+At time of writing (2024-09-01), Joe is a complete implementation of JLox,
+with a few syntactic and semantic changes.  The tool chain includes the
+script runner and REPL.
 
 ## Goals
 
