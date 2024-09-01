@@ -31,6 +31,10 @@ class Resolver {
                 resolve(stmt.statements());
                 endScope();
             }
+            case Stmt.Class stmt -> {
+                declare(stmt.name());
+                define(stmt.name());
+            }
             case Stmt.Expression stmt -> resolve(stmt.expr());
             case Stmt.For stmt -> {
                 if (stmt.init() != null)      resolve(stmt.init());

@@ -41,6 +41,7 @@ class Parser {
 
     private Stmt declaration() {
         try {
+            if (match(CLASS)) return classDeclaration();
             if (match(FUNCTION)) return functionDeclaration("function");
             if (match(VAR)) return varDeclaration();
 
@@ -49,6 +50,24 @@ class Parser {
             synchronize();
             return null;
         }
+    }
+
+    private Stmt classDeclaration() {
+        Token name = consume(IDENTIFIER, "Expected class name.");
+        consume(LEFT_BRACE, "Expected '{' before class body.");
+
+        List<Stmt.Function> methods = new ArrayList<>();
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            if (match(METHOD)) {
+                methods.add(functionDeclaration("method"));
+            } else {
+                throw error(advance(), "Expected method declaration.");
+            }
+        }
+
+        consume(RIGHT_BRACE, "Expect '}' after class body.");
+
+        return new Stmt.Class(name, methods);
     }
 
     private Stmt varDeclaration() {

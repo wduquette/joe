@@ -46,6 +46,7 @@ class Codifier {
             case Stmt.Block stmt ->
                 "{\n" + recodify(indent + 1, stmt.statements()) + "\n"
                 + leading(indent) +"}";
+            case Stmt.Class stmt -> "class " + stmt.name().lexeme() + ": TODO!";
             case Stmt.For stmt -> {
                 var buff = new StringBuilder();
                 buff.append("for (");

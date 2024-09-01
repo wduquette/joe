@@ -54,6 +54,12 @@ public class Interpreter {
             case Stmt.Block stmt -> {
                 return executeBlock(stmt.statements(), new Environment(environment));
             }
+            case Stmt.Class stmt -> {
+                environment.define(stmt.name().lexeme(), null);
+                JoeClass klass = new JoeClass(stmt.name().lexeme());
+                environment.assign(stmt.name(), klass);
+                return null;
+            }
             case Stmt.Expression stmt -> {
                 return evaluate(stmt.expr());
             }
