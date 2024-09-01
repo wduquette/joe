@@ -6,12 +6,14 @@ import java.util.Map;
 import java.util.Stack;
 
 class Resolver {
-    private enum FunctionType { NONE, FUNCTION }
+    private enum FunctionType { NONE, FUNCTION, INITIALIZER, METHOD }
+    private enum ClassType { NONE, CLASS, SUBCLASS }
 
     private final Joe joe;
     private final Interpreter interpreter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
+    private ClassType currentClass = ClassType.NONE;
 
     Resolver(Joe joe, Interpreter interpreter) {
         this.joe = joe;
@@ -30,6 +32,48 @@ class Resolver {
                 beginScope();
                 resolve(stmt.statements());
                 endScope();
+            }
+            case Stmt.Class stmt -> {
+                ClassType enclosingClass = currentClass;
+                currentClass = ClassType.CLASS;
+
+                declare(stmt.name());
+                define(stmt.name());
+
+                if (stmt.superclass() != null) {
+                    var className = stmt.name().lexeme();
+                    var superName = stmt.superclass().name().lexeme();
+                    if (className.equals(superName)) {
+                        joe.error(stmt.superclass().name(),
+                            "A class can't inherit from itself.");
+                    }
+                }
+
+                if (stmt.superclass() != null) {
+                    currentClass = ClassType.SUBCLASS;
+                    resolve(stmt.superclass());
+                }
+
+                if (stmt.superclass() != null) {
+                    // Create a scope to put "super" in, for access
+                    // by all methods defined directly on this class.
+                    beginScope();
+                    scopes.peek().put("super", true);
+                }
+
+                beginScope();
+                scopes.peek().put("this", true);
+                for (Stmt.Function method : stmt.methods()) {
+                    FunctionType declaration =
+                        method.name().lexeme().equals(JoeClass.INIT)
+                        ? FunctionType.INITIALIZER : FunctionType.METHOD;
+                    resolveFunction(method, declaration);
+                }
+                endScope();
+
+                if (stmt.superclass() != null) endScope();
+
+                currentClass = enclosingClass;
             }
             case Stmt.Expression stmt -> resolve(stmt.expr());
             case Stmt.For stmt -> {
@@ -55,7 +99,13 @@ class Resolver {
                     joe.error(stmt.keyword(),
                         "Attempted 'return' from top-level code.");
                 }
-                if (stmt.value() != null) resolve(stmt.value());
+                if (stmt.value() != null) {
+                    if (currentFunction == FunctionType.INITIALIZER) {
+                        joe.error(stmt.keyword(),
+                            "Attempted to return a value from an initializer.");
+                    }
+                    resolve(stmt.value());
+                }
             }
             case Stmt.While stmt -> {
                 resolve(stmt.condition());
@@ -88,11 +138,33 @@ class Resolver {
                     resolve(arg);
                 }
             }
+            case Expr.Get expr -> resolve(expr.object());
             case Expr.Grouping expr -> resolve(expr.expr());
             case Expr.Literal ignored -> {}
             case Expr.Logical expr -> {
                 resolve(expr.left());
                 resolve(expr.right());
+            }
+            case Expr.Set expr -> {
+                resolve(expr.value());
+                resolve(expr.object());
+            }
+            case Expr.Super expr -> {
+                if (currentClass == ClassType.NONE) {
+                    joe.error(expr.keyword(),
+                        "Attempted to use 'super' outside of a class.");
+                } else if (currentClass != ClassType.SUBCLASS) {
+                    joe.error(expr.keyword(),
+                        "Attempted to use 'super' in a class with no superclass.");
+                }
+                resolveLocal(expr, expr.keyword());
+            }
+            case Expr.This expr -> {
+                if (currentClass == ClassType.NONE) {
+                    joe.error(expr.keyword(),
+                        "Attempted to use 'this' outside of any class.");
+                }
+                resolveLocal(expr, expr.keyword());
             }
             case Expr.Unary expr -> resolve(expr.right());
             case Expr.Variable expr -> {

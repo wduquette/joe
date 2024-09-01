@@ -54,6 +54,46 @@ public class Interpreter {
             case Stmt.Block stmt -> {
                 return executeBlock(stmt.statements(), new Environment(environment));
             }
+            case Stmt.Class stmt -> {
+                // Valid superclass?
+                JoeClass superclass = null;
+                if (stmt.superclass() != null) {
+                    var object = evaluate(stmt.superclass());
+                    if (object instanceof JoeClass sc) {
+                        superclass = sc;
+                    } else {
+                        throw new RuntimeError(stmt.superclass().name(),
+                            "Superclass must be a class.");
+                    }
+                }
+
+                // The class itself
+                environment.define(stmt.name().lexeme(), null);
+
+                if (stmt.superclass() != null) {
+                    // Push a new environment to contain "super"
+                    environment = new Environment(environment);
+                    environment.define("super", superclass);
+                }
+
+                Map<String, JoeFunction> methods = new HashMap<>();
+                for (Stmt.Function method : stmt.methods()) {
+                    JoeFunction function = new JoeFunction(method, environment,
+                        stmt.name().lexeme().equals("init"));
+                    methods.put(method.name().lexeme(), function);
+                }
+
+                JoeClass klass =
+                    new JoeClass(stmt.name().lexeme(), superclass, methods);
+
+                if (superclass != null) {
+                    // Pop the "super" environment.
+                    environment = environment.enclosing;
+                }
+
+                environment.assign(stmt.name(), klass);
+                return null;
+            }
             case Stmt.Expression stmt -> {
                 return evaluate(stmt.expr());
             }
@@ -68,7 +108,7 @@ public class Interpreter {
                 }
             }
             case Stmt.Function stmt -> {
-                var function = new JoeFunction(stmt, environment);
+                var function = new JoeFunction(stmt, environment, false);
                 environment.define(stmt.name().lexeme(), function);
             }
             case Stmt.If stmt -> {
@@ -237,6 +277,14 @@ public class Interpreter {
                     throw joe.expected("a callable", callee);
                 }
             }
+            case Expr.Get expr -> {
+                Object object = evaluate(expr.object());
+                if (object instanceof JoeInstance) {
+                    yield ((JoeInstance) object).get(expr.name());
+                }
+
+                throw joe.expected("object", object);
+            }
             case Expr.Grouping expr -> evaluate(expr.expr());
             case Expr.Literal expr -> expr.value();
             case Expr.Logical expr -> {
@@ -250,6 +298,35 @@ public class Interpreter {
 
                 yield evaluate(expr.right());
             }
+            case Expr.Set expr -> {
+                Object object = evaluate(expr.object());
+
+                if (object instanceof JoeInstance instance) {
+                    Object value = evaluate(expr.value());
+                    instance.set(expr.name(), value);
+                    yield value;
+                } else {
+                    throw joe.expected("object", object);
+                }
+            }
+            case Expr.Super expr -> {
+                int distance = locals.get(expr);
+                JoeClass superclass = (JoeClass)environment.getAt(
+                    distance, "super");
+                JoeInstance instance = (JoeInstance)environment.getAt(
+                    distance - 1, "this");
+                JoeFunction method =
+                    superclass.findMethod(expr.method().lexeme());
+
+                if (method == null) {
+                    throw new RuntimeError(expr.method(),
+                        "Undefined property '" +
+                            expr.method().lexeme() + "'.");
+                }
+
+                yield method.bind(instance);
+            }
+            case Expr.This expr -> lookupVariable(expr.keyword(), expr);
             case Expr.Unary expr -> {
                 Object right = evaluate(expr.right());
 

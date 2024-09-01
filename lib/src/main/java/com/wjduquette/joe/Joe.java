@@ -197,7 +197,6 @@ public class Joe {
     /**
      * Given an arbitrary string, escapes all typical control characters as
      * they would appear in Java or Joe code.
-     * TODO: Handle unicode escapes
      * @param string The input string
      * @return The string with escapes
      */

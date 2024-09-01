@@ -41,6 +41,7 @@ class Parser {
 
     private Stmt declaration() {
         try {
+            if (match(CLASS)) return classDeclaration();
             if (match(FUNCTION)) return functionDeclaration("function");
             if (match(VAR)) return varDeclaration();
 
@@ -49,6 +50,35 @@ class Parser {
             synchronize();
             return null;
         }
+    }
+
+    private Stmt classDeclaration() {
+        // Class Name
+        Token name = consume(IDENTIFIER, "Expected class name.");
+
+        // Superclass
+        Expr.Variable superclass = null;
+
+        if (match(EXTENDS)) {
+            consume(IDENTIFIER, "Expect superclass name.");
+            superclass = new Expr.Variable(previous());
+        }
+
+        // Class body
+        consume(LEFT_BRACE, "Expected '{' before class body.");
+
+        List<Stmt.Function> methods = new ArrayList<>();
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            if (match(METHOD)) {
+                methods.add(functionDeclaration("method"));
+            } else {
+                throw error(advance(), "Expected method declaration.");
+            }
+        }
+
+        consume(RIGHT_BRACE, "Expect '}' after class body.");
+
+        return new Stmt.Class(name, superclass, methods);
     }
 
     private Stmt varDeclaration() {
@@ -207,6 +237,8 @@ class Parser {
             if (expr instanceof Expr.Variable) {
                 Token name = ((Expr.Variable)expr).name();
                 return new Expr.Assign(name, value);
+            } else if (expr instanceof Expr.Get get) {
+                return new Expr.Set(get.object(), get.name(), value);
             }
 
             error(equals, "Invalid assignment target.");
@@ -303,6 +335,9 @@ class Parser {
         while (true) {
             if (match(LEFT_PAREN)) {
                 expr = finishCall(expr);
+            } else if (match(DOT)) {
+                Token name = consume(IDENTIFIER, "Expected property name after '.'.");
+                expr = new Expr.Get(expr, name);
             } else {
                 break;
             }
@@ -338,17 +373,27 @@ class Parser {
             return new Expr.Literal(previous().literal());
         }
 
+        if (match(SUPER)) {
+            Token keyword = previous();
+            consume(DOT, "Expected '.' after 'super'.");
+            Token method = consume(IDENTIFIER,
+                "Expected superclass method name.");
+            return new Expr.Super(keyword, method);
+        }
+
+        if (match(THIS)) return new Expr.This(previous());
+
         if (match(IDENTIFIER)) {
             return new Expr.Variable(previous());
         }
 
         if (match(LEFT_PAREN)) {
             Expr expr = expression();
-            consume(RIGHT_PAREN, "Expect ')' after expression.");
+            consume(RIGHT_PAREN, "Expected ')' after expression.");
             return new Expr.Grouping(expr);
         }
 
-        throw error(peek(), "Expect expression.");
+        throw error(peek(), "Expected expression.");
     }
 
     //-------------------------------------------------------------------------

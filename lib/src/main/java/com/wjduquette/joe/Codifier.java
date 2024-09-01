@@ -46,6 +46,7 @@ class Codifier {
             case Stmt.Block stmt ->
                 "{\n" + recodify(indent + 1, stmt.statements()) + "\n"
                 + leading(indent) +"}";
+            case Stmt.Class stmt -> "class " + stmt.name().lexeme() + ": TODO!";
             case Stmt.For stmt -> {
                 var buff = new StringBuilder();
                 buff.append("for (");
@@ -166,12 +167,18 @@ class Codifier {
                     .collect(Collectors.joining(", "));
                 yield recodify(expr.callee()) + "(" + args + ")";
             }
+            case Get expr -> recodify(expr.object()) + "." + expr.name().lexeme();
             case Grouping expr -> "(" + recodify(expr.expr()) + ")";
             case Literal expr -> joe.codify(expr.value());
             case Logical expr ->
                 recodify(expr.left()) +
                 " " + expr.op().lexeme() + " " +
                 recodify(expr.right());
+            case Set expr ->
+                recodify(expr.object()) + "." + expr.name().lexeme() + " = " +
+                recodify(expr.value());
+            case Super expr -> "super." + expr.method().lexeme();
+            case This ignored -> "this";
             case Unary expr -> expr.op().lexeme() + recodify(expr.right());
             case Variable expr -> expr.name().lexeme();
         };
