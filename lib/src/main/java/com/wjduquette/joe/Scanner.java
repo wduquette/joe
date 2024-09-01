@@ -14,6 +14,7 @@ public class Scanner {
         keywords = new HashMap<>();
         keywords.put("class",    CLASS);
         keywords.put("else",     ELSE);
+        keywords.put("extends",  EXTENDS);
         keywords.put("false",    FALSE);
         keywords.put("for",      FOR);
         keywords.put("function", FUNCTION);

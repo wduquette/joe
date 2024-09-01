@@ -39,6 +39,20 @@ class Resolver {
 
                 declare(stmt.name());
                 define(stmt.name());
+
+                if (stmt.superclass() != null) {
+                    var className = stmt.name().lexeme();
+                    var superName = stmt.superclass().name().lexeme();
+                    if (className.equals(superName)) {
+                        joe.error(stmt.superclass().name(),
+                            "A class can't inherit from itself.");
+                    }
+                }
+
+                if (stmt.superclass() != null) {
+                    resolve(stmt.superclass());
+                }
+
                 beginScope();
                 scopes.peek().put("this", true);
                 for (Stmt.Function method : stmt.methods()) {

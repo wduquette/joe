@@ -55,6 +55,19 @@ public class Interpreter {
                 return executeBlock(stmt.statements(), new Environment(environment));
             }
             case Stmt.Class stmt -> {
+                // Valid superclass?
+                JoeClass superclass = null;
+                if (stmt.superclass() != null) {
+                    var object = evaluate(stmt.superclass());
+                    if (object instanceof JoeClass sc) {
+                        superclass = sc;
+                    } else {
+                        throw new RuntimeError(stmt.superclass().name(),
+                            "Superclass must be a class.");
+                    }
+                }
+
+                // The class itself
                 environment.define(stmt.name().lexeme(), null);
                 Map<String, JoeFunction> methods = new HashMap<>();
                 for (Stmt.Function method : stmt.methods()) {
@@ -63,7 +76,8 @@ public class Interpreter {
                     methods.put(method.name().lexeme(), function);
                 }
 
-                JoeClass klass = new JoeClass(stmt.name().lexeme(), methods);
+                JoeClass klass =
+                    new JoeClass(stmt.name().lexeme(), superclass, methods);
                 environment.assign(stmt.name(), klass);
                 return null;
             }

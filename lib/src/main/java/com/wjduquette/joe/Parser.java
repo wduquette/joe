@@ -53,7 +53,18 @@ class Parser {
     }
 
     private Stmt classDeclaration() {
+        // Class Name
         Token name = consume(IDENTIFIER, "Expected class name.");
+
+        // Superclass
+        Expr.Variable superclass = null;
+
+        if (match(EXTENDS)) {
+            consume(IDENTIFIER, "Expect superclass name.");
+            superclass = new Expr.Variable(previous());
+        }
+
+        // Class body
         consume(LEFT_BRACE, "Expected '{' before class body.");
 
         List<Stmt.Function> methods = new ArrayList<>();
@@ -67,7 +78,7 @@ class Parser {
 
         consume(RIGHT_BRACE, "Expect '}' after class body.");
 
-        return new Stmt.Class(name, methods);
+        return new Stmt.Class(name, superclass, methods);
     }
 
     private Stmt varDeclaration() {
