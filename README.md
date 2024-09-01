@@ -7,11 +7,39 @@ provide bindings to Java methods and types, but the runtime has no automatic
 access to the Java class hierarchy, to the operating system, or to any kind of
 I/O other than simple output (all of which can be redirected by the client).
 
-## Current Status
+Most of the following content will move to the Joe User's Guide once there is
+such a thing.
 
-At time of writing (2024-09-01), Joe is a complete implementation of JLox,
-with a few syntactic and semantic changes.  The tool chain includes the
-script runner and REPL.
+## Joe 0.1.0 (2024/09/01)
+
+Joe 0.1.0 is a complete implementation of JLox, with the following changes:
+
+- Syntax
+  - `null` replaces `nil`.
+  - `&&` replaces `and`.
+  - `||` replaces `or`.
+  - Strings can include the standard string escapes, which are converted into the usual characters.
+    - '\\\\', `\t`, `\b`, `\n`, `\r`, `\f`, `\"`
+  - `function` replaces `fun` as the function definition keyword.
+  - `method` is added as the method definition keyword.
+  - The `extends` keyword replaces `<` in `class Sub extends Super {...}`.
+- Semantics
+  - The `<`, `<=`, `>`, and `>=` operators can compare strings.
+  - A function with no `return` returns the value of the last statement in the
+    block (which is usually null).
+  - An expression statement yields the value of the expression.
+  - Thus, running a script returns a value.
+- Embedding API
+  - The `Joe` engine is separated from the `App` application, so that a client
+    can create `Joe` instances as needed.
+    - The embedding API is still mostly non-existent.
+- Tools
+  - The `App` includes "tool" infrastructure, and supports two tools, accessed
+    as `joe run` and `joe repl`.
+    - The intent is that a client project can reuse the underlying tools in its
+      own application if desired.
+    - `joe repl` outputs the value of each statement; other than that, the 
+      two tools are more or less as described in *Crafting Interpreters*.
 
 ## Goals
 
