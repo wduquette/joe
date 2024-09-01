@@ -16,6 +16,9 @@ public class JoeInstance {
             return fields.get(name.lexeme());
         }
 
+        JoeFunction method = klass.findMethod(name.lexeme());
+        if (method != null) return method;
+
         throw new RuntimeError(name,
             "Undefined property '" + name.lexeme() + "'.");
     }

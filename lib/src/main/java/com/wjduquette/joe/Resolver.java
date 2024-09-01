@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Stack;
 
 class Resolver {
-    private enum FunctionType { NONE, FUNCTION }
+    private enum FunctionType { NONE, FUNCTION, METHOD }
 
     private final Joe joe;
     private final Interpreter interpreter;
@@ -34,6 +34,10 @@ class Resolver {
             case Stmt.Class stmt -> {
                 declare(stmt.name());
                 define(stmt.name());
+                for (Stmt.Function method : stmt.methods()) {
+                    FunctionType declaration = FunctionType.METHOD;
+                    resolveFunction(method, declaration);
+                }
             }
             case Stmt.Expression stmt -> resolve(stmt.expr());
             case Stmt.For stmt -> {

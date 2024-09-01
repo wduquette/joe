@@ -56,7 +56,13 @@ public class Interpreter {
             }
             case Stmt.Class stmt -> {
                 environment.define(stmt.name().lexeme(), null);
-                JoeClass klass = new JoeClass(stmt.name().lexeme());
+                Map<String, JoeFunction> methods = new HashMap<>();
+                for (Stmt.Function method : stmt.methods()) {
+                    JoeFunction function = new JoeFunction(method, environment);
+                    methods.put(method.name().lexeme(), function);
+                }
+
+                JoeClass klass = new JoeClass(stmt.name().lexeme(), methods);
                 environment.assign(stmt.name(), klass);
                 return null;
             }
