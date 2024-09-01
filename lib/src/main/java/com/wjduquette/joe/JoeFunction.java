@@ -10,10 +10,16 @@ public class JoeFunction implements JoeCallable {
     private final Stmt.Function declaration;
     private final String signature;
     private final Environment closure;
+    private final boolean isInitializer;
 
-    JoeFunction(Stmt.Function declaration, Environment closure) {
+    JoeFunction(
+        Stmt.Function declaration,
+        Environment closure,
+        boolean isInitializer
+    ) {
         this.declaration = declaration;
         this.closure = closure;
+        this.isInitializer = isInitializer;
 
         var params = declaration.params().stream()
             .map(Token::lexeme)
@@ -41,7 +47,7 @@ public class JoeFunction implements JoeCallable {
     JoeFunction bind(JoeInstance instance) {
         Environment environment = new Environment(closure);
         environment.define("this", instance);
-        return new JoeFunction(declaration, environment);
+        return new JoeFunction(declaration, environment, isInitializer);
     }
 
     @Override
@@ -56,10 +62,14 @@ public class JoeFunction implements JoeCallable {
         }
 
         try {
-            return interpreter.executeBlock(declaration.body(), environment);
+            var result = interpreter.executeBlock(declaration.body(), environment);
+            if (isInitializer) return closure.getAt(0, "this");
+            return result;
         } catch (Return returnValue) {
+            if (isInitializer) return closure.getAt(0, "this");
             return returnValue.value;
         }
+
     }
 
     @Override

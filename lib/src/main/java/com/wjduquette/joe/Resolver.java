@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Stack;
 
 class Resolver {
-    private enum FunctionType { NONE, FUNCTION, METHOD }
+    private enum FunctionType { NONE, FUNCTION, INITIALIZER, METHOD }
     private enum ClassType { NONE, CLASS }
 
     private final Joe joe;
@@ -42,7 +42,9 @@ class Resolver {
                 beginScope();
                 scopes.peek().put("this", true);
                 for (Stmt.Function method : stmt.methods()) {
-                    FunctionType declaration = FunctionType.METHOD;
+                    FunctionType declaration =
+                        method.name().lexeme().equals(JoeClass.INIT)
+                        ? FunctionType.INITIALIZER : FunctionType.METHOD;
                     resolveFunction(method, declaration);
                 }
                 endScope();
@@ -73,7 +75,13 @@ class Resolver {
                     joe.error(stmt.keyword(),
                         "Attempted 'return' from top-level code.");
                 }
-                if (stmt.value() != null) resolve(stmt.value());
+                if (stmt.value() != null) {
+                    if (currentFunction == FunctionType.INITIALIZER) {
+                        joe.error(stmt.keyword(),
+                            "Attempted to return a value from an initializer.");
+                    }
+                    resolve(stmt.value());
+                }
             }
             case Stmt.While stmt -> {
                 resolve(stmt.condition());

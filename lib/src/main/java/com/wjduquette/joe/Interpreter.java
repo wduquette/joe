@@ -58,7 +58,8 @@ public class Interpreter {
                 environment.define(stmt.name().lexeme(), null);
                 Map<String, JoeFunction> methods = new HashMap<>();
                 for (Stmt.Function method : stmt.methods()) {
-                    JoeFunction function = new JoeFunction(method, environment);
+                    JoeFunction function = new JoeFunction(method, environment,
+                        stmt.name().lexeme().equals("init"));
                     methods.put(method.name().lexeme(), function);
                 }
 
@@ -80,7 +81,7 @@ public class Interpreter {
                 }
             }
             case Stmt.Function stmt -> {
-                var function = new JoeFunction(stmt, environment);
+                var function = new JoeFunction(stmt, environment, false);
                 environment.define(stmt.name().lexeme(), function);
             }
             case Stmt.If stmt -> {

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public class JoeClass implements JoeCallable {
+    public static final String INIT = "init";
     private final String name;
     private final Map<String, JoeFunction> methods;
 
@@ -27,6 +28,10 @@ public class JoeClass implements JoeCallable {
     @Override
     public Object call(Interpreter interp, List<Object> args) {
         JoeInstance instance = new JoeInstance(this);
+        JoeFunction initializer = findMethod(INIT);
+        if (initializer != null) {
+            initializer.bind(instance).call(interp, args);
+        }
         return instance;
     }
 
