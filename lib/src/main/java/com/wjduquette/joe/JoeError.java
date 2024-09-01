@@ -45,6 +45,7 @@ public class JoeError extends RuntimeException {
         return line;
     }
 
+    @SuppressWarnings("unused")
     public List<String> getFrames() {
         return Collections.unmodifiableList(frames);
     }
