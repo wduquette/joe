@@ -116,15 +116,10 @@ public class Joe {
     // Output and Error Handling
 
     private void runtimeError(JoeError error) {
-        var message = error instanceof AssertError
-            ? "Assertion Failure: " + error.getMessage()
-            : error.getMessage();
         if (error.line() >= 0) {
-            System.err.println(message +
-                "\n[line " + error.line() + "]");
-        } else {
-            System.err.println(message);
+            System.err.print("[line " + error.line() + "] ");
         }
+        System.err.println(error.getJoeStackTrace());
         hadRuntimeError = true;
     }
 

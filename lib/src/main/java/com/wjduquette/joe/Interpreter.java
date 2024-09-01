@@ -39,10 +39,11 @@ public class Interpreter {
             case Stmt.Assert stmt -> {
                 var condition = evaluate(stmt.condition());
                 if (!Joe.isTruthy(condition)) {
-                    var message = (stmt.message() != null)
-                        ? joe.stringify(evaluate(stmt.message()))
-                        : "Assertion unmet: " + joe.recodify(stmt.condition());
-                    throw new AssertError(message);
+                    var message = "Assertion unmet: " +
+                        (stmt.message() != null
+                            ? joe.stringify(evaluate(stmt.message()))
+                            : joe.recodify(stmt.condition()));
+                    throw new AssertError(stmt.keyword().line(), message);
                 }
             }
             case Stmt.Block stmt -> {

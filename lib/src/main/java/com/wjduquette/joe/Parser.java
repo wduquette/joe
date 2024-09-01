@@ -106,6 +106,7 @@ class Parser {
     }
 
     private Stmt assertStatement() {
+        Token keyword = previous();
         Expr condition = expression();
         Expr message = null;
 
@@ -115,7 +116,7 @@ class Parser {
 
         consume(SEMICOLON, "Expect ';' after assertion.");
 
-        return new Stmt.Assert(condition, message);
+        return new Stmt.Assert(keyword, condition, message);
     }
 
     private Stmt expressionStatement() {

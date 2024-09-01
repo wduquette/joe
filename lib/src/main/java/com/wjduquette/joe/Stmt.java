@@ -11,10 +11,11 @@ public sealed interface Stmt
      * Asserts that the condition is truthy, throwing an AssertError
      * otherwise.  If the message is omitted, a generated message will
      * be used.
+     * @param keyword The token, for line number info.
      * @param condition The condition to test
      * @param message The failure message, or null for the default
      */
-    record Assert(Expr condition, Expr message) implements Stmt {}
+    record Assert(Token keyword, Expr condition, Expr message) implements Stmt {}
 
     /**
      * A block of statements, surrounded by braces.
