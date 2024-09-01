@@ -42,11 +42,11 @@ public class JoeClass implements JoeCallable {
     }
 
     @Override
-    public Object call(Interpreter interp, List<Object> args) {
+    public Object call(Joe joe, List<Object> args) {
         JoeInstance instance = new JoeInstance(this);
         JoeFunction initializer = findMethod(INIT);
         if (initializer != null) {
-            initializer.bind(instance).call(interp, args);
+            initializer.bind(instance).call(joe, args);
         }
         return instance;
     }

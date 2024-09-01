@@ -21,23 +21,6 @@ public class Interpreter {
         this.joe = joe;
         this.globals = joe.getGlobalEnvironment();
         this.environment = globals;
-
-        globals.define("stringify",
-            new NativeFunction("stringify", this::_stringify));
-        globals.define("typeName",
-            new NativeFunction("typeName", this::_typeName));
-    }
-
-    // TODO: Define embedding API in Joe, standard library
-    private Object _stringify(Interpreter interp, List<Object> args) {
-        Joe.exactArity(args, 1, "stringify(value)");
-
-        return joe.stringify(args.get(0));
-    }
-    private Object _typeName(Interpreter interp, List<Object> args) {
-        Joe.exactArity(args, 1, "typeName(value)");
-
-        return joe.typeName(args.get(0));
     }
 
     //-------------------------------------------------------------------------
@@ -271,9 +254,7 @@ public class Interpreter {
                 }
 
                 if (callee instanceof JoeCallable callable) {
-                    // TODO: Should pass Joe, not Interpreter
-                    // TODO: Check function arity in JoeFunction!
-                    yield callable.call(this, args);
+                    yield callable.call(joe, args);
                 } else {
                     // TODO add recodify(expr.callee()) as a stack frame!
                     throw joe.expected("a callable", callee);

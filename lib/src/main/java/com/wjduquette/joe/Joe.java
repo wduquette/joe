@@ -25,10 +25,20 @@ public class Joe {
         globalEnvironment = new GlobalEnvironment();
         interpreter = new Interpreter(this);
         codifier = new Codifier(this);
+
+        StandardLibrary.LIB.install(this);
     }
 
     //-------------------------------------------------------------------------
     // Configuration and Embedding
+
+    /**
+     * Installs a native function into Joe's global environment.
+     * @param function The function
+     */
+    public void installGlobalFunction(NativeFunction function) {
+        globalEnvironment.define(function.name(), function);
+    }
 
     public GlobalEnvironment getGlobalEnvironment() {
         return globalEnvironment;
@@ -89,6 +99,17 @@ public class Joe {
             runtimeError(ex);
             return null;
         }
+    }
+
+    //-------------------------------------------------------------------------
+    // Internal Support -- for use within this package
+
+    /**
+     * Gets the engine's actual interpreter.
+     * @return The interpreter.
+     */
+    Interpreter interp() {
+        return interpreter;
     }
 
     //-------------------------------------------------------------------------

@@ -11,9 +11,13 @@ public class NativeFunction implements JoeCallable {
         this.callable = callable;
     }
 
+    public String name() {
+        return name;
+    }
+
     @Override
-    public Object call(Interpreter interp, List<Object> args) {
-        return callable.call(interp, args);
+    public Object call(Joe joe, List<Object> args) {
+        return callable.call(joe, args);
     }
 
     @Override
