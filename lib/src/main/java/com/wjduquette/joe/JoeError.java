@@ -1,7 +1,6 @@
 package com.wjduquette.joe;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class JoeError extends RuntimeException {
@@ -45,9 +44,13 @@ public class JoeError extends RuntimeException {
         return line;
     }
 
+    /**
+     * Use this to add stack frames to an existing error.
+     * @return The list of stack frame strings.
+     */
     @SuppressWarnings("unused")
     public List<String> getFrames() {
-        return Collections.unmodifiableList(frames);
+        return frames;
     }
 
     public String getJoeStackTrace() {
