@@ -1,0 +1,10 @@
+// Sample test script
+
+function testAssertEquals() {
+    assertEquals(5, 5);
+    assertEquals("abc", "abc");
+}
+
+function testFail() {
+    fail("Simulated failure");
+}
