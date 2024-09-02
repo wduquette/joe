@@ -47,43 +47,38 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Script Execution
 
-    @SuppressWarnings("UnusedReturnValue")
+    /**
+     * Reads the given file and executes its content as a script.
+     * @param path The file's path
+     * @return The script's result
+     * @throws IOException if the file cannot be read.
+     * @throws CompileError if the script could not be compiled.
+     * @throws JoeError on all runtime errors.
+     */
     public Object runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         var script = new String(bytes, Charset.defaultCharset());
-        var result = run(script);
 
-        // Indicate an error in the exit code.
-        if (hadError) System.exit(65);
-        if (hadRuntimeError) System.exit(70);
-
-        return result;
+        return run(script);
     }
 
-    public void runPrompt() throws IOException {
-        InputStreamReader input = new InputStreamReader(System.in);
-        BufferedReader reader = new BufferedReader(input);
-
-        for (;;) {
-            System.out.print("> ");
-            String line = reader.readLine();
-            if (line == null) break;
-            var result = run(line);
-            if (!hadError && result != null) {
-                System.out.println("-> " + stringify(result));
-            }
-            hadError = false;
-        }
-    }
-
-    public Object run(String source) {
+    /**
+     * Executes the script, throwing an appropriate error on failure.
+     * @param source The input
+     * @return The script's result
+     * @throws CompileError if the script could not be compiled.
+     * @throws JoeError on all runtime errors.
+     */
+    public Object run(String source) throws JoeError {
         Scanner scanner = new Scanner(this, source);
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(this, tokens);
         var statements = parser.parse();
 
         // Stop if there was a syntax error.
-        if (hadError) return null;
+        if (hadError) {
+            throw new CompileError("Syntax error in input, halting.");
+        }
 
         System.out.println("<<<\n" + recodify(statements) + "\n>>>");
 
@@ -91,14 +86,11 @@ public class Joe {
         resolver.resolve(statements);
 
         // Stop if there was a resolution error.
-        if (hadError) return null;
-
-        try {
-            return interpreter.interpret(statements);
-        } catch (JoeError ex) {
-            runtimeError(ex);
-            return null;
+        if (hadError) {
+            throw new CompileError("Semantic error in input, halting.");
         }
+
+        return interpreter.interpret(statements);
     }
 
     //-------------------------------------------------------------------------
@@ -114,14 +106,6 @@ public class Joe {
 
     //-------------------------------------------------------------------------
     // Output and Error Handling
-
-    private void runtimeError(JoeError error) {
-        if (error.line() >= 0) {
-            System.err.print("[line " + error.line() + "] ");
-        }
-        System.err.println(error.getJoeStackTrace());
-        hadRuntimeError = true;
-    }
 
     void error(int line, String message) {
         report(line, "", message);

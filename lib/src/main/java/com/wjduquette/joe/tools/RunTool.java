@@ -1,7 +1,9 @@
 package com.wjduquette.joe.tools;
 
 import com.wjduquette.joe.App;
+import com.wjduquette.joe.CompileError;
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeError;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -45,12 +47,25 @@ public class RunTool implements Tool {
 
         var joe = new Joe();
         var path = argq.poll();
+
         try {
             joe.runFile(path);
         } catch (IOException ex) {
             System.err.println("Could not read script: " + path +
                 "\n*** " + ex.getMessage());
             System.exit(1);
+        } catch (CompileError ex) {
+            if (ex.line() >= 0) {
+                System.err.print("[line " + ex.line() + "] ");
+            }
+            System.err.println(ex.getMessage());
+            System.exit(65);
+        } catch (JoeError ex) {
+            if (ex.line() >= 0) {
+                System.err.print("[line " + ex.line() + "] ");
+            }
+            System.err.println(ex.getJoeStackTrace());
+            System.exit(70);
         }
     }
 
