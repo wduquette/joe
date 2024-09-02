@@ -25,6 +25,26 @@ I wanted a language
 
 Joe is growing into that language.
 
+## Non-Goals
+
+**High Performance**: I don't need it; and I'm following the original Tcl/Tk
+dictum: write the fast code in the host language and glue it together with the
+scripting language.
+
+**Application development**: See above.  Joe is meant to be a partner with
+Java, not a replacement.
+
+**General scripting**: Use Python.  Or, better still, Tcl/Tk.
+
+**Pure functional programming**: I'm happy to incorporate functional
+techniques in my code; but I've spent over 40 years learning how to work
+with mutable state without shooting myself in the foot.
+
+**Automatic binding to Java classes**: I've written bindings by hand.  I've
+used generators like Swig.  Artisanal hand-crafted bindings are much more
+pleasing, at least to me.  I want to provide tools for that purpose, not 
+settle for something quick and ugly.
+
 ## Why Java?
 
 I've been using Java professionally, full-time, for the last nine years.  I'm
