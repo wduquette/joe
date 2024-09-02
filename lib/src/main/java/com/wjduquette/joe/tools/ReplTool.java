@@ -3,6 +3,7 @@ package com.wjduquette.joe.tools;
 import com.wjduquette.joe.App;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
+import com.wjduquette.joe.SyntaxError;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -86,6 +87,8 @@ public class ReplTool implements Tool {
                 if (result != null) {
                     System.out.println("-> " + joe.stringify(result));
                 }
+            } catch (SyntaxError ex) {
+                ex.printErrorsByLine();
             } catch (JoeError ex) {
                 System.err.println("*** " + ex.getJoeStackTrace());
             }

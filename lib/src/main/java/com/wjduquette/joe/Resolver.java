@@ -4,20 +4,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.function.Consumer;
 
 class Resolver {
     private enum FunctionType { NONE, FUNCTION, INITIALIZER, METHOD }
     private enum ClassType { NONE, CLASS, SUBCLASS }
 
-    private final Joe joe;
     private final Interpreter interpreter;
+    private final Consumer<SyntaxError.Detail> reporter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
     private ClassType currentClass = ClassType.NONE;
 
-    Resolver(Joe joe, Interpreter interpreter) {
-        this.joe = joe;
+    Resolver(
+        Interpreter interpreter,
+        Consumer<SyntaxError.Detail> reporter)
+    {
         this.interpreter = interpreter;
+        this.reporter = reporter;
     }
 
     public void resolve(List<Stmt> statements) {
@@ -48,7 +52,7 @@ class Resolver {
                     var className = stmt.name().lexeme();
                     var superName = stmt.superclass().name().lexeme();
                     if (className.equals(superName)) {
-                        joe.error(stmt.superclass().name(),
+                        error(stmt.superclass().name(),
                             "A class can't inherit from itself.");
                     }
                 }
@@ -100,12 +104,12 @@ class Resolver {
             case Stmt.Print stmt -> resolve(stmt.expr());
             case Stmt.Return stmt -> {
                 if (currentFunction == FunctionType.NONE) {
-                    joe.error(stmt.keyword(),
+                    error(stmt.keyword(),
                         "Attempted 'return' from top-level code.");
                 }
                 if (stmt.value() != null) {
                     if (currentFunction == FunctionType.INITIALIZER) {
-                        joe.error(stmt.keyword(),
+                        error(stmt.keyword(),
                             "Attempted to return a value from an initializer.");
                     }
                     resolve(stmt.value());
@@ -155,17 +159,17 @@ class Resolver {
             }
             case Expr.Super expr -> {
                 if (currentClass == ClassType.NONE) {
-                    joe.error(expr.keyword(),
+                    error(expr.keyword(),
                         "Attempted to use 'super' outside of a class.");
                 } else if (currentClass != ClassType.SUBCLASS) {
-                    joe.error(expr.keyword(),
+                    error(expr.keyword(),
                         "Attempted to use 'super' in a class with no superclass.");
                 }
                 resolveLocal(expr, expr.keyword());
             }
             case Expr.This expr -> {
                 if (currentClass == ClassType.NONE) {
-                    joe.error(expr.keyword(),
+                    error(expr.keyword(),
                         "Attempted to use 'this' outside of any class.");
                 }
                 resolveLocal(expr, expr.keyword());
@@ -174,7 +178,7 @@ class Resolver {
             case Expr.Variable expr -> {
                 if (!scopes.isEmpty() &&
                     scopes.peek().get(expr.name().lexeme()) == Boolean.FALSE) {
-                    joe.error(expr.name(),
+                    error(expr.name(),
                         "Can't read local variable in its own initializer.");
                 }
 
@@ -218,7 +222,7 @@ class Resolver {
 
         Map<String, Boolean> scope = scopes.peek();
         if (scope.containsKey(name.lexeme())) {
-            joe.error(name,
+            error(name,
                 "Already a variable with this name in this scope.");
         }
         scope.put(name.lexeme(), false);
@@ -227,5 +231,12 @@ class Resolver {
     private void define(Token name) {
         if (scopes.isEmpty()) return;
         scopes.peek().put(name.lexeme(), true);
+    }
+
+    // Saves the error detail.
+    void error(Token token, String message) {
+        var line = token.line();
+        var msg = "Error at '" + token.lexeme() + "': " + message;
+        reporter.accept(new SyntaxError.Detail(line, msg));
     }
 }

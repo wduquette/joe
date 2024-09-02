@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Joe {
@@ -13,7 +14,6 @@ public class Joe {
     private final GlobalEnvironment globalEnvironment;
     private final Interpreter interpreter;
     private final Codifier codifier;
-    boolean hadError = false;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -49,11 +49,13 @@ public class Joe {
      * @param path The file's path
      * @return The script's result
      * @throws IOException if the file cannot be read.
-     * @throws CompileError if the script could not be compiled.
+     * @throws SyntaxError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
     @SuppressWarnings("UnusedReturnValue")
-    public Object runFile(String path) throws IOException {
+    public Object runFile(String path)
+        throws IOException, SyntaxError, JoeError
+    {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         var script = new String(bytes, Charset.defaultCharset());
 
@@ -64,28 +66,30 @@ public class Joe {
      * Executes the script, throwing an appropriate error on failure.
      * @param source The input
      * @return The script's result
-     * @throws CompileError if the script could not be compiled.
+     * @throws SyntaxError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
-    public Object run(String source) throws JoeError {
-        Scanner scanner = new Scanner(this, source);
+    public Object run(String source) throws SyntaxError, JoeError {
+        var details = new ArrayList<SyntaxError.Detail>();
+
+        Scanner scanner = new Scanner(source, details::add);
         List<Token> tokens = scanner.scanTokens();
-        Parser parser = new Parser(this, tokens);
+        Parser parser = new Parser(tokens, details::add);
         var statements = parser.parse();
 
         // Stop if there was a syntax error.
-        if (hadError) {
-            throw new CompileError("Syntax error in input, halting.");
+        if (!details.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.", details);
         }
 
         System.out.println("<<<\n" + recodify(statements) + "\n>>>");
 
-        Resolver resolver = new Resolver(this, interpreter);
+        Resolver resolver = new Resolver(interpreter, details::add);
         resolver.resolve(statements);
 
         // Stop if there was a resolution error.
-        if (hadError) {
-            throw new CompileError("Semantic error in input, halting.");
+        if (!details.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.", details);
         }
 
         return interpreter.interpret(statements);
@@ -100,42 +104,6 @@ public class Joe {
      */
     Interpreter interp() {
         return interpreter;
-    }
-
-    //-------------------------------------------------------------------------
-    // Output and Error Handling
-
-    void error(int line, String message) {
-        report(line, "", message);
-    }
-
-    private void report(int line, String where, String message) {
-        System.err.println(
-                "[line " + line + "] Error" + where + ": " + message);
-        hadError = true;
-    }
-
-    void error(Token token, String message) {
-        if (token.type() == TokenType.EOF) {
-            report(token.line(), " at end", message);
-        } else {
-            report(token.line(), " at '" + token.lexeme() + "'", message);
-        }
-    }
-
-    // Converts the expression into something that looks like code.
-    String recodify(Expr expr) {
-        return codifier.recodify(expr);
-    }
-
-    // Converts the statement into something that looks like code.
-    String recodify(Stmt statement) {
-        return recodify(List.of(statement));
-    }
-
-    // Converts the statements into something that looks like code.
-    String recodify(List<Stmt> statements) {
-        return codifier.recodify(statements);
     }
 
     //-------------------------------------------------------------------------
@@ -187,7 +155,20 @@ public class Joe {
         }
     }
 
-    // Returns the type of the value, for use in error messages.
+    // Converts the expression into something that looks like code.
+    String recodify(Expr expr) {
+        return codifier.recodify(expr);
+    }
+
+    // Converts the statement into something that looks like code.
+    String recodify(Stmt statement) {
+        return recodify(List.of(statement));
+    }
+
+    // Converts the statements into something that looks like code.
+    String recodify(List<Stmt> statements) {
+        return codifier.recodify(statements);
+    }
 
     /**
      * Gets the script-level type of the value, or null if null.

@@ -1,7 +1,7 @@
 package com.wjduquette.joe.tools;
 
 import com.wjduquette.joe.App;
-import com.wjduquette.joe.CompileError;
+import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 
@@ -54,10 +54,8 @@ public class RunTool implements Tool {
             System.err.println("Could not read script: " + path +
                 "\n*** " + ex.getMessage());
             System.exit(1);
-        } catch (CompileError ex) {
-            if (ex.line() >= 0) {
-                System.err.print("[line " + ex.line() + "] ");
-            }
+        } catch (SyntaxError ex) {
+            ex.printErrorsByLine();
             System.err.println(ex.getMessage());
             System.exit(65);
         } catch (JoeError ex) {

@@ -1,17 +1,10 @@
 package com.wjduquette.joe;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static com.wjduquette.joe.checker.Checker.check;
 
 public class ScannerTest extends Ted {
-    private Joe joe;
-
-    @Before public void setup() {
-        joe = new Joe();
-    }
-
     @Test
     public void testStringEscapes() {
         test("testStringEscapes");
@@ -29,7 +22,7 @@ public class ScannerTest extends Ted {
     }
 
     private String scanString(String input) {
-        var scanner = new Scanner(joe, input);
+        var scanner = new Scanner(input, detail -> {});
         var result = scanner.scanTokens();
         if (result.isEmpty()) {
             return null;
