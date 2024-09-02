@@ -51,6 +51,7 @@ public class Joe {
      */
     public void installScriptResource(Class<?> cls, String resource) {
         try (var stream = cls.getResourceAsStream(resource)) {
+            assert stream != null;
             var source = new String(stream.readAllBytes(),
                 StandardCharsets.UTF_8);
             run(source);
