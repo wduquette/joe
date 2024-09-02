@@ -161,7 +161,6 @@ public class Joe {
      * @return The proxy, or null
      */
     TypeProxy<?> lookupProxy(Object object) {
-        var cls = object.getClass();
         return lookupProxyByClass(object.getClass());
     }
 
@@ -403,11 +402,11 @@ public class Joe {
     @SuppressWarnings("unchecked")
     public <T> T toType(Class<T> cls, Object arg) {
         if (arg != null && cls.isAssignableFrom(arg.getClass())) {
-            return (T)arg;
+            return (T) arg;
         } else {
             var proxy = lookupProxyByClass(cls);
             var typeName = proxy != null
-                ? proxy.getTypeName() : arg.getClass().getSimpleName();
+                ? proxy.getTypeName() : cls.getSimpleName();
             throw expected(typeName, arg);
         }
     }
