@@ -1,25 +1,25 @@
 package com.wjduquette.joe;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.wjduquette.joe.TokenType.*;
 
-@SuppressWarnings("ThrowableNotThrown")
 class Parser {
     private static final int MAX_CALL_ARGUMENTS = 255;
 
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Joe joe;
+    private final Consumer<SyntaxError.Detail> reporter;
     private final List<Token> tokens;
     private int current = 0;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    Parser(Joe joe, List<Token> tokens) {
-        this.joe = joe;
+    Parser(List<Token> tokens, Consumer<SyntaxError.Detail> reporter) {
+        this.reporter = reporter;
         this.tokens = tokens;
     }
 
@@ -46,7 +46,7 @@ class Parser {
             if (match(VAR)) return varDeclaration();
 
             return statement();
-        } catch (SyntaxError error) {
+        } catch (ErrorSync error) {
             synchronize();
             return null;
         }
@@ -72,7 +72,7 @@ class Parser {
             if (match(METHOD)) {
                 methods.add(functionDeclaration("method"));
             } else {
-                throw error(advance(), "Expected method declaration.");
+                throw errorSync(advance(), "Expected method declaration.");
             }
         }
 
@@ -94,14 +94,28 @@ class Parser {
     }
 
     private Stmt statement() {
+        if (match(ASSERT)) return assertStatement();
         if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
-        if (match(PRINT)) return printStatement();
         if (match(RETURN)) return returnStatement();
         if (match(WHILE)) return whileStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
+    }
+
+    private Stmt assertStatement() {
+        Token keyword = previous();
+        Expr condition = expression();
+        Expr message = null;
+
+        if (match(COMMA)) {
+            message = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after assertion.");
+
+        return new Stmt.Assert(keyword, condition, message);
     }
 
     private Stmt expressionStatement() {
@@ -180,12 +194,6 @@ class Parser {
         }
 
         return new Stmt.If(condition, thenBranch, elseBranch);
-    }
-
-    private Stmt printStatement() {
-        Expr value = expression();
-        consume(SEMICOLON, "Expect ';' after value.");
-        return new Stmt.Print(value);
     }
 
     private Stmt returnStatement() {
@@ -393,7 +401,7 @@ class Parser {
             return new Expr.Grouping(expr);
         }
 
-        throw error(peek(), "Expected expression.");
+        throw errorSync(peek(), "Expected expression.");
     }
 
     //-------------------------------------------------------------------------
@@ -413,7 +421,7 @@ class Parser {
     private Token consume(TokenType type, String message) {
         if (check(type)) return advance();
 
-        throw error(peek(), message);
+        throw errorSync(peek(), message);
     }
 
     private boolean check(TokenType type) {
@@ -438,9 +446,19 @@ class Parser {
         return tokens.get(current - 1);
     }
 
-    private SyntaxError error(Token token, String message) {
-        joe.error(token, message);
-        return new SyntaxError(message);
+    // Saves the error detail, with no synchronization.
+    void error(Token token, String message) {
+        var line = token.line();
+        var msg = token.type() == TokenType.EOF
+            ? "Error at end: " + message
+            : "Error at '" + token.lexeme() + "': " + message;
+        reporter.accept(new SyntaxError.Detail(line, msg));
+    }
+
+    // Saves the error detail, with synchronization.
+    private ErrorSync errorSync(Token token, String message) {
+        error(token, message);
+        return new ErrorSync(message);
     }
 
     // Discard tokens until we are at the beginning of the next statement.
@@ -455,12 +473,12 @@ class Parser {
             // If we see a keyword indicating the beginning of a new
             // statement, return.
             switch (peek().type()) {
+                case ASSERT:
                 case CLASS:
                 case FOR:
                 case FUNCTION:
                 case IF:
                 case METHOD:
-                case PRINT:
                 case RETURN:
                 case VAR:
                 case WHILE:
@@ -473,10 +491,10 @@ class Parser {
     }
 
     /**
-     * An error found while parsing Joe code.
+     * An exception used to synchronize errors.
      */
-    private static class SyntaxError extends RuntimeException {
-        SyntaxError(String message) {
+    private static class ErrorSync extends RuntimeException {
+        ErrorSync(String message) {
             super(message);
         }
     }

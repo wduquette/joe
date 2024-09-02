@@ -2,8 +2,12 @@ package com.wjduquette.joe.tools;
 
 import com.wjduquette.joe.App;
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeError;
+import com.wjduquette.joe.SyntaxError;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.List;
 
@@ -34,10 +38,15 @@ public class ReplTool implements Tool {
     );
 
     //-------------------------------------------------------------------------
+    // Instance Variables
+
+    private final Joe joe;
+
+    //-------------------------------------------------------------------------
     // Constructor
 
     public ReplTool() {
-        // Nothing to do
+        this.joe = new Joe();
     }
 
     //-------------------------------------------------------------------------
@@ -55,15 +64,37 @@ public class ReplTool implements Tool {
             System.exit(64);
         }
 
-        var joe = new Joe();
         try {
-            joe.runPrompt();
+            runPrompt();
         } catch (IOException ex) {
             System.err.print(
                 "I/O Error while reading from console: " +
                 ex.getMessage());
         }
     }
+
+    public void runPrompt() throws IOException {
+        InputStreamReader input = new InputStreamReader(System.in);
+        BufferedReader reader = new BufferedReader(input);
+
+        for (;;) {
+            System.out.print("> ");
+            String line = reader.readLine();
+            if (line == null) break;
+            try {
+                var result = joe.run(line);
+
+                if (result != null) {
+                    System.out.println("-> " + joe.stringify(result));
+                }
+            } catch (SyntaxError ex) {
+                ex.printErrorsByLine();
+            } catch (JoeError ex) {
+                System.err.println("*** " + ex.getJoeStackTrace());
+            }
+        }
+    }
+
 
 
     //-------------------------------------------------------------------------

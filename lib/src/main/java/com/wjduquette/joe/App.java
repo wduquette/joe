@@ -2,6 +2,7 @@ package com.wjduquette.joe;
 
 import com.wjduquette.joe.tools.ReplTool;
 import com.wjduquette.joe.tools.RunTool;
+import com.wjduquette.joe.tools.test.TestTool;
 import com.wjduquette.joe.tools.ToolLauncher;
 
 import java.util.List;
@@ -15,7 +16,8 @@ public class App {
     public static void main(String[] args) {
         var launcher = new ToolLauncher(NAME, List.of(
             RunTool.INFO,
-            ReplTool.INFO
+            ReplTool.INFO,
+            TestTool.INFO
         ));
 
         try {

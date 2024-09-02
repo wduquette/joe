@@ -43,6 +43,13 @@ class Codifier {
     // Recodifies a single statement with the desired indent level.
     private String recodify(int indent, Stmt statement) {
         var code = switch (statement) {
+            case Stmt.Assert stmt ->
+                "assert " +
+                recodify(stmt.condition()) +
+                (stmt.message() != null
+                    ? ", " + recodify(stmt.message())
+                    : "")
+                + ";";
             case Stmt.Block stmt ->
                 "{\n" + recodify(indent + 1, stmt.statements()) + "\n"
                 + leading(indent) +"}";
@@ -119,8 +126,6 @@ class Codifier {
                 "return" +
                     (stmt.value() != null ? " " + recodify(stmt.value()) : "")
                     + ";";
-            case Stmt.Print stmt ->
-                "print " + recodify(stmt.expr()) + ";";
             case Stmt.Var stmt -> stmt.initializer() != null
                 ? "var " + stmt.name().lexeme() + " = " +
                 recodify(stmt.initializer()) + ";"

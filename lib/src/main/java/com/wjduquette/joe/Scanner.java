@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static com.wjduquette.joe.TokenType.*;
 
@@ -12,6 +13,7 @@ public class Scanner {
 
     static {
         keywords = new HashMap<>();
+        keywords.put("assert",   ASSERT);
         keywords.put("class",    CLASS);
         keywords.put("else",     ELSE);
         keywords.put("extends",  EXTENDS);
@@ -21,7 +23,6 @@ public class Scanner {
         keywords.put("if",       IF);
         keywords.put("method",   METHOD);
         keywords.put("null",     NULL);
-        keywords.put("print",    PRINT);
         keywords.put("return",   RETURN);
         keywords.put("super",    SUPER);
         keywords.put("this",     THIS);
@@ -33,8 +34,8 @@ public class Scanner {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Joe joe;
     private final String source;
+    private final Consumer<SyntaxError.Detail> reporter;
     private final List<Token> tokens = new ArrayList<>();
     private int start = 0;
     private int current = 0;
@@ -43,9 +44,9 @@ public class Scanner {
     //-------------------------------------------------------------------------
     // Constructor
 
-    Scanner(Joe joe, String source) {
-        this.joe = joe;
+    Scanner(String source, Consumer<SyntaxError.Detail> reporter) {
         this.source = source;
+        this.reporter = reporter;
     }
 
     //-------------------------------------------------------------------------
@@ -91,14 +92,14 @@ public class Scanner {
                 if (match('&')) {
                     addToken(AND);
                 } else {
-                    joe.error(line, "Expected '&'.");
+                    error(line, "Expected '&'.");
                 }
             }
             case '|' -> {
                 if (match('|')) {
                     addToken(OR);
                 } else {
-                    joe.error(line, "Expected '|'.");
+                    error(line, "Expected '|'.");
                 }
             }
             case ' ', '\r', '\t' -> {
@@ -112,7 +113,7 @@ public class Scanner {
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    joe.error(line, "Unexpected character: '" + peek() + "'.");
+                    error(line, "Unexpected character: '" + peek() + "'.");
                 }
             }
         }
@@ -163,7 +164,7 @@ public class Scanner {
                             case 'f' -> buff.append('\f');
                             case '"' -> buff.append('"');
                             case 'u' -> unicode(buff);
-                            default -> joe.error(line,
+                            default -> error(line,
                                 "Unexpected escape: \\" + peek());
                         }
                     }
@@ -177,7 +178,7 @@ public class Scanner {
         }
 
         if (isAtEnd()) {
-            joe.error(line, "Unterminated string.");
+            error(line, "Unterminated string.");
             return;
         }
 
@@ -200,7 +201,7 @@ public class Scanner {
             var hex = Integer.parseInt(hexCode, 16);
             buff.append((char)hex);
         } else {
-            joe.error(line, "Incomplete Unicode escape");
+            error(line, "Incomplete Unicode escape");
         }
     }
 
@@ -259,4 +260,7 @@ public class Scanner {
         tokens.add(new Token(type, text, literal, line));
     }
 
+    private void error(int line, String message) {
+        reporter.accept(new SyntaxError.Detail(line, message));
+    }
 }

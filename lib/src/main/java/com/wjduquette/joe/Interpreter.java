@@ -21,23 +21,6 @@ public class Interpreter {
         this.joe = joe;
         this.globals = joe.getGlobalEnvironment();
         this.environment = globals;
-
-        globals.define("stringify",
-            new NativeFunction("stringify", this::_stringify));
-        globals.define("typeName",
-            new NativeFunction("typeName", this::_typeName));
-    }
-
-    // TODO: Define embedding API in Joe, standard library
-    private Object _stringify(Interpreter interp, List<Object> args) {
-        Joe.exactArity(args, 1, "stringify(value)");
-
-        return joe.stringify(args.get(0));
-    }
-    private Object _typeName(Interpreter interp, List<Object> args) {
-        Joe.exactArity(args, 1, "typeName(value)");
-
-        return joe.typeName(args.get(0));
     }
 
     //-------------------------------------------------------------------------
@@ -53,6 +36,16 @@ public class Interpreter {
 
     private Object execute(Stmt statement) {
         switch (statement) {
+            case Stmt.Assert stmt -> {
+                var condition = evaluate(stmt.condition());
+                if (!Joe.isTruthy(condition)) {
+                    var message = "Assertion unmet: " +
+                        (stmt.message() != null
+                            ? joe.stringify(evaluate(stmt.message()))
+                            : joe.recodify(stmt.condition()));
+                    throw new AssertError(stmt.keyword().line(), message);
+                }
+            }
             case Stmt.Block stmt -> {
                 return executeBlock(stmt.statements(), new Environment(environment));
             }
@@ -119,10 +112,6 @@ public class Interpreter {
                 } else if (stmt.elseBranch() != null) {
                     return execute(stmt.elseBranch());
                 }
-            }
-            case Stmt.Print stmt -> {
-                var value = evaluate(stmt.expr());
-                System.out.println(joe.stringify(value));
             }
             case Stmt.Return stmt -> {
                 Object value = null;
@@ -271,9 +260,7 @@ public class Interpreter {
                 }
 
                 if (callee instanceof JoeCallable callable) {
-                    // TODO: Should pass Joe, not Interpreter
-                    // TODO: Check function arity in JoeFunction!
-                    yield callable.call(this, args);
+                    yield callable.call(joe, args);
                 } else {
                     // TODO add recodify(expr.callee()) as a stack frame!
                     throw joe.expected("a callable", callee);

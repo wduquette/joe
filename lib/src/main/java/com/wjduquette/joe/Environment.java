@@ -1,6 +1,8 @@
 package com.wjduquette.joe;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Environment {
@@ -13,6 +15,20 @@ public class Environment {
 
     Environment(Environment enclosing) {
         this.enclosing = enclosing;
+    }
+
+    public List<String> getVarNames() {
+        return new ArrayList<>(values.keySet());
+    }
+
+    public Object getVar(String name) {
+        if (values.containsKey(name)) {
+            return values.get(name);
+        }
+
+        if (enclosing != null) return enclosing.getVar(name);
+
+        return null;
     }
 
     Object get(Token name) {

@@ -1,11 +1,11 @@
 package com.wjduquette.joe;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Joe {
@@ -15,8 +15,6 @@ public class Joe {
     private final GlobalEnvironment globalEnvironment;
     private final Interpreter interpreter;
     private final Codifier codifier;
-    boolean hadError = false;
-    boolean hadRuntimeError = false;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -25,6 +23,8 @@ public class Joe {
         globalEnvironment = new GlobalEnvironment();
         interpreter = new Interpreter(this);
         codifier = new Codifier(this);
+
+        StandardLibrary.LIB.install(this);
     }
 
     //-------------------------------------------------------------------------
@@ -34,107 +34,110 @@ public class Joe {
         return globalEnvironment;
     }
 
+    /**
+     * Installs a native function into Joe's global environment.
+     * @param function The function
+     */
+    public void installGlobalFunction(NativeFunction function) {
+        globalEnvironment.define(function.name(), function);
+    }
+
+    /**
+     * Installs a resource file into the engine, executing it as a Joe
+     * script.  This is the standard way to add library code written
+     * in Joe from within Java.
+     * @param cls The class
+     * @param resource The resource name, including any relative path.
+     */
+    public void installScriptResource(Class<?> cls, String resource) {
+        try (var stream = cls.getResourceAsStream(resource)) {
+            assert stream != null;
+            var source = new String(stream.readAllBytes(),
+                StandardCharsets.UTF_8);
+            run(source);
+        } catch (SyntaxError ex) {
+            System.err.println("Could not load script resource '" +
+                resource + "' relative to class " +
+                cls.getCanonicalName() + ":\n" + ex.getMessage());
+            ex.printErrorsByLine(System.err);
+            System.exit(1);
+        } catch (JoeError ex) {
+            System.err.println("Could not install script resource '" +
+                resource + "' relative to class " +
+                cls.getCanonicalName() + ":\n" + ex.getMessage());
+            System.err.println(ex.getJoeStackTrace());
+            System.exit(1);
+        } catch (IOException ex) {
+            System.err.println("Could not read script resource '" +
+                resource + "' relative to class\n" +
+                cls.getCanonicalName() + ": " + ex.getMessage());
+            System.exit(1);
+        }
+    }
+
     //-------------------------------------------------------------------------
     // Script Execution
 
+    /**
+     * Reads the given file and executes its content as a script.
+     * @param path The file's path
+     * @return The script's result
+     * @throws IOException if the file cannot be read.
+     * @throws SyntaxError if the script could not be compiled.
+     * @throws JoeError on all runtime errors.
+     */
     @SuppressWarnings("UnusedReturnValue")
-    public Object runFile(String path) throws IOException {
+    public Object runFile(String path)
+        throws IOException, SyntaxError, JoeError
+    {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         var script = new String(bytes, Charset.defaultCharset());
-        var result = run(script);
 
-        // Indicate an error in the exit code.
-        if (hadError) System.exit(65);
-        if (hadRuntimeError) System.exit(70);
-
-        return result;
+        return run(script);
     }
 
-    public void runPrompt() throws IOException {
-        InputStreamReader input = new InputStreamReader(System.in);
-        BufferedReader reader = new BufferedReader(input);
+    /**
+     * Executes the script, throwing an appropriate error on failure.
+     * @param source The input
+     * @return The script's result
+     * @throws SyntaxError if the script could not be compiled.
+     * @throws JoeError on all runtime errors.
+     */
+    public Object run(String source) throws SyntaxError, JoeError {
+        var details = new ArrayList<SyntaxError.Detail>();
 
-        for (;;) {
-            System.out.print("> ");
-            String line = reader.readLine();
-            if (line == null) break;
-            var result = run(line);
-            if (!hadError && result != null) {
-                System.out.println("-> " + stringify(result));
-            }
-            hadError = false;
-        }
-    }
-
-    public Object run(String source) {
-        Scanner scanner = new Scanner(this, source);
+        Scanner scanner = new Scanner(source, details::add);
         List<Token> tokens = scanner.scanTokens();
-        Parser parser = new Parser(this, tokens);
+        Parser parser = new Parser(tokens, details::add);
         var statements = parser.parse();
 
         // Stop if there was a syntax error.
-        if (hadError) return null;
+        if (!details.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.", details);
+        }
 
         System.out.println("<<<\n" + recodify(statements) + "\n>>>");
 
-        Resolver resolver = new Resolver(this, interpreter);
+        Resolver resolver = new Resolver(interpreter, details::add);
         resolver.resolve(statements);
 
         // Stop if there was a resolution error.
-        if (hadError) return null;
-
-        try {
-            return interpreter.interpret(statements);
-        } catch (JoeError ex) {
-            runtimeError(ex);
-            return null;
+        if (!details.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.", details);
         }
+
+        return interpreter.interpret(statements);
     }
 
     //-------------------------------------------------------------------------
-    // Output and Error Handling
+    // Internal Support -- for use within this package
 
-    private void runtimeError(JoeError error) {
-        if (error.line() >= 0) {
-            System.err.println(error.getMessage() +
-                "\n[line " + error.line() + "]");
-        } else {
-            System.err.println(error.getMessage());
-        }
-        hadRuntimeError = true;
-    }
-
-    void error(int line, String message) {
-        report(line, "", message);
-    }
-
-    private void report(int line, String where, String message) {
-        System.err.println(
-                "[line " + line + "] Error" + where + ": " + message);
-        hadError = true;
-    }
-
-    void error(Token token, String message) {
-        if (token.type() == TokenType.EOF) {
-            report(token.line(), " at end", message);
-        } else {
-            report(token.line(), " at '" + token.lexeme() + "'", message);
-        }
-    }
-
-    // Converts the expression into something that looks like code.
-    String recodify(Expr expr) {
-        return codifier.recodify(expr);
-    }
-
-    // Converts the statement into something that looks like code.
-    String recodify(Stmt statement) {
-        return recodify(List.of(statement));
-    }
-
-    // Converts the statements into something that looks like code.
-    String recodify(List<Stmt> statements) {
-        return codifier.recodify(statements);
+    /**
+     * Gets the engine's actual interpreter.
+     * @return The interpreter.
+     */
+    Interpreter interp() {
+        return interpreter;
     }
 
     //-------------------------------------------------------------------------
@@ -186,7 +189,20 @@ public class Joe {
         }
     }
 
-    // Returns the type of the value, for use in error messages.
+    // Converts the expression into something that looks like code.
+    String recodify(Expr expr) {
+        return codifier.recodify(expr);
+    }
+
+    // Converts the statement into something that looks like code.
+    String recodify(Stmt statement) {
+        return recodify(List.of(statement));
+    }
+
+    // Converts the statements into something that looks like code.
+    String recodify(List<Stmt> statements) {
+        return codifier.recodify(statements);
+    }
 
     /**
      * Gets the script-level type of the value, or null if null.
@@ -272,6 +288,10 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Argument parsing and error handling helpers
 
+    public static JoeError arityFailure(String signature) {
+        return new JoeError("Wrong number of arguments, expected: " + signature);
+    }
+
     /**
      * Throws an arity check failure if the arguments list contains the wrong
      * number of arguments.
@@ -282,7 +302,27 @@ public class Joe {
      */
     public static void exactArity(List<Object> args, int arity, String signature) {
         if (args.size() != arity) {
-            throw new JoeError("Wrong number of arguments, expected: " + signature);
+            throw arityFailure(signature);
+        }
+    }
+
+    /**
+     * Throws an arity check failure if the arguments list contains the wrong
+     * number of arguments.
+     * @param args The argument list
+     * @param minArity The minimum arity
+     * @param maxArity The maximum arity
+     * @param signature The signature string.
+     * @throws JoeError on failure
+     */
+    public static void arityRange(
+        List<Object> args,
+        int minArity,
+        int maxArity,
+        String signature)
+    {
+        if (args.size() < minArity || args.size() > maxArity) {
+            throw arityFailure(signature);
         }
     }
 

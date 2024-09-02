@@ -51,7 +51,7 @@ public class JoeFunction implements JoeCallable {
     }
 
     @Override
-    public Object call(Interpreter interpreter, List<Object> args) {
+    public Object call(Joe joe, List<Object> args) {
         Joe.exactArity(args, declaration.params().size(), signature);
 
         Environment environment = new Environment(closure);
@@ -62,7 +62,7 @@ public class JoeFunction implements JoeCallable {
         }
 
         try {
-            var result = interpreter.executeBlock(declaration.body(), environment);
+            var result = joe.interp().executeBlock(declaration.body(), environment);
             if (isInitializer) return closure.getAt(0, "this");
             return result;
         } catch (Return returnValue) {
