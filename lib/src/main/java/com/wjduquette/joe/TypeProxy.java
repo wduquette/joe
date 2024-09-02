@@ -78,13 +78,13 @@ public class TypeProxy<V> implements JoeCallable {
     /**
      * Returns a codified value, i.e., a value as it could be entered
      * in code, or a "<...>" token otherwise.
-     * Defaults to the value's toString().
+     * Defaults to the stringified value.
      * @param joe The engine
      * @param value The value
      * @return The string
      */
     public String codify(Joe joe, Object value) {
-        return value.toString();
+        return stringify(joe, value);
     }
 
     //-------------------------------------------------------------------------
