@@ -1,8 +1,6 @@
 package com.wjduquette.joe;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -16,7 +14,6 @@ public class Joe {
     private final Interpreter interpreter;
     private final Codifier codifier;
     boolean hadError = false;
-    boolean hadRuntimeError = false;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -55,6 +52,7 @@ public class Joe {
      * @throws CompileError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
+    @SuppressWarnings("UnusedReturnValue")
     public Object runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         var script = new String(bytes, Charset.defaultCharset());
