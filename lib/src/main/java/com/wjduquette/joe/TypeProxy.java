@@ -36,7 +36,7 @@ public class TypeProxy<V> implements JoeCallable {
      * be a real class (not an interface) that is assignable to the value
      * type.
      *
-     * A proxy can proxy any number of related types.
+     * <p>A proxy can proxy any number of related types.</p>
      * @param type The proxied type.
      */
     public void proxies(Class<? extends V> type) {
@@ -71,7 +71,7 @@ public class TypeProxy<V> implements JoeCallable {
      * @param value The value
      * @return The string
      */
-    public String stringify(Joe joe, V value) {
+    public String stringify(Joe joe, Object value) {
         return value.toString();
     }
 
@@ -83,7 +83,7 @@ public class TypeProxy<V> implements JoeCallable {
      * @param value The value
      * @return The string
      */
-    public String codify(Joe joe, V value) {
+    public String codify(Joe joe, Object value) {
         return value.toString();
     }
 

@@ -162,6 +162,10 @@ public class Joe {
      */
     TypeProxy<?> lookupProxy(Object object) {
         var cls = object.getClass();
+        return lookupProxyByClass(object.getClass());
+    }
+
+    TypeProxy<?> lookupProxyByClass(Class<?> cls) {
         do {
             var proxy = proxyTable.get(cls);
 
@@ -206,6 +210,12 @@ public class Joe {
             return text;
         }
 
+        var proxy = lookupProxy(value);
+
+        if (proxy != null) {
+            return proxy.stringify(this, value);
+        }
+
         return value.toString();
     }
 
@@ -217,11 +227,22 @@ public class Joe {
      * @return The value
      */
     public String codify(Object value) {
+        if (value == null) {
+            return "null";
+        }
+
+        // TODO: Move to StringProxy
         if (value instanceof String string) {
             return "\"" + escape(string) + "\"";
-        } else {
-            return stringify(value);
         }
+
+        var proxy = lookupProxy(value);
+
+        if (proxy != null) {
+            return proxy.codify(this, value);
+        }
+
+        return stringify(value);
     }
 
     // Converts the expression into something that looks like code.
@@ -378,4 +399,17 @@ public class Joe {
             "'"  + codify(got) + "'.";
         return new JoeError(message);
     }
+
+    @SuppressWarnings("unchecked")
+    public <T> T toType(Class<T> cls, Object arg) {
+        if (arg != null && cls.isAssignableFrom(arg.getClass())) {
+            return (T)arg;
+        } else {
+            var proxy = lookupProxyByClass(cls);
+            var typeName = proxy != null
+                ? proxy.getTypeName() : arg.getClass().getSimpleName();
+            throw expected(typeName, arg);
+        }
+    }
 }
+

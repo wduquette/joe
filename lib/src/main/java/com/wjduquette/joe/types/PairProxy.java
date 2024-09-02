@@ -27,20 +27,24 @@ public class PairProxy extends TypeProxy<Pair> {
     // Overridable methods
 
     @Override
-    public String stringify(Joe joe, Pair value) {
+    public String stringify(Joe joe, Object value) {
+        assert value instanceof Pair;
+        var pair = (Pair)value;
         return "Pair("
-            + joe.stringify(value.left())
+            + joe.stringify(pair.left())
             + ", "
-            + joe.stringify(value.right())
+            + joe.stringify(pair.right())
             + ")";
     }
 
     @Override
-    public String codify(Joe joe, Pair value) {
+    public String codify(Joe joe, Object value) {
+        assert value instanceof Pair;
+        var pair = (Pair)value;
         return "Pair("
-            + joe.codify(value.left())
+            + joe.codify(pair.left())
             + ", "
-            + joe.codify(value.right())
+            + joe.codify(pair.right())
             + ")";
     }
 
