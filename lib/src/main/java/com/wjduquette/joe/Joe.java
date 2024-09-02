@@ -249,7 +249,12 @@ public class Joe {
         return switch (value) {
             case null -> null;
             case JoeFunction function -> toInitialCap(function.kind());
-            default -> value.getClass().getSimpleName();
+            default -> {
+                var proxy = lookupProxy(value);
+                yield proxy != null
+                    ? proxy.getTypeName()
+                    : value.getClass().getSimpleName();
+            }
         };
     }
 

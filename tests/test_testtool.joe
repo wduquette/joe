@@ -13,6 +13,5 @@ function testAssertEquals() {
 function testFail() {
     function bad() { fail("Simulated failure"); }
     var err = catch(bad);
-
     assertEquals(err.message(), "Simulated failure");
 }
