@@ -1,0 +1,11 @@
+[book]
+authors = ["Will Duquette"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Joe User's Guide"
+
+[build]
+build-dir = "../docs"             # the directory where the output is placed
+create-missing = true             # whether or not to create missing pages
+use-default-preprocessors = true  # use the default preprocessors
