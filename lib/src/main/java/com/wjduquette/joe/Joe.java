@@ -11,7 +11,7 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final GlobalEnvironment globalEnvironment;
+    private final GlobalEnvironment globals;
     private final Interpreter interpreter;
     private final Codifier codifier;
     private final Map<Class<?>, TypeProxy<?>> proxyTable = new HashMap<>();
@@ -20,7 +20,7 @@ public class Joe {
     // Constructor
 
     public Joe() {
-        globalEnvironment = new GlobalEnvironment();
+        globals = new GlobalEnvironment();
         interpreter = new Interpreter(this);
         codifier = new Codifier(this);
 
@@ -30,8 +30,8 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Configuration and Embedding
 
-    public GlobalEnvironment getGlobalEnvironment() {
-        return globalEnvironment;
+    public GlobalEnvironment getGlobals() {
+        return globals;
     }
 
     /**
@@ -39,7 +39,7 @@ public class Joe {
      * @param function The function
      */
     public void installGlobalFunction(NativeFunction function) {
-        globalEnvironment.define(function.name(), function);
+        globals.define(function.name(), function);
     }
 
     public void installType(TypeProxy<?> typeProxy) {
@@ -48,8 +48,8 @@ public class Joe {
             proxyTable.put(cls, typeProxy);
         }
 
-        // TODO: Install global function, etc., when we have them, or
-        // have the proxy do it.
+        // NEXT, install the type into the environment.
+        globals.define(typeProxy.getTypeName(), typeProxy);
     }
 
     /**

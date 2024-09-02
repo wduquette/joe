@@ -117,7 +117,7 @@ public class TestTool implements Tool {
         }
 
         // NEXT, execute its tests.
-        var globals = joe.getGlobalEnvironment();
+        var globals = joe.getGlobals();
         var tests = globals.getVarNames().stream()
             .filter(name -> name.startsWith("test"))
             .toList();

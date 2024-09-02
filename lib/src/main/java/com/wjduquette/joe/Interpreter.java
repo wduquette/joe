@@ -19,7 +19,7 @@ public class Interpreter {
 
     public Interpreter(Joe joe) {
         this.joe = joe;
-        this.globals = joe.getGlobalEnvironment();
+        this.globals = joe.getGlobals();
         this.environment = globals;
     }
 
