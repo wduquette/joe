@@ -5,8 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Joe {
     //-------------------------------------------------------------------------
@@ -15,6 +14,7 @@ public class Joe {
     private final GlobalEnvironment globalEnvironment;
     private final Interpreter interpreter;
     private final Codifier codifier;
+    private final Map<Class<?>, TypeProxy<?>> proxyTable = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -40,6 +40,16 @@ public class Joe {
      */
     public void installGlobalFunction(NativeFunction function) {
         globalEnvironment.define(function.name(), function);
+    }
+
+    public void installType(TypeProxy<?> typeProxy) {
+        // FIRST, install the proxy into the proxy table.
+        for (var cls : typeProxy.getProxiedTypes()) {
+            proxyTable.put(cls, typeProxy);
+        }
+
+        // TODO: Install global function, etc., when we have them, or
+        // have the proxy do it.
     }
 
     /**
@@ -116,8 +126,6 @@ public class Joe {
             throw new SyntaxError("Syntax error in input, halting.", details);
         }
 
-        System.out.println("<<<\n" + recodify(statements) + "\n>>>");
-
         Resolver resolver = new Resolver(interpreter, details::add);
         resolver.resolve(statements);
 
@@ -138,6 +146,27 @@ public class Joe {
      */
     Interpreter interp() {
         return interpreter;
+    }
+
+    /**
+     * Looks for a proxy for this object's class, or any of its
+     * superclasses.
+     * @param object
+     * @return
+     */
+    TypeProxy<?> lookupProxy(Object object) {
+        var cls = object.getClass();
+        do {
+            var proxy = proxyTable.get(cls);
+
+            if (proxy != null) {
+                return proxy;
+            }
+
+            cls = cls.getSuperclass();
+        } while (cls != null && cls != Object.class);
+
+        return null;
     }
 
     //-------------------------------------------------------------------------

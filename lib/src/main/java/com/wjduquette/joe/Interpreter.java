@@ -268,8 +268,13 @@ public class Interpreter {
             }
             case Expr.Get expr -> {
                 Object object = evaluate(expr.object());
-                if (object instanceof JoeInstance) {
-                    yield ((JoeInstance) object).get(expr.name());
+                if (object instanceof JoeInstance instance) {
+                    yield instance.get(expr.name());
+                } else {
+                    var proxy = joe.lookupProxy(object);
+                    if (proxy != null) {
+                        yield proxy.findMethod(object, expr.name().lexeme());
+                    }
                 }
 
                 throw joe.expected("object", object);

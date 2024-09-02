@@ -1,5 +1,8 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.types.ErrorProxy;
+import com.wjduquette.joe.types.StringProxy;
+
 import java.util.List;
 
 public class StandardLibrary extends Library {
@@ -13,6 +16,9 @@ public class StandardLibrary extends Library {
         globalFunction("println",   this::_println);
         globalFunction("stringify", this::_stringify);
         globalFunction("typeName",  this::_typeName);
+
+        type(ErrorProxy.TYPE);
+        type(StringProxy.TYPE);
     }
 
     //**
