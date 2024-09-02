@@ -1,7 +1,6 @@
 package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.TypeProxy;
 
 import java.util.List;

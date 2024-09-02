@@ -273,7 +273,7 @@ public class Interpreter {
                 } else {
                     var proxy = joe.lookupProxy(object);
                     if (proxy != null) {
-                        yield proxy.findMethod(object, expr.name().lexeme());
+                        yield proxy.bind(object, expr.name().lexeme());
                     }
                 }
 

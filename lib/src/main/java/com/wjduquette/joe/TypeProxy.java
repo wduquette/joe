@@ -37,14 +37,20 @@ public class TypeProxy<V> {
     //-------------------------------------------------------------------------
     // Internal Methods
 
-    //-------------------------------------------------------------------------
-    // Public Methods
-
-    public Set<Class<?>> getProxiedTypes() {
-        return Collections.unmodifiableSet(proxiedTypes);
-    }
-
-    public JoeCallable findMethod(Object value, String name) {
+    /**
+     * Given an object, which *must* be assignable to the value type, and a
+     * method name, returns a callable that binds the method's callable to
+     * the object.
+     *
+     * <p><b>NOTE:</b> this is intended for use in Interpreter, which will
+     * find the proxy via Joe::lookupProxy; hence, this is type-safe.</p>
+     * @param value The value
+     * @param name The method name
+     * @return The bound callable
+     * @throws JoeError if the method is not found.
+     */
+    @SuppressWarnings("unchecked")
+    JoeCallable bind(Object value, String name) {
         var method = methods.get(name);
 
         // TODO: Consider allowing method chaining
@@ -54,4 +60,16 @@ public class TypeProxy<V> {
             throw new JoeError("Undefined property '" + name + "'.");
         }
     }
+
+    //-------------------------------------------------------------------------
+    // Public Methods
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public Set<Class<?>> getProxiedTypes() {
+        return Collections.unmodifiableSet(proxiedTypes);
+    }
+
 }

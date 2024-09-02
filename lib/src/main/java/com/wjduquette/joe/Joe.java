@@ -149,10 +149,16 @@ public class Joe {
     }
 
     /**
-     * Looks for a proxy for this object's class, or any of its
-     * superclasses.
-     * @param object
-     * @return
+     * Looks for a proxy for this object's class or its superclasses.
+     *
+     * <p><b>Note:</b> The construction of the proxyTable depends on
+     * the proxied types returned by each TypeProxy; and the proxiedTypes
+     * are constrained to be compatible with the TypeProxy's value type.
+     * Thus, if this method returns a proxy, it will *always* be
+     * compatible with the given object.
+     * </p>
+     * @param object The object for which we are looking up a proxy.
+     * @return The proxy, or null
      */
     TypeProxy<?> lookupProxy(Object object) {
         var cls = object.getClass();
