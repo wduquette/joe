@@ -2,6 +2,7 @@ package com.wjduquette.joe;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -29,6 +30,10 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Configuration and Embedding
 
+    public GlobalEnvironment getGlobalEnvironment() {
+        return globalEnvironment;
+    }
+
     /**
      * Installs a native function into Joe's global environment.
      * @param function The function
@@ -37,8 +42,23 @@ public class Joe {
         globalEnvironment.define(function.name(), function);
     }
 
-    public GlobalEnvironment getGlobalEnvironment() {
-        return globalEnvironment;
+    /**
+     * Installs a resource file into the engine, executing it as a Joe
+     * script.  This is the standard way to add library code written
+     * in Joe from within Java.
+     * @param cls The class
+     * @param resource The resource name, including any relative path.
+     */
+    public void installScriptResource(Class<?> cls, String resource) {
+        try (var stream = cls.getResourceAsStream(resource)) {
+            var source = new String(stream.readAllBytes(),
+                StandardCharsets.UTF_8);
+            run(source);
+        } catch (IOException ex) {
+            throw new JoeError("Could not read script resource '" +
+                resource + "' relative to class " +
+                cls.getCanonicalName() + ": " + ex.getMessage());
+        }
     }
 
     //-------------------------------------------------------------------------

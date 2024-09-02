@@ -2,7 +2,7 @@ package com.wjduquette.joe;
 
 import com.wjduquette.joe.tools.ReplTool;
 import com.wjduquette.joe.tools.RunTool;
-import com.wjduquette.joe.tools.TestTool;
+import com.wjduquette.joe.tools.test.TestTool;
 import com.wjduquette.joe.tools.ToolLauncher;
 
 import java.util.List;

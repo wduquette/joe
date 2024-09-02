@@ -1,6 +1,8 @@
-package com.wjduquette.joe.tools;
+package com.wjduquette.joe.tools.test;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.tools.Tool;
+import com.wjduquette.joe.tools.ToolInfo;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -143,6 +145,8 @@ public class TestTool implements Tool {
             new NativeFunction("assertEquals", this::_assertEquals));
         joe.installGlobalFunction(
             new NativeFunction("fail", this::_fail));
+
+        joe.installScriptResource(getClass(), "lib_test.joe");
     }
 
     private Object _assertEquals(Joe joe, List<Object> args) {
