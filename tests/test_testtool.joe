@@ -5,13 +5,17 @@ function testAssertEquals() {
     assertEquals("abc", "abc");
 
     function bad() { assertEquals("abc", 5); }
-    var err = catch(bad);
+    var pair = catch(bad);
+    println("pair=" + codify(pair));
+    var err = pair.right();
 
     assertEquals(err.message(), "Expected '5', got: 'abc'.");
 }
 
 function testFail() {
     function bad() { fail("Simulated failure"); }
-    var err = catch(bad);
+    var pair = catch(bad);
+    println("pair=" + codify(pair));
+    var err = pair.right();
     assertEquals(err.message(), "Simulated failure");
 }
