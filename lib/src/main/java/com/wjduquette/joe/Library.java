@@ -8,6 +8,7 @@ public class Library {
     // Instance Variables
 
     private final List<NativeFunction> globalFunctions = new ArrayList<>();
+    private final List<TypeProxy<?>> types = new ArrayList<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -23,6 +24,10 @@ public class Library {
         globalFunctions.add(new NativeFunction(name, callable));
     }
 
+    protected final void type(TypeProxy<?> typeProxy) {
+        types.add(typeProxy);
+    }
+
     /**
      * Installs the library's native functions and types into the
      * engine.
@@ -30,5 +35,6 @@ public class Library {
      */
     public final void install(Joe joe) {
         globalFunctions.forEach(joe::installGlobalFunction);
+        types.forEach(joe::installType);
     }
 }

@@ -1,23 +1,19 @@
 // Sample test script
 
-howdy();
-howdy();
-howdy();
-
 function testAssertEquals() {
     assertEquals(5, 5);
     assertEquals("abc", "abc");
 
     function bad() { assertEquals("abc", 5); }
+    var pair = catch(bad);
+    var err = pair.right();
 
-    assertEquals(stringify(catch(bad)),
-        "com.wjduquette.joe.AssertError: Expected '5', got: 'abc'."
-    );
+    assertEquals(err.message(), "Expected '5', got: 'abc'.");
 }
 
 function testFail() {
     function bad() { fail("Simulated failure"); }
-
-    assertEquals(stringify(catch(bad)),
-        "com.wjduquette.joe.AssertError: Simulated failure");
+    var pair = catch(bad);
+    var err = pair.right();
+    assertEquals(err.message(), "Simulated failure");
 }

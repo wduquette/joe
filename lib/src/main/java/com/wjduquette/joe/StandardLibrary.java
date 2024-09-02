@@ -1,5 +1,9 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.types.ErrorProxy;
+import com.wjduquette.joe.types.PairProxy;
+import com.wjduquette.joe.types.StringProxy;
+
 import java.util.List;
 
 public class StandardLibrary extends Library {
@@ -13,27 +17,31 @@ public class StandardLibrary extends Library {
         globalFunction("println",   this::_println);
         globalFunction("stringify", this::_stringify);
         globalFunction("typeName",  this::_typeName);
+
+        type(ErrorProxy.TYPE);
+        type(PairProxy.TYPE);
+        type(StringProxy.TYPE);
     }
 
     //**
     // @global catch
     // @args callable
-    // @returns error or null
-    // Executes the callable, which must not require any arguments,
+    // @returns Pair(result, error)
+    // Executes the callable, which must not require any arguments.
     // and returns `null` if the call succeeds and the error otherwise.
     //
-    // This is a preliminary implementation of `catch`.  Ultimately
-    // it needs to return a `Pair(ok,error)`.
+    // Returns `Pair(result, null)` on success and
+    // `Pair(null, Error)` on error.
     private Object _catch(Joe joe, List<Object> args) {
         Joe.exactArity(args, 1, "catch(callable)");
         var arg = args.get(0);
 
         if (arg instanceof JoeCallable callable) {
             try {
-                callable.call(joe, List.of());
-                return null;
+                var result = callable.call(joe, List.of());
+                return new Pair(result, null);
             } catch (JoeError ex) {
-                return ex;
+                return new Pair(null, ex);
             }
         } else {
             throw joe.expected("no-argument callable", arg);

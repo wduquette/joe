@@ -19,7 +19,7 @@ public class Interpreter {
 
     public Interpreter(Joe joe) {
         this.joe = joe;
-        this.globals = joe.getGlobalEnvironment();
+        this.globals = joe.getGlobals();
         this.environment = globals;
     }
 
@@ -268,8 +268,13 @@ public class Interpreter {
             }
             case Expr.Get expr -> {
                 Object object = evaluate(expr.object());
-                if (object instanceof JoeInstance) {
-                    yield ((JoeInstance) object).get(expr.name());
+                if (object instanceof JoeInstance instance) {
+                    yield instance.get(expr.name());
+                } else {
+                    var proxy = joe.lookupProxy(object);
+                    if (proxy != null) {
+                        yield proxy.bind(object, expr.name().lexeme());
+                    }
                 }
 
                 throw joe.expected("object", object);

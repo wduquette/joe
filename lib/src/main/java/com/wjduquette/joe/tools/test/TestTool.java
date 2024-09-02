@@ -95,7 +95,7 @@ public class TestTool implements Tool {
     }
 
     private void runTest(String scriptPath) {
-        System.out.println("Running: " + scriptPath);
+        System.out.println("\nRunning: " + scriptPath);
 
         // FIRST, load the script.
         try {
@@ -117,15 +117,23 @@ public class TestTool implements Tool {
         }
 
         // NEXT, execute its tests.
-        var globals = joe.getGlobalEnvironment();
+        var globals = joe.getGlobals();
         var tests = globals.getVarNames().stream()
             .filter(name -> name.startsWith("test"))
             .toList();
 
+        if (tests.isEmpty()) {
+            println("  No tests in file.");
+            return;
+        }
+
+        println();
+
         for (var test : tests) {
             var value = globals.getVar(test);
             if (value instanceof JoeCallable callable) {
-                println(test + " in file " + scriptPath);
+                System.out.printf("%-30s in file %s\n", test, scriptPath);
+
                 try {
                     callable.call(joe, List.of());
                     ++successCount;

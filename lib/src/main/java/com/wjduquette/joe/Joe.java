@@ -5,22 +5,22 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Joe {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final GlobalEnvironment globalEnvironment;
+    private final GlobalEnvironment globals;
     private final Interpreter interpreter;
     private final Codifier codifier;
+    private final Map<Class<?>, TypeProxy<?>> proxyTable = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
 
     public Joe() {
-        globalEnvironment = new GlobalEnvironment();
+        globals = new GlobalEnvironment();
         interpreter = new Interpreter(this);
         codifier = new Codifier(this);
 
@@ -30,8 +30,8 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Configuration and Embedding
 
-    public GlobalEnvironment getGlobalEnvironment() {
-        return globalEnvironment;
+    public GlobalEnvironment getGlobals() {
+        return globals;
     }
 
     /**
@@ -39,7 +39,17 @@ public class Joe {
      * @param function The function
      */
     public void installGlobalFunction(NativeFunction function) {
-        globalEnvironment.define(function.name(), function);
+        globals.define(function.name(), function);
+    }
+
+    public void installType(TypeProxy<?> typeProxy) {
+        // FIRST, install the proxy into the proxy table.
+        for (var cls : typeProxy.getProxiedTypes()) {
+            proxyTable.put(cls, typeProxy);
+        }
+
+        // NEXT, install the type into the environment.
+        globals.define(typeProxy.getTypeName(), typeProxy);
     }
 
     /**
@@ -116,8 +126,6 @@ public class Joe {
             throw new SyntaxError("Syntax error in input, halting.", details);
         }
 
-        System.out.println("<<<\n" + recodify(statements) + "\n>>>");
-
         Resolver resolver = new Resolver(interpreter, details::add);
         resolver.resolve(statements);
 
@@ -138,6 +146,36 @@ public class Joe {
      */
     Interpreter interp() {
         return interpreter;
+    }
+
+    /**
+     * Looks for a proxy for this object's class or its superclasses.
+     *
+     * <p><b>Note:</b> The construction of the proxyTable depends on
+     * the proxied types returned by each TypeProxy; and the proxiedTypes
+     * are constrained to be compatible with the TypeProxy's value type.
+     * Thus, if this method returns a proxy, it will *always* be
+     * compatible with the given object.
+     * </p>
+     * @param object The object for which we are looking up a proxy.
+     * @return The proxy, or null
+     */
+    TypeProxy<?> lookupProxy(Object object) {
+        return lookupProxyByClass(object.getClass());
+    }
+
+    TypeProxy<?> lookupProxyByClass(Class<?> cls) {
+        do {
+            var proxy = proxyTable.get(cls);
+
+            if (proxy != null) {
+                return proxy;
+            }
+
+            cls = cls.getSuperclass();
+        } while (cls != null && cls != Object.class);
+
+        return null;
     }
 
     //-------------------------------------------------------------------------
@@ -171,6 +209,12 @@ public class Joe {
             return text;
         }
 
+        var proxy = lookupProxy(value);
+
+        if (proxy != null) {
+            return proxy.stringify(this, value);
+        }
+
         return value.toString();
     }
 
@@ -182,11 +226,22 @@ public class Joe {
      * @return The value
      */
     public String codify(Object value) {
+        if (value == null) {
+            return "null";
+        }
+
+        // TODO: Move to StringProxy
         if (value instanceof String string) {
             return "\"" + escape(string) + "\"";
-        } else {
-            return stringify(value);
         }
+
+        var proxy = lookupProxy(value);
+
+        if (proxy != null) {
+            return proxy.codify(this, value);
+        }
+
+        return stringify(value);
     }
 
     // Converts the expression into something that looks like code.
@@ -214,7 +269,12 @@ public class Joe {
         return switch (value) {
             case null -> null;
             case JoeFunction function -> toInitialCap(function.kind());
-            default -> value.getClass().getSimpleName();
+            default -> {
+                var proxy = lookupProxy(value);
+                yield proxy != null
+                    ? proxy.getTypeName()
+                    : value.getClass().getSimpleName();
+            }
         };
     }
 
@@ -338,4 +398,17 @@ public class Joe {
             "'"  + codify(got) + "'.";
         return new JoeError(message);
     }
+
+    @SuppressWarnings("unchecked")
+    public <T> T toType(Class<T> cls, Object arg) {
+        if (arg != null && cls.isAssignableFrom(arg.getClass())) {
+            return (T) arg;
+        } else {
+            var proxy = lookupProxyByClass(cls);
+            var typeName = proxy != null
+                ? proxy.getTypeName() : cls.getSimpleName();
+            throw expected(typeName, arg);
+        }
+    }
 }
+
