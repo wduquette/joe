@@ -4,7 +4,7 @@ import java.util.List;
 
 public sealed interface Stmt
     permits Stmt.Assert, Stmt.Block, Stmt.Class, Stmt.Expression,
-            Stmt.Function, Stmt.For, Stmt.If, Stmt.Print, Stmt.Return,
+            Stmt.Function, Stmt.For, Stmt.If, Stmt.Return,
             Stmt.Var, Stmt.While
 {
     /**
@@ -61,12 +61,6 @@ public sealed interface Stmt
      * @param elseBranch Statement or block to execute if false, or null
      */
     record If(Expr condition, Stmt thenBranch, Stmt elseBranch) implements Stmt {}
-
-    /**
-     * A "print" statement (to be removed eventually)
-     * @param expr The expression to print.
-     */
-    record Print(Expr expr) implements Stmt {}
 
     /**
      * A "return" statement

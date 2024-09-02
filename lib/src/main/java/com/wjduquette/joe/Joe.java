@@ -55,10 +55,23 @@ public class Joe {
             var source = new String(stream.readAllBytes(),
                 StandardCharsets.UTF_8);
             run(source);
-        } catch (IOException ex) {
-            throw new JoeError("Could not read script resource '" +
+        } catch (SyntaxError ex) {
+            System.err.println("Could not load script resource '" +
                 resource + "' relative to class " +
+                cls.getCanonicalName() + ":\n" + ex.getMessage());
+            ex.printErrorsByLine(System.err);
+            System.exit(1);
+        } catch (JoeError ex) {
+            System.err.println("Could not install script resource '" +
+                resource + "' relative to class " +
+                cls.getCanonicalName() + ":\n" + ex.getMessage());
+            System.err.println(ex.getJoeStackTrace());
+            System.exit(1);
+        } catch (IOException ex) {
+            System.err.println("Could not read script resource '" +
+                resource + "' relative to class\n" +
                 cls.getCanonicalName() + ": " + ex.getMessage());
+            System.exit(1);
         }
     }
 
@@ -275,6 +288,10 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Argument parsing and error handling helpers
 
+    public static JoeError arityFailure(String signature) {
+        return new JoeError("Wrong number of arguments, expected: " + signature);
+    }
+
     /**
      * Throws an arity check failure if the arguments list contains the wrong
      * number of arguments.
@@ -285,7 +302,27 @@ public class Joe {
      */
     public static void exactArity(List<Object> args, int arity, String signature) {
         if (args.size() != arity) {
-            throw new JoeError("Wrong number of arguments, expected: " + signature);
+            throw arityFailure(signature);
+        }
+    }
+
+    /**
+     * Throws an arity check failure if the arguments list contains the wrong
+     * number of arguments.
+     * @param args The argument list
+     * @param minArity The minimum arity
+     * @param maxArity The maximum arity
+     * @param signature The signature string.
+     * @throws JoeError on failure
+     */
+    public static void arityRange(
+        List<Object> args,
+        int minArity,
+        int maxArity,
+        String signature)
+    {
+        if (args.size() < minArity || args.size() > maxArity) {
+            throw arityFailure(signature);
         }
     }
 

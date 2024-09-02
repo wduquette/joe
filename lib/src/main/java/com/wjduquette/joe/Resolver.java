@@ -101,7 +101,6 @@ class Resolver {
                 resolve(stmt.thenBranch());
                 if (stmt.elseBranch() != null) resolve(stmt.elseBranch());
             }
-            case Stmt.Print stmt -> resolve(stmt.expr());
             case Stmt.Return stmt -> {
                 if (currentFunction == FunctionType.NONE) {
                     error(stmt.keyword(),

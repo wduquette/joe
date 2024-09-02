@@ -1,5 +1,6 @@
 package com.wjduquette.joe;
 
+import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -25,7 +26,11 @@ public class SyntaxError extends JoeError {
         return details;
     }
 
+    public void printErrorsByLine(PrintStream out) {
+        details.forEach(d -> out.println(d.toString()));
+    }
+
     public void printErrorsByLine() {
-         details.forEach(d -> System.out.println(d.toString()));
+        printErrorsByLine(System.out);
     }
 }

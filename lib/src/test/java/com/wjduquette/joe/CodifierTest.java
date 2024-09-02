@@ -112,14 +112,6 @@ public class CodifierTest extends Ted {
     }
 
     @Test
-    public void testStmtPrint() {
-        test("testStmtPrint");
-
-        var stmt = new Stmt.Print(two);
-        check(joe.recodify(stmt)).eq("print 2;");
-    }
-
-    @Test
     public void testStmtVar() {
         test("testStmtVar");
 

@@ -23,7 +23,6 @@ public class Scanner {
         keywords.put("if",       IF);
         keywords.put("method",   METHOD);
         keywords.put("null",     NULL);
-        keywords.put("print",    PRINT);
         keywords.put("return",   RETURN);
         keywords.put("super",    SUPER);
         keywords.put("this",     THIS);

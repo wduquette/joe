@@ -113,10 +113,6 @@ public class Interpreter {
                     return execute(stmt.elseBranch());
                 }
             }
-            case Stmt.Print stmt -> {
-                var value = evaluate(stmt.expr());
-                System.out.println(joe.stringify(value));
-            }
             case Stmt.Return stmt -> {
                 Object value = null;
                 if (stmt.value() != null) value = evaluate(stmt.value());

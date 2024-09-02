@@ -1,5 +1,9 @@
 // Sample test script
 
+howdy();
+howdy();
+howdy();
+
 function testAssertEquals() {
     assertEquals(5, 5);
     assertEquals("abc", "abc");
@@ -7,7 +11,7 @@ function testAssertEquals() {
     function bad() { assertEquals("abc", 5); }
 
     assertEquals(stringify(catch(bad)),
-        "com.wjduquette.joe.AssertError: Expected 'abc', got: '5'."
+        "com.wjduquette.joe.AssertError: Expected '5', got: 'abc'."
     );
 }
 

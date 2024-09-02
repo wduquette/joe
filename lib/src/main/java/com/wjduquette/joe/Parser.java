@@ -97,7 +97,6 @@ class Parser {
         if (match(ASSERT)) return assertStatement();
         if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
-        if (match(PRINT)) return printStatement();
         if (match(RETURN)) return returnStatement();
         if (match(WHILE)) return whileStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
@@ -195,12 +194,6 @@ class Parser {
         }
 
         return new Stmt.If(condition, thenBranch, elseBranch);
-    }
-
-    private Stmt printStatement() {
-        Expr value = expression();
-        consume(SEMICOLON, "Expect ';' after value.");
-        return new Stmt.Print(value);
     }
 
     private Stmt returnStatement() {
@@ -480,12 +473,12 @@ class Parser {
             // If we see a keyword indicating the beginning of a new
             // statement, return.
             switch (peek().type()) {
+                case ASSERT:
                 case CLASS:
                 case FOR:
                 case FUNCTION:
                 case IF:
                 case METHOD:
-                case PRINT:
                 case RETURN:
                 case VAR:
                 case WHILE:
