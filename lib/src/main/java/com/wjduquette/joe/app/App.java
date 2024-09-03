@@ -1,4 +1,4 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.tools.ReplTool;
 import com.wjduquette.joe.tools.RunTool;

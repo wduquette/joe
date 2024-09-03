@@ -32,5 +32,5 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'com.wjduquette.joe.App'
+    mainClass = 'com.wjduquette.joe.app.App'
 }
