@@ -237,17 +237,13 @@ public class Interpreter {
                         yield (double)left * (double)right;
                     }
                     case PLUS -> {
-                        if (left instanceof Double a) {
-                           if (right instanceof Double b) {
-                               yield a + b;
-                           } else {
-                               throw new RuntimeError(expr.op(),
-                                   "Expected a second double, got " +
-                                       joe.typeName(right) + " '" +
-                                       joe.codify(right) + "'.");
-                           }
-                        } else {
+                        if (left instanceof Double a && right instanceof Double b) {
+                           yield a + b;
+                        } else if (left instanceof String || right instanceof String) {
                             yield joe.stringify(left) + joe.stringify(right);
+                        } else {
+                            throw new RuntimeError(expr.op(),
+                                "'+' cannot combine the given operands.");
                         }
 
                     }
