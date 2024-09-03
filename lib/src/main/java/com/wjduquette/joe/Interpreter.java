@@ -237,15 +237,19 @@ public class Interpreter {
                         yield (double)left * (double)right;
                     }
                     case PLUS -> {
-                        if (left instanceof Double a && right instanceof Double b) {
-                            yield a + b;
+                        if (left instanceof Double a) {
+                           if (right instanceof Double b) {
+                               yield a + b;
+                           } else {
+                               throw new RuntimeError(expr.op(),
+                                   "Expected a second double, got " +
+                                       joe.typeName(right) + " '" +
+                                       joe.codify(right) + "'.");
+                           }
+                        } else {
+                            yield joe.stringify(left) + joe.stringify(right);
                         }
 
-                        if (left instanceof String a && right instanceof String b) {
-                            yield a + b;
-                        }
-
-                        throw notSimilar(expr.op());
                     }
                     default -> throw new IllegalStateException(
                         "Unexpected operator: " + expr.op());
@@ -365,7 +369,7 @@ public class Interpreter {
 
     private RuntimeError notSimilar(Token operator) {
         return new RuntimeError(operator,
-            "Operands must both be numbers or both be strings.");
+            "Expected two doubles or two strings.");
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
