@@ -199,9 +199,17 @@ public class Scanner {
         if (current - mark == 4) {
             var hexCode = source.substring(mark, current);
             var hex = Integer.parseInt(hexCode, 16);
-            buff.append((char)hex);
+            buff.append(unicodeToString(hex));
         } else {
             error(line, "Incomplete Unicode escape");
+        }
+    }
+
+    private String unicodeToString(int hex) {
+        try {
+            return Character.toString(hex);
+        } catch (Exception ex) {
+            return "\uFFFD";
         }
     }
 
