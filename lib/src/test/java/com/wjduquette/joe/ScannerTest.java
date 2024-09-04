@@ -2,9 +2,14 @@ package com.wjduquette.joe;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.wjduquette.joe.checker.Checker.check;
 
 public class ScannerTest extends Ted {
+    private final List<String> details = new ArrayList<>();
+
     @Test
     public void testStringEscapes() {
         test("testStringEscapes");
@@ -19,6 +24,59 @@ public class ScannerTest extends Ted {
         check(scanString("\"-\\u2192-\"")).eq("-→-");
 
         check(scanString("\"-\\\"")).eq(null);
+    }
+
+    @Test
+    public void testError_incompleteAnd() {
+        test("testError_incompleteAnd");
+        check(scan("&-"))
+            .hasString("Expected '&&', got: '&'.");
+    }
+
+    @Test
+    public void testError_incompleteOr() {
+        test("testError_incompleteOr");
+        check(scan("|-"))
+            .hasString("Expected '||', got: '|'.");
+    }
+
+    @Test
+    public void testError_unexpectedChar() {
+        test("testError_unexpectedChar");
+        check(scan("#"))
+            .hasString("Unexpected character: '#'.");
+    }
+
+    @Test
+    public void testError_unexpectedEscape() {
+        test("testError_unexpectedEscape");
+        check(scan("\"\\x\""))
+            .hasString("Unexpected escape: '\\x'.");
+    }
+
+    @Test
+    public void testError_unterminatedString() {
+        test("testError_unterminatedString");
+        check(scan("\"abc"))
+            .hasString("Unterminated string.");
+    }
+
+    @Test
+    public void testError_incompleteUnicodeEscape() {
+        test("testError_incompleteUnicodeEscape");
+        check(scan("\"\\u123\""))
+            .hasString("Incomplete Unicode escape: '\\u123'.");
+    }
+
+    // Scans and returns the first error
+    private String scan(String input) {
+        details.clear();
+        var scanner = new Scanner(input, detail -> {
+            System.out.println("detail: " + detail);
+            details.add(detail.message());
+        });
+        scanner.scanTokens();
+        return details.isEmpty() ? null : details.getFirst();
     }
 
     private String scanString(String input) {

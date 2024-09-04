@@ -92,14 +92,14 @@ public class Scanner {
                 if (match('&')) {
                     addToken(AND);
                 } else {
-                    error(line, "Expected '&'.");
+                    error(line, "Expected '&&', got: '&'.");
                 }
             }
             case '|' -> {
                 if (match('|')) {
                     addToken(OR);
                 } else {
-                    error(line, "Expected '|'.");
+                    error(line, "Expected '||', got: '|'.");
                 }
             }
             case ' ', '\r', '\t' -> {
@@ -113,7 +113,7 @@ public class Scanner {
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    error(line, "Unexpected character: '" + peek() + "'.");
+                    error(line, "Unexpected character: '" + c + "'.");
                 }
             }
         }
@@ -165,7 +165,7 @@ public class Scanner {
                             case '"' -> buff.append('"');
                             case 'u' -> unicode(buff);
                             default -> error(line,
-                                "Unexpected escape: \\" + peek());
+                                "Unexpected escape: '\\" + escape + "'.");
                         }
                     }
                 }
@@ -201,7 +201,8 @@ public class Scanner {
             var hex = Integer.parseInt(hexCode, 16);
             buff.append(unicodeToString(hex));
         } else {
-            error(line, "Incomplete Unicode escape");
+            var hexCode = source.substring(mark, current);
+            error(line, "Incomplete Unicode escape: '\\u" + hexCode + "'.");
         }
     }
 
