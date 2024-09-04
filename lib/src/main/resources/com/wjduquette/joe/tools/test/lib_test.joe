@@ -1,3 +1,73 @@
 // `joe test`'s Test Library
 
-// We will add real content here soon.
+//**
+// @function checkCatch
+// @args callable
+// @return [[CatchChecker]]
+// Executes a no-arg *callable* and returns a checker for checking
+// the error result.
+function checkCatch(callable) {
+    return CatchChecker(catch(callable));
+}
+
+//**
+// @class CatchChecker
+// A test checker for `catch()` results.
+// Use `checkCatch(callable)` to create it.
+class CatchChecker {
+    //**
+    // @init
+    // @args pair
+    // Initializes the checker with the result of a `catch()`.
+    method init(pair) {
+        this.pair = pair;
+        this.err = pair.right();
+    }
+
+    //**
+    // @method isOK
+    // @returns this
+    // Checks that the catch result is not an error.
+    method isOK() {
+        assert this.err == null,
+            "Expected no error, got: '"
+            + this.err.message() + "'.";
+        return this;
+    }
+
+    //**
+    // @method isError
+    // @returns Boolean
+    // Returns `true` if there was an error, and `false` otherwise.
+    method isError() {
+        assert this.err != null, "Expected an error, got: "
+            + typeName(this.pair.left())
+            + " '" + codify(this.pair.left()) + "'.";
+        return this;
+    }
+
+    //**
+    // @method message
+    // @args expected
+    // @returns this
+    // Checks that the error message matches the *expected* value.
+    method message(expected) {
+        this.isError();
+        assert this.err.message() == expected,
+            "Expected message '" + expected + "', got: '" +
+            this.err.message() + "'.";
+        return this;
+    }
+
+    //**
+    // @method type
+    // @args expected
+    // @returns this
+    // Checks the error type matches the *expected* value.
+    method type(expected) {
+        this.isError();
+        assert this.err.type() == expected,
+            "Expected error type '" + expected + "', got: '" + this.err.type() + "'.";
+        return this;
+    }
+}

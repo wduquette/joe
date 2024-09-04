@@ -1,0 +1,63 @@
+// Sample test script
+
+function _good() {
+    return "abc";
+}
+
+function _error() {
+    assert 1 == 2, "Simulated Error";
+}
+
+function testCheckCatch_isOK() {
+    checkCatch(_good).isOK();
+}
+
+function testCheckCatch_isError() {
+    checkCatch(_error)
+        .isError()
+        .type("AssertError")
+        .message("Simulated Error");
+}
+
+function testCheckCatch_fail_isOK() {
+    function bad() { checkCatch(_error).isOK(); }
+
+    checkCatch(bad)
+        .message("Expected no error, got: 'Simulated Error'.");
+}
+
+function testCheckCatch_fail_isError() {
+    function bad() { checkCatch(_good).isError(); }
+
+    checkCatch(bad)
+        .message("Expected an error, got: String '\"abc\"'.");
+}
+
+function testCheckCatch_fail_message() {
+    function bad() { checkCatch(_error).message("Ouch"); }
+
+    checkCatch(bad)
+        .message("Expected message 'Ouch', got: 'Simulated Error'.");
+}
+
+function testCheckCatch_fail_type() {
+    function bad() { checkCatch(_error).type("JoeError"); }
+
+    checkCatch(bad)
+        .message("Expected error type 'JoeError', got: 'AssertError'.");
+}
+
+function testAssertEquals() {
+    assertEquals(5, 5);
+    assertEquals("abc", "abc");
+
+    function bad() { assertEquals("abc", 5); }
+    checkCatch(bad)
+        .message("Expected '5', got: 'abc'.");
+}
+
+function testFail() {
+    function bad() { fail("Called fail()"); }
+    checkCatch(bad)
+        .message("Called fail()");
+}
