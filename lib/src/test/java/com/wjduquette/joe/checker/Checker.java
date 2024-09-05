@@ -1,5 +1,6 @@
 package com.wjduquette.joe.checker;
 
+import java.util.List;
 import java.util.Objects;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
@@ -9,6 +10,10 @@ public class Checker<Value> {
 
     public static <V> Checker<V> check(V value) {
         return new Checker<>(value);
+    }
+
+    public static <V> ListChecker<V> checkList(List<V> list) {
+        return new ListChecker<>(list);
     }
 
     public static Checker<Exception> checkThrow(Runnable runnable) {
