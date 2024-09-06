@@ -30,7 +30,7 @@ public class Scanner {
     }
 
     static {
-        var words = new TreeSet<String>(reserved.keySet());
+        var words = new TreeSet<>(reserved.keySet());
         RESERVED_WORDS = Collections.unmodifiableSet(words);
     }
 
