@@ -85,7 +85,7 @@ class CatchChecker {
     // Initializes the checker with the result of a `catch()`.
     method init(pair) {
         this.pair = pair;
-        this.err = pair.right();
+        this.err = pair.left() == #error ? pair.right() : null;
     }
 
     //**
@@ -105,8 +105,8 @@ class CatchChecker {
     // Returns `true` if there was an error, and `false` otherwise.
     method isError() {
         assert this.err != null, "Expected an error, got: "
-            + typeName(this.pair.left())
-            + " '" + codify(this.pair.left()) + "'.";
+            + typeName(this.pair.right())
+            + " '" + codify(this.pair.right()) + "'.";
         return this;
     }
 

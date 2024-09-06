@@ -9,6 +9,9 @@ import java.util.List;
 
 public class StandardLibrary extends Library {
     public static final StandardLibrary LIB = new StandardLibrary();
+    public static final Keyword OK = new Keyword("ok");
+    public static final Keyword ERROR = new Keyword("error");
+
     public StandardLibrary() {
         super();
 
@@ -28,12 +31,10 @@ public class StandardLibrary extends Library {
     //**
     // @global catch
     // @args callable
-    // @returns Pair(result, error)
+    // @returns Pair
     // Executes the callable, which must not require any arguments.
-    // and returns `null` if the call succeeds and the error otherwise.
-    //
-    // Returns `Pair(result, null)` on success and
-    // `Pair(null, Error)` on error.
+    // Returns `Pair(#ok, returnValue)` on success and
+    // `Pair(#error, Error)` on error.
     private Object _catch(Joe joe, List<Object> args) {
         Joe.exactArity(args, 1, "catch(callable)");
         var arg = args.get(0);
@@ -41,9 +42,9 @@ public class StandardLibrary extends Library {
         if (arg instanceof JoeCallable callable) {
             try {
                 var result = callable.call(joe, List.of());
-                return new Pair(result, null);
+                return new Pair(OK, result);
             } catch (JoeError ex) {
-                return new Pair(null, ex);
+                return new Pair(ERROR, ex);
             }
         } else {
             throw joe.expected("no-argument callable", arg);

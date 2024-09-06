@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import java.util.Objects;
+
 public final class Keyword {
     private final String name;
 
@@ -8,7 +10,7 @@ public final class Keyword {
      * @param name The keyword's name.
      */
     public Keyword(String name) {
-        this.name = name;
+        this.name = Objects.requireNonNull(name);
     }
 
     public String name() {
@@ -18,5 +20,20 @@ public final class Keyword {
     @Override
     public String toString() {
         return "#" + name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Keyword keyword = (Keyword) o;
+
+        return name.equals(keyword.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }
