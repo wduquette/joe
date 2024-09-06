@@ -45,7 +45,9 @@ public class ListChecker<Value> {
         if (list.size() != items.size()) {
             throw new AssertionError(
                 "Size mismatch: expected " + items.size() +
-                    " item(s), got: " + list.size() + " item(s).");
+                    " item(s), got: " + list.size() + " item(s),\n  " +
+                    list
+                );
         }
 
         for (var i = 0; i < items.size(); i++) {
