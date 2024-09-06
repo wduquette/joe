@@ -236,7 +236,7 @@ class Parser {
     }
 
     private Expr assignment() {
-        Expr expr = or();
+        Expr expr = ternary();
 
         if (match(EQUAL)) {
             Token equals = previous();
@@ -250,6 +250,20 @@ class Parser {
             }
 
             error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
+    }
+
+    private Expr ternary() {
+        var expr = or();
+
+        if (match(QUESTION)) {
+            var token = previous();
+            var trueExpr = or();
+            consume(COLON, "Expected ':' after expression.");
+            var falseExpr = or();
+            return new Expr.Ternary(expr, token, trueExpr, falseExpr);
         }
 
         return expr;

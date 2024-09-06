@@ -174,6 +174,11 @@ class Resolver {
                 resolveLocal(expr, expr.keyword());
             }
             case Expr.Unary expr -> resolve(expr.right());
+            case Expr.Ternary expr -> {
+                resolve(expr.condition());
+                resolve(expr.trueExpr());
+                resolve(expr.falseExpr());
+            }
             case Expr.Variable expr -> {
                 if (!scopes.isEmpty() &&
                     scopes.peek().get(expr.name().lexeme()) == Boolean.FALSE) {
