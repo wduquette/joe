@@ -74,7 +74,7 @@ public class ParserTest extends Ted {
         test("testStmtClass_noLeftBrace");
 
         var details = parse("""
-            class Thing 
+            class Thing
                 method init() {}
             }
             """);
@@ -88,7 +88,7 @@ public class ParserTest extends Ted {
         test("testStmtClass_badMethod");
 
         var details = parse("""
-            class Thing { 
+            class Thing {
                 function init() {}
             }
             """);
@@ -102,7 +102,7 @@ public class ParserTest extends Ted {
         test("testStmtClass_noRightBrace");
 
         var details = parse("""
-            class Thing { 
+            class Thing {
                 method init() {}
             """);
         checkList(details).items(
@@ -134,7 +134,7 @@ public class ParserTest extends Ted {
         test("testStmtFor_noLeftParen");
 
         var details = parse("""
-            for var i = 1; i < 5; i = i + 1) { } 
+            for var i = 1; i < 5; i = i + 1) { }
             """);
         checkList(details).items(
             "[line 1] Error at 'var': Expected '(' after 'for'.",
@@ -148,7 +148,7 @@ public class ParserTest extends Ted {
         test("testStmtFor_noSemiAfterCondition");
 
         var details = parse("""
-            for (var i = 1; i < 5 i = i + 1) { } 
+            for (var i = 1; i < 5 i = i + 1) { }
             """);
         checkList(details).items(
             "[line 1] Error at 'i': Expected ';' after loop condition."
@@ -160,7 +160,7 @@ public class ParserTest extends Ted {
         test("testStmtFor_noRightParen");
 
         var details = parse("""
-            for (var i = 1; i < 5; i = i + 1 { } 
+            for (var i = 1; i < 5; i = i + 1 { }
             """);
         checkList(details).items(
             "[line 1] Error at '{': Expected ')' after loop clauses."
@@ -265,7 +265,7 @@ public class ParserTest extends Ted {
         test("testStmtReturn_noSemiColon");
 
         var details = parse("""
-            return 1 
+            return 1
             var x;
             """);
         checkList(details).items(
