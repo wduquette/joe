@@ -43,8 +43,8 @@ public class ScannerTest extends Ted {
     @Test
     public void testError_unexpectedChar() {
         test("testError_unexpectedChar");
-        check(scan("#"))
-            .hasString("Unexpected character: '#'.");
+        check(scan("^"))
+            .hasString("Unexpected character: '^'.");
     }
 
     @Test

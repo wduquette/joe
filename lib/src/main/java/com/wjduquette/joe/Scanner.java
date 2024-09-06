@@ -9,26 +9,26 @@ import java.util.function.Consumer;
 import static com.wjduquette.joe.TokenType.*;
 
 public class Scanner {
-    private static final Map<String, TokenType> keywords;
+    private static final Map<String, TokenType> reserved;
 
     static {
-        keywords = new HashMap<>();
-        keywords.put("assert",   ASSERT);
-        keywords.put("class",    CLASS);
-        keywords.put("else",     ELSE);
-        keywords.put("extends",  EXTENDS);
-        keywords.put("false",    FALSE);
-        keywords.put("for",      FOR);
-        keywords.put("function", FUNCTION);
-        keywords.put("if",       IF);
-        keywords.put("method",   METHOD);
-        keywords.put("null",     NULL);
-        keywords.put("return",   RETURN);
-        keywords.put("super",    SUPER);
-        keywords.put("this",     THIS);
-        keywords.put("true",     TRUE);
-        keywords.put("var",      VAR);
-        keywords.put("while",    WHILE);
+        reserved = new HashMap<>();
+        reserved.put("assert",   ASSERT);
+        reserved.put("class",    CLASS);
+        reserved.put("else",     ELSE);
+        reserved.put("extends",  EXTENDS);
+        reserved.put("false",    FALSE);
+        reserved.put("for",      FOR);
+        reserved.put("function", FUNCTION);
+        reserved.put("if",       IF);
+        reserved.put("method",   METHOD);
+        reserved.put("null",     NULL);
+        reserved.put("return",   RETURN);
+        reserved.put("super",    SUPER);
+        reserved.put("this",     THIS);
+        reserved.put("true",     TRUE);
+        reserved.put("var",      VAR);
+        reserved.put("while",    WHILE);
     }
 
     //-------------------------------------------------------------------------
@@ -107,6 +107,7 @@ public class Scanner {
             }
             case '\n' -> line++;
             case '"' -> string();
+            case '#' -> keyword();
             default -> {
                 if (isDigit(c)) {
                     number();
@@ -123,10 +124,23 @@ public class Scanner {
         while (isAlphaNumeric(peek())) advance();
 
         String text = source.substring(start, current);
-        TokenType type = keywords.get(text);
+        TokenType type = reserved.get(text);
         if (type == null) type = IDENTIFIER;
 
         addToken(type);
+    }
+
+    private void keyword() {
+        if (!isAlpha(peek())) {
+            error(line, "Expected keyword name.");
+            return;
+        }
+        while (isAlphaNumeric(peek())) advance();
+
+        var keyword = new Keyword(
+            source.substring(start + 1, current));
+
+        addToken(KEYWORD, keyword);
     }
 
     private void number() {

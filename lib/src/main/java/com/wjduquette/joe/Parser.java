@@ -377,7 +377,7 @@ class Parser {
         if (match(TRUE)) return new Expr.Literal(true);
         if (match(NULL)) return new Expr.Literal(null);
 
-        if (match(NUMBER, STRING)) {
+        if (match(NUMBER, STRING, KEYWORD)) {
             return new Expr.Literal(previous().literal());
         }
 
