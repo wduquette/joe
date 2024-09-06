@@ -60,7 +60,7 @@ class Parser {
         Expr.Variable superclass = null;
 
         if (match(EXTENDS)) {
-            consume(IDENTIFIER, "Expect superclass name.");
+            consume(IDENTIFIER, "Expected superclass name.");
             superclass = new Expr.Variable(previous());
         }
 
@@ -76,20 +76,20 @@ class Parser {
             }
         }
 
-        consume(RIGHT_BRACE, "Expect '}' after class body.");
+        consume(RIGHT_BRACE, "Expected '}' after class body.");
 
         return new Stmt.Class(name, superclass, methods);
     }
 
     private Stmt varDeclaration() {
-        Token name = consume(IDENTIFIER, "Expect variable name.");
+        Token name = consume(IDENTIFIER, "Expected variable name.");
 
         Expr initializer = null;
         if (match(EQUAL)) {
             initializer = expression();
         }
 
-        consume(SEMICOLON, "Expect ';' after variable declaration.");
+        consume(SEMICOLON, "Expected ';' after variable declaration.");
         return new Stmt.Var(name, initializer);
     }
 
@@ -113,19 +113,19 @@ class Parser {
             message = expression();
         }
 
-        consume(SEMICOLON, "Expect ';' after assertion.");
+        consume(SEMICOLON, "Expected ';' after assertion.");
 
         return new Stmt.Assert(keyword, condition, message);
     }
 
     private Stmt expressionStatement() {
         Expr value = expression();
-        consume(SEMICOLON, "Expect ';' after expression.");
+        consume(SEMICOLON, "Expected ';' after expression.");
         return new Stmt.Expression(value);
     }
 
     private Stmt forStatement() {
-        consume(LEFT_PAREN, "Expect '(' after 'for'.");
+        consume(LEFT_PAREN, "Expected '(' after 'for'.");
 
         // Initializer
         Stmt init;
@@ -143,14 +143,14 @@ class Parser {
             System.out.println("B1");
             condition = expression();
         }
-        consume(SEMICOLON, "Expect ';' after loop condition.");
+        consume(SEMICOLON, "Expected ';' after loop condition.");
 
         // Increment
         Expr incr = null;
         if (!check(RIGHT_PAREN)) {
             incr = expression();
         }
-        consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+        consume(RIGHT_PAREN, "Expected ')' after loop clauses.");
 
         // Body
         Stmt body = statement();
@@ -159,9 +159,9 @@ class Parser {
     }
 
     private Stmt.Function functionDeclaration(String kind) {
-        Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
+        Token name = consume(IDENTIFIER, "Expected " + kind + " name.");
 
-        consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+        consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
 
         List<Token> parameters = new ArrayList<>();
         if (!check(RIGHT_PAREN)) {
@@ -183,9 +183,9 @@ class Parser {
     }
 
     private Stmt ifStatement() {
-        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        consume(LEFT_PAREN, "Expected '(' after 'if'.");
         Expr condition = expression();
-        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+        consume(RIGHT_PAREN, "Expected ')' after if condition.");
 
         Stmt thenBranch = statement();
         Stmt elseBranch = null;
@@ -209,9 +209,9 @@ class Parser {
     }
 
     private Stmt whileStatement() {
-        consume(LEFT_PAREN, "Expect '(' after 'while'.");
+        consume(LEFT_PAREN, "Expected '(' after 'while'.");
         Expr condition = expression();
-        consume(RIGHT_PAREN, "Expect ')' after condition.");
+        consume(RIGHT_PAREN, "Expected ')' after condition.");
         Stmt body = statement();
 
         return new Stmt.While(condition, body);
@@ -224,7 +224,7 @@ class Parser {
             statements.add(declaration());
         }
 
-        consume(RIGHT_BRACE, "Expect '}' after block.");
+        consume(RIGHT_BRACE, "Expected '}' after block.");
         return statements;
     }
 
@@ -377,7 +377,7 @@ class Parser {
         if (match(TRUE)) return new Expr.Literal(true);
         if (match(NULL)) return new Expr.Literal(null);
 
-        if (match(NUMBER, STRING)) {
+        if (match(NUMBER, STRING, KEYWORD)) {
             return new Expr.Literal(previous().literal());
         }
 

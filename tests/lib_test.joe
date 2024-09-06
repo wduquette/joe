@@ -1,0 +1,118 @@
+// Sample test script
+
+function testAssertEquals() {
+    assertEquals(5, 5);
+    assertEquals("abc", "abc");
+
+    function bad() { assertEquals("abc", 5); }
+    checkCatch(bad)
+        .message("Expected '5', got: 'abc'.");
+}
+
+function testFail() {
+    function bad() { fail("Called fail()"); }
+    checkCatch(bad)
+        .message("Called fail()");
+}
+
+function testCheck_eq() {
+    check("abc").eq("abc");
+
+    function bad() { check("abc").eq("def"); }
+    checkCatch(bad)
+        .message("Expected String '\"def\"', got: String '\"abc\"'.");
+}
+
+function testCheck_isTrue() {
+    check(true).isTrue();
+    check(1).isTrue();
+    check("abc").isTrue();
+
+    function bad() { check(false).isTrue(); }
+    checkCatch(bad)
+        .message("Expected true, got: Boolean 'false'.");
+}
+
+function testCheck_isFalse() {
+    check(false).isFalse();
+    check(null).isFalse();
+
+    function bad() { check(true).isFalse(); }
+    checkCatch(bad)
+        .message("Expected false, got: Boolean 'true'.");
+}
+
+function testCheck_isNull() {
+    check(null).isNull();
+
+    function bad() { check("abc").isNull(); }
+    checkCatch(bad)
+        .message("Expected null, got: String '\"abc\"'.");
+}
+
+function testCheck_isNonNull() {
+    check(1).isNonNull();
+
+    function bad() { check(null).isNonNull(); }
+    checkCatch(bad)
+        .message("Expected non-null, got: 'null'.");
+}
+
+function testCheck_hasTypeName() {
+    check(true).hasTypeName("Boolean");
+    check(1).hasTypeName("Double");
+    check("abc").hasTypeName("String");
+    check(null).hasTypeName(null);
+
+    function bad() { check(true).hasTypeName("String"); }
+    checkCatch(bad)
+        .message("Expected type name 'String', got: String '\"Boolean\"'.");
+}
+
+function testCheckCatch_isOK() {
+    checkCatch(_good).isOK();
+}
+
+function testCheckCatch_isError() {
+    checkCatch(_error)
+        .isError()
+        .type("AssertError")
+        .message("Simulated Error");
+}
+
+function testCheckCatch_fail_isOK() {
+    function bad() { checkCatch(_error).isOK(); }
+
+    checkCatch(bad)
+        .message("Expected no error, got: 'Simulated Error'.");
+}
+
+function testCheckCatch_fail_isError() {
+    function bad() { checkCatch(_good).isError(); }
+
+    checkCatch(bad)
+        .message("Expected an error, got: String '\"abc\"'.");
+}
+
+function testCheckCatch_fail_message() {
+    function bad() { checkCatch(_error).message("Ouch"); }
+
+    checkCatch(bad)
+        .message("Expected message 'Ouch', got: 'Simulated Error'.");
+}
+
+function testCheckCatch_fail_type() {
+    function bad() { checkCatch(_error).type("JoeError"); }
+
+    checkCatch(bad)
+        .message("Expected error type 'JoeError', got: 'AssertError'.");
+}
+
+function _good() {
+    return "abc";
+}
+
+function _error() {
+    assert 1 == 2, "Simulated Error";
+}
+

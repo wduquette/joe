@@ -1,6 +1,7 @@
 package com.wjduquette.joe.tools.test;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 

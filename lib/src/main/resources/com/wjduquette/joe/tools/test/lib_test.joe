@@ -1,3 +1,145 @@
 // `joe test`'s Test Library
 
-// We will add real content here soon.
+//**
+// @function check
+// @args value
+// @return [[ValueChecker]]
+// Returns a checker for testing a computed value.
+function check(value) {
+    return ValueChecker(value);
+}
+
+//**
+// @function checkCatch
+// @args callable
+// @return [[CatchChecker]]
+// Executes a no-arg *callable* and returns a checker for checking
+// the error result.
+function checkCatch(callable) {
+    return CatchChecker(catch(callable));
+}
+
+//**
+// @class ValueChecker
+// A fluent test checker for arbitrary values.
+// Use `check(value)` to create one.
+class ValueChecker {
+    //**
+    // @init
+    // @args value
+    // Initializes the new checker with the given *value*.
+    method init(value) {
+        this.value = value;
+    }
+
+
+    method eq(expected) {
+        assert this.value == expected, this._expected(_typedValue(expected));
+        return this;
+    }
+
+    method isTrue() {
+        assert this.value, this._expected("true");
+        return this;
+    }
+
+    method isFalse() {
+        assert !this.value, this._expected("false");
+        return this;
+    }
+
+    method isNull() {
+        assert this.value == null, this._expected("null");
+        return this;
+    }
+
+    method isNonNull() {
+        assert this.value != null, this._expected("non-null");
+        return this;
+    }
+
+    method hasTypeName(name) {
+        var got = typeName(this.value);
+        assert got == name,
+            this._expected2("type name '" + name + "'", got);
+    }
+
+    method _expected(what) {
+        return "Expected " + what + ", got: " +
+            _typedValue(this.value) + ".";
+    }
+    method _expected2(what, got) {
+        return "Expected " + what + ", got: " +
+            _typedValue(got) + ".";
+    }
+}
+
+//**
+// @class CatchChecker
+// A fluent test checker for `catch()` results.
+// Use `checkCatch(callable)` to create it.
+class CatchChecker {
+    //**
+    // @init
+    // @args pair
+    // Initializes the checker with the result of a `catch()`.
+    method init(pair) {
+        this.pair = pair;
+        this.err = pair.right();
+    }
+
+    //**
+    // @method isOK
+    // @returns this
+    // Checks that the catch result is not an error.
+    method isOK() {
+        assert this.err == null,
+            "Expected no error, got: '"
+            + this.err.message() + "'.";
+        return this;
+    }
+
+    //**
+    // @method isError
+    // @returns Boolean
+    // Returns `true` if there was an error, and `false` otherwise.
+    method isError() {
+        assert this.err != null, "Expected an error, got: "
+            + typeName(this.pair.left())
+            + " '" + codify(this.pair.left()) + "'.";
+        return this;
+    }
+
+    //**
+    // @method message
+    // @args expected
+    // @returns this
+    // Checks that the error message matches the *expected* value.
+    method message(expected) {
+        this.isError();
+        assert this.err.message() == expected,
+            "Expected message '" + expected + "', got: '" +
+            this.err.message() + "'.";
+        return this;
+    }
+
+    //**
+    // @method type
+    // @args expected
+    // @returns this
+    // Checks the error type matches the *expected* value.
+    method type(expected) {
+        this.isError();
+        assert this.err.type() == expected,
+            "Expected error type '" + expected + "', got: '" + this.err.type() + "'.";
+        return this;
+    }
+}
+
+function _typedValue(value) {
+    if (value == null) {
+        return "'null'";
+    } else {
+        return typeName(value) + " '" + codify(value) + "'";
+    }
+}

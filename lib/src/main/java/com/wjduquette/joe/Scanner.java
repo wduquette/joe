@@ -9,26 +9,26 @@ import java.util.function.Consumer;
 import static com.wjduquette.joe.TokenType.*;
 
 public class Scanner {
-    private static final Map<String, TokenType> keywords;
+    private static final Map<String, TokenType> reserved;
 
     static {
-        keywords = new HashMap<>();
-        keywords.put("assert",   ASSERT);
-        keywords.put("class",    CLASS);
-        keywords.put("else",     ELSE);
-        keywords.put("extends",  EXTENDS);
-        keywords.put("false",    FALSE);
-        keywords.put("for",      FOR);
-        keywords.put("function", FUNCTION);
-        keywords.put("if",       IF);
-        keywords.put("method",   METHOD);
-        keywords.put("null",     NULL);
-        keywords.put("return",   RETURN);
-        keywords.put("super",    SUPER);
-        keywords.put("this",     THIS);
-        keywords.put("true",     TRUE);
-        keywords.put("var",      VAR);
-        keywords.put("while",    WHILE);
+        reserved = new HashMap<>();
+        reserved.put("assert",   ASSERT);
+        reserved.put("class",    CLASS);
+        reserved.put("else",     ELSE);
+        reserved.put("extends",  EXTENDS);
+        reserved.put("false",    FALSE);
+        reserved.put("for",      FOR);
+        reserved.put("function", FUNCTION);
+        reserved.put("if",       IF);
+        reserved.put("method",   METHOD);
+        reserved.put("null",     NULL);
+        reserved.put("return",   RETURN);
+        reserved.put("super",    SUPER);
+        reserved.put("this",     THIS);
+        reserved.put("true",     TRUE);
+        reserved.put("var",      VAR);
+        reserved.put("while",    WHILE);
     }
 
     //-------------------------------------------------------------------------
@@ -92,14 +92,14 @@ public class Scanner {
                 if (match('&')) {
                     addToken(AND);
                 } else {
-                    error(line, "Expected '&'.");
+                    error(line, "Expected '&&', got: '&'.");
                 }
             }
             case '|' -> {
                 if (match('|')) {
                     addToken(OR);
                 } else {
-                    error(line, "Expected '|'.");
+                    error(line, "Expected '||', got: '|'.");
                 }
             }
             case ' ', '\r', '\t' -> {
@@ -107,13 +107,14 @@ public class Scanner {
             }
             case '\n' -> line++;
             case '"' -> string();
+            case '#' -> keyword();
             default -> {
                 if (isDigit(c)) {
                     number();
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    error(line, "Unexpected character: '" + peek() + "'.");
+                    error(line, "Unexpected character: '" + c + "'.");
                 }
             }
         }
@@ -123,10 +124,23 @@ public class Scanner {
         while (isAlphaNumeric(peek())) advance();
 
         String text = source.substring(start, current);
-        TokenType type = keywords.get(text);
+        TokenType type = reserved.get(text);
         if (type == null) type = IDENTIFIER;
 
         addToken(type);
+    }
+
+    private void keyword() {
+        if (!isAlpha(peek())) {
+            error(line, "Expected keyword name.");
+            return;
+        }
+        while (isAlphaNumeric(peek())) advance();
+
+        var keyword = new Keyword(
+            source.substring(start + 1, current));
+
+        addToken(KEYWORD, keyword);
     }
 
     private void number() {
@@ -165,7 +179,7 @@ public class Scanner {
                             case '"' -> buff.append('"');
                             case 'u' -> unicode(buff);
                             default -> error(line,
-                                "Unexpected escape: \\" + peek());
+                                "Unexpected escape: '\\" + escape + "'.");
                         }
                     }
                 }
@@ -199,9 +213,18 @@ public class Scanner {
         if (current - mark == 4) {
             var hexCode = source.substring(mark, current);
             var hex = Integer.parseInt(hexCode, 16);
-            buff.append((char)hex);
+            buff.append(unicodeToString(hex));
         } else {
-            error(line, "Incomplete Unicode escape");
+            var hexCode = source.substring(mark, current);
+            error(line, "Incomplete Unicode escape: '\\u" + hexCode + "'.");
+        }
+    }
+
+    private String unicodeToString(int hex) {
+        try {
+            return Character.toString(hex);
+        } catch (Exception ex) {
+            return "\uFFFD";
         }
     }
 

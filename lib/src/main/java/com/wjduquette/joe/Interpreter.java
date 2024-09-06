@@ -39,10 +39,9 @@ public class Interpreter {
             case Stmt.Assert stmt -> {
                 var condition = evaluate(stmt.condition());
                 if (!Joe.isTruthy(condition)) {
-                    var message = "Assertion unmet: " +
-                        (stmt.message() != null
-                            ? joe.stringify(evaluate(stmt.message()))
-                            : joe.recodify(stmt.condition()));
+                    var message = (stmt.message() != null
+                        ? joe.stringify(evaluate(stmt.message()))
+                        : "Assertion unmet: " + joe.recodify(stmt.condition()));
                     throw new AssertError(stmt.keyword().line(), message);
                 }
             }
@@ -270,7 +269,7 @@ public class Interpreter {
                 Object object = evaluate(expr.object());
                 if (object instanceof JoeInstance instance) {
                     yield instance.get(expr.name());
-                } else {
+                } else if (object != null) {
                     var proxy = joe.lookupProxy(object);
                     if (proxy != null) {
                         yield proxy.bind(object, expr.name().lexeme());
