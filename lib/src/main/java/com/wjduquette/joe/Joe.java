@@ -345,6 +345,18 @@ public class Joe {
         }
     }
 
+    /**
+     * Determines whether the name is a valid Joe identifier or not.
+     * @param name The name
+     * @return true or false
+     */
+    public static boolean isIdentifier(String name) {
+        if (Scanner.RESERVED_WORDS.contains(name)) {
+            return false;
+        }
+        return name.matches("[_A-Za-z][_A-Za-z0-9]*");
+    }
+
     //-------------------------------------------------------------------------
     // Argument parsing and error handling helpers
 
@@ -397,6 +409,22 @@ public class Joe {
             (got != null ? typeName(got) + " " : "") +
             "'"  + codify(got) + "'.";
         return new JoeError(message);
+    }
+
+    public Keyword toKeyword(Object arg) {
+        if (arg instanceof Keyword keyword) {
+            return keyword;
+        }
+
+        throw expected("keyword", arg);
+    }
+
+    public String toString(Object arg) {
+        if (arg instanceof String string) {
+            return string;
+        }
+
+        throw expected("string", arg);
     }
 
     @SuppressWarnings("unchecked")

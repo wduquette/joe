@@ -1,14 +1,12 @@
 package com.wjduquette.joe;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static com.wjduquette.joe.TokenType.*;
 
 public class Scanner {
+    public static final Set<String> RESERVED_WORDS;
     private static final Map<String, TokenType> reserved;
 
     static {
@@ -29,6 +27,11 @@ public class Scanner {
         reserved.put("true",     TRUE);
         reserved.put("var",      VAR);
         reserved.put("while",    WHILE);
+    }
+
+    static {
+        var words = new TreeSet<String>(reserved.keySet());
+        RESERVED_WORDS = Collections.unmodifiableSet(words);
     }
 
     //-------------------------------------------------------------------------
