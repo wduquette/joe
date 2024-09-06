@@ -1,0 +1,50 @@
+// Operator Tests
+
+function testAnd() {
+    // With booleans
+    check(true && true).eq(true);
+    check(true && false).eq(false);
+    check(false && true).eq(false);
+    check(false && false).eq(false);
+
+    // Returns first argument if first is falsey.
+    check(false && 1).eq(false);
+    check(null && 1).eq(null);
+
+    // Returns second argument if first is truthy
+    check(1 && 2).eq(2);
+    check(1 && null).eq(null);
+}
+
+function testAssignment() {
+    var a = 1;
+    var b;
+    var c;
+    c = b = a;
+    check(c).eq(b).eq(a).eq(1);
+}
+
+function testComparison() {
+    check(0 < 1).isTrue();
+    check(1 < 1).isFalse();
+
+    check(0 <= 1).isTrue();
+    check(1 <= 1).isTrue();
+    check(2 <= 1).isFalse();
+
+    check(0 > 0).isFalse();
+    check(1 > 0).isTrue();
+
+    check(1 >= 0).isTrue();
+    check(1 >= 1).isTrue();
+    check(1 >= 2).isFalse();
+}
+
+// divide
+// equality
+// minus
+// not
+// or
+// plus
+// ternary
+// times
