@@ -5,7 +5,7 @@ import java.util.List;
 public sealed interface Expr
     permits Expr.Assign, Expr.Binary, Expr.Call, Expr.Get, Expr.Grouping,
             Expr.Literal, Expr.Logical, Expr.Set, Expr.Super, Expr.This,
-            Expr.Unary, Expr.Variable
+            Expr.Ternary, Expr.Unary, Expr.Variable
 {
     /**
      * An assignment to an existing variable.
@@ -91,6 +91,15 @@ public sealed interface Expr
      * @param right The expression yielding the value to be operated upon.
      */
     record Unary(Token op, Expr right) implements Expr {}
+
+    /**
+     * A ternary operation
+     * @param condition The condition
+     * @param op The question mark operator token
+     * @param trueExpr The true expression
+     * @param falseExpr The false expression
+     */
+    record Ternary(Expr condition, Token op, Expr trueExpr, Expr falseExpr) implements Expr {}
 
     /**
      * A get of a variable's value.

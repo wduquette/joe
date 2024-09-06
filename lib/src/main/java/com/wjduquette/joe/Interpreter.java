@@ -320,6 +320,15 @@ public class Interpreter {
                 yield method.bind(instance);
             }
             case Expr.This expr -> lookupVariable(expr.keyword(), expr);
+            case Expr.Ternary expr -> {
+                var condition = Joe.isTruthy(evaluate(expr.condition()));
+
+                if (Joe.isTruthy(condition)) {
+                    yield evaluate(expr.trueExpr());
+                } else {
+                    yield evaluate(expr.falseExpr());
+                }
+            }
             case Expr.Unary expr -> {
                 Object right = evaluate(expr.right());
 

@@ -70,10 +70,12 @@ public class Scanner {
             case ')' -> addToken(RIGHT_PAREN);
             case '{' -> addToken(LEFT_BRACE);
             case '}' -> addToken(RIGHT_BRACE);
+            case ':' -> addToken(COLON);
             case ',' -> addToken(COMMA);
             case '.' -> addToken(DOT);
             case '-' -> addToken(MINUS);
             case '+' -> addToken(PLUS);
+            case '?' -> addToken(QUESTION);
             case ';' -> addToken(SEMICOLON);
             case '*' -> addToken(STAR);
             case '!' -> addToken(match('=') ? BANG_EQUAL : BANG);
