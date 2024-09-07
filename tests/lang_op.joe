@@ -40,11 +40,79 @@ function testComparison() {
     check(1 >= 2).isFalse();
 }
 
-// divide
-// equality
-// minus
-// not
-// or
-// plus
-// ternary
-// times
+function testDivide() {
+    check(4/2).eq(2);
+    check(String(4/0)).eq("Infinity");  // TODO: support Infinity,  NaN
+
+    function bad() { 4 / "abc"; }
+    checkCatch(bad)
+        .message("Operands must be numbers.");
+}
+
+function testEquality() {
+    check(1 == 1).isTrue();
+    check("a" == "a").isTrue();
+    check(#k == #k).isTrue();
+    check(1 == 2).isFalse();
+    check("a" == #k).isFalse();
+
+    check(1 != 1).isFalse();
+    check(1 != 2).isTrue();
+    check("a" != #k).isTrue();
+}
+
+function testMinus() {
+    check(4 - 1).eq(3);
+    check(1 - 4).eq(-3);
+
+    function bad() { 4 - "abc"; }
+    checkCatch(bad)
+        .message("Operands must be numbers.");
+}
+
+function testNot() {
+    check(!true).isFalse();
+    check(!1).isFalse();
+    check(!false).isTrue();
+    check(!null).isTrue();
+}
+
+function testOr() {
+    // With booleans
+    check(true || true).eq(true);
+    check(true || false).eq(true);
+    check(false || true).eq(true);
+    check(false || false).eq(false);
+
+    // Returns first argument if first is truthy.
+    check(true || false).eq(true);
+    check(1 || null).eq(1);
+
+    // Returns second argument if first is falsy
+    check(false || 2).eq(2);
+    check(null || 4).eq(4);
+}
+
+function testPlus() {
+    check(1 + 2).eq(3);
+    check("a" + "b").eq("ab");
+    check("a" + 1).eq("a1");
+    check(1 + "a").eq("1a");
+
+    function bad() { #a + #b; }
+    checkCatch(bad)
+        .message("'+' cannot combine the given operands.");
+}
+
+function testTernary() {
+    check(true ? "a" : "b").eq("a");
+    check(false ? "a" : "b").eq("b");
+}
+
+function testTimes() {
+    check(4 * 2).eq(8);
+
+    function bad() { 4 * "abc"; }
+    checkCatch(bad)
+        .message("Operands must be numbers.");
+}
