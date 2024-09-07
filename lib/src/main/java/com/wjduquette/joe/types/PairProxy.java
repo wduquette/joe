@@ -21,6 +21,7 @@ public class PairProxy extends TypeProxy<Pair> {
 
         method("left",  this::_left);
         method("right", this::_right);
+        method("toString", this::_toString);
     }
 
     //-------------------------------------------------------------------------
@@ -75,5 +76,10 @@ public class PairProxy extends TypeProxy<Pair> {
     private Object _right(Pair value, Joe joe, List<Object> args) {
         Joe.exactArity(args, 0, "right()");
         return value.right();
+    }
+
+    private Object _toString(Pair value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 0, "toString");
+        return joe.stringify(value);
     }
 }
