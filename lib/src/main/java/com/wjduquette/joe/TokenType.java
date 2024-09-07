@@ -18,7 +18,7 @@ enum TokenType {
 
     // Reserved Words.
     ASSERT, CLASS, ELSE, EXTENDS, FALSE, FUNCTION, FOR, IF, METHOD, NULL,
-    RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+    RETURN, STATIC, SUPER, THIS, TRUE, VAR, WHILE,
 
     EOF
 }

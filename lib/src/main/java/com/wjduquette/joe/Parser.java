@@ -67,18 +67,31 @@ class Parser {
         // Class body
         consume(LEFT_BRACE, "Expected '{' before class body.");
 
+        List<Stmt.Function> staticMethods = new ArrayList<>();
         List<Stmt.Function> methods = new ArrayList<>();
+        List<Stmt> staticInitializer = new ArrayList<>();
+
         while (!check(RIGHT_BRACE) && !isAtEnd()) {
             if (match(METHOD)) {
                 methods.add(functionDeclaration("method"));
+            } else if (match(STATIC)) {
+                if (match(METHOD)) {
+                    staticMethods.add(functionDeclaration("method"));
+                } else {
+                    consume(LEFT_BRACE,
+                        "Expected 'method' or '{' after 'static'.");
+                    staticInitializer.addAll(block());
+                }
             } else {
-                throw errorSync(advance(), "Expected method declaration.");
+                throw errorSync(advance(),
+                    "Expected method, static method, or static initializer.");
             }
         }
 
         consume(RIGHT_BRACE, "Expected '}' after class body.");
 
-        return new Stmt.Class(name, superclass, methods);
+        return new Stmt.Class(name, superclass,
+            staticMethods, methods, staticInitializer);
     }
 
     private Stmt varDeclaration() {

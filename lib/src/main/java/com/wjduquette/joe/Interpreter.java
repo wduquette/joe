@@ -1,9 +1,6 @@
 package com.wjduquette.joe;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Interpreter {
     //-------------------------------------------------------------------------
@@ -21,6 +18,19 @@ public class Interpreter {
         this.joe = joe;
         this.globals = joe.getGlobals();
         this.environment = globals;
+    }
+
+    //-------------------------------------------------------------------------
+    // Debugging API
+
+    @SuppressWarnings("unused")
+    void dumpEnvironment() {
+        var env = environment;
+
+        while (env != null) {
+            env.dump();
+            env = env.enclosing;
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -64,6 +74,15 @@ public class Interpreter {
                 // The class itself
                 environment.define(stmt.name().lexeme(), null);
 
+                // Static Methods
+                Map<String, JoeFunction> staticMethods = new HashMap<>();
+                for (Stmt.Function method : stmt.staticMethods()) {
+                    JoeFunction function = new JoeFunction(method, environment,
+                        false);
+                    staticMethods.put(method.name().lexeme(), function);
+                }
+
+
                 if (stmt.superclass() != null) {
                     // Push a new environment to contain "super"
                     environment = new Environment(environment);
@@ -78,7 +97,8 @@ public class Interpreter {
                 }
 
                 JoeClass klass =
-                    new JoeClass(stmt.name().lexeme(), superclass, methods);
+                    new JoeClass(stmt.name().lexeme(),
+                        superclass, staticMethods, methods);
 
                 if (superclass != null) {
                     // Pop the "super" environment.
@@ -86,6 +106,11 @@ public class Interpreter {
                 }
 
                 environment.assign(stmt.name(), klass);
+
+                // Static Initialization
+                if (!stmt.staticInitializer().isEmpty()) {
+                    executeBlock(stmt.staticInitializer(), environment);
+                }
                 return null;
             }
             case Stmt.Expression stmt -> {

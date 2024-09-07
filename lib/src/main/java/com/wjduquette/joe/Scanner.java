@@ -22,6 +22,7 @@ public class Scanner {
         reserved.put("method",   METHOD);
         reserved.put("null",     NULL);
         reserved.put("return",   RETURN);
+        reserved.put("static",   STATIC);
         reserved.put("super",    SUPER);
         reserved.put("this",     THIS);
         reserved.put("true",     TRUE);

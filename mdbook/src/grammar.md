@@ -16,11 +16,15 @@ declaration     → classDecl
                 | statement ;
 
 classDecl       | "class" IDENTIFIER ( "extends" IDENTIFIER )?
-                  "{" methodDecl* "}" ;
-methodDecl      | "method" function ;
-funDecl         | "function" function ;
+                  "{" classItem* "}" ;
+classItem       → "method" function
+                | "static" "method" function
+                | "static" block ; 
+                
+funDecl         → "function" function ;
 function        → IDENTIFIER "(" parameters? ")" block ;
 parameters      → IDENTITIFIER ( "," IDENTIFIER )* ;
+
 varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
                
 statement       → exprStmt

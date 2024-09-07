@@ -1,9 +1,6 @@
 package com.wjduquette.joe;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Environment {
     final Environment enclosing;
@@ -11,6 +8,14 @@ public class Environment {
 
     Environment() {
         enclosing = null;
+    }
+
+    void dump() {
+        System.out.println(this);
+        var map = new TreeMap<>(values);
+        for (var key : map.keySet()) {
+            System.out.printf("  %-20s %s\n", key, map.get(key).toString());
+        }
     }
 
     Environment(Environment enclosing) {
