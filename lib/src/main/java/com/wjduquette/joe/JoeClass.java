@@ -1,13 +1,30 @@
 package com.wjduquette.joe;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JoeClass implements JoeCallable {
+public class JoeClass implements JoeObject, JoeCallable {
     public static final String INIT = "init";
+
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
+    // The class name
     private final String name;
+
+    // The superclass, or null
     private final JoeClass superclass;
+
+    // Static methods and constants
+    private final Map<String, JoeFunction> staticMethods;
+    private final Map<String, Object> fields = new HashMap<>();
+
+    // JoeInstance Instance Methods
     private final Map<String, JoeFunction> methods;
+
+    //-------------------------------------------------------------------------
+    // Constructor
 
     /**
      * Creates a new class.
@@ -18,12 +35,17 @@ public class JoeClass implements JoeCallable {
     JoeClass(
         String name,
         JoeClass superclass,
+        Map<String, JoeFunction> staticMethods,
         Map<String, JoeFunction> methods
     ) {
         this.name = name;
         this.superclass = superclass;
+        this.staticMethods = staticMethods;
         this.methods = methods;
     }
+
+    //-------------------------------------------------------------------------
+    // JoeClass API
 
     public String name() {
         return name;
@@ -50,6 +72,30 @@ public class JoeClass implements JoeCallable {
         }
         return instance;
     }
+
+    //-------------------------------------------------------------------------
+    // JoeObject API
+
+    @Override
+    public Object get(String name) {
+        if (fields.containsKey(name)) {
+            return fields.get(name);
+        }
+
+        if (staticMethods.containsKey(name)) {
+            return staticMethods.get(name);
+        }
+
+        throw new JoeError("Undefined property '" + name + "'.");
+    }
+
+    @Override
+    public void set(String name, Object value) {
+        fields.put(name, value);
+    }
+
+    //-------------------------------------------------------------------------
+    // Object API
 
     @Override
     public String toString() {

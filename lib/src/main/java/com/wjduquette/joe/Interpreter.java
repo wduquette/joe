@@ -70,6 +70,9 @@ public class Interpreter {
                     environment.define("super", superclass);
                 }
 
+                Map<String, JoeFunction> staticMethods = new HashMap<>();
+                // TODO: initialize the map of static methods
+
                 Map<String, JoeFunction> methods = new HashMap<>();
                 for (Stmt.Function method : stmt.methods()) {
                     JoeFunction function = new JoeFunction(method, environment,
@@ -78,7 +81,8 @@ public class Interpreter {
                 }
 
                 JoeClass klass =
-                    new JoeClass(stmt.name().lexeme(), superclass, methods);
+                    new JoeClass(stmt.name().lexeme(),
+                        superclass, staticMethods, methods);
 
                 if (superclass != null) {
                     // Pop the "super" environment.

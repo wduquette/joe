@@ -17,9 +17,9 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
 
     // Static methods and constants
     private boolean isStatic = false;
-    private static final Map<String, NativeFunction> staticMethods =
+    private final Map<String, NativeFunction> staticMethods =
         new HashMap<>();
-    private static final Map<String, Object> constants = new HashMap<>();
+    private final Map<String, Object> constants = new HashMap<>();
 
     //
     // Value methods and functions.  These will be null or empty if this is
