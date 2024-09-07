@@ -15,7 +15,16 @@ public class StringProxy extends TypeProxy<String> {
         super("String");
 
         proxies(String.class);
+        initializer(this::_init);
         method("length", this::_length);
+    }
+
+    //-------------------------------------------------------------------------
+    // Initializer Implementation
+
+    private Object _init(Joe joe, List<Object> args) {
+        Joe.exactArity(args, 1, "String(value)");
+        return joe.stringify(args.get(0));
     }
 
     //-------------------------------------------------------------------------
