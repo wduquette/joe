@@ -108,7 +108,7 @@ public class Interpreter {
                 environment.assign(stmt.name(), klass);
 
                 // Static Initialization
-                if (stmt.staticInitializer() != null) {
+                if (!stmt.staticInitializer().isEmpty()) {
                     executeBlock(stmt.staticInitializer(), environment);
                 }
                 return null;

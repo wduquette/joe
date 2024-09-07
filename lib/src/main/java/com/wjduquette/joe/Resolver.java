@@ -53,7 +53,7 @@ class Resolver {
                     FunctionType declaration = FunctionType.FUNCTION;
                     resolveFunction(method, declaration);
                 }
-                if (stmt.staticInitializer() != null) {
+                if (!stmt.staticInitializer().isEmpty()) {
                     resolve(stmt.staticInitializer());
                 }
 

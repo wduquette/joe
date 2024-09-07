@@ -69,7 +69,7 @@ class Parser {
 
         List<Stmt.Function> staticMethods = new ArrayList<>();
         List<Stmt.Function> methods = new ArrayList<>();
-        List<Stmt> staticInitializer = null;
+        List<Stmt> staticInitializer = new ArrayList<>();
 
         while (!check(RIGHT_BRACE) && !isAtEnd()) {
             if (match(METHOD)) {
@@ -80,7 +80,7 @@ class Parser {
                 } else {
                     consume(LEFT_BRACE,
                         "Expected 'method' or '{' after 'static'.");
-                    staticInitializer = block();
+                    staticInitializer.addAll(block());
                 }
             } else {
                 throw errorSync(advance(),

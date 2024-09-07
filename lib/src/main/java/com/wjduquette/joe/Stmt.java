@@ -29,7 +29,7 @@ public sealed interface Stmt
      * @param superclass The superclass variable, or null for none
      * @param staticMethods The class object's static methods
      * @param methods The class's instance methods
-     * @param staticInitializer The static initializer, or null.
+     * @param staticInitializer The static initializer statements
      */
     record Class(
         Token name,
