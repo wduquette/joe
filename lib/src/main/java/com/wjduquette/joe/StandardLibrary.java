@@ -1,9 +1,6 @@
 package com.wjduquette.joe;
 
-import com.wjduquette.joe.types.ErrorProxy;
-import com.wjduquette.joe.types.KeywordProxy;
-import com.wjduquette.joe.types.PairProxy;
-import com.wjduquette.joe.types.StringProxy;
+import com.wjduquette.joe.types.*;
 
 import java.util.List;
 
@@ -22,6 +19,7 @@ public class StandardLibrary extends Library {
         globalFunction("stringify", this::_stringify);
         globalFunction("typeName",  this::_typeName);
 
+        type(DoubleProxy.TYPE);
         type(ErrorProxy.TYPE);
         type(KeywordProxy.TYPE);
         type(PairProxy.TYPE);

@@ -411,6 +411,14 @@ public class Joe {
         return new JoeError(message);
     }
 
+    public double toDouble(Object arg) {
+        if (arg instanceof Double num) {
+            return num;
+        }
+
+        throw expected("double", arg);
+    }
+
     public Keyword toKeyword(Object arg) {
         if (arg instanceof Keyword keyword) {
             return keyword;
