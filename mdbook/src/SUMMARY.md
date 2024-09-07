@@ -1,5 +1,20 @@
 # Summary
 
 [Introduction](introduction.md)
+[Change Log](changes.md)
 
-- [1. The Joe Language](./language.md)
+---
+
+# Language Reference
+
+- [The Joe Language](language.md)
+ 
+---
+ 
+# Library Reference
+
+- [Standard Library](library.md)
+
+---
+
+[Joe Grammar](grammar.md)

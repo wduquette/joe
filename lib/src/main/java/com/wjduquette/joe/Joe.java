@@ -178,6 +178,14 @@ public class Joe {
         return null;
     }
 
+    JoeObject getJoeObject(Object value) {
+        if (value instanceof JoeObject obj) {
+            return obj;
+        } else {
+            return new ProxiedValue(this, lookupProxy(value), value);
+        }
+    }
+
     //-------------------------------------------------------------------------
     // Services provided to the rest of the implementation
 
@@ -409,6 +417,14 @@ public class Joe {
             (got != null ? typeName(got) + " " : "") +
             "'"  + codify(got) + "'.";
         return new JoeError(message);
+    }
+
+    public double toDouble(Object arg) {
+        if (arg instanceof Double num) {
+            return num;
+        }
+
+        throw expected("double", arg);
     }
 
     public Keyword toKeyword(Object arg) {

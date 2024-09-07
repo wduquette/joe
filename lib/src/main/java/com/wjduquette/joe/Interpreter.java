@@ -267,16 +267,8 @@ public class Interpreter {
             }
             case Expr.Get expr -> {
                 Object object = evaluate(expr.object());
-                if (object instanceof JoeInstance instance) {
-                    yield instance.get(expr.name());
-                } else if (object != null) {
-                    var proxy = joe.lookupProxy(object);
-                    if (proxy != null) {
-                        yield proxy.bind(object, expr.name().lexeme());
-                    }
-                }
-
-                throw joe.expected("object", object);
+                JoeObject instance = joe.getJoeObject(object);
+                yield instance.get(expr.name().lexeme());
             }
             case Expr.Grouping expr -> evaluate(expr.expr());
             case Expr.Literal expr -> expr.value();
@@ -293,14 +285,12 @@ public class Interpreter {
             }
             case Expr.Set expr -> {
                 Object object = evaluate(expr.object());
+                JoeObject instance = joe.getJoeObject(object);
 
-                if (object instanceof JoeInstance instance) {
-                    Object value = evaluate(expr.value());
-                    instance.set(expr.name(), value);
-                    yield value;
-                } else {
-                    throw joe.expected("object", object);
-                }
+                Object value = evaluate(expr.value());
+                var name = expr.name().lexeme();
+                instance.set(name, value);
+                yield value;
             }
             case Expr.Super expr -> {
                 int distance = locals.get(expr);

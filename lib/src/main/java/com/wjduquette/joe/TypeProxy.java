@@ -7,13 +7,34 @@ import java.util.*;
  * metadata and services for the type.
  * @param <V> The native value type
  */
-public class TypeProxy<V> implements JoeCallable {
+public class TypeProxy<V> implements JoeObject, JoeCallable {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // Type V's script-level name.  May differ from the Java-level
+    // name.
     private final String typeName;
+
+    // Static methods and constants
+    private boolean isStatic = false;
+    private static final Map<String, NativeFunction> staticMethods =
+        new HashMap<>();
+    private static final Map<String, Object> constants = new HashMap<>();
+
+    //
+    // Value methods and functions.  These will be null or empty if this is
+    // a static type.
+    //
+
+    // The set of Java value types that are proxied by this proxy.
+    // Often this will just be type V; but if V is an interface it will
+    // be concrete types that implement V.
     private final Set<Class<? extends V>> proxiedTypes = new HashSet<>();
+
+    // The type's initializer
     private NativeFunction initializer = null;
+
+    // The instance methods
     private final Map<String, JoeValueCallable<V>> methods = new HashMap<>();
 
     //-------------------------------------------------------------------------
@@ -30,6 +51,32 @@ public class TypeProxy<V> implements JoeCallable {
 
     //-------------------------------------------------------------------------
     // Type Builders
+
+    /**
+     * Declares that this is a static type, with no initializer or
+     * instance methods.
+     */
+    public void staticType() {
+        this.isStatic = true;
+    }
+
+    /**
+     * Defines a static method for the type.
+     * @param name The method name
+     * @param callable The callable that implements the method.
+     */
+    public void staticMethod(String name, JoeCallable callable) {
+        staticMethods.put(name, new NativeFunction(name, callable));
+    }
+
+    /**
+     * Defines a static constant for the type.
+     * @param name The constant name
+     * @param value The value
+     */
+    public void constant(String name, Object value) {
+        constants.put(name, value);
+    }
 
     /**
      * Declares that this proxy is a proxy for the given type, which should
@@ -59,6 +106,27 @@ public class TypeProxy<V> implements JoeCallable {
      */
     public void method(String name, JoeValueCallable<V> callable) {
         methods.put(name, callable);
+    }
+
+    //-------------------------------------------------------------------------
+    // JoeObject API
+
+    @Override
+    public Object get(String name) {
+        if (constants.containsKey(name)) {
+            return constants.get(name);
+        }
+
+        if (staticMethods.containsKey(name)) {
+            return staticMethods.get(name);
+        }
+
+        throw new JoeError("Undefined property '" + name + "'.");
+    }
+
+    @Override
+    public void set(String name, Object value) {
+        throw new JoeError("Type " + typeName + " has no settable properties.");
     }
 
     //-------------------------------------------------------------------------
@@ -94,7 +162,7 @@ public class TypeProxy<V> implements JoeCallable {
     public Object call(Joe joe, List<Object> args) {
         if (initializer != null) {
             return initializer.call(joe, args);
-        } else if (methods.isEmpty()) {
+        } else if (isStatic) {
             throw new JoeError("Type " + typeName +
                 " is static and cannot be initialized.");
         } else {
