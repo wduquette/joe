@@ -1,0 +1,36 @@
+// Class and Instance Tests
+//
+// TODO: Incomplete
+
+function testInit() {
+    var thing = Thing("Fred", #green);
+    check(thing.name).eq("Fred");
+    check(thing.color).eq(#green);
+}
+
+function testCanSetFields() {
+    var thing = Thing("Fred", #green);
+    thing.name = "George";
+    thing.color = #ginger;
+    check(thing.name).eq("George");
+    check(thing.color).eq(#ginger);
+}
+
+function testCanCallMethods() {
+    var thing = Thing("Fred", #green);
+    check(thing.info()).eq("name='Fred' color='#green'");
+}
+
+//-----------------------------------------------------------------------------
+// Helpers
+
+class Thing {
+    method init(name, color) {
+        this.name = name;
+        this.color = color;
+    }
+
+    method info() {
+        return "name='" + this.name + "' color='" + this.color + "'";
+    }
+}

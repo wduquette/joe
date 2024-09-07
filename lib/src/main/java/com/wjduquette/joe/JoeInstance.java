@@ -3,7 +3,7 @@ package com.wjduquette.joe;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JoeInstance {
+public class JoeInstance implements JoeObject {
     private final JoeClass klass;
     private final Map<String, Object> fields = new HashMap<>();
 
@@ -11,7 +11,8 @@ public class JoeInstance {
         this.klass = klass;
     }
 
-    Object get(Token name) {
+    @Override
+    public Object get(Token name) {
         if (fields.containsKey(name.lexeme())) {
             return fields.get(name.lexeme());
         }
@@ -23,7 +24,8 @@ public class JoeInstance {
             "Undefined property '" + name.lexeme() + "'.");
     }
 
-    void set(Token name, Object value) {
+    @Override
+    public void set(Token name, Object value) {
         fields.put(name.lexeme(), value);
     }
 
