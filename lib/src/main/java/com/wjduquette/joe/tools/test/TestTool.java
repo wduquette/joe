@@ -36,6 +36,7 @@ public class TestTool implements Tool {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    boolean verbose = false;
     private final List<String> testScripts = new ArrayList<>();
     private int loadErrorCount = 0;
     private int successCount = 0;
@@ -66,7 +67,12 @@ public class TestTool implements Tool {
         }
 
         while (!argq.isEmpty()) {
-            testScripts.add(argq.poll());
+            var arg = argq.poll();
+
+            switch (arg) {
+                case "-v", "--verbose" -> verbose = true;
+                default -> testScripts.add(arg);
+            }
         }
 
         // NEXT, run the tests.
@@ -92,7 +98,9 @@ public class TestTool implements Tool {
     }
 
     private void runTest(String scriptPath) {
-        System.out.println("\nRunning: " + scriptPath);
+        if (verbose) {
+            println("\nRunning: " + scriptPath);
+        }
 
         // NEXT, configure the engine.
         var joe = new Joe();
@@ -124,16 +132,20 @@ public class TestTool implements Tool {
             .toList();
 
         if (tests.isEmpty()) {
-            println("  No tests in file.");
+            println("***  No tests in: " + scriptPath);
             return;
         }
 
-        println();
+        if (verbose) {
+            println();
+        }
 
         for (var test : tests) {
             var value = globals.getVar(test);
             if (value instanceof JoeCallable callable) {
-                System.out.printf("%-30s in file %s\n", test, scriptPath);
+                if (verbose) {
+                    System.out.printf("%-30s in file %s\n", test, scriptPath);
+                }
 
                 try {
                     callable.call(joe, List.of());
