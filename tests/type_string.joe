@@ -1,0 +1,39 @@
+// String type tests
+
+function testCharAt() {
+    check("abc".charAt(0)).eq("a");
+    check("abc".charAt(2)).eq("c");
+    check("abc".charAt(2.9)).eq("c");
+
+    function bad1() { "abc".charAt(-1); }
+    function bad2() { "abc".charAt(3); }
+    checkCatch(bad1).message("Expected 0 <= index < 3, got Double '-1'.");
+    checkCatch(bad2).message("Expected 0 <= index < 3, got Double '3'.");
+}
+
+function testContains() {
+    check("abcdef".contains("bcd")).isTrue();
+    check("abcdef".contains("123")).isFalse();
+}
+
+function testEndsWith() {
+    check("abcdef".endsWith("def")).isTrue();
+    check("abcdef".endsWith("cde")).isFalse();
+}
+
+function testIndent() {
+    check("abc".indent(2)).eq("  abc");
+}
+
+function testLength() {
+    check("abc".length()).eq(3);
+}
+
+function testStartsWith() {
+    check("abcdef".startsWith("abc")).isTrue();
+    check("abcdef".startsWith("bcd")).isFalse();
+}
+
+function testStripIndent() {
+    check("   abc".stripIndent()).eq("abc");
+}
