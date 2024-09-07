@@ -27,9 +27,17 @@ public sealed interface Stmt
      * A class declaration
      * @param name The class name
      * @param superclass The superclass variable, or null for none
-     * @param methods The class's methods
+     * @param staticMethods The class object's static methods
+     * @param methods The class's instance methods
+     * @param staticInitializer The static initializer, or null.
      */
-    record Class(Token name, Expr.Variable superclass, List<Stmt.Function> methods) implements Stmt {}
+    record Class(
+        Token name,
+        Expr.Variable superclass,
+        List<Stmt.Function> staticMethods,
+        List<Stmt.Function> methods,
+        List<Stmt> staticInitializer
+    ) implements Stmt {}
 
     /**
      * An expression statement: an expression followed by a ";"

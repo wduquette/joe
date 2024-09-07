@@ -48,6 +48,15 @@ class Resolver {
                 declare(stmt.name());
                 define(stmt.name());
 
+                // Static Methods and Initializer
+                for (Stmt.Function method : stmt.staticMethods()) {
+                    FunctionType declaration = FunctionType.FUNCTION;
+                    resolveFunction(method, declaration);
+                }
+                if (stmt.staticInitializer() != null) {
+                    resolve(stmt.staticInitializer());
+                }
+
                 if (stmt.superclass() != null) {
                     var className = stmt.name().lexeme();
                     var superName = stmt.superclass().name().lexeme();
@@ -57,6 +66,7 @@ class Resolver {
                     }
                 }
 
+                // Superclass
                 if (stmt.superclass() != null) {
                     currentClass = ClassType.SUBCLASS;
                     resolve(stmt.superclass());
@@ -69,6 +79,7 @@ class Resolver {
                     scopes.peek().put("super", true);
                 }
 
+                // Instance methods
                 beginScope();
                 scopes.peek().put("this", true);
                 for (Stmt.Function method : stmt.methods()) {

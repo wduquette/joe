@@ -21,6 +21,46 @@ function testCanCallMethods() {
     check(thing.info()).eq("name='Fred' color='#green'");
 }
 
+function testStaticMethods() {
+    class WithStatics {
+        static method greeting() {
+            return #howdy;
+        }
+        static method howdy() {
+            return WithStatics.greeting();
+        }
+    }
+
+    check(WithStatics.greeting()).eq(#howdy);
+    check(WithStatics.howdy()).eq(#howdy);
+}
+
+function testClassCapturesScope() {
+    var greeting = #howdy;
+
+    class WithStatics {
+        static method howdy() {
+            return greeting;
+        }
+    }
+
+    check(WithStatics.howdy()).eq(#howdy);
+}
+
+function testStaticInitializer() {
+    class WithStatics {
+        static {
+            WithStatics.greeting = #howdy;
+        }
+        static method howdy() {
+            return WithStatics.greeting;
+        }
+    }
+
+    check(WithStatics.greeting).eq(#howdy);
+    check(WithStatics.howdy()).eq(#howdy);
+}
+
 //-----------------------------------------------------------------------------
 // Helpers
 

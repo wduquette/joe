@@ -93,7 +93,8 @@ public class ParserTest extends Ted {
             }
             """);
         checkList(details).items(
-            "[line 2] Error at 'function': Expected method declaration."
+            "[line 2] Error at 'function': Expected method, static method," +
+            " or static initializer."
         );
     }
 

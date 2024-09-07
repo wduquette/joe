@@ -1,0 +1,13 @@
+// Function tests
+// TODO: Incomplete
+
+function testNestedScope() {
+    var greeting = #howdy;
+
+    function greet() {
+        return greeting;
+    }
+
+    // The function captures its environment
+    check(greet()).eq(#howdy);
+}

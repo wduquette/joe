@@ -25,6 +25,12 @@ public class Joe {
         codifier = new Codifier(this);
 
         StandardLibrary.LIB.install(this);
+        installGlobalFunction(new NativeFunction("dumpEnv", this::_dumpEnv));
+    }
+
+    private Object _dumpEnv(Joe joe, List<Object> args) {
+        interpreter.dumpEnvironment();
+        return null;
     }
 
     //-------------------------------------------------------------------------
