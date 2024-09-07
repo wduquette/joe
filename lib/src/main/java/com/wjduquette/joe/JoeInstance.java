@@ -12,21 +12,20 @@ class JoeInstance implements JoeObject {
     }
 
     @Override
-    public Object get(Token name) {
-        if (fields.containsKey(name.lexeme())) {
-            return fields.get(name.lexeme());
+    public Object get(String name) {
+        if (fields.containsKey(name)) {
+            return fields.get(name);
         }
 
-        JoeFunction method = klass.findMethod(name.lexeme());
+        JoeFunction method = klass.findMethod(name);
         if (method != null) return method.bind(this);
 
-        throw new RuntimeError(name,
-            "Undefined property '" + name.lexeme() + "'.");
+        throw new JoeError("Undefined property '" + name + "'.");
     }
 
     @Override
-    public void set(Token name, Object value) {
-        fields.put(name.lexeme(), value);
+    public void set(String name, Object value) {
+        fields.put(name, value);
     }
 
     @Override

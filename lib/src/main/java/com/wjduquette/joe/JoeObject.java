@@ -1,7 +1,7 @@
 package com.wjduquette.joe;
 
 interface JoeObject {
-    Object get(Token name);
+    Object get(String name);
 
-    void set(Token name, Object value);
+    void set(String name, Object value);
 }
