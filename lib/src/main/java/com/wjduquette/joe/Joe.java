@@ -178,6 +178,14 @@ public class Joe {
         return null;
     }
 
+    JoeObject getJoeObject(Object value) {
+        if (value instanceof JoeObject obj) {
+            return obj;
+        } else {
+            return new ProxiedValue(this, lookupProxy(value), value);
+        }
+    }
+
     //-------------------------------------------------------------------------
     // Services provided to the rest of the implementation
 
