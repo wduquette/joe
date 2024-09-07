@@ -37,7 +37,6 @@ public class TestTool implements Tool {
     // Instance Variables
 
     private final List<String> testScripts = new ArrayList<>();
-    private final Joe joe = new Joe();
     private int loadErrorCount = 0;
     private int successCount = 0;
     private int failureCount = 0;
@@ -70,9 +69,6 @@ public class TestTool implements Tool {
             testScripts.add(argq.poll());
         }
 
-        // NEXT, configure the engine.
-        installTestFunctions(joe);
-
         // NEXT, run the tests.
         for (var path : testScripts) {
             runTest(path);
@@ -97,6 +93,10 @@ public class TestTool implements Tool {
 
     private void runTest(String scriptPath) {
         System.out.println("\nRunning: " + scriptPath);
+
+        // NEXT, configure the engine.
+        var joe = new Joe();
+        installTestFunctions(joe);
 
         // FIRST, load the script.
         try {
