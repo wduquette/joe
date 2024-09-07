@@ -3,7 +3,7 @@ package com.wjduquette.joe;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JoeInstance implements JoeObject {
+class JoeInstance implements JoeObject {
     private final JoeClass klass;
     private final Map<String, Object> fields = new HashMap<>();
 
