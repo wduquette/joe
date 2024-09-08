@@ -22,6 +22,7 @@ public class StandardLibrary extends Library {
         type(NumberProxy.TYPE);
         type(ErrorProxy.TYPE);
         type(KeywordProxy.TYPE);
+        type(ListProxy.TYPE);
         type(PairProxy.TYPE);
         type(StringProxy.TYPE);
     }
