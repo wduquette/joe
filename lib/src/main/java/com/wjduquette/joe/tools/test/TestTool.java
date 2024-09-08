@@ -151,9 +151,15 @@ public class TestTool implements Tool {
                     callable.call(joe, ArgQueue.EMPTY);
                     ++successCount;
                 } catch (AssertError ex) {
+                    if (!verbose) {
+                        System.out.printf("%-30s in file %s\n", test, scriptPath);
+                    }
                     println("  FAILED: " + ex.getMessage());
                     ++failureCount;
                 } catch (JoeError ex) {
+                    if (!verbose) {
+                        System.out.printf("%-30s in file %s\n", test, scriptPath);
+                    }
                     println("  ERROR: " + ex.getMessage());
                     ++errorCount;
                 }

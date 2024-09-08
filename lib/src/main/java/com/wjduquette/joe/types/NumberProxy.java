@@ -13,10 +13,21 @@ public class NumberProxy extends TypeProxy<Double> {
     public NumberProxy() {
         super("Number");
         staticType();
+        proxies(Double.class);
 
         constant("PI", Math.PI);
 
         staticMethod("abs", this::_abs);
+    }
+
+    public String stringify(Joe joe, Object value) {
+        assert value instanceof Double;
+
+        String text = ((Double)value).toString();
+        if (text.endsWith(".0")) {
+            text = text.substring(0, text.length() - 2);
+        }
+        return text;
     }
 
     //-------------------------------------------------------------------------

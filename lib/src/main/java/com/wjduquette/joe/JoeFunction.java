@@ -74,7 +74,7 @@ public class JoeFunction implements JoeCallable {
                 args.next());
         }
 
-        if (!args.isEmpty()) {
+        if (isVarArgs) {
             var varArgs = new ArrayList<>(args.remainder());
             environment.define(Parser.ARGS, varArgs);
         }

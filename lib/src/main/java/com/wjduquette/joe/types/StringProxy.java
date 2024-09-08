@@ -5,6 +5,9 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.TypeProxy;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class StringProxy extends TypeProxy<String> {
     public static final StringProxy TYPE = new StringProxy();
 
@@ -16,6 +19,9 @@ public class StringProxy extends TypeProxy<String> {
 
         proxies(String.class);
         initializer(this::_init);
+
+        staticMethod("join",       this::_join);
+
         method("charAt",           this::_charAt);
         method("contains",         this::_contains);
         method("endsWith",         this::_endsWith);
@@ -25,16 +31,15 @@ public class StringProxy extends TypeProxy<String> {
 //        method("indexOf",          this::_indexOf);    // TODO Wait for varargs
         method("isBlank",          this::_isBlank);
         method("isEmpty",          this::_isEmpty);
-//        method("join",             this::_join);       // TODO Wait for List
 //        method("lastIndexOf",      this::_lastIndexOf);  // TODO Wait for varargs
         method("length",           this::_length);
-//        method("lines",            this::_lines);      // TODO Wait for List
+        method("lines",            this::_lines);
         method("matches",          this::_matches);
         method("repeat",           this::_repeat);
         method("replace",          this::_replace);
         method("replaceAll",       this::_replaceAll);
         method("replaceFirst",     this::_replaceFirst);
-//        method("split",            this::_split);      // TODO Wait for List
+        method("split",            this::_split);
         method("startsWith",       this::_startsWith);
         method("strip",            this::_strip);
         method("stripIndent",      this::_stripIndent);
@@ -53,6 +58,19 @@ public class StringProxy extends TypeProxy<String> {
         Joe.exactArity(args, 1, "String(value)");
         return joe.stringify(args.get(0));
     }
+
+    //-------------------------------------------------------------------------
+    // Static Method Implementations
+
+    private Object _join(Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 2, "join(delimiter, list)");
+        var delim = joe.stringify(args.next());
+        var list = joe.toList(args.next());
+        return list.stream()
+            .map(joe::stringify)
+            .collect(Collectors.joining(delim));
+    }
+
 
     //-------------------------------------------------------------------------
     // Method Implementations
@@ -130,14 +148,30 @@ public class StringProxy extends TypeProxy<String> {
         return (double)value.length();
     }
 
+    //**
+    // @method lines
+    // @returns List
+    // Returns a list consisting of the lines of text in the string.
+    private Object _lines(String value, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "lines()");
+        return new ListValue(value.lines().toList());
+    }
+
     private Object _matches(String value, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "");
-        throw new JoeError("Unsupported Operation: Not Yet Implemented");
+        Joe.exactArity(args, 1, "matches(pattern)");
+        return value.matches(joe.toString(args.next()));
     }
 
     private Object _repeat(String value, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "");
-        throw new JoeError("Unsupported Operation: Not Yet Implemented");
+        Joe.exactArity(args, 1, "repeat(count)");
+        var arg = args.next();
+        var count = joe.toInteger(arg);
+
+        if (count < 0) {
+            throw joe.expected("non-negative count", arg);
+        }
+
+        return value.repeat(count);
     }
 
     private Object _replace(String value, Joe joe, ArgQueue args) {
@@ -155,6 +189,12 @@ public class StringProxy extends TypeProxy<String> {
         throw new JoeError("Unsupported Operation: Not Yet Implemented");
     }
 
+    private Object _split(String value, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "split(delimiter)");
+        var delim = joe.toString(args.next());
+        var tokens = value.split(delim);
+        return new ListValue(Arrays.asList(tokens));
+    }
 
     //**
     // @method startsWith

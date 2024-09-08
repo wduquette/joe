@@ -75,4 +75,11 @@ public class JoeTest extends Ted {
         // This is a spot check.
         check(joe.recodify(new Expr.Literal(2.0))).eq("2");
     }
+
+    @Test
+    public void testTypeName() {
+        test("testTypeName");
+
+        check(joe.typeName(5.0)).eq("Number");
+    }
 }

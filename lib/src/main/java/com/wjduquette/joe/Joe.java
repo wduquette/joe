@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.types.ListValue;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -215,14 +217,6 @@ public class Joe {
     public String stringify(Object value) {
         if (value == null) return "null";
 
-        if (value instanceof Double) {
-            String text = value.toString();
-            if (text.endsWith(".0")) {
-                text = text.substring(0, text.length() - 2);
-            }
-            return text;
-        }
-
         var proxy = lookupProxy(value);
 
         if (proxy != null) {
@@ -433,7 +427,7 @@ public class Joe {
      * @return The error
      */
     public JoeError expected(String what, Object got) {
-        var message = "Expected " + what + ", got " +
+        var message = "Expected " + what + ", got: " +
             (got != null ? typeName(got) + " " : "") +
             "'"  + codify(got) + "'.";
         return new JoeError(message);
@@ -471,6 +465,16 @@ public class Joe {
         }
 
         throw expected("keyword", arg);
+    }
+
+    public JoeList toList(Object arg) {
+        if (arg instanceof JoeList list) {
+            return list;
+        } else if (arg instanceof List<?> list) {
+            return new ListValue(list);
+        } else {
+            throw expected("List", arg);
+        }
     }
 
     public String toString(Object arg) {

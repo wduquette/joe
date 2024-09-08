@@ -7,8 +7,8 @@ function testCharAt() {
 
     function bad1() { "abc".charAt(-1); }
     function bad2() { "abc".charAt(3); }
-    checkCatch(bad1).message("Expected 0 <= index < 3, got Double '-1'.");
-    checkCatch(bad2).message("Expected 0 <= index < 3, got Double '3'.");
+    checkCatch(bad1).message("Expected 0 <= index < 3, got: Number '-1'.");
+    checkCatch(bad2).message("Expected 0 <= index < 3, got: Number '3'.");
 }
 
 function testContains() {
@@ -42,8 +42,42 @@ function testIsEmpty() {
     check("".isEmpty()).isTrue();
 }
 
+function testJoin() {
+    check(String.join(",", List())).eq("");
+    check(String.join(",", List("a", "b"))).eq("a,b");
+    check(String.join(",", List(1, 2))).eq("1,2");
+}
+
 function testLength() {
     check("abc".length()).eq(3);
+}
+
+function testLines() {
+    check(" abc ".lines())
+        .eq(List(" abc "));
+    check(" abc \n def ".lines())
+        .eq(List(" abc ", " def "));
+}
+
+function testMatches() {
+    check("abc".matches("[a-z]+")).isTrue();
+    check("123".matches("[a-z]+")).isFalse();
+}
+
+function testRepeat() {
+    check("abc".repeat(0)).eq("");
+    check("abc".repeat(1)).eq("abc");
+    check("abc".repeat(2)).eq("abcabc");
+
+    function bad() { "abc".repeat(-1); }
+
+    checkCatch(bad)
+        .message("Expected non-negative count, got: Number '-1'.");
+}
+
+function testSplit() {
+    check("abc,def,ghi".split(","))
+    .eq(List("abc", "def", "ghi"));
 }
 
 function testStartsWith() {

@@ -17,10 +17,10 @@ public class StandardLibrary extends Library {
         globalFunction("stringify", this::_stringify);
         globalFunction("typeName",  this::_typeName);
 
-        type(NumberProxy.TYPE);
         type(ErrorProxy.TYPE);
         type(KeywordProxy.TYPE);
         type(ListProxy.TYPE);
+        type(NumberProxy.TYPE);
         type(PairProxy.TYPE);
         type(StringProxy.TYPE);
     }

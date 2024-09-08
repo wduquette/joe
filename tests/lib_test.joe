@@ -60,7 +60,7 @@ function testCheck_isNonNull() {
 
 function testCheck_hasTypeName() {
     check(true).hasTypeName("Boolean");
-    check(1).hasTypeName("Double");
+    check(1).hasTypeName("Number");
     check("abc").hasTypeName("String");
     check(null).hasTypeName(null);
 
