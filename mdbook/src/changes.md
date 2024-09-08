@@ -21,7 +21,7 @@ Joe 0.2.0 extends Joe on every axis.
 - Library
   - Added `catch()` function
   - Added `println()`, `print()` functions
-  - Added `Double` proxy
+  - Added `Number` proxy (all numbers are Java `Doubles`)
   - Added `Error` proxy (for `JoeError` and its subclasses)
   - Added `Keyword` Java type, with proxy
   - Added `Pair` Java type, with proxy
