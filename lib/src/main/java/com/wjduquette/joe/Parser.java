@@ -7,8 +7,8 @@ import java.util.function.Consumer;
 import static com.wjduquette.joe.TokenType.*;
 
 class Parser {
+    public static final String ARGS = "args";
     private static final int MAX_CALL_ARGUMENTS = 255;
-    private static final String ARGS = "args";
 
     //-------------------------------------------------------------------------
     // Instance Variables
