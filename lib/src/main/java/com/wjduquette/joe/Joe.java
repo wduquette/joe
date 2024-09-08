@@ -393,6 +393,20 @@ public class Joe {
     }
 
     /**
+     * Throws an arity check failure if the arguments list contains fewer
+     * than the minimum number of arguments.
+     * @param args The argument list
+     * @param minArity The minimum arity
+     * @param signature The signature string.
+     * @throws JoeError on failure
+     */
+    public static void minArity(List<Object> args, int minArity, String signature) {
+        if (args.size() < minArity) {
+            throw arityFailure(signature);
+        }
+    }
+
+    /**
      * Throws an arity check failure if the arguments list contains the wrong
      * number of arguments.
      * @param args The argument list

@@ -1,5 +1,6 @@
 package com.wjduquette.joe;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,6 +12,7 @@ public class JoeFunction implements JoeCallable {
     private final String signature;
     private final Environment closure;
     private final boolean isInitializer;
+    private final boolean isVarArgs;
 
     JoeFunction(
         Stmt.Function declaration,
@@ -20,7 +22,10 @@ public class JoeFunction implements JoeCallable {
         this.declaration = declaration;
         this.closure = closure;
         this.isInitializer = isInitializer;
+        this.isVarArgs = !declaration.params().isEmpty()
+            && declaration.params().getLast().lexeme().equals(Parser.ARGS);
 
+        // FIRST, compute the signature string.
         var params = declaration.params().stream()
             .map(Token::lexeme)
             .collect(Collectors.joining(", "));
@@ -52,13 +57,28 @@ public class JoeFunction implements JoeCallable {
 
     @Override
     public Object call(Joe joe, List<Object> args) {
-        Joe.exactArity(args, declaration.params().size(), signature);
+        // FIRST, check the arity
+        var expected = isVarArgs
+            ? declaration.params().size() - 1
+            : declaration.params().size();
+        if (isVarArgs) {
+            Joe.minArity(args, expected, signature);
+        } else {
+            Joe.exactArity(args, expected, signature);
+        }
 
+        // NEXT, create the environment for the arguments.
         Environment environment = new Environment(closure);
 
-        for (int i = 0; i < declaration.params().size(); i++) {
+        for (int i = 0; i < expected; i++) {
             environment.define(declaration.params().get(i).lexeme(),
                 args.get(i));
+        }
+
+        if (isVarArgs) {
+            var varArgs = new ArrayList<>(args.subList(expected, args.size()));
+            environment.define(declaration.params().getLast().lexeme(),
+                varArgs);
         }
 
         try {
@@ -69,7 +89,6 @@ public class JoeFunction implements JoeCallable {
             if (isInitializer) return closure.getAt(0, "this");
             return returnValue.value;
         }
-
     }
 
     @Override

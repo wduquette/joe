@@ -17,6 +17,9 @@ Joe 0.2.0 extends Joe on every axis.
   - Joe `class` declarations may now include `static method` declarations
     and `static {...}` initializer blocks.  Static methods and variables are 
     always referenced by the class name, as in Java.
+  - Joe functions and methods can now accept a variable length argument list 
+    by defining an `args` parameter as the last parameter in the list.  `args`
+    will be a list containing any excess values.
   
 - Library
   - Added `catch()` function

@@ -11,3 +11,17 @@ function testNestedScope() {
     // The function captures its environment
     check(greet()).eq(#howdy);
 }
+
+function testVarArgs() {
+    function varArgs(a, args) {
+        println("a=" + a);
+        println("args=" + args);
+    }
+
+    // TODO: Revise once the list type is available
+    // For now, just make sure that these calls do not fail.
+    varArgs("a");
+    varArgs("a", "b");
+    varArgs("a", "b", "c");
+}
+
