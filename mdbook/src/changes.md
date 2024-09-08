@@ -14,6 +14,9 @@ Joe 0.2.0 extends Joe on every axis.
     a string.
   - Added `Keyword` values: `#abc` is an interned constant.
   - Added the ternary operator `? :`.
+  - Joe `class` declarations may now include `static method` declarations
+    and `static {...}` initializer blocks.  Static methods and variables are 
+    always referenced by the class name, as in Java.
   
 - Library
   - Added `catch()` function
