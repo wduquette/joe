@@ -20,11 +20,11 @@ public class Library {
     //-------------------------------------------------------------------------
     // Library builders
 
-    protected final void globalFunction(String name, JoeCallable callable) {
+    public final void globalFunction(String name, JoeCallable callable) {
         globalFunctions.add(new NativeFunction(name, callable));
     }
 
-    protected final void type(TypeProxy<?> typeProxy) {
+    public final void type(TypeProxy<?> typeProxy) {
         types.add(typeProxy);
     }
 
