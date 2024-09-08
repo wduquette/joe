@@ -1,5 +1,6 @@
 package com.wjduquette.joe;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -7,6 +8,7 @@ import static com.wjduquette.joe.TokenType.*;
 
 class Parser {
     private static final int MAX_CALL_ARGUMENTS = 255;
+    private static final String ARGS = "args";
 
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -177,6 +179,7 @@ class Parser {
         consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
 
         List<Token> parameters = new ArrayList<>();
+        var names = new HashMap<String,Token>();
         if (!check(RIGHT_PAREN)) {
             do {
                 if (parameters.size() >= MAX_CALL_ARGUMENTS) {
@@ -184,10 +187,22 @@ class Parser {
                         " parameters.");
                 }
 
-                parameters.add(
-                    consume(IDENTIFIER, "Expected parameter name."));
+                var token = consume(IDENTIFIER, "Expected parameter name.");
+                if (names.containsKey(token.lexeme())) {
+                    throw errorSync(token, "Duplicate parameter name.");
+                }
+                names.put(token.lexeme(), token);
+                parameters.add(token);
             } while (match(COMMA));
         }
+
+        if (names.containsKey(ARGS) &&
+            !parameters.getLast().lexeme().equals(ARGS)
+        ) {
+            throw errorSync(names.get(ARGS),
+                "'args' must be the final parameter when present.");
+        }
+
         consume(RIGHT_PAREN, "Expected ')' after parameter list.");
 
         consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");

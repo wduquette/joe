@@ -208,6 +208,30 @@ public class ParserTest extends Ted {
     }
 
     @Test
+    public void testStmtFunction_duplicateParam() {
+        test("testStmtFunction_duplicateParam");
+
+        var details = parse("""
+            function bad(x,y,x) {}
+            """);
+        checkList(details).items(
+            "[line 1] Error at 'x': Duplicate parameter name."
+        );
+    }
+
+    @Test
+    public void testStmtFunction_argsPosition() {
+        test("testStmtFunction_argsPosition");
+
+        var details = parse("""
+            function bad(x,args,y) {}
+            """);
+        checkList(details).items(
+            "[line 1] Error at 'args': 'args' must be the final parameter when present."
+        );
+    }
+
+    @Test
     public void testStmtFunction_noRightParen() {
         test("testStmtFunction_noRightParen");
 
