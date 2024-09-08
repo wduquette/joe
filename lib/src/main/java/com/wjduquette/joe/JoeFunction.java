@@ -1,7 +1,6 @@
 package com.wjduquette.joe;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -56,7 +55,7 @@ public class JoeFunction implements JoeCallable {
     }
 
     @Override
-    public Object call(Joe joe, List<Object> args) {
+    public Object call(Joe joe, ArgQueue args) {
         // FIRST, check the arity
         var expected = isVarArgs
             ? declaration.params().size() - 1
@@ -72,13 +71,12 @@ public class JoeFunction implements JoeCallable {
 
         for (int i = 0; i < expected; i++) {
             environment.define(declaration.params().get(i).lexeme(),
-                args.get(i));
+                args.next());
         }
 
-        if (isVarArgs) {
-            var varArgs = new ArrayList<>(args.subList(expected, args.size()));
-            environment.define(declaration.params().getLast().lexeme(),
-                varArgs);
+        if (!args.isEmpty()) {
+            var varArgs = new ArrayList<>(args.remainder());
+            environment.define(Parser.ARGS, varArgs);
         }
 
         try {

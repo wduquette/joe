@@ -148,7 +148,7 @@ public class TestTool implements Tool {
                 }
 
                 try {
-                    callable.call(joe, List.of());
+                    callable.call(joe, ArgQueue.EMPTY);
                     ++successCount;
                 } catch (AssertError ex) {
                     println("  FAILED: " + ex.getMessage());
@@ -170,7 +170,7 @@ public class TestTool implements Tool {
         joe.installScriptResource(getClass(), "lib_test.joe");
     }
 
-    private Object _assertEquals(Joe joe, List<Object> args) {
+    private Object _assertEquals(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 2, "assertEquals(got, expected)");
         var got = args.get(0);
         var expected = args.get(1);
@@ -184,7 +184,7 @@ public class TestTool implements Tool {
         return null;
     }
 
-    private Object _fail(Joe joe, List<Object> args) {
+    private Object _fail(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "fail(message)");
         throw new AssertError(joe.stringify(args.get(0)));
     }

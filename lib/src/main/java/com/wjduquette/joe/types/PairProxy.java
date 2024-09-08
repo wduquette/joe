@@ -1,10 +1,9 @@
 package com.wjduquette.joe.types;
 
+import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Pair;
 import com.wjduquette.joe.TypeProxy;
-
-import java.util.List;
 
 public class PairProxy extends TypeProxy<Pair> {
     public static final PairProxy TYPE = new PairProxy();
@@ -52,7 +51,7 @@ public class PairProxy extends TypeProxy<Pair> {
     //-------------------------------------------------------------------------
     // Initializer
 
-    public Object _init(Joe joe, List<Object> args) {
+    public Object _init(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 2, "Pair(left, right)");
         return new Pair(args.get(0), args.get(1));
     }
@@ -64,7 +63,7 @@ public class PairProxy extends TypeProxy<Pair> {
     // @method left
     // @returns The left-hand value
     // Gets the first value in the pair.
-    private Object _left(Pair value, Joe joe, List<Object> args) {
+    private Object _left(Pair value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "left()");
         return value.left();
     }
@@ -73,12 +72,12 @@ public class PairProxy extends TypeProxy<Pair> {
     // @method right
     // @returns The right-hand value
     // Gets the second value in the pair.
-    private Object _right(Pair value, Joe joe, List<Object> args) {
+    private Object _right(Pair value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "right()");
         return value.right();
     }
 
-    private Object _toString(Pair value, Joe joe, List<Object> args) {
+    private Object _toString(Pair value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "toString");
         return joe.stringify(value);
     }

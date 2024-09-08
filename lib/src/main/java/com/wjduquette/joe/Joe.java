@@ -28,7 +28,7 @@ public class Joe {
         installGlobalFunction(new NativeFunction("dumpEnv", this::_dumpEnv));
     }
 
-    private Object _dumpEnv(Joe joe, List<Object> args) {
+    private Object _dumpEnv(Joe joe, ArgQueue args) {
         interpreter.dumpEnvironment();
         return null;
     }
@@ -386,7 +386,7 @@ public class Joe {
      * @param signature The signature string.
      * @throws JoeError on failure
      */
-    public static void exactArity(List<Object> args, int arity, String signature) {
+    public static void exactArity(ArgQueue args, int arity, String signature) {
         if (args.size() != arity) {
             throw arityFailure(signature);
         }
@@ -400,7 +400,7 @@ public class Joe {
      * @param signature The signature string.
      * @throws JoeError on failure
      */
-    public static void minArity(List<Object> args, int minArity, String signature) {
+    public static void minArity(ArgQueue args, int minArity, String signature) {
         if (args.size() < minArity) {
             throw arityFailure(signature);
         }
@@ -416,7 +416,7 @@ public class Joe {
      * @throws JoeError on failure
      */
     public static void arityRange(
-        List<Object> args,
+        ArgQueue args,
         int minArity,
         int maxArity,
         String signature)

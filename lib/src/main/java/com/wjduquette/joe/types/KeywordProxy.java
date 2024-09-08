@@ -1,10 +1,9 @@
 package com.wjduquette.joe.types;
 
+import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.TypeProxy;
-
-import java.util.List;
 
 public class KeywordProxy extends TypeProxy<Keyword> {
     public static final KeywordProxy TYPE = new KeywordProxy();
@@ -30,7 +29,7 @@ public class KeywordProxy extends TypeProxy<Keyword> {
     // @args name
     // Creates a new keyword given its name, without or without
     // the leading `#`.
-    private Object _init(Joe joe, List<Object> args) {
+    private Object _init(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "Keyword(name)");
         var arg = args.get(0);
         var name = joe.toString(arg);
@@ -54,7 +53,7 @@ public class KeywordProxy extends TypeProxy<Keyword> {
     // @method name
     // @returns String
     // Gets the keyword's name, omitting the leading `#`.
-    private Object _name(Keyword keyword, Joe joe, List<Object> args) {
+    private Object _name(Keyword keyword, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "name()");
         return keyword.name();
     }
@@ -63,7 +62,7 @@ public class KeywordProxy extends TypeProxy<Keyword> {
     // @method toString
     // @returns String
     // Gets the keyword's string representation, including the leading `#`.
-    private Object _toString(Keyword keyword, Joe joe, List<Object> args) {
+    private Object _toString(Keyword keyword, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "toString()");
         return keyword.toString();
     }

@@ -1,9 +1,8 @@
 package com.wjduquette.joe.types;
 
+import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.TypeProxy;
-
-import java.util.List;
 
 public class NumberProxy extends TypeProxy<Double> {
     public static final NumberProxy TYPE = new NumberProxy();
@@ -23,7 +22,7 @@ public class NumberProxy extends TypeProxy<Double> {
     //-------------------------------------------------------------------------
     // Static Methods
 
-    private Object _abs(Joe joe, List<Object> args) {
+    private Object _abs(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "Number.abs(value)");
         return Math.abs(joe.toDouble(args.get(0)));
     }

@@ -2,8 +2,6 @@ package com.wjduquette.joe;
 
 import com.wjduquette.joe.types.*;
 
-import java.util.List;
-
 public class StandardLibrary extends Library {
     public static final StandardLibrary LIB = new StandardLibrary();
     public static final Keyword OK = new Keyword("ok");
@@ -34,13 +32,13 @@ public class StandardLibrary extends Library {
     // Executes the callable, which must not require any arguments.
     // Returns `Pair(#ok, returnValue)` on success and
     // `Pair(#error, Error)` on error.
-    private Object _catch(Joe joe, List<Object> args) {
+    private Object _catch(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "catch(callable)");
         var arg = args.get(0);
 
         if (arg instanceof JoeCallable callable) {
             try {
-                var result = callable.call(joe, List.of());
+                var result = callable.call(joe, ArgQueue.EMPTY);
                 return new Pair(OK, result);
             } catch (JoeError ex) {
                 return new Pair(ERROR, ex);
@@ -50,20 +48,20 @@ public class StandardLibrary extends Library {
         }
     }
 
-    private Object _codify(Joe joe, List<Object> args) {
+    private Object _codify(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "codify(value)");
 
         return joe.codify(args.get(0));
     }
 
-    private Object _print(Joe joe, List<Object> args) {
+    private Object _print(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "print(text)");
 
         System.out.print(joe.stringify(args.get(0)));
         return null;
     }
 
-    private Object _println(Joe joe, List<Object> args) {
+    private Object _println(Joe joe, ArgQueue args) {
         Joe.arityRange(args, 0, 1, "println([text])");
 
         if (args.isEmpty()) {
@@ -74,13 +72,13 @@ public class StandardLibrary extends Library {
         return null;
     }
 
-    private Object _stringify(Joe joe, List<Object> args) {
+    private Object _stringify(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "stringify(value)");
 
         return joe.stringify(args.get(0));
     }
 
-    private Object _typeName(Joe joe, List<Object> args) {
+    private Object _typeName(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "typeName(value)");
 
         return joe.typeName(args.get(0));

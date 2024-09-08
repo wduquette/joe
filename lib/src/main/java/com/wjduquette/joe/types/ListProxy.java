@@ -1,10 +1,9 @@
 package com.wjduquette.joe.types;
 
+import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeList;
 import com.wjduquette.joe.TypeProxy;
-
-import java.util.List;
 
 public class ListProxy extends TypeProxy<JoeList> {
     public static final ListProxy TYPE = new ListProxy();
@@ -22,14 +21,14 @@ public class ListProxy extends TypeProxy<JoeList> {
     //-------------------------------------------------------------------------
     // Initializer Implementation
 
-    private Object _init(Joe joe, List<Object> args) {
-        return new ListValue(args);
+    private Object _init(Joe joe, ArgQueue args) {
+        return new ListValue(args.asList());
     }
 
     //-------------------------------------------------------------------------
     // Method Implementation
 
-    private Object _size(JoeList list, Joe joe, List<Object> args) {
+    private Object _size(JoeList list, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "size()");
         return (double)list.size();
     }

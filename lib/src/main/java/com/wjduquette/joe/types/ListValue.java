@@ -19,6 +19,7 @@ public class ListValue
     /**
      * Creates an empty list.
      */
+    @SuppressWarnings("unused")
     public ListValue() {
         // nothing to do
     }

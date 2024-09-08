@@ -1,7 +1,5 @@
 package com.wjduquette.joe;
 
-import java.util.List;
-
 public class NativeFunction implements JoeCallable {
     private final String name;
     private final JoeCallable callable;
@@ -16,7 +14,7 @@ public class NativeFunction implements JoeCallable {
     }
 
     @Override
-    public Object call(Joe joe, List<Object> args) {
+    public Object call(Joe joe, ArgQueue args) {
         return callable.call(joe, args);
     }
 

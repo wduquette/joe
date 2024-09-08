@@ -1,7 +1,6 @@
 package com.wjduquette.joe;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class JoeClass implements JoeObject, JoeCallable {
@@ -64,7 +63,7 @@ public class JoeClass implements JoeObject, JoeCallable {
     }
 
     @Override
-    public Object call(Joe joe, List<Object> args) {
+    public Object call(Joe joe, ArgQueue args) {
         JoeInstance instance = new JoeInstance(this);
         JoeFunction initializer = findMethod(INIT);
         if (initializer != null) {
