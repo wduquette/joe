@@ -21,8 +21,25 @@ function testEndsWith() {
     check("abcdef".endsWith("cde")).isFalse();
 }
 
+function testEqualsIgnoreCase() {
+    check("abc".equalsIgnoreCase("ABC")).isTrue();
+    check("abc".equalsIgnoreCase("ABCD")).isFalse();
+}
+
 function testIndent() {
     check("abc".indent(2)).eq("  abc");
+}
+
+function testIsBlank() {
+    check("abc".isBlank()).isFalse();
+    check("   ".isBlank()).isTrue();
+    check("".isBlank()).isTrue();
+}
+
+function testIsEmpty() {
+    check("abc".isEmpty()).isFalse();
+    check("   ".isEmpty()).isFalse();
+    check("".isEmpty()).isTrue();
 }
 
 function testLength() {
@@ -34,6 +51,30 @@ function testStartsWith() {
     check("abcdef".startsWith("bcd")).isFalse();
 }
 
+function testStrip() {
+    check("  abc  ".strip()).eq("abc");
+}
+
 function testStripIndent() {
     check("   abc".stripIndent()).eq("abc");
+}
+
+function testStripLeading() {
+    check("  abc  ".stripLeading()).eq("abc  ");
+}
+
+function testStripTrailing() {
+    check("  abc  ".stripTrailing()).eq("  abc");
+}
+
+function testToLowerCase() {
+    check("ABC".toUpperCase()).eq("abc");
+}
+
+function testToLowerCase() {
+    check("AbC".toString()).eq("AbC");
+}
+
+function testToUpperCase() {
+    check("abc".toUpperCase()).eq("ABC");
 }

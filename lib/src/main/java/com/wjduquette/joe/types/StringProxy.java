@@ -1,6 +1,7 @@
 package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.TypeProxy;
 
 import java.util.List;
@@ -16,14 +17,34 @@ public class StringProxy extends TypeProxy<String> {
 
         proxies(String.class);
         initializer(this::_init);
-        method("charAt",      this::_charAt);
-        method("endsWith",    this::_endsWith);
-        method("contains",    this::_contains);
-        method("indent",      this::_indent);
-//        method("indexOf",     this::_indexOf);  Wait for varargs
-        method("length",      this::_length);
-        method("startsWith",  this::_startsWith);
-        method("stripIndent", this::_stripIndent);
+        method("charAt",           this::_charAt);
+        method("contains",         this::_contains);
+        method("endsWith",         this::_endsWith);
+        method("equalsIgnoreCase", this::_equalsIgnoreCase);
+//        method("format",           this::_format);     // TODO Need printf logic
+        method("indent",           this::_indent);
+//        method("indexOf",          this::_indexOf);    // TODO Wait for varargs
+        method("isBlank",          this::_isBlank);
+        method("isEmpty",          this::_isEmpty);
+//        method("join",             this::_join);       // TODO Wait for List
+//        method("lastIndexOf",      this::_lastIndexOf);  // TODO Wait for varargs
+        method("length",           this::_length);
+//        method("lines",            this::_lines);      // TODO Wait for List
+        method("matches",          this::_matches);
+        method("repeat",           this::_repeat);
+        method("replace",          this::_replace);
+        method("replaceAll",       this::_replaceAll);
+        method("replaceFirst",     this::_replaceFirst);
+//        method("split",            this::_split);      // TODO Wait for List
+        method("startsWith",       this::_startsWith);
+        method("strip",            this::_strip);
+        method("stripIndent",      this::_stripIndent);
+        method("stripLeading",     this::_stripLeading);
+        method("stripTrailing",    this::_stripTrailing);
+//        method("substring",        this::_substring);  // Wait for List
+        method("toLowerCase",      this::_toLowerCase);
+        method("toString",         this::_toString);
+        method("toUpperCase",      this::_toUpperCase);
     }
 
     //-------------------------------------------------------------------------
@@ -71,6 +92,11 @@ public class StringProxy extends TypeProxy<String> {
         return value.endsWith(suffix);
     }
 
+    private Object _equalsIgnoreCase(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 1, "other");
+        return value.equalsIgnoreCase(joe.stringify(args.get(0)));
+    }
+
     //**
     // @method indent
     // @args n
@@ -86,6 +112,16 @@ public class StringProxy extends TypeProxy<String> {
         return value.indent(n).stripTrailing();
     }
 
+    private Object _isBlank(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 0, "isBlank()");
+        return value.isBlank();
+    }
+
+    private Object _isEmpty(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 0, "isEmpty()");
+        return value.isEmpty();
+    }
+
     //**
     // @method length
     // @returns Double
@@ -94,6 +130,32 @@ public class StringProxy extends TypeProxy<String> {
         Joe.exactArity(args, 0, "length()");
         return (double)value.length();
     }
+
+    private Object _matches(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 1, "");
+        throw new JoeError("Unsupported Operation: Not Yet Implemented");
+    }
+
+    private Object _repeat(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 1, "");
+        throw new JoeError("Unsupported Operation: Not Yet Implemented");
+    }
+
+    private Object _replace(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 1, "");
+        throw new JoeError("Unsupported Operation: Not Yet Implemented");
+    }
+
+    private Object _replaceAll(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 1, "");
+        throw new JoeError("Unsupported Operation: Not Yet Implemented");
+    }
+
+    private Object _replaceFirst(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 1, "");
+        throw new JoeError("Unsupported Operation: Not Yet Implemented");
+    }
+
 
     //**
     // @method startsWith
@@ -106,6 +168,11 @@ public class StringProxy extends TypeProxy<String> {
         return value.startsWith(prefix);
     }
 
+    private Object _strip(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 0, "strip()");
+        return value.strip();
+    }
+
     //**
     // @method stripIndent
     // @returns String
@@ -115,4 +182,30 @@ public class StringProxy extends TypeProxy<String> {
         Joe.exactArity(args, 0, "stripIndent()");
         return value.stripIndent();
     }
+
+    private Object _stripLeading(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 0, "stripLeading()");
+        return value.stripLeading();
+    }
+
+    private Object _stripTrailing(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 0, "stripTrailing()");
+        return value.stripTrailing();
+    }
+
+    private Object _toLowerCase(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 0, "toLowerCase()");
+        return value.toLowerCase();
+    }
+
+    private Object _toString(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 0, "toString()");
+        return value;
+    }
+
+    private Object _toUpperCase(String value, Joe joe, List<Object> args) {
+        Joe.exactArity(args, 0, "toUpperCase()");
+        return value.toUpperCase();
+    }
+
 }
