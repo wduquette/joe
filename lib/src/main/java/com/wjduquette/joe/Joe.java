@@ -433,6 +433,24 @@ public class Joe {
         throw expected("double", arg);
     }
 
+    public int toInteger(Object arg) {
+        if (arg instanceof Double num) {
+            return num.intValue();
+        }
+
+        throw expected("number", arg);
+    }
+
+    public int toIndex(Object arg, int limit) {
+        var value = toInteger(arg);
+
+        if (0 <= value && value < limit) {
+            return value;
+        }
+
+        throw expected("0 <= index < " + limit, arg);
+    }
+
     public Keyword toKeyword(Object arg) {
         if (arg instanceof Keyword keyword) {
             return keyword;

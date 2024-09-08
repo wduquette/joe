@@ -1,0 +1,80 @@
+// String type tests
+
+function testCharAt() {
+    check("abc".charAt(0)).eq("a");
+    check("abc".charAt(2)).eq("c");
+    check("abc".charAt(2.9)).eq("c");
+
+    function bad1() { "abc".charAt(-1); }
+    function bad2() { "abc".charAt(3); }
+    checkCatch(bad1).message("Expected 0 <= index < 3, got Double '-1'.");
+    checkCatch(bad2).message("Expected 0 <= index < 3, got Double '3'.");
+}
+
+function testContains() {
+    check("abcdef".contains("bcd")).isTrue();
+    check("abcdef".contains("123")).isFalse();
+}
+
+function testEndsWith() {
+    check("abcdef".endsWith("def")).isTrue();
+    check("abcdef".endsWith("cde")).isFalse();
+}
+
+function testEqualsIgnoreCase() {
+    check("abc".equalsIgnoreCase("ABC")).isTrue();
+    check("abc".equalsIgnoreCase("ABCD")).isFalse();
+}
+
+function testIndent() {
+    check("abc".indent(2)).eq("  abc");
+}
+
+function testIsBlank() {
+    check("abc".isBlank()).isFalse();
+    check("   ".isBlank()).isTrue();
+    check("".isBlank()).isTrue();
+}
+
+function testIsEmpty() {
+    check("abc".isEmpty()).isFalse();
+    check("   ".isEmpty()).isFalse();
+    check("".isEmpty()).isTrue();
+}
+
+function testLength() {
+    check("abc".length()).eq(3);
+}
+
+function testStartsWith() {
+    check("abcdef".startsWith("abc")).isTrue();
+    check("abcdef".startsWith("bcd")).isFalse();
+}
+
+function testStrip() {
+    check("  abc  ".strip()).eq("abc");
+}
+
+function testStripIndent() {
+    check("   abc".stripIndent()).eq("abc");
+}
+
+function testStripLeading() {
+    check("  abc  ".stripLeading()).eq("abc  ");
+}
+
+function testStripTrailing() {
+    check("  abc  ".stripTrailing()).eq("  abc");
+}
+
+function testToLowerCase() {
+    check("ABC".toUpperCase()).eq("abc");
+}
+
+function testToLowerCase() {
+    check("AbC".toString()).eq("AbC");
+}
+
+function testToUpperCase() {
+    check("abc".toUpperCase()).eq("ABC");
+}
