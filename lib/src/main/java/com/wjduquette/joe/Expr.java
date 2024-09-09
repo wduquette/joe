@@ -50,14 +50,10 @@ public sealed interface Expr
 
     /**
      * A lambda function.
-     * @param token The backslash token
-     * @param params The parameters
-     * @param body The function body
+     * @param declaration The function's declaration
      */
     record Lambda(
-        Token token,
-        List<Token> params,
-        List<Stmt> body
+        Stmt.Function declaration
     ) implements Expr {}
 
     /**

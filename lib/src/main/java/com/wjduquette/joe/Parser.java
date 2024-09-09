@@ -459,7 +459,8 @@ class Parser {
                 var expr = expression();
                 body = List.of(new Stmt.Return(token, expr));
             }
-            return new Expr.Lambda(token, parameters, body);
+            var decl = new Stmt.Function("lambda", token, parameters, body);
+            return new Expr.Lambda(decl);
         }
 
         if (match(LEFT_PAREN)) {

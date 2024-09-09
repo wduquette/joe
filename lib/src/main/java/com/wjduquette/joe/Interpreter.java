@@ -297,7 +297,7 @@ public class Interpreter {
             }
             case Expr.Grouping expr -> evaluate(expr.expr());
             case Expr.Lambda expr ->
-                throw new RuntimeError(expr.token(), "Lambdas not yet implemented.");
+                new JoeFunction(expr.declaration(), environment, false);
             case Expr.Literal expr -> expr.value();
             case Expr.Logical expr -> {
                 Object left = evaluate(expr.left());

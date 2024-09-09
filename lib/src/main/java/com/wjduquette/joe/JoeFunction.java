@@ -13,6 +13,7 @@ public final class JoeFunction implements JoeCallable {
     private final boolean isInitializer;
     private final boolean isVarArgs;
     private final String signature;
+    private final boolean isLambda;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -26,6 +27,7 @@ public final class JoeFunction implements JoeCallable {
         this.closure = closure;
         this.isInitializer = isInitializer;
         this.isVarArgs = isVarArgs(declaration.params());
+        this.isLambda = declaration.kind().equals("lambda");
         this.signature = makeSignature();
     }
 
@@ -38,7 +40,11 @@ public final class JoeFunction implements JoeCallable {
         var params = declaration.params().stream()
             .map(Token::lexeme)
             .collect(Collectors.joining(", "));
-        return declaration.name().lexeme() + "(" + params + ")";
+        if (isLambda) {
+            return declaration.name().lexeme() + params;
+        } else {
+            return declaration.name().lexeme() + "(" + params + ")";
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -104,6 +110,6 @@ public final class JoeFunction implements JoeCallable {
 
     @Override
     public String toString() {
-        return "<" + declaration.kind() + " " + declaration.name().lexeme() + ">";
+        return "<" + declaration.kind() + " " + signature + ">";
     }
 }
