@@ -457,7 +457,7 @@ class Parser {
                 body = block();
             } else {
                 var expr = expression();
-                body = List.of(new Stmt.Expression(expr));
+                body = List.of(new Stmt.Return(token, expr));
             }
             return new Expr.Lambda(token, parameters, body);
         }
