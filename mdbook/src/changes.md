@@ -20,6 +20,7 @@ Joe 0.2.0 extends Joe on every axis.
   - Joe functions and methods can now accept a variable length argument list 
     by defining an `args` parameter as the last parameter in the list.  `args`
     will be a list containing any excess values.
+  - Added lambda functions, e.g., `\x -> x*x` or `\x -> { return x*x; }`
   
 - Library
   - Added `catch()` function

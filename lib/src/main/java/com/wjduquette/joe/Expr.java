@@ -4,8 +4,8 @@ import java.util.List;
 
 public sealed interface Expr
     permits Expr.Assign, Expr.Binary, Expr.Call, Expr.Get, Expr.Grouping,
-            Expr.Literal, Expr.Logical, Expr.Set, Expr.Super, Expr.This,
-            Expr.Ternary, Expr.Unary, Expr.Variable
+            Expr.Lambda, Expr.Literal, Expr.Logical, Expr.Set, Expr.Super,
+            Expr.This, Expr.Ternary, Expr.Unary, Expr.Variable
 {
     /**
      * An assignment to an existing variable.
@@ -47,6 +47,14 @@ public sealed interface Expr
      * @param expr The expression in parentheses.
      */
     record Grouping(Expr expr) implements Expr {}
+
+    /**
+     * A lambda function.
+     * @param declaration The function's declaration
+     */
+    record Lambda(
+        Stmt.Function declaration
+    ) implements Expr {}
 
     /**
      * A literal value.

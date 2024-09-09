@@ -296,6 +296,8 @@ public class Interpreter {
                 yield instance.get(expr.name().lexeme());
             }
             case Expr.Grouping expr -> evaluate(expr.expr());
+            case Expr.Lambda expr ->
+                new JoeFunction(expr.declaration(), environment, false);
             case Expr.Literal expr -> expr.value();
             case Expr.Logical expr -> {
                 Object left = evaluate(expr.left());

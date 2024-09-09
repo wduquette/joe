@@ -70,23 +70,24 @@ public class Scanner {
     private void scanToken() {
         char c = advance();
         switch (c) {
-            case '(' -> addToken(LEFT_PAREN);
-            case ')' -> addToken(RIGHT_PAREN);
-            case '{' -> addToken(LEFT_BRACE);
-            case '}' -> addToken(RIGHT_BRACE);
-            case ':' -> addToken(COLON);
-            case ',' -> addToken(COMMA);
-            case '.' -> addToken(DOT);
-            case '-' -> addToken(MINUS);
-            case '+' -> addToken(PLUS);
-            case '?' -> addToken(QUESTION);
-            case ';' -> addToken(SEMICOLON);
-            case '*' -> addToken(STAR);
-            case '!' -> addToken(match('=') ? BANG_EQUAL : BANG);
-            case '=' -> addToken(match('=') ? EQUAL_EQUAL : EQUAL);
-            case '<' -> addToken(match('=') ? LESS_EQUAL : LESS);
-            case '>' -> addToken(match('=') ? GREATER_EQUAL : GREATER);
-            case '/' -> {
+            case '('  -> addToken(LEFT_PAREN);
+            case ')'  -> addToken(RIGHT_PAREN);
+            case '{'  -> addToken(LEFT_BRACE);
+            case '}'  -> addToken(RIGHT_BRACE);
+            case '\\' -> addToken(BACK_SLASH);
+            case ':'  -> addToken(COLON);
+            case ','  -> addToken(COMMA);
+            case '.'  -> addToken(DOT);
+            case '-'  -> addToken(match('>') ? MINUS_GREATER : MINUS);
+            case '+'  -> addToken(PLUS);
+            case '?'  -> addToken(QUESTION);
+            case ';'  -> addToken(SEMICOLON);
+            case '*'  -> addToken(STAR);
+            case '!'  -> addToken(match('=') ? BANG_EQUAL : BANG);
+            case '='  -> addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+            case '<'  -> addToken(match('=') ? LESS_EQUAL : LESS);
+            case '>'  -> addToken(match('=') ? GREATER_EQUAL : GREATER);
+            case '/'  -> {
                 if (match('/')) {
                     // A comment goes until the end of the line.
                     while (peek() != '\n' && !isAtEnd()) advance();

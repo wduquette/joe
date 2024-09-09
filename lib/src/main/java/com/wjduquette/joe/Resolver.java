@@ -7,7 +7,7 @@ import java.util.Stack;
 import java.util.function.Consumer;
 
 class Resolver {
-    private enum FunctionType { NONE, FUNCTION, INITIALIZER, METHOD }
+    private enum FunctionType { NONE, FUNCTION, INITIALIZER, METHOD, LAMBDA }
     private enum ClassType { NONE, CLASS, SUBCLASS }
 
     private final Interpreter interpreter;
@@ -158,6 +158,8 @@ class Resolver {
             }
             case Expr.Get expr -> resolve(expr.object());
             case Expr.Grouping expr -> resolve(expr.expr());
+            case Expr.Lambda expr ->
+                resolveFunction(expr.declaration(), FunctionType.LAMBDA);
             case Expr.Literal ignored -> {}
             case Expr.Logical expr -> {
                 resolve(expr.left());

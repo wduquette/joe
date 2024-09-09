@@ -3,6 +3,7 @@ package com.wjduquette.joe;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class ArgQueue {
     public static final ArgQueue EMPTY = new ArgQueue();
@@ -84,5 +85,12 @@ public final class ArgQueue {
      */
     public List<Object> asList() {
         return args;
+    }
+
+    @Override
+    public String toString() {
+        var before = args.subList(0, next).stream().map(Object::toString).collect(Collectors.joining(","));
+        var after = args.subList(next, args.size()).stream().map(Object::toString).collect(Collectors.joining(","));
+        return "ArgQueue[" + before + "/" + after + "]";
     }
 }
