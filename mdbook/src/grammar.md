@@ -65,6 +65,7 @@ primary         → "true" | "false" | "nil"
                 | NUMBER | STRING | KEYWORD
                 | "this"
                 | IDENTIFIER 
+                | "\" parameters? "->" ( expression | block ) ; 
                 | "(" expression ")" 
                 | "super" "." IDENTIFIER ;
 ```
