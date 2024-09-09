@@ -178,9 +178,19 @@ class Parser {
 
         consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
 
+        List<Token> parameters = parameters(RIGHT_PAREN);
+
+        consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
+        List<Stmt> body = block();
+        return new Stmt.Function(kind, name, parameters, body);
+    }
+
+    private List<Token> parameters(TokenType terminator) {
         List<Token> parameters = new ArrayList<>();
+
         var names = new HashMap<String,Token>();
-        if (!check(RIGHT_PAREN)) {
+
+        if (!check(terminator)) {
             do {
                 if (parameters.size() >= MAX_CALL_ARGUMENTS) {
                     error(peek(), "Expected no more than " + MAX_CALL_ARGUMENTS +
@@ -202,12 +212,13 @@ class Parser {
             throw errorSync(names.get(ARGS),
                 "'args' must be the final parameter when present.");
         }
+        var terminatorString = terminator == RIGHT_PAREN
+            ? ")" : "->";
 
-        consume(RIGHT_PAREN, "Expected ')' after parameter list.");
+        consume(terminator, "Expected '" +
+            terminatorString + "' after parameter list.");
 
-        consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
-        List<Stmt> body = block();
-        return new Stmt.Function(kind, name, parameters, body);
+        return parameters;
     }
 
     private Stmt ifStatement() {
@@ -435,6 +446,10 @@ class Parser {
 
         if (match(IDENTIFIER)) {
             return new Expr.Variable(previous());
+        }
+
+        if (match(BACK_SLASH)) {
+
         }
 
         if (match(LEFT_PAREN)) {
