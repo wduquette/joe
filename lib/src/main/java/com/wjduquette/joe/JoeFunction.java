@@ -1,17 +1,21 @@
 package com.wjduquette.joe;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * A function implemented in Joe.
  */
-public class JoeFunction implements JoeCallable {
+public final class JoeFunction implements JoeCallable {
     private final Stmt.Function declaration;
-    private final String signature;
     private final Environment closure;
     private final boolean isInitializer;
     private final boolean isVarArgs;
+    private final String signature;
+
+    //-------------------------------------------------------------------------
+    // Constructor
 
     JoeFunction(
         Stmt.Function declaration,
@@ -21,15 +25,24 @@ public class JoeFunction implements JoeCallable {
         this.declaration = declaration;
         this.closure = closure;
         this.isInitializer = isInitializer;
-        this.isVarArgs = !declaration.params().isEmpty()
-            && declaration.params().getLast().lexeme().equals(Parser.ARGS);
+        this.isVarArgs = isVarArgs(declaration.params());
+        this.signature = makeSignature();
+    }
 
-        // FIRST, compute the signature string.
+    private boolean isVarArgs(List<Token> params) {
+            return !params.isEmpty()
+                && params.getLast().lexeme().equals(Parser.ARGS);
+    }
+
+    private String makeSignature() {
         var params = declaration.params().stream()
             .map(Token::lexeme)
             .collect(Collectors.joining(", "));
-        this.signature = declaration.name().lexeme() + "(" + params + ")";
+        return declaration.name().lexeme() + "(" + params + ")";
     }
+
+    //-------------------------------------------------------------------------
+    // Methods
 
     /**
      * Return the name of the function.

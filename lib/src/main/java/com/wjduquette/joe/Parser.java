@@ -449,7 +449,17 @@ class Parser {
         }
 
         if (match(BACK_SLASH)) {
+            var token = previous();
+            var parameters = parameters(MINUS_GREATER);
 
+            List<Stmt> body;
+            if (match(LEFT_BRACE)) {
+                body = block();
+            } else {
+                var expr = expression();
+                body = List.of(new Stmt.Expression(expr));
+            }
+            return new Expr.Lambda(token, parameters, body);
         }
 
         if (match(LEFT_PAREN)) {

@@ -158,6 +158,7 @@ class Resolver {
             }
             case Expr.Get expr -> resolve(expr.object());
             case Expr.Grouping expr -> resolve(expr.expr());
+            case Expr.Lambda expr -> resolve(expr.body());
             case Expr.Literal ignored -> {}
             case Expr.Logical expr -> {
                 resolve(expr.left());

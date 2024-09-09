@@ -194,6 +194,11 @@ class Codifier {
             }
             case Get expr -> recodify(expr.object()) + "." + expr.name().lexeme();
             case Grouping expr -> "(" + recodify(expr.expr()) + ")";
+            case Lambda expr -> {
+                var params = expr.params().stream()
+                    .map(Token::lexeme).collect(Collectors.joining(", "));
+                yield "\\" + params + " -> " + recodify(expr.body());
+            }
             case Literal expr -> joe.codify(expr.value());
             case Logical expr ->
                 recodify(expr.left()) +
