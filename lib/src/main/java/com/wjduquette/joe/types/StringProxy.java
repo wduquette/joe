@@ -2,7 +2,6 @@ package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.TypeProxy;
 
 import java.util.Arrays;
@@ -21,6 +20,8 @@ public class StringProxy extends TypeProxy<String> {
         initializer(this::_init);
 
         staticMethod("join",       this::_join);
+
+        // pad/padLeft
 
         method("charAt",           this::_charAt);
         method("contains",         this::_contains);
@@ -175,18 +176,27 @@ public class StringProxy extends TypeProxy<String> {
     }
 
     private Object _replace(String value, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "");
-        throw new JoeError("Unsupported Operation: Not Yet Implemented");
+        Joe.exactArity(args, 2, "replace(target,replacement)");
+        return value.replace(
+            joe.stringify(args.next()),
+            joe.stringify(args.next())
+        );
     }
 
     private Object _replaceAll(String value, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "");
-        throw new JoeError("Unsupported Operation: Not Yet Implemented");
+        Joe.exactArity(args, 2, "replaceAll(regex, replacement)");
+        return value.replaceAll(
+            joe.toString(args.next()),
+            joe.stringify(args.next())
+        );
     }
 
     private Object _replaceFirst(String value, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "");
-        throw new JoeError("Unsupported Operation: Not Yet Implemented");
+        Joe.exactArity(args, 2, "replaceFirst(regex, replacement)");
+        return value.replaceFirst(
+            joe.toString(args.next()),
+            joe.stringify(args.next())
+        );
     }
 
     private Object _split(String value, Joe joe, ArgQueue args) {

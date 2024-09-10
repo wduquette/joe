@@ -75,6 +75,21 @@ function testRepeat() {
         .message("Expected non-negative count, got: Number '-1'.");
 }
 
+function testReplace() {
+    check("One cow, two cow.".replace("cow", "pig"))
+        .eq("One pig, two pig.");
+}
+
+function testReplaceAll() {
+    check("One cow, two cow.".replaceAll("[aeiou]", "*"))
+        .eq("On* c*w, tw* c*w.");
+}
+
+function testReplaceFirst() {
+    check("One cow, two cow.".replaceFirst("[aeiou]", "*"))
+        .eq("On* cow, two cow.");
+}
+
 function testSplit() {
     check("abc,def,ghi".split(","))
     .eq(List("abc", "def", "ghi"));
