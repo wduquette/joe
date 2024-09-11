@@ -55,7 +55,7 @@ public class Extractor {
                     result.add(new Line(number, line));
                 } else if (line.trim().equals(BODY)) {
                     result.add(new Line(number, ""));
-                } else {
+                } else if (!line.trim().equals(START)) {
                     inBlock = false;
                 }
             } else if (line.trim().startsWith(START)) {
