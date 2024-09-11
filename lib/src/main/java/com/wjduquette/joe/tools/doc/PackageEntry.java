@@ -13,6 +13,10 @@ public class PackageEntry extends Entry {
     // The package's global functions.
     private final List<FunctionEntry> functions = new ArrayList<>();
 
+    // The package's types
+    private final List<TypeEntry> types = new ArrayList<>();
+
+
     //-------------------------------------------------------------------------
     // Constructor
 
@@ -26,4 +30,9 @@ public class PackageEntry extends Entry {
 
     public String              name()      { return name; }
     public List<FunctionEntry> functions() { return functions; }
+    public List<TypeEntry>     types()     { return types; }
+
+    public String toString() {
+        return "Package[" + name + "]";
+    }
 }

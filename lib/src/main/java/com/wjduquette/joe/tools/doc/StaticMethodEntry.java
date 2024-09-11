@@ -46,4 +46,8 @@ public class StaticMethodEntry extends TypeMember implements Callable {
     public void setReturnSpec(String returnSpec) {
         this.returnSpec = returnSpec;
     }
+
+    public String toString() {
+        return "StaticMethod[" + name + "]";
+    }
 }

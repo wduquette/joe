@@ -31,4 +31,8 @@ public class InitializerEntry extends TypeMember implements Callable {
     public String       name()          { return name; }
     public List<String> argSpecs()      { return argSpec; }
     public String returnSpec() { return type().name(); }
+
+    public String toString() {
+        return "Initializer[" + name + "]";
+    }
 }

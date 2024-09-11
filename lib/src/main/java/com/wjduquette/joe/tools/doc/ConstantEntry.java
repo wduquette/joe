@@ -25,4 +25,8 @@ public class ConstantEntry extends TypeMember {
     // Accessors
 
     public String name() { return name; }
+
+    public String toString() {
+        return "Constant[" + name + "]";
+    }
 }

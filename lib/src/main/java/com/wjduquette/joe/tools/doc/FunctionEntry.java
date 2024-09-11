@@ -38,4 +38,8 @@ public class FunctionEntry extends Entry implements Callable {
     public void setReturnSpec(String returnSpec) {
         this.returnSpec = returnSpec;
     }
+
+    public String toString() {
+        return "Function[" + name + "]";
+    }
 }

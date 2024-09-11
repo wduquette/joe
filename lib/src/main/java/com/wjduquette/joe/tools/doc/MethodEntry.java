@@ -38,4 +38,8 @@ public class MethodEntry extends TypeMember implements Callable {
     public void setReturnSpec(String returnSpec) {
         this.returnSpec = returnSpec;
     }
+
+    public String toString() {
+        return "Method[" + name + "]";
+    }
 }

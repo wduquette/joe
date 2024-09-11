@@ -12,9 +12,8 @@ public class TypeEntry extends Entry {
 
     private final List<ConstantEntry> constants = new ArrayList<>();
     private final List<StaticMethodEntry> staticMethods = new ArrayList<>();
-    private final List<MethodEntry> methods = new ArrayList<>();
-
     private InitializerEntry initializer = null;
+    private final List<MethodEntry> methods = new ArrayList<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -30,11 +29,15 @@ public class TypeEntry extends Entry {
     String                  name()          { return name; }
     List<ConstantEntry>     constants()     { return constants; }
     List<StaticMethodEntry> staticMethods() { return staticMethods; }
-    List<MethodEntry>       methods()       { return methods; }
     InitializerEntry        initializer()   { return initializer; }
+    List<MethodEntry>       methods()       { return methods; }
 
     void setInitializer(InitializerEntry initializer) {
         this.initializer = initializer;
     }
 
+    @Override
+    public String toString() {
+        return "Type[" + name + "]";
+    }
 }
