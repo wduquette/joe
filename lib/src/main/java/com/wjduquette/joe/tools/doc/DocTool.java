@@ -59,24 +59,32 @@ public class DocTool implements Tool {
             System.exit(1);
         }
 
-        // NEXT, populate the list of files.
+        // NEXT, get the input folders.
+        // NOTE: These will ultimately come from the joe_doc.monica file.
         inputFolders.add(Path.of("../lib/src/main/java/com/wjduquette/joe"));
         inputFolders.add(Path.of("../lib/src/main/resources/com/wjduquette/joe"));
 
-        println("Scanning folders:");
-        for (var folder : inputFolders) {
-            println("  " + folder);
-            scanFolder(folder);
-        }
+        // NEXT, populate the list of files.
+        scanInputFolders();
 
-        // Dump the list of found files
         if (inputFiles.isEmpty()) {
             println("*** No files found.");
             exit();
         }
 
-        for (var file : inputFiles) {
-            scanFile(file);
+        // NEXT, parse the files and build up the documentation set.
+        var docSet = new DocumentationSet();
+        var parser = new DocCommentParser(docSet);
+        inputFiles.forEach(parser::parse);
+
+        docSet.dump();
+    }
+
+    private void scanInputFolders() {
+        println("Scanning folders:");
+        for (var folder : inputFolders) {
+            println("  " + folder);
+            scanFolder(folder);
         }
     }
 
@@ -100,14 +108,6 @@ public class DocTool implements Tool {
         return ndx >= 0 ? text.substring(ndx) : "";
     }
 
-    private void scanFile(Path file) {
-        var lines = Extractor.process(file);
-        if (lines.isEmpty()) {
-            return;
-        }
-        System.out.println("Reading: " + file);
-        lines.forEach(line -> System.out.println("  " + line));
-    }
 
     //-------------------------------------------------------------------------
     // Main
