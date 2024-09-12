@@ -76,7 +76,20 @@ public class DocTool implements Tool {
         // NEXT, parse the files and build up the documentation set.
         var docSet = new DocumentationSet();
         var parser = new DocCommentParser(docSet);
-        inputFiles.forEach(parser::parse);
+        var errors = 0;
+        for (var file : inputFiles) {
+            try {
+                parser.parse(file);
+            } catch (DocCommentParser.ParseError ex) {
+                // The parser has already output the errors.
+                ++errors;
+            }
+        }
+
+        if (errors > 0) {
+            println("*** Errors found in JoeDoc input; terminating.");
+            exit(1);
+        }
 
         docSet.dump();
     }

@@ -1,6 +1,8 @@
 package com.wjduquette.joe.tools.doc;
 
 
+import com.wjduquette.joe.Joe;
+
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -45,18 +47,17 @@ class DocCommentParser {
         // if any are not blank, that's an error.
         System.out.println("Reading: " + docFile);
 
-        try {
-            parse();
-        } catch (ParseError ex) {
-            // The error has already been output.
-        }
+        _parse();
     }
 
     //-------------------------------------------------------------------------
     // Parser
 
     private static final String PACKAGE = "@package";
+    private static final String TITLE = "@title";
     private static final String FUNCTION = "@function";
+    private static final String ARGS = "@args";
+    private static final String RETURN = "@return";
     private static final String TYPE = "@type";
     private static final String CONSTANT = "@constant";
     private static final String STATIC = "@static";
@@ -75,15 +76,16 @@ class DocCommentParser {
         PACKAGE, FUNCTION, TYPE, CONSTANT, STATIC, INIT, METHOD
     );
 
-    private void parse() {
+    private void _parse() {
         while(!atEnd()) {
             if (!advanceToTag(null)) return;
 
             var tag = advance().getTag();
 
-            switch (tag.name()) {
-                case PACKAGE -> _package(tag);
-                default -> throw error(previous(), "Unexpected tag: " + tag);
+            if (tag.name().equals(PACKAGE)) {
+                _package(tag);
+            } else {
+                throw error(previous(), "Unexpected tag: " + tag);
             }
         }
     }
@@ -104,6 +106,9 @@ class DocCommentParser {
 
     private void _package(Tag pkgTag) {
         trace("_package", pkgTag);
+        if (!Joe.isPackageName(pkgTag.value())) {
+            throw error(previous(), expected(pkgTag));
+        }
         PackageEntry pkg = new PackageEntry(pkgTag.value());
         docSet.packages().add(pkg);
 
@@ -118,6 +123,7 @@ class DocCommentParser {
 
             advance();
             switch (tag.name()) {
+                case TITLE -> pkg.setTitle(tag.value());
                 case FUNCTION -> _function(pkg, tag);
                 case TYPE -> _type(pkg, tag);
                 default -> throw error(previous(), "Unexpected tag: " + tag);
@@ -127,6 +133,9 @@ class DocCommentParser {
 
     private void _function(PackageEntry pkg, Tag funcTag) {
         FunctionEntry func = new FunctionEntry(pkg, funcTag.value());
+        if (!Joe.isIdentifier(funcTag.value())) {
+            throw error(previous(), expected(funcTag));
+        }
         pkg.functions().add(func);
 
         while (!atEnd()) {
@@ -140,7 +149,8 @@ class DocCommentParser {
 
             advance();
             switch (tag.name()) {
-                // TODO: Add metadata
+                case ARGS -> func.argSpecs().add(tag.value());
+                case RETURN -> func.setReturnSpec(tag.value());
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
@@ -148,6 +158,9 @@ class DocCommentParser {
 
     private void _type(PackageEntry pkg, Tag typeTag) {
         TypeEntry type = new TypeEntry(pkg, typeTag.value());
+        if (!Joe.isIdentifier(typeTag.value())) {
+            throw error(previous(), expected(typeTag));
+        }
         pkg.types().add(type);
 
         while (!atEnd()) {
@@ -172,26 +185,27 @@ class DocCommentParser {
 
     private void _constant(TypeEntry type, Tag constantTag) {
         ConstantEntry constant = new ConstantEntry(type, constantTag.value());
+        if (!Joe.isIdentifier(constantTag.value())) {
+            throw error(previous(), expected(constantTag));
+        }
         type.constants().add(constant);
 
-        while (!atEnd()) {
-            if (!advanceToTag(constant)) break;
+        // Constants have no tags, only content.
+        if (!advanceToTag(constant)) return;
 
-            var tag = peek().getTag();
+        var tag = peek().getTag();
 
-            if (TYPE_CHILD_ENDERS.contains(tag.name())) {
-                break;
-            }
-
+        if (!TYPE_CHILD_ENDERS.contains(tag.name())) {
             advance();
-            switch (tag.name()) {
-                default -> throw error(previous(), "Unexpected tag: " + tag);
-            }
+            throw error(previous(), "Unexpected tag: " + tag);
         }
     }
 
     private void _static(TypeEntry type, Tag methodTag) {
         StaticMethodEntry method = new StaticMethodEntry(type, methodTag.value());
+        if (!Joe.isIdentifier(methodTag.value())) {
+            throw error(previous(), expected(methodTag));
+        }
         type.staticMethods().add(method);
 
         while (!atEnd()) {
@@ -205,13 +219,20 @@ class DocCommentParser {
 
             advance();
             switch (tag.name()) {
+                case ARGS -> method.argSpecs().add(tag.value());
+                case RETURN -> method.setReturnSpec(tag.value());
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
     }
 
     private void _init(TypeEntry type, Tag initTag) {
-        InitializerEntry init = new InitializerEntry(type, initTag.value());
+        InitializerEntry init = new InitializerEntry(type);
+        if (!initTag.value().isBlank()) {
+            throw error(previous(),
+                initTag.name() + " has unexpected value: '" +
+                initTag.value() + "'.");
+        }
         type.setInitializer(init);
 
         while (!atEnd()) {
@@ -224,14 +245,19 @@ class DocCommentParser {
             }
 
             advance();
-            switch (tag.name()) {
-                default -> throw error(previous(), "Unexpected tag: " + tag);
+            if (tag.name().equals(ARGS)) {
+                init.argSpecs().add(tag.value());
+            } else {
+                throw error(previous(), "Unexpected tag: " + tag);
             }
         }
     }
 
     private void _method(TypeEntry type, Tag methodTag) {
         MethodEntry method = new MethodEntry(type, methodTag.value());
+        if (!Joe.isIdentifier(methodTag.value())) {
+            throw error(previous(), expected(methodTag));
+        }
         type.methods().add(method);
 
         while (!atEnd()) {
@@ -245,6 +271,8 @@ class DocCommentParser {
 
             advance();
             switch (tag.name()) {
+                case ARGS -> method.argSpecs().add(tag.value());
+                case RETURN -> method.setReturnSpec(tag.value());
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
@@ -255,7 +283,7 @@ class DocCommentParser {
 
     // ParseError is just a convenient way to break out of the parser.
     // We halt on the first error for now.
-    private static class ParseError extends RuntimeException { }
+    static class ParseError extends RuntimeException { }
 
     // Is there any input left?
     private boolean atEnd() {
@@ -296,6 +324,11 @@ class DocCommentParser {
     // Returns the previous line.
     private Line previous() {
         return previous;
+    }
+
+    private String expected(Tag tag) {
+        return "Expected " + tag.name() + " value, got: '" +
+            tag.value() + "'.";
     }
 
     private ParseError error(Line line, String message) {

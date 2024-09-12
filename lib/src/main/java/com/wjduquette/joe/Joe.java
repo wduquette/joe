@@ -365,6 +365,24 @@ public class Joe {
         return name.matches("[_A-Za-z][_A-Za-z0-9]*");
     }
 
+    /**
+     * Determines whether or not this is a valid Joe package name.
+     * @param name The putative name
+     * @return true or false
+     */
+    public static boolean isPackageName(String name) {
+        var tokens = name.split("\\.");
+        if (tokens.length == 0) {
+            return false;
+        }
+        for (var token : tokens) {
+            if (!isIdentifier(token)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     //-------------------------------------------------------------------------
     // Argument parsing and error handling helpers
 

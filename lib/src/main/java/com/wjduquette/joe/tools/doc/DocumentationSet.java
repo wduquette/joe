@@ -35,6 +35,9 @@ class DocumentationSet {
 
         for (var pkg : packages) {
             System.out.println("  " + pkg);
+            if (pkg.title() != null) {
+                System.out.println("    [" + pkg.title() + "]");
+            }
             dumpContent(pkg, "    ");
             for (var fn : pkg.functions()) {
                 System.out.println("    " + fn);
