@@ -30,4 +30,6 @@ public class InitializerEntry extends TypeMember implements Callable {
     public String toString() {
         return "Initializer[" + name() + "]";
     }
+
+    public String h3Title() { return name() + "()"; }
 }

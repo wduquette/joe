@@ -31,17 +31,9 @@ public class StaticMethodEntry extends TypeMember implements Callable {
     //-------------------------------------------------------------------------
     // Accessors
 
-    public String name() {
-        return name;
-    }
-
-    public List<String> argSpecs() {
-        return argSpec;
-    }
-
-    public String returnSpec() {
-        return returnSpec;
-    }
+    public String name() { return name; }
+    public List<String> argSpecs() { return argSpec; }
+    public String returnSpec() { return returnSpec; }
 
     public void setReturnSpec(String returnSpec) {
         this.returnSpec = returnSpec;
@@ -50,4 +42,6 @@ public class StaticMethodEntry extends TypeMember implements Callable {
     public String toString() {
         return "StaticMethod[" + name + "]";
     }
+
+    public String h3Title() { return name + "()"; }
 }

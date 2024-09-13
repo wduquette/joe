@@ -7,6 +7,8 @@ interface Callable {
     // Accessors
 
     List<String> argSpecs();
-
     String returnSpec();
+    List<String> content();
+
+    String h3Title();
 }

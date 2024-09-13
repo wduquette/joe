@@ -31,8 +31,9 @@ public class PackageEntry extends Entry {
     //-------------------------------------------------------------------------
     // Accessors
 
-    public String              name()      { return name; }
-    public String              title()     { return title; }
+    public String name()     { return name; }
+    public String title()    { return title; }
+
     public List<FunctionEntry> functions() { return functions; }
     public List<TypeEntry>     types()     { return types; }
 
@@ -42,5 +43,18 @@ public class PackageEntry extends Entry {
 
     public String toString() {
         return "Package[" + name + "]";
+    }
+
+    //-------------------------------------------------------------------------
+    // Computed properties
+
+    public String filename() {
+        return "pkg." + name + ".md";
+    }
+
+    public String h1Title() {
+        return title != null
+            ? title + " (`" + name + "`)"
+            : "`" + name + "` package";
     }
 }

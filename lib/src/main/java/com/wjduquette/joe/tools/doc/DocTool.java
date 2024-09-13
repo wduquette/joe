@@ -33,6 +33,9 @@ public class DocTool implements Tool {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    private final DocConfig config = new DocConfig();
+
+    // Ultimately, these will go in DocConfig.
     private final List<Path> inputFolders = new ArrayList<>();
     private final List<Path> inputFiles = new ArrayList<>();
 
@@ -64,6 +67,7 @@ public class DocTool implements Tool {
 //        inputFolders.add(Path.of("../lib/src/main/java/com/wjduquette/joe"));
 //        inputFolders.add(Path.of("../lib/src/main/resources/com/wjduquette/joe"));
         inputFolders.add(Path.of("."));
+        config.setOutputFolder(Path.of("src/library"));
 
         // NEXT, populate the list of files.
         scanInputFolders();
@@ -91,7 +95,11 @@ public class DocTool implements Tool {
             exit(1);
         }
 
-        docSet.dump();
+//        docSet.dump();
+
+        // NEXT, generate the doc files
+        var generator = new Generator(config, docSet);
+        generator.generate();
     }
 
     private void scanInputFolders() {

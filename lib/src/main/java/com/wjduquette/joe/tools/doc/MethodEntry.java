@@ -42,4 +42,6 @@ public class MethodEntry extends TypeMember implements Callable {
     public String toString() {
         return "Method[" + name + "]";
     }
+
+    public String h3Title() { return name + "()"; }
 }
