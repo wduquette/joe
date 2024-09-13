@@ -149,7 +149,7 @@ class DocCommentParser {
 
             advance();
             switch (tag.name()) {
-                case ARGS -> func.argSpecs().add(tag.value());
+                case ARGS -> func.argSpecs().add(_argSpec(tag));
                 case RETURN -> func.setReturnSpec(tag.value());
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
@@ -219,7 +219,7 @@ class DocCommentParser {
 
             advance();
             switch (tag.name()) {
-                case ARGS -> method.argSpecs().add(tag.value());
+                case ARGS -> method.argSpecs().add(_argSpec(tag));
                 case RETURN -> method.setReturnSpec(tag.value());
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
@@ -246,7 +246,7 @@ class DocCommentParser {
 
             advance();
             if (tag.name().equals(ARGS)) {
-                init.argSpecs().add(tag.value());
+                init.argSpecs().add(_argSpec(tag));
             } else {
                 throw error(previous(), "Unexpected tag: " + tag);
             }
@@ -271,10 +271,18 @@ class DocCommentParser {
 
             advance();
             switch (tag.name()) {
-                case ARGS -> method.argSpecs().add(tag.value());
+                case ARGS -> method.argSpecs().add(_argSpec(tag));
                 case RETURN -> method.setReturnSpec(tag.value());
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
+        }
+    }
+
+    private String _argSpec(Tag tag) {
+        if (ArgSpec.isValid(tag.value())) {
+            return tag.value().trim();
+        } else {
+            throw error(previous, expected(tag));
         }
     }
 
