@@ -16,6 +16,12 @@ public class StringProxy extends TypeProxy<String> {
     public StringProxy() {
         super("String");
 
+        //**
+        // @package joe
+        // @type String
+        // A `String` is just a Java `String`, as accessed from a Joe script.
+        //
+        // **Note**: Joe provides a number of methods that Java does not.
         proxies(String.class);
         initializer(this::_init);
 
@@ -79,7 +85,7 @@ public class StringProxy extends TypeProxy<String> {
     //**
     // @method charAt
     // @args index
-    // @returns String
+    // @result String
     // Returns the character at the *index* as a string.
     private Object _charAt(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "charAt(index)");
@@ -91,7 +97,7 @@ public class StringProxy extends TypeProxy<String> {
     //**
     // @method contains
     // @args target
-    // @returns Boolean
+    // @result Boolean
     // Returns `true` if this contains the *target*, and `false` otherwise.
     private Object _contains(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "contains(target)");
@@ -102,7 +108,7 @@ public class StringProxy extends TypeProxy<String> {
     //**
     // @method endsWith
     // @args suffix
-    // @returns Boolean
+    // @result Boolean
     // Returns `true` if this string ends with the suffix, and `false` otherwise.
     private Object _endsWith(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "endsWith(suffix)");
@@ -118,7 +124,7 @@ public class StringProxy extends TypeProxy<String> {
     //**
     // @method indent
     // @args n
-    // @returns String
+    // @result String
     // Indents or outdents the string by *n* characters.
     //
     // Note: Java's `String::indent` returns the result with a trailing
@@ -142,7 +148,7 @@ public class StringProxy extends TypeProxy<String> {
 
     //**
     // @method length
-    // @returns Double
+    // @result Double
     // Gets the string's length.
     private Object _length(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "length()");
@@ -151,7 +157,7 @@ public class StringProxy extends TypeProxy<String> {
 
     //**
     // @method lines
-    // @returns List
+    // @result List
     // Returns a list consisting of the lines of text in the string.
     private Object _lines(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "lines()");
@@ -209,7 +215,7 @@ public class StringProxy extends TypeProxy<String> {
     //**
     // @method startsWith
     // @args prefix
-    // @returns Boolean
+    // @result Boolean
     // Returns `true` if this string starts with the prefix, and `false` otherwise.
     private Object _startsWith(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "startsWith(prefix)");
@@ -224,7 +230,7 @@ public class StringProxy extends TypeProxy<String> {
 
     //**
     // @method stripIndent
-    // @returns String
+    // @result String
     // Strips the indent from each line of the string, preserving relative
     // indentation.
     private Object _stripIndent(String value, Joe joe, ArgQueue args) {

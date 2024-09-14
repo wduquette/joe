@@ -64,9 +64,9 @@ public class DocTool implements Tool {
 
         // NEXT, get the input folders.
         // NOTE: These will ultimately come from the joe_doc.monica file.
-//        inputFolders.add(Path.of("../lib/src/main/java/com/wjduquette/joe"));
-//        inputFolders.add(Path.of("../lib/src/main/resources/com/wjduquette/joe"));
-        inputFolders.add(Path.of("."));
+        inputFolders.add(Path.of("../lib/src/main/java/com/wjduquette/joe"));
+        inputFolders.add(Path.of("../lib/src/main/resources/com/wjduquette/joe"));
+//        inputFolders.add(Path.of("."));
         config.setOutputFolder(Path.of("src/library"));
 
         // NEXT, populate the list of files.

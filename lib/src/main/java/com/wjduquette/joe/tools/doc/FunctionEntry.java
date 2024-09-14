@@ -17,7 +17,7 @@ class FunctionEntry extends Entry implements Callable {
     private final List<String> argSpec = new ArrayList<>();
 
     // The callable's return value, or null
-    private String returnSpec;
+    private String result;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -31,17 +31,17 @@ class FunctionEntry extends Entry implements Callable {
     //-------------------------------------------------------------------------
     // Accessors
 
-    public String name()        { return name; }
-    public String id()          { return "function." + name; }
+    public String name()          { return name; }
+    public String id()            { return "function." + name; }
     public String fullMnemonic()  { return pkg().fullMnemonic() + "#" + id(); }
     public String shortMnemonic() { return pkg().shortMnemonic() + "#" + id(); }
-    public String filename()    { return pkg().filename(); }
-    public String returnSpec()  { return returnSpec; }
+    public String filename()      { return pkg().filename(); }
+    public String result()        { return result; }
 
     public List<String> argSpecs() { return argSpec; }
 
-    void setReturnSpec(String returnSpec) {
-        this.returnSpec = returnSpec;
+    void setResult(String result) {
+        this.result = result;
     }
 
     public String toString() {

@@ -17,7 +17,7 @@ class MethodEntry extends TypeMember implements Callable {
     private final List<String> argSpec = new ArrayList<>();
 
     // The callable's return value, or null
-    private String returnSpec;
+    private String result;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -37,12 +37,12 @@ class MethodEntry extends TypeMember implements Callable {
     public String fullMnemonic()  { return type().fullMnemonic() + "#" + id(); }
     public String shortMnemonic() { return type().shortMnemonic() + "#" + id(); }
     public String filename()      { return type().filename(); }
-    public String returnSpec()    { return returnSpec; }
+    public String result()        { return result; }
 
-    public List<String> argSpecs()   { return argSpec; }
+    public List<String> argSpecs() { return argSpec; }
 
-    public void setReturnSpec(String returnSpec) {
-        this.returnSpec = returnSpec;
+    public void setResult(String result) {
+        this.result = result;
     }
 
     public String toString() {

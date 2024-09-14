@@ -57,7 +57,7 @@ class DocCommentParser {
     private static final String TITLE = "@title";
     private static final String FUNCTION = "@function";
     private static final String ARGS = "@args";
-    private static final String RETURN = "@return";
+    private static final String RESULT = "@result";
     private static final String TYPE = "@type";
     private static final String CONSTANT = "@constant";
     private static final String STATIC = "@static";
@@ -150,7 +150,7 @@ class DocCommentParser {
             advance();
             switch (tag.name()) {
                 case ARGS -> func.argSpecs().add(_argSpec(tag));
-                case RETURN -> func.setReturnSpec(tag.value());
+                case RESULT -> func.setResult(tag.value());
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
@@ -220,7 +220,7 @@ class DocCommentParser {
             advance();
             switch (tag.name()) {
                 case ARGS -> method.argSpecs().add(_argSpec(tag));
-                case RETURN -> method.setReturnSpec(tag.value());
+                case RESULT -> method.setResult(tag.value());
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
@@ -272,7 +272,7 @@ class DocCommentParser {
             advance();
             switch (tag.name()) {
                 case ARGS -> method.argSpecs().add(_argSpec(tag));
-                case RETURN -> method.setReturnSpec(tag.value());
+                case RESULT -> method.setResult(tag.value());
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }

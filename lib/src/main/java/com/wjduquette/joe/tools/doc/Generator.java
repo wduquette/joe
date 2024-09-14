@@ -272,8 +272,8 @@ class Generator {
                 .append(ArgSpec.asMarkdown(spec))
                 .append(")");
 
-            if (callable.returnSpec() != null) {
-                buff.append(" → ").append(callable.returnSpec());
+            if (callable.result() != null) {
+                buff.append(" → ").append(callable.result());
             }
             buff.append("**");
             result.add(buff.toString());

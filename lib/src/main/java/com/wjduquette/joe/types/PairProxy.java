@@ -14,6 +14,11 @@ public class PairProxy extends TypeProxy<Pair> {
     public PairProxy() {
         super("Pair");
 
+        //**
+        // @package joe
+        // @type Pair
+        // The `Pair` type represents a pair of values.  It is used to return
+        // two values from a function or method.
         proxies(Pair.class);
 
         initializer(this::_init);
@@ -61,7 +66,7 @@ public class PairProxy extends TypeProxy<Pair> {
 
     //**
     // @method left
-    // @returns The left-hand value
+    // @result value
     // Gets the first value in the pair.
     private Object _left(Pair value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "left()");
@@ -70,7 +75,7 @@ public class PairProxy extends TypeProxy<Pair> {
 
     //**
     // @method right
-    // @returns The right-hand value
+    // @result value right-hand value
     // Gets the second value in the pair.
     private Object _right(Pair value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "right()");

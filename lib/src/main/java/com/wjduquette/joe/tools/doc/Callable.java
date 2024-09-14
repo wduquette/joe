@@ -10,6 +10,6 @@ interface Callable {
     String id();
     String name();
     List<String> argSpecs();
-    String returnSpec();
+    String result();
     List<String> content();
 }

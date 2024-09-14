@@ -28,9 +28,9 @@ class InitializerEntry extends TypeMember implements Callable {
     public String fullMnemonic()  { return type().fullMnemonic() + "#" + id(); }
     public String shortMnemonic() { return type().shortMnemonic() + "#" + id(); }
     public String filename()      { return type().filename(); }
+    public String result()        { return type().name(); }
 
-    public List<String> argSpecs()      { return argSpec; }
-    public String returnSpec()          { return type().name(); }
+    public List<String> argSpecs() { return argSpec; }
 
     public String toString() {
         return "Initializer[" + name() + "]";
