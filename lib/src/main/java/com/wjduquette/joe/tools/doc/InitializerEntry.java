@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * An entry for a type initializer
  */
-public class InitializerEntry extends TypeMember implements Callable {
+class InitializerEntry extends TypeMember implements Callable {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -23,7 +23,12 @@ public class InitializerEntry extends TypeMember implements Callable {
     //-------------------------------------------------------------------------
     // Accessors
 
-    public String       name()          { return type().name(); }
+    public String name()          { return type().name(); }
+    public String id()            { return "init"; }
+    public String fullMnemonic()  { return type().fullMnemonic() + "#" + id(); }
+    public String shortMnemonic() { return type().shortMnemonic() + "#" + id(); }
+    public String filename()      { return type().filename(); }
+
     public List<String> argSpecs()      { return argSpec; }
     public String returnSpec()          { return type().name(); }
 

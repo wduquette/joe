@@ -3,7 +3,7 @@ package com.wjduquette.joe.tools.doc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TypeEntry extends Entry {
+class TypeEntry extends Entry {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -26,17 +26,19 @@ public class TypeEntry extends Entry {
     //-------------------------------------------------------------------------
     // Accessors
 
-    List<ConstantEntry>     constants()     { return constants; }
-    List<StaticMethodEntry> staticMethods() { return staticMethods; }
-    InitializerEntry        initializer()   { return initializer; }
-    List<MethodEntry>       methods()       { return methods; }
+    public List<ConstantEntry>     constants()     { return constants; }
+    public List<StaticMethodEntry> staticMethods() { return staticMethods; }
+    public InitializerEntry        initializer()   { return initializer; }
+    public List<MethodEntry>       methods()       { return methods; }
 
-    String prefix()      { return name; }
-    String name()        { return name; }
-    String valuePrefix() { return "value"; }
-    String filename()    { return "type." + pkg().name() + "." + name + ".md"; }
+    public String prefix()        { return name; }
+    public String name()          { return name; }
+    public String fullMnemonic()  { return pkg().name() + "." + name; }
+    public String shortMnemonic() { return name; }
+    public String valuePrefix()   { return "value"; }
+    public String filename()      { return "type." + pkg().name() + "." + name + ".md"; }
 
-    void setInitializer(InitializerEntry initializer) {
+    public void setInitializer(InitializerEntry initializer) {
         this.initializer = initializer;
     }
 

@@ -3,7 +3,7 @@ package com.wjduquette.joe.tools.doc;
 /**
  * An entry for a constant that belongs to a type.
  */
-public class ConstantEntry extends TypeMember {
+class ConstantEntry extends TypeMember {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -24,7 +24,11 @@ public class ConstantEntry extends TypeMember {
     //-------------------------------------------------------------------------
     // Accessors
 
-    public String name() { return name; }
+    public String name()     { return name; }
+    public String id()       { return "constant." + name; }
+    public String fullMnemonic()  { return type().fullMnemonic() + "#" + id(); }
+    public String shortMnemonic() { return type().shortMnemonic() + "#" + id(); }
+    public String filename() { return type().filename(); }
 
     public String toString() {
         return "Constant[" + name + "]";

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * An entry for a global function that belongs to a package.
  */
-public class MethodEntry extends TypeMember implements Callable {
+class MethodEntry extends TypeMember implements Callable {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -31,10 +31,15 @@ public class MethodEntry extends TypeMember implements Callable {
     //-------------------------------------------------------------------------
     // Accessors
 
-    public String       prefix()     { return type().valuePrefix(); }
-    public String       name()       { return name; }
+    public String prefix()        { return type().valuePrefix(); }
+    public String name()          { return name; }
+    public String id()            { return "method." + name; }
+    public String fullMnemonic()  { return type().fullMnemonic() + "#" + id(); }
+    public String shortMnemonic() { return type().shortMnemonic() + "#" + id(); }
+    public String filename()      { return type().filename(); }
+    public String returnSpec()    { return returnSpec; }
+
     public List<String> argSpecs()   { return argSpec; }
-    public String       returnSpec() { return returnSpec; }
 
     public void setReturnSpec(String returnSpec) {
         this.returnSpec = returnSpec;

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * The documentation entry for a given entity.
  */
-public abstract class Entry {
+abstract class Entry {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -41,6 +41,14 @@ public abstract class Entry {
     //-------------------------------------------------------------------------
     // Accessors
 
-    public PackageEntry pkg()     { return pkg; }
+    public String id() { return null; } // Members only.
+
+    abstract public String fullMnemonic();
+    abstract public String shortMnemonic();
+    abstract public String filename();
+
+    PackageEntry pkg()     { return pkg; }
+
     public List<String> content() { return content; }
+
 }

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * An entry for a global function that belongs to a package.
  */
-public class FunctionEntry extends Entry implements Callable {
+class FunctionEntry extends Entry implements Callable {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -22,7 +22,7 @@ public class FunctionEntry extends Entry implements Callable {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public FunctionEntry(PackageEntry pkg, String name) {
+    FunctionEntry(PackageEntry pkg, String name) {
         super(pkg);
 
         this.name = name;
@@ -31,11 +31,16 @@ public class FunctionEntry extends Entry implements Callable {
     //-------------------------------------------------------------------------
     // Accessors
 
-    public String name()           { return name; }
-    public List<String> argSpecs() { return argSpec; }
-    public String returnSpec()     { return returnSpec; }
+    public String name()        { return name; }
+    public String id()          { return "function." + name; }
+    public String fullMnemonic()  { return pkg().fullMnemonic() + "#" + id(); }
+    public String shortMnemonic() { return pkg().shortMnemonic() + "#" + id(); }
+    public String filename()    { return pkg().filename(); }
+    public String returnSpec()  { return returnSpec; }
 
-    public void setReturnSpec(String returnSpec) {
+    public List<String> argSpecs() { return argSpec; }
+
+    void setReturnSpec(String returnSpec) {
         this.returnSpec = returnSpec;
     }
 

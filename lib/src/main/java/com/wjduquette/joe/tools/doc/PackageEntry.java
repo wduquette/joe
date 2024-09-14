@@ -31,16 +31,20 @@ public class PackageEntry extends Entry {
     //-------------------------------------------------------------------------
     // Accessors
 
-    public String name()     { return name; }
-    public String title()    { return title; }
+    public String name()          { return name; }
+    public String title()         { return title; }
+    public String shortMnemonic() { return name; }
+    public String fullMnemonic()  { return name; }
+    public String filename()      { return "pkg." + name + ".md"; }
 
-    public List<FunctionEntry> functions() { return functions; }
-    public List<TypeEntry>     types()     { return types; }
+    List<FunctionEntry> functions() { return functions; }
+    List<TypeEntry>     types()     { return types; }
 
-    public void setTitle(String title) {
+    void setTitle(String title) {
         this.title = title;
     }
 
+    @Override
     public String toString() {
         return "Package[" + name + "]";
     }
@@ -48,7 +52,4 @@ public class PackageEntry extends Entry {
     //-------------------------------------------------------------------------
     // Computed properties
 
-    public String filename() {
-        return "pkg." + name + ".md";
-    }
 }
