@@ -15,7 +15,13 @@
 
 - [Standard Library](library.md)
   - [Joe Standard Library](./library/pkg.joe.md)
-    - [Thing Type](./library/type.joe.Thing.md) 
+    - [Error Type](./library/type.joe.Error.md)
+    - [Keyword Type](./library/type.joe.Keyword.md)
+    - [Pair Type](./library/type.joe.Pair.md)
+    - [String Type](./library/type.joe.String.md)
+  - [Joe Test Tool API](./library/pkg.joe.test.md)
+    - [CatchChecker Type](./library/type.joe.test.CatchChecker.md)
+    - [ValueChecker Type](./library/type.joe.test.ValueChecker.md)
 
 
 ---

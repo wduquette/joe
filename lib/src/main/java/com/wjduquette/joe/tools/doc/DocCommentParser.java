@@ -109,8 +109,12 @@ class DocCommentParser {
         if (!Joe.isPackageName(pkgTag.value())) {
             throw error(previous(), expected(pkgTag));
         }
-        PackageEntry pkg = new PackageEntry(pkgTag.value());
-        docSet.packages().add(pkg);
+        var pkg = findPackage(pkgTag.value());
+
+        if (pkg == null) {
+            pkg = new PackageEntry(pkgTag.value());
+            docSet.packages().add(pkg);
+        }
 
         while (!atEnd()) {
             if (!advanceToTag(pkg)) break;
@@ -129,6 +133,12 @@ class DocCommentParser {
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
+    }
+
+    private PackageEntry findPackage(String name) {
+        return docSet.packages().stream()
+            .filter(p -> p.name().equals(name))
+            .findFirst().orElse(null);
     }
 
     private void _function(PackageEntry pkg, Tag funcTag) {
