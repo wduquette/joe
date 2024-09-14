@@ -60,15 +60,27 @@ class Generator {
 
         // NEXT, output the package index.
         out.println();
-        out.println("TODO: Package Index");
-        out.println();
+
+        if (!pkg.functions().isEmpty()) {
+            out.hb("functions", "Functions");
+            out.println();
+            pkg.functions().forEach(f -> writeCallableLink(out, 0, f));
+            out.println();
+        }
+
+        if (!pkg.types().isEmpty()) {
+            out.hb("Types");
+            out.println();
+            pkg.types().forEach(t -> writeTypeLink(out, 0, t));
+            out.println();
+        }
 
         // NEXT, output the remaining content
         content.forEach(out::println);
 
         // NEXT, output the entries for each of the package's functions.
         if (!pkg.functions().isEmpty()) {
-            out.h2("Functions");
+            out.h2("functions", "Functions");
             writeCallableBodies(out, pkg.functions());
         }
     }
@@ -77,6 +89,17 @@ class Generator {
         return pkg.title() != null
             ? pkg.title() + " (" + mono(pkg.name()) + ")"
             : mono(pkg.name()) +  " package";
+    }
+
+    private void writeTypeLink(
+        ContentWriter out,
+        int indent,
+        TypeEntry type
+    ) {
+        var leader = " ".repeat(indent);
+
+        out.println(leader + "- [" + type.name() + " type](" +
+            type.filename() + ")");
     }
 
     //-------------------------------------------------------------------------
@@ -138,7 +161,7 @@ class Generator {
     }
 
     private void writeConstantBody(ContentWriter out, ConstantEntry constant) {
-        out.h3(constant.type().prefix() + "." + constant.name());
+        out.h3(constant.id(), constant.type().prefix() + "." + constant.name());
         constant.content().forEach(out::println);
         out.println();
     }
@@ -154,6 +177,18 @@ class Generator {
         out.println();
     }
 
+    private void writeCallableLink(
+        ContentWriter out,
+        int indent,
+        Callable callable
+    ) {
+        var leader = " ".repeat(indent);
+
+        for (var sig : callableBodySignatures(callable)) {
+            out.println(leader + "- [" + sig + "](#" + callable.id() + ")");
+        }
+    }
+
     private void writeCallableBody(ContentWriter out, Callable callable) {
         var title = switch(callable) {
             case StaticMethodEntry entry ->
@@ -163,21 +198,21 @@ class Generator {
             default -> callable.name() + "()";
         };
 
-        out.h3(title);
-        out.println(callableBodySignatures(callable));
+        out.h3(callable.id(), title);
+        out.println(String.join("<br>\n", callableBodySignatures(callable)));
         out.println();
         callable.content().forEach(out::println);
         out.println();
     }
 
     private void writeInitializerBody(ContentWriter out, InitializerEntry callable) {
-        out.println(callableBodySignatures(callable));
+        out.println(String.join("<br>\n", callableBodySignatures(callable)));
         out.println();
         callable.content().forEach(out::println);
         out.println();
     }
 
-    private String callableBodySignatures(Callable callable) {
+    private List<String> callableBodySignatures(Callable callable) {
         var result = new ArrayList<String>();
 
         var prefix = switch(callable) {
@@ -203,7 +238,7 @@ class Generator {
             result.add(buff.toString());
         }
 
-        return String.join("<br>\n", result);
+        return result;
     }
 
     //-------------------------------------------------------------------------

@@ -9,7 +9,10 @@ TODO: Type Index
 ## Constants
 ---
 
+<span id="constant.WEIGHT"> </span>
+
 ### Thing.WEIGHT
+
 ---
 
 The weight of a Thing in tons.
@@ -18,7 +21,10 @@ The weight of a Thing in tons.
 ## Static Methods
 ---
 
+<span id="static.categorize"> </span>
+
 ### Thing.categorize()
+
 ---
 
 **Thing.categorize(*thing*) → Bin**
@@ -37,7 +43,10 @@ There's a way to create `Things`
 ## Methods
 ---
 
+<span id="method.summon"> </span>
+
 ### *value*.summon()
+
 ---
 
 ***value*.summon(*thing*)**

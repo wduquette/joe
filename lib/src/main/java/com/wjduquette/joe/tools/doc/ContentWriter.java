@@ -36,11 +36,40 @@ public class ContentWriter extends PrintWriter {
     }
 
     /**
+     * Outputs a level 2 title.
+     * @param title The title
+     */
+    public void h2(String id, String title) {
+        println("<h2 id=\"" + id + "\">" + title + "</h2>\n");
+        hline();
+    }
+
+    /**
      * Outputs a level 3 title.
      * @param title The title
      */
     public void h3(String title) {
         println("### " + title);
+        hline();
+    }
+
+    public void hb(String title) {
+        println("**" + title + "**");
+    }
+
+    public void hb(String id, String title) {
+        println("**[" + title + "](#" + id + ")**");
+    }
+
+    /**
+     * Outputs a level 3 title with link ID
+     * @param id The link ID
+     * @param title The title
+     */
+    public void h3(String id, String title) {
+        println("<span id=\"" + id + "\"> </span>\n");
+        println("### " + title);
+        println();
         hline();
     }
 
@@ -50,4 +79,6 @@ public class ContentWriter extends PrintWriter {
     public void hline() {
         println("---\n");
     }
+
+
 }

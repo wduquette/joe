@@ -3,5 +3,3 @@
 
 Stuff about `joe.bob`.
 
-TODO: Package Index
-
