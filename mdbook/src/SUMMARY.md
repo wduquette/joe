@@ -15,7 +15,9 @@
 
 - [Standard Library](library.md)
   - [Joe Standard Library](./library/pkg.joe.md)
- 
+    - [Thing Type](./library/type.joe.Thing.md) 
+
+
 ---
 
 [Joe Grammar](grammar.md)

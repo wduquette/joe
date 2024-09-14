@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 
 class Generator {
     interface ContentFunction {
@@ -35,12 +36,14 @@ class Generator {
      */
     public void generate() {
         // FIRST, generate the files for each package, in order.
-        var packages = docSet.packages().stream()
-            .sorted(Comparator.comparing(PackageEntry::name))
-            .toList();
-        for (var pkg : packages) {
+        for (var pkg : sorted(docSet.packages(), PackageEntry::name)) {
             write(config.getOutputFolder().resolve(pkg.filename()),
                 out -> writePackageFile(out, pkg));
+
+            for (var type : sorted(pkg.types(), TypeEntry::name)) {
+                write(config.getOutputFolder().resolve(type.filename()),
+                    out -> writeTypeFile(out, type));
+            }
         }
     }
 
@@ -49,7 +52,7 @@ class Generator {
 
     private void writePackageFile(ContentWriter out, PackageEntry pkg) {
         // FIRST, output the header
-        out.h1(pkg.h1Title());
+        out.h1(h1PackageTitle(pkg));
 
         // NEXT, output the first paragraph of the content.
         var content = new ArrayList<>(pkg.content());
@@ -66,40 +69,122 @@ class Generator {
         // NEXT, output the entries for each of the package's functions.
         if (!pkg.functions().isEmpty()) {
             out.h2("Functions");
-            writeCallables(out, pkg.functions());
+            writeCallableBodies(out, pkg.functions());
         }
     }
 
-    private void writeCallables(
+    private String h1PackageTitle(PackageEntry pkg) {
+        return pkg.title() != null
+            ? pkg.title() + " (" + mono(pkg.name()) + ")"
+            : mono(pkg.name()) +  " package";
+    }
+
+    //-------------------------------------------------------------------------
+    // Type Files
+
+    private void writeTypeFile(ContentWriter out, TypeEntry type) {
+        // FIRST, output the header
+        out.h1(mono(type.name())
+            + " type ("
+            + mono(type.pkg().name())
+            + ")");
+
+        // NEXT, output the first paragraph of the content.
+        var content = new ArrayList<>(type.content());
+        contentIntro(content).forEach(out::println);
+
+        // NEXT, output the type index.
+        out.println();
+        out.println("TODO: Type Index");
+        out.println();
+
+        // NEXT, output the remaining content
+        content.forEach(out::println);
+
+        // NEXT, output Constants.
+        if (!type.constants().isEmpty()) {
+            out.h2("Constants");
+            writeConstantBodies(out, type.constants());
+        }
+
+        // NEXT, output Static Methods
+        if (!type.staticMethods().isEmpty()) {
+            out.h2("Static Methods");
+            writeCallableBodies(out, type.staticMethods());
+        }
+
+        // NEXT, output Initializer
+        if (type.initializer() != null) {
+            out.h2(type.name() + " Initializer");
+            writeInitializerBody(out, type.initializer());
+        }
+
+        // NEXT, output Instance Methods
+        if (!type.methods().isEmpty()) {
+            out.h2("Methods");
+            writeCallableBodies(out, type.methods());
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    // Constants
+
+    private void writeConstantBodies(
         ContentWriter out,
-        List<? extends Callable> callables
+        List<ConstantEntry> constants
     ) {
-        callables.forEach(c -> writeCallable(out, c));
+        constants.forEach(c -> writeConstantBody(out, c));
         out.println();
     }
 
-    private void writeCallable(ContentWriter out, Callable callable) {
-        var title = callable.prefix() == null
-            ? callable.name()
-            : callable.prefix() + "." + callable.name();
+    private void writeConstantBody(ContentWriter out, ConstantEntry constant) {
+        out.h3(constant.type().prefix() + "." + constant.name());
+        constant.content().forEach(out::println);
+        out.println();
+    }
+
+    //-------------------------------------------------------------------------
+    // Callables
+
+    private void writeCallableBodies(
+        ContentWriter out,
+        List<? extends Callable> callables
+    ) {
+        callables.forEach(c -> writeCallableBody(out, c));
+        out.println();
+    }
+
+    private void writeCallableBody(ContentWriter out, Callable callable) {
+        var title = switch(callable) {
+            case StaticMethodEntry entry ->
+                entry.prefix() + "." + entry.name() + "()";
+            case MethodEntry entry ->
+                ital(downCase(entry.prefix())) + "." + entry.name() + "()";
+            default -> callable.name() + "()";
+        };
+
         out.h3(title);
-        out.hline();
-        out.println(bodySignatures(callable));
+        out.println(callableBodySignatures(callable));
         out.println();
         callable.content().forEach(out::println);
         out.println();
     }
 
-    private String bodySignatures(Callable callable) {
+    private void writeInitializerBody(ContentWriter out, InitializerEntry callable) {
+        out.println(callableBodySignatures(callable));
+        out.println();
+        callable.content().forEach(out::println);
+        out.println();
+    }
+
+    private String callableBodySignatures(Callable callable) {
         var result = new ArrayList<String>();
 
-        String prefix = "";
-
-        if (callable.prefix() != null) {
-            prefix = hasLeadingCap(callable.prefix())
-                ? callable.prefix() + "."
-                : "*" + prefix + "*.";
-        }
+        var prefix = switch(callable) {
+            case StaticMethodEntry entry -> entry.prefix() + ".";
+            case MethodEntry entry -> ital(downCase(entry.prefix())) + ".";
+            default -> "";
+        };
 
         var name = prefix + callable.name();
 
@@ -124,6 +209,20 @@ class Generator {
     //-------------------------------------------------------------------------
     // Entry Helpers
 
+    private String mono(String text) {
+        return "`" + text + "`";
+    }
+
+    private String ital(String text) {
+        return "*" + text + "*";
+    }
+
+    private <T> List<T> sorted(List<T> input, Function<T,String> getter) {
+        return input.stream()
+            .sorted(Comparator.comparing(getter))
+            .toList();
+    }
+
     // Extracts and returns the first paragraph of the content.
     private List<String> contentIntro(List<String> content) {
         var result = new ArrayList<String>();
@@ -141,8 +240,13 @@ class Generator {
         return result;
     }
 
-    private boolean hasLeadingCap(String name) {
-        return Character.isUpperCase(name.charAt(0));
+    private String downCase(String name) {
+        if (!name.isEmpty()) {
+            var ch = name.charAt(0);
+            return Character.toLowerCase(ch) + name.substring(1);
+        } else {
+            return "";
+        }
     }
 
     //-------------------------------------------------------------------------

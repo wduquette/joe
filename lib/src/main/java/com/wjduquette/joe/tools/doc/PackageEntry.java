@@ -51,10 +51,4 @@ public class PackageEntry extends Entry {
     public String filename() {
         return "pkg." + name + ".md";
     }
-
-    public String h1Title() {
-        return title != null
-            ? title + " (`" + name + "`)"
-            : "`" + name + "` package";
-    }
 }

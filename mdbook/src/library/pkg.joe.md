@@ -1,4 +1,5 @@
 # Joe Standard Library (`joe`)
+---
 
 Stuff about the `joe` package.
 
@@ -9,9 +10,9 @@ The stuff includes all the functions and types defined by
 the package.
 
 ## Functions
+---
 
-### fred
-
+### fred()
 ---
 
 **fred(*baz*) → george**<br>
@@ -19,8 +20,7 @@ the package.
 
 Stuff about function `fred`.
 
-### bob
-
+### bob()
 ---
 
 **bob(*baz*) → ted**<br>

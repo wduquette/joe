@@ -26,13 +26,15 @@ public class TypeEntry extends Entry {
     //-------------------------------------------------------------------------
     // Accessors
 
-    String                  name()          { return name; }
     List<ConstantEntry>     constants()     { return constants; }
     List<StaticMethodEntry> staticMethods() { return staticMethods; }
     InitializerEntry        initializer()   { return initializer; }
     List<MethodEntry>       methods()       { return methods; }
-    String                  prefix()        { return name; }
-    String                  valuePrefix()   { return "value"; }
+
+    String prefix()      { return name; }
+    String name()        { return name; }
+    String valuePrefix() { return "value"; }
+    String filename()    { return "type." + pkg().name() + "." + name + ".md"; }
 
     void setInitializer(InitializerEntry initializer) {
         this.initializer = initializer;

@@ -23,7 +23,7 @@ public class ContentWriter extends PrintWriter {
      */
     public void h1(String title) {
         println("# " + title);
-        println();
+        hline();
     }
 
     /**
@@ -32,7 +32,7 @@ public class ContentWriter extends PrintWriter {
      */
     public void h2(String title) {
         println("## " + title);
-        println();
+        hline();
     }
 
     /**
@@ -41,7 +41,7 @@ public class ContentWriter extends PrintWriter {
      */
     public void h3(String title) {
         println("### " + title);
-        println();
+        hline();
     }
 
     /**
