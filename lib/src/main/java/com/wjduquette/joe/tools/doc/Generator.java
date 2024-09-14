@@ -118,33 +118,62 @@ class Generator {
 
         // NEXT, output the type index.
         out.println();
-        out.println("TODO: Type Index");
-        out.println();
+
+        if (!type.constants().isEmpty()) {
+            out.hb("constants", "Constants");
+            out.println();
+            type.constants()
+                .forEach(c -> writeConstantLink(out, 0, c));
+            out.println();
+        }
+
+        if (!type.staticMethods().isEmpty()) {
+            out.hb("statics", "Static Methods");
+            out.println();
+            type.staticMethods()
+                .forEach(m -> writeCallableLink(out, 0, m));
+            out.println();
+        }
+
+        if (type.initializer() != null) {
+            out.hb("init", "Initializer");
+            out.println();
+            writeCallableLink(out, 0, type.initializer());
+            out.println();
+        }
+
+        if (!type.methods().isEmpty()) {
+            out.hb("methods", "Methods");
+            out.println();
+            type.methods()
+                .forEach(m -> writeCallableLink(out, 0, m));
+            out.println();
+        }
 
         // NEXT, output the remaining content
         content.forEach(out::println);
 
         // NEXT, output Constants.
         if (!type.constants().isEmpty()) {
-            out.h2("Constants");
+            out.h2("constants", "Constants");
             writeConstantBodies(out, type.constants());
         }
 
         // NEXT, output Static Methods
         if (!type.staticMethods().isEmpty()) {
-            out.h2("Static Methods");
+            out.h2("statics", "Static Methods");
             writeCallableBodies(out, type.staticMethods());
         }
 
         // NEXT, output Initializer
         if (type.initializer() != null) {
-            out.h2(type.name() + " Initializer");
+            out.h2("init", type.name() + " Initializer");
             writeInitializerBody(out, type.initializer());
         }
 
         // NEXT, output Instance Methods
         if (!type.methods().isEmpty()) {
-            out.h2("Methods");
+            out.h2("methods","Methods");
             writeCallableBodies(out, type.methods());
         }
     }
@@ -164,6 +193,18 @@ class Generator {
         out.h3(constant.id(), constant.type().prefix() + "." + constant.name());
         constant.content().forEach(out::println);
         out.println();
+    }
+
+    private void writeConstantLink(
+        ContentWriter out,
+        int indent,
+        ConstantEntry constant
+    ) {
+        var leader = " ".repeat(indent);
+        out.println(leader + "- [" +
+            constant.type().prefix() + "." + constant.name() +
+            "](#" + constant.id() + ")"
+        );
     }
 
     //-------------------------------------------------------------------------

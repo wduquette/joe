@@ -3,10 +3,25 @@
 
 Stuff about type `thing`.
 
-TODO: Type Index
+**[Constants](#constants)**
+
+- [Thing.WEIGHT](#constant.WEIGHT)
+
+**[Static Methods](#statics)**
+
+- [**Thing.categorize(*thing*) → Bin**](#static.categorize)
+
+**[Initializer](#init)**
+
+- [**Thing(*bin*) → Thing**](#init)
+
+**[Methods](#methods)**
+
+- [***value*.summon(*thing*)**](#method.summon)
 
 
-## Constants
+<h2 id="constants">Constants</h2>
+
 ---
 
 <span id="constant.WEIGHT"> </span>
@@ -18,7 +33,8 @@ TODO: Type Index
 The weight of a Thing in tons.
 
 
-## Static Methods
+<h2 id="statics">Static Methods</h2>
+
 ---
 
 <span id="static.categorize"> </span>
@@ -33,14 +49,16 @@ What the static method does
 
 
 
-## Thing Initializer
+<h2 id="init">Thing Initializer</h2>
+
 ---
 
 **Thing(*bin*) → Thing**
 
 There's a way to create `Things`
 
-## Methods
+<h2 id="methods">Methods</h2>
+
 ---
 
 <span id="method.summon"> </span>
