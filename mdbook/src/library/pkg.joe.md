@@ -10,19 +10,21 @@ the package.
 
 ## Functions
 
-### fred()
+### fred
 
 ---
 
-TODO: signature
+**fred(*baz*) → george**<br>
+**fred(*foo*, *bar*) → george**
 
 Stuff about function `fred`.
 
-### bob()
+### bob
 
 ---
 
-TODO: signature
+**bob(*baz*) → ted**<br>
+**bob(*foo*, *bar*) → ted**
 
 Stuff about function `bob`.
 

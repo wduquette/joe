@@ -31,6 +31,7 @@ public class MethodEntry extends TypeMember implements Callable {
     //-------------------------------------------------------------------------
     // Accessors
 
+    public String       prefix()     { return type().valuePrefix(); }
     public String       name()       { return name; }
     public List<String> argSpecs()   { return argSpec; }
     public String       returnSpec() { return returnSpec; }
@@ -42,6 +43,4 @@ public class MethodEntry extends TypeMember implements Callable {
     public String toString() {
         return "Method[" + name + "]";
     }
-
-    public String h3Title() { return name + "()"; }
 }

@@ -31,6 +31,8 @@ public class TypeEntry extends Entry {
     List<StaticMethodEntry> staticMethods() { return staticMethods; }
     InitializerEntry        initializer()   { return initializer; }
     List<MethodEntry>       methods()       { return methods; }
+    String                  prefix()        { return name; }
+    String                  valuePrefix()   { return "value"; }
 
     void setInitializer(InitializerEntry initializer) {
         this.initializer = initializer;

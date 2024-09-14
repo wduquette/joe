@@ -6,9 +6,9 @@ interface Callable {
     //-------------------------------------------------------------------------
     // Accessors
 
+    default String prefix() { return null; }
+    String name();
     List<String> argSpecs();
     String returnSpec();
     List<String> content();
-
-    String h3Title();
 }

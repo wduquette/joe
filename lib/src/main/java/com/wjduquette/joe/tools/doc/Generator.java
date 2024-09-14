@@ -79,11 +79,46 @@ class Generator {
     }
 
     private void writeCallable(ContentWriter out, Callable callable) {
-        out.h3(callable.h3Title());
+        var title = callable.prefix() == null
+            ? callable.name()
+            : callable.prefix() + "." + callable.name();
+        out.h3(title);
         out.hline();
-        out.println("TODO: signature\n");
+        out.println(bodySignatures(callable));
+        out.println();
         callable.content().forEach(out::println);
         out.println();
+    }
+
+    private String bodySignatures(Callable callable) {
+        var result = new ArrayList<String>();
+
+        String prefix = "";
+
+        if (callable.prefix() != null) {
+            prefix = hasLeadingCap(callable.prefix())
+                ? callable.prefix() + "."
+                : "*" + prefix + "*.";
+        }
+
+        var name = prefix + callable.name();
+
+        for (var spec : callable.argSpecs()) {
+            StringBuilder buff = new StringBuilder();
+            buff.append("**")
+                .append(name)
+                .append("(")
+                .append(ArgSpec.asMarkdown(spec))
+                .append(")");
+
+            if (callable.returnSpec() != null) {
+                buff.append(" → ").append(callable.returnSpec());
+            }
+            buff.append("**");
+            result.add(buff.toString());
+        }
+
+        return String.join("<br>\n", result);
     }
 
     //-------------------------------------------------------------------------
@@ -104,6 +139,10 @@ class Generator {
         }
 
         return result;
+    }
+
+    private boolean hasLeadingCap(String name) {
+        return Character.isUpperCase(name.charAt(0));
     }
 
     //-------------------------------------------------------------------------

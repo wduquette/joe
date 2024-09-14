@@ -42,7 +42,4 @@ public class FunctionEntry extends Entry implements Callable {
     public String toString() {
         return "Function[" + name + "]";
     }
-
-    public String h3Title() { return name + "()"; }
-
 }
