@@ -35,7 +35,10 @@ class Generator {
      * configuration.
      */
     public void generate() {
-        // FIRST, generate the files for each package, in order.
+        // FIRST, compute lookup tables.
+        // TODO
+
+        // NEXT, generate the files for each package, in order.
         for (var pkg : sorted(docSet.packages(), PackageEntry::name)) {
             write(config.getOutputFolder().resolve(pkg.filename()),
                 out -> writePackageFile(out, pkg));
@@ -203,7 +206,7 @@ class Generator {
         var leader = " ".repeat(indent);
         out.println(leader + "- [" +
             constant.type().prefix() + "." + constant.name() +
-            "](#" + constant.id() + ")"
+            "](" +constant.filename() + "#" + constant.id() + ")"
         );
     }
 
@@ -225,8 +228,9 @@ class Generator {
     ) {
         var leader = " ".repeat(indent);
 
-        for (var sig : callableBodySignatures(callable)) {
-            out.println(leader + "- [" + sig + "](#" + callable.id() + ")");
+        for (var sig : callableSignatures(callable)) {
+            out.println(leader + "- [" + sig + "](" +
+                callable.filename() + "#" + callable.id() + ")");
         }
     }
 
@@ -240,20 +244,20 @@ class Generator {
         };
 
         out.h3(callable.id(), title);
-        out.println(String.join("<br>\n", callableBodySignatures(callable)));
+        out.println(String.join("<br>\n", callableSignatures(callable)));
         out.println();
         callable.content().forEach(out::println);
         out.println();
     }
 
     private void writeInitializerBody(ContentWriter out, InitializerEntry callable) {
-        out.println(String.join("<br>\n", callableBodySignatures(callable)));
+        out.println(String.join("<br>\n", callableSignatures(callable)));
         out.println();
         callable.content().forEach(out::println);
         out.println();
     }
 
-    private List<String> callableBodySignatures(Callable callable) {
+    private List<String> callableSignatures(Callable callable) {
         var result = new ArrayList<String>();
 
         var prefix = switch(callable) {
@@ -264,7 +268,11 @@ class Generator {
 
         var name = prefix + callable.name();
 
-        for (var spec : callable.argSpecs()) {
+        var argSpecs = !callable.argSpecs().isEmpty()
+            ? callable.argSpecs()
+            : List.of("");
+
+        for (var spec : argSpecs) {
             StringBuilder buff = new StringBuilder();
             buff.append("**")
                 .append(name)
