@@ -20,9 +20,6 @@ class Generator {
     private final DocConfig config;
     private final DocumentationSet docSet;
 
-    // Lookup table: full mnemonic to entry
-    private final Map<String,Entry> fullTable = new HashMap<>();
-
     // Transient
     private final transient Map<String,Entry> shortTable = new HashMap<>();
 
@@ -32,9 +29,6 @@ class Generator {
     public Generator(DocConfig config, DocumentationSet docSet) {
         this.config = config;
         this.docSet = docSet;
-
-        // Populate the full mnemonic lookup table
-        docSet.entries().forEach(e -> fullTable.put(e.fullMnemonic(), e));
     }
 
     //-------------------------------------------------------------------------
@@ -372,7 +366,7 @@ class Generator {
     }
 
     private String resultLink(String name) {
-        var entry = fullTable.get(name);
+        var entry = docSet.lookup(name);
 
         if (entry == null) {
             entry = shortTable.get(name);

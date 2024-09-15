@@ -1,7 +1,9 @@
 package com.wjduquette.joe.tools.doc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The documentation entries scanned from the project source.
@@ -12,6 +14,9 @@ class DocumentationSet {
 
     // The packages in the documentation set.
     private final List<PackageEntry> packages = new ArrayList<>();
+
+    // A look-up table, full mnemonic to entry.
+    private final Map<String,Entry> lookupTable = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -27,6 +32,19 @@ class DocumentationSet {
         return packages;
     }
 
+    /**
+     * Adds the entry to the documentation set's mnemonic lookup table.
+     * @param entry The entry
+     */
+    public void remember(Entry entry) {
+        lookupTable.put(entry.fullMnemonic(), entry);
+    }
+
+    public Entry lookup(String fullMnemonic) {
+        return lookupTable.get(fullMnemonic);
+    }
+
+    @SuppressWarnings("unused")
     public List<Entry> entries() {
         var result = new ArrayList<Entry>();
 

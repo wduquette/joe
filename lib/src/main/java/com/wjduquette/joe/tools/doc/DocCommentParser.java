@@ -114,6 +114,7 @@ class DocCommentParser {
         if (pkg == null) {
             pkg = new PackageEntry(pkgTag.value());
             docSet.packages().add(pkg);
+            docSet.remember(pkg);
         }
 
         while (!atEnd()) {
@@ -143,6 +144,8 @@ class DocCommentParser {
 
     private void _function(PackageEntry pkg, Tag funcTag) {
         FunctionEntry func = new FunctionEntry(pkg, funcTag.value());
+        remember(func);
+
         if (!Joe.isIdentifier(funcTag.value())) {
             throw error(previous(), expected(funcTag));
         }
@@ -160,7 +163,7 @@ class DocCommentParser {
             advance();
             switch (tag.name()) {
                 case ARGS -> func.argSpecs().add(_argSpec(tag));
-                case RESULT -> func.setResult(tag.value());
+                case RESULT -> func.setResult(_result(tag));
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
@@ -168,6 +171,8 @@ class DocCommentParser {
 
     private void _type(PackageEntry pkg, Tag typeTag) {
         TypeEntry type = new TypeEntry(pkg, typeTag.value());
+        remember(type);
+
         if (!Joe.isIdentifier(typeTag.value())) {
             throw error(previous(), expected(typeTag));
         }
@@ -195,6 +200,8 @@ class DocCommentParser {
 
     private void _constant(TypeEntry type, Tag constantTag) {
         ConstantEntry constant = new ConstantEntry(type, constantTag.value());
+        remember(constant);
+
         if (!Joe.isIdentifier(constantTag.value())) {
             throw error(previous(), expected(constantTag));
         }
@@ -213,6 +220,8 @@ class DocCommentParser {
 
     private void _static(TypeEntry type, Tag methodTag) {
         StaticMethodEntry method = new StaticMethodEntry(type, methodTag.value());
+        remember(method);
+
         if (!Joe.isIdentifier(methodTag.value())) {
             throw error(previous(), expected(methodTag));
         }
@@ -230,7 +239,7 @@ class DocCommentParser {
             advance();
             switch (tag.name()) {
                 case ARGS -> method.argSpecs().add(_argSpec(tag));
-                case RESULT -> method.setResult(tag.value());
+                case RESULT -> method.setResult(_result(tag));
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
@@ -238,6 +247,8 @@ class DocCommentParser {
 
     private void _init(TypeEntry type, Tag initTag) {
         InitializerEntry init = new InitializerEntry(type);
+        remember(init);
+
         if (!initTag.value().isBlank()) {
             throw error(previous(),
                 initTag.name() + " has unexpected value: '" +
@@ -265,6 +276,8 @@ class DocCommentParser {
 
     private void _method(TypeEntry type, Tag methodTag) {
         MethodEntry method = new MethodEntry(type, methodTag.value());
+        remember(method);
+
         if (!Joe.isIdentifier(methodTag.value())) {
             throw error(previous(), expected(methodTag));
         }
@@ -282,7 +295,7 @@ class DocCommentParser {
             advance();
             switch (tag.name()) {
                 case ARGS -> method.argSpecs().add(_argSpec(tag));
-                case RESULT -> method.setResult(tag.value());
+                case RESULT -> method.setResult(_result(tag));
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
@@ -296,8 +309,24 @@ class DocCommentParser {
         }
     }
 
+    private String _result(Tag tag) {
+        var result = tag.value().trim();
+        if (result.split("\\s").length > 1) {
+            throw error(previous(), "Expected result type");
+        }
+        return result;
+    }
+
     //-------------------------------------------------------------------------
     // Primitives
+
+    private void remember(Entry entry) {
+        if (docSet.lookup(entry.fullMnemonic()) != null) {
+            throw error(previous(), "Duplicate entry.");
+        } else {
+            docSet.remember(entry);
+        }
+    }
 
     // ParseError is just a convenient way to break out of the parser.
     // We halt on the first error for now.
