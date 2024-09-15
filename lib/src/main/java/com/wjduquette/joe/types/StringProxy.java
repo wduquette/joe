@@ -35,10 +35,10 @@ public class StringProxy extends TypeProxy<String> {
         method("equalsIgnoreCase", this::_equalsIgnoreCase);
 //        method("format",           this::_format);     // TODO Need printf logic
         method("indent",           this::_indent);
-//        method("indexOf",          this::_indexOf);    // TODO Wait for varargs
+//        method("indexOf",          this::_indexOf);    // TODO
         method("isBlank",          this::_isBlank);
         method("isEmpty",          this::_isEmpty);
-//        method("lastIndexOf",      this::_lastIndexOf);  // TODO Wait for varargs
+//        method("lastIndexOf",      this::_lastIndexOf);  // TODO
         method("length",           this::_length);
         method("lines",            this::_lines);
         method("matches",          this::_matches);
@@ -47,12 +47,13 @@ public class StringProxy extends TypeProxy<String> {
         method("replaceAll",       this::_replaceAll);
         method("replaceFirst",     this::_replaceFirst);
         method("split",            this::_split);
+// TODO splitWithDelimiters
         method("startsWith",       this::_startsWith);
         method("strip",            this::_strip);
         method("stripIndent",      this::_stripIndent);
         method("stripLeading",     this::_stripLeading);
         method("stripTrailing",    this::_stripTrailing);
-//        method("substring",        this::_substring);  // Wait for List
+//        method("substring",        this::_substring);  // TODO
         method("toLowerCase",      this::_toLowerCase);
         method("toString",         this::_toString);
         method("toUpperCase",      this::_toUpperCase);
@@ -61,6 +62,10 @@ public class StringProxy extends TypeProxy<String> {
     //-------------------------------------------------------------------------
     // Initializer Implementation
 
+    //**
+    // @init
+    // @args value
+    // Converts the value into its string representation.
     private Object _init(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "String(value)");
         return joe.stringify(args.get(0));
@@ -69,6 +74,12 @@ public class StringProxy extends TypeProxy<String> {
     //-------------------------------------------------------------------------
     // Static Method Implementations
 
+    //**
+    // @static join
+    // @args delimiter, list
+    // @result String
+    // Given a delimiter and a list, joins the string representations of the
+    // list items into a single string, delimited by the given delimiter.
     private Object _join(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 2, "join(delimiter, list)");
         var delim = joe.stringify(args.next());
@@ -116,6 +127,12 @@ public class StringProxy extends TypeProxy<String> {
         return value.endsWith(suffix);
     }
 
+    //**
+    // @method equalsIgnoreCase
+    // @args other
+    // @result Boolean
+    // Returns `true` if this string is equal to the string representation
+    // of the *other* value, ignoring case, and `false` otherwise.
     private Object _equalsIgnoreCase(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "other");
         return value.equalsIgnoreCase(joe.stringify(args.get(0)));
@@ -136,11 +153,20 @@ public class StringProxy extends TypeProxy<String> {
         return value.indent(n).stripTrailing();
     }
 
+    //**
+    // @method isBlank
+    // @result Boolean
+    // Returns `true` if this string is empty or contains only
+    // whitespace, and `false` otherwise.
     private Object _isBlank(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "isBlank()");
         return value.isBlank();
     }
 
+    //**
+    // @method isEmpty
+    // @result Boolean
+    // Returns `true` if this string is the empty string, and `false` otherwise.
     private Object _isEmpty(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "isEmpty()");
         return value.isEmpty();
@@ -164,11 +190,22 @@ public class StringProxy extends TypeProxy<String> {
         return new ListValue(value.lines().toList());
     }
 
+    //**
+    // @method matches
+    // @args pattern
+    // @result Boolean
+    // Returns `true` if this string matches the regex pattern, and
+    // `false` otherwise.
     private Object _matches(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "matches(pattern)");
         return value.matches(joe.toString(args.next()));
     }
 
+    //**
+    // @method repeat
+    // @args count
+    // @result String
+    // Creates a string containing this string repeated *count* times.
     private Object _repeat(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "repeat(count)");
         var arg = args.next();
@@ -181,6 +218,12 @@ public class StringProxy extends TypeProxy<String> {
         return value.repeat(count);
     }
 
+    //**
+    // @method replace
+    // @args target, replacement
+    // @result String
+    // Returns the string created by replacing every occurrence of the
+    // *target* string in this string with the *replacement* string.
     private Object _replace(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 2, "replace(target,replacement)");
         return value.replace(
@@ -189,6 +232,12 @@ public class StringProxy extends TypeProxy<String> {
         );
     }
 
+    //**
+    // @method replaceAll
+    // @args regex, replacement
+    // @result String
+    // Returns the string created by replacing each substring of this
+    // string that matches the *regex* with the replacement string.
     private Object _replaceAll(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 2, "replaceAll(regex, replacement)");
         return value.replaceAll(
@@ -197,6 +246,12 @@ public class StringProxy extends TypeProxy<String> {
         );
     }
 
+    //**
+    // @method replaceFirst
+    // @args regex, replacement
+    // @result String
+    // Returns the string created by replacing the first substring of this
+    // string that matches the *regex* with the replacement string.
     private Object _replaceFirst(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 2, "replaceFirst(regex, replacement)");
         return value.replaceFirst(
@@ -205,6 +260,14 @@ public class StringProxy extends TypeProxy<String> {
         );
     }
 
+    //**
+    // @method split
+    // @args delimiter
+    // @result List
+    // Returns a list of the tokens formed by splitting the string on
+    // each of the substrings that match the *delimiter* regular
+    // expression pattern.  The delimiter substrings are not included
+    // in the list.
     private Object _split(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "split(delimiter)");
         var delim = joe.toString(args.next());
@@ -223,6 +286,10 @@ public class StringProxy extends TypeProxy<String> {
         return value.startsWith(prefix);
     }
 
+    //**
+    // @method strip
+    // @result String
+    // Returns this string, stripped of all leading and trailing whitespace.
     private Object _strip(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "strip()");
         return value.strip();
@@ -238,29 +305,48 @@ public class StringProxy extends TypeProxy<String> {
         return value.stripIndent();
     }
 
+    //**
+    // @method stripLeading
+    // @result String
+    // Returns this string, stripped of all leading whitespace.
     private Object _stripLeading(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "stripLeading()");
         return value.stripLeading();
     }
 
+    //**
+    // @method stripTrailing
+    // @result String
+    // Returns this string, stripped of all trailing whitespace.
     private Object _stripTrailing(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "stripTrailing()");
         return value.stripTrailing();
     }
 
+    //**
+    // @method toLowerCase
+    // @result String
+    // Returns this string converted to lowercase.
     private Object _toLowerCase(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "toLowerCase()");
         return value.toLowerCase();
     }
 
+    //**
+    // @method toString
+    // @result String
+    // Returns this string.
     private Object _toString(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "toString()");
         return value;
     }
 
+    //**
+    // @method toUpperCase
+    // @result String
+    // Returns this string converted to uppercase.
     private Object _toUpperCase(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "toUpperCase()");
         return value.toUpperCase();
     }
-
 }
