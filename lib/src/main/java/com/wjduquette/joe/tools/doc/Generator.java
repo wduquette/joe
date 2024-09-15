@@ -313,7 +313,7 @@ class Generator {
             case StaticMethodEntry entry ->
                 entry.prefix() + "." + entry.name() + "()";
             case MethodEntry entry ->
-                ital(downCase(entry.prefix())) + "." + entry.name() + "()";
+                ital(entry.prefix()) + "." + entry.name() + "()";
             default -> callable.name() + "()";
         };
 
@@ -347,7 +347,7 @@ class Generator {
 
         var prefix = switch(callable) {
             case StaticMethodEntry entry -> entry.prefix() + ".";
-            case MethodEntry entry -> ital(downCase(entry.prefix())) + ".";
+            case MethodEntry entry -> ital(entry.prefix()) + ".";
             default -> "";
         };
 
@@ -411,15 +411,6 @@ class Generator {
         }
 
         return result;
-    }
-
-    private String downCase(String name) {
-        if (!name.isEmpty()) {
-            var ch = name.charAt(0);
-            return Character.toLowerCase(ch) + name.substring(1);
-        } else {
-            return "";
-        }
     }
 
     private String link(String text, String url) {

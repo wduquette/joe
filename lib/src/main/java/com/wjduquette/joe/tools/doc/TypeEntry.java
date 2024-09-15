@@ -35,7 +35,7 @@ class TypeEntry extends Entry {
     public String name()          { return name; }
     public String fullMnemonic()  { return pkg().name() + "." + name; }
     public String shortMnemonic() { return name; }
-    public String valuePrefix()   { return "value"; }
+    public String valuePrefix()   { return downCase(name); }
     public String filename()      { return "type." + pkg().name() + "." + name + ".md"; }
 
     public void setInitializer(InitializerEntry initializer) {
@@ -45,5 +45,14 @@ class TypeEntry extends Entry {
     @Override
     public String toString() {
         return "Type[" + name + "]";
+    }
+
+    private String downCase(String name) {
+        if (!name.isEmpty()) {
+            var ch = name.charAt(0);
+            return Character.toLowerCase(ch) + name.substring(1);
+        } else {
+            return "";
+        }
     }
 }
