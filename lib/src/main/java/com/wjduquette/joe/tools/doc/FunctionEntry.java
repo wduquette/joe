@@ -34,7 +34,7 @@ class FunctionEntry extends Entry implements Callable {
     public String name()          { return name; }
     public String id()            { return "function." + name; }
     public String fullMnemonic()  { return pkg().fullMnemonic() + "#" + id(); }
-    public String shortMnemonic() { return pkg().shortMnemonic() + "#" + id(); }
+    public String shortMnemonic() { return id(); }
     public String filename()      { return pkg().filename(); }
     public String result()        { return result; }
 

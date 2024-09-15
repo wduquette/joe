@@ -46,6 +46,11 @@ abstract class Entry {
     abstract public String fullMnemonic();
     abstract public String shortMnemonic();
     abstract public String filename();
+    public String url() {
+        return id() != null
+            ? filename() + "#" + id()
+            : filename();
+    }
 
     PackageEntry pkg()     { return pkg; }
 

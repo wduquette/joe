@@ -115,7 +115,7 @@ class Generator {
         out.h1(packageH1Title(pkg));
 
         // NEXT, output the first paragraph of the content.
-        var content = new ArrayList<>(pkg.content());
+        var content = expandMnemonicLinks(pkg.content());
         contentIntro(content).forEach(out::println);
 
         // NEXT, output the package index.
@@ -181,7 +181,7 @@ class Generator {
             + ")");
 
         // NEXT, output the first paragraph of the content.
-        var content = new ArrayList<>(type.content());
+        var content = expandMnemonicLinks(type.content());
         contentIntro(content).forEach(out::println);
 
         // NEXT, output the type index.
@@ -260,7 +260,7 @@ class Generator {
 
     private void writeConstantBody(ContentWriter out, ConstantEntry constant) {
         out.h3(constant.id(), constant.type().prefix() + "." + constant.name());
-        constant.content().forEach(out::println);
+        expandMnemonicLinks(constant.content()).forEach(out::println);
         out.println();
     }
 
@@ -320,14 +320,14 @@ class Generator {
         out.h3(callable.id(), title);
         out.println(plainSignatures(callable));
         out.println();
-        callable.content().forEach(out::println);
+        expandMnemonicLinks(callable.content()).forEach(out::println);
         out.println();
     }
 
     private void writeInitializerBody(ContentWriter out, InitializerEntry callable) {
         out.println(plainSignatures(callable));
         out.println();
-        callable.content().forEach(out::println);
+        expandMnemonicLinks(callable.content()).forEach(out::println);
         out.println();
     }
 
@@ -380,6 +380,74 @@ class Generator {
     }
 
     //-------------------------------------------------------------------------
+    // Mnemonic Links
+
+    private List<String> expandMnemonicLinks(List<String> content) {
+        var list = new ArrayList<String>();
+        content.stream()
+            .map(this::expandLinks)
+            .forEach(list::add);
+        return list;
+    }
+
+    private String expandLinks(String line) {
+        var buff = new StringBuilder();
+        var head = line;
+        int ndx;
+
+        while ((ndx = head.indexOf("[[")) != -1) {
+//            buff.append(head.substring(0, ndx));
+            buff.append(head, 0, ndx);
+            head = head.substring(ndx);
+
+            // Check for incomplete link
+            var tail = head.indexOf("]]");
+            if (tail == -1) {
+                buff.append(head);
+                return buff.toString();
+            }
+
+            var mnemonic = head.substring(2, head.indexOf("]]"));
+            head = head.substring(tail + 2);
+
+            if (docSet.lookup(mnemonic) != null) {
+                buff.append(inlineLink(docSet.lookup(mnemonic)));
+            } else if (shortTable.get(mnemonic) != null) {
+                buff.append(inlineLink(shortTable.get(mnemonic)));
+            } else {
+                // Leave it in place; it's incorrect.
+                warn("Unknown mnemonic in link: [[" + mnemonic + "]]");
+                buff.append("[[").append(mnemonic).append("]]");
+            }
+        }
+
+        buff.append(head);
+        return buff.toString();
+    }
+
+    private String inlineLink(Entry entry) {
+        return link(inlineLinkText(entry), entry.url());
+    }
+
+    private String inlineLinkText(Entry entry) {
+        return switch (entry) {
+            case PackageEntry pkg -> mono(pkg.name());
+            case FunctionEntry fn -> mono(fn.name() + "()");
+            case TypeEntry t -> mono(t.name());
+            case ConstantEntry c
+                -> mono(c.type().name() + "." + c.name());
+            case StaticMethodEntry m
+                -> mono(m.type().name() + "." + m.name() + "()");
+            case InitializerEntry fn
+                -> mono(fn.name() + "()");
+            case MethodEntry m
+                -> mono(m.name() + "()");
+            default -> throw new IllegalArgumentException("Unknown entry type!");
+        };
+    }
+
+
+    //-------------------------------------------------------------------------
     // Entry Helpers
 
     private String mono(String text) {
@@ -415,6 +483,10 @@ class Generator {
 
     private String link(String text, String url) {
         return "[" + text + "](" + url + ")";
+    }
+
+    private void warn(String message) {
+        System.out.println("*** " + message);
     }
 
     //-------------------------------------------------------------------------

@@ -18,7 +18,8 @@ public class ErrorProxy extends TypeProxy<JoeError> {
         // @package joe
         // @type Error
         // The `Error` type represents an exception thrown during the
-        // execution of a `Joe` script.
+        // execution of a `Joe` script. A script can catch errors
+        // thrown during execution using the [[function.catch]] function.
         proxies(JoeError.class);
         method("message", this::_message);
         method("type",    this::_type);
