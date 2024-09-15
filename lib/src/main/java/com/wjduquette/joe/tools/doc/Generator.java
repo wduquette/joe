@@ -3,9 +3,7 @@ package com.wjduquette.joe.tools.doc;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 class Generator {
@@ -18,8 +16,15 @@ class Generator {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // Constructor Arguments
     private final DocConfig config;
     private final DocumentationSet docSet;
+
+    // Lookup table: full mnemonic to entry
+    private final Map<String,Entry> fullTable = new HashMap<>();
+
+    // Transient
+    private final transient Map<String,Entry> shortTable = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -27,6 +32,9 @@ class Generator {
     public Generator(DocConfig config, DocumentationSet docSet) {
         this.config = config;
         this.docSet = docSet;
+
+        // Populate the full mnemonic lookup table
+        docSet.entries().forEach(e -> fullTable.put(e.fullMnemonic(), e));
     }
 
     //-------------------------------------------------------------------------
@@ -37,18 +45,22 @@ class Generator {
      * configuration.
      */
     public void generate() {
-        // FIRST, compute lookup tables.
-        // TODO
-
-        // NEXT, generate the index file.
+        // FIRST, generate the index file.
         write(config.getOutputFolder().resolve(DOC_SET_INDEX),
             this::writeDocSetIndex);
 
         // NEXT, generate the files for each package, in order.
         for (var pkg : sorted(docSet.packages(), PackageEntry::name)) {
+            // FIRST, populate the short mnemonic lookup table for this
+            // package
+            shortTable.clear();
+            pkg.entries().forEach(e -> shortTable.put(e.shortMnemonic(), e));
+
+            // NEXT, write the package file
             write(config.getOutputFolder().resolve(pkg.filename()),
                 out -> writePackageFile(out, pkg));
 
+            // NEXT, write each type file
             for (var type : sorted(pkg.types(), TypeEntry::name)) {
                 write(config.getOutputFolder().resolve(type.filename()),
                     out -> writeTypeFile(out, type));
@@ -283,9 +295,16 @@ class Generator {
     ) {
         var leader = " ".repeat(indent);
 
-        for (var sig : callableSignatures(callable)) {
-            out.println(leader + "- [" + sig + "](" +
-                callable.filename() + "#" + callable.id() + ")");
+        for (var sig : signatures(callable)) {
+            out.print(leader
+                + "- "
+                + link(sig, callable.filename() + "#" + callable.id())
+            );
+
+            if (callable.result() != null) {
+                out.print(" → " + resultLink(callable.result()));
+            }
+            out.println();
         }
     }
 
@@ -299,21 +318,32 @@ class Generator {
         };
 
         out.h3(callable.id(), title);
-        out.println(String.join("<br>\n", callableSignatures(callable)));
+        out.println(plainSignatures(callable));
         out.println();
         callable.content().forEach(out::println);
         out.println();
     }
 
     private void writeInitializerBody(ContentWriter out, InitializerEntry callable) {
-        out.println(String.join("<br>\n", callableSignatures(callable)));
+        out.println(plainSignatures(callable));
         out.println();
         callable.content().forEach(out::println);
         out.println();
     }
 
-    private List<String> callableSignatures(Callable callable) {
+    private String plainSignatures(Callable callable) {
         var result = new ArrayList<String>();
+
+        for (var sig : signatures(callable)) {
+            result.add(callable.result() != null
+                ? "**" + sig + " → " + callable.result() + "**"
+                : "**" + sig + "**");
+        }
+        return String.join("<br>\n", result);
+    }
+
+    private List<String> signatures(Callable callable) {
+        var signatures = new ArrayList<String>();
 
         var prefix = switch(callable) {
             case StaticMethodEntry entry -> entry.prefix() + ".";
@@ -328,21 +358,21 @@ class Generator {
             : List.of("");
 
         for (var spec : argSpecs) {
-            StringBuilder buff = new StringBuilder();
-            buff.append("**")
-                .append(name)
-                .append("(")
-                .append(ArgSpec.asMarkdown(spec))
-                .append(")");
-
-            if (callable.result() != null) {
-                buff.append(" → ").append(callable.result());
-            }
-            buff.append("**");
-            result.add(buff.toString());
+            var sig = name + "(" + ArgSpec.asMarkdown(spec) + ")";
+            signatures.add(sig);
         }
 
-        return result;
+        return signatures;
+    }
+
+    private String resultLink(String resultSpec) {
+        var entry = shortTable.getOrDefault(resultSpec, fullTable.get(resultSpec));
+
+        if (entry instanceof TypeEntry type) {
+            return "[" + resultSpec + "](" + type.filename() + ")";
+        } else {
+            return resultSpec;
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -386,6 +416,10 @@ class Generator {
         } else {
             return "";
         }
+    }
+
+    private String link(String text, String url) {
+        return "[" + text + "](" + url + ")";
     }
 
     //-------------------------------------------------------------------------

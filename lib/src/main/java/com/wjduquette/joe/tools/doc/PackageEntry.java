@@ -3,7 +3,7 @@ package com.wjduquette.joe.tools.doc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PackageEntry extends Entry {
+class PackageEntry extends Entry {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -26,6 +26,24 @@ public class PackageEntry extends Entry {
     public PackageEntry(String name) {
         super();
         this.name = name;
+    }
+
+    public List<Entry> entries() {
+        var result = new ArrayList<Entry>();
+
+        result.addAll(functions);
+
+        for (var type : types) {
+            result.add(type);
+            result.addAll(type.constants());
+            result.addAll(type.staticMethods());
+            if (type.initializer() != null) {
+                result.add(type.initializer());
+            }
+            result.addAll(type.methods());
+        }
+
+        return result;
     }
 
     //-------------------------------------------------------------------------

@@ -27,9 +27,21 @@ class DocumentationSet {
         return packages;
     }
 
+    public List<Entry> entries() {
+        var result = new ArrayList<Entry>();
+
+        for (var pkg : packages) {
+            result.add(pkg);
+            result.addAll(pkg.entries());
+        }
+
+        return result;
+    }
+
     //-------------------------------------------------------------------------
     // Operations
 
+    @SuppressWarnings("unused")
     public void dump() {
         System.out.println("Documentation Set:");
 
