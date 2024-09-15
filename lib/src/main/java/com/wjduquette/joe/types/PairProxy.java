@@ -56,6 +56,10 @@ public class PairProxy extends TypeProxy<Pair> {
     //-------------------------------------------------------------------------
     // Initializer
 
+    //**
+    // @init
+    // @args left, right
+    // Creates a `Pair` from two arbitrary values, *left* and *right*.
     public Object _init(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 2, "Pair(left, right)");
         return new Pair(args.get(0), args.get(1));
@@ -67,7 +71,7 @@ public class PairProxy extends TypeProxy<Pair> {
     //**
     // @method left
     // @result value
-    // Gets the first value in the pair.
+    // Returns the first value in the pair.
     private Object _left(Pair value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "left()");
         return value.left();
@@ -76,7 +80,7 @@ public class PairProxy extends TypeProxy<Pair> {
     //**
     // @method right
     // @result value
-    // Gets the second value in the pair.
+    // Returns the second value in the pair.
     private Object _right(Pair value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "right()");
         return value.right();
