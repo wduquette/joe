@@ -75,7 +75,7 @@ public class PairProxy extends TypeProxy<Pair> {
 
     //**
     // @method right
-    // @result value right-hand value
+    // @result value
     // Gets the second value in the pair.
     private Object _right(Pair value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "right()");

@@ -53,8 +53,7 @@ class Generator {
         for (var pkg : sorted(docSet.packages(), PackageEntry::name)) {
             // FIRST, populate the short mnemonic lookup table for this
             // package
-            shortTable.clear();
-            pkg.entries().forEach(e -> shortTable.put(e.shortMnemonic(), e));
+            populateShortTable(pkg);
 
             // NEXT, write the package file
             write(config.getOutputFolder().resolve(pkg.filename()),
@@ -66,6 +65,11 @@ class Generator {
                     out -> writeTypeFile(out, type));
             }
         }
+    }
+
+    private void populateShortTable(PackageEntry pkg) {
+        shortTable.clear();
+        pkg.entries().forEach(e -> shortTable.put(e.shortMnemonic(), e));
     }
 
     //-------------------------------------------------------------------------
@@ -81,6 +85,8 @@ class Generator {
         out.println();
 
         for (var pkg : sorted(docSet.packages(), PackageEntry::name)) {
+            populateShortTable(pkg);
+
             out.println("- [" + packageIndexTitle(pkg) + "](" +
                 pkg.filename() + ")");
 
@@ -336,7 +342,7 @@ class Generator {
 
         for (var sig : signatures(callable)) {
             result.add(callable.result() != null
-                ? "**" + sig + " → " + callable.result() + "**"
+                ? "**" + sig + " → " + resultLink(callable.result()) + "**"
                 : "**" + sig + "**");
         }
         return String.join("<br>\n", result);
@@ -365,13 +371,17 @@ class Generator {
         return signatures;
     }
 
-    private String resultLink(String resultSpec) {
-        var entry = shortTable.getOrDefault(resultSpec, fullTable.get(resultSpec));
+    private String resultLink(String name) {
+        var entry = fullTable.get(name);
+
+        if (entry == null) {
+            entry = shortTable.get(name);
+        }
 
         if (entry instanceof TypeEntry type) {
-            return "[" + resultSpec + "](" + type.filename() + ")";
+            return "[" + name + "](" + type.filename() + ")";
         } else {
-            return resultSpec;
+            return name;
         }
     }
 
