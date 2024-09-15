@@ -14,6 +14,14 @@ public class KeywordProxy extends TypeProxy<Keyword> {
     public KeywordProxy() {
         super("Keyword");
 
+        //**
+        // @package joe
+        // @type Keyword
+        // A `Keyword` is a symbolic value, and one of the basic Joe types.
+        // A keyword is an identifier with a leading hash symbol, e.g.,
+        // `#flag`.  They are commonly used in Joe code in place of
+        // enumerations, especially to identify options in variable length
+        // argument lists.
         proxies(Keyword.class);
         initializer(this::_init);
 
@@ -51,7 +59,7 @@ public class KeywordProxy extends TypeProxy<Keyword> {
 
     //**
     // @method name
-    // @returns String
+    // @result String
     // Gets the keyword's name, omitting the leading `#`.
     private Object _name(Keyword keyword, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "name()");
@@ -60,7 +68,7 @@ public class KeywordProxy extends TypeProxy<Keyword> {
 
     //**
     // @method toString
-    // @returns String
+    // @result String
     // Gets the keyword's string representation, including the leading `#`.
     private Object _toString(Keyword keyword, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "toString()");

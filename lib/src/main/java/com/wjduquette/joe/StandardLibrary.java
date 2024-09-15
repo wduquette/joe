@@ -10,6 +10,10 @@ public class StandardLibrary extends Library {
     public StandardLibrary() {
         super();
 
+        //**
+        // @package joe
+        // @title Joe Standard Library
+        // The `joe` package contains Joe's standard library.
         globalFunction("catch",     this::_catch);
         globalFunction("codify",    this::_codify);
         globalFunction("print",     this::_print);
@@ -26,9 +30,9 @@ public class StandardLibrary extends Library {
     }
 
     //**
-    // @global catch
+    // @function catch
     // @args callable
-    // @returns Pair
+    // @result Pair
     // Executes the callable, which must not require any arguments.
     // Returns `Pair(#ok, returnValue)` on success and
     // `Pair(#error, Error)` on error.

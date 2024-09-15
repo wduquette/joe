@@ -14,6 +14,12 @@ public class ErrorProxy extends TypeProxy<JoeError> {
     public ErrorProxy() {
         super("Error");
 
+        //**
+        // @package joe
+        // @type Error
+        // The `Error` type represents an exception thrown during the
+        // execution of a `Joe` script. A script can catch errors
+        // thrown during execution using the [[function.catch]] function.
         proxies(JoeError.class);
         method("message", this::_message);
         method("type",    this::_type);
@@ -32,7 +38,7 @@ public class ErrorProxy extends TypeProxy<JoeError> {
 
     //**
     // @method message
-    // @returns The message [[String]]
+    // @result text
     // Gets the actual error message
     private Object _message(JoeError error, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "message()");
@@ -41,7 +47,7 @@ public class ErrorProxy extends TypeProxy<JoeError> {
 
     //**
     // @method type
-    // @returns The name
+    // @result name
     // Gets the name of the concrete error type.
     private Object _type(JoeError error, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "type()");

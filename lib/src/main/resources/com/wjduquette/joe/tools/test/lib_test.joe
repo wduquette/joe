@@ -1,9 +1,15 @@
 // `joe test`'s Test Library
 
 //**
+// @package joe.test
+// @title Joe Test Tool API
+// This package defines the test assertions and checkers that are available
+// for use in `joe test` test suites.
+
+//**
 // @function check
 // @args value
-// @return [[ValueChecker]]
+// @result ValueChecker
 // Returns a checker for testing a computed value.
 function check(value) {
     return ValueChecker(value);
@@ -12,7 +18,7 @@ function check(value) {
 //**
 // @function checkCatch
 // @args callable
-// @return [[CatchChecker]]
+// @result CatchChecker
 // Executes a no-arg *callable* and returns a checker for checking
 // the error result.
 function checkCatch(callable) {
@@ -20,7 +26,7 @@ function checkCatch(callable) {
 }
 
 //**
-// @class ValueChecker
+// @type ValueChecker
 // A fluent test checker for arbitrary values.
 // Use `check(value)` to create one.
 class ValueChecker {
@@ -75,7 +81,7 @@ class ValueChecker {
 }
 
 //**
-// @class CatchChecker
+// @type CatchChecker
 // A fluent test checker for `catch()` results.
 // Use `checkCatch(callable)` to create it.
 class CatchChecker {
@@ -90,7 +96,7 @@ class CatchChecker {
 
     //**
     // @method isOK
-    // @returns this
+    // @result this
     // Checks that the catch result is not an error.
     method isOK() {
         assert this.err == null,
@@ -101,7 +107,7 @@ class CatchChecker {
 
     //**
     // @method isError
-    // @returns Boolean
+    // @result Boolean
     // Returns `true` if there was an error, and `false` otherwise.
     method isError() {
         assert this.err != null, "Expected an error, got: "
@@ -113,7 +119,7 @@ class CatchChecker {
     //**
     // @method message
     // @args expected
-    // @returns this
+    // @result this
     // Checks that the error message matches the *expected* value.
     method message(expected) {
         this.isError();
@@ -126,7 +132,7 @@ class CatchChecker {
     //**
     // @method type
     // @args expected
-    // @returns this
+    // @result this
     // Checks the error type matches the *expected* value.
     method type(expected) {
         this.isError();
