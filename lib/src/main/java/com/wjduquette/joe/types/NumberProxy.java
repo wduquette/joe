@@ -10,11 +10,19 @@ public class NumberProxy extends TypeProxy<Double> {
     //-------------------------------------------------------------------------
     // Constructor
 
+    //**
+    // @package joe
+    // @type Number
+    // The `Number` type is a static type that collects together a number of
+    // useful constants and numeric methods.
     public NumberProxy() {
         super("Number");
         staticType();
         proxies(Double.class);
 
+        //**
+        // @constant PI
+        // The mathematical constant 𝛑.
         constant("PI", Math.PI);
 
         staticMethod("abs", this::_abs);
@@ -33,6 +41,11 @@ public class NumberProxy extends TypeProxy<Double> {
     //-------------------------------------------------------------------------
     // Static Methods
 
+    //**
+    // @static abs
+    // @args number
+    // @result Number
+    // Returns the absolute value of the given *number*.
     private Object _abs(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "Number.abs(value)");
         return Math.abs(joe.toDouble(args.get(0)));

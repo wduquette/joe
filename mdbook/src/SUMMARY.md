@@ -17,6 +17,8 @@
   - [Joe Standard Library](./library/pkg.joe.md)
     - [Error Type](./library/type.joe.Error.md)
     - [Keyword Type](./library/type.joe.Keyword.md)
+    - [List Type](./library/type.joe.List.md)
+    - [Number Type](./library/type.joe.Number.md)
     - [Pair Type](./library/type.joe.Pair.md)
     - [String Type](./library/type.joe.String.md)
   - [Joe Test Tool API](./library/pkg.joe.test.md)
