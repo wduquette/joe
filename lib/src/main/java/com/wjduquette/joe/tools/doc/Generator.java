@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.function.Function;
 
 class Generator {
+    public static final String DOC_SET_INDEX = "index.md";
+
     interface ContentFunction {
         void write(ContentWriter out);
     }
@@ -38,6 +40,10 @@ class Generator {
         // FIRST, compute lookup tables.
         // TODO
 
+        // NEXT, generate the index file.
+        write(config.getOutputFolder().resolve(DOC_SET_INDEX),
+            this::writeDocSetIndex);
+
         // NEXT, generate the files for each package, in order.
         for (var pkg : sorted(docSet.packages(), PackageEntry::name)) {
             write(config.getOutputFolder().resolve(pkg.filename()),
@@ -51,11 +57,50 @@ class Generator {
     }
 
     //-------------------------------------------------------------------------
+    // Documentation Set Index
+
+    private void writeDocSetIndex(ContentWriter out) {
+        out.h1("Library API Index");
+        out.println();
+        out.println("""
+            The following is a complete index of the packages, functions,
+            types, methods, and constants include in Joe's library.
+            """);
+        out.println();
+
+        for (var pkg : sorted(docSet.packages(), PackageEntry::name)) {
+            out.println("- [" + packageIndexTitle(pkg) + "](" +
+                pkg.filename() + ")");
+
+            for (var fn : sorted(pkg.functions(), Callable::name)) {
+                writeCallableLink(out, 2, fn);
+            }
+
+            for (var type : sorted(pkg.types(), TypeEntry::name)) {
+                writeTypeLink(out, 2, type);
+
+                sorted(type.constants(), ConstantEntry::name)
+                    .forEach(c -> writeConstantLink(out, 4, c));
+
+                sorted(type.staticMethods(), StaticMethodEntry::name)
+                    .forEach(m -> writeCallableLink(out, 4, m));
+
+                if (type.initializer() != null) {
+                    writeCallableLink(out, 4, type.initializer());
+                }
+
+                sorted(type.methods(), MethodEntry::name)
+                    .forEach(m -> writeCallableLink(out, 4, m));
+            }
+        }
+    }
+
+    //-------------------------------------------------------------------------
     // Package Files
 
     private void writePackageFile(ContentWriter out, PackageEntry pkg) {
         // FIRST, output the header
-        out.h1(h1PackageTitle(pkg));
+        out.h1(packageH1Title(pkg));
 
         // NEXT, output the first paragraph of the content.
         var content = new ArrayList<>(pkg.content());
@@ -67,14 +112,16 @@ class Generator {
         if (!pkg.functions().isEmpty()) {
             out.hb("functions", "Functions");
             out.println();
-            pkg.functions().forEach(f -> writeCallableLink(out, 0, f));
+            sorted(pkg.functions(), Callable::name)
+                .forEach(f -> writeCallableLink(out, 0, f));
             out.println();
         }
 
         if (!pkg.types().isEmpty()) {
             out.hb("Types");
             out.println();
-            pkg.types().forEach(t -> writeTypeLink(out, 0, t));
+            sorted(pkg.types(), TypeEntry::name)
+                .forEach(t -> writeTypeLink(out, 0, t));
             out.println();
         }
 
@@ -88,10 +135,16 @@ class Generator {
         }
     }
 
-    private String h1PackageTitle(PackageEntry pkg) {
+    private String packageH1Title(PackageEntry pkg) {
         return pkg.title() != null
             ? pkg.title() + " (" + mono(pkg.name()) + ")"
             : mono(pkg.name()) +  " package";
+    }
+
+    private String packageIndexTitle(PackageEntry pkg) {
+        return pkg.title() != null
+            ? mono(pkg.name()) +  " package (" + pkg.title() + ")"
+            : mono(pkg.name()) + " package";
     }
 
     private void writeTypeLink(
@@ -125,7 +178,7 @@ class Generator {
         if (!type.constants().isEmpty()) {
             out.hb("constants", "Constants");
             out.println();
-            type.constants()
+            sorted(type.constants(), ConstantEntry::name)
                 .forEach(c -> writeConstantLink(out, 0, c));
             out.println();
         }
@@ -133,7 +186,7 @@ class Generator {
         if (!type.staticMethods().isEmpty()) {
             out.hb("statics", "Static Methods");
             out.println();
-            type.staticMethods()
+            sorted(type.staticMethods(), StaticMethodEntry::name)
                 .forEach(m -> writeCallableLink(out, 0, m));
             out.println();
         }
@@ -148,7 +201,7 @@ class Generator {
         if (!type.methods().isEmpty()) {
             out.hb("methods", "Methods");
             out.println();
-            type.methods()
+            sorted(type.methods(), MethodEntry::name)
                 .forEach(m -> writeCallableLink(out, 0, m));
             out.println();
         }
@@ -188,7 +241,8 @@ class Generator {
         ContentWriter out,
         List<ConstantEntry> constants
     ) {
-        constants.forEach(c -> writeConstantBody(out, c));
+        sorted(constants, ConstantEntry::name)
+            .forEach(c -> writeConstantBody(out, c));
         out.println();
     }
 
@@ -217,7 +271,8 @@ class Generator {
         ContentWriter out,
         List<? extends Callable> callables
     ) {
-        callables.forEach(c -> writeCallableBody(out, c));
+        sorted(callables, Callable::name)
+            .forEach(c -> writeCallableBody(out, c));
         out.println();
     }
 

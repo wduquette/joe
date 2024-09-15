@@ -13,7 +13,7 @@
  
 # Library Reference
 
-- [Standard Library](library.md)
+- [Library API](library.md)
   - [Joe Standard Library](./library/pkg.joe.md)
     - [Error Type](./library/type.joe.Error.md)
     - [Keyword Type](./library/type.joe.Keyword.md)
@@ -22,6 +22,7 @@
   - [Joe Test Tool API](./library/pkg.joe.test.md)
     - [CatchChecker Type](./library/type.joe.test.CatchChecker.md)
     - [ValueChecker Type](./library/type.joe.test.ValueChecker.md)
+  - [Library API Index](./library/index.md)
 
 
 ---

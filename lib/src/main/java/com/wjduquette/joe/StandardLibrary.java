@@ -12,6 +12,7 @@ public class StandardLibrary extends Library {
 
         //**
         // @package joe
+        // @title Joe Standard Library
         // The `joe` package contains Joe's standard library.
         globalFunction("catch",     this::_catch);
         globalFunction("codify",    this::_codify);

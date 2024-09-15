@@ -2,13 +2,14 @@
 
 //**
 // @package joe.test
+// @title Joe Test Tool API
 // This package defines the test assertions and checkers that are available
 // for use in `joe test` test suites.
 
 //**
 // @function check
 // @args value
-// @result [[ValueChecker]]
+// @result ValueChecker
 // Returns a checker for testing a computed value.
 function check(value) {
     return ValueChecker(value);
@@ -17,7 +18,7 @@ function check(value) {
 //**
 // @function checkCatch
 // @args callable
-// @result [[CatchChecker]]
+// @result CatchChecker
 // Executes a no-arg *callable* and returns a checker for checking
 // the error result.
 function checkCatch(callable) {
