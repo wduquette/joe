@@ -15,7 +15,15 @@ public class NativeFunction implements JoeCallable {
 
     @Override
     public Object call(Joe joe, ArgQueue args) {
-        return callable.call(joe, args);
+        try {
+            return callable.call(joe, args);
+        } catch (JoeError ex) {
+            // TODO: Add stack frame
+            throw ex;
+        } catch (Exception ex) {
+            throw new JoeError("Error in " + name + "(): " +
+                ex.getMessage());
+        }
     }
 
     @Override
