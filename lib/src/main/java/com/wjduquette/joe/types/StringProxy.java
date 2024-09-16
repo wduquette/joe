@@ -29,34 +29,34 @@ public class StringProxy extends TypeProxy<String> {
 
         // pad/padLeft
 
-        method("charAt",           this::_charAt);
-        method("contains",         this::_contains);
-        method("endsWith",         this::_endsWith);
-        method("equalsIgnoreCase", this::_equalsIgnoreCase);
+        method("charAt",              this::_charAt);
+        method("contains",            this::_contains);
+        method("endsWith",            this::_endsWith);
+        method("equalsIgnoreCase",    this::_equalsIgnoreCase);
 //        method("format",           this::_format);     // TODO Need printf logic
-        method("indent",           this::_indent);
-//        method("indexOf",          this::_indexOf);    // TODO
-        method("isBlank",          this::_isBlank);
-        method("isEmpty",          this::_isEmpty);
-//        method("lastIndexOf",      this::_lastIndexOf);  // TODO
-        method("length",           this::_length);
-        method("lines",            this::_lines);
-        method("matches",          this::_matches);
-        method("repeat",           this::_repeat);
-        method("replace",          this::_replace);
-        method("replaceAll",       this::_replaceAll);
-        method("replaceFirst",     this::_replaceFirst);
-        method("split",            this::_split);
-// TODO splitWithDelimiters
-        method("startsWith",       this::_startsWith);
-        method("strip",            this::_strip);
-        method("stripIndent",      this::_stripIndent);
-        method("stripLeading",     this::_stripLeading);
-        method("stripTrailing",    this::_stripTrailing);
-//        method("substring",        this::_substring);  // TODO
-        method("toLowerCase",      this::_toLowerCase);
-        method("toString",         this::_toString);
-        method("toUpperCase",      this::_toUpperCase);
+        method("indent",              this::_indent);
+        method("indexOf",             this::_indexOf);
+        method("isBlank",             this::_isBlank);
+        method("isEmpty",             this::_isEmpty);
+        method("lastIndexOf",         this::_lastIndexOf);
+        method("length",              this::_length);
+        method("lines",               this::_lines);
+        method("matches",             this::_matches);
+        method("repeat",              this::_repeat);
+        method("replace",             this::_replace);
+        method("replaceAll",          this::_replaceAll);
+        method("replaceFirst",        this::_replaceFirst);
+        method("split",               this::_split);
+        method("splitWithDelimiters", this::_splitWithDelimiters);
+        method("startsWith",          this::_startsWith);
+        method("strip",               this::_strip);
+        method("stripIndent",         this::_stripIndent);
+        method("stripLeading",        this::_stripLeading);
+        method("stripTrailing",       this::_stripTrailing);
+        method("substring",           this::_substring);
+        method("toLowerCase",         this::_toLowerCase);
+        method("toString",            this::_toString);
+        method("toUpperCase",         this::_toUpperCase);
     }
 
     //-------------------------------------------------------------------------
@@ -154,6 +154,32 @@ public class StringProxy extends TypeProxy<String> {
     }
 
     //**
+    // @method indexOf
+    // @args target, [beginIndex], [endIndex]
+    // @result Number
+    // Returns the index of the first occurrence of the *target* string in
+    // this string, or -1 if the *target* is not found.  The search starts
+    // at *beginIndex*, which defaults to 0, and ends at *endIndex*, which
+    // defaults to the end of the string.
+    private Object _indexOf(String value, Joe joe, ArgQueue args) {
+        Joe.arityRange(args, 1, 3, "indexOf(target, [beginIndex], [endIndex])");
+        var target = joe.stringify(args.next());
+
+        if (args.isEmpty()) {
+            return (double) value.indexOf(target);
+        } else if (args.size() == 1) {
+            return (double) value.indexOf(target,
+                joe.toInteger(args.next())
+            );
+        } else {
+            return (double) value.indexOf(target,
+                joe.toInteger(args.next()),
+                joe.toInteger(args.next())
+            );
+        }
+    }
+
+    //**
     // @method isBlank
     // @result Boolean
     // Returns `true` if this string is empty or contains only
@@ -170,6 +196,26 @@ public class StringProxy extends TypeProxy<String> {
     private Object _isEmpty(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "isEmpty()");
         return value.isEmpty();
+    }
+
+    //**
+    // @method lastIndexOf
+    // @args target, [fromIndex]
+    // @result Number
+    // Returns the index of the last occurrence of the *target* string in
+    // this string, or -1 if the *target* is not found.  The search starts
+    // at *fromIndex*, which defaults to 0, and proceeds towards the start of
+    // the string.
+    private Object _lastIndexOf(String value, Joe joe, ArgQueue args) {
+        Joe.arityRange(args, 1, 2, "lastIndexOf(target, [fromIndex]");
+        var target = joe.stringify(args.next());
+        if (args.isEmpty()) {
+            return (double) value.lastIndexOf(target);
+        } else {
+            return (double) value.lastIndexOf(target,
+                joe.toInteger(args.next())
+            );
+        }
     }
 
     //**
@@ -276,6 +322,21 @@ public class StringProxy extends TypeProxy<String> {
     }
 
     //**
+    // @method splitWithDelimiters
+    // @args delimiter
+    // @result List
+    // Returns a list of the tokens formed by splitting the string on
+    // each of the substrings that match the *delimiter* regular
+    // expression pattern.  The delimiter substrings are included
+    // as tokens in the list.
+    private Object _splitWithDelimiters(String value, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "splitWithDelimiters(delimiter)");
+        var delim = joe.toString(args.next());
+        var tokens = value.splitWithDelimiters(delim, 0);
+        return new ListValue(Arrays.asList(tokens));
+    }
+
+    //**
     // @method startsWith
     // @args prefix
     // @result Boolean
@@ -321,6 +382,27 @@ public class StringProxy extends TypeProxy<String> {
     private Object _stripTrailing(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "stripTrailing()");
         return value.stripTrailing();
+    }
+
+    //**
+    // @method substring
+    // @args beginIndex, [endIndex]
+    // @result String
+    // Returns the substring of this string that starts at the
+    // *beginIndex* and ends at the *endIndex*; *endIndex* defaults
+    // to the end of the string.
+    private Object _substring(String value, Joe joe, ArgQueue args) {
+        Joe.arityRange(args, 1, 2, "substring(beginIndex, [endIndex]");
+        if (args.size() == 1) {
+            return value.substring(
+                joe.toIndex(args.next(), value.length())
+            );
+        } else {
+            return value.substring(
+                joe.toIndex(args.next(), value.length()),
+                joe.toIndex(args.next(), value.length())
+            );
+        }
     }
 
     //**

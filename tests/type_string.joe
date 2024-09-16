@@ -30,6 +30,14 @@ function testIndent() {
     check("abc".indent(2)).eq("  abc");
 }
 
+function testIndexOf() {
+    check("abcdefghi".indexOf("xyz")).eq(-1);
+    check("abcdefghi".indexOf("def")).eq(3);
+
+    check("abcabcabc".indexOf("bc", 2)).eq(4);
+    check("abcdeabcde".indexOf("c", 3, 6)).eq(-1);
+}
+
 function testIsBlank() {
     check("abc".isBlank()).isFalse();
     check("   ".isBlank()).isTrue();
@@ -46,6 +54,13 @@ function testJoin() {
     check(String.join(",", List())).eq("");
     check(String.join(",", List("a", "b"))).eq("a,b");
     check(String.join(",", List(1, 2))).eq("1,2");
+}
+
+function testLastIndexOf() {
+    check("abcdefghi".lastIndexOf("xyz")).eq(-1);
+    check("abcabc".lastIndexOf("b")).eq(4);
+
+    check("abcabc".lastIndexOf("b", 3)).eq(1);
 }
 
 function testLength() {
@@ -95,6 +110,11 @@ function testSplit() {
     .eq(List("abc", "def", "ghi"));
 }
 
+function testSplitWithDelimiters() {
+    check("abc,def,ghi".splitWithDelimiters(","))
+    .eq(List("abc", ",", "def", ",", "ghi"));
+}
+
 function testStartsWith() {
     check("abcdef".startsWith("abc")).isTrue();
     check("abcdef".startsWith("bcd")).isFalse();
@@ -114,6 +134,12 @@ function testStripLeading() {
 
 function testStripTrailing() {
     check("  abc  ".stripTrailing()).eq("  abc");
+}
+
+function testSubstring() {
+    var txt = "abcdefghi";
+    check(txt.substring(3)).eq("defghi");
+    check(txt.substring(3, 6)).eq("def");
 }
 
 function testToLowerCase() {
