@@ -5,23 +5,23 @@ import com.wjduquette.joe.*;
 import java.nio.file.Path;
 
 public class JoeDocPackage extends Library {
-    public static final JoeDocPackage PACKAGE = new JoeDocPackage();
+    private final DocConfig config;
 
-    public JoeDocPackage() {
+    //**
+    // @package joe.doc
+    // @title JoeDoc Configuration API
+    // The `joe.doc` package contains the Joe API used in
+    // the `joe doc` configuration file, `doc_config.joe`.
+    public JoeDocPackage(DocConfig config) {
         super();
-
-        //**
-        // @package joe.doc
-        // @title JoeDoc Configuration API
-        // The `joe.doc` package contains the Joe API used in
-        // the `joe doc` configuration file, `doc_config.joe`.
+        this.config = config;
+        type(new DocConfigProxy());
     }
 
-    private static class DocConfigProxy extends TypeProxy<Void> {
+    private class DocConfigProxy extends TypeProxy<Void> {
         //---------------------------------------------------------------------
         // Instance Variables
 
-        private final DocConfig config;
 
         //---------------------------------------------------------------------
         // Constructor
@@ -30,9 +30,8 @@ public class JoeDocPackage extends Library {
         // @type DocConfig
         // The `DocConfig` static type owns the static methods used to
         // configure the `joe doc` tool.
-        public DocConfigProxy(DocConfig config) {
+        public DocConfigProxy() {
             super("DocConfig");
-            this.config = config;
             staticType();
 
             staticMethod("inputFile",    this::_inputFile);

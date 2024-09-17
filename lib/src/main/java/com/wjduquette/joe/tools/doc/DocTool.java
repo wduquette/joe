@@ -1,5 +1,7 @@
 package com.wjduquette.joe.tools.doc;
 
+import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
@@ -28,6 +30,8 @@ public class DocTool implements Tool {
     public static final Set<String> FILE_TYPES = Set.of(
         ".java", ".joe"
     );
+
+    public static final Path DOC_CONFIG = Path.of("doc_config.joe");
 
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -58,11 +62,33 @@ public class DocTool implements Tool {
             System.exit(1);
         }
 
-        // NEXT, get the input folders.
-        // NOTE: These will ultimately come from the joe_doc.monica file.
-        config.inputFolders().add(Path.of("../lib/src/main/java/com/wjduquette/joe"));
-        config.inputFolders().add(Path.of("../lib/src/main/resources/com/wjduquette/joe"));
-        config.setOutputFolder(Path.of("src/library"));
+        // NEXT, look for the doc_config file.
+        if (!Files.exists(DOC_CONFIG)) {
+            System.err.println("Could not find " + DOC_CONFIG +
+                " in the current working directory.");
+            exit(1);
+        }
+
+        var joe = new Joe();
+        joe.installLibrary(new JoeDocPackage(config));
+        try {
+            joe.runFile(DOC_CONFIG.toString());
+        } catch (IOException ex) {
+            System.err.println("Could not load " + DOC_CONFIG +
+                ": " + ex.getMessage());
+            exit(1);
+        } catch (JoeError ex) {
+            System.err.println("Error in " + DOC_CONFIG +
+                ": " + ex.getMessage());
+            exit(1);
+        }
+
+//
+//        // NEXT, get the input folders.
+//        // NOTE: These will ultimately come from the joe_doc.monica file.
+//        config.inputFolders().add(Path.of("../lib/src/main/java/com/wjduquette/joe"));
+//        config.inputFolders().add(Path.of("../lib/src/main/resources/com/wjduquette/joe"));
+//        config.setOutputFolder(Path.of("src/library"));
 
         // NEXT, populate the list of files.
         scanInputFolders();
