@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 class JoeInstance implements JoeObject {
-    private final JoeClass klass;
+    private final JoeClass joeClass;
     private final Map<String, Object> fields = new HashMap<>();
 
     JoeInstance(JoeClass klass) {
-        this.klass = klass;
+        this.joeClass = klass;
     }
 
     @Override
@@ -17,7 +17,7 @@ class JoeInstance implements JoeObject {
             return fields.get(name);
         }
 
-        JoeFunction method = klass.findMethod(name);
+        JoeFunction method = joeClass.findMethod(name);
         if (method != null) return method.bind(this);
 
         throw new JoeError("Undefined property '" + name + "'.");
@@ -28,8 +28,12 @@ class JoeInstance implements JoeObject {
         fields.put(name, value);
     }
 
+    public JoeClass joeClass() {
+        return joeClass;
+    }
+
     @Override
     public String toString() {
-        return "<" + klass.name() + "@" + String.format("%x",hashCode()) + ">";
+        return "<" + joeClass.name() + "@" + String.format("%x",hashCode()) + ">";
     }
 }

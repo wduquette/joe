@@ -21,6 +21,7 @@ public class StandardLibrary extends Package {
         globalFunction("stringify", this::_stringify);
         globalFunction("typeName",  this::_typeName);
 
+        type(BooleanProxy.TYPE);
         type(ErrorProxy.TYPE);
         type(KeywordProxy.TYPE);
         type(ListProxy.TYPE);
@@ -58,6 +59,11 @@ public class StandardLibrary extends Package {
         return joe.codify(args.get(0));
     }
 
+    //**
+    // @function print
+    // @args text
+    // Prints its text to standard output (which might be
+    // redirected by the application).
     private Object _print(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "print(text)");
 
@@ -65,6 +71,11 @@ public class StandardLibrary extends Package {
         return null;
     }
 
+    //**
+    // @function println
+    // @args [text]
+    // Prints its text followed by a line separator to standard output
+    // (which might be redirected by the application).
     private Object _println(Joe joe, ArgQueue args) {
         Joe.arityRange(args, 0, 1, "println([text])");
 
@@ -76,12 +87,23 @@ public class StandardLibrary extends Package {
         return null;
     }
 
+    //**
+    // @function stringify
+    // @args value
+    // @result String
+    // Converts its value to a string for output.  This function
+    // is functionally equivalent to [[String#init]].
     private Object _stringify(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "stringify(value)");
 
         return joe.stringify(args.get(0));
     }
 
+    //**
+    // @function typeName
+    // @args value
+    // @result String
+    // Returns the name of the value's type.
     private Object _typeName(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "typeName(value)");
 

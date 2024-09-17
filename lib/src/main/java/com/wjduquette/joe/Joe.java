@@ -288,12 +288,16 @@ public class Joe {
     public String typeName(Object value) {
         return switch (value) {
             case null -> null;
-            case JoeFunction function -> toInitialCap(function.kind());
+            case JoeFunction function -> "<" + function.kind() + " " + function.name() + ">";
+            case NativeFunction function -> "<native " + function.name() + ">";
+            case TypeProxy<?> proxy -> "<proxy " + proxy.getTypeName() + ">";
+            case JoeClass cls -> "<class " + cls.name() + ">";
+            case JoeInstance obj -> obj.joeClass().name();
             default -> {
                 var proxy = lookupProxy(value);
                 yield proxy != null
                     ? proxy.getTypeName()
-                    : value.getClass().getSimpleName();
+                    : "<java " + value.getClass().getCanonicalName() + ">";
             }
         };
     }
@@ -354,15 +358,6 @@ public class Joe {
         if (a == null) return false;
 
         return a.equals(b);
-    }
-
-    private String toInitialCap(String string) {
-        if (string != null && !string.isEmpty()) {
-            return Character.toUpperCase(string.charAt(0)) +
-                string.substring(1);
-        } else {
-            return string;
-        }
     }
 
     /**
