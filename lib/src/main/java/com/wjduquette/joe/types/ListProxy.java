@@ -1,9 +1,6 @@
 package com.wjduquette.joe.types;
 
-import com.wjduquette.joe.ArgQueue;
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeList;
-import com.wjduquette.joe.TypeProxy;
+import com.wjduquette.joe.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,8 +31,8 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("copy",        this::_copy);
         // filter
         method("get",         this::_get);
-        // getFirst
-        // getLast
+        method("getFirst",    this::_getFirst);
+        method("getLast",     this::_getLast);
         // indexOf
         method("isEmpty",     this::_isEmpty);
         // lastIndexOf
@@ -160,6 +157,34 @@ public class ListProxy extends TypeProxy<JoeList> {
     private Object _get(JoeList list, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "get(index)");
         return list.get(joe.toIndex(args.next(), list.size()));
+    }
+
+    //**
+    // @method getFirst
+    // @result value
+    // Returns the first value in the list.  It's an error if
+    // the list is empty.
+    private Object _getFirst(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "getFirst()");
+        if (!list.isEmpty()) {
+            return list.getFirst();
+        } else {
+            throw new JoeError("List is empty.");
+        }
+    }
+
+    //**
+    // @method getLast
+    // @result value
+    // Returns the last value in the list.  It's an error if
+    // the list is empty.
+    private Object _getLast(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "getLast()");
+        if (!list.isEmpty()) {
+            return list.getLast();
+        } else {
+            throw new JoeError("List is empty.");
+        }
     }
 
     //**

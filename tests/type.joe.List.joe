@@ -88,6 +88,27 @@ function testGet() {
         .message("Expected 0 <= index < 3, got: Number '4'.");
 }
 
+//-----------------------------------------------------------------------------
+// testGetFirst()
+
+function testGetFirst() {
+    var list = List(1, 2, 3);
+    check(list.getFirst()).eq(1);
+
+    checkCatch(\-> List().getFirst())
+        .message("List is empty.");
+}
+
+//-----------------------------------------------------------------------------
+// testGetLast()
+
+function testGetLast() {
+    var list = List(1, 2, 3);
+    check(list.getLast()).eq(3);
+
+    checkCatch(\-> List().getLast())
+        .message("List is empty.");
+}
 
 //-----------------------------------------------------------------------------
 // isEmpty()
