@@ -12,9 +12,8 @@ public class BooleanProxy extends TypeProxy<Boolean> {
 
     //**
     // @package joe
-    // @type Number
-    // The `Number` type is a static type that collects together a number of
-    // useful constants and numeric methods.
+    // @type Boolean
+    // The `Boolean` type has the expected values `true` and `false`.
     public BooleanProxy() {
         super("Boolean");
         staticType();
