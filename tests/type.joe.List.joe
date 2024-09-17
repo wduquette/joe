@@ -142,6 +142,29 @@ function testRemoveAt() {
 }
 
 //-----------------------------------------------------------------------------
+// testRemoveFirst()
+
+function testRemoveFirst() {
+    var list = List(1, 2, 3);
+    check(list.removeFirst()).eq(1);
+
+    checkCatch(\-> List().removeFirst())
+        .message("List is empty.");
+}
+
+//-----------------------------------------------------------------------------
+// testRemoveLast()
+
+function testRemoveLast() {
+    var list = List(1, 2, 3);
+    check(list.removeLast()).eq(3);
+
+    checkCatch(\-> List().removeLast())
+        .message("List is empty.");
+}
+
+
+//-----------------------------------------------------------------------------
 // size()
 
 function testSize() {

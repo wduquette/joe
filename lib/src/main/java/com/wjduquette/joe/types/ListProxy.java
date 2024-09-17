@@ -37,11 +37,13 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("isEmpty",     this::_isEmpty);
         // lastIndexOf
         // map
+        // peekFirst
+        // peekLast
         method("remove",      this::_remove);
         method("removeAt",    this::_removeAt);
         // removeAll
-        // removeFirst
-        // removeLast
+        method("removeFirst", this::_removeFirst);
+        method("removeLast",  this::_removeLast);
         // reversed
         // set
         // sort -- need comparison infrastructure
@@ -217,6 +219,35 @@ public class ListProxy extends TypeProxy<JoeList> {
         Joe.exactArity(args, 1, "remove(index)");
         return list.remove(joe.toIndex(args.next(), list.size()));
     }
+
+    //**
+    // @method removeFirst
+    // @result value
+    // Removes and returns the first value in the list.  It's an error if
+    // the list is empty.
+    private Object _removeFirst(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "removeFirst()");
+        if (!list.isEmpty()) {
+            return list.removeFirst();
+        } else {
+            throw new JoeError("List is empty.");
+        }
+    }
+
+    //**
+    // @method removeLast
+    // @result value
+    // Removes and returns the last value in the list.  It's an error if
+    // the list is empty.
+    private Object _removeLast(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "removeLast()");
+        if (!list.isEmpty()) {
+            return list.getLast();
+        } else {
+            throw new JoeError("List is empty.");
+        }
+    }
+
 
     //**
     // @method size
