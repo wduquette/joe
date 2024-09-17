@@ -40,8 +40,8 @@ public class ListProxy extends TypeProxy<JoeList> {
         // peekFirst
         // peekLast
         method("remove",      this::_remove);
+        method("removeAll",   this::_removeAll);
         method("removeAt",    this::_removeAt);
-        // removeAll
         method("removeFirst", this::_removeFirst);
         method("removeLast",  this::_removeLast);
         // reversed
@@ -208,6 +208,18 @@ public class ListProxy extends TypeProxy<JoeList> {
     private Object _remove(JoeList list, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "remove(value)");
         return list.remove(args.next());
+    }
+
+    //**
+    // @method removeAll
+    // @args collection
+    // @result Boolean
+    // Removes all items in the list that are found in the *collection*.
+    // Returns `true` if any items were removed, `false` otherwise.
+    private Object _removeAll(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "removeAll(collection)");
+        return list.removeAll(
+            joe.toType(Collection.class, args.next()));
     }
 
     //**
