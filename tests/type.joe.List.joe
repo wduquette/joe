@@ -111,11 +111,29 @@ function testGetLast() {
 }
 
 //-----------------------------------------------------------------------------
+// indexOf()
+
+function testIndexOf() {
+    var list = List(1, 2, 3, 2, 1);
+    check(list.indexOf(2)).eq(1);
+    check(list.indexOf(4)).eq(-1);
+}
+
+//-----------------------------------------------------------------------------
 // isEmpty()
 
 function testIsEmpty() {
     check(List(1).isEmpty()).eq(false);
     check(List().isEmpty()).eq(true);
+}
+
+//-----------------------------------------------------------------------------
+// lastIndexOf()
+
+function testLastIndexOf() {
+    var list = List(1, 2, 3, 2, 1);
+    check(list.lastIndexOf(2)).eq(3);
+    check(list.lastIndexOf(4)).eq(-1);
 }
 
 //-----------------------------------------------------------------------------

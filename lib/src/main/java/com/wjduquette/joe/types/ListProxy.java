@@ -33,9 +33,9 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("get",         this::_get);
         method("getFirst",    this::_getFirst);
         method("getLast",     this::_getLast);
-        // indexOf
+        method("indexOf",     this::_indexOf);
         method("isEmpty",     this::_isEmpty);
-        // lastIndexOf
+        method("lastIndexOf", this::_lastIndexOf);
         // map
         // peekFirst
         // peekLast
@@ -190,12 +190,34 @@ public class ListProxy extends TypeProxy<JoeList> {
     }
 
     //**
+    // @method indexOf
+    // @args value
+    // @result Number
+    // Returns the index of the first occurrence of the *value* in
+    // the list, or -1 if not found.
+    private Object _indexOf(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "indexOf(value)");
+        return (double)list.indexOf(args.next());
+    }
+
+    //**
     // @method isEmpty
     // @result Boolean
     // Returns `true` if the list is empty, and `false` otherwise.
     private Object _isEmpty(JoeList list, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "isEmpty()");
         return list.isEmpty();
+    }
+
+    //**
+    // @method lastIndexOf
+    // @args value
+    // @result Number
+    // Returns the index of the last occurrence of the *value* in
+    // the list, or -1 if not found.
+    private Object _lastIndexOf(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "lastIndexOf(value)");
+        return (double)list.lastIndexOf(args.next());
     }
 
     //**
