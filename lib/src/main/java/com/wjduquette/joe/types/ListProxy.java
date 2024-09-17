@@ -5,6 +5,8 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeList;
 import com.wjduquette.joe.TypeProxy;
 
+import java.util.Collection;
+
 public class ListProxy extends TypeProxy<JoeList> {
     public static final ListProxy TYPE = new ListProxy();
 
@@ -22,7 +24,9 @@ public class ListProxy extends TypeProxy<JoeList> {
         super("List");
         proxies(ListValue.class); // Types that implement `JoeList`
         initializer(this::_init);
-        method("size", this::_size);
+        method("add",     this::_add);
+        method("addAll",  this::_addAll);
+        method("size",    this::_size);
     }
 
     //-------------------------------------------------------------------------
@@ -38,6 +42,48 @@ public class ListProxy extends TypeProxy<JoeList> {
 
     //-------------------------------------------------------------------------
     // Method Implementation
+
+    //**
+    // @method add
+    // @args [index], item
+    // @result this
+    // Adds the item to the list at the given *index*, which defaults
+    // to the end of the list.
+    private Object _add(JoeList list, Joe joe, ArgQueue args) {
+        Joe.arityRange(args, 1, 2, "add([index], item)");
+
+        if (args.size() == 1) {
+            list.add(args.next());
+        } else {
+            list.add(
+                joe.toIndex(args.next(), list.size() + 1),
+                args.next()
+            );
+        }
+
+        return list;
+    }
+
+    //**
+    // @method addAll
+    // @args [index], collection
+    // @result this
+    // Adds all items in the *collection* to the list at the
+    // given *index*, which defaults to the end of the list.
+    private Object _addAll(JoeList list, Joe joe, ArgQueue args) {
+        Joe.arityRange(args, 1, 2, "addAll([index], collection)");
+
+        if (args.size() == 1) {
+            list.addAll(joe.toList(args.next()));
+        } else {
+            list.addAll(
+                joe.toIndex(args.next(), list.size() + 1),
+                joe.toType(Collection.class, args.next())
+            );
+        }
+
+        return list;
+    }
 
     //**
     // @method size

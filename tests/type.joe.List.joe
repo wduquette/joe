@@ -1,0 +1,48 @@
+// List type tests
+
+//-----------------------------------------------------------------------------
+// add()
+
+function testAdd_simple() {
+    var list = List();
+    check(list.add(1)).eq(List(1));
+    check(list.add(2)).eq(List(1, 2));
+    check(list.add(3)).eq(List(1, 2, 3));
+}
+
+function testAdd_index() {
+    var list = List();
+    check(list.add(1)).eq(List(1));
+    check(list.add(0, 2)).eq(List(2, 1));
+    check(list.add(1, 3)).eq(List(2, 3, 1));
+
+    checkCatch(\-> list.add(-1, 4))
+        .message("Expected 0 <= index < 4, got: Number '-1'.");
+}
+
+//-----------------------------------------------------------------------------
+// addAll()
+
+function testAddAll_simple() {
+    var list = List(1, 2);
+    check(list.addAll(List(3, 4, 5))).eq(List(1, 2, 3, 4, 5));
+
+    checkCatch(\-> list.addAll(6))
+        .message("Expected List, got: Number '6'.");
+}
+
+function testAddAll_index() {
+    var list = List(1, 5);
+    check(list.addAll(1, List(2, 3, 4))).eq(List(1, 2, 3, 4, 5));
+
+    checkCatch(\-> list.addAll(-1, List()))
+        .message("Expected 0 <= index < 6, got: Number '-1'.");
+}
+
+//-----------------------------------------------------------------------------
+// size()
+
+function testSize() {
+    check(List().size()).eq(0);
+    check(List(1,2,3).size()).eq(3);
+}
