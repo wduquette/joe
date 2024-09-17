@@ -37,8 +37,8 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("isEmpty",     this::_isEmpty);
         method("lastIndexOf", this::_lastIndexOf);
         // map
-        // peekFirst
-        // peekLast
+        method("peekFirst",   this::_peekFirst);
+        method("peekLast",    this::_peekLast);
         method("remove",      this::_remove);
         method("removeAll",   this::_removeAll);
         method("removeAt",    this::_removeAt);
@@ -219,6 +219,35 @@ public class ListProxy extends TypeProxy<JoeList> {
         Joe.exactArity(args, 1, "lastIndexOf(value)");
         return (double)list.lastIndexOf(args.next());
     }
+
+    //**
+    // @method peekFirst
+    // @result value
+    // Returns the first value in the list, or null if
+    // the list is empty.
+    private Object _peekFirst(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "peekFirst()");
+        if (!list.isEmpty()) {
+            return list.getFirst();
+        } else {
+            return null;
+        }
+    }
+
+    //**
+    // @method peekLast
+    // @result value
+    // Returns the last value in the list, or null if
+    // the list is empty.
+    private Object _peekLast(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "peekLast()");
+        if (!list.isEmpty()) {
+            return list.getLast();
+        } else {
+            return null;
+        }
+    }
+
 
     //**
     // @method remove

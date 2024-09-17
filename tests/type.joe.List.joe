@@ -137,6 +137,24 @@ function testLastIndexOf() {
 }
 
 //-----------------------------------------------------------------------------
+// testPeekFirst()
+
+function testPeekFirst() {
+    var list = List(1, 2, 3);
+    check(list.peekFirst()).eq(1);
+    check(List().peekFirst()).eq(null);
+}
+
+//-----------------------------------------------------------------------------
+// testPeekLast()
+
+function testPeekLast() {
+    var list = List(1, 2, 3);
+    check(list.peekLast()).eq(3);
+    check(List().peekLast()).eq(null);
+}
+
+//-----------------------------------------------------------------------------
 // testRemove()
 
 function testRemove() {
