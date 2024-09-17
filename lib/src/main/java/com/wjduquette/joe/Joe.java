@@ -43,11 +43,11 @@ public class Joe {
     }
 
     /**
-     * Installs a library into this interpreter.
-     * @param library The library
+     * Installs a package into this interpreter.
+     * @param pkg The package
      */
-    public void installLibrary(Library library) {
-        library.install(this);
+    public void installPackage(Package pkg) {
+        pkg.install(this);
     }
 
     /**
@@ -58,6 +58,10 @@ public class Joe {
         globals.define(function.name(), function);
     }
 
+    /**
+     * Installs a type proxy into Joe's global environment.
+     * @param typeProxy The type proxy.
+     */
     public void installType(TypeProxy<?> typeProxy) {
         // FIRST, install the proxy into the proxy table.
         for (var cls : typeProxy.getProxiedTypes()) {

@@ -74,7 +74,7 @@ class Generator {
         out.println();
         out.println("""
             The following is a complete index of the packages, functions,
-            types, methods, and constants include in Joe's library.
+            types, methods, and constants include in Joe's aPackage.
             """);
         out.println();
 

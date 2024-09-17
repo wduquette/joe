@@ -3,7 +3,11 @@ package com.wjduquette.joe;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Library {
+/**
+ * A package containing Joe functions and or types, for installation into
+ * a Joe interpreter.
+ */
+public class Package {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -13,12 +17,12 @@ public class Library {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Library() {
+    public Package() {
         // nothing to do yet
     }
 
     //-------------------------------------------------------------------------
-    // Library builders
+    // Package builders
 
     public final void globalFunction(String name, JoeCallable callable) {
         globalFunctions.add(new NativeFunction(name, callable));
@@ -29,7 +33,7 @@ public class Library {
     }
 
     /**
-     * Installs the library's native functions and types into the
+     * Installs the package's native functions and types into the
      * engine.
      * @param joe The engine
      */

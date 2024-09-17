@@ -1,10 +1,11 @@
 package com.wjduquette.joe.tools.doc;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.Package;
 
 import java.nio.file.Path;
 
-public class JoeDocPackage extends Library {
+public class JoeDocPackage extends Package {
     private final DocConfig config;
 
     //**

@@ -43,7 +43,7 @@ Joe 0.2.0 extends Joe on every axis.
       - E.g., `Double.PI`, `Double.abs()`.
 
 - Tools
-  - Added `joe test`, a test runner for Joe-level test scripts, with a library
+  - Added `joe test`, a test runner for Joe-level test scripts, with a aPackage
     of assertion checkers.
 
 - Development

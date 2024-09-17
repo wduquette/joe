@@ -70,7 +70,7 @@ public class DocTool implements Tool {
         }
 
         var joe = new Joe();
-        joe.installLibrary(new JoeDocPackage(config));
+        joe.installPackage(new JoeDocPackage(config));
         try {
             joe.runFile(DOC_CONFIG.toString());
         } catch (IOException ex) {
