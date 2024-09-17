@@ -45,7 +45,7 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("removeFirst", this::_removeFirst);
         method("removeLast",  this::_removeLast);
         // reversed
-        // set
+        method("set",         this::_set);
         // sort -- need comparison infrastructure
         // subList
         method("size",        this::_size);
@@ -258,6 +258,20 @@ public class ListProxy extends TypeProxy<JoeList> {
         } else {
             throw new JoeError("List is empty.");
         }
+    }
+
+    //**
+    // @method set
+    // @args index, newValue
+    // @result oldValue
+    // Puts the *value* at the given *index*, returning the
+    // *oldValue* at that index.
+    private Object _set(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 2, "set(index, newValue)");
+        return list.set(
+            joe.toIndex(args.next(), list.size()),
+            args.next()
+        );
     }
 
 
