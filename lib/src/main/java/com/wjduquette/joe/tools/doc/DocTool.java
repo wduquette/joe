@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -33,11 +32,8 @@ public class DocTool implements Tool {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The client's configuration
     private final DocConfig config = new DocConfig();
-
-    // Ultimately, these will go in DocConfig.
-    private final List<Path> inputFolders = new ArrayList<>();
-    private final List<Path> inputFiles = new ArrayList<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -64,15 +60,14 @@ public class DocTool implements Tool {
 
         // NEXT, get the input folders.
         // NOTE: These will ultimately come from the joe_doc.monica file.
-        inputFolders.add(Path.of("../lib/src/main/java/com/wjduquette/joe"));
-        inputFolders.add(Path.of("../lib/src/main/resources/com/wjduquette/joe"));
-//        inputFolders.add(Path.of("."));
+        config.inputFolders().add(Path.of("../lib/src/main/java/com/wjduquette/joe"));
+        config.inputFolders().add(Path.of("../lib/src/main/resources/com/wjduquette/joe"));
         config.setOutputFolder(Path.of("src/library"));
 
         // NEXT, populate the list of files.
         scanInputFolders();
 
-        if (inputFiles.isEmpty()) {
+        if (config.inputFiles().isEmpty()) {
             println("*** No files found.");
             exit();
         }
@@ -81,7 +76,7 @@ public class DocTool implements Tool {
         var docSet = new DocumentationSet();
         var parser = new DocCommentParser(docSet);
         var errors = 0;
-        for (var file : inputFiles) {
+        for (var file : config.inputFiles()) {
             try {
                 parser.parse(file);
             } catch (DocCommentParser.ParseError ex) {
@@ -104,7 +99,7 @@ public class DocTool implements Tool {
 
     private void scanInputFolders() {
         println("Scanning folders:");
-        for (var folder : inputFolders) {
+        for (var folder : config.inputFolders()) {
             println("  " + folder);
             scanFolder(folder);
         }
@@ -117,7 +112,7 @@ public class DocTool implements Tool {
         try (var stream = Files.walk(folder)) {
             stream
                 .filter(p -> FILE_TYPES.contains(fileType(p)))
-                .forEach(inputFiles::add);
+                .forEach(config.inputFiles()::add);
         } catch (IOException ex) {
             println("*** Failed to scan '" + folder + "':\n" +
                 ex.getMessage());
