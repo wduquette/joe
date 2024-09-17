@@ -211,6 +211,14 @@ function testRemoveLast() {
 }
 
 //-----------------------------------------------------------------------------
+// reversed()
+
+function testReversed() {
+    var list = List(1, 2, 3);
+    check(list.reversed()).eq(List(3, 2, 1));
+}
+
+//-----------------------------------------------------------------------------
 // set()
 
 function testSet() {

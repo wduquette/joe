@@ -44,7 +44,7 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("removeAt",    this::_removeAt);
         method("removeFirst", this::_removeFirst);
         method("removeLast",  this::_removeLast);
-        // reversed
+        method("reversed",    this::_reversed);
         method("set",         this::_set);
         // sort -- need comparison infrastructure
         method("sublist",     this::_sublist);
@@ -309,6 +309,15 @@ public class ListProxy extends TypeProxy<JoeList> {
         } else {
             throw new JoeError("List is empty.");
         }
+    }
+
+    //**
+    // @method reverse
+    // @result List
+    // Returns a reversed copy of the list.
+    private Object _reversed(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "reversed()");
+        return new ListValue(list.reversed());
     }
 
     //**
