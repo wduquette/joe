@@ -55,7 +55,7 @@ public class ArgSpec {
                 // Italicize
                 buff.append("*").append(token).append("*");
             } else {
-                buff.append(token.replace("[", "\\["));
+                buff.append(token.replace("[", "\\[").replace("]", "\\]"));
             }
         }
 

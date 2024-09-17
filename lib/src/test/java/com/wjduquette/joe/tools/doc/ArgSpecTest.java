@@ -37,6 +37,6 @@ public class ArgSpecTest extends Ted {
         check(ArgSpec.asMarkdown("")).eq("");
         check(ArgSpec.asMarkdown("x, y")).eq("*x*, *y*");
         check(ArgSpec.asMarkdown("x, y...")).eq("*x*, *y*...");
-        check(ArgSpec.asMarkdown("x, [y], z...")).eq("*x*, \\[*y*], *z*...");
+        check(ArgSpec.asMarkdown("x, [y], z...")).eq("*x*, \\[*y*\\], *z*...");
     }
 }
