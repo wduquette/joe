@@ -29,6 +29,25 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("addAll",      this::_addAll);
         method("clear",       this::_clear);
         method("contains",    this::_contains);
+        // containsAll
+        method("copy",        this::_copy);
+        // filter
+        // get
+        // getFirst
+        // getLast
+        // indexOf
+        // isEmpty
+        // lastIndexOf
+        // map
+        // remove
+        // removeAt
+        // removeAll
+        // removeFirst
+        // removeLast
+        // reversed
+        // set
+        // sort -- need comparison infrastructure
+        // subList
         method("size",        this::_size);
     }
 
@@ -107,6 +126,15 @@ public class ListProxy extends TypeProxy<JoeList> {
     private Object _contains(JoeList list, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "contains(value)");
         return list.contains(args.next());
+    }
+
+    //**
+    // @method copy
+    // @result this
+    // Returns a shallow copy of the list.
+    private Object _copy(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "copy()");
+        return new ListValue(list);
     }
 
     //**

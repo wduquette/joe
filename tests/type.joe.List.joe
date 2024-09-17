@@ -56,6 +56,17 @@ function testContains() {
     check(list.contains(4)).eq(false);
 }
 
+//-----------------------------------------------------------------------------
+// copy()
+
+function testCopy() {
+    var a = List(1, 2, 3);
+    var b = a.copy();
+    a.clear();
+    check(a.size()).eq(0);
+    check(b).eq(List(1, 2, 3));
+}
+
 
 //-----------------------------------------------------------------------------
 // size()
