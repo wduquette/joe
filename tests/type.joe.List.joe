@@ -57,6 +57,15 @@ function testContains() {
 }
 
 //-----------------------------------------------------------------------------
+// containsAll()
+
+function testContainsAll() {
+    var list = List(1, 2, 3);
+    check(list.containsAll(List(2, 3))).eq(true);
+    check(list.containsAll(List(4))).eq(false);
+}
+
+//-----------------------------------------------------------------------------
 // copy()
 
 function testCopy() {

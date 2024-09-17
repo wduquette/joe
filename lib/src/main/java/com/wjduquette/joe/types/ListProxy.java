@@ -6,6 +6,7 @@ import com.wjduquette.joe.JoeList;
 import com.wjduquette.joe.TypeProxy;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 public class ListProxy extends TypeProxy<JoeList> {
     public static final ListProxy TYPE = new ListProxy();
@@ -29,7 +30,7 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("addAll",      this::_addAll);
         method("clear",       this::_clear);
         method("contains",    this::_contains);
-        // containsAll
+        method("containsAll", this::_containsAll);
         method("copy",        this::_copy);
         // filter
         // get
@@ -129,8 +130,22 @@ public class ListProxy extends TypeProxy<JoeList> {
     }
 
     //**
+    // @method containsAll
+    // @args collection
+    // @result Boolean
+    // Returns `true` if the list contains all the values in
+    // the *collection*, and `false` otherwise.
+    private Object _containsAll(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "containsAll(collection)");
+        // According to IntelliJ, converting the list to a HashSet gives
+        // better performance.
+        return new HashSet<>(list).containsAll(
+            joe.toType(Collection.class, args.next()));
+    }
+
+    //**
     // @method copy
-    // @result this
+    // @result List
     // Returns a shallow copy of the list.
     private Object _copy(JoeList list, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "copy()");
