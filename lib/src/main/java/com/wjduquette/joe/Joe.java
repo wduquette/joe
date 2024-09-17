@@ -43,6 +43,14 @@ public class Joe {
     }
 
     /**
+     * Installs a library into this interpreter.
+     * @param library The library
+     */
+    public void installLibrary(Library library) {
+        library.install(this);
+    }
+
+    /**
      * Installs a native function into Joe's global environment.
      * @param function The function
      */

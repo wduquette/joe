@@ -1,0 +1,5 @@
+// Configuration for the Joe library docs
+DocConfig
+    .inputFolder("../lib/src/main/java/com/wjduquette/joe")
+    .inputFolder("../lib/src/main/resources/com/wjduquette/joe")
+    .outputFolder("src/library");

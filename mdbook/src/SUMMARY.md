@@ -24,6 +24,8 @@
   - [Joe Test Tool API](./library/pkg.joe.test.md)
     - [CatchChecker Type](./library/type.joe.test.CatchChecker.md)
     - [ValueChecker Type](./library/type.joe.test.ValueChecker.md)
+  - [JoeDoc Configuration API](./library/pkg.joe.doc.md)
+    - [DocConfig Type](./library/type.joe.doc.DocConfig.md)
   - [Library API Index](./library/index.md)
 
 

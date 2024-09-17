@@ -40,7 +40,7 @@ class Generator {
      */
     public void generate() {
         // FIRST, generate the index file.
-        write(config.getOutputFolder().resolve(DOC_SET_INDEX),
+        write(config.outputFolder().resolve(DOC_SET_INDEX),
             this::writeDocSetIndex);
 
         // NEXT, generate the files for each package, in order.
@@ -50,12 +50,12 @@ class Generator {
             populateShortTable(pkg);
 
             // NEXT, write the package file
-            write(config.getOutputFolder().resolve(pkg.filename()),
+            write(config.outputFolder().resolve(pkg.filename()),
                 out -> writePackageFile(out, pkg));
 
             // NEXT, write each type file
             for (var type : sorted(pkg.types(), TypeEntry::name)) {
-                write(config.getOutputFolder().resolve(type.filename()),
+                write(config.outputFolder().resolve(type.filename()),
                     out -> writeTypeFile(out, type));
             }
         }
