@@ -40,6 +40,14 @@ function testAddAll_index() {
 }
 
 //-----------------------------------------------------------------------------
+// clear()
+
+function testClear() {
+    var list = List(1, 2, 3);
+    check(list.clear()).eq(List());
+}
+
+//-----------------------------------------------------------------------------
 // size()
 
 function testSize() {

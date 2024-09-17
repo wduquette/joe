@@ -26,6 +26,7 @@ public class ListProxy extends TypeProxy<JoeList> {
         initializer(this::_init);
         method("add",     this::_add);
         method("addAll",  this::_addAll);
+        method("clear",   this::_clear);
         method("size",    this::_size);
     }
 
@@ -82,6 +83,16 @@ public class ListProxy extends TypeProxy<JoeList> {
             );
         }
 
+        return list;
+    }
+
+    //**
+    // @method clear
+    // @result this
+    // Removes all items from the list.
+    private Object _clear(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "clear()");
+        list.clear();
         return list;
     }
 
