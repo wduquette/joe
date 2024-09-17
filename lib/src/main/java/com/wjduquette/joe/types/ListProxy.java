@@ -37,8 +37,8 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("isEmpty",     this::_isEmpty);
         // lastIndexOf
         // map
-        // remove
-        // removeAt
+        method("remove",      this::_remove);
+        method("removeAt",    this::_removeAt);
         // removeAll
         // removeFirst
         // removeLast
@@ -194,6 +194,28 @@ public class ListProxy extends TypeProxy<JoeList> {
     private Object _isEmpty(JoeList list, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "isEmpty()");
         return list.isEmpty();
+    }
+
+    //**
+    // @method remove
+    // @args value
+    // @result Boolean
+    // Removes the *value* from the list if it's present.  Returns
+    // `true` if the item was removed, and `false` if it was not
+    // present
+    private Object _remove(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "remove(value)");
+        return list.remove(args.next());
+    }
+
+    //**
+    // @method removeAt
+    // @args index
+    // @result value
+    // Removes and returns the value at the given *index*.
+    private Object _removeAt(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "remove(index)");
+        return list.remove(joe.toIndex(args.next(), list.size()));
     }
 
     //**

@@ -119,6 +119,29 @@ function testIsEmpty() {
 }
 
 //-----------------------------------------------------------------------------
+// testRemove()
+
+function testRemove() {
+    var list = List(1, 2, 3);
+    check(list.remove(2)).eq(true);
+    check(list).eq(List(1, 3));
+
+    check(list.remove(2)).eq(false);
+}
+
+//-----------------------------------------------------------------------------
+// testRemoveAt()
+
+function testRemoveAt() {
+    var list = List(1, 2, 3);
+    check(list.removeAt(1)).eq(2);
+    check(list).eq(List(1, 3));
+
+    checkCatch(\-> list.removeAt(-1))
+        .message("Expected 0 <= index < 2, got: Number '-1'.");
+}
+
+//-----------------------------------------------------------------------------
 // size()
 
 function testSize() {
