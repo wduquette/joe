@@ -48,6 +48,16 @@ function testClear() {
 }
 
 //-----------------------------------------------------------------------------
+// contains()
+
+function testContains() {
+    var list = List(1, 2, 3);
+    check(list.contains(2)).eq(true);
+    check(list.contains(4)).eq(false);
+}
+
+
+//-----------------------------------------------------------------------------
 // size()
 
 function testSize() {

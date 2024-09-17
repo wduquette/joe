@@ -24,10 +24,12 @@ public class ListProxy extends TypeProxy<JoeList> {
         super("List");
         proxies(ListValue.class); // Types that implement `JoeList`
         initializer(this::_init);
-        method("add",     this::_add);
-        method("addAll",  this::_addAll);
-        method("clear",   this::_clear);
-        method("size",    this::_size);
+
+        method("add",         this::_add);
+        method("addAll",      this::_addAll);
+        method("clear",       this::_clear);
+        method("contains",    this::_contains);
+        method("size",        this::_size);
     }
 
     //-------------------------------------------------------------------------
@@ -94,6 +96,17 @@ public class ListProxy extends TypeProxy<JoeList> {
         Joe.exactArity(args, 0, "clear()");
         list.clear();
         return list;
+    }
+
+    //**
+    // @method contains
+    // @args value
+    // @result Boolean
+    // Returns `true` if the list contains the *value*, and `false`
+    // otherwise.
+    private Object _contains(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "contains(value)");
+        return list.contains(args.next());
     }
 
     //**
