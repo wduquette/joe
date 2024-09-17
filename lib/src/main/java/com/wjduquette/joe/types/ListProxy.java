@@ -33,11 +33,11 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("containsAll", this::_containsAll);
         method("copy",        this::_copy);
         // filter
-        // get
+        method("get",         this::_get);
         // getFirst
         // getLast
         // indexOf
-        // isEmpty
+        method("isEmpty",     this::_isEmpty);
         // lastIndexOf
         // map
         // remove
@@ -150,6 +150,25 @@ public class ListProxy extends TypeProxy<JoeList> {
     private Object _copy(JoeList list, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "copy()");
         return new ListValue(list);
+    }
+
+    //**
+    // @method get
+    // @args index
+    // @result value
+    // Returns the value at the given *index*.
+    private Object _get(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "get(index)");
+        return list.get(joe.toIndex(args.next(), list.size()));
+    }
+
+    //**
+    // @method isEmpty
+    // @result Boolean
+    // Returns `true` if the list is empty, and `false` otherwise.
+    private Object _isEmpty(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "isEmpty()");
+        return list.isEmpty();
     }
 
     //**

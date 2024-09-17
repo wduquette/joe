@@ -76,6 +76,26 @@ function testCopy() {
     check(b).eq(List(1, 2, 3));
 }
 
+//-----------------------------------------------------------------------------
+// testGet()
+
+function testGet() {
+    var list = List(1, 2, 3);
+    check(list.get(0)).eq(1);
+    check(list.get(2)).eq(3);
+
+    checkCatch(\-> list.get(4))
+        .message("Expected 0 <= index < 3, got: Number '4'.");
+}
+
+
+//-----------------------------------------------------------------------------
+// isEmpty()
+
+function testIsEmpty() {
+    check(List(1).isEmpty()).eq(false);
+    check(List().isEmpty()).eq(true);
+}
 
 //-----------------------------------------------------------------------------
 // size()
