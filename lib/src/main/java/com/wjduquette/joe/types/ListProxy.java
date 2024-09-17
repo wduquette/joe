@@ -20,7 +20,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // Java code might be read-only or require a specific item type.
     public ListProxy() {
         super("List");
-        proxies(JoeList.class);
+        proxies(ListValue.class); // Types that implement `JoeList`
         initializer(this::_init);
         method("size", this::_size);
     }
