@@ -9,6 +9,14 @@ import static com.wjduquette.joe.checker.Checker.checkList;
 public class ArgSpecTest extends Ted {
 
     @Test
+    public void testBug_leadingOrTrailingOptionalArg() {
+        var spec = "[x]";
+        check(ArgSpec.isValid(spec)).eq(true);
+        checkList(ArgSpec.names(spec)).items("x");
+        check(ArgSpec.asMarkdown(spec)).eq("\\[*x*\\]");
+    }
+
+    @Test
     public void testNames() {
         test("testNames");
         checkList(ArgSpec.names("")).items();

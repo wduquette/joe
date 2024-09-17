@@ -39,7 +39,9 @@ public class ArgSpec {
 
         // NEXT, split out the words
         var names = spec.split("[ ,.\\[\\]]+");
-        return Arrays.asList(names);
+        return Arrays.asList(names).stream()
+            .filter(s -> !s.isBlank())
+            .toList();
     }
 
     /**
