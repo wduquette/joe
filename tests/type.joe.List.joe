@@ -208,3 +208,13 @@ function testSize() {
     check(List().size()).eq(0);
     check(List(1,2,3).size()).eq(3);
 }
+
+//-----------------------------------------------------------------------------
+// sublist()
+
+function testSublist() {
+    var list = List(1, 2, 3, 4, 5);
+    check(list.sublist(1)).eq(List(2, 3, 4, 5));
+    check(list.sublist(1, 3)).eq(List(2, 3));
+}
+

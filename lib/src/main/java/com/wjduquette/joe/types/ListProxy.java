@@ -47,7 +47,7 @@ public class ListProxy extends TypeProxy<JoeList> {
         // reversed
         method("set",         this::_set);
         // sort -- need comparison infrastructure
-        // subList
+        method("sublist",     this::_sublist);
         method("size",        this::_size);
     }
 
@@ -296,7 +296,6 @@ public class ListProxy extends TypeProxy<JoeList> {
         );
     }
 
-
     //**
     // @method size
     // @result Number
@@ -306,4 +305,21 @@ public class ListProxy extends TypeProxy<JoeList> {
         return (double)list.size();
     }
 
+    //**
+    // @method sublist
+    // @args start, [end]
+    // @result List
+    // Returns the sublist of this list that starts at *start*
+    // and ends before *end*, which defaults to the end of the list.
+    private Object _sublist(JoeList list, Joe joe, ArgQueue args) {
+        Joe.arityRange(args, 1, 2, "sublist(start, [end])");
+        var start = joe.toIndex(args.next(), list.size());
+
+        if (args.isEmpty()) {
+            return new ListValue(list.subList(start, list.size()));
+        } else {
+            var end = joe.toIndex(args.next(), list.size() + 1);
+            return new ListValue(list.subList(start, end));
+        }
+    }
 }
