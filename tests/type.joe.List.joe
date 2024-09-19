@@ -77,6 +77,16 @@ function testCopy() {
 }
 
 //-----------------------------------------------------------------------------
+// filter()
+
+function testFilter() {
+    var list = List(1, 2, 3, 4, 5);
+    check(list.filter(\item -> true)).eq(list);
+    check(list.filter(\item -> item > 3)).eq(List(4, 5));
+    check(list.filter(\item -> item == "a")).eq(List());
+}
+
+//-----------------------------------------------------------------------------
 // testGet()
 
 function testGet() {

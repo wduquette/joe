@@ -4,6 +4,7 @@ import com.wjduquette.joe.*;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 public class ListProxy extends TypeProxy<JoeList> {
     public static final ListProxy TYPE = new ListProxy();
@@ -29,7 +30,7 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("contains",    this::_contains);
         method("containsAll", this::_containsAll);
         method("copy",        this::_copy);
-        // filter
+        method("filter",      this::_filter);
         method("get",         this::_get);
         method("getFirst",    this::_getFirst);
         method("getLast",     this::_getLast);
@@ -149,6 +150,28 @@ public class ListProxy extends TypeProxy<JoeList> {
     private Object _copy(JoeList list, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "copy()");
         return new ListValue(list);
+    }
+
+    //**
+    // @method filter
+    // @args predicate
+    // @result List
+    // Returns a list containing the elements for which the filter
+    // *predicate* is true.
+    private Object _filter(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "filter(predicate)");
+        var arg = args.next();
+
+        if (arg instanceof JoeCallable callable) {
+            var result = new ListValue();
+            for (var item : list) {
+                var flag = callable.call(joe, new ArgQueue(List.of(item)));
+                if (Joe.isTruthy(flag)) result.add(item);
+            }
+            return result;
+        } else {
+            throw joe.expected("predicate", arg);
+        }
     }
 
     //**
