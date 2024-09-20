@@ -226,6 +226,7 @@ public class ListWrapper implements JoeList {
         return list.hashCode();
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object other) {
         return list.equals(other);

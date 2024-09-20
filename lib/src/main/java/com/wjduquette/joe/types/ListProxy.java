@@ -4,6 +4,7 @@ import com.wjduquette.joe.*;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 public class ListProxy extends TypeProxy<JoeList> {
     public static final ListProxy TYPE = new ListProxy();
@@ -20,7 +21,8 @@ public class ListProxy extends TypeProxy<JoeList> {
     // Java code might be read-only or require a specific item type.
     public ListProxy() {
         super("List");
-        proxies(ListValue.class); // Types that implement `JoeList`
+        proxies(ListValue.class);    // Types that implement `JoeList`
+        proxies(ListWrapper.class);
         initializer(this::_init);
 
         method("add",         this::_add);
@@ -49,6 +51,7 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("sorted",      this::_sorted);
         method("sublist",     this::_sublist);
         method("size",        this::_size);
+        method("toString",    this::_toString);
     }
 
     //-------------------------------------------------------------------------
@@ -60,6 +63,21 @@ public class ListProxy extends TypeProxy<JoeList> {
     // Creates a `List` of the argument values.
     private Object _init(Joe joe, ArgQueue args) {
         return new ListValue(args.asList());
+    }
+
+    //-------------------------------------------------------------------------
+    // Stringify
+
+    @Override
+    public String stringify(Joe joe, Object object) {
+        assert object instanceof JoeList;
+        var list = (JoeList)object;
+
+        return "List("
+            + list.stream()
+                .map(joe::codify)
+                .collect(Collectors.joining(", "))
+            + ")";
     }
 
     //-------------------------------------------------------------------------
@@ -412,7 +430,6 @@ public class ListProxy extends TypeProxy<JoeList> {
         }
     }
 
-
     //**
     // @method sublist
     // @args start, [end]
@@ -429,5 +446,14 @@ public class ListProxy extends TypeProxy<JoeList> {
             var end = joe.toIndex(args.next(), list.size() + 1);
             return new ListValue(list.subList(start, end));
         }
+    }
+
+    //**
+    // @method toString
+    // @result String
+    // Returns the string representation of this list.
+    private Object _toString(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "toString()");
+        return stringify(joe, list);
     }
 }
