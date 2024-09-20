@@ -241,12 +241,12 @@ public class ListProxy extends TypeProxy<JoeList> {
 
     //**
     // @method map
-    // @args function
+    // @args func
     // @result List
-    // Returns a list containing the items that result of applying the
-    // *function* to each item in this list.
+    // Returns a list containing the items that result from applying
+    // function *func* to each item in this list.
     private Object _map(JoeList list, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "map(function)");
+        Joe.exactArity(args, 1, "map(func)");
         var callable = args.next();
 
         var result = new ListValue();
