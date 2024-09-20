@@ -302,6 +302,12 @@ public class Joe {
         };
     }
 
+    public String classTypeName(Class<?> cls) {
+        var proxy = lookupProxyByClass(cls);
+        return proxy != null
+            ? proxy.getTypeName() : cls.getSimpleName();
+    }
+
     /**
      * Given an arbitrary string, escapes all typical control characters as
      * they would appear in Java or Joe code.
@@ -554,10 +560,7 @@ public class Joe {
         if (arg != null && cls.isAssignableFrom(arg.getClass())) {
             return (T) arg;
         } else {
-            var proxy = lookupProxyByClass(cls);
-            var typeName = proxy != null
-                ? proxy.getTypeName() : cls.getSimpleName();
-            throw expected(typeName, arg);
+            throw expected(classTypeName(cls), arg);
         }
     }
 }
