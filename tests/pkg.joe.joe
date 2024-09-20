@@ -1,5 +1,28 @@
 // Tests for joe package functions
 
+//-----------------------------------------------------------------------------
+// compare()
+
+function testCompare_string() {
+    check(compare("a", "b")).eq(-1);
+    check(compare("b", "b")).eq(0);
+    check(compare("c", "b")).eq(1);
+}
+
+function testCompare_number() {
+    check(compare(0, 1)).eq(-1);
+    check(compare(1, 1)).eq(0);
+    check(compare(2, 1)).eq(1);
+}
+
+function testCompare_mismatch() {
+    checkCatch(\-> compare(1, #a))
+        .message("Expected two strings or two numbers.");
+}
+
+//-----------------------------------------------------------------------------
+// typeName()
+
 function testTypeName() {
     function howdy() {}
     class Thing {}

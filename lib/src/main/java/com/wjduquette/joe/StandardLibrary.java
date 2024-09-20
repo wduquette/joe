@@ -16,6 +16,7 @@ public class StandardLibrary extends Package {
         // The `joe` package contains Joe's standard library.
         globalFunction("catch",     this::_catch);
         globalFunction("codify",    this::_codify);
+        globalFunction("compare",   this::_compare);
         globalFunction("print",     this::_print);
         globalFunction("println",   this::_println);
         globalFunction("stringify", this::_stringify);
@@ -53,6 +54,28 @@ public class StandardLibrary extends Package {
         Joe.exactArity(args, 1, "codify(value)");
 
         return joe.codify(args.get(0));
+    }
+
+    //**
+    // @function compare
+    // @args a, b
+    // @result Number
+    //
+    // Given two strings or two numbers *a* and *b*, returns -1, 0,
+    // or 1 as *a* < *b*, *a* == *b*, or *a* > *b*.  This function
+    // is useful when sorting collections.
+    private Object _compare(Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 2, "compare(a, b)");
+        var a = args.next();
+        var b = args.next();
+
+        if (a instanceof String s && b instanceof String t) {
+            return (double)s.compareTo(t);
+        } else if (a instanceof Double m && b instanceof Double n) {
+            return (double)m.compareTo(n);
+        } else {
+            throw new JoeError("Expected two strings or two numbers.");
+        }
     }
 
     //**
