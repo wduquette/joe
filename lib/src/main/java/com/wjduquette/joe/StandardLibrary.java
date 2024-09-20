@@ -66,16 +66,7 @@ public class StandardLibrary extends Package {
     // is useful when sorting collections.
     private Object _compare(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 2, "compare(a, b)");
-        var a = args.next();
-        var b = args.next();
-
-        if (a instanceof String s && b instanceof String t) {
-            return (double)s.compareTo(t);
-        } else if (a instanceof Double m && b instanceof Double n) {
-            return (double)m.compareTo(n);
-        } else {
-            throw new JoeError("Expected two strings or two numbers.");
-        }
+        return (double)Joe.compare(args.next(), args.next());
     }
 
     //**

@@ -361,6 +361,23 @@ public class Joe {
     }
 
     /**
+     * Compares two objects, returning -1, 0, or 1, provided
+     * they are both Strings or both Numbers
+     * @param a the first object
+     * @param b the second object
+     * @return -1, 0, or 1
+     */
+    public static int compare(Object a, Object b) {
+        if (a instanceof String s && b instanceof String t) {
+            return s.compareTo(t);
+        } else if (a instanceof Double m && b instanceof Double n) {
+            return m.compareTo(n);
+        } else {
+            throw new JoeError("Expected two strings or two numbers.");
+        }
+    }
+
+    /**
      * Determines whether the name is a valid Joe identifier or not.
      * @param name The name
      * @return true or false
@@ -466,6 +483,19 @@ public class Joe {
         return new JoeError(message);
     }
 
+    /**
+     * Converts a Monica comparator callable to a Java comparator.
+     * @param arg The callable
+     * @return The comparator
+     */
+    public Comparator<Object> toComparator(Object arg) {
+        if (arg instanceof JoeCallable) {
+            return (Object a, Object b) -> toInteger(call(arg, a, b));
+        } else {
+            throw expected("comparator", arg);
+        }
+    }
+
     public double toDouble(Object arg) {
         if (arg instanceof Double num) {
             return num;
@@ -492,6 +522,7 @@ public class Joe {
         throw expected("0 <= index < " + limit, arg);
     }
 
+    @SuppressWarnings("unused")
     public Keyword toKeyword(Object arg) {
         if (arg instanceof Keyword keyword) {
             return keyword;

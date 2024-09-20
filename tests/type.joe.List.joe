@@ -254,6 +254,43 @@ function testSize() {
 }
 
 //-----------------------------------------------------------------------------
+// sorted()
+
+function testSorted_goodNoComp() {
+    var list = List(5, 4, 3, 2, 1);
+    check(list.sorted()).eq(List(1, 2, 3, 4, 5));
+
+    var list2 = List("e", "d", "c", "b", "a");
+    check(list2.sorted()).eq(List("a", "b", "c", "d", "e"));
+}
+
+function testSorted_goodComp() {
+    var list = List(5, 4, 3, 2, 1);
+    check(list.sorted(compare)).eq(List(1, 2, 3, 4, 5));
+
+    var list2 = List("e", "d", "c", "b", "a");
+    check(list2.sorted(compare)).eq(List("a", "b", "c", "d", "e"));
+}
+
+function testSorted_descending() {
+    var list = List(1,2,3,4,5);
+    check(list.sorted(\a,b -> -compare(a,b))).eq(List(5,4,3,2,1));
+}
+
+function testSorted_mismatch() {
+    var list = List(5, "d", 3, "b", 1);
+    checkCatch(\-> list.sorted())
+        .message("Expected two strings or two numbers.");
+}
+
+function testSorted_badComp() {
+    var list = List(5, 4, 3, 2, 1);
+    checkCatch(\-> list.sorted(\a,b -> "abc"))
+        .message("Expected number, got: String '\"abc\"'.");
+}
+
+
+//-----------------------------------------------------------------------------
 // sublist()
 
 function testSublist() {

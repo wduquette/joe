@@ -46,7 +46,7 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("removeLast",  this::_removeLast);
         method("reversed",    this::_reversed);
         method("set",         this::_set);
-        // sort -- need comparison infrastructure
+        method("sorted",      this::_sorted);
         method("sublist",     this::_sublist);
         method("size",        this::_size);
     }
@@ -378,6 +378,40 @@ public class ListProxy extends TypeProxy<JoeList> {
         Joe.exactArity(args, 0, "size()");
         return (double)list.size();
     }
+
+    //**
+    // @method sorted
+    // @args [comparator]
+    // @result List
+    // Returns a list, sorted in ascending order.  If no *comparator*
+    // is provided, the list must be a list of strings or a list
+    // of numbers.  If a *comparator* is given, it must be a function
+    // that takes two arguments and returns -1, 0, 1, like
+    // the standard [[function.compare]] function.
+    //
+    // To sort in descending order, provide a *comparator* that reverses
+    // the comparison.
+    //
+    // ```joe
+    // var list = List(1,2,3,4,5);
+    // var descending = list.sorted(\a,b -> -compare(a,b));
+    // ```
+    private Object _sorted(JoeList list, Joe joe, ArgQueue args) {
+        Joe.arityRange(args, 0, 1, "sorted([comparator])");
+        if (args.isEmpty()) {
+            var result = list.stream()
+                .sorted(Joe::compare)
+                .toList();
+            return new ListValue(result);
+        } else {
+            var comparator = joe.toComparator(args.next());
+            var result = list.stream()
+                .sorted(comparator)
+                .toList();
+            return new ListValue(result);
+        }
+    }
+
 
     //**
     // @method sublist
