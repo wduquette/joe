@@ -147,6 +147,14 @@ function testLastIndexOf() {
 }
 
 //-----------------------------------------------------------------------------
+// map()
+
+function testMap() {
+    var list = List(1, 2, 3);
+    check(list.map(\x -> 2*x)).eq(List(2, 4, 6));
+}
+
+//-----------------------------------------------------------------------------
 // testPeekFirst()
 
 function testPeekFirst() {

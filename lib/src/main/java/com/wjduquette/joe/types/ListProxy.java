@@ -37,7 +37,7 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("indexOf",     this::_indexOf);
         method("isEmpty",     this::_isEmpty);
         method("lastIndexOf", this::_lastIndexOf);
-        // map
+        method("map",         this::_map);
         method("peekFirst",   this::_peekFirst);
         method("peekLast",    this::_peekLast);
         method("remove",      this::_remove);
@@ -160,18 +160,15 @@ public class ListProxy extends TypeProxy<JoeList> {
     // *predicate* is true.
     private Object _filter(JoeList list, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "filter(predicate)");
-        var arg = args.next();
+        var callable = args.next();
 
-        if (arg instanceof JoeCallable callable) {
-            var result = new ListValue();
-            for (var item : list) {
-                var flag = callable.call(joe, new ArgQueue(List.of(item)));
-                if (Joe.isTruthy(flag)) result.add(item);
+        var result = new ListValue();
+        for (var item : list) {
+            if (Joe.isTruthy(joe.call(callable, item))) {
+                result.add(item);
             }
-            return result;
-        } else {
-            throw joe.expected("predicate", arg);
         }
+        return result;
     }
 
     //**
@@ -241,6 +238,23 @@ public class ListProxy extends TypeProxy<JoeList> {
     private Object _lastIndexOf(JoeList list, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "lastIndexOf(value)");
         return (double)list.lastIndexOf(args.next());
+    }
+
+    //**
+    // @method map
+    // @args function
+    // @result List
+    // Returns a list containing the items that result of applying the
+    // *function* to each item in this list.
+    private Object _map(JoeList list, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "map(function)");
+        var callable = args.next();
+
+        var result = new ListValue();
+        for (var item : list) {
+            result.add(joe.call(callable, item));
+        }
+        return result;
     }
 
     //**

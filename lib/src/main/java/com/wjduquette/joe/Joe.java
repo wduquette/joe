@@ -390,6 +390,14 @@ public class Joe {
         return true;
     }
 
+    public Object call(Object callee, Object... args) {
+        if (callee instanceof JoeCallable callable) {
+            return callable.call(this, new ArgQueue(List.of(args)));
+        } else {
+            throw expected("callable", callee);
+        }
+    }
+
     //-------------------------------------------------------------------------
     // Argument parsing and error handling helpers
 
