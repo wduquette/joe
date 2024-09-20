@@ -4,7 +4,6 @@ import com.wjduquette.joe.*;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 public class ListProxy extends TypeProxy<JoeList> {
     public static final ListProxy TYPE = new ListProxy();

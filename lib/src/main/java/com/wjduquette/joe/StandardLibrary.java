@@ -39,17 +39,13 @@ public class StandardLibrary extends Package {
     // `Pair(#error, Error)` on error.
     private Object _catch(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "catch(callable)");
-        var arg = args.get(0);
+        var callable = args.get(0);
 
-        if (arg instanceof JoeCallable callable) {
-            try {
-                var result = callable.call(joe, ArgQueue.EMPTY);
-                return new Pair(OK, result);
-            } catch (JoeError ex) {
-                return new Pair(ERROR, ex);
-            }
-        } else {
-            throw joe.expected("no-argument callable", arg);
+        try {
+            var result = joe.call(callable);
+            return new Pair(OK, result);
+        } catch (JoeError ex) {
+            return new Pair(ERROR, ex);
         }
     }
 
