@@ -9,7 +9,7 @@ Joe 0.2.0 extends Joe on every axis.
   
 - Language
   - Added `assert` statement
-  - Remove `print` statement
+  - Removed `print` statement (replaced with `println()`, etc.)
   - `+` will do string concatenation provided that at least one operand is
     a string.
   - Added `Keyword` values: `#abc` is an interned constant.
@@ -21,9 +21,11 @@ Joe 0.2.0 extends Joe on every axis.
     by defining an `args` parameter as the last parameter in the list.  `args`
     will be a list containing any excess values.
   - Added lambda functions, e.g., `\x -> x*x` or `\x -> { return x*x; }`
+  - Added `throw` statement
   
 - Library
   - Added `catch()` function
+  - Added `compare()` function
   - Added `println()`, `print()` functions
   - Added `Error` proxy (for `JoeError` and its subclasses)
   - Added `Keyword` Java type, with proxy
@@ -41,10 +43,15 @@ Joe 0.2.0 extends Joe on every axis.
       - E.g., a `String`'s `length()` method.
     - Static methods and constants
       - E.g., `Double.PI`, `Double.abs()`.
+  - Added notion of a `Package`, which defines some number of global
+    functions and type proxies.
 
 - Tools
   - Added `joe test`, a test runner for Joe-level test scripts, with a aPackage
     of assertion checkers.
+  - Added `joe doc`, a tool var producing Joe API documentation from 
+    scanned "JoeDoc" comments.  (See the 
+    [Library API](library.md) for examples of `joe doc` output.)
 
 - Development
   - Added `joe/tests`, the script-level Joe test suite.

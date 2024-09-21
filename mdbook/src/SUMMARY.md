@@ -8,6 +8,11 @@
 # Language Reference
 
 - [The Joe Language](language.md)
+  - [Types and Values](types.md)
+  - [Operators](operators.md)
+  - [Statements](statements.md)
+  - [Functions](functions.md)
+  - [Classes](classes.md)
  
 ---
  
@@ -28,7 +33,6 @@
   - [JoeDoc Configuration API](./library/pkg.joe.doc.md)
     - [DocConfig Type](./library/type.joe.doc.DocConfig.md)
   - [Library API Index](./library/index.md)
-
 
 ---
 
