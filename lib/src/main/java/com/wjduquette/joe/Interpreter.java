@@ -136,14 +136,20 @@ public class Interpreter {
             }
             case Stmt.ForEach stmt -> {
                 var list = evaluate(stmt.listExpr());
-                // TODO: Add iterability flag to TypeProxy, and check proxy
                 Collection<?> collection = switch (list) {
                     case Collection<?> c -> c;
                     case JoeIterable i -> i.getItems();
-                    default -> throw new RuntimeError(stmt.varName(),
-                        "Expected iterable, got: " +
-                        joe.typeName(list) + "'" +
-                        joe.stringify(list) + "'");
+                    default -> {
+                        var instance = joe.getJoeObject(list);
+                        if (instance.canIterate()) {
+                            yield instance.getItems();
+                        } else {
+                            throw new RuntimeError(stmt.varName(),
+                                "Expected iterable, got: " +
+                                    joe.typeName(list) + "'" +
+                                    joe.stringify(list) + "'");
+                        }
+                    }
                 };
 
                 for (var item : collection) {

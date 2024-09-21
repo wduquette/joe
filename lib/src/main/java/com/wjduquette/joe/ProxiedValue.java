@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import java.util.Collection;
+
 /**
  * A value, paired with its TypeProxy, or null.  It is the responsibility
  * of the caller (i.e., the Joe engine) to make sure that the proxy and
@@ -29,5 +31,15 @@ record ProxiedValue(Joe joe, TypeProxy<?> proxy, Object value)
             throw new JoeError("Values of type " + joe.typeName(value) +
                 " have no settable properties.");
         }
+    }
+
+    @Override
+    public boolean canIterate() {
+        return proxy.canIterate();
+    }
+
+    @Override
+    public Collection<?> getItems() {
+        return proxy.getItems(value);
     }
 }
