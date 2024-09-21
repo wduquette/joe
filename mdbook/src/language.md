@@ -1,6 +1,6 @@
 # 1. The Joe Language
 
-Joe is a dynamic scripting language:
+Joe is a Java-like dynamic scripting language:
 
 - Meant for adding scriptability to Java applications and libraries.
 - Designed to be comfortable for Java developers.
