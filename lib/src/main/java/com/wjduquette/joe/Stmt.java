@@ -4,8 +4,9 @@ import java.util.List;
 
 public sealed interface Stmt
     permits Stmt.Assert, Stmt.Block, Stmt.Break, Stmt.Class,
-            Stmt.Continue, Stmt.Expression, Stmt.Function, Stmt.For,
-            Stmt.If, Stmt.Return, Stmt.Throw, Stmt.Var, Stmt.While
+            Stmt.Continue, Stmt.Expression, Stmt.For, Stmt.ForEach,
+            Stmt.Function, Stmt.If, Stmt.Return, Stmt.Throw, Stmt.Var,
+            Stmt.While
 {
     /**
      * Asserts that the condition is truthy, throwing an AssertError
@@ -65,6 +66,14 @@ public sealed interface Stmt
      * @param body The body of the loop, a statement or block.
      */
     record For(Stmt init, Expr condition, Expr incr, Stmt body) implements Stmt {}
+
+    /**
+     * A "foreach" loop
+     * @param varName The loop variable
+     * @param listExpr The list expression
+     * @param body The body of the loop, a statement or block.
+     */
+    record ForEach(Token varName, Expr listExpr, Stmt body) implements Stmt {}
 
     /**
      * A function or method.

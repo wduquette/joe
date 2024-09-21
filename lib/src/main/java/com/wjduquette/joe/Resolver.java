@@ -122,6 +122,12 @@ class Resolver {
                 resolve(stmt.body());
                 --loopCounter;
             }
+            case Stmt.ForEach stmt -> {
+                ++loopCounter;
+                resolve(stmt.listExpr());
+                resolve(stmt.body());
+                --loopCounter;
+            }
             case Stmt.Function stmt -> {
                 declare(stmt.name());
                 define(stmt.name());

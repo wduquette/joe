@@ -113,6 +113,7 @@ class Parser {
         if (match(BREAK)) return breakStatement();
         if (match(CONTINUE)) return continueStatement();
         if (match(FOR)) return forStatement();
+        if (match(FOREACH)) return forEachStatement();
         if (match(IF)) return ifStatement();
         if (match(RETURN)) return returnStatement();
         if (match(THROW)) return throwStatement();
@@ -186,6 +187,25 @@ class Parser {
         Stmt body = statement();
 
         return new Stmt.For(init, condition, incr, body);
+    }
+
+    private Stmt forEachStatement() {
+        consume(LEFT_PAREN, "Expected '(' after 'foreach'.");
+        consume(VAR, "Expected 'var' before loop variable name.");
+        Token varName = consume(IDENTIFIER, "Expected loop variable name.");
+        consume(COLON, "Expected ':' after loop variable name.");
+
+        // List Expression
+        Expr listExpr = expression();
+        consume(RIGHT_PAREN, "Expected ')' after loop expression.");
+
+        // Body
+        var body = statement();
+
+        return new Stmt.Block(List.of(
+            new Stmt.Var(varName, null),
+            new Stmt.ForEach(varName, listExpr, body)
+        ));
     }
 
     private Stmt.Function functionDeclaration(String kind) {

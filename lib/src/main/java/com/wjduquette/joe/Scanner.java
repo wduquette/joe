@@ -19,6 +19,7 @@ public class Scanner {
         reserved.put("extends",  EXTENDS);
         reserved.put("false",    FALSE);
         reserved.put("for",      FOR);
+        reserved.put("foreach",  FOREACH);
         reserved.put("function", FUNCTION);
         reserved.put("if",       IF);
         reserved.put("method",   METHOD);

@@ -28,6 +28,8 @@ parameters      → IDENTITIFIER ( "," IDENTIFIER )* ;
 varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
                
 statement       → exprStmt
+                | breakStmt
+                | continueStmt
                 | forStmt
                 | ifStmt
                 | printStmt
@@ -37,9 +39,12 @@ statement       → exprStmt
                 | block ;
 
 exprStmt        → expression ";" ;
+breakStmt       → "break" ";" ;
+continueStmt    → "continue" ";" ;
 forStmt         → "for" "(" ( varDecl | exprStmt | ";" )
                   expression? ";"
                   expression? ")" statement ;
+forEachStmt     → "foreach" "(" "var" IDENTIFIER ":" expression ")" statement;
 ifStmt          → "if" "(" expression ")" statement 
                   ( "else" statement )? ;
 printStmt       → "print" expression ";" ;
