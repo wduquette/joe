@@ -7,4 +7,4 @@ provide bindings to Java methods and types, but the runtime has no automatic
 access to the Java class hierarchy, to the operating system, or to any kind of
 I/O other than simple output (all of which can be redirected by the client).
 
-TODO: Add link to Joe User's Guide.
+See the [Joe User's Guide](https://wduquette.github.io/joe) for more details.
