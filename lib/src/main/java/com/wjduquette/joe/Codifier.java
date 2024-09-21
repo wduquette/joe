@@ -53,6 +53,7 @@ class Codifier {
             case Stmt.Block stmt ->
                 "{\n" + recodify(indent + 1, stmt.statements()) + "\n"
                 + leading(indent) +"}";
+            case Stmt.Break ignored -> "break;";
             case Stmt.Class stmt -> {
                 var buff = new StringBuilder();
                 buff.append("class ")
@@ -74,6 +75,7 @@ class Codifier {
 
                 yield buff.toString();
             }
+            case Stmt.Continue ignored -> "continue;";
             case Stmt.For stmt -> {
                 var buff = new StringBuilder();
                 buff.append("for (");
@@ -126,7 +128,7 @@ class Codifier {
                 "return" +
                     (stmt.value() != null ? " " + recodify(stmt.value()) : "")
                     + ";";
-            case Stmt.Throw stmt -> "throw" + recodify(stmt.value());
+            case Stmt.Throw stmt -> "throw" + recodify(stmt.value()) + ";";
             case Stmt.Var stmt -> stmt.initializer() != null
                 ? "var " + stmt.name().lexeme() + " = " +
                 recodify(stmt.initializer()) + ";"

@@ -12,7 +12,9 @@ public class Scanner {
     static {
         reserved = new HashMap<>();
         reserved.put("assert",   ASSERT);
+        reserved.put("break",    BREAK);
         reserved.put("class",    CLASS);
+        reserved.put("continue", CONTINUE);
         reserved.put("else",     ELSE);
         reserved.put("extends",  EXTENDS);
         reserved.put("false",    FALSE);

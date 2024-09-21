@@ -3,9 +3,9 @@ package com.wjduquette.joe;
 import java.util.List;
 
 public sealed interface Stmt
-    permits Stmt.Assert, Stmt.Block, Stmt.Class, Stmt.Expression,
-            Stmt.Function, Stmt.For, Stmt.If, Stmt.Return, Stmt.Throw,
-            Stmt.Var, Stmt.While
+    permits Stmt.Assert, Stmt.Block, Stmt.Break, Stmt.Class,
+            Stmt.Continue, Stmt.Expression, Stmt.Function, Stmt.For,
+            Stmt.If, Stmt.Return, Stmt.Throw, Stmt.Var, Stmt.While
 {
     /**
      * Asserts that the condition is truthy, throwing an AssertError
@@ -24,6 +24,12 @@ public sealed interface Stmt
     record Block(List<Stmt> statements) implements Stmt {}
 
     /**
+     * A break statement in a loop.
+     * @param token The token, for line number info.
+     */
+    record Break(Token token) implements Stmt {}
+
+    /**
      * A class declaration
      * @param name The class name
      * @param superclass The superclass variable, or null for none
@@ -38,6 +44,12 @@ public sealed interface Stmt
         List<Stmt.Function> methods,
         List<Stmt> staticInitializer
     ) implements Stmt {}
+
+    /**
+     * A continue statement in a loop.
+     * @param token The token, for line number info.
+     */
+    record Continue(Token token) implements Stmt {}
 
     /**
      * An expression statement: an expression followed by a ";"

@@ -58,6 +58,7 @@ public class Interpreter {
             case Stmt.Block stmt -> {
                 return executeBlock(stmt.statements(), new Environment(environment));
             }
+            case Stmt.Break ignored -> throw new Break();
             case Stmt.Class stmt -> {
                 // Valid superclass?
                 JoeClass superclass = null;
@@ -113,6 +114,7 @@ public class Interpreter {
                 }
                 return null;
             }
+            case Stmt.Continue ignored -> throw new Continue();
             case Stmt.Expression stmt -> {
                 return evaluate(stmt.expr());
             }
@@ -122,7 +124,13 @@ public class Interpreter {
                 }
 
                 while (Joe.isTruthy(evaluate(stmt.condition()))) {
-                    execute(stmt.body());
+                    try {
+                        execute(stmt.body());
+                    } catch (Break ex) {
+                        break;
+                    } catch (Continue ex) {
+                        // Nothing else to do
+                    }
                     evaluate(stmt.incr());
                 }
             }
@@ -160,7 +168,13 @@ public class Interpreter {
             }
             case Stmt.While stmt -> {
                 while (Joe.isTruthy(evaluate(stmt.condition()))) {
-                    execute(stmt.body());
+                    try {
+                        execute(stmt.body());
+                    } catch (Break ex) {
+                        break;
+                    } catch (Continue ex) {
+                        // Nothing special to do.
+                    }
                 }
             }
         }
@@ -381,7 +395,9 @@ public class Interpreter {
     }
 
     //-------------------------------------------------------------------------
-    // Predicates
+    // Control Flow Exceptions
+
+
 
     //-------------------------------------------------------------------------
     // Error Checking

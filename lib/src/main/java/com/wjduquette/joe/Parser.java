@@ -110,6 +110,8 @@ class Parser {
 
     private Stmt statement() {
         if (match(ASSERT)) return assertStatement();
+        if (match(BREAK)) return breakStatement();
+        if (match(CONTINUE)) return continueStatement();
         if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(RETURN)) return returnStatement();
@@ -132,6 +134,18 @@ class Parser {
         consume(SEMICOLON, "Expected ';' after assertion.");
 
         return new Stmt.Assert(keyword, condition, message);
+    }
+
+    private Stmt breakStatement() {
+        Token keyword = previous();
+        consume(SEMICOLON, "Expected ';' after 'break' value.");
+        return new Stmt.Break(keyword);
+    }
+
+    private Stmt continueStatement() {
+        Token keyword = previous();
+        consume(SEMICOLON, "Expected ';' after 'continue' value.");
+        return new Stmt.Continue(keyword);
     }
 
     private Stmt expressionStatement() {

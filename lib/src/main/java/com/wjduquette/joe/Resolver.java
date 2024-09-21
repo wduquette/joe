@@ -6,6 +6,10 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.function.Consumer;
 
+/**
+ * The resolver is responsible for doing resolving variable names
+ * to scopes, and for doing other scope-related checks.
+ */
 class Resolver {
     private enum FunctionType { NONE, FUNCTION, INITIALIZER, METHOD, LAMBDA }
     private enum ClassType { NONE, CLASS, SUBCLASS }
@@ -15,6 +19,9 @@ class Resolver {
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
     private ClassType currentClass = ClassType.NONE;
+
+    // Tracks whether we are in a loop or not.
+    private int loopCounter = 0;
 
     Resolver(
         Interpreter interpreter,
@@ -40,6 +47,12 @@ class Resolver {
                 beginScope();
                 resolve(stmt.statements());
                 endScope();
+            }
+            case Stmt.Break stmt -> {
+                if (loopCounter == 0) {
+                    error(stmt.token(),
+                        "'break' used outside of loop.");
+                }
             }
             case Stmt.Class stmt -> {
                 ClassType enclosingClass = currentClass;
@@ -94,12 +107,20 @@ class Resolver {
 
                 currentClass = enclosingClass;
             }
+            case Stmt.Continue stmt -> {
+                if (loopCounter == 0) {
+                    error(stmt.token(),
+                        "'continue' used outside of loop.");
+                }
+            }
             case Stmt.Expression stmt -> resolve(stmt.expr());
             case Stmt.For stmt -> {
+                ++loopCounter;
                 if (stmt.init() != null)      resolve(stmt.init());
                 if (stmt.condition() != null) resolve(stmt.condition());
                 if (stmt.incr() != null)      resolve(stmt.incr());
                 resolve(stmt.body());
+                --loopCounter;
             }
             case Stmt.Function stmt -> {
                 declare(stmt.name());
@@ -127,8 +148,10 @@ class Resolver {
             }
             case Stmt.Throw stmt -> resolve(stmt.value());
             case Stmt.While stmt -> {
+                ++loopCounter;
                 resolve(stmt.condition());
                 resolve(stmt.body());
+                --loopCounter;
             }
             case Stmt.Var stmt -> {
                 declare(stmt.name());
