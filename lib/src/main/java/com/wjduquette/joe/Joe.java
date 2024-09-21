@@ -1,6 +1,7 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.types.ListValue;
+import com.wjduquette.joe.types.ListWrapper;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -562,6 +563,35 @@ public class Joe {
         } else {
             throw expected(classTypeName(cls), arg);
         }
+    }
+
+    //-------------------------------------------------------------------------
+    // Wrapped Collections
+
+    /**
+     * Given an arbitrary Java list, wraps it as a JoeList and ensures that
+     * any added values are can be assigned to the given itemType.  Updates
+     * made by the script will update the underlying Java list.  If this
+     * is not desired, either use `Joe::readonlyList()` or return it as a
+     * new `ListValue`.
+     * @param list The list to wrap
+     * @param itemType The type
+     * @return The wrapped list.
+     */
+    @SuppressWarnings("unused")
+    public JoeList wrapList(List<?> list, Class<?> itemType) {
+        return ListWrapper.wrap(this, list, itemType);
+    }
+
+    /**
+     * Given an arbitrary Java list, wraps it to be read-only.  It can
+     * be accessed freely at the script level, but not modified.
+     * @param list The list to wrap
+     * @return The wrapped list
+     */
+    @SuppressWarnings("unused")
+    public JoeList readonlyList(List<?> list) {
+        return ListWrapper.readOnly(this, list);
     }
 }
 
