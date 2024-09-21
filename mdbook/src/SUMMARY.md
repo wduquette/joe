@@ -13,6 +13,11 @@
   - [Statements](statements.md)
   - [Functions](functions.md)
   - [Classes](classes.md)
+- [Extending Joe](extending/extending.md)
+  - [Joe and Java Data Types](extending/java_types.md)
+  - [Native Functions](extending/native_functions.md)
+  - [Native Types](extending/native_types.md)
+  - [Joe Packages](extending/packages.md)
  
 ---
  
