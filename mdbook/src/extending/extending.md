@@ -3,10 +3,10 @@
 Joe can easily be extended with new functions, data types, and bindings
 to existing Java types.  This section explains how the trick is done.
 
-- [Joe and Java Data Types]
-- [Native Functions]
-- [Native Types]
-- [Joe Packages]
+- [Joe and Java Data Types](java_types.md)
+- [Native Functions](native_functions.md)
+- [Registered Types](registered_types.md)
+- [Joe Packages](packages.md)
 
 These sections will refer constantly to Joe's Java API.  See the Javadoc
 for details.

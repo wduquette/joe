@@ -16,7 +16,7 @@
 - [Extending Joe](extending/extending.md)
   - [Joe and Java Data Types](extending/java_types.md)
   - [Native Functions](extending/native_functions.md)
-  - [Native Types](extending/native_types.md)
+  - [Registered Types](extending/registered_types.md)
   - [Joe Packages](extending/packages.md)
  
 ---

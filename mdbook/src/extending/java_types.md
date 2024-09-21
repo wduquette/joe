@@ -51,13 +51,13 @@ Given such a value, Joe can:
 
 For many domain-specific use cases, that may be all that's required.
 When more is wanted, the client can register a 
-[type proxy](native_types.md) for the type, thus turning the opaque
+[type proxy](registered_types.md) for the type, thus turning the opaque
 type into a registered type.
 
 ## Registered Types
 
 A *registered type* is a Java type for which the client has registered
-a [type proxy](native_types.md). The type proxy can give the Joe 
+a [type proxy](registered_types.md). The type proxy can give the Joe 
 interpreter the ability to:
 
 - Create instances of the type
