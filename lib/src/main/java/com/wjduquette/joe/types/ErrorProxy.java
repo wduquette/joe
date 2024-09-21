@@ -21,6 +21,9 @@ public class ErrorProxy extends TypeProxy<JoeError> {
         // execution of a `Joe` script. A script can catch errors
         // thrown during execution using the [[function.catch]] function.
         proxies(JoeError.class);
+
+        initializer(this::_initializer);
+
         method("message", this::_message);
         method("type",    this::_type);
     }
@@ -31,6 +34,18 @@ public class ErrorProxy extends TypeProxy<JoeError> {
         var err = (JoeError)value;
         return "Error[type=" + err.getClass().getSimpleName()
             + ", message='" + joe.codify(err.getMessage()) + "']";
+    }
+
+    //-------------------------------------------------------------------------
+    // Initializer implementation
+
+    //**
+    // @init
+    // @args message
+    // Creates an `Error` with the given *message*.
+    public Object _initializer(Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "Error(message)");
+        return new JoeError(joe.stringify(args.next()));
     }
 
     //-------------------------------------------------------------------------
