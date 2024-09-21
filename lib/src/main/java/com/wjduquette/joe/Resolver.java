@@ -125,6 +125,7 @@ class Resolver {
                     resolve(stmt.value());
                 }
             }
+            case Stmt.Throw stmt -> resolve(stmt.value());
             case Stmt.While stmt -> {
                 resolve(stmt.condition());
                 resolve(stmt.body());

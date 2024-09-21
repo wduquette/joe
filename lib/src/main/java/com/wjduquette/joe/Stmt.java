@@ -4,7 +4,7 @@ import java.util.List;
 
 public sealed interface Stmt
     permits Stmt.Assert, Stmt.Block, Stmt.Class, Stmt.Expression,
-            Stmt.Function, Stmt.For, Stmt.If, Stmt.Return,
+            Stmt.Function, Stmt.For, Stmt.If, Stmt.Return, Stmt.Throw,
             Stmt.Var, Stmt.While
 {
     /**
@@ -76,6 +76,13 @@ public sealed interface Stmt
      * @param value The value, or null
      */
     record Return(Token keyword, Expr value) implements Stmt {}
+
+    /**
+     * A "throw" statement
+     * @param keyword The throw keyword, for error location
+     * @param value The error value
+     */
+    record Throw(Token keyword, Expr value) implements Stmt {}
 
     /**
      * A "var" variable declaration.

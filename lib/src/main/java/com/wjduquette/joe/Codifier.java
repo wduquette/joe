@@ -126,6 +126,7 @@ class Codifier {
                 "return" +
                     (stmt.value() != null ? " " + recodify(stmt.value()) : "")
                     + ";";
+            case Stmt.Throw stmt -> "throw" + recodify(stmt.value());
             case Stmt.Var stmt -> stmt.initializer() != null
                 ? "var " + stmt.name().lexeme() + " = " +
                 recodify(stmt.initializer()) + ";"

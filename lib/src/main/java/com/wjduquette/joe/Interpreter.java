@@ -143,6 +143,14 @@ public class Interpreter {
 
                 throw new Return(value);
             }
+            case Stmt.Throw stmt -> {
+                var value = evaluate(stmt.value());
+                if (value instanceof JoeError error) {
+                    throw error;
+                } else {
+                    throw new JoeError(joe.stringify(value));
+                }
+            }
             case Stmt.Var stmt -> {
                 Object value = null;
                 if (stmt.initializer() != null) {

@@ -25,6 +25,7 @@ public class Scanner {
         reserved.put("static",   STATIC);
         reserved.put("super",    SUPER);
         reserved.put("this",     THIS);
+        reserved.put("throw",    THROW);
         reserved.put("true",     TRUE);
         reserved.put("var",      VAR);
         reserved.put("while",    WHILE);

@@ -1,0 +1,18 @@
+// Tests for the throw statement
+
+function testThrowString() {
+    checkCatch(\-> { throw "Simulated Error."; })
+        .message("Simulated Error.");
+}
+
+function testThrowAnything() {
+    checkCatch(\-> { throw #bogus; })
+        .message("#bogus");
+}
+
+function testRethrow() {
+    var pair = catch(\-> { throw "Simulated Error."; });
+    var err = pair.right();
+    checkCatch(\-> { throw err; })
+        .message("Simulated Error.");
+}

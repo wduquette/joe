@@ -32,6 +32,7 @@ statement       → exprStmt
                 | ifStmt
                 | printStmt
                 | returnStmt
+                | throwStmt
                 | whileStmt 
                 | block ;
 
@@ -43,6 +44,7 @@ ifStmt          → "if" "(" expression ")" statement
                   ( "else" statement )? ;
 printStmt       → "print" expression ";" ;
 returnStmt      → "return" expression? ";" ;
+throwStmt       → "throw" expression ";" ;
 whileStmt       → "while" "(" expression ")" statement ;
 block           → "{" declaration* "}" ;
 

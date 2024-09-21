@@ -113,6 +113,7 @@ class Parser {
         if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(RETURN)) return returnStatement();
+        if (match(THROW)) return throwStatement();
         if (match(WHILE)) return whileStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
@@ -245,6 +246,14 @@ class Parser {
 
         consume(SEMICOLON, "Expected ';' after return value.");
         return new Stmt.Return(keyword, value);
+    }
+
+    private Stmt throwStatement() {
+        Token keyword = previous();
+        Expr value = expression();
+
+        consume(SEMICOLON, "Expected ';' after thrown error.");
+        return new Stmt.Throw(keyword, value);
     }
 
     private Stmt whileStatement() {
