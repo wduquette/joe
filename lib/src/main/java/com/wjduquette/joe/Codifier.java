@@ -99,6 +99,12 @@ class Codifier {
                     .append(body(indent, stmt.body()));
                 yield buff.toString();
             }
+            case Stmt.ForEach stmt -> "foreach (var "
+                + stmt.varName().lexeme()
+                + " : "
+                + recodify(stmt.listExpr())
+                + ")"
+                + body(indent, stmt.body());
             case Stmt.Function stmt -> {
                 var params = stmt.params().stream()
                     .map(Token::lexeme)

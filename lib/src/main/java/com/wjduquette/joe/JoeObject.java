@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import java.util.Collection;
+
 interface JoeObject {
     /**
      * Get the value of the named object property.
@@ -17,4 +19,20 @@ interface JoeObject {
      * be set.
      */
     void set(String name, Object value);
+
+    /**
+     * Whether the object supports iteration with foreach or not.
+     * @return true or false
+     */
+    default boolean canIterate() { return false; }
+
+    /**
+     * If canIterate(), returns the collection to iterate over.
+     * @return The collection
+     * @throws UnsupportedOperationException if !canIterate()
+     */
+    default Collection<?> getItems() {
+        throw new UnsupportedOperationException(
+            "Type does not support iteration.");
+    }
 }

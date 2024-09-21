@@ -1,0 +1,55 @@
+// foreach statement tests.
+
+function testForeach_simple() {
+    var list = List("a", "b", "c");
+    var result = List();
+
+    foreach (var i : list) 
+        result.add(i);
+
+    check(result).eq(list);
+}
+
+function testForeach_block() {
+    var list = List("a", "b", "c");
+    var result = List();
+
+    foreach (var i : list) {
+        result.add(i);
+    }
+
+    check(result).eq(list);
+}
+
+function testForeach_break() {
+    var list = List("a", "b", "c");
+    var result = List();
+
+    foreach (var i : list) {
+        if (i == "b") break;
+        result.add(i);
+    }
+
+    check(result).eq(List("a"));
+}
+
+function testForeach_continue() {
+    var list = List("a", "b", "c");
+    var result = List();
+
+    foreach (var i : list) {
+        if (i == "b") continue;
+        result.add(i);
+    }
+
+    check(result).eq(List("a", "c"));
+}
+
+function testForeach_continue() {
+    foreach (var i : List(1)) {
+        // Do nothing
+    }
+
+    checkCatch(\-> i)
+        .message("Undefined variable 'i'.");
+}

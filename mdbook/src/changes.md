@@ -23,6 +23,7 @@ Joe 0.2.0 extends Joe on every axis.
   - Added lambda functions, e.g., `\x -> x*x` or `\x -> { return x*x; }`.
   - Added `throw` statement.
   - Added `break` and `continue` statements.
+  - Added `foreach` statement.
   
 - Library
   - Added `catch()` function

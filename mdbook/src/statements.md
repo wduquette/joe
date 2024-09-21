@@ -1,8 +1,21 @@
 # Statements
 
-The Joe language provides the following statements.
+The Joe language provides the following statements. Statements are terminated 
+by a semicolon or (sometimes) a block, as in Java.
 
-Statements are terminated by a semicolon or a block, as in Java.
+- [Variable Declarations](#variable-declarations)
+- [Function Declarations](#function-declarations)
+- [Class Declarations](#class-declarations)
+- [Expression Statements](#expression-statements)
+- [Blocks](#blocks)
+- [Return](#return)
+- [If Statements](#if-statements)
+- [While Loops](#while-loops)
+- [For Loops](#for-loops)
+- [Foreach Loops](#foreach-loops)
+- [Break and Continue](#break-and-continue)
+- [Throw](#throw)
+- [Assert](#assert)
 
 ## Variable Declarations
 
@@ -18,6 +31,16 @@ var y;      // y == null
 Joe is lexically scoped; undeclared variables in function or method bodies
 are presumed to be declared in an enclosing scope.  It is an error if
 they are not.
+
+## Function Declarations
+
+Functions are declared with the `function` statement.  See
+[Functions](functions.md) for more details.
+
+## Class Declarations
+
+Classes are declared with the `class` statement.  See
+[Classes](classes.md) for more details.
 
 ## Expression Statements
 
@@ -80,12 +103,27 @@ while (x < 10) {
 
 ## For Loops
 
-`for` loops are defined as in Java.
+`for` loops are defined as in Java, except that `for (var item : list)`
+is not supported.  See [Foreach Loops](#foreach-loops), below.
 
 ```joe
 for (var i = 0; i < 10; i = i + 1) {
     ...
 }
+```
+
+## Foreach Loops
+
+`foreach` loops allow iteration over the members of a collection, e.g.,
+a Joe `List`.
+
+```joe
+var list = List("a", "b", "c");
+
+// Prints "a", "b", and "c" on successive lines.
+foreach (var item : list) {
+    println(item);
+} 
 ```
 
 ## Break and Continue
@@ -95,16 +133,6 @@ continue with the next iteration of the enclosing loop, just as in Java.
 
 There is no support for labeled breaks or continues in order to jump through
 nested loops.
-
-## Function Declarations
-
-Functions are declared with the `function` statement.  See
-[Functions](functions.md) for more details.
-
-## Class Declarations
-
-Classes are declared with the `class` statement.  See
-[Classes](classes.md) for more details.
 
 ## Throw
 

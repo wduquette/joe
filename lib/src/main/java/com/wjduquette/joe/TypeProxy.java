@@ -1,6 +1,7 @@
 package com.wjduquette.joe;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * A proxy for a native Java type.  The proxy implements all required
@@ -20,6 +21,7 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
     private final Map<String, NativeFunction> staticMethods =
         new HashMap<>();
     private final Map<String, Object> constants = new HashMap<>();
+    private Function<V, Collection<?>> iterableSupplier = null;
 
     //
     // Value methods and functions.  These will be null or empty if this is
@@ -100,6 +102,16 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
     }
 
     /**
+     * Defines a way for the proxy to get a list of iterables from
+     * the value.
+     * @param supplier The iterable supplier.
+     */
+    @SuppressWarnings("unused")
+    public void iterables(Function<V,Collection<?>> supplier) {
+        this.iterableSupplier = supplier;
+    }
+
+    /**
      * Defines a method for the type.
      * @param name The method name
      * @param callable The value callable that implements the method.
@@ -169,6 +181,18 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
             throw new JoeError("Type " + typeName +
                 " cannot be instantiated at the script level.");
         }
+    }
+
+    //-------------------------------------------------------------------------
+    // Iterability
+
+    public boolean canIterate() {
+        return iterableSupplier != null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<?> getItems(Object value) {
+        return iterableSupplier.apply((V)value);
     }
 
     //-------------------------------------------------------------------------
