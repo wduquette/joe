@@ -782,6 +782,103 @@ without having to define a name:</p>
 var squares = list.map(\x -&gt; x*x);
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="classes"><a class="header" href="#classes">Classes</a></h1>
+<p>Joe supports a simple notion of classes, including single inheritance.</p>
+<pre><code class="language-joe">class Person {
+    method init(first, last) {
+        this.first = first;
+        this.last = last;
+    }
+    
+    method fullName() {
+        return this.first + " " + this.last;
+    }
+}
+
+var joe = Person("Joe", "Pro");
+println(joe.first);         // Prints "Joe"
+println(joe.fullName());    // Prints "Joe Pro"
+</code></pre>
+<h2 id="class-properties"><a class="header" href="#class-properties">Class Properties</a></h2>
+<p>A class has two kinds of property, method properties and variable properties,
+aka instance variables.</p>
+<p>The two kinds of property share a namespace.  Take care not to give instance
+variables the same name as methods; the variable will shadow the method,
+yielding surprising results.</p>
+<h2 id="variable-properties"><a class="header" href="#variable-properties">Variable Properties</a></h2>
+<p>Instance variables are accessed via the <code>this</code> variable within the class's
+methods, and as properties of the instance in other scopes:</p>
+<pre><code class="language-joe">class Person {
+    ...
+    method fullName() {
+        return this.first + " " + this.last;
+    }
+}
+
+var joe = Person("Joe", "Pro");
+println(joe.first);         // Prints "Joe"
+</code></pre>
+<h2 id="method-properties"><a class="header" href="#method-properties">Method Properties</a></h2>
+<p>Methods are defined in the class body using the <code>method</code> statement.<br />
+Methods are identical to Joe functions, except that each method is bound
+to its instance and has access to its instance via the <code>this</code> variable.</p>
+<p>Methods are accessed via the <code>this</code> variable within the class's
+methods, and as properties of the instance in other scopes:</p>
+<pre><code class="language-joe">class Person {
+    method fullName() { ... }
+    method greet() { println("Howdy," + this.fullName()); }
+}
+
+var joe = Person("Joe", "Pro");
+joe.greet();    // Prints "Howdy, Joe Pro!"
+</code></pre>
+<h2 id="the-class-initializer"><a class="header" href="#the-class-initializer">The Class Initializer</a></h2>
+<p>The class's name, which by convention begins with an uppercase letter,
+serves as the class's constructor.  It delegates its work to the class's
+optional <code>init</code> method, and takes the same arguments.</p>
+<pre><code class="language-joe">class Person {
+    method init(first, last) {
+        this.first = first;
+        this.last = last;
+    }
+    ...    
+}
+
+var joe = Person("Joe", "Pro");
+</code></pre>
+<p>The <code>init</code> method can be called directly on an instance to reinitialize
+the object, but this is rarely done.</p>
+<h2 id="method-references"><a class="header" href="#method-references">Method References</a></h2>
+<p>An instance method is a first class object, just like a function, and
+can be referenced by its name. For example,</p>
+<pre><code class="language-joe">class Person {
+    ...
+    method fullName() {
+        return this.first + " " + this.last;
+    }
+}
+
+var joe = Person("Joe", "Pro");
+var myFunc = joe.fullName;
+println(myFunc());          // Prints "Joe Pro"
+</code></pre>
+<h2 id="superclasses-and-inheritance"><a class="header" href="#superclasses-and-inheritance">Superclasses and Inheritance</a></h2>
+<p>A class can inherit from a superclass using the <code>extends</code> keyword:</p>
+<pre><code class="language-joe">class Superclass {
+    method name() { return "Superclass"; }
+}
+
+class Subclass extends Superclass {
+    method name() {
+        return "Subclass of " + super.name();
+    }
+}
+
+var sub = Subclass();
+println(sub.name());    // Prints "Subclass of Superclass".
+</code></pre>
+<p>As shown in the example, a subclass can call superclass methods by
+means of the <code>super</code> variable.  <code>super</code> is only defined in methods
+of subclasses.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="library-api-index"><a class="header" href="#library-api-index">Library API Index</a></h1>
 <hr />
 <p>The following is a complete index of the packages, functions,
