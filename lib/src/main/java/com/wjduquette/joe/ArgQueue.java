@@ -5,8 +5,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * An argument queue, as passed to Joe callables.  The ArgQueue presents
+ * the arguments both as a list for indexed access and as a queue for
+ * polling using the {@code next()} method.
+ */
 public final class ArgQueue {
+    /**
+     * An empty argument queue.
+     */
     public static final ArgQueue EMPTY = new ArgQueue();
+
     //-------------------------------------------------------------------------
     // Instance variables
 
@@ -16,10 +25,17 @@ public final class ArgQueue {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an empty argument queue.
+     */
     public ArgQueue() {
         this(new ArrayList<>());
     }
 
+    /**
+     * Creates an argument queue containing the given list of arguments.
+     * @param args the arguments.
+     */
     public ArgQueue(List<?> args) {
         this.args = Collections.unmodifiableList(args);
     }
@@ -28,18 +44,45 @@ public final class ArgQueue {
     // Public API
 
     /**
-     * Returns the number of remaining arguments.
-     * @return the number.
+     * The total number of arguments.
+     * @return the number
      */
     public int size() {
+        return args.size();
+    }
+
+    /**
+     * Gets whether the queue has any arguments or not.
+     * @return true or false.
+     */
+    public boolean isEmpty() {
+        return args.isEmpty();
+    }
+
+    /**
+     * Gets the argument from the complete list of arguments.
+     * @param index The index
+     * @return The value.
+     */
+    public Object get(int index) {
+        return args.get(index);
+    }
+
+    /**
+     * Returns the number of remaining arguments, i.e., those not yet retrieved
+     * using {@code next()}.
+     * @return the number.
+     */
+    public int remainingArgs() {
         return args.size() - next;
     }
 
     /**
-     * Gets whether the queue is empty or not.
+     * Gets whether the queue has any remaining arguments or not, i.e.,
+     * those not yet retrieved using {@code next()}.
      * @return true or false
      */
-    public boolean isEmpty() {
+    public boolean hasRemaining() {
         return next >= args.size();
     }
 
@@ -61,10 +104,10 @@ public final class ArgQueue {
      * @param index The index
      * @return the argument
      */
-    public Object get(int index) {
-        if (index < 0 || index >= size()) {
+    public Object getRemaining(int index) {
+        if (index < 0 || index >= remainingArgs()) {
             throw new IllegalArgumentException(
-                "Expected index in range 0 < index < " + size() +
+                "Expected index in range 0 < index < " + remainingArgs() +
                 ", got: " + index);
         }
         return args.get(next + index);
