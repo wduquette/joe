@@ -30,6 +30,10 @@ java {
     }
 }
 
+task myJavadocs(type: Javadoc) {
+    source = sourceSets.main.allJava
+}
+
 application {
     // Define the main class for the application.
     mainClass = 'com.wjduquette.joe.app.App'

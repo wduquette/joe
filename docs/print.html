@@ -1124,7 +1124,294 @@ added to the list.</p>
 maps or sets; when it does, they should be returned in the same way
 as lists.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="registered-types-1"><a class="header" href="#registered-types-1">Registered Types</a></h1>
+<p>A <em>registered type</em> is a Java data type for which Joe has been provided
+a <em>type proxy</em>: an object that provides information about the type.
+Most of Joe's standard types, e.g.,
+<a href="extending/../library/type.joe.String.html"><code>String</code></a>, are implemented in just this
+way.  This section explains how to define a <code>TypeProxy&lt;V&gt;</code> and register
+it with Joe for use.</p>
+<h2 id="defining-a-type-proxy"><a class="header" href="#defining-a-type-proxy">Defining A Type Proxy</a></h2>
+<p>A type proxy is a subclass of <code>TypeProxy&lt;V&gt;</code>, where <code>V</code> is the proxied type.
+For example,</p>
+<pre><code class="language-java">public class StringProxy extends TypeProxy&lt;String&gt; {
+    public StringProxy() {
+        ...
+    }
+    ...
+}
+</code></pre>
+<p>The constructor defines the various aspects of the proxy.</p>
+<ul>
+<li><a href="extending/registered_types.html#the-script-level-type-name">The Script-level Type Name</a></li>
+<li><a href="extending/registered_types.html#the-proxied-types">The Proxied Types</a></li>
+<li><a href="extending/registered_types.html#static-constants">Static Constants</a></li>
+<li><a href="extending/registered_types.html#static-methods">Static Methods</a></li>
+<li><a href="extending/registered_types.html#initializer">Initializer</a></li>
+<li><a href="extending/registered_types.html#static-types">Static Types</a></li>
+<li><a href="extending/registered_types.html#instance-methods">Instance Methods</a></li>
+<li><a href="extending/registered_types.html#installing-a-type-proxy">Installing a Type Proxy</a></li>
+</ul>
+<h2 id="the-script-level-type-name"><a class="header" href="#the-script-level-type-name">The Script-level Type Name</a></h2>
+<p>First, the proxy defines the script-level type name, which by convention
+should always begin with an uppercase letter.  For example:</p>
+<pre><code class="language-java">public class StringProxy extends TypeProxy&lt;String&gt; {
+    public StringProxy() {
+        super("String");
+        ...
+    }
+    ...
+}
+</code></pre>
+<p>The script-level type name is often the same as the Java class name, but not
+always.</p>
+<ul>
+<li>Joe's <code>Number</code> type is actually a Java <code>Double</code>; it's called <code>Number</code> because
+there's only one kind of number in Joe.</li>
+<li>Joe's <code>List</code> type actually maps to two different <code>List&lt;Object&gt;</code> types, both
+under the umbrella of the <code>JoeList</code> interface.  Calling it simply <code>List</code> is a
+kindness to the client.</li>
+</ul>
+<p>When the proxy is registered Joe will create a global variable with the
+same name as the type, e.g., <code>String</code>.</p>
+<h2 id="the-proxied-types"><a class="header" href="#the-proxied-types">The Proxied Types</a></h2>
+<p>Second, the proxy must explicitly identify the proxied type or types, which
+must be genuine classes, not interfaces.</p>
+<p>Usually a proxy will proxy the single type <code>V</code>, but if <code>V</code> is an interface
+the relevant classes need to be identified. Here's the first case:</p>
+<pre><code class="language-java">public class StringProxy extends TypeProxy&lt;String&gt; {
+    public StringProxy() {
+        super("String");
+        proxies(String.class);
+    }
+    ...
+}
+</code></pre>
+<p>And here's an example of the second.  <code>JoeList</code> is an interface, so we must
+tell Joe which types the interpreter should look for.</p>
+<pre><code class="language-java">public class ListProxy extends TypeProxy&lt;JoeList&gt; {
+    public ListProxy() {
+        super("List");
+        proxies(ListValue.class);
+        proxies(ListWrapper.class);
+    }
+    ...
+}
+</code></pre>
+<h2 id="static-constants"><a class="header" href="#static-constants">Static Constants</a></h2>
+<p>A proxy may define any number of named constants, to be presented at
+the script level as properties of the type object.  For example,
+<code>NumberProxy</code> defines several numeric constants.  A constant is defined
+by its property name and the relevant Joe value.</p>
+<pre><code class="language-java">public class NumberProxy extends TypeProxy&lt;Double&gt; {
+    public NumberProxy() {
+        super("Number");
+        ...
+        constant("E", Math.E);
+        ...
+    }
+    ...
+}
+</code></pre>
+<p>In this case, the constant is accessible as <code>Number.E</code>.</p>
+<h2 id="static-methods"><a class="header" href="#static-methods">Static Methods</a></h2>
+<p>A proxy may also define any number of static methods, called as properties
+of the type object.  For example, the <code>String</code> type defines the
+<a href="extending/../library/type.joe.String.html#static.join"><code>String.join()</code></a> method, which
+joins the items in the list into a string with a given delimiter.</p>
+<p>A static method is simply a <a href="extending/native_functions.html">native function</a> defined
+as a property of a list object.</p>
+<pre><code class="language-java">public class StringProxy extends TypeProxy&lt;String&gt; {
+    public StringProxy() {
+        ...
+        staticMethod("join", this::_join);
+        ...
+    }
+    ...
+    
+    private Object _join(Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 2, "join(delimiter, list)");
+        ...
+    }
+}
+</code></pre>
+<h2 id="initializer"><a class="header" href="#initializer">Initializer</a></h2>
+<p>Most type proxies will provide an initializer function for creating values of
+the type.  The initializer function is named after the type, returns a value
+of the type, and may take any desired arguments.</p>
+<p>For example, the <code>List</code> type provides this
+<a href="extending/../library/type.joe.List.html#init">initializer</a>:</p>
+<pre><code class="language-java">public class ListProxy extends TypeProxy&lt;JoeList&gt; {
+    public ListProxy() {
+        super("List");
+        ...
+        initializer(this::_init);
+        ...
+    }
+
+    private Object _init(Joe joe, ArgQueue args) {
+        return new ListValue(args.asList());
+    }
+</code></pre>
+<h2 id="static-types"><a class="header" href="#static-types">Static Types</a></h2>
+<p>A type proxy can be defined as a kind of library of static constants and
+methods.  The <code>NumberProxy</code> is just such a proxy.  Numbers have no methods
+in Joe, and they do not need an initializer as they can be typed directly
+into a script.</p>
+<p>In this case, the type can be declared to be a <em>static type</em>.  Among other
+things, this means that attempts to create an instance using the type's
+initializer will get a suitable error message.</p>
+<pre><code class="language-java">public class NumberProxy extends TypeProxy&lt;Double&gt; {
+    public NumberProxy() {
+        super("Number");
+        staticType();
+        proxies(Double.class);
+        ...
+    }
+    ...
+}
+</code></pre>
+<p>In the case of the <code>Number</code> type, the proxy still proxies an actual data type.
+This need not be the case.  It is common to define a static type as a named
+library of functions with no related Java type.  For example, consider
+a library to convert between Joe values and JSON strings.  It might look
+like this:</p>
+<pre><code class="language-java">public class JSONProxy extends TypeProxy&lt;Void&gt; {
+    public JSONProxy() {
+        super("JSON");
+        staticType();
+        
+        staticMethod("toJSON",   this::_toJSON);
+        staticMethod("fromJSON", this::_fromJSON);
+        ...
+    }
+    ...
+}
+</code></pre>
+<h2 id="instance-methods"><a class="header" href="#instance-methods">Instance Methods</a></h2>
+<p>Most type proxies will define one or more instance methods for values of the
+type.  For example, <a href="extending/../library/type.joe.String.html"><code>String</code></a> and
+<a href="extending/../library/type.joe.List.html"><code>List</code></a> provide a great many instance methods.</p>
+<p>An instance method is quite similar to a <a href="extending/native_functions.html">native function</a>;
+the only practical difference is that an instance method is bound to a value
+of the proxied type, and so has a slightly different signature.  For example,
+here is the implementation of the <code>String</code> type's
+<a href="extending/../library/type.joe.String.html#method.length"><code>length()</code></a> method.</p>
+<pre><code class="language-java">public class StringProxy extends TypeProxy&lt;String&gt; {
+    public StringProxy() {
+        ...
+        method("length", this::_length);
+        ...
+    }
+    ...
+
+    private Object _length(String value, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "length()");
+        return (double)value.length();
+    }
+}
+</code></pre>
+<p>Each instance method takes an initial argument that receives the bound value.
+The argument's type is type <code>V</code>, as defined in the proxy's <code>extends</code> clause.
+Otherwise, this is nothing more than a native function, and it is implemented
+in precisely the same way.</p>
+<h2 id="installing-a-type-proxy"><a class="header" href="#installing-a-type-proxy">Installing a Type Proxy</a></h2>
+<p>Type proxies are installed using the <code>Joe::installType</code> method:</p>
+<pre><code class="language-java">var joe = new Joe();
+
+joe.installType(new MyTypeProxy());
+</code></pre>
+<p>Installation creates the <code>MyType</code> object, and registers the type so that
+<code>MyType</code>'s instance methods can be used with all values of <code>MyType</code>.</p>
+<p>If a type proxy has no dynamic data, i.e., if it need not be configured with
+application-specific data in order to do its job, it is customary to create
+a single instance that can be reused with any number of instances of <code>Joe</code>.
+This is the case for all of the proxies in Joe's standard library.  For example,</p>
+<pre><code class="language-java">public class StringProxy extends TypeProxy&lt;String&gt; {
+    public static final StringProxy TYPE = new StringProxy();
+    ...
+}
+</code></pre>
+<p>This can then be installed as follows:</p>
+<pre><code class="language-java">var joe = new Joe();
+
+joe.installType(StringProxy.TYPE);
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="joe-packages"><a class="header" href="#joe-packages">Joe Packages</a></h1>
+<p>A <em>package</em> is a collection of Joe functions and types intended to be added
+to a <code>Joe</code> interpreter as a unit.  Joe's
+<a href="extending/../library/pkg.joe.html">Standard Library</a> is just such a package, as is
+the <a href="extending/../library/pkg.joe.test.html">Test Tool API</a> provided by <code>joe test</code>.</p>
+<p>A package can be implemented in Java as a collection of
+<a href="extending/native_functions.html">native functions</a> and
+<a href="extending/registered_types.html">registered types</a>, or in Joe as a collection of
+Joe <a href="extending/../functions.html">functions</a> and <a href="extending/../classes.html">classes</a>, or as
+combination of the two.</p>
+<p>Joe intentionally provides no means of installing a package at the script
+level; it is for the Java client to determine which packages it wishes
+to make available.<sup class="footnote-reference"><a href="#import">1</a></sup>  Consequently, packages are usually defined
+at the Java level even when they are implemented primarily as Joe code.</p>
+<ul>
+<li><a href="extending/packages.html#defining-a-package">Defining a Package</a></li>
+<li><a href="extending/packages.html#installing-a-package">Installing a Package</a></li>
+<li><a href="extending/packages.html#library-packages-vs-component-packages">Library Packages vs. Component Packages</a></li>
+</ul>
+<h2 id="defining-a-package"><a class="header" href="#defining-a-package">Defining a Package</a></h2>
+<p>Defining a package is much like defining a
+<a href="extending/registered_types.html">registered type</a>.</p>
+<ul>
+<li>Subclass <code>Package</code></li>
+<li>Give the package a name</li>
+<li>Add content.</li>
+</ul>
+<p>For example, the [Standard Library] package, <code>joe</code>, is defined like this:</p>
+<pre><code class="language-java">public class StandardLibrary extends Package {
+    public static final StandardLibrary PACKAGE = new StandardLibrary();
+    ...
+
+    public StandardLibrary() {
+        super("joe");                           // &lt;-- define package name
+
+        globalFunction("catch", this::_catch);  // &lt;-- Native function
+        ...
+
+        type(BooleanProxy.TYPE);                // &lt;-- Type proxy
+        ...
+    }
+    ...
+}
+</code></pre>
+<p>A global function is just a <a href="extending/native_functions.html">native function</a>; when the
+package is installed, each defined global function will be
+installed automatically into the interpreter using <code>Joe::installGlobalFunction</code>.
+The function implementations are typically placed within the <code>Package</code> subclass
+itself, as shown here.</p>
+<p>The types are simply <a href="extending/registered_types.html">registered types</a>; when the
+package is installed, each listed type will be installed automatically
+into the interpreter using <code>Joe::installType</code>.  The actual proxies
+can be defined as nested classes in the <code>Package</code> subclass, but are
+more typically defined in their own <code>.java</code> files.</p>
+<h2 id="installing-a-package"><a class="header" href="#installing-a-package">Installing a Package</a></h2>
+<p>To install a package into an interpreter, use <code>Joe::installPackage</code>:</p>
+<pre><code class="language-java">var joe = Joe();
+joe.installPackage(new MyPackage());    // OR
+joe.installPackage(MyPackage.PACKAGE);
+</code></pre>
+<h2 id="library-packages-vs-component-packages"><a class="header" href="#library-packages-vs-component-packages">Library Packages vs. Component Packages</a></h2>
+<p>Reusable libraries, such as Joe's standard library, are usually defined
+as <code>Package</code> subclasses, as shown here.</p>
+<p>Often, though, a particular component, e.g., <code>joe test</code>, will define a
+component-specific package of code, which is installed automatically by
+the component into the component's own instance of <code>Joe</code>.  In this
+case the component might or might not define an explicit <code>Package</code> subclass,
+as the <code>Package</code> is primarily a convenient way for a client to install
+reusable bindings.</p>
+<p>However, the component API should still be thought of as a package, and
+given a package name, as this is how distinct bindings are distinguished
+in the documentation produced by the <code>joe doc</code> tool.</p>
+<div class="footnote-definition" id="import"><sup class="footnote-definition-label">1</sup>
+<p>Of course, a client could choose to provide a native function
+for importing its own packages....</p>
+</div>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="library-api-index"><a class="header" href="#library-api-index">Library API Index</a></h1>
 <hr />
 <p>The following is a complete index of the packages, functions,
