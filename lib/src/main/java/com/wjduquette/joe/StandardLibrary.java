@@ -3,7 +3,7 @@ package com.wjduquette.joe;
 import com.wjduquette.joe.types.*;
 
 public class StandardLibrary extends Package {
-    public static final StandardLibrary LIB = new StandardLibrary();
+    public static final StandardLibrary PACKAGE = new StandardLibrary();
     public static final Keyword OK = new Keyword("ok");
     public static final Keyword ERROR = new Keyword("error");
 
