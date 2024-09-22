@@ -1,4 +1,4 @@
-# 1. The Joe Language
+# The Joe Language
 
 Joe is a Java-like dynamic scripting language:
 

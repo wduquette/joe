@@ -9,3 +9,7 @@ title = "Joe User's Guide"
 build-dir = "../docs"             # the directory where the output is placed
 create-missing = true             # whether or not to create missing pages
 use-default-preprocessors = true  # use the default preprocessors
+
+[output.html.fold]
+enable = true
+level = 1

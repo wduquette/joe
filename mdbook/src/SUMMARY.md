@@ -8,16 +8,29 @@
 # Language Reference
 
 - [The Joe Language](language.md)
-  - [Types and Values](types.md)
-  - [Operators](operators.md)
-  - [Statements](statements.md)
-  - [Functions](functions.md)
-  - [Classes](classes.md)
+- [Types and Values](types.md)
+- [Operators](operators.md)
+- [Statements](statements.md)
+- [Functions](functions.md)
+- [Classes](classes.md)
+
+---
+
+# Embedding and Extending Joe
+- [Embedding Joe](embedding/embedding.md)
 - [Extending Joe](extending/extending.md)
   - [Joe and Java Data Types](extending/java_types.md)
   - [Native Functions](extending/native_functions.md)
   - [Registered Types](extending/registered_types.md)
   - [Joe Packages](extending/packages.md)
+  
+---
+
+# Joe Tools
+- [`joe run`](joe_run.md)
+- [`joe repl`](joe_repl.md)
+- [`joe test`](joe_test.md)
+- [`joe doc`](joe_doc.md)
  
 ---
  
