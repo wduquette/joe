@@ -240,6 +240,13 @@ type <code>V</code>.  A <code>TypeProxy</code> can provide
 </li>
 <li>Added notion of a <code>Package</code>, which defines some number of global
 functions and type proxies.</li>
+<li>All script-level output now goes through <code>Joe::setOutputHandler</code>,
+which defaults to writing to <code>System.out</code>.
+<ul>
+<li>The methods <code>Joe::println</code> and <code>Joe::print</code> can be used from
+Java bindings.</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>

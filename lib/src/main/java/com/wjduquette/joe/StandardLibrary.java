@@ -77,7 +77,7 @@ public class StandardLibrary extends Package {
     private Object _print(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "print(text)");
 
-        System.out.print(joe.stringify(args.get(0)));
+        joe.print(joe.stringify(args.get(0)));
         return null;
     }
 
@@ -90,9 +90,9 @@ public class StandardLibrary extends Package {
         Joe.arityRange(args, 0, 1, "println([text])");
 
         if (args.isEmpty()) {
-            System.out.println();
+            joe.println();
         } else {
-            System.out.println(joe.stringify(args.get(0)));
+            joe.println(joe.stringify(args.get(0)));
         }
         return null;
     }

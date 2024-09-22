@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class Joe {
     //-------------------------------------------------------------------------
@@ -18,6 +19,9 @@ public class Joe {
     private final Interpreter interpreter;
     private final Codifier codifier;
     private final Map<Class<?>, TypeProxy<?>> proxyTable = new HashMap<>();
+
+    // The handler for all script-generated output
+    private Consumer<String> outputHandler = this::systemOutHandler;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -104,6 +108,61 @@ public class Joe {
                 cls.getCanonicalName() + ": " + ex.getMessage());
             System.exit(1);
         }
+    }
+
+    //-------------------------------------------------------------------------
+    // Output Handling
+
+
+    /**
+     * Gets the client's output handler.
+     * @return the handler
+     */
+    @SuppressWarnings("unused")
+    public Consumer<String> getOutputHandler() {
+        return outputHandler;
+    }
+
+    /**
+     * Sets the client's output handler.  By default, all script output
+     * goes to System.out.
+     * @param outputHandler The output handler.
+     */
+    @SuppressWarnings("unused")
+    public void setOutputHandler(Consumer<String> outputHandler) {
+        this.outputHandler = Objects.requireNonNull(outputHandler);
+    }
+
+    /**
+     * Prints the text, followed by a newline, using the client's output handler.
+     * @param text The text
+     */
+    public void println(String text) {
+        print(text);
+        print(System.lineSeparator());
+    }
+
+    /**
+     * Prints a newline using the client's output handler.
+     */
+    public void println() {
+        print(System.lineSeparator());
+    }
+
+    /**
+     * Prints the text using the client's output handler.
+     * @param text The text
+     */
+    public void print(String text) {
+        outputHandler.accept(text);
+    }
+
+    /**
+     * The default output handler; writes to System.out.
+     * @param text The text
+     */
+    private void systemOutHandler(String text) {
+        System.out.print(text);
     }
 
     //-------------------------------------------------------------------------

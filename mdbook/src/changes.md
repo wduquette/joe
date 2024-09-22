@@ -47,6 +47,10 @@ Joe 0.2.0 extends Joe on every axis.
       - E.g., `Double.PI`, `Double.abs()`.
   - Added notion of a `Package`, which defines some number of global
     functions and type proxies.
+  - All script-level output now goes through `Joe::setOutputHandler`,
+    which defaults to writing to `System.out`.
+    - The methods `Joe::println` and `Joe::print` can be used from 
+      Java bindings.
 
 - Tools
   - Added `joe test`, a test runner for Joe-level test scripts, with a aPackage
