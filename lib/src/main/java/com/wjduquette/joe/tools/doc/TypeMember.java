@@ -1,6 +1,6 @@
 package com.wjduquette.joe.tools.doc;
 
-public abstract class TypeMember extends Entry {
+abstract class TypeMember extends Entry {
     //-------------------------------------------------------------------------
     // Instance Variables
 

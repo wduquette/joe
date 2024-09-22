@@ -12,10 +12,10 @@ public class JoeError extends RuntimeException {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // Source line number
+    /** The source line number. */
     private final int line;
 
-    // Script level "stack frames"
+    /** Script level "stack frames" */
     private final List<String> frames = new ArrayList<>();
 
     //-------------------------------------------------------------------------

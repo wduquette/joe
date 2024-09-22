@@ -26,6 +26,7 @@ public class ListValue
 
     /**
      * Creates a list containing the desired elements.
+     * @param values The list's initial values.
      */
     public ListValue(Collection<?> values) {
         addAll(values);

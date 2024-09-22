@@ -1,14 +1,32 @@
 package com.wjduquette.joe.tools.doc;
 
-public record Line(int number, String text) {
+/**
+ * A line of doc comment text, stripped of its leading "//".
+ * @param number The line number in the source file
+ * @param text The text
+ */
+record Line(int number, String text) {
+    /**
+     * Returns true if the line is blank, and false otherwise.
+     * @return true or false
+     */
     public boolean isBlank() {
         return text.isBlank();
     }
 
+    /**
+     * Returns true if the line's non-whitespace text begins with
+     * an "@" tag.
+     * @return true or false
+     */
     public boolean isTagged() {
         return text.trim().startsWith("@");
     }
 
+    /**
+     * If isTagged(), returns the tag and its value.
+     * @return The Tag
+     */
     public Tag getTag() {
         var txt = text.trim();
         if (!txt.startsWith("@")) {

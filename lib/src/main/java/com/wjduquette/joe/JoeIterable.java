@@ -7,5 +7,9 @@ import java.util.Collection;
  * using Joe's `foreach` statement.
  */
 public interface JoeIterable {
+    /**
+     * Returns a collection of objects to iterate over.
+     * @return The list
+     */
     Collection<Object> getItems();
 }

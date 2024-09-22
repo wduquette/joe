@@ -3,7 +3,10 @@ package com.wjduquette.joe;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JoeClass implements JoeObject, JoeCallable {
+/**
+ * A class defined in a Joe script.
+ */
+class JoeClass implements JoeObject, JoeCallable {
     public static final String INIT = "init";
 
     //-------------------------------------------------------------------------

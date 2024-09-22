@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 import static com.wjduquette.joe.TokenType.*;
 
-public class Scanner {
+class Scanner {
     public static final Set<String> RESERVED_WORDS;
     private static final Map<String, TokenType> reserved;
 

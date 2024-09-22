@@ -22,6 +22,8 @@ public class ToolLauncher {
 
     /**
      * Initializes the application object.
+     * @param appName The application file name, as used to invoke the app.
+     * @param infoList A list of the tools to be launched.
      */
     public ToolLauncher(String appName, List<ToolInfo> infoList) {
         this.appName = appName;
@@ -31,11 +33,19 @@ public class ToolLauncher {
     //-------------------------------------------------------------------------
     // Configuration
 
+    /**
+     * Whether output should be verbose or not.
+     * @return true or false.
+     */
     @SuppressWarnings("unused")
     public boolean isVerbose() {
         return verbose;
     }
 
+    /**
+     * Sets whether output should be verbose or not.
+     * @param verbose true or false
+     */
     @SuppressWarnings("unused")
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;

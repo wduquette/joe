@@ -5,12 +5,19 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.TypeProxy;
 
+/**
+ * The type proxy for Keyword values.
+ */
 public class KeywordProxy extends TypeProxy<Keyword> {
+    /** The proxy's TYPE constant. */
     public static final KeywordProxy TYPE = new KeywordProxy();
 
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates the proxy.
+     */
     public KeywordProxy() {
         super("Keyword");
 

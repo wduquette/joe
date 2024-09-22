@@ -10,6 +10,9 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The implementation of the `joe test` tool.
+ */
 public class TestTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
@@ -46,6 +49,9 @@ public class TestTool implements Tool {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates the tool.
+     */
     public TestTool() {
         // Nothing to do
     }
@@ -198,6 +204,10 @@ public class TestTool implements Tool {
     //-------------------------------------------------------------------------
     // Main
 
+    /**
+     * The tool's main routine.
+     * @param args The command line arguments.
+     */
     public static void main(String[] args) {
         new TestTool().run(args);
     }

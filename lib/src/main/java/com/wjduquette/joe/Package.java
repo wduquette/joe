@@ -19,6 +19,11 @@ public class Package {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates the package, assigning its name.  The name should be a lowercase
+     * dotted identifier, like a Java package name.
+     * @param name The name.
+     */
     public Package(String name) {
         this.name = name;
     }
@@ -26,10 +31,19 @@ public class Package {
     //-------------------------------------------------------------------------
     // Package builders
 
+    /**
+     * Adds a global function to the package.
+     * @param name The function's name
+     * @param callable The callable, usually a method reference.
+     */
     public final void globalFunction(String name, JoeCallable callable) {
         globalFunctions.add(new NativeFunction(name, callable));
     }
 
+    /**
+     * Adds a registered type to the package, given its proxy.
+     * @param typeProxy The proxy.
+     */
     public final void type(TypeProxy<?> typeProxy) {
         types.add(typeProxy);
     }
@@ -47,6 +61,10 @@ public class Package {
     //-------------------------------------------------------------------------
     // Accessors
 
+    /**
+     * Gets the package's name.
+     * @return The name
+     */
     @SuppressWarnings("unused")
     public String name() {
         return name;

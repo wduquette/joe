@@ -6,7 +6,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
+/**
+ * The Joe List type's proxy.
+ */
 public class ListProxy extends TypeProxy<JoeList> {
+    /** The proxy's TYPE constant. */
     public static final ListProxy TYPE = new ListProxy();
 
     //-------------------------------------------------------------------------
@@ -19,6 +23,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // Lists created using the [[List#init]] initializer can contain any kind
     // of Joe value; the list need not be homogeneous.  Lists received from
     // Java code might be read-only or require a specific item type.
+    /** Creates the proxy. */
     public ListProxy() {
         super("List");
         proxies(ListValue.class);    // Types that implement `JoeList`

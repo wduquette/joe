@@ -16,10 +16,17 @@ public interface Tool {
     //-------------------------------------------------------------------------
     // Defaulted Tool API
 
+    /**
+     * Prints a newline to System.out.
+     */
     default void println() {
         System.out.println();
     }
 
+    /**
+     * Prints an object System.out.
+     * @param object The object
+     */
     default void println(Object object) {
         System.out.println(object.toString());
     }
@@ -32,6 +39,14 @@ public interface Tool {
         toolInfo().printUsage(appName);
     }
 
+    /**
+     * Given an option, looks for the option's value in the argument
+     * queue.
+     * @param opt The option
+     * @param argq The queue
+     * @return The value
+     * @throws ToolException if the option has no value.
+     */
     default String toOptArg(String opt, Deque<String> argq) {
         if (!argq.isEmpty()) {
             return argq.poll();
@@ -42,6 +57,13 @@ public interface Tool {
         }
     }
 
+    /**
+     * Converts the argument to a value of the enumeration.
+     * @param cls The enum class
+     * @param arg The argument
+     * @return The enum constant.
+     * @param <E> The enum type.
+     */
     default <E extends Enum<E>> E toEnum(Class<E> cls, String arg) {
         try {
             return Enum.valueOf(cls, arg.toUpperCase());
@@ -50,6 +72,14 @@ public interface Tool {
         }
     }
 
+    /**
+     * Converts the option's value to a value of the enumeration.
+     * @param cls The enum class
+     * @param opt The option
+     * @param argq The argument queue
+     * @return The enum constant.
+     * @param <E> The enum type.
+     */
     default <E extends Enum<E>> E toEnum(
         Class<E> cls,
         String opt,
@@ -58,27 +88,56 @@ public interface Tool {
         return toEnum(cls, toOptArg(opt, argq));
     }
 
+    /**
+     * Returns a ToolException for an "unknown option" error.
+     * @param opt The option.
+     * @return The exception
+     */
     default ToolException unknownOption(String opt) {
         return new ToolException("Unknown option: \"" + opt + "\".");
     }
 
+    /**
+     * Returns a ToolException for an "expected this, got that" error.
+     * @param expected what was expected
+     * @param got what was received.
+     * @return The exception
+     */
     default ToolException expected(String expected, String got) {
         return new ToolException(
             "Expected " + expected + ", got: \"" + got + "\".");
     }
 
+    /**
+     * Simply returns a ToolException with the given message.
+     * @param message The message
+     * @return The exception
+     */
     default ToolException error(String message) {
         return new ToolException(message);
     }
 
+    /**
+     * Returns a ToolException with the given message and cause.
+     * @param message The message
+     * @param cause The cause
+     * @return The exception
+     */
     default ToolException error(String message, Throwable cause) {
         return new ToolException(message, cause);
     }
 
+    /**
+     * Exits the tool with a code of 0.
+     */
     default void exit() {
         exit(0);
     }
 
+    /**
+     * Exits the tool with the given code.
+     * @param code The code
+     */
     default void exit(int code) {
         System.exit(code);
     }

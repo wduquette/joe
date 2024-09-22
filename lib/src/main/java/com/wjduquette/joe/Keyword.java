@@ -2,6 +2,9 @@ package com.wjduquette.joe;
 
 import java.util.Objects;
 
+/**
+ * An interned symbol in a Joe interpreter.
+ */
 public final class Keyword {
     private final String name;
 
@@ -13,6 +16,10 @@ public final class Keyword {
         this.name = Objects.requireNonNull(name);
     }
 
+    /**
+     * The keyword's name, omitting the leading "#"
+     * @return The name
+     */
     public String name() {
         return name;
     }

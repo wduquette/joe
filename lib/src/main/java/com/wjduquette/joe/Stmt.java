@@ -2,7 +2,10 @@ package com.wjduquette.joe;
 
 import java.util.List;
 
-public sealed interface Stmt
+/**
+ * The statements that can appear in a Joe AST.
+ */
+sealed interface Stmt
     permits Stmt.Assert, Stmt.Block, Stmt.Break, Stmt.Class,
             Stmt.Continue, Stmt.Expression, Stmt.For, Stmt.ForEach,
             Stmt.Function, Stmt.If, Stmt.Return, Stmt.Throw, Stmt.Var,

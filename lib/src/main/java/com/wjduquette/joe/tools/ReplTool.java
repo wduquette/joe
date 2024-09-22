@@ -11,6 +11,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.List;
 
+/**
+ * The implementation for the {@code joe repl} tool.
+ */
 public class ReplTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
@@ -45,6 +48,9 @@ public class ReplTool implements Tool {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates the tool
+     */
     public ReplTool() {
         this.joe = new Joe();
     }
@@ -52,6 +58,10 @@ public class ReplTool implements Tool {
     //-------------------------------------------------------------------------
     // Execution
 
+    /**
+     * Gets the tool's implementation info.
+     * @return The info
+     */
     public ToolInfo toolInfo() {
         return INFO;
     }
@@ -73,7 +83,7 @@ public class ReplTool implements Tool {
         }
     }
 
-    public void runPrompt() throws IOException {
+    void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
@@ -100,6 +110,10 @@ public class ReplTool implements Tool {
     //-------------------------------------------------------------------------
     // Main
 
+    /**
+     * The tool's main routine.
+     * @param args The command-line arguments.
+     */
     public static void main(String[] args) {
         new ReplTool().run(args);
     }

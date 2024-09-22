@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * The various kinds of expression that can appear in Joe's AST.
  */
-public sealed interface Expr
+sealed interface Expr
     permits Expr.Assign, Expr.Binary, Expr.Call, Expr.Get, Expr.Grouping,
             Expr.Lambda, Expr.Literal, Expr.Logical, Expr.Set, Expr.Super,
             Expr.This, Expr.Ternary, Expr.Unary, Expr.Variable

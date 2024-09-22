@@ -186,10 +186,19 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
     //-------------------------------------------------------------------------
     // Iterability
 
+    /**
+     * Gets whether or not values of this type are iterable.
+     * @return true or false
+     */
     public boolean canIterate() {
         return iterableSupplier != null;
     }
 
+    /**
+     * If this type is iterable, returns the value's items for iteration.
+     * @param value The value
+     * @return The items
+     */
     @SuppressWarnings("unchecked")
     public Collection<?> getItems(Object value) {
         return iterableSupplier.apply((V)value);

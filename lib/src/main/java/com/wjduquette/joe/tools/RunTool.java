@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.List;
 
+/**
+ * The implementation for the {@code joe run} tool.
+ */
 public class RunTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
@@ -26,6 +29,7 @@ public class RunTool implements Tool {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /** Creates the tool. */
     public RunTool() {
         // Nothing to do
     }
@@ -33,6 +37,10 @@ public class RunTool implements Tool {
     //-------------------------------------------------------------------------
     // Execution
 
+    /**
+     * Gets implementation info about the tool.
+     * @return The info.
+     */
     public ToolInfo toolInfo() {
         return INFO;
     }
@@ -71,6 +79,10 @@ public class RunTool implements Tool {
     //-------------------------------------------------------------------------
     // Main
 
+    /**
+     * The tool's main routine.
+     * @param args The command-line arguments.
+     */
     public static void main(String[] args) {
         new RunTool().run(args);
     }

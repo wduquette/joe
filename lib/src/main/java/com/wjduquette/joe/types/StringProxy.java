@@ -7,12 +7,17 @@ import com.wjduquette.joe.TypeProxy;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+/**
+ * The type proxy for Joe's String type.
+ */
 public class StringProxy extends TypeProxy<String> {
+    /** The type constant, for installation. */
     public static final StringProxy TYPE = new StringProxy();
 
     //-------------------------------------------------------------------------
     // Constructor
 
+    /** Creates the proxy. */
     public StringProxy() {
         super("String");
 

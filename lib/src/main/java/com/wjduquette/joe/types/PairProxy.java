@@ -5,12 +5,17 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Pair;
 import com.wjduquette.joe.TypeProxy;
 
+/**
+ * The type proxy for the Joe Pair type.
+ */
 public class PairProxy extends TypeProxy<Pair> {
+    /** The type constant, for installation. */
     public static final PairProxy TYPE = new PairProxy();
 
     //-------------------------------------------------------------------------
     // Constructor
 
+    /** Creates the proxy. */
     public PairProxy() {
         super("Pair");
 
@@ -60,7 +65,7 @@ public class PairProxy extends TypeProxy<Pair> {
     // @init
     // @args left, right
     // Creates a `Pair` from two arbitrary values, *left* and *right*.
-    public Object _init(Joe joe, ArgQueue args) {
+    private Object _init(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 2, "Pair(left, right)");
         return new Pair(args.getRemaining(0), args.getRemaining(1));
     }

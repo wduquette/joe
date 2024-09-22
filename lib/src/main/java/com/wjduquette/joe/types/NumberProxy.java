@@ -6,7 +6,11 @@ import com.wjduquette.joe.TypeProxy;
 
 import java.util.List;
 
+/**
+ * The type proxy for Joe's Number type.
+ */
 public class NumberProxy extends TypeProxy<Double> {
+    /** The type constant. */
     public static final NumberProxy TYPE = new NumberProxy();
 
     //-------------------------------------------------------------------------
@@ -19,6 +23,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // useful constants and numeric methods.  Most of the methods
     // gathered here are delegated directly to Java's `java.lang.Math`
     // class; numeric details are to be found there.
+    /** Creates the proxy. */
     public NumberProxy() {
         super("Number");
         staticType();
