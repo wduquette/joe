@@ -14,7 +14,7 @@ public class JoeDocPackage extends Package {
     // The `joe.doc` package contains the Joe API used in
     // the `joe doc` configuration file, `doc_config.joe`.
     public JoeDocPackage(DocConfig config) {
-        super();
+        super("joe.doc");
         this.config = config;
         type(new DocConfigProxy());
     }

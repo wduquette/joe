@@ -8,7 +8,7 @@ public class StandardLibrary extends Package {
     public static final Keyword ERROR = new Keyword("error");
 
     public StandardLibrary() {
-        super();
+        super("joe");
 
         //**
         // @package joe

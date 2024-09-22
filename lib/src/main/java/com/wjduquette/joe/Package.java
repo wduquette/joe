@@ -11,14 +11,16 @@ public class Package {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    private final String name;
+
     private final List<NativeFunction> globalFunctions = new ArrayList<>();
     private final List<TypeProxy<?>> types = new ArrayList<>();
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Package() {
-        // nothing to do yet
+    public Package(String name) {
+        this.name = name;
     }
 
     //-------------------------------------------------------------------------
@@ -40,5 +42,13 @@ public class Package {
     public final void install(Joe joe) {
         globalFunctions.forEach(joe::installGlobalFunction);
         types.forEach(joe::installType);
+    }
+
+    //-------------------------------------------------------------------------
+    // Accessors
+
+    @SuppressWarnings("unused")
+    public String name() {
+        return name;
     }
 }
