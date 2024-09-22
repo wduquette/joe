@@ -13,6 +13,9 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * The implementation for the {@code joe doc} tool.
+ */
 public class DocTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
@@ -27,10 +30,16 @@ public class DocTool implements Tool {
         DocTool::main
     );
 
+    /**
+     * The set of file types normally scanned for doc comments.
+     */
     public static final Set<String> FILE_TYPES = Set.of(
         ".java", ".joe"
     );
 
+    /**
+     * The name of the {@code joe doc} tool's configuration file.
+     */
     public static final Path DOC_CONFIG = Path.of("doc_config.joe");
 
     //-------------------------------------------------------------------------
@@ -42,6 +51,9 @@ public class DocTool implements Tool {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an instance of the DocTool.
+     */
     public DocTool() {
         // Nothing to do
     }
@@ -155,6 +167,10 @@ public class DocTool implements Tool {
     //-------------------------------------------------------------------------
     // Main
 
+    /**
+     * The {@code joe doc} tool's main routine.
+     * @param args The command line arguments
+     */
     public static void main(String[] args) {
         new DocTool().run(args);
     }

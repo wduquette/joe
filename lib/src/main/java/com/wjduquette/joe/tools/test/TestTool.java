@@ -178,8 +178,8 @@ public class TestTool implements Tool {
 
     private Object _assertEquals(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 2, "assertEquals(got, expected)");
-        var got = args.get(0);
-        var expected = args.get(1);
+        var got = args.getRemaining(0);
+        var expected = args.getRemaining(1);
 
         if (!Joe.isEqual(got, expected)) {
             throw new AssertError("Expected '" +
@@ -192,7 +192,7 @@ public class TestTool implements Tool {
 
     private Object _fail(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "fail(message)");
-        throw new AssertError(joe.stringify(args.get(0)));
+        throw new AssertError(joe.stringify(args.getRemaining(0)));
     }
 
     //-------------------------------------------------------------------------

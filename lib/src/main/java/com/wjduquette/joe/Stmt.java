@@ -61,7 +61,7 @@ public sealed interface Stmt
     /**
      * A "for" loop
      * @param init The initializer, e.g., "var i = 0"
-     * @param condition The condition, e.g., "i < 10"
+     * @param condition The condition, e.g., "i &lt; 10"
      * @param incr The incrementer, e.g., "i = i + 1"
      * @param body The body of the loop, a statement or block.
      */

@@ -16,7 +16,8 @@ public class ArgSpec {
 
     /**
      * Validates an arg spec
-     * @return The spec
+     * @param spec The spec
+     * @return true or false
      */
     public static boolean isValid(String spec) {
         for (var name : names(spec)) {
@@ -28,7 +29,8 @@ public class ArgSpec {
     }
 
     /**
-     * Returns the names of the arguments.
+     * Returns the names of the arguments in the spec.
+     * @param spec The spec
      * @return The list of names
      */
     public static List<String> names(String spec) {
@@ -46,7 +48,8 @@ public class ArgSpec {
 
     /**
      * Returns the arg spec as a Markdown string.
-     * @return The list of names
+     * @param spec The spec
+     * @return The Markdown string.
      */
     public static String asMarkdown(String spec) {
         var tokens = spec.splitWithDelimiters("[ ,.\\[\\]]+", 0);

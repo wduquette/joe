@@ -92,7 +92,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     private Object _add(JoeList list, Joe joe, ArgQueue args) {
         Joe.arityRange(args, 1, 2, "add([index], item)");
 
-        if (args.size() == 1) {
+        if (args.remainingArgs() == 1) {
             list.add(args.next());
         } else {
             list.add(
@@ -113,7 +113,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     private Object _addAll(JoeList list, Joe joe, ArgQueue args) {
         Joe.arityRange(args, 1, 2, "addAll([index], collection)");
 
-        if (args.size() == 1) {
+        if (args.remainingArgs() == 1) {
             list.addAll(joe.toList(args.next()));
         } else {
             list.addAll(
@@ -416,7 +416,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // ```
     private Object _sorted(JoeList list, Joe joe, ArgQueue args) {
         Joe.arityRange(args, 0, 1, "sorted([comparator])");
-        if (args.isEmpty()) {
+        if (args.hasRemaining()) {
             var result = list.stream()
                 .sorted(Joe::compare)
                 .toList();
@@ -440,7 +440,7 @@ public class ListProxy extends TypeProxy<JoeList> {
         Joe.arityRange(args, 1, 2, "sublist(start, [end])");
         var start = joe.toIndex(args.next(), list.size());
 
-        if (args.isEmpty()) {
+        if (args.hasRemaining()) {
             return new ListValue(list.subList(start, list.size()));
         } else {
             var end = joe.toIndex(args.next(), list.size() + 1);

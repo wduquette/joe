@@ -68,7 +68,7 @@ public class StringProxy extends TypeProxy<String> {
     // Converts the value into its string representation.
     private Object _init(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "String(value)");
-        return joe.stringify(args.get(0));
+        return joe.stringify(args.getRemaining(0));
     }
 
     //-------------------------------------------------------------------------
@@ -100,7 +100,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns the character at the *index* as a string.
     private Object _charAt(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "charAt(index)");
-        var index = joe.toIndex(args.get(0), value.length());
+        var index = joe.toIndex(args.getRemaining(0), value.length());
         var c = value.charAt(index);
         return Character.toString(c);
     }
@@ -112,7 +112,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns `true` if this contains the *target*, and `false` otherwise.
     private Object _contains(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "contains(target)");
-        var target = joe.stringify(args.get(0));
+        var target = joe.stringify(args.getRemaining(0));
         return value.contains(target);
     }
 
@@ -123,7 +123,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns `true` if this string ends with the suffix, and `false` otherwise.
     private Object _endsWith(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "endsWith(suffix)");
-        var suffix = joe.stringify(args.get(0));
+        var suffix = joe.stringify(args.getRemaining(0));
         return value.endsWith(suffix);
     }
 
@@ -135,7 +135,7 @@ public class StringProxy extends TypeProxy<String> {
     // of the *other* value, ignoring case, and `false` otherwise.
     private Object _equalsIgnoreCase(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "other");
-        return value.equalsIgnoreCase(joe.stringify(args.get(0)));
+        return value.equalsIgnoreCase(joe.stringify(args.getRemaining(0)));
     }
 
     //**
@@ -149,7 +149,7 @@ public class StringProxy extends TypeProxy<String> {
     // so Joe trims it.
     private Object _indent(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "indent(n)");
-        var n = joe.toInteger(args.get(0));
+        var n = joe.toInteger(args.getRemaining(0));
         return value.indent(n).stripTrailing();
     }
 
@@ -165,9 +165,9 @@ public class StringProxy extends TypeProxy<String> {
         Joe.arityRange(args, 1, 3, "indexOf(target, [beginIndex], [endIndex])");
         var target = joe.stringify(args.next());
 
-        if (args.isEmpty()) {
+        if (args.hasRemaining()) {
             return (double) value.indexOf(target);
-        } else if (args.size() == 1) {
+        } else if (args.remainingArgs() == 1) {
             return (double) value.indexOf(target,
                 joe.toInteger(args.next())
             );
@@ -209,7 +209,7 @@ public class StringProxy extends TypeProxy<String> {
     private Object _lastIndexOf(String value, Joe joe, ArgQueue args) {
         Joe.arityRange(args, 1, 2, "lastIndexOf(target, [fromIndex]");
         var target = joe.stringify(args.next());
-        if (args.isEmpty()) {
+        if (args.hasRemaining()) {
             return (double) value.lastIndexOf(target);
         } else {
             return (double) value.lastIndexOf(target,
@@ -343,7 +343,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns `true` if this string starts with the prefix, and `false` otherwise.
     private Object _startsWith(String value, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "startsWith(prefix)");
-        var prefix = joe.stringify(args.get(0));
+        var prefix = joe.stringify(args.getRemaining(0));
         return value.startsWith(prefix);
     }
 
@@ -393,7 +393,7 @@ public class StringProxy extends TypeProxy<String> {
     // to the end of the string.
     private Object _substring(String value, Joe joe, ArgQueue args) {
         Joe.arityRange(args, 1, 2, "substring(beginIndex, [endIndex]");
-        if (args.size() == 1) {
+        if (args.remainingArgs() == 1) {
             return value.substring(
                 joe.toIndex(args.next(), value.length())
             );

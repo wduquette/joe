@@ -2,6 +2,9 @@ package com.wjduquette.joe;
 
 import java.util.List;
 
+/**
+ * The various kinds of expression that can appear in Joe's AST.
+ */
 public sealed interface Expr
     permits Expr.Assign, Expr.Binary, Expr.Call, Expr.Get, Expr.Grouping,
             Expr.Lambda, Expr.Literal, Expr.Logical, Expr.Set, Expr.Super,
@@ -17,8 +20,8 @@ public sealed interface Expr
     record Assign(Token name, Expr value) implements Expr {}
 
     /**
-     * A binary expression, e.g., "+", "<", etc.
-     * See Expr.Logical for "&&" and "||" binaries.
+     * A binary expression, e.g., "+", "&lt;", etc.
+     * See Expr.Logical for "&amp;&amp;" and "||" binaries.
      * @param left The left-hand expression
      * @param op The operator
      * @param right The right-hand expression
@@ -66,7 +69,7 @@ public sealed interface Expr
      * A logical binary operation.
      * See Expr.Binary for normal binary operations, e.g., "+".
      * @param left The left-hand expression
-     * @param op The operator, "&&" or "||"
+     * @param op The operator, "&amp;&amp;" or "||"
      * @param right The right-hand expression
      */
     record Logical(Expr left, Token op, Expr right) implements Expr {}

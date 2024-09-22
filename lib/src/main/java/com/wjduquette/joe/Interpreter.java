@@ -2,7 +2,7 @@ package com.wjduquette.joe;
 
 import java.util.*;
 
-public class Interpreter {
+class Interpreter {
     //-------------------------------------------------------------------------
     // Instance Variables
 

@@ -2,13 +2,29 @@ package com.wjduquette.joe;
 
 import java.util.*;
 
+/**
+ * A Joe environment, a dictionary of variable names and values.
+ */
 public class Environment {
     final Environment enclosing;
     private final Map<String, Object> values = new HashMap<>();
 
+    /**
+     * Creates an environment with no enclosing environment.
+     * This is only done by the {@link GlobalEnvironment}.
+     */
     Environment() {
         enclosing = null;
     }
+
+    /**
+     * Creates an environment with the given enclosing environment.
+     * @param enclosing The enclosing environment.
+     */
+    Environment(Environment enclosing) {
+        this.enclosing = enclosing;
+    }
+
 
     void dump() {
         System.out.println(this);
@@ -18,14 +34,20 @@ public class Environment {
         }
     }
 
-    Environment(Environment enclosing) {
-        this.enclosing = enclosing;
-    }
-
+    /**
+     * Gets the names of the variables declared in this environment.
+     * Does not include variables defined in enclosing environments.
+     * @return The list.
+     */
     public List<String> getVarNames() {
         return new ArrayList<>(values.keySet());
     }
 
+    /**
+     * Gets the value of the named variable.
+     * @param name The name
+     * @return The value
+     */
     public Object getVar(String name) {
         if (values.containsKey(name)) {
             return values.get(name);

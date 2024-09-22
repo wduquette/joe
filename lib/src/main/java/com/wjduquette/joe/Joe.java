@@ -11,6 +11,10 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
 
+/**
+ * The Joe language interpreter.  Clients create an instance of Joe,
+ * install any needed bindings, and then use it to execute Joe scripts.
+ */
 public class Joe {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -26,6 +30,10 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates a clean instance of Joe.  It will include the complete
+     * standard library, but nothing else.
+     */
     public Joe() {
         globals = new GlobalEnvironment();
         interpreter = new Interpreter(this);
@@ -43,12 +51,16 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Configuration and Embedding
 
+    /**
+     * Returns Joe's global environment, for querying.
+     * @return The environment.
+     */
     public GlobalEnvironment getGlobals() {
         return globals;
     }
 
     /**
-     * Installs a package into this interpreter.
+     * Installs a package into Joe's global environment.
      * @param pkg The package
      */
     public void installPackage(Package pkg) {
@@ -64,7 +76,7 @@ public class Joe {
     }
 
     /**
-     * Installs a type proxy into Joe's global environment.
+     * Installs a registered type's proxy into Joe's global environment.
      * @param typeProxy The type proxy.
      */
     public void installType(TypeProxy<?> typeProxy) {
@@ -244,6 +256,12 @@ public class Joe {
         return lookupProxyByClass(object.getClass());
     }
 
+    /**
+     * Looks for a type proxy by the proxied class, rather than by
+     * a value of a proxied class.
+     * @param cls The class
+     * @return The proxy, or null if not found.
+     */
     TypeProxy<?> lookupProxyByClass(Class<?> cls) {
         do {
             var proxy = proxyTable.get(cls);
@@ -258,6 +276,12 @@ public class Joe {
         return null;
     }
 
+    /**
+     * Given a value, gets a JoeObject: either an instance of a JoeClass,
+     * or a ProxiedValue.
+     * @param value The value
+     * @return The JoeObject
+     */
     JoeObject getJoeObject(Object value) {
         if (value instanceof JoeObject obj) {
             return obj;
@@ -362,6 +386,11 @@ public class Joe {
         };
     }
 
+    /**
+     * Gets the script-level type name of the given class.
+     * @param cls The class
+     * @return The name
+     */
     public String classTypeName(Class<?> cls) {
         var proxy = lookupProxyByClass(cls);
         return proxy != null
@@ -473,6 +502,12 @@ public class Joe {
         return true;
     }
 
+    /**
+     * Calls a JoeCallable value with the given arguments.
+     * @param callee A Joe value which must be callable.
+     * @param args The arguments to pass to the callable
+     * @return The result of calling the callable.
+     */
     public Object call(Object callee, Object... args) {
         if (callee instanceof JoeCallable callable) {
             return callable.call(this, new ArgQueue(List.of(args)));
@@ -484,6 +519,13 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Argument parsing and error handling helpers
 
+    /**
+     * Returns a "Wrong number of arguments" JoeError for a method or function
+     * with the given signature.  This is primarily used by the arity checker
+     * methods, but can also be used by native functions and methods at need.
+     * @param signature The signature
+     * @return The error, to be thrown.
+     */
     public static JoeError arityFailure(String signature) {
         return new JoeError("Wrong number of arguments, expected: " + signature);
     }
@@ -497,7 +539,7 @@ public class Joe {
      * @throws JoeError on failure
      */
     public static void exactArity(ArgQueue args, int arity, String signature) {
-        if (args.size() != arity) {
+        if (args.remainingArgs() != arity) {
             throw arityFailure(signature);
         }
     }
@@ -511,7 +553,7 @@ public class Joe {
      * @throws JoeError on failure
      */
     public static void minArity(ArgQueue args, int minArity, String signature) {
-        if (args.size() < minArity) {
+        if (args.remainingArgs() < minArity) {
             throw arityFailure(signature);
         }
     }
@@ -531,7 +573,7 @@ public class Joe {
         int maxArity,
         String signature)
     {
-        if (args.size() < minArity || args.size() > maxArity) {
+        if (args.remainingArgs() < minArity || args.remainingArgs() > maxArity) {
             throw arityFailure(signature);
         }
     }
@@ -562,6 +604,13 @@ public class Joe {
         }
     }
 
+    /**
+     * Requires that the argument is a Double, and returns it as a
+     * double for further processing.
+     * @param arg The argument
+     * @return the value
+     * @throws JoeError if the argument is not a Double.
+     */
     public double toDouble(Object arg) {
         if (arg instanceof Double num) {
             return num;
@@ -570,6 +619,14 @@ public class Joe {
         throw expected("double", arg);
     }
 
+    /**
+     * Requires that the argument is a Double, and returns it as an
+     * integer for further processing.  Any fractional part is
+     * truncated.
+     * @param arg The argument
+     * @return the value
+     * @throws JoeError if the argument is not a Double.
+     */
     public int toInteger(Object arg) {
         if (arg instanceof Double num) {
             return num.intValue();
@@ -578,6 +635,15 @@ public class Joe {
         throw expected("number", arg);
     }
 
+    /**
+     * Requires that the argument is a Double, and returns it as an
+     * integer in the range 0 to limit - 1 for further processing.  Any
+     * fractional part is truncated.
+     * @param arg The argument
+     * @param limit The maximum index - 1, e.g., the size of a list.
+     * @return the value
+     * @throws JoeError if the argument is not a Double or is out of range.
+     */
     public int toIndex(Object arg, int limit) {
         var value = toInteger(arg);
 
@@ -588,6 +654,13 @@ public class Joe {
         throw expected("0 <= index < " + limit, arg);
     }
 
+    /**
+     * Requires that the argument is a Keyword, and returns it as
+     * such.
+     * @param arg The argument
+     * @return The keyword
+     * @throws JoeError if the argument is not a keyword
+     */
     @SuppressWarnings("unused")
     public Keyword toKeyword(Object arg) {
         if (arg instanceof Keyword keyword) {
@@ -597,6 +670,13 @@ public class Joe {
         throw expected("keyword", arg);
     }
 
+    /**
+     * Requires that the argument is a JoeList, and returns it as
+     * such.
+     * @param arg The argument
+     * @return The list
+     * @throws JoeError if the argument is not a JoeList
+     */
     public JoeList toList(Object arg) {
         if (arg instanceof JoeList list) {
             return list;
@@ -607,6 +687,15 @@ public class Joe {
         }
     }
 
+    /**
+     * Requires that the argument is a String, and returns it as
+     * such. Contrast this with {@code stringify()}, which converts
+     * the argument to its String representation.  Which to use is
+     * sometimes a matter of need, and sometimes a matter of taste.
+     * @param arg The argument
+     * @return The string
+     * @throws JoeError if the argument is not a String
+     */
     public String toString(Object arg) {
         if (arg instanceof String string) {
             return string;
@@ -615,6 +704,16 @@ public class Joe {
         throw expected("string", arg);
     }
 
+
+    /**
+     * Requires that the argument be assignable to a variable of the
+     * given class, and returns it as such.
+     * @param cls The class
+     * @param arg The argument
+     * @return The value as cast
+     * @param <T> The required value type.
+     * @throws JoeError if the argument is not a valid T.
+     */
     @SuppressWarnings("unchecked")
     public <T> T toType(Class<T> cls, Object arg) {
         if (arg != null && cls.isAssignableFrom(arg.getClass())) {

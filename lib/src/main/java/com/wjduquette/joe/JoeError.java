@@ -3,6 +3,11 @@ package com.wjduquette.joe;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is the base class for all error exceptions thrown by Joe at
+ * runtime.  It can include line number information, as well as a
+ * "stack trace" built up by the Joe interpreter.
+ */
 public class JoeError extends RuntimeException {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -17,17 +22,21 @@ public class JoeError extends RuntimeException {
     // Constructor
 
     /**
-     * Creates an error with no line number info
+     * Creates an error with no line number info and an optional number
+     * of stack frame strings.
      * @param message The error message.
+     * @param frames The stack frame strings.
      */
     public JoeError(String message, String... frames) {
         this(-1, message, frames);
     }
 
     /**
-     * Creates an error with line number info
+     * Creates an error with line number info and an optional number
+     * of stack frame strings.
      * @param line The line number
      * @param message The error message.
+     * @param frames The stack frame strings.
      */
     public JoeError(int line, String message, String... frames) {
         super(message);
@@ -53,6 +62,11 @@ public class JoeError extends RuntimeException {
         return frames;
     }
 
+    /**
+     * Gets the script-level stack trace based on the provided stack
+     * frame strings.
+     * @return The stack trace
+     */
     public String getJoeStackTrace() {
         return frames.isEmpty()
             ? getMessage()

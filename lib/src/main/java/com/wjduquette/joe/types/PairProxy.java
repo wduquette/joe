@@ -62,7 +62,7 @@ public class PairProxy extends TypeProxy<Pair> {
     // Creates a `Pair` from two arbitrary values, *left* and *right*.
     public Object _init(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 2, "Pair(left, right)");
-        return new Pair(args.get(0), args.get(1));
+        return new Pair(args.getRemaining(0), args.getRemaining(1));
     }
 
     //-------------------------------------------------------------------------

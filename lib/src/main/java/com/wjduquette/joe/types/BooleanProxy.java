@@ -4,7 +4,13 @@ import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.TypeProxy;
 
+/**
+ * The type proxy for Joe's `Boolean` type.
+ */
 public class BooleanProxy extends TypeProxy<Boolean> {
+    /**
+     * The proxy's constant, used for installation.
+     */
     public static final BooleanProxy TYPE = new BooleanProxy();
 
     //-------------------------------------------------------------------------
@@ -14,6 +20,10 @@ public class BooleanProxy extends TypeProxy<Boolean> {
     // @package joe
     // @type Boolean
     // The `Boolean` type has the expected values `true` and `false`.
+
+    /**
+     * Creates an instance of the proxy.
+     */
     public BooleanProxy() {
         super("Boolean");
         staticType();

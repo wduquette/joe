@@ -40,7 +40,7 @@ public class StandardLibrary extends Package {
     // `Pair(#error, Error)` on error.
     private Object _catch(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "catch(callable)");
-        var callable = args.get(0);
+        var callable = args.getRemaining(0);
 
         try {
             var result = joe.call(callable);
@@ -53,7 +53,7 @@ public class StandardLibrary extends Package {
     private Object _codify(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "codify(value)");
 
-        return joe.codify(args.get(0));
+        return joe.codify(args.getRemaining(0));
     }
 
     //**
@@ -77,7 +77,7 @@ public class StandardLibrary extends Package {
     private Object _print(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "print(text)");
 
-        joe.print(joe.stringify(args.get(0)));
+        joe.print(joe.stringify(args.getRemaining(0)));
         return null;
     }
 
@@ -89,10 +89,10 @@ public class StandardLibrary extends Package {
     private Object _println(Joe joe, ArgQueue args) {
         Joe.arityRange(args, 0, 1, "println([text])");
 
-        if (args.isEmpty()) {
+        if (args.hasRemaining()) {
             joe.println();
         } else {
-            joe.println(joe.stringify(args.get(0)));
+            joe.println(joe.stringify(args.getRemaining(0)));
         }
         return null;
     }
@@ -106,7 +106,7 @@ public class StandardLibrary extends Package {
     private Object _stringify(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "stringify(value)");
 
-        return joe.stringify(args.get(0));
+        return joe.stringify(args.getRemaining(0));
     }
 
     //**
@@ -117,6 +117,6 @@ public class StandardLibrary extends Package {
     private Object _typeName(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "typeName(value)");
 
-        return joe.typeName(args.get(0));
+        return joe.typeName(args.getRemaining(0));
     }
 }

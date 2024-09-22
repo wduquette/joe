@@ -2,7 +2,7 @@ package com.wjduquette.joe.tools.doc;
 
 import java.io.*;
 
-public class ContentWriter extends PrintWriter {
+class ContentWriter extends PrintWriter {
     //-------------------------------------------------------------------------
     // Constructor
 

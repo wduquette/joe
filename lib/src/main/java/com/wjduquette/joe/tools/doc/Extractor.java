@@ -6,7 +6,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Extractor {
+/**
+ * The extractor extracts doc comments from a scanned file, and returns them
+ * as a list of {@link Line} objects for parsing.
+ */
+class Extractor {
     private static final String START = "//**";
     private static final String BODY = "//";
 

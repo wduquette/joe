@@ -5,12 +5,19 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.TypeProxy;
 
+/**
+ * The type proxy for {@link JoeError} values.
+ */
 public class ErrorProxy extends TypeProxy<JoeError> {
+    /** The proxy's TYPE constant. */
     public static final ErrorProxy TYPE = new ErrorProxy();
 
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an instance of the proxy.
+     */
     public ErrorProxy() {
         super("Error");
 
@@ -43,7 +50,7 @@ public class ErrorProxy extends TypeProxy<JoeError> {
     // @init
     // @args message
     // Creates an `Error` with the given *message*.
-    public Object _initializer(Joe joe, ArgQueue args) {
+    private Object _initializer(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "Error(message)");
         return new JoeError(joe.stringify(args.next()));
     }

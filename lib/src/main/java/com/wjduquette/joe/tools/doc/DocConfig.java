@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Configuration data for `joe doc`
  */
-public class DocConfig {
+class DocConfig {
     //-------------------------------------------------------------------------
     // Instance Variables
 
