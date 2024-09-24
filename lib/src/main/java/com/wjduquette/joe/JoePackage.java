@@ -7,7 +7,7 @@ import java.util.List;
  * A package containing Joe functions and or types, for installation into
  * a Joe interpreter.
  */
-public class Package {
+public class JoePackage {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -15,6 +15,7 @@ public class Package {
 
     private final List<NativeFunction> globalFunctions = new ArrayList<>();
     private final List<TypeProxy<?>> types = new ArrayList<>();
+    private final List<ScriptResource> scriptResources = new ArrayList<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -24,7 +25,7 @@ public class Package {
      * dotted identifier, like a Java package name.
      * @param name The name.
      */
-    public Package(String name) {
+    public JoePackage(String name) {
         this.name = name;
     }
 
@@ -49,6 +50,16 @@ public class Package {
     }
 
     /**
+     * Adds a script resource file to the package given a Java class
+     * and a resource file name relative to the location of that class.
+     * @param cls The class
+     * @param resource The resource file name.
+     */
+    public final void scriptResource(Class<?> cls, String resource) {
+        scriptResources.add(new ScriptResource(cls, resource));
+    }
+
+    /**
      * Installs the package's native functions and types into the
      * engine.
      * @param joe The engine
@@ -56,6 +67,7 @@ public class Package {
     public final void install(Joe joe) {
         globalFunctions.forEach(joe::installGlobalFunction);
         types.forEach(joe::installType);
+        scriptResources.forEach(r -> joe.installScriptResource(r.cls, r.name));
     }
 
     //-------------------------------------------------------------------------
@@ -69,4 +81,9 @@ public class Package {
     public String name() {
         return name;
     }
+
+    //-------------------------------------------------------------------------
+    // Helper Classes
+
+    private record ScriptResource(Class<?> cls, String name) {}
 }

@@ -110,7 +110,7 @@ public class TestTool implements Tool {
 
         // NEXT, configure the engine.
         var joe = new Joe();
-        installTestFunctions(joe);
+        joe.installPackage(TestPackage.PACKAGE);
 
         // FIRST, load the script.
         try {
@@ -171,34 +171,6 @@ public class TestTool implements Tool {
                 }
             }
         }
-    }
-
-    private void installTestFunctions(Joe joe) {
-        joe.installGlobalFunction(
-            new NativeFunction("assertEquals", this::_assertEquals));
-        joe.installGlobalFunction(
-            new NativeFunction("fail", this::_fail));
-
-        joe.installScriptResource(getClass(), "lib_test.joe");
-    }
-
-    private Object _assertEquals(Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 2, "assertEquals(got, expected)");
-        var got = args.getRemaining(0);
-        var expected = args.getRemaining(1);
-
-        if (!Joe.isEqual(got, expected)) {
-            throw new AssertError("Expected '" +
-                joe.stringify(expected) + "', got: '" +
-                joe.stringify(got) + "'.");
-        }
-
-        return null;
-    }
-
-    private Object _fail(Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "fail(message)");
-        throw new AssertError(joe.stringify(args.getRemaining(0)));
     }
 
     //-------------------------------------------------------------------------

@@ -64,6 +64,7 @@ public class Joe {
      * @param name The name
      * @return The value, if found
      */
+    @SuppressWarnings("unused")
     public Optional<Object> getVar(String name) {
         return Optional.ofNullable(globals.getVar(name));
     }
@@ -73,6 +74,7 @@ public class Joe {
      * @param name The name
      * @param value The name
      */
+    @SuppressWarnings("unused")
     public void setVar(String name, Object value) {
         globals.setVar(name, value);
     }
@@ -81,7 +83,7 @@ public class Joe {
      * Installs a package into Joe's global environment.
      * @param pkg The package
      */
-    public void installPackage(Package pkg) {
+    public void installPackage(JoePackage pkg) {
         pkg.install(this);
     }
 
