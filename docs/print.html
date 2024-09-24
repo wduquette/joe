@@ -187,7 +187,7 @@ language.  Others might find it useful or interesting as well.</p>
 <li>With few, if any, external dependencies</li>
 <li>That is Java-friendly in its syntax and semantics</li>
 <li>That can work with native Java types</li>
-<li>With a simple API for embedding it in an application or aPackage</li>
+<li>With a simple API for embedding it in an application or library</li>
 <li>That provides excellent compilation and runtime error messages</li>
 <li>That is naturally sandboxed at the script level
 <ul>
@@ -242,9 +242,10 @@ and run my embedded Javascript in Node.  Um, no.  The tail on that dog is
 much too big.</p>
 <p>I've used LuaJ quite a bit. It has some nice features, but the syntax and some
 of the language choices are weird from a Java point of view; the error
-messages are frequently unhelpful; the aPackage is incomplete; and I kinda hate
-Lua tables with a passion.  (I've been acquainted with "associative arrays"
-since I learned Awk in the late 1980's.  But Lua tables are just weird.)</p>
+messages are frequently unhelpful; the standard library is incomplete; and I
+kinda hate Lua tables with a passion.  (I've been acquainted with "associative
+arrays" since I learned Awk in the late 1980's.  But Lua tables are just weird,
+and the standard table API has some peculiar holes.)</p>
 <p>And then I ran into Robert Nystrom's Lox (see below), and realized that I
 could build on his example and produce a language that meets my needs and
 aesthetics.</p>
@@ -351,7 +352,7 @@ type <code>V</code>.  A <code>TypeProxy</code> can provide
 </li>
 </ul>
 </li>
-<li>Added notion of a <code>Package</code>, which defines some number of global
+<li>Added notion of a <code>JoePackage</code>, which defines some number of global
 functions and type proxies.</li>
 <li>All script-level output now goes through <code>Joe::setOutputHandler</code>,
 which defaults to writing to <code>System.out</code>.
@@ -1360,23 +1361,29 @@ at the Java level even when they are implemented primarily as Joe code.</p>
 <p>Defining a package is much like defining a
 <a href="extending/registered_types.html">registered type</a>.</p>
 <ul>
-<li>Subclass <code>Package</code></li>
+<li>Subclass <code>JoePackage</code></li>
 <li>Give the package a name</li>
 <li>Add content.</li>
 </ul>
 <p>For example, the [Standard Library] package, <code>joe</code>, is defined like this:</p>
-<pre><code class="language-java">public class StandardLibrary extends Package {
+<pre><code class="language-java">public class StandardLibrary extends JoePackage {
     public static final StandardLibrary PACKAGE = new StandardLibrary();
     ...
 
     public StandardLibrary() {
-        super("joe");                           // &lt;-- define package name
+        // Define the package name
+        super("joe");
 
-        globalFunction("catch", this::_catch);  // &lt;-- Native function
+        // Add native functions
+        globalFunction("catch", this::_catch);
         ...
 
-        type(BooleanProxy.TYPE);                // &lt;-- Type proxy
+        // Add native types
+        type(BooleanProxy.TYPE);
         ...
+        
+        // Include script resources
+        scriptResource(getClass(), "pkg.joe.joe");
     }
     ...
 }
@@ -1384,13 +1391,17 @@ at the Java level even when they are implemented primarily as Joe code.</p>
 <p>A global function is just a <a href="extending/native_functions.html">native function</a>; when the
 package is installed, each defined global function will be
 installed automatically into the interpreter using <code>Joe::installGlobalFunction</code>.
-The function implementations are typically placed within the <code>Package</code> subclass
+The function implementations are typically placed within the <code>JoePackage</code> subclass
 itself, as shown here.</p>
 <p>The types are simply <a href="extending/registered_types.html">registered types</a>; when the
 package is installed, each listed type will be installed automatically
 into the interpreter using <code>Joe::installType</code>.  The actual proxies
-can be defined as nested classes in the <code>Package</code> subclass, but are
+can be defined as nested classes in the <code>JoePackage</code> subclass, but are
 more typically defined in their own <code>.java</code> files.</p>
+<p>Finally, a script resource is simply a Joe script found as a resource file
+in the project's jar file, usually adjacent to the package class that
+references it.  At installation, the script resources will be loaded and
+executed after the global functions and native types.</p>
 <h2 id="installing-a-package"><a class="header" href="#installing-a-package">Installing a Package</a></h2>
 <p>To install a package into an interpreter, use <code>Joe::installPackage</code>:</p>
 <pre><code class="language-java">var joe = Joe();
@@ -1399,12 +1410,12 @@ joe.installPackage(MyPackage.PACKAGE);
 </code></pre>
 <h2 id="library-packages-vs-component-packages"><a class="header" href="#library-packages-vs-component-packages">Library Packages vs. Component Packages</a></h2>
 <p>Reusable libraries, such as Joe's standard library, are usually defined
-as <code>Package</code> subclasses, as shown here.</p>
+as <code>JoePackage</code> subclasses, as shown here.</p>
 <p>Often, though, a particular component, e.g., <code>joe test</code>, will define a
 component-specific package of code, which is installed automatically by
 the component into the component's own instance of <code>Joe</code>.  In this
-case the component might or might not define an explicit <code>Package</code> subclass,
-as the <code>Package</code> is primarily a convenient way for a client to install
+case the component might or might not define an explicit <code>JoePackage</code> subclass,
+as the <code>JoePackage</code> is primarily a convenient way for a client to install
 reusable bindings.</p>
 <p>However, the component API should still be thought of as a package, and
 given a package name, as this is how distinct bindings are distinguished

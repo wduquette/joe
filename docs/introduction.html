@@ -186,7 +186,7 @@ language.  Others might find it useful or interesting as well.</p>
 <li>With few, if any, external dependencies</li>
 <li>That is Java-friendly in its syntax and semantics</li>
 <li>That can work with native Java types</li>
-<li>With a simple API for embedding it in an application or aPackage</li>
+<li>With a simple API for embedding it in an application or library</li>
 <li>That provides excellent compilation and runtime error messages</li>
 <li>That is naturally sandboxed at the script level
 <ul>
@@ -241,9 +241,10 @@ and run my embedded Javascript in Node.  Um, no.  The tail on that dog is
 much too big.</p>
 <p>I've used LuaJ quite a bit. It has some nice features, but the syntax and some
 of the language choices are weird from a Java point of view; the error
-messages are frequently unhelpful; the aPackage is incomplete; and I kinda hate
-Lua tables with a passion.  (I've been acquainted with "associative arrays"
-since I learned Awk in the late 1980's.  But Lua tables are just weird.)</p>
+messages are frequently unhelpful; the standard library is incomplete; and I
+kinda hate Lua tables with a passion.  (I've been acquainted with "associative
+arrays" since I learned Awk in the late 1980's.  But Lua tables are just weird,
+and the standard table API has some peculiar holes.)</p>
 <p>And then I ran into Robert Nystrom's Lox (see below), and realized that I
 could build on his example and produce a language that meets my needs and
 aesthetics.</p>

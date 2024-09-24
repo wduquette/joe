@@ -15,7 +15,7 @@ I wanted a language
 - With few, if any, external dependencies
 - That is Java-friendly in its syntax and semantics
 - That can work with native Java types
-- With a simple API for embedding it in an application or aPackage
+- With a simple API for embedding it in an application or library
 - That provides excellent compilation and runtime error messages
 - That is naturally sandboxed at the script level
   - I.e., scripts cannot access arbitrary Java packages, the operating system,
@@ -82,9 +82,10 @@ much too big.
 
 I've used LuaJ quite a bit. It has some nice features, but the syntax and some
 of the language choices are weird from a Java point of view; the error
-messages are frequently unhelpful; the aPackage is incomplete; and I kinda hate
-Lua tables with a passion.  (I've been acquainted with "associative arrays" 
-since I learned Awk in the late 1980's.  But Lua tables are just weird.)
+messages are frequently unhelpful; the standard library is incomplete; and I 
+kinda hate Lua tables with a passion.  (I've been acquainted with "associative 
+arrays" since I learned Awk in the late 1980's.  But Lua tables are just weird,
+and the standard table API has some peculiar holes.)
 
 And then I ran into Robert Nystrom's Lox (see below), and realized that I
 could build on his example and produce a language that meets my needs and 

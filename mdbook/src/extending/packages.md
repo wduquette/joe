@@ -25,25 +25,31 @@ at the Java level even when they are implemented primarily as Joe code.
 Defining a package is much like defining a 
 [registered type](registered_types.md).
 
-- Subclass `Package`
+- Subclass `JoePackage`
 - Give the package a name
 - Add content.
 
 For example, the [Standard Library] package, `joe`, is defined like this:
 
 ```java
-public class StandardLibrary extends Package {
+public class StandardLibrary extends JoePackage {
     public static final StandardLibrary PACKAGE = new StandardLibrary();
     ...
 
     public StandardLibrary() {
-        super("joe");                           // <-- define package name
+        // Define the package name
+        super("joe");
 
-        globalFunction("catch", this::_catch);  // <-- Native function
+        // Add native functions
+        globalFunction("catch", this::_catch);
         ...
 
-        type(BooleanProxy.TYPE);                // <-- Type proxy
+        // Add native types
+        type(BooleanProxy.TYPE);
         ...
+        
+        // Include script resources
+        scriptResource(getClass(), "pkg.joe.joe");
     }
     ...
 }
@@ -52,14 +58,19 @@ public class StandardLibrary extends Package {
 A global function is just a [native function](native_functions.md); when the
 package is installed, each defined global function will be 
 installed automatically into the interpreter using `Joe::installGlobalFunction`.
-The function implementations are typically placed within the `Package` subclass 
+The function implementations are typically placed within the `JoePackage` subclass 
 itself, as shown here.
 
 The types are simply [registered types](registered_types.md); when the
 package is installed, each listed type will be installed automatically
 into the interpreter using `Joe::installType`.  The actual proxies
-can be defined as nested classes in the `Package` subclass, but are
+can be defined as nested classes in the `JoePackage` subclass, but are
 more typically defined in their own `.java` files.
+
+Finally, a script resource is simply a Joe script found as a resource file 
+in the project's jar file, usually adjacent to the package class that 
+references it.  At installation, the script resources will be loaded and 
+executed after the global functions and native types.
 
 ## Installing a Package
 
@@ -74,13 +85,13 @@ joe.installPackage(MyPackage.PACKAGE);
 ## Library Packages vs. Component Packages
 
 Reusable libraries, such as Joe's standard library, are usually defined 
-as `Package` subclasses, as shown here.
+as `JoePackage` subclasses, as shown here.
 
 Often, though, a particular component, e.g., `joe test`, will define a
 component-specific package of code, which is installed automatically by
 the component into the component's own instance of `Joe`.  In this 
-case the component might or might not define an explicit `Package` subclass,
-as the `Package` is primarily a convenient way for a client to install
+case the component might or might not define an explicit `JoePackage` subclass,
+as the `JoePackage` is primarily a convenient way for a client to install
 reusable bindings.
 
 However, the component API should still be thought of as a package, and

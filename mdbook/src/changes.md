@@ -45,7 +45,7 @@ Joe 0.2.0 extends Joe on every axis.
       - E.g., a `String`'s `length()` method.
     - Static methods and constants
       - E.g., `Double.PI`, `Double.abs()`.
-  - Added notion of a `Package`, which defines some number of global
+  - Added notion of a `JoePackage`, which defines some number of global
     functions and type proxies.
   - All script-level output now goes through `Joe::setOutputHandler`,
     which defaults to writing to `System.out`.
