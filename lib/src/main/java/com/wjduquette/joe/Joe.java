@@ -60,6 +60,24 @@ public class Joe {
     }
 
     /**
+     * Gets a global variable's value by name.
+     * @param name The name
+     * @return The value, if found
+     */
+    public Optional<Object> getVar(String name) {
+        return Optional.ofNullable(globals.getVar(name));
+    }
+
+    /**
+     * Sets a global variable's value by name.
+     * @param name The name
+     * @param value The name
+     */
+    public void setVar(String name, Object value) {
+        globals.setVar(name, value);
+    }
+
+    /**
      * Installs a package into Joe's global environment.
      * @param pkg The package
      */
@@ -72,7 +90,7 @@ public class Joe {
      * @param function The function
      */
     public void installGlobalFunction(NativeFunction function) {
-        globals.define(function.name(), function);
+        globals.setVar(function.name(), function);
     }
 
     /**
@@ -86,7 +104,7 @@ public class Joe {
         }
 
         // NEXT, install the type into the environment.
-        globals.define(typeProxy.getTypeName(), typeProxy);
+        globals.setVar(typeProxy.getTypeName(), typeProxy);
     }
 
     /**

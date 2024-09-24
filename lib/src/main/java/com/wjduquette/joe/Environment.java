@@ -84,7 +84,7 @@ public class Environment {
             "Undefined variable '" + name.lexeme() + "'.");
     }
 
-    void define(String name, Object value) {
+    void setVar(String name, Object value) {
         values.put(name, value);
     }
 

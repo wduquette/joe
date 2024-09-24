@@ -69,7 +69,7 @@ public final class JoeFunction implements JoeCallable {
 
     JoeFunction bind(JoeInstance instance) {
         Environment environment = new Environment(closure);
-        environment.define("this", instance);
+        environment.setVar("this", instance);
         return new JoeFunction(declaration, environment, isInitializer);
     }
 
@@ -89,13 +89,13 @@ public final class JoeFunction implements JoeCallable {
         Environment environment = new Environment(closure);
 
         for (int i = 0; i < expected; i++) {
-            environment.define(declaration.params().get(i).lexeme(),
+            environment.setVar(declaration.params().get(i).lexeme(),
                 args.next());
         }
 
         if (isVarArgs) {
             var varArgs = new ArrayList<>(args.remainder());
-            environment.define(Parser.ARGS, varArgs);
+            environment.setVar(Parser.ARGS, varArgs);
         }
 
         try {

@@ -73,7 +73,7 @@ class Interpreter {
                 }
 
                 // The class itself
-                environment.define(stmt.name().lexeme(), null);
+                environment.setVar(stmt.name().lexeme(), null);
 
                 // Static Methods
                 Map<String, JoeFunction> staticMethods = new HashMap<>();
@@ -87,7 +87,7 @@ class Interpreter {
                 if (stmt.superclass() != null) {
                     // Push a new environment to contain "super"
                     environment = new Environment(environment);
-                    environment.define("super", superclass);
+                    environment.setVar("super", superclass);
                 }
 
                 Map<String, JoeFunction> methods = new HashMap<>();
@@ -154,7 +154,7 @@ class Interpreter {
 
                 for (var item : collection) {
                     try {
-                        environment.define(stmt.varName().lexeme(), item);
+                        environment.setVar(stmt.varName().lexeme(), item);
                         execute(stmt.body());
                     } catch (Break ex) {
                         break;
@@ -165,7 +165,7 @@ class Interpreter {
             }
             case Stmt.Function stmt -> {
                 var function = new JoeFunction(stmt, environment, false);
-                environment.define(stmt.name().lexeme(), function);
+                environment.setVar(stmt.name().lexeme(), function);
             }
             case Stmt.If stmt -> {
                 if (Joe.isTruthy(evaluate(stmt.condition()))) {
@@ -193,7 +193,7 @@ class Interpreter {
                 if (stmt.initializer() != null) {
                     value = evaluate(stmt.initializer());
                 }
-                environment.define(stmt.name().lexeme(), value);
+                environment.setVar(stmt.name().lexeme(), value);
             }
             case Stmt.While stmt -> {
                 while (Joe.isTruthy(evaluate(stmt.condition()))) {
