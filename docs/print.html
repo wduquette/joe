@@ -1560,7 +1560,141 @@ various other niceties.  See
 <a href="embedding/embedding.html">Embedding Joe</a> and
 <a href="extending/extending.html">Extending Joe</a> for details.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="joe-test"><a class="header" href="#joe-test">joe test</a></h1>
-<p>TODO: Describe <code>joe test</code> and how to write and execute Joe test suites.</p>
+<p>The <code>joe test</code> tool is used to execute test scripts for Joe code and
+native APIs. This section explains how to write a test script,
+run tests, and interpret the results; and also how to extend Joe's
+test runner to include client-specific Joe
+<a href="extending/packages.html">packages</a>.</p>
+<ul>
+<li><a href="joe_test.html#writing-a-test-script">Writing a Test Script</a></li>
+<li><a href="joe_test.html#test-outcomes">Test Outcomes</a></li>
+<li><a href="joe_test.html#test-scaffolding">Test Scaffolding</a></li>
+<li><a href="joe_test.html#test-checkers">Test Checkers</a></li>
+<li><a href="joe_test.html#running-test-scripts">Running Test Scripts</a></li>
+<li><a href="joe_test.html#extending-the-test-runner">Extending the Test Runner</a></li>
+</ul>
+<h2 id="writing-a-test-script"><a class="header" href="#writing-a-test-script">Writing a Test Script</a></h2>
+<p>A test script is simply a Joe script containing tests, to be executed by
+the <code>joe test</code> tool.  A test is a no-argument function whose name
+begins with the string "test":</p>
+<pre><code class="language-joe">function testSomething() {
+    // Test Something
+}
+</code></pre>
+<p><code>joe test</code> loads the file and then executes each of the test functions
+one at a time, keeping track of the results.  <strong>Note</strong>: the order in which
+the functions will be executed is not the same as the order in which
+they appear in the file.  Take care to make each test independent of
+the other tests in the file.</p>
+<h2 id="test-outcomes"><a class="header" href="#test-outcomes">Test Outcomes</a></h2>
+<p>For each test there are three possible outcomes:</p>
+<div class="table-wrapper"><table><thead><tr><th>Result</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>Success</td><td>The test ran without error</td></tr>
+<tr><td>Failure</td><td>The test threw an <code>AssertError</code></td></tr>
+<tr><td>Error</td><td>The test threw some other <code>JoeError</code></td></tr>
+</tbody></table>
+</div>
+<p>Here's a successful test:</p>
+<pre><code class="language-joe">function testAddition() {
+    var x = 2 + 2;
+    assert x == 4;
+}
+</code></pre>
+<p>And here's a failure:</p>
+<pre><code class="language-joe">function testAddition() {
+    var x = 2 + 2;
+    assert x == 5;
+}
+</code></pre>
+<p>And here's an error; <code>println()</code> only takes a single argument</p>
+<pre><code class="language-joe">function testAddition() {
+    var x = 2 + 2;
+    println("x=", x);  // &lt;- invalid syntax!
+    assert x == 4;
+}
+</code></pre>
+<h2 id="test-scaffolding"><a class="header" href="#test-scaffolding">Test Scaffolding</a></h2>
+<p>In addition to the test functions, a test script can also contain any number
+of other functions and classes, used as "scaffolding" by the tests.</p>
+<p>However, individual test scripts are totally independent; they are executed
+in distinct interpreters, so that there is no possibility of cross-talk.</p>
+<h2 id="test-checkers"><a class="header" href="#test-checkers">Test Checkers</a></h2>
+<p>The example above uses the <code>assert</code> statement to check the result of
+computations.  This is a viable alternative; in addition, Joe's
+test runner defines a collection of functions and methods for testing
+results more simply and with better error messages.  See the
+<a href="library/pkg.joe.test.html">Joe Test Tool API</a> for the details.</p>
+<p>For example, the test above would more typically be written like this:</p>
+<pre><code class="language-joe">function testAddition() {
+    var x = 2 + 2;
+    check(x).eq(4);
+}
+</code></pre>
+<h2 id="running-test-scripts"><a class="header" href="#running-test-scripts">Running Test Scripts</a></h2>
+<p>To run one or more test scripts, just pass their file names to <code>joe test</code>:</p>
+<pre><code class="language-shell">$ cd joe/tests
+$ joe test *.joe
+
+Successes: 118
+Failures:  0
+Error:     0
+Total:     118
+
+ALL TESTS PASS
+</code></pre>
+<p>By default, Joe will only display more information for failed tests:</p>
+<pre><code class="language-shell">$ joe test *.joe
+testEndsWith                   in file type.joe.String.joe
+  FAILED: Expected true, got: Boolean 'false'.
+
+Successes: 117
+Failures:  1
+Error:     0
+Total:     118
+</code></pre>
+<p>In particular, any output printed by tests is hidden.  To see all test
+output, use the <code>--verbose</code> option (aka <code>-v</code>).  The output will list
+each test script, each test name in the file, and any output related
+to each test.</p>
+<pre><code class="language-shell">$ joe test -v *.joe
+
+Running: lang_class.joe
+
+testCanSetFields               in file lang_class.joe
+testStaticInitializer          in file lang_class.joe
+testInit                       in file lang_class.joe
+testStaticMethods              in file lang_class.joe
+testCanCallMethods             in file lang_class.joe
+testClassCapturesScope         in file lang_class.joe
+...
+
+Successes: 118
+Failures:  0
+Error:     0
+Total:     118
+
+ALL TESTS PASS
+</code></pre>
+<h2 id="extending-the-test-runner"><a class="header" href="#extending-the-test-runner">Extending the Test Runner</a></h2>
+<p>As with <code>joe run</code> and <code>joe repl</code>, Joe conducts all tests in a vanilla Joe
+interpreter; the only extensions are <code>joe test</code>'s
+<a href="library/pkg.joe.test.html">test API</a>.  A client project will usually wish to use
+the test runner for its own Joe bindings.</p>
+<p>And as with <code>joe run</code>, Joe can't predict the context in which those bindings
+will need to be tested; it might be an entire scriptable application.  Thus,
+Joe expects that client will provide their own test tool.</p>
+<p>As of Joe 0.2.0, the simplest way to do this is to copy the test tool and
+modify the copy.  The test tool is defined by the Java class
+<code>com.wjduquette.joe.tools.test.TestTool</code>.  It is a short, straightforward
+file.</p>
+<p>The relevant code is in the <code>runTest()</code> method:</p>
+<pre><code class="language-java">// NEXT, configure the engine.
+var joe = new Joe();
+joe.installPackage(TestPackage.PACKAGE);
+</code></pre>
+<p>At this point in <code>runTest</code>, install any required native functions, types,
+or packages as described in <a href="extending/extending.html">Extending Joe</a>.</p>
+<p>We hope to make this simpler in a later release.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="joe-doc"><a class="header" href="#joe-doc">joe doc</a></h1>
 <p>TODO: describe how to add JoeDoc comments to <code>.java</code> and <code>.joe</code> source
 files, and how to use the <code>joe doc</code> tool to produce finished
