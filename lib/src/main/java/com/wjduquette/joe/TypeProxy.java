@@ -68,7 +68,7 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
      * @param callable The callable that implements the method.
      */
     public void staticMethod(String name, JoeCallable callable) {
-        staticMethods.put(name, new NativeFunction(name, callable));
+        staticMethods.put(name, new NativeFunction(name, "static method", callable));
     }
 
     /**
@@ -98,7 +98,7 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
      * @param callable The callable
      */
     public void initializer(JoeCallable callable) {
-        this.initializer = new NativeFunction(typeName, callable);
+        this.initializer = new NativeFunction(typeName, "initializer", callable);
     }
 
     /**

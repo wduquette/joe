@@ -38,7 +38,7 @@ public class JoePackage {
      * @param callable The callable, usually a method reference.
      */
     public final void globalFunction(String name, JoeCallable callable) {
-        globalFunctions.add(new NativeFunction(name, callable));
+        globalFunctions.add(new NativeFunction(name, "function", callable));
     }
 
     /**

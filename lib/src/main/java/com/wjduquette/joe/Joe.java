@@ -41,7 +41,7 @@ public class Joe {
         codifier = new Codifier(this);
 
         StandardLibrary.PACKAGE.install(this);
-        installGlobalFunction(new NativeFunction("dumpEnv", this::_dumpEnv));
+        installGlobalFunction(new NativeFunction("dumpEnv", "function", this::_dumpEnv));
     }
 
     private Object _dumpEnv(Joe joe, ArgQueue args) {
