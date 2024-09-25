@@ -421,7 +421,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // ```
     private Object _sorted(JoeList list, Joe joe, ArgQueue args) {
         Joe.arityRange(args, 0, 1, "sorted([comparator])");
-        if (args.hasRemaining()) {
+        if (!args.hasRemaining()) {
             var result = list.stream()
                 .sorted(Joe::compare)
                 .toList();
@@ -445,7 +445,7 @@ public class ListProxy extends TypeProxy<JoeList> {
         Joe.arityRange(args, 1, 2, "sublist(start, [end])");
         var start = joe.toIndex(args.next(), list.size());
 
-        if (args.hasRemaining()) {
+        if (!args.hasRemaining()) {
             return new ListValue(list.subList(start, list.size()));
         } else {
             var end = joe.toIndex(args.next(), list.size() + 1);
