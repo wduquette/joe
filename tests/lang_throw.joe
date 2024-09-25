@@ -2,17 +2,52 @@
 
 function testThrowString() {
     checkCatch(\-> { throw "Simulated Error."; })
-        .message("Simulated Error.");
+        .message("Simulated Error.")
+        .stackFrames(
+            "In lambda \\ -> ..."
+        );
 }
 
 function testThrowAnything() {
     checkCatch(\-> { throw #bogus; })
-        .message("#bogus");
+        .message("#bogus")
+        .stackFrames(
+            "In lambda \\ -> ..."
+        );
 }
 
-function testRethrow() {
+function testRethrow_withFrame() {
     var pair = catch(\-> { throw "Simulated Error."; });
     var err = pair.right();
+    err.stackFrames().add("Added detail.");
     checkCatch(\-> { throw err; })
-        .message("Simulated Error.");
+        .message("Simulated Error.")
+        .stackFrames(
+            "In lambda \\ -> ...",
+            "Added detail.",
+            "In lambda \\ -> ..."
+        );
+}
+
+function testStackFrames() {
+    function ted(a, b) {
+        throw "Simulated Error";
+    }
+
+    function dave(x, y) {
+        ted(x, x * y);
+    }
+
+    function bob(a, b) {
+        dave(a, a + b);
+    }
+
+    checkCatch(\-> bob(2, 3))
+        .message("Simulated Error")
+        .stackFrames(
+            "In function ted(2, 10)",
+            "In function dave(2, 5)",
+            "In function bob(2, 3)",
+            "In lambda \\ -> ..."
+        );
 }
