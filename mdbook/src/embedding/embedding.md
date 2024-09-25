@@ -66,7 +66,7 @@ Joe throws `JoeError` for any runtime error.  There are three subclasses.
 All kinds of `JoeError` can accumulate a script-level stack trace.  Use
 the exception's `getFrames()` method to get the stack frames (a list of 
 strings); or its `getJoeStackTrace()` method to get the stack trace in a 
-form suitable for printing.[^stackTrace]
+form suitable for printing.
 
 ## Executing a REPL
 
@@ -114,7 +114,3 @@ allow each scriptable component to have its own instance of `Joe`.
 
 [^embed]: Not how to run Joe in an embedded hardware environment.  Just
 to be clear.
-
-[^stackTrace]: At time of writing, Joe isn't yet populating the stack
-trace.  That will soon change.
-

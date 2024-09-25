@@ -229,7 +229,7 @@ script using Joe's <code>throw</code> statement.</li>
 <p>All kinds of <code>JoeError</code> can accumulate a script-level stack trace.  Use
 the exception's <code>getFrames()</code> method to get the stack frames (a list of
 strings); or its <code>getJoeStackTrace()</code> method to get the stack trace in a
-form suitable for printing.<sup class="footnote-reference"><a href="#stackTrace">2</a></sup></p>
+form suitable for printing.</p>
 <h2 id="executing-a-repl"><a class="header" href="#executing-a-repl">Executing a REPL</a></h2>
 <p>Joe provides <a href="../joe_repl.html"><code>joe repl</code></a>, a tool that invokes an interactive
 read/eval/print loop on a vanilla Joe interpreter.  A project can easily
@@ -264,10 +264,6 @@ allow each scriptable component to have its own instance of <code>Joe</code>.</p
 <div class="footnote-definition" id="embed"><sup class="footnote-definition-label">1</sup>
 <p>Not how to run Joe in an embedded hardware environment.  Just
 to be clear.</p>
-</div>
-<div class="footnote-definition" id="stackTrace"><sup class="footnote-definition-label">2</sup>
-<p>At time of writing, Joe isn't yet populating the stack
-trace.  That will soon change.</p>
 </div>
 
                     </main>
