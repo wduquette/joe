@@ -38,32 +38,66 @@ class ValueChecker {
         this.value = value;
     }
 
-
+    //**
+    // @method eq
+    // @args expected
+    // @result this
+    // Checks that the value is equal to the *expected* value.
     method eq(expected) {
         assert this.value == expected, this._expected(_typedValue(expected));
         return this;
     }
 
+    //**
+    // @method isTrue
+    // @result this
+    // Checks that the value is truthy.
     method isTrue() {
         assert this.value, this._expected("true");
         return this;
     }
 
+    //**
+    // @method isFalse
+    // @result this
+    // Checks that the value is falsey.
     method isFalse() {
         assert !this.value, this._expected("false");
         return this;
     }
 
+    //**
+    // @method isNull
+    // @result this
+    // Checks that the value is `null`
     method isNull() {
         assert this.value == null, this._expected("null");
         return this;
     }
 
+    //**
+    // @method isNotNull
+    // @result this
+    // Checks that the value is not `null`
     method isNonNull() {
         assert this.value != null, this._expected("non-null");
         return this;
     }
 
+    //**
+    // @method isEmpty
+    // @result this
+    // Checks that the value `isEmpty()` according to its own `isEmpty()`
+    // method.
+    method isEmpty() {
+        assert this.value.isEmpty(), this._expected("isEmpty()");
+    }
+
+    //**
+    // @method hasTypeName
+    // @args name
+    // @result this
+    // Checks that the value's `typeName()` is the given *name*.
     method hasTypeName(name) {
         var got = typeName(this.value);
         assert got == name,

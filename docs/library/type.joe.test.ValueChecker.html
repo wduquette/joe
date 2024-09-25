@@ -181,10 +181,58 @@ Use <code>check(value)</code> to create one.</p>
 <ul>
 <li><a href="type.joe.test.ValueChecker.html#init">ValueChecker(<em>value</em>)</a> → <a href="type.joe.test.ValueChecker.html">ValueChecker</a></li>
 </ul>
+<p><strong><a href="#methods">Methods</a></strong></p>
+<ul>
+<li><a href="type.joe.test.ValueChecker.html#method.eq"><em>valueChecker</em>.eq(<em>expected</em>)</a> → this</li>
+<li><a href="type.joe.test.ValueChecker.html#method.hasTypeName"><em>valueChecker</em>.hasTypeName(<em>name</em>)</a> → this</li>
+<li><a href="type.joe.test.ValueChecker.html#method.isEmpty"><em>valueChecker</em>.isEmpty()</a> → this</li>
+<li><a href="type.joe.test.ValueChecker.html#method.isFalse"><em>valueChecker</em>.isFalse()</a> → this</li>
+<li><a href="type.joe.test.ValueChecker.html#method.isNotNull"><em>valueChecker</em>.isNotNull()</a> → this</li>
+<li><a href="type.joe.test.ValueChecker.html#method.isNull"><em>valueChecker</em>.isNull()</a> → this</li>
+<li><a href="type.joe.test.ValueChecker.html#method.isTrue"><em>valueChecker</em>.isTrue()</a> → this</li>
+</ul>
 <h2 id="init"><a class="header" href="#init">ValueChecker Initializer</a></h2>
 <hr />
 <p><strong>ValueChecker(<em>value</em>) → <a href="type.joe.test.ValueChecker.html">ValueChecker</a></strong></p>
 <p>Initializes the new checker with the given <em>value</em>.</p>
+<h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
+<hr />
+<p><span id="method.eq"> </span></p>
+<h3 id="valuecheckereq"><a class="header" href="#valuecheckereq"><em>valueChecker</em>.eq()</a></h3>
+<hr />
+<p><strong><em>valueChecker</em>.eq(<em>expected</em>) → this</strong></p>
+<p>Checks that the value is equal to the <em>expected</em> value.</p>
+<p><span id="method.hasTypeName"> </span></p>
+<h3 id="valuecheckerhastypename"><a class="header" href="#valuecheckerhastypename"><em>valueChecker</em>.hasTypeName()</a></h3>
+<hr />
+<p><strong><em>valueChecker</em>.hasTypeName(<em>name</em>) → this</strong></p>
+<p>Checks that the value's <code>typeName()</code> is the given <em>name</em>.</p>
+<p><span id="method.isEmpty"> </span></p>
+<h3 id="valuecheckerisempty"><a class="header" href="#valuecheckerisempty"><em>valueChecker</em>.isEmpty()</a></h3>
+<hr />
+<p><strong><em>valueChecker</em>.isEmpty() → this</strong></p>
+<p>Checks that the value <code>isEmpty()</code> according to its own <code>isEmpty()</code>
+method.</p>
+<p><span id="method.isFalse"> </span></p>
+<h3 id="valuecheckerisfalse"><a class="header" href="#valuecheckerisfalse"><em>valueChecker</em>.isFalse()</a></h3>
+<hr />
+<p><strong><em>valueChecker</em>.isFalse() → this</strong></p>
+<p>Checks that the value is falsey.</p>
+<p><span id="method.isNotNull"> </span></p>
+<h3 id="valuecheckerisnotnull"><a class="header" href="#valuecheckerisnotnull"><em>valueChecker</em>.isNotNull()</a></h3>
+<hr />
+<p><strong><em>valueChecker</em>.isNotNull() → this</strong></p>
+<p>Checks that the value is not <code>null</code></p>
+<p><span id="method.isNull"> </span></p>
+<h3 id="valuecheckerisnull"><a class="header" href="#valuecheckerisnull"><em>valueChecker</em>.isNull()</a></h3>
+<hr />
+<p><strong><em>valueChecker</em>.isNull() → this</strong></p>
+<p>Checks that the value is <code>null</code></p>
+<p><span id="method.isTrue"> </span></p>
+<h3 id="valuecheckeristrue"><a class="header" href="#valuecheckeristrue"><em>valueChecker</em>.isTrue()</a></h3>
+<hr />
+<p><strong><em>valueChecker</em>.isTrue() → this</strong></p>
+<p>Checks that the value is truthy.</p>
 
                     </main>
 
