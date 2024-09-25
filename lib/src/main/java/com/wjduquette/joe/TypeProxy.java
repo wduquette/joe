@@ -223,9 +223,8 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
     JoeCallable bind(Object value, String name) {
         var method = methods.get(name);
 
-        // TODO: Consider allowing method chaining
         if (method != null) {
-            return (joe, args) -> method.call((V)value, joe, args);
+            return new NativeMethod<>((V)value, name, method);
         } else {
             throw new JoeError("Undefined property '" + name + "'.");
         }
