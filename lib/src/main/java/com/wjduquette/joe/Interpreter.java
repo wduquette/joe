@@ -25,6 +25,11 @@ class Interpreter {
 
     @SuppressWarnings("unused")
     void dumpEnvironment() {
+        System.out.println("Local Variables:");
+        for (var e : locals.entrySet()) {
+            System.out.println("  [" + e.getValue() + "]: " + joe.recodify(e.getKey()));
+        }
+
         var env = environment;
 
         while (env != null) {
