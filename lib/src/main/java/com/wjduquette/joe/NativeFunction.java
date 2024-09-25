@@ -30,7 +30,8 @@ public class NativeFunction implements JoeCallable {
         try {
             return callable.call(joe, args);
         } catch (JoeError ex) {
-            // TODO: Add stack frame
+            ex.getFrames().add("In native function " + name() +
+                "(" + joe.codify(args) + ")");
             throw ex;
         } catch (Exception ex) {
             throw new JoeError("Error in " + name + "(): " +
