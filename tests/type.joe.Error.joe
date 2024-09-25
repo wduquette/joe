@@ -1,0 +1,26 @@
+// type.joe.Error.joe
+//
+// Tests for the `Error` type
+
+function testInitializer_simple() {
+    var error = Error("Message");
+    check(error.message()).eq("Message");
+    check(error.type()).eq("JoeError");
+    check(error.stackFrames()).isEmpty();
+    check(error.stackTrace()).eq(error.message());
+}
+
+function testInitializer_withFrames() {
+    var error = Error("Message", "A", "B");
+    check(error.message()).eq("Message");
+    check(error.type()).eq("JoeError");
+    check(error.stackFrames()).eq(List("A", "B"));
+    check(error.stackTrace()).eq(error.message() + "\n  A" + "\n  B");
+}
+
+function testStackFrames_mutable() {
+    var error = Error("Message");
+    check(error.stackFrames()).isEmpty();
+    error.stackFrames().add("A");
+    check(error.stackFrames()).eq(List("A"));
+}
