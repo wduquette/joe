@@ -83,7 +83,7 @@ public final class ArgQueue {
      * @return true or false
      */
     public boolean hasRemaining() {
-        return next >= args.size();
+        return next < args.size();
     }
 
     /**
