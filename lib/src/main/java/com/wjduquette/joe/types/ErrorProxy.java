@@ -31,8 +31,10 @@ public class ErrorProxy extends TypeProxy<JoeError> {
 
         initializer(this::_initializer);
 
-        method("message", this::_message);
-        method("type",    this::_type);
+        method("stackFrames", this::_stackFrames);
+        method("stackTrace",  this::_stackTrace);
+        method("message",     this::_message);
+        method("type",        this::_type);
     }
 
     @Override
@@ -57,6 +59,26 @@ public class ErrorProxy extends TypeProxy<JoeError> {
 
     //-------------------------------------------------------------------------
     // Method Implementations
+
+    //**
+    // @method stackFrames
+    // @result List
+    // Returns the list of stack frame strings.  Clients may add to the list
+    // and rethrow the error.
+    private Object _stackFrames(JoeError error, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "stackFrames()");
+        return joe.wrapList(error.getFrames(), String.class);
+    }
+
+    //**
+    // @method stackTrace
+    // @result String
+    // Returns the complete error, including the initial error messages
+    // and all stack frames.
+    private Object _stackTrace(JoeError error, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "stackTrace()");
+        return error.getJoeStackTrace();
+    }
 
     //**
     // @method message
