@@ -1,6 +1,7 @@
 package com.wjduquette.joe;
 
-import java.util.ArrayList;
+import com.wjduquette.joe.types.ListValue;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,7 +95,7 @@ public final class JoeFunction implements JoeCallable {
         }
 
         if (isVarArgs) {
-            var varArgs = new ArrayList<>(args.remainder());
+            var varArgs = new ListValue(args.remainder());
             environment.setVar(Parser.ARGS, varArgs);
         }
 
@@ -105,6 +106,15 @@ public final class JoeFunction implements JoeCallable {
         } catch (Return returnValue) {
             if (isInitializer) return closure.getAt(0, "this");
             return returnValue.value;
+        } catch (JoeError ex) {
+            if (!kind().equals("lambda")) {
+                ex.getFrames().add("In " + kind() + " " + name() +
+                    "(" + joe.codify(args) + ")");
+            } else {
+                ex.getFrames().add("In " + kind() + " \\" +
+                    joe.codify(args) + " -> ...");
+            }
+            throw ex;
         }
     }
 
