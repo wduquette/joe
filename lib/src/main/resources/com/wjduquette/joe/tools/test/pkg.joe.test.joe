@@ -140,6 +140,32 @@ class CatchChecker {
             "Expected error type '" + expected + "', got: '" + this.err.type() + "'.";
         return this;
     }
+
+    //**
+    // @method stackFrames
+    // @args frame,...
+    // @result this
+    // Checks that the actual stack frames match the expected list of
+    // stack frames. The expected frames are passed as individual arguments.
+    method stackFrames(args) {
+        this.isError();
+        assert this.err.stackFrames() == args,
+            "Expected stack frames '" + args + "', got: '" + this.err.stackFrames() + "'.";
+        return this;
+    }
+
+    //**
+    // @method stackTrace
+    // @args expected
+    // @result this
+    // Checks that the actual stack traces matches the expected stack trace
+    // string.
+    method stackTrace(expected) {
+        this.isError();
+        assert this.err.stackTrace() == expected,
+            "Expected stack trace '" + expected + "', got: '" + this.err.stackTrace() + "'.";
+        return this;
+    }
 }
 
 function _typedValue(value) {

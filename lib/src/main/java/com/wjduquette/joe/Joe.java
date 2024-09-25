@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * The Joe language interpreter.  Clients create an instance of Joe,
@@ -40,7 +41,7 @@ public class Joe {
         codifier = new Codifier(this);
 
         StandardLibrary.PACKAGE.install(this);
-        installGlobalFunction(new NativeFunction("dumpEnv", this::_dumpEnv));
+        installGlobalFunction(new NativeFunction("dumpEnv", "function", this::_dumpEnv));
     }
 
     private Object _dumpEnv(Joe joe, ArgQueue args) {
@@ -357,6 +358,12 @@ public class Joe {
         // TODO: Move to StringProxy
         if (value instanceof String string) {
             return "\"" + escape(string) + "\"";
+        }
+
+        if (value instanceof ArgQueue args) {
+            return args.asList().stream()
+                .map(this::codify)
+                .collect(Collectors.joining(", "));
         }
 
         var proxy = lookupProxy(value);

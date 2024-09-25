@@ -68,7 +68,7 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
      * @param callable The callable that implements the method.
      */
     public void staticMethod(String name, JoeCallable callable) {
-        staticMethods.put(name, new NativeFunction(name, callable));
+        staticMethods.put(name, new NativeFunction(name, "static method", callable));
     }
 
     /**
@@ -98,7 +98,7 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
      * @param callable The callable
      */
     public void initializer(JoeCallable callable) {
-        this.initializer = new NativeFunction(typeName, callable);
+        this.initializer = new NativeFunction(typeName, "initializer", callable);
     }
 
     /**
@@ -223,9 +223,8 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
     JoeCallable bind(Object value, String name) {
         var method = methods.get(name);
 
-        // TODO: Consider allowing method chaining
         if (method != null) {
-            return (joe, args) -> method.call((V)value, joe, args);
+            return new NativeMethod<>((V)value, name, method);
         } else {
             throw new JoeError("Undefined property '" + name + "'.");
         }

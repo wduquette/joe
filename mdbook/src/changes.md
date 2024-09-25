@@ -24,6 +24,8 @@ Joe 0.2.0 extends Joe on every axis.
   - Added `throw` statement.
   - Added `break` and `continue` statements.
   - Added `foreach` statement.
+  - `JoeError` exceptions now include a script-level stack trace, populated as
+    the stack is unwound.
   
 - Library
   - Added `catch()` function

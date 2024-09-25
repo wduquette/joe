@@ -186,6 +186,8 @@ Use <code>checkCatch(callable)</code> to create it.</p>
 <li><a href="type.joe.test.CatchChecker.html#method.isError"><em>catchChecker</em>.isError()</a> → Boolean</li>
 <li><a href="type.joe.test.CatchChecker.html#method.isOK"><em>catchChecker</em>.isOK()</a> → this</li>
 <li><a href="type.joe.test.CatchChecker.html#method.message"><em>catchChecker</em>.message(<em>expected</em>)</a> → this</li>
+<li><a href="type.joe.test.CatchChecker.html#method.stackFrames"><em>catchChecker</em>.stackFrames(<em>frame</em>,...)</a> → this</li>
+<li><a href="type.joe.test.CatchChecker.html#method.stackTrace"><em>catchChecker</em>.stackTrace(<em>expected</em>)</a> → this</li>
 <li><a href="type.joe.test.CatchChecker.html#method.type"><em>catchChecker</em>.type(<em>expected</em>)</a> → this</li>
 </ul>
 <h2 id="init"><a class="header" href="#init">CatchChecker Initializer</a></h2>
@@ -209,6 +211,18 @@ Use <code>checkCatch(callable)</code> to create it.</p>
 <hr />
 <p><strong><em>catchChecker</em>.message(<em>expected</em>) → this</strong></p>
 <p>Checks that the error message matches the <em>expected</em> value.</p>
+<p><span id="method.stackFrames"> </span></p>
+<h3 id="catchcheckerstackframes"><a class="header" href="#catchcheckerstackframes"><em>catchChecker</em>.stackFrames()</a></h3>
+<hr />
+<p><strong><em>catchChecker</em>.stackFrames(<em>frame</em>,...) → this</strong></p>
+<p>Checks that the actual stack frames match the expected list of
+stack frames. The expected frames are passed as individual arguments.</p>
+<p><span id="method.stackTrace"> </span></p>
+<h3 id="catchcheckerstacktrace"><a class="header" href="#catchcheckerstacktrace"><em>catchChecker</em>.stackTrace()</a></h3>
+<hr />
+<p><strong><em>catchChecker</em>.stackTrace(<em>expected</em>) → this</strong></p>
+<p>Checks that the actual stack traces matches the expected stack trace
+string.</p>
 <p><span id="method.type"> </span></p>
 <h3 id="catchcheckertype"><a class="header" href="#catchcheckertype"><em>catchChecker</em>.type()</a></h3>
 <hr />
