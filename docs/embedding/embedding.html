@@ -174,6 +174,101 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="embedding-joe"><a class="header" href="#embedding-joe">Embedding Joe</a></h1>
+<p>This section explains how to embed a Joe interpreter into an application
+or library.<sup class="footnote-reference"><a href="#embed">1</a></sup></p>
+<p>There are several basic tasks.</p>
+<ul>
+<li><a href="#creating-the-interpreter">Creating the Interpreter</a></li>
+<li><a href="#installing-bindings">Installing Bindings</a></li>
+<li><a href="#executing-scripts">Executing Scripts</a></li>
+<li><a href="#executing-a-repl">Executing a REPL</a></li>
+<li><a href="#redirective-output">Redirecting Output</a></li>
+<li><a href="#practical-usage">Practical Usage</a></li>
+</ul>
+<h2 id="creating-the-interpreter"><a class="header" href="#creating-the-interpreter">Creating the Interpreter</a></h2>
+<p>To create an interpreter, just create an instance of <code>Joe</code>.</p>
+<pre><code class="language-java">var joe = new Joe();
+</code></pre>
+<p>That's all there is to it.</p>
+<h2 id="installing-bindings"><a class="header" href="#installing-bindings">Installing Bindings</a></h2>
+<p>Most use cases will involve defining domain-specific bindings, as described
+in the <a href="../extending/extending.html">Extending Joe</a> section.  Use the following
+<code>Joe</code> methods to install bindings into your instance of <code>Joe</code>:</p>
+<ul>
+<li><code>setVar()</code> to set a variable in the global environment.</li>
+<li><code>installGlobalFunction()</code> to install a native function.</li>
+<li><code>installType()</code> to register a type proxy for a native type</li>
+<li><code>installScriptResource()</code> to load a Joe script from the project jar file.</li>
+<li><code>installScriptResource()</code> to load a Joe script from the project jar file.</li>
+</ul>
+<p>See the above link and <code>Joe</code>'s javadoc for details on how to create these
+various kinds of bindings.</p>
+<h2 id="executing-scripts"><a class="header" href="#executing-scripts">Executing Scripts</a></h2>
+<p><code>Joe</code> provides two ways to execute scripts:</p>
+<ul>
+<li><code>joe.runFile()</code> reads a script from a named file and executes it.</li>
+<li><code>joe.run()</code> executes a script passed in as a string.</li>
+</ul>
+<p>Each can throw two Joe-specific exceptions.</p>
+<p>Joe throws <code>SyntaxError</code> if there's any error found while parsing the
+script.  The exception's message is fairly vanilla; but the exception
+includes a list of "details" describing all syntax errors found, by
+source line.  <code>SyntaxError::getErrorsByLine()</code> returns the list;
+<code>SyntaxError::printErrorsByLine()</code> will print the errors to either
+<code>System.out</code> (as <code>joe run</code> does) or to the <code>PrintStream</code> of your choice.</p>
+<p>Joe throws <code>JoeError</code> for any runtime error.  There are three subclasses.</p>
+<ul>
+<li><code>RuntimeError</code> is an error thrown by Joe's interpreter itself.<br />
+<code>RuntimeError</code> exceptions will usually include the source line number
+at which the error occurred; see the <code>line()</code> method.</li>
+<li><code>AssertError</code> is an error thrown by Joe's <code>assert</code> statement.  The message
+details the condition that failed.</li>
+<li>A vanilla <code>JoeError</code> is an error thrown by a Joe binding or by a Joe
+script using Joe's <code>throw</code> statement.</li>
+</ul>
+<p>All kinds of <code>JoeError</code> can accumulate a script-level stack trace.  Use
+the exception's <code>getFrames()</code> method to get the stack frames (a list of
+strings); or its <code>getJoeStackTrace()</code> method to get the stack trace in a
+form suitable for printing.<sup class="footnote-reference"><a href="#stackTrace">2</a></sup></p>
+<h2 id="executing-a-repl"><a class="header" href="#executing-a-repl">Executing a REPL</a></h2>
+<p>Joe provides <a href="../joe_repl.html"><code>joe repl</code></a>, a tool that invokes an interactive
+read/eval/print loop on a vanilla Joe interpreter.  A project can easily
+implement its own REPL with its own bindings; see
+<code>com.wjduquette.joe.tools.ReplTool</code> for an example.  It's essentially
+some I/O code wrapped around the <code>joe.run()</code> call.</p>
+<p>Joe doesn't provide a <code>Joe</code> method for invoking the REPL simply because
+clients users will want to customize it heavily for their needs.</p>
+<h2 id="redirecting-output"><a class="header" href="#redirecting-output">Redirecting Output</a></h2>
+<p>The Joe tools, <code>joe run</code> <em>et al</em>, send their output to <code>System.out</code>.  This
+is appropriate for a simple command-line tool; a more complex application
+might wish to redirect all script output to a log, or perhaps to swallow
+it unseen.  Joe handles this via its <code>outputHandler</code>, a simple
+<code>Consumer&lt;String&gt;</code>.</p>
+<pre><code class="language-java">var joe = new Joe();
+joe.setOutputHandler(text -&gt; log(text));
+</code></pre>
+<p>The script-level <code>print()</code> and <code>println()</code> functions all send their output
+through this handler.  Further, <code>Joe</code> provides Java-level <code>print()</code> and
+<code>println()</code> functions that do the same; this allows the body of any
+native function to easily output whatever it likes.</p>
+<pre><code class="language-java">private Object _square(Joe joe, ArgQueue args) {
+    ...
+    joe.println("In square()!");
+}
+</code></pre>
+<h2 id="practical-usage"><a class="header" href="#practical-usage">Practical Usage</a></h2>
+<p>There are many ways to use Joe in an application or library.  One can define
+a single instance of <code>Joe</code> and use it for running all scripts; or one can
+allow each scriptable component to have its own instance of <code>Joe</code>.</p>
+<hr />
+<div class="footnote-definition" id="embed"><sup class="footnote-definition-label">1</sup>
+<p>Not how to run Joe in an embedded hardware environment.  Just
+to be clear.</p>
+</div>
+<div class="footnote-definition" id="stackTrace"><sup class="footnote-definition-label">2</sup>
+<p>At time of writing, Joe isn't yet populating the stack
+trace.  That will soon change.</p>
+</div>
 
                     </main>
 
