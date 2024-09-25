@@ -1,0 +1,19 @@
+// type.joe.Keyword.joe
+//
+// Keyword tests
+
+function testInitializer() {
+    check(Keyword("abc")).eq(#abc);
+    check(Keyword("#abc")).eq(#abc);
+
+    checkCatch(\-> Keyword("a@"))
+        .message("Expected keyword name, got: String '\"a@\"'.");
+}
+
+function testName() {
+    check(#abc.name()).eq("abc");
+}
+
+function testToString() {
+    check(#abc.toString()).eq("#abc");
+}
