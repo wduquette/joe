@@ -19,19 +19,26 @@ public class TestTool implements Tool {
      */
     public static final ToolInfo INFO = new ToolInfo(
         "test",
-        "testFile.joe...",
+        "options... testFile.joe...",
         "Executes Joe tests.",
         """
         Executes a test suite consisting of one or more Joe test scripts,
         accumulating the results.
         
-        Tests are defined as no-argument Joe functions with names beginning
-        with "test".  They use the various test checkers to check
-        results:
+        Options:
         
-        - Joe's "assert" statement
-        - assertEquals(got, expected)
-        - fail(message)
+        --verbose, -v
+            Enable verbose output.  Normally only failures and the final
+            summary are included in the output.  If this is given, all test
+            output is included.
+        
+        Test Scripts
+        
+        A test script is a Joe script containing one or more no-argument Joe
+        functions with names beginning with "test".  A test fails if it
+        throws a Joe AssertError, either via Joe's assert statement or by
+        using one of the test checkers defined by the test tool.  See
+        the Joe User's Guide for more details.
         """,
         TestTool::main
     );
