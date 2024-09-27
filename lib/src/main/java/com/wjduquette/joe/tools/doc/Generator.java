@@ -39,7 +39,15 @@ class Generator {
      * configuration.
      */
     public void generate() {
-        // FIRST, generate the index file.
+        // FIRST, create the output folder (if it doesn't already exist)
+        try {
+            Files.createDirectories(config.outputFolder());
+        } catch (Exception ex) {
+            System.out.println("*** Could not create output folder:\n" +
+                "  " + ex.getMessage());
+        }
+
+        // NEXT, generate the index file.
         write(config.outputFolder().resolve(DOC_SET_INDEX),
             this::writeDocSetIndex);
 
