@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.wjduquette.joe"},{"l":"com.wjduquette.joe.app"},{"l":"com.wjduquette.joe.tools"},{"l":"com.wjduquette.joe.tools.doc"},{"l":"com.wjduquette.joe.tools.test"},{"l":"com.wjduquette.joe.types"}];updateSearchResults();
