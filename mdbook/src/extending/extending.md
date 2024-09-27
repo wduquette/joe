@@ -9,7 +9,7 @@ to existing Java types.  This section explains how the trick is done.
 - [Joe Packages](packages.md)
 
 These sections will refer constantly to Joe's Java API.  See the 
-[Joe Javadoc](../javadoc/index.html) for details.
+Joe Javadoc for details.
 
 But first, a little philosophy.
 
