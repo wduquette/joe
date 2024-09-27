@@ -8,8 +8,8 @@ to existing Java types.  This section explains how the trick is done.
 - [Registered Types](registered_types.md)
 - [Joe Packages](packages.md)
 
-These sections will refer constantly to Joe's Java API.  See the Javadoc
-for details.
+These sections will refer constantly to Joe's Java API.  See the 
+[Joe Javadoc](../javadoc/index.html) for details.
 
 But first, a little philosophy.
 

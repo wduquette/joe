@@ -12,6 +12,9 @@ There are several basic tasks.
 - [Redirecting Output](#redirective-output)
 - [Practical Usage](#practical-usage)
 
+See the [Joe Javadoc](../javadoc/index.html) for details on the many
+methods discussed in this section.
+
 ## Creating the Interpreter
 
 To create an interpreter, just create an instance of `Joe`.

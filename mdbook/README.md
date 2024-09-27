@@ -20,8 +20,8 @@ $ ./javadoc.sh
 $
 ```
 
-The `build.sh` script combines the first two steps. See below for the third
-step.
+The `build.sh` script combines the three steps.  See below for notes on 
+building the Javadoc.
 
 ```shell
 $ ./build.sh
