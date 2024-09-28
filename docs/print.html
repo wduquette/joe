@@ -292,9 +292,20 @@ buy him lunch.</p>
 <ul>
 <li>Language
 <ul>
-<li>Numeric literals can now use scientific notation, e.g., <code>12.34e56</code>,
-as in Java.</li>
-<li>Hex literals, e.g., <code>0x12FF</code>.</li>
+<li>Numeric literals
+<ul>
+<li>Can be entered using scientific notation, e.g., <code>12.34e56</code></li>
+<li>Can be entered as hex literals, e.g., <code>0x12FF</code>.</li>
+<li>See <a href="types.html#numbers">Types and Values: Numbers</a>.</li>
+</ul>
+</li>
+<li>Text blocks
+<ul>
+<li>Normal strings can no longer contain unescaped newlines.</li>
+<li>Joe now has Java-like text blocks, enclosed in <code>"""</code> pairs.</li>
+<li>See <a href="types.html#strings">Types and Values: Strings</a>.</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -518,10 +529,29 @@ as Java <code>String</code> values, and provide much the same range of operation
 <li><code>"abcd"</code></li>
 </ul>
 <p>String literals support the usual array of escapes, including
-<code>\n</code>, <code>\\</code>, <code>\"</code>, etc.<sup class="footnote-reference"><a href="#unicode">1</a></sup></p>
-<p>TODO: Include full list.</p>
-<p>At time of writing, double-quoted strings can be multiline; no
-attempt is made to clean up the whitespace.</p>
+<code>\n</code>, <code>\\</code>, <code>\"</code>, <code>\t</code>, <code>\b</code>, <code>\r</code>, <code>\f</code> and unicode escapes.<sup class="footnote-reference"><a href="#unicode">1</a></sup></p>
+<p>In addition, Joe supports multiline text blocks delimited by <code>"""</code>,
+somewhat like Java's text blocks:<sup class="footnote-reference"><a href="#textblocks">2</a></sup></p>
+<pre><code class="language-joe">var block = """
+    Line 1
+      "Line 2"
+           Line 3
+    """;
+</code></pre>
+<p>Text blocks follow these rules:</p>
+<ul>
+<li>Leading blank lines are stripped.</li>
+<li>Trailing whitespace is stripped</li>
+<li>What remains is outdented to the left margin via Java's
+<code>String::stripIndent()</code> method, which preserves relative whitespace.</li>
+<li>Text blocks can contain all the usual escapes, including <code>\"</code>.</li>
+<li>But single <code>"</code> characters in a text block <em>need not</em> be escaped.</li>
+</ul>
+<p>Thus, the block shown above would print like this:</p>
+<pre><code class="language-text">Line 1
+  "Line 2"
+      Line 3
+</code></pre>
 <h2 id="keywords"><a class="header" href="#keywords">Keywords</a></h2>
 <p>A <a href="library/type.joe.Keyword.html">Keyword</a> is an interned symbol,
 implemented internally using
@@ -573,6 +603,13 @@ time.  See the sections on <a href="functions.html">Functions</a> and
 <div class="footnote-definition" id="unicode"><sup class="footnote-definition-label">1</sup>
 <p>Joe supports Unicode escapes, e.g., <code>\u1234</code>, as in Java;
 but only within string literals.</p>
+</div>
+<div class="footnote-definition" id="textblocks"><sup class="footnote-definition-label">2</sup>
+<p>The documentation for Java's text blocks is strewn with
+special cases, and is nearly impenetrable.  The Joe implementation is
+simpler and a little more forgiving, relying on Java's
+<code>String::stripIndent</code> to do most of the work; and I <em>think</em> the result
+is pretty much the same.</p>
 </div>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="operators"><a class="header" href="#operators">Operators</a></h1>
 <p>Joe defines a subset of Java's operators, with a few differences.</p>
