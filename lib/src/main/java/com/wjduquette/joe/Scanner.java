@@ -89,11 +89,21 @@ class Scanner {
                     addToken(MINUS_EQUAL);
                 } else if (match('>')) {
                     addToken(MINUS_GREATER);
+                } else if (match('-')) {
+                    addToken(MINUS_MINUS);
                 } else {
                     addToken(MINUS);
                 }
             }
-            case '+'  -> addToken(match('=') ? PLUS_EQUAL : PLUS);
+            case '+'  -> {
+                if (match('=')) {
+                    addToken(PLUS_EQUAL);
+                } else if (match('+')) {
+                    addToken(PLUS_PLUS);
+                } else {
+                    addToken(PLUS);
+                }
+            }
             case '?'  -> addToken(QUESTION);
             case ';'  -> addToken(SEMICOLON);
             case '*'  -> addToken(match('=') ? STAR_EQUAL : STAR);

@@ -55,7 +55,9 @@ block           → "{" declaration* "}" ;
 
 // Expression
 expression      → assignment ;
-assignment      → ( call "." )? IDENTIFIER "=" assignment
+assignment      → ( call "." )? IDENTIFIER 
+                  ( "=" | "+=" | "-=" | "*=" | "/=" ) 
+                  assignment 
                 | ternary ;
 ternary         → logic_or "?" logic_or ":" logic_or ;
 logic_or        → logic_and ( "||" logic_and )* ;
@@ -119,9 +121,7 @@ block           → "{" declaration* "}" ;
 
 // Expression
 expression      → assignment ;
-assignment      → ( call "." )? IDENTIFIER 
-                  ( "=" | "+=" | "-=" | "*=" | "/=" ) 
-                  assignment ;
+assignment      → ( call "." )? IDENTIFIER "=" assignment
                 | logic_or ;
 logic_or        → logic_and ( "||" logic_and )* ;
 logic_or        → equality ( "&&" equality )* ;

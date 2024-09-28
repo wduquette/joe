@@ -17,8 +17,9 @@ sealed interface Expr
      * @param name The variable's name token
      * @param op The assignment operator
      * @param value The expression to assign to it.
+     * @param usePrior Whether to yield the prior value instead of the assigned.
      */
-    record Assign(Token name, Token op, Expr value) implements Expr {}
+    record Assign(Token name, Token op, Expr value, boolean usePrior) implements Expr {}
 
     /**
      * A binary expression, e.g., "+", "&lt;", etc.
@@ -82,8 +83,9 @@ sealed interface Expr
      * @param name The name of the property
      * @param op The assignment operator
      * @param value The expression that yields the value to assign.
+     * @param usePrior Whether to yield the prior value instead of the assigned.
      */
-    record Set(Expr object, Token name, Token op, Expr value) implements Expr {}
+    record Set(Expr object, Token name, Token op, Expr value, boolean usePrior) implements Expr {}
 
     /**
      * In a class method, a reference to a superclass method

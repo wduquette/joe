@@ -13,9 +13,11 @@ enum TokenType {
     GREATER, GREATER_EQUAL,
     MINUS_EQUAL,
     MINUS_GREATER,
+    MINUS_MINUS,
     LESS, LESS_EQUAL,
     OR,
     PLUS_EQUAL,
+    PLUS_PLUS,
     SLASH_EQUAL,
     STAR_EQUAL,
 
