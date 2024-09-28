@@ -165,6 +165,22 @@ class Scanner {
             while (isDigit(peek())) advance();
         }
 
+        // Look for an exponent.
+        if (peek() == 'e' || peek() == 'E') {
+            advance(); // Consume the "e"
+
+            if (peek() == '+' || peek() == '-') {
+                advance(); // Consume the sign
+            }
+
+            if (!isDigit(peek())) {
+                error(line, "Expected exponent.");
+                return;
+            }
+
+            while (isDigit(peek())) advance();
+        }
+
         addToken(NUMBER,
                 Double.parseDouble(source.substring(start, current)));
     }
@@ -245,6 +261,15 @@ class Scanner {
 
         current++;
         return true;
+    }
+
+    @SuppressWarnings("unused")
+    private char previous() {
+        if (current == 0) {
+            throw new IllegalStateException(
+                "previous() called when current == 0");
+        }
+        return source.charAt(current - 1);
     }
 
     private char peek() {
