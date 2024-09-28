@@ -45,12 +45,35 @@ String literals are double-quoted, as in Java:
 - `"abcd"`
  
 String literals support the usual array of escapes, including
-`\n`, `\\`, `\"`, etc.[^unicode]
+`\n`, `\\`, `\"`, `\t`, `\b`, `\r`, `\f` and unicode escapes.[^unicode]
 
-TODO: Include full list.
+In addition, Joe supports multiline text blocks delimited by `"""`, 
+somewhat like Java's text blocks:[^textblocks]
 
-At time of writing, double-quoted strings can be multiline; no
-attempt is made to clean up the whitespace.
+```joe
+var block = """
+    Line 1
+      "Line 2"
+           Line 3
+    """;
+```
+
+Text blocks follow these rules:
+
+- Leading blank lines are stripped.
+- Trailing whitespace is stripped
+- What remains is outdented to the left margin via Java's
+  `String::stripIndent()` method, which preserves relative whitespace.
+- Text blocks can contain all the usual escapes, including `\"`.
+- But single `"` characters in a text block *need not* be escaped.
+
+Thus, the block shown above would print like this:
+
+```text
+Line 1
+  "Line 2"
+      Line 3
+```
 
 ## Keywords
 
@@ -120,3 +143,9 @@ See the section on [Classes](classes.md) for more information.
 
 [^unicode]: Joe supports Unicode escapes, e.g., `\u1234`, as in Java;
 but only within string literals.
+
+[^textblocks]: The documentation for Java's text blocks is strewn with
+special cases, and is nearly impenetrable.  The Joe implementation is 
+simpler and a little more forgiving, relying on Java's 
+`String::stripIndent` to do most of the work; and I *think* the result 
+is pretty much the same.
