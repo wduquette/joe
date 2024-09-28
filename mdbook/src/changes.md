@@ -1,11 +1,15 @@
 # Change Log
 
-## Changes in 0.2.0 (Forthcoming)
+## Changes in 0.3.0 (Forthcoming)
+
+- ...
+
+## Changes in 0.2.0 (2024-09-27)
 
 Joe 0.2.0 extends Joe on every axis.
 
 - Documentation
-  - Added this User's Guide (still a WIP)
+  - Added this User's Guide
   
 - Language
   - Added `assert` statement
