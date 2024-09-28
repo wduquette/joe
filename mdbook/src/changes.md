@@ -17,6 +17,7 @@
     - Added the `in` and `ni` [membership operators](operators.md#membership-operators).
     - Added the `+=`, `-=`, `*=`, and `/=` assignment operators, with
       their usual semantics.
+    - Added the `++` and `--` operators, with their usual semantics.
 
 - Documentation
   - Added the topics "Stringification" and "Iterability" to the

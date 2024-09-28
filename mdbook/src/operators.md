@@ -2,8 +2,6 @@
 
 Joe defines a subset of Java's operators, with a few differences.
 
-TODO: `++`, `--`
-
 ## Arithmetic Operators
 
 The `+`, `-`, `*`, and `/` operators (including unary `-`) are defined as in 
@@ -80,3 +78,7 @@ In particular:
 ```joe
 x = y = 5;  // Assigns 5 to x and y.
 ```
+
+## Pre- and Post-Increment/Decrement Operators
+
+The `++` and `--` operators work as they do in Java.

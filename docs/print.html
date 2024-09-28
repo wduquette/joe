@@ -315,6 +315,7 @@ buy him lunch.</p>
 <li>Added the <code>in</code> and <code>ni</code> <a href="operators.html#membership-operators">membership operators</a>.</li>
 <li>Added the <code>+=</code>, <code>-=</code>, <code>*=</code>, and <code>/=</code> assignment operators, with
 their usual semantics.</li>
+<li>Added the <code>++</code> and <code>--</code> operators, with their usual semantics.</li>
 </ul>
 </li>
 </ul>
@@ -637,7 +638,6 @@ is pretty much the same.</p>
 </div>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="operators"><a class="header" href="#operators">Operators</a></h1>
 <p>Joe defines a subset of Java's operators, with a few differences.</p>
-<p>TODO: <code>++</code>, <code>--</code></p>
 <h2 id="arithmetic-operators"><a class="header" href="#arithmetic-operators">Arithmetic Operators</a></h2>
 <p>The <code>+</code>, <code>-</code>, <code>*</code>, and <code>/</code> operators (including unary <code>-</code>) are defined as in
 Java, with the usual precedence.</p>
@@ -693,6 +693,8 @@ will be converted to a string.</p>
 </ul>
 <pre><code class="language-joe">x = y = 5;  // Assigns 5 to x and y.
 </code></pre>
+<h2 id="pre--and-post-incrementdecrement-operators"><a class="header" href="#pre--and-post-incrementdecrement-operators">Pre- and Post-Increment/Decrement Operators</a></h2>
+<p>The <code>++</code> and <code>--</code> operators work as they do in Java.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="statements"><a class="header" href="#statements">Statements</a></h1>
 <p>The Joe language provides the following statements. Statements are terminated
 by a semicolon or (sometimes) a block, as in Java.</p>
@@ -3585,7 +3587,9 @@ block           → "{" declaration* "}" ;
 
 // Expression
 expression      → assignment ;
-assignment      → ( call "." )? IDENTIFIER "=" assignment
+assignment      → ( call "." )? IDENTIFIER 
+                  ( "=" | "+=" | "-=" | "*=" | "/=" ) 
+                  assignment 
                 | ternary ;
 ternary         → logic_or "?" logic_or ":" logic_or ;
 logic_or        → logic_and ( "||" logic_and )* ;
@@ -3594,8 +3598,9 @@ equality        → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison      → term ( ( "&gt;" | "&gt;=" | "&lt;" | "&lt;=" | "in" | "ni" ) term )* ;
 term            → factor ( ( "-" | "+" ) factor )* ;
 factor          → unary ( ( "/" | "*" ) unary )* ;
-unary           → ( "-" | "!" ) unary 
-                | call ;
+unary           → ( "++" | "==" | "-" | "!" ) unary 
+                | postfix ;
+postfix         → call ( "++" | "--" )? ;
 call            → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 arguments       → expression ( "," expression )* ;
 primary         → "true" | "false" | "nil"
@@ -3645,9 +3650,7 @@ block           → "{" declaration* "}" ;
 
 // Expression
 expression      → assignment ;
-assignment      → ( call "." )? IDENTIFIER 
-                  ( "=" | "+=" | "-=" | "*=" | "/=" ) 
-                  assignment ;
+assignment      → ( call "." )? IDENTIFIER "=" assignment
                 | logic_or ;
 logic_or        → logic_and ( "||" logic_and )* ;
 logic_or        → equality ( "&amp;&amp;" equality )* ;

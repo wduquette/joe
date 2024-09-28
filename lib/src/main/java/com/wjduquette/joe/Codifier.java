@@ -215,6 +215,15 @@ class Codifier {
                 recodify(expr.left()) +
                 " " + expr.op().lexeme() + " " +
                 recodify(expr.right());
+            case PrePostAssign expr -> expr.isPre()
+                ? expr.op().lexeme() + expr.name().lexeme()
+                : expr.name().lexeme() + expr.op().lexeme();
+            case PrePostSet expr -> {
+                var prop = recodify(expr.object()) + "." + expr.name().lexeme();
+                yield expr.isPre()
+                    ? expr.op().lexeme() + prop
+                    : prop + expr.op().lexeme();
+            }
             case Set expr ->
                 recodify(expr.object()) + "." + expr.name().lexeme() +
                     " " + expr.op().lexeme() + " " +

@@ -7,7 +7,8 @@ import java.util.List;
  */
 sealed interface Expr
     permits Expr.Assign, Expr.Binary, Expr.Call, Expr.Get, Expr.Grouping,
-            Expr.Lambda, Expr.Literal, Expr.Logical, Expr.Set, Expr.Super,
+            Expr.Lambda, Expr.Literal, Expr.Logical, Expr.PrePostAssign,
+            Expr.PrePostSet, Expr.Set, Expr.Super,
             Expr.This, Expr.Ternary, Expr.Unary, Expr.Variable
 {
     /**
@@ -17,9 +18,8 @@ sealed interface Expr
      * @param name The variable's name token
      * @param op The assignment operator
      * @param value The expression to assign to it.
-     * @param usePrior Whether to yield the prior value instead of the assigned.
      */
-    record Assign(Token name, Token op, Expr value, boolean usePrior) implements Expr {}
+    record Assign(Token name, Token op, Expr value) implements Expr {}
 
     /**
      * A binary expression, e.g., "+", "&lt;", etc.
@@ -77,15 +77,31 @@ sealed interface Expr
     record Logical(Expr left, Token op, Expr right) implements Expr {}
 
     /**
+     * A pre-or-post increment/decrement to an existing variable.
+     * @param name The variable's name token
+     * @param op The operator
+     * @param isPre Whether this is a pre-increment/decrement or not.
+     */
+    record PrePostAssign(Token name, Token op, boolean isPre) implements Expr {}
+
+    /**
+     * A pre-or-post increment/decrement to an existing property.
+     * @param object The expression that yields the object.
+     * @param name The name of the property
+     * @param op The operator
+     * @param isPre Whether this is a pre-increment/decrement or not.
+     */
+    record PrePostSet(Expr object, Token name, Token op, boolean isPre) implements Expr {}
+
+    /**
      * An assignment to an object property.
      * See Expr.Assign for assignments to normal variables.
      * @param object The expression that yields the object.
      * @param name The name of the property
      * @param op The assignment operator
      * @param value The expression that yields the value to assign.
-     * @param usePrior Whether to yield the prior value instead of the assigned.
      */
-    record Set(Expr object, Token name, Token op, Expr value, boolean usePrior) implements Expr {}
+    record Set(Expr object, Token name, Token op, Expr value) implements Expr {}
 
     /**
      * In a class method, a reference to a superclass method

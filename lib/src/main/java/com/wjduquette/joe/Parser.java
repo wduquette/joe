@@ -318,23 +318,23 @@ class Parser {
     }
 
     private Expr assignment() {
-        Expr expr = ternary();
+        Expr target = ternary();
 
         if (match(EQUAL, PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL)) {
             Token op = previous();
             Expr value = assignment();
 
-            if (expr instanceof Expr.Variable) {
-                Token name = ((Expr.Variable)expr).name();
-                return new Expr.Assign(name, op, value, false);
-            } else if (expr instanceof Expr.Get get) {
-                return new Expr.Set(get.object(), get.name(), op, value, false);
+            if (target instanceof Expr.Variable) {
+                Token name = ((Expr.Variable) target).name();
+                return new Expr.Assign(name, op, value);
+            } else if (target instanceof Expr.Get get) {
+                return new Expr.Set(get.object(), get.name(), op, value);
             }
 
             error(op, "Invalid assignment target.");
         }
 
-        return expr;
+        return target;
     }
 
     private Expr ternary() {
@@ -424,13 +424,43 @@ class Parser {
     }
 
     private Expr unary() {
-        if (match(BANG, MINUS)) {
-            Token operator = previous();
+        if (match(PLUS_PLUS, MINUS_MINUS)) {
+            // Pre-increment/decrement
+            Token op = previous();
+            Expr target = unary();
+            return prePost(op, target, true);
+        } else if (match(BANG, MINUS)) {
+            Token op = previous();
             Expr right = unary();
-            return new Expr.Unary(operator, right);
+
+            return new Expr.Unary(op, right);
         }
 
-        return call();
+        return postfix();
+    }
+
+    private Expr postfix() {
+        Expr target = call();
+
+        if (match(PLUS_PLUS, MINUS_MINUS)) {
+            // Post-increment/decrement
+            Token op = previous();
+            return prePost(op, target, false);
+        }
+
+        return target;
+    }
+
+    private Expr prePost(Token op, Expr target, boolean isPre) {
+        if (target instanceof Expr.Variable) {
+            Token name = ((Expr.Variable) target).name();
+            return new Expr.PrePostAssign(name, op, isPre);
+        } else if (target instanceof Expr.Get get) {
+            return new Expr.PrePostSet(get.object(), get.name(), op, isPre);
+        }
+
+        error(op, "Invalid '" + op.lexeme() + "' target.");
+        return null;
     }
 
     private Expr call() {

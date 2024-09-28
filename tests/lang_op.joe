@@ -235,4 +235,65 @@ function testSlashEquals_property() {
         .message("Operands must be numbers.");
 }
 
+//-----------------------------------------------------------------------------
+// ++
+
+function testPlusPlus_pre_var() {
+    var x = 0;
+    check(++x).eq(1);
+    check(x).eq(1);
+}
+
+function testPlusPlus_post_var() {
+    var x = 0;
+    check(x++).eq(0);
+    check(x).eq(1);
+}
+
+function testPlusPlus_pre_prop() {
+    var t = Thing();
+    t.x = 0;
+    check(++t.x).eq(1);
+    check(t.x).eq(1);
+}
+
+function testPlusPlus_post_prop() {
+    var t = Thing();
+    t.x = 0;
+    check(t.x++).eq(0);
+    check(t.x).eq(1);
+}
+
+//-----------------------------------------------------------------------------
+// --
+
+function testMinusMinus_pre_var() {
+    var x = 0;
+    check(--x).eq(-1);
+    check(x).eq(-1);
+}
+
+function testMinusMinus_post_var() {
+    var x = 0;
+    check(x--).eq(0);
+    check(x).eq(-1);
+}
+
+function testMinusMinus_pre_prop() {
+    var t = Thing();
+    t.x = 0;
+    check(--t.x).eq(-1);
+    check(t.x).eq(-1);
+}
+
+function testMinusMinus_post_prop() {
+    var t = Thing();
+    t.x = 0;
+    check(t.x--).eq(0);
+    check(t.x).eq(-1);
+}
+
+//-----------------------------------------------------------------------------
+// Helpers
+
 class Thing {}

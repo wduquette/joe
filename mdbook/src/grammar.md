@@ -66,8 +66,9 @@ equality        → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison      → term ( ( ">" | ">=" | "<" | "<=" | "in" | "ni" ) term )* ;
 term            → factor ( ( "-" | "+" ) factor )* ;
 factor          → unary ( ( "/" | "*" ) unary )* ;
-unary           → ( "-" | "!" ) unary 
-                | call ;
+unary           → ( "++" | "==" | "-" | "!" ) unary 
+                | postfix ;
+postfix         → call ( "++" | "--" )? ;
 call            → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 arguments       → expression ( "," expression )* ;
 primary         → "true" | "false" | "nil"
