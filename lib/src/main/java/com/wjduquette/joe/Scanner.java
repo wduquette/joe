@@ -200,12 +200,74 @@ class Scanner {
     }
 
     private void string() {
+        if (matchNext("\"\"")) {
+            multiLineString();
+        } else {
+            singleLineString();
+        }
+    }
+
+    private void singleLineString() {
         var buff = new StringBuilder();
 
         while (peek() != '"' && !isAtEnd()) {
             var c = peek();
 
             switch (c) {
+                case '\\' -> {
+                    if (!isAtEnd()) {
+                        advance(); // Skip past the backslash
+                        var escape = advance();
+                        switch (escape) {
+                            case '\\' -> buff.append('\\');
+                            case 't' -> buff.append('\t');
+                            case 'b' -> buff.append('\b');
+                            case 'n' -> buff.append('\n');
+                            case 'r' -> buff.append('\r');
+                            case 'f' -> buff.append('\f');
+                            case '"' -> buff.append('"');
+                            case 'u' -> unicode(buff);
+                            default -> error(line,
+                                "Unexpected escape: '\\" + escape + "'.");
+                        }
+                    }
+                }
+                case '\n' -> {
+                    error(line, "Newline in single-line string.");
+                    return;
+                }
+                default -> buff.append(advance());
+            }
+        }
+
+        if (isAtEnd()) {
+            error(line, "Unterminated string.");
+            return;
+        }
+
+        // The closing quote
+        advance();
+
+        // Add the unescaped string.
+        addToken(STRING, buff.toString());
+    }
+
+    private void multiLineString() {
+        var buff = new StringBuilder();
+
+        while (!isAtEnd()) {
+            var c = peek();
+
+            switch (c) {
+                case '"' -> {
+                    if (matchNext("\"\"\"")) {
+                        // Add the unescaped string.
+                        addToken(STRING, outdent(buff.toString()));
+                        return;
+                    } else {
+                        buff.append(advance());
+                    }
+                }
                 case '\\' -> {
                     if (!isAtEnd()) {
                         advance(); // Skip past the backslash
@@ -232,16 +294,33 @@ class Scanner {
             }
         }
 
-        if (isAtEnd()) {
-            error(line, "Unterminated string.");
-            return;
+        error(line, "Unterminated text block.");
+    }
+
+    private String outdent(String text) {
+        // FIRST, remove leading blank lines.
+        while (true) {
+            var ndx = text.indexOf('\n');
+
+            if (ndx >= 0 && text.substring(0, ndx).isBlank()) {
+                text = text.substring(ndx + 1);
+            } else {
+                break;
+            }
         }
 
-        // The closing quote
-        advance();
+        // NEXT, strip the indent and return.
+        return text.stripIndent().stripTrailing();
+    }
 
-        // Add the unescaped string.
-        addToken(STRING, buff.toString());
+    private boolean matchNext(String chars) {
+        for (int i = 0; i < chars.length(); i++) {
+            if (peekNext(i) != chars.charAt(i)) {
+                return false;
+            }
+        }
+        current += chars.length();
+        return true;
     }
 
     private void unicode(StringBuilder buff) {
@@ -277,15 +356,6 @@ class Scanner {
         return true;
     }
 
-    @SuppressWarnings("unused")
-    private char previous() {
-        if (current == 0) {
-            throw new IllegalStateException(
-                "previous() called when current == 0");
-        }
-        return source.charAt(current - 1);
-    }
-
     private char peek() {
         if (isAtEnd()) return '\0';
         return source.charAt(current);
@@ -294,6 +364,11 @@ class Scanner {
     private char peekNext() {
         if (current + 1 >= source.length()) return '\0';
         return source.charAt(current + 1);
+    }
+
+    private char peekNext(int delta) {
+        if (current + delta >= source.length()) return '\0';
+        return source.charAt(current + delta);
     }
 
     private boolean isAlpha(char c) {
