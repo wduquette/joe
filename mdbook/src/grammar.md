@@ -119,7 +119,9 @@ block           → "{" declaration* "}" ;
 
 // Expression
 expression      → assignment ;
-assignment      → ( call "." )? IDENTIFIER "=" assignment
+assignment      → ( call "." )? IDENTIFIER 
+                  ( "=" | "+=" | "-=" | "*=" | "/=" ) 
+                  assignment ;
                 | logic_or ;
 logic_or        → logic_and ( "||" logic_and )* ;
 logic_or        → equality ( "&&" equality )* ;

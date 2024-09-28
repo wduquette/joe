@@ -2,7 +2,7 @@
 
 Joe defines a subset of Java's operators, with a few differences.
 
-TODO: `+=`, `-=`, `*=`, `/=`, `++`, `--`
+TODO: `++`, `--`
 
 ## Arithmetic Operators
 
@@ -65,10 +65,17 @@ var x = 100;
 println(x > 50 ? "big" : "small"); // Prints "big"
 ```
 
-## The Assignment Operator
+## Assignment Operators
 
-The `=` operator assigns a value to a variable or object property.
-As in Java, an assignment expression yields the assigned value.
+The `=`, `+=`, `-=`, `*=`, and `/=` operators work as they do in Java.
+
+In particular:
+
+- The `+=` operator can concatenate strings if the variable
+  or property on the left-hand side contains a string; the right operand
+  will be converted to a string.
+
+- An assignment expression yields the assigned value.
 
 ```joe
 x = y = 5;  // Assigns 5 to x and y.

@@ -229,15 +229,20 @@ class Interpreter {
     Object evaluate(Expr expression) {
         return switch (expression) {
             case Expr.Assign expr -> {
-                Object value = evaluate(expr.value());
+                Object right = evaluate(expr.value());
                 var distance = locals.get(expr);
 
-                if (distance != null) {
-                    environment.assignAt(distance, expr.name(), value);
-                } else {
-                    globals.assign(expr.name(), value);
+                if (expr.op().type() != TokenType.EQUAL) {
+                    Object left = lookupVariable(expr.name(), expr);
+                    right = computeExtendedAssignment(left, expr.op(), right);
                 }
-                yield value;
+
+                if (distance != null) {
+                    environment.assignAt(distance, expr.name(), right);
+                } else {
+                    globals.assign(expr.name(), right);
+                }
+                yield right;
             }
             case Expr.Binary expr -> {
                 Object left = evaluate(expr.left());
@@ -358,10 +363,16 @@ class Interpreter {
                 Object object = evaluate(expr.object());
                 JoeObject instance = joe.getJoeObject(object);
 
-                Object value = evaluate(expr.value());
+                Object right = evaluate(expr.value());
                 var name = expr.name().lexeme();
-                instance.set(name, value);
-                yield value;
+
+                if (expr.op().type() != TokenType.EQUAL) {
+                    var left = instance.get(name);
+                    right = computeExtendedAssignment(left, expr.op(), right);
+                }
+
+                instance.set(name, right);
+                yield right;
             }
             case Expr.Super expr -> {
                 int distance = locals.get(expr);
@@ -414,6 +425,30 @@ class Interpreter {
         } else {
             return globals.get(name);
         }
+    }
+
+    // Given the value of a variable or property, and one of the extended
+    // assignment operators, computes the new value of the variable or
+    // property.
+    private Object computeExtendedAssignment(
+        Object left, Token op, Object right
+    ) {
+        // FIRST, check for concatenation
+        if (left instanceof String s && op.type() == TokenType.PLUS_EQUAL) {
+            return s + joe.stringify(right);
+        }
+
+        // NEXT, both must be numbers.
+        checkNumberOperands(op, left, right);
+
+        return switch(op.type()) {
+            case PLUS_EQUAL -> (double)left + (double)right;
+            case MINUS_EQUAL -> (double)left - (double)right;
+            case STAR_EQUAL -> (double)left * (double)right;
+            case SLASH_EQUAL -> (double)left / (double)right;
+            default -> throw new IllegalStateException(
+                "Unexpected operator: " + op.type());
+        };
     }
 
     // Gets the argument as a collection, if possible

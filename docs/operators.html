@@ -175,7 +175,7 @@
                     <main>
                         <h1 id="operators"><a class="header" href="#operators">Operators</a></h1>
 <p>Joe defines a subset of Java's operators, with a few differences.</p>
-<p>TODO: <code>+=</code>, <code>-=</code>, <code>*=</code>, <code>/=</code>, <code>++</code>, <code>--</code></p>
+<p>TODO: <code>++</code>, <code>--</code></p>
 <h2 id="arithmetic-operators"><a class="header" href="#arithmetic-operators">Arithmetic Operators</a></h2>
 <p>The <code>+</code>, <code>-</code>, <code>*</code>, and <code>/</code> operators (including unary <code>-</code>) are defined as in
 Java, with the usual precedence.</p>
@@ -216,9 +216,19 @@ println(y || 1); // Prints 1
 <pre><code class="language-joe">var x = 100;
 println(x &gt; 50 ? "big" : "small"); // Prints "big"
 </code></pre>
-<h2 id="the-assignment-operator"><a class="header" href="#the-assignment-operator">The Assignment Operator</a></h2>
-<p>The <code>=</code> operator assigns a value to a variable or object property.
-As in Java, an assignment expression yields the assigned value.</p>
+<h2 id="assignment-operators"><a class="header" href="#assignment-operators">Assignment Operators</a></h2>
+<p>The <code>=</code>, <code>+=</code>, <code>-=</code>, <code>*=</code>, and <code>/=</code> operators work as they do in Java.</p>
+<p>In particular:</p>
+<ul>
+<li>
+<p>The <code>+=</code> operator can concatenate strings if the variable
+or property on the left-hand side contains a string; the right operand
+will be converted to a string.</p>
+</li>
+<li>
+<p>An assignment expression yields the assigned value.</p>
+</li>
+</ul>
 <pre><code class="language-joe">x = y = 5;  // Assigns 5 to x and y.
 </code></pre>
 

@@ -15,9 +15,10 @@ sealed interface Expr
      * See Stmt.Var for variable declaration, and Stmt.Set for assigning to
      * an object property.
      * @param name The variable's name token
+     * @param op The assignment operator
      * @param value The expression to assign to it.
      */
-    record Assign(Token name, Expr value) implements Expr {}
+    record Assign(Token name, Token op, Expr value) implements Expr {}
 
     /**
      * A binary expression, e.g., "+", "&lt;", etc.
@@ -79,9 +80,10 @@ sealed interface Expr
      * See Expr.Assign for assignments to normal variables.
      * @param object The expression that yields the object.
      * @param name The name of the property
+     * @param op The assignment operator
      * @param value The expression that yields the value to assign.
      */
-    record Set(Expr object, Token name, Expr value) implements Expr {}
+    record Set(Expr object, Token name, Token op, Expr value) implements Expr {}
 
     /**
      * In a class method, a reference to a superclass method

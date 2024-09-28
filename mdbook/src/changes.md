@@ -7,16 +7,21 @@
     - Can be entered using scientific notation, e.g., `12.34e56`
     - Can be entered as hex literals, e.g., `0x12FF`.
     - See [Types and Values: Numbers](types.md#numbers).
+  
   - Text blocks
     - Normal strings can no longer contain unescaped newlines.
     - Joe now has Java-like text blocks, enclosed in `"""` pairs.
     - See [Types and Values: Strings](types.md#strings).
+
   - Operators
-    - Added the `in` and `ni` 
-      [membership operators](operators.md#membership-operators).
+    - Added the `in` and `ni` [membership operators](operators.md#membership-operators).
+    - Added the `+=`, `-=`, `*=`, and `/=` assignment operators, with
+      their usual semantics.
+
 - Documentation
   - Added the topics "Stringification" and "Iterability" to the
     [Registered Types](extending/registered_types.md) section.
+
 - Bug fixes
   - Fixed broken `println()` function.
 
