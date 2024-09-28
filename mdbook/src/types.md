@@ -8,6 +8,7 @@ types:
 - [Booleans](#booleans)
 - [Numbers](#numbers)
 - [Strings](#strings)
+- [Raw String Literals](#raw-string-literals)
 - [Keywords](#keywords)
 - [Pairs](#pairs)
 - [Lists](#lists)
@@ -74,6 +75,19 @@ Line 1
   "Line 2"
       Line 3
 ```
+
+## Raw String Literals
+
+A string entered using single quotes is a raw string literal.  In a 
+raw string literal the backslash is just another character; the literal 
+`'\n'` yields a string containing a backslash followed by a lower-case `n`.
+
+Similarly, a text block contained within `'''` delimiters is a raw text
+block, and is processed in the same way: as a normal text block, but
+without any backslash escapes.
+
+The primary use for raw strings is to make regular expressions more
+readable.
 
 ## Keywords
 

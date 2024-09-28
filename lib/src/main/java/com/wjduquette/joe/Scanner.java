@@ -140,6 +140,7 @@ class Scanner {
             }
             case '\n' -> line++;
             case '"' -> string();
+            case '\'' -> rawString();
             case '#' -> keyword();
             default -> {
                 if (c == '0' && peek() == 'x') {
@@ -223,13 +224,10 @@ class Scanner {
 
     private void string() {
         if (matchNext("\"\"")) {
-            multiLineString();
-        } else {
-            singleLineString();
+            textBlock();
+            return;
         }
-    }
 
-    private void singleLineString() {
         var buff = new StringBuilder();
 
         while (peek() != '"' && !isAtEnd()) {
@@ -274,7 +272,7 @@ class Scanner {
         addToken(STRING, buff.toString());
     }
 
-    private void multiLineString() {
+    private void textBlock() {
         var buff = new StringBuilder();
 
         while (!isAtEnd()) {
@@ -319,6 +317,59 @@ class Scanner {
         error(line, "Unterminated text block.");
     }
 
+    private void rawString() {
+        if (matchNext("''")) {
+            rawTextBlock();
+            return;
+        }
+
+        while (peek() != '\'' && !isAtEnd()) {
+            var c = advance();
+
+            if (c == '\n') {
+                error(line, "Newline in raw string.");
+                return;
+            }
+        }
+
+        if (isAtEnd()) {
+            error(line, "Unterminated raw string.");
+            return;
+        }
+
+        // The closing quote
+        advance();
+
+        // Add the raw string.
+        addToken(STRING, source.substring(start+1,current-1));
+    }
+
+    private void rawTextBlock() {
+        while (!isAtEnd()) {
+            var c = peek();
+
+            switch (c) {
+                case '\'' -> {
+                    if (matchNext("'''")) {
+                        // Add the string.
+                        var string = source.substring(start+3,current-3);
+                        addToken(STRING, outdent(string));
+                        return;
+                    } else {
+                        advance();
+                    }
+                }
+                case '\n' -> {
+                    line++;
+                    advance();
+                }
+                default -> advance();
+            }
+        }
+
+        error(line, "Unterminated raw text block.");
+    }
+
     private String outdent(String text) {
         // FIRST, remove leading blank lines.
         while (true) {
@@ -352,12 +403,12 @@ class Scanner {
             advance();
         }
 
+        var hexCode = source.substring(mark, current);
+
         if (current - mark == 4) {
-            var hexCode = source.substring(mark, current);
             var hex = Integer.parseInt(hexCode, 16);
             buff.append(unicodeToString(hex));
         } else {
-            var hexCode = source.substring(mark, current);
             error(line, "Incomplete Unicode escape: '\\u" + hexCode + "'.");
         }
     }

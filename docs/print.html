@@ -310,6 +310,15 @@ buy him lunch.</p>
 </ul>
 </li>
 <li>
+<p>Raw string literals</p>
+<ul>
+<li>Raw string literals are entered using single quotes rather than
+double quotes.  Within a raw string literal the backslash character
+has no special meaning.</li>
+<li>Raw text blocks are entered using <code>'''</code> rather than <code>"""</code>.</li>
+</ul>
+</li>
+<li>
 <p>Operators</p>
 <ul>
 <li>Added the <code>in</code> and <code>ni</code> <a href="operators.html#membership-operators">membership operators</a>.</li>
@@ -524,6 +533,7 @@ types:</p>
 <li><a href="types.html#booleans">Booleans</a></li>
 <li><a href="types.html#numbers">Numbers</a></li>
 <li><a href="types.html#strings">Strings</a></li>
+<li><a href="types.html#raw-string-literals">Raw String Literals</a></li>
 <li><a href="types.html#keywords">Keywords</a></li>
 <li><a href="types.html#pairs">Pairs</a></li>
 <li><a href="types.html#lists">Lists</a></li>
@@ -577,6 +587,15 @@ somewhat like Java's text blocks:<sup class="footnote-reference"><a href="#textb
   "Line 2"
       Line 3
 </code></pre>
+<h2 id="raw-string-literals"><a class="header" href="#raw-string-literals">Raw String Literals</a></h2>
+<p>A string entered using single quotes is a raw string literal.  In a
+raw string literal the backslash is just another character; the literal
+<code>'\n'</code> yields a string containing a backslash followed by a lower-case <code>n</code>.</p>
+<p>Similarly, a text block contained within <code>'''</code> delimiters is a raw text
+block, and is processed in the same way: as a normal text block, but
+without any backslash escapes.</p>
+<p>The primary use for raw strings is to make regular expressions more
+readable.</p>
 <h2 id="keywords"><a class="header" href="#keywords">Keywords</a></h2>
 <p>A <a href="library/type.joe.Keyword.html">Keyword</a> is an interned symbol,
 implemented internally using

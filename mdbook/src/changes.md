@@ -12,6 +12,12 @@
     - Normal strings can no longer contain unescaped newlines.
     - Joe now has Java-like text blocks, enclosed in `"""` pairs.
     - See [Types and Values: Strings](types.md#strings).
+  
+  - Raw string literals
+    - Raw string literals are entered using single quotes rather than 
+      double quotes.  Within a raw string literal the backslash character
+      has no special meaning.
+    - Raw text blocks are entered using `'''` rather than `"""`.
 
   - Operators
     - Added the `in` and `ni` [membership operators](operators.md#membership-operators).
