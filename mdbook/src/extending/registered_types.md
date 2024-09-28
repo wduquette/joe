@@ -25,6 +25,8 @@ The constructor defines the various aspects of the proxy.
 
 - [The Script-level Type Name](#the-script-level-type-name)
 - [The Proxied Types](#the-proxied-types)
+- [Stringification](#stringification)
+- [Iterability](#iterability)
 - [Static Constants](#static-constants)
 - [Static Methods](#static-methods)
 - [Initializer](#initializer)
@@ -87,6 +89,62 @@ public class ListProxy extends TypeProxy<JoeList> {
         proxies(ListValue.class);
         proxies(ListWrapper.class);
     }
+    ...
+}
+```
+
+## Stringification
+
+When Joe converts a value to a string, it can do so in two ways:
+
+- Via `Joe::stringify()`, which is intended to produce a string for display.
+- Via `Joe::codify()`, which is intended to produce a string that looks more 
+  like the code you'd see in a script to create the value.
+
+Both of these default to the value's normal Java `toString()`.
+
+To change how a value is stringified, override `TypeProxy::stringify`.  For
+example, `NumberProxy` ensures that integer-valued numbers are displayed
+without a trailing `.0`:
+
+```java
+@Override
+public String stringify(Joe joe, Object value) {
+    assert value instanceof Double;
+
+    String text = ((Double)value).toString();
+    if (text.endsWith(".0")) {
+        text = text.substring(0, text.length() - 2);
+    }
+    return text;
+}
+```
+
+Similarly, to override how a value is "codified", which usually affects how
+it appears in error messages, override `TypeProxy::codify`.  By default,
+this method just calls the proxy's `stringify`.
+
+## Iterability
+
+Joe's `foreach` statement, and its `in` and `ni` operators,  
+can iterate over or search the following kinds of collection values:
+
+- Any Java `Collection<?>`
+- Any value that implements the `JoeIterable` interface
+- Any `JoeObject`, e.g., any registered type, that can convert its values
+  into a list for iteration.
+
+To make your registered type iterable, provide an iterables supplier, a
+function that accepts a value of your type and returns a `Collection<?>`.
+
+```java
+public class MyTypeProxy extends TypeProxy<MyType> {
+  public MyTypeProxy() {
+    super("MyType");
+        ...
+        iterables(myValue -> myValue.getItems());
+        ...
+  }
     ...
 }
 ```

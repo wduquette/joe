@@ -55,17 +55,20 @@ block           → "{" declaration* "}" ;
 
 // Expression
 expression      → assignment ;
-assignment      → ( call "." )? IDENTIFIER "=" assignment
+assignment      → ( call "." )? IDENTIFIER 
+                  ( "=" | "+=" | "-=" | "*=" | "/=" ) 
+                  assignment 
                 | ternary ;
 ternary         → logic_or "?" logic_or ":" logic_or ;
 logic_or        → logic_and ( "||" logic_and )* ;
 logic_or        → equality ( "&&" equality )* ;
 equality        → comparison ( ( "!=" | "==" ) comparison )* ;
-comparison      → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+comparison      → term ( ( ">" | ">=" | "<" | "<=" | "in" | "ni" ) term )* ;
 term            → factor ( ( "-" | "+" ) factor )* ;
 factor          → unary ( ( "/" | "*" ) unary )* ;
-unary           → ( "-" | "!" ) unary 
-                | call ;
+unary           → ( "++" | "==" | "-" | "!" ) unary 
+                | postfix ;
+postfix         → call ( "++" | "--" )? ;
 call            → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 arguments       → expression ( "," expression )* ;
 primary         → "true" | "false" | "nil"

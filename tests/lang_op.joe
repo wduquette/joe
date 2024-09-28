@@ -116,3 +116,184 @@ function testTimes() {
     checkCatch(bad)
         .message("Operands must be numbers.");
 }
+
+function testIN() {
+    var list = List(#a, #b, #c);
+    check(#a in list).isTrue();
+    check(#d in list).isFalse();
+
+    checkCatch(\-> #a in #a)
+        .message("Expected iterable, got: Keyword '#a'.");
+}
+
+function testNI() {
+    var list = List(#a, #b, #c);
+    check(#a ni list).isFalse();
+    check(#d ni list).isTrue();
+
+    checkCatch(\-> #a ni #a)
+        .message("Expected iterable, got: Keyword '#a'.");
+}
+
+function testPlusEquals_var() {
+    var x = 5;
+    var s = "abc";
+    check(x += 7).eq(12);
+    check(x).eq(12);
+    check(s += "def").eq("abcdef");
+    check(s).eq("abcdef");
+
+    checkCatch(\-> x += "abc")
+        .message("Operands must be numbers.");
+}
+
+function testPlusEquals_property() {
+    var thing = Thing();
+    thing.x = 5;
+    thing.s = "abc";
+    check(thing.x += 7).eq(12);
+    check(thing.x).eq(12);
+    check(thing.s += "def").eq("abcdef");
+    check(thing.s).eq("abcdef");
+
+    checkCatch(\-> thing.x += "abc")
+        .message("Operands must be numbers.");
+}
+
+function testMinusEquals_var() {
+    var x = 5;
+    var s = "abc";
+    check(x -= 7).eq(-2);
+    check(x).eq(-2);
+
+    checkCatch(\-> x -= "abc")
+        .message("Operands must be numbers.");
+    checkCatch(\-> s -= 7)
+        .message("Operands must be numbers.");
+}
+
+function testMinusEquals_property() {
+    var thing = Thing();
+    thing.x = 5;
+    thing.s = "abc";
+    check(thing.x -= 7).eq(-2);
+    check(thing.x).eq(-2);
+
+    checkCatch(\-> thing.x -= "abc")
+        .message("Operands must be numbers.");
+    checkCatch(\-> thing.s -= 7)
+        .message("Operands must be numbers.");
+}
+
+function testStarEquals_var() {
+    var x = 5;
+    var s = "abc";
+    check(x *= 7).eq(35);
+    check(x).eq(35);
+
+    checkCatch(\-> x *= "abc")
+        .message("Operands must be numbers.");
+    checkCatch(\-> s *= 7)
+        .message("Operands must be numbers.");
+}
+
+function testStarEquals_property() {
+    var thing = Thing();
+    thing.x = 5;
+    thing.s = "abc";
+    check(thing.x *= 7).eq(35);
+    check(thing.x).eq(35);
+
+    checkCatch(\-> thing.x *= "abc")
+        .message("Operands must be numbers.");
+    checkCatch(\-> thing.s *= 7)
+        .message("Operands must be numbers.");
+}
+
+function testSlashEquals_var() {
+    var x = 50;
+    var s = "abc";
+    check(x /= 5).eq(10);
+    check(x).eq(10);
+
+    checkCatch(\-> x /= "abc")
+        .message("Operands must be numbers.");
+    checkCatch(\-> s /= 7)
+        .message("Operands must be numbers.");
+}
+
+function testSlashEquals_property() {
+    var thing = Thing();
+    thing.x = 50;
+    thing.s = "abc";
+    check(thing.x /= 5).eq(10);
+    check(thing.x).eq(10);
+
+    checkCatch(\-> thing.x /= "abc")
+        .message("Operands must be numbers.");
+    checkCatch(\-> thing.s /= 7)
+        .message("Operands must be numbers.");
+}
+
+//-----------------------------------------------------------------------------
+// ++
+
+function testPlusPlus_pre_var() {
+    var x = 0;
+    check(++x).eq(1);
+    check(x).eq(1);
+}
+
+function testPlusPlus_post_var() {
+    var x = 0;
+    check(x++).eq(0);
+    check(x).eq(1);
+}
+
+function testPlusPlus_pre_prop() {
+    var t = Thing();
+    t.x = 0;
+    check(++t.x).eq(1);
+    check(t.x).eq(1);
+}
+
+function testPlusPlus_post_prop() {
+    var t = Thing();
+    t.x = 0;
+    check(t.x++).eq(0);
+    check(t.x).eq(1);
+}
+
+//-----------------------------------------------------------------------------
+// --
+
+function testMinusMinus_pre_var() {
+    var x = 0;
+    check(--x).eq(-1);
+    check(x).eq(-1);
+}
+
+function testMinusMinus_post_var() {
+    var x = 0;
+    check(x--).eq(0);
+    check(x).eq(-1);
+}
+
+function testMinusMinus_pre_prop() {
+    var t = Thing();
+    t.x = 0;
+    check(--t.x).eq(-1);
+    check(t.x).eq(-1);
+}
+
+function testMinusMinus_post_prop() {
+    var t = Thing();
+    t.x = 0;
+    check(t.x--).eq(0);
+    check(t.x).eq(-1);
+}
+
+//-----------------------------------------------------------------------------
+// Helpers
+
+class Thing {}

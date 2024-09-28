@@ -141,21 +141,7 @@ class Interpreter {
             }
             case Stmt.ForEach stmt -> {
                 var list = evaluate(stmt.listExpr());
-                Collection<?> collection = switch (list) {
-                    case Collection<?> c -> c;
-                    case JoeIterable i -> i.getItems();
-                    default -> {
-                        var instance = joe.getJoeObject(list);
-                        if (instance.canIterate()) {
-                            yield instance.getItems();
-                        } else {
-                            throw new RuntimeError(stmt.varName(),
-                                "Expected iterable, got: " +
-                                    joe.typeName(list) + "'" +
-                                    joe.stringify(list) + "'");
-                        }
-                    }
-                };
+                Collection<?> collection = toCollection(stmt.varName(), list);
 
                 for (var item : collection) {
                     try {
@@ -242,17 +228,25 @@ class Interpreter {
 
     Object evaluate(Expr expression) {
         return switch (expression) {
+            // Assign a value to a variable or an object property, using
+            // =, +=, -=, *=, /=
             case Expr.Assign expr -> {
-                Object value = evaluate(expr.value());
+                Object right = evaluate(expr.value());
                 var distance = locals.get(expr);
 
-                if (distance != null) {
-                    environment.assignAt(distance, expr.name(), value);
-                } else {
-                    globals.assign(expr.name(), value);
+                if (expr.op().type() != TokenType.EQUAL) {
+                    Object left = lookupVariable(expr.name(), expr);
+                    right = computeExtendedAssignment(left, expr.op(), right);
                 }
-                yield value;
+
+                if (distance != null) {
+                    environment.assignAt(distance, expr.name(), right);
+                } else {
+                    globals.assign(expr.name(), right);
+                }
+                yield right;
             }
+            // Compute any binary operation except for && and ||
             case Expr.Binary expr -> {
                 Object left = evaluate(expr.left());
                 Object right = evaluate(expr.right());
@@ -282,6 +276,7 @@ class Interpreter {
 
                         throw notSimilar(expr.op());
                     }
+                    case IN -> toCollection(expr.op(), right).contains(left);
                     case LESS -> {
                         if (left instanceof Double a && right instanceof Double b) {
                             yield a < b;
@@ -308,6 +303,7 @@ class Interpreter {
                         checkNumberOperands(expr.op(), left, right);
                         yield (double)left - (double)right;
                     }
+                    case NI -> !toCollection(expr.op(), right).contains(left);
                     case SLASH -> {
                         checkNumberOperands(expr.op(), left, right);
                         yield (double)left / (double)right;
@@ -331,6 +327,7 @@ class Interpreter {
                         "Unexpected operator: " + expr.op());
                 };
             }
+            // Call a function or method
             case Expr.Call expr -> {
                 Object callee = evaluate(expr.callee());
 
@@ -346,15 +343,21 @@ class Interpreter {
                     throw joe.expected("a callable", callee);
                 }
             }
+            // Get an object property.  The expression must evaluate to
+            // a JoeObject, i.e., a JoeInstance or a ProxiedValue.
             case Expr.Get expr -> {
                 Object object = evaluate(expr.object());
                 JoeObject instance = joe.getJoeObject(object);
                 yield instance.get(expr.name().lexeme());
             }
+            // (expr...)
             case Expr.Grouping expr -> evaluate(expr.expr());
+            // Return a callable for the given lambda
             case Expr.Lambda expr ->
                 new JoeFunction(expr.declaration(), environment, false);
+            // Any literal
             case Expr.Literal expr -> expr.value();
+            // && and ||
             case Expr.Logical expr -> {
                 Object left = evaluate(expr.left());
 
@@ -366,15 +369,57 @@ class Interpreter {
 
                 yield evaluate(expr.right());
             }
+            // ++ and -- with a variable name
+            case Expr.PrePostAssign expr -> {
+                var distance = locals.get(expr);
+                Object prior = lookupVariable(expr.name(), expr);
+                checkNumericTarget(expr.op(), prior);
+
+                double assigned = expr.op().type() == TokenType.PLUS_PLUS
+                    ? (double)prior + 1
+                    : (double)prior - 1;
+                var result = expr.isPre() ? assigned : prior;
+
+                if (distance != null) {
+                    environment.assignAt(distance, expr.name(), assigned);
+                } else {
+                    globals.assign(expr.name(), assigned);
+                }
+                yield result;
+            }
+            // ++ and -- with an object property
+            case Expr.PrePostSet expr -> {
+                Object object = evaluate(expr.object());
+                JoeObject instance = joe.getJoeObject(object);
+                var name = expr.name().lexeme();
+                var prior = instance.get(name);
+                checkNumericTarget(expr.op(), prior);
+
+                double assigned = expr.op().type() == TokenType.PLUS_PLUS
+                    ? (double)prior + 1
+                    : (double)prior - 1;
+                var result = expr.isPre() ? assigned : prior;
+
+                instance.set(name, assigned);
+                yield result;
+            }
+            // Assign a value to an object property using =, +=, -=, *=, /=
             case Expr.Set expr -> {
                 Object object = evaluate(expr.object());
                 JoeObject instance = joe.getJoeObject(object);
 
-                Object value = evaluate(expr.value());
+                Object right = evaluate(expr.value());
                 var name = expr.name().lexeme();
-                instance.set(name, value);
-                yield value;
+
+                if (expr.op().type() != TokenType.EQUAL) {
+                    var left = instance.get(name);
+                    right = computeExtendedAssignment(left, expr.op(), right);
+                }
+
+                instance.set(name, right);
+                yield right;
             }
+            // Handle `super.<methodName>` in methods
             case Expr.Super expr -> {
                 int distance = locals.get(expr);
                 JoeClass superclass = (JoeClass)environment.getAt(
@@ -392,7 +437,9 @@ class Interpreter {
 
                 yield method.bind(instance);
             }
+            // Handle `this.<property>` in methods
             case Expr.This expr -> lookupVariable(expr.keyword(), expr);
+            // The ternary `? :` operator
             case Expr.Ternary expr -> {
                 var condition = Joe.isTruthy(evaluate(expr.condition()));
 
@@ -402,6 +449,7 @@ class Interpreter {
                     yield evaluate(expr.falseExpr());
                 }
             }
+            // The unary operators
             case Expr.Unary expr -> {
                 Object right = evaluate(expr.right());
 
@@ -415,6 +463,7 @@ class Interpreter {
                         "Unexpected operator: " + expr.op());
                 };
             }
+            // Get a variable's value
             case Expr.Variable expr -> lookupVariable(expr.name(), expr);
         };
     }
@@ -428,10 +477,48 @@ class Interpreter {
         }
     }
 
-    //-------------------------------------------------------------------------
-    // Control Flow Exceptions
+    // Given the value of a variable or property, and one of the extended
+    // assignment operators, computes the new value of the variable or
+    // property.
+    private Object computeExtendedAssignment(
+        Object left, Token op, Object right
+    ) {
+        // FIRST, check for concatenation
+        if (left instanceof String s && op.type() == TokenType.PLUS_EQUAL) {
+            return s + joe.stringify(right);
+        }
 
+        // NEXT, both must be numbers.
+        checkNumberOperands(op, left, right);
 
+        return switch(op.type()) {
+            case PLUS_EQUAL -> (double)left + (double)right;
+            case MINUS_EQUAL -> (double)left - (double)right;
+            case STAR_EQUAL -> (double)left * (double)right;
+            case SLASH_EQUAL -> (double)left / (double)right;
+            default -> throw new IllegalStateException(
+                "Unexpected operator: " + op.type());
+        };
+    }
+
+    // Gets the argument as a collection, if possible
+    private Collection<?> toCollection(Token token, Object arg) {
+        return switch (arg) {
+            case Collection<?> c -> c;
+            case JoeIterable i -> i.getItems();
+            default -> {
+                var instance = joe.getJoeObject(arg);
+                if (instance.canIterate()) {
+                    yield instance.getItems();
+                } else {
+                    throw new RuntimeError(token,
+                        "Expected iterable, got: " +
+                            joe.typeName(arg) + " '" +
+                            joe.codify(arg) + "'.");
+                }
+            }
+        };
+    }
 
     //-------------------------------------------------------------------------
     // Error Checking
@@ -454,5 +541,10 @@ class Interpreter {
     private void checkNumberOperand(Token operator, Object operand) {
         if (operand instanceof Double) return;
         throw new RuntimeError(operator, "Operand must be a number.");
+    }
+
+    private void checkNumericTarget(Token operator, Object operand) {
+        if (operand instanceof Double) return;
+        throw new RuntimeError(operator, "Target of operand must contain a number.");
     }
 }

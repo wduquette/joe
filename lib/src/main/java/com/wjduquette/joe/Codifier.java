@@ -185,7 +185,8 @@ class Codifier {
     String recodify(Expr expression) {
         return switch (expression) {
             case Assign expr ->
-                expr.name().lexeme() + " = " + recodify(expr.value());
+                expr.name().lexeme() + " " + expr.op().lexeme() + " " +
+                    recodify(expr.value());
             case Binary expr -> {
                 var type = expr.op().type();
                 // Let * and / bind visually tighter.
@@ -214,8 +215,18 @@ class Codifier {
                 recodify(expr.left()) +
                 " " + expr.op().lexeme() + " " +
                 recodify(expr.right());
+            case PrePostAssign expr -> expr.isPre()
+                ? expr.op().lexeme() + expr.name().lexeme()
+                : expr.name().lexeme() + expr.op().lexeme();
+            case PrePostSet expr -> {
+                var prop = recodify(expr.object()) + "." + expr.name().lexeme();
+                yield expr.isPre()
+                    ? expr.op().lexeme() + prop
+                    : prop + expr.op().lexeme();
+            }
             case Set expr ->
-                recodify(expr.object()) + "." + expr.name().lexeme() + " = " +
+                recodify(expr.object()) + "." + expr.name().lexeme() +
+                    " " + expr.op().lexeme() + " " +
                 recodify(expr.value());
             case Super expr -> "super." + expr.method().lexeme();
             case This ignored -> "this";

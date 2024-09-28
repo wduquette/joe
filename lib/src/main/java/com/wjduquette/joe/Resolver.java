@@ -195,6 +195,8 @@ class Resolver {
                 resolve(expr.left());
                 resolve(expr.right());
             }
+            case Expr.PrePostAssign expr -> resolveLocal(expr, expr.name());
+            case Expr.PrePostSet expr -> resolve(expr.object());
             case Expr.Set expr -> {
                 resolve(expr.value());
                 resolve(expr.object());

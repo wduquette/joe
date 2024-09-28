@@ -194,6 +194,8 @@ For example,</p>
 <ul>
 <li><a href="#the-script-level-type-name">The Script-level Type Name</a></li>
 <li><a href="#the-proxied-types">The Proxied Types</a></li>
+<li><a href="#stringification">Stringification</a></li>
+<li><a href="#iterability">Iterability</a></li>
 <li><a href="#static-constants">Static Constants</a></li>
 <li><a href="#static-methods">Static Methods</a></li>
 <li><a href="#initializer">Initializer</a></li>
@@ -244,6 +246,52 @@ tell Joe which types the interpreter should look for.</p>
         proxies(ListValue.class);
         proxies(ListWrapper.class);
     }
+    ...
+}
+</code></pre>
+<h2 id="stringification"><a class="header" href="#stringification">Stringification</a></h2>
+<p>When Joe converts a value to a string, it can do so in two ways:</p>
+<ul>
+<li>Via <code>Joe::stringify()</code>, which is intended to produce a string for display.</li>
+<li>Via <code>Joe::codify()</code>, which is intended to produce a string that looks more
+like the code you'd see in a script to create the value.</li>
+</ul>
+<p>Both of these default to the value's normal Java <code>toString()</code>.</p>
+<p>To change how a value is stringified, override <code>TypeProxy::stringify</code>.  For
+example, <code>NumberProxy</code> ensures that integer-valued numbers are displayed
+without a trailing <code>.0</code>:</p>
+<pre><code class="language-java">@Override
+public String stringify(Joe joe, Object value) {
+    assert value instanceof Double;
+
+    String text = ((Double)value).toString();
+    if (text.endsWith(".0")) {
+        text = text.substring(0, text.length() - 2);
+    }
+    return text;
+}
+</code></pre>
+<p>Similarly, to override how a value is "codified", which usually affects how
+it appears in error messages, override <code>TypeProxy::codify</code>.  By default,
+this method just calls the proxy's <code>stringify</code>.</p>
+<h2 id="iterability"><a class="header" href="#iterability">Iterability</a></h2>
+<p>Joe's <code>foreach</code> statement, and its <code>in</code> and <code>ni</code> operators,<br />
+can iterate over or search the following kinds of collection values:</p>
+<ul>
+<li>Any Java <code>Collection&lt;?&gt;</code></li>
+<li>Any value that implements the <code>JoeIterable</code> interface</li>
+<li>Any <code>JoeObject</code>, e.g., any registered type, that can convert its values
+into a list for iteration.</li>
+</ul>
+<p>To make your registered type iterable, provide an iterables supplier, a
+function that accepts a value of your type and returns a <code>Collection&lt;?&gt;</code>.</p>
+<pre><code class="language-java">public class MyTypeProxy extends TypeProxy&lt;MyType&gt; {
+  public MyTypeProxy() {
+    super("MyType");
+        ...
+        iterables(myValue -&gt; myValue.getItems());
+        ...
+  }
     ...
 }
 </code></pre>
