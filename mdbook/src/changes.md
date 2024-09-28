@@ -11,6 +11,14 @@
     - Normal strings can no longer contain unescaped newlines.
     - Joe now has Java-like text blocks, enclosed in `"""` pairs.
     - See [Types and Values: Strings](types.md#strings).
+  - Operators
+    - Added the `in` and `ni` 
+      [membership operators](operators.md#membership-operators).
+- Documentation
+  - Added the topics "Stringification" and "Iterability" to the
+    [Registered Types](extending/registered_types.md) section.
+- Bug fixes
+  - Fixed broken `println()` function.
 
 ## Changes in 0.2.0 (2024-09-27)
 

@@ -61,7 +61,7 @@ ternary         → logic_or "?" logic_or ":" logic_or ;
 logic_or        → logic_and ( "||" logic_and )* ;
 logic_or        → equality ( "&&" equality )* ;
 equality        → comparison ( ( "!=" | "==" ) comparison )* ;
-comparison      → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+comparison      → term ( ( ">" | ">=" | "<" | "<=" | "in" | "ni" ) term )* ;
 term            → factor ( ( "-" | "+" ) factor )* ;
 factor          → unary ( ( "/" | "*" ) unary )* ;
 unary           → ( "-" | "!" ) unary 

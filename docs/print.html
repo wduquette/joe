@@ -306,6 +306,23 @@ buy him lunch.</p>
 <li>See <a href="types.html#strings">Types and Values: Strings</a>.</li>
 </ul>
 </li>
+<li>Operators
+<ul>
+<li>Added the <code>in</code> and <code>ni</code>
+<a href="operators.html#membership-operators">membership operators</a>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Documentation
+<ul>
+<li>Added the topics "Stringification" and "Iterability" to the
+<a href="extending/registered_types.html">Registered Types</a> section.</li>
+</ul>
+</li>
+<li>Bug fixes
+<ul>
+<li>Fixed broken <code>println()</code> function.</li>
 </ul>
 </li>
 </ul>
@@ -613,7 +630,7 @@ is pretty much the same.</p>
 </div>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="operators"><a class="header" href="#operators">Operators</a></h1>
 <p>Joe defines a subset of Java's operators, with a few differences.</p>
-<p>TODO: <code>+=</code>, <code>-=</code>, <code>*=</code>, <code>/=</code>, <code>++</code>, <code>--</code>, <code>in</code>, <code>ni</code>.</p>
+<p>TODO: <code>+=</code>, <code>-=</code>, <code>*=</code>, <code>/=</code>, <code>++</code>, <code>--</code></p>
 <h2 id="arithmetic-operators"><a class="header" href="#arithmetic-operators">Arithmetic Operators</a></h2>
 <p>The <code>+</code>, <code>-</code>, <code>*</code>, and <code>/</code> operators (including unary <code>-</code>) are defined as in
 Java, with the usual precedence.</p>
@@ -625,6 +642,16 @@ if at least one operand is a <code>String</code>.</p>
 equality.  As a result, Joe values do not provide an <code>equals()</code> method.</p>
 <p>The <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, and <code>&lt;=</code> operators compare numbers as they do in Java,
 but also compare <code>Strings</code> lexicographically.</p>
+<h2 id="membership-operators"><a class="header" href="#membership-operators">Membership Operators</a></h2>
+<p>The <code>in</code> and <code>ni</code> ("Not In") operators check for membership of elements in
+collections, e.g., Joe <a href="library/type.joe.List.html"><code>List</code></a> values.</p>
+<pre><code class="language-joe">var list = List("A", "B", "C");
+
+if ("A" in list) println("Got it!");
+if ("D" ni list) println("Nope, not there!");
+</code></pre>
+<p>These operators work with the same set of collection values as the
+<a href="statements.html#foreach-loops"><code>foreach</code> statement</a>.</p>
 <h2 id="logical-operators"><a class="header" href="#logical-operators">Logical Operators</a></h2>
 <p>The <code>&amp;&amp;</code> and <code>||</code> operators provide short-circuit execution of Boolean
 expressions in the usual way.  However, in Joe the values <code>false</code> and <code>null</code>
@@ -1284,6 +1311,8 @@ For example,</p>
 <ul>
 <li><a href="extending/registered_types.html#the-script-level-type-name">The Script-level Type Name</a></li>
 <li><a href="extending/registered_types.html#the-proxied-types">The Proxied Types</a></li>
+<li><a href="extending/registered_types.html#stringification">Stringification</a></li>
+<li><a href="extending/registered_types.html#iterability">Iterability</a></li>
 <li><a href="extending/registered_types.html#static-constants">Static Constants</a></li>
 <li><a href="extending/registered_types.html#static-methods">Static Methods</a></li>
 <li><a href="extending/registered_types.html#initializer">Initializer</a></li>
@@ -1334,6 +1363,52 @@ tell Joe which types the interpreter should look for.</p>
         proxies(ListValue.class);
         proxies(ListWrapper.class);
     }
+    ...
+}
+</code></pre>
+<h2 id="stringification"><a class="header" href="#stringification">Stringification</a></h2>
+<p>When Joe converts a value to a string, it can do so in two ways:</p>
+<ul>
+<li>Via <code>Joe::stringify()</code>, which is intended to produce a string for display.</li>
+<li>Via <code>Joe::codify()</code>, which is intended to produce a string that looks more
+like the code you'd see in a script to create the value.</li>
+</ul>
+<p>Both of these default to the value's normal Java <code>toString()</code>.</p>
+<p>To change how a value is stringified, override <code>TypeProxy::stringify</code>.  For
+example, <code>NumberProxy</code> ensures that integer-valued numbers are displayed
+without a trailing <code>.0</code>:</p>
+<pre><code class="language-java">@Override
+public String stringify(Joe joe, Object value) {
+    assert value instanceof Double;
+
+    String text = ((Double)value).toString();
+    if (text.endsWith(".0")) {
+        text = text.substring(0, text.length() - 2);
+    }
+    return text;
+}
+</code></pre>
+<p>Similarly, to override how a value is "codified", which usually affects how
+it appears in error messages, override <code>TypeProxy::codify</code>.  By default,
+this method just calls the proxy's <code>stringify</code>.</p>
+<h2 id="iterability"><a class="header" href="#iterability">Iterability</a></h2>
+<p>Joe's <code>foreach</code> statement, and its <code>in</code> and <code>ni</code> operators,<br />
+can iterate over or search the following kinds of collection values:</p>
+<ul>
+<li>Any Java <code>Collection&lt;?&gt;</code></li>
+<li>Any value that implements the <code>JoeIterable</code> interface</li>
+<li>Any <code>JoeObject</code>, e.g., any registered type, that can convert its values
+into a list for iteration.</li>
+</ul>
+<p>To make your registered type iterable, provide an iterables supplier, a
+function that accepts a value of your type and returns a <code>Collection&lt;?&gt;</code>.</p>
+<pre><code class="language-java">public class MyTypeProxy extends TypeProxy&lt;MyType&gt; {
+  public MyTypeProxy() {
+    super("MyType");
+        ...
+        iterables(myValue -&gt; myValue.getItems());
+        ...
+  }
     ...
 }
 </code></pre>
@@ -3499,7 +3574,7 @@ ternary         → logic_or "?" logic_or ":" logic_or ;
 logic_or        → logic_and ( "||" logic_and )* ;
 logic_or        → equality ( "&amp;&amp;" equality )* ;
 equality        → comparison ( ( "!=" | "==" ) comparison )* ;
-comparison      → term ( ( "&gt;" | "&gt;=" | "&lt;" | "&lt;=" ) term )* ;
+comparison      → term ( ( "&gt;" | "&gt;=" | "&lt;" | "&lt;=" | "in" | "ni" ) term )* ;
 term            → factor ( ( "-" | "+" ) factor )* ;
 factor          → unary ( ( "/" | "*" ) unary )* ;
 unary           → ( "-" | "!" ) unary 

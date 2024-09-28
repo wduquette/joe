@@ -175,7 +175,7 @@
                     <main>
                         <h1 id="operators"><a class="header" href="#operators">Operators</a></h1>
 <p>Joe defines a subset of Java's operators, with a few differences.</p>
-<p>TODO: <code>+=</code>, <code>-=</code>, <code>*=</code>, <code>/=</code>, <code>++</code>, <code>--</code>, <code>in</code>, <code>ni</code>.</p>
+<p>TODO: <code>+=</code>, <code>-=</code>, <code>*=</code>, <code>/=</code>, <code>++</code>, <code>--</code></p>
 <h2 id="arithmetic-operators"><a class="header" href="#arithmetic-operators">Arithmetic Operators</a></h2>
 <p>The <code>+</code>, <code>-</code>, <code>*</code>, and <code>/</code> operators (including unary <code>-</code>) are defined as in
 Java, with the usual precedence.</p>
@@ -187,6 +187,16 @@ if at least one operand is a <code>String</code>.</p>
 equality.  As a result, Joe values do not provide an <code>equals()</code> method.</p>
 <p>The <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, and <code>&lt;=</code> operators compare numbers as they do in Java,
 but also compare <code>Strings</code> lexicographically.</p>
+<h2 id="membership-operators"><a class="header" href="#membership-operators">Membership Operators</a></h2>
+<p>The <code>in</code> and <code>ni</code> ("Not In") operators check for membership of elements in
+collections, e.g., Joe <a href="library/type.joe.List.html"><code>List</code></a> values.</p>
+<pre><code class="language-joe">var list = List("A", "B", "C");
+
+if ("A" in list) println("Got it!");
+if ("D" ni list) println("Nope, not there!");
+</code></pre>
+<p>These operators work with the same set of collection values as the
+<a href="statements.html#foreach-loops"><code>foreach</code> statement</a>.</p>
 <h2 id="logical-operators"><a class="header" href="#logical-operators">Logical Operators</a></h2>
 <p>The <code>&amp;&amp;</code> and <code>||</code> operators provide short-circuit execution of Boolean
 expressions in the usual way.  However, in Joe the values <code>false</code> and <code>null</code>

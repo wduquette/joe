@@ -2,7 +2,7 @@
 
 Joe defines a subset of Java's operators, with a few differences.
 
-TODO: `+=`, `-=`, `*=`, `/=`, `++`, `--`, `in`, `ni`.
+TODO: `+=`, `-=`, `*=`, `/=`, `++`, `--`
 
 ## Arithmetic Operators
 
@@ -20,6 +20,21 @@ equality.  As a result, Joe values do not provide an `equals()` method.
 
 The `>`, `<`, `>=`, and `<=` operators compare numbers as they do in Java,
 but also compare `Strings` lexicographically.
+
+## Membership Operators
+
+The `in` and `ni` ("Not In") operators check for membership of elements in 
+collections, e.g., Joe [`List`](library/type.joe.List.md) values.
+
+```joe
+var list = List("A", "B", "C");
+
+if ("A" in list) println("Got it!");
+if ("D" ni list) println("Nope, not there!");
+```
+
+These operators work with the same set of collection values as the 
+[`foreach` statement](statements.md#foreach-loops).
 
 ## Logical Operators
 
