@@ -89,7 +89,7 @@ class StandardLibrary extends JoePackage {
     private Object _println(Joe joe, ArgQueue args) {
         Joe.arityRange(args, 0, 1, "println([text])");
 
-        if (args.hasRemaining()) {
+        if (!args.hasRemaining()) {
             joe.println();
         } else {
             joe.println(joe.stringify(args.getRemaining(0)));
