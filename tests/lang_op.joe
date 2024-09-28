@@ -116,3 +116,21 @@ function testTimes() {
     checkCatch(bad)
         .message("Operands must be numbers.");
 }
+
+function testIN() {
+    var list = List(#a, #b, #c);
+    check(#a in list).isTrue();
+    check(#d in list).isFalse();
+
+    checkCatch(\-> #a in #a)
+        .message("Expected iterable, got: Keyword '#a'.");
+}
+
+function testNI() {
+    var list = List(#a, #b, #c);
+    check(#a ni list).isFalse();
+    check(#d ni list).isTrue();
+
+    checkCatch(\-> #a ni #a)
+        .message("Expected iterable, got: Keyword '#a'.");
+}

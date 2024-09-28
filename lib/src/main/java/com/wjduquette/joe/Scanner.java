@@ -22,7 +22,9 @@ class Scanner {
         reserved.put("foreach",  FOREACH);
         reserved.put("function", FUNCTION);
         reserved.put("if",       IF);
+        reserved.put("in",       IN);
         reserved.put("method",   METHOD);
+        reserved.put("ni",       NI);
         reserved.put("null",     NULL);
         reserved.put("return",   RETURN);
         reserved.put("static",   STATIC);

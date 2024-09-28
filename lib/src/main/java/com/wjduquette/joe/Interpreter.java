@@ -141,21 +141,7 @@ class Interpreter {
             }
             case Stmt.ForEach stmt -> {
                 var list = evaluate(stmt.listExpr());
-                Collection<?> collection = switch (list) {
-                    case Collection<?> c -> c;
-                    case JoeIterable i -> i.getItems();
-                    default -> {
-                        var instance = joe.getJoeObject(list);
-                        if (instance.canIterate()) {
-                            yield instance.getItems();
-                        } else {
-                            throw new RuntimeError(stmt.varName(),
-                                "Expected iterable, got: " +
-                                    joe.typeName(list) + "'" +
-                                    joe.stringify(list) + "'");
-                        }
-                    }
-                };
+                Collection<?> collection = toCollection(stmt.varName(), list);
 
                 for (var item : collection) {
                     try {
@@ -282,6 +268,7 @@ class Interpreter {
 
                         throw notSimilar(expr.op());
                     }
+                    case IN -> toCollection(expr.op(), right).contains(left);
                     case LESS -> {
                         if (left instanceof Double a && right instanceof Double b) {
                             yield a < b;
@@ -308,6 +295,7 @@ class Interpreter {
                         checkNumberOperands(expr.op(), left, right);
                         yield (double)left - (double)right;
                     }
+                    case NI -> !toCollection(expr.op(), right).contains(left);
                     case SLASH -> {
                         checkNumberOperands(expr.op(), left, right);
                         yield (double)left / (double)right;
@@ -428,10 +416,24 @@ class Interpreter {
         }
     }
 
-    //-------------------------------------------------------------------------
-    // Control Flow Exceptions
-
-
+    // Gets the argument as a collection, if possible
+    private Collection<?> toCollection(Token token, Object arg) {
+        return switch (arg) {
+            case Collection<?> c -> c;
+            case JoeIterable i -> i.getItems();
+            default -> {
+                var instance = joe.getJoeObject(arg);
+                if (instance.canIterate()) {
+                    yield instance.getItems();
+                } else {
+                    throw new RuntimeError(token,
+                        "Expected iterable, got: " +
+                            joe.typeName(arg) + " '" +
+                            joe.codify(arg) + "'.");
+                }
+            }
+        };
+    }
 
     //-------------------------------------------------------------------------
     // Error Checking
