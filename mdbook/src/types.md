@@ -28,10 +28,12 @@ other values are considered "truthy".
 All [numbers](library/type.joe.Number.md) are represented as IEEE 
 double precision values, i.e., Java `Doubles`, as in Javascript and Lua.
 
-Syntactically, numeric literals are defined as in Java.[^numeric]
+Syntactically, numeric literals are defined as in Java.
 
 - `123`
 - `123.456`
+- `123.4e-56`
+- `0x12FF`
 
 ## Strings
 
@@ -115,9 +117,6 @@ Joe scripts can define classes; a class can have:
 Joe classes support single inheritance.
 
 See the section on [Classes](classes.md) for more information.
-
-[^numeric]: At time of writing, Joe does not yet support exponential
-notation or hexadecimal literals.
 
 [^unicode]: Joe supports Unicode escapes, e.g., `\u1234`, as in Java;
 but only within string literals.

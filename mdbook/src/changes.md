@@ -2,7 +2,10 @@
 
 ## Changes in 0.3.0 (Forthcoming)
 
-- ...
+- Language
+  - Numeric literals can now use scientific notation, e.g., `12.34e56`,
+    as in Java.
+  - Hex literals, e.g., `0x12FF`.
 
 ## Changes in 0.2.0 (2024-09-27)
 

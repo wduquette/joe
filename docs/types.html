@@ -197,10 +197,12 @@ other values are considered "truthy".</p>
 <h2 id="numbers"><a class="header" href="#numbers">Numbers</a></h2>
 <p>All <a href="library/type.joe.Number.html">numbers</a> are represented as IEEE
 double precision values, i.e., Java <code>Doubles</code>, as in Javascript and Lua.</p>
-<p>Syntactically, numeric literals are defined as in Java.<sup class="footnote-reference"><a href="#numeric">1</a></sup></p>
+<p>Syntactically, numeric literals are defined as in Java.</p>
 <ul>
 <li><code>123</code></li>
 <li><code>123.456</code></li>
+<li><code>123.4e-56</code></li>
+<li><code>0x12FF</code></li>
 </ul>
 <h2 id="strings"><a class="header" href="#strings">Strings</a></h2>
 <p><a href="library/type.joe.String.html">Joe strings</a> are represented internally
@@ -210,7 +212,7 @@ as Java <code>String</code> values, and provide much the same range of operation
 <li><code>"abcd"</code></li>
 </ul>
 <p>String literals support the usual array of escapes, including
-<code>\n</code>, <code>\\</code>, <code>\"</code>, etc.<sup class="footnote-reference"><a href="#unicode">2</a></sup></p>
+<code>\n</code>, <code>\\</code>, <code>\"</code>, etc.<sup class="footnote-reference"><a href="#unicode">1</a></sup></p>
 <p>TODO: Include full list.</p>
 <p>At time of writing, double-quoted strings can be multiline; no
 attempt is made to clean up the whitespace.</p>
@@ -262,11 +264,7 @@ time.  See the sections on <a href="functions.html">Functions</a> and
 </ul>
 <p>Joe classes support single inheritance.</p>
 <p>See the section on <a href="classes.html">Classes</a> for more information.</p>
-<div class="footnote-definition" id="numeric"><sup class="footnote-definition-label">1</sup>
-<p>At time of writing, Joe does not yet support exponential
-notation or hexadecimal literals.</p>
-</div>
-<div class="footnote-definition" id="unicode"><sup class="footnote-definition-label">2</sup>
+<div class="footnote-definition" id="unicode"><sup class="footnote-definition-label">1</sup>
 <p>Joe supports Unicode escapes, e.g., <code>\u1234</code>, as in Java;
 but only within string literals.</p>
 </div>
