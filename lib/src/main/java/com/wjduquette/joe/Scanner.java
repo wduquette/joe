@@ -120,7 +120,9 @@ class Scanner {
             case '"' -> string();
             case '#' -> keyword();
             default -> {
-                if (isDigit(c)) {
+                if (c == '0' && peek() == 'x') {
+                    hexNumber();
+                } else if (isDigit(c)) {
                     number();
                 } else if (isAlpha(c)) {
                     identifier();
@@ -152,6 +154,18 @@ class Scanner {
             source.substring(start + 1, current));
 
         addToken(KEYWORD, keyword);
+    }
+
+    private void hexNumber() {
+        advance();  // Consume the x
+        while (isHexDigit(peek())) advance();
+
+        try {
+            var num = Integer.parseInt(source.substring(start + 2, current), 16);
+            addToken(NUMBER, (double)num);
+        } catch (Exception ex) {
+            error(line, "Invalid hex literal.");
+        }
     }
 
     private void number() {
