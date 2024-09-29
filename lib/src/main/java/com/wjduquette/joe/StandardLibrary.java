@@ -26,6 +26,7 @@ class StandardLibrary extends JoePackage {
         type(ErrorProxy.TYPE);
         type(KeywordProxy.TYPE);
         type(ListProxy.TYPE);
+        type(MapProxy.TYPE);
         type(NumberProxy.TYPE);
         type(PairProxy.TYPE);
         type(StringProxy.TYPE);
