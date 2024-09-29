@@ -24,8 +24,12 @@
     - Added the `+=`, `-=`, `*=`, and `/=` assignment operators, with
       their usual semantics.
     - Added the `++` and `--` operators, with their usual semantics.
+     
+- Library
+  - Added the [`Map`](library/type.joe.Map.md) type.
 
 - Documentation
+  - Added the relevant documentation for all changes list above.
   - Added the topics "Stringification" and "Iterability" to the
     [Registered Types](extending/registered_types.md) section.
 

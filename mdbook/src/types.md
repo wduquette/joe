@@ -12,6 +12,7 @@ types:
 - [Keywords](#keywords)
 - [Pairs](#pairs)
 - [Lists](#lists)
+- [Maps](#maps)
 - [Errors](#errors)
 - [Functions and Methods](#functions-and-methods)
 - [Classes and Instances](#classes-and-instances)
@@ -113,7 +114,7 @@ println("left  = " + pair.left());
 println("right = " + pair.right());
 ```
 
-## List
+## Lists
 
 A [List](library/type.joe.List.md) is a Java `List<Object>` that 
 contains an ordered collection of arbitrary Joe values, and has much
@@ -122,6 +123,17 @@ the same operations as Java lists.  See the link for the full API.
 ```joe
 var list = List("a", "b", "c", "d");
 println(list.get(2)); // Outputs "c".
+```
+
+## Maps
+
+A [Map](library/type.joe.Map.md) is a Java `Map<Object,Object>`, 
+basic key/value store.  It has much the same operations as Java maps.
+See the link for the full API.
+
+```joe
+var map = map(#a, 1, #b, 2);
+println(map.get(#b)); // Outputs "2".
 ```
 
 ## Errors
