@@ -58,6 +58,21 @@ function testCheck_isNonNull() {
         .message("Expected non-null, got: 'null'.");
 }
 
+function testCheck_isEmpty() {
+    check(List()).isEmpty();
+    check("").isEmpty();
+
+    checkCatch(\-> check(List(1, 2)).isEmpty())
+        .message("Expected isEmpty(), got: List 'List(1, 2)'.");
+}
+
+function testCheck_containsAll() {
+    check(List(#a, #b, #c)).containsAll(#a, #b);
+
+    checkCatch(\-> check(List(#a)).containsAll(#a, #b))
+        .message("Expected collection to contain Keyword '#b' got: 'List(#a, #b)'.");
+}
+
 function testCheck_hasTypeName() {
     check(true).hasTypeName("Boolean");
     check(1).hasTypeName("Number");
