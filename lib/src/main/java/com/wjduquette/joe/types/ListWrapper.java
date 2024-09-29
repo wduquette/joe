@@ -213,7 +213,7 @@ public class ListWrapper implements JoeList {
     }
 
     private void requireCanAdd(Object value) {
-        if (!itemType.isAssignableFrom(value.getClass())) {
+        if (itemType != null && !itemType.isAssignableFrom(value.getClass())) {
             throw joe.expected(joe.classTypeName(itemType), value);
         }
     }
@@ -234,7 +234,6 @@ public class ListWrapper implements JoeList {
 
     @Override
     public String toString() {
-        return list.toString();
+        return ListProxy.TYPE.stringify(joe, list);
     }
-
 }

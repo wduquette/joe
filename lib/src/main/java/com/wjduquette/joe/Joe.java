@@ -2,6 +2,7 @@ package com.wjduquette.joe;
 
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.ListWrapper;
+import com.wjduquette.joe.types.MapWrapper;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -777,6 +778,33 @@ public class Joe {
     @SuppressWarnings("unused")
     public JoeList readonlyList(List<?> list) {
         return ListWrapper.readOnly(this, list);
+    }
+
+    /**
+     * Given an arbitrary Java map, wraps it as a JoeMap and ensures that
+     * any added key,value pairs are compatible with the given key and
+     * value types.  Updates made by the script will update the underlying
+     * Java map.  If this is not desired, either use `Joe::readonlyMap()`
+     * or return it as a new `MapValue`.
+     * @param map The map to wrap
+     * @param keyType The type
+     * @param valueType The type
+     * @return The wrapped map.
+     */
+    @SuppressWarnings("unused")
+    public JoeMap wrapMap(Map<?,?> map, Class<?> keyType, Class<?> valueType) {
+        return MapWrapper.wrap(this, map, keyType, valueType);
+    }
+
+    /**
+     * Given an arbitrary Java map, wraps it to be read-only.  It can
+     * be accessed freely at the script level, but not modified.
+     * @param map The map to wrap
+     * @return The wrapped map
+     */
+    @SuppressWarnings("unused")
+    public JoeMap readonlyMap(Map<?,?> map) {
+        return MapWrapper.readOnly(this, map);
     }
 }
 

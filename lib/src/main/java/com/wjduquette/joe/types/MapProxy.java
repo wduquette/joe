@@ -178,13 +178,12 @@ public class MapProxy extends TypeProxy<JoeMap> {
     //**
     // @method put
     // @args key, value
-    // @result this
+    // @result the replaced value
     // Adds the *key/*value* pair to the map.
     private Object _put(JoeMap map, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 2, "put(key, value)");
 
-        map.put(args.next(), args.next());
-        return map;
+        return map.put(args.next(), args.next());
     }
 
     //**
