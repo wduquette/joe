@@ -7,7 +7,7 @@ import java.util.*;
  */
 public class Environment {
     final Environment enclosing;
-    private final Map<String, Object> values = new HashMap<>();
+    protected final Map<String, Object> values = new HashMap<>();
 
     /**
      * Creates an environment with no enclosing environment.
@@ -32,15 +32,6 @@ public class Environment {
         for (var key : map.keySet()) {
             System.out.printf("  %-20s %s\n", key, map.get(key).toString());
         }
-    }
-
-    /**
-     * Gets the names of the variables declared in this environment.
-     * Does not include variables defined in enclosing environments.
-     * @return The list.
-     */
-    public List<String> getVarNames() {
-        return new ArrayList<>(values.keySet());
     }
 
     /**
