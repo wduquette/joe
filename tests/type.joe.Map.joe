@@ -40,3 +40,60 @@ function testCopy() {
     check(map2 == map).isFalse();
 }
 
+function testGet() {
+    var map = Map(#a, 1);
+    check(map.get(#a)).eq(1);
+    check(map.get(#b)).isNull();
+}
+
+function testGetOrDefault() {
+    var map = Map(#a, 1);
+    check(map.getOrDefault(#a,0)).eq(1);
+    check(map.getOrDefault(#b,0)).eq(0);
+}
+
+function testIsEmpty() {
+    check(Map().isEmpty()).isTrue();
+    check(Map(#a, 1).isEmpty()).isFalse();
+}
+
+function testKeySet() {
+    var map = Map(#a, 1, #b, 2);
+    check(map.keySet()).containsAll(#a, #b);
+}
+
+function testPut() {
+    var map = Map();
+    map.put(#a, 1);
+    check(map.get(#a)).eq(1);
+}
+
+function testPutAll() {
+    var map1 = Map(#a, 1, #b, 2);
+    var map2 = Map(#c, 3);
+    map2.putAll(map1);
+    check(map2).eq(Map(#a, 1, #b, 2, #c, 3));
+}
+
+function testRemove() {
+    var map = Map(#a, 1, #b, 2, #c, 3);
+    check(map.remove(#b)).eq(2);
+    check(map).eq(Map(#a, 1, #c, 3));
+    check(map.remove(#d)).eq(null);
+    check(map).eq(Map(#a, 1, #c, 3));
+}
+
+function testSize() {
+    check(Map().size()).eq(0);
+    check(Map(#a, 1, #b, 2).size()).eq(2);
+}
+
+function testToString() {
+    check(Map(#a, 1, #b, 2).toString()).eq("Map(#a=1, #b=2)");
+}
+
+function testValues() {
+    var map = Map(#a, 1, #b, 2);
+    check(map.values()).containsAll(1, 2);
+}
+
