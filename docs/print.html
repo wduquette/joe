@@ -330,8 +330,15 @@ their usual semantics.</li>
 </ul>
 </li>
 <li>
+<p>Library</p>
+<ul>
+<li>Added the <a href="library/type.joe.Map.html"><code>Map</code></a> type.</li>
+</ul>
+</li>
+<li>
 <p>Documentation</p>
 <ul>
+<li>Added the relevant documentation for all changes list above.</li>
 <li>Added the topics "Stringification" and "Iterability" to the
 <a href="extending/registered_types.html">Registered Types</a> section.</li>
 </ul>
@@ -537,6 +544,7 @@ types:</p>
 <li><a href="types.html#keywords">Keywords</a></li>
 <li><a href="types.html#pairs">Pairs</a></li>
 <li><a href="types.html#lists">Lists</a></li>
+<li><a href="types.html#maps">Maps</a></li>
 <li><a href="types.html#errors">Errors</a></li>
 <li><a href="types.html#functions-and-methods">Functions and Methods</a></li>
 <li><a href="types.html#classes-and-instances">Classes and Instances</a></li>
@@ -614,12 +622,19 @@ and <code>right</code>; it's used to return a pair of values from a function.</p
 println("left  = " + pair.left());
 println("right = " + pair.right());
 </code></pre>
-<h2 id="list"><a class="header" href="#list">List</a></h2>
+<h2 id="lists"><a class="header" href="#lists">Lists</a></h2>
 <p>A <a href="library/type.joe.List.html">List</a> is a Java <code>List&lt;Object&gt;</code> that
 contains an ordered collection of arbitrary Joe values, and has much
 the same operations as Java lists.  See the link for the full API.</p>
 <pre><code class="language-joe">var list = List("a", "b", "c", "d");
 println(list.get(2)); // Outputs "c".
+</code></pre>
+<h2 id="maps"><a class="header" href="#maps">Maps</a></h2>
+<p>A <a href="library/type.joe.Map.html">Map</a> is a Java <code>Map&lt;Object,Object&gt;</code>,
+basic key/value store.  It has much the same operations as Java maps.
+See the link for the full API.</p>
+<pre><code class="language-joe">var map = map(#a, 1, #b, 2);
+println(map.get(#b)); // Outputs "2".
 </code></pre>
 <h2 id="errors"><a class="header" href="#errors">Errors</a></h2>
 <p>An <a href="library/type.joe.Error.html">Error</a> is a Java <code>JoeError</code> exception:
@@ -2249,7 +2264,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.Map.html#method.getOrDefault"><em>map</em>.getOrDefault(<em>key</em>, <em>defaultValue</em>)</a> → value</li>
 <li><a href="library/type.joe.Map.html#method.isEmpty"><em>map</em>.isEmpty()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Map.html#method.keySet"><em>map</em>.keySet()</a> → <a href="library/type.joe.List.html">List</a></li>
-<li><a href="library/type.joe.Map.html#method.put"><em>map</em>.put(<em>key</em>, <em>value</em>)</a> → this</li>
+<li><a href="library/type.joe.Map.html#method.put"><em>map</em>.put(<em>key</em>, <em>value</em>)</a> → value</li>
 <li><a href="library/type.joe.Map.html#method.putAll"><em>map</em>.putAll(<em>map</em>)</a> → this</li>
 <li><a href="library/type.joe.Map.html#method.remove"><em>map</em>.remove(<em>key</em>)</a> → value</li>
 <li><a href="library/type.joe.Map.html#method.size"><em>map</em>.size()</a> → <a href="library/type.joe.Number.html">Number</a></li>
@@ -2763,7 +2778,7 @@ key/value types.</p>
 <li><a href="library/type.joe.Map.html#method.getOrDefault"><em>map</em>.getOrDefault(<em>key</em>, <em>defaultValue</em>)</a> → value</li>
 <li><a href="library/type.joe.Map.html#method.isEmpty"><em>map</em>.isEmpty()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Map.html#method.keySet"><em>map</em>.keySet()</a> → <a href="library/type.joe.List.html">List</a></li>
-<li><a href="library/type.joe.Map.html#method.put"><em>map</em>.put(<em>key</em>, <em>value</em>)</a> → this</li>
+<li><a href="library/type.joe.Map.html#method.put"><em>map</em>.put(<em>key</em>, <em>value</em>)</a> → value</li>
 <li><a href="library/type.joe.Map.html#method.putAll"><em>map</em>.putAll(<em>map</em>)</a> → this</li>
 <li><a href="library/type.joe.Map.html#method.remove"><em>map</em>.remove(<em>key</em>)</a> → value</li>
 <li><a href="library/type.joe.Map.html#method.size"><em>map</em>.size()</a> → <a href="library/type.joe.Number.html">Number</a></li>
@@ -2822,8 +2837,8 @@ TODO: return a readonly SetWrapper once we have sets.</p>
 <p><span id="method.put"> </span></p>
 <h3 id="mapput"><a class="header" href="#mapput"><em>map</em>.put()</a></h3>
 <hr />
-<p><strong><em>map</em>.put(<em>key</em>, <em>value</em>) → this</strong></p>
-<p>Adds the *key/<em>value</em> pair to the map.</p>
+<p><strong><em>map</em>.put(<em>key</em>, <em>value</em>) → value</strong></p>
+<p>Adds the *key/<em>value</em> pair to the map, returning the replaced value.</p>
 <p><span id="method.putAll"> </span></p>
 <h3 id="mapputall"><a class="header" href="#mapputall"><em>map</em>.putAll()</a></h3>
 <hr />
@@ -3580,7 +3595,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.Map.html#method.getOrDefault"><em>map</em>.getOrDefault(<em>key</em>, <em>defaultValue</em>)</a> → value</li>
 <li><a href="library/type.joe.Map.html#method.isEmpty"><em>map</em>.isEmpty()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Map.html#method.keySet"><em>map</em>.keySet()</a> → <a href="library/type.joe.List.html">List</a></li>
-<li><a href="library/type.joe.Map.html#method.put"><em>map</em>.put(<em>key</em>, <em>value</em>)</a> → this</li>
+<li><a href="library/type.joe.Map.html#method.put"><em>map</em>.put(<em>key</em>, <em>value</em>)</a> → value</li>
 <li><a href="library/type.joe.Map.html#method.putAll"><em>map</em>.putAll(<em>map</em>)</a> → this</li>
 <li><a href="library/type.joe.Map.html#method.remove"><em>map</em>.remove(<em>key</em>)</a> → value</li>
 <li><a href="library/type.joe.Map.html#method.size"><em>map</em>.size()</a> → <a href="library/type.joe.Number.html">Number</a></li>

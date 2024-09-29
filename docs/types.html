@@ -186,6 +186,7 @@ types:</p>
 <li><a href="#keywords">Keywords</a></li>
 <li><a href="#pairs">Pairs</a></li>
 <li><a href="#lists">Lists</a></li>
+<li><a href="#maps">Maps</a></li>
 <li><a href="#errors">Errors</a></li>
 <li><a href="#functions-and-methods">Functions and Methods</a></li>
 <li><a href="#classes-and-instances">Classes and Instances</a></li>
@@ -263,12 +264,19 @@ and <code>right</code>; it's used to return a pair of values from a function.</p
 println("left  = " + pair.left());
 println("right = " + pair.right());
 </code></pre>
-<h2 id="list"><a class="header" href="#list">List</a></h2>
+<h2 id="lists"><a class="header" href="#lists">Lists</a></h2>
 <p>A <a href="library/type.joe.List.html">List</a> is a Java <code>List&lt;Object&gt;</code> that
 contains an ordered collection of arbitrary Joe values, and has much
 the same operations as Java lists.  See the link for the full API.</p>
 <pre><code class="language-joe">var list = List("a", "b", "c", "d");
 println(list.get(2)); // Outputs "c".
+</code></pre>
+<h2 id="maps"><a class="header" href="#maps">Maps</a></h2>
+<p>A <a href="library/type.joe.Map.html">Map</a> is a Java <code>Map&lt;Object,Object&gt;</code>,
+basic key/value store.  It has much the same operations as Java maps.
+See the link for the full API.</p>
+<pre><code class="language-joe">var map = map(#a, 1, #b, 2);
+println(map.get(#b)); // Outputs "2".
 </code></pre>
 <h2 id="errors"><a class="header" href="#errors">Errors</a></h2>
 <p>An <a href="library/type.joe.Error.html">Error</a> is a Java <code>JoeError</code> exception:
