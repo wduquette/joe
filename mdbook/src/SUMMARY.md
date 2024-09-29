@@ -42,6 +42,7 @@
     - [Error Type](./library/type.joe.Error.md)
     - [Keyword Type](./library/type.joe.Keyword.md)
     - [List Type](./library/type.joe.List.md)
+    - [Map Type](./library/type.joe.Map.md)
     - [Number Type](./library/type.joe.Number.md)
     - [Pair Type](./library/type.joe.Pair.md)
     - [String Type](./library/type.joe.String.md)

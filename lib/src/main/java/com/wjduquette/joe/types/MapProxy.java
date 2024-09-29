@@ -15,10 +15,11 @@ public class MapProxy extends TypeProxy<JoeMap> {
     //**
     // @package joe
     // @type Map
-    // A Joe `Map` is a Java `Map`, roughly equivalent to a Java `ArrayMap`.
+    // A Joe `Map` is a Java `Map`, roughly equivalent to a Java `HashMap`.
     // Maps created using the [[Map#init]] initializer can contain any kind
-    // of Joe value; the list need not be homogeneous.  Maps received from
-    // Java code might be read-only or require a specific item type.
+    // of Joe keys and values; the map need not be homogeneous.  Maps
+    // received from Java code might be read-only or require a specific
+    // key/value types.
     /** Creates the proxy. */
     public MapProxy() {
         super("Map");
@@ -52,8 +53,12 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // key/value pairs.
     private Object _init(Joe joe, ArgQueue args) {
         if (args.size() % 2 != 0) {
+            var argList = args.asList().stream()
+                .map(joe::codify)
+                .collect(Collectors.joining(", "));
+
             throw new JoeError("Expected an even number of arguments, got: '" +
-                args);
+                argList + "'.");
         }
 
         var map = new MapValue();
@@ -75,7 +80,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
 
         return "Map("
             + map.entrySet().stream()
-                .map(e -> joe.codify(e.getKey()) + ": " + joe.codify(e.getValue()))
+                .map(e -> joe.codify(e.getKey()) + "=" + joe.codify(e.getValue()))
                 .collect(Collectors.joining(", "))
             + ")";
     }
