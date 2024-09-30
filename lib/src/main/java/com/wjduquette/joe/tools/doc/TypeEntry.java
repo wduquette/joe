@@ -12,6 +12,7 @@ class TypeEntry extends Entry {
 
     private final List<ConstantEntry> constants = new ArrayList<>();
     private final List<StaticMethodEntry> staticMethods = new ArrayList<>();
+    private String supertypeName = null;
     private InitializerEntry initializer = null;
     private final List<MethodEntry> methods = new ArrayList<>();
 
@@ -28,6 +29,7 @@ class TypeEntry extends Entry {
 
     public List<ConstantEntry>     constants()     { return constants; }
     public List<StaticMethodEntry> staticMethods() { return staticMethods; }
+    public String                  supertypeName() { return supertypeName; }
     public InitializerEntry        initializer()   { return initializer; }
     public List<MethodEntry>       methods()       { return methods; }
 
@@ -37,6 +39,10 @@ class TypeEntry extends Entry {
     public String shortMnemonic() { return name; }
     public String valuePrefix()   { return downCase(name); }
     public String filename()      { return "type." + pkg().name() + "." + name + ".md"; }
+
+    public void setSupertypeName(String supertypeName) {
+        this.supertypeName = supertypeName;
+    }
 
     public void setInitializer(InitializerEntry initializer) {
         this.initializer = initializer;

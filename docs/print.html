@@ -1364,6 +1364,7 @@ For example,</p>
 <ul>
 <li><a href="extending/registered_types.html#the-script-level-type-name">The Script-level Type Name</a></li>
 <li><a href="extending/registered_types.html#the-proxied-types">The Proxied Types</a></li>
+<li><a href="extending/registered_types.html#the-supertype">The Supertype</a></li>
 <li><a href="extending/registered_types.html#stringification">Stringification</a></li>
 <li><a href="extending/registered_types.html#iterability">Iterability</a></li>
 <li><a href="extending/registered_types.html#static-constants">Static Constants</a></li>
@@ -1416,6 +1417,20 @@ tell Joe which types the interpreter should look for.</p>
         proxies(ListValue.class);
         proxies(ListWrapper.class);
     }
+    ...
+}
+</code></pre>
+<h2 id="the-supertype"><a class="header" href="#the-supertype">The Supertype</a></h2>
+<p>Sometimes it happens that both a type and its supertype are registered types;
+this is the case with Joe's <code>Error</code> and <code>AssertError</code> types.  In such a case,
+the subtype's proxy can "inherit" the supertype's methods via the <code>supertype()</code>
+method:</p>
+<pre><code class="language-java">public class AssertErrorProxy extends TypeProxy&lt;AssertError&gt; {
+  public AssertErrorProxy() {
+    super("AssertError");
+    proxies(AssertError.class);
+    extendsProxy(ErrorProxy.TYPE);
+  }
     ...
 }
 </code></pre>

@@ -24,6 +24,7 @@ public class AssertErrorProxy extends TypeProxy<AssertError> {
         //**
         // @package joe
         // @type AssertError
+        // @extends Error
         // The `AssertError` type represents an exception thrown during the
         // execution of a `Joe` script by the `assert` statement, or
         // created by the `joe.test` package to represent a test value. A
