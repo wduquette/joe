@@ -1,0 +1,22 @@
+// AssertError tests
+//
+// AssertError inherits its methods from Error.
+
+function testInitializer_noFrames() {
+    var err = AssertError("Failure");
+    check(err.message()).eq("Failure");
+    check(err.stackFrames()).isEmpty();
+}
+
+function testInitializer_frames() {
+    var err = AssertError("Failure", "A", "B");
+    check(err.message()).eq("Failure");
+    check(err.stackFrames()).eq(List("A", "B"));
+}
+
+function testCanThrow() {
+    var err = AssertError("Failure", "A", "B");
+    checkCatch(\-> { throw err; })
+        .message("Failure");
+}
+

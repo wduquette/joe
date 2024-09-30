@@ -50,10 +50,10 @@ public class ErrorProxy extends TypeProxy<JoeError> {
 
     //**
     // @init
-    // @args message, [frame,...]
+    // @args message, [frames...]
     // Creates an `Error` with the given *message*.
     private Object _initializer(Joe joe, ArgQueue args) {
-        Joe.minArity(args, 1, "Error(message)");
+        Joe.minArity(args, 1, "Error(message, [frames...])");
         var error = new JoeError(joe.stringify(args.next()));
 
         while (args.hasRemaining()) {

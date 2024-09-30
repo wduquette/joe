@@ -22,6 +22,7 @@ class StandardLibrary extends JoePackage {
         globalFunction("stringify", this::_stringify);
         globalFunction("typeName",  this::_typeName);
 
+        type(AssertErrorProxy.TYPE);
         type(BooleanProxy.TYPE);
         type(ErrorProxy.TYPE);
         type(KeywordProxy.TYPE);

@@ -18,6 +18,7 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
 
     // Static methods and constants
     private boolean isStatic = false;
+    private TypeProxy<? super V> superProxy = null;
     private final Map<String, NativeFunction> staticMethods =
         new HashMap<>();
     private final Map<String, Object> constants = new HashMap<>();
@@ -60,6 +61,16 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
      */
     public void staticType() {
         this.isStatic = true;
+    }
+
+    /**
+     * Specifies the type proxy of this type's supertype.  In this way
+     * a type proxy can inherit the methods (in particular) of its
+     * supertype's proxy.
+     * @param superProxy The supertype's proxy
+     */
+    public void extendsProxy(TypeProxy<? super V> superProxy) {
+        this.superProxy = superProxy;
     }
 
     /**
@@ -224,7 +235,9 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
         var method = methods.get(name);
 
         if (method != null) {
-            return new NativeMethod<>((V)value, name, method);
+            return new NativeMethod<>((V) value, name, method);
+        } else if (superProxy != null) {
+            return superProxy.bind(value, name);
         } else {
             throw new JoeError("Undefined property '" + name + "'.");
         }

@@ -25,6 +25,7 @@ The constructor defines the various aspects of the proxy.
 
 - [The Script-level Type Name](#the-script-level-type-name)
 - [The Proxied Types](#the-proxied-types)
+- [The Supertype](#the-supertype)
 - [Stringification](#stringification)
 - [Iterability](#iterability)
 - [Static Constants](#static-constants)
@@ -92,6 +93,25 @@ public class ListProxy extends TypeProxy<JoeList> {
     ...
 }
 ```
+
+## The Supertype
+
+Sometimes it happens that both a type and its supertype are registered types;
+this is the case with Joe's `Error` and `AssertError` types.  In such a case,
+the subtype's proxy can "inherit" the supertype's methods via the `supertype()`
+method:
+
+```java
+public class AssertErrorProxy extends TypeProxy<AssertError> {
+  public AssertErrorProxy() {
+    super("AssertError");
+    proxies(AssertError.class);
+    extendsProxy(ErrorProxy.TYPE);
+  }
+    ...
+}
+```
+
 
 ## Stringification
 
