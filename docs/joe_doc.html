@@ -374,7 +374,19 @@ in the generated documentation.</p>
 <h3 id="the-type-entity"><a class="header" href="#the-type-entity">The <code>@type</code> Entity</a></h3>
 <p>The <code>@type</code> entity documents a type, and so begins with <code>@type &lt;name&gt;</code>.</p>
 <p>The <em>name</em> should be the name of a type defined in the current package.</p>
-<p>At present, the <code>@type</code> entity has no metadata tags.</p>
+<p>The entity has the following optional metadata:</p>
+<div class="table-wrapper"><table><thead><tr><th>Metadata Tag</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>@extends &lt;type&gt;</code></td><td>This type extends the named type.</td></tr>
+</tbody></table>
+</div>
+<ul>
+<li>The <code>&lt;type&gt;</code> should be the name or qualified name of this type's supertype.</li>
+</ul>
+<pre><code class="language-java">//**
+// @type AssertError
+// @extends Error
+// ...
+</code></pre>
 <h3 id="the-constant-entity"><a class="header" href="#the-constant-entity">The <code>@constant</code> Entity</a></h3>
 <p>The <code>@constant</code> entity documents a constant defined by a type, and so
 begins with <code>@constant &lt;name&gt;</code>. The <em>name</em> should be the name of a

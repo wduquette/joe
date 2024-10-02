@@ -204,7 +204,20 @@ The `@type` entity documents a type, and so begins with `@type <name>`.
 
 The *name* should be the name of a type defined in the current package.
 
-At present, the `@type` entity has no metadata tags.
+The entity has the following optional metadata:
+
+| Metadata Tag      | Meaning                            |
+|-------------------|------------------------------------|
+| `@extends <type>` | This type extends the named type.  |
+
+- The `<type>` should be the name or qualified name of this type's supertype.
+
+```java
+//**
+// @type AssertError
+// @extends Error
+// ...
+```
 
 ### The `@constant` Entity
 
