@@ -2215,17 +2215,17 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.html#function.println">println([<em>text</em>])</a></li>
 <li><a href="library/pkg.joe.html#function.stringify">stringify(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/pkg.joe.html#function.typeName">typeName(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
-<li><a href="library/type.joe.AssertError.html">AssertError type</a>
+<li><a href="library/type.joe.AssertError.html">AssertError</a> extends <a href="library/type.joe.Error.html">Error</a>
 <ul>
 <li><a href="library/type.joe.AssertError.html#init">AssertError(<em>message</em>, [<em>frames</em>...])</a> → <a href="library/type.joe.AssertError.html">AssertError</a></li>
 </ul>
 </li>
-<li><a href="library/type.joe.Boolean.html">Boolean type</a>
+<li><a href="library/type.joe.Boolean.html">Boolean</a>
 <ul>
 <li><a href="library/type.joe.Boolean.html#static.valueOf">Boolean.valueOf(<em>string</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 </ul>
 </li>
-<li><a href="library/type.joe.Error.html">Error type</a>
+<li><a href="library/type.joe.Error.html">Error</a>
 <ul>
 <li><a href="library/type.joe.Error.html#init">Error(<em>message</em>, [<em>frames</em>...])</a> → <a href="library/type.joe.Error.html">Error</a></li>
 <li><a href="library/type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
@@ -2234,14 +2234,14 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.Error.html#method.type"><em>error</em>.type()</a> → name</li>
 </ul>
 </li>
-<li><a href="library/type.joe.Keyword.html">Keyword type</a>
+<li><a href="library/type.joe.Keyword.html">Keyword</a>
 <ul>
 <li><a href="library/type.joe.Keyword.html#init">Keyword(<em>name</em>)</a> → <a href="library/type.joe.Keyword.html">Keyword</a></li>
 <li><a href="library/type.joe.Keyword.html#method.name"><em>keyword</em>.name()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Keyword.html#method.toString"><em>keyword</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
 </li>
-<li><a href="library/type.joe.List.html">List type</a>
+<li><a href="library/type.joe.List.html">List</a>
 <ul>
 <li><a href="library/type.joe.List.html#init">List(<em>values</em>...)</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.List.html#method.add"><em>list</em>.add([<em>index</em>], <em>item</em>)</a> → this</li>
@@ -2273,7 +2273,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.List.html#method.toString"><em>list</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
 </li>
-<li><a href="library/type.joe.Map.html">Map type</a>
+<li><a href="library/type.joe.Map.html">Map</a>
 <ul>
 <li><a href="library/type.joe.Map.html#init">Map(<em>values</em>...)</a> → <a href="library/type.joe.Map.html">Map</a></li>
 <li><a href="library/type.joe.Map.html#method.clear"><em>map</em>.clear()</a> → this</li>
@@ -2292,7 +2292,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.Map.html#method.values"><em>map</em>.values()</a> → <a href="library/type.joe.List.html">List</a></li>
 </ul>
 </li>
-<li><a href="library/type.joe.Number.html">Number type</a>
+<li><a href="library/type.joe.Number.html">Number</a>
 <ul>
 <li><a href="library/type.joe.Number.html#constant.E">Number.E</a></li>
 <li><a href="library/type.joe.Number.html#constant.MAX_INT">Number.MAX_INT</a></li>
@@ -2329,14 +2329,14 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.Number.html#static.toRadians">Number.toRadians(<em>degrees</em>)</a> → <a href="library/type.joe.Number.html">Number</a></li>
 </ul>
 </li>
-<li><a href="library/type.joe.Pair.html">Pair type</a>
+<li><a href="library/type.joe.Pair.html">Pair</a>
 <ul>
 <li><a href="library/type.joe.Pair.html#init">Pair(<em>left</em>, <em>right</em>)</a> → <a href="library/type.joe.Pair.html">Pair</a></li>
 <li><a href="library/type.joe.Pair.html#method.left"><em>pair</em>.left()</a> → value</li>
 <li><a href="library/type.joe.Pair.html#method.right"><em>pair</em>.right()</a> → value</li>
 </ul>
 </li>
-<li><a href="library/type.joe.String.html">String type</a>
+<li><a href="library/type.joe.String.html">String</a>
 <ul>
 <li><a href="library/type.joe.String.html#static.join">String.join(<em>delimiter</em>, <em>list</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#init">String(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -2373,7 +2373,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/pkg.joe.doc.html"><code>joe.doc</code> package (JoeDoc Configuration API)</a>
 <ul>
-<li><a href="library/type.joe.doc.DocConfig.html">DocConfig type</a>
+<li><a href="library/type.joe.doc.DocConfig.html">DocConfig</a>
 <ul>
 <li><a href="library/type.joe.doc.DocConfig.html#static.inputFile">DocConfig.inputFile(<em>filename</em>,...)</a> → this</li>
 <li><a href="library/type.joe.doc.DocConfig.html#static.inputFolder">DocConfig.inputFolder(<em>folder</em>,...)</a> → this</li>
@@ -2386,7 +2386,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <ul>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
-<li><a href="library/type.joe.test.CatchChecker.html">CatchChecker type</a>
+<li><a href="library/type.joe.test.CatchChecker.html">CatchChecker</a>
 <ul>
 <li><a href="library/type.joe.test.CatchChecker.html#init">CatchChecker(<em>pair</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/type.joe.test.CatchChecker.html#method.isError"><em>catchChecker</em>.isError()</a> → Boolean</li>
@@ -2397,7 +2397,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.test.CatchChecker.html#method.type"><em>catchChecker</em>.type(<em>expected</em>)</a> → this</li>
 </ul>
 </li>
-<li><a href="library/type.joe.test.ValueChecker.html">ValueChecker type</a>
+<li><a href="library/type.joe.test.ValueChecker.html">ValueChecker</a>
 <ul>
 <li><a href="library/type.joe.test.ValueChecker.html#init">ValueChecker(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/type.joe.test.ValueChecker.html#method.containsAll"><em>valueChecker</em>.containsAll(<em>values</em>...)</a> → this</li>
@@ -2427,15 +2427,15 @@ types, methods, and constants include in Joe's aPackage.</p>
 </ul>
 <p><strong>Types</strong></p>
 <ul>
-<li><a href="library/type.joe.AssertError.html">AssertError type</a></li>
-<li><a href="library/type.joe.Boolean.html">Boolean type</a></li>
-<li><a href="library/type.joe.Error.html">Error type</a></li>
-<li><a href="library/type.joe.Keyword.html">Keyword type</a></li>
-<li><a href="library/type.joe.List.html">List type</a></li>
-<li><a href="library/type.joe.Map.html">Map type</a></li>
-<li><a href="library/type.joe.Number.html">Number type</a></li>
-<li><a href="library/type.joe.Pair.html">Pair type</a></li>
-<li><a href="library/type.joe.String.html">String type</a></li>
+<li><a href="library/type.joe.AssertError.html">AssertError</a> extends <a href="library/type.joe.Error.html">Error</a></li>
+<li><a href="library/type.joe.Boolean.html">Boolean</a></li>
+<li><a href="library/type.joe.Error.html">Error</a></li>
+<li><a href="library/type.joe.Keyword.html">Keyword</a></li>
+<li><a href="library/type.joe.List.html">List</a></li>
+<li><a href="library/type.joe.Map.html">Map</a></li>
+<li><a href="library/type.joe.Number.html">Number</a></li>
+<li><a href="library/type.joe.Pair.html">Pair</a></li>
+<li><a href="library/type.joe.String.html">String</a></li>
 </ul>
 <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
 <hr />
@@ -2478,6 +2478,7 @@ is functionally equivalent to <a href="library/type.joe.String.html#init"><code>
 <p>Returns the name of the value's type.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="asserterror-type-joe"><a class="header" href="#asserterror-type-joe"><code>AssertError</code> type (<code>joe</code>)</a></h1>
 <hr />
+<p><strong>Extends</strong>: <a href="library/type.joe.Error.html">Error</a><br></p>
 <p>The <code>AssertError</code> type represents an exception thrown during the
 execution of a <code>Joe</code> script by the <code>assert</code> statement, or
 created by the <code>joe.test</code> package to represent a test value. A
@@ -2486,6 +2487,13 @@ the <a href="library/pkg.joe.html#function.catch"><code>catch()</code></a> funct
 <p><strong><a href="library/type.joe.AssertError.html#init">Initializer</a></strong></p>
 <ul>
 <li><a href="library/type.joe.AssertError.html#init">AssertError(<em>message</em>, [<em>frames</em>...])</a> → <a href="library/type.joe.AssertError.html">AssertError</a></li>
+</ul>
+<p><strong>Error Methods</strong></p>
+<ul>
+<li><a href="library/type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
+<li><a href="library/type.joe.Error.html#method.stackFrames"><em>error</em>.stackFrames()</a> → <a href="library/type.joe.List.html">List</a></li>
+<li><a href="library/type.joe.Error.html#method.stackTrace"><em>error</em>.stackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
+<li><a href="library/type.joe.Error.html#method.type"><em>error</em>.type()</a> → name</li>
 </ul>
 <h2 id="init"><a class="header" href="#init">AssertError Initializer</a></h2>
 <hr />
@@ -2510,6 +2518,7 @@ and <code>false</code> for all other values, including null.</p>
 <p><strong>Note:</strong> this is consistent with the Java behavior.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="error-type-joe"><a class="header" href="#error-type-joe"><code>Error</code> type (<code>joe</code>)</a></h1>
 <hr />
+<p><strong>Extended By</strong>: <a href="library/type.joe.AssertError.html">AssertError</a><br></p>
 <p>The <code>Error</code> type represents an exception thrown during the
 execution of a <code>Joe</code> script. A script can catch errors
 thrown during execution using the <a href="library/pkg.joe.html#function.catch"><code>catch()</code></a> function.</p>
@@ -3373,8 +3382,8 @@ for use in <code>joe test</code> test suites.</p>
 </ul>
 <p><strong>Types</strong></p>
 <ul>
-<li><a href="library/type.joe.test.CatchChecker.html">CatchChecker type</a></li>
-<li><a href="library/type.joe.test.ValueChecker.html">ValueChecker type</a></li>
+<li><a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
+<li><a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 </ul>
 <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
 <hr />
@@ -3517,7 +3526,7 @@ method.</p>
 the <code>joe doc</code> configuration file, <code>doc_config.joe</code>.</p>
 <p><strong>Types</strong></p>
 <ul>
-<li><a href="library/type.joe.doc.DocConfig.html">DocConfig type</a></li>
+<li><a href="library/type.joe.doc.DocConfig.html">DocConfig</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="docconfig-type-joedoc"><a class="header" href="#docconfig-type-joedoc"><code>DocConfig</code> type (<code>joe.doc</code>)</a></h1>
 <hr />
@@ -3568,17 +3577,17 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.html#function.println">println([<em>text</em>])</a></li>
 <li><a href="library/pkg.joe.html#function.stringify">stringify(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/pkg.joe.html#function.typeName">typeName(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
-<li><a href="library/type.joe.AssertError.html">AssertError type</a>
+<li><a href="library/type.joe.AssertError.html">AssertError</a> extends <a href="library/type.joe.Error.html">Error</a>
 <ul>
 <li><a href="library/type.joe.AssertError.html#init">AssertError(<em>message</em>, [<em>frames</em>...])</a> → <a href="library/type.joe.AssertError.html">AssertError</a></li>
 </ul>
 </li>
-<li><a href="library/type.joe.Boolean.html">Boolean type</a>
+<li><a href="library/type.joe.Boolean.html">Boolean</a>
 <ul>
 <li><a href="library/type.joe.Boolean.html#static.valueOf">Boolean.valueOf(<em>string</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 </ul>
 </li>
-<li><a href="library/type.joe.Error.html">Error type</a>
+<li><a href="library/type.joe.Error.html">Error</a>
 <ul>
 <li><a href="library/type.joe.Error.html#init">Error(<em>message</em>, [<em>frames</em>...])</a> → <a href="library/type.joe.Error.html">Error</a></li>
 <li><a href="library/type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
@@ -3587,14 +3596,14 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.Error.html#method.type"><em>error</em>.type()</a> → name</li>
 </ul>
 </li>
-<li><a href="library/type.joe.Keyword.html">Keyword type</a>
+<li><a href="library/type.joe.Keyword.html">Keyword</a>
 <ul>
 <li><a href="library/type.joe.Keyword.html#init">Keyword(<em>name</em>)</a> → <a href="library/type.joe.Keyword.html">Keyword</a></li>
 <li><a href="library/type.joe.Keyword.html#method.name"><em>keyword</em>.name()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Keyword.html#method.toString"><em>keyword</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
 </li>
-<li><a href="library/type.joe.List.html">List type</a>
+<li><a href="library/type.joe.List.html">List</a>
 <ul>
 <li><a href="library/type.joe.List.html#init">List(<em>values</em>...)</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.List.html#method.add"><em>list</em>.add([<em>index</em>], <em>item</em>)</a> → this</li>
@@ -3626,7 +3635,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.List.html#method.toString"><em>list</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
 </li>
-<li><a href="library/type.joe.Map.html">Map type</a>
+<li><a href="library/type.joe.Map.html">Map</a>
 <ul>
 <li><a href="library/type.joe.Map.html#init">Map(<em>values</em>...)</a> → <a href="library/type.joe.Map.html">Map</a></li>
 <li><a href="library/type.joe.Map.html#method.clear"><em>map</em>.clear()</a> → this</li>
@@ -3645,7 +3654,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.Map.html#method.values"><em>map</em>.values()</a> → <a href="library/type.joe.List.html">List</a></li>
 </ul>
 </li>
-<li><a href="library/type.joe.Number.html">Number type</a>
+<li><a href="library/type.joe.Number.html">Number</a>
 <ul>
 <li><a href="library/type.joe.Number.html#constant.E">Number.E</a></li>
 <li><a href="library/type.joe.Number.html#constant.MAX_INT">Number.MAX_INT</a></li>
@@ -3682,14 +3691,14 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.Number.html#static.toRadians">Number.toRadians(<em>degrees</em>)</a> → <a href="library/type.joe.Number.html">Number</a></li>
 </ul>
 </li>
-<li><a href="library/type.joe.Pair.html">Pair type</a>
+<li><a href="library/type.joe.Pair.html">Pair</a>
 <ul>
 <li><a href="library/type.joe.Pair.html#init">Pair(<em>left</em>, <em>right</em>)</a> → <a href="library/type.joe.Pair.html">Pair</a></li>
 <li><a href="library/type.joe.Pair.html#method.left"><em>pair</em>.left()</a> → value</li>
 <li><a href="library/type.joe.Pair.html#method.right"><em>pair</em>.right()</a> → value</li>
 </ul>
 </li>
-<li><a href="library/type.joe.String.html">String type</a>
+<li><a href="library/type.joe.String.html">String</a>
 <ul>
 <li><a href="library/type.joe.String.html#static.join">String.join(<em>delimiter</em>, <em>list</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#init">String(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -3726,7 +3735,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/pkg.joe.doc.html"><code>joe.doc</code> package (JoeDoc Configuration API)</a>
 <ul>
-<li><a href="library/type.joe.doc.DocConfig.html">DocConfig type</a>
+<li><a href="library/type.joe.doc.DocConfig.html">DocConfig</a>
 <ul>
 <li><a href="library/type.joe.doc.DocConfig.html#static.inputFile">DocConfig.inputFile(<em>filename</em>,...)</a> → this</li>
 <li><a href="library/type.joe.doc.DocConfig.html#static.inputFolder">DocConfig.inputFolder(<em>folder</em>,...)</a> → this</li>
@@ -3739,7 +3748,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <ul>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
-<li><a href="library/type.joe.test.CatchChecker.html">CatchChecker type</a>
+<li><a href="library/type.joe.test.CatchChecker.html">CatchChecker</a>
 <ul>
 <li><a href="library/type.joe.test.CatchChecker.html#init">CatchChecker(<em>pair</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/type.joe.test.CatchChecker.html#method.isError"><em>catchChecker</em>.isError()</a> → Boolean</li>
@@ -3750,7 +3759,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.test.CatchChecker.html#method.type"><em>catchChecker</em>.type(<em>expected</em>)</a> → this</li>
 </ul>
 </li>
-<li><a href="library/type.joe.test.ValueChecker.html">ValueChecker type</a>
+<li><a href="library/type.joe.test.ValueChecker.html">ValueChecker</a>
 <ul>
 <li><a href="library/type.joe.test.ValueChecker.html#init">ValueChecker(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/type.joe.test.ValueChecker.html#method.containsAll"><em>valueChecker</em>.containsAll(<em>values</em>...)</a> → this</li>

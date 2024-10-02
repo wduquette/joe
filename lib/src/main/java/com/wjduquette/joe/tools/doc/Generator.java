@@ -174,9 +174,14 @@ class Generator {
     ) {
         var leader = " ".repeat(indent);
 
-        out.println(leader + "- [" + type.name() + " type](" +
+        out.print(leader + "- [" + type.name() + "](" +
             type.filename() + ")");
+        if (type.supertypeName() != null) {
+            out.print(" extends " + typeLinkOrName(type.supertypeName()));
+        }
+        out.println();
     }
+
 
     //-------------------------------------------------------------------------
     // Type Files
@@ -187,6 +192,16 @@ class Generator {
             + " type ("
             + mono(type.pkg().name())
             + ")");
+
+        if (type.supertypeName() != null) {
+            out.topic("Extends", typeLinkOrName(type.supertypeName()));
+        }
+        var subtypeLinks = subtypeLinks(type);
+        if (!subtypeLinks.isEmpty()) {
+            out.topic("Extended By", subtypeLinks);
+        }
+        out.println();
+
 
         // NEXT, output the first paragraph of the content.
         var content = expandMnemonicLinks(type.content());
@@ -226,6 +241,16 @@ class Generator {
             out.println();
         }
 
+        var supertype = lookupType(type.supertypeName());
+        while (supertype != null) {
+            out.hb(supertype.name() + " Methods");
+            out.println();
+            sorted(supertype.methods(), MethodEntry::name)
+                .forEach(m -> writeCallableLink(out, 0, m));
+            out.println();
+            supertype = lookupType(supertype.supertypeName());
+        }
+
         // NEXT, output the remaining content
         content.forEach(out::println);
 
@@ -252,6 +277,17 @@ class Generator {
             out.h2("methods","Methods");
             writeCallableBodies(out, type.methods());
         }
+    }
+
+    private String subtypeLinks(TypeEntry type) {
+        List<String> subtypes = docSet.entries().stream()
+            .filter(e -> e instanceof TypeEntry)
+            .map(e -> (TypeEntry)e)
+            .filter(t -> type.shortMnemonic().equals(t.supertypeName()) ||
+                type.fullMnemonic().equals(t.supertypeName()))
+            .map(t -> typeLinkOrName(t.shortMnemonic()))
+            .toList();
+        return String.join(", ", subtypes);
     }
 
     //-------------------------------------------------------------------------
@@ -310,7 +346,7 @@ class Generator {
             );
 
             if (callable.result() != null) {
-                out.print(" → " + resultLink(callable.result()));
+                out.print(" → " + typeLinkOrName(callable.result()));
             }
             out.println();
         }
@@ -344,7 +380,7 @@ class Generator {
 
         for (var sig : signatures(callable)) {
             result.add(callable.result() != null
-                ? "**" + sig + " → " + resultLink(callable.result()) + "**"
+                ? "**" + sig + " → " + typeLinkOrName(callable.result()) + "**"
                 : "**" + sig + "**");
         }
         return String.join("<br>\n", result);
@@ -373,7 +409,21 @@ class Generator {
         return signatures;
     }
 
-    private String resultLink(String name) {
+    private String typeLinkOrName(String name) {
+        var type = lookupType(name);
+
+        if (type != null) {
+            return "[" + name + "](" + type.filename() + ")";
+        } else {
+            return name;
+        }
+    }
+
+    private TypeEntry lookupType(String name) {
+        if (name == null) {
+            return null;
+        }
+
         var entry = docSet.lookup(name);
 
         if (entry == null) {
@@ -381,9 +431,9 @@ class Generator {
         }
 
         if (entry instanceof TypeEntry type) {
-            return "[" + name + "](" + type.filename() + ")";
+            return type;
         } else {
-            return name;
+            return null;
         }
     }
 
