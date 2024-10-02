@@ -38,6 +38,7 @@
 
 - [Library API](library/index.md)
   - [Joe Standard Library](./library/pkg.joe.md)
+    - [AssertError Type](./library/type.joe.AssertError.md)
     - [Boolean Type](./library/type.joe.Boolean.md)
     - [Error Type](./library/type.joe.Error.md)
     - [Keyword Type](./library/type.joe.Keyword.md)

@@ -59,6 +59,7 @@ class DocCommentParser {
     private static final String ARGS = "@args";
     private static final String RESULT = "@result";
     private static final String TYPE = "@type";
+    private static final String EXTENDS = "@extends";
     private static final String CONSTANT = "@constant";
     private static final String STATIC = "@static";
     private static final String INIT = "@init";
@@ -189,6 +190,7 @@ class DocCommentParser {
 
             advance();
             switch (tag.name()) {
+                case EXTENDS -> type.setSupertypeName(_extends(tag));
                 case CONSTANT -> _constant(type, tag);
                 case STATIC -> _static(type, tag);
                 case INIT -> _init(type, tag);
@@ -196,6 +198,14 @@ class DocCommentParser {
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
+    }
+
+    private String _extends(Tag tag) {
+        var result = tag.value().trim();
+        if (result.split("\\s").length > 1) {
+            throw error(previous(), "Expected supertype name");
+        }
+        return result;
     }
 
     private void _constant(TypeEntry type, Tag constantTag) {

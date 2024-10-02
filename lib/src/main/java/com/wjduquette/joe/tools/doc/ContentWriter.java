@@ -61,6 +61,10 @@ class ContentWriter extends PrintWriter {
         println("**[" + title + "](#" + id + ")**");
     }
 
+    public void topic(String topic, String text) {
+        println("**" + topic + "**: " + text + "<br>");
+    }
+
     /**
      * Outputs a level 3 title with link ID
      * @param id The link ID
