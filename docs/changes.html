@@ -218,7 +218,18 @@ their usual semantics.</li>
 <li>
 <p>Library</p>
 <ul>
+<li>A value type's type proxy can now inherit methods from the value type's
+supertype's type proxy.</li>
 <li>Added the <a href="library/type.joe.Map.html"><code>Map</code></a> type.</li>
+<li>Added the <a href="library/type.joe.AssertError.html"><code>AssertError</code></a> type, which
+explicitly extends the <a href="library/type.joe.Error.html"><code>Error</code></a> type.</li>
+</ul>
+</li>
+<li>
+<p><code>joe doc</code> Tool</p>
+<ul>
+<li>A <code>@type</code>'s doc comment can now reference the type's supertype using
+the <code>@extends</code> metadata tag.</li>
 </ul>
 </li>
 <li>
