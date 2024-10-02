@@ -31,6 +31,7 @@
   - Added the [`Map`](library/type.joe.Map.md) type.
   - Added the [`AssertError`](library/type.joe.AssertError.md) type, which
     explicitly extends the [`Error`](library/type.joe.Error.md) type.
+  - Added the [`StringBuilder`](library/type.joe.StringBuilder.md) type.
 
 - `joe doc` Tool
   - A `@type`'s doc comment can now reference the type's supertype using
