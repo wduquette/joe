@@ -53,6 +53,8 @@
     - [ValueChecker Type](./library/type.joe.test.ValueChecker.md)
   - [JoeDoc Configuration API](./library/pkg.joe.doc.md)
     - [DocConfig Type](./library/type.joe.doc.DocConfig.md)
+  - [Console API](./library/pkg.joe.console.md)
+    - [Console Type](library/type.joe.console.Console.md);
   - [Library API Index](./library/index.md)
 
 ---

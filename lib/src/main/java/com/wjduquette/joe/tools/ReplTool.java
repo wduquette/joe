@@ -4,11 +4,13 @@ import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SyntaxError;
+import com.wjduquette.joe.console.ConsolePackage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -67,12 +69,10 @@ public class ReplTool implements Tool {
     }
 
     private void run(String[] args) {
-        var argq = new ArrayDeque<>(List.of(args));
+        var consolePackage = new ConsolePackage();
+        consolePackage.getArgs().addAll(List.of(args));
+        joe.installPackage(consolePackage);
 
-        if (!argq.isEmpty()) {
-            printUsage(App.NAME);
-            System.exit(64);
-        }
 
         try {
             runPrompt();
