@@ -26,7 +26,16 @@
     - Added the `++` and `--` operators, with their usual semantics.
      
 - Library
+  - A value type's type proxy can now inherit methods from the value type's
+    supertype's type proxy.
   - Added the [`Map`](library/type.joe.Map.md) type.
+  - Added the [`AssertError`](library/type.joe.AssertError.md) type, which
+    explicitly extends the [`Error`](library/type.joe.Error.md) type.
+  - Added the [`StringBuilder`](library/type.joe.StringBuilder.md) type.
+
+- `joe doc` Tool
+  - A `@type`'s doc comment can now reference the type's supertype using
+    the `@extends` metadata tag.
 
 - Documentation
   - Added the relevant documentation for all changes list above.
