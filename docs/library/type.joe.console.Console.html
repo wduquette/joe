@@ -181,6 +181,8 @@ environment, sufficient to writing simple scripts.</p>
 <ul>
 <li><a href="type.joe.console.Console.html#static.args">Console.args()</a> → List</li>
 <li><a href="type.joe.console.Console.html#static.cd">Console.cd(<em>path</em>)</a> → Path</li>
+<li><a href="type.joe.console.Console.html#static.exit">Console.exit([<em>code</em>])</a></li>
+<li><a href="type.joe.console.Console.html#static.mkdir">Console.mkdir(<em>path</em>)</a></li>
 <li><a href="type.joe.console.Console.html#static.pwd">Console.pwd()</a> → Path</li>
 <li><a href="type.joe.console.Console.html#static.read">Console.read()</a> → String</li>
 <li><a href="type.joe.console.Console.html#static.readFile">Console.readFile(<em>filePath</em>)</a> → String</li>
@@ -202,6 +204,19 @@ filtered by the application.</p>
 <p>Changes the current working directory to the given path.  If
 the path is relative, it is treated as relative to the
 current working directory.</p>
+<p><span id="static.exit"> </span></p>
+<h3 id="consoleexit"><a class="header" href="#consoleexit">Console.exit()</a></h3>
+<hr />
+<p><strong>Console.exit([<em>code</em>])</strong></p>
+<p>Exits the application with the given exit <em>code</em>, which defaults
+to 0.</p>
+<p><span id="static.mkdir"> </span></p>
+<h3 id="consolemkdir"><a class="header" href="#consolemkdir">Console.mkdir()</a></h3>
+<hr />
+<p><strong>Console.mkdir(<em>path</em>)</strong></p>
+<p>Creates the directory given its path, including any required
+parent directories.  If the path is relative, it is treated as
+relative to the current working directory.</p>
 <p><span id="static.pwd"> </span></p>
 <h3 id="consolepwd"><a class="header" href="#consolepwd">Console.pwd()</a></h3>
 <hr />

@@ -89,7 +89,7 @@ class StandardLibrary extends JoePackage {
     // @function printf
     // @args fmt, [values...]
     // Formats its arguments given the
-    // [[String#static.format]] string, and prints the result
+    // [[String#static.format]] *fmt* string, and prints the result
     // to standard output (which might be
     // redirected by the application).
     private Object _printf(Joe joe, ArgQueue args) {

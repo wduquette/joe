@@ -181,6 +181,7 @@
 <li><a href="pkg.joe.html#function.catch">catch(<em>callable</em>)</a> → <a href="type.joe.Pair.html">Pair</a></li>
 <li><a href="pkg.joe.html#function.compare">compare(<em>a</em>, <em>b</em>)</a> → <a href="type.joe.Number.html">Number</a></li>
 <li><a href="pkg.joe.html#function.print">print(<em>text</em>)</a></li>
+<li><a href="pkg.joe.html#function.printf">printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="pkg.joe.html#function.println">println([<em>text</em>])</a></li>
 <li><a href="pkg.joe.html#function.stringify">stringify(<em>value</em>)</a> → <a href="type.joe.String.html">String</a></li>
 <li><a href="pkg.joe.html#function.typeName">typeName(<em>value</em>)</a> → <a href="type.joe.String.html">String</a></li>
@@ -219,6 +220,14 @@ is useful when sorting collections.</p>
 <hr />
 <p><strong>print(<em>text</em>)</strong></p>
 <p>Prints its text to standard output (which might be
+redirected by the application).</p>
+<p><span id="function.printf"> </span></p>
+<h3 id="printf"><a class="header" href="#printf">printf()</a></h3>
+<hr />
+<p><strong>printf(<em>fmt</em>, [<em>values</em>...])</strong></p>
+<p>Formats its arguments given the
+<a href="type.joe.String.html#static.format"><code>String.format()</code></a> <em>fmt</em> string, and prints the result
+to standard output (which might be
 redirected by the application).</p>
 <p><span id="function.println"> </span></p>
 <h3 id="println"><a class="header" href="#println">println()</a></h3>

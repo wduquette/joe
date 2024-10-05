@@ -2236,6 +2236,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.html#function.catch">catch(<em>callable</em>)</a> → <a href="library/type.joe.Pair.html">Pair</a></li>
 <li><a href="library/pkg.joe.html#function.compare">compare(<em>a</em>, <em>b</em>)</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/pkg.joe.html#function.print">print(<em>text</em>)</a></li>
+<li><a href="library/pkg.joe.html#function.printf">printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="library/pkg.joe.html#function.println">println([<em>text</em>])</a></li>
 <li><a href="library/pkg.joe.html#function.stringify">stringify(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/pkg.joe.html#function.typeName">typeName(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -2362,6 +2363,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.String.html">String</a>
 <ul>
+<li><a href="library/type.joe.String.html#static.format">String.format(<em>fmt</em>, [<em>values</em>...])</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#static.join">String.join(<em>delimiter</em>, <em>list</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#init">String(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#method.charAt"><em>string</em>.charAt(<em>index</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -2398,6 +2400,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.StringBuilder.html#init">StringBuilder()</a> → <a href="library/type.joe.StringBuilder.html">StringBuilder</a></li>
 <li><a href="library/type.joe.StringBuilder.html#method.append"><em>stringBuilder</em>.append(<em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.StringBuilder.html#method.print"><em>stringBuilder</em>.print(<em>value</em>)</a> → this</li>
+<li><a href="library/type.joe.StringBuilder.html#method.printf"><em>stringBuilder</em>.printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="library/type.joe.StringBuilder.html#method.println"><em>stringBuilder</em>.println(<em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.StringBuilder.html#method.toString"><em>stringBuilder</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -2410,6 +2413,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 <ul>
 <li><a href="library/type.joe.console.Console.html#static.args">Console.args()</a> → List</li>
 <li><a href="library/type.joe.console.Console.html#static.cd">Console.cd(<em>path</em>)</a> → Path</li>
+<li><a href="library/type.joe.console.Console.html#static.exit">Console.exit([<em>code</em>])</a></li>
+<li><a href="library/type.joe.console.Console.html#static.mkdir">Console.mkdir(<em>path</em>)</a></li>
 <li><a href="library/type.joe.console.Console.html#static.pwd">Console.pwd()</a> → Path</li>
 <li><a href="library/type.joe.console.Console.html#static.read">Console.read()</a> → String</li>
 <li><a href="library/type.joe.console.Console.html#static.readFile">Console.readFile(<em>filePath</em>)</a> → String</li>
@@ -2469,6 +2474,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.html#function.catch">catch(<em>callable</em>)</a> → <a href="library/type.joe.Pair.html">Pair</a></li>
 <li><a href="library/pkg.joe.html#function.compare">compare(<em>a</em>, <em>b</em>)</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/pkg.joe.html#function.print">print(<em>text</em>)</a></li>
+<li><a href="library/pkg.joe.html#function.printf">printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="library/pkg.joe.html#function.println">println([<em>text</em>])</a></li>
 <li><a href="library/pkg.joe.html#function.stringify">stringify(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/pkg.joe.html#function.typeName">typeName(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -2507,6 +2513,14 @@ is useful when sorting collections.</p>
 <hr />
 <p><strong>print(<em>text</em>)</strong></p>
 <p>Prints its text to standard output (which might be
+redirected by the application).</p>
+<p><span id="function.printf"> </span></p>
+<h3 id="printf"><a class="header" href="#printf">printf()</a></h3>
+<hr />
+<p><strong>printf(<em>fmt</em>, [<em>values</em>...])</strong></p>
+<p>Formats its arguments given the
+<a href="library/type.joe.String.html#static.format"><code>String.format()</code></a> <em>fmt</em> string, and prints the result
+to standard output (which might be
 redirected by the application).</p>
 <p><span id="function.println"> </span></p>
 <h3 id="println"><a class="header" href="#println">println()</a></h3>
@@ -3210,6 +3224,7 @@ two values from a function or method.</p>
 <p>A <code>String</code> is just a Java <code>String</code>, as accessed from a Joe script.</p>
 <p><strong><a href="library/type.joe.String.html#statics">Static Methods</a></strong></p>
 <ul>
+<li><a href="library/type.joe.String.html#static.format">String.format(<em>fmt</em>, [<em>values</em>...])</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#static.join">String.join(<em>delimiter</em>, <em>list</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
 <p><strong><a href="library/type.joe.String.html#init">Initializer</a></strong></p>
@@ -3249,6 +3264,11 @@ two values from a function or method.</p>
 <p><strong>Note</strong>: Joe provides a number of methods that Java does not.</p>
 <h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
 <hr />
+<p><span id="static.format"> </span></p>
+<h3 id="stringformat"><a class="header" href="#stringformat">String.format()</a></h3>
+<hr />
+<p><strong>String.format(<em>fmt</em>, [<em>values</em>...]) → <a href="library/type.joe.String.html">String</a></strong></p>
+<p>Formats the string given the format string.</p>
 <p><span id="static.join"> </span></p>
 <h3 id="stringjoin"><a class="header" href="#stringjoin">String.join()</a></h3>
 <hr />
@@ -3432,6 +3452,7 @@ methods.</p>
 <ul>
 <li><a href="library/type.joe.StringBuilder.html#method.append"><em>stringBuilder</em>.append(<em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.StringBuilder.html#method.print"><em>stringBuilder</em>.print(<em>value</em>)</a> → this</li>
+<li><a href="library/type.joe.StringBuilder.html#method.printf"><em>stringBuilder</em>.printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="library/type.joe.StringBuilder.html#method.println"><em>stringBuilder</em>.println(<em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.StringBuilder.html#method.toString"><em>stringBuilder</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -3451,6 +3472,13 @@ methods.</p>
 <hr />
 <p><strong><em>stringBuilder</em>.print(<em>value</em>) → this</strong></p>
 <p>Adds the value to the buffer.</p>
+<p><span id="method.printf"> </span></p>
+<h3 id="stringbuilderprintf"><a class="header" href="#stringbuilderprintf"><em>stringBuilder</em>.printf()</a></h3>
+<hr />
+<p><strong><em>stringBuilder</em>.printf(<em>fmt</em>, [<em>values</em>...])</strong></p>
+<p>Formats its arguments given the
+<a href="library/type.joe.String.html#static.format"><code>String.format()</code></a> <em>fmt</em> string, and appends the result
+to the buffer.</p>
 <p><span id="method.println"> </span></p>
 <h3 id="stringbuilderprintln"><a class="header" href="#stringbuilderprintln"><em>stringBuilder</em>.println()</a></h3>
 <hr />
@@ -3657,11 +3685,27 @@ file.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="joeconsole-package"><a class="header" href="#joeconsole-package"><code>joe.console</code> package</a></h1>
 <hr />
 <p>This package contains an API for use by simple command-line tools.
-It is provided primarily as an example, and in an effort to make
-<code>joe run</code> and <code>joe repl</code> somewhat useful.</p>
+Using it, clients can:</p>
 <p><strong>Types</strong></p>
 <ul>
-<li><a href="library/type.joe.console.Console.html">Console</a></li>
+<li>
+<p><a href="library/type.joe.console.Console.html">Console</a></p>
+</li>
+<li>
+<p>Acquire the command line arguments</p>
+</li>
+<li>
+<p>Read from System.in</p>
+</li>
+<li>
+<p>Read from a file</p>
+</li>
+<li>
+<p>Write to a file</p>
+</li>
+<li>
+<p>Query and set the current working directory</p>
+</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="console-type-joeconsole"><a class="header" href="#console-type-joeconsole"><code>Console</code> type (<code>joe.console</code>)</a></h1>
 <hr />
@@ -3671,6 +3715,8 @@ environment, sufficient to writing simple scripts.</p>
 <ul>
 <li><a href="library/type.joe.console.Console.html#static.args">Console.args()</a> → List</li>
 <li><a href="library/type.joe.console.Console.html#static.cd">Console.cd(<em>path</em>)</a> → Path</li>
+<li><a href="library/type.joe.console.Console.html#static.exit">Console.exit([<em>code</em>])</a></li>
+<li><a href="library/type.joe.console.Console.html#static.mkdir">Console.mkdir(<em>path</em>)</a></li>
 <li><a href="library/type.joe.console.Console.html#static.pwd">Console.pwd()</a> → Path</li>
 <li><a href="library/type.joe.console.Console.html#static.read">Console.read()</a> → String</li>
 <li><a href="library/type.joe.console.Console.html#static.readFile">Console.readFile(<em>filePath</em>)</a> → String</li>
@@ -3692,6 +3738,19 @@ filtered by the application.</p>
 <p>Changes the current working directory to the given path.  If
 the path is relative, it is treated as relative to the
 current working directory.</p>
+<p><span id="static.exit"> </span></p>
+<h3 id="consoleexit"><a class="header" href="#consoleexit">Console.exit()</a></h3>
+<hr />
+<p><strong>Console.exit([<em>code</em>])</strong></p>
+<p>Exits the application with the given exit <em>code</em>, which defaults
+to 0.</p>
+<p><span id="static.mkdir"> </span></p>
+<h3 id="consolemkdir"><a class="header" href="#consolemkdir">Console.mkdir()</a></h3>
+<hr />
+<p><strong>Console.mkdir(<em>path</em>)</strong></p>
+<p>Creates the directory given its path, including any required
+parent directories.  If the path is relative, it is treated as
+relative to the current working directory.</p>
 <p><span id="static.pwd"> </span></p>
 <h3 id="consolepwd"><a class="header" href="#consolepwd">Console.pwd()</a></h3>
 <hr />
@@ -3729,6 +3788,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.html#function.catch">catch(<em>callable</em>)</a> → <a href="library/type.joe.Pair.html">Pair</a></li>
 <li><a href="library/pkg.joe.html#function.compare">compare(<em>a</em>, <em>b</em>)</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/pkg.joe.html#function.print">print(<em>text</em>)</a></li>
+<li><a href="library/pkg.joe.html#function.printf">printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="library/pkg.joe.html#function.println">println([<em>text</em>])</a></li>
 <li><a href="library/pkg.joe.html#function.stringify">stringify(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/pkg.joe.html#function.typeName">typeName(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -3855,6 +3915,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.String.html">String</a>
 <ul>
+<li><a href="library/type.joe.String.html#static.format">String.format(<em>fmt</em>, [<em>values</em>...])</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#static.join">String.join(<em>delimiter</em>, <em>list</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#init">String(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#method.charAt"><em>string</em>.charAt(<em>index</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -3891,6 +3952,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.StringBuilder.html#init">StringBuilder()</a> → <a href="library/type.joe.StringBuilder.html">StringBuilder</a></li>
 <li><a href="library/type.joe.StringBuilder.html#method.append"><em>stringBuilder</em>.append(<em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.StringBuilder.html#method.print"><em>stringBuilder</em>.print(<em>value</em>)</a> → this</li>
+<li><a href="library/type.joe.StringBuilder.html#method.printf"><em>stringBuilder</em>.printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="library/type.joe.StringBuilder.html#method.println"><em>stringBuilder</em>.println(<em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.StringBuilder.html#method.toString"><em>stringBuilder</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -3903,6 +3965,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 <ul>
 <li><a href="library/type.joe.console.Console.html#static.args">Console.args()</a> → List</li>
 <li><a href="library/type.joe.console.Console.html#static.cd">Console.cd(<em>path</em>)</a> → Path</li>
+<li><a href="library/type.joe.console.Console.html#static.exit">Console.exit([<em>code</em>])</a></li>
+<li><a href="library/type.joe.console.Console.html#static.mkdir">Console.mkdir(<em>path</em>)</a></li>
 <li><a href="library/type.joe.console.Console.html#static.pwd">Console.pwd()</a> → Path</li>
 <li><a href="library/type.joe.console.Console.html#static.read">Console.read()</a> → String</li>
 <li><a href="library/type.joe.console.Console.html#static.readFile">Console.readFile(<em>filePath</em>)</a> → String</li>

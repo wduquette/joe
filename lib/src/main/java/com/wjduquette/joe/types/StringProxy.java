@@ -81,7 +81,7 @@ public class StringProxy extends TypeProxy<String> {
     // Static Method Implementations
 
     //**
-    // @method format
+    // @static format
     // @args fmt, [values...]
     // @result String
     // Formats the string given the format string.

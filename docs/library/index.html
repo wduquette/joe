@@ -183,6 +183,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="pkg.joe.html#function.catch">catch(<em>callable</em>)</a> → <a href="type.joe.Pair.html">Pair</a></li>
 <li><a href="pkg.joe.html#function.compare">compare(<em>a</em>, <em>b</em>)</a> → <a href="type.joe.Number.html">Number</a></li>
 <li><a href="pkg.joe.html#function.print">print(<em>text</em>)</a></li>
+<li><a href="pkg.joe.html#function.printf">printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="pkg.joe.html#function.println">println([<em>text</em>])</a></li>
 <li><a href="pkg.joe.html#function.stringify">stringify(<em>value</em>)</a> → <a href="type.joe.String.html">String</a></li>
 <li><a href="pkg.joe.html#function.typeName">typeName(<em>value</em>)</a> → <a href="type.joe.String.html">String</a></li>
@@ -309,6 +310,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="type.joe.String.html">String</a>
 <ul>
+<li><a href="type.joe.String.html#static.format">String.format(<em>fmt</em>, [<em>values</em>...])</a> → <a href="type.joe.String.html">String</a></li>
 <li><a href="type.joe.String.html#static.join">String.join(<em>delimiter</em>, <em>list</em>)</a> → <a href="type.joe.String.html">String</a></li>
 <li><a href="type.joe.String.html#init">String(<em>value</em>)</a> → <a href="type.joe.String.html">String</a></li>
 <li><a href="type.joe.String.html#method.charAt"><em>string</em>.charAt(<em>index</em>)</a> → <a href="type.joe.String.html">String</a></li>
@@ -345,6 +347,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="type.joe.StringBuilder.html#init">StringBuilder()</a> → <a href="type.joe.StringBuilder.html">StringBuilder</a></li>
 <li><a href="type.joe.StringBuilder.html#method.append"><em>stringBuilder</em>.append(<em>value</em>)</a> → this</li>
 <li><a href="type.joe.StringBuilder.html#method.print"><em>stringBuilder</em>.print(<em>value</em>)</a> → this</li>
+<li><a href="type.joe.StringBuilder.html#method.printf"><em>stringBuilder</em>.printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="type.joe.StringBuilder.html#method.println"><em>stringBuilder</em>.println(<em>value</em>)</a> → this</li>
 <li><a href="type.joe.StringBuilder.html#method.toString"><em>stringBuilder</em>.toString()</a> → <a href="type.joe.String.html">String</a></li>
 </ul>
@@ -357,6 +360,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 <ul>
 <li><a href="type.joe.console.Console.html#static.args">Console.args()</a> → List</li>
 <li><a href="type.joe.console.Console.html#static.cd">Console.cd(<em>path</em>)</a> → Path</li>
+<li><a href="type.joe.console.Console.html#static.exit">Console.exit([<em>code</em>])</a></li>
+<li><a href="type.joe.console.Console.html#static.mkdir">Console.mkdir(<em>path</em>)</a></li>
 <li><a href="type.joe.console.Console.html#static.pwd">Console.pwd()</a> → Path</li>
 <li><a href="type.joe.console.Console.html#static.read">Console.read()</a> → String</li>
 <li><a href="type.joe.console.Console.html#static.readFile">Console.readFile(<em>filePath</em>)</a> → String</li>
