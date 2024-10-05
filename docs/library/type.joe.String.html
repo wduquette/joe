@@ -226,7 +226,8 @@
 <h3 id="stringformat"><a class="header" href="#stringformat">String.format()</a></h3>
 <hr />
 <p><strong>String.format(<em>fmt</em>, [<em>values</em>...]) → <a href="type.joe.String.html">String</a></strong></p>
-<p>Formats the string given the format string.</p>
+<p>Formats the values into a string given the format string. See
+<a href="type.joe.String.html#topic.formatting">String Formatting</a>, below, for the format string syntax.</p>
 <p><span id="static.join"> </span></p>
 <h3 id="stringjoin"><a class="header" href="#stringjoin">String.join()</a></h3>
 <hr />
@@ -407,6 +408,54 @@ to the Java method of the same name, supporting a subset of
 <p>As with Java, the basic syntax is:</p>
 <pre><code>%[flags][width][.precision][conversion]
 </code></pre>
+<h3 id="conversions"><a class="header" href="#conversions">Conversions</a></h3>
+<p>The conversion codes are as follows:</p>
+<div class="table-wrapper"><table><thead><tr><th>Conversion</th><th>Input Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>b</code>, <code>B</code></td><td>Any</td><td><code>true</code> if truthy, <code>false</code> if falsey</td></tr>
+<tr><td><code>h</code>, <code>H</code></td><td>Any</td><td>The value's hash code as a hex string.</td></tr>
+<tr><td><code>s</code>, <code>S</code></td><td>Any</td><td>The value, stringified.</td></tr>
+<tr><td><code>d</code></td><td>Number</td><td>Converted to integer and formatted.</td></tr>
+<tr><td><code>x</code>, <code>X</code></td><td>Number</td><td>Converted to integer, formatted as hex</td></tr>
+<tr><td><code>e</code>, <code>E</code></td><td>Number</td><td>Decimal, scientific notation</td></tr>
+<tr><td><code>f</code></td><td>Number</td><td>Decimal</td></tr>
+<tr><td><code>g</code>, <code>G</code></td><td>Number</td><td>Decimal or scientific notation, as appropriate.</td></tr>
+<tr><td><code>%</code></td><td>n/a</td><td>A literal percent sign</td></tr>
+<tr><td><code>n</code></td><td>n/a</td><td>The platform-specific line separator</td></tr>
+</tbody></table>
+</div>
+<ul>
+<li>Note: the uppercase variant of the conversion is the same as the
+lowercase variant, but converts the output to uppercase.</li>
+</ul>
+<h3 id="precision"><a class="header" href="#precision">Precision</a></h3>
+<ul>
+<li>
+<p>For decimal conversions, the <em>precision</em> is the number of digits after
+the decimal place.</p>
+</li>
+<li>
+<p>For the conversions with input type "Any" in the above table, the
+natural length of the output might be longer than the desired <em>width</em>.
+In this case, the <em>precision</em> field specifies the maximum width of
+the output.</p>
+</li>
+<li>
+<p>The <em>precision</em> field cannot be used with the <code>d</code>, <code>x</code>, and <code>X</code>
+conversions.</p>
+</li>
+</ul>
+<h3 id="flags"><a class="header" href="#flags">Flags</a></h3>
+<p>The supported flags are as follows, and apply only to the specified
+argument type.</p>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Input Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>-</code></td><td>Any</td><td>Result is left-justified.</td></tr>
+<tr><td><code>+</code></td><td>Number</td><td>Result always includes a sign</td></tr>
+<tr><td>space</td><td>Number</td><td>Leading space for positive values</td></tr>
+<tr><td><code>0</code></td><td>Number</td><td>Padded with leading zeros</td></tr>
+<tr><td><code>,</code></td><td>Number</td><td>Use local-specific grouping separators</td></tr>
+<tr><td><code>(</code></td><td>Number</td><td>Enclose negative numbers in parentheses</td></tr>
+</tbody></table>
+</div>
 <h3 id="whats-not-supported"><a class="header" href="#whats-not-supported">What's Not Supported</a></h3>
 <p>Joe's <code>String.format()</code> method does <em>not</em> support the following:</p>
 <ul>

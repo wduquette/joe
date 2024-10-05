@@ -71,9 +71,9 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     //**
     // @method printf
     // @args fmt, [values...]
-    // Formats its arguments given the
-    // [[String#static.format]] *fmt* string, and appends the result
-    // to the buffer.
+    // Formats its arguments given the *fmt* string, and appends the result
+    // to the buffer.  See [[String#topic.formatting]] for the format
+    // string syntax.
     private Object _printf(StringBuilder buff, Joe joe, ArgQueue args) {
         Joe.minArity(args, 1, "printf(fmt, [values]...)");
         var fmt = joe.toString(args.next());

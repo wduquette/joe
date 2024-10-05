@@ -68,7 +68,76 @@ public class StringProxy extends TypeProxy<String> {
     //**
     // @typeTopic formatting
     // @title String Formatting
-    // Details about Joe format strings and the format method.
+    // The Joe [[String#static.format]] method formats strings similarly
+    // to the Java method of the same name, supporting a subset of
+    // [Java's format string syntax](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Formatter.html#syntax).
+    //
+    // This section describes the supported subset.
+    //
+    // As with Java, the basic syntax is:
+    //
+    //     %[flags][width][.precision][conversion]
+    //
+    // ### Conversions
+    //
+    // The conversion codes are as follows:
+    //
+    // | Conversion | Input Type | Description                                     |
+    // | ---------- | ---------- | ----------------------------------------------- |
+    // | `b`, `B`   | Any        | `true` if truthy, `false` if falsey             |
+    // | `h`, `H`   | Any        | The value's hash code as a hex string.          |
+    // | `s`, `S`   | Any        | The value, stringified.                         |
+    // | `d`        | Number     | Converted to integer and formatted.             |
+    // | `x`, `X`   | Number     | Converted to integer, formatted as hex          |
+    // | `e`, `E`   | Number     | Decimal, scientific notation                    |
+    // | `f`        | Number     | Decimal                                         |
+    // | `g`, `G`   | Number     | Decimal or scientific notation, as appropriate. |
+    // | `%`        | n/a        | A literal percent sign                          |
+    // | `n`        | n/a        | The platform-specific line separator            |
+    //
+    // - Note: the uppercase variant of the conversion is the same as the
+    //   lowercase variant, but converts the output to uppercase.
+    //
+    // ### Precision
+    //
+    // - For decimal conversions, the *precision* is the number of digits after
+    //   the decimal place.
+    //
+    // - For the conversions with input type "Any" in the above table, the
+    //   natural length of the output might be longer than the desired *width*.
+    //   In this case, the *precision* field specifies the maximum width of
+    //   the output.
+    //
+    // - The *precision* field cannot be used with the `d`, `x`, and `X`
+    //   conversions.
+    //
+    // ### Flags
+    //
+    // The supported flags are as follows, and apply only to the specified
+    // argument type.
+    //
+    // | Flag        | Input Type | Description                             |
+    // | ----------- | ---------- | --------------------------------------- |
+    // | `-`         | Any        | Result is left-justified.               |
+    // | `+`         | Number     | Result always includes a sign           |
+    // | space       | Number     | Leading space for positive values       |
+    // | `0`         | Number     | Padded with leading zeros               |
+    // | `,`         | Number     | Use local-specific grouping separators  |
+    // | `(`         | Number     | Enclose negative numbers in parentheses |
+    //
+    // ### What's Not Supported
+    //
+    // Joe's `String.format()` method does *not* support the following:
+    //
+    // - Argument indices, using `$` syntax.
+    // - Date/time formatting.
+    //
+    // I don't use argument indices with Java's `String.format()`, as I find
+    // them to be fragile; and I've always found it weird to combine simple
+    // type formatting and complex date/time formatting in what's meant to
+    // be a type-safe clone of Java's `printf()` syntax.  I'd much prefer
+    // to provide a distinct API for using Java's `java.time` package.
+
 
     //-------------------------------------------------------------------------
     // Initializer Implementation
@@ -89,7 +158,8 @@ public class StringProxy extends TypeProxy<String> {
     // @static format
     // @args fmt, [values...]
     // @result String
-    // Formats the string given the format string.
+    // Formats the values into a string given the format string. See
+    // [[String#topic.formatting]], below, for the format string syntax.
     private Object _format(Joe joe, ArgQueue args) {
         Joe.minArity(args, 1, "format(fmt, [values...])");
         var fmt = joe.toString(args.next());

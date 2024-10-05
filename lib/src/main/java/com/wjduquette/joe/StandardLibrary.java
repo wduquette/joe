@@ -93,10 +93,11 @@ class StandardLibrary extends JoePackage {
     //**
     // @function printf
     // @args fmt, [values...]
-    // Formats its arguments given the
-    // [[String#static.format]] *fmt* string, and prints the result
-    // to standard output (which might be
-    // redirected by the application).
+    // Formats its arguments given the *fmt* string, and prints the result
+    // to standard output (which might be redirected by the application).
+    //
+    // See [[String#topic.formatting]] for the format
+    // string syntax.
     private Object _printf(Joe joe, ArgQueue args) {
         Joe.minArity(args, 1, "printf(fmt, [values]...)");
         var fmt = joe.toString(args.next());
