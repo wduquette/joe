@@ -25,6 +25,7 @@ public class Joe {
     private final Interpreter interpreter;
     private final Codifier codifier;
     private final Map<Class<?>, TypeProxy<?>> proxyTable = new HashMap<>();
+    private final Set<Class<?>> opaqueTypes = new HashSet<>();
 
     // The handler for all script-generated output
     private Consumer<String> outputHandler = this::systemOutHandler;
@@ -281,13 +282,34 @@ public class Joe {
     /**
      * Looks for a type proxy by the proxied class, rather than by
      * a value of a proxied class.
+     *
+     * <p>The search goes as follows:
+     * the class itself, each superclass up to (but not including)
+     * `Object`; and then, starting again at the class itself, each
+     * of the class's interfaces, and so on again up to `Object`.</p>
+     *
+     * <p>Any successful result is cached, and so the second and subsequent
+     * lookups should be quick.</p>
      * @param cls The class
      * @return The proxy, or null if not found.
      */
     TypeProxy<?> lookupProxyByClass(Class<?> cls) {
-        var c = cls;
+        // FIRST, do have a known proxy?
+        var proxy = proxyTable.get(cls);
+        if (proxy != null) {
+            return proxy;
+        }
+
+        // NEXT, is it known to be opaque?
+        if (opaqueTypes.contains(cls)) {
+            return null;
+        }
+
+        // NEXT, search for a registered superclass.
+        var c = cls.getSuperclass();
+
         do {
-            var proxy = proxyTable.get(c);
+            proxy = proxyTable.get(c);
 
             if (proxy != null) {
                 // If we could only find a proxy for a supertype,
@@ -301,6 +323,21 @@ public class Joe {
             c = c.getSuperclass();
         } while (c != null && c != Object.class);
 
+        // NEXT, search for a registered interface.
+        c = cls;
+
+        do {
+            for (var type : c.getInterfaces()) {
+                proxy = proxyTable.get(type);
+                proxyTable.put(cls, proxy);
+                return proxy;
+            }
+
+            c = c.getSuperclass();
+        } while (c != null && c != Object.class);
+
+        // NEXT, remember that we could not find a proxy.
+        opaqueTypes.add(cls);
         return null;
     }
 
