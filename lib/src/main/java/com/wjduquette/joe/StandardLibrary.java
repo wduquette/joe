@@ -18,6 +18,7 @@ class StandardLibrary extends JoePackage {
         globalFunction("codify",    this::_codify);
         globalFunction("compare",   this::_compare);
         globalFunction("print",     this::_print);
+        globalFunction("printf",    this::_printf);
         globalFunction("println",   this::_println);
         globalFunction("stringify", this::_stringify);
         globalFunction("typeName",  this::_typeName);
@@ -80,7 +81,22 @@ class StandardLibrary extends JoePackage {
     private Object _print(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "print(text)");
 
-        joe.print(joe.stringify(args.getRemaining(0)));
+        joe.print(joe.stringify(args.next()));
+        return null;
+    }
+
+    //**
+    // @function printf
+    // @args fmt, [values...]
+    // Formats its arguments given the
+    // [[String#static.format]] string, and prints the result
+    // to standard output (which might be
+    // redirected by the application).
+    private Object _printf(Joe joe, ArgQueue args) {
+        Joe.minArity(args, 1, "printf(fmt, [values]...)");
+        var fmt = joe.toString(args.next());
+
+        joe.print(StringFormatter.format(joe, fmt, args.remainder()));
         return null;
     }
 
