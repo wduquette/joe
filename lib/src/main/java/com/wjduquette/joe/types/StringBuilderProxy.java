@@ -1,9 +1,6 @@
 package com.wjduquette.joe.types;
 
-import com.wjduquette.joe.ArgQueue;
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeList;
-import com.wjduquette.joe.TypeProxy;
+import com.wjduquette.joe.*;
 
 public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     /**
@@ -30,7 +27,7 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
 
         method("append",   this::_append);
         method("print",    this::_print);
-        // TODO method("printf",   this::_printf);
+        method("printf",   this::_printf);
         method("println",  this::_println);
         method("toString", this::_toString);
     }
@@ -68,6 +65,21 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     private Object _print(StringBuilder buff, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "print(value)");
         buff.append(joe.stringify(args.next()));
+        return buff;
+    }
+
+    //**
+    // @function printf
+    // @args fmt, [values...]
+    // Formats its arguments given the
+    // [[String#static.format]] string, and prints the result
+    // to standard output (which might be
+    // redirected by the application).
+    private Object _printf(StringBuilder buff, Joe joe, ArgQueue args) {
+        Joe.minArity(args, 1, "printf(fmt, [values]...)");
+        var fmt = joe.toString(args.next());
+
+        buff.append(StringFormatter.format(joe, fmt, args.remainder()));
         return buff;
     }
 
