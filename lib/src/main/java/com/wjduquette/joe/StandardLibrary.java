@@ -36,6 +36,11 @@ class StandardLibrary extends JoePackage {
     }
 
     //**
+    // @packageTopic joe
+    // @title Why "Joe"?
+    // My friend Joe's a straight shooter, and never misses his mark.
+
+    //**
     // @function catch
     // @args callable
     // @result Pair

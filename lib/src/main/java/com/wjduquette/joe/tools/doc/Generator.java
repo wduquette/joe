@@ -129,6 +129,13 @@ class Generator {
         // NEXT, output the package index.
         out.println();
 
+        if (!pkg.topics().isEmpty()) {
+            out.hb("topics", "Topics");
+            out.println();
+            pkg.topics().forEach(t -> writeTopicLink(out, 0, t));
+            out.println();
+        }
+
         if (!pkg.functions().isEmpty()) {
             out.hb("functions", "Functions");
             out.println();
@@ -152,6 +159,12 @@ class Generator {
         if (!pkg.functions().isEmpty()) {
             out.h2("functions", "Functions");
             writeCallableBodies(out, pkg.functions());
+        }
+
+        // NEXT, output the topics
+        for (var topic : pkg.topics()) {
+            out.h2(topic.id(), topic.title());
+            topic.content().forEach(out::println);
         }
     }
 
@@ -202,13 +215,19 @@ class Generator {
         }
         out.println();
 
-
         // NEXT, output the first paragraph of the content.
         var content = expandMnemonicLinks(type.content());
         contentIntro(content).forEach(out::println);
 
         // NEXT, output the type index.
         out.println();
+
+        if (!type.topics().isEmpty()) {
+            out.hb("topics", "Topics");
+            out.println();
+            type.topics().forEach(t -> writeTopicLink(out, 0, t));
+            out.println();
+        }
 
         if (!type.constants().isEmpty()) {
             out.hb("constants", "Constants");
@@ -277,6 +296,12 @@ class Generator {
             out.h2("methods","Methods");
             writeCallableBodies(out, type.methods());
         }
+
+        // NEXT, output the topics
+        for (var topic : type.topics()) {
+            out.h2(topic.id(), topic.title());
+            topic.content().forEach(out::println);
+        }
     }
 
     private String subtypeLinks(TypeEntry type) {
@@ -288,6 +313,21 @@ class Generator {
             .map(t -> typeLinkOrName(t.shortMnemonic()))
             .toList();
         return String.join(", ", subtypes);
+    }
+
+    //-------------------------------------------------------------------------
+    // Topics
+
+    private void writeTopicLink(
+        ContentWriter out,
+        int indent,
+        TopicEntry topic
+    ) {
+        var leader = " ".repeat(indent);
+        out.println(leader + "- [" +
+            topic.title() +
+            "](" + topic.filename() + "#" + topic.id() + ")"
+        );
     }
 
     //-------------------------------------------------------------------------

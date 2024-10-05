@@ -65,6 +65,11 @@ public class StringProxy extends TypeProxy<String> {
         method("toUpperCase",         this::_toUpperCase);
     }
 
+    //**
+    // @typeTopic formatting
+    // @title String Formatting
+    // Details about Joe format strings and the format method.
+
     //-------------------------------------------------------------------------
     // Initializer Implementation
 

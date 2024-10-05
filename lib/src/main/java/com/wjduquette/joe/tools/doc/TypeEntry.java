@@ -15,6 +15,8 @@ class TypeEntry extends Entry {
     private String supertypeName = null;
     private InitializerEntry initializer = null;
     private final List<MethodEntry> methods = new ArrayList<>();
+    private final List<TopicEntry> topics = new ArrayList<>();
+
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -32,6 +34,7 @@ class TypeEntry extends Entry {
     public String                  supertypeName() { return supertypeName; }
     public InitializerEntry        initializer()   { return initializer; }
     public List<MethodEntry>       methods()       { return methods; }
+    List<TopicEntry>               topics()        { return topics; }
 
     public String prefix()        { return name; }
     public String name()          { return name; }
