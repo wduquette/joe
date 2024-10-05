@@ -32,10 +32,28 @@
   - Added the [`AssertError`](library/type.joe.AssertError.md) type, which
     explicitly extends the [`Error`](library/type.joe.Error.md) type.
   - Added the [`StringBuilder`](library/type.joe.StringBuilder.md) type.
+  - Added the optional [`joe.console`](library/pkg.joe.console.md) package,
+    for use by scripts invoked by the command line.
+  - Implemented the `String.format()` method for formatting strings based on
+    a format string, mostly mirroring Java's method of the same name. See 
+    [String Formatting](library/type.joe.String.md#topic.formatting) for
+    details.
+  - Added `printf()` to the [Standard Library](library/pkg.joe.md).
+  - Added a `printf()` method to the 
+    [`StringBuilder`](library/type.joe.StringBuilder.md) type.
+
+- `joe run` Tool
+  - Installs the [`joe.console`](library/pkg.joe.console.md) package.
+   
+- `joe repl` Tool
+  - Installs the [`joe.console`](library/pkg.joe.console.md) package.
 
 - `joe doc` Tool
   - A `@type`'s doc comment can now reference the type's supertype using
     the `@extends` metadata tag.
+  - `@package` and `@type` documentation can include additional topic sections
+    at the bottom of their documentation pages using the new `@packageTopic`
+    and `@typeTopic` entries.
 
 - Documentation
   - Added the relevant documentation for all changes list above.

@@ -95,7 +95,7 @@ aesthetics.
 
 I know the trend these days is to pick a language with a package manager and
 then construct your app from dozens, if not hundreds, of external packages.
-And sure, you can do that.  Me, I'll be over here no worrying about 
+And sure, you can do that.  Me, I'll be over here not worrying about 
 supply chain issues.
 
 ## Why Sandboxed?
@@ -125,9 +125,9 @@ Lox is a little language described in Robert Nystrom's excellent book,
 tree-walker implementation of the language implemented in Java.  
 
 The Joe language and implementation derive from Lox in general and JLox in 
-particular, though it is by no means a mere copy; I've changed and added
-syntax, refactored the implementation, etc., etc., as my needs (and whimsy) 
-takes me.  But the only reason any of that of is possible
+particular and retains Lox semantics at its core.  I've subsequently changed 
+and added syntax, refactored the implementation, etc., etc., as my needs 
+(and whimsy) takes me.  But the only reason any of that is possible,
 is because Mr. Nystrom designed and built a very nice little language and wrote
 what is possibly the best programming text I've ever read to describe how the
 trick is done.[^lunch]

@@ -190,6 +190,12 @@ $
 <p>To display the result of an expression, type in the expression followed
 by a semicolon, as shown.  To execute the statement, do likewise.</p>
 <p>To exit the REPL, press <code>^D</code> or <code>^C</code>.</p>
+<h2 id="the-joeconsole-api"><a class="header" href="#the-joeconsole-api">The <code>joe.console</code> API</a></h2>
+<p>The Joe interpreter used by <code>joe repl</code> includes an optional Joe package,
+<a href="library/pkg.joe.console.html"><code>joe.console</code></a>, that allows Joe scripts to
+access the command line arguments, read standard input and text files, and
+write text files.  Follow the link for details.</p>
+<h2 id="extending-joe"><a class="header" href="#extending-joe">Extending Joe</a></h2>
 <p>It is expected that projects using Joe will want to define an
 equivalent tool that includes the project-specific bindings, along with
 various other niceties.  See

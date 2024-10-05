@@ -224,6 +224,27 @@ supertype's type proxy.</li>
 <li>Added the <a href="library/type.joe.AssertError.html"><code>AssertError</code></a> type, which
 explicitly extends the <a href="library/type.joe.Error.html"><code>Error</code></a> type.</li>
 <li>Added the <a href="library/type.joe.StringBuilder.html"><code>StringBuilder</code></a> type.</li>
+<li>Added the optional <a href="library/pkg.joe.console.html"><code>joe.console</code></a> package,
+for use by scripts invoked by the command line.</li>
+<li>Implemented the <code>String.format()</code> method for formatting strings based on
+a format string, mostly mirroring Java's method of the same name. See
+<a href="library/type.joe.String.html#topic.formatting">String Formatting</a> for
+details.</li>
+<li>Added <code>printf()</code> to the <a href="library/pkg.joe.html">Standard Library</a>.</li>
+<li>Added a <code>printf()</code> method to the
+<a href="library/type.joe.StringBuilder.html"><code>StringBuilder</code></a> type.</li>
+</ul>
+</li>
+<li>
+<p><code>joe run</code> Tool</p>
+<ul>
+<li>Installs the <a href="library/pkg.joe.console.html"><code>joe.console</code></a> package.</li>
+</ul>
+</li>
+<li>
+<p><code>joe repl</code> Tool</p>
+<ul>
+<li>Installs the <a href="library/pkg.joe.console.html"><code>joe.console</code></a> package.</li>
 </ul>
 </li>
 <li>
@@ -231,6 +252,9 @@ explicitly extends the <a href="library/type.joe.Error.html"><code>Error</code><
 <ul>
 <li>A <code>@type</code>'s doc comment can now reference the type's supertype using
 the <code>@extends</code> metadata tag.</li>
+<li><code>@package</code> and <code>@type</code> documentation can include additional topic sections
+at the bottom of their documentation pages using the new <code>@packageTopic</code>
+and <code>@typeTopic</code> entries.</li>
 </ul>
 </li>
 <li>
