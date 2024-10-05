@@ -163,8 +163,7 @@ class Generator {
 
         // NEXT, output the topics
         for (var topic : pkg.topics()) {
-            out.h2(topic.id(), topic.title());
-            topic.content().forEach(out::println);
+            writeTopicBody(out, topic);
         }
     }
 
@@ -299,8 +298,7 @@ class Generator {
 
         // NEXT, output the topics
         for (var topic : type.topics()) {
-            out.h2(topic.id(), topic.title());
-            topic.content().forEach(out::println);
+            writeTopicBody(out, topic);
         }
     }
 
@@ -317,6 +315,12 @@ class Generator {
 
     //-------------------------------------------------------------------------
     // Topics
+
+    private void writeTopicBody(ContentWriter out, TopicEntry topic) {
+        out.h2(topic.id(), topic.title());
+        expandMnemonicLinks(topic.content()).forEach(out::println);
+        out.println();
+    }
 
     private void writeTopicLink(
         ContentWriter out,

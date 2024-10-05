@@ -400,7 +400,24 @@ to the end of the string.</p>
 <p>Returns this string converted to uppercase.</p>
 <h2 id="topic.formatting"><a class="header" href="#topic.formatting">String Formatting</a></h2>
 <hr />
-<p>Details about Joe format strings and the format method.</p>
+<p>The Joe <a href="type.joe.String.html#static.format"><code>String.format()</code></a> method formats strings similarly
+to the Java method of the same name, supporting a subset of
+<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Formatter.html#syntax">Java's format string syntax</a>.</p>
+<p>This section describes the supported subset.</p>
+<p>As with Java, the basic syntax is:</p>
+<pre><code>%[flags][width][.precision][conversion]
+</code></pre>
+<h3 id="whats-not-supported"><a class="header" href="#whats-not-supported">What's Not Supported</a></h3>
+<p>Joe's <code>String.format()</code> method does <em>not</em> support the following:</p>
+<ul>
+<li>Argument indices, using <code>$</code> syntax.</li>
+<li>Date/time formatting.</li>
+</ul>
+<p>I don't use argument indices with Java's <code>String.format()</code>, as I find
+them to be fragile; and I've always found it weird to combine simple
+type formatting and complex date/time formatting in what's meant to
+be a type-safe clone of Java's <code>printf()</code> syntax.  I'd much prefer
+to provide a distinct API for using Java's <code>java.time</code> package.</p>
 
                     </main>
 
