@@ -2411,6 +2411,9 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.console.Console.html#static.args">Console.args()</a> → List</li>
 <li><a href="library/type.joe.console.Console.html#static.cd">Console.cd(<em>path</em>)</a> → Path</li>
 <li><a href="library/type.joe.console.Console.html#static.pwd">Console.pwd()</a> → Path</li>
+<li><a href="library/type.joe.console.Console.html#static.read">Console.read()</a> → String</li>
+<li><a href="library/type.joe.console.Console.html#static.readFile">Console.readFile(<em>filePath</em>)</a> → String</li>
+<li><a href="library/type.joe.console.Console.html#static.readLines">Console.readLines(<em>filePath</em>)</a> → List</li>
 <li><a href="library/type.joe.console.Console.html#static.writeFile">Console.writeFile(<em>filePath</em>, <em>text</em>)</a></li>
 </ul>
 </li>
@@ -3669,6 +3672,9 @@ environment, sufficient to writing simple scripts.</p>
 <li><a href="library/type.joe.console.Console.html#static.args">Console.args()</a> → List</li>
 <li><a href="library/type.joe.console.Console.html#static.cd">Console.cd(<em>path</em>)</a> → Path</li>
 <li><a href="library/type.joe.console.Console.html#static.pwd">Console.pwd()</a> → Path</li>
+<li><a href="library/type.joe.console.Console.html#static.read">Console.read()</a> → String</li>
+<li><a href="library/type.joe.console.Console.html#static.readFile">Console.readFile(<em>filePath</em>)</a> → String</li>
+<li><a href="library/type.joe.console.Console.html#static.readLines">Console.readLines(<em>filePath</em>)</a> → List</li>
 <li><a href="library/type.joe.console.Console.html#static.writeFile">Console.writeFile(<em>filePath</em>, <em>text</em>)</a></li>
 </ul>
 <h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
@@ -3691,11 +3697,28 @@ current working directory.</p>
 <hr />
 <p><strong>Console.pwd() → Path</strong></p>
 <p>Returns the current working directory.</p>
+<p><span id="static.read"> </span></p>
+<h3 id="consoleread"><a class="header" href="#consoleread">Console.read()</a></h3>
+<hr />
+<p><strong>Console.read() → String</strong></p>
+<p>Returns a string from standard input, or null at EOF.</p>
+<p><span id="static.readFile"> </span></p>
+<h3 id="consolereadfile"><a class="header" href="#consolereadfile">Console.readFile()</a></h3>
+<hr />
+<p><strong>Console.readFile(<em>filePath</em>) → String</strong></p>
+<p>Reads the contents of the file at the given <em>filePath</em> and
+returns it as a string.</p>
+<p><span id="static.readLines"> </span></p>
+<h3 id="consolereadlines"><a class="header" href="#consolereadlines">Console.readLines()</a></h3>
+<hr />
+<p><strong>Console.readLines(<em>filePath</em>) → List</strong></p>
+<p>Reads the contents of the file at the given <em>filePath</em> and
+returns it as a list of line strings</p>
 <p><span id="static.writeFile"> </span></p>
 <h3 id="consolewritefile"><a class="header" href="#consolewritefile">Console.writeFile()</a></h3>
 <hr />
 <p><strong>Console.writeFile(<em>filePath</em>, <em>text</em>)</strong></p>
-<p>Writes the <em>text</em> to the given <em>filePath</em>.</p>
+<p>Writes the <em>text</em> as a file at the given <em>filePath</em>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="library-api-index-1"><a class="header" href="#library-api-index-1">Library API Index</a></h1>
 <hr />
 <p>The following is a complete index of the packages, functions,
@@ -3881,6 +3904,9 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.console.Console.html#static.args">Console.args()</a> → List</li>
 <li><a href="library/type.joe.console.Console.html#static.cd">Console.cd(<em>path</em>)</a> → Path</li>
 <li><a href="library/type.joe.console.Console.html#static.pwd">Console.pwd()</a> → Path</li>
+<li><a href="library/type.joe.console.Console.html#static.read">Console.read()</a> → String</li>
+<li><a href="library/type.joe.console.Console.html#static.readFile">Console.readFile(<em>filePath</em>)</a> → String</li>
+<li><a href="library/type.joe.console.Console.html#static.readLines">Console.readLines(<em>filePath</em>)</a> → List</li>
 <li><a href="library/type.joe.console.Console.html#static.writeFile">Console.writeFile(<em>filePath</em>, <em>text</em>)</a></li>
 </ul>
 </li>

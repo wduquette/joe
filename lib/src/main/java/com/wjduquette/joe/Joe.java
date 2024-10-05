@@ -285,15 +285,21 @@ public class Joe {
      * @return The proxy, or null if not found.
      */
     TypeProxy<?> lookupProxyByClass(Class<?> cls) {
+        var c = cls;
         do {
-            var proxy = proxyTable.get(cls);
+            var proxy = proxyTable.get(c);
 
             if (proxy != null) {
+                // If we could only find a proxy for a supertype,
+                // cache it so that we don't need to look it up again.
+                if (!c.equals(cls)) {
+                    proxyTable.put(cls, proxy);
+                }
                 return proxy;
             }
 
-            cls = cls.getSuperclass();
-        } while (cls != null && cls != Object.class);
+            c = c.getSuperclass();
+        } while (c != null && c != Object.class);
 
         return null;
     }

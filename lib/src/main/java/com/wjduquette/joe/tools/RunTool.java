@@ -4,6 +4,7 @@ import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
+import com.wjduquette.joe.console.ConsolePackage;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -48,13 +49,17 @@ public class RunTool implements Tool {
     private void run(String[] args) {
         var argq = new ArrayDeque<>(List.of(args));
 
-        if (argq.size() != 1) {
+        if (argq.size() == 0) {
             printUsage(App.NAME);
             System.exit(64);
         }
 
         var joe = new Joe();
         var path = argq.poll();
+
+        var consolePackage = new ConsolePackage();
+        consolePackage.getArgs().addAll(List.of(args));
+        joe.installPackage(consolePackage);
 
         try {
             joe.runFile(path);
