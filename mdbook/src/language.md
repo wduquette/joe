@@ -10,12 +10,18 @@ But equally, Joe is designed to be insulated from the larger Java world.
 Adding a Joe interpreter should not, on its own, add security issues to
 an application.
 
-- Joe has no access to the host operating system.
+A vanilla `Joe` interpreter:
+
+- Has no access to the host operating system.
   - Unless the client implements a Java binding for Joe that 
     provides such access.
-- Joe has no access to the Java standard library.
-  - Except insofar as the client adds bindings to standard Java
-    packages.
+- Has no access to the Java standard library.
+  - Except insofar as the Joe standard library depends on it.
+
+The client is free to add bindings in Java that do both, as described
+in the [Extending Joe](extending/extending.md) section, and as 
+the [`joe run`](joe_run.md) and [`joe repl`](joe_repl.md) do by
+adding the [`joe.console` package](library/pkg.joe.console.md).
 
 Joe has its origin in the JLox language from Robert Nystrom's 
 outstanding book and website, 

@@ -178,7 +178,7 @@
 convenience to those learning the Joe language (and as a debugging aid
 for the Joe developer).</p>
 <p>It takes a single argument, a Joe script to execute.  It loads the script
-into a vanilla Joe interpreter, displaying any syntax errors;
+into a Joe interpreter, displaying any syntax errors;
 and if there are none executes the script and displays its output.</p>
 <p>Here's a simple script.</p>
 <pre><code class="language-joe">// hello.joe
@@ -189,6 +189,14 @@ println("Hello, world!");
 Hello, world!
 $
 </code></pre>
+<h2 id="the-joeconsole-api"><a class="header" href="#the-joeconsole-api">The <code>joe.console</code> API</a></h2>
+<p>The Joe interpreter used by <code>joe run</code> includes an optional Joe package,
+<a href="library/pkg.joe.console.html"><code>joe.console</code></a>, that allows Joe scripts to
+access the command line arguments, read standard input and text files, and
+write text files.  Follow the link for details.</p>
+<h2 id="extending-joe"><a class="header" href="#extending-joe">Extending Joe</a></h2>
+<p>A vanilla Joe interpreter has no way of accessing the platform except by
+printing output, and even that can be redirected by the client application.</p>
 <p>It is expected that projects using Joe will want to define an
 equivalent tool that includes the project-specific bindings.  See
 <a href="embedding/embedding.html">Embedding Joe</a> and

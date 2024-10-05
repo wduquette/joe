@@ -252,7 +252,7 @@ aesthetics.</p>
 <h2 id="why-no-external-dependencies"><a class="header" href="#why-no-external-dependencies">Why No External Dependencies?</a></h2>
 <p>I know the trend these days is to pick a language with a package manager and
 then construct your app from dozens, if not hundreds, of external packages.
-And sure, you can do that.  Me, I'll be over here no worrying about
+And sure, you can do that.  Me, I'll be over here not worrying about
 supply chain issues.</p>
 <h2 id="why-sandboxed"><a class="header" href="#why-sandboxed">Why Sandboxed?</a></h2>
 <p>Because I don't want to worry about security issues; and more particularly,
@@ -273,9 +273,9 @@ work around.</p>
 <a href="https://craftinginterpreters.com"><em>Crafting Interpreters</em></a>; JLox is a
 tree-walker implementation of the language implemented in Java.</p>
 <p>The Joe language and implementation derive from Lox in general and JLox in
-particular, though it is by no means a mere copy; I've changed and added
-syntax, refactored the implementation, etc., etc., as my needs (and whimsy)
-takes me.  But the only reason any of that of is possible
+particular and retains Lox semantics at its core.  I've subsequently changed
+and added syntax, refactored the implementation, etc., etc., as my needs
+(and whimsy) takes me.  But the only reason any of that is possible,
 is because Mr. Nystrom designed and built a very nice little language and wrote
 what is possibly the best programming text I've ever read to describe how the
 trick is done.<sup class="footnote-reference"><a href="#lunch">2</a></sup></p>
@@ -338,6 +338,27 @@ supertype's type proxy.</li>
 <li>Added the <a href="library/type.joe.AssertError.html"><code>AssertError</code></a> type, which
 explicitly extends the <a href="library/type.joe.Error.html"><code>Error</code></a> type.</li>
 <li>Added the <a href="library/type.joe.StringBuilder.html"><code>StringBuilder</code></a> type.</li>
+<li>Added the optional <a href="library/pkg.joe.console.html"><code>joe.console</code></a> package,
+for use by scripts invoked by the command line.</li>
+<li>Implemented the <code>String.format()</code> method for formatting strings based on
+a format string, mostly mirroring Java's method of the same name. See
+<a href="library/type.joe.String.html#topic.formatting">String Formatting</a> for
+details.</li>
+<li>Added <code>printf()</code> to the <a href="library/pkg.joe.html">Standard Library</a>.</li>
+<li>Added a <code>printf()</code> method to the
+<a href="library/type.joe.StringBuilder.html"><code>StringBuilder</code></a> type.</li>
+</ul>
+</li>
+<li>
+<p><code>joe run</code> Tool</p>
+<ul>
+<li>Installs the <a href="library/pkg.joe.console.html"><code>joe.console</code></a> package.</li>
+</ul>
+</li>
+<li>
+<p><code>joe repl</code> Tool</p>
+<ul>
+<li>Installs the <a href="library/pkg.joe.console.html"><code>joe.console</code></a> package.</li>
 </ul>
 </li>
 <li>
@@ -345,6 +366,9 @@ explicitly extends the <a href="library/type.joe.Error.html"><code>Error</code><
 <ul>
 <li>A <code>@type</code>'s doc comment can now reference the type's supertype using
 the <code>@extends</code> metadata tag.</li>
+<li><code>@package</code> and <code>@type</code> documentation can include additional topic sections
+at the bottom of their documentation pages using the new <code>@packageTopic</code>
+and <code>@typeTopic</code> entries.</li>
 </ul>
 </li>
 <li>
@@ -523,20 +547,24 @@ two tools are more or less as described in <em>Crafting Interpreters</em>.</li>
 <p>But equally, Joe is designed to be insulated from the larger Java world.
 Adding a Joe interpreter should not, on its own, add security issues to
 an application.</p>
+<p>A vanilla <code>Joe</code> interpreter:</p>
 <ul>
-<li>Joe has no access to the host operating system.
+<li>Has no access to the host operating system.
 <ul>
 <li>Unless the client implements a Java binding for Joe that
 provides such access.</li>
 </ul>
 </li>
-<li>Joe has no access to the Java standard library.
+<li>Has no access to the Java standard library.
 <ul>
-<li>Except insofar as the client adds bindings to standard Java
-packages.</li>
+<li>Except insofar as the Joe standard library depends on it.</li>
 </ul>
 </li>
 </ul>
+<p>The client is free to add bindings in Java that do both, as described
+in the <a href="extending/extending.html">Extending Joe</a> section, and as
+the <a href="joe_run.html"><code>joe run</code></a> and <a href="joe_repl.html"><code>joe repl</code></a> do by
+adding the <a href="library/pkg.joe.console.html"><code>joe.console</code> package</a>.</p>
 <p>Joe has its origin in the JLox language from Robert Nystrom's
 outstanding book and website,
 <a href="https://craftinginterpreters.com"><em>Crafting Interpreters</em></a>, but is
@@ -1376,6 +1404,7 @@ For example,</p>
 <ul>
 <li><a href="extending/registered_types.html#the-script-level-type-name">The Script-level Type Name</a></li>
 <li><a href="extending/registered_types.html#the-proxied-types">The Proxied Types</a></li>
+<li><a href="extending/registered_types.html#type-lookup">Type Lookup</a></li>
 <li><a href="extending/registered_types.html#the-supertype">The Supertype</a></li>
 <li><a href="extending/registered_types.html#stringification">Stringification</a></li>
 <li><a href="extending/registered_types.html#iterability">Iterability</a></li>
@@ -1409,8 +1438,7 @@ kindness to the client.</li>
 <p>When the proxy is registered Joe will create a global variable with the
 same name as the type, e.g., <code>String</code>.</p>
 <h2 id="the-proxied-types"><a class="header" href="#the-proxied-types">The Proxied Types</a></h2>
-<p>Second, the proxy must explicitly identify the proxied type or types, which
-must be genuine classes, not interfaces.</p>
+<p>Second, the proxy must explicitly identify the proxied type or types.</p>
 <p>Usually a proxy will proxy the single type <code>V</code>, but if <code>V</code> is an interface
 the relevant classes need to be identified. Here's the first case:</p>
 <pre><code class="language-java">public class StringProxy extends TypeProxy&lt;String&gt; {
@@ -1432,6 +1460,48 @@ tell Joe which types the interpreter should look for.</p>
     ...
 }
 </code></pre>
+<h2 id="type-lookup"><a class="header" href="#type-lookup">Type Lookup</a></h2>
+<p>At runtime, Joe sees a value and looks for the value's type proxy
+in its type registry.  This section explains how
+the lookup is done, as it can get complicated.</p>
+<p>First, Joe maintains two lookup tables:</p>
+<ul>
+<li>The <code>proxyTable</code>, a map from <code>Class</code> objects to <code>TypeProxy&lt;?&gt;</code> objects.</li>
+<li>The <code>opaqueTypes</code> table, a set if <code>Class</code> objects which are known not
+to have type proxies.</li>
+</ul>
+<p>Given these, the lookup logic is as follows:</p>
+<ul>
+<li>
+<p>If value's <code>Class</code> is found in the <code>proxyTable</code>, the proxy is returned
+immediately.  This is the most common case.</p>
+</li>
+<li>
+<p>Next, if the <code>Class</code> is found in the <code>opaqueTypes</code> table, the lookup
+fails immediately.</p>
+</li>
+<li>
+<p>Next, Joe checks the <code>proxyTable</code> for the value's superclass, and so on
+up the class hierarchy.</p>
+<ul>
+<li>If a proxy is found, it is cached back into the <code>proxyTable</code> for the
+value's concrete class.  It will be found immediately next time.</li>
+</ul>
+</li>
+<li>
+<p>Next, Joe checks the <code>proxyTable</code> for any interfaces implemented by the
+value's type, starting with the type's own <code>Class</code> and working its way
+up the class hierarchy.</p>
+<ul>
+<li>If a proxy is found, it is cached back into the <code>proxyTable</code> for the
+value's concrete class.  It will be found immediately next time.</li>
+</ul>
+</li>
+<li>
+<p>Finally, if no proxy has been found the value's <code>Class</code> is added to the
+<code>opaqueTypes</code> table, so that lookups will "fail fast" next time.</p>
+</li>
+</ul>
 <h2 id="the-supertype"><a class="header" href="#the-supertype">The Supertype</a></h2>
 <p>Sometimes it happens that both a type and its supertype are registered types;
 this is the case with Joe's <code>Error</code> and <code>AssertError</code> types.  In such a case,
@@ -1722,7 +1792,7 @@ for importing its own packages....</p>
 convenience to those learning the Joe language (and as a debugging aid
 for the Joe developer).</p>
 <p>It takes a single argument, a Joe script to execute.  It loads the script
-into a vanilla Joe interpreter, displaying any syntax errors;
+into a Joe interpreter, displaying any syntax errors;
 and if there are none executes the script and displays its output.</p>
 <p>Here's a simple script.</p>
 <pre><code class="language-joe">// hello.joe
@@ -1733,6 +1803,14 @@ println("Hello, world!");
 Hello, world!
 $
 </code></pre>
+<h2 id="the-joeconsole-api"><a class="header" href="#the-joeconsole-api">The <code>joe.console</code> API</a></h2>
+<p>The Joe interpreter used by <code>joe run</code> includes an optional Joe package,
+<a href="library/pkg.joe.console.html"><code>joe.console</code></a>, that allows Joe scripts to
+access the command line arguments, read standard input and text files, and
+write text files.  Follow the link for details.</p>
+<h2 id="extending-joe-1"><a class="header" href="#extending-joe-1">Extending Joe</a></h2>
+<p>A vanilla Joe interpreter has no way of accessing the platform except by
+printing output, and even that can be redirected by the client application.</p>
 <p>It is expected that projects using Joe will want to define an
 equivalent tool that includes the project-specific bindings.  See
 <a href="embedding/embedding.html">Embedding Joe</a> and
@@ -1754,6 +1832,12 @@ $
 <p>To display the result of an expression, type in the expression followed
 by a semicolon, as shown.  To execute the statement, do likewise.</p>
 <p>To exit the REPL, press <code>^D</code> or <code>^C</code>.</p>
+<h2 id="the-joeconsole-api-1"><a class="header" href="#the-joeconsole-api-1">The <code>joe.console</code> API</a></h2>
+<p>The Joe interpreter used by <code>joe repl</code> includes an optional Joe package,
+<a href="library/pkg.joe.console.html"><code>joe.console</code></a>, that allows Joe scripts to
+access the command line arguments, read standard input and text files, and
+write text files.  Follow the link for details.</p>
+<h2 id="extending-joe-2"><a class="header" href="#extending-joe-2">Extending Joe</a></h2>
 <p>It is expected that projects using Joe will want to define an
 equivalent tool that includes the project-specific bindings, along with
 various other niceties.  See
@@ -1912,8 +1996,10 @@ API documentation.<sup class="footnote-reference"><a href="#markdown">1</a></sup
 <li><a href="joe_doc.html#entity-types">Entity Types</a>
 <ul>
 <li><a href="joe_doc.html#the-package-entity">The <code>@package</code> Entity</a></li>
+<li><a href="joe_doc.html#the-packagetopic-entity">The <code>@packageTopic</code> Entity</a></li>
 <li><a href="joe_doc.html#the-function-entity">The <code>@function</code> Entity</a></li>
 <li><a href="joe_doc.html#the-type-entity">The <code>@type</code> Entity</a></li>
+<li><a href="joe_doc.html#the-typetopic-entity">The <code>@typeTopic</code> Entity</a></li>
 <li><a href="joe_doc.html#the-constant-entity">The <code>@constant</code> Entity</a></li>
 <li><a href="joe_doc.html#the-static-entity">The <code>@static</code> Entity</a></li>
 <li><a href="joe_doc.html#the-init-entity">The <code>@init</code> Entity</a></li>
@@ -1949,6 +2035,7 @@ following types of entity:</p>
 <li>Methods</li>
 </ul>
 </li>
+<li>Additional topics concerning a specific package or type</li>
 </ul>
 </li>
 </ul>
@@ -1987,8 +2074,10 @@ entity tags:</p>
 <li><code>@static &lt;name&gt;</code></li>
 <li><code>@init</code></li>
 <li><code>@method &lt;name&gt;</code></li>
+<li><code>@typeTopic &lt;name&gt;</code></li>
 </ul>
 </li>
+<li><code>@packageTopic &lt;name&gt;</code></li>
 </ul>
 </li>
 </ul>
@@ -2065,6 +2154,20 @@ following optional metadata:</p>
 // @title Joe Standard Library
 // The `joe` package contains Joe's standard library.
 </code></pre>
+<h3 id="the-packagetopic-entity"><a class="header" href="#the-packagetopic-entity">The <code>@packageTopic</code> Entity</a></h3>
+<p>A package's normal Markdown content goes near the top of the generated
+package page, below the index but above the function entries.  The
+<code>@packageTopic</code> entity is way to add titled Markdown content at the
+<em>bottom</em> of the package file, where it is out of the way.</p>
+<p>The <code>@packageTopic</code> entity begins with <code>@packageTopic &lt;name&gt;</code>, and has
+the following metadata:</p>
+<div class="table-wrapper"><table><thead><tr><th>Metadata Tag</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>@title string</code></td><td>Gives the topic a title.</td></tr>
+</tbody></table>
+</div>
+<p>The title string is used as a header in the generated content, and in
+links to that content.  In theory the <code>@title</code> tag is optional, but
+in practice one always wants to use it.</p>
 <h3 id="the-function-entity"><a class="header" href="#the-function-entity">The <code>@function</code> Entity</a></h3>
 <p>The <code>@function</code> entity documents a global function, and
 begins with <code>@function &lt;name&gt;</code>.  The <em>name</em> should be the name of
@@ -2109,6 +2212,23 @@ in the generated documentation.</p>
 // @extends Error
 // ...
 </code></pre>
+<h3 id="the-typetopic-entity"><a class="header" href="#the-typetopic-entity">The <code>@typeTopic</code> Entity</a></h3>
+<p>A type's normal Markdown content goes near the top of the generated
+type page, below the index but above the various constant and method
+entries.  The <code>@typeTopic</code> entity is way to add titled Markdown content
+at the <em>bottom</em> of the package file, where it is out of the way.</p>
+<p>The <code>@typeTopic</code> entity begins with <code>@typeTopic &lt;name&gt;</code>, and has
+the following metadata:</p>
+<div class="table-wrapper"><table><thead><tr><th>Metadata Tag</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>@title string</code></td><td>Gives the topic a title.</td></tr>
+</tbody></table>
+</div>
+<p>The title string is used as a header in the generated content, and in
+links to that content.  In theory the <code>@title</code> tag is optional, but
+in practice one always wants to use it.</p>
+<p>As an example, the <a href="library/type.joe.String.html"><code>String</code> type</a> uses a
+<code>@typeTopic</code> to document its
+<a href="library/type.joe.String.html#topic.formatting">format string syntax</a>.</p>
 <h3 id="the-constant-entity"><a class="header" href="#the-constant-entity">The <code>@constant</code> Entity</a></h3>
 <p>The <code>@constant</code> entity documents a constant defined by a type, and so
 begins with <code>@constant &lt;name&gt;</code>. The <em>name</em> should be the name of a
@@ -2152,8 +2272,10 @@ content in the entire documentation set.</li>
 </ul>
 <div class="table-wrapper"><table><thead><tr><th>Entity</th><th>Qualified</th><th>Unqualified</th></tr></thead><tbody>
 <tr><td><code>@package</code></td><td><code>&lt;pkg&gt;</code></td><td><code>&lt;pkg&gt;</code></td></tr>
+<tr><td><code>@packageTopic</code></td><td><code>&lt;pkg&gt;#topic.&lt;name&gt;</code></td><td><code>&lt;pkg&gt;#topic.&lt;name&gt;</code></td></tr>
 <tr><td><code>@function</code></td><td><code>&lt;pkg&gt;#function.&lt;name&gt;</code></td><td><code>function.&lt;name&gt;</code></td></tr>
 <tr><td><code>@type</code></td><td><code>&lt;pkg&gt;.&lt;type&gt;</code></td><td><code>&lt;type&gt;</code></td></tr>
+<tr><td><code>@typeTopic</code></td><td><code>&lt;pkg&gt;.&lt;type&gt;#topic.&lt;name&gt;</code></td><td><code>&lt;type&gt;#topic.&lt;name&gt;</code></td></tr>
 <tr><td><code>@constant</code></td><td><code>&lt;pkg&gt;.&lt;type&gt;#constant.&lt;name&gt;</code></td><td><code>&lt;type&gt;#constant.&lt;name&gt;</code></td></tr>
 <tr><td><code>@static</code></td><td><code>&lt;pkg&gt;.&lt;type&gt;#static.&lt;name&gt;</code></td><td><code>&lt;type&gt;#static.&lt;name&gt;</code></td></tr>
 <tr><td><code>@init</code></td><td><code>&lt;pkg&gt;.&lt;type&gt;#init</code></td><td><code>&lt;type&gt;#init</code></td></tr>
@@ -2236,6 +2358,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.html#function.catch">catch(<em>callable</em>)</a> → <a href="library/type.joe.Pair.html">Pair</a></li>
 <li><a href="library/pkg.joe.html#function.compare">compare(<em>a</em>, <em>b</em>)</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/pkg.joe.html#function.print">print(<em>text</em>)</a></li>
+<li><a href="library/pkg.joe.html#function.printf">printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="library/pkg.joe.html#function.println">println([<em>text</em>])</a></li>
 <li><a href="library/pkg.joe.html#function.stringify">stringify(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/pkg.joe.html#function.typeName">typeName(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -2362,6 +2485,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.String.html">String</a>
 <ul>
+<li><a href="library/type.joe.String.html#static.format">String.format(<em>fmt</em>, [<em>values</em>...])</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#static.join">String.join(<em>delimiter</em>, <em>list</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#init">String(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#method.charAt"><em>string</em>.charAt(<em>index</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -2398,6 +2522,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.StringBuilder.html#init">StringBuilder()</a> → <a href="library/type.joe.StringBuilder.html">StringBuilder</a></li>
 <li><a href="library/type.joe.StringBuilder.html#method.append"><em>stringBuilder</em>.append(<em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.StringBuilder.html#method.print"><em>stringBuilder</em>.print(<em>value</em>)</a> → this</li>
+<li><a href="library/type.joe.StringBuilder.html#method.printf"><em>stringBuilder</em>.printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="library/type.joe.StringBuilder.html#method.println"><em>stringBuilder</em>.println(<em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.StringBuilder.html#method.toString"><em>stringBuilder</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -2410,6 +2535,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 <ul>
 <li><a href="library/type.joe.console.Console.html#static.args">Console.args()</a> → List</li>
 <li><a href="library/type.joe.console.Console.html#static.cd">Console.cd(<em>path</em>)</a> → Path</li>
+<li><a href="library/type.joe.console.Console.html#static.exit">Console.exit([<em>code</em>])</a></li>
+<li><a href="library/type.joe.console.Console.html#static.mkdir">Console.mkdir(<em>path</em>)</a></li>
 <li><a href="library/type.joe.console.Console.html#static.pwd">Console.pwd()</a> → Path</li>
 <li><a href="library/type.joe.console.Console.html#static.read">Console.read()</a> → String</li>
 <li><a href="library/type.joe.console.Console.html#static.readFile">Console.readFile(<em>filePath</em>)</a> → String</li>
@@ -2464,11 +2591,16 @@ types, methods, and constants include in Joe's aPackage.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="joe-standard-library-joe"><a class="header" href="#joe-standard-library-joe">Joe Standard Library (<code>joe</code>)</a></h1>
 <hr />
 <p>The <code>joe</code> package contains Joe's standard library.</p>
+<p><strong><a href="library/pkg.joe.html#topics">Topics</a></strong></p>
+<ul>
+<li><a href="library/pkg.joe.html#topic.joe">Why "Joe"?</a></li>
+</ul>
 <p><strong><a href="library/pkg.joe.html#functions">Functions</a></strong></p>
 <ul>
 <li><a href="library/pkg.joe.html#function.catch">catch(<em>callable</em>)</a> → <a href="library/type.joe.Pair.html">Pair</a></li>
 <li><a href="library/pkg.joe.html#function.compare">compare(<em>a</em>, <em>b</em>)</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/pkg.joe.html#function.print">print(<em>text</em>)</a></li>
+<li><a href="library/pkg.joe.html#function.printf">printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="library/pkg.joe.html#function.println">println([<em>text</em>])</a></li>
 <li><a href="library/pkg.joe.html#function.stringify">stringify(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/pkg.joe.html#function.typeName">typeName(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -2508,6 +2640,14 @@ is useful when sorting collections.</p>
 <p><strong>print(<em>text</em>)</strong></p>
 <p>Prints its text to standard output (which might be
 redirected by the application).</p>
+<p><span id="function.printf"> </span></p>
+<h3 id="printf"><a class="header" href="#printf">printf()</a></h3>
+<hr />
+<p><strong>printf(<em>fmt</em>, [<em>values</em>...])</strong></p>
+<p>Formats its arguments given the <em>fmt</em> string, and prints the result
+to standard output (which might be redirected by the application).</p>
+<p>See <a href="library/type.joe.String.html#topic.formatting">String Formatting</a> for the format
+string syntax.</p>
 <p><span id="function.println"> </span></p>
 <h3 id="println"><a class="header" href="#println">println()</a></h3>
 <hr />
@@ -2525,6 +2665,9 @@ is functionally equivalent to <a href="library/type.joe.String.html#init"><code>
 <hr />
 <p><strong>typeName(<em>value</em>) → <a href="library/type.joe.String.html">String</a></strong></p>
 <p>Returns the name of the value's type.</p>
+<h2 id="topic.joe"><a class="header" href="#topic.joe">Why "Joe"?</a></h2>
+<hr />
+<p>My friend Joe's a straight shooter, and never misses his mark.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="asserterror-type-joe"><a class="header" href="#asserterror-type-joe"><code>AssertError</code> type (<code>joe</code>)</a></h1>
 <hr />
 <p><strong>Extends</strong>: <a href="library/type.joe.Error.html">Error</a><br></p>
@@ -3208,8 +3351,13 @@ two values from a function or method.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="string-type-joe"><a class="header" href="#string-type-joe"><code>String</code> type (<code>joe</code>)</a></h1>
 <hr />
 <p>A <code>String</code> is just a Java <code>String</code>, as accessed from a Joe script.</p>
+<p><strong><a href="library/type.joe.String.html#topics">Topics</a></strong></p>
+<ul>
+<li><a href="library/type.joe.String.html#topic.formatting">String Formatting</a></li>
+</ul>
 <p><strong><a href="library/type.joe.String.html#statics">Static Methods</a></strong></p>
 <ul>
+<li><a href="library/type.joe.String.html#static.format">String.format(<em>fmt</em>, [<em>values</em>...])</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#static.join">String.join(<em>delimiter</em>, <em>list</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
 <p><strong><a href="library/type.joe.String.html#init">Initializer</a></strong></p>
@@ -3249,6 +3397,12 @@ two values from a function or method.</p>
 <p><strong>Note</strong>: Joe provides a number of methods that Java does not.</p>
 <h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
 <hr />
+<p><span id="static.format"> </span></p>
+<h3 id="stringformat"><a class="header" href="#stringformat">String.format()</a></h3>
+<hr />
+<p><strong>String.format(<em>fmt</em>, [<em>values</em>...]) → <a href="library/type.joe.String.html">String</a></strong></p>
+<p>Formats the values into a string given the format string. See
+<a href="library/type.joe.String.html#topic.formatting">String Formatting</a>, below, for the format string syntax.</p>
 <p><span id="static.join"> </span></p>
 <h3 id="stringjoin"><a class="header" href="#stringjoin">String.join()</a></h3>
 <hr />
@@ -3420,6 +3574,74 @@ to the end of the string.</p>
 <hr />
 <p><strong><em>string</em>.toUpperCase() → <a href="library/type.joe.String.html">String</a></strong></p>
 <p>Returns this string converted to uppercase.</p>
+<h2 id="topic.formatting"><a class="header" href="#topic.formatting">String Formatting</a></h2>
+<hr />
+<p>The Joe <a href="library/type.joe.String.html#static.format"><code>String.format()</code></a> method formats strings similarly
+to the Java method of the same name, supporting a subset of
+<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Formatter.html#syntax">Java's format string syntax</a>.</p>
+<p>This section describes the supported subset.</p>
+<p>As with Java, the basic syntax is:</p>
+<pre><code>%[flags][width][.precision][conversion]
+</code></pre>
+<h3 id="conversions"><a class="header" href="#conversions">Conversions</a></h3>
+<p>The conversion codes are as follows:</p>
+<div class="table-wrapper"><table><thead><tr><th>Conversion</th><th>Input Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>b</code>, <code>B</code></td><td>Any</td><td><code>true</code> if truthy, <code>false</code> if falsey</td></tr>
+<tr><td><code>h</code>, <code>H</code></td><td>Any</td><td>The value's hash code as a hex string.</td></tr>
+<tr><td><code>s</code>, <code>S</code></td><td>Any</td><td>The value, stringified.</td></tr>
+<tr><td><code>d</code></td><td>Number</td><td>Converted to integer and formatted.</td></tr>
+<tr><td><code>x</code>, <code>X</code></td><td>Number</td><td>Converted to integer, formatted as hex</td></tr>
+<tr><td><code>e</code>, <code>E</code></td><td>Number</td><td>Decimal, scientific notation</td></tr>
+<tr><td><code>f</code></td><td>Number</td><td>Decimal</td></tr>
+<tr><td><code>g</code>, <code>G</code></td><td>Number</td><td>Decimal or scientific notation, as appropriate.</td></tr>
+<tr><td><code>%</code></td><td>n/a</td><td>A literal percent sign</td></tr>
+<tr><td><code>n</code></td><td>n/a</td><td>The platform-specific line separator</td></tr>
+</tbody></table>
+</div>
+<ul>
+<li>Note: the uppercase variant of the conversion is the same as the
+lowercase variant, but converts the output to uppercase.</li>
+</ul>
+<h3 id="precision"><a class="header" href="#precision">Precision</a></h3>
+<ul>
+<li>
+<p>For decimal conversions, the <em>precision</em> is the number of digits after
+the decimal place.</p>
+</li>
+<li>
+<p>For the conversions with input type "Any" in the above table, the
+natural length of the output might be longer than the desired <em>width</em>.
+In this case, the <em>precision</em> field specifies the maximum width of
+the output.</p>
+</li>
+<li>
+<p>The <em>precision</em> field cannot be used with the <code>d</code>, <code>x</code>, and <code>X</code>
+conversions.</p>
+</li>
+</ul>
+<h3 id="flags"><a class="header" href="#flags">Flags</a></h3>
+<p>The supported flags are as follows, and apply only to the specified
+argument type.</p>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Input Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>-</code></td><td>Any</td><td>Result is left-justified.</td></tr>
+<tr><td><code>+</code></td><td>Number</td><td>Result always includes a sign</td></tr>
+<tr><td>space</td><td>Number</td><td>Leading space for positive values</td></tr>
+<tr><td><code>0</code></td><td>Number</td><td>Padded with leading zeros</td></tr>
+<tr><td><code>,</code></td><td>Number</td><td>Use local-specific grouping separators</td></tr>
+<tr><td><code>(</code></td><td>Number</td><td>Enclose negative numbers in parentheses</td></tr>
+</tbody></table>
+</div>
+<h3 id="whats-not-supported"><a class="header" href="#whats-not-supported">What's Not Supported</a></h3>
+<p>Joe's <code>String.format()</code> method does <em>not</em> support the following:</p>
+<ul>
+<li>Argument indices, using <code>$</code> syntax.</li>
+<li>Date/time formatting.</li>
+</ul>
+<p>I don't use argument indices with Java's <code>String.format()</code>, as I find
+them to be fragile; and I've always found it weird to combine simple
+type formatting and complex date/time formatting in what's meant to
+be a type-safe clone of Java's <code>printf()</code> syntax.  I'd much prefer
+to provide a distinct API for using Java's <code>java.time</code> package.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="stringbuilder-type-joe"><a class="header" href="#stringbuilder-type-joe"><code>StringBuilder</code> type (<code>joe</code>)</a></h1>
 <hr />
 <p>A Joe <code>StringBuilder</code> is a Java <code>StringBuilder</code>, with a variety of
@@ -3432,6 +3654,7 @@ methods.</p>
 <ul>
 <li><a href="library/type.joe.StringBuilder.html#method.append"><em>stringBuilder</em>.append(<em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.StringBuilder.html#method.print"><em>stringBuilder</em>.print(<em>value</em>)</a> → this</li>
+<li><a href="library/type.joe.StringBuilder.html#method.printf"><em>stringBuilder</em>.printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="library/type.joe.StringBuilder.html#method.println"><em>stringBuilder</em>.println(<em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.StringBuilder.html#method.toString"><em>stringBuilder</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -3451,6 +3674,13 @@ methods.</p>
 <hr />
 <p><strong><em>stringBuilder</em>.print(<em>value</em>) → this</strong></p>
 <p>Adds the value to the buffer.</p>
+<p><span id="method.printf"> </span></p>
+<h3 id="stringbuilderprintf"><a class="header" href="#stringbuilderprintf"><em>stringBuilder</em>.printf()</a></h3>
+<hr />
+<p><strong><em>stringBuilder</em>.printf(<em>fmt</em>, [<em>values</em>...])</strong></p>
+<p>Formats its arguments given the <em>fmt</em> string, and appends the result
+to the buffer.  See <a href="library/type.joe.String.html#topic.formatting">String Formatting</a> for the format
+string syntax.</p>
 <p><span id="method.println"> </span></p>
 <h3 id="stringbuilderprintln"><a class="header" href="#stringbuilderprintln"><em>stringBuilder</em>.println()</a></h3>
 <hr />
@@ -3656,12 +3886,18 @@ If unset, defaults to the folder containing the <code>doc_config.joe</code>
 file.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="joeconsole-package"><a class="header" href="#joeconsole-package"><code>joe.console</code> package</a></h1>
 <hr />
-<p>This package contains an API for use by simple command-line tools.
-It is provided primarily as an example, and in an effort to make
-<code>joe run</code> and <code>joe repl</code> somewhat useful.</p>
+<p>This package contains an API for use by simple command-line tools.</p>
 <p><strong>Types</strong></p>
 <ul>
 <li><a href="library/type.joe.console.Console.html">Console</a></li>
+</ul>
+<p>Using it, clients can:</p>
+<ul>
+<li>Acquire the command line arguments</li>
+<li>Read from System.in</li>
+<li>Read from a file</li>
+<li>Write to a file</li>
+<li>Query and set the current working directory</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="console-type-joeconsole"><a class="header" href="#console-type-joeconsole"><code>Console</code> type (<code>joe.console</code>)</a></h1>
 <hr />
@@ -3671,6 +3907,8 @@ environment, sufficient to writing simple scripts.</p>
 <ul>
 <li><a href="library/type.joe.console.Console.html#static.args">Console.args()</a> → List</li>
 <li><a href="library/type.joe.console.Console.html#static.cd">Console.cd(<em>path</em>)</a> → Path</li>
+<li><a href="library/type.joe.console.Console.html#static.exit">Console.exit([<em>code</em>])</a></li>
+<li><a href="library/type.joe.console.Console.html#static.mkdir">Console.mkdir(<em>path</em>)</a></li>
 <li><a href="library/type.joe.console.Console.html#static.pwd">Console.pwd()</a> → Path</li>
 <li><a href="library/type.joe.console.Console.html#static.read">Console.read()</a> → String</li>
 <li><a href="library/type.joe.console.Console.html#static.readFile">Console.readFile(<em>filePath</em>)</a> → String</li>
@@ -3692,6 +3930,19 @@ filtered by the application.</p>
 <p>Changes the current working directory to the given path.  If
 the path is relative, it is treated as relative to the
 current working directory.</p>
+<p><span id="static.exit"> </span></p>
+<h3 id="consoleexit"><a class="header" href="#consoleexit">Console.exit()</a></h3>
+<hr />
+<p><strong>Console.exit([<em>code</em>])</strong></p>
+<p>Exits the application with the given exit <em>code</em>, which defaults
+to 0.</p>
+<p><span id="static.mkdir"> </span></p>
+<h3 id="consolemkdir"><a class="header" href="#consolemkdir">Console.mkdir()</a></h3>
+<hr />
+<p><strong>Console.mkdir(<em>path</em>)</strong></p>
+<p>Creates the directory given its path, including any required
+parent directories.  If the path is relative, it is treated as
+relative to the current working directory.</p>
 <p><span id="static.pwd"> </span></p>
 <h3 id="consolepwd"><a class="header" href="#consolepwd">Console.pwd()</a></h3>
 <hr />
@@ -3729,6 +3980,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.html#function.catch">catch(<em>callable</em>)</a> → <a href="library/type.joe.Pair.html">Pair</a></li>
 <li><a href="library/pkg.joe.html#function.compare">compare(<em>a</em>, <em>b</em>)</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/pkg.joe.html#function.print">print(<em>text</em>)</a></li>
+<li><a href="library/pkg.joe.html#function.printf">printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="library/pkg.joe.html#function.println">println([<em>text</em>])</a></li>
 <li><a href="library/pkg.joe.html#function.stringify">stringify(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/pkg.joe.html#function.typeName">typeName(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -3855,6 +4107,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.String.html">String</a>
 <ul>
+<li><a href="library/type.joe.String.html#static.format">String.format(<em>fmt</em>, [<em>values</em>...])</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#static.join">String.join(<em>delimiter</em>, <em>list</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#init">String(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.String.html#method.charAt"><em>string</em>.charAt(<em>index</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -3891,6 +4144,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.StringBuilder.html#init">StringBuilder()</a> → <a href="library/type.joe.StringBuilder.html">StringBuilder</a></li>
 <li><a href="library/type.joe.StringBuilder.html#method.append"><em>stringBuilder</em>.append(<em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.StringBuilder.html#method.print"><em>stringBuilder</em>.print(<em>value</em>)</a> → this</li>
+<li><a href="library/type.joe.StringBuilder.html#method.printf"><em>stringBuilder</em>.printf(<em>fmt</em>, [<em>values</em>...])</a></li>
 <li><a href="library/type.joe.StringBuilder.html#method.println"><em>stringBuilder</em>.println(<em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.StringBuilder.html#method.toString"><em>stringBuilder</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -3903,6 +4157,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 <ul>
 <li><a href="library/type.joe.console.Console.html#static.args">Console.args()</a> → List</li>
 <li><a href="library/type.joe.console.Console.html#static.cd">Console.cd(<em>path</em>)</a> → Path</li>
+<li><a href="library/type.joe.console.Console.html#static.exit">Console.exit([<em>code</em>])</a></li>
+<li><a href="library/type.joe.console.Console.html#static.mkdir">Console.mkdir(<em>path</em>)</a></li>
 <li><a href="library/type.joe.console.Console.html#static.pwd">Console.pwd()</a> → Path</li>
 <li><a href="library/type.joe.console.Console.html#static.read">Console.read()</a> → String</li>
 <li><a href="library/type.joe.console.Console.html#static.readFile">Console.readFile(<em>filePath</em>)</a> → String</li>

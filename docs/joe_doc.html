@@ -190,8 +190,10 @@ API documentation.<sup class="footnote-reference"><a href="#markdown">1</a></sup
 <li><a href="#entity-types">Entity Types</a>
 <ul>
 <li><a href="#the-package-entity">The <code>@package</code> Entity</a></li>
+<li><a href="#the-packagetopic-entity">The <code>@packageTopic</code> Entity</a></li>
 <li><a href="#the-function-entity">The <code>@function</code> Entity</a></li>
 <li><a href="#the-type-entity">The <code>@type</code> Entity</a></li>
+<li><a href="#the-typetopic-entity">The <code>@typeTopic</code> Entity</a></li>
 <li><a href="#the-constant-entity">The <code>@constant</code> Entity</a></li>
 <li><a href="#the-static-entity">The <code>@static</code> Entity</a></li>
 <li><a href="#the-init-entity">The <code>@init</code> Entity</a></li>
@@ -227,6 +229,7 @@ following types of entity:</p>
 <li>Methods</li>
 </ul>
 </li>
+<li>Additional topics concerning a specific package or type</li>
 </ul>
 </li>
 </ul>
@@ -265,8 +268,10 @@ entity tags:</p>
 <li><code>@static &lt;name&gt;</code></li>
 <li><code>@init</code></li>
 <li><code>@method &lt;name&gt;</code></li>
+<li><code>@typeTopic &lt;name&gt;</code></li>
 </ul>
 </li>
+<li><code>@packageTopic &lt;name&gt;</code></li>
 </ul>
 </li>
 </ul>
@@ -343,6 +348,20 @@ following optional metadata:</p>
 // @title Joe Standard Library
 // The `joe` package contains Joe's standard library.
 </code></pre>
+<h3 id="the-packagetopic-entity"><a class="header" href="#the-packagetopic-entity">The <code>@packageTopic</code> Entity</a></h3>
+<p>A package's normal Markdown content goes near the top of the generated
+package page, below the index but above the function entries.  The
+<code>@packageTopic</code> entity is way to add titled Markdown content at the
+<em>bottom</em> of the package file, where it is out of the way.</p>
+<p>The <code>@packageTopic</code> entity begins with <code>@packageTopic &lt;name&gt;</code>, and has
+the following metadata:</p>
+<div class="table-wrapper"><table><thead><tr><th>Metadata Tag</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>@title string</code></td><td>Gives the topic a title.</td></tr>
+</tbody></table>
+</div>
+<p>The title string is used as a header in the generated content, and in
+links to that content.  In theory the <code>@title</code> tag is optional, but
+in practice one always wants to use it.</p>
 <h3 id="the-function-entity"><a class="header" href="#the-function-entity">The <code>@function</code> Entity</a></h3>
 <p>The <code>@function</code> entity documents a global function, and
 begins with <code>@function &lt;name&gt;</code>.  The <em>name</em> should be the name of
@@ -387,6 +406,23 @@ in the generated documentation.</p>
 // @extends Error
 // ...
 </code></pre>
+<h3 id="the-typetopic-entity"><a class="header" href="#the-typetopic-entity">The <code>@typeTopic</code> Entity</a></h3>
+<p>A type's normal Markdown content goes near the top of the generated
+type page, below the index but above the various constant and method
+entries.  The <code>@typeTopic</code> entity is way to add titled Markdown content
+at the <em>bottom</em> of the package file, where it is out of the way.</p>
+<p>The <code>@typeTopic</code> entity begins with <code>@typeTopic &lt;name&gt;</code>, and has
+the following metadata:</p>
+<div class="table-wrapper"><table><thead><tr><th>Metadata Tag</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>@title string</code></td><td>Gives the topic a title.</td></tr>
+</tbody></table>
+</div>
+<p>The title string is used as a header in the generated content, and in
+links to that content.  In theory the <code>@title</code> tag is optional, but
+in practice one always wants to use it.</p>
+<p>As an example, the <a href="library/type.joe.String.html"><code>String</code> type</a> uses a
+<code>@typeTopic</code> to document its
+<a href="library/type.joe.String.html#topic.formatting">format string syntax</a>.</p>
 <h3 id="the-constant-entity"><a class="header" href="#the-constant-entity">The <code>@constant</code> Entity</a></h3>
 <p>The <code>@constant</code> entity documents a constant defined by a type, and so
 begins with <code>@constant &lt;name&gt;</code>. The <em>name</em> should be the name of a
@@ -430,8 +466,10 @@ content in the entire documentation set.</li>
 </ul>
 <div class="table-wrapper"><table><thead><tr><th>Entity</th><th>Qualified</th><th>Unqualified</th></tr></thead><tbody>
 <tr><td><code>@package</code></td><td><code>&lt;pkg&gt;</code></td><td><code>&lt;pkg&gt;</code></td></tr>
+<tr><td><code>@packageTopic</code></td><td><code>&lt;pkg&gt;#topic.&lt;name&gt;</code></td><td><code>&lt;pkg&gt;#topic.&lt;name&gt;</code></td></tr>
 <tr><td><code>@function</code></td><td><code>&lt;pkg&gt;#function.&lt;name&gt;</code></td><td><code>function.&lt;name&gt;</code></td></tr>
 <tr><td><code>@type</code></td><td><code>&lt;pkg&gt;.&lt;type&gt;</code></td><td><code>&lt;type&gt;</code></td></tr>
+<tr><td><code>@typeTopic</code></td><td><code>&lt;pkg&gt;.&lt;type&gt;#topic.&lt;name&gt;</code></td><td><code>&lt;type&gt;#topic.&lt;name&gt;</code></td></tr>
 <tr><td><code>@constant</code></td><td><code>&lt;pkg&gt;.&lt;type&gt;#constant.&lt;name&gt;</code></td><td><code>&lt;type&gt;#constant.&lt;name&gt;</code></td></tr>
 <tr><td><code>@static</code></td><td><code>&lt;pkg&gt;.&lt;type&gt;#static.&lt;name&gt;</code></td><td><code>&lt;type&gt;#static.&lt;name&gt;</code></td></tr>
 <tr><td><code>@init</code></td><td><code>&lt;pkg&gt;.&lt;type&gt;#init</code></td><td><code>&lt;type&gt;#init</code></td></tr>

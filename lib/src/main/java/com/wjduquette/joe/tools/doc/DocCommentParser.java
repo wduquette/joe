@@ -55,10 +55,12 @@ class DocCommentParser {
 
     private static final String PACKAGE = "@package";
     private static final String TITLE = "@title";
+    private static final String PACKAGE_TOPIC = "@packageTopic";
     private static final String FUNCTION = "@function";
     private static final String ARGS = "@args";
     private static final String RESULT = "@result";
     private static final String TYPE = "@type";
+    private static final String TYPE_TOPIC = "@typeTopic";
     private static final String EXTENDS = "@extends";
     private static final String CONSTANT = "@constant";
     private static final String STATIC = "@static";
@@ -70,11 +72,12 @@ class DocCommentParser {
     );
 
     private static final Set<String> PACKAGE_CHILD_ENDERS = Set.of(
-        PACKAGE, FUNCTION, TYPE
+        PACKAGE, FUNCTION, TYPE, PACKAGE_TOPIC
     );
 
     private static final Set<String> TYPE_CHILD_ENDERS = Set.of(
-        PACKAGE, FUNCTION, TYPE, CONSTANT, STATIC, INIT, METHOD
+        PACKAGE, FUNCTION, TYPE, PACKAGE_TOPIC,
+        CONSTANT, STATIC, INIT, METHOD, TYPE_TOPIC
     );
 
     private void _parse() {
@@ -132,7 +135,37 @@ class DocCommentParser {
                 case TITLE -> pkg.setTitle(tag.value());
                 case FUNCTION -> _function(pkg, tag);
                 case TYPE -> _type(pkg, tag);
+                case PACKAGE_TOPIC -> _packageTopic(pkg, tag);
                 default -> throw error(previous(), "Unexpected tag: " + tag);
+            }
+        }
+    }
+
+    private void _packageTopic(PackageEntry pkg, Tag topicTag) {
+        trace("_packageTopic", pkg, topicTag);
+
+        TopicEntry topic = new TopicEntry(pkg, topicTag.value());
+
+        if (!Joe.isIdentifier(topicTag.value())) {
+            throw error(previous(), expected(topicTag));
+        }
+
+        pkg.topics().add(topic);
+
+        while (!atEnd()) {
+            if (!advanceToTag(topic)) break;
+
+            var tag = peek().getTag();
+
+            if (PACKAGE_CHILD_ENDERS.contains(tag.name())) {
+                break;
+            }
+
+            advance();
+            if (tag.name().equals(TITLE)) {
+                topic.setTitle(tag.value());
+            } else {
+                throw error(previous(), "Unexpected tag: " + tag);
             }
         }
     }
@@ -171,6 +204,7 @@ class DocCommentParser {
     }
 
     private void _type(PackageEntry pkg, Tag typeTag) {
+        trace("_type", typeTag);
         TypeEntry type = new TypeEntry(pkg, typeTag.value());
         remember(type);
 
@@ -184,9 +218,12 @@ class DocCommentParser {
 
             var tag = peek().getTag();
 
+            trace("_type ending?");
+
             if (PACKAGE_CHILD_ENDERS.contains(tag.name())) {
                 break;
             }
+            trace("_type parsing");
 
             advance();
             switch (tag.name()) {
@@ -195,6 +232,7 @@ class DocCommentParser {
                 case STATIC -> _static(type, tag);
                 case INIT -> _init(type, tag);
                 case METHOD -> _method(type, tag);
+                case TYPE_TOPIC -> _typeTopic(type, tag);
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
@@ -207,6 +245,7 @@ class DocCommentParser {
         }
         return result;
     }
+
 
     private void _constant(TypeEntry type, Tag constantTag) {
         ConstantEntry constant = new ConstantEntry(type, constantTag.value());
@@ -307,6 +346,35 @@ class DocCommentParser {
                 case ARGS -> method.argSpecs().add(_argSpec(tag));
                 case RESULT -> method.setResult(_result(tag));
                 default -> throw error(previous(), "Unexpected tag: " + tag);
+            }
+        }
+    }
+
+    private void _typeTopic(TypeEntry type, Tag topicTag) {
+        trace("_typeTopic", type, topicTag);
+
+        TopicEntry topic = new TopicEntry(type, topicTag.value());
+
+        if (!Joe.isIdentifier(topicTag.value())) {
+            throw error(previous(), expected(topicTag));
+        }
+
+        type.topics().add(topic);
+
+        while (!atEnd()) {
+            if (!advanceToTag(topic)) break;
+
+            var tag = peek().getTag();
+
+            if (TYPE_CHILD_ENDERS.contains(tag.name())) {
+                break;
+            }
+
+            advance();
+            if (tag.name().equals(TITLE)) {
+                topic.setTitle(tag.value());
+            } else {
+                throw error(previous(), "Unexpected tag: " + tag);
             }
         }
     }

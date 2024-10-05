@@ -22,6 +22,15 @@ by a semicolon, as shown.  To execute the statement, do likewise.
 
 To exit the REPL, press `^D` or `^C`.
 
+## The `joe.console` API
+
+The Joe interpreter used by `joe repl` includes an optional Joe package,
+[`joe.console`](library/pkg.joe.console.md), that allows Joe scripts to
+access the command line arguments, read standard input and text files, and
+write text files.  Follow the link for details.
+
+## Extending Joe
+
 It is expected that projects using Joe will want to define an
 equivalent tool that includes the project-specific bindings, along with
 various other niceties.  See

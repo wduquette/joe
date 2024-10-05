@@ -194,6 +194,7 @@ For example,</p>
 <ul>
 <li><a href="#the-script-level-type-name">The Script-level Type Name</a></li>
 <li><a href="#the-proxied-types">The Proxied Types</a></li>
+<li><a href="#type-lookup">Type Lookup</a></li>
 <li><a href="#the-supertype">The Supertype</a></li>
 <li><a href="#stringification">Stringification</a></li>
 <li><a href="#iterability">Iterability</a></li>
@@ -227,8 +228,7 @@ kindness to the client.</li>
 <p>When the proxy is registered Joe will create a global variable with the
 same name as the type, e.g., <code>String</code>.</p>
 <h2 id="the-proxied-types"><a class="header" href="#the-proxied-types">The Proxied Types</a></h2>
-<p>Second, the proxy must explicitly identify the proxied type or types, which
-must be genuine classes, not interfaces.</p>
+<p>Second, the proxy must explicitly identify the proxied type or types.</p>
 <p>Usually a proxy will proxy the single type <code>V</code>, but if <code>V</code> is an interface
 the relevant classes need to be identified. Here's the first case:</p>
 <pre><code class="language-java">public class StringProxy extends TypeProxy&lt;String&gt; {
@@ -250,6 +250,48 @@ tell Joe which types the interpreter should look for.</p>
     ...
 }
 </code></pre>
+<h2 id="type-lookup"><a class="header" href="#type-lookup">Type Lookup</a></h2>
+<p>At runtime, Joe sees a value and looks for the value's type proxy
+in its type registry.  This section explains how
+the lookup is done, as it can get complicated.</p>
+<p>First, Joe maintains two lookup tables:</p>
+<ul>
+<li>The <code>proxyTable</code>, a map from <code>Class</code> objects to <code>TypeProxy&lt;?&gt;</code> objects.</li>
+<li>The <code>opaqueTypes</code> table, a set if <code>Class</code> objects which are known not
+to have type proxies.</li>
+</ul>
+<p>Given these, the lookup logic is as follows:</p>
+<ul>
+<li>
+<p>If value's <code>Class</code> is found in the <code>proxyTable</code>, the proxy is returned
+immediately.  This is the most common case.</p>
+</li>
+<li>
+<p>Next, if the <code>Class</code> is found in the <code>opaqueTypes</code> table, the lookup
+fails immediately.</p>
+</li>
+<li>
+<p>Next, Joe checks the <code>proxyTable</code> for the value's superclass, and so on
+up the class hierarchy.</p>
+<ul>
+<li>If a proxy is found, it is cached back into the <code>proxyTable</code> for the
+value's concrete class.  It will be found immediately next time.</li>
+</ul>
+</li>
+<li>
+<p>Next, Joe checks the <code>proxyTable</code> for any interfaces implemented by the
+value's type, starting with the type's own <code>Class</code> and working its way
+up the class hierarchy.</p>
+<ul>
+<li>If a proxy is found, it is cached back into the <code>proxyTable</code> for the
+value's concrete class.  It will be found immediately next time.</li>
+</ul>
+</li>
+<li>
+<p>Finally, if no proxy has been found the value's <code>Class</code> is added to the
+<code>opaqueTypes</code> table, so that lookups will "fail fast" next time.</p>
+</li>
+</ul>
 <h2 id="the-supertype"><a class="header" href="#the-supertype">The Supertype</a></h2>
 <p>Sometimes it happens that both a type and its supertype are registered types;
 this is the case with Joe's <code>Error</code> and <code>AssertError</code> types.  In such a case,

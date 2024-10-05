@@ -19,6 +19,9 @@ class PackageEntry extends Entry {
     // The package's types
     private final List<TypeEntry> types = new ArrayList<>();
 
+    // The package's topics
+    private final List<TopicEntry> topics = new ArrayList<>();
+
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -32,6 +35,7 @@ class PackageEntry extends Entry {
         var result = new ArrayList<Entry>();
 
         result.addAll(functions);
+        result.addAll(topics);
 
         for (var type : types) {
             result.add(type);
@@ -41,6 +45,7 @@ class PackageEntry extends Entry {
                 result.add(type.initializer());
             }
             result.addAll(type.methods());
+            result.addAll(type.topics());
         }
 
         return result;
@@ -57,6 +62,7 @@ class PackageEntry extends Entry {
 
     List<FunctionEntry> functions() { return functions; }
     List<TypeEntry>     types()     { return types; }
+    List<TopicEntry>    topics()    { return topics; }
 
     void setTitle(String title) {
         this.title = title;

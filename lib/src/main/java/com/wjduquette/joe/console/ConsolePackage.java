@@ -27,6 +27,7 @@ public class ConsolePackage extends JoePackage {
     //**
     // @package joe.console
     // This package contains an API for use by simple command-line tools.
+    //
     // Using it, clients can:
     //
     // - Acquire the command line arguments
