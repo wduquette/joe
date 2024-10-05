@@ -35,6 +35,7 @@ class PackageEntry extends Entry {
         var result = new ArrayList<Entry>();
 
         result.addAll(functions);
+        result.addAll(topics);
 
         for (var type : types) {
             result.add(type);
@@ -44,6 +45,7 @@ class PackageEntry extends Entry {
                 result.add(type.initializer());
             }
             result.addAll(type.methods());
+            result.addAll(type.topics());
         }
 
         return result;

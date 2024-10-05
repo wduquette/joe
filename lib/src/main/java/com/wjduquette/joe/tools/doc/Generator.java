@@ -544,6 +544,8 @@ class Generator {
                 -> mono(fn.name() + "()");
             case MethodEntry m
                 -> mono(m.name() + "()");
+            case TopicEntry t
+                -> t.title();
             default -> throw new IllegalArgumentException("Unknown entry type!");
         };
     }
