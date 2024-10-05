@@ -5,9 +5,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A class to format strings for Joe.
+ */
 public class StringFormatter {
     private static final Map<String,List<ArgType>> formatCache = new HashMap<>();
 
+    /**
+     * Formats a string in the Joe context, validating arguments and converting
+     * doubles to integers as needed.  See the Joe User's Guide for
+     * constraints on the format string.  The format string is parsed to the
+     * extent needed to:
+     *
+     * <ul>
+     * <li>Exclude unsupported conversions, etc.</li>
+     * <li>Determine the expected types of the values to format.</li>
+     * </ul>
+     *
+     * <p>For the numeric conversions, the code expects Doubles or
+     * Integers; it does not support any other numeric types.</p>
+     *
+     * <p>Note: if it weren't for the double-to-integer conversion, we
+     * could just call `String.format()` and throw any exception as a
+     * JoeError.  But the feature would be much less useful that way.</p>
+     * @param joe The Joe instance.
+     * @param fmt The format string
+     * @param args The arguments
+     * @return The formatted string.
+     */
     public static String format(
         Joe joe,
         String fmt,
@@ -15,20 +40,19 @@ public class StringFormatter {
     ) {
         // FIRST, parse the format for the argument types, caching the
         // result for later.
-        var types = formatCache.computeIfAbsent(fmt,
-            f -> new FormatParser(f).parse());
+        var types = formatCache.computeIfAbsent(fmt, f -> new Parser(f).parse());
 
         // NEXT, do we have the right number of arguments?
-        if (types.size() != args.size() - 1) {
+        if (types.size() != args.size()) {
             throw new JoeError("Expected " + types.size() +
-                " values to format, got: " + (args.size() - 1));
+                " values to format, got: " + args.size() + ".");
         }
 
         // NEXT, build the array of values, doing any needed checks and
         // conversions.
         var values = new Object[types.size()];
         for (var i = 0; i < types.size(); i++) {
-            var arg = args.get(i + 1);
+            var arg = args.get(i);
             values[i] = switch (types.get(i)) {
                 case ANY -> arg;
                 case DOUBLE -> {
@@ -38,7 +62,7 @@ public class StringFormatter {
                         yield (double)num;
                     }
                     throw new JoeError(
-                        "Conversion " + i + " expected a number, got: " +
+                        "Conversion expected a number, got: " +
                             joe.typeName(arg) + " '" +
                             joe.stringify(arg) + "'.",
                         "In format '" + fmt + "'.");
@@ -50,7 +74,7 @@ public class StringFormatter {
                         yield arg;
                     }
                     throw new JoeError(
-                        "Conversion " + i + " expected a number, got: " +
+                        "Conversion expected a number, got: " +
                             joe.typeName(arg) + " '" +
                             joe.stringify(arg) + "'.",
                         "In format '" + fmt + "'.");
@@ -58,8 +82,12 @@ public class StringFormatter {
             };
         }
 
-        // NEXT, format the string.
-        return String.format(fmt, values);
+        // NEXT, format the string, rethrowing any format errors.
+        try {
+            return String.format(fmt, values);
+        } catch (Exception ex) {
+            throw new JoeError("Invalid format string: '" + fmt + "'.");
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -73,87 +101,53 @@ public class StringFormatter {
         INT
     }
 
-    private enum TokenType {
-        // Single character tokens
-        PERCENT,
-        FLAG,
-        DOT,
-        CONVERSION,
-
-        // Multi-character tokens
-        NUMBER,  // Width or precision
-
-        EOF
-    }
-
-    private record Token(TokenType type, String lexeme) {}
-
-    private static class Scanner {
+    private static class Parser {
         private final String source;
-        private final List<Token> tokens = new ArrayList<>();
-        private int start = 0;
         private int current = 0;
 
-        Scanner(String source) {
+        Parser(String source) {
             this.source = source;
         }
 
-        List<Token> scanTokens() {
-            // FIRST, get leading text.
-            text();
+        private List<ArgType> parse() {
+            var result = new ArrayList<ArgType>();
 
-            // NEXT, scan for content.
+            var inConversion = false;
             while (!isAtEnd()) {
-                start = current;
-                scanToken();
-            }
+                var c = advance();
 
-            tokens.add(new Token(TokenType.EOF, null));
-            return tokens;
-        }
+                if (inConversion) {
+                    switch (c) {
+                        // Conversions; save the arg type (if any)
+                        case 'b', 'B', 'h', 'H', 's', 'S' -> {
+                            result.add(ArgType.ANY);
+                            inConversion = false;
+                        }
+                        case 'd', 'x', 'X' -> {
+                            result.add(ArgType.INT);
+                            inConversion = false;
+                        }
+                        case 'e', 'E', 'f', 'g', 'G' -> {
+                            result.add(ArgType.DOUBLE);
+                            inConversion = false;
+                        }
+                        case 'n', '%' -> inConversion = false;
 
-        private void scanToken() {
-            char c = advance();
-            switch (c) {
-                case '-', '+', ' ', ',', '(' -> addToken(TokenType.FLAG);
-                case 'b', 'B', 'd', 'e', 'E', 'f', 'g', 'G', 'h', 'H', 'n',
-                     's', 'S', '%' -> addToken(TokenType.CONVERSION);
-                default -> {
-                    if (isDigit(c)) {
-                        number();
-                    } else {
-                        // Anything else is invalid in a conversion; skip to
-                        // the next %.
-                        text();
+                        // Valid characters within a conversion.
+                        case '-', '+', ' ', ',', '(', '.',
+                             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+                            -> {}
+
+                        // Characters that shouldn't be with a Joe conversion.
+                        default -> throw new JoeError(
+                            "Invalid character in conversion: '" + c + "'.");
                     }
+                } else {
+                    if (c == '%') inConversion = true;
                 }
             }
-        }
 
-        private void text() {
-            while (!isAtEnd() && peek() != '%') advance();
-
-            // Just skip the token; we don't care about it.
-            start = current;
-
-            if (peek() == '%') {
-                advance();
-                addToken(TokenType.PERCENT);
-            }
-        }
-
-        private void number() {
-            while (isDigit(peek())) advance();
-            addToken(TokenType.NUMBER);
-        }
-
-        private boolean isDigit(char c) {
-            return c >= '0' && c <= '9';
-        }
-
-        private char peek() {
-            if (isAtEnd()) return '\0';
-            return source.charAt(current);
+            return result;
         }
 
         private boolean isAtEnd() {
@@ -163,119 +157,5 @@ public class StringFormatter {
         private char advance() {
             return source.charAt(current++);
         }
-
-        private void addToken(TokenType type) {
-            tokens.add(new Token(type, source.substring(start, current)));
-        }
     }
-
-    private static class FormatParser {
-        private final List<Token> tokens;
-        private int current = 0;
-
-        FormatParser(String source) {
-            this.tokens = new Scanner(source).scanTokens();
-            System.out.println("Got tokens: " + tokens);
-        }
-
-        List<ArgType> parse() {
-            var argTypes = new ArrayList<ArgType>();
-
-            while (!isAtEnd()) {
-                var argType = argType();
-                if (argType != null) {
-                    argTypes.add(argType());
-                }
-            }
-
-            return argTypes;
-        }
-
-        private ArgType argType() {
-            consume(TokenType.PERCENT, "Expected '%'.");
-
-            var gotFlag = false;
-            var gotWidth = false;
-            var gotPrecision = false;
-
-            while (match(TokenType.FLAG)) {
-                gotFlag = true;
-            }
-
-            if (check(TokenType.NUMBER)) {
-                gotWidth = true;
-                advance();
-            }
-
-            if (check(TokenType.DOT)) {
-                gotPrecision = true;
-                consume(TokenType.NUMBER,
-                    "Expected precision after '.'.");
-            }
-
-            var conv = consume(TokenType.CONVERSION,
-                "Expected conversion character.");
-            return switch (conv.lexeme().charAt(0)) {
-                case 'b', 'B', 'h', 'H', 's', 'S' -> ArgType.ANY;
-                case 'd', 'x', 'X' -> {
-                    if (gotPrecision) {
-                        throw new JoeError(
-                        "The precision field is not allowed for this conversion: '" +
-                            conv.lexeme() + "'.");
-                    }
-                    yield ArgType.INT;
-                }
-                case 'e', 'E', 'f', 'g', 'G' -> ArgType.DOUBLE;
-                default -> {
-                    if (gotFlag || gotWidth || gotPrecision) {
-                        throw new JoeError(
-                            "Flags, width, etc., are not allowed for this conversion: '" +
-                            conv.lexeme() + "'.");
-                    }
-                    yield null;
-                }
-            };
-        }
-
-        private Token peek() {
-            return tokens.get(current);
-        }
-
-        private Token previous() {
-            return tokens.get(current - 1);
-        }
-
-        private Token consume(TokenType type, String message) {
-            if (check(type)) return advance();
-
-            throw new JoeError(message);
-        }
-
-        private Token advance() {
-            if (!isAtEnd()) current++;
-            return previous();
-        }
-
-        private boolean match(TokenType... types) {
-            for (TokenType type : types) {
-                if (check(type)) {
-                    advance();
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private boolean check(TokenType type) {
-            if (isAtEnd()) return false;
-            return peek().type() == type;
-        }
-
-        private boolean isAtEnd() {
-            return peek().type() == TokenType.EOF;
-        }
-    }
-
-
 }
