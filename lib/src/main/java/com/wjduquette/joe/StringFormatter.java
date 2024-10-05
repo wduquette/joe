@@ -55,6 +55,7 @@ public class StringFormatter {
             var arg = args.get(i);
             values[i] = switch (types.get(i)) {
                 case ANY -> arg;
+                case STRING -> joe.stringify(arg);
                 case DOUBLE -> {
                     if (arg instanceof Double) {
                         yield arg;
@@ -94,9 +95,10 @@ public class StringFormatter {
     // Format Parser
 
     // The Java type expected by a conversion in the format string:
-    // Any value at all, a double, or an int.
+    // Any value at all, a string, a double, or an int.
     private enum ArgType {
         ANY,
+        STRING,
         DOUBLE,
         INT
     }
@@ -119,8 +121,12 @@ public class StringFormatter {
                 if (inConversion) {
                     switch (c) {
                         // Conversions; save the arg type (if any)
-                        case 'b', 'B', 'h', 'H', 's', 'S' -> {
+                        case 'b', 'B', 'h', 'H' -> {
                             result.add(ArgType.ANY);
+                            inConversion = false;
+                        }
+                        case 's', 'S' -> {
+                            result.add(ArgType.STRING);
                             inConversion = false;
                         }
                         case 'd', 'x', 'X' -> {
