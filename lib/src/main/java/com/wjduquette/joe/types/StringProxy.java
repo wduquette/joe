@@ -2,6 +2,7 @@ package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.StringFormatter;
 import com.wjduquette.joe.TypeProxy;
 
 import java.util.Arrays;
@@ -30,7 +31,8 @@ public class StringProxy extends TypeProxy<String> {
         proxies(String.class);
         initializer(this::_init);
 
-        staticMethod("join",       this::_join);
+        staticMethod("format",        this::_format);
+        staticMethod("join",          this::_join);
 
         // pad/padLeft
 
@@ -38,7 +40,6 @@ public class StringProxy extends TypeProxy<String> {
         method("contains",            this::_contains);
         method("endsWith",            this::_endsWith);
         method("equalsIgnoreCase",    this::_equalsIgnoreCase);
-//        method("format",           this::_format);     // TODO Need printf logic
         method("indent",              this::_indent);
         method("indexOf",             this::_indexOf);
         method("isBlank",             this::_isBlank);
@@ -78,6 +79,17 @@ public class StringProxy extends TypeProxy<String> {
 
     //-------------------------------------------------------------------------
     // Static Method Implementations
+
+    //**
+    // @method format
+    // @args fmt, [values...]
+    // @result String
+    // Formats the string given the format string.
+    private Object _format(Joe joe, ArgQueue args) {
+        Joe.minArity(args, 1, "format(fmt, [values...])");
+        var fmt = joe.toString(args.next());
+        return StringFormatter.format(joe, fmt, args.remainder());
+    }
 
     //**
     // @static join
