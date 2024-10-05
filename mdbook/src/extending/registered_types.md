@@ -25,6 +25,7 @@ The constructor defines the various aspects of the proxy.
 
 - [The Script-level Type Name](#the-script-level-type-name)
 - [The Proxied Types](#the-proxied-types)
+- [Type Lookup](#type-lookup)
 - [The Supertype](#the-supertype)
 - [Stringification](#stringification)
 - [Iterability](#iterability)
@@ -64,8 +65,7 @@ same name as the type, e.g., `String`.
 
 ## The Proxied Types
 
-Second, the proxy must explicitly identify the proxied type or types, which
-must be genuine classes, not interfaces. 
+Second, the proxy must explicitly identify the proxied type or types.
 
 Usually a proxy will proxy the single type `V`, but if `V` is an interface
 the relevant classes need to be identified. Here's the first case:
@@ -93,6 +93,40 @@ public class ListProxy extends TypeProxy<JoeList> {
     ...
 }
 ```
+
+## Type Lookup
+
+At runtime, Joe sees a value and looks for the value's type proxy 
+in its type registry.  This section explains how
+the lookup is done, as it can get complicated.
+
+First, Joe maintains two lookup tables:
+
+- The `proxyTable`, a map from `Class` objects to `TypeProxy<?>` objects.
+- The `opaqueTypes` table, a set if `Class` objects which are known not
+  to have type proxies.
+
+Given these, the lookup logic is as follows: 
+
+- If value's `Class` is found in the `proxyTable`, the proxy is returned 
+  immediately.  This is the most common case.
+
+- Next, if the `Class` is found in the `opaqueTypes` table, the lookup
+  fails immediately.
+
+- Next, Joe checks the `proxyTable` for the value's superclass, and so on
+  up the class hierarchy.
+  - If a proxy is found, it is cached back into the `proxyTable` for the
+    value's concrete class.  It will be found immediately next time.
+
+- Next, Joe checks the `proxyTable` for any interfaces implemented by the
+  value's type, starting with the type's own `Class` and working its way
+  up the class hierarchy.
+  - If a proxy is found, it is cached back into the `proxyTable` for the
+    value's concrete class.  It will be found immediately next time.
+
+- Finally, if no proxy has been found the value's `Class` is added to the
+  `opaqueTypes` table, so that lookups will "fail fast" next time.
 
 ## The Supertype
 
