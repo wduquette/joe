@@ -24,8 +24,11 @@ public class Joe {
     private final GlobalEnvironment globals;
     private final Interpreter interpreter;
     private final Codifier codifier;
+
+    // Type Registry
     private final Map<Class<?>, TypeProxy<?>> proxyTable = new HashMap<>();
     private final Set<Class<?>> opaqueTypes = new HashSet<>();
+    private final Set<Class<?>> cachedTypes = new HashSet<>();
 
     // The handler for all script-generated output
     private Consumer<String> outputHandler = this::systemOutHandler;
@@ -103,7 +106,13 @@ public class Joe {
      * @param typeProxy The type proxy.
      */
     public void installType(TypeProxy<?> typeProxy) {
-        // FIRST, install the proxy into the proxy table.
+        // FIRST, clear the type cache, as things might get looked up
+        // differently with the new type.
+        cachedTypes.forEach(proxyTable::remove);
+        opaqueTypes.removeAll(cachedTypes);
+        cachedTypes.clear();
+
+        // NEXT, install the proxy into the proxy table.
         for (var cls : typeProxy.getProxiedTypes()) {
             proxyTable.put(cls, typeProxy);
         }
@@ -316,6 +325,7 @@ public class Joe {
                 // cache it so that we don't need to look it up again.
                 if (!c.equals(cls)) {
                     proxyTable.put(cls, proxy);
+                    cachedTypes.add(cls);
                 }
                 return proxy;
             }
@@ -330,6 +340,7 @@ public class Joe {
             for (var type : c.getInterfaces()) {
                 proxy = proxyTable.get(type);
                 proxyTable.put(cls, proxy);
+                cachedTypes.add(cls);
                 return proxy;
             }
 
@@ -338,6 +349,7 @@ public class Joe {
 
         // NEXT, remember that we could not find a proxy.
         opaqueTypes.add(cls);
+        cachedTypes.add(cls);
         return null;
     }
 
