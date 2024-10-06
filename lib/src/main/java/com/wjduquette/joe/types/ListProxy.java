@@ -97,7 +97,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     private Object _add(JoeList list, Joe joe, ArgQueue args) {
         Joe.arityRange(args, 1, 2, "add([index], item)");
 
-        if (args.remainingArgs() == 1) {
+        if (args.numRemaining() == 1) {
             list.add(args.next());
         } else {
             list.add(
@@ -118,7 +118,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     private Object _addAll(JoeList list, Joe joe, ArgQueue args) {
         Joe.arityRange(args, 1, 2, "addAll([index], collection)");
 
-        if (args.remainingArgs() == 1) {
+        if (args.numRemaining() == 1) {
             list.addAll(joe.toList(args.next()));
         } else {
             list.addAll(

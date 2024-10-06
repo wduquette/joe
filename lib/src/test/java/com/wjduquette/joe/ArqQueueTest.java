@@ -12,7 +12,7 @@ public class ArqQueueTest extends Ted {
         args = new ArgQueue();
         check(args.size()).eq(0);
         check(args.isEmpty()).eq(true);
-        check(args.remainingArgs()).eq(0);
+        check(args.numRemaining()).eq(0);
         check(args.hasRemaining()).eq(false);
     }
 }

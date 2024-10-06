@@ -55,6 +55,7 @@
     - [DocConfig Type](./library/type.joe.doc.DocConfig.md)
   - [Console API](./library/pkg.joe.console.md)
     - [Console Type](library/type.joe.console.Console.md);
+    - [Path Type](library/type.joe.console.Path.md);
   - [Library API Index](./library/index.md)
 
 ---

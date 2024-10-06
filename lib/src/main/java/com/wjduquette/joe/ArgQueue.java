@@ -73,7 +73,7 @@ public final class ArgQueue {
      * using {@code next()}.
      * @return the number.
      */
-    public int remainingArgs() {
+    public int numRemaining() {
         return args.size() - next;
     }
 
@@ -105,9 +105,9 @@ public final class ArgQueue {
      * @return the argument
      */
     public Object getRemaining(int index) {
-        if (index < 0 || index >= remainingArgs()) {
+        if (index < 0 || index >= numRemaining()) {
             throw new IllegalArgumentException(
-                "Expected index in range 0 < index < " + remainingArgs() +
+                "Expected index in range 0 < index < " + numRemaining() +
                 ", got: " + index);
         }
         return args.get(next + index);

@@ -279,7 +279,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // single [[List]].
     private Object _max(Joe joe, ArgQueue args) {
         Joe.minArity(args, 1, "Number.max(num...)");
-        List<?> list = (args.remainingArgs() == 1 && args.getRemaining(0) instanceof List<?>)
+        List<?> list = (args.numRemaining() == 1 && args.getRemaining(0) instanceof List<?>)
             ? joe.toList(args.getRemaining(0))
             : args.asList();
         return list.stream()
@@ -297,7 +297,7 @@ public class NumberProxy extends TypeProxy<Double> {
     private Object _min(Joe joe, ArgQueue args) {
         Joe.minArity(args, 1, "Number.min(num...)");
 
-        List<?> list = (args.remainingArgs() == 1 && args.getRemaining(0) instanceof List<?>)
+        List<?> list = (args.numRemaining() == 1 && args.getRemaining(0) instanceof List<?>)
             ? joe.toList(args.getRemaining(0))
             : args.asList();
         return list.stream()
