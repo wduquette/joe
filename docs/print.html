@@ -2574,8 +2574,10 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/pkg.joe.test.html"><code>joe.test</code> package (Joe Test Tool API)</a>
 <ul>
+<li><a href="library/pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
+<li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
 <li><a href="library/type.joe.test.CatchChecker.html">CatchChecker</a>
 <ul>
 <li><a href="library/type.joe.test.CatchChecker.html#init">CatchChecker(<em>pair</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
@@ -3712,8 +3714,10 @@ string syntax.</p>
 for use in <code>joe test</code> test suites.</p>
 <p><strong><a href="library/pkg.joe.test.html#functions">Functions</a></strong></p>
 <ul>
+<li><a href="library/pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
+<li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
 </ul>
 <p><strong>Types</strong></p>
 <ul>
@@ -3722,6 +3726,12 @@ for use in <code>joe test</code> test suites.</p>
 </ul>
 <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
 <hr />
+<p><span id="function.assertEquals"> </span></p>
+<h3 id="assertequals"><a class="header" href="#assertequals">assertEquals()</a></h3>
+<hr />
+<p><strong>assertEquals(<em>got</em>, <em>expected</em>)</strong></p>
+<p>Verifies that <em>got</em> equals the <em>expected</em> value, producing an
+informative assertion error if not.</p>
 <p><span id="function.check"> </span></p>
 <h3 id="check"><a class="header" href="#check">check()</a></h3>
 <hr />
@@ -3733,6 +3743,12 @@ for use in <code>joe test</code> test suites.</p>
 <p><strong>checkCatch(<em>callable</em>) → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></strong></p>
 <p>Executes a no-arg <em>callable</em> and returns a checker for checking
 the error result.</p>
+<p><span id="function.fail"> </span></p>
+<h3 id="fail"><a class="header" href="#fail">fail()</a></h3>
+<hr />
+<p><strong>fail(<em>message</em>)</strong></p>
+<p>Throws an assertion error with the given <em>message</em>, failing the
+test immediately.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="catchchecker-type-joetest"><a class="header" href="#catchchecker-type-joetest"><code>CatchChecker</code> type (<code>joe.test</code>)</a></h1>
 <hr />
 <p>A fluent test checker for <code>catch()</code> results.
@@ -4302,8 +4318,10 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/pkg.joe.test.html"><code>joe.test</code> package (Joe Test Tool API)</a>
 <ul>
+<li><a href="library/pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
+<li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
 <li><a href="library/type.joe.test.CatchChecker.html">CatchChecker</a>
 <ul>
 <li><a href="library/type.joe.test.CatchChecker.html#init">CatchChecker(<em>pair</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
