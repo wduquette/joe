@@ -2,9 +2,6 @@
 
 //**
 // @package joe.test
-// @title Joe Test Tool API
-// This package defines the test assertions and checkers that are available
-// for use in `joe test` test suites.
 
 //**
 // @function check

@@ -1,19 +1,32 @@
 package com.wjduquette.joe.tools.test;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.console.PathProxy;
 
 class TestPackage extends JoePackage {
     public static final JoePackage PACKAGE = new TestPackage();
 
-    // See pkg.joe.test.Joe for the remaining docs.
+    // See also pkg.joe.test.Joe for the rest of the package.
 
     //**
     // @package joe.test
+    // @title Joe Test Tool API
+    // This package defines the test assertions and checkers that are available
+    // for use in `joe test` test suites.
+    //
+    // ## Imported Types
+    //
+    // In addition to the APIs documented here, `joe.test` includes types from
+    // other packages so that they can be tested:
+    //
+    // - From [[joe.console]], [[joe.console.Path]]
+
     public TestPackage() {
         super("joe.test");
         globalFunction("assertEquals", this::_assertEquals);
         globalFunction("fail",         this::_fail);
         scriptResource(getClass(), "pkg.joe.test.joe");
+        type(PathProxy.TYPE);
     }
 
     //**

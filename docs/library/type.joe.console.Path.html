@@ -187,13 +187,17 @@ host file system.</p>
 </ul>
 <p><strong><a href="#methods">Methods</a></strong></p>
 <ul>
+<li><a href="type.joe.console.Path.html#method.endsWith"><em>path</em>.endsWith(<em>path</em>)</a> → Boolean</li>
 <li><a href="type.joe.console.Path.html#method.getFileName"><em>path</em>.getFileName()</a> → <a href="type.joe.console.Path.html">Path</a></li>
 <li><a href="type.joe.console.Path.html#method.getName"><em>path</em>.getName(<em>index</em>)</a> → <a href="type.joe.console.Path.html">Path</a></li>
 <li><a href="type.joe.console.Path.html#method.getNameCount"><em>path</em>.getNameCount()</a> → Number</li>
 <li><a href="type.joe.console.Path.html#method.getParent"><em>path</em>.getParent()</a> → <a href="type.joe.console.Path.html">Path</a></li>
 <li><a href="type.joe.console.Path.html#method.isAbsolute"><em>path</em>.isAbsolute()</a> → Boolean</li>
 <li><a href="type.joe.console.Path.html#method.normalize"><em>path</em>.normalize()</a> → <a href="type.joe.console.Path.html">Path</a></li>
+<li><a href="type.joe.console.Path.html#method.relativize"><em>path</em>.relativize(<em>other</em>)</a> → <a href="type.joe.console.Path.html">Path</a></li>
 <li><a href="type.joe.console.Path.html#method.resolve"><em>path</em>.resolve(<em>other</em>)</a> → <a href="type.joe.console.Path.html">Path</a></li>
+<li><a href="type.joe.console.Path.html#method.startsWith"><em>path</em>.startsWith(<em>path</em>)</a> → Boolean</li>
+<li><a href="type.joe.console.Path.html#method.subpath"><em>path</em>.subpath(<em>start</em>, [<em>end</em>])</a> → <a href="type.joe.console.Path.html">Path</a></li>
 <li><a href="type.joe.console.Path.html#method.toAbsolutePath"><em>path</em>.toAbsolutePath()</a> → <a href="type.joe.console.Path.html">Path</a></li>
 <li><a href="type.joe.console.Path.html#method.toString"><em>path</em>.toString()</a> → String</li>
 </ul>
@@ -211,6 +215,12 @@ than <em>b</em> when compared lexicographically.</p>
 <p>Creates a path from one or more string components.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
+<p><span id="method.endsWith"> </span></p>
+<h3 id="pathendswith"><a class="header" href="#pathendswith"><em>path</em>.endsWith()</a></h3>
+<hr />
+<p><strong><em>path</em>.endsWith(<em>path</em>) → Boolean</strong></p>
+<p>Returns <code>true</code> if this path ends with the given <em>path</em>.  The
+<em>path</em> may be specified as a <code>Path</code> or a <code>String</code>.</p>
 <p><span id="method.getFileName"> </span></p>
 <h3 id="pathgetfilename"><a class="header" href="#pathgetfilename"><em>path</em>.getFileName()</a></h3>
 <hr />
@@ -243,6 +253,12 @@ otherwise.</p>
 <hr />
 <p><strong><em>path</em>.normalize() → <a href="type.joe.console.Path.html">Path</a></strong></p>
 <p>Returns the path with redundant name elements eliminated.</p>
+<p><span id="method.relativize"> </span></p>
+<h3 id="pathrelativize"><a class="header" href="#pathrelativize"><em>path</em>.relativize()</a></h3>
+<hr />
+<p><strong><em>path</em>.relativize(<em>other</em>) → <a href="type.joe.console.Path.html">Path</a></strong></p>
+<p>Returns a relative path from this path to the <em>other</em> path.</p>
+<p>The <em>other</em> path may a <code>Path</code> or a <code>String</code>.</p>
 <p><span id="method.resolve"> </span></p>
 <h3 id="pathresolve"><a class="header" href="#pathresolve"><em>path</em>.resolve()</a></h3>
 <hr />
@@ -252,12 +268,23 @@ relative, constructs a path starting with this path and
 continuing with the other.  If <em>other</em> is absolute, it is
 returned unchanged.</p>
 <p>The <em>other</em> path may a <code>Path</code> or a <code>String</code>.</p>
+<p><span id="method.startsWith"> </span></p>
+<h3 id="pathstartswith"><a class="header" href="#pathstartswith"><em>path</em>.startsWith()</a></h3>
+<hr />
+<p><strong><em>path</em>.startsWith(<em>path</em>) → Boolean</strong></p>
+<p>Returns <code>true</code> if this path starts with the given <em>path</em>.  The
+<em>path</em> may be specified as a <code>Path</code> or a <code>String</code>.</p>
+<p><span id="method.subpath"> </span></p>
+<h3 id="pathsubpath"><a class="header" href="#pathsubpath"><em>path</em>.subpath()</a></h3>
+<hr />
+<p><strong><em>path</em>.subpath(<em>start</em>, [<em>end</em>]) → <a href="type.joe.console.Path.html">Path</a></strong></p>
+<p>Returns the subpath of this path that starts at <em>start</em>
+and ends before <em>end</em>, which defaults to the end of the path.</p>
 <p><span id="method.toAbsolutePath"> </span></p>
 <h3 id="pathtoabsolutepath"><a class="header" href="#pathtoabsolutepath"><em>path</em>.toAbsolutePath()</a></h3>
 <hr />
 <p><strong><em>path</em>.toAbsolutePath() → <a href="type.joe.console.Path.html">Path</a></strong></p>
-<p>Converts the path into an absolute path by resolving it against
-the console's current working directory.</p>
+<p>Converts the path into an absolute path.</p>
 <p><span id="method.toString"> </span></p>
 <h3 id="pathtostring"><a class="header" href="#pathtostring"><em>path</em>.toString()</a></h3>
 <hr />

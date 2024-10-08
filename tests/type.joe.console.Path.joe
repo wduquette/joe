@@ -1,0 +1,72 @@
+// Tests for type.joe.console.Path.
+
+function testInitializer() {
+    var p = Path("root/file.txt");
+    check(typeName(p)).eq("Path");
+    check(p.getFileName()).eq(Path("file.txt"));
+    check(p.getParent()).eq(Path("root"));
+    check(p.getNameCount()).eq(2);
+    check(p.getName(0)).eq(Path("root"));
+    check(p.getName(1)).eq(Path("file.txt"));
+    check(p.isAbsolute()).isFalse();
+    check(p.toString()).eq("root/file.txt");
+
+    check(Path("root", "foo", "bar")).eq(Path("root/foo/bar"));
+}
+
+function testCompare() {
+    var p1 = Path("root/fileA.txt");
+    var p2 = Path("root/fileB.txt");
+
+    check(Path.compare(p1, p1)).eq(0);
+    check(Path.compare(p1, p2)).eq(-1);
+    check(Path.compare(p2, p1)).eq(1);
+}
+
+function testEndsWith() {
+    var p = Path("root/ball/fileA.txt");
+    check(p.endsWith(p.getFileName())).isTrue();
+    check(p.endsWith(p.getParent())).isFalse();
+}
+
+function testNormalize() {
+    var p = Path("root/foo/../bar/file.txt");
+    check(p.normalize()).eq(Path("root/bar/file.txt"));
+}
+
+function testRelativize() {
+    var p1 = Path("/root/foo");
+    var p2 = Path("/root/foo/bar/file.text");
+    check(p1.relativize(p2)).eq(Path("bar/file.text"));
+}
+
+function testResolve() {
+    var p1 = Path("/root/foo");
+    var p2 = Path("bar/file.text");
+    var p3 = Path("/other/tree");
+
+    check(p1.resolve(p2)).eq(Path("/root/foo/bar/file.text"));
+    check(p1.resolve(p3)).eq(p3);
+}
+
+function testStartsWith() {
+    var p = Path("root/ball/fileA.txt");
+    check(p.startsWith(p.getParent())).isTrue();
+    check(p.startsWith(p.getFileName())).isFalse();
+}
+
+function testSubpath() {
+    var p = Path("/root/foo/bar/file.text");
+    check(p.subpath(2)).eq(Path("bar/file.text"));
+    check(p.subpath(0, 2)).eq(Path("root/foo"));
+}
+
+function testToAbsolute() {
+    var p1 = Path(".");
+    var p2 = p1.toAbsolutePath();
+    check(p2.isAbsolute()).isTrue();
+
+    // Absolute paths are host-dependent; just verify that the new
+    // path begins with a "/", making it an absolute path.
+    check(p2.toString().startsWith("/")).isTrue();
+}
