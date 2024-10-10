@@ -29,11 +29,13 @@
   - A value type's type proxy can now inherit methods from the value type's
     supertype's type proxy.
   - Added the [`Map`](library/type.joe.Map.md) type.
+  - Added the [`Set`](library/type.joe.Set.md) type.
   - Added the [`AssertError`](library/type.joe.AssertError.md) type, which
     explicitly extends the [`Error`](library/type.joe.Error.md) type.
   - Added the [`StringBuilder`](library/type.joe.StringBuilder.md) type.
   - Added the optional [`joe.console`](library/pkg.joe.console.md) package,
-    for use by scripts invoked by the command line.
+    for use by scripts invoked by the command line, including the 
+    [`Path`](library/type.joe.console.Path.md) type.
   - Implemented the `String.format()` method for formatting strings based on
     a format string, mostly mirroring Java's method of the same name. See 
     [String Formatting](library/type.joe.String.md#topic.formatting) for
