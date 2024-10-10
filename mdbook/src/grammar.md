@@ -1,4 +1,4 @@
-# Joe Grammar
+# Appendix: Joe Grammar
 
 This appendix shows the grammar of the Joe language, in the syntax 
 used in *Crafting Interpreters*.  Below that is the full 
