@@ -13,6 +13,7 @@ types:
 - [Pairs](#pairs)
 - [Lists](#lists)
 - [Maps](#maps)
+- [Sets](#sets)
 - [Errors](#errors)
 - [Functions and Methods](#functions-and-methods)
 - [Classes and Instances](#classes-and-instances)
@@ -132,8 +133,18 @@ basic key/value store.  It has much the same operations as Java maps.
 See the link for the full API.
 
 ```joe
-var map = map(#a, 1, #b, 2);
+var map = Map(#a, 1, #b, 2);
 println(map.get(#b)); // Outputs "2".
+```
+
+## Sets
+
+A [Set](library/type.joe.Set.md) is a Java `Set<Object>`.  It has much 
+the same operations as Java sets. See the link for the full API.
+
+```joe
+var set = Set(#a, #b);
+println(set.contains(#b)); // Outputs "true".
 ```
 
 ## Errors

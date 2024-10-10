@@ -24,7 +24,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     public MapProxy() {
         super("Map");
         proxies(MapValue.class);    // Types that implement `JoeMap`
-// TODO        proxies(MapWrapper.class);
+        proxies(MapWrapper.class);
         initializer(this::_init);
 
         method("clear",         this::_clear);
@@ -166,13 +166,12 @@ public class MapProxy extends TypeProxy<JoeMap> {
 
     //**
     // @method keySet
-    // @result List
-    // Returns a list of the keys in the map.
-    // TODO: return a readonly SetWrapper once we have sets.
+    // @result Set
+    // Returns a set of the keys in the map.
     private Object _keySet(JoeMap map, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "keySet()");
 
-        return new ListValue(map.keySet());
+        return SetWrapper.readOnly(joe, map.keySet());
     }
 
     //**
@@ -239,7 +238,6 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @method values
     // @result List
     // Returns a list of the values in the map.
-    // TODO: return a readonly SetWrapper once we have sets.
     private Object _values(JoeMap map, Joe joe, ArgQueue args) {
         Joe.exactArity(args, 0, "values()");
 

@@ -3,6 +3,7 @@ package com.wjduquette.joe;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.ListWrapper;
 import com.wjduquette.joe.types.MapWrapper;
+import com.wjduquette.joe.types.SetWrapper;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -860,6 +861,32 @@ public class Joe {
     @SuppressWarnings("unused")
     public JoeMap readonlyMap(Map<?,?> map) {
         return MapWrapper.readOnly(this, map);
+    }
+
+    /**
+     * Given an arbitrary Java set, wraps it as a JoeSet and ensures that
+     * any added values are compatible with the given value type.  Updates
+     * made by the script will update the underlying Java set.  If this is not
+     * desired, either use `Joe::readonlySet()` or return it as a
+     * new `SetValue`.
+     * @param set The set to wrap
+     * @param valueType The value type
+     * @return The wrapped set.
+     */
+    @SuppressWarnings("unused")
+    public JoeSet wrapSet(Set<?> set, Class<?> valueType) {
+        return SetWrapper.wrap(this, set, valueType);
+    }
+
+    /**
+     * Given an arbitrary Java set, wraps it to be read-only.  It can
+     * be accessed freely at the script level, but not modified.
+     * @param set The set to wrap
+     * @return The wrapped set
+     */
+    @SuppressWarnings("unused")
+    public JoeSet readonlySet(Set<?> set) {
+        return SetWrapper.readOnly(this, set);
     }
 }
 
