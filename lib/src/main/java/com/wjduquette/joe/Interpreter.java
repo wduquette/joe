@@ -171,6 +171,26 @@ class Interpreter {
 
                 throw new Return(value);
             }
+            case Stmt.Switch stmt -> {
+                var value = evaluate(stmt.expr());
+                for (var c : stmt.cases()) {
+                    // A normal case has values.
+                    for (var caseValue : c.values()) {
+                        var cv = evaluate(caseValue);
+                        if (Joe.isEqual(value, cv)) {
+                            return execute(c.statement());
+                        }
+                    }
+
+                    // Default case; always the last
+                    if (c.values().isEmpty()) {
+                        return execute(c.statement());
+                    }
+                }
+
+                // No case matched
+                return null;
+            }
             case Stmt.Throw stmt -> {
                 var value = evaluate(stmt.value());
                 if (value instanceof JoeError error) {

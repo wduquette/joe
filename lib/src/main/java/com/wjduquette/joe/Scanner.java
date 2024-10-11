@@ -13,8 +13,10 @@ class Scanner {
         reserved = new HashMap<>();
         reserved.put("assert",   ASSERT);
         reserved.put("break",    BREAK);
+        reserved.put("case",     CASE);
         reserved.put("class",    CLASS);
         reserved.put("continue", CONTINUE);
+        reserved.put("default",  DEFAULT);
         reserved.put("else",     ELSE);
         reserved.put("extends",  EXTENDS);
         reserved.put("false",    FALSE);
@@ -29,6 +31,7 @@ class Scanner {
         reserved.put("return",   RETURN);
         reserved.put("static",   STATIC);
         reserved.put("super",    SUPER);
+        reserved.put("switch",   SWITCH);
         reserved.put("this",     THIS);
         reserved.put("throw",    THROW);
         reserved.put("true",     TRUE);
