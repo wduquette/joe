@@ -20,6 +20,7 @@ public class GuiPackage extends JoePackage {
     //**
     // @package joe.gui
     // This package contains an experimental API for building JavaFX GUIs.
+    // It assumes a familiarity with JavaFX.
 
     public GuiPackage(Stage stage, VBox root) {
         super("joe.gui");
@@ -27,7 +28,22 @@ public class GuiPackage extends JoePackage {
         this.root = root;
 
         type(new WinProxy());
+        type(NodeProxy.TYPE);
+        type(RegionProxy.TYPE);
+        type(PaneProxy.TYPE);
+        type(VBoxProxy.TYPE);
     }
+
+    //**
+    // @packageTopic hierarchy
+    // @title Widget Hierarchy
+    //
+    // The `joe.gui` widget type hierarchy is a subset of the JavaFX hierarchy.
+    //
+    // - [[Node]]: Base class
+    //   - [[Region]]: Nodes with geometry
+    //     - [[Pane]]: Nodes that manage children
+    //       - [[VBox]]: A vertical stack of widgets
 
     //-------------------------------------------------------------------------
     // Configuration
@@ -68,6 +84,7 @@ public class GuiPackage extends JoePackage {
         //**
         // @static setSize
         // @args width, height
+        // @result this
         // Sets the preferred size of the root window.  The width and height
         // must be positive.
         private Object _setSize(Joe joe, ArgQueue args) {
@@ -79,18 +96,19 @@ public class GuiPackage extends JoePackage {
             }
             stage.setWidth(width);
             stage.setHeight(height);
-            return null;
+            return this;
         }
 
         //**
         // @static setTitle
         // @args title
+        // @result this
         // Sets the title of the root window.
         private Object _setTitle(Joe joe, ArgQueue args) {
             Joe.exactArity(args, 1, "Win.setTitle(title)");
             var title = joe.toString(args.next());
             stage.setTitle(title);
-            return null;
+            return this;
         }
     }
 }
