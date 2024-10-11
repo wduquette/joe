@@ -10,7 +10,19 @@ import java.util.Collections;
  * A generic proxy for enum types.  Each enum will need its own proxy.
  * @param <E> The enum type
  */
-public class EnumProxy<E extends Enum> extends TypeProxy<E> {
+public class EnumProxy<E extends Enum<E>> extends TypeProxy<E> {
+    //-------------------------------------------------------------------------
+    // Static Methods
+
+    public static <E extends Enum<E>> E valueOf(Class<E> cls, String name) {
+        for (var c : cls.getEnumConstants()) {
+            if (c.name().equalsIgnoreCase(name)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -58,13 +70,13 @@ public class EnumProxy<E extends Enum> extends TypeProxy<E> {
         Joe.exactArity(args, 1, getTypeName() + ".valueOf(name)");
         var name = joe.toString(args.next());
 
-        for (var c : cls.getEnumConstants()) {
-            if (c.name().equalsIgnoreCase(name)) {
-                return c;
-            }
-        }
+        var c = EnumProxy.valueOf(cls, name);
 
-        throw joe.expected("name of " + getTypeName() + " constant", name);
+        if (c != null) {
+            return c;
+        } else {
+            throw joe.expected("name of " + getTypeName() + " constant", name);
+        }
     }
 
     //-------------------------------------------------------------------------
