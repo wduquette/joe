@@ -793,6 +793,7 @@ by a semicolon or (sometimes) a block, as in Java.</p>
 <li><a href="statements.html#for-loops">For Loops</a></li>
 <li><a href="statements.html#foreach-loops">Foreach Loops</a></li>
 <li><a href="statements.html#break-and-continue">Break and Continue</a></li>
+<li><a href="statements.html#switch-statements">Switch Statements</a></li>
 <li><a href="statements.html#throw">Throw</a></li>
 <li><a href="statements.html#assert">Assert</a></li>
 </ul>
@@ -873,6 +874,27 @@ foreach (var item : list) {
 continue with the next iteration of the enclosing loop, just as in Java.</p>
 <p>There is no support for labeled breaks or continues in order to jump through
 nested loops.</p>
+<h2 id="switch-statements"><a class="header" href="#switch-statements">Switch Statements</a></h2>
+<p>Joe's <code>switch</code> statement uses Java's enhanced switch syntax rather than
+the classic C-like syntax:</p>
+<pre><code class="language-joe">switch (x) {
+    case 1, 2, 3 -&gt; return "abc";
+    case 4, 5, 6 -&gt; return "def";
+    case 7, 8, 9 -&gt; return "ghi";
+    default -&gt; return "???";
+}
+</code></pre>
+<ul>
+<li>The switch value and the case values can be any Joe values or
+expressions.</li>
+<li>There must be at least one <code>case</code> clause.</li>
+<li>Each <code>case</code> can have one or more values to match.</li>
+<li>Each case's body can be a single statement or a block.</li>
+<li>If present, the <code>default</code> clause must follow all the <code>case</code> clauses.</li>
+</ul>
+<p>The implementation is quite simple: each case value is checked in
+turn, from the top to the bottom, until a match is found; then the
+case's body is executed.</p>
 <h2 id="throw"><a class="header" href="#throw">Throw</a></h2>
 <p>The <code>throw</code> statement is used to explicitly throw
 <a href="library/type.joe.Error.html">error exceptions</a> in a Joe script.</p>
@@ -4543,6 +4565,7 @@ statement       → exprStmt
                 | ifStmt
                 | printStmt
                 | returnStmt
+                | switchStmt
                 | throwStmt
                 | whileStmt 
                 | block ;
@@ -4558,6 +4581,10 @@ ifStmt          → "if" "(" expression ")" statement
                   ( "else" statement )? ;
 printStmt       → "print" expression ";" ;
 returnStmt      → "return" expression? ";" ;
+switchStmt      → "switch" "(" expression ")" "{"
+                  ( "case" expression ( "," expression )* "-&gt;" statement )+
+                  ( "default" "-&gt;" statement )?
+                  "}" ;
 throwStmt       → "throw" expression ";" ;
 whileStmt       → "while" "(" expression ")" statement ;
 block           → "{" declaration* "}" ;

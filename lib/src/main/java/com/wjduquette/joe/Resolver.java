@@ -152,6 +152,13 @@ class Resolver {
                     resolve(stmt.value());
                 }
             }
+            case Stmt.Switch stmt -> {
+                resolve(stmt.expr());
+                for (var c : stmt.cases()) {
+                    c.values().forEach(this::resolve);
+                    resolve(c.statement());
+                }
+            }
             case Stmt.Throw stmt -> resolve(stmt.value());
             case Stmt.While stmt -> {
                 ++loopCounter;

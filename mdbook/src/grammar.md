@@ -34,6 +34,7 @@ statement       → exprStmt
                 | ifStmt
                 | printStmt
                 | returnStmt
+                | switchStmt
                 | throwStmt
                 | whileStmt 
                 | block ;
@@ -49,6 +50,10 @@ ifStmt          → "if" "(" expression ")" statement
                   ( "else" statement )? ;
 printStmt       → "print" expression ";" ;
 returnStmt      → "return" expression? ";" ;
+switchStmt      → "switch" "(" expression ")" "{"
+                  ( "case" expression ( "," expression )* "->" statement )+
+                  ( "default" "->" statement )?
+                  "}" ;
 throwStmt       → "throw" expression ";" ;
 whileStmt       → "while" "(" expression ")" statement ;
 block           → "{" declaration* "}" ;

@@ -24,6 +24,9 @@
     - Added the `+=`, `-=`, `*=`, and `/=` assignment operators, with
       their usual semantics.
     - Added the `++` and `--` operators, with their usual semantics.
+  
+  - Statements
+    - Added the [`switch` statement](statements.md#switch-statements).
      
 - Library
   - A value type's type proxy can now inherit methods from the value type's

@@ -8,8 +8,8 @@ import java.util.List;
 sealed interface Stmt
     permits Stmt.Assert, Stmt.Block, Stmt.Break, Stmt.Class,
             Stmt.Continue, Stmt.Expression, Stmt.For, Stmt.ForEach,
-            Stmt.Function, Stmt.If, Stmt.Return, Stmt.Throw, Stmt.Var,
-            Stmt.While
+            Stmt.Function, Stmt.If, Stmt.Return, Stmt.Switch,
+            Stmt.Throw, Stmt.Var, Stmt.While
 {
     /**
      * Asserts that the condition is truthy, throwing an AssertError
@@ -100,6 +100,30 @@ sealed interface Stmt
      * @param value The value, or null
      */
     record Return(Token keyword, Expr value) implements Stmt {}
+
+    /**
+     * A "switch" statement.
+     * @param keyword The "switch" keyword
+     * @param expr The switch expression
+     * @param cases A list of cases
+     */
+    record Switch(
+        Token keyword,
+        Expr expr,
+        List<Case> cases
+    ) implements Stmt {}
+
+    /**
+     * A case in a switch statement.
+     * @param keyword The "case" keyword
+     * @param values The value expressions for this case.
+     * @param statement The statement to execute
+     */
+    record Case(
+        Token keyword,
+        List<Expr> values,
+        Stmt statement
+    ) {}
 
     /**
      * A "throw" statement

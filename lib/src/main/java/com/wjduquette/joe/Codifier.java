@@ -134,6 +134,26 @@ class Codifier {
                 "return" +
                     (stmt.value() != null ? " " + recodify(stmt.value()) : "")
                     + ";";
+            case Stmt.Switch stmt -> {
+                var buff = new StringBuilder();
+                buff.append("switch (")
+                    .append(recodify(stmt.expr()))
+                    .append(") {");
+                for (var c : stmt.cases()) {
+                    buff.append(leading(indent + 1))
+                        .append(c.keyword().lexeme())
+                        .append(" ");
+                    var values = c.values().stream()
+                        .map(this::recodify)
+                        .collect(Collectors.joining(", "));
+                    buff.append(values)
+                        .append(" -> ")
+                        .append(body(0, c.statement()));
+                }
+                buff.append(leading(indent))
+                    .append("}");
+                yield buff.toString();
+            }
             case Stmt.Throw stmt -> "throw" + recodify(stmt.value()) + ";";
             case Stmt.Var stmt -> stmt.initializer() != null
                 ? "var " + stmt.name().lexeme() + " = " +

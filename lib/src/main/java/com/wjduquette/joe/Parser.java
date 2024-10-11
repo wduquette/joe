@@ -116,6 +116,7 @@ class Parser {
         if (match(FOREACH)) return forEachStatement();
         if (match(IF)) return ifStatement();
         if (match(RETURN)) return returnStatement();
+        if (match(SWITCH)) return switchStatement();
         if (match(THROW)) return throwStatement();
         if (match(WHILE)) return whileStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
@@ -280,6 +281,49 @@ class Parser {
 
         consume(SEMICOLON, "Expected ';' after return value.");
         return new Stmt.Return(keyword, value);
+    }
+
+    private Stmt switchStatement() {
+        Token keyword = previous();
+        var cases = new ArrayList<Stmt.Case>();
+
+        // FIRST, parse the head of the statement
+        consume(LEFT_PAREN, "Expected '(' after 'switch'.");
+        Expr switchExpr = expression();
+        consume(RIGHT_PAREN, "Expected ')' after switch expression.");
+        consume(LEFT_BRACE, "Expected '{' before switch body.");
+
+        // NEXT, parse the cases.
+        while (match(CASE)) {
+            var caseKeyword = previous();
+            var values = new ArrayList<Expr>();
+
+            // FIRST, parse the values
+            values.add(expression());
+            while (match(COMMA)) {
+                values.add(expression());
+            }
+            consume(MINUS_GREATER, "Expected '->' after case values.");
+            var stmt = statement();
+            cases.add(new Stmt.Case(caseKeyword, values, stmt));
+        }
+
+        if (cases.isEmpty()) {
+            error(previous(), "Expected at least one 'case' in switch.");
+        }
+
+        // NEXT, parse the default case, if it exists
+        if (match(DEFAULT)) {
+            var caseKeyword = previous();
+            consume(MINUS_GREATER, "Expected '->' after 'default'.");
+            var stmt = statement();
+            cases.add(new Stmt.Case(caseKeyword, List.of(), stmt));
+        }
+
+        // NEXT, complete the statement
+        consume(RIGHT_BRACE, "Expected '}' after switch body.");
+
+        return new Stmt.Switch(keyword, switchExpr, cases);
     }
 
     private Stmt throwStatement() {
