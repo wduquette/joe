@@ -3,6 +3,7 @@ package com.wjduquette.joe.app;
 import com.wjduquette.joe.tools.ReplTool;
 import com.wjduquette.joe.tools.RunTool;
 import com.wjduquette.joe.tools.doc.DocTool;
+import com.wjduquette.joe.tools.gui.GuiTool;
 import com.wjduquette.joe.tools.test.TestTool;
 import com.wjduquette.joe.tools.ToolLauncher;
 
@@ -32,7 +33,8 @@ public class App {
             RunTool.INFO,
             ReplTool.INFO,
             TestTool.INFO,
-            DocTool.INFO
+            DocTool.INFO,
+            GuiTool.INFO
         ));
 
         try {
