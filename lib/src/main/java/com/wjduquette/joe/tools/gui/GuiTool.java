@@ -5,6 +5,7 @@ import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.console.ConsolePackage;
+import com.wjduquette.joe.gui.GuiPackage;
 import com.wjduquette.joe.tools.FXTool;
 import com.wjduquette.joe.tools.ToolInfo;
 import javafx.scene.Scene;
@@ -30,6 +31,7 @@ public class GuiTool extends FXTool {
     //------------------------------------------------------------------------
     // Instance Variables
 
+    private final Joe joe = new Joe();
     private final VBox root = new VBox();
 
     //------------------------------------------------------------------------
@@ -50,13 +52,21 @@ public class GuiTool extends FXTool {
             exit(64);
         }
 
-        // NEXT, load the script.
-        var joe = new Joe();
-        var path = args.poll();
+        // NEXT, create the scene with default settings.
+        Scene scene = new Scene(root, 400, 300);
+        stage.setTitle("joe gui");
+        stage.setScene(scene);
 
+        // NEXT, load the required packages
         var consolePackage = new ConsolePackage();
         consolePackage.getArgs().addAll(args);
         joe.installPackage(consolePackage);
+
+        var guiPackage = new GuiPackage(stage, root);
+        joe.installPackage(guiPackage);
+
+        // NEXT, execute the script.
+        var path = args.poll();
 
         try {
             joe.runFile(path);
@@ -77,10 +87,6 @@ public class GuiTool extends FXTool {
         }
 
         // NEXT, pop up the window
-        Scene scene = new Scene(root, 400, 300);
-
-        stage.setTitle("joe gui");
-        stage.setScene(scene);
         stage.show();
     }
 
