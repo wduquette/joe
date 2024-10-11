@@ -1,6 +1,10 @@
 # Change Log
 
-## Changes in 0.3.0 (Forthcoming)
+## Changes in 0.4.0 (Forthcoming)
+
+- None yet
+
+## Changes in 0.3.0 (2024-10-11)
 
 - Language
   - Numeric literals
