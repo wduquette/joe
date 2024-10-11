@@ -30,12 +30,22 @@ public class GuiPackage extends JoePackage {
         this.stage = stage;
         this.root = root;
 
+        // Main Singleton
         type(new WinProxy());
+
+        // Base classes
         type(NodeProxy.TYPE);
         type(RegionProxy.TYPE);
+
+        // Controls
+        type(ControlProxy.TYPE);
+        type(LabelProxy.TYPE);
+
+        // Panes
         type(PaneProxy.TYPE);
         type(VBoxProxy.TYPE);
 
+        // Enums
         // TODO: JoeDoc!
         type(new EnumProxy<>("Pos", Pos.class));
         type(new EnumProxy<>("Priority", Priority.class));
@@ -49,6 +59,8 @@ public class GuiPackage extends JoePackage {
     //
     // - [[Node]]: Base class
     //   - [[Region]]: Nodes with geometry
+    //     - [[Control]]: Nodes to interact with
+    //       - [[Label]]: A label
     //     - [[Pane]]: Nodes that manage children
     //       - [[VBox]]: A vertical stack of widgets
 

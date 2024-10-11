@@ -18,7 +18,8 @@ record ProxiedValue(Joe joe, TypeProxy<?> proxy, Object value)
         if (proxy != null) {
             return proxy.bind(value, name);
         } else {
-            throw new JoeError("Values of type " + joe.typeName(value) +
+            throw new JoeError("Values of type " +
+                value.getClass().getName() +
                 " have no gettable properties.");
         }
     }
@@ -28,7 +29,8 @@ record ProxiedValue(Joe joe, TypeProxy<?> proxy, Object value)
         if (proxy != null) {
             proxy.set(name, value);
         } else {
-            throw new JoeError("Values of type " + joe.typeName(value) +
+            throw new JoeError("Values of type " +
+                value.getClass().getName() +
                 " have no settable properties.");
         }
     }

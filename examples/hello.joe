@@ -1,0 +1,20 @@
+// test_gui.joe: testing `joe gui`
+Win.setTitle("joe win: Hello")
+   .setSize(300, 150);
+
+var name = "world";
+
+if (Console.args().size() >= 2) {
+    name = Console.args().get(1);
+}
+
+Win.root()
+    .setStyle("-fx-background-color: darkgreen")
+    .setAlignment(#center)
+    .child(Label()
+        .setText("Hello, " + name + "!")
+        .setStyle(
+            "-fx-font-size: 36px",
+            "-fx-text-fill: white"
+        )
+    );

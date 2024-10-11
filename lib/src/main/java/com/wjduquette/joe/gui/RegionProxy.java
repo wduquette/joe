@@ -18,6 +18,7 @@ class RegionProxy extends TypeProxy<Region> {
     // [[Node]] widgets that occupy space on the screen.
     public RegionProxy() {
         super("Region");
+        extendsProxy(NodeProxy.TYPE);
         proxies(Region.class);
 
         // Constants
