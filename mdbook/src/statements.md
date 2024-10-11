@@ -14,6 +14,7 @@ by a semicolon or (sometimes) a block, as in Java.
 - [For Loops](#for-loops)
 - [Foreach Loops](#foreach-loops)
 - [Break and Continue](#break-and-continue)
+- [Switch Statements](#switch-statements)
 - [Throw](#throw)
 - [Assert](#assert)
 
@@ -133,6 +134,31 @@ continue with the next iteration of the enclosing loop, just as in Java.
 
 There is no support for labeled breaks or continues in order to jump through
 nested loops.
+
+## Switch Statements
+
+Joe's `switch` statement uses Java's enhanced switch syntax rather than
+the classic C-like syntax:
+
+```joe
+switch (x) {
+    case 1, 2, 3 -> return "abc";
+    case 4, 5, 6 -> return "def";
+    case 7, 8, 9 -> return "ghi";
+    default -> return "???";
+}
+```
+
+- The switch value and the case values can be any Joe values or
+  expressions.
+- There must be at least one `case` clause.
+- Each `case` can have one or more values to match.
+- Each case's body can be a single statement or a block.
+- If present, the `default` clause must follow all the `case` clauses.
+
+The implementation is quite simple: each case value is checked in 
+turn, from the top to the bottom, until a match is found; then the
+case's body is executed.
 
 ## Throw
 
