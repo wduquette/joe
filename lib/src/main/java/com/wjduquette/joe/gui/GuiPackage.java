@@ -1,6 +1,9 @@
 package com.wjduquette.joe.gui;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.types.EnumProxy;
+import javafx.geometry.Pos;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -32,6 +35,10 @@ public class GuiPackage extends JoePackage {
         type(RegionProxy.TYPE);
         type(PaneProxy.TYPE);
         type(VBoxProxy.TYPE);
+
+        // TODO: JoeDoc!
+        type(new EnumProxy<>("Pos", Pos.class));
+        type(new EnumProxy<>("Priority", Priority.class));
     }
 
     //**
