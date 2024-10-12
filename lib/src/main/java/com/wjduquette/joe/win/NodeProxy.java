@@ -4,6 +4,8 @@ import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.TypeProxy;
 import javafx.scene.Node;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 import java.util.stream.Collectors;
 
@@ -35,6 +37,7 @@ class NodeProxy extends TypeProxy<Node> {
         method("setId",           this::_setId);
         method("setStyle",        this::_setStyle);
         method("setVisible",      this::_setVisible);
+        method("vgrow",           this::_vgrow);
     }
 
 
@@ -142,6 +145,26 @@ class NodeProxy extends TypeProxy<Node> {
             .map(joe::toString)
             .collect(Collectors.joining(";\n"));
         node.setStyle(styles);
+        return node;
+    }
+
+    //**
+    // @method vgrow
+    // @args [priority]
+    // @result this
+    // Sets the [[VBox]] `vgrow` constraint for the node to the
+    // given [[Priority]], or to `Priority.ALWAYS` if the priority
+    // is omitted.
+    //
+    // This method is equivalent to [[VBox#static.setVgrow]], but is
+    // frequently more convenient.
+    private Object _vgrow(Node node, Joe joe, ArgQueue args) {
+        Joe.arityRange(args, 0, 1, "vgrow([priority]");
+        if (args.isEmpty()) {
+            VBox.setVgrow(node, Priority.ALWAYS);
+        } else {
+            VBox.setVgrow(node, joe.toEnum(args.next(), Priority.class));
+        }
         return node;
     }
 }

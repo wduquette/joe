@@ -3,7 +3,10 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.TypeProxy;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 class VBoxProxy extends TypeProxy<VBox> {
@@ -22,6 +25,11 @@ class VBoxProxy extends TypeProxy<VBox> {
         proxies(VBox.class);
         extendsProxy(PaneProxy.TYPE);
 
+        staticMethod("getMargin", this::_getMargin);
+        staticMethod("getVgrow",  this::_getVgrow);
+        staticMethod("setMargin", this::_setMargin);
+        staticMethod("setVgrow",  this::_setVgrow);
+
         // No initializer
         initializer(this::_initializer);
 
@@ -34,6 +42,57 @@ class VBoxProxy extends TypeProxy<VBox> {
         method("setSpacing",   this::_setSpacing);
     }
 
+    //-------------------------------------------------------------------------
+    // Static Methods
+
+    //**
+    // @static getMargin
+    // @args node
+    // @result Insets
+    // Gets the [[Node]]'s margin in its parent [[VBox]].
+    private Object _getMargin(Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "VBox.getMargin(node)");
+        return VBox.getMargin(joe.toClass(args.next(), Node.class));
+    }
+
+    //**
+    // @static getVgrow
+    // @args node
+    // @result Priority
+    // Gets how the [[Node]] will resize itself to the height of
+    // its parent [[VBox]].
+    private Object _getVgrow(Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "VBox.getVgrow(node)");
+        return VBox.getVgrow(joe.toClass(args.next(), Node.class));
+    }
+
+    //**
+    // @static setMargin
+    // @args node, insets
+    // Gets the [[Node]]'s margin in its parent [[VBox]] given an
+    // [[Insets]] object.
+    private Object _setMargin(Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 2, "VBox.setMargin(node, insets)");
+        VBox.setMargin(
+            joe.toClass(args.next(), Node.class),
+            joe.toClass(args.next(), Insets.class)
+        );
+        return null;
+    }
+
+    //**
+    // @static setVgrow
+    // @args node, priority
+    // Sets how the [[Node]] will resize itself to the height of
+    // its parent [[VBox]], given a [[Priority]] value.
+    private Object _setVgrow(Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 2, "VBox.setVgrow(node, priority)");
+        VBox.setVgrow(
+            joe.toClass(args.next(), Node.class),
+            joe.toClass(args.next(), Priority.class)
+        );
+        return null;
+    }
 
     //-------------------------------------------------------------------------
     // Initializer

@@ -50,6 +50,9 @@ public class WinPackage extends JoePackage {
         // TODO: JoeDoc!
         type(new EnumProxy<>("Pos", Pos.class));
         type(new EnumProxy<>("Priority", Priority.class));
+
+        // Utility Classes
+        type(InsetsProxy.TYPE);
     }
 
     //**
