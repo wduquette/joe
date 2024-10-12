@@ -59,6 +59,7 @@
     - [Path Type](library/type.joe.console.Path.md);
   - [GUI API (joe.gui)](./library/pkg.joe.gui.md)
     - [Control Type](library/type.joe.gui.Control.md);
+    - [Button Type](library/type.joe.gui.Button.md);
     - [Label Type](library/type.joe.gui.Label.md);
     - [Node Type](library/type.joe.gui.Node.md);
     - [Pane Type](library/type.joe.gui.Pane.md);

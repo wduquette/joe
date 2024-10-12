@@ -39,6 +39,7 @@ public class GuiPackage extends JoePackage {
 
         // Controls
         type(ControlProxy.TYPE);
+        type(ButtonProxy.TYPE);
         type(LabelProxy.TYPE);
 
         // Panes
@@ -60,6 +61,7 @@ public class GuiPackage extends JoePackage {
     // - [[Node]]: Base class
     //   - [[Region]]: Nodes with geometry
     //     - [[Control]]: Nodes to interact with
+    //       - [[Button]]: A button
     //       - [[Label]]: A label
     //     - [[Pane]]: Nodes that manage children
     //       - [[VBox]]: A vertical stack of widgets

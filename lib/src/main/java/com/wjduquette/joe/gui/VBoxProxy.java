@@ -105,7 +105,7 @@ class VBoxProxy extends TypeProxy<VBox> {
     // @result this
     // Sets the vertical space in *pixels* between each child.
     private Object _setSpacing(VBox node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "setSpacing(pixels)");
+        Joe.exactArity(args, 1, "setSpacing(pixels)");
         node.setSpacing(joe.toDouble(args.next()));
         return node;
     }
