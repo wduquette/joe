@@ -49,7 +49,7 @@ public class RunTool implements Tool {
     private void run(String[] args) {
         var argq = new ArrayDeque<>(List.of(args));
 
-        if (argq.size() == 0) {
+        if (argq.isEmpty()) {
             printUsage(App.NAME);
             System.exit(64);
         }
@@ -58,7 +58,8 @@ public class RunTool implements Tool {
         var path = argq.poll();
 
         var consolePackage = new ConsolePackage();
-        consolePackage.getArgs().addAll(List.of(args));
+        consolePackage.setScript(path);
+        consolePackage.getArgs().addAll(argq);
         joe.installPackage(consolePackage);
 
         try {

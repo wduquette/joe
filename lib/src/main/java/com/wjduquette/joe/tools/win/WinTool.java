@@ -58,7 +58,9 @@ public class WinTool extends FXTool {
         stage.setScene(scene);
 
         // NEXT, load the required packages
+        var path = args.poll();
         var consolePackage = new ConsolePackage();
+        consolePackage.setScript(path);
         consolePackage.getArgs().addAll(args);
         joe.installPackage(consolePackage);
 
@@ -66,8 +68,6 @@ public class WinTool extends FXTool {
         joe.installPackage(guiPackage);
 
         // NEXT, execute the script.
-        var path = args.poll();
-
         try {
             joe.runFile(path);
         } catch (IOException ex) {
