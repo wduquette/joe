@@ -107,12 +107,9 @@ public class ListWrapper implements JoeList {
 
     @Override
     public boolean add(Object o) {
-        System.out.println("add: " + o);
         requireReadWrite();
-        System.out.println("type check: " + itemType);
         if (itemType != null) requireCanAdd(o);
 
-        System.out.println("adding to: " + list);
         return list.add(o);
     }
 
