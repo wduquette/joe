@@ -1,11 +1,11 @@
-package com.wjduquette.joe.tools.gui;
+package com.wjduquette.joe.tools.win;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.console.ConsolePackage;
-import com.wjduquette.joe.gui.GuiPackage;
+import com.wjduquette.joe.win.WinPackage;
 import com.wjduquette.joe.tools.FXTool;
 import com.wjduquette.joe.tools.ToolInfo;
 import javafx.scene.Scene;
@@ -15,17 +15,17 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Deque;
 
-public class GuiTool extends FXTool {
+public class WinTool extends FXTool {
     public static final ToolInfo INFO = new ToolInfo(
-        "gui",
+        "win",
         "script.joe args...",
         "Displays a scripted GUI.",
         """
         Given a script, this tool displays a JavaFX GUI.  The tool provides
         the Joe standard library along with the optional joe.console and
-        joe.gui packages.  See the Joe User's Guide for details.
+        joe.win packages.  See the Joe User's Guide for details.
         """,
-        GuiTool::main
+        WinTool::main
     );
 
     //------------------------------------------------------------------------
@@ -37,7 +37,7 @@ public class GuiTool extends FXTool {
     //------------------------------------------------------------------------
     // Constructor
 
-    public GuiTool() {
+    public WinTool() {
         super(INFO);
     }
 
@@ -54,7 +54,7 @@ public class GuiTool extends FXTool {
 
         // NEXT, create the scene with default settings.
         Scene scene = new Scene(root, 400, 300);
-        stage.setTitle("joe gui");
+        stage.setTitle("joe win");
         stage.setScene(scene);
 
         // NEXT, load the required packages
@@ -62,7 +62,7 @@ public class GuiTool extends FXTool {
         consolePackage.getArgs().addAll(args);
         joe.installPackage(consolePackage);
 
-        var guiPackage = new GuiPackage(stage, root);
+        var guiPackage = new WinPackage(stage, root);
         joe.installPackage(guiPackage);
 
         // NEXT, execute the script.

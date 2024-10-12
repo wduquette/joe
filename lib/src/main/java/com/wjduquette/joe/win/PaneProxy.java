@@ -1,4 +1,4 @@
-package com.wjduquette.joe.gui;
+package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
@@ -13,7 +13,7 @@ class PaneProxy extends TypeProxy<Pane> {
     // Constructor
 
     //**
-    // @package joe.gui
+    // @package joe.win
     // @type Pane
     // The `Pane` type is the base class for JavaFX
     // [[Node]] widgets that can have child nodes.

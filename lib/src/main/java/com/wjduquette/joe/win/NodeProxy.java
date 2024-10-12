@@ -1,4 +1,4 @@
-package com.wjduquette.joe.gui;
+package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
@@ -14,7 +14,7 @@ class NodeProxy extends TypeProxy<Node> {
     // Constructor
 
     //**
-    // @package joe.gui
+    // @package joe.win
     // @type Node
     // The `Node` widget is the abstract base class for the JavaFX widget
     // hierarchy. This abstract type provides features available for

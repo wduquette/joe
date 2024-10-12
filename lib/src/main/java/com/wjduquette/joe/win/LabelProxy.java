@@ -1,10 +1,9 @@
-package com.wjduquette.joe.gui;
+package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.TypeProxy;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 
 class LabelProxy extends TypeProxy<Label> {
     public static final LabelProxy TYPE = new LabelProxy();
@@ -13,7 +12,7 @@ class LabelProxy extends TypeProxy<Label> {
     // Constructor
 
     //**
-    // @package joe.gui
+    // @package joe.win
     // @type Label
     // The `Label` type is the base class for JavaFX
     // labels like [[Label]] widgets.

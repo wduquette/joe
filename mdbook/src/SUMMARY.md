@@ -57,15 +57,15 @@
   - [Console API (joe.console)](./library/pkg.joe.console.md)
     - [Console Type](library/type.joe.console.Console.md);
     - [Path Type](library/type.joe.console.Path.md);
-  - [GUI API (joe.gui)](./library/pkg.joe.gui.md)
-    - [Control Type](library/type.joe.gui.Control.md);
-    - [Button Type](library/type.joe.gui.Button.md);
-    - [Label Type](library/type.joe.gui.Label.md);
-    - [Node Type](library/type.joe.gui.Node.md);
-    - [Pane Type](library/type.joe.gui.Pane.md);
-    - [Region Type](library/type.joe.gui.Region.md);
-    - [VBox Type](library/type.joe.gui.VBox.md);
-    - [Win Type](library/type.joe.gui.Win.md);
+  - [GUI API (joe.win)](./library/pkg.joe.win.md)
+    - [Control Type](library/type.joe.win.Control.md);
+    - [Button Type](library/type.joe.win.Button.md);
+    - [Label Type](library/type.joe.win.Label.md);
+    - [Node Type](library/type.joe.win.Node.md);
+    - [Pane Type](library/type.joe.win.Pane.md);
+    - [Region Type](library/type.joe.win.Region.md);
+    - [VBox Type](library/type.joe.win.VBox.md);
+    - [Win Type](library/type.joe.win.Win.md);
   - [Library API Index](./library/index.md)
 
 ---

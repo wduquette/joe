@@ -1,4 +1,4 @@
-package com.wjduquette.joe.gui;
+package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
@@ -13,7 +13,7 @@ class ControlProxy extends TypeProxy<Control> {
     // Constructor
 
     //**
-    // @package joe.gui
+    // @package joe.win
     // @type Control
     // The `Control` type is the base class for JavaFX
     // controls like [[Label]] widgets.

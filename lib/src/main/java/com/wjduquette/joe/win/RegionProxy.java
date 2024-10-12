@@ -1,4 +1,4 @@
-package com.wjduquette.joe.gui;
+package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
@@ -12,7 +12,7 @@ class RegionProxy extends TypeProxy<Region> {
     // Constructor
 
     //**
-    // @package joe.gui
+    // @package joe.win
     // @type Region
     // The `Region` type is the abstract base class for JavaFX
     // [[Node]] widgets that occupy space on the screen.

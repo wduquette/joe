@@ -1,4 +1,4 @@
-package com.wjduquette.joe.gui;
+package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
@@ -15,7 +15,7 @@ class ButtonProxy extends TypeProxy<Button> {
     // Constructor
 
     //**
-    // @package joe.gui
+    // @package joe.win
     // @type Button
     // The `Button` type is the base class for JavaFX
     // labels like [[Button]] widgets.

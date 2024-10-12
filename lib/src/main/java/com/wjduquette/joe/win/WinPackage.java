@@ -1,4 +1,4 @@
-package com.wjduquette.joe.gui;
+package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.types.EnumProxy;
@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 /**
  * An experimental Joe package for building JavaFX GUIs
  */
-public class GuiPackage extends JoePackage {
+public class WinPackage extends JoePackage {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -21,12 +21,12 @@ public class GuiPackage extends JoePackage {
     // Constructor
 
     //**
-    // @package joe.gui
+    // @package joe.win
     // This package contains an experimental API for building JavaFX GUIs.
     // It assumes a familiarity with JavaFX.
 
-    public GuiPackage(Stage stage, VBox root) {
-        super("joe.gui");
+    public WinPackage(Stage stage, VBox root) {
+        super("joe.win");
         this.stage = stage;
         this.root = root;
 
@@ -56,7 +56,7 @@ public class GuiPackage extends JoePackage {
     // @packageTopic hierarchy
     // @title Widget Hierarchy
     //
-    // The `joe.gui` widget type hierarchy is a subset of the JavaFX hierarchy.
+    // The `joe.win` widget type hierarchy is a subset of the JavaFX hierarchy.
     //
     // - [[Node]]: Base class
     //   - [[Region]]: Nodes with geometry
