@@ -28,7 +28,6 @@ class NodeProxy extends FXProxy<Node> {
         // No initializer
 
         //**
-        //
         // ## Properties
         //
         // | Property   | Type             | Description        |
