@@ -2,10 +2,9 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.TypeProxy;
 import javafx.scene.control.Label;
 
-class LabelProxy extends TypeProxy<Label> {
+class LabelProxy extends FXProxy<Label> {
     public static final LabelProxy TYPE = new LabelProxy();
 
     //-------------------------------------------------------------------------
@@ -14,6 +13,7 @@ class LabelProxy extends TypeProxy<Label> {
     //**
     // @package joe.win
     // @type Label
+    // @extends Control
     // The `Label` type is the base class for JavaFX
     // labels like [[Label]] widgets.
     public LabelProxy() {
@@ -24,9 +24,11 @@ class LabelProxy extends TypeProxy<Label> {
         // Initializer
         initializer(this::_initializer);
 
+        // Properties
+        fxProperty("text", String.class, Label::textProperty);
+
         // Methods
-        method("getText", this::_getText);
-        method("setText", this::_setText);
+        method("text", this::_text);
     }
 
     //-------------------------------------------------------------------------
@@ -49,21 +51,12 @@ class LabelProxy extends TypeProxy<Label> {
     // Methods
 
     //**
-    // @method getText
-    // @result joe.String
-    // Gets the label's text, or null for none.
-    private Object _getText(Label node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "getText()");
-        return node.getText();
-    }
-
-    //**
-    // @method setText
+    // @method text
     // @args text
     // @result this
-    // Gets the label's text or null for none.
-    private Object _setText(Label node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "setText(text)");
+    // Sets the label's text.
+    private Object _text(Label node, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "text(text)");
         node.setText(joe.stringify(args.next()));
         return node;
     }

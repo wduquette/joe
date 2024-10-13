@@ -14,6 +14,7 @@ class RegionProxy extends TypeProxy<Region> {
     //**
     // @package joe.win
     // @type Region
+    // @extends Node
     // The `Region` type is the abstract base class for JavaFX
     // [[Node]] widgets that occupy space on the screen.
     public RegionProxy() {

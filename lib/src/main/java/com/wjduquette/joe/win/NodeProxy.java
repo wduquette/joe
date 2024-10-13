@@ -9,7 +9,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.stream.Collectors;
 
-class NodeProxy extends TypeProxy<Node> {
+class NodeProxy extends FXProxy<Node> {
     public static final NodeProxy TYPE = new NodeProxy();
 
     //-------------------------------------------------------------------------
@@ -27,16 +27,25 @@ class NodeProxy extends TypeProxy<Node> {
 
         // No initializer
 
+        //**
+        //
+        // ## Properties
+        //
+        // | Property   | Type             | Description        |
+        // | ---------- | ---------------- | ------------------ |
+        // | `#id`      | [[joe.String]]   | JavaFX ID          |
+        // | `#style`   | [[joe.String]]   | FXCSS style string |
+        // | `#visible` | [[joe.Boolean]]  | Visibility flag    |
+        fxProperty("id",      String.class,  Node::idProperty);
+        fxProperty("style",   String.class,  Node::styleProperty);
+        fxProperty("visible", Boolean.class, Node::visibleProperty);
+
         // Methods
-        method("getId",           this::_getId);
-        method("getStyle",        this::_getStyle);
-        method("getStyleClasses", this::_getStyleClasses);
+        method("disable",         this::_disable);
+        method("id",              this::_id);
         method("isDisabled",      this::_isDisabled);
-        method("isVisible",       this::_isVisible);
-        method("setDisable",      this::_setDisable);
-        method("setId",           this::_setId);
-        method("setStyle",        this::_setStyle);
-        method("setVisible",      this::_setVisible);
+        method("styleClasses",    this::_styleClasses);
+        method("styles",          this::_styles);
         method("vgrow",           this::_vgrow);
     }
 
@@ -45,33 +54,29 @@ class NodeProxy extends TypeProxy<Node> {
     // Methods
 
     //**
-    // @method getId
-    // @result joe.String
-    // Gets the node's ID string, or null if not defined.
-    private Object _getId(Node node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "getId()");
-        return node.getId();
+    // @method disable
+    // @args [flag]
+    // @result this
+    // Sets the node's `#disable` property to *flag*; if omitted,
+    // *flag* defaults to `true`.  While `true`, this node and its
+    // descendants in the scene graph will be disabled.
+    private Object _disable(Node node, Joe joe, ArgQueue args) {
+        Joe.arityRange(args, 0, 1, "disable([flag])");
+        var flag = args.isEmpty() ? true : Joe.isTruthy(args.next());
+        node.setDisable(flag);
+        return node;
     }
 
     //**
-    // @method getStyle
-    // @result joe.String
-    // Gets the node's FXCSS style, or null if none.  The style is a single
-    // CSS string which can contain multiple style settings, separated by
-    // semicolons.
-    private Object _getStyle(Node node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "getStyle()");
-        return node.getStyle();
-    }
-
-    //**
-    // @method getStyleClasses
-    // @result joe.List
-    // Gets the list of the node's FXCSS style class names.  Values must
-    // be valid CSS style class strings.
-    private Object _getStyleClasses(Node node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "getStyleClasses()");
-        return joe.wrapList(node.getStyleClass(), String.class);
+    // @method id
+    // @args id
+    // @result this
+    // Sets the node's `#id` property to the given *id* string.
+    private Object _id(Node node, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "id(id)");
+        var id = joe.toString(args.next());
+        node.setId(id);
+        return node;
     }
 
     //**
@@ -84,63 +89,23 @@ class NodeProxy extends TypeProxy<Node> {
     }
 
     //**
-    // @method isVisible
-    // @result joe.Boolean
-    // Returns `true` if the node is marked "visible", and `false` otherwise.
-    //
-    // Note: if `false`, the node will occupy its usual space in the window,
-    // but will be transparent.
-    private Object _isVisible(Node node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "isVisible()");
-        return node.isVisible();
+    // @method styleClasses
+    // @result joe.List
+    // Gets the list of the node's FXCSS style class names.  Values must
+    // be valid CSS style class strings.
+    private Object _styleClasses(Node node, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "styleClasses()");
+        return joe.wrapList(node.getStyleClass(), String.class);
     }
 
     //**
-    // @method setDisable
-    // @args flag
-    // @result this
-    // Sets the node's `disable` flag.  If `true`, this node and its
-    // descendants in the scene graph will be disabled.
-    private Object _setDisable(Node node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "setDisable(flag)");
-        node.setDisable(Joe.isTruthy(args.next()));
-        return node;
-    }
-
-    //**
-    // @method setId
-    // @args id
-    // @result this
-    // Sets the node's ID string.
-    private Object _setId(Node node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "setId(id)");
-        var id = joe.toString(args.next());
-        node.setId(id);
-        return node;
-    }
-
-    //**
-    // @method setVisible
-    // @args flag
-    // @result this
-    // Sets the node's `visible` flag.
-    //
-    // Note: if `false`, the node will occupy its usual space in the window,
-    // but will be transparent.
-    private Object _setVisible(Node node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "setVisible(flag)");
-        node.setVisible(Joe.isTruthy(args.next()));
-        return node;
-    }
-
-    //**
-    // @method setStyle
+    // @method styles
     // @args style, ...
     // @result this
-    // Sets the node's FXCSS style.  The caller can pass multiple style
-    // strings, which will be joined with semicolons.
-    private Object _setStyle(Node node, Joe joe, ArgQueue args) {
-        Joe.minArity(args, 1, "setStyle(style, ...)");
+    // Sets the node's FXCSS `#style` property.  The caller can pass
+    // multiple style strings, which will be joined with semicolons.
+    private Object _styles(Node node, Joe joe, ArgQueue args) {
+        Joe.minArity(args, 1, "styles(style, ...)");
         var styles = args.asList().stream()
             .map(joe::toString)
             .collect(Collectors.joining(";\n"));
@@ -156,8 +121,8 @@ class NodeProxy extends TypeProxy<Node> {
     // given [[Priority]], or to `Priority.ALWAYS` if the priority
     // is omitted.
     //
-    // This method is equivalent to [[VBox#static.setVgrow]], but is
-    // frequently more convenient.
+    // This method is equivalent to the JavaFX `VBox.setVgrow()`
+    // method.
     private Object _vgrow(Node node, Joe joe, ArgQueue args) {
         Joe.arityRange(args, 0, 1, "vgrow([priority]");
         if (args.isEmpty()) {

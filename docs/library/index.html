@@ -450,7 +450,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="pkg.joe.win.html"><code>joe.win</code> package</a>
 <ul>
-<li><a href="type.joe.win.Button.html">Button</a>
+<li><a href="type.joe.win.Button.html">Button</a> extends <a href="type.joe.win.Control.html">Control</a>
 <ul>
 <li><a href="type.joe.win.Button.html#init">Button([<em>text</em>], [<em>action</em>])</a> → <a href="type.joe.win.Button.html">Button</a></li>
 <li><a href="type.joe.win.Button.html#method.action"><em>button</em>.action(<em>callable</em>)</a> → this</li>
@@ -458,11 +458,19 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="type.joe.win.Button.html#method.setText"><em>button</em>.setText(<em>text</em>)</a> → this</li>
 </ul>
 </li>
-<li><a href="type.joe.win.Control.html">Control</a>
+<li><a href="type.joe.win.Control.html">Control</a> extends <a href="type.joe.win.Region.html">Region</a>
 <ul>
 <li><a href="type.joe.win.Control.html#method.getTooltip"><em>control</em>.getTooltip()</a> → Tooltip</li>
 <li><a href="type.joe.win.Control.html#method.setTooltip"><em>control</em>.setTooltip(<em>tooltip</em>)</a> → this</li>
 <li><a href="type.joe.win.Control.html#method.setTooltipText"><em>control</em>.setTooltipText(<em>text</em>)</a> → this</li>
+</ul>
+</li>
+<li><a href="type.joe.win.FX.html">FX</a>
+<ul>
+<li><a href="type.joe.win.FX.html#method.getProperty"><em>fX</em>.getProperty(<em>keyword</em>)</a> → value</li>
+<li><a href="type.joe.win.FX.html#method.listenTo"><em>fX</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
+<li><a href="type.joe.win.FX.html#method.properties"><em>fX</em>.properties()</a> → <a href="type.joe.Set.html">joe.Set</a></li>
+<li><a href="type.joe.win.FX.html#method.setProperty"><em>fX</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
 </ul>
 </li>
 <li><a href="type.joe.win.Insets.html">Insets</a>
@@ -475,35 +483,30 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="type.joe.win.Insets.html#method.getTop"><em>insets</em>.getTop()</a> → Number</li>
 </ul>
 </li>
-<li><a href="type.joe.win.Label.html">Label</a>
+<li><a href="type.joe.win.Label.html">Label</a> extends <a href="type.joe.win.Control.html">Control</a>
 <ul>
 <li><a href="type.joe.win.Label.html#init">Label([<em>text</em>])</a> → <a href="type.joe.win.Label.html">Label</a></li>
-<li><a href="type.joe.win.Label.html#method.getText"><em>label</em>.getText()</a> → <a href="type.joe.String.html">joe.String</a></li>
-<li><a href="type.joe.win.Label.html#method.setText"><em>label</em>.setText(<em>text</em>)</a> → this</li>
+<li><a href="type.joe.win.Label.html#method.text"><em>label</em>.text(<em>text</em>)</a> → this</li>
 </ul>
 </li>
 <li><a href="type.joe.win.Node.html">Node</a>
 <ul>
-<li><a href="type.joe.win.Node.html#method.getId"><em>node</em>.getId()</a> → <a href="type.joe.String.html">joe.String</a></li>
-<li><a href="type.joe.win.Node.html#method.getStyle"><em>node</em>.getStyle()</a> → <a href="type.joe.String.html">joe.String</a></li>
-<li><a href="type.joe.win.Node.html#method.getStyleClasses"><em>node</em>.getStyleClasses()</a> → <a href="type.joe.List.html">joe.List</a></li>
+<li><a href="type.joe.win.Node.html#method.disable"><em>node</em>.disable([<em>flag</em>])</a> → this</li>
+<li><a href="type.joe.win.Node.html#method.id"><em>node</em>.id(<em>id</em>)</a> → this</li>
 <li><a href="type.joe.win.Node.html#method.isDisabled"><em>node</em>.isDisabled()</a> → <a href="type.joe.Boolean.html">joe.Boolean</a></li>
-<li><a href="type.joe.win.Node.html#method.isVisible"><em>node</em>.isVisible()</a> → <a href="type.joe.Boolean.html">joe.Boolean</a></li>
-<li><a href="type.joe.win.Node.html#method.setDisable"><em>node</em>.setDisable(<em>flag</em>)</a> → this</li>
-<li><a href="type.joe.win.Node.html#method.setId"><em>node</em>.setId(<em>id</em>)</a> → this</li>
-<li><a href="type.joe.win.Node.html#method.setStyle"><em>node</em>.setStyle(<em>style</em>, ...)</a> → this</li>
-<li><a href="type.joe.win.Node.html#method.setVisible"><em>node</em>.setVisible(<em>flag</em>)</a> → this</li>
+<li><a href="type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="type.joe.List.html">joe.List</a></li>
+<li><a href="type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 </li>
-<li><a href="type.joe.win.Pane.html">Pane</a>
+<li><a href="type.joe.win.Pane.html">Pane</a> extends <a href="type.joe.win.Region.html">Region</a>
 <ul>
 <li><a href="type.joe.win.Pane.html#init">Pane()</a> → <a href="type.joe.win.Pane.html">Pane</a></li>
 <li><a href="type.joe.win.Pane.html#method.child"><em>pane</em>.child(<em>node</em>)</a> → this</li>
 <li><a href="type.joe.win.Pane.html#method.getChildren"><em>pane</em>.getChildren()</a> → <a href="type.joe.List.html">joe.List</a></li>
 </ul>
 </li>
-<li><a href="type.joe.win.Region.html">Region</a>
+<li><a href="type.joe.win.Region.html">Region</a> extends <a href="type.joe.win.Node.html">Node</a>
 <ul>
 <li><a href="type.joe.win.Region.html#constant.USE_COMPUTED_SIZE">Region.USE_COMPUTED_SIZE</a></li>
 <li><a href="type.joe.win.Region.html#constant.USE_PREF_SIZE">Region.USE_PREF_SIZE</a></li>
@@ -513,7 +516,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="type.joe.win.Region.html#method.setPrefWidth"><em>region</em>.setPrefWidth(<em>width</em>)</a> → this</li>
 </ul>
 </li>
-<li><a href="type.joe.win.VBox.html">VBox</a>
+<li><a href="type.joe.win.VBox.html">VBox</a> extends <a href="type.joe.win.Pane.html">Pane</a>
 <ul>
 <li><a href="type.joe.win.VBox.html#static.getMargin">VBox.getMargin(<em>node</em>)</a> → <a href="type.joe.win.Insets.html">Insets</a></li>
 <li><a href="type.joe.win.VBox.html#static.getVgrow">VBox.getVgrow(<em>node</em>)</a> → Priority</li>

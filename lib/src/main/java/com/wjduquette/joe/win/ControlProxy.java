@@ -15,6 +15,7 @@ class ControlProxy extends TypeProxy<Control> {
     //**
     // @package joe.win
     // @type Control
+    // @extends Region
     // The `Control` type is the base class for JavaFX
     // controls like [[Label]] widgets.
     public ControlProxy() {

@@ -175,78 +175,56 @@
                     <main>
                         <h1 id="node-type-joewin"><a class="header" href="#node-type-joewin"><code>Node</code> type (<code>joe.win</code>)</a></h1>
 <hr />
+<p><strong>Extended By</strong>: <a href="type.joe.win.Region.html">Region</a><br></p>
 <p>The <code>Node</code> widget is the abstract base class for the JavaFX widget
 hierarchy. This abstract type provides features available for
 all widgets.</p>
 <p><strong><a href="#methods">Methods</a></strong></p>
 <ul>
-<li><a href="type.joe.win.Node.html#method.getId"><em>node</em>.getId()</a> → <a href="type.joe.String.html">joe.String</a></li>
-<li><a href="type.joe.win.Node.html#method.getStyle"><em>node</em>.getStyle()</a> → <a href="type.joe.String.html">joe.String</a></li>
-<li><a href="type.joe.win.Node.html#method.getStyleClasses"><em>node</em>.getStyleClasses()</a> → <a href="type.joe.List.html">joe.List</a></li>
+<li><a href="type.joe.win.Node.html#method.disable"><em>node</em>.disable([<em>flag</em>])</a> → this</li>
+<li><a href="type.joe.win.Node.html#method.id"><em>node</em>.id(<em>id</em>)</a> → this</li>
 <li><a href="type.joe.win.Node.html#method.isDisabled"><em>node</em>.isDisabled()</a> → <a href="type.joe.Boolean.html">joe.Boolean</a></li>
-<li><a href="type.joe.win.Node.html#method.isVisible"><em>node</em>.isVisible()</a> → <a href="type.joe.Boolean.html">joe.Boolean</a></li>
-<li><a href="type.joe.win.Node.html#method.setDisable"><em>node</em>.setDisable(<em>flag</em>)</a> → this</li>
-<li><a href="type.joe.win.Node.html#method.setId"><em>node</em>.setId(<em>id</em>)</a> → this</li>
-<li><a href="type.joe.win.Node.html#method.setStyle"><em>node</em>.setStyle(<em>style</em>, ...)</a> → this</li>
-<li><a href="type.joe.win.Node.html#method.setVisible"><em>node</em>.setVisible(<em>flag</em>)</a> → this</li>
+<li><a href="type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="type.joe.List.html">joe.List</a></li>
+<li><a href="type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
-<h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
+<h2 id="properties"><a class="header" href="#properties">Properties</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>#id</code></td><td><a href="type.joe.String.html"><code>String</code></a></td><td>JavaFX ID</td></tr>
+<tr><td><code>#style</code></td><td><a href="type.joe.String.html"><code>String</code></a></td><td>FXCSS style string</td></tr>
+<tr><td><code>#visible</code></td><td><a href="type.joe.Boolean.html"><code>Boolean</code></a></td><td>Visibility flag</td></tr>
+</tbody></table>
+</div><h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
-<p><span id="method.getId"> </span></p>
-<h3 id="nodegetid"><a class="header" href="#nodegetid"><em>node</em>.getId()</a></h3>
+<p><span id="method.disable"> </span></p>
+<h3 id="nodedisable"><a class="header" href="#nodedisable"><em>node</em>.disable()</a></h3>
 <hr />
-<p><strong><em>node</em>.getId() → <a href="type.joe.String.html">joe.String</a></strong></p>
-<p>Gets the node's ID string, or null if not defined.</p>
-<p><span id="method.getStyle"> </span></p>
-<h3 id="nodegetstyle"><a class="header" href="#nodegetstyle"><em>node</em>.getStyle()</a></h3>
+<p><strong><em>node</em>.disable([<em>flag</em>]) → this</strong></p>
+<p>Sets the node's <code>#disable</code> property to <em>flag</em>; if omitted,
+<em>flag</em> defaults to <code>true</code>.  While <code>true</code>, this node and its
+descendants in the scene graph will be disabled.</p>
+<p><span id="method.id"> </span></p>
+<h3 id="nodeid"><a class="header" href="#nodeid"><em>node</em>.id()</a></h3>
 <hr />
-<p><strong><em>node</em>.getStyle() → <a href="type.joe.String.html">joe.String</a></strong></p>
-<p>Gets the node's FXCSS style, or null if none.  The style is a single
-CSS string which can contain multiple style settings, separated by
-semicolons.</p>
-<p><span id="method.getStyleClasses"> </span></p>
-<h3 id="nodegetstyleclasses"><a class="header" href="#nodegetstyleclasses"><em>node</em>.getStyleClasses()</a></h3>
-<hr />
-<p><strong><em>node</em>.getStyleClasses() → <a href="type.joe.List.html">joe.List</a></strong></p>
-<p>Gets the list of the node's FXCSS style class names.  Values must
-be valid CSS style class strings.</p>
+<p><strong><em>node</em>.id(<em>id</em>) → this</strong></p>
+<p>Sets the node's <code>#id</code> property to the given <em>id</em> string.</p>
 <p><span id="method.isDisabled"> </span></p>
 <h3 id="nodeisdisabled"><a class="header" href="#nodeisdisabled"><em>node</em>.isDisabled()</a></h3>
 <hr />
 <p><strong><em>node</em>.isDisabled() → <a href="type.joe.Boolean.html">joe.Boolean</a></strong></p>
 <p>Returns <code>true</code> if the node has been disabled, and <code>false</code> otherwise.</p>
-<p><span id="method.isVisible"> </span></p>
-<h3 id="nodeisvisible"><a class="header" href="#nodeisvisible"><em>node</em>.isVisible()</a></h3>
+<p><span id="method.styleClasses"> </span></p>
+<h3 id="nodestyleclasses"><a class="header" href="#nodestyleclasses"><em>node</em>.styleClasses()</a></h3>
 <hr />
-<p><strong><em>node</em>.isVisible() → <a href="type.joe.Boolean.html">joe.Boolean</a></strong></p>
-<p>Returns <code>true</code> if the node is marked "visible", and <code>false</code> otherwise.</p>
-<p>Note: if <code>false</code>, the node will occupy its usual space in the window,
-but will be transparent.</p>
-<p><span id="method.setDisable"> </span></p>
-<h3 id="nodesetdisable"><a class="header" href="#nodesetdisable"><em>node</em>.setDisable()</a></h3>
+<p><strong><em>node</em>.styleClasses() → <a href="type.joe.List.html">joe.List</a></strong></p>
+<p>Gets the list of the node's FXCSS style class names.  Values must
+be valid CSS style class strings.</p>
+<p><span id="method.styles"> </span></p>
+<h3 id="nodestyles"><a class="header" href="#nodestyles"><em>node</em>.styles()</a></h3>
 <hr />
-<p><strong><em>node</em>.setDisable(<em>flag</em>) → this</strong></p>
-<p>Sets the node's <code>disable</code> flag.  If <code>true</code>, this node and its
-descendants in the scene graph will be disabled.</p>
-<p><span id="method.setId"> </span></p>
-<h3 id="nodesetid"><a class="header" href="#nodesetid"><em>node</em>.setId()</a></h3>
-<hr />
-<p><strong><em>node</em>.setId(<em>id</em>) → this</strong></p>
-<p>Sets the node's ID string.</p>
-<p><span id="method.setStyle"> </span></p>
-<h3 id="nodesetstyle"><a class="header" href="#nodesetstyle"><em>node</em>.setStyle()</a></h3>
-<hr />
-<p><strong><em>node</em>.setStyle(<em>style</em>, ...) → this</strong></p>
-<p>Sets the node's FXCSS style.  The caller can pass multiple style
-strings, which will be joined with semicolons.</p>
-<p><span id="method.setVisible"> </span></p>
-<h3 id="nodesetvisible"><a class="header" href="#nodesetvisible"><em>node</em>.setVisible()</a></h3>
-<hr />
-<p><strong><em>node</em>.setVisible(<em>flag</em>) → this</strong></p>
-<p>Sets the node's <code>visible</code> flag.</p>
-<p>Note: if <code>false</code>, the node will occupy its usual space in the window,
-but will be transparent.</p>
+<p><strong><em>node</em>.styles(<em>style</em>, ...) → this</strong></p>
+<p>Sets the node's FXCSS <code>#style</code> property.  The caller can pass
+multiple style strings, which will be joined with semicolons.</p>
 <p><span id="method.vgrow"> </span></p>
 <h3 id="nodevgrow"><a class="header" href="#nodevgrow"><em>node</em>.vgrow()</a></h3>
 <hr />
@@ -254,8 +232,8 @@ but will be transparent.</p>
 <p>Sets the <a href="type.joe.win.VBox.html"><code>VBox</code></a> <code>vgrow</code> constraint for the node to the
 given [[Priority]], or to <code>Priority.ALWAYS</code> if the priority
 is omitted.</p>
-<p>This method is equivalent to <a href="type.joe.win.VBox.html#static.setVgrow"><code>VBox.setVgrow()</code></a>, but is
-frequently more convenient.</p>
+<p>This method is equivalent to the JavaFX <code>VBox.setVgrow()</code>
+method.</p>
 
                     </main>
 

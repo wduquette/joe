@@ -15,6 +15,7 @@ class PaneProxy extends TypeProxy<Pane> {
     //**
     // @package joe.win
     // @type Pane
+    // @extends Region
     // The `Pane` type is the base class for JavaFX
     // [[Node]] widgets that can have child nodes.
     public PaneProxy() {

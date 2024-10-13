@@ -17,6 +17,7 @@ class ButtonProxy extends TypeProxy<Button> {
     //**
     // @package joe.win
     // @type Button
+    // @extends Control
     // The `Button` type is the base class for JavaFX
     // labels like [[Button]] widgets.
     public ButtonProxy() {

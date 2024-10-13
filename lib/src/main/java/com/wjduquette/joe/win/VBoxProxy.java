@@ -18,6 +18,7 @@ class VBoxProxy extends TypeProxy<VBox> {
     //**
     // @package joe.win
     // @type VBox
+    // @extends Pane
     // The `VBox` type is a [[Pane]] that manages a vertical stack of
     // widgets.
     public VBoxProxy() {
