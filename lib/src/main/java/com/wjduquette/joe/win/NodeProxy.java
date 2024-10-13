@@ -2,7 +2,6 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.TypeProxy;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -61,7 +60,7 @@ class NodeProxy extends FXProxy<Node> {
     // descendants in the scene graph will be disabled.
     private Object _disable(Node node, Joe joe, ArgQueue args) {
         Joe.arityRange(args, 0, 1, "disable([flag])");
-        var flag = args.isEmpty() ? true : Joe.isTruthy(args.next());
+        var flag = args.isEmpty() || Joe.isTruthy(args.next());
         node.setDisable(flag);
         return node;
     }
