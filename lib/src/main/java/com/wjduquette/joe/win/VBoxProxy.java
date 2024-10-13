@@ -9,7 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-class VBoxProxy extends TypeProxy<VBox> {
+class VBoxProxy extends FXProxy<VBox> {
     public static final VBoxProxy TYPE = new VBoxProxy();
 
     //-------------------------------------------------------------------------

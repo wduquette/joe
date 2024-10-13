@@ -6,7 +6,7 @@ import com.wjduquette.joe.TypeProxy;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
-class PaneProxy extends TypeProxy<Pane> {
+class PaneProxy extends FXProxy<Pane> {
     public static final PaneProxy TYPE = new PaneProxy();
 
     //-------------------------------------------------------------------------

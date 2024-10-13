@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 /**
  * Proxy for a JavaFX Button.
  */
-class ButtonProxy extends TypeProxy<Button> {
+class ButtonProxy extends FXProxy<Button> {
     public static final ButtonProxy TYPE = new ButtonProxy();
 
     //-------------------------------------------------------------------------

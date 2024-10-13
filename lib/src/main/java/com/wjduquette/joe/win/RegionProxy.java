@@ -2,10 +2,9 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.TypeProxy;
 import javafx.scene.layout.Region;
 
-class RegionProxy extends TypeProxy<Region> {
+class RegionProxy extends FXProxy<Region> {
     public static final RegionProxy TYPE = new RegionProxy();
 
     //-------------------------------------------------------------------------
@@ -38,6 +37,9 @@ class RegionProxy extends TypeProxy<Region> {
         // value to indicate that the preferred width or height should be used
         // for that property.
         constant("USE_PREF_SIZE",     Region.USE_PREF_SIZE);
+
+        // Properties
+        fxProperty("prefHeight", Number.class, Region::prefHeightProperty);
 
         // No initializer
 

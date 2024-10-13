@@ -6,7 +6,7 @@ import com.wjduquette.joe.TypeProxy;
 import javafx.scene.control.Control;
 import javafx.scene.control.Tooltip;
 
-class ControlProxy extends TypeProxy<Control> {
+class ControlProxy extends FXProxy<Control> {
     public static final ControlProxy TYPE = new ControlProxy();
 
     //-------------------------------------------------------------------------
