@@ -18,8 +18,10 @@ public class FXProxy<V> extends TypeProxy<V> {
 
     //**
     // @package joe.win
-    // @type FX
-    // Type used to define JavaFX type proxies.
+    // @type FXProxy
+    // @generic
+    // This type defines the property access methods commonly used by
+    // JavaFX types.
     public FXProxy(String name) {
         super(name);
 

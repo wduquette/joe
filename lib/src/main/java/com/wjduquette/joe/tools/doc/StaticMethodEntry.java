@@ -28,6 +28,13 @@ class StaticMethodEntry extends TypeMember implements Callable {
         this.name = name;
     }
 
+    public StaticMethodEntry(TypeEntry type, StaticMethodEntry other) {
+        super(type);
+        this.name = other.name;
+        this.argSpec.addAll(other.argSpec);
+        this.result = other.result();
+    }
+
     //-------------------------------------------------------------------------
     // Accessors
 

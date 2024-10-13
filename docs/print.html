@@ -2243,11 +2243,32 @@ in the generated documentation.</p>
 <p>The entity has the following optional metadata:</p>
 <div class="table-wrapper"><table><thead><tr><th>Metadata Tag</th><th>Meaning</th></tr></thead><tbody>
 <tr><td><code>@extends &lt;type&gt;</code></td><td>This type extends the named type.</td></tr>
+<tr><td><code>@generic</code></td><td>This type is generic, and will not appear in the generated docs.</td></tr>
+<tr><td><code>@includes &lt;type&gt;</code></td><td>This type includes the documentation for the named type.</td></tr>
 </tbody></table>
 </div>
 <ul>
-<li>The <code>&lt;type&gt;</code> should be the name or qualified name of this type's supertype.</li>
+<li><code>&lt;type&gt;</code> should be the name or qualified name of a referenced type.</li>
 </ul>
+<p>The <code>@extends &lt;type&gt;</code> tag is used when this type extends (i.e., subclasses)
+another script-visible type.  For example, in the standard library the
+<a href="library/type.joe.AssertError.html"><code>AssertError</code></a> type extends the
+<a href="library/type.joe.Error.html"><code>Error</code></a>, both of which are visible at the
+script-level.</p>
+<p>The <code>@generic</code> tag is used for generic proxies, like Joe's <code>EnumProxy&lt;E&gt;</code>,
+where the same proxy is used by many distinct types.  <code>joe doc</code> will accumulate
+a generic type's documentation, but will not create a page for the type in
+the generated documentation.</p>
+<p>The <code>@includes &lt;type&gt;</code> tag indicates that this type's documentation should
+include the documentation from another (usually generic) type. The included
+type may be any type in the current documentation set, or
+any of the following generic types from Joe's standard library:</p>
+<ul>
+<li><code>@include joe.Enum</code>.</li>
+</ul>
+<p>The included documentation will be represented as part of the including type.</p>
+<p><strong>Note:</strong> a type may include exactly one other type, and includes are not
+transitive.</p>
 <pre><code class="language-java">//**
 // @type AssertError
 // @extends Error
@@ -2681,14 +2702,6 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Control.html#method.setTooltipText"><em>control</em>.setTooltipText(<em>text</em>)</a> → this</li>
 </ul>
 </li>
-<li><a href="library/type.joe.win.FX.html">FX</a>
-<ul>
-<li><a href="library/type.joe.win.FX.html#method.getProperty"><em>fX</em>.getProperty(<em>keyword</em>)</a> → value</li>
-<li><a href="library/type.joe.win.FX.html#method.listenTo"><em>fX</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
-<li><a href="library/type.joe.win.FX.html#method.properties"><em>fX</em>.properties()</a> → <a href="library/type.joe.Set.html">joe.Set</a></li>
-<li><a href="library/type.joe.win.FX.html#method.setProperty"><em>fX</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
-</ul>
-</li>
 <li><a href="library/type.joe.win.Insets.html">Insets</a>
 <ul>
 <li><a href="library/type.joe.win.Insets.html#init">Insets(<em>pixels</em>)</a> → <a href="library/type.joe.win.Insets.html">Insets</a></li>
@@ -2708,8 +2721,12 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Node.html">Node</a>
 <ul>
 <li><a href="library/type.joe.win.Node.html#method.disable"><em>node</em>.disable([<em>flag</em>])</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.getProperty"><em>node</em>.getProperty(<em>keyword</em>)</a> → value</li>
 <li><a href="library/type.joe.win.Node.html#method.id"><em>node</em>.id(<em>id</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.isDisabled"><em>node</em>.isDisabled()</a> → <a href="library/type.joe.Boolean.html">joe.Boolean</a></li>
+<li><a href="library/type.joe.win.Node.html#method.listenTo"><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.properties"><em>node</em>.properties()</a> → <a href="library/type.joe.Set.html">joe.Set</a></li>
+<li><a href="library/type.joe.win.Node.html#method.setProperty"><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
@@ -4371,7 +4388,6 @@ It assumes a familiarity with JavaFX.</p>
 <ul>
 <li><a href="library/type.joe.win.Button.html">Button</a> extends <a href="library/type.joe.win.Control.html">Control</a></li>
 <li><a href="library/type.joe.win.Control.html">Control</a> extends <a href="library/type.joe.win.Region.html">Region</a></li>
-<li><a href="library/type.joe.win.FX.html">FX</a></li>
 <li><a href="library/type.joe.win.Insets.html">Insets</a></li>
 <li><a href="library/type.joe.win.Label.html">Label</a> extends <a href="library/type.joe.win.Control.html">Control</a></li>
 <li><a href="library/type.joe.win.Node.html">Node</a></li>
@@ -4426,8 +4442,12 @@ controls like <a href="library/type.joe.win.Label.html"><code>Label</code></a> w
 <p><strong>Node Methods</strong></p>
 <ul>
 <li><a href="library/type.joe.win.Node.html#method.disable"><em>node</em>.disable([<em>flag</em>])</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.getProperty"><em>node</em>.getProperty(<em>keyword</em>)</a> → value</li>
 <li><a href="library/type.joe.win.Node.html#method.id"><em>node</em>.id(<em>id</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.isDisabled"><em>node</em>.isDisabled()</a> → <a href="library/type.joe.Boolean.html">joe.Boolean</a></li>
+<li><a href="library/type.joe.win.Node.html#method.listenTo"><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.properties"><em>node</em>.properties()</a> → <a href="library/type.joe.Set.html">joe.Set</a></li>
+<li><a href="library/type.joe.win.Node.html#method.setProperty"><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
@@ -4480,8 +4500,12 @@ labels like <a href="library/type.joe.win.Button.html"><code>Button</code></a> w
 <p><strong>Node Methods</strong></p>
 <ul>
 <li><a href="library/type.joe.win.Node.html#method.disable"><em>node</em>.disable([<em>flag</em>])</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.getProperty"><em>node</em>.getProperty(<em>keyword</em>)</a> → value</li>
 <li><a href="library/type.joe.win.Node.html#method.id"><em>node</em>.id(<em>id</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.isDisabled"><em>node</em>.isDisabled()</a> → <a href="library/type.joe.Boolean.html">joe.Boolean</a></li>
+<li><a href="library/type.joe.win.Node.html#method.listenTo"><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.properties"><em>node</em>.properties()</a> → <a href="library/type.joe.Set.html">joe.Set</a></li>
+<li><a href="library/type.joe.win.Node.html#method.setProperty"><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
@@ -4585,8 +4609,12 @@ labels like <a href="library/type.joe.win.Label.html"><code>Label</code></a> wid
 <p><strong>Node Methods</strong></p>
 <ul>
 <li><a href="library/type.joe.win.Node.html#method.disable"><em>node</em>.disable([<em>flag</em>])</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.getProperty"><em>node</em>.getProperty(<em>keyword</em>)</a> → value</li>
 <li><a href="library/type.joe.win.Node.html#method.id"><em>node</em>.id(<em>id</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.isDisabled"><em>node</em>.isDisabled()</a> → <a href="library/type.joe.Boolean.html">joe.Boolean</a></li>
+<li><a href="library/type.joe.win.Node.html#method.listenTo"><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.properties"><em>node</em>.properties()</a> → <a href="library/type.joe.Set.html">joe.Set</a></li>
+<li><a href="library/type.joe.win.Node.html#method.setProperty"><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
@@ -4611,8 +4639,12 @@ all widgets.</p>
 <p><strong><a href="library/type.joe.win.Node.html#methods">Methods</a></strong></p>
 <ul>
 <li><a href="library/type.joe.win.Node.html#method.disable"><em>node</em>.disable([<em>flag</em>])</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.getProperty"><em>node</em>.getProperty(<em>keyword</em>)</a> → value</li>
 <li><a href="library/type.joe.win.Node.html#method.id"><em>node</em>.id(<em>id</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.isDisabled"><em>node</em>.isDisabled()</a> → <a href="library/type.joe.Boolean.html">joe.Boolean</a></li>
+<li><a href="library/type.joe.win.Node.html#method.listenTo"><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.properties"><em>node</em>.properties()</a> → <a href="library/type.joe.Set.html">joe.Set</a></li>
+<li><a href="library/type.joe.win.Node.html#method.setProperty"><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
@@ -4623,7 +4655,10 @@ all widgets.</p>
 <tr><td><code>#style</code></td><td><a href="library/type.joe.String.html"><code>String</code></a></td><td>FXCSS style string</td></tr>
 <tr><td><code>#visible</code></td><td><a href="library/type.joe.Boolean.html"><code>Boolean</code></a></td><td>Visibility flag</td></tr>
 </tbody></table>
-</div><h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
+</div>
+<p>This type defines the property access methods commonly used by
+JavaFX types.</p>
+<h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
 <p><span id="method.disable"> </span></p>
 <h3 id="nodedisable"><a class="header" href="#nodedisable"><em>node</em>.disable()</a></h3>
@@ -4632,6 +4667,10 @@ all widgets.</p>
 <p>Sets the node's <code>#disable</code> property to <em>flag</em>; if omitted,
 <em>flag</em> defaults to <code>true</code>.  While <code>true</code>, this node and its
 descendants in the scene graph will be disabled.</p>
+<p><span id="method.getProperty"> </span></p>
+<h3 id="nodegetproperty"><a class="header" href="#nodegetproperty"><em>node</em>.getProperty()</a></h3>
+<hr />
+<p><strong><em>node</em>.getProperty(<em>keyword</em>) → value</strong></p>
 <p><span id="method.id"> </span></p>
 <h3 id="nodeid"><a class="header" href="#nodeid"><em>node</em>.id()</a></h3>
 <hr />
@@ -4642,6 +4681,18 @@ descendants in the scene graph will be disabled.</p>
 <hr />
 <p><strong><em>node</em>.isDisabled() → <a href="library/type.joe.Boolean.html">joe.Boolean</a></strong></p>
 <p>Returns <code>true</code> if the node has been disabled, and <code>false</code> otherwise.</p>
+<p><span id="method.listenTo"> </span></p>
+<h3 id="nodelistento"><a class="header" href="#nodelistento"><em>node</em>.listenTo()</a></h3>
+<hr />
+<p><strong><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>) → this</strong></p>
+<p><span id="method.properties"> </span></p>
+<h3 id="nodeproperties"><a class="header" href="#nodeproperties"><em>node</em>.properties()</a></h3>
+<hr />
+<p><strong><em>node</em>.properties() → <a href="library/type.joe.Set.html">joe.Set</a></strong></p>
+<p><span id="method.setProperty"> </span></p>
+<h3 id="nodesetproperty"><a class="header" href="#nodesetproperty"><em>node</em>.setProperty()</a></h3>
+<hr />
+<p><strong><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>) → this</strong></p>
 <p><span id="method.styleClasses"> </span></p>
 <h3 id="nodestyleclasses"><a class="header" href="#nodestyleclasses"><em>node</em>.styleClasses()</a></h3>
 <hr />
@@ -4688,8 +4739,12 @@ method.</p>
 <p><strong>Node Methods</strong></p>
 <ul>
 <li><a href="library/type.joe.win.Node.html#method.disable"><em>node</em>.disable([<em>flag</em>])</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.getProperty"><em>node</em>.getProperty(<em>keyword</em>)</a> → value</li>
 <li><a href="library/type.joe.win.Node.html#method.id"><em>node</em>.id(<em>id</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.isDisabled"><em>node</em>.isDisabled()</a> → <a href="library/type.joe.Boolean.html">joe.Boolean</a></li>
+<li><a href="library/type.joe.win.Node.html#method.listenTo"><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.properties"><em>node</em>.properties()</a> → <a href="library/type.joe.Set.html">joe.Set</a></li>
+<li><a href="library/type.joe.win.Node.html#method.setProperty"><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
@@ -4732,8 +4787,12 @@ All items must belong some <a href="library/type.joe.win.Node.html"><code>Node</
 <p><strong>Node Methods</strong></p>
 <ul>
 <li><a href="library/type.joe.win.Node.html#method.disable"><em>node</em>.disable([<em>flag</em>])</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.getProperty"><em>node</em>.getProperty(<em>keyword</em>)</a> → value</li>
 <li><a href="library/type.joe.win.Node.html#method.id"><em>node</em>.id(<em>id</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.isDisabled"><em>node</em>.isDisabled()</a> → <a href="library/type.joe.Boolean.html">joe.Boolean</a></li>
+<li><a href="library/type.joe.win.Node.html#method.listenTo"><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.properties"><em>node</em>.properties()</a> → <a href="library/type.joe.Set.html">joe.Set</a></li>
+<li><a href="library/type.joe.win.Node.html#method.setProperty"><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
@@ -4813,8 +4872,12 @@ widgets.</p>
 <p><strong>Node Methods</strong></p>
 <ul>
 <li><a href="library/type.joe.win.Node.html#method.disable"><em>node</em>.disable([<em>flag</em>])</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.getProperty"><em>node</em>.getProperty(<em>keyword</em>)</a> → value</li>
 <li><a href="library/type.joe.win.Node.html#method.id"><em>node</em>.id(<em>id</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.isDisabled"><em>node</em>.isDisabled()</a> → <a href="library/type.joe.Boolean.html">joe.Boolean</a></li>
+<li><a href="library/type.joe.win.Node.html#method.listenTo"><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.properties"><em>node</em>.properties()</a> → <a href="library/type.joe.Set.html">joe.Set</a></li>
+<li><a href="library/type.joe.win.Node.html#method.setProperty"><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
@@ -5200,14 +5263,6 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Control.html#method.setTooltipText"><em>control</em>.setTooltipText(<em>text</em>)</a> → this</li>
 </ul>
 </li>
-<li><a href="library/type.joe.win.FX.html">FX</a>
-<ul>
-<li><a href="library/type.joe.win.FX.html#method.getProperty"><em>fX</em>.getProperty(<em>keyword</em>)</a> → value</li>
-<li><a href="library/type.joe.win.FX.html#method.listenTo"><em>fX</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
-<li><a href="library/type.joe.win.FX.html#method.properties"><em>fX</em>.properties()</a> → <a href="library/type.joe.Set.html">joe.Set</a></li>
-<li><a href="library/type.joe.win.FX.html#method.setProperty"><em>fX</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
-</ul>
-</li>
 <li><a href="library/type.joe.win.Insets.html">Insets</a>
 <ul>
 <li><a href="library/type.joe.win.Insets.html#init">Insets(<em>pixels</em>)</a> → <a href="library/type.joe.win.Insets.html">Insets</a></li>
@@ -5227,8 +5282,12 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Node.html">Node</a>
 <ul>
 <li><a href="library/type.joe.win.Node.html#method.disable"><em>node</em>.disable([<em>flag</em>])</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.getProperty"><em>node</em>.getProperty(<em>keyword</em>)</a> → value</li>
 <li><a href="library/type.joe.win.Node.html#method.id"><em>node</em>.id(<em>id</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.isDisabled"><em>node</em>.isDisabled()</a> → <a href="library/type.joe.Boolean.html">joe.Boolean</a></li>
+<li><a href="library/type.joe.win.Node.html#method.listenTo"><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.properties"><em>node</em>.properties()</a> → <a href="library/type.joe.Set.html">joe.Set</a></li>
+<li><a href="library/type.joe.win.Node.html#method.setProperty"><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>

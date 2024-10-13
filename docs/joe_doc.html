@@ -396,11 +396,32 @@ in the generated documentation.</p>
 <p>The entity has the following optional metadata:</p>
 <div class="table-wrapper"><table><thead><tr><th>Metadata Tag</th><th>Meaning</th></tr></thead><tbody>
 <tr><td><code>@extends &lt;type&gt;</code></td><td>This type extends the named type.</td></tr>
+<tr><td><code>@generic</code></td><td>This type is generic, and will not appear in the generated docs.</td></tr>
+<tr><td><code>@includes &lt;type&gt;</code></td><td>This type includes the documentation for the named type.</td></tr>
 </tbody></table>
 </div>
 <ul>
-<li>The <code>&lt;type&gt;</code> should be the name or qualified name of this type's supertype.</li>
+<li><code>&lt;type&gt;</code> should be the name or qualified name of a referenced type.</li>
 </ul>
+<p>The <code>@extends &lt;type&gt;</code> tag is used when this type extends (i.e., subclasses)
+another script-visible type.  For example, in the standard library the
+<a href="library/type.joe.AssertError.html"><code>AssertError</code></a> type extends the
+<a href="library/type.joe.Error.html"><code>Error</code></a>, both of which are visible at the
+script-level.</p>
+<p>The <code>@generic</code> tag is used for generic proxies, like Joe's <code>EnumProxy&lt;E&gt;</code>,
+where the same proxy is used by many distinct types.  <code>joe doc</code> will accumulate
+a generic type's documentation, but will not create a page for the type in
+the generated documentation.</p>
+<p>The <code>@includes &lt;type&gt;</code> tag indicates that this type's documentation should
+include the documentation from another (usually generic) type. The included
+type may be any type in the current documentation set, or
+any of the following generic types from Joe's standard library:</p>
+<ul>
+<li><code>@include joe.Enum</code>.</li>
+</ul>
+<p>The included documentation will be represented as part of the including type.</p>
+<p><strong>Note:</strong> a type may include exactly one other type, and includes are not
+transitive.</p>
 <pre><code class="language-java">//**
 // @type AssertError
 // @extends Error

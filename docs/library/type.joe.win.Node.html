@@ -182,8 +182,12 @@ all widgets.</p>
 <p><strong><a href="#methods">Methods</a></strong></p>
 <ul>
 <li><a href="type.joe.win.Node.html#method.disable"><em>node</em>.disable([<em>flag</em>])</a> → this</li>
+<li><a href="type.joe.win.Node.html#method.getProperty"><em>node</em>.getProperty(<em>keyword</em>)</a> → value</li>
 <li><a href="type.joe.win.Node.html#method.id"><em>node</em>.id(<em>id</em>)</a> → this</li>
 <li><a href="type.joe.win.Node.html#method.isDisabled"><em>node</em>.isDisabled()</a> → <a href="type.joe.Boolean.html">joe.Boolean</a></li>
+<li><a href="type.joe.win.Node.html#method.listenTo"><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
+<li><a href="type.joe.win.Node.html#method.properties"><em>node</em>.properties()</a> → <a href="type.joe.Set.html">joe.Set</a></li>
+<li><a href="type.joe.win.Node.html#method.setProperty"><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
 <li><a href="type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="type.joe.List.html">joe.List</a></li>
 <li><a href="type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
@@ -194,7 +198,10 @@ all widgets.</p>
 <tr><td><code>#style</code></td><td><a href="type.joe.String.html"><code>String</code></a></td><td>FXCSS style string</td></tr>
 <tr><td><code>#visible</code></td><td><a href="type.joe.Boolean.html"><code>Boolean</code></a></td><td>Visibility flag</td></tr>
 </tbody></table>
-</div><h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
+</div>
+<p>This type defines the property access methods commonly used by
+JavaFX types.</p>
+<h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
 <p><span id="method.disable"> </span></p>
 <h3 id="nodedisable"><a class="header" href="#nodedisable"><em>node</em>.disable()</a></h3>
@@ -203,6 +210,10 @@ all widgets.</p>
 <p>Sets the node's <code>#disable</code> property to <em>flag</em>; if omitted,
 <em>flag</em> defaults to <code>true</code>.  While <code>true</code>, this node and its
 descendants in the scene graph will be disabled.</p>
+<p><span id="method.getProperty"> </span></p>
+<h3 id="nodegetproperty"><a class="header" href="#nodegetproperty"><em>node</em>.getProperty()</a></h3>
+<hr />
+<p><strong><em>node</em>.getProperty(<em>keyword</em>) → value</strong></p>
 <p><span id="method.id"> </span></p>
 <h3 id="nodeid"><a class="header" href="#nodeid"><em>node</em>.id()</a></h3>
 <hr />
@@ -213,6 +224,18 @@ descendants in the scene graph will be disabled.</p>
 <hr />
 <p><strong><em>node</em>.isDisabled() → <a href="type.joe.Boolean.html">joe.Boolean</a></strong></p>
 <p>Returns <code>true</code> if the node has been disabled, and <code>false</code> otherwise.</p>
+<p><span id="method.listenTo"> </span></p>
+<h3 id="nodelistento"><a class="header" href="#nodelistento"><em>node</em>.listenTo()</a></h3>
+<hr />
+<p><strong><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>) → this</strong></p>
+<p><span id="method.properties"> </span></p>
+<h3 id="nodeproperties"><a class="header" href="#nodeproperties"><em>node</em>.properties()</a></h3>
+<hr />
+<p><strong><em>node</em>.properties() → <a href="type.joe.Set.html">joe.Set</a></strong></p>
+<p><span id="method.setProperty"> </span></p>
+<h3 id="nodesetproperty"><a class="header" href="#nodesetproperty"><em>node</em>.setProperty()</a></h3>
+<hr />
+<p><strong><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>) → this</strong></p>
 <p><span id="method.styleClasses"> </span></p>
 <h3 id="nodestyleclasses"><a class="header" href="#nodestyleclasses"><em>node</em>.styleClasses()</a></h3>
 <hr />

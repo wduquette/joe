@@ -61,6 +61,8 @@ class DocCommentParser {
     private static final String RESULT = "@result";
     private static final String TYPE = "@type";
     private static final String TYPE_TOPIC = "@typeTopic";
+    private static final String GENERIC = "@generic";
+    private static final String INCLUDES = "@includes";
     private static final String EXTENDS = "@extends";
     private static final String CONSTANT = "@constant";
     private static final String STATIC = "@static";
@@ -227,7 +229,9 @@ class DocCommentParser {
 
             advance();
             switch (tag.name()) {
+                case GENERIC -> type.setGeneric(true);
                 case EXTENDS -> type.setSupertypeName(_extends(tag));
+                case INCLUDES -> type.setIncludes(_includes(tag));
                 case CONSTANT -> _constant(type, tag);
                 case STATIC -> _static(type, tag);
                 case INIT -> _init(type, tag);
@@ -246,6 +250,13 @@ class DocCommentParser {
         return result;
     }
 
+    private String _includes(Tag tag) {
+        var result = tag.value().trim();
+        if (result.split("\\s").length > 1) {
+            throw error(previous(), "Expected type name");
+        }
+        return result;
+    }
 
     private void _constant(TypeEntry type, Tag constantTag) {
         ConstantEntry constant = new ConstantEntry(type, constantTag.value());

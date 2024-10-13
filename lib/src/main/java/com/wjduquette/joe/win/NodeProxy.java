@@ -17,6 +17,7 @@ class NodeProxy extends FXProxy<Node> {
     //**
     // @package joe.win
     // @type Node
+    // @includes FXProxy
     // The `Node` widget is the abstract base class for the JavaFX widget
     // hierarchy. This abstract type provides features available for
     // all widgets.
