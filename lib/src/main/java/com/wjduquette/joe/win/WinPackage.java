@@ -135,4 +135,11 @@ public class WinPackage extends JoePackage {
             return this;
         }
     }
+
+    //-------------------------------------------------------------------------
+    // Static converters for use with properties
+
+    static Pos toPos(Joe joe, Object arg) {
+        return joe.toEnum(arg, Pos.class);
+    }
 }

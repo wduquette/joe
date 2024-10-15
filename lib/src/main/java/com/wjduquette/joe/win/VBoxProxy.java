@@ -45,8 +45,8 @@ class VBoxProxy extends FXProxy<VBox> {
         // | `#spacing`   | [[Number]] | The spacing between children in pixels |
 
         // Properties
-        fxProperty("alignment", Pos.class,    VBox::alignmentProperty);
-        fxProperty("spacing",   Number.class, VBox::spacingProperty);
+        fxProperty("alignment", Pos.class, VBox::alignmentProperty, WinPackage::toPos);
+        fxProperty("spacing", Number.class, VBox::spacingProperty, Joe::toDouble);
 
         // Methods
         method("spacing", this::_spacing);
