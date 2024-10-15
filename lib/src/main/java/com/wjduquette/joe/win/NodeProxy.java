@@ -37,9 +37,9 @@ class NodeProxy extends FXProxy<Node> {
         // | `#id`      | [[joe.String]]   | JavaFX ID          |
         // | `#style`   | [[joe.String]]   | FXCSS style string |
         // | `#visible` | [[joe.Boolean]]  | Visibility flag    |
-        fxProperty("id",      String.class,  Node::idProperty);
-        fxProperty("style",   String.class,  Node::styleProperty);
-        fxProperty("visible", Boolean.class, Node::visibleProperty);
+        fxProperty("id",      Node::idProperty,      Joe::toString);
+        fxProperty("style",   Node::styleProperty,   Joe::toString);
+        fxProperty("visible", Node::visibleProperty, Joe::toBoolean);
 
         // Methods
         method("disable",         this::_disable);

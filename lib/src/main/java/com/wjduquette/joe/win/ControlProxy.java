@@ -33,7 +33,7 @@ class ControlProxy extends FXProxy<Control> {
         // | `#tooltip`    | [[Tooltip]]     | The control's tooltip      |
 
         // Properties
-        fxProperty("tooltip", Tooltip.class, Control::tooltipProperty);
+        fxProperty("tooltip", Control::tooltipProperty, WinPackage::toTooltip);
 
         // Methods
         method("tooltip",     this::_tooltip);

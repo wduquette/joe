@@ -50,36 +50,17 @@ public class FXProxy<V> extends TypeProxy<V> {
     /**
      * Defines a JavaFX property.
      * @param keywordName The identifying keyword's name.
-     * @param cls The property's value class.
-     * @param getter The getter for the property object.
-     * @param <P> The property's value type.
-     */
-    public <P> void fxProperty(
-        String keywordName,
-        Class<P> cls,
-        PropertyGetter<V,P> getter
-    ) {
-        var keyword = new Keyword(keywordName);
-        var def = new PropertyDef<V,P>(keyword, cls, getter, null);
-        properties.put(keyword, def);
-    }
-
-    /**
-     * Defines a JavaFX property.
-     * @param keywordName The identifying keyword's name.
-     * @param cls The property's value class.
      * @param getter The getter for the property object.
      * @param converter The converter for the value.
      * @param <P> The property's value type.
      */
     public <P> void fxProperty(
         String keywordName,
-        Class<P> cls,
         PropertyGetter<V,P> getter,
-        ArgConverter converter
+        ArgConverter<P> converter
     ) {
         var keyword = new Keyword(keywordName);
-        var def = new PropertyDef<V,P>(keyword, cls, getter, converter);
+        var def = new PropertyDef<V,P>(keyword, null, getter, converter);
         properties.put(keyword, def);
     }
 
@@ -162,31 +143,25 @@ public class FXProxy<V> extends TypeProxy<V> {
         Property<P> get(V value);
     }
 
-    public interface ArgConverter {
-        Object convert(Joe joe, Object arg);
+    public interface ArgConverter<P> {
+        P convert(Joe joe, Object arg);
     }
 
     private record PropertyDef<V, P>(
         Keyword keyword,
         Class<P> propertyClass,
         PropertyGetter<V,P> getter,
-        ArgConverter converter
+        ArgConverter<P> converter
     ) {
         Property<P> getProperty(V obj) {
             return getter.get(obj);
         }
 
-        // Note: the cast to (P) is checked by the isAssignableFrom test.
-        @SuppressWarnings("unchecked")
         void setProperty(Joe joe, V obj, Object arg) {
             var property = getProperty(obj);
-            Object value = converter != null ? converter.convert(joe, arg) : arg;
-            if (!propertyClass.isAssignableFrom(value.getClass())) {
-                throw joe.expected("valid property value", value);
-            }
 
             try {
-                property.setValue((P)value);
+                property.setValue(converter.convert(joe, arg));
             } catch (Exception ex) {
                 throw new JoeError(
                     "Failed to set property:" + ex.getMessage());

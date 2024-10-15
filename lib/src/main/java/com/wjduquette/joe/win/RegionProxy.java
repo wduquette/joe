@@ -56,13 +56,13 @@ class RegionProxy extends FXProxy<Region> {
         // | `#prefWidth`  | [[joe.Number]]  | Preferred width in pixels  |
 
         // Properties
-        fxProperty("maxHeight",  Number.class, Region::maxHeightProperty);
-        fxProperty("maxHeight",  Number.class, Region::maxHeightProperty);
-        fxProperty("minWidth",   Number.class, Region::minWidthProperty);
-        fxProperty("minWidth",   Number.class, Region::minWidthProperty);
-        fxProperty("padding",    Insets.class, Region::paddingProperty);
-        fxProperty("prefHeight", Number.class, Region::prefHeightProperty);
-        fxProperty("prefWidth",  Number.class, Region::prefWidthProperty);
+        fxProperty("maxHeight",  Region::maxHeightProperty,  Joe::toDouble);
+        fxProperty("maxHeight",  Region::maxHeightProperty,  Joe::toDouble);
+        fxProperty("minWidth",   Region::minWidthProperty,   Joe::toDouble);
+        fxProperty("minWidth",   Region::minWidthProperty,   Joe::toDouble);
+        fxProperty("padding",    Region::paddingProperty,    WinPackage::toInsets);
+        fxProperty("prefHeight", Region::prefHeightProperty, Joe::toDouble);
+        fxProperty("prefWidth",  Region::prefWidthProperty,  Joe::toDouble);
 
         // No initializer
 

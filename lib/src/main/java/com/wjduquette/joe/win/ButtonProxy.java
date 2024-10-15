@@ -40,6 +40,9 @@ class ButtonProxy extends FXProxy<Button> {
         //
         // - *callable(1)*: A callable taking one argument
 
+        fxProperty("onAction", Button::onActionProperty, WinPackage::toAction);
+        fxProperty("text",     Button::textProperty,     Joe::toString);
+
         // Methods
         method("action", this::_action);
         method("text",   this::_text);

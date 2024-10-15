@@ -673,6 +673,15 @@ public class Joe {
     }
 
     /**
+     * Converts the argument to a boolean.
+     * @param arg The argument
+     * @return the value
+     */
+    public boolean toBoolean(Object arg) {
+        return Joe.isTruthy(arg);
+    }
+
+    /**
      * Requires that the argument is a value of type T.
      * @param arg The argument
      * @param cls The desired class T

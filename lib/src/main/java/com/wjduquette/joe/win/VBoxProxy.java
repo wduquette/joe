@@ -3,7 +3,6 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -45,8 +44,8 @@ class VBoxProxy extends FXProxy<VBox> {
         // | `#spacing`   | [[Number]] | The spacing between children in pixels |
 
         // Properties
-        fxProperty("alignment", Pos.class, VBox::alignmentProperty, WinPackage::toPos);
-        fxProperty("spacing", Number.class, VBox::spacingProperty, Joe::toDouble);
+        fxProperty("alignment", VBox::alignmentProperty, WinPackage::toPos);
+        fxProperty("spacing",   VBox::spacingProperty,   Joe::toDouble);
 
         // Methods
         method("spacing", this::_spacing);

@@ -35,7 +35,7 @@ class LabelProxy extends FXProxy<Label> {
         // | `#text`       | [[joe.String]]  | The label's text |
 
         // Properties
-        fxProperty("text", String.class, Label::textProperty);
+        fxProperty("text", Label::textProperty, Joe::toString);
 
         // Methods
         method("text", this::_text);
