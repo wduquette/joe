@@ -2,7 +2,6 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.TypeProxy;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
@@ -17,7 +16,7 @@ class PaneProxy extends FXProxy<Pane> {
     // @type Pane
     // @extends Region
     // The `Pane` type is the base class for JavaFX
-    // [[Node]] widgets that can have child nodes.
+    // [[Node]] widgets that manage child nodes.
     public PaneProxy() {
         super("Pane");
         extendsProxy(RegionProxy.TYPE);
@@ -26,9 +25,15 @@ class PaneProxy extends FXProxy<Pane> {
         // No initializer
         initializer(this::_initializer);
 
+        //**
+        // ## Properties
+        //
+        // `Pane` widgets have the properties they inherit from their
+        // superclasses.
+
         // Methods
-        method("child", this::_child);
-        method("getChildren", this::_getChildren);
+        method("child",    this::_child);
+        method("children", this::_children);
     }
 
 
@@ -58,12 +63,12 @@ class PaneProxy extends FXProxy<Pane> {
     }
 
     //**
-    // @method getChildren
+    // @method children
     // @result joe.List
     // Gets the list of the node's children, which can be updated freely.
     // All items must belong some [[Node]] subclass.
-    private Object _getChildren(Pane pane, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "getChildren()");
+    private Object _children(Pane pane, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 0, "children()");
         return joe.wrapList(pane.getChildren(), Node.class);
     }
 }

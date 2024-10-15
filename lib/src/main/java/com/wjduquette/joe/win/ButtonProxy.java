@@ -2,7 +2,6 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.TypeProxy;
 import javafx.scene.control.Button;
 
 /**
@@ -28,10 +27,22 @@ class ButtonProxy extends FXProxy<Button> {
         // Initializer
         initializer(this::_initializer);
 
+        //**
+        // ## Properties
+        //
+        // `Button` widgets have the following properties, in addition to
+        // those inherited from superclasses.
+        //
+        // | Property      | Type            | Description            |
+        // | ------------- | --------------- | ---------------------- |
+        // | `#onAction`   | *callable(1)*   | The `onAction` handler |
+        // | `#text`       | [[joe.String]]  | The button's text      |
+        //
+        // - *callable(1)*: A callable taking one argument
+
         // Methods
-        method("action",  this::_action);
-        method("getText", this::_getText);
-        method("setText", this::_setText);
+        method("action", this::_action);
+        method("text",   this::_text);
     }
 
     //-------------------------------------------------------------------------
@@ -73,21 +84,12 @@ class ButtonProxy extends FXProxy<Button> {
     }
 
     //**
-    // @method getText
-    // @result joe.String
-    // Gets the button's text, or null for none.
-    private Object _getText(Button node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "getText()");
-        return node.getText();
-    }
-
-    //**
-    // @method setText
+    // @method text
     // @args text
     // @result this
-    // Gets the button's text or null for none.
-    private Object _setText(Button node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "setText(text)");
+    // Sets the button's *text*.
+    private Object _text(Button node, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "text(text)");
         node.setText(joe.stringify(args.next()));
         return node;
     }

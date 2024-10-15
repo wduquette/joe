@@ -186,10 +186,12 @@
 </ul>
 <p><strong><a href="#methods">Methods</a></strong></p>
 <ul>
-<li><a href="type.joe.win.Region.html#method.getPrefHeight"><em>region</em>.getPrefHeight()</a> → <a href="type.joe.Number.html">joe.Number</a></li>
-<li><a href="type.joe.win.Region.html#method.getPrefWidth"><em>region</em>.getPrefWidth()</a> → <a href="type.joe.Number.html">joe.Number</a></li>
-<li><a href="type.joe.win.Region.html#method.setPrefHeight"><em>region</em>.setPrefHeight(<em>height</em>)</a> → this</li>
-<li><a href="type.joe.win.Region.html#method.setPrefWidth"><em>region</em>.setPrefWidth(<em>width</em>)</a> → this</li>
+<li><a href="type.joe.win.Region.html#method.height"><em>region</em>.height(<em>height</em>)</a> → this</li>
+<li><a href="type.joe.win.Region.html#method.padding"><em>region</em>.padding(<em>pixels</em>)</a> → this</li>
+<li><a href="type.joe.win.Region.html#method.padding"><em>region</em>.padding(<em>top</em>, <em>right</em>, <em>bottom</em>, <em>left</em>)</a> → this</li>
+<li><a href="type.joe.win.Region.html#method.prefHeight"><em>region</em>.prefHeight(<em>height</em>)</a> → this</li>
+<li><a href="type.joe.win.Region.html#method.prefWidth"><em>region</em>.prefWidth(<em>width</em>)</a> → this</li>
+<li><a href="type.joe.win.Region.html#method.width"><em>region</em>.width(<em>width</em>)</a> → this</li>
 </ul>
 <p><strong>Node Methods</strong></p>
 <ul>
@@ -214,31 +216,50 @@ properties.</p>
 <p><span id="constant.USE_PREF_SIZE"> </span></p>
 <h3 id="regionuse_pref_size"><a class="header" href="#regionuse_pref_size">Region.USE_PREF_SIZE</a></h3>
 <hr />
-<p>Use as the <code>minWidth</code>, <code>maxWidth</code>, <code>minHeight</code>, or <code>maxHeight</code>
+<p>Use as the <code>#minWidth</code>, <code>#maxWidth</code>, <code>#minHeight</code>, or <code>#maxHeight</code>
 value to indicate that the preferred width or height should be used
 for that property.</p>
-<h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
+<h2 id="properties"><a class="header" href="#properties">Properties</a></h2>
+<p><code>Region</code> widgets have the following properties, in addition
+those inherited from superclasses.</p>
+<div class="table-wrapper"><table><thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>#maxHeight</code></td><td><a href="type.joe.Number.html"><code>Number</code></a></td><td>Maximum height in pixels</td></tr>
+<tr><td><code>#maxWidth</code></td><td><a href="type.joe.Number.html"><code>Number</code></a></td><td>Maximum width in pixels</td></tr>
+<tr><td><code>#minHeight</code></td><td><a href="type.joe.Number.html"><code>Number</code></a></td><td>Minimum height in pixels</td></tr>
+<tr><td><code>#minWidth</code></td><td><a href="type.joe.Number.html"><code>Number</code></a></td><td>Minimum width in pixels</td></tr>
+<tr><td><code>#padding</code></td><td><a href="type.joe.win.Insets.html"><code>Insets</code></a></td><td>Preferred height in pixels</td></tr>
+<tr><td><code>#prefHeight</code></td><td><a href="type.joe.Number.html"><code>Number</code></a></td><td>Preferred height in pixels</td></tr>
+<tr><td><code>#prefWidth</code></td><td><a href="type.joe.Number.html"><code>Number</code></a></td><td>Preferred width in pixels</td></tr>
+</tbody></table>
+</div><h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
-<p><span id="method.getPrefHeight"> </span></p>
-<h3 id="regiongetprefheight"><a class="header" href="#regiongetprefheight"><em>region</em>.getPrefHeight()</a></h3>
+<p><span id="method.height"> </span></p>
+<h3 id="regionheight"><a class="header" href="#regionheight"><em>region</em>.height()</a></h3>
 <hr />
-<p><strong><em>region</em>.getPrefHeight() → <a href="type.joe.Number.html">joe.Number</a></strong></p>
-<p>Gets the node's preferred height in pixels.</p>
-<p><span id="method.getPrefWidth"> </span></p>
-<h3 id="regiongetprefwidth"><a class="header" href="#regiongetprefwidth"><em>region</em>.getPrefWidth()</a></h3>
+<p><strong><em>region</em>.height(<em>height</em>) → this</strong></p>
+<p>Sets the node's preferred, minimum, and maximum height in pixels.</p>
+<p><span id="method.padding"> </span></p>
+<h3 id="regionpadding"><a class="header" href="#regionpadding"><em>region</em>.padding()</a></h3>
 <hr />
-<p><strong><em>region</em>.getPrefWidth() → <a href="type.joe.Number.html">joe.Number</a></strong></p>
-<p>Gets the node's preferred width in pixels.</p>
-<p><span id="method.setPrefHeight"> </span></p>
-<h3 id="regionsetprefheight"><a class="header" href="#regionsetprefheight"><em>region</em>.setPrefHeight()</a></h3>
+<p><strong><em>region</em>.padding(<em>pixels</em>) → this</strong><br>
+<strong><em>region</em>.padding(<em>top</em>, <em>right</em>, <em>bottom</em>, <em>left</em>) → this</strong></p>
+<p>Sets the padding in pixels on all sides of the region.
+If a single value is given, it is used for all four sides.</p>
+<p><span id="method.prefHeight"> </span></p>
+<h3 id="regionprefheight"><a class="header" href="#regionprefheight"><em>region</em>.prefHeight()</a></h3>
 <hr />
-<p><strong><em>region</em>.setPrefHeight(<em>height</em>) → this</strong></p>
+<p><strong><em>region</em>.prefHeight(<em>height</em>) → this</strong></p>
 <p>Sets the node's preferred height in pixels.</p>
-<p><span id="method.setPrefWidth"> </span></p>
-<h3 id="regionsetprefwidth"><a class="header" href="#regionsetprefwidth"><em>region</em>.setPrefWidth()</a></h3>
+<p><span id="method.prefWidth"> </span></p>
+<h3 id="regionprefwidth"><a class="header" href="#regionprefwidth"><em>region</em>.prefWidth()</a></h3>
 <hr />
-<p><strong><em>region</em>.setPrefWidth(<em>width</em>) → this</strong></p>
+<p><strong><em>region</em>.prefWidth(<em>width</em>) → this</strong></p>
 <p>Sets the node's preferred width in pixels.</p>
+<p><span id="method.width"> </span></p>
+<h3 id="regionwidth"><a class="header" href="#regionwidth"><em>region</em>.width()</a></h3>
+<hr />
+<p><strong><em>region</em>.width(<em>width</em>) → this</strong></p>
+<p>Sets the node's preferred, minimum, and maximum width in pixels.</p>
 
                     </main>
 

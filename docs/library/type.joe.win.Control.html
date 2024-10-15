@@ -178,19 +178,20 @@
 <p><strong>Extends</strong>: <a href="type.joe.win.Region.html">Region</a><br>
 <strong>Extended By</strong>: <a href="type.joe.win.Label.html">Label</a>, <a href="type.joe.win.Button.html">Button</a><br></p>
 <p>The <code>Control</code> type is the base class for JavaFX
-controls like <a href="type.joe.win.Label.html"><code>Label</code></a> widgets.</p>
+controls like the <a href="type.joe.win.Label.html"><code>Label</code></a> and <a href="type.joe.win.Button.html"><code>Button</code></a> widgets.</p>
 <p><strong><a href="#methods">Methods</a></strong></p>
 <ul>
-<li><a href="type.joe.win.Control.html#method.getTooltip"><em>control</em>.getTooltip()</a> → Tooltip</li>
-<li><a href="type.joe.win.Control.html#method.setTooltip"><em>control</em>.setTooltip(<em>tooltip</em>)</a> → this</li>
-<li><a href="type.joe.win.Control.html#method.setTooltipText"><em>control</em>.setTooltipText(<em>text</em>)</a> → this</li>
+<li><a href="type.joe.win.Control.html#method.tooltip"><em>control</em>.tooltip(<em>tooltip</em>)</a> → this</li>
+<li><a href="type.joe.win.Control.html#method.tooltipText"><em>control</em>.tooltipText(<em>text</em>)</a> → this</li>
 </ul>
 <p><strong>Region Methods</strong></p>
 <ul>
-<li><a href="type.joe.win.Region.html#method.getPrefHeight"><em>region</em>.getPrefHeight()</a> → <a href="type.joe.Number.html">joe.Number</a></li>
-<li><a href="type.joe.win.Region.html#method.getPrefWidth"><em>region</em>.getPrefWidth()</a> → <a href="type.joe.Number.html">joe.Number</a></li>
-<li><a href="type.joe.win.Region.html#method.setPrefHeight"><em>region</em>.setPrefHeight(<em>height</em>)</a> → this</li>
-<li><a href="type.joe.win.Region.html#method.setPrefWidth"><em>region</em>.setPrefWidth(<em>width</em>)</a> → this</li>
+<li><a href="type.joe.win.Region.html#method.height"><em>region</em>.height(<em>height</em>)</a> → this</li>
+<li><a href="type.joe.win.Region.html#method.padding"><em>region</em>.padding(<em>pixels</em>)</a> → this</li>
+<li><a href="type.joe.win.Region.html#method.padding"><em>region</em>.padding(<em>top</em>, <em>right</em>, <em>bottom</em>, <em>left</em>)</a> → this</li>
+<li><a href="type.joe.win.Region.html#method.prefHeight"><em>region</em>.prefHeight(<em>height</em>)</a> → this</li>
+<li><a href="type.joe.win.Region.html#method.prefWidth"><em>region</em>.prefWidth(<em>width</em>)</a> → this</li>
+<li><a href="type.joe.win.Region.html#method.width"><em>region</em>.width(<em>width</em>)</a> → this</li>
 </ul>
 <p><strong>Node Methods</strong></p>
 <ul>
@@ -205,22 +206,23 @@ controls like <a href="type.joe.win.Label.html"><code>Label</code></a> widgets.<
 <li><a href="type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
-<h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
+<h2 id="properties"><a class="header" href="#properties">Properties</a></h2>
+<p><code>Control</code> widgets have the following properties, in addition
+those inherited from superclasses.</p>
+<div class="table-wrapper"><table><thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>#tooltip</code></td><td>[[Tooltip]]</td><td>The control's tooltip</td></tr>
+</tbody></table>
+</div><h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
-<p><span id="method.getTooltip"> </span></p>
-<h3 id="controlgettooltip"><a class="header" href="#controlgettooltip"><em>control</em>.getTooltip()</a></h3>
+<p><span id="method.tooltip"> </span></p>
+<h3 id="controltooltip"><a class="header" href="#controltooltip"><em>control</em>.tooltip()</a></h3>
 <hr />
-<p><strong><em>control</em>.getTooltip() → Tooltip</strong></p>
-<p>Gets the control's tooltip, or null for none.</p>
-<p><span id="method.setTooltip"> </span></p>
-<h3 id="controlsettooltip"><a class="header" href="#controlsettooltip"><em>control</em>.setTooltip()</a></h3>
+<p><strong><em>control</em>.tooltip(<em>tooltip</em>) → this</strong></p>
+<p>Sets the control's [[Tooltip]], or null for none.</p>
+<p><span id="method.tooltipText"> </span></p>
+<h3 id="controltooltiptext"><a class="header" href="#controltooltiptext"><em>control</em>.tooltipText()</a></h3>
 <hr />
-<p><strong><em>control</em>.setTooltip(<em>tooltip</em>) → this</strong></p>
-<p>Gets the control's [[Tooltip]], or null for none.</p>
-<p><span id="method.setTooltipText"> </span></p>
-<h3 id="controlsettooltiptext"><a class="header" href="#controlsettooltiptext"><em>control</em>.setTooltipText()</a></h3>
-<hr />
-<p><strong><em>control</em>.setTooltipText(<em>text</em>) → this</strong></p>
+<p><strong><em>control</em>.tooltipText(<em>text</em>) → this</strong></p>
 <p>Gives the control a tooltip with the given <em>text</em>.</p>
 
                     </main>

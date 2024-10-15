@@ -24,6 +24,16 @@ class LabelProxy extends FXProxy<Label> {
         // Initializer
         initializer(this::_initializer);
 
+        //**
+        // ## Properties
+        //
+        // `Label` widgets have the following properties, in addition to
+        // those inherited from superclasses.
+        //
+        // | Property      | Type            | Description      |
+        // | ------------- | --------------- | ---------------- |
+        // | `#text`       | [[joe.String]]  | The label's text |
+
         // Properties
         fxProperty("text", String.class, Label::textProperty);
 

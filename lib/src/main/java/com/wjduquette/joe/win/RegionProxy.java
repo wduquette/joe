@@ -2,6 +2,7 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
+import javafx.geometry.Insets;
 import javafx.scene.layout.Region;
 
 class RegionProxy extends FXProxy<Region> {
@@ -33,26 +34,45 @@ class RegionProxy extends FXProxy<Region> {
         //**
         // @constant USE_PREF_SIZE
         //
-        // Use as the `minWidth`, `maxWidth`, `minHeight`, or `maxHeight`
+        // Use as the `#minWidth`, `#maxWidth`, `#minHeight`, or `#maxHeight`
         // value to indicate that the preferred width or height should be used
         // for that property.
         constant("USE_PREF_SIZE",     Region.USE_PREF_SIZE);
 
+        //**
+        // ## Properties
+        //
+        // `Region` widgets have the following properties, in addition to
+        // those inherited from superclasses.
+        //
+        // | Property      | Type            | Description                |
+        // | ------------- | --------------- | -------------------------- |
+        // | `#maxHeight`  | [[joe.Number]]  | Maximum height in pixels   |
+        // | `#maxWidth`   | [[joe.Number]]  | Maximum width in pixels    |
+        // | `#minHeight`  | [[joe.Number]]  | Minimum height in pixels   |
+        // | `#minWidth`   | [[joe.Number]]  | Minimum width in pixels    |
+        // | `#padding`    | [[Insets]]      | Preferred height in pixels |
+        // | `#prefHeight` | [[joe.Number]]  | Preferred height in pixels |
+        // | `#prefWidth`  | [[joe.Number]]  | Preferred width in pixels  |
+
         // Properties
+        fxProperty("maxHeight",  Number.class, Region::maxHeightProperty);
+        fxProperty("maxHeight",  Number.class, Region::maxHeightProperty);
+        fxProperty("minWidth",   Number.class, Region::minWidthProperty);
+        fxProperty("minWidth",   Number.class, Region::minWidthProperty);
+        fxProperty("padding",    Insets.class, Region::paddingProperty);
         fxProperty("prefHeight", Number.class, Region::prefHeightProperty);
+        fxProperty("prefWidth",  Number.class, Region::prefWidthProperty);
 
         // No initializer
 
         // Methods
-        method("getPrefHeight",     this::_getPrefHeight);
-        method("setPrefHeight",     this::_setPrefHeight);
-        method("getPrefWidth",      this::_getPrefWidth);
-        method("setPrefWidth",      this::_setPrefWidth);
-
-        // PROPERTIES TO ADD
-        // maxWidth, minWidth, maxHeight, minHeight,
-        // width, height (setting these sets max, min, preferred)
-        // padding (requires Insets type)
+        method("height",         this::_height);
+        method("padding",        this::_padding);
+        method("prefWidth",      this::_prefWidth);
+        method("prefHeight",     this::_prefHeight);
+        method("prefWidth",      this::_prefWidth);
+        method("width",          this::_width);
     }
 
 
@@ -60,42 +80,76 @@ class RegionProxy extends FXProxy<Region> {
     // Methods
 
     //**
-    // @method getPrefHeight
-    // @result joe.Number
-    // Gets the node's preferred height in pixels.
-    private Object _getPrefHeight(Region node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "getPrefHeight()");
-        return node.getPrefHeight();
+    // @method height
+    // @args height
+    // @result this
+    // Sets the node's preferred, minimum, and maximum height in pixels.
+    private Object _height(Region node, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "height(height)");
+        var pixels = joe.toDouble(args.next());
+        node.setMinHeight(pixels);
+        node.setMaxHeight(pixels);
+        node.setPrefHeight(pixels);
+        return node;
     }
 
     //**
-    // @method getPrefWidth
-    // @result joe.Number
-    // Gets the node's preferred width in pixels.
-    private Object _getPrefWidth(Region node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "getPrefWidth()");
-        return node.getPrefWidth();
+    // @method padding
+    // @args pixels
+    // @args top, right, bottom, left
+    // @result this
+    // Sets the padding in pixels on all sides of the region.
+    // If a single value is given, it is used for all four sides.
+    private Object _padding(Region node, Joe joe, ArgQueue args) {
+        var insets = switch(args.size()) {
+            case 1 -> new Insets(joe.toDouble(args.next()));
+            case 4 -> new Insets(
+                joe.toDouble(args.next()),
+                joe.toDouble(args.next()),
+                joe.toDouble(args.next()),
+                joe.toDouble(args.next())
+            );
+            default -> throw Joe.arityFailure(
+                "padding(pixels) or padding(top, right, bottom, left)");
+        };
+
+        node.setPadding(insets);
+        return this;
     }
 
     //**
-    // @method setPrefHeight
+    // @method prefHeight
     // @args height
     // @result this
     // Sets the node's preferred height in pixels.
-    private Object _setPrefHeight(Region node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "setPrefHeight(height)");
+    private Object _prefHeight(Region node, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "prefHeight(height)");
         node.setPrefHeight(joe.toDouble(args.next()));
         return node;
     }
 
     //**
-    // @method setPrefWidth
+    // @method prefWidth
     // @args width
     // @result this
     // Sets the node's preferred width in pixels.
-    private Object _setPrefWidth(Region node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "setPrefWidth(width)");
+    private Object _prefWidth(Region node, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "prefWidth(width)");
         node.setPrefWidth(joe.toDouble(args.next()));
+        return node;
+    }
+
+    //**
+    // @method width
+    // @args width
+    // @result this
+    // Sets the node's preferred, minimum, and maximum width in pixels.
+    private Object _width(Region node, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "width(width)");
+        var pixels = joe.toDouble(args.next());
+        node.setMinWidth(pixels);
+        node.setMaxWidth(pixels);
+        node.setPrefWidth(pixels);
         return node;
     }
 }

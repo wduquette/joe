@@ -30,6 +30,8 @@ class NodeProxy extends FXProxy<Node> {
         //**
         // ## Properties
         //
+        // All `Node` widgets have the following properties.
+        //
         // | Property   | Type             | Description        |
         // | ---------- | ---------------- | ------------------ |
         // | `#id`      | [[joe.String]]   | JavaFX ID          |

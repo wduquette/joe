@@ -2,7 +2,6 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.ArgQueue;
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.TypeProxy;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -34,13 +33,23 @@ class VBoxProxy extends FXProxy<VBox> {
         // No initializer
         initializer(this::_initializer);
 
+        //**
+        // ## Properties
+        //
+        // `VBox` widgets have the following properties, in addition to
+        // those inherited from superclasses.
+        //
+        // | Property     | Type       | Description                |
+        // | ------------ | ---------- | -------------------------- |
+        // | `#alignment` | [[Pos]]    | The default alignment for children  |
+        // | `#spacing`   | [[Number]] | The spacing between children in pixels |
+
+        // Properties
+        fxProperty("alignment", Pos.class,    VBox::alignmentProperty);
+        fxProperty("spacing",   Number.class, VBox::spacingProperty);
+
         // Methods
-        method("getAlignment", this::_getAlignment);
-        method("isFillWidth",  this::_isFillWidth);
-        method("getSpacing",   this::_getSpacing);
-        method("setAlignment", this::_setAlignment);
-        method("setFillWidth",  this::_setFillWidth);
-        method("setSpacing",   this::_setSpacing);
+        method("spacing", this::_spacing);
     }
 
     //-------------------------------------------------------------------------
@@ -110,62 +119,12 @@ class VBoxProxy extends FXProxy<VBox> {
     // Methods
 
     //**
-    // @method getAlignment
-    // @result Pos
-    // Gets the default alignment of children within the box.
-    private Object _getAlignment(VBox node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "getAlignment()");
-        return node.getAlignment();
-    }
-
-    //**
-    // @method getSpacing
-    // @result joe.Number
-    // Gets the vertical space in pixels between each child.
-    private Object _getSpacing(VBox node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "getSpacing()");
-        return node.getSpacing();
-    }
-
-    //**
-    // @method isFillWidth
-    // @result joe.Boolean
-    // Gets whether children will fill the width of the vbox or not.
-    private Object _isFillWidth(VBox node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "isFillWidth()");
-        return node.isFillWidth();
-    }
-
-    //**
-    // @method setAlignment
-    // @args pos
-    // @result this
-    // Sets the default alignment of children within the box to the
-    // given [[Pos]] value.
-    private Object _setAlignment(VBox node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "setAlignment(pos)");
-        node.setAlignment(joe.toEnum(args.next(), Pos.class));
-        return node;
-    }
-
-    //**
-    // @method setFillWith
-    // @args flag
-    // @result this
-    // Sets whether children will fill the width of the vbox or not.
-    private Object _setFillWidth(VBox node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "setFillWidth(flag)");
-        node.setFillWidth(Joe.isTruthy(args.next()));
-        return node;
-    }
-
-    //**
-    // @method setSpacing
+    // @method spacing
     // @args pixels
     // @result this
     // Sets the vertical space in *pixels* between each child.
-    private Object _setSpacing(VBox node, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, "setSpacing(pixels)");
+    private Object _spacing(VBox node, Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "spacing(pixels)");
         node.setSpacing(joe.toDouble(args.next()));
         return node;
     }
