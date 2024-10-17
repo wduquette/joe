@@ -64,6 +64,8 @@
     - [Label Type](library/type.joe.win.Label.md);
     - [Node Type](library/type.joe.win.Node.md);
     - [Pane Type](library/type.joe.win.Pane.md);
+    - [Pos Type](library/type.joe.win.Pos.md);
+    - [Priority Type](library/type.joe.win.Priority.md);
     - [Region Type](library/type.joe.win.Region.md);
     - [VBox Type](library/type.joe.win.VBox.md);
     - [Win Type](library/type.joe.win.Win.md);

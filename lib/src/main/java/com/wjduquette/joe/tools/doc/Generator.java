@@ -68,6 +68,10 @@ class Generator {
                 var included = lookupType(type.includes());
 
                 if (included == null) {
+                    included = GENERICS.get(type.includes());
+                }
+
+                if (included == null) {
                     warn("Type '" + type.name() +
                         "' @includes unknown type '" + type.includes() +
                         "': ignored.");
@@ -79,6 +83,7 @@ class Generator {
                 included.methods().forEach(m ->
                     type.methods().add(new MethodEntry(type, m)));
                 type.topics().addAll(included.topics());
+                type.content().add("");
                 type.content().addAll(included.content());
             }
         }
@@ -647,5 +652,57 @@ class Generator {
             System.err.println("*** Failed to write " + path + ",\n   " +
                 ex.getMessage());
         }
+    }
+
+    //-------------------------------------------------------------------------
+    // Joe Generic Types
+
+    private static final Map<String,TypeEntry> GENERICS = new HashMap<>();
+
+    static {
+        populateGenerics();
+    }
+
+    static void populateGenerics() {
+        var pkg = new PackageEntry("joe");
+        var type = new TypeEntry(pkg, "Enum");
+        GENERICS.put(type.fullMnemonic(), type);
+
+        var staticMethod = new StaticMethodEntry(type, "values");
+        staticMethod.setResult("List");
+        staticMethod.content().add("""
+            Returns a list of the enumerated type's values.
+            """);
+        type.staticMethods().add(staticMethod);
+
+        staticMethod = new StaticMethodEntry(type, "valueOf");
+        staticMethod.argSpecs().add("name");
+        staticMethod.setResult("value");
+        staticMethod.content().add("""
+            Returns the enumerated constant with the given name.
+            """);
+        type.staticMethods().add(staticMethod);
+
+        var method = new MethodEntry(type, "name");
+        method.setResult("String");
+        method.content().add("""
+            Returns the name of the enumerated constant.
+            """);
+        type.methods().add(method);
+
+        method = new MethodEntry(type, "ordinal");
+        method.setResult("Number");
+        method.content().add("""
+            Returns the index of the enumerated constant
+            in the `values()` list.
+            """);
+        type.methods().add(method);
+
+        method = new MethodEntry(type, "toString");
+        method.setResult("String");
+        method.content().add("""
+            Returns the name of the enumerated constant.
+            """);
+        type.methods().add(method);
     }
 }

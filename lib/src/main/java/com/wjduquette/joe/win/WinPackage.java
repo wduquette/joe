@@ -51,8 +51,38 @@ public class WinPackage extends JoePackage {
         type(VBoxProxy.TYPE);
 
         // Enums
-        // TODO: JoeDoc!
+
+        //**
+        // @type Pos
+        // @includes joe.Enum
+        // The `Pos` enum lists ways a widget can be aligned
+        // relative to the boundaries of a rectangular space.
+        //
+        // @constant BASELINE_CENTER
+        // @constant BASELINE_LEFT
+        // @constant BASELINE_RIGHT
+        // @constant BOTTOM_CENTER
+        // @constant BOTTOM_LEFT
+        // @constant BOTTOM_RIGHT
+        // @constant CENTER
+        // @constant CENTER_LEFT
+        // @constant CENTER_RIGHT
+        // @constant TOP_CENTER
+        // @constant TOP_LEFT
+        // @constant TOP_RIGHT
         type(new EnumProxy<>("Pos", Pos.class));
+
+
+        //**
+        // @type Priority
+        // @includes joe.Enum
+        // The `Priority` enum's values indicate when a widget
+        // should resize itself to fit its parent widget.  The
+        // default is generally `NEVER`.
+        //
+        // @constant ALWAYS
+        // @constant SOMETIMES
+        // @constant NEVER
         type(new EnumProxy<>("Priority", Priority.class));
 
         // Utility Classes

@@ -38,10 +38,10 @@ class VBoxProxy extends FXProxy<VBox> {
         // `VBox` widgets have the following properties, in addition to
         // those inherited from superclasses.
         //
-        // | Property     | Type       | Description                |
-        // | ------------ | ---------- | -------------------------- |
-        // | `#alignment` | [[Pos]]    | The default alignment for children  |
-        // | `#spacing`   | [[Number]] | The spacing between children in pixels |
+        // | Property     | Type           | Description                |
+        // | ------------ | -------------- | -------------------------- |
+        // | `#alignment` | [[Pos]]        | The default alignment for children  |
+        // | `#spacing`   | [[joe.Number]] | The spacing between children in pixels |
 
         // Properties
         fxProperty("alignment", VBox::alignmentProperty, WinPackage::toPos);
