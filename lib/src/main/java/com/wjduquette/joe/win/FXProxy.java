@@ -6,6 +6,12 @@ import javafx.beans.property.Property;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A TypeProxy that includes support for JavaFX properties.  The documentation
+ * for the related methods is defined as a JoeDoc @mixin; all direct subclasses
+ * (e.g., NodeProxy, MenuItemProxy) should "@includeMixin FXProxy".
+ * @param <V>
+ */
 public class FXProxy<V> extends TypeProxy<V> {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -17,11 +23,7 @@ public class FXProxy<V> extends TypeProxy<V> {
     // Constructor
 
     //**
-    // @package joe.win
-    // @type FXProxy
-    // @generic
-    // This type defines the property access methods commonly used by
-    // JavaFX types.
+    // @mixin FXProxy
     public FXProxy(String name) {
         super(name);
 

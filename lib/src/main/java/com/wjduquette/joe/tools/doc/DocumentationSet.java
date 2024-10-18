@@ -18,6 +18,9 @@ class DocumentationSet {
     // A look-up table, full mnemonic to entry.
     private final Map<String,Entry> lookupTable = new HashMap<>();
 
+    // The mixins defined by the documentation set.
+    private final Map<String,MixinEntry> mixins = new HashMap<>();
+
     //-------------------------------------------------------------------------
     // Constructor
 
@@ -27,6 +30,10 @@ class DocumentationSet {
 
     //-------------------------------------------------------------------------
     // Accessors
+
+    public Map<String,MixinEntry> mixins() {
+        return mixins;
+    }
 
     public List<PackageEntry> packages() {
         return packages;

@@ -11,7 +11,7 @@ abstract class TypeMember extends Entry {
     // Constructor
 
     public TypeMember(TypeEntry type) {
-        super(type.pkg());
+        super(type != null ? type.pkg() : null);
         this.type = type;
     }
 
