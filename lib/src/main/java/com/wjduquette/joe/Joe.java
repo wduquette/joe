@@ -728,8 +728,9 @@ public class Joe {
 
     /**
      * Verifies that the argument is either an enum constant of the
-     * desired type, or a keyword with a name that matches an enum
-     * constant of the desired type, and returns the enum constant.
+     * desired type, a keyword whose name matches an enum
+     * constant of the desired type, or a string ditto, and returns the
+     * enum constant.
      * @param arg The argument
      * @param cls The enum class
      * @return The constant
@@ -742,8 +743,14 @@ public class Joe {
             return (E)arg;
         }
 
-        if (arg instanceof Keyword keyword) {
-            var c = EnumProxy.valueOf(cls, keyword.name());
+        var name = switch (arg) {
+            case Keyword k -> k.name();
+            case String s -> s;
+            default -> null;
+        };
+
+        if (name != null) {
+            var c = EnumProxy.valueOf(cls, name);
             if (c != null) {
                 return c;
             }

@@ -8,6 +8,9 @@ import java.util.Collections;
 
 /**
  * A generic proxy for enum types.  Each enum will need its own proxy.
+ *
+ * <p><b>NOTE:</b> if this proxy is changed, update the default docs added
+ * by the `@enum` tag in `tools.doc.DocCommentParser`.</p>
  * @param <E> The enum type
  */
 public class EnumProxy<E extends Enum<E>> extends TypeProxy<E> {
@@ -46,14 +49,24 @@ public class EnumProxy<E extends Enum<E>> extends TypeProxy<E> {
             constant(e.name(), e);
         }
 
+        // Initializer
+        initializer(this::_initializer);
+
         // Static Methods
         staticMethod("values",  this::_values);
-        staticMethod("valueOf", this::_valueOf);
 
         // Methods
         method("name",     this::_name);
         method("ordinal",  this::_ordinal);
         method("toString", this::_toString);
+    }
+
+    //-------------------------------------------------------------------------
+    // Initializer
+
+    private Object _initializer(Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, getTypeName() + "(value)");
+        return joe.toEnum(args.next(), cls);
     }
 
     //-------------------------------------------------------------------------
@@ -66,18 +79,6 @@ public class EnumProxy<E extends Enum<E>> extends TypeProxy<E> {
         return list;
     }
 
-    private Object _valueOf(Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 1, getTypeName() + ".valueOf(name)");
-        var name = joe.toString(args.next());
-
-        var c = EnumProxy.valueOf(cls, name);
-
-        if (c != null) {
-            return c;
-        } else {
-            throw joe.expected("name of " + getTypeName() + " constant", name);
-        }
-    }
 
     //-------------------------------------------------------------------------
     // Methods

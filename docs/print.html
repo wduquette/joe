@@ -2844,8 +2844,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_CENTER">Pos.TOP_CENTER</a></li>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_LEFT">Pos.TOP_LEFT</a></li>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_RIGHT">Pos.TOP_RIGHT</a></li>
-<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>
 <li><a href="library/type.joe.win.Pos.html#static.values">Pos.values()</a> → List</li>
+<li><a href="library/type.joe.win.Pos.html#init">Pos(<em>value</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>
 <li><a href="library/type.joe.win.Pos.html#method.name"><em>pos</em>.name()</a> → String</li>
 <li><a href="library/type.joe.win.Pos.html#method.ordinal"><em>pos</em>.ordinal()</a> → Number</li>
 <li><a href="library/type.joe.win.Pos.html#method.toString"><em>pos</em>.toString()</a> → String</li>
@@ -2856,8 +2856,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Priority.html#constant.ALWAYS">Priority.ALWAYS</a></li>
 <li><a href="library/type.joe.win.Priority.html#constant.NEVER">Priority.NEVER</a></li>
 <li><a href="library/type.joe.win.Priority.html#constant.SOMETIMES">Priority.SOMETIMES</a></li>
-<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Priority.html">Priority</a></li>
 <li><a href="library/type.joe.win.Priority.html#static.values">Priority.values()</a> → List</li>
+<li><a href="library/type.joe.win.Priority.html#init">Priority(<em>value</em>)</a> → <a href="library/type.joe.win.Priority.html">Priority</a></li>
 <li><a href="library/type.joe.win.Priority.html#method.name"><em>priority</em>.name()</a> → String</li>
 <li><a href="library/type.joe.win.Priority.html#method.ordinal"><em>priority</em>.ordinal()</a> → Number</li>
 <li><a href="library/type.joe.win.Priority.html#method.toString"><em>priority</em>.toString()</a> → String</li>
@@ -4940,8 +4940,11 @@ relative to the boundaries of a rectangular space.</p>
 </ul>
 <p><strong><a href="library/type.joe.win.Pos.html#statics">Static Methods</a></strong></p>
 <ul>
-<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>
 <li><a href="library/type.joe.win.Pos.html#static.values">Pos.values()</a> → List</li>
+</ul>
+<p><strong><a href="library/type.joe.win.Pos.html#init">Initializer</a></strong></p>
+<ul>
+<li><a href="library/type.joe.win.Pos.html#init">Pos(<em>value</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>
 </ul>
 <p><strong><a href="library/type.joe.win.Pos.html#methods">Methods</a></strong></p>
 <ul>
@@ -4989,17 +4992,23 @@ relative to the boundaries of a rectangular space.</p>
 <hr />
 <h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
 <hr />
-<p><span id="static.valueOf"> </span></p>
-<h3 id="posvalueof"><a class="header" href="#posvalueof">Pos.valueOf()</a></h3>
-<hr />
-<p><strong>Pos.valueOf(<em>name</em>) → <a href="library/type.joe.win.Pos.html">Pos</a></strong></p>
-<p>Returns the enumerated constant with the given <em>name</em>, disregarding
-case.  The <em>name</em> may be a <code>String</code> or a <code>Keyword</code>.</p>
 <p><span id="static.values"> </span></p>
 <h3 id="posvalues"><a class="header" href="#posvalues">Pos.values()</a></h3>
 <hr />
 <p><strong>Pos.values() → List</strong></p>
 <p>Returns a list of the enumerated type's values.</p>
+<h2 id="init"><a class="header" href="#init">Pos Initializer</a></h2>
+<hr />
+<p><strong>Pos(<em>value</em>) → <a href="library/type.joe.win.Pos.html">Pos</a></strong></p>
+<p>Attempts to convert the <em>value</em> to an enum constant for this
+enum.  The value may be:</p>
+<ul>
+<li>One of the enum's constants.</li>
+<li>A string that matches the name of a constant,
+disregarding case.</li>
+<li>A keyword whose name matches the name of a constant,
+disregarding case.</li>
+</ul>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
 <p><span id="method.name"> </span></p>
@@ -5031,8 +5040,11 @@ default is generally <code>NEVER</code>.</p>
 </ul>
 <p><strong><a href="library/type.joe.win.Priority.html#statics">Static Methods</a></strong></p>
 <ul>
-<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Priority.html">Priority</a></li>
 <li><a href="library/type.joe.win.Priority.html#static.values">Priority.values()</a> → List</li>
+</ul>
+<p><strong><a href="library/type.joe.win.Priority.html#init">Initializer</a></strong></p>
+<ul>
+<li><a href="library/type.joe.win.Priority.html#init">Priority(<em>value</em>)</a> → <a href="library/type.joe.win.Priority.html">Priority</a></li>
 </ul>
 <p><strong><a href="library/type.joe.win.Priority.html#methods">Methods</a></strong></p>
 <ul>
@@ -5053,17 +5065,23 @@ default is generally <code>NEVER</code>.</p>
 <hr />
 <h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
 <hr />
-<p><span id="static.valueOf"> </span></p>
-<h3 id="priorityvalueof"><a class="header" href="#priorityvalueof">Priority.valueOf()</a></h3>
-<hr />
-<p><strong>Priority.valueOf(<em>name</em>) → <a href="library/type.joe.win.Priority.html">Priority</a></strong></p>
-<p>Returns the enumerated constant with the given <em>name</em>, disregarding
-case.  The <em>name</em> may be a <code>String</code> or a <code>Keyword</code>.</p>
 <p><span id="static.values"> </span></p>
 <h3 id="priorityvalues"><a class="header" href="#priorityvalues">Priority.values()</a></h3>
 <hr />
 <p><strong>Priority.values() → List</strong></p>
 <p>Returns a list of the enumerated type's values.</p>
+<h2 id="init"><a class="header" href="#init">Priority Initializer</a></h2>
+<hr />
+<p><strong>Priority(<em>value</em>) → <a href="library/type.joe.win.Priority.html">Priority</a></strong></p>
+<p>Attempts to convert the <em>value</em> to an enum constant for this
+enum.  The value may be:</p>
+<ul>
+<li>One of the enum's constants.</li>
+<li>A string that matches the name of a constant,
+disregarding case.</li>
+<li>A keyword whose name matches the name of a constant,
+disregarding case.</li>
+</ul>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
 <p><span id="method.name"> </span></p>
@@ -5627,8 +5645,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_CENTER">Pos.TOP_CENTER</a></li>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_LEFT">Pos.TOP_LEFT</a></li>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_RIGHT">Pos.TOP_RIGHT</a></li>
-<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>
 <li><a href="library/type.joe.win.Pos.html#static.values">Pos.values()</a> → List</li>
+<li><a href="library/type.joe.win.Pos.html#init">Pos(<em>value</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>
 <li><a href="library/type.joe.win.Pos.html#method.name"><em>pos</em>.name()</a> → String</li>
 <li><a href="library/type.joe.win.Pos.html#method.ordinal"><em>pos</em>.ordinal()</a> → Number</li>
 <li><a href="library/type.joe.win.Pos.html#method.toString"><em>pos</em>.toString()</a> → String</li>
@@ -5639,8 +5657,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Priority.html#constant.ALWAYS">Priority.ALWAYS</a></li>
 <li><a href="library/type.joe.win.Priority.html#constant.NEVER">Priority.NEVER</a></li>
 <li><a href="library/type.joe.win.Priority.html#constant.SOMETIMES">Priority.SOMETIMES</a></li>
-<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Priority.html">Priority</a></li>
 <li><a href="library/type.joe.win.Priority.html#static.values">Priority.values()</a> → List</li>
+<li><a href="library/type.joe.win.Priority.html#init">Priority(<em>value</em>)</a> → <a href="library/type.joe.win.Priority.html">Priority</a></li>
 <li><a href="library/type.joe.win.Priority.html#method.name"><em>priority</em>.name()</a> → String</li>
 <li><a href="library/type.joe.win.Priority.html#method.ordinal"><em>priority</em>.ordinal()</a> → Number</li>
 <li><a href="library/type.joe.win.Priority.html#method.toString"><em>priority</em>.toString()</a> → String</li>

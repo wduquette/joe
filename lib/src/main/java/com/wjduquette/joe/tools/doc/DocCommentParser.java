@@ -306,6 +306,21 @@ class DocCommentParser {
     // This is kind of ugly, but enums are a special case in almost
     // every way.
     private void addEnumContent(TypeEntry type) {
+        // Add initializer`
+        var init = new InitializerEntry(type);
+        init.argSpecs().add("value");
+        init.content().add("""
+            Attempts to convert the *value* to an enum constant for this
+            enum.  The value may be:
+            
+            - One of the enum's constants.
+            - A string that matches the name of a constant,
+              disregarding case.
+            - A keyword whose name matches the name of a constant,
+              disregarding case.
+            """);
+        type.setInitializer(init);
+
         // Add static method `values()`
         var values = new StaticMethodEntry(type, "values");
         values.setResult("List");
@@ -314,15 +329,6 @@ class DocCommentParser {
             """);
         type.staticMethods().add(values);
 
-        // Add static method `valueOf()`
-        var valueOf = new StaticMethodEntry(type, "valueOf");
-        valueOf.argSpecs().add("name");
-        valueOf.setResult(type.name());
-        valueOf.content().add("""
-            Returns the enumerated constant with the given *name*, disregarding
-            case.  The *name* may be a `String` or a `Keyword`.
-            """);
-        type.staticMethods().add(valueOf);
 
         // Add method `name()`
 

@@ -82,6 +82,8 @@ public class NumberProxy extends TypeProxy<Double> {
         // 𝛕, the ratio of the circumference of a circle to its radius.
         constant("TAU",                 Math.TAU);
 
+        initializer(this::_initializer);
+
         staticMethod("abs",       this::_abs);
         staticMethod("acos",      this::_acos);
         staticMethod("asin",      this::_asin);
@@ -121,6 +123,30 @@ public class NumberProxy extends TypeProxy<Double> {
             text = text.substring(0, text.length() - 2);
         }
         return text;
+    }
+
+    //-------------------------------------------------------------------------
+    // Initializer
+
+    //**
+    // @init
+    // @args string
+    // Converts a numeric string to a number.  Supports Joe's numeric
+    // literal syntax, including hexadecimals.
+    private Object _initializer(Joe joe, ArgQueue args) {
+        Joe.exactArity(args, 1, "Number(string)");
+        var string = joe.stringify(args.next()).trim();
+
+        try {
+            if (string.startsWith("0x")) {
+                string = string.substring(2);
+                return (double)Integer.parseInt(string, 16);
+            } else {
+                return Double.parseDouble(string);
+            }
+        } catch (IllegalArgumentException ex) {
+            throw joe.expected("numeric string", string);
+        }
     }
 
     //-------------------------------------------------------------------------
