@@ -2,7 +2,9 @@
 
 ## Changes in 0.4.0 (Forthcoming)
 
-- None yet
+- Added experimental `joe.win` package for creating JavaFX GUIs in Joe.
+  - Optional package.
+  - Loaded (with `joe.console`) by new `joe win` tool.
 
 ## Changes in 0.3.0 (2024-10-11)
 
