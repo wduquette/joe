@@ -10,6 +10,7 @@ class TypeEntry extends Entry {
     // The type's name.
     private final String name;
 
+    private boolean isEnum = false;
     private boolean isGeneric = false;
     private final List<ConstantEntry> constants = new ArrayList<>();
     private final List<StaticMethodEntry> staticMethods = new ArrayList<>();
@@ -40,12 +41,17 @@ class TypeEntry extends Entry {
     List<TopicEntry>               topics()        { return topics; }
 
     public String  prefix()        { return name; }
+    public boolean isEnum()        { return isEnum; }
     public boolean isGeneric()     { return isGeneric; }
     public String  name()          { return name; }
     public String  fullMnemonic()  { return pkg().name() + "." + name; }
     public String  shortMnemonic() { return name; }
     public String  valuePrefix()   { return downCase(name); }
     public String  filename()      { return "type." + pkg().name() + "." + name + ".md"; }
+
+    public void setEnum(boolean flag) {
+        this.isEnum = flag;
+    }
 
     public void setGeneric(boolean flag) {
         this.isGeneric = flag;

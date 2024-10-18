@@ -60,6 +60,7 @@ class DocCommentParser {
     private static final String ARGS = "@args";
     private static final String RESULT = "@result";
     private static final String TYPE = "@type";
+    private static final String ENUM = "@enum";
     private static final String TYPE_TOPIC = "@typeTopic";
     private static final String GENERIC = "@generic";
     private static final String INCLUDES = "@includes";
@@ -74,11 +75,11 @@ class DocCommentParser {
     );
 
     private static final Set<String> PACKAGE_CHILD_ENDERS = Set.of(
-        PACKAGE, FUNCTION, TYPE, PACKAGE_TOPIC
+        PACKAGE, FUNCTION, TYPE, ENUM, PACKAGE_TOPIC
     );
 
     private static final Set<String> TYPE_CHILD_ENDERS = Set.of(
-        PACKAGE, FUNCTION, TYPE, PACKAGE_TOPIC,
+        PACKAGE, FUNCTION, TYPE, ENUM, PACKAGE_TOPIC,
         CONSTANT, STATIC, INIT, METHOD, TYPE_TOPIC
     );
 
@@ -136,7 +137,7 @@ class DocCommentParser {
             switch (tag.name()) {
                 case TITLE -> pkg.setTitle(tag.value());
                 case FUNCTION -> _function(pkg, tag);
-                case TYPE -> _type(pkg, tag);
+                case TYPE, ENUM -> _type(pkg, tag);
                 case PACKAGE_TOPIC -> _packageTopic(pkg, tag);
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
@@ -206,8 +207,11 @@ class DocCommentParser {
     }
 
     private void _type(PackageEntry pkg, Tag typeTag) {
+        // FIRST, create the type, validating its name and making sure
+        // it's unique.
         trace("_type", typeTag);
         TypeEntry type = new TypeEntry(pkg, typeTag.value());
+        type.setEnum(typeTag.name().equals(ENUM));
         remember(type);
 
         if (!Joe.isIdentifier(typeTag.value())) {
@@ -215,6 +219,12 @@ class DocCommentParser {
         }
         pkg.types().add(type);
 
+        // NEXT, if it's an enum add the standard enum content.
+        if (type.isEnum()) {
+            addEnumContent(type);
+        }
+
+        // NEXT, parse its content.
         while (!atEnd()) {
             if (!advanceToTag(type)) break;
 
@@ -240,6 +250,52 @@ class DocCommentParser {
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
+    }
+
+    // This is kind of ugly, but enums are a special case in almost
+    // every way.
+    private void addEnumContent(TypeEntry type) {
+        // Add static method `values()`
+        var values = new StaticMethodEntry(type, "values");
+        values.setResult("List");
+        values.content().add("""
+            Returns a list of the enumerated type's values.
+            """);
+        type.staticMethods().add(values);
+
+        // Add static method `valueOf()`
+        var valueOf = new StaticMethodEntry(type, "valueOf");
+        valueOf.argSpecs().add("name");
+        valueOf.setResult(type.name());
+        valueOf.content().add("""
+            Returns the enumerated constant with the given *name*, disregarding
+            case.  The *name* may be a `String` or a `Keyword`.
+            """);
+        type.staticMethods().add(valueOf);
+
+        // Add method `name()`
+
+        var name = new MethodEntry(type, "name");
+        name.setResult("String");
+        name.content().add("""
+            Returns the name of the enumerated constant.
+            """);
+        type.methods().add(name);
+
+        var ordinal = new MethodEntry(type, "ordinal");
+        ordinal.setResult("Number");
+        ordinal.content().add("""
+            Returns the index of the enumerated constant
+            in the `values()` list.
+            """);
+        type.methods().add(ordinal);
+
+        var toString = new MethodEntry(type, "toString");
+        toString.setResult("String");
+        toString.content().add("""
+            Returns the name of the enumerated constant.
+            """);
+        type.methods().add(toString);
     }
 
     private String _extends(Tag tag) {

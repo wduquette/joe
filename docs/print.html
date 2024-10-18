@@ -290,7 +290,12 @@ buy him lunch.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="change-log"><a class="header" href="#change-log">Change Log</a></h1>
 <h2 id="changes-in-040-forthcoming"><a class="header" href="#changes-in-040-forthcoming">Changes in 0.4.0 (Forthcoming)</a></h2>
 <ul>
-<li>None yet</li>
+<li>Added experimental <code>joe.win</code> package for creating JavaFX GUIs in Joe.
+<ul>
+<li>Optional package.</li>
+<li>Loaded (with <code>joe.console</code>) by new <code>joe win</code> tool.</li>
+</ul>
+</li>
 </ul>
 <h2 id="changes-in-030-2024-10-11"><a class="header" href="#changes-in-030-2024-10-11">Changes in 0.3.0 (2024-10-11)</a></h2>
 <ul>
@@ -2751,7 +2756,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_CENTER">Pos.TOP_CENTER</a></li>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_LEFT">Pos.TOP_LEFT</a></li>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_RIGHT">Pos.TOP_RIGHT</a></li>
-<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → value</li>
+<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>
 <li><a href="library/type.joe.win.Pos.html#static.values">Pos.values()</a> → List</li>
 <li><a href="library/type.joe.win.Pos.html#method.name"><em>pos</em>.name()</a> → String</li>
 <li><a href="library/type.joe.win.Pos.html#method.ordinal"><em>pos</em>.ordinal()</a> → Number</li>
@@ -2763,7 +2768,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Priority.html#constant.ALWAYS">Priority.ALWAYS</a></li>
 <li><a href="library/type.joe.win.Priority.html#constant.NEVER">Priority.NEVER</a></li>
 <li><a href="library/type.joe.win.Priority.html#constant.SOMETIMES">Priority.SOMETIMES</a></li>
-<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → value</li>
+<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Priority.html">Priority</a></li>
 <li><a href="library/type.joe.win.Priority.html#static.values">Priority.values()</a> → List</li>
 <li><a href="library/type.joe.win.Priority.html#method.name"><em>priority</em>.name()</a> → String</li>
 <li><a href="library/type.joe.win.Priority.html#method.ordinal"><em>priority</em>.ordinal()</a> → Number</li>
@@ -4850,7 +4855,7 @@ relative to the boundaries of a rectangular space.</p>
 </ul>
 <p><strong><a href="library/type.joe.win.Pos.html#statics">Static Methods</a></strong></p>
 <ul>
-<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → value</li>
+<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>
 <li><a href="library/type.joe.win.Pos.html#static.values">Pos.values()</a> → List</li>
 </ul>
 <p><strong><a href="library/type.joe.win.Pos.html#methods">Methods</a></strong></p>
@@ -4902,8 +4907,9 @@ relative to the boundaries of a rectangular space.</p>
 <p><span id="static.valueOf"> </span></p>
 <h3 id="posvalueof"><a class="header" href="#posvalueof">Pos.valueOf()</a></h3>
 <hr />
-<p><strong>Pos.valueOf(<em>name</em>) → value</strong></p>
-<p>Returns the enumerated constant with the given name.</p>
+<p><strong>Pos.valueOf(<em>name</em>) → <a href="library/type.joe.win.Pos.html">Pos</a></strong></p>
+<p>Returns the enumerated constant with the given <em>name</em>, disregarding
+case.  The <em>name</em> may be a <code>String</code> or a <code>Keyword</code>.</p>
 <p><span id="static.values"> </span></p>
 <h3 id="posvalues"><a class="header" href="#posvalues">Pos.values()</a></h3>
 <hr />
@@ -4940,7 +4946,7 @@ default is generally <code>NEVER</code>.</p>
 </ul>
 <p><strong><a href="library/type.joe.win.Priority.html#statics">Static Methods</a></strong></p>
 <ul>
-<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → value</li>
+<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Priority.html">Priority</a></li>
 <li><a href="library/type.joe.win.Priority.html#static.values">Priority.values()</a> → List</li>
 </ul>
 <p><strong><a href="library/type.joe.win.Priority.html#methods">Methods</a></strong></p>
@@ -4965,8 +4971,9 @@ default is generally <code>NEVER</code>.</p>
 <p><span id="static.valueOf"> </span></p>
 <h3 id="priorityvalueof"><a class="header" href="#priorityvalueof">Priority.valueOf()</a></h3>
 <hr />
-<p><strong>Priority.valueOf(<em>name</em>) → value</strong></p>
-<p>Returns the enumerated constant with the given name.</p>
+<p><strong>Priority.valueOf(<em>name</em>) → <a href="library/type.joe.win.Priority.html">Priority</a></strong></p>
+<p>Returns the enumerated constant with the given <em>name</em>, disregarding
+case.  The <em>name</em> may be a <code>String</code> or a <code>Keyword</code>.</p>
 <p><span id="static.values"> </span></p>
 <h3 id="priorityvalues"><a class="header" href="#priorityvalues">Priority.values()</a></h3>
 <hr />
@@ -5535,7 +5542,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_CENTER">Pos.TOP_CENTER</a></li>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_LEFT">Pos.TOP_LEFT</a></li>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_RIGHT">Pos.TOP_RIGHT</a></li>
-<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → value</li>
+<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>
 <li><a href="library/type.joe.win.Pos.html#static.values">Pos.values()</a> → List</li>
 <li><a href="library/type.joe.win.Pos.html#method.name"><em>pos</em>.name()</a> → String</li>
 <li><a href="library/type.joe.win.Pos.html#method.ordinal"><em>pos</em>.ordinal()</a> → Number</li>
@@ -5547,7 +5554,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Priority.html#constant.ALWAYS">Priority.ALWAYS</a></li>
 <li><a href="library/type.joe.win.Priority.html#constant.NEVER">Priority.NEVER</a></li>
 <li><a href="library/type.joe.win.Priority.html#constant.SOMETIMES">Priority.SOMETIMES</a></li>
-<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → value</li>
+<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Priority.html">Priority</a></li>
 <li><a href="library/type.joe.win.Priority.html#static.values">Priority.values()</a> → List</li>
 <li><a href="library/type.joe.win.Priority.html#method.name"><em>priority</em>.name()</a> → String</li>
 <li><a href="library/type.joe.win.Priority.html#method.ordinal"><em>priority</em>.ordinal()</a> → Number</li>
