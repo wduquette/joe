@@ -388,6 +388,10 @@ public class Joe {
     public String stringify(Object value) {
         if (value == null) return "null";
 
+        if (value instanceof JoeToString jts) {
+            return jts.toString(this);
+        }
+
         var proxy = lookupProxy(value);
 
         if (proxy != null) {
