@@ -290,7 +290,31 @@ buy him lunch.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="change-log"><a class="header" href="#change-log">Change Log</a></h1>
 <h2 id="changes-in-040-forthcoming"><a class="header" href="#changes-in-040-forthcoming">Changes in 0.4.0 (Forthcoming)</a></h2>
 <ul>
-<li>None yet</li>
+<li>
+<p>Library</p>
+<ul>
+<li>Added experimental <code>joe.win</code> package for creating JavaFX GUIs in Joe.
+<ul>
+<li>Optional package.</li>
+<li>Loaded (with <code>joe.console</code>) by new <code>joe win</code> tool.</li>
+</ul>
+</li>
+<li>Added <code>EnumProxy&lt;E&gt;</code> for implementing bindings to Java enums.</li>
+</ul>
+</li>
+<li>
+<p>Tools</p>
+<ul>
+<li>Experimental <code>joe win</code> tool</li>
+<li><code>joe doc</code>
+<ul>
+<li>Added <code>@enum</code> entity for documenting enum types.</li>
+<li>Added <code>@mixin</code> entity for documentation to be included into
+multiple <code>@type</code> entities</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <h2 id="changes-in-030-2024-10-11"><a class="header" href="#changes-in-030-2024-10-11">Changes in 0.3.0 (2024-10-11)</a></h2>
 <ul>
@@ -2040,11 +2064,13 @@ API documentation.<sup class="footnote-reference"><a href="#markdown">1</a></sup
 <li><a href="joe_doc.html#the-packagetopic-entity">The <code>@packageTopic</code> Entity</a></li>
 <li><a href="joe_doc.html#the-function-entity">The <code>@function</code> Entity</a></li>
 <li><a href="joe_doc.html#the-type-entity">The <code>@type</code> Entity</a></li>
+<li><a href="joe_doc.html#the-enum-entity">The <code>@enum</code> Entity</a></li>
 <li><a href="joe_doc.html#the-typetopic-entity">The <code>@typeTopic</code> Entity</a></li>
 <li><a href="joe_doc.html#the-constant-entity">The <code>@constant</code> Entity</a></li>
 <li><a href="joe_doc.html#the-static-entity">The <code>@static</code> Entity</a></li>
 <li><a href="joe_doc.html#the-init-entity">The <code>@init</code> Entity</a></li>
 <li><a href="joe_doc.html#the-method-entity">The <code>@method</code> Entity</a></li>
+<li><a href="joe_doc.html#the-mixin-entity">The <code>@mixin</code> Entity</a></li>
 </ul>
 </li>
 <li><a href="joe_doc.html#joedoc-links">JoeDoc Links</a>
@@ -2068,7 +2094,7 @@ following types of entity:</p>
 <li>Packages
 <ul>
 <li>Functions</li>
-<li>Types
+<li>Types (including Enums)
 <ul>
 <li>Constants</li>
 <li>Static Methods</li>
@@ -2077,6 +2103,12 @@ following types of entity:</p>
 </ul>
 </li>
 <li>Additional topics concerning a specific package or type</li>
+</ul>
+</li>
+<li>Mixins
+<ul>
+<li>A pseudo-type used for documentation content to be included in
+multiple types.</li>
 </ul>
 </li>
 </ul>
@@ -2104,35 +2136,42 @@ according to its structure.</p>
 <h3 id="entity-tags"><a class="header" href="#entity-tags">Entity Tags</a></h3>
 <p>In the example just shown, the tag <code>@package</code> indicates that the following
 comment text concerns the named package.  <code>joe doc</code> understands the following
-entity tags:</p>
+entity tags.</p>
 <ul>
-<li><code>@package &lt;name&gt;</code>
+<li><a href="joe_doc.html#the-package-entity"><code>@package &lt;name&gt;</code></a>
 <ul>
-<li><code>@function &lt;name&gt;</code></li>
-<li><code>@type &lt;name&gt;</code>
+<li><a href="joe_doc.html#the-function-entity"><code>@function &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-type-entity"><code>@type &lt;name&gt;</code></a>
 <ul>
-<li><code>@constant &lt;name&gt;</code></li>
-<li><code>@static &lt;name&gt;</code></li>
-<li><code>@init</code></li>
-<li><code>@method &lt;name&gt;</code></li>
-<li><code>@typeTopic &lt;name&gt;</code></li>
+<li><a href="joe_doc.html#the-constant-entity"><code>@constant &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-static-entity"><code>@static &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-init-entity"><code>@init</code></a></li>
+<li><a href="joe_doc.html#the-method-entity"><code>@method &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-typetopic-entity"><code>@typeTopic &lt;name&gt;</code></a></li>
 </ul>
 </li>
-<li><code>@packageTopic &lt;name&gt;</code></li>
+<li><a href="joe_doc.html#the-packagetopic-entity"><code>@packageTopic &lt;name&gt;</code></a></li>
+</ul>
+</li>
+<li><a href="joe_doc.html#the-mixin-entity"><code>@mixin &lt;name&gt;</code></a>
+<ul>
+<li><a href="joe_doc.html#the-constant-entity"><code>@constant &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-static-entity"><code>@static &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-method-entity"><code>@method &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-typetopic-entity"><code>@typeTopic &lt;name&gt;</code></a></li>
 </ul>
 </li>
 </ul>
-<p>This is the same outline <a href="joe_doc.html#joedoc-structure">shown above</a>, and purposely so.</p>
+<p>This is the same outline <a href="joe_doc.html#joedoc-structure">shown above</a>, and purposely so.  Each entity
+has a parent, and the parentage is indicated by the outline.</p>
 <ul>
-<li><code>@package</code> must be the first entity tag in a given file.</li>
-<li>The <code>@function</code> and <code>@type</code> entities that follow are added to that package.</li>
-<li>The <code>@constant</code>, <code>@static</code>, <code>@init</code>, and <code>@method</code> entities that follow a
-<code>@type</code> are added to that type.</li>
-</ul>
-<p><code>joe doc</code> checks carefully for duplicates.</p>
-<ul>
-<li>Each <code>@function</code> and <code>@type</code> must be unique in the <code>@package</code>.</li>
-<li>Each <code>@constant</code>, <code>@static</code>, and <code>@method</code> must be unique in the <code>@type</code>.</li>
+<li><code>@package</code> and <code>@mixin</code> entities belong to the documentation set.</li>
+<li>Every <code>@function</code> and <code>@type</code> entity belongs to the <code>@package</code> that
+most nearly precedes it in the same file.</li>
+<li>Every <code>@constant</code>, <code>@static</code>, <code>@init</code>, and <code>@method</code> entity belongs to
+the <code>@type</code> or <code>@mixin</code> that most nearly precedes it in the same file.</li>
+<li>It's an error if the expected parent entity is missing.</li>
+<li><code>joe doc</code> checks carefully for duplicate names.</li>
 <li>A <code>@type</code> can have at most a single <code>@init</code> (initializer) entity; and it
 has no name because it always has the same name as its type.</li>
 </ul>
@@ -2140,10 +2179,10 @@ has no name because it always has the same name as its type.</li>
 a number of files. Thus, the same <code>@package</code> name can appear in multiple
 files, and the related entities will all be ascribed to the same package.</p>
 <p>A single source file may (in principle) contain documentation for multiple
-packages and types.  If <code>joe doc</code> sees a second <code>@package</code>, it immediately
-switches to that <code>@package</code>, and so for the others.</p>
+mixins, packages and types.  If <code>joe doc</code> sees a second <code>@package</code>,
+it immediately switches to that <code>@package</code>, and so for the others.</p>
 <h3 id="example"><a class="header" href="#example">Example</a></h3>
-<p>Here is the beginning of the documentation in Joe's <code>StandardLibrary.java</code>
+<p>Here is the beginning of the documentation in Joe's <code>MonicaPackage.java</code>
 file:</p>
 <pre><code class="language-java">//**
 // @package joe
@@ -2189,6 +2228,10 @@ following optional metadata:</p>
 </tbody></table>
 </div>
 <p>The title string is used in the generated documentation.</p>
+<p>The <code>@package</code> entity may have
+<a href="joe_doc.html#the-function-entity"><code>@function</code></a>,
+<a href="joe_doc.html#the-type-entity"><code>@type</code></a>, and
+<a href="joe_doc.html#the-packagetopic-entity"><code>@packageTopic</code></a> children.</p>
 <p>For example,</p>
 <pre><code class="language-java">//**
 // @package joe
@@ -2238,47 +2281,54 @@ omitted if the function returns nothing (i.e., always returns
 <code>null</code>). If the <em>result</em> names a type, it will appear as a link to that type
 in the generated documentation.</p>
 <h3 id="the-type-entity"><a class="header" href="#the-type-entity">The <code>@type</code> Entity</a></h3>
-<p>The <code>@type</code> entity documents a type, and so begins with <code>@type &lt;name&gt;</code>.</p>
-<p>The <em>name</em> should be the name of a type defined in the current package.</p>
+<p>The <code>@type</code> entity documents a type, and so begins with <code>@type &lt;name&gt;</code>. The
+<em>name</em> should be the name of a type defined in the current package.</p>
 <p>The entity has the following optional metadata:</p>
 <div class="table-wrapper"><table><thead><tr><th>Metadata Tag</th><th>Meaning</th></tr></thead><tbody>
 <tr><td><code>@extends &lt;type&gt;</code></td><td>This type extends the named type.</td></tr>
-<tr><td><code>@generic</code></td><td>This type is generic, and will not appear in the generated docs.</td></tr>
-<tr><td><code>@includes &lt;type&gt;</code></td><td>This type includes the documentation for the named type.</td></tr>
+<tr><td><code>@includeMixin &lt;mixin&gt;</code></td><td>This type's documentation includes the named mixin.</td></tr>
 </tbody></table>
 </div>
 <ul>
-<li><code>&lt;type&gt;</code> should be the name or qualified name of a referenced type.</li>
+<li><code>&lt;mixin&gt;</code> should be the name of a</li>
 </ul>
 <p>The <code>@extends &lt;type&gt;</code> tag is used when this type extends (i.e., subclasses)
-another script-visible type.  For example, in the standard library the
-<a href="library/type.joe.AssertError.html"><code>AssertError</code></a> type extends the
-<a href="library/type.joe.Error.html"><code>Error</code></a>, both of which are visible at the
-script-level.</p>
-<p>The <code>@generic</code> tag is used for generic proxies, like Joe's <code>EnumProxy&lt;E&gt;</code>,
-where the same proxy is used by many distinct types.  <code>joe doc</code> will accumulate
-a generic type's documentation, but will not create a page for the type in
-the generated documentation.</p>
-<p>The <code>@includes &lt;type&gt;</code> tag indicates that this type's documentation should
-include the documentation from another (usually generic) type. The included
-type may be any type in the current documentation set, or
-any of the following generic types from Joe's standard library:</p>
-<ul>
-<li><code>@include joe.Enum</code>.</li>
-</ul>
-<p>The included documentation will be represented as part of the including type.</p>
-<p><strong>Note:</strong> a type may include exactly one other type, and includes are not
-transitive.</p>
+another script-visible type.  The <code>&lt;type&gt;</code> should be the name or qualified name
+of a referenced <code>@type</code>.</p>
+<p>The <code>@includesMixin &lt;mixin&gt;</code> tag indicates that this type's documentation should
+include the documentation from a <a href="joe_doc.html#the-mixin-entity"><code>@mixin</code></a> defined in this
+documentation set. The included documentation will be represented as part of
+the including type.</p>
+<p>The <code>@type</code> entity may have
+<a href="joe_doc.html#the-constant-entity"><code>@constant</code></a>,
+<a href="joe_doc.html#the-static-entity"><code>@static</code></a>,
+<a href="joe_doc.html#the-init-entity"><code>@init</code></a>,
+<a href="joe_doc.html#the-method-entity"><code>@method</code></a>,
+and
+<a href="joe_doc.html#the-method-entity"><code>@typeTopic</code></a>
+children.</p>
+<p>For example, in the standard library the <a href="library/type.joe.AssertError.html"><code>AssertError</code></a> type extends the
+<a href="library/type.joe.Error.html"><code>Error</code></a> type, both of which are visible at the script-level.</p>
 <pre><code class="language-java">//**
 // @type AssertError
 // @extends Error
 // ...
 </code></pre>
+<h3 id="the-enum-entity"><a class="header" href="#the-enum-entity">The <code>@enum</code> Entity</a></h3>
+<p>The <code>@enum</code> entity documents a native Java enumerated type whose
+binding is created using Joe's <code>EnumProxy&lt;E&gt;</code> type proxy class. An
+<code>@enum</code> entity is just like a <a href="joe_doc.html#the-type-entity"><code>@type</code> entity</a>,
+except that it automatically includes documentation for the enum's static
+methods, <code>values()</code> and <code>valueOf</code>, and for the enum's instance methods,
+<code>name()</code>, <code>ordinal()</code>, and <code>toString()</code>.</p>
+<p>A simple <code>@enum</code> doc comment will usually need to include only a description
+of the enum and the enum's <code>@constant</code> entities. If the specific enum
+defines other static or instance methods, they can be included as well.</p>
 <h3 id="the-typetopic-entity"><a class="header" href="#the-typetopic-entity">The <code>@typeTopic</code> Entity</a></h3>
 <p>A type's normal Markdown content goes near the top of the generated
 type page, below the index but above the various constant and method
 entries.  The <code>@typeTopic</code> entity is way to add titled Markdown content
-at the <em>bottom</em> of the package file, where it is out of the way.</p>
+at the <em>bottom</em> of the type's file, where it is out of the way.</p>
 <p>The <code>@typeTopic</code> entity begins with <code>@typeTopic &lt;name&gt;</code>, and has
 the following metadata:</p>
 <div class="table-wrapper"><table><thead><tr><th>Metadata Tag</th><th>Meaning</th></tr></thead><tbody>
@@ -2313,6 +2363,49 @@ always an instance of the current type.</p>
 current type, and begins with <code>@method &lt;name&gt;</code>.  The <em>name</em> should be
 the name of a method defined by the current type.</p>
 <p>The <code>@method</code> entity has the same metadata as the <code>@function</code> entity.</p>
+<h3 id="the-mixin-entity"><a class="header" href="#the-mixin-entity">The <code>@mixin</code> Entity</a></h3>
+<p>The <code>@mixin</code> entity is like a pseudo-<code>@type</code>; it contains type content that
+would otherwise be duplicated in multiple <code>@type</code> entries.  Mixin entities
+belong to the documentation set, not to any specific package, and may be
+included by any <code>@type</code> entity.</p>
+<p>Every mixin begins with <code>@mixin &lt;name&gt;</code>; mixin names must be unique within
+the documentation set.</p>
+<p>Mixins have no metadata tags, and may have Markdown content and
+<a href="joe_doc.html#the-constant-entity"><code>@constant</code></a>,
+<a href="joe_doc.html#the-static-entity"><code>@static</code></a>,
+<a href="joe_doc.html#the-method-entity"><code>@method</code></a>,
+and
+<a href="joe_doc.html#the-method-entity"><code>@typeTopic</code></a>
+children.</p>
+<p>When a type wants to include a mixin, it uses the <code>@includesMixin &lt;name&gt;</code>
+metadata tag.</p>
+<ul>
+<li>The mixin's Markdown content is inserted into the type's
+Markdown content at the location of the <code>@includesMixin</code> tag</li>
+<li>The mixin's children are then added to the type.</li>
+</ul>
+<p>A mixin is like a template; the string <code>&lt;type&gt;</code> may be included anywhere
+in the content of the mixin itself and its children, and will be replaced
+on inclusion by the including type's name.</p>
+<p>For example, the mixin might define:</p>
+<pre><code class="language-java">//**
+// @mixin MyMixin
+// 
+// The `&lt;type&gt;` type is able to...
+//
+// @method myMethod
+// @result &lt;type&gt;
+// This method...
+</code></pre>
+<p>Then, another type can include it like this:</p>
+<pre><code class="language-java">//**
+// @type MyType
+// The `MyType` type represents...
+//
+// @includeMixin MyMixin
+//
+// The MyMixin Markdown content is included above, replacing the include tag.
+</code></pre>
 <h2 id="joedoc-links"><a class="header" href="#joedoc-links">JoeDoc Links</a></h2>
 <p>The Markdown content for each entity can of course contain normal
 Markdown links.  In addition, though, JoeDoc supports abbreviated
@@ -2751,7 +2844,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_CENTER">Pos.TOP_CENTER</a></li>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_LEFT">Pos.TOP_LEFT</a></li>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_RIGHT">Pos.TOP_RIGHT</a></li>
-<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → value</li>
+<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>
 <li><a href="library/type.joe.win.Pos.html#static.values">Pos.values()</a> → List</li>
 <li><a href="library/type.joe.win.Pos.html#method.name"><em>pos</em>.name()</a> → String</li>
 <li><a href="library/type.joe.win.Pos.html#method.ordinal"><em>pos</em>.ordinal()</a> → Number</li>
@@ -2763,7 +2856,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Priority.html#constant.ALWAYS">Priority.ALWAYS</a></li>
 <li><a href="library/type.joe.win.Priority.html#constant.NEVER">Priority.NEVER</a></li>
 <li><a href="library/type.joe.win.Priority.html#constant.SOMETIMES">Priority.SOMETIMES</a></li>
-<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → value</li>
+<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Priority.html">Priority</a></li>
 <li><a href="library/type.joe.win.Priority.html#static.values">Priority.values()</a> → List</li>
 <li><a href="library/type.joe.win.Priority.html#method.name"><em>priority</em>.name()</a> → String</li>
 <li><a href="library/type.joe.win.Priority.html#method.ordinal"><em>priority</em>.ordinal()</a> → Number</li>
@@ -4701,10 +4794,7 @@ all widgets.</p>
 <tr><td><code>#style</code></td><td><a href="library/type.joe.String.html"><code>String</code></a></td><td>FXCSS style string</td></tr>
 <tr><td><code>#visible</code></td><td><a href="library/type.joe.Boolean.html"><code>Boolean</code></a></td><td>Visibility flag</td></tr>
 </tbody></table>
-</div>
-<p>This type defines the property access methods commonly used by
-JavaFX types.</p>
-<h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
+</div><h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
 <p><span id="method.disable"> </span></p>
 <h3 id="nodedisable"><a class="header" href="#nodedisable"><em>node</em>.disable()</a></h3>
@@ -4850,7 +4940,7 @@ relative to the boundaries of a rectangular space.</p>
 </ul>
 <p><strong><a href="library/type.joe.win.Pos.html#statics">Static Methods</a></strong></p>
 <ul>
-<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → value</li>
+<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>
 <li><a href="library/type.joe.win.Pos.html#static.values">Pos.values()</a> → List</li>
 </ul>
 <p><strong><a href="library/type.joe.win.Pos.html#methods">Methods</a></strong></p>
@@ -4902,8 +4992,9 @@ relative to the boundaries of a rectangular space.</p>
 <p><span id="static.valueOf"> </span></p>
 <h3 id="posvalueof"><a class="header" href="#posvalueof">Pos.valueOf()</a></h3>
 <hr />
-<p><strong>Pos.valueOf(<em>name</em>) → value</strong></p>
-<p>Returns the enumerated constant with the given name.</p>
+<p><strong>Pos.valueOf(<em>name</em>) → <a href="library/type.joe.win.Pos.html">Pos</a></strong></p>
+<p>Returns the enumerated constant with the given <em>name</em>, disregarding
+case.  The <em>name</em> may be a <code>String</code> or a <code>Keyword</code>.</p>
 <p><span id="static.values"> </span></p>
 <h3 id="posvalues"><a class="header" href="#posvalues">Pos.values()</a></h3>
 <hr />
@@ -4940,7 +5031,7 @@ default is generally <code>NEVER</code>.</p>
 </ul>
 <p><strong><a href="library/type.joe.win.Priority.html#statics">Static Methods</a></strong></p>
 <ul>
-<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → value</li>
+<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Priority.html">Priority</a></li>
 <li><a href="library/type.joe.win.Priority.html#static.values">Priority.values()</a> → List</li>
 </ul>
 <p><strong><a href="library/type.joe.win.Priority.html#methods">Methods</a></strong></p>
@@ -4965,8 +5056,9 @@ default is generally <code>NEVER</code>.</p>
 <p><span id="static.valueOf"> </span></p>
 <h3 id="priorityvalueof"><a class="header" href="#priorityvalueof">Priority.valueOf()</a></h3>
 <hr />
-<p><strong>Priority.valueOf(<em>name</em>) → value</strong></p>
-<p>Returns the enumerated constant with the given name.</p>
+<p><strong>Priority.valueOf(<em>name</em>) → <a href="library/type.joe.win.Priority.html">Priority</a></strong></p>
+<p>Returns the enumerated constant with the given <em>name</em>, disregarding
+case.  The <em>name</em> may be a <code>String</code> or a <code>Keyword</code>.</p>
 <p><span id="static.values"> </span></p>
 <h3 id="priorityvalues"><a class="header" href="#priorityvalues">Priority.values()</a></h3>
 <hr />
@@ -5535,7 +5627,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_CENTER">Pos.TOP_CENTER</a></li>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_LEFT">Pos.TOP_LEFT</a></li>
 <li><a href="library/type.joe.win.Pos.html#constant.TOP_RIGHT">Pos.TOP_RIGHT</a></li>
-<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → value</li>
+<li><a href="library/type.joe.win.Pos.html#static.valueOf">Pos.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>
 <li><a href="library/type.joe.win.Pos.html#static.values">Pos.values()</a> → List</li>
 <li><a href="library/type.joe.win.Pos.html#method.name"><em>pos</em>.name()</a> → String</li>
 <li><a href="library/type.joe.win.Pos.html#method.ordinal"><em>pos</em>.ordinal()</a> → Number</li>
@@ -5547,7 +5639,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Priority.html#constant.ALWAYS">Priority.ALWAYS</a></li>
 <li><a href="library/type.joe.win.Priority.html#constant.NEVER">Priority.NEVER</a></li>
 <li><a href="library/type.joe.win.Priority.html#constant.SOMETIMES">Priority.SOMETIMES</a></li>
-<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → value</li>
+<li><a href="library/type.joe.win.Priority.html#static.valueOf">Priority.valueOf(<em>name</em>)</a> → <a href="library/type.joe.win.Priority.html">Priority</a></li>
 <li><a href="library/type.joe.win.Priority.html#static.values">Priority.values()</a> → List</li>
 <li><a href="library/type.joe.win.Priority.html#method.name"><em>priority</em>.name()</a> → String</li>
 <li><a href="library/type.joe.win.Priority.html#method.ordinal"><em>priority</em>.ordinal()</a> → Number</li>

@@ -47,44 +47,17 @@ class Generator {
                 "  " + ex.getMessage());
         }
 
-        // NEXT, process included types
+        // NEXT, prepare for generation
         for (var pkg : docSet.packages()) {
             // FIRST, populate the short mnemonic lookup table for this
             // package
             populateShortTable(pkg);
 
-            // NEXT, look for includes.
+            // NEXT, include any mixins.
             for (var type : pkg.types()) {
-                if (type.includes() == null) continue;
-
-                if (type.isGeneric()) {
-                    warn("Generic type '" + type.name() +
-                        "' @includes type '" + type.includes() +
-                        "': ignored.");
-
-                    continue;
+                if (!type.mixins().isEmpty()) {
+                    includeMixins(type);
                 }
-
-                var included = lookupType(type.includes());
-
-                if (included == null) {
-                    included = GENERICS.get(type.includes());
-                }
-
-                if (included == null) {
-                    warn("Type '" + type.name() +
-                        "' @includes unknown type '" + type.includes() +
-                        "': ignored.");
-                    continue;
-                }
-
-                included.staticMethods().forEach(m ->
-                    type.staticMethods().add(new StaticMethodEntry(type, m)));
-                included.methods().forEach(m ->
-                    type.methods().add(new MethodEntry(type, m)));
-                type.topics().addAll(included.topics());
-                type.content().add("");
-                type.content().addAll(included.content());
             }
         }
 
@@ -104,11 +77,21 @@ class Generator {
 
             // NEXT, write each type file
             for (var type : sorted(pkg.types(), TypeEntry::name)) {
-                if (!type.isGeneric()) {
-                    write(config.outputFolder().resolve(type.filename()),
-                        out -> writeTypeFile(out, type));
-                }
+                write(config.outputFolder().resolve(type.filename()),
+                    out -> writeTypeFile(out, type));
             }
+        }
+    }
+
+    private void includeMixins(TypeEntry type) {
+        for (var mixinName : type.mixins()) {
+            var mixin = docSet.mixins().get(mixinName);
+            if (mixin == null) {
+                warn("Unknown mixin '" + mixinName + "' in type " + type);
+                continue;
+            }
+
+            type.includeMixin(mixin);
         }
     }
 
@@ -140,8 +123,6 @@ class Generator {
             }
 
             for (var type : sorted(pkg.types(), TypeEntry::name)) {
-                if (type.isGeneric()) continue;
-
                 writeTypeLink(out, 2, type);
 
                 sorted(type.constants(), ConstantEntry::name)
@@ -189,7 +170,7 @@ class Generator {
             out.println();
         }
 
-        var types = pkg.types().stream().filter(t -> !t.isGeneric()).toList();
+        var types = pkg.types();
 
         if (!types.isEmpty()) {
             out.hb("Types");
@@ -652,57 +633,5 @@ class Generator {
             System.err.println("*** Failed to write " + path + ",\n   " +
                 ex.getMessage());
         }
-    }
-
-    //-------------------------------------------------------------------------
-    // Joe Generic Types
-
-    private static final Map<String,TypeEntry> GENERICS = new HashMap<>();
-
-    static {
-        populateGenerics();
-    }
-
-    static void populateGenerics() {
-        var pkg = new PackageEntry("joe");
-        var type = new TypeEntry(pkg, "Enum");
-        GENERICS.put(type.fullMnemonic(), type);
-
-        var staticMethod = new StaticMethodEntry(type, "values");
-        staticMethod.setResult("List");
-        staticMethod.content().add("""
-            Returns a list of the enumerated type's values.
-            """);
-        type.staticMethods().add(staticMethod);
-
-        staticMethod = new StaticMethodEntry(type, "valueOf");
-        staticMethod.argSpecs().add("name");
-        staticMethod.setResult("value");
-        staticMethod.content().add("""
-            Returns the enumerated constant with the given name.
-            """);
-        type.staticMethods().add(staticMethod);
-
-        var method = new MethodEntry(type, "name");
-        method.setResult("String");
-        method.content().add("""
-            Returns the name of the enumerated constant.
-            """);
-        type.methods().add(method);
-
-        method = new MethodEntry(type, "ordinal");
-        method.setResult("Number");
-        method.content().add("""
-            Returns the index of the enumerated constant
-            in the `values()` list.
-            """);
-        type.methods().add(method);
-
-        method = new MethodEntry(type, "toString");
-        method.setResult("String");
-        method.content().add("""
-            Returns the name of the enumerated constant.
-            """);
-        type.methods().add(method);
     }
 }

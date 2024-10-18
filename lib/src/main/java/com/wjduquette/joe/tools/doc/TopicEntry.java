@@ -24,7 +24,7 @@ class TopicEntry extends Entry {
     }
 
     public TopicEntry(TypeEntry type, String name) {
-        super(type.pkg());
+        super(type != null ? type.pkg() : null);
 
         this.type = type;
         this.name = name;
@@ -41,9 +41,26 @@ class TopicEntry extends Entry {
     public String name()          { return name; }
     public String title()         { return title; }
     public String id()            { return "topic." + name; }
-    public String fullMnemonic()  { return parent().fullMnemonic() + "#" + id(); }
-    public String shortMnemonic() { return parent().shortMnemonic() + "#" + id(); }
-    public String filename()      { return parent().filename(); }
+    public String fullMnemonic()  {
+        if (parent() == null) {
+            throw new UnsupportedOperationException("Mixin topic.");
+        }
+        return parent().fullMnemonic() + "#" + id();
+    }
+
+    public String shortMnemonic() {
+        if (parent() == null) {
+            throw new UnsupportedOperationException("Mixin topic.");
+        }
+        return parent().shortMnemonic() + "#" + id();
+    }
+
+    public String filename()      {
+        if (parent() == null) {
+            throw new UnsupportedOperationException("Mixin topic.");
+        }
+        return parent().filename();
+    }
 
     private Entry parent() {
         return type != null ? type : pkg();

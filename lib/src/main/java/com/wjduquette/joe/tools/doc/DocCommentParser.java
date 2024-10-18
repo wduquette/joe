@@ -53,6 +53,7 @@ class DocCommentParser {
     //-------------------------------------------------------------------------
     // Parser
 
+    private static final String MIXIN = "@mixin";
     private static final String PACKAGE = "@package";
     private static final String TITLE = "@title";
     private static final String PACKAGE_TOPIC = "@packageTopic";
@@ -60,25 +61,33 @@ class DocCommentParser {
     private static final String ARGS = "@args";
     private static final String RESULT = "@result";
     private static final String TYPE = "@type";
+    private static final String ENUM = "@enum";
     private static final String TYPE_TOPIC = "@typeTopic";
-    private static final String GENERIC = "@generic";
-    private static final String INCLUDES = "@includes";
+    private static final String INCLUDE_MIXIN = "@includeMixin";
     private static final String EXTENDS = "@extends";
     private static final String CONSTANT = "@constant";
     private static final String STATIC = "@static";
     private static final String INIT = "@init";
     private static final String METHOD = "@method";
 
+    private static final Set<String> MIXIN_ENDERS = Set.of(
+        PACKAGE, MIXIN
+    );
+
+    private static final Set<String> MIXIN_CHILD_ENDERS = Set.of(
+        PACKAGE, MIXIN, CONSTANT, STATIC, METHOD, TYPE_TOPIC
+    );
+
     private static final Set<String> PACKAGE_ENDERS = Set.of(
-        PACKAGE
+        PACKAGE, MIXIN
     );
 
     private static final Set<String> PACKAGE_CHILD_ENDERS = Set.of(
-        PACKAGE, FUNCTION, TYPE, PACKAGE_TOPIC
+        PACKAGE, MIXIN, FUNCTION, TYPE, ENUM, PACKAGE_TOPIC
     );
 
     private static final Set<String> TYPE_CHILD_ENDERS = Set.of(
-        PACKAGE, FUNCTION, TYPE, PACKAGE_TOPIC,
+        PACKAGE, MIXIN, FUNCTION, TYPE, ENUM, PACKAGE_TOPIC,
         CONSTANT, STATIC, INIT, METHOD, TYPE_TOPIC
     );
 
@@ -88,7 +97,9 @@ class DocCommentParser {
 
             var tag = advance().getTag();
 
-            if (tag.name().equals(PACKAGE)) {
+            if (tag.name().equals(MIXIN)) {
+                _mixin(tag);
+            } else if (tag.name().equals(PACKAGE)) {
                 _package(tag);
             } else {
                 throw error(previous(), "Unexpected tag: " + tag);
@@ -106,6 +117,44 @@ class DocCommentParser {
                 System.out.println(text + "\n    peek: [At end]");
             } else {
                 System.out.println(text + "\n    peek: " + peek());
+            }
+        }
+    }
+
+    private void _mixin(Tag mixinTag) {
+        // FIRST, create the mixin, validating its name and making sure
+        // it's unique.
+        trace("_mixin", mixinTag);
+        MixinEntry mixin = new MixinEntry(mixinTag.value());
+
+        if (!Joe.isIdentifier(mixinTag.value())) {
+            throw error(previous(), expected(mixinTag));
+        }
+
+        if (docSet.mixins().containsKey(mixinTag.value())) {
+            throw error(previous(), "Duplicate mixin.");
+        }
+
+        // NEXT, remember the mixin.
+        docSet.mixins().put(mixin.name(), mixin);
+
+        // NEXT, parse its content.
+        while (!atEnd()) {
+            if (!advanceToTag(mixin)) break;
+
+            var tag = peek().getTag();
+
+            if (MIXIN_ENDERS.contains(tag.name())) {
+                break;
+            }
+
+            advance();
+            switch (tag.name()) {
+                case CONSTANT -> _constant(mixin, tag);
+                case STATIC -> _static(mixin, tag);
+                case METHOD -> _method(mixin, tag);
+                case TYPE_TOPIC -> _typeTopic(mixin, tag);
+                default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
     }
@@ -136,12 +185,13 @@ class DocCommentParser {
             switch (tag.name()) {
                 case TITLE -> pkg.setTitle(tag.value());
                 case FUNCTION -> _function(pkg, tag);
-                case TYPE -> _type(pkg, tag);
+                case TYPE, ENUM -> _type(pkg, tag);
                 case PACKAGE_TOPIC -> _packageTopic(pkg, tag);
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
         }
     }
+
 
     private void _packageTopic(PackageEntry pkg, Tag topicTag) {
         trace("_packageTopic", pkg, topicTag);
@@ -206,8 +256,11 @@ class DocCommentParser {
     }
 
     private void _type(PackageEntry pkg, Tag typeTag) {
+        // FIRST, create the type, validating its name and making sure
+        // it's unique.
         trace("_type", typeTag);
         TypeEntry type = new TypeEntry(pkg, typeTag.value());
+        type.setEnum(typeTag.name().equals(ENUM));
         remember(type);
 
         if (!Joe.isIdentifier(typeTag.value())) {
@@ -215,6 +268,12 @@ class DocCommentParser {
         }
         pkg.types().add(type);
 
+        // NEXT, if it's an enum add the standard enum content.
+        if (type.isEnum()) {
+            addEnumContent(type);
+        }
+
+        // NEXT, parse its content.
         while (!atEnd()) {
             if (!advanceToTag(type)) break;
 
@@ -229,9 +288,11 @@ class DocCommentParser {
 
             advance();
             switch (tag.name()) {
-                case GENERIC -> type.setGeneric(true);
                 case EXTENDS -> type.setSupertypeName(_extends(tag));
-                case INCLUDES -> type.setIncludes(_includes(tag));
+                case INCLUDE_MIXIN -> {
+                    type.mixins().add(_includeMixin(tag));
+                    type.content().add("<mixin " + tag.value() + ">");
+                }
                 case CONSTANT -> _constant(type, tag);
                 case STATIC -> _static(type, tag);
                 case INIT -> _init(type, tag);
@@ -242,6 +303,52 @@ class DocCommentParser {
         }
     }
 
+    // This is kind of ugly, but enums are a special case in almost
+    // every way.
+    private void addEnumContent(TypeEntry type) {
+        // Add static method `values()`
+        var values = new StaticMethodEntry(type, "values");
+        values.setResult("List");
+        values.content().add("""
+            Returns a list of the enumerated type's values.
+            """);
+        type.staticMethods().add(values);
+
+        // Add static method `valueOf()`
+        var valueOf = new StaticMethodEntry(type, "valueOf");
+        valueOf.argSpecs().add("name");
+        valueOf.setResult(type.name());
+        valueOf.content().add("""
+            Returns the enumerated constant with the given *name*, disregarding
+            case.  The *name* may be a `String` or a `Keyword`.
+            """);
+        type.staticMethods().add(valueOf);
+
+        // Add method `name()`
+
+        var name = new MethodEntry(type, "name");
+        name.setResult("String");
+        name.content().add("""
+            Returns the name of the enumerated constant.
+            """);
+        type.methods().add(name);
+
+        var ordinal = new MethodEntry(type, "ordinal");
+        ordinal.setResult("Number");
+        ordinal.content().add("""
+            Returns the index of the enumerated constant
+            in the `values()` list.
+            """);
+        type.methods().add(ordinal);
+
+        var toString = new MethodEntry(type, "toString");
+        toString.setResult("String");
+        toString.content().add("""
+            Returns the name of the enumerated constant.
+            """);
+        type.methods().add(toString);
+    }
+
     private String _extends(Tag tag) {
         var result = tag.value().trim();
         if (result.split("\\s").length > 1) {
@@ -250,49 +357,59 @@ class DocCommentParser {
         return result;
     }
 
-    private String _includes(Tag tag) {
+    private String _includeMixin(Tag tag) {
         var result = tag.value().trim();
         if (result.split("\\s").length > 1) {
-            throw error(previous(), "Expected type name");
+            throw error(previous(), "Expected mixin name");
         }
         return result;
     }
 
-    private void _constant(TypeEntry type, Tag constantTag) {
-        ConstantEntry constant = new ConstantEntry(type, constantTag.value());
-        remember(constant);
+    private void _constant(TypeOrMixin parent, Tag constantTag) {
+        var isType = parent instanceof TypeEntry;
+        var type = isType ? (TypeEntry)parent : null;
 
         if (!Joe.isIdentifier(constantTag.value())) {
             throw error(previous(), expected(constantTag));
         }
-        type.constants().add(constant);
+
+        ConstantEntry constant = new ConstantEntry(type, constantTag.value());
+        if (isType) remember(constant);
+
+        parent.constants().add(constant);
 
         // Constants have no tags, only content.
         if (!advanceToTag(constant)) return;
 
         var tag = peek().getTag();
 
-        if (!TYPE_CHILD_ENDERS.contains(tag.name())) {
+        var enders = isType ? TYPE_CHILD_ENDERS : MIXIN_CHILD_ENDERS;
+
+        if (!enders.contains(tag.name())) {
             advance();
             throw error(previous(), "Unexpected tag: " + tag);
         }
     }
 
-    private void _static(TypeEntry type, Tag methodTag) {
+    private void _static(TypeOrMixin parent, Tag methodTag) {
+        var isType = parent instanceof TypeEntry;
+        var type = isType ? (TypeEntry)parent : null;
         StaticMethodEntry method = new StaticMethodEntry(type, methodTag.value());
-        remember(method);
 
         if (!Joe.isIdentifier(methodTag.value())) {
             throw error(previous(), expected(methodTag));
         }
-        type.staticMethods().add(method);
+
+        if (isType) remember(method);
+        parent.staticMethods().add(method);
 
         while (!atEnd()) {
             if (!advanceToTag(method)) break;
 
             var tag = peek().getTag();
 
-            if (TYPE_CHILD_ENDERS.contains(tag.name())) {
+            var enders = isType ? TYPE_CHILD_ENDERS : MIXIN_CHILD_ENDERS;
+            if (enders.contains(tag.name())) {
                 break;
             }
 
@@ -334,21 +451,25 @@ class DocCommentParser {
         }
     }
 
-    private void _method(TypeEntry type, Tag methodTag) {
+    private void _method(TypeOrMixin parent, Tag methodTag) {
+        var isType = parent instanceof TypeEntry;
+        var type = isType ? (TypeEntry)parent : null;
         MethodEntry method = new MethodEntry(type, methodTag.value());
-        remember(method);
 
         if (!Joe.isIdentifier(methodTag.value())) {
             throw error(previous(), expected(methodTag));
         }
-        type.methods().add(method);
+        if (isType) remember(method);
+
+        parent.methods().add(method);
 
         while (!atEnd()) {
             if (!advanceToTag(method)) break;
 
             var tag = peek().getTag();
 
-            if (TYPE_CHILD_ENDERS.contains(tag.name())) {
+            var enders = isType ? TYPE_CHILD_ENDERS : MIXIN_CHILD_ENDERS;
+            if (enders.contains(tag.name())) {
                 break;
             }
 
@@ -361,23 +482,26 @@ class DocCommentParser {
         }
     }
 
-    private void _typeTopic(TypeEntry type, Tag topicTag) {
+    private void _typeTopic(TypeOrMixin parent, Tag topicTag) {
+        var isType = parent instanceof TypeEntry;
+        var type = isType ? (TypeEntry)parent : null;
         trace("_typeTopic", type, topicTag);
-
-        TopicEntry topic = new TopicEntry(type, topicTag.value());
 
         if (!Joe.isIdentifier(topicTag.value())) {
             throw error(previous(), expected(topicTag));
         }
 
-        type.topics().add(topic);
+        TopicEntry topic = new TopicEntry(type, topicTag.value());
+
+        parent.topics().add(topic);
 
         while (!atEnd()) {
             if (!advanceToTag(topic)) break;
 
             var tag = peek().getTag();
 
-            if (TYPE_CHILD_ENDERS.contains(tag.name())) {
+            var enders = isType ? TYPE_CHILD_ENDERS : MIXIN_CHILD_ENDERS;
+            if (enders.contains(tag.name())) {
                 break;
             }
 

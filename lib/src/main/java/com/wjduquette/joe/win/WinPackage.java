@@ -53,8 +53,7 @@ public class WinPackage extends JoePackage {
         // Enums
 
         //**
-        // @type Pos
-        // @includes joe.Enum
+        // @enum Pos
         // The `Pos` enum lists ways a widget can be aligned
         // relative to the boundaries of a rectangular space.
         //
@@ -74,8 +73,7 @@ public class WinPackage extends JoePackage {
 
 
         //**
-        // @type Priority
-        // @includes joe.Enum
+        // @enum Priority
         // The `Priority` enum's values indicate when a widget
         // should resize itself to fit its parent widget.  The
         // default is generally `NEVER`.

@@ -23,11 +23,13 @@ abstract class Entry {
      * Initializes the Entry presuming that it's a PackageEntry.
      */
     Entry() {
-        if (this instanceof PackageEntry p) {
-            pkg = p;
-        } else {
-            throw new IllegalStateException("Only PackageEntry can use no-arg constructor");
-        }
+        this.pkg = switch (this) {
+            case PackageEntry p -> p;
+            case MixinEntry ignored -> null;
+            default ->
+                throw new IllegalStateException(
+                    "This entry type cannot use no-arg constructor");
+        };
     }
 
     /**
@@ -55,5 +57,4 @@ abstract class Entry {
     PackageEntry pkg()     { return pkg; }
 
     public List<String> content() { return content; }
-
 }

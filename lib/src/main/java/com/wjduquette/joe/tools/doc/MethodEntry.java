@@ -28,14 +28,6 @@ class MethodEntry extends TypeMember implements Callable {
         this.name = name;
     }
 
-    public MethodEntry(TypeEntry type, MethodEntry other) {
-        super(type);
-        this.name = other.name;
-        this.argSpec.addAll(other.argSpec);
-        this.result = other.result();
-        this.content().addAll(other.content());
-    }
-
     //-------------------------------------------------------------------------
     // Accessors
 
