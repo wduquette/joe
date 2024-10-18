@@ -193,6 +193,7 @@ API documentation.<sup class="footnote-reference"><a href="#markdown">1</a></sup
 <li><a href="#the-packagetopic-entity">The <code>@packageTopic</code> Entity</a></li>
 <li><a href="#the-function-entity">The <code>@function</code> Entity</a></li>
 <li><a href="#the-type-entity">The <code>@type</code> Entity</a></li>
+<li><a href="#the-enum-entity">The <code>@enum</code> Entity</a></li>
 <li><a href="#the-typetopic-entity">The <code>@typeTopic</code> Entity</a></li>
 <li><a href="#the-constant-entity">The <code>@constant</code> Entity</a></li>
 <li><a href="#the-static-entity">The <code>@static</code> Entity</a></li>
@@ -221,7 +222,7 @@ following types of entity:</p>
 <li>Packages
 <ul>
 <li>Functions</li>
-<li>Types
+<li>Types (including Enums)
 <ul>
 <li>Constants</li>
 <li>Static Methods</li>
@@ -408,17 +409,13 @@ another script-visible type.  For example, in the standard library the
 <a href="library/type.joe.AssertError.html"><code>AssertError</code></a> type extends the
 <a href="library/type.joe.Error.html"><code>Error</code></a>, both of which are visible at the
 script-level.</p>
-<p>The <code>@generic</code> tag is used for generic proxies, like Joe's <code>EnumProxy&lt;E&gt;</code>,
+<p>The <code>@generic</code> tag is used for generic proxies,
 where the same proxy is used by many distinct types.  <code>joe doc</code> will accumulate
 a generic type's documentation, but will not create a page for the type in
 the generated documentation.</p>
 <p>The <code>@includes &lt;type&gt;</code> tag indicates that this type's documentation should
 include the documentation from another (usually generic) type. The included
-type may be any type in the current documentation set, or
-any of the following generic types from Joe's standard library:</p>
-<ul>
-<li><code>@include joe.Enum</code>.</li>
-</ul>
+type may be any type in the current documentation set.</p>
 <p>The included documentation will be represented as part of the including type.</p>
 <p><strong>Note:</strong> a type may include exactly one other type, and includes are not
 transitive.</p>
@@ -427,6 +424,16 @@ transitive.</p>
 // @extends Error
 // ...
 </code></pre>
+<h3 id="the-enum-entity"><a class="header" href="#the-enum-entity">The <code>@enum</code> Entity</a></h3>
+<p>The <code>@enum</code> entity documents a native Java enumerated type whose
+binding is created using Joe's <code>EnumProxy&lt;E&gt;</code> type proxy class. An
+<code>@enum</code> entity is just like a <a href="#the-type-entity"><code>@type</code> entity</a>,
+except that it automatically includes documentation for the enum's static
+methods, <code>values()</code> and <code>valueOf</code>, and for the enum's instance methods,
+<code>name()</code>, <code>ordinal()</code>, and <code>toString()</code>.</p>
+<p>A simple <code>@enum</code> doc comment will usually need to include only a description
+of the enum and the enum's <code>@constant</code> entities. If the specific enum
+defines other static or instance methods, they can be included as well.</p>
 <h3 id="the-typetopic-entity"><a class="header" href="#the-typetopic-entity">The <code>@typeTopic</code> Entity</a></h3>
 <p>A type's normal Markdown content goes near the top of the generated
 type page, below the index but above the various constant and method
