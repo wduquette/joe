@@ -1,0 +1,18 @@
+// win_hello.joe: GUI hello world
+Win.setTitle("joe win: Hello")
+   .setSize(300, 150);
+
+var name = Console.args().isEmpty()
+    ? "world" : Console.args().get(0);
+
+function goodbye() {
+    Console.exit(0);
+}
+
+Win.root()
+    .setAlignment(#center)
+    .setSpacing(10)
+    .child(Label("Hello, " + name + "!"))
+    .child(Button("Goodbye", goodbye))
+    ;
+

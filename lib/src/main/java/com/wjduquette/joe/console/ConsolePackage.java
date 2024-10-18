@@ -8,10 +8,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class ConsolePackage extends JoePackage {
     //-------------------------------------------------------------------------
     // Instance Variables
+
+    // The script forwarded to the console
+    private String scriptFile = null;
 
     // The command line arguments forwarded to the console.
     private final ListValue argList = new ListValue();
@@ -48,8 +52,36 @@ public class ConsolePackage extends JoePackage {
 
 
     /**
-     * The client can configure the console package with the arguments
-     * after creating it.
+     * Gets the script path provided by the client, or null if none.
+     * @return The path
+     */
+    public String getScript() {
+        return scriptFile;
+    }
+
+    /**
+     * Sets the name and path of the executing script.   The client should set
+     * this when creating the package.
+     * @param fileName The path
+     */
+    public void setScript(String fileName) {
+        this.scriptFile = fileName;
+    }
+
+    /**
+     * Sets the command line arguments.  The client should this to
+     * initialize the argument list when creating the package. The
+     * arg list should not include anything but the arguments proper
+     * (i.e., not "argv0").
+     * @param args The argument list
+     */
+    public void setArgs(List<String> args) {
+        argList.clear();
+        argList.addAll(args);
+    }
+
+    /**
+     * Gets the command line arguments.
      * @return The argument list
      */
     public ListValue getArgs() {

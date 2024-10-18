@@ -230,11 +230,36 @@ The *name* should be the name of a type defined in the current package.
 
 The entity has the following optional metadata:
 
-| Metadata Tag      | Meaning                            |
-|-------------------|------------------------------------|
-| `@extends <type>` | This type extends the named type.  |
+| Metadata Tag       | Meaning                                                          |
+|--------------------|------------------------------------------------------------------|
+| `@extends <type>`  | This type extends the named type.                                |
+| `@generic`         | This type is generic, and will not appear in the generated docs. |
+| `@includes <type>` | This type includes the documentation for the named type.         |
 
-- The `<type>` should be the name or qualified name of this type's supertype.
+- `<type>` should be the name or qualified name of a referenced type.
+
+The `@extends <type>` tag is used when this type extends (i.e., subclasses) 
+another script-visible type.  For example, in the standard library the 
+[`AssertError`](library/type.joe.AssertError.md) type extends the
+[`Error`](library/type.joe.Error.md), both of which are visible at the 
+script-level.
+
+The `@generic` tag is used for generic proxies, like Joe's `EnumProxy<E>`,
+where the same proxy is used by many distinct types.  `joe doc` will accumulate 
+a generic type's documentation, but will not create a page for the type in 
+the generated documentation.
+
+The `@includes <type>` tag indicates that this type's documentation should 
+include the documentation from another (usually generic) type. The included
+type may be any type in the current documentation set, or 
+any of the following generic types from Joe's standard library:
+
+- `@include joe.Enum`.
+
+The included documentation will be represented as part of the including type.
+
+**Note:** a type may include exactly one other type, and includes are not 
+transitive.
 
 ```java
 //**

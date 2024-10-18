@@ -50,10 +50,8 @@ class StandardLibrary extends JoePackage {
     // `Pair(#error, Error)` on error.
     private Object _catch(Joe joe, ArgQueue args) {
         Joe.exactArity(args, 1, "catch(callable)");
-        var callable = args.getRemaining(0);
-
         try {
-            var result = joe.call(callable);
+            var result = joe.call(args.next());
             return new Pair(OK, result);
         } catch (JoeError ex) {
             return new Pair(ERROR, ex);

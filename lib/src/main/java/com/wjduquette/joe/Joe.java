@@ -1,9 +1,6 @@
 package com.wjduquette.joe;
 
-import com.wjduquette.joe.types.ListValue;
-import com.wjduquette.joe.types.ListWrapper;
-import com.wjduquette.joe.types.MapWrapper;
-import com.wjduquette.joe.types.SetWrapper;
+import com.wjduquette.joe.types.*;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -676,6 +673,32 @@ public class Joe {
     }
 
     /**
+     * Converts the argument to a boolean.
+     * @param arg The argument
+     * @return the value
+     */
+    public boolean toBoolean(Object arg) {
+        return Joe.isTruthy(arg);
+    }
+
+    /**
+     * Requires that the argument is a value of type T.
+     * @param arg The argument
+     * @param cls The desired class T
+     * @return The value, cast to class T
+     * @param <T> The desired value type
+     * @throws JoeError if the argument is incompatible with the desired class.
+     */
+    @SuppressWarnings({"unused", "unchecked"})
+    public <T> T toClass(Object arg, Class<T> cls) {
+        if (cls.isAssignableFrom(arg.getClass())) {
+            return (T)arg;
+        } else {
+            throw expected(classTypeName(cls), arg);
+        }
+    }
+
+    /**
      * Converts a Monica comparator callable to a Java comparator.
      * @param arg The callable
      * @return The comparator
@@ -701,6 +724,32 @@ public class Joe {
         }
 
         throw expected("double", arg);
+    }
+
+    /**
+     * Verifies that the argument is either an enum constant of the
+     * desired type, or a keyword with a name that matches an enum
+     * constant of the desired type, and returns the enum constant.
+     * @param arg The argument
+     * @param cls The enum class
+     * @return The constant
+     * @param <E> The enum type
+     * @throws JoeError if the no enum constant is found.
+     */
+    @SuppressWarnings({"unused", "unchecked"})
+    public <E extends Enum<E>> E toEnum(Object arg, Class<E> cls) {
+        if (cls.isAssignableFrom(arg.getClass())) {
+            return (E)arg;
+        }
+
+        if (arg instanceof Keyword keyword) {
+            var c = EnumProxy.valueOf(cls, keyword.name());
+            if (c != null) {
+                return c;
+            }
+        }
+
+        throw expected(classTypeName(cls), arg);
     }
 
     /**

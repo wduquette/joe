@@ -64,6 +64,7 @@ class Extractor {
                 }
             } else if (line.trim().startsWith(START)) {
                 inBlock = true;
+                result.add(new Line(number, ""));
             }
         }
 

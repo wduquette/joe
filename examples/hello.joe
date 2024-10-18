@@ -1,0 +1,9 @@
+var name;
+
+if (!Console.args().isEmpty()) {
+    name = Console.args().get(0);
+} else {
+    name = "world";
+}
+
+println("Hello, " + name + "!");

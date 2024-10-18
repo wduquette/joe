@@ -37,7 +37,7 @@
 # Library Reference
 
 - [Library API](library/index.md)
-  - [Joe Standard Library](./library/pkg.joe.md)
+  - [Joe Standard Library (joe)](./library/pkg.joe.md)
     - [AssertError Type](./library/type.joe.AssertError.md)
     - [Boolean Type](./library/type.joe.Boolean.md)
     - [Error Type](./library/type.joe.Error.md)
@@ -49,14 +49,26 @@
     - [Set Type](./library/type.joe.Set.md)
     - [String Type](./library/type.joe.String.md)
     - [StringBuilder Type](./library/type.joe.StringBuilder.md)
-  - [Joe Test Tool API](./library/pkg.joe.test.md)
+  - [Joe Test Tool API (joe.test)](./library/pkg.joe.test.md)
     - [CatchChecker Type](./library/type.joe.test.CatchChecker.md)
     - [ValueChecker Type](./library/type.joe.test.ValueChecker.md)
-  - [JoeDoc Configuration API](./library/pkg.joe.doc.md)
+  - [JoeDoc Configuration API (joe.doc)](./library/pkg.joe.doc.md)
     - [DocConfig Type](./library/type.joe.doc.DocConfig.md)
-  - [Console API](./library/pkg.joe.console.md)
+  - [Console API (joe.console)](./library/pkg.joe.console.md)
     - [Console Type](library/type.joe.console.Console.md);
     - [Path Type](library/type.joe.console.Path.md);
+  - [GUI API (joe.win)](./library/pkg.joe.win.md)
+    - [Control Type](library/type.joe.win.Control.md);
+    - [Button Type](library/type.joe.win.Button.md);
+    - [Insets Type](library/type.joe.win.Insets.md);
+    - [Label Type](library/type.joe.win.Label.md);
+    - [Node Type](library/type.joe.win.Node.md);
+    - [Pane Type](library/type.joe.win.Pane.md);
+    - [Pos Type](library/type.joe.win.Pos.md);
+    - [Priority Type](library/type.joe.win.Priority.md);
+    - [Region Type](library/type.joe.win.Region.md);
+    - [VBox Type](library/type.joe.win.VBox.md);
+    - [Win Type](library/type.joe.win.Win.md);
   - [Library API Index](./library/index.md)
 
 ---

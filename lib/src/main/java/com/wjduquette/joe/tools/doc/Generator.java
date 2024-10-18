@@ -47,6 +47,47 @@ class Generator {
                 "  " + ex.getMessage());
         }
 
+        // NEXT, process included types
+        for (var pkg : docSet.packages()) {
+            // FIRST, populate the short mnemonic lookup table for this
+            // package
+            populateShortTable(pkg);
+
+            // NEXT, look for includes.
+            for (var type : pkg.types()) {
+                if (type.includes() == null) continue;
+
+                if (type.isGeneric()) {
+                    warn("Generic type '" + type.name() +
+                        "' @includes type '" + type.includes() +
+                        "': ignored.");
+
+                    continue;
+                }
+
+                var included = lookupType(type.includes());
+
+                if (included == null) {
+                    included = GENERICS.get(type.includes());
+                }
+
+                if (included == null) {
+                    warn("Type '" + type.name() +
+                        "' @includes unknown type '" + type.includes() +
+                        "': ignored.");
+                    continue;
+                }
+
+                included.staticMethods().forEach(m ->
+                    type.staticMethods().add(new StaticMethodEntry(type, m)));
+                included.methods().forEach(m ->
+                    type.methods().add(new MethodEntry(type, m)));
+                type.topics().addAll(included.topics());
+                type.content().add("");
+                type.content().addAll(included.content());
+            }
+        }
+
         // NEXT, generate the index file.
         write(config.outputFolder().resolve(DOC_SET_INDEX),
             this::writeDocSetIndex);
@@ -63,8 +104,10 @@ class Generator {
 
             // NEXT, write each type file
             for (var type : sorted(pkg.types(), TypeEntry::name)) {
-                write(config.outputFolder().resolve(type.filename()),
-                    out -> writeTypeFile(out, type));
+                if (!type.isGeneric()) {
+                    write(config.outputFolder().resolve(type.filename()),
+                        out -> writeTypeFile(out, type));
+                }
             }
         }
     }
@@ -97,6 +140,8 @@ class Generator {
             }
 
             for (var type : sorted(pkg.types(), TypeEntry::name)) {
+                if (type.isGeneric()) continue;
+
                 writeTypeLink(out, 2, type);
 
                 sorted(type.constants(), ConstantEntry::name)
@@ -144,10 +189,12 @@ class Generator {
             out.println();
         }
 
-        if (!pkg.types().isEmpty()) {
+        var types = pkg.types().stream().filter(t -> !t.isGeneric()).toList();
+
+        if (!types.isEmpty()) {
             out.hb("Types");
             out.println();
-            sorted(pkg.types(), TypeEntry::name)
+            sorted(types, TypeEntry::name)
                 .forEach(t -> writeTypeLink(out, 0, t));
             out.println();
         }
@@ -605,5 +652,57 @@ class Generator {
             System.err.println("*** Failed to write " + path + ",\n   " +
                 ex.getMessage());
         }
+    }
+
+    //-------------------------------------------------------------------------
+    // Joe Generic Types
+
+    private static final Map<String,TypeEntry> GENERICS = new HashMap<>();
+
+    static {
+        populateGenerics();
+    }
+
+    static void populateGenerics() {
+        var pkg = new PackageEntry("joe");
+        var type = new TypeEntry(pkg, "Enum");
+        GENERICS.put(type.fullMnemonic(), type);
+
+        var staticMethod = new StaticMethodEntry(type, "values");
+        staticMethod.setResult("List");
+        staticMethod.content().add("""
+            Returns a list of the enumerated type's values.
+            """);
+        type.staticMethods().add(staticMethod);
+
+        staticMethod = new StaticMethodEntry(type, "valueOf");
+        staticMethod.argSpecs().add("name");
+        staticMethod.setResult("value");
+        staticMethod.content().add("""
+            Returns the enumerated constant with the given name.
+            """);
+        type.staticMethods().add(staticMethod);
+
+        var method = new MethodEntry(type, "name");
+        method.setResult("String");
+        method.content().add("""
+            Returns the name of the enumerated constant.
+            """);
+        type.methods().add(method);
+
+        method = new MethodEntry(type, "ordinal");
+        method.setResult("Number");
+        method.content().add("""
+            Returns the index of the enumerated constant
+            in the `values()` list.
+            """);
+        type.methods().add(method);
+
+        method = new MethodEntry(type, "toString");
+        method.setResult("String");
+        method.content().add("""
+            Returns the name of the enumerated constant.
+            """);
+        type.methods().add(method);
     }
 }
