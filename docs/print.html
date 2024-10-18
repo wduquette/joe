@@ -2051,6 +2051,7 @@ API documentation.<sup class="footnote-reference"><a href="#markdown">1</a></sup
 <li><a href="joe_doc.html#the-static-entity">The <code>@static</code> Entity</a></li>
 <li><a href="joe_doc.html#the-init-entity">The <code>@init</code> Entity</a></li>
 <li><a href="joe_doc.html#the-method-entity">The <code>@method</code> Entity</a></li>
+<li><a href="joe_doc.html#the-mixin-entity">The <code>@mixin</code> Entity</a></li>
 </ul>
 </li>
 <li><a href="joe_doc.html#joedoc-links">JoeDoc Links</a>
@@ -2085,6 +2086,12 @@ following types of entity:</p>
 <li>Additional topics concerning a specific package or type</li>
 </ul>
 </li>
+<li>Mixins
+<ul>
+<li>A pseudo-type used for documentation content to be included in
+multiple types.</li>
+</ul>
+</li>
 </ul>
 <p>Unsurprisingly, this is the same structure you'll find in the
 <a href="extending/extending.html">Extending Joe</a> section.  And unsurprisingly,
@@ -2110,35 +2117,42 @@ according to its structure.</p>
 <h3 id="entity-tags"><a class="header" href="#entity-tags">Entity Tags</a></h3>
 <p>In the example just shown, the tag <code>@package</code> indicates that the following
 comment text concerns the named package.  <code>joe doc</code> understands the following
-entity tags:</p>
+entity tags.</p>
 <ul>
-<li><code>@package &lt;name&gt;</code>
+<li><a href="joe_doc.html#the-package-entity"><code>@package &lt;name&gt;</code></a>
 <ul>
-<li><code>@function &lt;name&gt;</code></li>
-<li><code>@type &lt;name&gt;</code>
+<li><a href="joe_doc.html#the-function-entity"><code>@function &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-type-entity"><code>@type &lt;name&gt;</code></a>
 <ul>
-<li><code>@constant &lt;name&gt;</code></li>
-<li><code>@static &lt;name&gt;</code></li>
-<li><code>@init</code></li>
-<li><code>@method &lt;name&gt;</code></li>
-<li><code>@typeTopic &lt;name&gt;</code></li>
+<li><a href="joe_doc.html#the-constant-entity"><code>@constant &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-static-entity"><code>@static &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-init-entity"><code>@init</code></a></li>
+<li><a href="joe_doc.html#the-method-entity"><code>@method &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-typetopic-entity"><code>@typeTopic &lt;name&gt;</code></a></li>
 </ul>
 </li>
-<li><code>@packageTopic &lt;name&gt;</code></li>
+<li><a href="joe_doc.html#the-packagetopic-entity"><code>@packageTopic &lt;name&gt;</code></a></li>
+</ul>
+</li>
+<li><a href="joe_doc.html#the-mixin-entity"><code>@mixin &lt;name&gt;</code></a>
+<ul>
+<li><a href="joe_doc.html#the-constant-entity"><code>@constant &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-static-entity"><code>@static &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-method-entity"><code>@method &lt;name&gt;</code></a></li>
+<li><a href="joe_doc.html#the-typetopic-entity"><code>@typeTopic &lt;name&gt;</code></a></li>
 </ul>
 </li>
 </ul>
-<p>This is the same outline <a href="joe_doc.html#joedoc-structure">shown above</a>, and purposely so.</p>
+<p>This is the same outline <a href="joe_doc.html#joedoc-structure">shown above</a>, and purposely so.  Each entity
+has a parent, and the parentage is indicated by the outline.</p>
 <ul>
-<li><code>@package</code> must be the first entity tag in a given file.</li>
-<li>The <code>@function</code> and <code>@type</code> entities that follow are added to that package.</li>
-<li>The <code>@constant</code>, <code>@static</code>, <code>@init</code>, and <code>@method</code> entities that follow a
-<code>@type</code> are added to that type.</li>
-</ul>
-<p><code>joe doc</code> checks carefully for duplicates.</p>
-<ul>
-<li>Each <code>@function</code> and <code>@type</code> must be unique in the <code>@package</code>.</li>
-<li>Each <code>@constant</code>, <code>@static</code>, and <code>@method</code> must be unique in the <code>@type</code>.</li>
+<li><code>@package</code> and <code>@mixin</code> entities belong to the documentation set.</li>
+<li>Every <code>@function</code> and <code>@type</code> entity belongs to the <code>@package</code> that
+most nearly precedes it in the same file.</li>
+<li>Every <code>@constant</code>, <code>@static</code>, <code>@init</code>, and <code>@method</code> entity belongs to
+the <code>@type</code> or <code>@mixin</code> that most nearly precedes it in the same file.</li>
+<li>It's an error if the expected parent entity is missing.</li>
+<li><code>joe doc</code> checks carefully for duplicate names.</li>
 <li>A <code>@type</code> can have at most a single <code>@init</code> (initializer) entity; and it
 has no name because it always has the same name as its type.</li>
 </ul>
@@ -2146,10 +2160,10 @@ has no name because it always has the same name as its type.</li>
 a number of files. Thus, the same <code>@package</code> name can appear in multiple
 files, and the related entities will all be ascribed to the same package.</p>
 <p>A single source file may (in principle) contain documentation for multiple
-packages and types.  If <code>joe doc</code> sees a second <code>@package</code>, it immediately
-switches to that <code>@package</code>, and so for the others.</p>
+mixins, packages and types.  If <code>joe doc</code> sees a second <code>@package</code>,
+it immediately switches to that <code>@package</code>, and so for the others.</p>
 <h3 id="example"><a class="header" href="#example">Example</a></h3>
-<p>Here is the beginning of the documentation in Joe's <code>StandardLibrary.java</code>
+<p>Here is the beginning of the documentation in Joe's <code>MonicaPackage.java</code>
 file:</p>
 <pre><code class="language-java">//**
 // @package joe
@@ -2195,6 +2209,10 @@ following optional metadata:</p>
 </tbody></table>
 </div>
 <p>The title string is used in the generated documentation.</p>
+<p>The <code>@package</code> entity may have
+<a href="joe_doc.html#the-function-entity"><code>@function</code></a>,
+<a href="joe_doc.html#the-type-entity"><code>@type</code></a>, and
+<a href="joe_doc.html#the-packagetopic-entity"><code>@packageTopic</code></a> children.</p>
 <p>For example,</p>
 <pre><code class="language-java">//**
 // @package joe
@@ -2244,33 +2262,34 @@ omitted if the function returns nothing (i.e., always returns
 <code>null</code>). If the <em>result</em> names a type, it will appear as a link to that type
 in the generated documentation.</p>
 <h3 id="the-type-entity"><a class="header" href="#the-type-entity">The <code>@type</code> Entity</a></h3>
-<p>The <code>@type</code> entity documents a type, and so begins with <code>@type &lt;name&gt;</code>.</p>
-<p>The <em>name</em> should be the name of a type defined in the current package.</p>
+<p>The <code>@type</code> entity documents a type, and so begins with <code>@type &lt;name&gt;</code>. The
+<em>name</em> should be the name of a type defined in the current package.</p>
 <p>The entity has the following optional metadata:</p>
 <div class="table-wrapper"><table><thead><tr><th>Metadata Tag</th><th>Meaning</th></tr></thead><tbody>
 <tr><td><code>@extends &lt;type&gt;</code></td><td>This type extends the named type.</td></tr>
-<tr><td><code>@generic</code></td><td>This type is generic, and will not appear in the generated docs.</td></tr>
-<tr><td><code>@includes &lt;type&gt;</code></td><td>This type includes the documentation for the named type.</td></tr>
+<tr><td><code>@includeMixin &lt;mixin&gt;</code></td><td>This type's documentation includes the named mixin.</td></tr>
 </tbody></table>
 </div>
 <ul>
-<li><code>&lt;type&gt;</code> should be the name or qualified name of a referenced type.</li>
+<li><code>&lt;mixin&gt;</code> should be the name of a</li>
 </ul>
 <p>The <code>@extends &lt;type&gt;</code> tag is used when this type extends (i.e., subclasses)
-another script-visible type.  For example, in the standard library the
-<a href="library/type.joe.AssertError.html"><code>AssertError</code></a> type extends the
-<a href="library/type.joe.Error.html"><code>Error</code></a>, both of which are visible at the
-script-level.</p>
-<p>The <code>@generic</code> tag is used for generic proxies,
-where the same proxy is used by many distinct types.  <code>joe doc</code> will accumulate
-a generic type's documentation, but will not create a page for the type in
-the generated documentation.</p>
-<p>The <code>@includes &lt;type&gt;</code> tag indicates that this type's documentation should
-include the documentation from another (usually generic) type. The included
-type may be any type in the current documentation set.</p>
-<p>The included documentation will be represented as part of the including type.</p>
-<p><strong>Note:</strong> a type may include exactly one other type, and includes are not
-transitive.</p>
+another script-visible type.  The <code>&lt;type&gt;</code> should be the name or qualified name
+of a referenced <code>@type</code>.</p>
+<p>The <code>@includesMixin &lt;mixin&gt;</code> tag indicates that this type's documentation should
+include the documentation from a <a href="joe_doc.html#the-mixin-entity"><code>@mixin</code></a> defined in this
+documentation set. The included documentation will be represented as part of
+the including type.</p>
+<p>The <code>@type</code> entity may have
+<a href="joe_doc.html#the-constant-entity"><code>@constant</code></a>,
+<a href="joe_doc.html#the-static-entity"><code>@static</code></a>,
+<a href="joe_doc.html#the-init-entity"><code>@init</code></a>,
+<a href="joe_doc.html#the-method-entity"><code>@method</code></a>,
+and
+<a href="joe_doc.html#the-method-entity"><code>@typeTopic</code></a>
+children.</p>
+<p>For example, in the standard library the <a href="library/type.joe.AssertError.html"><code>AssertError</code></a> type extends the
+<a href="library/type.joe.Error.html"><code>Error</code></a> type, both of which are visible at the script-level.</p>
 <pre><code class="language-java">//**
 // @type AssertError
 // @extends Error
@@ -2290,7 +2309,7 @@ defines other static or instance methods, they can be included as well.</p>
 <p>A type's normal Markdown content goes near the top of the generated
 type page, below the index but above the various constant and method
 entries.  The <code>@typeTopic</code> entity is way to add titled Markdown content
-at the <em>bottom</em> of the package file, where it is out of the way.</p>
+at the <em>bottom</em> of the type's file, where it is out of the way.</p>
 <p>The <code>@typeTopic</code> entity begins with <code>@typeTopic &lt;name&gt;</code>, and has
 the following metadata:</p>
 <div class="table-wrapper"><table><thead><tr><th>Metadata Tag</th><th>Meaning</th></tr></thead><tbody>
@@ -2325,6 +2344,49 @@ always an instance of the current type.</p>
 current type, and begins with <code>@method &lt;name&gt;</code>.  The <em>name</em> should be
 the name of a method defined by the current type.</p>
 <p>The <code>@method</code> entity has the same metadata as the <code>@function</code> entity.</p>
+<h3 id="the-mixin-entity"><a class="header" href="#the-mixin-entity">The <code>@mixin</code> Entity</a></h3>
+<p>The <code>@mixin</code> entity is like a pseudo-<code>@type</code>; it contains type content that
+would otherwise be duplicated in multiple <code>@type</code> entries.  Mixin entities
+belong to the documentation set, not to any specific package, and may be
+included by any <code>@type</code> entity.</p>
+<p>Every mixin begins with <code>@mixin &lt;name&gt;</code>; mixin names must be unique within
+the documentation set.</p>
+<p>Mixins have no metadata tags, and may have Markdown content and
+<a href="joe_doc.html#the-constant-entity"><code>@constant</code></a>,
+<a href="joe_doc.html#the-static-entity"><code>@static</code></a>,
+<a href="joe_doc.html#the-method-entity"><code>@method</code></a>,
+and
+<a href="joe_doc.html#the-method-entity"><code>@typeTopic</code></a>
+children.</p>
+<p>When a type wants to include a mixin, it uses the <code>@includesMixin &lt;name&gt;</code>
+metadata tag.</p>
+<ul>
+<li>The mixin's Markdown content is inserted into the type's
+Markdown content at the location of the <code>@includesMixin</code> tag</li>
+<li>The mixin's children are then added to the type.</li>
+</ul>
+<p>A mixin is like a template; the string <code>&lt;type&gt;</code> may be included anywhere
+in the content of the mixin itself and its children, and will be replaced
+on inclusion by the including type's name.</p>
+<p>For example, the mixin might define:</p>
+<pre><code class="language-java">//**
+// @mixin MyMixin
+// 
+// The `&lt;type&gt;` type is able to...
+//
+// @method myMethod
+// @result &lt;type&gt;
+// This method...
+</code></pre>
+<p>Then, another type can include it like this:</p>
+<pre><code class="language-java">//**
+// @type MyType
+// The `MyType` type represents...
+//
+// @includeMixin MyMixin
+//
+// The MyMixin Markdown content is included above, replacing the include tag.
+</code></pre>
 <h2 id="joedoc-links"><a class="header" href="#joedoc-links">JoeDoc Links</a></h2>
 <p>The Markdown content for each entity can of course contain normal
 Markdown links.  In addition, though, JoeDoc supports abbreviated
