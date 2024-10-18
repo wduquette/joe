@@ -23,6 +23,9 @@ class StandardLibrary extends JoePackage {
         globalFunction("stringify", this::_stringify);
         globalFunction("typeName",  this::_typeName);
 
+        // Documented in Tuple.java.
+        globalFunction("Tuple", Tuple::new);
+
         type(AssertErrorProxy.TYPE);
         type(BooleanProxy.TYPE);
         type(ErrorProxy.TYPE);
