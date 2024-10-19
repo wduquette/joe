@@ -11,5 +11,5 @@ public interface JoeCallable {
      * @return The callable's result
      * @throws JoeError on any runtime error.
      */
-    Object call(Joe joe, ArgQueue args);
+    Object call(Joe joe, Args args);
 }

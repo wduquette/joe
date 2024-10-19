@@ -47,7 +47,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @args values...
     // Creates a `Set` of the argument values, which must be a flat list of
     // key/value pairs.
-    private Object _init(Joe joe, ArgQueue args) {
+    private Object _init(Joe joe, Args args) {
         return new SetValue(args.asList());
     }
 
@@ -74,7 +74,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @args value
     // @result Boolean
     // Adds the *value* to the set, returning true if it wasn't already present.
-    private Object _add(JoeSet set, Joe joe, ArgQueue args) {
+    private Object _add(JoeSet set, Joe joe, Args args) {
         Joe.exactArity(args, 1, "add(value)");
 
         return set.add(args.next());
@@ -85,7 +85,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @args collection
     // @result Boolean
     // Adds the content of the *collection* to this set.
-    private Object _addAll(JoeSet set, Joe joe, ArgQueue args) {
+    private Object _addAll(JoeSet set, Joe joe, Args args) {
         Joe.exactArity(args, 1, "addAll(collection)");
         var arg = args.next();
 
@@ -100,7 +100,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @method clear
     // @result this
     // Empties the set.
-    private Object _clear(JoeSet set, Joe joe, ArgQueue args) {
+    private Object _clear(JoeSet set, Joe joe, Args args) {
         Joe.exactArity(args, 0, "clear()");
 
         set.clear();
@@ -112,7 +112,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @args value
     // @result Boolean
     // Returns `true` if the set contains the *value*, and `false` otherwise.
-    private Object _contains(JoeSet set, Joe joe, ArgQueue args) {
+    private Object _contains(JoeSet set, Joe joe, Args args) {
         Joe.exactArity(args, 1, "contains(value)");
 
         return set.contains(args.next());
@@ -122,7 +122,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @method copy
     // @result Set
     // Returns a shallow copy of this set.
-    private Object _copy(JoeSet set, Joe joe, ArgQueue args) {
+    private Object _copy(JoeSet set, Joe joe, Args args) {
         Joe.exactArity(args, 0, "copy()");
 
         return new SetValue(set);
@@ -133,7 +133,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @method isEmpty
     // @result Boolean
     // Returns `true` if the set is empty, and `false` otherwise.
-    private Object _isEmpty(JoeSet set, Joe joe, ArgQueue args) {
+    private Object _isEmpty(JoeSet set, Joe joe, Args args) {
         Joe.exactArity(args, 0, "isEmpty()");
 
         return set.isEmpty();
@@ -145,7 +145,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @result Boolean
     // Removes the value, return `true` if it was present and `false`
     // otherwise.
-    private Object _remove(JoeSet set, Joe joe, ArgQueue args) {
+    private Object _remove(JoeSet set, Joe joe, Args args) {
         Joe.exactArity(args, 1, "remove(value)");
 
         return set.remove(args.next());
@@ -157,7 +157,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @result Boolean
     // Removes all values in the *collection* from the set, returning `true`
     // if the set changed and `false` otherwise.
-    private Object _removeAll(JoeSet set, Joe joe, ArgQueue args) {
+    private Object _removeAll(JoeSet set, Joe joe, Args args) {
         Joe.exactArity(args, 1, "removeAll(collection)");
 
         var arg = args.next();
@@ -172,7 +172,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @method size
     // @result Number
     // Returns the number of values in the set.
-    private Object _size(JoeSet set, Joe joe, ArgQueue args) {
+    private Object _size(JoeSet set, Joe joe, Args args) {
         Joe.exactArity(args, 0, "size()");
 
         return (double)set.size();
@@ -182,7 +182,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @method toString
     // @result String
     // Returns the set's string representation.
-    private Object _toString(JoeSet set, Joe joe, ArgQueue args) {
+    private Object _toString(JoeSet set, Joe joe, Args args) {
         Joe.exactArity(args, 0, "toString()");
 
         return stringify(joe, set);

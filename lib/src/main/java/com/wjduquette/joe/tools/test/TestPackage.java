@@ -34,7 +34,7 @@ class TestPackage extends JoePackage {
     // @args got, expected
     // Verifies that *got* equals the *expected* value, producing an
     // informative assertion error if not.
-    private Object _assertEquals(Joe joe, ArgQueue args) {
+    private Object _assertEquals(Joe joe, Args args) {
         Joe.exactArity(args, 2, "assertEquals(got, expected)");
         var got = args.getRemaining(0);
         var expected = args.getRemaining(1);
@@ -53,7 +53,7 @@ class TestPackage extends JoePackage {
     // @args message
     // Throws an assertion error with the given *message*, failing the
     // test immediately.
-    private Object _fail(Joe joe, ArgQueue args) {
+    private Object _fail(Joe joe, Args args) {
         Joe.exactArity(args, 1, "fail(message)");
         throw new AssertError(joe.stringify(args.getRemaining(0)));
     }

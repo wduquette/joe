@@ -132,7 +132,7 @@ public class WinPackage extends JoePackage {
         // @static root
         // @result VBox
         // Returns the root window, a [[VBox]].
-        private Object _root(Joe joe, ArgQueue args) {
+        private Object _root(Joe joe, Args args) {
             Joe.exactArity(args, 0, "Win.root()");
             return root;
         }
@@ -143,7 +143,7 @@ public class WinPackage extends JoePackage {
         // @result this
         // Sets the preferred size of the root window.  The width and height
         // must be positive.
-        private Object _setSize(Joe joe, ArgQueue args) {
+        private Object _setSize(Joe joe, Args args) {
             Joe.exactArity(args, 2, "Win.setSize(width, title)");
             var width = joe.toDouble(args.next());
             var height = joe.toDouble(args.next());
@@ -160,7 +160,7 @@ public class WinPackage extends JoePackage {
         // @args title
         // @result this
         // Sets the title of the root window.
-        private Object _setTitle(Joe joe, ArgQueue args) {
+        private Object _setTitle(Joe joe, Args args) {
             Joe.exactArity(args, 1, "Win.setTitle(title)");
             var title = joe.toString(args.next());
             stage.setTitle(title);

@@ -1,6 +1,6 @@
 package com.wjduquette.joe.win;
 
-import com.wjduquette.joe.ArgQueue;
+import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -59,7 +59,7 @@ class VBoxProxy extends FXProxy<VBox> {
     // @args node
     // @result Insets
     // Gets the [[Node]]'s margin in its parent [[VBox]].
-    private Object _getMargin(Joe joe, ArgQueue args) {
+    private Object _getMargin(Joe joe, Args args) {
         Joe.exactArity(args, 1, "VBox.getMargin(node)");
         return VBox.getMargin(joe.toClass(args.next(), Node.class));
     }
@@ -70,7 +70,7 @@ class VBoxProxy extends FXProxy<VBox> {
     // @result Priority
     // Gets how the [[Node]] will resize itself to the height of
     // its parent [[VBox]].
-    private Object _getVgrow(Joe joe, ArgQueue args) {
+    private Object _getVgrow(Joe joe, Args args) {
         Joe.exactArity(args, 1, "VBox.getVgrow(node)");
         return VBox.getVgrow(joe.toClass(args.next(), Node.class));
     }
@@ -80,7 +80,7 @@ class VBoxProxy extends FXProxy<VBox> {
     // @args node, insets
     // Gets the [[Node]]'s margin in its parent [[VBox]] given an
     // [[Insets]] object.
-    private Object _setMargin(Joe joe, ArgQueue args) {
+    private Object _setMargin(Joe joe, Args args) {
         Joe.exactArity(args, 2, "VBox.setMargin(node, insets)");
         VBox.setMargin(
             joe.toClass(args.next(), Node.class),
@@ -94,7 +94,7 @@ class VBoxProxy extends FXProxy<VBox> {
     // @args node, priority
     // Sets how the [[Node]] will resize itself to the height of
     // its parent [[VBox]], given a [[Priority]] value.
-    private Object _setVgrow(Joe joe, ArgQueue args) {
+    private Object _setVgrow(Joe joe, Args args) {
         Joe.exactArity(args, 2, "VBox.setVgrow(node, priority)");
         VBox.setVgrow(
             joe.toClass(args.next(), Node.class),
@@ -109,7 +109,7 @@ class VBoxProxy extends FXProxy<VBox> {
     //**
     // @init
     // Returns a `VBox`.
-    private Object _initializer(Joe joe, ArgQueue args) {
+    private Object _initializer(Joe joe, Args args) {
         Joe.exactArity(args, 0, "VBox()");
         return new VBox();
     }
@@ -122,7 +122,7 @@ class VBoxProxy extends FXProxy<VBox> {
     // @args pixels
     // @result this
     // Sets the vertical space in *pixels* between each child.
-    private Object _spacing(VBox node, Joe joe, ArgQueue args) {
+    private Object _spacing(VBox node, Joe joe, Args args) {
         Joe.exactArity(args, 1, "spacing(pixels)");
         node.setSpacing(joe.toDouble(args.next()));
         return node;

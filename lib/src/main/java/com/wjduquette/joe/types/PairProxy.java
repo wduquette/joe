@@ -1,6 +1,6 @@
 package com.wjduquette.joe.types;
 
-import com.wjduquette.joe.ArgQueue;
+import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Pair;
 import com.wjduquette.joe.TypeProxy;
@@ -65,7 +65,7 @@ public class PairProxy extends TypeProxy<Pair> {
     // @init
     // @args left, right
     // Creates a `Pair` from two arbitrary values, *left* and *right*.
-    private Object _init(Joe joe, ArgQueue args) {
+    private Object _init(Joe joe, Args args) {
         Joe.exactArity(args, 2, "Pair(left, right)");
         return new Pair(args.getRemaining(0), args.getRemaining(1));
     }
@@ -77,7 +77,7 @@ public class PairProxy extends TypeProxy<Pair> {
     // @method left
     // @result value
     // Returns the first value in the pair.
-    private Object _left(Pair value, Joe joe, ArgQueue args) {
+    private Object _left(Pair value, Joe joe, Args args) {
         Joe.exactArity(args, 0, "left()");
         return value.left();
     }
@@ -86,12 +86,12 @@ public class PairProxy extends TypeProxy<Pair> {
     // @method right
     // @result value
     // Returns the second value in the pair.
-    private Object _right(Pair value, Joe joe, ArgQueue args) {
+    private Object _right(Pair value, Joe joe, Args args) {
         Joe.exactArity(args, 0, "right()");
         return value.right();
     }
 
-    private Object _toString(Pair value, Joe joe, ArgQueue args) {
+    private Object _toString(Pair value, Joe joe, Args args) {
         Joe.exactArity(args, 0, "toString");
         return joe.stringify(value);
     }

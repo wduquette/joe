@@ -66,7 +66,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @init
     // @args values...
     // Creates a `List` of the argument values.
-    private Object _init(Joe joe, ArgQueue args) {
+    private Object _init(Joe joe, Args args) {
         return new ListValue(args.asList());
     }
 
@@ -94,10 +94,10 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result this
     // Adds the item to the list at the given *index*, which defaults
     // to the end of the list.
-    private Object _add(JoeList list, Joe joe, ArgQueue args) {
+    private Object _add(JoeList list, Joe joe, Args args) {
         Joe.arityRange(args, 1, 2, "add([index], item)");
 
-        if (args.numRemaining() == 1) {
+        if (args.remaining() == 1) {
             list.add(args.next());
         } else {
             list.add(
@@ -115,10 +115,10 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result this
     // Adds all items in the *collection* to the list at the
     // given *index*, which defaults to the end of the list.
-    private Object _addAll(JoeList list, Joe joe, ArgQueue args) {
+    private Object _addAll(JoeList list, Joe joe, Args args) {
         Joe.arityRange(args, 1, 2, "addAll([index], collection)");
 
-        if (args.numRemaining() == 1) {
+        if (args.remaining() == 1) {
             list.addAll(joe.toList(args.next()));
         } else {
             list.addAll(
@@ -134,7 +134,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @method clear
     // @result this
     // Removes all items from the list.
-    private Object _clear(JoeList list, Joe joe, ArgQueue args) {
+    private Object _clear(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 0, "clear()");
         list.clear();
         return list;
@@ -146,7 +146,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result Boolean
     // Returns `true` if the list contains the *value*, and `false`
     // otherwise.
-    private Object _contains(JoeList list, Joe joe, ArgQueue args) {
+    private Object _contains(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 1, "contains(value)");
         return list.contains(args.next());
     }
@@ -157,7 +157,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result Boolean
     // Returns `true` if the list contains all the values in
     // the *collection*, and `false` otherwise.
-    private Object _containsAll(JoeList list, Joe joe, ArgQueue args) {
+    private Object _containsAll(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 1, "containsAll(collection)");
         // According to IntelliJ, converting the list to a HashSet gives
         // better performance.
@@ -169,7 +169,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @method copy
     // @result List
     // Returns a shallow copy of the list.
-    private Object _copy(JoeList list, Joe joe, ArgQueue args) {
+    private Object _copy(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 0, "copy()");
         return new ListValue(list);
     }
@@ -180,7 +180,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result List
     // Returns a list containing the elements for which the filter
     // *predicate* is true.
-    private Object _filter(JoeList list, Joe joe, ArgQueue args) {
+    private Object _filter(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 1, "filter(predicate)");
         var callable = args.next();
 
@@ -198,7 +198,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @args index
     // @result value
     // Returns the value at the given *index*.
-    private Object _get(JoeList list, Joe joe, ArgQueue args) {
+    private Object _get(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 1, "get(index)");
         return list.get(joe.toIndex(args.next(), list.size()));
     }
@@ -208,7 +208,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result value
     // Returns the first value in the list.  It's an error if
     // the list is empty.
-    private Object _getFirst(JoeList list, Joe joe, ArgQueue args) {
+    private Object _getFirst(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 0, "getFirst()");
         if (!list.isEmpty()) {
             return list.getFirst();
@@ -222,7 +222,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result value
     // Returns the last value in the list.  It's an error if
     // the list is empty.
-    private Object _getLast(JoeList list, Joe joe, ArgQueue args) {
+    private Object _getLast(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 0, "getLast()");
         if (!list.isEmpty()) {
             return list.getLast();
@@ -237,7 +237,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result Number
     // Returns the index of the first occurrence of the *value* in
     // the list, or -1 if not found.
-    private Object _indexOf(JoeList list, Joe joe, ArgQueue args) {
+    private Object _indexOf(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 1, "indexOf(value)");
         return (double)list.indexOf(args.next());
     }
@@ -246,7 +246,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @method isEmpty
     // @result Boolean
     // Returns `true` if the list is empty, and `false` otherwise.
-    private Object _isEmpty(JoeList list, Joe joe, ArgQueue args) {
+    private Object _isEmpty(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 0, "isEmpty()");
         return list.isEmpty();
     }
@@ -257,7 +257,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result Number
     // Returns the index of the last occurrence of the *value* in
     // the list, or -1 if not found.
-    private Object _lastIndexOf(JoeList list, Joe joe, ArgQueue args) {
+    private Object _lastIndexOf(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 1, "lastIndexOf(value)");
         return (double)list.lastIndexOf(args.next());
     }
@@ -268,7 +268,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result List
     // Returns a list containing the items that result from applying
     // function *func* to each item in this list.
-    private Object _map(JoeList list, Joe joe, ArgQueue args) {
+    private Object _map(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 1, "map(func)");
         var callable = args.next();
 
@@ -284,7 +284,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result value
     // Returns the first value in the list, or null if
     // the list is empty.
-    private Object _peekFirst(JoeList list, Joe joe, ArgQueue args) {
+    private Object _peekFirst(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 0, "peekFirst()");
         if (!list.isEmpty()) {
             return list.getFirst();
@@ -298,7 +298,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result value
     // Returns the last value in the list, or null if
     // the list is empty.
-    private Object _peekLast(JoeList list, Joe joe, ArgQueue args) {
+    private Object _peekLast(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 0, "peekLast()");
         if (!list.isEmpty()) {
             return list.getLast();
@@ -315,7 +315,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // Removes the *value* from the list if it's present.  Returns
     // `true` if the item was removed, and `false` if it was not
     // present
-    private Object _remove(JoeList list, Joe joe, ArgQueue args) {
+    private Object _remove(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 1, "remove(value)");
         return list.remove(args.next());
     }
@@ -326,7 +326,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result Boolean
     // Removes all items in the list that are found in the *collection*.
     // Returns `true` if any items were removed, `false` otherwise.
-    private Object _removeAll(JoeList list, Joe joe, ArgQueue args) {
+    private Object _removeAll(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 1, "removeAll(collection)");
         return list.removeAll(
             joe.toType(Collection.class, args.next()));
@@ -337,7 +337,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @args index
     // @result value
     // Removes and returns the value at the given *index*.
-    private Object _removeAt(JoeList list, Joe joe, ArgQueue args) {
+    private Object _removeAt(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 1, "remove(index)");
         return list.remove(joe.toIndex(args.next(), list.size()));
     }
@@ -347,7 +347,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result value
     // Removes and returns the first value in the list.  It's an error if
     // the list is empty.
-    private Object _removeFirst(JoeList list, Joe joe, ArgQueue args) {
+    private Object _removeFirst(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 0, "removeFirst()");
         if (!list.isEmpty()) {
             return list.removeFirst();
@@ -361,7 +361,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result value
     // Removes and returns the last value in the list.  It's an error if
     // the list is empty.
-    private Object _removeLast(JoeList list, Joe joe, ArgQueue args) {
+    private Object _removeLast(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 0, "removeLast()");
         if (!list.isEmpty()) {
             return list.getLast();
@@ -374,7 +374,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @method reverse
     // @result List
     // Returns a reversed copy of the list.
-    private Object _reversed(JoeList list, Joe joe, ArgQueue args) {
+    private Object _reversed(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 0, "reversed()");
         return new ListValue(list.reversed());
     }
@@ -385,7 +385,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result oldValue
     // Puts the *value* at the given *index*, returning the
     // *oldValue* at that index.
-    private Object _set(JoeList list, Joe joe, ArgQueue args) {
+    private Object _set(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 2, "set(index, newValue)");
         return list.set(
             joe.toIndex(args.next(), list.size()),
@@ -397,7 +397,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @method size
     // @result Number
     // Returns the number of items in the list.
-    private Object _size(JoeList list, Joe joe, ArgQueue args) {
+    private Object _size(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 0, "size()");
         return (double)list.size();
     }
@@ -419,7 +419,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // var list = List(1,2,3,4,5);
     // var descending = list.sorted(\a,b -> -compare(a,b));
     // ```
-    private Object _sorted(JoeList list, Joe joe, ArgQueue args) {
+    private Object _sorted(JoeList list, Joe joe, Args args) {
         Joe.arityRange(args, 0, 1, "sorted([comparator])");
         if (!args.hasRemaining()) {
             var result = list.stream()
@@ -441,7 +441,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @result List
     // Returns the sublist of this list that starts at *start*
     // and ends before *end*, which defaults to the end of the list.
-    private Object _sublist(JoeList list, Joe joe, ArgQueue args) {
+    private Object _sublist(JoeList list, Joe joe, Args args) {
         Joe.arityRange(args, 1, 2, "sublist(start, [end])");
         var start = joe.toIndex(args.next(), list.size());
 
@@ -457,7 +457,7 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @method toString
     // @result String
     // Returns the string representation of this list.
-    private Object _toString(JoeList list, Joe joe, ArgQueue args) {
+    private Object _toString(JoeList list, Joe joe, Args args) {
         Joe.exactArity(args, 0, "toString()");
         return stringify(joe, list);
     }

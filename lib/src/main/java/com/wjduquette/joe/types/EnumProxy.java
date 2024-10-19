@@ -1,6 +1,6 @@
 package com.wjduquette.joe.types;
 
-import com.wjduquette.joe.ArgQueue;
+import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.TypeProxy;
 
@@ -64,7 +64,7 @@ public class EnumProxy<E extends Enum<E>> extends TypeProxy<E> {
     //-------------------------------------------------------------------------
     // Initializer
 
-    private Object _initializer(Joe joe, ArgQueue args) {
+    private Object _initializer(Joe joe, Args args) {
         Joe.exactArity(args, 1, getTypeName() + "(value)");
         return joe.toEnum(args.next(), cls);
     }
@@ -72,7 +72,7 @@ public class EnumProxy<E extends Enum<E>> extends TypeProxy<E> {
     //-------------------------------------------------------------------------
     // Static Methods
 
-    private Object _values(Joe joe, ArgQueue args) {
+    private Object _values(Joe joe, Args args) {
         Joe.exactArity(args, 0, getTypeName() + ".values()");
         var list = new ListValue();
         Collections.addAll(list, cls.getEnumConstants());
@@ -83,17 +83,17 @@ public class EnumProxy<E extends Enum<E>> extends TypeProxy<E> {
     //-------------------------------------------------------------------------
     // Methods
 
-    private Object _name(E value, Joe joe, ArgQueue args) {
+    private Object _name(E value, Joe joe, Args args) {
         Joe.exactArity(args, 0, "name()");
         return value.name();
     }
 
-    private Object _ordinal(E value, Joe joe, ArgQueue args) {
+    private Object _ordinal(E value, Joe joe, Args args) {
         Joe.exactArity(args, 0, "ordinal()");
         return (double)value.ordinal();
     }
 
-    private Object _toString(E value, Joe joe, ArgQueue args) {
+    private Object _toString(E value, Joe joe, Args args) {
         Joe.exactArity(args, 0, "toString()");
         return value.toString();
     }

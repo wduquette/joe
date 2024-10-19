@@ -38,7 +38,7 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     //**
     // @init
     // Creates an empty `StringBuilder`.
-    private Object _init(Joe joe, ArgQueue args) {
+    private Object _init(Joe joe, Args args) {
         Joe.exactArity(args, 0, "StringBuilder()");
         return new StringBuilder();
     }
@@ -51,7 +51,7 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     // @args value
     // @result this
     // Adds the value to the buffer.
-    private Object _append(StringBuilder buff, Joe joe, ArgQueue args) {
+    private Object _append(StringBuilder buff, Joe joe, Args args) {
         Joe.exactArity(args, 1, "append(value)");
         buff.append(joe.stringify(args.next()));
         return buff;
@@ -62,7 +62,7 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     // @args value
     // @result this
     // Adds the value to the buffer.
-    private Object _print(StringBuilder buff, Joe joe, ArgQueue args) {
+    private Object _print(StringBuilder buff, Joe joe, Args args) {
         Joe.exactArity(args, 1, "print(value)");
         buff.append(joe.stringify(args.next()));
         return buff;
@@ -74,11 +74,11 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     // Formats its arguments given the *fmt* string, and appends the result
     // to the buffer.  See [[String#topic.formatting]] for the format
     // string syntax.
-    private Object _printf(StringBuilder buff, Joe joe, ArgQueue args) {
+    private Object _printf(StringBuilder buff, Joe joe, Args args) {
         Joe.minArity(args, 1, "printf(fmt, [values]...)");
         var fmt = joe.toString(args.next());
 
-        buff.append(StringFormatter.format(joe, fmt, args.remainder()));
+        buff.append(StringFormatter.format(joe, fmt, args.remainderAsList()));
         return buff;
     }
 
@@ -87,7 +87,7 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     // @args value
     // @result this
     // Adds the value to the buffer, followed by a new line.
-    private Object _println(StringBuilder buff, Joe joe, ArgQueue args) {
+    private Object _println(StringBuilder buff, Joe joe, Args args) {
         Joe.exactArity(args, 1, "println(value)");
         buff.append(joe.stringify(args.next())).append("\n");
         return buff;
@@ -97,7 +97,7 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     // @method toString
     // @result String
     // Returns the string.
-    private Object _toString(StringBuilder buff, Joe joe, ArgQueue args) {
+    private Object _toString(StringBuilder buff, Joe joe, Args args) {
         Joe.exactArity(args, 0, "toString()");
         return buff.toString();
     }

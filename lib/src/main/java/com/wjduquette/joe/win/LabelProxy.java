@@ -1,6 +1,6 @@
 package com.wjduquette.joe.win;
 
-import com.wjduquette.joe.ArgQueue;
+import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import javafx.scene.control.Label;
 
@@ -48,7 +48,7 @@ class LabelProxy extends FXProxy<Label> {
     // @init
     // @args [text]
     // Returns a `Label`.
-    private Object _initializer(Joe joe, ArgQueue args) {
+    private Object _initializer(Joe joe, Args args) {
         Joe.arityRange(args, 0, 1, "Label([text])");
         if (args.isEmpty()) {
             return new Label();
@@ -65,7 +65,7 @@ class LabelProxy extends FXProxy<Label> {
     // @args text
     // @result this
     // Sets the label's text.
-    private Object _text(Label node, Joe joe, ArgQueue args) {
+    private Object _text(Label node, Joe joe, Args args) {
         Joe.exactArity(args, 1, "text(text)");
         node.setText(joe.stringify(args.next()));
         return node;

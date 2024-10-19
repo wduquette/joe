@@ -13,5 +13,5 @@ public interface JoeValueCallable<V> {
      * @return The callable's result
      * @throws JoeError on any runtime error.
      */
-    Object call(V value, Joe joe, ArgQueue args);
+    Object call(V value, Joe joe, Args args);
 }

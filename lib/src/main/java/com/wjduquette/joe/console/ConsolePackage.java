@@ -121,7 +121,7 @@ public class ConsolePackage extends JoePackage {
         // @result List
         // Returns a list of the arguments passed to the command line, as
         // filtered by the application.
-        private Object _args(Joe joe, ArgQueue args) {
+        private Object _args(Joe joe, Args args) {
             Joe.exactArity(args, 0, "Console.args()");
             return joe.readonlyList(argList);
         }
@@ -133,7 +133,7 @@ public class ConsolePackage extends JoePackage {
         // Changes the current working directory to the given path.  If
         // the path is relative, it is treated as relative to the
         // current working directory.
-        private Object _cd(Joe joe, ArgQueue args) {
+        private Object _cd(Joe joe, Args args) {
             Joe.exactArity(args, 1, "Console.cd(path)");
             cwd = toResolvedPath(joe, args.next());
             return cwd;
@@ -144,7 +144,7 @@ public class ConsolePackage extends JoePackage {
         // @args [code]
         // Exits the application with the given exit *code*, which defaults
         // to 0.
-        private Object _exit(Joe joe, ArgQueue args) {
+        private Object _exit(Joe joe, Args args) {
             Joe.arityRange(args, 0, 1, "Console.exit([code])");
             int code = 0;
             if (args.size() == 1) {
@@ -160,7 +160,7 @@ public class ConsolePackage extends JoePackage {
         // Creates the directory given its path, including any required
         // parent directories.  If the path is relative, it is treated as
         // relative to the current working directory.
-        private Object _mkdir(Joe joe, ArgQueue args) {
+        private Object _mkdir(Joe joe, Args args) {
             Joe.exactArity(args, 1, "Console.mkdir(path)");
             var path = toResolvedPath(joe, args.next());
             try {
@@ -177,7 +177,7 @@ public class ConsolePackage extends JoePackage {
         // @static pwd
         // @result Path
         // Returns the current working directory.
-        private Object _pwd(Joe joe, ArgQueue args) {
+        private Object _pwd(Joe joe, Args args) {
             Joe.exactArity(args, 0, "Console.pwd()");
             return cwd;
         }
@@ -186,7 +186,7 @@ public class ConsolePackage extends JoePackage {
         // @static read
         // @result String
         // Returns a string from standard input, or null at EOF.
-        private Object _read(Joe joe, ArgQueue args) {
+        private Object _read(Joe joe, Args args) {
             Joe.exactArity(args, 0, "Console.read()");
             if (inputReader == null) {
                 inputReader = new BufferedReader(new InputStreamReader(System.in));
@@ -204,7 +204,7 @@ public class ConsolePackage extends JoePackage {
         // @static writeFile
         // @args filePath, text
         // Writes the *text* as a file at the given *filePath*.
-        private Object _writeFile(Joe joe, ArgQueue args) {
+        private Object _writeFile(Joe joe, Args args) {
             Joe.exactArity(args, 2, "Console.writeFile(filePath, text)");
             var filePath = toResolvedPath(joe, args.next());
             var text = joe.toString(args.next());
@@ -222,7 +222,7 @@ public class ConsolePackage extends JoePackage {
         // @result String
         // Reads the contents of the file at the given *filePath* and
         // returns it as a string.
-        private Object _readFile(Joe joe, ArgQueue args) {
+        private Object _readFile(Joe joe, Args args) {
             Joe.exactArity(args, 1, "Console.readFile(filePath)");
             var filePath = toResolvedPath(joe, args.next());
             try {
@@ -238,7 +238,7 @@ public class ConsolePackage extends JoePackage {
         // @result List
         // Reads the contents of the file at the given *filePath* and
         // returns it as a list of line strings
-        private Object _readLines(Joe joe, ArgQueue args) {
+        private Object _readLines(Joe joe, Args args) {
             Joe.exactArity(args, 1, "Console.readLines(filePath)");
             var filePath = toResolvedPath(joe, args.next());
             var result = new ListValue();

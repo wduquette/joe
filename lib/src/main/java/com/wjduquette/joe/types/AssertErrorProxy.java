@@ -1,6 +1,6 @@
 package com.wjduquette.joe.types;
 
-import com.wjduquette.joe.ArgQueue;
+import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.AssertError;
 import com.wjduquette.joe.TypeProxy;
@@ -52,7 +52,7 @@ public class AssertErrorProxy extends TypeProxy<AssertError> {
     // @args message, [frames...]
     // Creates an `AssertError` with the given *message* and stack frame
     // strings.
-    private Object _initializer(Joe joe, ArgQueue args) {
+    private Object _initializer(Joe joe, Args args) {
         Joe.minArity(args, 1, "AssertError(message,[frames...])");
         var error = new AssertError(joe.stringify(args.next()));
 
