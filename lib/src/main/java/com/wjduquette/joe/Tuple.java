@@ -95,7 +95,7 @@ public class Tuple implements JoeObject, JoeToString {
      * @param joe The interpreter
      * @param args The name/value array
      */
-    public Tuple(Joe joe, ArgQueue args) {
+    public Tuple(Joe joe, Args args) {
         if (args.size() % 2 != 0) {
             throw new JoeError("Tuple() expects an even number of arguments.");
         }
@@ -172,7 +172,7 @@ public class Tuple implements JoeObject, JoeToString {
     //     println("ok: " + tuple.ok);
     // }
     // ```
-    private static Object _matches(Tuple tuple, Joe joe, ArgQueue args) {
+    private static Object _matches(Tuple tuple, Joe joe, Args args) {
         if (args.size() == tuple.fields.size()) {
             for (var key : tuple.fields.keySet()) {
                 var arg = args.next();
@@ -196,7 +196,7 @@ public class Tuple implements JoeObject, JoeToString {
     // @method toString
     // @result String
     // Returns the tuple's string representation.
-    private static Object _toString(Tuple tuple, Joe joe, ArgQueue args) {
+    private static Object _toString(Tuple tuple, Joe joe, Args args) {
         Joe.exactArity(args, 0, "toString()");
 
         return tuple.toString(joe);

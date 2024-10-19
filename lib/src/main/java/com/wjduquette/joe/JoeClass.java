@@ -66,7 +66,7 @@ class JoeClass implements JoeObject, JoeCallable {
     }
 
     @Override
-    public Object call(Joe joe, ArgQueue args) {
+    public Object call(Joe joe, Args args) {
         JoeInstance instance = new JoeInstance(this);
         JoeFunction initializer = findMethod(INIT);
         if (initializer != null) {

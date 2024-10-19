@@ -182,7 +182,7 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
     // Initializer implementation
 
     @Override
-    public Object call(Joe joe, ArgQueue args) {
+    public Object call(Joe joe, Args args) {
         if (initializer != null) {
             return initializer.call(joe, args);
         } else if (isStatic) {

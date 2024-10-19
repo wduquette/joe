@@ -357,7 +357,7 @@ class Interpreter {
                 }
 
                 if (callee instanceof JoeCallable callable) {
-                    yield callable.call(joe, new ArgQueue(args));
+                    yield callable.call(joe, new Args(args));
                 } else {
                     // TODO add recodify(expr.callee()) as a stack frame!
                     throw joe.expected("a callable", callee);

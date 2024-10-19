@@ -161,7 +161,7 @@ public class TestTool implements Tool {
                 }
 
                 try {
-                    callable.call(joe, ArgQueue.EMPTY);
+                    callable.call(joe, Args.EMPTY);
                     ++successCount;
                 } catch (AssertError ex) {
                     if (!verbose) {

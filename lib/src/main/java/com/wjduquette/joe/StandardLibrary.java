@@ -51,7 +51,7 @@ class StandardLibrary extends JoePackage {
     // Executes the callable, which must not require any arguments.
     // Returns `Pair(#ok, returnValue)` on success and
     // `Pair(#error, Error)` on error.
-    private Object _catch(Joe joe, ArgQueue args) {
+    private Object _catch(Joe joe, Args args) {
         Joe.exactArity(args, 1, "catch(callable)");
         try {
             var result = joe.call(args.next());
@@ -61,7 +61,7 @@ class StandardLibrary extends JoePackage {
         }
     }
 
-    private Object _codify(Joe joe, ArgQueue args) {
+    private Object _codify(Joe joe, Args args) {
         Joe.exactArity(args, 1, "codify(value)");
 
         return joe.codify(args.getRemaining(0));
@@ -75,7 +75,7 @@ class StandardLibrary extends JoePackage {
     // Given two strings or two numbers *a* and *b*, returns -1, 0,
     // or 1 as *a* < *b*, *a* == *b*, or *a* > *b*.  This function
     // is useful when sorting collections.
-    private Object _compare(Joe joe, ArgQueue args) {
+    private Object _compare(Joe joe, Args args) {
         Joe.exactArity(args, 2, "compare(a, b)");
         return (double)Joe.compare(args.next(), args.next());
     }
@@ -85,7 +85,7 @@ class StandardLibrary extends JoePackage {
     // @args text
     // Prints its text to standard output (which might be
     // redirected by the application).
-    private Object _print(Joe joe, ArgQueue args) {
+    private Object _print(Joe joe, Args args) {
         Joe.exactArity(args, 1, "print(text)");
 
         joe.print(joe.stringify(args.next()));
@@ -100,7 +100,7 @@ class StandardLibrary extends JoePackage {
     //
     // See [[String#topic.formatting]] for the format
     // string syntax.
-    private Object _printf(Joe joe, ArgQueue args) {
+    private Object _printf(Joe joe, Args args) {
         Joe.minArity(args, 1, "printf(fmt, [values]...)");
         var fmt = joe.toString(args.next());
 
@@ -113,7 +113,7 @@ class StandardLibrary extends JoePackage {
     // @args [text]
     // Prints its text followed by a line separator to standard output
     // (which might be redirected by the application).
-    private Object _println(Joe joe, ArgQueue args) {
+    private Object _println(Joe joe, Args args) {
         Joe.arityRange(args, 0, 1, "println([text])");
 
         if (!args.hasRemaining()) {
@@ -130,7 +130,7 @@ class StandardLibrary extends JoePackage {
     // @result String
     // Converts its value to a string for output.  This function
     // is functionally equivalent to [[String#init]].
-    private Object _stringify(Joe joe, ArgQueue args) {
+    private Object _stringify(Joe joe, Args args) {
         Joe.exactArity(args, 1, "stringify(value)");
 
         return joe.stringify(args.getRemaining(0));
@@ -141,7 +141,7 @@ class StandardLibrary extends JoePackage {
     // @args value
     // @result String
     // Returns the name of the value's type.
-    private Object _typeName(Joe joe, ArgQueue args) {
+    private Object _typeName(Joe joe, Args args) {
         Joe.exactArity(args, 1, "typeName(value)");
 
         return joe.typeName(args.getRemaining(0));

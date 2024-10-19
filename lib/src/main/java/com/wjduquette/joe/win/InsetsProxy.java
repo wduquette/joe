@@ -1,6 +1,6 @@
 package com.wjduquette.joe.win;
 
-import com.wjduquette.joe.ArgQueue;
+import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.TypeProxy;
 import javafx.geometry.Insets;
@@ -41,7 +41,7 @@ class InsetsProxy extends TypeProxy<Insets> {
     // of a [[Node]].  If a single value *pixels* is given, the margin will
     // be the same on all four sides; otherwise, the initializer expects
     // all four values in the given order.
-    private Object _initializer(Joe joe, ArgQueue args) {
+    private Object _initializer(Joe joe, Args args) {
         return switch(args.size()) {
             case 1 -> new Insets(joe.toDouble(args.next()));
             case 4 -> new Insets(
@@ -62,7 +62,7 @@ class InsetsProxy extends TypeProxy<Insets> {
     // @method getBottom
     // @result Number
     // Gets the width of the margin on the bottom of the node, in pixels.
-    private Object _getBottom(Insets insets, Joe joe, ArgQueue args) {
+    private Object _getBottom(Insets insets, Joe joe, Args args) {
         Joe.exactArity(args, 0, "getBottom()");
         return insets.getBottom();
     }
@@ -71,7 +71,7 @@ class InsetsProxy extends TypeProxy<Insets> {
     // @method getLeft
     // @result Number
     // Gets the width of the margin on the left of the node, in pixels.
-    private Object _getLeft(Insets insets, Joe joe, ArgQueue args) {
+    private Object _getLeft(Insets insets, Joe joe, Args args) {
         Joe.exactArity(args, 0, "getLeft()");
         return insets.getLeft();
     }
@@ -80,7 +80,7 @@ class InsetsProxy extends TypeProxy<Insets> {
     // @method getRight
     // @result Number
     // Gets the width of the margin on the right of the node, in pixels.
-    private Object _getRight(Insets insets, Joe joe, ArgQueue args) {
+    private Object _getRight(Insets insets, Joe joe, Args args) {
         Joe.exactArity(args, 0, "getRight()");
         return insets.getRight();
     }
@@ -89,7 +89,7 @@ class InsetsProxy extends TypeProxy<Insets> {
     // @method getTop
     // @result Number
     // Gets the width of the margin on the top of the node, in pixels.
-    private Object _getTop(Insets insets, Joe joe, ArgQueue args) {
+    private Object _getTop(Insets insets, Joe joe, Args args) {
         Joe.exactArity(args, 0, "getTop()");
         return insets.getTop();
     }

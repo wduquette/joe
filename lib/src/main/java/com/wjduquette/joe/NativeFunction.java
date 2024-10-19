@@ -30,7 +30,7 @@ public class NativeFunction implements JoeCallable {
     }
 
     @Override
-    public Object call(Joe joe, ArgQueue args) {
+    public Object call(Joe joe, Args args) {
         try {
             return callable.call(joe, args);
         } catch (JoeError ex) {

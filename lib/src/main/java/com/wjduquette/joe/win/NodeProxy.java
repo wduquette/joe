@@ -1,6 +1,6 @@
 package com.wjduquette.joe.win;
 
-import com.wjduquette.joe.ArgQueue;
+import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
@@ -62,7 +62,7 @@ class NodeProxy extends FXProxy<Node> {
     // Sets the node's `#disable` property to *flag*; if omitted,
     // *flag* defaults to `true`.  While `true`, this node and its
     // descendants in the scene graph will be disabled.
-    private Object _disable(Node node, Joe joe, ArgQueue args) {
+    private Object _disable(Node node, Joe joe, Args args) {
         Joe.arityRange(args, 0, 1, "disable([flag])");
         var flag = args.isEmpty() || Joe.isTruthy(args.next());
         node.setDisable(flag);
@@ -74,7 +74,7 @@ class NodeProxy extends FXProxy<Node> {
     // @args id
     // @result this
     // Sets the node's `#id` property to the given *id* string.
-    private Object _id(Node node, Joe joe, ArgQueue args) {
+    private Object _id(Node node, Joe joe, Args args) {
         Joe.exactArity(args, 1, "id(id)");
         var id = joe.toString(args.next());
         node.setId(id);
@@ -85,7 +85,7 @@ class NodeProxy extends FXProxy<Node> {
     // @method isDisabled
     // @result joe.Boolean
     // Returns `true` if the node has been disabled, and `false` otherwise.
-    private Object _isDisabled(Node node, Joe joe, ArgQueue args) {
+    private Object _isDisabled(Node node, Joe joe, Args args) {
         Joe.exactArity(args, 0, "isDisabled()");
         return node.isDisabled();
     }
@@ -95,7 +95,7 @@ class NodeProxy extends FXProxy<Node> {
     // @result joe.List
     // Gets the list of the node's FXCSS style class names.  Values must
     // be valid CSS style class strings.
-    private Object _styleClasses(Node node, Joe joe, ArgQueue args) {
+    private Object _styleClasses(Node node, Joe joe, Args args) {
         Joe.exactArity(args, 0, "styleClasses()");
         return joe.wrapList(node.getStyleClass(), String.class);
     }
@@ -106,7 +106,7 @@ class NodeProxy extends FXProxy<Node> {
     // @result this
     // Sets the node's FXCSS `#style` property.  The caller can pass
     // multiple style strings, which will be joined with semicolons.
-    private Object _styles(Node node, Joe joe, ArgQueue args) {
+    private Object _styles(Node node, Joe joe, Args args) {
         Joe.minArity(args, 1, "styles(style, ...)");
         var styles = args.asList().stream()
             .map(joe::toString)
@@ -125,7 +125,7 @@ class NodeProxy extends FXProxy<Node> {
     //
     // This method is equivalent to the JavaFX `VBox.setVgrow()`
     // method.
-    private Object _vgrow(Node node, Joe joe, ArgQueue args) {
+    private Object _vgrow(Node node, Joe joe, Args args) {
         Joe.arityRange(args, 0, 1, "vgrow([priority]");
         if (args.isEmpty()) {
             VBox.setVgrow(node, Priority.ALWAYS);

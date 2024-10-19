@@ -1,6 +1,6 @@
 package com.wjduquette.joe.types;
 
-import com.wjduquette.joe.ArgQueue;
+import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.TypeProxy;
 
@@ -43,7 +43,7 @@ public class BooleanProxy extends TypeProxy<Boolean> {
     // and `false` for all other values, including null.
     //
     // **Note:** this is consistent with the Java behavior.
-    private Object _valueOf(Joe joe, ArgQueue args) {
+    private Object _valueOf(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Boolean.valueOf(value)");
         var arg = args.next();
         return arg != null && Boolean.parseBoolean(joe.toString(args));

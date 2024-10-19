@@ -47,7 +47,7 @@ public class Joe {
         installGlobalFunction(new NativeFunction("dumpEnv", "function", this::_dumpEnv));
     }
 
-    private Object _dumpEnv(Joe joe, ArgQueue args) {
+    private Object _dumpEnv(Joe joe, Args args) {
         interpreter.dumpEnvironment();
         return null;
     }
@@ -418,7 +418,7 @@ public class Joe {
             return "\"" + escape(string) + "\"";
         }
 
-        if (value instanceof ArgQueue args) {
+        if (value instanceof Args args) {
             return args.asList().stream()
                 .map(this::codify)
                 .collect(Collectors.joining(", "));
@@ -595,7 +595,7 @@ public class Joe {
      */
     public Object call(Object callee, Object... args) {
         if (callee instanceof JoeCallable callable) {
-            return callable.call(this, new ArgQueue(List.of(args)));
+            return callable.call(this, new Args(List.of(args)));
         } else {
             throw expected("callable", callee);
         }
@@ -623,7 +623,7 @@ public class Joe {
      * @param signature The signature string.
      * @throws JoeError on failure
      */
-    public static void exactArity(ArgQueue args, int arity, String signature) {
+    public static void exactArity(Args args, int arity, String signature) {
         if (args.numRemaining() != arity) {
             throw arityFailure(signature);
         }
@@ -637,7 +637,7 @@ public class Joe {
      * @param signature The signature string.
      * @throws JoeError on failure
      */
-    public static void minArity(ArgQueue args, int minArity, String signature) {
+    public static void minArity(Args args, int minArity, String signature) {
         if (args.numRemaining() < minArity) {
             throw arityFailure(signature);
         }
@@ -653,7 +653,7 @@ public class Joe {
      * @throws JoeError on failure
      */
     public static void arityRange(
-        ArgQueue args,
+        Args args,
         int minArity,
         int maxArity,
         String signature)

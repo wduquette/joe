@@ -47,7 +47,7 @@ class JoeDocPackage extends JoePackage {
         // Adds the paths of one or more files to scan for JoeDoc
         // comments.  File paths are relative to the location of the
         // `doc_config.joe` file.
-        private Object _inputFile(Joe joe, ArgQueue args) {
+        private Object _inputFile(Joe joe, Args args) {
             Joe.minArity(args, 1, "inputFile(filename, ...)");
 
             for (var name : args.asList()) {
@@ -67,7 +67,7 @@ class JoeDocPackage extends JoePackage {
         //
         // Folder paths are relative to the location of the
         // `doc_config.joe` file.
-        private Object _inputFolder(Joe joe, ArgQueue args) {
+        private Object _inputFolder(Joe joe, Args args) {
             Joe.minArity(args, 1, "inputFolder(folder, ...)");
 
             for (var name : args.asList()) {
@@ -83,7 +83,7 @@ class JoeDocPackage extends JoePackage {
         // Sets the name of the folder to receive the generated outputs.
         // If unset, defaults to the folder containing the `doc_config.joe`
         // file.
-        private Object _outputFolder(Joe joe, ArgQueue args) {
+        private Object _outputFolder(Joe joe, Args args) {
             Joe.exactArity(args, 1, "outputFolder(folder)");
 
             config.setOutputFolder(Path.of(joe.toString(args.next())));

@@ -75,7 +75,7 @@ public final class JoeFunction implements JoeCallable {
     }
 
     @Override
-    public Object call(Joe joe, ArgQueue args) {
+    public Object call(Joe joe, Args args) {
         // FIRST, check the arity
         var expected = isVarArgs
             ? declaration.params().size() - 1

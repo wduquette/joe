@@ -74,7 +74,7 @@ public class FXProxy<V> extends TypeProxy<V> {
     // @args keyword
     // @result value
     // Gets the value of the property with the given *keyword*.
-    private Object _getProperty(V obj, Joe joe, ArgQueue args) {
+    private Object _getProperty(V obj, Joe joe, Args args) {
         Joe.exactArity(args, 1, "getProperty(keyword)");
 
         return toDef(joe, args.next()).getProperty(obj).getValue();
@@ -92,7 +92,7 @@ public class FXProxy<V> extends TypeProxy<V> {
     // - The new value of the property
     //
     // The listener will be called when the property's value changes.
-    private Object _listenTo(V obj, Joe joe, ArgQueue args) {
+    private Object _listenTo(V obj, Joe joe, Args args) {
         Joe.exactArity(args, 2, "listenTo(keyword, listener");
         var keyword = joe.toKeyword(args.next());
         var def =  toDef(joe, keyword).getProperty(obj);
@@ -106,7 +106,7 @@ public class FXProxy<V> extends TypeProxy<V> {
     // @method properties
     // @result joe.Set
     // Returns a readonly `Set` of the object's property keywords.
-    private Object _properties(V obj, Joe joe, ArgQueue args) {
+    private Object _properties(V obj, Joe joe, Args args) {
         Joe.exactArity(args, 0, "properties()");
         return joe.readonlySet(properties.keySet());
     }
@@ -117,7 +117,7 @@ public class FXProxy<V> extends TypeProxy<V> {
     // @result this
     // Sets the *value* of the property with the given *keyword*.
     // The *value* must be assignable to the property's value type.
-    private Object _setProperty(V obj, Joe joe, ArgQueue args) {
+    private Object _setProperty(V obj, Joe joe, Args args) {
         Joe.exactArity(args, 2, "setProperty(keyword, value)");
 
         var def = toDef(joe, args.next());

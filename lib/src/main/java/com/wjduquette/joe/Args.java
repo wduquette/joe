@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
  * the arguments both as a list for indexed access and as a queue for
  * polling using the {@code next()} method.
  */
-public final class ArgQueue {
+public final class Args {
     /**
      * An empty argument queue.
      */
-    public static final ArgQueue EMPTY = new ArgQueue();
+    public static final Args EMPTY = new Args();
 
     //-------------------------------------------------------------------------
     // Instance variables
@@ -28,7 +28,7 @@ public final class ArgQueue {
     /**
      * Creates an empty argument queue.
      */
-    public ArgQueue() {
+    public Args() {
         this(new ArrayList<>());
     }
 
@@ -36,7 +36,7 @@ public final class ArgQueue {
      * Creates an argument queue containing the given list of arguments.
      * @param args the arguments.
      */
-    public ArgQueue(List<?> args) {
+    public Args(List<?> args) {
         this.args = Collections.unmodifiableList(args);
     }
 
@@ -134,6 +134,6 @@ public final class ArgQueue {
     public String toString() {
         var before = args.subList(0, next).stream().map(Object::toString).collect(Collectors.joining(","));
         var after = args.subList(next, args.size()).stream().map(Object::toString).collect(Collectors.joining(","));
-        return "ArgQueue[" + before + "/" + after + "]";
+        return "Args[" + before + "/" + after + "]";
     }
 }

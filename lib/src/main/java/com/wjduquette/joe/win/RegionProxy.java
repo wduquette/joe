@@ -1,6 +1,6 @@
 package com.wjduquette.joe.win;
 
-import com.wjduquette.joe.ArgQueue;
+import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Region;
@@ -84,7 +84,7 @@ class RegionProxy extends FXProxy<Region> {
     // @args height
     // @result this
     // Sets the node's preferred, minimum, and maximum height in pixels.
-    private Object _height(Region node, Joe joe, ArgQueue args) {
+    private Object _height(Region node, Joe joe, Args args) {
         Joe.exactArity(args, 1, "height(height)");
         var pixels = joe.toDouble(args.next());
         node.setMinHeight(pixels);
@@ -100,7 +100,7 @@ class RegionProxy extends FXProxy<Region> {
     // @result this
     // Sets the padding in pixels on all sides of the region.
     // If a single value is given, it is used for all four sides.
-    private Object _padding(Region node, Joe joe, ArgQueue args) {
+    private Object _padding(Region node, Joe joe, Args args) {
         var insets = switch(args.size()) {
             case 1 -> new Insets(joe.toDouble(args.next()));
             case 4 -> new Insets(
@@ -122,7 +122,7 @@ class RegionProxy extends FXProxy<Region> {
     // @args height
     // @result this
     // Sets the node's preferred height in pixels.
-    private Object _prefHeight(Region node, Joe joe, ArgQueue args) {
+    private Object _prefHeight(Region node, Joe joe, Args args) {
         Joe.exactArity(args, 1, "prefHeight(height)");
         node.setPrefHeight(joe.toDouble(args.next()));
         return node;
@@ -133,7 +133,7 @@ class RegionProxy extends FXProxy<Region> {
     // @args width
     // @result this
     // Sets the node's preferred width in pixels.
-    private Object _prefWidth(Region node, Joe joe, ArgQueue args) {
+    private Object _prefWidth(Region node, Joe joe, Args args) {
         Joe.exactArity(args, 1, "prefWidth(width)");
         node.setPrefWidth(joe.toDouble(args.next()));
         return node;
@@ -144,7 +144,7 @@ class RegionProxy extends FXProxy<Region> {
     // @args width
     // @result this
     // Sets the node's preferred, minimum, and maximum width in pixels.
-    private Object _width(Region node, Joe joe, ArgQueue args) {
+    private Object _width(Region node, Joe joe, Args args) {
         Joe.exactArity(args, 1, "width(width)");
         var pixels = joe.toDouble(args.next());
         node.setMinWidth(pixels);
