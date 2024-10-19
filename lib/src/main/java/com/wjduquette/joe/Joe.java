@@ -595,7 +595,7 @@ public class Joe {
      */
     public Object call(Object callee, Object... args) {
         if (callee instanceof JoeCallable callable) {
-            return callable.call(this, new Args(List.of(args)));
+            return callable.call(this, new Args(args));
         } else {
             throw expected("callable", callee);
         }

@@ -351,9 +351,9 @@ class Interpreter {
             case Expr.Call expr -> {
                 Object callee = evaluate(expr.callee());
 
-                var args = new ArrayList<>();
-                for (var arg : expr.arguments()) {
-                    args.add(evaluate(arg));
+                var args = new Object[expr.arguments().size()];
+                for (var i = 0; i < expr.arguments().size(); i++) {
+                    args[i] = evaluate(expr.arguments().get(i));
                 }
 
                 if (callee instanceof JoeCallable callable) {

@@ -39,15 +39,6 @@ public final class Args {
     }
 
     /**
-     * Creates an argument queue containing the given list of arguments.
-     * @param args the arguments.
-     */
-    @Deprecated
-    public Args(List<?> args) {
-        this.args = args.toArray();
-    }
-
-    /**
      * Creates an argument queue given the array of arguments.
      * @param args The arguments
      */
