@@ -27,7 +27,7 @@ function testToString() {
     check(stringify(t)).eq("Tuple(#a, 1, #b, 2)");
 }
 
-function testMatches_fields() {
+function testIs() {
     var t = Tuple(#a, 1, #b, 2);
     check(t.is(#a, #b)).isTrue();
     check(t.is(#a, #_)).isTrue();
@@ -39,14 +39,14 @@ function testMatches_fields() {
     check(t.is(#a, #b, #c)).isFalse();    // Wrong # args
 }
 
-function testMatches_all() {
+function testHas() {
     var t = Tuple(#a, 1, #b, 2);
-    check(t.is(#a, 1, #b, 2)).isTrue();
-    check(t.is(#a, #_, #b, 2)).isTrue();
-    check(t.is(#a, 1, #_, 2)).isTrue();
-    check(t.is(#a, 1, #b, #_)).isTrue();
-    check(t.is(#x, 1, #b, 2)).isFalse();         // Wrong field
-    check(t.is(#a, 2, #b, 2)).isFalse();         // Wrong value
-    check(t.is(#a, 1)).isFalse();                // Wrong # args
-    check(t.is(#a, 1, #b, 2, #c, 3)).isFalse();  // Wrong # args
+    check(t.has(#a, 1, #b, 2)).isTrue();
+    check(t.has(#a, #_, #b, 2)).isTrue();
+    check(t.has(#a, 1, #_, 2)).isTrue();
+    check(t.has(#a, 1, #b, #_)).isTrue();
+    check(t.has(#x, 1, #b, 2)).isFalse();         // Wrong field
+    check(t.has(#a, 2, #b, 2)).isFalse();         // Wrong value
+    check(t.has(#a, 1)).isFalse();                // Wrong # args
+    check(t.has(#a, 1, #b, 2, #c, 3)).isFalse();  // Wrong # args
 }

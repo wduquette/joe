@@ -21,7 +21,8 @@ public class Tuple implements JoeObject, JoeToString {
         new HashMap<>();
 
     static {
-        METHODS.put("is", Tuple::_is);
+        METHODS.put("is",       Tuple::_is);
+        METHODS.put("has",      Tuple::_has);
         METHODS.put("toString", Tuple::_toString);
     }
 
@@ -67,12 +68,15 @@ public class Tuple implements JoeObject, JoeToString {
     //
     // A function may return tuples with different fields depending on the
     // circumstances.  The [[Tuple#method.is]] method is used to match
-    // against the tuple's fields and/or fields and content:
+    // against the tuple's fields, and the [[Tuple#method.has]] method is
+    // used to match against both fields and their values.
     //
     // ```joe
-    // if (tuple.is(#flag, true, #result, #_)) {
+    // var tuple = Tuple(#flag, true, #result, 123);
+    //
+    // if (tuple.has(#flag, true, #result, #_)) {
     //     println("OK, got: " + tuple.result);
-    // } else if (tuple.is(#flag, false, #error, #_)) {
+    // } else if (tuple.has(#flag, false, #error, #_)) {
     //     println("Error, got: " + tuple.error);
     // }
     // ```
@@ -82,6 +86,8 @@ public class Tuple implements JoeObject, JoeToString {
     // `Tuple(#error, error)`, resulting in code like this:
     //
     // ```joe
+    // var tuple = Tuple(#ok, true);
+    //
     // if (tuple.is(#ok)) {
     //     println("OK, got: " + tuple.ok);
     // } else if (tuple.is(#error)) {
@@ -89,7 +95,7 @@ public class Tuple implements JoeObject, JoeToString {
     // }
     // ```
     //
-    // See the [[Tuple#method.is]] method for more.
+    // See the [[Tuple#method.is]] and [[Tuple#method.has]] methods for more.
     /**
      * The argument list is a flat list of keyword/value pairs.
      * @param joe The interpreter
@@ -128,25 +134,25 @@ public class Tuple implements JoeObject, JoeToString {
 
     //**
     // @method is
-    // @args field, [field]...
-    // @args field, value, [field, value]...
+    // @args keyword,...
     // @result Boolean
     //
-    // Returns `true` if the tuple matches the pattern of *field* keywords or
-    // *field*, *value* pairs, and `false` otherwise.  Returns `false` if the
-    // number of fields/pairs in the tuple is different from the number of
-    // the number of fields or pairs passed in.
+    // Returns `true` if the number of *keywords* passed in match the number
+    // of fields in the tuple, and each keyword has the same name as the
+    // matching field, and `false` otherwise.
     //
-    // The keyword `#_` is a wildcard; it will match any field or value.
+    // The keyword `#_` is a wildcard; it will match any field.
     //
     // For example, the following creates a tuple with the field `#ok`
-    // which has the value `123`.
+    // which has the value `123`, and then matches against it.
     //
     // ```joe
     // var tuple = Tuple(#ok, 123);
     // ...
     // if (tuple.is(#ok)) {
     //     println("ok: " + tuple.ok);
+    // } else {
+    //     println("No match.");
     // }
     // ```
     private static Object _is(Tuple tuple, Joe joe, Args args) {
@@ -156,7 +162,37 @@ public class Tuple implements JoeObject, JoeToString {
                 if (!arg.equals(ANY) && !key.equals(arg)) return false;
             }
             return true;
-        } else if (args.size() == 2*tuple.fields.size()) {
+        } else {
+            return false;
+        }
+    }
+
+    //**
+    // @method has
+    // @args keyword, value, [keyword, value]...
+    // @result Boolean
+    //
+    // Returns `true` if the number of *keyword*/*value* pairs matches the
+    // number of fields in the tuple, and each field has the same name
+    // and value as the matching *keyword/*value* pair.
+    //
+    // The keyword `#_` is a wildcard; it will match any field or value.
+    //
+    // For example, the following creates a tuple with the field `#ok`
+    // which has the value `123`, and then matches against the field name
+    // and its value.
+    //
+    // ```joe
+    // var tuple = Tuple(#ok, 123);
+    // ...
+    // if (tuple.has(#ok, 123)) {
+    //     println("ok: " + tuple.ok);
+    // } else {
+    //     println("No match.");
+    // }
+    // ```
+    private static Object _has(Tuple tuple, Joe joe, Args args) {
+        if (args.size() == 2*tuple.fields.size()) {
             for (var e : tuple.fields.entrySet()) {
                 var keyArg = args.next();
                 var valueArg = args.next();
