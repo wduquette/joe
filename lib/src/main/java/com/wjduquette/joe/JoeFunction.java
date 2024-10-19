@@ -95,7 +95,7 @@ public final class JoeFunction implements JoeCallable {
         }
 
         if (isVarArgs) {
-            var varArgs = new ListValue(args.remainder());
+            var varArgs = new ListValue(args.remainderAsList());
             environment.setVar(Parser.ARGS, varArgs);
         }
 

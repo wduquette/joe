@@ -163,7 +163,7 @@ public class StringProxy extends TypeProxy<String> {
     private Object _format(Joe joe, Args args) {
         Joe.minArity(args, 1, "format(fmt, [values...])");
         var fmt = joe.toString(args.next());
-        return StringFormatter.format(joe, fmt, args.remainder());
+        return StringFormatter.format(joe, fmt, args.remainderAsList());
     }
 
     //**
@@ -259,7 +259,7 @@ public class StringProxy extends TypeProxy<String> {
 
         if (!args.hasRemaining()) {
             return (double) value.indexOf(target);
-        } else if (args.numRemaining() == 1) {
+        } else if (args.remaining() == 1) {
             return (double) value.indexOf(target,
                 joe.toInteger(args.next())
             );
@@ -485,7 +485,7 @@ public class StringProxy extends TypeProxy<String> {
     // to the end of the string.
     private Object _substring(String value, Joe joe, Args args) {
         Joe.arityRange(args, 1, 2, "substring(beginIndex, [endIndex]");
-        if (args.numRemaining() == 1) {
+        if (args.remaining() == 1) {
             return value.substring(
                 joe.toIndex(args.next(), value.length())
             );

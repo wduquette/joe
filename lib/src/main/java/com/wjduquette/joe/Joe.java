@@ -624,7 +624,7 @@ public class Joe {
      * @throws JoeError on failure
      */
     public static void exactArity(Args args, int arity, String signature) {
-        if (args.numRemaining() != arity) {
+        if (args.remaining() != arity) {
             throw arityFailure(signature);
         }
     }
@@ -638,7 +638,7 @@ public class Joe {
      * @throws JoeError on failure
      */
     public static void minArity(Args args, int minArity, String signature) {
-        if (args.numRemaining() < minArity) {
+        if (args.remaining() < minArity) {
             throw arityFailure(signature);
         }
     }
@@ -658,7 +658,7 @@ public class Joe {
         int maxArity,
         String signature)
     {
-        if (args.numRemaining() < minArity || args.numRemaining() > maxArity) {
+        if (args.remaining() < minArity || args.remaining() > maxArity) {
             throw arityFailure(signature);
         }
     }

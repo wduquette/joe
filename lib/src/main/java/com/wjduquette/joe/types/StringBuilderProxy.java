@@ -78,7 +78,7 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
         Joe.minArity(args, 1, "printf(fmt, [values]...)");
         var fmt = joe.toString(args.next());
 
-        buff.append(StringFormatter.format(joe, fmt, args.remainder()));
+        buff.append(StringFormatter.format(joe, fmt, args.remainderAsList()));
         return buff;
     }
 

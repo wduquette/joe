@@ -104,7 +104,7 @@ class StandardLibrary extends JoePackage {
         Joe.minArity(args, 1, "printf(fmt, [values]...)");
         var fmt = joe.toString(args.next());
 
-        joe.print(StringFormatter.format(joe, fmt, args.remainder()));
+        joe.print(StringFormatter.format(joe, fmt, args.remainderAsList()));
         return null;
     }
 
