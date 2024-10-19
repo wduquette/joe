@@ -177,40 +177,64 @@
 <hr />
 <p><strong><a href="#init">Initializer</a></strong></p>
 <ul>
-<li><a href="type.joe.Tuple.html#init">Tuple(<em>name</em>, <em>value</em>, [<em>name</em>, <em>value</em>]...)</a> → <a href="type.joe.Tuple.html">Tuple</a></li>
+<li><a href="type.joe.Tuple.html#init">Tuple(<em>keyword</em>, <em>value</em>, [<em>keyword</em>, <em>value</em>]...)</a> → <a href="type.joe.Tuple.html">Tuple</a></li>
 </ul>
 <p><strong><a href="#methods">Methods</a></strong></p>
 <ul>
-<li><a href="type.joe.Tuple.html#method.matches"><em>tuple</em>.matches(<em>name</em>,...)</a> → <a href="type.joe.Boolean.html">Boolean</a></li>
+<li><a href="type.joe.Tuple.html#method.matches"><em>tuple</em>.matches(<em>field</em>, [<em>field</em>]...)</a> → <a href="type.joe.Boolean.html">Boolean</a></li>
+<li><a href="type.joe.Tuple.html#method.matches"><em>tuple</em>.matches(<em>field</em>, <em>value</em>, [<em>field</em>, <em>value</em>]...)</a> → <a href="type.joe.Boolean.html">Boolean</a></li>
 <li><a href="type.joe.Tuple.html#method.toString"><em>tuple</em>.toString()</a> → <a href="type.joe.String.html">String</a></li>
 </ul>
 <h2 id="init"><a class="header" href="#init">Tuple Initializer</a></h2>
 <hr />
-<p><strong>Tuple(<em>name</em>, <em>value</em>, [<em>name</em>, <em>value</em>]...) → <a href="type.joe.Tuple.html">Tuple</a></strong></p>
-<p>Given name and value pairs, returns a <code>Tuple</code> object with
-the named fields assigned to the given values.</p>
+<p><strong>Tuple(<em>keyword</em>, <em>value</em>, [<em>keyword</em>, <em>value</em>]...) → <a href="type.joe.Tuple.html">Tuple</a></strong></p>
+<p>Given keyword and value pairs, returns an immutable <code>Tuple</code> object with
+the fields named by the keywords assigned to the given values.</p>
 <p>For example,</p>
 <pre><code class="language-joe">var tuple = Tuple(#flag, true, #result, 123);
 
 println("flag   = " + tuple.flag);
 println("result = " + tuple.result);
 </code></pre>
+<p>Tuples are intended as a result type for functions that need to return
+multiple values, e.g., a status and a value or two values.</p>
+<p>A function may return tuples with different fields depending on the
+circumstances.  The <a href="type.joe.Tuple.html#method.matches"><code>matches()</code></a> method is used to match
+against the tuple's fields and/or fields and content:</p>
+<pre><code class="language-joe">if (tuple.matches(#flag, true, #result, #_)) {
+    println("OK, got: " + tuple.result);
+} else if (tuple.matches(#flag, false, #error, #_)) {
+    println("Error, got: " + tuple.error);
+}
+</code></pre>
+<p>In case like this, the field name itself can convey the status.  The
+function could return either <code>Tuple(#ok, result)</code> or
+<code>Tuple(#error, error)</code>, resulting in code like this:</p>
+<pre><code class="language-joe">if (tuple.matches(#ok)) {
+    println("OK, got: " + tuple.ok);
+} else if (tuple.matches(#error)) {
+    println("Error, got: " + tuple.error);
+}
+</code></pre>
+<p>See the <a href="type.joe.Tuple.html#method.matches"><code>matches()</code></a> method for more.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
 <p><span id="method.matches"> </span></p>
 <h3 id="tuplematches"><a class="header" href="#tuplematches"><em>tuple</em>.matches()</a></h3>
 <hr />
-<p><strong><em>tuple</em>.matches(<em>name</em>,...) → <a href="type.joe.Boolean.html">Boolean</a></strong></p>
-<p>Returns <code>true</code> if the <em>names</em> passed in match the names of the
-defined fields, and false otherwise.</p>
-<p>The <em>names</em> may be passed as strings or keywords; the convention
-is to use keywords.  Pass the keyword <code>#_</code> as a wildcard to
-match any field name.</p>
-<p>For example,</p>
+<p><strong><em>tuple</em>.matches(<em>field</em>, [<em>field</em>]...) → <a href="type.joe.Boolean.html">Boolean</a></strong><br>
+<strong><em>tuple</em>.matches(<em>field</em>, <em>value</em>, [<em>field</em>, <em>value</em>]...) → <a href="type.joe.Boolean.html">Boolean</a></strong></p>
+<p>Returns <code>true</code> if the tuple matches the pattern of <em>field</em> keywords or
+<em>field</em>, <em>value</em> pairs, and <code>false</code> otherwise.  Returns <code>false</code> if the
+number of fields/pairs in the tuple is different from the number of
+the number of fields or pairs passed in.</p>
+<p>The keyword <code>#_</code> is a wildcard; it will match any field or value.</p>
+<p>For example, the following creates a tuple with the field <code>#ok</code>
+which has the value <code>123</code>.</p>
 <pre><code class="language-joe">var tuple = Tuple(#ok, 123);
 ...
-if (tuple.matches(#ok, #value)) {
-    println("ok: " + tuple.value);
+if (tuple.matches(#ok)) {
+    println("ok: " + tuple.ok);
 }
 </code></pre>
 <p><span id="method.toString"> </span></p>
