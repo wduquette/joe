@@ -120,7 +120,7 @@ it immediately switches to that `@package`, and so for the others.
 
 ### Example
 
-Here is the beginning of the documentation in Joe's `MonicaPackage.java`
+Here is the beginning of the documentation in Joe's `StandardLibrary.java`
 file:
 
 ```java

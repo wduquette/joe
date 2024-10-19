@@ -1,0 +1,52 @@
+// Tests for the joe.Tuple type.
+
+function testCreate_ok() {
+    var t = Tuple(#a, 1, #b, 2);
+    check(t.a).eq(1);
+    check(t.b).eq(2);
+}
+
+function testCreate_fail_odd() {
+    checkCatch(\-> Tuple(#a, 1, #b))
+        .message("Tuple() expects an even number of arguments.");
+}
+
+function testCreate_fail_collision() {
+    checkCatch(\-> Tuple(#a, 1, #toString, 2))
+        .message("Invalid field #toString: conflicts with the tuple's 'toString()' method.");
+}
+
+function testCreate_fail_wildcard() {
+    checkCatch(\-> Tuple(#a, 1, #_, 2))
+        .message("Invalid field #_: Tuple reserves #_ as a wildcard.");
+}
+
+function testToString() {
+    var t = Tuple(#a, 1, #b, 2);
+    check(t.toString()).eq("Tuple(#a, 1, #b, 2)");
+    check(stringify(t)).eq("Tuple(#a, 1, #b, 2)");
+}
+
+function testMatches_fields() {
+    var t = Tuple(#a, 1, #b, 2);
+    check(t.matches(#a, #b)).isTrue();
+    check(t.matches(#a, #_)).isTrue();
+    check(t.matches(#_, #b)).isTrue();
+    check(t.matches(#a, #x)).isFalse();        // Wrong field
+    check(t.matches(#x, #b)).isFalse();        // Wrong field
+    check(t.matches("a", "b")).isFalse();      // Not keywords
+    check(t.matches(#a)).isFalse();            // Wrong # args
+    check(t.matches(#a, #b, #c)).isFalse();    // Wrong # args
+}
+
+function testMatches_all() {
+    var t = Tuple(#a, 1, #b, 2);
+    check(t.matches(#a, 1, #b, 2)).isTrue();
+    check(t.matches(#a, #_, #b, 2)).isTrue();
+    check(t.matches(#a, 1, #_, 2)).isTrue();
+    check(t.matches(#a, 1, #b, #_)).isTrue();
+    check(t.matches(#x, 1, #b, 2)).isFalse();         // Wrong field
+    check(t.matches(#a, 2, #b, 2)).isFalse();         // Wrong value
+    check(t.matches(#a, 1)).isFalse();                // Wrong # args
+    check(t.matches(#a, 1, #b, 2, #c, 3)).isFalse();  // Wrong # args
+}
