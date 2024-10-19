@@ -21,7 +21,7 @@ public class Tuple implements JoeObject, JoeToString {
         new HashMap<>();
 
     static {
-        METHODS.put("matches", Tuple::_matches);
+        METHODS.put("is", Tuple::_is);
         METHODS.put("toString", Tuple::_toString);
     }
 
@@ -34,7 +34,7 @@ public class Tuple implements JoeObject, JoeToString {
      * @return The tuple
      */
     public static Tuple of(Joe joe, Object... args) {
-        return new Tuple(joe, args);
+        return new Tuple(joe, new Args(args));
     }
 
     //-------------------------------------------------------------------------
@@ -66,13 +66,13 @@ public class Tuple implements JoeObject, JoeToString {
     // multiple values, e.g., a status and a value or two values.
     //
     // A function may return tuples with different fields depending on the
-    // circumstances.  The [[Tuple#method.matches]] method is used to match
+    // circumstances.  The [[Tuple#method.is]] method is used to match
     // against the tuple's fields and/or fields and content:
     //
     // ```joe
-    // if (tuple.matches(#flag, true, #result, #_)) {
+    // if (tuple.is(#flag, true, #result, #_)) {
     //     println("OK, got: " + tuple.result);
-    // } else if (tuple.matches(#flag, false, #error, #_)) {
+    // } else if (tuple.is(#flag, false, #error, #_)) {
     //     println("Error, got: " + tuple.error);
     // }
     // ```
@@ -82,14 +82,14 @@ public class Tuple implements JoeObject, JoeToString {
     // `Tuple(#error, error)`, resulting in code like this:
     //
     // ```joe
-    // if (tuple.matches(#ok)) {
+    // if (tuple.is(#ok)) {
     //     println("OK, got: " + tuple.ok);
-    // } else if (tuple.matches(#error)) {
+    // } else if (tuple.is(#error)) {
     //     println("Error, got: " + tuple.error);
     // }
     // ```
     //
-    // See the [[Tuple#method.matches]] method for more.
+    // See the [[Tuple#method.is]] method for more.
     /**
      * The argument list is a flat list of keyword/value pairs.
      * @param joe The interpreter
@@ -106,29 +106,6 @@ public class Tuple implements JoeObject, JoeToString {
             var value = args.get(i + 1);
 
             fields.put(keyword, value);
-        }
-    }
-
-    /**
-     * For use by Tuple.of(), which would be a constructor except that
-     * the overloading would be ambiguous.
-     * @param args The pairs
-     */
-    private Tuple(Joe joe, Object[] args) {
-        if (args.length % 2 != 0) {
-            throw new JoeError("Tuple() expects an even number of arguments.");
-        }
-
-        for (int i = 0; i < args.length; i += 2) {
-            var name = args[i];
-            var value = args[i + 1];
-            if (name instanceof String s && Joe.isIdentifier(s)) {
-                validateField(s);
-                var keyword = new Keyword(s);
-                fields.put(keyword, value);
-            } else {
-                throw joe.expected("identifier", name);
-            }
         }
     }
 
@@ -150,7 +127,7 @@ public class Tuple implements JoeObject, JoeToString {
     // Value Methods
 
     //**
-    // @method matches
+    // @method is
     // @args field, [field]...
     // @args field, value, [field, value]...
     // @result Boolean
@@ -168,11 +145,11 @@ public class Tuple implements JoeObject, JoeToString {
     // ```joe
     // var tuple = Tuple(#ok, 123);
     // ...
-    // if (tuple.matches(#ok)) {
+    // if (tuple.is(#ok)) {
     //     println("ok: " + tuple.ok);
     // }
     // ```
-    private static Object _matches(Tuple tuple, Joe joe, Args args) {
+    private static Object _is(Tuple tuple, Joe joe, Args args) {
         if (args.size() == tuple.fields.size()) {
             for (var key : tuple.fields.keySet()) {
                 var arg = args.next();

@@ -181,8 +181,8 @@
 </ul>
 <p><strong><a href="#methods">Methods</a></strong></p>
 <ul>
-<li><a href="type.joe.Tuple.html#method.matches"><em>tuple</em>.matches(<em>field</em>, [<em>field</em>]...)</a> → <a href="type.joe.Boolean.html">Boolean</a></li>
-<li><a href="type.joe.Tuple.html#method.matches"><em>tuple</em>.matches(<em>field</em>, <em>value</em>, [<em>field</em>, <em>value</em>]...)</a> → <a href="type.joe.Boolean.html">Boolean</a></li>
+<li><a href="type.joe.Tuple.html#method.is"><em>tuple</em>.is(<em>field</em>, [<em>field</em>]...)</a> → <a href="type.joe.Boolean.html">Boolean</a></li>
+<li><a href="type.joe.Tuple.html#method.is"><em>tuple</em>.is(<em>field</em>, <em>value</em>, [<em>field</em>, <em>value</em>]...)</a> → <a href="type.joe.Boolean.html">Boolean</a></li>
 <li><a href="type.joe.Tuple.html#method.toString"><em>tuple</em>.toString()</a> → <a href="type.joe.String.html">String</a></li>
 </ul>
 <h2 id="init"><a class="header" href="#init">Tuple Initializer</a></h2>
@@ -199,31 +199,31 @@ println("result = " + tuple.result);
 <p>Tuples are intended as a result type for functions that need to return
 multiple values, e.g., a status and a value or two values.</p>
 <p>A function may return tuples with different fields depending on the
-circumstances.  The <a href="type.joe.Tuple.html#method.matches"><code>matches()</code></a> method is used to match
+circumstances.  The <a href="type.joe.Tuple.html#method.is"><code>is()</code></a> method is used to match
 against the tuple's fields and/or fields and content:</p>
-<pre><code class="language-joe">if (tuple.matches(#flag, true, #result, #_)) {
+<pre><code class="language-joe">if (tuple.is(#flag, true, #result, #_)) {
     println("OK, got: " + tuple.result);
-} else if (tuple.matches(#flag, false, #error, #_)) {
+} else if (tuple.is(#flag, false, #error, #_)) {
     println("Error, got: " + tuple.error);
 }
 </code></pre>
 <p>In case like this, the field name itself can convey the status.  The
 function could return either <code>Tuple(#ok, result)</code> or
 <code>Tuple(#error, error)</code>, resulting in code like this:</p>
-<pre><code class="language-joe">if (tuple.matches(#ok)) {
+<pre><code class="language-joe">if (tuple.is(#ok)) {
     println("OK, got: " + tuple.ok);
-} else if (tuple.matches(#error)) {
+} else if (tuple.is(#error)) {
     println("Error, got: " + tuple.error);
 }
 </code></pre>
-<p>See the <a href="type.joe.Tuple.html#method.matches"><code>matches()</code></a> method for more.</p>
+<p>See the <a href="type.joe.Tuple.html#method.is"><code>is()</code></a> method for more.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
-<p><span id="method.matches"> </span></p>
-<h3 id="tuplematches"><a class="header" href="#tuplematches"><em>tuple</em>.matches()</a></h3>
+<p><span id="method.is"> </span></p>
+<h3 id="tupleis"><a class="header" href="#tupleis"><em>tuple</em>.is()</a></h3>
 <hr />
-<p><strong><em>tuple</em>.matches(<em>field</em>, [<em>field</em>]...) → <a href="type.joe.Boolean.html">Boolean</a></strong><br>
-<strong><em>tuple</em>.matches(<em>field</em>, <em>value</em>, [<em>field</em>, <em>value</em>]...) → <a href="type.joe.Boolean.html">Boolean</a></strong></p>
+<p><strong><em>tuple</em>.is(<em>field</em>, [<em>field</em>]...) → <a href="type.joe.Boolean.html">Boolean</a></strong><br>
+<strong><em>tuple</em>.is(<em>field</em>, <em>value</em>, [<em>field</em>, <em>value</em>]...) → <a href="type.joe.Boolean.html">Boolean</a></strong></p>
 <p>Returns <code>true</code> if the tuple matches the pattern of <em>field</em> keywords or
 <em>field</em>, <em>value</em> pairs, and <code>false</code> otherwise.  Returns <code>false</code> if the
 number of fields/pairs in the tuple is different from the number of
@@ -233,7 +233,7 @@ the number of fields or pairs passed in.</p>
 which has the value <code>123</code>.</p>
 <pre><code class="language-joe">var tuple = Tuple(#ok, 123);
 ...
-if (tuple.matches(#ok)) {
+if (tuple.is(#ok)) {
     println("ok: " + tuple.ok);
 }
 </code></pre>
