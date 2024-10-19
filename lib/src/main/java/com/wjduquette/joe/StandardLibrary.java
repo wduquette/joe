@@ -47,17 +47,17 @@ class StandardLibrary extends JoePackage {
     //**
     // @function catch
     // @args callable
-    // @result Pair
+    // @result Tuple
     // Executes the callable, which must not require any arguments.
-    // Returns `Pair(#ok, returnValue)` on success and
-    // `Pair(#error, Error)` on error.
+    // Returns `Tuple(#ok, returnValue)` on success and
+    // `Tuple(#error, Error)` on error.
     private Object _catch(Joe joe, Args args) {
         Joe.exactArity(args, 1, "catch(callable)");
         try {
             var result = joe.call(args.next());
-            return new Pair(OK, result);
+            return Tuple.of(joe, OK, result);
         } catch (JoeError ex) {
-            return new Pair(ERROR, ex);
+            return Tuple.of(joe, ERROR, ex);
         }
     }
 

@@ -17,8 +17,8 @@ function testThrowAnything() {
 }
 
 function testRethrow_withFrame() {
-    var pair = catch(\-> { throw "Simulated Error."; });
-    var err = pair.right();
+    var tuple = catch(\-> { throw "Simulated Error."; });
+    var err = tuple.error;
     err.stackFrames().add("Added detail.");
     checkCatch(\-> { throw err; })
         .message("Simulated Error.")

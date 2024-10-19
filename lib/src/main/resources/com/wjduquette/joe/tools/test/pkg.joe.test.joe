@@ -135,11 +135,11 @@ class ValueChecker {
 class CatchChecker {
     //**
     // @init
-    // @args pair
+    // @args tuple
     // Initializes the checker with the result of a `catch()`.
-    method init(pair) {
-        this.pair = pair;
-        this.err = pair.left() == #error ? pair.right() : null;
+    method init(tuple) {
+        this.tuple = tuple;
+        this.err = tuple.is(#error) ? tuple.error : null;
     }
 
     //**
@@ -159,8 +159,7 @@ class CatchChecker {
     // Returns `true` if there was an error, and `false` otherwise.
     method isError() {
         assert this.err != null, "Expected an error, got: "
-            + typeName(this.pair.right())
-            + " '" + codify(this.pair.right()) + "'.";
+            + _typedValue(this.tuple.ok) + ".";
         return this;
     }
 
