@@ -10,8 +10,8 @@ function goodbye() {
 }
 
 Win.root()
-    .setAlignment(#center)
-    .setSpacing(10)
+    .setProperty(#alignment, #center)
+    .spacing(10)
     .child(Label("Hello, " + name + "!"))
     .child(Button("Goodbye", goodbye))
     ;

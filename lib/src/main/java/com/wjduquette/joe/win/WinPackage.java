@@ -11,6 +11,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 /**
  * An experimental Joe package for building JavaFX GUIs
  */
@@ -101,6 +104,27 @@ public class WinPackage extends JoePackage {
     //     - [[Pane]]: Nodes that manage children
     //       - [[VBox]]: A vertical stack of widgets
 
+    //**
+    // @packageTopic css
+    // @title Styling with CSS
+    //
+    // Scripts can style widgets using CSS in several different ways.
+    //
+    // - The [[Win#static.css]] method associates a CSS stylesheet, passed
+    //   as a text string, with the application as a whole.
+    // - Each widget has a [[Node#method.styleClasses]] method which returns
+    //   a list of the names of the CSS style classes that apply to the widget;
+    //   add any desired style class name to this list.
+    // - Each widget has a `#style` property which can be set to a string
+    //   defining one or more CSS style settings, similar to the HTML
+    //   `style` attribute.
+    //
+    // JavaFX styles widgets using its own peculiar form of CSS, called
+    // "FXCSS".  See the
+    // [*JavaFX CSS Reference Guide*](https://openjfx.io/javadoc/21/javafx.graphics/javafx/scene/doc-files/cssref.html)
+    // for details.
+
+
     //-------------------------------------------------------------------------
     // Configuration
 
@@ -120,13 +144,45 @@ public class WinPackage extends JoePackage {
         WinProxy() {
             super("Win");
             staticType();
-            staticMethod("root",  this::_root);
+            staticMethod("css",      this::_css);
+            staticMethod("root",     this::_root);
             staticMethod("setSize",  this::_setSize);
             staticMethod("setTitle", this::_setTitle);
         }
 
         //---------------------------------------------------------------------
         // Static Methods
+
+        //**
+        // @static css
+        // @args css
+        // @result this
+        // Sets the text of the CSS style sheet for the application as a
+        // whole to *css*.  For example,
+        //
+        // ```joe
+        // Win.css("""
+        //     .label { -fx-text-fill: pink; }
+        //     """);
+        // ```
+        //
+        // See [[joe.win#topic.css]] for more on using CSS in `joe win` scripts.
+        //
+        // **JavaFX:** In particular, this adds the given CSS to the
+        // `Scene`'s `stylesheets` property as a `data:` URL containing
+        // the given *css* text. The styles are therefore accessible to
+        // the entire scene.
+        private Object _css(Joe joe, Args args) {
+            Joe.exactArity(args, 1, "css(css)");
+            var css = joe.toString(args.next());
+
+            // %-encode for inclusion in a URL
+            var encoded = Base64.getEncoder()
+                .encodeToString(css.getBytes(StandardCharsets.UTF_8));
+            stage.getScene().getStylesheets()
+                .add("data:text/css;base64," + encoded);
+            return this;
+        }
 
         //**
         // @static root

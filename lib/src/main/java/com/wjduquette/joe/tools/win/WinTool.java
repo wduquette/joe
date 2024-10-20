@@ -54,6 +54,7 @@ public class WinTool extends FXTool {
 
         // NEXT, create the scene with default settings.
         Scene scene = new Scene(root, 400, 300);
+//        scene.getStylesheets().add("file:foo.css");
         stage.setTitle("joe win");
         stage.setScene(scene);
 

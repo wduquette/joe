@@ -2896,6 +2896,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.win.Win.html">Win</a>
 <ul>
+<li><a href="library/type.joe.win.Win.html#static.css">Win.css(<em>css</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Win.html#static.root">Win.root()</a> → <a href="library/type.joe.win.VBox.html">VBox</a></li>
 <li><a href="library/type.joe.win.Win.html#static.setSize">Win.setSize(<em>width</em>, <em>height</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Win.html#static.setTitle">Win.setTitle(<em>title</em>)</a> → this</li>
@@ -4616,6 +4617,7 @@ It assumes a familiarity with JavaFX.</p>
 <p><strong><a href="library/pkg.joe.win.html#topics">Topics</a></strong></p>
 <ul>
 <li><a href="library/pkg.joe.win.html#topic.hierarchy">Widget Hierarchy</a></li>
+<li><a href="library/pkg.joe.win.html#topic.css">Styling with CSS</a></li>
 </ul>
 <p><strong>Types</strong></p>
 <ul>
@@ -4655,6 +4657,23 @@ It assumes a familiarity with JavaFX.</p>
 </ul>
 </li>
 </ul>
+<h2 id="topic.css"><a class="header" href="#topic.css">Styling with CSS</a></h2>
+<hr />
+<p>Scripts can style widgets using CSS in several different ways.</p>
+<ul>
+<li>The <a href="library/type.joe.win.Win.html#static.css"><code>Win.css()</code></a> method associates a CSS stylesheet, passed
+as a text string, with the application as a whole.</li>
+<li>Each widget has a <a href="library/type.joe.win.Node.html#method.styleClasses"><code>styleClasses()</code></a> method which returns
+a list of the names of the CSS style classes that apply to the widget;
+add any desired style class name to this list.</li>
+<li>Each widget has a <code>#style</code> property which can be set to a string
+defining one or more CSS style settings, similar to the HTML
+<code>style</code> attribute.</li>
+</ul>
+<p>JavaFX styles widgets using its own peculiar form of CSS, called
+"FXCSS".  See the
+<a href="https://openjfx.io/javadoc/21/javafx.graphics/javafx/scene/doc-files/cssref.html"><em>JavaFX CSS Reference Guide</em></a>
+for details.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="control-type-joewin"><a class="header" href="#control-type-joewin"><code>Control</code> type (<code>joe.win</code>)</a></h1>
 <hr />
 <p><strong>Extends</strong>: <a href="library/type.joe.win.Region.html">Region</a><br>
@@ -4906,7 +4925,9 @@ all widgets.</p>
 <tr><td><code>#style</code></td><td><a href="library/type.joe.String.html"><code>String</code></a></td><td>FXCSS style string</td></tr>
 <tr><td><code>#visible</code></td><td><a href="library/type.joe.Boolean.html"><code>Boolean</code></a></td><td>Visibility flag</td></tr>
 </tbody></table>
-</div><h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
+</div>
+<p>See <a href="library/pkg.joe.win.html#topic.css">Styling with CSS</a> for more on using CSS.</p>
+<h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
 <p><span id="method.disable"> </span></p>
 <h3 id="nodedisable"><a class="header" href="#nodedisable"><em>node</em>.disable()</a></h3>
@@ -4958,13 +4979,15 @@ The <em>value</em> must be assignable to the property's value type.</p>
 <hr />
 <p><strong><em>node</em>.styleClasses() → <a href="library/type.joe.List.html">joe.List</a></strong></p>
 <p>Gets the list of the node's FXCSS style class names.  Values must
-be valid CSS style class strings.</p>
+be valid CSS style class names.</p>
+<p>See <a href="library/pkg.joe.win.html#topic.css">Styling with CSS</a> for more on using CSS.</p>
 <p><span id="method.styles"> </span></p>
 <h3 id="nodestyles"><a class="header" href="#nodestyles"><em>node</em>.styles()</a></h3>
 <hr />
 <p><strong><em>node</em>.styles(<em>style</em>, ...) → this</strong></p>
 <p>Sets the node's FXCSS <code>#style</code> property.  The caller can pass
 multiple style strings, which will be joined with semicolons.</p>
+<p>See <a href="library/pkg.joe.win.html#topic.css">Styling with CSS</a> for more on using CSS.</p>
 <p><span id="method.vgrow"> </span></p>
 <h3 id="nodevgrow"><a class="header" href="#nodevgrow"><em>node</em>.vgrow()</a></h3>
 <hr />
@@ -5394,12 +5417,28 @@ its parent <a href="library/type.joe.win.VBox.html"><code>VBox</code></a>, given
 <p>This static type provides access to the application window.</p>
 <p><strong><a href="library/type.joe.win.Win.html#statics">Static Methods</a></strong></p>
 <ul>
+<li><a href="library/type.joe.win.Win.html#static.css">Win.css(<em>css</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Win.html#static.root">Win.root()</a> → <a href="library/type.joe.win.VBox.html">VBox</a></li>
 <li><a href="library/type.joe.win.Win.html#static.setSize">Win.setSize(<em>width</em>, <em>height</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Win.html#static.setTitle">Win.setTitle(<em>title</em>)</a> → this</li>
 </ul>
 <h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
 <hr />
+<p><span id="static.css"> </span></p>
+<h3 id="wincss"><a class="header" href="#wincss">Win.css()</a></h3>
+<hr />
+<p><strong>Win.css(<em>css</em>) → this</strong></p>
+<p>Sets the text of the CSS style sheet for the application as a
+whole to <em>css</em>.  For example,</p>
+<pre><code class="language-joe">Win.css("""
+    .label { -fx-text-fill: pink; }
+    """);
+</code></pre>
+<p>See <a href="library/pkg.joe.win.html#topic.css">Styling with CSS</a> for more on using CSS in <code>joe win</code> scripts.</p>
+<p><strong>JavaFX:</strong> In particular, this adds the given CSS to the
+<code>Scene</code>'s <code>stylesheets</code> property as a <code>data:</code> URL containing
+the given <em>css</em> text. The styles are therefore accessible to
+the entire scene.</p>
 <p><span id="static.root"> </span></p>
 <h3 id="winroot"><a class="header" href="#winroot">Win.root()</a></h3>
 <hr />
@@ -5809,6 +5848,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.win.Win.html">Win</a>
 <ul>
+<li><a href="library/type.joe.win.Win.html#static.css">Win.css(<em>css</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Win.html#static.root">Win.root()</a> → <a href="library/type.joe.win.VBox.html">VBox</a></li>
 <li><a href="library/type.joe.win.Win.html#static.setSize">Win.setSize(<em>width</em>, <em>height</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Win.html#static.setTitle">Win.setTitle(<em>title</em>)</a> → this</li>

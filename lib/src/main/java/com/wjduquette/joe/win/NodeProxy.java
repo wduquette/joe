@@ -38,6 +38,8 @@ class NodeProxy extends FXProxy<Node> {
         // | `#id`      | [[joe.String]]   | JavaFX ID          |
         // | `#style`   | [[joe.String]]   | FXCSS style string |
         // | `#visible` | [[joe.Boolean]]  | Visibility flag    |
+        //
+        // See [[joe.win#topic.css]] for more on using CSS.
         fxProperty("id",      Node::idProperty,      Joe::toString);
         fxProperty("style",   Node::styleProperty,   Joe::toString);
         fxProperty("visible", Node::visibleProperty, Joe::toBoolean);
@@ -94,7 +96,9 @@ class NodeProxy extends FXProxy<Node> {
     // @method styleClasses
     // @result joe.List
     // Gets the list of the node's FXCSS style class names.  Values must
-    // be valid CSS style class strings.
+    // be valid CSS style class names.
+    //
+    // See [[joe.win#topic.css]] for more on using CSS.
     private Object _styleClasses(Node node, Joe joe, Args args) {
         Joe.exactArity(args, 0, "styleClasses()");
         return joe.wrapList(node.getStyleClass(), String.class);
@@ -106,6 +110,8 @@ class NodeProxy extends FXProxy<Node> {
     // @result this
     // Sets the node's FXCSS `#style` property.  The caller can pass
     // multiple style strings, which will be joined with semicolons.
+    //
+    // See [[joe.win#topic.css]] for more on using CSS.
     private Object _styles(Node node, Joe joe, Args args) {
         Joe.minArity(args, 1, "styles(style, ...)");
         var styles = args.asList().stream()

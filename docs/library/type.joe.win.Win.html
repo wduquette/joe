@@ -178,12 +178,28 @@
 <p>This static type provides access to the application window.</p>
 <p><strong><a href="#statics">Static Methods</a></strong></p>
 <ul>
+<li><a href="type.joe.win.Win.html#static.css">Win.css(<em>css</em>)</a> → this</li>
 <li><a href="type.joe.win.Win.html#static.root">Win.root()</a> → <a href="type.joe.win.VBox.html">VBox</a></li>
 <li><a href="type.joe.win.Win.html#static.setSize">Win.setSize(<em>width</em>, <em>height</em>)</a> → this</li>
 <li><a href="type.joe.win.Win.html#static.setTitle">Win.setTitle(<em>title</em>)</a> → this</li>
 </ul>
 <h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
 <hr />
+<p><span id="static.css"> </span></p>
+<h3 id="wincss"><a class="header" href="#wincss">Win.css()</a></h3>
+<hr />
+<p><strong>Win.css(<em>css</em>) → this</strong></p>
+<p>Sets the text of the CSS style sheet for the application as a
+whole to <em>css</em>.  For example,</p>
+<pre><code class="language-joe">Win.css("""
+    .label { -fx-text-fill: pink; }
+    """);
+</code></pre>
+<p>See <a href="pkg.joe.win.html#topic.css">Styling with CSS</a> for more on using CSS in <code>joe win</code> scripts.</p>
+<p><strong>JavaFX:</strong> In particular, this adds the given CSS to the
+<code>Scene</code>'s <code>stylesheets</code> property as a <code>data:</code> URL containing
+the given <em>css</em> text. The styles are therefore accessible to
+the entire scene.</p>
 <p><span id="static.root"> </span></p>
 <h3 id="winroot"><a class="header" href="#winroot">Win.root()</a></h3>
 <hr />
