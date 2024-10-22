@@ -31,6 +31,40 @@ public class WinPackage extends JoePackage {
     // @package joe.win
     // This package contains an experimental API for building JavaFX GUIs.
     // It assumes a familiarity with JavaFX.
+    //
+    // @packageTopic hierarchy
+    // @title Widget Hierarchy
+    //
+    // The `joe.win` widget type hierarchy is a subset of the JavaFX hierarchy.
+    //
+    // - [[Node]]: Base class
+    //   - [[Region]]: Nodes with geometry
+    //     - [[Control]]: Nodes to interact with
+    //       - [[Button]]: A button
+    //       - [[Label]]: A label
+    //     - [[Pane]]: Nodes that manage children
+    //       - [[HBox]]: A row of widgets
+    //       - [[StackPane]]: Widgets stacked like cards in a deck
+    //       - [[VBox]]: A column of widgets
+    //
+    // @packageTopic css
+    // @title Styling with CSS
+    //
+    // Scripts can style widgets using CSS in several different ways.
+    //
+    // - The [[Win#static.css]] method associates a CSS stylesheet, passed
+    //   as a text string, with the application as a whole.
+    // - Each widget has a [[Node#method.styleClasses]] method which returns
+    //   a list of the names of the CSS style classes that apply to the widget;
+    //   add any desired style class name to this list.
+    // - Each widget has a `#style` property which can be set to a string
+    //   defining one or more CSS style settings, similar to the HTML
+    //   `style` attribute.
+    //
+    // JavaFX styles widgets using its own peculiar form of CSS, called
+    // "FXCSS".  See the
+    // [*JavaFX CSS Reference Guide*](https://openjfx.io/javadoc/21/javafx.graphics/javafx/scene/doc-files/cssref.html)
+    // for details.
 
     public WinPackage(Stage stage, VBox root) {
         super("joe.win");
@@ -51,6 +85,7 @@ public class WinPackage extends JoePackage {
 
         // Panes
         type(PaneProxy.TYPE);
+        type(StackPaneProxy.TYPE);
         type(VBoxProxy.TYPE);
         type(HBoxProxy.TYPE);
 
@@ -90,41 +125,6 @@ public class WinPackage extends JoePackage {
         // Utility Classes
         type(InsetsProxy.TYPE);
     }
-
-    //**
-    // @packageTopic hierarchy
-    // @title Widget Hierarchy
-    //
-    // The `joe.win` widget type hierarchy is a subset of the JavaFX hierarchy.
-    //
-    // - [[Node]]: Base class
-    //   - [[Region]]: Nodes with geometry
-    //     - [[Control]]: Nodes to interact with
-    //       - [[Button]]: A button
-    //       - [[Label]]: A label
-    //     - [[Pane]]: Nodes that manage children
-    //       - [[HBox]]: A row of widgets
-    //       - [[VBox]]: A column of widgets
-
-    //**
-    // @packageTopic css
-    // @title Styling with CSS
-    //
-    // Scripts can style widgets using CSS in several different ways.
-    //
-    // - The [[Win#static.css]] method associates a CSS stylesheet, passed
-    //   as a text string, with the application as a whole.
-    // - Each widget has a [[Node#method.styleClasses]] method which returns
-    //   a list of the names of the CSS style classes that apply to the widget;
-    //   add any desired style class name to this list.
-    // - Each widget has a `#style` property which can be set to a string
-    //   defining one or more CSS style settings, similar to the HTML
-    //   `style` attribute.
-    //
-    // JavaFX styles widgets using its own peculiar form of CSS, called
-    // "FXCSS".  See the
-    // [*JavaFX CSS Reference Guide*](https://openjfx.io/javadoc/21/javafx.graphics/javafx/scene/doc-files/cssref.html)
-    // for details.
 
 
     //-------------------------------------------------------------------------

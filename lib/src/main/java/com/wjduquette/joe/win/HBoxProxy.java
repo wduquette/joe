@@ -3,6 +3,7 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.HBox;
@@ -24,10 +25,10 @@ class HBoxProxy extends FXProxy<HBox> {
         proxies(HBox.class);
         extendsProxy(PaneProxy.TYPE);
 
-        staticMethod("getMargin", this::_getMargin);
-        staticMethod("getHgrow",  this::_getHgrow);
-        staticMethod("setMargin", this::_setMargin);
-        staticMethod("setHgrow",  this::_setHgrow);
+        staticMethod("getHgrow",      this::_getHgrow);
+        staticMethod("getMargin",     this::_getMargin);
+        staticMethod("setHgrow",      this::_setHgrow);
+        staticMethod("setMargin",     this::_setMargin);
 
         // No initializer
         initializer(this::_initializer);
@@ -55,6 +56,17 @@ class HBoxProxy extends FXProxy<HBox> {
     // Static Methods
 
     //**
+    // @static getHgrow
+    // @args node
+    // @result Priority
+    // Gets how the [[Node]] will resize itself to the height of
+    // its parent [[HBox]].
+    private Object _getHgrow(Joe joe, Args args) {
+        Joe.exactArity(args, 1, "HBox.getHgrow(node)");
+        return HBox.getHgrow(joe.toClass(args.next(), Node.class));
+    }
+
+    //**
     // @static getMargin
     // @args node
     // @result Insets
@@ -65,14 +77,17 @@ class HBoxProxy extends FXProxy<HBox> {
     }
 
     //**
-    // @static getHgrow
-    // @args node
-    // @result Priority
-    // Gets how the [[Node]] will resize itself to the height of
-    // its parent [[HBox]].
-    private Object _getHgrow(Joe joe, Args args) {
-        Joe.exactArity(args, 1, "HBox.getHgrow(node)");
-        return HBox.getHgrow(joe.toClass(args.next(), Node.class));
+    // @static setHgrow
+    // @args node, priority
+    // Sets how the [[Node]] will resize itself to the height of
+    // its parent [[HBox]], given a [[Priority]] value.
+    private Object _setHgrow(Joe joe, Args args) {
+        Joe.exactArity(args, 2, "HBox.setHgrow(node, priority)");
+        HBox.setHgrow(
+            joe.toClass(args.next(), Node.class),
+            joe.toClass(args.next(), Priority.class)
+        );
+        return null;
     }
 
     //**
@@ -89,19 +104,6 @@ class HBoxProxy extends FXProxy<HBox> {
         return null;
     }
 
-    //**
-    // @static setHgrow
-    // @args node, priority
-    // Sets how the [[Node]] will resize itself to the height of
-    // its parent [[HBox]], given a [[Priority]] value.
-    private Object _setHgrow(Joe joe, Args args) {
-        Joe.exactArity(args, 2, "HBox.setHgrow(node, priority)");
-        HBox.setHgrow(
-            joe.toClass(args.next(), Node.class),
-            joe.toClass(args.next(), Priority.class)
-        );
-        return null;
-    }
 
     //-------------------------------------------------------------------------
     // Initializer

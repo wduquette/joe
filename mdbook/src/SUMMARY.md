@@ -69,6 +69,7 @@
     - [Pos Type](library/type.joe.win.Pos.md);
     - [Priority Type](library/type.joe.win.Priority.md);
     - [Region Type](library/type.joe.win.Region.md);
+    - [StackPane Type](library/type.joe.win.StackPane.md);
     - [VBox Type](library/type.joe.win.VBox.md);
     - [Win Type](library/type.joe.win.Win.md);
   - [Library API Index](./library/index.md)
