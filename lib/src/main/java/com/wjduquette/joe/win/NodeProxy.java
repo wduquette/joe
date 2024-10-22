@@ -3,6 +3,7 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import javafx.scene.Node;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
@@ -46,6 +47,7 @@ class NodeProxy extends FXProxy<Node> {
 
         // Methods
         method("disable",         this::_disable);
+        method("hgrow",           this::_hgrow);
         method("id",              this::_id);
         method("isDisabled",      this::_isDisabled);
         method("styleClasses",    this::_styleClasses);
@@ -68,6 +70,26 @@ class NodeProxy extends FXProxy<Node> {
         Joe.arityRange(args, 0, 1, "disable([flag])");
         var flag = args.isEmpty() || Joe.isTruthy(args.next());
         node.setDisable(flag);
+        return node;
+    }
+
+    //**
+    // @method hgrow
+    // @args [priority]
+    // @result this
+    // Sets the [[HBox]] `hgrow` constraint for the node to the
+    // given [[Priority]], or to `Priority.ALWAYS` if the priority
+    // is omitted.
+    //
+    // This method is equivalent to the JavaFX `HBox.setHgrow()`
+    // method.
+    private Object _hgrow(Node node, Joe joe, Args args) {
+        Joe.arityRange(args, 0, 1, "hgrow([priority]");
+        if (args.isEmpty()) {
+            HBox.setHgrow(node, Priority.ALWAYS);
+        } else {
+            HBox.setHgrow(node, joe.toEnum(args.next(), Priority.class));
+        }
         return node;
     }
 

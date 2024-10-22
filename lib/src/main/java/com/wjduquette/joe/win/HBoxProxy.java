@@ -5,29 +5,29 @@ import com.wjduquette.joe.Joe;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 
-class VBoxProxy extends FXProxy<VBox> {
-    public static final VBoxProxy TYPE = new VBoxProxy();
+class HBoxProxy extends FXProxy<HBox> {
+    public static final HBoxProxy TYPE = new HBoxProxy();
 
     //-------------------------------------------------------------------------
     // Constructor
 
     //**
     // @package joe.win
-    // @type VBox
+    // @type HBox
     // @extends Pane
-    // The `VBox` type is a [[Pane]] that manages a column of
+    // The `HBox` type is a [[Pane]] that manages a row of
     // widgets.
-    public VBoxProxy() {
-        super("VBox");
-        proxies(VBox.class);
+    public HBoxProxy() {
+        super("HBox");
+        proxies(HBox.class);
         extendsProxy(PaneProxy.TYPE);
 
         staticMethod("getMargin", this::_getMargin);
-        staticMethod("getVgrow",  this::_getVgrow);
+        staticMethod("getHgrow",  this::_getHgrow);
         staticMethod("setMargin", this::_setMargin);
-        staticMethod("setVgrow",  this::_setVgrow);
+        staticMethod("setHgrow",  this::_setHgrow);
 
         // No initializer
         initializer(this::_initializer);
@@ -35,7 +35,7 @@ class VBoxProxy extends FXProxy<VBox> {
         //**
         // ## Properties
         //
-        // `VBox` widgets have the following properties, in addition to
+        // `HBox` widgets have the following properties, in addition to
         // those inherited from superclasses.
         //
         // | Property     | Type           | Description                |
@@ -44,8 +44,8 @@ class VBoxProxy extends FXProxy<VBox> {
         // | `#spacing`   | [[joe.Number]] | The spacing between children in pixels |
 
         // Properties
-        fxProperty("alignment", VBox::alignmentProperty, WinPackage::toPos);
-        fxProperty("spacing",   VBox::spacingProperty,   Joe::toDouble);
+        fxProperty("alignment", HBox::alignmentProperty, WinPackage::toPos);
+        fxProperty("spacing",   HBox::spacingProperty,   Joe::toDouble);
 
         // Methods
         method("spacing", this::_spacing);
@@ -58,31 +58,31 @@ class VBoxProxy extends FXProxy<VBox> {
     // @static getMargin
     // @args node
     // @result Insets
-    // Gets the [[Node]]'s margin in its parent [[VBox]].
+    // Gets the [[Node]]'s margin in its parent [[HBox]].
     private Object _getMargin(Joe joe, Args args) {
-        Joe.exactArity(args, 1, "VBox.getMargin(node)");
-        return VBox.getMargin(joe.toClass(args.next(), Node.class));
+        Joe.exactArity(args, 1, "HBox.getMargin(node)");
+        return HBox.getMargin(joe.toClass(args.next(), Node.class));
     }
 
     //**
-    // @static getVgrow
+    // @static getHgrow
     // @args node
     // @result Priority
     // Gets how the [[Node]] will resize itself to the height of
-    // its parent [[VBox]].
-    private Object _getVgrow(Joe joe, Args args) {
-        Joe.exactArity(args, 1, "VBox.getVgrow(node)");
-        return VBox.getVgrow(joe.toClass(args.next(), Node.class));
+    // its parent [[HBox]].
+    private Object _getHgrow(Joe joe, Args args) {
+        Joe.exactArity(args, 1, "HBox.getHgrow(node)");
+        return HBox.getHgrow(joe.toClass(args.next(), Node.class));
     }
 
     //**
     // @static setMargin
     // @args node, insets
-    // Gets the [[Node]]'s margin in its parent [[VBox]] given an
+    // Gets the [[Node]]'s margin in its parent [[HBox]] given an
     // [[Insets]] object.
     private Object _setMargin(Joe joe, Args args) {
-        Joe.exactArity(args, 2, "VBox.setMargin(node, insets)");
-        VBox.setMargin(
+        Joe.exactArity(args, 2, "HBox.setMargin(node, insets)");
+        HBox.setMargin(
             joe.toClass(args.next(), Node.class),
             joe.toClass(args.next(), Insets.class)
         );
@@ -90,13 +90,13 @@ class VBoxProxy extends FXProxy<VBox> {
     }
 
     //**
-    // @static setVgrow
+    // @static setHgrow
     // @args node, priority
     // Sets how the [[Node]] will resize itself to the height of
-    // its parent [[VBox]], given a [[Priority]] value.
-    private Object _setVgrow(Joe joe, Args args) {
-        Joe.exactArity(args, 2, "VBox.setVgrow(node, priority)");
-        VBox.setVgrow(
+    // its parent [[HBox]], given a [[Priority]] value.
+    private Object _setHgrow(Joe joe, Args args) {
+        Joe.exactArity(args, 2, "HBox.setHgrow(node, priority)");
+        HBox.setHgrow(
             joe.toClass(args.next(), Node.class),
             joe.toClass(args.next(), Priority.class)
         );
@@ -108,10 +108,10 @@ class VBoxProxy extends FXProxy<VBox> {
 
     //**
     // @init
-    // Returns a `VBox`.
+    // Returns a `HBox`.
     private Object _initializer(Joe joe, Args args) {
-        Joe.exactArity(args, 0, "VBox()");
-        return new VBox();
+        Joe.exactArity(args, 0, "HBox()");
+        return new HBox();
     }
 
     //-------------------------------------------------------------------------
@@ -122,7 +122,7 @@ class VBoxProxy extends FXProxy<VBox> {
     // @args pixels
     // @result this
     // Sets the vertical space in *pixels* between each child.
-    private Object _spacing(VBox node, Joe joe, Args args) {
+    private Object _spacing(HBox node, Joe joe, Args args) {
         Joe.exactArity(args, 1, "spacing(pixels)");
         node.setSpacing(joe.toDouble(args.next()));
         return node;

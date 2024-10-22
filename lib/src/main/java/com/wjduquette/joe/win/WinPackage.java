@@ -52,6 +52,7 @@ public class WinPackage extends JoePackage {
         // Panes
         type(PaneProxy.TYPE);
         type(VBoxProxy.TYPE);
+        type(HBoxProxy.TYPE);
 
         // Enums
 
@@ -102,7 +103,8 @@ public class WinPackage extends JoePackage {
     //       - [[Button]]: A button
     //       - [[Label]]: A label
     //     - [[Pane]]: Nodes that manage children
-    //       - [[VBox]]: A vertical stack of widgets
+    //       - [[HBox]]: A row of widgets
+    //       - [[VBox]]: A column of widgets
 
     //**
     // @packageTopic css

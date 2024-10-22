@@ -61,6 +61,7 @@
   - [GUI API (joe.win)](./library/pkg.joe.win.md)
     - [Control Type](library/type.joe.win.Control.md);
     - [Button Type](library/type.joe.win.Button.md);
+    - [HBox Type](library/type.joe.win.HBox.md);
     - [Insets Type](library/type.joe.win.Insets.md);
     - [Label Type](library/type.joe.win.Label.md);
     - [Node Type](library/type.joe.win.Node.md);
