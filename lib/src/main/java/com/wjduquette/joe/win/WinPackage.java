@@ -145,6 +145,7 @@ public class WinPackage extends JoePackage {
             super("Win");
             staticType();
             staticMethod("css",      this::_css);
+            staticMethod("cssFile",  this::_cssFile);
             staticMethod("root",     this::_root);
             staticMethod("setSize",  this::_setSize);
             staticMethod("setTitle", this::_setTitle);
@@ -181,6 +182,31 @@ public class WinPackage extends JoePackage {
                 .encodeToString(css.getBytes(StandardCharsets.UTF_8));
             stage.getScene().getStylesheets()
                 .add("data:text/css;base64," + encoded);
+            return this;
+        }
+
+        //**
+        // @static cssFile
+        // @args filename
+        // @result this
+        // Sets the CSS style sheet for the application as a whole given
+        // a path to a `.css` file.
+        //
+        // ```joe
+        // Win.cssFill("my.css");
+        // ```
+        //
+        // See [[joe.win#topic.css]] for more on using CSS in `joe win` scripts.
+        //
+        // **JavaFX:** In particular, this adds the given CSS file to the
+        // `Scene`'s `stylesheets` property as a `file:` URL. The styles are
+        // therefore accessible to // the entire scene.
+        private Object _cssFile(Joe joe, Args args) {
+            Joe.exactArity(args, 1, "cssFile(filename)");
+            var filename = joe.toString(args.next());
+
+            stage.getScene().getStylesheets()
+                .add("file:" + filename);
             return this;
         }
 
