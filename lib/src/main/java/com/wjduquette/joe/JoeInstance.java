@@ -7,8 +7,13 @@ class JoeInstance implements JoeObject {
     private final JoeClass joeClass;
     private final Map<String, Object> fields = new HashMap<>();
 
-    JoeInstance(JoeClass klass) {
-        this.joeClass = klass;
+    JoeInstance(JoeClass joeClass) {
+        this.joeClass = joeClass;
+    }
+
+    @Override
+    public String typeName() {
+        return joeClass.name();
     }
 
     @Override
@@ -17,8 +22,8 @@ class JoeInstance implements JoeObject {
             return fields.get(name);
         }
 
-        JoeFunction method = joeClass.findMethod(name);
-        if (method != null) return method.bind(this);
+        JoeCallable method = joeClass.bind(this, name);
+        if (method != null) return method;
 
         throw new JoeError("Undefined property '" + name + "'.");
     }

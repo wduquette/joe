@@ -61,6 +61,25 @@ function testStaticInitializer() {
     check(WithStatics.howdy()).eq(#howdy);
 }
 
+function testCanSubclass() {
+    class Parent {
+        method init(taste) { this.taste = taste; }
+        method getTaste() { return this.taste; }
+    }
+
+    class Child extends Parent {
+        method init(taste, color) {
+            super.init(taste);
+            this.color = color;
+        }
+        method getColor() { return this.color; }
+    }
+
+    var kid = Child(#sweet, #red);
+    check(kid.getTaste()).eq(#sweet);
+    check(kid.getColor()).eq(#red);
+}
+
 //-----------------------------------------------------------------------------
 // Helpers
 

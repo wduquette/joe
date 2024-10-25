@@ -220,6 +220,11 @@ public class Tuple implements JoeObject, JoeToString {
 
 
     @Override
+    public String typeName() {
+        return "Tuple";
+    }
+
+    @Override
     public Object get(String name) {
         var keyword = new Keyword(name);
         var value = fields.get(keyword);

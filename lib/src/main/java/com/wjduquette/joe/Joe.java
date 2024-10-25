@@ -116,7 +116,7 @@ public class Joe {
         }
 
         // NEXT, install the type into the environment.
-        globals.setVar(typeProxy.getTypeName(), typeProxy);
+        globals.setVar(typeProxy.name(), typeProxy);
     }
 
     /**
@@ -457,15 +457,15 @@ public class Joe {
     public String typeName(Object value) {
         return switch (value) {
             case null -> null;
-            case JoeFunction function -> "<" + function.kind() + " " + function.name() + ">";
-            case NativeFunction function -> "<native " + function.name() + ">";
-            case TypeProxy<?> proxy -> "<proxy " + proxy.getTypeName() + ">";
-            case JoeClass cls -> "<class " + cls.name() + ">";
-            case JoeInstance obj -> obj.joeClass().name();
+            case JoeFunction function -> "<" + function.kind() + ">";
+            case NativeMethod<?> ignored -> "<native method>";
+            case NativeFunction ignored -> "<native function>";
+            case JoeObject obj -> obj.typeName();
             default -> {
-                var proxy = lookupProxy(value);
-                yield proxy != null
-                    ? proxy.getTypeName()
+                // If it's a native type, try to get bind to a type proxy.
+                var bound = getJoeObject(value);
+                yield bound != null
+                    ? bound.typeName()
                     : "<java " + value.getClass().getCanonicalName() + ">";
             }
         };
@@ -479,7 +479,7 @@ public class Joe {
     public String classTypeName(Class<?> cls) {
         var proxy = lookupProxyByClass(cls);
         return proxy != null
-            ? proxy.getTypeName() : cls.getSimpleName();
+            ? proxy.name() : cls.getSimpleName();
     }
 
     /**

@@ -1,106 +1,40 @@
 package com.wjduquette.joe;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * A class defined in a Joe script.
- */
-class JoeClass implements JoeObject, JoeCallable {
-    public static final String INIT = "init";
-
-    //-------------------------------------------------------------------------
-    // Instance Variables
-
-    // The class name
-    private final String name;
-
-    // The superclass, or null
-    private final JoeClass superclass;
-
-    // Static methods and constants
-    private final Map<String, JoeFunction> staticMethods;
-    private final Map<String, Object> fields = new HashMap<>();
-
-    // JoeInstance Instance Methods
-    private final Map<String, JoeFunction> methods;
-
-    //-------------------------------------------------------------------------
-    // Constructor
+public interface JoeClass extends JoeCallable {
+    /**
+     * The name for a class's initializer method.
+     */
+    String INIT = "init";
 
     /**
-     * Creates a new class.
-     * @param name The class's variable name.
-     * @param superclass The superclass, or null
-     * @param methods The map of methods by name
+     * Gets the class's name.
+     * @return The name
      */
-    JoeClass(
-        String name,
-        JoeClass superclass,
-        Map<String, JoeFunction> staticMethods,
-        Map<String, JoeFunction> methods
-    ) {
-        this.name = name;
-        this.superclass = superclass;
-        this.staticMethods = staticMethods;
-        this.methods = methods;
+    String name();
+
+    /**
+     * Returns a callable that binds the named method
+     * to the value, or null if the method was not found.
+     * @param value The value
+     * @param name The method name
+     * @return The bound callable
+     */
+    JoeCallable bind(Object value, String name);
+
+    /**
+     * Whether or not this class can be extended by a subclass.
+     * @return true or false
+     */
+    default boolean canBeExtended() {
+        return false;
     }
 
-    //-------------------------------------------------------------------------
-    // JoeClass API
-
-    public String name() {
-        return name;
-    }
-
-    JoeFunction findMethod(String name) {
-        if (methods.containsKey(name)) {
-            return methods.get(name);
-        }
-
-        if (superclass != null) {
-            return superclass.findMethod(name);
-        }
-
-        return null;
-    }
-
-    @Override
-    public Object call(Joe joe, Args args) {
-        JoeInstance instance = new JoeInstance(this);
-        JoeFunction initializer = findMethod(INIT);
-        if (initializer != null) {
-            initializer.bind(instance).call(joe, args);
-        }
-        return instance;
-    }
-
-    //-------------------------------------------------------------------------
-    // JoeObject API
-
-    @Override
-    public Object get(String name) {
-        if (fields.containsKey(name)) {
-            return fields.get(name);
-        }
-
-        if (staticMethods.containsKey(name)) {
-            return staticMethods.get(name);
-        }
-
-        throw new JoeError("Undefined property '" + name + "'.");
-    }
-
-    @Override
-    public void set(String name, Object value) {
-        fields.put(name, value);
-    }
-
-    //-------------------------------------------------------------------------
-    // Object API
-
-    @Override
-    public String toString() {
-        return "<class " + name + ">";
+    /**
+     * Creates an instance of the class.
+     * @param joeClass The actual parent class, either this class or a subclass.
+     * @return The instance
+     */
+    default JoeObject make(JoeClass joeClass) {
+        throw new UnsupportedOperationException();
     }
 }

@@ -8,13 +8,13 @@ import java.util.function.Function;
  * metadata and services for the type.
  * @param <V> The native value type
  */
-public class TypeProxy<V> implements JoeObject, JoeCallable {
+public class TypeProxy<V> implements JoeObject, JoeClass {
     //-------------------------------------------------------------------------
     // Instance Variables
 
     // Type V's script-level name.  May differ from the Java-level
     // name.
-    private final String typeName;
+    private final String name;
 
     // Static methods and constants
     private boolean isStatic = false;
@@ -49,7 +49,7 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
      * @param name The name
      */
     public TypeProxy(String name) {
-        this.typeName = name;
+        this.name = name;
     }
 
     //-------------------------------------------------------------------------
@@ -109,7 +109,7 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
      * @param callable The callable
      */
     public void initializer(JoeCallable callable) {
-        this.initializer = new NativeFunction(typeName, "initializer", callable);
+        this.initializer = new NativeFunction(name, "initializer", callable);
     }
 
     /**
@@ -149,7 +149,7 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
 
     @Override
     public void set(String name, Object value) {
-        throw new JoeError("Type " + typeName + " has no settable properties.");
+        throw new JoeError("Type " + this.name + " has no settable properties.");
     }
 
     //-------------------------------------------------------------------------
@@ -186,10 +186,10 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
         if (initializer != null) {
             return initializer.call(joe, args);
         } else if (isStatic) {
-            throw new JoeError("Type " + typeName +
+            throw new JoeError("Type " + name +
                 " is static and cannot be initialized.");
         } else {
-            throw new JoeError("Type " + typeName +
+            throw new JoeError("Type " + name +
                 " cannot be instantiated at the script level.");
         }
     }
@@ -231,7 +231,7 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
      * @throws JoeError if the method is not found.
      */
     @SuppressWarnings("unchecked")
-    JoeCallable bind(Object value, String name) {
+    public JoeCallable bind(Object value, String name) {
         var method = methods.get(name);
 
         if (method != null) {
@@ -239,7 +239,7 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
         } else if (superProxy != null) {
             return superProxy.bind(value, name);
         } else {
-            throw new JoeError("Undefined property '" + name + "'.");
+            return null;
         }
     }
 
@@ -251,8 +251,17 @@ public class TypeProxy<V> implements JoeObject, JoeCallable {
      * Java name.
      * @return The name
      */
-    public final String getTypeName() {
-        return typeName;
+    public final String name() {
+        return name;
+    }
+
+    /**
+     * As a JoeObject, the proxy needs a typeName.  It's simply a
+     * "{@code &lt;type&gt;}".
+     * @return The name.
+     */
+    public final String typeName() {
+        return "<native type>";
     }
 
     /**

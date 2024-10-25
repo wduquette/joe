@@ -31,9 +31,9 @@ function testTypeName() {
     check(typeName(1)).eq("Number");
     check(typeName("abc")).eq("String");
     check(typeName(thing)).eq("Thing");
-    check(typeName(howdy)).eq("<function howdy>");
-    check(typeName(Thing)).eq("<class Thing>");
-    check(typeName(typeName)).eq("<native typeName>");
-    check(typeName(String)).eq("<proxy String>");
+    check(typeName(howdy)).eq("<function>");
+    check(typeName(Thing)).eq("<class>");
+    check(typeName(typeName)).eq("<native function>");
+    check(typeName(String)).eq("<native type>");
 }
 

@@ -70,6 +70,10 @@ class Interpreter {
                 if (stmt.superclass() != null) {
                     var object = evaluate(stmt.superclass());
                     if (object instanceof JoeClass sc) {
+                        if (!sc.canBeExtended()) {
+                            throw new RuntimeError(stmt.superclass().name(),
+                                "Type " + sc.name() + " cannot be subclassed.");
+                        }
                         superclass = sc;
                     } else {
                         throw new RuntimeError(stmt.superclass().name(),
@@ -102,9 +106,8 @@ class Interpreter {
                     methods.put(method.name().lexeme(), function);
                 }
 
-                JoeClass klass =
-                    new JoeClass(stmt.name().lexeme(),
-                        superclass, staticMethods, methods);
+                JoeClass klass = new ScriptedClass(stmt.name().lexeme(),
+                    superclass, staticMethods, methods);
 
                 if (superclass != null) {
                     // Pop the "super" environment.
@@ -444,10 +447,10 @@ class Interpreter {
                 int distance = locals.get(expr);
                 JoeClass superclass = (JoeClass)environment.getAt(
                     distance, "super");
-                JoeInstance instance = (JoeInstance)environment.getAt(
+                JoeObject instance = (JoeObject)environment.getAt(
                     distance - 1, "this");
-                JoeFunction method =
-                    superclass.findMethod(expr.method().lexeme());
+                JoeCallable method =
+                    superclass.bind(instance, expr.method().lexeme());
 
                 if (method == null) {
                     throw new RuntimeError(expr.method(),
@@ -455,7 +458,7 @@ class Interpreter {
                             expr.method().lexeme() + "'.");
                 }
 
-                yield method.bind(instance);
+                yield method;
             }
             // Handle `this.<property>` in methods
             case Expr.This expr -> lookupVariable(expr.keyword(), expr);

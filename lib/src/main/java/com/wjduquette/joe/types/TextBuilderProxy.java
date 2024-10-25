@@ -2,30 +2,33 @@ package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.*;
 
-public class StringBuilderProxy extends TypeProxy<StringBuilder> {
+public class TextBuilderProxy extends TypeProxy<TextBuilder> {
     /**
      * The proxy's TYPE constant.
      */
-    public static final StringBuilderProxy TYPE = new StringBuilderProxy();
+    public static final TextBuilderProxy TYPE = new TextBuilderProxy();
 
     //-------------------------------------------------------------------------
     // Constructor
 
     //**
     // @package joe
-    // @type StringBuilder
-    // A Joe `StringBuilder` is a Java `StringBuilder`, with a variety of
-    // methods.
+    // @type TextBuilder
+    // `TextBuilder` is a native type similar to a Java `StringBuilder`; it's
+    // used for building up text strings a little at a time.
+    //
+    // Joe classes can extend the `TextBuilder` type.
 
     /**
      * Creates the proxy.
      */
-    public StringBuilderProxy() {
-        super("StringBuilder");
-        proxies(StringBuilder.class);
+    public TextBuilderProxy() {
+        super("TextBuilder");
+        proxies(TextBuilder.class);
         initializer(this::_init);
 
         method("append",   this::_append);
+        method("clear",    this::_clear);
         method("print",    this::_print);
         method("printf",   this::_printf);
         method("println",  this::_println);
@@ -33,14 +36,28 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     }
 
     //-------------------------------------------------------------------------
+    // JoeClass API
+
+    @Override
+    public boolean canBeExtended() {
+        return true;
+    }
+
+    @Override
+    public JoeObject make(JoeClass joeClass) {
+        return new TextBuilder(joeClass);
+    }
+
+
+    //-------------------------------------------------------------------------
     // Initializer Implementation
 
     //**
     // @init
-    // Creates an empty `StringBuilder`.
+    // Creates an empty `TextBuilder`.
     private Object _init(Joe joe, Args args) {
-        Joe.exactArity(args, 0, "StringBuilder()");
-        return new StringBuilder();
+        Joe.exactArity(args, 0, "TextBuilder()");
+        return make(this);
     }
 
     //-------------------------------------------------------------------------
@@ -51,9 +68,19 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     // @args value
     // @result this
     // Adds the value to the buffer.
-    private Object _append(StringBuilder buff, Joe joe, Args args) {
+    private Object _append(TextBuilder buff, Joe joe, Args args) {
         Joe.exactArity(args, 1, "append(value)");
         buff.append(joe.stringify(args.next()));
+        return buff;
+    }
+
+    //**
+    // @method clear
+    // @result this
+    // Clears the buffer.
+    private Object _clear(TextBuilder buff, Joe joe, Args args) {
+        Joe.exactArity(args, 0, "clear()");
+        buff.clear();
         return buff;
     }
 
@@ -62,7 +89,7 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     // @args value
     // @result this
     // Adds the value to the buffer.
-    private Object _print(StringBuilder buff, Joe joe, Args args) {
+    private Object _print(TextBuilder buff, Joe joe, Args args) {
         Joe.exactArity(args, 1, "print(value)");
         buff.append(joe.stringify(args.next()));
         return buff;
@@ -74,7 +101,7 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     // Formats its arguments given the *fmt* string, and appends the result
     // to the buffer.  See [[String#topic.formatting]] for the format
     // string syntax.
-    private Object _printf(StringBuilder buff, Joe joe, Args args) {
+    private Object _printf(TextBuilder buff, Joe joe, Args args) {
         Joe.minArity(args, 1, "printf(fmt, [values]...)");
         var fmt = joe.toString(args.next());
 
@@ -87,7 +114,7 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     // @args value
     // @result this
     // Adds the value to the buffer, followed by a new line.
-    private Object _println(StringBuilder buff, Joe joe, Args args) {
+    private Object _println(TextBuilder buff, Joe joe, Args args) {
         Joe.exactArity(args, 1, "println(value)");
         buff.append(joe.stringify(args.next())).append("\n");
         return buff;
@@ -97,7 +124,7 @@ public class StringBuilderProxy extends TypeProxy<StringBuilder> {
     // @method toString
     // @result String
     // Returns the string.
-    private Object _toString(StringBuilder buff, Joe joe, Args args) {
+    private Object _toString(TextBuilder buff, Joe joe, Args args) {
         Joe.exactArity(args, 0, "toString()");
         return buff.toString();
     }
