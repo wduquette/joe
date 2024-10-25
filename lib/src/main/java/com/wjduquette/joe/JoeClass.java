@@ -18,7 +18,7 @@ public interface JoeClass extends JoeCallable {
      * Whether or not this class can be subclassed.
      * @return true or false
      */
-    default boolean canSubclass() {
+    default boolean canBeSubclassed() {
         return false;
     }
 }
