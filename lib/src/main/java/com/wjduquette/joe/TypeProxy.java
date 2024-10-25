@@ -261,7 +261,7 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
      * @return The name.
      */
     public final String typeName() {
-        return "<type>";
+        return "<native type>";
     }
 
     /**
