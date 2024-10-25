@@ -65,7 +65,7 @@ public class EnumProxy<E extends Enum<E>> extends TypeProxy<E> {
     // Initializer
 
     private Object _initializer(Joe joe, Args args) {
-        Joe.exactArity(args, 1, getTypeName() + "(value)");
+        Joe.exactArity(args, 1, name() + "(value)");
         return joe.toEnum(args.next(), cls);
     }
 
@@ -73,7 +73,7 @@ public class EnumProxy<E extends Enum<E>> extends TypeProxy<E> {
     // Static Methods
 
     private Object _values(Joe joe, Args args) {
-        Joe.exactArity(args, 0, getTypeName() + ".values()");
+        Joe.exactArity(args, 0, name() + ".values()");
         var list = new ListValue();
         Collections.addAll(list, cls.getEnumConstants());
         return list;

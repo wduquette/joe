@@ -55,13 +55,15 @@ class ScriptedClass implements JoeClass, JoeObject {
     }
 
     @Override
-    public JoeFunction findMethod(String name) {
-        if (methods.containsKey(name)) {
-            return methods.get(name);
+    public JoeCallable bind(Object value, String name) {
+        var method = methods.get(name);
+
+        if (method != null) {
+            return method.bind((JoeInstance)value);
         }
 
         if (superclass != null) {
-            return superclass.findMethod(name);
+            return superclass.bind(value, name);
         }
 
         return null;
@@ -70,9 +72,9 @@ class ScriptedClass implements JoeClass, JoeObject {
     @Override
     public Object call(Joe joe, Args args) {
         JoeInstance instance = new JoeInstance(this);
-        JoeFunction initializer = findMethod(INIT);
+        JoeCallable initializer = bind(instance, INIT);
         if (initializer != null) {
-            initializer.bind(instance).call(joe, args);
+            initializer.call(joe, args);
         }
         return instance;
     }

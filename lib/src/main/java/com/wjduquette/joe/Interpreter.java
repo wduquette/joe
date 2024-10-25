@@ -72,7 +72,7 @@ class Interpreter {
                     if (object instanceof JoeClass sc) {
                         if (!sc.canBeSubclassed()) {
                             throw new RuntimeError(stmt.superclass().name(),
-                                "This class cannot be subclassed.");
+                                "Type " + sc.name() + " cannot be subclassed.");
                         }
                         superclass = sc;
                     } else {
@@ -449,8 +449,8 @@ class Interpreter {
                     distance, "super");
                 JoeInstance instance = (JoeInstance)environment.getAt(
                     distance - 1, "this");
-                JoeFunction method =
-                    superclass.findMethod(expr.method().lexeme());
+                JoeCallable method =
+                    superclass.bind(instance, expr.method().lexeme());
 
                 if (method == null) {
                     throw new RuntimeError(expr.method(),
@@ -458,7 +458,7 @@ class Interpreter {
                             expr.method().lexeme() + "'.");
                 }
 
-                yield method.bind(instance);
+                yield method;
             }
             // Handle `this.<property>` in methods
             case Expr.This expr -> lookupVariable(expr.keyword(), expr);

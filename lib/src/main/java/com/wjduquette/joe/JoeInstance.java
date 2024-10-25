@@ -17,8 +17,8 @@ class JoeInstance implements JoeObject {
             return fields.get(name);
         }
 
-        JoeFunction method = joeClass.findMethod(name);
-        if (method != null) return method.bind(this);
+        JoeCallable method = joeClass.bind(this, name);
+        if (method != null) return method;
 
         throw new JoeError("Undefined property '" + name + "'.");
     }

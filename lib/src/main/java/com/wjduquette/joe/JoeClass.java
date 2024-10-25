@@ -8,11 +8,13 @@ public interface JoeClass extends JoeCallable {
     String name();
 
     /**
-     * Finds an instance method, by name.
+     * Returns a callable that binds the named method
+     * to the value, or null if the method was not found.
+     * @param value The value
      * @param name The method name
-     * @return The bound function
+     * @return The bound callable
      */
-    JoeFunction findMethod(String name);
+    JoeCallable bind(Object value, String name);
 
     /**
      * Whether or not this class can be subclassed.
