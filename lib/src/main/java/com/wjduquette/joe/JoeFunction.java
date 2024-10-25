@@ -68,7 +68,7 @@ public final class JoeFunction implements JoeCallable {
         return declaration.kind();
     }
 
-    JoeFunction bind(JoeInstance instance) {
+    JoeFunction bind(JoeObject instance) {
         Environment environment = new Environment(closure);
         environment.setVar("this", instance);
         return new JoeFunction(declaration, environment, isInitializer);

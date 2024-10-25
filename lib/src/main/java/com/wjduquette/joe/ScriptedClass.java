@@ -67,7 +67,7 @@ class ScriptedClass implements JoeClass, JoeObject {
         var method = methods.get(name);
 
         if (method != null) {
-            return method.bind((JoeInstance)value);
+            return method.bind((JoeObject)value);
         }
 
         if (superclass != null) {

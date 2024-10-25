@@ -447,7 +447,7 @@ class Interpreter {
                 int distance = locals.get(expr);
                 JoeClass superclass = (JoeClass)environment.getAt(
                     distance, "super");
-                JoeInstance instance = (JoeInstance)environment.getAt(
+                JoeObject instance = (JoeObject)environment.getAt(
                     distance - 1, "this");
                 JoeCallable method =
                     superclass.bind(instance, expr.method().lexeme());

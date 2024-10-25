@@ -1,0 +1,85 @@
+// Tests for the TextBuilder type.
+
+//-----------------------------------------------------------------------------
+// Basic Usage
+
+function testEmpty() {
+    var buff = TextBuilder();
+    check(buff.toString()).eq("");
+}
+
+function testAppend() {
+    var buff = TextBuilder();
+    buff.append("a")
+        .append("b")
+        .append("c");
+    check(buff.toString()).eq("abc");
+}
+
+function testClear() {
+    var buff = TextBuilder();
+    buff.append("a")
+        .append("b")
+        .append("c");
+    buff.clear();
+    check(buff.toString()).eq("");
+}
+
+function testPrint() {
+    var buff = TextBuilder();
+    buff.print("a")
+        .print("b")
+        .print("c");
+    check(buff.toString()).eq("abc");
+}
+
+function testPrintln() {
+    var buff = TextBuilder();
+    buff.println("a")
+        .println("b")
+        .println("c");
+    check(buff.toString()).eq("a\nb\nc\n");
+}
+
+function testPrintf() {
+    var buff = TextBuilder();
+    buff.printf("%04d", 1);
+    check(buff.toString()).eq("0001");
+}
+
+//-----------------------------------------------------------------------------
+// Object Properties
+
+function testFields() {
+    var buff = TextBuilder();
+    buff.name = "Fred";
+    check(buff.name).eq("Fred");
+}
+
+//-----------------------------------------------------------------------------
+// Subclassing
+
+function testSubclass_canExtend() {
+    class Buff extends TextBuilder {
+        method init(leader) {
+            this.leader = leader;
+        }
+        method fancy(text) {
+            this.append(this.leader + text);
+        }
+    }
+    var buff = Buff("+++ ");
+    buff.fancy("abc");
+    check(buff.toString()).eq("+++ abc");
+}
+
+function testSubclass_canUseSuper() {
+    class Buff extends TextBuilder {
+        method println(text) {
+            super.println(text);
+        }
+    }
+    var buff = Buff();
+    buff.println("abc");
+    check(buff.toString()).eq("abc\n");
+}

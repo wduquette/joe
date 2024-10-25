@@ -37,6 +37,7 @@ class StandardLibrary extends JoePackage {
         type(SetProxy.TYPE);
         type(StringProxy.TYPE);
         type(StringBuilderProxy.TYPE);
+        type(TextBuilderProxy.TYPE);
 
         type(GadgetProxy.TYPE);
     }
