@@ -239,7 +239,7 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
         } else if (superProxy != null) {
             return superProxy.bind(value, name);
         } else {
-            throw new JoeError("Undefined property '" + name + "'.");
+            return null;
         }
     }
 

@@ -16,7 +16,12 @@ record ProxiedValue(Joe joe, TypeProxy<?> proxy, Object value)
     @Override
     public Object get(String name) {
         if (proxy != null) {
-            return proxy.bind(value, name);
+            var method = proxy.bind(value, name);
+            if (method != null) {
+                return method;
+            } else {
+                throw new JoeError("Undefined property '" + name + "'.");
+            }
         } else {
             throw new JoeError("Values of type " +
                 value.getClass().getName() +
