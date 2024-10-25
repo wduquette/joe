@@ -48,7 +48,7 @@
     - [Pair Type](./library/type.joe.Pair.md)
     - [Set Type](./library/type.joe.Set.md)
     - [String Type](./library/type.joe.String.md)
-    - [StringBuilder Type](./library/type.joe.StringBuilder.md)
+    - [TextBuilder Type](./library/type.joe.TextBuilder.md)
     - [Tuple Type](./library/type.joe.Tuple.md)
   - [Joe Test Tool API (joe.test)](./library/pkg.joe.test.md)
     - [CatchChecker Type](./library/type.joe.test.CatchChecker.md)

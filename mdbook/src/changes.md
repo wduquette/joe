@@ -2,11 +2,23 @@
 
 ## Changes in 0.4.0 (Forthcoming)
 
+- Extending
+  - It is now possible to define native types that more fully resemble 
+    Joe classes and instances, e.g., the new `TextBuilder`.
+    - Instances of `TextBuilder` have data fields, just like Joe class
+      instances.
+    - `TextBuilder` can be extended by Joe classes.
+
 - Library
   - Added experimental `joe.win` package for creating JavaFX GUIs in Joe.
     - Optional package.
     - Loaded (with `joe.console`) by new `joe win` tool.
   - Added `EnumProxy<E>` for implementing bindings to Java enums.
+  - Added `Tuple` type, as a tuple return type for functions.
+    - The standard `catch()` function now returns a `Tuple` rather than a
+      `Pair`.
+  - Replaced the `StringBuilder` type with the new `TextBuilder` type,
+    which is a native type that can be subclassed by Joe classes.
 
 - Tools
   - Experimental `joe win` tool
@@ -14,6 +26,8 @@
     - Added `@enum` entity for documenting enum types.
     - Added `@mixin` entity for documentation to be included into
       multiple `@type` entities
+
+
 
 ## Changes in 0.3.0 (2024-10-11)
 
