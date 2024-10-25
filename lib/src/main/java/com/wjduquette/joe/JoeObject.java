@@ -2,7 +2,13 @@ package com.wjduquette.joe;
 
 import java.util.Collection;
 
-interface JoeObject {
+public interface JoeObject {
+    /**
+     * Gets the object's type name.
+     * @return The name
+     */
+    String typeName();
+
     /**
      * Get the value of the named object property.
      * @param name The name

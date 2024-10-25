@@ -28,4 +28,13 @@ public interface JoeClass extends JoeCallable {
     default boolean canBeExtended() {
         return false;
     }
+
+    /**
+     * Creates an instance of the class.
+     * @param joeClass The actual parent class, either this class or a subclass.
+     * @return The instance
+     */
+    default JoeObject make(JoeClass joeClass) {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -7,8 +7,13 @@ class JoeInstance implements JoeObject {
     private final JoeClass joeClass;
     private final Map<String, Object> fields = new HashMap<>();
 
-    JoeInstance(JoeClass klass) {
-        this.joeClass = klass;
+    JoeInstance(JoeClass joeClass) {
+        this.joeClass = joeClass;
+    }
+
+    @Override
+    public String typeName() {
+        return joeClass.name();
     }
 
     @Override

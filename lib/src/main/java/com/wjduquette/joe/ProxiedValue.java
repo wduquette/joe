@@ -13,6 +13,12 @@ import java.util.Collection;
 record ProxiedValue(Joe joe, TypeProxy<?> proxy, Object value)
     implements JoeObject
 {
+
+    @Override
+    public String typeName() {
+        return proxy.name();
+    }
+
     @Override
     public Object get(String name) {
         if (proxy != null) {

@@ -47,6 +47,16 @@ class ScriptedClass implements JoeClass, JoeObject {
     //-------------------------------------------------------------------------
     // JoeClass API
 
+
+    @Override
+    public JoeObject make(JoeClass joeClass) {
+        if (superclass != null) {
+            return superclass.make(this);
+        } else {
+            return new JoeInstance(joeClass);
+        }
+    }
+
     @Override
     public String name() {
         return name;
@@ -69,7 +79,7 @@ class ScriptedClass implements JoeClass, JoeObject {
 
     @Override
     public Object call(Joe joe, Args args) {
-        JoeInstance instance = new JoeInstance(this);
+        JoeObject instance = make(this);
         JoeCallable initializer = bind(instance, INIT);
         if (initializer != null) {
             initializer.call(joe, args);
@@ -84,6 +94,12 @@ class ScriptedClass implements JoeClass, JoeObject {
 
     //-------------------------------------------------------------------------
     // JoeObject API
+
+
+    @Override
+    public String typeName() {
+        return "<class>";
+    }
 
     @Override
     public Object get(String name) {

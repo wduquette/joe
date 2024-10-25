@@ -256,6 +256,15 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
     }
 
     /**
+     * As a JoeObject, the proxy needs a typeName.  It's simply a
+     * "{@code &lt;type&gt;}".
+     * @return The name.
+     */
+    public final String typeName() {
+        return "<type>";
+    }
+
+    /**
      * Gets the Java types proxied by this type.  These should be
      * actual classes, not interfaces, that are assignable to the
      * value type.
