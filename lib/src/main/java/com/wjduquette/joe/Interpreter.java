@@ -102,9 +102,8 @@ class Interpreter {
                     methods.put(method.name().lexeme(), function);
                 }
 
-                JoeClass klass =
-                    new JoeClass(stmt.name().lexeme(),
-                        superclass, staticMethods, methods);
+                JoeClass klass = new ScriptedClass(stmt.name().lexeme(),
+                    superclass, staticMethods, methods);
 
                 if (superclass != null) {
                     // Pop the "super" environment.
