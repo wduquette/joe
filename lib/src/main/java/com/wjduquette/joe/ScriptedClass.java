@@ -77,6 +77,11 @@ class ScriptedClass implements JoeClass, JoeObject {
         return instance;
     }
 
+    @Override
+    public boolean canSubclass() {
+        return true;
+    }
+
     //-------------------------------------------------------------------------
     // JoeObject API
 
