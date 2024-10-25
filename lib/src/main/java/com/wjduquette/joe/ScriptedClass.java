@@ -78,7 +78,7 @@ class ScriptedClass implements JoeClass, JoeObject {
     }
 
     @Override
-    public boolean canBeSubclassed() {
+    public boolean canBeExtended() {
         return true;
     }
 

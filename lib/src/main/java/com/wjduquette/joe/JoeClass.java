@@ -22,10 +22,10 @@ public interface JoeClass extends JoeCallable {
     JoeCallable bind(Object value, String name);
 
     /**
-     * Whether or not this class can be subclassed.
+     * Whether or not this class can be extended by a subclass.
      * @return true or false
      */
-    default boolean canBeSubclassed() {
+    default boolean canBeExtended() {
         return false;
     }
 }

@@ -70,7 +70,7 @@ class Interpreter {
                 if (stmt.superclass() != null) {
                     var object = evaluate(stmt.superclass());
                     if (object instanceof JoeClass sc) {
-                        if (!sc.canBeSubclassed()) {
+                        if (!sc.canBeExtended()) {
                             throw new RuntimeError(stmt.superclass().name(),
                                 "Type " + sc.name() + " cannot be subclassed.");
                         }
