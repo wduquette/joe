@@ -2,6 +2,11 @@ package com.wjduquette.joe;
 
 public interface JoeClass extends JoeCallable {
     /**
+     * The name for a class's initializer method.
+     */
+    String INIT = "init";
+
+    /**
      * Gets the class's name.
      * @return The name
      */

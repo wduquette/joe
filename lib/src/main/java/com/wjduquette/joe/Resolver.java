@@ -97,7 +97,7 @@ class Resolver {
                 scopes.peek().put("this", true);
                 for (Stmt.Function method : stmt.methods()) {
                     FunctionType declaration =
-                        method.name().lexeme().equals(ScriptedClass.INIT)
+                        method.name().lexeme().equals(JoeClass.INIT)
                         ? FunctionType.INITIALIZER : FunctionType.METHOD;
                     resolveFunction(method, declaration);
                 }

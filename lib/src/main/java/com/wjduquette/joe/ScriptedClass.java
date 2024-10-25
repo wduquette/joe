@@ -7,8 +7,6 @@ import java.util.Map;
  * A class defined in a Joe script.
  */
 class ScriptedClass implements JoeClass, JoeObject {
-    public static final String INIT = "init";
-
     //-------------------------------------------------------------------------
     // Instance Variables
 
