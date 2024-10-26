@@ -2,7 +2,7 @@ package com.wjduquette.joe;
 
 import java.util.Collection;
 
-public interface JoeObject {
+public interface JoeObject extends JoeToString {
     /**
      * Gets the object's type name.
      * @return The name
@@ -40,5 +40,14 @@ public interface JoeObject {
     default Collection<?> getItems() {
         throw new UnsupportedOperationException(
             "Type does not support iteration.");
+    }
+
+    /**
+     * Returns the Joe-specific string representation.
+     * @param joe The interpreter
+     * @return The string.
+     */
+    default String toString(Joe joe) {
+        return toString();
     }
 }

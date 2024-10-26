@@ -361,7 +361,7 @@ public class Joe {
         if (value instanceof JoeObject obj) {
             return obj;
         } else {
-            return new ProxiedValue(this, lookupProxy(value), value);
+            return new BoundValue(this, lookupProxy(value), value);
         }
     }
 
@@ -392,13 +392,7 @@ public class Joe {
             return jts.toString(this);
         }
 
-        var proxy = lookupProxy(value);
-
-        if (proxy != null) {
-            return proxy.stringify(this, value);
-        }
-
-        return value.toString();
+        return getJoeObject(value).toString();
     }
 
     /**
