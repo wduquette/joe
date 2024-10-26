@@ -2,6 +2,8 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeClass;
+import com.wjduquette.joe.JoeObject;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -19,6 +21,8 @@ class StackPaneProxy extends FXProxy<StackPane> {
     // @extends Pane
     // The `StackPane` type is a [[Pane]] that manages one or children
     // stacked one on top of each other like cards in a deck.
+    //
+    // Joe classes can extend the `StackPane` type.
     public StackPaneProxy() {
         super("StackPane");
         proxies(StackPane.class);
@@ -48,6 +52,20 @@ class StackPaneProxy extends FXProxy<StackPane> {
         // Methods
         // None
     }
+
+    //-------------------------------------------------------------------------
+    // JoeClass API
+
+    @Override
+    public boolean canBeExtended() {
+        return true;
+    }
+
+    @Override
+    public JoeObject make(JoeClass joeClass) {
+        return new JoeStackPane(joeClass);
+    }
+
 
     //-------------------------------------------------------------------------
     // Static Methods
@@ -108,7 +126,7 @@ class StackPaneProxy extends FXProxy<StackPane> {
     // Returns a `StackPane`.
     private Object _initializer(Joe joe, Args args) {
         Joe.exactArity(args, 0, "StackPane()");
-        return new StackPane();
+        return make(this);
     }
 
     //-------------------------------------------------------------------------
