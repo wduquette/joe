@@ -19,6 +19,8 @@
       `Pair`.
   - Replaced the `StringBuilder` type with the new `TextBuilder` type,
     which is a native type that can be subclassed by Joe classes.
+  - `joe.win`
+    - The `StackPane` type can now be subclassed by Joe classes.
 
 - Tools
   - Experimental `joe win` tool

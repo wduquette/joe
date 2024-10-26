@@ -321,6 +321,11 @@ instances.</li>
 </li>
 <li>Replaced the <code>StringBuilder</code> type with the new <code>TextBuilder</code> type,
 which is a native type that can be subclassed by Joe classes.</li>
+<li><code>joe.win</code>
+<ul>
+<li>The <code>StackPane</code> type can now be subclassed by Joe classes.</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>
@@ -5486,7 +5491,8 @@ If a single value is given, it is used for all four sides.</p>
 <hr />
 <p><strong>Extends</strong>: <a href="library/type.joe.win.Pane.html">Pane</a><br></p>
 <p>The <code>StackPane</code> type is a <a href="library/type.joe.win.Pane.html"><code>Pane</code></a> that manages one or children
-stacked one on top of each other like cards in a deck.</p>
+stacked one on top of each other like cards in a deck.
+Joe classes can extend the <code>StackPane</code> type.</p>
 <p><strong><a href="library/type.joe.win.StackPane.html#statics">Static Methods</a></strong></p>
 <ul>
 <li><a href="library/type.joe.win.StackPane.html#static.getAlignment">StackPane.getAlignment(<em>node</em>)</a> → <a href="library/type.joe.win.Pos.html">Pos</a></li>

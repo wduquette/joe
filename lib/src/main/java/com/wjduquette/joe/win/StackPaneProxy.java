@@ -21,7 +21,6 @@ class StackPaneProxy extends FXProxy<StackPane> {
     // @extends Pane
     // The `StackPane` type is a [[Pane]] that manages one or children
     // stacked one on top of each other like cards in a deck.
-    //
     // Joe classes can extend the `StackPane` type.
     public StackPaneProxy() {
         super("StackPane");
