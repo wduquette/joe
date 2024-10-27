@@ -2,6 +2,8 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeClass;
+import com.wjduquette.joe.JoeObject;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
@@ -18,7 +20,7 @@ class VBoxProxy extends FXProxy<VBox> {
     // @type VBox
     // @extends Pane
     // The `VBox` type is a [[Pane]] that manages a column of
-    // widgets.
+    // widgets. Joe classes can extend the `VBox` type.
     public VBoxProxy() {
         super("VBox");
         proxies(VBox.class);
@@ -50,6 +52,20 @@ class VBoxProxy extends FXProxy<VBox> {
         // Methods
         method("spacing", this::_spacing);
     }
+
+    //-------------------------------------------------------------------------
+    // JoeClass API
+
+    @Override
+    public boolean canBeExtended() {
+        return true;
+    }
+
+    @Override
+    public JoeObject make(JoeClass joeClass) {
+        return new JoeVBox(joeClass);
+    }
+
 
     //-------------------------------------------------------------------------
     // Static Methods
@@ -111,7 +127,7 @@ class VBoxProxy extends FXProxy<VBox> {
     // Returns a `VBox`.
     private Object _initializer(Joe joe, Args args) {
         Joe.exactArity(args, 0, "VBox()");
-        return new VBox();
+        return make(this);
     }
 
     //-------------------------------------------------------------------------

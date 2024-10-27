@@ -2,8 +2,9 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeClass;
+import com.wjduquette.joe.JoeObject;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.HBox;
@@ -19,7 +20,7 @@ class HBoxProxy extends FXProxy<HBox> {
     // @type HBox
     // @extends Pane
     // The `HBox` type is a [[Pane]] that manages a row of
-    // widgets.
+    // widgets. Joe classes can extend the `HBox` type.
     public HBoxProxy() {
         super("HBox");
         proxies(HBox.class);
@@ -50,6 +51,19 @@ class HBoxProxy extends FXProxy<HBox> {
 
         // Methods
         method("spacing", this::_spacing);
+    }
+
+    //-------------------------------------------------------------------------
+    // JoeClass API
+
+    @Override
+    public boolean canBeExtended() {
+        return true;
+    }
+
+    @Override
+    public JoeObject make(JoeClass joeClass) {
+        return new JoeHBox(joeClass);
     }
 
     //-------------------------------------------------------------------------
@@ -113,7 +127,7 @@ class HBoxProxy extends FXProxy<HBox> {
     // Returns a `HBox`.
     private Object _initializer(Joe joe, Args args) {
         Joe.exactArity(args, 0, "HBox()");
-        return new HBox();
+        return make(this);
     }
 
     //-------------------------------------------------------------------------
