@@ -45,7 +45,6 @@
     - [List Type](./library/type.joe.List.md)
     - [Map Type](./library/type.joe.Map.md)
     - [Number Type](./library/type.joe.Number.md)
-    - [Pair Type](./library/type.joe.Pair.md)
     - [Set Type](./library/type.joe.Set.md)
     - [String Type](./library/type.joe.String.md)
     - [TextBuilder Type](./library/type.joe.TextBuilder.md)

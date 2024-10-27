@@ -49,12 +49,11 @@ public class Tuple implements JoeObject, JoeToString {
     //**
     // @package joe
     // @type Tuple
-    // @init
-    // @args keyword, value, [keyword, value]...
-    // Given keyword and value pairs, returns an immutable `Tuple` object with
-    // the fields named by the keywords assigned to the given values.
     //
-    // For example,
+    // A `Tuple` is an ordered set of named values whose names are
+    // determined at the time the `Tuple` is created.
+    //
+    // ## Examples
     //
     // ```joe
     // var tuple = Tuple(#flag, true, #result, 123);
@@ -64,7 +63,8 @@ public class Tuple implements JoeObject, JoeToString {
     // ```
     //
     // Tuples are intended as a result type for functions that need to return
-    // multiple values, e.g., a status and a value or two values.
+    // multiple values, e.g., a status and a value, two values, three
+    // values, etc.
     //
     // A function may return tuples with different fields depending on the
     // circumstances.  The [[Tuple#method.is]] method is used to match
@@ -96,6 +96,12 @@ public class Tuple implements JoeObject, JoeToString {
     // ```
     //
     // See the [[Tuple#method.is]] and [[Tuple#method.has]] methods for more.
+
+    //**
+    // @init
+    // @args keyword, value, [keyword, value]...
+    // Given keyword and value pairs, returns an immutable `Tuple` object with
+    // the fields named by the keywords assigned to the given values.
     /**
      * The argument list is a flat list of keyword/value pairs.
      * @param joe The interpreter

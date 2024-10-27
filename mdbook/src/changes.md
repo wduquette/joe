@@ -21,6 +21,7 @@
   - Added `Tuple` type, as a tuple return type for functions.
     - The standard `catch()` function now returns a `Tuple` rather than a
       `Pair`.
+    - Removed `Pair`.
   - Replaced the `StringBuilder` type with the new `TextBuilder` type,
     which is a native type that can be subclassed by Joe classes.
 

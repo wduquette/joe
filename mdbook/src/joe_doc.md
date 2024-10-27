@@ -134,10 +134,10 @@ file:
 //**
 // @function catch
 // @args callable
-// @result Pair
+// @result Tuple
 // Executes the callable, which must not require any arguments.
-// Returns `Pair(#ok, returnValue)` on success and
-// `Pair(#error, Error)` on error.
+// Returns `Tuple(#ok, returnValue)` on success and
+// `Tuple(#error, Error)` on error.
 
 ... java code ...
 ```

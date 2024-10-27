@@ -20,7 +20,7 @@ represented internally as a normal Java value.
 | `Keyword` | `com.wjduquette.joe.Keyword`                         |
 | `List`    | `com.wjduquette.joe.JoeList` (a `List<Object>`)      |
 | `Number`  | `java.lang.Double`                                   |
-| `Pair`    | `com.wjduquette.joe.Pair`                            |
+| `Tuple`   | `com.wjduquette.joe.Tuple`                           |
 | `String`  | `java.lang.String`                                   |
 
 When used in Java code, consequently, a Joe `List` is a Java list.

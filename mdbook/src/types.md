@@ -10,10 +10,10 @@ types:
 - [Strings](#strings)
 - [Raw String Literals](#raw-string-literals)
 - [Keywords](#keywords)
-- [Pairs](#pairs)
 - [Lists](#lists)
 - [Maps](#maps)
 - [Sets](#sets)
+- [Tuples](#tuples)
 - [Errors](#errors)
 - [Functions and Methods](#functions-and-methods)
 - [Classes and Instances](#classes-and-instances)
@@ -104,17 +104,6 @@ A keyword literal is an identifier preceded by a `#` character:
 - `#no`
 - `#descending`
 
-## Pairs
-
-A [Pair](library/type.joe.Pair.md) is a pair of values, denoted `left`
-and `right`; it's used to return a pair of values from a function.
-
-```joe
-var pair = Pair("abc", 123);
-println("left  = " + pair.left());
-println("right = " + pair.right());
-```
-
 ## Lists
 
 A [List](library/type.joe.List.md) is a Java `List<Object>` that 
@@ -146,6 +135,23 @@ the same operations as Java sets. See the link for the full API.
 var set = Set(#a, #b);
 println(set.contains(#b)); // Outputs "true".
 ```
+
+## Tuples
+
+A [`Tuple`](library/type.joe.Tuple.md) is an ordered set of named 
+fields whose names are determined at the time the `Tuple` is created.
+Tuples support pattern matching on the field names and values.
+
+```joe
+var tuple = Tuple(#flag, true, #result, 123);
+
+println("flag   = " + tuple.flag);
+println("result = " + tuple.result);
+```
+
+Tuples are intended as a flexible result type for functions that need 
+to return multiple values, e.g., a status and a value, two values, three
+values, etc.
 
 ## Errors
 
