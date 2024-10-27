@@ -13,14 +13,16 @@
   - Added experimental `joe.win` package for creating JavaFX GUIs in Joe.
     - Optional package.
     - Loaded (with `joe.console`) by new `joe win` tool.
+    - Widgets
+      - `Node`, `Region`
+      - `Pane`, `StackPane`, `VBox`, `HBox`
+      - `Control`, `Label`, `Button`
   - Added `EnumProxy<E>` for implementing bindings to Java enums.
   - Added `Tuple` type, as a tuple return type for functions.
     - The standard `catch()` function now returns a `Tuple` rather than a
       `Pair`.
   - Replaced the `StringBuilder` type with the new `TextBuilder` type,
     which is a native type that can be subclassed by Joe classes.
-  - `joe.win`
-    - The `StackPane` type can now be subclassed by Joe classes.
 
 - Tools
   - Experimental `joe win` tool
@@ -28,8 +30,6 @@
     - Added `@enum` entity for documenting enum types.
     - Added `@mixin` entity for documentation to be included into
       multiple `@type` entities
-
-
 
 ## Changes in 0.3.0 (2024-10-11)
 
