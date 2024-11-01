@@ -291,6 +291,16 @@ buy him lunch.</p>
 <h2 id="changes-in-040-forthcoming"><a class="header" href="#changes-in-040-forthcoming">Changes in 0.4.0 (Forthcoming)</a></h2>
 <ul>
 <li>
+<p>Language</p>
+<ul>
+<li>Added the <code>@</code> operator.
+<ul>
+<li>In class methods, <code>@name</code> is identical to <code>this.name</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
 <p>Extending</p>
 <ul>
 <li>It is now possible to define native types that more fully resemble
@@ -340,6 +350,17 @@ which is a native type that can be subclassed by Joe classes.</li>
 <li>Added <code>@enum</code> entity for documenting enum types.</li>
 <li>Added <code>@mixin</code> entity for documentation to be included into
 multiple <code>@type</code> entities</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Miscellaneous</p>
+<ul>
+<li>Removed the <code>Joe::recodify(Stmt)</code> and <code>Joe::recodify(List&lt;Stmt&gt;)</code> methods.
+<ul>
+<li>They were unused and <code>Codifier</code> is likely to be replaced altogether
+in the near future.</li>
 </ul>
 </li>
 </ul>
@@ -846,6 +867,9 @@ will be converted to a string.</p>
 </code></pre>
 <h2 id="pre--and-post-incrementdecrement-operators"><a class="header" href="#pre--and-post-incrementdecrement-operators">Pre- and Post-Increment/Decrement Operators</a></h2>
 <p>The <code>++</code> and <code>--</code> operators work as they do in Java.</p>
+<h2 id="the--operator"><a class="header" href="#the--operator">The <code>@</code> Operator</a></h2>
+<p>The <code>@</code> operator is used in instance methods as a synonym for <code>this.</code>.
+See <a href="classes.html">Classes</a> for more details.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="statements"><a class="header" href="#statements">Statements</a></h1>
 <p>The Joe language provides the following statements. Statements are terminated
 by a semicolon or (sometimes) a block, as in Java.</p>
@@ -1121,6 +1145,25 @@ var joe = Person("Joe", "Pro");
 </code></pre>
 <p>The <code>init</code> method can be called directly on an instance to reinitialize
 the object, but this is rarely done.</p>
+<h2 id="the--operator-1"><a class="header" href="#the--operator-1">The <code>@</code> Operator</a></h2>
+<p>Joe requires that methods refer to all instance variables and methods
+using <code>this.</code>, which yields cluttered, noisy looking code.  As a convenience,
+the <code>@</code> operator is equivalent to <code>this.</code>, enabling code like this:</p>
+<pre><code class="language-joe">class Person {
+    method init(first, last) {
+        @first = first;
+        @last = last;
+    }
+    
+    method fullname() {
+        return @first + " " + @last; 
+    }
+    
+    method greet(greeting) {
+        return greeting + ", " + @fullname() + "!";
+    }
+}
+</code></pre>
 <h2 id="method-references"><a class="header" href="#method-references">Method References</a></h2>
 <p>An instance method is a first class object, just like a function, and
 can be referenced by its name. For example,</p>
@@ -6181,6 +6224,7 @@ arguments       → expression ( "," expression )* ;
 primary         → "true" | "false" | "nil"
                 | NUMBER | STRING | KEYWORD
                 | "this"
+                | "@"
                 | IDENTIFIER 
                 | "\" parameters? "-&gt;" ( expression | block ) ; 
                 | "(" expression ")" 

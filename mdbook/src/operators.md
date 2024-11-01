@@ -82,3 +82,8 @@ x = y = 5;  // Assigns 5 to x and y.
 ## Pre- and Post-Increment/Decrement Operators
 
 The `++` and `--` operators work as they do in Java.
+
+## The `@` Operator
+
+The `@` operator is used in instance methods as a synonym for `this.`.
+See [Classes](classes.md) for more details.

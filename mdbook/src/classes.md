@@ -64,6 +64,7 @@ var joe = Person("Joe", "Pro");
 joe.greet();    // Prints "Howdy, Joe Pro!"
 ```
 
+
 ## The Class Initializer
 
 The class's name, which by convention begins with an uppercase letter,
@@ -84,6 +85,29 @@ var joe = Person("Joe", "Pro");
 
 The `init` method can be called directly on an instance to reinitialize
 the object, but this is rarely done.
+
+## The `@` Operator
+
+Joe requires that methods refer to all instance variables and methods
+using `this.`, which yields cluttered, noisy looking code.  As a convenience,
+the `@` operator is equivalent to `this.`, enabling code like this:
+
+```joe
+class Person {
+    method init(first, last) {
+        @first = first;
+        @last = last;
+    }
+    
+    method fullname() {
+        return @first + " " + @last; 
+    }
+    
+    method greet(greeting) {
+        return greeting + ", " + @fullname() + "!";
+    }
+}
+```
 
 ## Method References
 

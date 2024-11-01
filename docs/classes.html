@@ -239,6 +239,25 @@ var joe = Person("Joe", "Pro");
 </code></pre>
 <p>The <code>init</code> method can be called directly on an instance to reinitialize
 the object, but this is rarely done.</p>
+<h2 id="the--operator"><a class="header" href="#the--operator">The <code>@</code> Operator</a></h2>
+<p>Joe requires that methods refer to all instance variables and methods
+using <code>this.</code>, which yields cluttered, noisy looking code.  As a convenience,
+the <code>@</code> operator is equivalent to <code>this.</code>, enabling code like this:</p>
+<pre><code class="language-joe">class Person {
+    method init(first, last) {
+        @first = first;
+        @last = last;
+    }
+    
+    method fullname() {
+        return @first + " " + @last; 
+    }
+    
+    method greet(greeting) {
+        return greeting + ", " + @fullname() + "!";
+    }
+}
+</code></pre>
 <h2 id="method-references"><a class="header" href="#method-references">Method References</a></h2>
 <p>An instance method is a first class object, just like a function, and
 can be referenced by its name. For example,</p>

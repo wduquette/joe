@@ -177,6 +177,16 @@
 <h2 id="changes-in-040-forthcoming"><a class="header" href="#changes-in-040-forthcoming">Changes in 0.4.0 (Forthcoming)</a></h2>
 <ul>
 <li>
+<p>Language</p>
+<ul>
+<li>Added the <code>@</code> operator.
+<ul>
+<li>In class methods, <code>@name</code> is identical to <code>this.name</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
 <p>Extending</p>
 <ul>
 <li>It is now possible to define native types that more fully resemble
@@ -226,6 +236,17 @@ which is a native type that can be subclassed by Joe classes.</li>
 <li>Added <code>@enum</code> entity for documenting enum types.</li>
 <li>Added <code>@mixin</code> entity for documentation to be included into
 multiple <code>@type</code> entities</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Miscellaneous</p>
+<ul>
+<li>Removed the <code>Joe::recodify(Stmt)</code> and <code>Joe::recodify(List&lt;Stmt&gt;)</code> methods.
+<ul>
+<li>They were unused and <code>Codifier</code> is likely to be replaced altogether
+in the near future.</li>
 </ul>
 </li>
 </ul>

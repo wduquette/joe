@@ -2,6 +2,10 @@
 
 ## Changes in 0.4.0 (Forthcoming)
 
+- Language
+  - Added the `@` operator.
+    - In class methods, `@name` is identical to `this.name`.
+
 - Extending
   - It is now possible to define native types that more fully resemble 
     Joe classes and instances, e.g., the new `TextBuilder`.
@@ -31,7 +35,12 @@
     - Added `@enum` entity for documenting enum types.
     - Added `@mixin` entity for documentation to be included into
       multiple `@type` entities
-
+     
+- Miscellaneous
+  - Removed the `Joe::recodify(Stmt)` and `Joe::recodify(List<Stmt>)` methods.
+    - They were unused and `Codifier` is likely to be replaced altogether
+      in the near future.
+  
 ## Changes in 0.3.0 (2024-10-11)
 
 - Language

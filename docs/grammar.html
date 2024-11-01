@@ -250,6 +250,7 @@ arguments       → expression ( "," expression )* ;
 primary         → "true" | "false" | "nil"
                 | NUMBER | STRING | KEYWORD
                 | "this"
+                | "@"
                 | IDENTIFIER 
                 | "\" parameters? "-&gt;" ( expression | block ) ; 
                 | "(" expression ")" 
