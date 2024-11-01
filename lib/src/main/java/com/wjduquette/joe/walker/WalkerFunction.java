@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * A function implemented in Joe.
  */
-public final class JoeFunction implements JoeCallable {
+public final class WalkerFunction implements JoeCallable {
     private final Interpreter interpreter;
     private final Stmt.Function declaration;
     private final Environment closure;
@@ -21,7 +21,7 @@ public final class JoeFunction implements JoeCallable {
     //-------------------------------------------------------------------------
     // Constructor
 
-    JoeFunction(
+    WalkerFunction(
         Interpreter interpreter,
         Stmt.Function declaration,
         Environment closure,
@@ -72,10 +72,10 @@ public final class JoeFunction implements JoeCallable {
         return declaration.kind();
     }
 
-    JoeFunction bind(JoeObject instance) {
+    WalkerFunction bind(JoeObject instance) {
         Environment environment = new Environment(closure);
         environment.setVar("this", instance);
-        return new JoeFunction(interpreter, declaration, environment,
+        return new WalkerFunction(interpreter, declaration, environment,
             isInitializer);
     }
 

@@ -96,10 +96,10 @@ class Interpreter {
                 environment.setVar(stmt.name().lexeme(), null);
 
                 // Static Methods
-                Map<String, JoeFunction> staticMethods = new HashMap<>();
+                Map<String, WalkerFunction> staticMethods = new HashMap<>();
                 for (Stmt.Function method : stmt.staticMethods()) {
-                    JoeFunction function =
-                        new JoeFunction(this, method, environment, false);
+                    WalkerFunction function =
+                        new WalkerFunction(this, method, environment, false);
                     staticMethods.put(method.name().lexeme(), function);
                 }
 
@@ -110,10 +110,10 @@ class Interpreter {
                     environment.setVar("super", superclass);
                 }
 
-                Map<String, JoeFunction> methods = new HashMap<>();
+                Map<String, WalkerFunction> methods = new HashMap<>();
                 for (Stmt.Function method : stmt.methods()) {
-                    JoeFunction function =
-                        new JoeFunction(this, method, environment,
+                    WalkerFunction function =
+                        new WalkerFunction(this, method, environment,
                             stmt.name().lexeme().equals("init"));
                     methods.put(method.name().lexeme(), function);
                 }
@@ -171,7 +171,7 @@ class Interpreter {
                 }
             }
             case Stmt.Function stmt -> {
-                var function = new JoeFunction(this, stmt, environment, false);
+                var function = new WalkerFunction(this, stmt, environment, false);
                 environment.setVar(stmt.name().lexeme(), function);
             }
             case Stmt.If stmt -> {
@@ -390,7 +390,7 @@ class Interpreter {
             case Expr.Grouping expr -> evaluate(expr.expr());
             // Return a callable for the given lambda
             case Expr.Lambda expr ->
-                new JoeFunction(this, expr.declaration(), environment, false);
+                new WalkerFunction(this, expr.declaration(), environment, false);
             // Any literal
             case Expr.Literal expr -> expr.value();
             // && and ||

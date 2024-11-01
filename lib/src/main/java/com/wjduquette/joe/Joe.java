@@ -1,7 +1,7 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.types.*;
-import com.wjduquette.joe.walker.JoeFunction;
+import com.wjduquette.joe.walker.WalkerFunction;
 import com.wjduquette.joe.walker.WalkerEngine;
 
 import java.io.IOException;
@@ -437,7 +437,7 @@ public class Joe {
     public String typeName(Object value) {
         return switch (value) {
             case null -> null;
-            case JoeFunction function -> "<" + function.kind() + ">";
+            case WalkerFunction function -> "<" + function.kind() + ">";
             case NativeMethod<?> ignored -> "<native method>";
             case NativeFunction ignored -> "<native function>";
             case JoeObject obj -> obj.typeName();

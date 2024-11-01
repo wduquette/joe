@@ -19,11 +19,11 @@ class ScriptedClass implements JoeClass, JoeObject {
     private final JoeClass superclass;
 
     // Static methods and constants
-    private final Map<String, JoeFunction> staticMethods;
+    private final Map<String, WalkerFunction> staticMethods;
     private final Map<String, Object> fields = new HashMap<>();
 
     // JoeInstance Instance Methods
-    private final Map<String, JoeFunction> methods;
+    private final Map<String, WalkerFunction> methods;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -37,8 +37,8 @@ class ScriptedClass implements JoeClass, JoeObject {
     ScriptedClass(
         String name,
         JoeClass superclass,
-        Map<String, JoeFunction> staticMethods,
-        Map<String, JoeFunction> methods
+        Map<String, WalkerFunction> staticMethods,
+        Map<String, WalkerFunction> methods
     ) {
         this.name = name;
         this.superclass = superclass;
@@ -55,7 +55,7 @@ class ScriptedClass implements JoeClass, JoeObject {
         if (superclass != null) {
             return superclass.make(this);
         } else {
-            return new JoeInstance(joeClass);
+            return new WalkerInstance(joeClass);
         }
     }
 

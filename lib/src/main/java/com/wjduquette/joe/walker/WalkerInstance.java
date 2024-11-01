@@ -8,11 +8,11 @@ import com.wjduquette.joe.JoeObject;
 import java.util.HashMap;
 import java.util.Map;
 
-class JoeInstance implements JoeObject {
+class WalkerInstance implements JoeObject {
     private final JoeClass joeClass;
     private final Map<String, Object> fields = new HashMap<>();
 
-    JoeInstance(JoeClass joeClass) {
+    WalkerInstance(JoeClass joeClass) {
         this.joeClass = joeClass;
     }
 
