@@ -8,6 +8,7 @@ import static com.wjduquette.joe.checker.Checker.check;
 
 public class CodifierTest extends Ted {
     Joe joe;
+    Codifier codifier;
     Literal one = new Literal(1.0);
     Literal two = new Literal(2.0);
     Literal decimal = new Literal(2.5);
@@ -17,6 +18,7 @@ public class CodifierTest extends Ted {
     @Before
     public void setup() {
         joe = new Joe();
+        codifier = new Codifier(joe);
     }
 
     //
@@ -34,7 +36,7 @@ public class CodifierTest extends Ted {
             new Token(STAR, "*", null, 1),
             two
         );
-        check(joe.recodify(bin)).eq("1*2");
+        check(codifier.recodify(bin)).eq("1*2");
     }
 
     @Test
@@ -45,7 +47,7 @@ public class CodifierTest extends Ted {
             new Token(SLASH, "/", null, 1),
             two
         );
-        check(joe.recodify(bin)).eq("1/2");
+        check(codifier.recodify(bin)).eq("1/2");
     }
 
     @Test
@@ -56,22 +58,22 @@ public class CodifierTest extends Ted {
             new Token(PLUS, "+", null, 1),
             two
         );
-        check(joe.recodify(bin)).eq("1 + 2");
+        check(codifier.recodify(bin)).eq("1 + 2");
     }
 
     @Test
     public void testExprGrouping() {
         test("testExprGrouping");
         var group = new Grouping(decimal);
-        check(joe.recodify(group)).eq("(2.5)");
+        check(codifier.recodify(group)).eq("(2.5)");
     }
 
     @Test
     public void testExprLiteral() {
         test("testExprLiteral");
-        check(joe.recodify(two)).eq("2");
-        check(joe.recodify(decimal)).eq("2.5");
-        check(joe.recodify(string)).eq("\"abc\"");
+        check(codifier.recodify(two)).eq("2");
+        check(codifier.recodify(decimal)).eq("2.5");
+        check(codifier.recodify(string)).eq("\"abc\"");
     }
 
     @Test
@@ -81,12 +83,12 @@ public class CodifierTest extends Ted {
             new Token(MINUS, "-", null, 1),
             two
         );
-        check(joe.recodify(unary)).eq("-2");
+        check(codifier.recodify(unary)).eq("-2");
     }
 
     @Test
     public void testExprVariable() {
         test("testExprVariable");
-        check(joe.recodify(variable)).eq("counter");
+        check(codifier.recodify(variable)).eq("counter");
     }
 }

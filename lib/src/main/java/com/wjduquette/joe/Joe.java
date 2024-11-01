@@ -3,10 +3,7 @@ package com.wjduquette.joe;
 import com.wjduquette.joe.types.*;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -19,8 +16,7 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Interpreter interpreter;
-    private final Codifier codifier;
+    private final Engine engine;
 
     // Type Registry
     private final Map<Class<?>, TypeProxy<?>> proxyTable = new HashMap<>();
@@ -38,16 +34,9 @@ public class Joe {
      * standard library, but nothing else.
      */
     public Joe() {
-        interpreter = new Interpreter(this);
-        codifier = new Codifier(this);
+        engine = new WalkerEngine(this);
 
         StandardLibrary.PACKAGE.install(this);
-        installGlobalFunction(new NativeFunction("dumpEnv", "function", this::_dumpEnv));
-    }
-
-    private Object _dumpEnv(Joe joe, Args args) {
-        interpreter.dumpEnvironment();
-        return null;
     }
 
     //-------------------------------------------------------------------------
@@ -58,7 +47,7 @@ public class Joe {
      * @return The environment.
      */
     public GlobalEnvironment globals() {
-        return interpreter.globals();
+        return engine.globals();
     }
 
     /**
@@ -220,10 +209,7 @@ public class Joe {
     public Object runFile(String path)
         throws IOException, SyntaxError, JoeError
     {
-        byte[] bytes = Files.readAllBytes(Paths.get(path));
-        var script = new String(bytes, Charset.defaultCharset());
-
-        return run(script);
+        return engine.runFile(path);
     }
 
     /**
@@ -234,27 +220,7 @@ public class Joe {
      * @throws JoeError on all runtime errors.
      */
     public Object run(String source) throws SyntaxError, JoeError {
-        var details = new ArrayList<SyntaxError.Detail>();
-
-        Scanner scanner = new Scanner(source, details::add);
-        List<Token> tokens = scanner.scanTokens();
-        Parser parser = new Parser(tokens, details::add);
-        var statements = parser.parse();
-
-        // Stop if there was a syntax error.
-        if (!details.isEmpty()) {
-            throw new SyntaxError("Syntax error in input, halting.", details);
-        }
-
-        Resolver resolver = new Resolver(interpreter, details::add);
-        resolver.resolve(statements);
-
-        // Stop if there was a resolution error.
-        if (!details.isEmpty()) {
-            throw new SyntaxError("Syntax error in input, halting.", details);
-        }
-
-        return interpreter.interpret(statements);
+        return engine.run(source);
     }
 
     //-------------------------------------------------------------------------
@@ -415,11 +381,6 @@ public class Joe {
         }
 
         return stringify(value);
-    }
-
-    // Converts the expression into something that looks like code.
-    String recodify(Expr expr) {
-        return codifier.recodify(expr);
     }
 
     /**

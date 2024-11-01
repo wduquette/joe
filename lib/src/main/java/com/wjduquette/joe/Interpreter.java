@@ -10,6 +10,7 @@ class Interpreter {
     final GlobalEnvironment globals = new GlobalEnvironment();
     private Environment environment;
     private final Map<Expr, Integer> locals = new HashMap<>();
+    private final Codifier codifier;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -17,6 +18,7 @@ class Interpreter {
     public Interpreter(Joe joe) {
         this.joe = joe;
         this.environment = globals;
+        this.codifier = new Codifier(joe);
     }
 
     //-------------------------------------------------------------------------
@@ -26,7 +28,8 @@ class Interpreter {
     void dumpEnvironment() {
         System.out.println("Local Variables:");
         for (var e : locals.entrySet()) {
-            System.out.println("  [" + e.getValue() + "]: " + joe.recodify(e.getKey()));
+            System.out.println("  [" + e.getValue() + "]: " +
+                codifier.recodify(e.getKey()));
         }
 
         var env = environment;
@@ -59,7 +62,8 @@ class Interpreter {
                 if (!Joe.isTruthy(condition)) {
                     var message = (stmt.message() != null
                         ? joe.stringify(evaluate(stmt.message()))
-                        : "Assertion unmet: " + joe.recodify(stmt.condition()));
+                        : "Assertion unmet: " +
+                          codifier.recodify(stmt.condition()));
                     throw new AssertError(stmt.keyword().line(), message);
                 }
             }

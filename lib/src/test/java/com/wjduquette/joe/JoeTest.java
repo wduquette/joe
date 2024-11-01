@@ -69,14 +69,6 @@ public class JoeTest extends Ted {
     }
 
     @Test
-    public void testRecodify() {
-        test("testRecodify");
-        // NOTE: the algorithm is tested in ASTPrinterTest.
-        // This is a spot check.
-        check(joe.recodify(new Expr.Literal(2.0))).eq("2");
-    }
-
-    @Test
     public void testTypeName() {
         test("testTypeName");
 
