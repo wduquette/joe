@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
  * A function implemented in Joe.
  */
 public final class JoeFunction implements JoeCallable {
+    private final Interpreter interpreter;
     private final Stmt.Function declaration;
     private final Environment closure;
     private final boolean isInitializer;
@@ -20,10 +21,12 @@ public final class JoeFunction implements JoeCallable {
     // Constructor
 
     JoeFunction(
+        Interpreter interpreter,
         Stmt.Function declaration,
         Environment closure,
         boolean isInitializer
     ) {
+        this.interpreter = interpreter;
         this.declaration = declaration;
         this.closure = closure;
         this.isInitializer = isInitializer;
@@ -71,7 +74,8 @@ public final class JoeFunction implements JoeCallable {
     JoeFunction bind(JoeObject instance) {
         Environment environment = new Environment(closure);
         environment.setVar("this", instance);
-        return new JoeFunction(declaration, environment, isInitializer);
+        return new JoeFunction(interpreter, declaration, environment,
+            isInitializer);
     }
 
     @Override
@@ -100,7 +104,7 @@ public final class JoeFunction implements JoeCallable {
         }
 
         try {
-            var result = joe.interp().executeBlock(declaration.body(), environment);
+            var result = interpreter.executeBlock(declaration.body(), environment);
             if (isInitializer) return closure.getAt(0, "this");
             return result;
         } catch (Return returnValue) {

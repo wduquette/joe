@@ -19,7 +19,6 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final GlobalEnvironment globals;
     private final Interpreter interpreter;
     private final Codifier codifier;
 
@@ -39,7 +38,6 @@ public class Joe {
      * standard library, but nothing else.
      */
     public Joe() {
-        globals = new GlobalEnvironment();
         interpreter = new Interpreter(this);
         codifier = new Codifier(this);
 
@@ -59,8 +57,8 @@ public class Joe {
      * Returns Joe's global environment, for querying.
      * @return The environment.
      */
-    public GlobalEnvironment getGlobals() {
-        return globals;
+    public GlobalEnvironment globals() {
+        return interpreter.globals();
     }
 
     /**
@@ -70,7 +68,7 @@ public class Joe {
      */
     @SuppressWarnings("unused")
     public Optional<Object> getVar(String name) {
-        return Optional.ofNullable(globals.getVar(name));
+        return Optional.ofNullable(globals().getVar(name));
     }
 
     /**
@@ -80,7 +78,7 @@ public class Joe {
      */
     @SuppressWarnings("unused")
     public void setVar(String name, Object value) {
-        globals.setVar(name, value);
+        globals().setVar(name, value);
     }
 
     /**
@@ -96,7 +94,7 @@ public class Joe {
      * @param function The function
      */
     public void installGlobalFunction(NativeFunction function) {
-        globals.setVar(function.name(), function);
+        globals().setVar(function.name(), function);
     }
 
     /**
@@ -116,7 +114,7 @@ public class Joe {
         }
 
         // NEXT, install the type into the environment.
-        globals.setVar(typeProxy.name(), typeProxy);
+        globals().setVar(typeProxy.name(), typeProxy);
     }
 
     /**
@@ -261,14 +259,6 @@ public class Joe {
 
     //-------------------------------------------------------------------------
     // Internal Support -- for use within this package
-
-    /**
-     * Gets the engine's actual interpreter.
-     * @return The interpreter.
-     */
-    Interpreter interp() {
-        return interpreter;
-    }
 
     /**
      * Looks for a proxy for this object's class or its superclasses.

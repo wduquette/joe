@@ -7,7 +7,7 @@ class Interpreter {
     // Instance Variables
 
     private final Joe joe;
-    final Environment globals;
+    final GlobalEnvironment globals = new GlobalEnvironment();
     private Environment environment;
     private final Map<Expr, Integer> locals = new HashMap<>();
 
@@ -16,7 +16,6 @@ class Interpreter {
 
     public Interpreter(Joe joe) {
         this.joe = joe;
-        this.globals = joe.getGlobals();
         this.environment = globals;
     }
 
@@ -40,6 +39,10 @@ class Interpreter {
 
     //-------------------------------------------------------------------------
     // Public API
+
+    public GlobalEnvironment globals() {
+        return globals;
+    }
 
     public Object interpret(List<Stmt> statements) throws RuntimeError {
         Object result = null;
@@ -87,8 +90,8 @@ class Interpreter {
                 // Static Methods
                 Map<String, JoeFunction> staticMethods = new HashMap<>();
                 for (Stmt.Function method : stmt.staticMethods()) {
-                    JoeFunction function = new JoeFunction(method, environment,
-                        false);
+                    JoeFunction function =
+                        new JoeFunction(this, method, environment, false);
                     staticMethods.put(method.name().lexeme(), function);
                 }
 
@@ -101,8 +104,9 @@ class Interpreter {
 
                 Map<String, JoeFunction> methods = new HashMap<>();
                 for (Stmt.Function method : stmt.methods()) {
-                    JoeFunction function = new JoeFunction(method, environment,
-                        stmt.name().lexeme().equals("init"));
+                    JoeFunction function =
+                        new JoeFunction(this, method, environment,
+                            stmt.name().lexeme().equals("init"));
                     methods.put(method.name().lexeme(), function);
                 }
 
@@ -114,6 +118,7 @@ class Interpreter {
                     environment = environment.enclosing;
                 }
 
+                assert environment != null;
                 environment.assign(stmt.name(), klass);
 
                 // Static Initialization
@@ -158,7 +163,7 @@ class Interpreter {
                 }
             }
             case Stmt.Function stmt -> {
-                var function = new JoeFunction(stmt, environment, false);
+                var function = new JoeFunction(this, stmt, environment, false);
                 environment.setVar(stmt.name().lexeme(), function);
             }
             case Stmt.If stmt -> {
@@ -377,7 +382,7 @@ class Interpreter {
             case Expr.Grouping expr -> evaluate(expr.expr());
             // Return a callable for the given lambda
             case Expr.Lambda expr ->
-                new JoeFunction(expr.declaration(), environment, false);
+                new JoeFunction(this, expr.declaration(), environment, false);
             // Any literal
             case Expr.Literal expr -> expr.value();
             // && and ||
