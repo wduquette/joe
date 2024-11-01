@@ -36,21 +36,6 @@ class Environment {
         }
     }
 
-    /**
-     * Gets the value of the named variable.
-     * @param name The name
-     * @return The value
-     */
-    public Object getVar(String name) {
-        if (values.containsKey(name)) {
-            return values.get(name);
-        }
-
-        if (enclosing != null) return enclosing.getVar(name);
-
-        return null;
-    }
-
     Object get(Token name) {
         if (values.containsKey(name.lexeme())) {
             return values.get(name.lexeme());

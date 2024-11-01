@@ -15,6 +15,16 @@ class GlobalEnvironment extends Environment {
     }
 
     /**
+     * Gets the value of the named global variable.
+     * @param name The name
+     * @return The value
+     */
+    public Object getVar(String name) {
+        return values.get(name);
+    }
+
+
+    /**
      * Gets the names of the variables declared in the global environment.
      * @return The set.
      */
