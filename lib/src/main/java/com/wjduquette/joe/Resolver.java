@@ -204,19 +204,6 @@ class Resolver {
                 resolve(expr.value());
                 resolveLocal(expr, expr.name());
             }
-            case Expr.At expr -> {
-                if (currentClass == ClassType.NONE) {
-                    error(expr.keyword(),
-                        "Attempted to use 'this' outside of any class.");
-                } else if (currentFunction == FunctionType.STATIC_INITIALIZER) {
-                    error(expr.keyword(),
-                        "Attempted to use 'this' in a static initializer.");
-                } else if (currentFunction == FunctionType.STATIC_METHOD) {
-                    error(expr.keyword(),
-                        "Attempted to use 'this' in a static method.");
-                }
-                resolveLocal(expr, Token.synthetic("this"));
-            }
             case Expr.Binary expr -> {
                 resolve(expr.left());
                 resolve(expr.right());
@@ -262,15 +249,19 @@ class Resolver {
             case Expr.This expr -> {
                 if (currentClass == ClassType.NONE) {
                     error(expr.keyword(),
-                        "Attempted to use 'this' outside of any class.");
+                        "Attempted to use '" + expr.keyword().lexeme() +
+                        "' outside of any class.");
                 } else if (currentFunction == FunctionType.STATIC_INITIALIZER) {
                     error(expr.keyword(),
-                        "Attempted to use 'this' in a static initializer.");
+                        "Attempted to use '" + expr.keyword().lexeme() +
+                        "' in a static initializer.");
                 } else if (currentFunction == FunctionType.STATIC_METHOD) {
                     error(expr.keyword(),
-                        "Attempted to use 'this' in a static method.");
+                        "Attempted to use '" + expr.keyword().lexeme() +
+                        "' in a static method.");
                 }
-                resolveLocal(expr, expr.keyword());
+                // The expr.keyword might be '@'
+                resolveLocal(expr, Token.synthetic("this"));
             }
             case Expr.Unary expr -> resolve(expr.right());
             case Expr.Ternary expr -> {

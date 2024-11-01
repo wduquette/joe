@@ -433,9 +433,9 @@ public class Joe {
     }
 
     // Converts the statement into something that looks like code.
-    String recodify(Stmt statement) {
-        return recodify(List.of(statement));
-    }
+//    String recodify(Stmt statement) {
+//        return recodify(List.of(statement));
+//    }
 
     // Converts the statements into something that looks like code.
     String recodify(List<Stmt> statements) {

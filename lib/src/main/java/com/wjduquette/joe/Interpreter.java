@@ -269,21 +269,6 @@ class Interpreter {
                 }
                 yield right;
             }
-            // Handle `@<property>` in methods
-            case Expr.At expr -> {
-                int distance = locals.get(expr);
-                JoeObject instance = (JoeObject)environment.getAt(
-                    distance, "this");
-                var value = instance.get(expr.name().lexeme());
-
-                if (value == null) {
-                    throw new RuntimeError(expr.name(),
-                        "Undefined property '" +
-                            expr.name().lexeme() + "'.");
-                }
-
-                yield value;
-            }
             // Compute any binary operation except for && and ||
             case Expr.Binary expr -> {
                 Object left = evaluate(expr.left());
@@ -475,8 +460,9 @@ class Interpreter {
 
                 yield method;
             }
-            // Handle `this.<property>` in methods
-            case Expr.This expr -> lookupVariable(expr.keyword(), expr);
+            // Handle `this.<property>` in methods.  Note: the expr's
+            // keyword might be "@".
+            case Expr.This expr -> lookupVariable(Token.synthetic("this"), expr);
             // The ternary `? :` operator
             case Expr.Ternary expr -> {
                 var condition = Joe.isTruthy(evaluate(expr.condition()));

@@ -373,9 +373,6 @@ class Parser {
                 return new Expr.Assign(name, op, value);
             } else if (target instanceof Expr.Get get) {
                 return new Expr.Set(get.object(), get.name(), op, value);
-            } else if (target instanceof Expr.At at) {
-                var obj = new Expr.Variable(Token.synthetic("this"));
-                return new Expr.Set(obj, at.name(), op, value);
             }
 
             error(op, "Invalid assignment target.");
@@ -558,7 +555,8 @@ class Parser {
             Token keyword = previous();
             Token name = consume(IDENTIFIER,
                 "Expected class property name.");
-            return new Expr.At(keyword, name);
+            var obj = new Expr.This(keyword);
+            return new Expr.Get(obj, name);
         }
 
         if (match(SUPER)) {
