@@ -1,7 +1,6 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.types.*;
-import com.wjduquette.joe.walker.WalkerFunction;
 import com.wjduquette.joe.walker.WalkerEngine;
 
 import java.io.IOException;
@@ -26,32 +25,12 @@ public class Joe {
     static {
         var set = new TreeSet<String>();
         Collections.addAll(set,
-            "assert",
-            "break",
-            "case",
-            "class",
-            "continue",
-            "default",
-            "else",
-            "extends",
-            "false",
-            "for",
-            "foreach",
-            "function",
-            "if",
-            "in",
-            "method",
-            "ni",
-            "null",
-            "return",
-            "static",
-            "super",
-            "switch",
-            "this",
-            "throw",
-            "true",
-            "var",
-            "while"
+            "assert", "break", "case", "class", "continue", "default",
+            "else", "extends", "false", "for", "foreach", "function",
+            "if", "in", "method", "ni", "null", "return",
+            "static", "super", "switch",
+            "this", "throw", "true",
+            "var", "while"
         );
         RESERVED_WORDS = Collections.unmodifiableSet(set);
     }
@@ -437,10 +416,7 @@ public class Joe {
     public String typeName(Object value) {
         return switch (value) {
             case null -> null;
-            case WalkerFunction function -> "<" + function.kind() + ">";
-            case NativeMethod<?> ignored -> "<native method>";
-            case NativeFunction ignored -> "<native function>";
-            case JoeObject obj -> obj.typeName();
+            case HasTypeName htn -> htn.typeName();
             default -> {
                 // If it's a native type, try to get bind to a type proxy.
                 var bound = getJoeObject(value);

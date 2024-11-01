@@ -4,7 +4,7 @@ package com.wjduquette.joe;
  * A native function, implemented in Java, for use in a Joe interpreter.
  * @param <V> The value type
  */
-public class NativeMethod<V> implements JoeCallable {
+public class NativeMethod<V> implements JoeCallable, HasTypeName {
     private final V value;
     private final String name;
     private final JoeValueCallable<V> callable;
@@ -29,6 +29,9 @@ public class NativeMethod<V> implements JoeCallable {
         return name;
     }
 
+    //-------------------------------------------------------------------------
+    // JoeCallable API
+
     @Override
     public Object call(Joe joe, Args args) {
         try {
@@ -43,6 +46,16 @@ public class NativeMethod<V> implements JoeCallable {
         }
     }
 
+    //-------------------------------------------------------------------------
+    // HasTypeName API
+
+    @Override
+    public String typeName() {
+        return "<native method>";
+    }
+
+    //-------------------------------------------------------------------------
+    // Object API
     @Override
     public String toString() {
         return "<native method " + name + ">";
