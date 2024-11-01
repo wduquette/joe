@@ -1,10 +1,12 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
+import com.wjduquette.joe.SyntaxError;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static com.wjduquette.joe.TokenType.*;
+import static com.wjduquette.joe.walker.TokenType.*;
 
 class Parser {
     public static final String ARGS = "args";

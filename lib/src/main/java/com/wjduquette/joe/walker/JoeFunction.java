@@ -1,5 +1,6 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
 
+import com.wjduquette.joe.*;
 import com.wjduquette.joe.types.ListValue;
 
 import java.util.List;

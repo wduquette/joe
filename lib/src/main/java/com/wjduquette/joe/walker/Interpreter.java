@@ -1,4 +1,6 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
+
+import com.wjduquette.joe.*;
 
 import java.util.*;
 
@@ -78,12 +80,14 @@ class Interpreter {
                     var object = evaluate(stmt.superclass());
                     if (object instanceof JoeClass sc) {
                         if (!sc.canBeExtended()) {
-                            throw new RuntimeError(stmt.superclass().name(),
+                            throw new RuntimeError(
+                                stmt.superclass().name().line(),
                                 "Type " + sc.name() + " cannot be subclassed.");
                         }
                         superclass = sc;
                     } else {
-                        throw new RuntimeError(stmt.superclass().name(),
+                        throw new RuntimeError(
+                            stmt.superclass().name().line(),
                             "Superclass must be a class.");
                     }
                 }
@@ -350,7 +354,7 @@ class Interpreter {
                         } else if (left instanceof String || right instanceof String) {
                             yield joe.stringify(left) + joe.stringify(right);
                         } else {
-                            throw new RuntimeError(expr.op(),
+                            throw new RuntimeError(expr.op().line(),
                                 "'+' cannot combine the given operands.");
                         }
 
@@ -462,7 +466,7 @@ class Interpreter {
                     superclass.bind(instance, expr.method().lexeme());
 
                 if (method == null) {
-                    throw new RuntimeError(expr.method(),
+                    throw new RuntimeError(expr.method().line(),
                         "Undefined property '" +
                             expr.method().lexeme() + "'.");
                 }
@@ -544,7 +548,7 @@ class Interpreter {
                 if (instance.canIterate()) {
                     yield instance.getItems();
                 } else {
-                    throw new RuntimeError(token,
+                    throw new RuntimeError(token.line(),
                         "Expected iterable, got: " +
                             joe.typeName(arg) + " '" +
                             joe.codify(arg) + "'.");
@@ -563,21 +567,21 @@ class Interpreter {
     {
         if (left instanceof Double && right instanceof Double) return;
 
-        throw new RuntimeError(operator, "Operands must be numbers.");
+        throw new RuntimeError(operator.line(), "Operands must be numbers.");
     }
 
     private RuntimeError notSimilar(Token operator) {
-        return new RuntimeError(operator,
+        return new RuntimeError(operator.line(),
             "Expected two doubles or two strings.");
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
         if (operand instanceof Double) return;
-        throw new RuntimeError(operator, "Operand must be a number.");
+        throw new RuntimeError(operator.line(), "Operand must be a number.");
     }
 
     private void checkNumericTarget(Token operator, Object operand) {
         if (operand instanceof Double) return;
-        throw new RuntimeError(operator, "Target of operand must contain a number.");
+        throw new RuntimeError(operator.line(), "Target of operand must contain a number.");
     }
 }

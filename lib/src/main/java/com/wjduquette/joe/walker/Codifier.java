@@ -1,9 +1,11 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
+
+import com.wjduquette.joe.Joe;
 
 import java.util.stream.Collectors;
 
-import static com.wjduquette.joe.Expr.*;
-import static com.wjduquette.joe.TokenType.*;
+import static com.wjduquette.joe.walker.Expr.*;
+import static com.wjduquette.joe.walker.TokenType.*;
 
 /**
  * Given the AST for a list of statements, a single statement, or a single

@@ -1,6 +1,10 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.types.*;
+import com.wjduquette.joe.walker.GlobalEnvironment;
+import com.wjduquette.joe.walker.JoeFunction;
+import com.wjduquette.joe.walker.Scanner;
+import com.wjduquette.joe.walker.WalkerEngine;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -313,7 +317,7 @@ public class Joe {
      * @param value The value
      * @return The JoeObject
      */
-    JoeObject getJoeObject(Object value) {
+    public JoeObject getJoeObject(Object value) {
         if (value instanceof JoeObject obj) {
             return obj;
         } else {

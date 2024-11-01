@@ -1,4 +1,6 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
+
+import com.wjduquette.joe.*;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

@@ -1,4 +1,6 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
+
+import com.wjduquette.joe.Joe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.List;
  * global variables, functions, types, etc.
  */
 public class GlobalEnvironment extends Environment {
-    GlobalEnvironment() {
+    public GlobalEnvironment() {
         super();
     }
 

@@ -1,11 +1,14 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
+
+import com.wjduquette.joe.Keyword;
+import com.wjduquette.joe.SyntaxError;
 
 import java.util.*;
 import java.util.function.Consumer;
 
-import static com.wjduquette.joe.TokenType.*;
+import static com.wjduquette.joe.walker.TokenType.*;
 
-class Scanner {
+public class Scanner {
     public static final Set<String> RESERVED_WORDS;
     private static final Map<String, TokenType> reserved;
 

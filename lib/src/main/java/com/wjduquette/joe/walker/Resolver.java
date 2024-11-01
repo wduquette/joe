@@ -1,4 +1,7 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
+
+import com.wjduquette.joe.JoeClass;
+import com.wjduquette.joe.SyntaxError;
 
 import java.util.HashMap;
 import java.util.List;

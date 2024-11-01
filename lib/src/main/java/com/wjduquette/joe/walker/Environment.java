@@ -1,4 +1,6 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
+
+import com.wjduquette.joe.RuntimeError;
 
 import java.util.*;
 
@@ -13,7 +15,7 @@ public class Environment {
      * Creates an environment with no enclosing environment.
      * This is only done by the {@link GlobalEnvironment}.
      */
-    Environment() {
+    public Environment() {
         enclosing = null;
     }
 
@@ -21,7 +23,7 @@ public class Environment {
      * Creates an environment with the given enclosing environment.
      * @param enclosing The enclosing environment.
      */
-    Environment(Environment enclosing) {
+    public Environment(Environment enclosing) {
         this.enclosing = enclosing;
     }
 
@@ -56,7 +58,7 @@ public class Environment {
 
         if (enclosing != null) return enclosing.get(name);
 
-        throw new RuntimeError(name,
+        throw new RuntimeError(name.line(),
             "Undefined variable '" + name.lexeme() + "'.");
     }
 
@@ -71,11 +73,11 @@ public class Environment {
             return;
         }
 
-        throw new RuntimeError(name,
+        throw new RuntimeError(name.line(),
             "Undefined variable '" + name.lexeme() + "'.");
     }
 
-    void setVar(String name, Object value) {
+    public void setVar(String name, Object value) {
         values.put(name, value);
     }
 

@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.walker.GlobalEnvironment;
+
 import java.io.IOException;
 
 /**

@@ -5,7 +5,7 @@ package com.wjduquette.joe;
  * interpreter.
  */
 public class RuntimeError extends JoeError {
-    RuntimeError(Token token, String message, String... frames) {
-        super(token.line(), message, frames);
+    public RuntimeError(int line, String message, String... frames) {
+        super(line, message, frames);
     }
 }

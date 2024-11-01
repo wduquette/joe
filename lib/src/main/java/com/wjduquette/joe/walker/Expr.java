@@ -1,4 +1,4 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
 
 import java.util.List;
 

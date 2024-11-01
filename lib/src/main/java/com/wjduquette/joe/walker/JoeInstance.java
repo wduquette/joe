@@ -1,4 +1,9 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
+
+import com.wjduquette.joe.JoeCallable;
+import com.wjduquette.joe.JoeClass;
+import com.wjduquette.joe.JoeError;
+import com.wjduquette.joe.JoeObject;
 
 import java.util.HashMap;
 import java.util.Map;

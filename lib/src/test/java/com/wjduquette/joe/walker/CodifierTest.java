@@ -1,9 +1,11 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
 
+import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.Ted;
 import org.junit.Before;
 import org.junit.Test;
-import static com.wjduquette.joe.TokenType.*;
-import static com.wjduquette.joe.Expr.*;
+import static com.wjduquette.joe.walker.TokenType.*;
+import static com.wjduquette.joe.walker.Expr.*;
 import static com.wjduquette.joe.checker.Checker.check;
 
 public class CodifierTest extends Ted {

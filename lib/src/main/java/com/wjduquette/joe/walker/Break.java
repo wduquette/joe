@@ -1,4 +1,4 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
 
 /**
  * A "break" in a Joe loop.

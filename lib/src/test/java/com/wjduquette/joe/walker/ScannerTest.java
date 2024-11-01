@@ -1,5 +1,6 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
 
+import com.wjduquette.joe.Ted;
 import org.junit.Test;
 
 import java.util.ArrayList;

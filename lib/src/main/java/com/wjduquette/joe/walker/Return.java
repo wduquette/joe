@@ -1,4 +1,4 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.walker;
 
 class Return extends RuntimeException {
     final Object value;

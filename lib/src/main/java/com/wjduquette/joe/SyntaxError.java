@@ -23,7 +23,7 @@ public class SyntaxError extends JoeError {
         }
     }
 
-    SyntaxError(String message, List<Detail> details) {
+    public SyntaxError(String message, List<Detail> details) {
         super(message);
         this.details = details;
     }
