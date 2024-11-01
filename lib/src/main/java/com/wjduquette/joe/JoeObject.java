@@ -2,7 +2,7 @@ package com.wjduquette.joe;
 
 import java.util.Collection;
 
-public interface JoeObject extends JoeToString, HasTypeName {
+public interface JoeObject extends HasToString, HasTypeName {
     /**
      * Gets the object's type name.
      * @return The name
