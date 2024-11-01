@@ -1,7 +1,6 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.types.*;
-import com.wjduquette.joe.walker.GlobalEnvironment;
 import com.wjduquette.joe.walker.JoeFunction;
 import com.wjduquette.joe.walker.Scanner;
 import com.wjduquette.joe.walker.WalkerEngine;
@@ -47,21 +46,23 @@ public class Joe {
     // Configuration and Embedding
 
     /**
-     * Returns Joe's global environment, for querying.
-     * @return The environment.
+     * Gets the names of the defined global variables.
+     * @return The names
      */
-    public GlobalEnvironment globals() {
-        return engine.globals();
+    public Set<String> getVarNames() {
+        return engine.getVarNames();
     }
 
     /**
-     * Gets a global variable's value by name.
+     * Gets a global variable's value by name.  Returns null if the variable
+     * is not found.  Check {@code getVarNames()} to determine whether a
+     * global variable is defined or not.
      * @param name The name
-     * @return The value, if found
+     * @return The value
      */
     @SuppressWarnings("unused")
-    public Optional<Object> getVar(String name) {
-        return Optional.ofNullable(globals().getVar(name));
+    public Object getVar(String name) {
+        return engine.getVar(name);
     }
 
     /**
@@ -71,7 +72,7 @@ public class Joe {
      */
     @SuppressWarnings("unused")
     public void setVar(String name, Object value) {
-        globals().setVar(name, value);
+        engine.setVar(name, value);
     }
 
     /**
@@ -87,7 +88,7 @@ public class Joe {
      * @param function The function
      */
     public void installGlobalFunction(NativeFunction function) {
-        globals().setVar(function.name(), function);
+        engine.setVar(function.name(), function);
     }
 
     /**
@@ -107,7 +108,7 @@ public class Joe {
         }
 
         // NEXT, install the type into the environment.
-        globals().setVar(typeProxy.name(), typeProxy);
+        engine.setVar(typeProxy.name(), typeProxy);
     }
 
     /**

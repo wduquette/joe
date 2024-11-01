@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class WalkerEngine implements Engine {
     //-------------------------------------------------------------------------
@@ -25,8 +26,20 @@ public class WalkerEngine implements Engine {
     //-------------------------------------------------------------------------
     // Engine API
 
-    public GlobalEnvironment globals() {
-        return interpreter.globals();
+
+    @Override
+    public Set<String> getVarNames() {
+        return interpreter.globals().getVarNames();
+    }
+
+    @Override
+    public Object getVar(String name) {
+        return interpreter.globals().getVar(name);
+    }
+
+    @Override
+    public void setVar(String name, Object value) {
+        interpreter.globals().setVar(name, value);
     }
 
     /**

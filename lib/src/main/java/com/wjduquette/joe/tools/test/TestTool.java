@@ -139,8 +139,7 @@ public class TestTool implements Tool {
         }
 
         // NEXT, execute its tests.
-        var globals = joe.globals();
-        var tests = globals.getVarNames().stream()
+        var tests = joe.getVarNames().stream()
             .filter(name -> name.startsWith("test"))
             .toList();
 
@@ -154,7 +153,7 @@ public class TestTool implements Tool {
         }
 
         for (var test : tests) {
-            var value = globals.getVar(test);
+            var value = joe.getVar(test);
             if (value instanceof JoeCallable callable) {
                 if (verbose) {
                     System.out.printf("%-30s in file %s\n", test, scriptPath);

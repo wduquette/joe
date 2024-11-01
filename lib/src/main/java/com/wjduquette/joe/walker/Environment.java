@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * A Joe environment, a dictionary of variable names and values.
  */
-public class Environment {
+class Environment {
     final Environment enclosing;
     protected final Map<String, Object> values = new HashMap<>();
 

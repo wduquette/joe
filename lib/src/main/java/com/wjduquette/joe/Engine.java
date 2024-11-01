@@ -1,8 +1,7 @@
 package com.wjduquette.joe;
 
-import com.wjduquette.joe.walker.GlobalEnvironment;
-
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * An Engine is a parsing and execution engine for the Joe language.
@@ -13,10 +12,24 @@ import java.io.IOException;
  */
 public interface Engine {
     /**
-     * Gets the global environment.
-     * @return The global environment.
+     * Gets the set of variables from the global environment.
+     * @return The names.
      */
-    GlobalEnvironment globals();
+    Set<String> getVarNames();
+
+    /**
+     * Gets the value of a global variable.
+     * @param name The name
+     * @return The value
+     */
+    Object getVar(String name);
+
+    /**
+     * Sets the value of a global variable.
+     * @param name The name
+     * @param value The value
+     */
+    void setVar(String name, Object value);
 
     /**
      * Reads the given file and executes its content as a script.
@@ -37,4 +50,5 @@ public interface Engine {
      * @throws JoeError on all runtime errors.
      */
     Object run(String source) throws SyntaxError, JoeError;
+
 }
