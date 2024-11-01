@@ -81,6 +81,14 @@ function testCanSubclass() {
 }
 
 //-----------------------------------------------------------------------------
+// `@` operator
+
+function testCanUseAt() {
+    var thing = AtThing("Fred", "red");
+    check(thing.info()).eq("name='Fred' color='red'");
+}
+
+//-----------------------------------------------------------------------------
 // Helpers
 
 class Thing {
@@ -93,3 +101,15 @@ class Thing {
         return "name='" + this.name + "' color='" + this.color + "'";
     }
 }
+
+class AtThing {
+    method init(name, color) {
+        @name = name;
+        @color = color;
+    }
+
+    method info() {
+        return "name='" + @name + "' color='" + @color + "'";
+    }
+}
+

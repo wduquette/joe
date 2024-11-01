@@ -432,16 +432,6 @@ public class Joe {
         return codifier.recodify(expr);
     }
 
-    // Converts the statement into something that looks like code.
-    String recodify(Stmt statement) {
-        return recodify(List.of(statement));
-    }
-
-    // Converts the statements into something that looks like code.
-    String recodify(List<Stmt> statements) {
-        return codifier.recodify(statements);
-    }
-
     /**
      * Gets the script-level type of the value, or null if null.
      * This is primarily for use in error messages.

@@ -89,26 +89,4 @@ public class CodifierTest extends Ted {
         test("testExprVariable");
         check(joe.recodify(variable)).eq("counter");
     }
-
-    //-------------------------------------------------------------------------
-    // Statements
-
-    @Test
-    public void testStmtExpr() {
-        test("testStmtExpr");
-
-        var stmt = new Stmt.Expression(two);
-        check(joe.recodify(stmt)).eq("2;");
-    }
-
-    @Test
-    public void testStmtVar() {
-        test("testStmtVar");
-
-        var stmt = new Stmt.Var(
-            new Token(IDENTIFIER, "x", null, 1),
-            two
-        );
-        check(joe.recodify(stmt)).eq("var x = 2;");
-    }
 }

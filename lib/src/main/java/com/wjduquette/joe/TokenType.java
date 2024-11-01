@@ -3,7 +3,7 @@ package com.wjduquette.joe;
 enum TokenType {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-    BACK_SLASH, COLON, COMMA, DOT, MINUS, PLUS, QUESTION,
+    AT, BACK_SLASH, COLON, COMMA, DOT, MINUS, PLUS, QUESTION,
     SEMICOLON, SLASH, STAR,
 
     // One or two character tokens.

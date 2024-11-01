@@ -551,6 +551,14 @@ class Parser {
             return new Expr.Literal(previous().literal());
         }
 
+        if (match(AT)) {
+            Token keyword = previous();
+            Token name = consume(IDENTIFIER,
+                "Expected class property name.");
+            var obj = new Expr.This(keyword);
+            return new Expr.Get(obj, name);
+        }
+
         if (match(SUPER)) {
             Token keyword = previous();
             consume(DOT, "Expected '.' after 'super'.");

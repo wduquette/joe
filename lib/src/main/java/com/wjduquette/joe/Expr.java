@@ -6,7 +6,8 @@ import java.util.List;
  * The various kinds of expression that can appear in Joe's AST.
  */
 sealed interface Expr
-    permits Expr.Assign, Expr.Binary, Expr.Call, Expr.Get, Expr.Grouping,
+    permits Expr.Assign, Expr.Binary, Expr.Call,
+            Expr.Get, Expr.Grouping,
             Expr.Lambda, Expr.Literal, Expr.Logical, Expr.PrePostAssign,
             Expr.PrePostSet, Expr.Set, Expr.Super,
             Expr.This, Expr.Ternary, Expr.Unary, Expr.Variable

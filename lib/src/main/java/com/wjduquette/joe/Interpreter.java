@@ -460,8 +460,9 @@ class Interpreter {
 
                 yield method;
             }
-            // Handle `this.<property>` in methods
-            case Expr.This expr -> lookupVariable(expr.keyword(), expr);
+            // Handle `this.<property>` in methods.  Note: the expr's
+            // keyword might be "@".
+            case Expr.This expr -> lookupVariable(Token.synthetic("this"), expr);
             // The ternary `? :` operator
             case Expr.Ternary expr -> {
                 var condition = Joe.isTruthy(evaluate(expr.condition()));
