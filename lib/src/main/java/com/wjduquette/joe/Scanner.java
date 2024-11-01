@@ -83,6 +83,7 @@ class Scanner {
             case ')'  -> addToken(RIGHT_PAREN);
             case '{'  -> addToken(LEFT_BRACE);
             case '}'  -> addToken(RIGHT_BRACE);
+            case '@'  -> addToken(AT);
             case '\\' -> addToken(BACK_SLASH);
             case ':'  -> addToken(COLON);
             case ','  -> addToken(COMMA);

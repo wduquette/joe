@@ -207,6 +207,7 @@ class Codifier {
             case Assign expr ->
                 expr.name().lexeme() + " " + expr.op().lexeme() + " " +
                     recodify(expr.value());
+            case At expr -> "@" + expr.name().lexeme();
             case Binary expr -> {
                 var type = expr.op().type();
                 // Let * and / bind visually tighter.

@@ -6,7 +6,8 @@ import java.util.List;
  * The various kinds of expression that can appear in Joe's AST.
  */
 sealed interface Expr
-    permits Expr.Assign, Expr.Binary, Expr.Call, Expr.Get, Expr.Grouping,
+    permits Expr.Assign, Expr.At, Expr.Binary, Expr.Call,
+            Expr.Get, Expr.Grouping,
             Expr.Lambda, Expr.Literal, Expr.Logical, Expr.PrePostAssign,
             Expr.PrePostSet, Expr.Set, Expr.Super,
             Expr.This, Expr.Ternary, Expr.Unary, Expr.Variable
@@ -20,6 +21,13 @@ sealed interface Expr
      * @param value The expression to assign to it.
      */
     record Assign(Token name, Token op, Expr value) implements Expr {}
+
+    /**
+     * In a class method, a reference to a class property
+     * @param keyword The "@" keyword
+     * @param name The property name
+     */
+    record At(Token keyword, Token name) implements Expr {}
 
     /**
      * A binary expression, e.g., "+", "&lt;", etc.

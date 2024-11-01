@@ -204,6 +204,19 @@ class Resolver {
                 resolve(expr.value());
                 resolveLocal(expr, expr.name());
             }
+            case Expr.At expr -> {
+                if (currentClass == ClassType.NONE) {
+                    error(expr.keyword(),
+                        "Attempted to use 'this' outside of any class.");
+                } else if (currentFunction == FunctionType.STATIC_INITIALIZER) {
+                    error(expr.keyword(),
+                        "Attempted to use 'this' in a static initializer.");
+                } else if (currentFunction == FunctionType.STATIC_METHOD) {
+                    error(expr.keyword(),
+                        "Attempted to use 'this' in a static method.");
+                }
+                resolveLocal(expr, Token.synthetic("this"));
+            }
             case Expr.Binary expr -> {
                 resolve(expr.left());
                 resolve(expr.right());
