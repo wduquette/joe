@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 import static com.wjduquette.joe.walker.TokenType.*;
 
-public class Scanner {
+class Scanner {
     private static final Map<String, TokenType> reserved;
 
     static {
