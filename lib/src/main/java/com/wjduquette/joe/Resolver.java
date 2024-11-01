@@ -11,8 +11,20 @@ import java.util.function.Consumer;
  * to scopes, and for doing other scope-related checks.
  */
 class Resolver {
-    private enum FunctionType { NONE, FUNCTION, INITIALIZER, METHOD, LAMBDA }
-    private enum ClassType { NONE, CLASS, SUBCLASS }
+    private enum FunctionType {
+        NONE,                // Not in a function
+        FUNCTION,            // In a normal function
+        METHOD,              // In an instance method
+        INITIALIZER,         // In `method init()`
+        STATIC_METHOD,       // In a static method
+        STATIC_INITIALIZER,  // In a static initializer
+        LAMBDA
+    }
+    private enum ClassType {
+        NONE,                // Not in a class
+        CLASS,               // In a root class
+        SUBCLASS             // In a subclass
+    }
 
     private final Interpreter interpreter;
     private final Consumer<SyntaxError.Detail> reporter;
@@ -61,13 +73,23 @@ class Resolver {
                 declare(stmt.name());
                 define(stmt.name());
 
+                // Superclass
+                if (stmt.superclass() != null) {
+                    currentClass = ClassType.SUBCLASS;
+                    resolve(stmt.superclass());
+                }
+
                 // Static Methods and Initializer
                 for (Stmt.Function method : stmt.staticMethods()) {
-                    FunctionType declaration = FunctionType.FUNCTION;
+                    FunctionType declaration = FunctionType.STATIC_METHOD;
                     resolveFunction(method, declaration);
                 }
+
                 if (!stmt.staticInitializer().isEmpty()) {
+                    var oldFunction = currentFunction;
+                    currentFunction = FunctionType.STATIC_INITIALIZER;
                     resolve(stmt.staticInitializer());
+                    currentFunction = oldFunction;
                 }
 
                 if (stmt.superclass() != null) {
@@ -77,12 +99,6 @@ class Resolver {
                         error(stmt.superclass().name(),
                             "A class can't inherit from itself.");
                     }
-                }
-
-                // Superclass
-                if (stmt.superclass() != null) {
-                    currentClass = ClassType.SUBCLASS;
-                    resolve(stmt.superclass());
                 }
 
                 if (stmt.superclass() != null) {
@@ -144,10 +160,16 @@ class Resolver {
                     error(stmt.keyword(),
                         "Attempted 'return' from top-level code.");
                 }
+
+                if (currentFunction == FunctionType.STATIC_INITIALIZER) {
+                    error(stmt.keyword(),
+                        "Attempted 'return' from static initializer.");
+                }
+
                 if (stmt.value() != null) {
                     if (currentFunction == FunctionType.INITIALIZER) {
                         error(stmt.keyword(),
-                            "Attempted to return a value from an initializer.");
+                            "Attempted to return a value from an instance initializer.");
                     }
                     resolve(stmt.value());
                 }
@@ -212,6 +234,12 @@ class Resolver {
                 if (currentClass == ClassType.NONE) {
                     error(expr.keyword(),
                         "Attempted to use 'super' outside of a class.");
+                } else if (currentFunction == FunctionType.STATIC_INITIALIZER) {
+                    error(expr.keyword(),
+                        "Attempted to use 'super' in a static initializer.");
+                } else if (currentFunction == FunctionType.STATIC_METHOD) {
+                    error(expr.keyword(),
+                        "Attempted to use 'super' in a static method.");
                 } else if (currentClass != ClassType.SUBCLASS) {
                     error(expr.keyword(),
                         "Attempted to use 'super' in a class with no superclass.");
@@ -222,6 +250,12 @@ class Resolver {
                 if (currentClass == ClassType.NONE) {
                     error(expr.keyword(),
                         "Attempted to use 'this' outside of any class.");
+                } else if (currentFunction == FunctionType.STATIC_INITIALIZER) {
+                    error(expr.keyword(),
+                        "Attempted to use 'this' in a static initializer.");
+                } else if (currentFunction == FunctionType.STATIC_METHOD) {
+                    error(expr.keyword(),
+                        "Attempted to use 'this' in a static method.");
                 }
                 resolveLocal(expr, expr.keyword());
             }
