@@ -1,5 +1,6 @@
 package com.wjduquette.joe.walker;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.SyntaxError;
 
@@ -9,42 +10,43 @@ import java.util.function.Consumer;
 import static com.wjduquette.joe.walker.TokenType.*;
 
 public class Scanner {
-    public static final Set<String> RESERVED_WORDS;
     private static final Map<String, TokenType> reserved;
 
     static {
         reserved = new HashMap<>();
-        reserved.put("assert",   ASSERT);
-        reserved.put("break",    BREAK);
-        reserved.put("case",     CASE);
-        reserved.put("class",    CLASS);
-        reserved.put("continue", CONTINUE);
-        reserved.put("default",  DEFAULT);
-        reserved.put("else",     ELSE);
-        reserved.put("extends",  EXTENDS);
-        reserved.put("false",    FALSE);
-        reserved.put("for",      FOR);
-        reserved.put("foreach",  FOREACH);
-        reserved.put("function", FUNCTION);
-        reserved.put("if",       IF);
-        reserved.put("in",       IN);
-        reserved.put("method",   METHOD);
-        reserved.put("ni",       NI);
-        reserved.put("null",     NULL);
-        reserved.put("return",   RETURN);
-        reserved.put("static",   STATIC);
-        reserved.put("super",    SUPER);
-        reserved.put("switch",   SWITCH);
-        reserved.put("this",     THIS);
-        reserved.put("throw",    THROW);
-        reserved.put("true",     TRUE);
-        reserved.put("var",      VAR);
-        reserved.put("while",    WHILE);
+        reserved("assert",   ASSERT);
+        reserved("break",    BREAK);
+        reserved("case",     CASE);
+        reserved("class",    CLASS);
+        reserved("continue", CONTINUE);
+        reserved("default",  DEFAULT);
+        reserved("else",     ELSE);
+        reserved("extends",  EXTENDS);
+        reserved("false",    FALSE);
+        reserved("for",      FOR);
+        reserved("foreach",  FOREACH);
+        reserved("function", FUNCTION);
+        reserved("if",       IF);
+        reserved("in",       IN);
+        reserved("method",   METHOD);
+        reserved("ni",       NI);
+        reserved("null",     NULL);
+        reserved("return",   RETURN);
+        reserved("static",   STATIC);
+        reserved("super",    SUPER);
+        reserved("switch",   SWITCH);
+        reserved("this",     THIS);
+        reserved("throw",    THROW);
+        reserved("true",     TRUE);
+        reserved("var",      VAR);
+        reserved("while",    WHILE);
     }
 
-    static {
-        var words = new TreeSet<>(reserved.keySet());
-        RESERVED_WORDS = Collections.unmodifiableSet(words);
+    private static void reserved(String word, TokenType token) {
+        if (!Joe.RESERVED_WORDS.contains(word)) {
+            throw new IllegalStateException("Not reserved: '" + word + "'.");
+        }
+        reserved.put(word, token);
     }
 
     //-------------------------------------------------------------------------

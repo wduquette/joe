@@ -2,7 +2,6 @@ package com.wjduquette.joe;
 
 import com.wjduquette.joe.types.*;
 import com.wjduquette.joe.walker.JoeFunction;
-import com.wjduquette.joe.walker.Scanner;
 import com.wjduquette.joe.walker.WalkerEngine;
 
 import java.io.IOException;
@@ -16,6 +15,47 @@ import java.util.stream.Collectors;
  * install any needed bindings, and then use it to execute Joe scripts.
  */
 public class Joe {
+    //-------------------------------------------------------------------------
+    // Static constants
+
+    /**
+     * The set of Joe's reserved words.
+     */
+    public static final Set<String> RESERVED_WORDS;
+
+    static {
+        var set = new TreeSet<String>();
+        Collections.addAll(set,
+            "assert",
+            "break",
+            "case",
+            "class",
+            "continue",
+            "default",
+            "else",
+            "extends",
+            "false",
+            "for",
+            "foreach",
+            "function",
+            "if",
+            "in",
+            "method",
+            "ni",
+            "null",
+            "return",
+            "static",
+            "super",
+            "switch",
+            "this",
+            "throw",
+            "true",
+            "var",
+            "while"
+        );
+        RESERVED_WORDS = Collections.unmodifiableSet(set);
+    }
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -503,7 +543,7 @@ public class Joe {
      * @return true or false
      */
     public static boolean isIdentifier(String name) {
-        if (Scanner.RESERVED_WORDS.contains(name)) {
+        if (Joe.RESERVED_WORDS.contains(name)) {
             return false;
         }
         return name.matches("[_A-Za-z][_A-Za-z0-9]*");
