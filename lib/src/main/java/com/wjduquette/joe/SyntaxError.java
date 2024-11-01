@@ -7,7 +7,7 @@ import java.util.List;
  * An error found while processing a Joe script prior to
  * execution.
  */
-public class SyntaxError extends JoeError {
+public class SyntaxError extends RuntimeException {
     /** The individual error messages, by line. */
     private final List<Detail> details;
 
