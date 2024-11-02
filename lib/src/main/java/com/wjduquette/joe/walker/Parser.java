@@ -1,4 +1,5 @@
 package com.wjduquette.joe.walker;
+import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 
 import java.util.ArrayList;
@@ -15,14 +16,20 @@ class Parser {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Consumer<SyntaxError.Detail> reporter;
+    private final SourceBuffer source;
     private final List<Token> tokens;
+    private final Consumer<SyntaxError.Detail> reporter;
     private int current = 0;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    Parser(List<Token> tokens, Consumer<SyntaxError.Detail> reporter) {
+    Parser(
+        SourceBuffer source,
+        List<Token> tokens,
+        Consumer<SyntaxError.Detail> reporter)
+    {
+        this.source = source;
         this.reporter = reporter;
         this.tokens = tokens;
     }
@@ -128,11 +135,17 @@ class Parser {
 
     private Stmt assertStatement() {
         Token keyword = previous();
+        var conditionStart = keyword.span().end();
         Expr condition = expression();
-        Expr message = null;
+        var conditionEnd = previous().span().end();
+        Expr message;
 
         if (match(COMMA)) {
             message = expression();
+        } else {
+            var conditionText =
+                source.span(conditionStart, conditionEnd).text().strip();
+            message = new Expr.Literal("Assertion unmet: " + conditionText);
         }
 
         consume(SEMICOLON, "Expected ';' after assertion.");

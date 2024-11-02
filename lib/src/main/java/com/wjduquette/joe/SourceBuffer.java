@@ -5,6 +5,20 @@ import java.util.List;
 
 public class SourceBuffer {
     //-------------------------------------------------------------------------
+    // Static API
+
+    /**
+     * Creates a synthetic span, unrelated to an actual source script.
+     * Methods that require a `SourceBuffer` throw
+     * `UnsupportedOperationException`.
+     * @param text The text
+     * @return The span.
+     */
+    public static Span synthetic(String text) {
+        return new SyntheticSpan(text);
+    }
+
+    //-------------------------------------------------------------------------
     // Instance Variables
 
     // The buffer's ID; this is usually the filename of a script file.
@@ -132,10 +146,6 @@ public class SourceBuffer {
         }
     }
 
-    public Span synthetic(String text) {
-        return new SyntheticSpan(text);
-    }
-
     //-------------------------------------------------------------------------
     // Helper Types
 
@@ -216,25 +226,25 @@ public class SourceBuffer {
         }
     }
 
-    private class SyntheticSpan implements Span {
-        private final String text;
-
-        public SyntheticSpan(String text) {
-            this.text = text;
-        }
-
-        @Override public String filename() { return filename; }
-        @Override public String text() { return text; }
-        @Override public SourceBuffer buffer() { return SourceBuffer.this; }
-
-        @Override
-        public int start() {
+    private record  SyntheticSpan(String text) implements Span {
+        @Override public SourceBuffer buffer() {
             throw new UnsupportedOperationException("Synthetic span");
         }
 
-        @Override
-        public int end() {
+        @Override public String filename() {
             throw new UnsupportedOperationException("Synthetic span");
+        }
+
+        @Override public int start() {
+            throw new UnsupportedOperationException("Synthetic span");
+        }
+
+        @Override public int end() {
+            throw new UnsupportedOperationException("Synthetic span");
+        }
+
+        @Override public String toString() {
+            return "Span[" + text + "]";
         }
     }
 
@@ -262,5 +272,11 @@ public class SourceBuffer {
         @Override public String text() { return source.substring(start, end); }
         @Override public int start() { return start; }
         @Override public int end() { return end; }
+
+        @Override public String toString() {
+            return "Span[" + filename + ",@" + startPosition() +
+                " (" + start + ")," + text() + "]";
+        }
+
     }
 }

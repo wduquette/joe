@@ -98,7 +98,8 @@ class Scanner {
             scanToken();
         }
 
-        tokens.add(new Token(EOF, "", null, line));
+        var endSpan = buffer.span(source.length(), source.length());
+        tokens.add(new Token(EOF, endSpan, null));
         return tokens;
     }
 
@@ -519,8 +520,8 @@ class Scanner {
     }
 
     private void addToken(TokenType type, Object literal) {
-        String text = source.substring(start, current);
-        tokens.add(new Token(type, text, literal, line));
+        var span = buffer.span(start, current);
+        tokens.add(new Token(type, span, literal));
     }
 
     private void error(int line, String message) {

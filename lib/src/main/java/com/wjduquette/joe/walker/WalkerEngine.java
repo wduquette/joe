@@ -77,7 +77,8 @@ public class WalkerEngine implements Engine {
 
         Scanner scanner = new Scanner(filename, source, details::add);
         List<Token> tokens = scanner.scanTokens();
-        Parser parser = new Parser(tokens, details::add);
+        var buffer = scanner.buffer();
+        Parser parser = new Parser(buffer, tokens, details::add);
         var statements = parser.parse();
 
         // Stop if there was a syntax error.
@@ -94,7 +95,7 @@ public class WalkerEngine implements Engine {
         }
 
         // Save the buffer, for later introspection.
-        buffers.put(filename, scanner.buffer());
+        buffers.put(filename, buffer);
 
         return interpreter.interpret(statements);
     }

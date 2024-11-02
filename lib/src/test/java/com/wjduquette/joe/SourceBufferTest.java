@@ -101,11 +101,10 @@ public class SourceBufferTest extends Ted {
 
     @Test
     public void testSynthetic() {
-        buff = new SourceBuffer("-", "abc\ndef");
-        var span = buff.synthetic("xyz");
-        check(span.filename()).eq("-");
+        var span = SourceBuffer.synthetic("xyz");
         check(span.text()).eq("xyz");
-        check(span.buffer()).eq(buff);
+        checkThrow(span::buffer);
+        checkThrow(span::filename);
         checkThrow(span::start);
         checkThrow(span::end);
     }
