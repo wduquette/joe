@@ -90,7 +90,7 @@ public class ReplTool implements Tool {
             String line = reader.readLine();
             if (line == null) break;
             try {
-                var result = joe.run(line);
+                var result = joe.run("%repl%", line);
 
                 if (result != null) {
                     System.out.println("-> " + joe.stringify(result));

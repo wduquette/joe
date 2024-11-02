@@ -108,7 +108,7 @@ public class ParserTest extends Ted {
                 method init() {}
             """);
         checkList(details).items(
-            "[line 3] Error at end: Expected '}' after class body."
+            "[line 2] Error at end: Expected '}' after class body."
         );
     }
 
@@ -361,7 +361,7 @@ public class ParserTest extends Ted {
     // Scans and returns the parse errors
     private List<String> parse(String input) {
         details.clear();
-        var scanner = new Scanner(input, detail ->
+        var scanner = new Scanner("-", input, detail ->
             details.add(detail.message())
         );
         var tokens = scanner.scanTokens();
@@ -371,7 +371,7 @@ public class ParserTest extends Ted {
                 String.join("\n  ", details));
         }
 
-        var parser = new Parser(tokens, detail ->
+        var parser = new Parser(scanner.buffer(), tokens, detail ->
             details.add("[line " + detail.line() + "] " + detail.message())
         );
         parser.parse();

@@ -5,7 +5,11 @@ package com.wjduquette.joe;
  * interpreter.
  */
 public class RuntimeError extends JoeError {
-    public RuntimeError(int line, String message, String... frames) {
-        super(line, message, frames);
+    public RuntimeError(
+        SourceBuffer.Span span,
+        String message,
+        String... frames
+    ) {
+        super(span, message, frames);
     }
 }

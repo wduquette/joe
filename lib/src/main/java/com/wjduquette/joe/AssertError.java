@@ -16,10 +16,10 @@ public class AssertError extends JoeError {
     /**
      * Creates an assert error at the given line number with the
      * given message.
-     * @param line The line number
+     * @param span The span of text related to the error.
      * @param message The message
      */
-    public AssertError(int line, String message) {
-        super(line, message);
+    public AssertError(SourceBuffer.Span span, String message) {
+        super(span, message);
     }
 }

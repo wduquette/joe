@@ -2,6 +2,7 @@ package com.wjduquette.joe;
 
 import java.io.PrintStream;
 import java.util.List;
+import com.wjduquette.joe.SourceBuffer.Span;
 
 /**
  * An error found while processing a Joe script prior to
@@ -13,13 +14,24 @@ public class SyntaxError extends RuntimeException {
 
     /**
      * A specific syntax error
-     * @param line The line number in the input.
+     * @param span The span of text in the input.
      * @param message The error message.
      */
-    public record Detail(int line, String message) {
+    public record Detail(Span span, String message) {
+        public Detail {
+            if (span.isSynthetic()) {
+                throw new IllegalArgumentException(
+                    "SyntaxError.Detail created with synthetic span: " + span);
+            }
+        }
+
+        public int line() {
+            return span.startLine();
+        }
+
         @Override
         public String toString() {
-            return "[" + line + "] " + message;
+            return "[line " + span.startLine() + "] " + message;
         }
     }
 

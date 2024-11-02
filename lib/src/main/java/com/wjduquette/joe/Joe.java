@@ -142,7 +142,7 @@ public class Joe {
             assert stream != null;
             var source = new String(stream.readAllBytes(),
                 StandardCharsets.UTF_8);
-            run(source);
+            run(resource, source);
         } catch (SyntaxError ex) {
             System.err.println("Could not load script resource '" +
                 resource + "' relative to class " +
@@ -238,13 +238,16 @@ public class Joe {
 
     /**
      * Executes the script, throwing an appropriate error on failure.
+     * The filename is usually the bare file name of the script file,
+     * but can be any string relevant to the application, e.g., "%repl%".
+     * @param filename The filename
      * @param source The input
      * @return The script's result
      * @throws SyntaxError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
-    public Object run(String source) throws SyntaxError, JoeError {
-        return engine.run(source);
+    public Object run(String filename, String source) throws SyntaxError, JoeError {
+        return engine.run(filename, source);
     }
 
     //-------------------------------------------------------------------------

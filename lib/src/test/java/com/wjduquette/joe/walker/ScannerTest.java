@@ -72,7 +72,7 @@ public class ScannerTest extends Ted {
     // Scans and returns the first error
     private String scan(String input) {
         details.clear();
-        var scanner = new Scanner(input, detail -> {
+        var scanner = new Scanner("-", input, detail -> {
             System.out.println("detail: " + detail);
             details.add(detail.message());
         });
@@ -81,7 +81,7 @@ public class ScannerTest extends Ted {
     }
 
     private String scanString(String input) {
-        var scanner = new Scanner(input, detail -> {});
+        var scanner = new Scanner("-", input, detail -> {});
         var result = scanner.scanTokens();
         if (result.isEmpty()) {
             return null;
