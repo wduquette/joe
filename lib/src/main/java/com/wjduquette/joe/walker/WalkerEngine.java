@@ -6,15 +6,18 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class WalkerEngine implements Engine {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The interpreter
     private final Interpreter interpreter;
+
+    // The buffers
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private final Map<String,SourceBuffer> buffers = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -44,7 +47,7 @@ public class WalkerEngine implements Engine {
 
     /**
      * Reads the given file and executes its content as a script.
-     * @param path The file's path
+     * @param scriptPath The file's path
      * @return The script's result
      * @throws IOException if the file cannot be read.
      * @throws SyntaxError if the script could not be compiled.
@@ -55,7 +58,7 @@ public class WalkerEngine implements Engine {
         throws IOException, SyntaxError, JoeError
     {
         var path = Paths.get(scriptPath);
-        byte[] bytes = Files.readAllBytes(Paths.get(scriptPath));
+        byte[] bytes = Files.readAllBytes(path);
         var script = new String(bytes, Charset.defaultCharset());
 
         return run(path.getFileName().toString(), script);
@@ -89,6 +92,9 @@ public class WalkerEngine implements Engine {
         if (!details.isEmpty()) {
             throw new SyntaxError("Syntax error in input, halting.", details);
         }
+
+        // Save the buffer, for later introspection.
+        buffers.put(filename, scanner.buffer());
 
         return interpreter.interpret(statements);
     }
