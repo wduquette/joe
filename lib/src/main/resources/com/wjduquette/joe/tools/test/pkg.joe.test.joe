@@ -32,7 +32,7 @@ class ValueChecker {
     // @args value
     // Initializes the new checker with the given *value*.
     method init(value) {
-        this.value = value;
+        @value = value;
     }
 
     //**
@@ -41,7 +41,7 @@ class ValueChecker {
     // @result this
     // Checks that the value is equal to the *expected* value.
     method eq(expected) {
-        assert this.value == expected, this._expected(_typedValue(expected));
+        assert @value == expected, @_expected(_typedValue(expected));
         return this;
     }
 
@@ -50,7 +50,7 @@ class ValueChecker {
     // @result this
     // Checks that the value is truthy.
     method isTrue() {
-        assert this.value, this._expected("true");
+        assert @value, @_expected("true");
         return this;
     }
 
@@ -59,7 +59,7 @@ class ValueChecker {
     // @result this
     // Checks that the value is falsey.
     method isFalse() {
-        assert !this.value, this._expected("false");
+        assert !@value, @_expected("false");
         return this;
     }
 
@@ -68,7 +68,7 @@ class ValueChecker {
     // @result this
     // Checks that the value is `null`
     method isNull() {
-        assert this.value == null, this._expected("null");
+        assert @value == null, @_expected("null");
         return this;
     }
 
@@ -77,7 +77,7 @@ class ValueChecker {
     // @result this
     // Checks that the value is not `null`
     method isNonNull() {
-        assert this.value != null, this._expected("non-null");
+        assert @value != null, @_expected("non-null");
         return this;
     }
 
@@ -87,7 +87,7 @@ class ValueChecker {
     // Checks that the value `isEmpty()` according to its own `isEmpty()`
     // method.
     method isEmpty() {
-        assert this.value.isEmpty(), this._expected("isEmpty()");
+        assert @value.isEmpty(), @_expected("isEmpty()");
     }
 
     //**
@@ -99,7 +99,7 @@ class ValueChecker {
     method containsAll(args) {
         // TODO: Need predicate to check for a collection
         foreach (var arg : args) {
-            if (!this.value.contains(arg)) {
+            if (!@value.contains(arg)) {
                 fail("Expected collection to contain " +
                     typeName(arg) + " '" + arg + "' got: '" +
                     args + "'.");
@@ -113,14 +113,14 @@ class ValueChecker {
     // @result this
     // Checks that the value's `typeName()` is the given *name*.
     method hasTypeName(name) {
-        var got = typeName(this.value);
+        var got = typeName(@value);
         assert got == name,
-            this._expected2("type name '" + name + "'", got);
+            @_expected2("type name '" + name + "'", got);
     }
 
     method _expected(what) {
         return "Expected " + what + ", got: " +
-            _typedValue(this.value) + ".";
+            _typedValue(@value) + ".";
     }
     method _expected2(what, got) {
         return "Expected " + what + ", got: " +
@@ -138,8 +138,8 @@ class CatchChecker {
     // @args tuple
     // Initializes the checker with the result of a `catch()`.
     method init(tuple) {
-        this.tuple = tuple;
-        this.err = tuple.is(#error) ? tuple.error : null;
+        @tuple = tuple;
+        @err = tuple.is(#error) ? tuple.error : null;
     }
 
     //**
@@ -147,9 +147,9 @@ class CatchChecker {
     // @result this
     // Checks that the catch result is not an error.
     method isOK() {
-        assert this.err == null,
+        assert @err == null,
             "Expected no error, got: '"
-            + this.err.message() + "'.";
+            + @err.message() + "'.";
         return this;
     }
 
@@ -158,8 +158,8 @@ class CatchChecker {
     // @result Boolean
     // Returns `true` if there was an error, and `false` otherwise.
     method isError() {
-        assert this.err != null, "Expected an error, got: "
-            + _typedValue(this.tuple.ok) + ".";
+        assert @err != null, "Expected an error, got: "
+            + _typedValue(@tuple.ok) + ".";
         return this;
     }
 
@@ -169,10 +169,10 @@ class CatchChecker {
     // @result this
     // Checks that the error message matches the *expected* value.
     method message(expected) {
-        this.isError();
-        assert this.err.message() == expected,
+        @isError();
+        assert @err.message() == expected,
             "Expected message '" + expected + "', got: '" +
-            this.err.message() + "'.";
+            @err.message() + "'.";
         return this;
     }
 
@@ -182,9 +182,9 @@ class CatchChecker {
     // @result this
     // Checks the error type matches the *expected* value.
     method type(expected) {
-        this.isError();
-        assert this.err.type() == expected,
-            "Expected error type '" + expected + "', got: '" + this.err.type() + "'.";
+        @isError();
+        assert @err.type() == expected,
+            "Expected error type '" + expected + "', got: '" + @err.type() + "'.";
         return this;
     }
 
@@ -195,9 +195,9 @@ class CatchChecker {
     // Checks that the actual stack frames match the expected list of
     // stack frames. The expected frames are passed as individual arguments.
     method stackFrames(args) {
-        this.isError();
-        assert this.err.stackFrames() == args,
-            "Expected stack frames '" + args + "', got: '" + this.err.stackFrames() + "'.";
+        @isError();
+        assert @err.stackFrames() == args,
+            "Expected stack frames '" + args + "', got: '" + @err.stackFrames() + "'.";
         return this;
     }
 
@@ -208,9 +208,9 @@ class CatchChecker {
     // Checks that the actual stack traces matches the expected stack trace
     // string.
     method stackTrace(expected) {
-        this.isError();
-        assert this.err.stackTrace() == expected,
-            "Expected stack trace '" + expected + "', got: '" + this.err.stackTrace() + "'.";
+        @isError();
+        assert @err.stackTrace() == expected,
+            "Expected stack trace '" + expected + "', got: '" + @err.stackTrace() + "'.";
         return this;
     }
 }
