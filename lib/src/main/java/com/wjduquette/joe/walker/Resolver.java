@@ -332,8 +332,7 @@ class Resolver {
 
     // Saves the error detail.
     void error(Token token, String message) {
-        var line = token.line();
         var msg = "Error at '" + token.lexeme() + "': " + message;
-        reporter.accept(new SyntaxError.Detail(line, msg));
+        reporter.accept(new SyntaxError.Detail(token.span(), msg));
     }
 }

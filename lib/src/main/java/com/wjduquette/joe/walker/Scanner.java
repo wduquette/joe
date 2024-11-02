@@ -59,7 +59,6 @@ class Scanner {
     private final List<Token> tokens = new ArrayList<>();
     private int start = 0;
     private int current = 0;
-    private int line = 1;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -168,20 +167,20 @@ class Scanner {
                 if (match('&')) {
                     addToken(AND);
                 } else {
-                    error(line, "Expected '&&', got: '&'.");
+                    error("Expected '&&', got: '&'.");
                 }
             }
             case '|' -> {
                 if (match('|')) {
                     addToken(OR);
                 } else {
-                    error(line, "Expected '||', got: '|'.");
+                    error("Expected '||', got: '|'.");
                 }
             }
             case ' ', '\r', '\t' -> {
                 // Ignore whitespace.
             }
-            case '\n' -> line++;
+            case '\n' -> {}
             case '"' -> string();
             case '\'' -> rawString();
             case '#' -> keyword();
@@ -193,7 +192,7 @@ class Scanner {
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    error(line, "Unexpected character: '" + c + "'.");
+                    error("Unexpected character: '" + c + "'.");
                 }
             }
         }
@@ -211,7 +210,7 @@ class Scanner {
 
     private void keyword() {
         if (!isAlpha(peek())) {
-            error(line, "Expected keyword name.");
+            error("Expected keyword name.");
             return;
         }
         while (isAlphaNumeric(peek())) advance();
@@ -230,7 +229,7 @@ class Scanner {
             var num = Integer.parseInt(source.substring(start + 2, current), 16);
             addToken(NUMBER, (double)num);
         } catch (Exception ex) {
-            error(line, "Invalid hex literal.");
+            error("Invalid hex literal.");
         }
     }
 
@@ -254,7 +253,7 @@ class Scanner {
             }
 
             if (!isDigit(peek())) {
-                error(line, "Expected exponent.");
+                error("Expected exponent.");
                 return;
             }
 
@@ -290,13 +289,13 @@ class Scanner {
                             case 'f' -> buff.append('\f');
                             case '"' -> buff.append('"');
                             case 'u' -> unicode(buff);
-                            default -> error(line,
+                            default -> error(
                                 "Unexpected escape: '\\" + escape + "'.");
                         }
                     }
                 }
                 case '\n' -> {
-                    error(line, "Newline in single-line string.");
+                    error("Newline in single-line string.");
                     return;
                 }
                 default -> buff.append(advance());
@@ -304,7 +303,7 @@ class Scanner {
         }
 
         if (isAtEnd()) {
-            error(line, "Unterminated string.");
+            error("Unterminated string.");
             return;
         }
 
@@ -344,20 +343,16 @@ class Scanner {
                             case 'f' -> buff.append('\f');
                             case '"' -> buff.append('"');
                             case 'u' -> unicode(buff);
-                            default -> error(line,
+                            default -> error(
                                 "Unexpected escape: '\\" + escape + "'.");
                         }
                     }
-                }
-                case '\n' -> {
-                    line++;
-                    buff.append(advance());
                 }
                 default -> buff.append(advance());
             }
         }
 
-        error(line, "Unterminated text block.");
+        error("Unterminated text block.");
     }
 
     private void rawString() {
@@ -370,13 +365,13 @@ class Scanner {
             var c = advance();
 
             if (c == '\n') {
-                error(line, "Newline in raw string.");
+                error("Newline in raw string.");
                 return;
             }
         }
 
         if (isAtEnd()) {
-            error(line, "Unterminated raw string.");
+            error("Unterminated raw string.");
             return;
         }
 
@@ -402,15 +397,11 @@ class Scanner {
                         advance();
                     }
                 }
-                case '\n' -> {
-                    line++;
-                    advance();
-                }
                 default -> advance();
             }
         }
 
-        error(line, "Unterminated raw text block.");
+        error("Unterminated raw text block.");
     }
 
     private String outdent(String text) {
@@ -452,7 +443,7 @@ class Scanner {
             var hex = Integer.parseInt(hexCode, 16);
             buff.append(unicodeToString(hex));
         } else {
-            error(line, "Incomplete Unicode escape: '\\u" + hexCode + "'.");
+            error("Incomplete Unicode escape: '\\u" + hexCode + "'.");
         }
     }
 
@@ -524,7 +515,8 @@ class Scanner {
         tokens.add(new Token(type, span, literal));
     }
 
-    private void error(int line, String message) {
-        reporter.accept(new SyntaxError.Detail(line, message));
+    private void error(String message) {
+        reporter.accept(
+            new SyntaxError.Detail(buffer.span(start, current), message));
     }
 }

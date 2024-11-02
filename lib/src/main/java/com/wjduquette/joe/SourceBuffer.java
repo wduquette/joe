@@ -224,9 +224,19 @@ public class SourceBuffer {
         default Position endPosition() {
             return buffer().index2position(end());
         }
+
+        /**
+         * Whether is a synthetic span or not.  Synthetic spans are
+         * used internally, but should not be exposed to the client.
+         */
+        default boolean isSynthetic() {
+            return false;
+        }
     }
 
-    private record  SyntheticSpan(String text) implements Span {
+    private record SyntheticSpan(String text) implements Span {
+        @Override public boolean isSynthetic() { return true; }
+
         @Override public SourceBuffer buffer() {
             throw new UnsupportedOperationException("Synthetic span");
         }

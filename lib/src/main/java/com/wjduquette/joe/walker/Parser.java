@@ -656,11 +656,10 @@ class Parser {
 
     // Saves the error detail, with no synchronization.
     void error(Token token, String message) {
-        var line = token.line();
         var msg = token.type() == TokenType.EOF
             ? "Error at end: " + message
             : "Error at '" + token.lexeme() + "': " + message;
-        reporter.accept(new SyntaxError.Detail(line, msg));
+        reporter.accept(new SyntaxError.Detail(token.span(), msg));
     }
 
     // Saves the error detail, with synchronization.
