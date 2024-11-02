@@ -54,32 +54,49 @@ public class SourceBuffer {
     /**
      * Gets the text of the line with the given line number.  Strips any
      * trailing whitespace.
-     * @param lineNumber The line number, starting at 1.
+     * @param line The line number, starting at 1.
      * @return The text.
      */
-    public String line(int lineNumber) {
-        var index = lineNumber - 1;
-        var start = lines.get(index);
-        var end = index + 1 < lines.size()
-            ? lines.get(index + 1)
-            : source.length();
-        return source.substring(start, end).stripTrailing();
+    public String line(int line) {
+        if (0 < line && line <= lines.size()) {
+            var start = lines.get(line - 1);
+            var end = endOfLine(line);
+            return source.substring(start, end).stripTrailing();
+        } else {
+            throw new IllegalArgumentException("Line out of range.");
+        }
     }
 
     /**
      * Get the line number, starting at 1, that contains this index.
      * @param index The index
-     * @return The line number
+     * @return The line number, or -1 if the index is out of range.
      */
     public int index2line(int index) {
-        for (var i = 0; i < lines.size(); i++) {
-            var n = lines.get(i);
-            System.out.println("index=" + index + " i=" + i + " n=" + n);
-            if (index <= n) {
-                return i + 1;
+        // FIRST, allow the character position just after the end
+        // of the string as a valid index to the last line.
+        if (index == source.length()) {
+            return lines.size();
+        }
+
+        // NEXT, find the line that contains this index.
+        for (var line = 1; line <= lines.size(); line++) {
+            var start = lines.get(line - 1);
+            var end = endOfLine(line);
+
+            if (start <= index && index < end) {
+                return line;
             }
         }
-        return lines.size();
+        return -1;
+    }
+
+    private int endOfLine(int line) {
+        // NOTE: lines is indexed 0 to n-1, but line is an index
+        // 1 to n.
+        return line < lines.size()
+            ? lines.get(line)  // Beginning of the next line
+            : source.length(); // End of the string
     }
 
     /**
@@ -105,6 +122,16 @@ public class SourceBuffer {
         return new BufferSpan(start, end);
     }
 
+    public Span lineSpan(int line) {
+        if (0 < line && line <= lines.size()) {
+            var start = lines.get(line - 1);
+            var end = endOfLine(line);
+            return span(start, end);
+        } else {
+            throw new IllegalArgumentException("Line out of range.");
+        }
+    }
+
     public Span synthetic(String text) {
         return new SyntheticSpan(text);
     }
@@ -125,6 +152,12 @@ public class SourceBuffer {
      */
     public interface Span {
         /**
+         * The source buffer to which this span belongs.
+         * @return The buffer
+         */
+        SourceBuffer buffer();
+
+        /**
          * The filename from which the span was drawn (or some other identifier).
          * @return the filename
          */
@@ -135,6 +168,52 @@ public class SourceBuffer {
          * @return The text.
          */
         String text();
+
+        /**
+         * The start index of this span.
+         * @return The index
+         */
+        int start();
+
+        /**
+         * The end index of this span.
+         * @return The index
+         */
+        int end();
+
+        /**
+         * Gets the number of the line containing the start of the span.
+         * @return The line
+         */
+        default int startLine() {
+            return buffer().index2line(start());
+        }
+
+        /**
+         * Gets the number of the line containing the end of the span.
+         * @return The line
+         */
+        default int endLine() {
+            return buffer().index2line(end());
+        }
+
+        /**
+         * Gets the position (line,column) of the start of the span
+         * in the source.
+         * @return The position
+         */
+        default Position startPosition() {
+            return buffer().index2position(start());
+        }
+
+        /**
+         * Gets the position (line,column) of the end of the span
+         * in the source.
+         * @return The position
+         */
+        default Position endPosition() {
+            return buffer().index2position(end());
+        }
     }
 
     private class SyntheticSpan implements Span {
@@ -144,12 +223,18 @@ public class SourceBuffer {
             this.text = text;
         }
 
-        public String filename() {
-            return filename;
+        @Override public String filename() { return filename; }
+        @Override public String text() { return text; }
+        @Override public SourceBuffer buffer() { return SourceBuffer.this; }
+
+        @Override
+        public int start() {
+            throw new UnsupportedOperationException("Synthetic span");
         }
 
-        public String text() {
-            return text;
+        @Override
+        public int end() {
+            throw new UnsupportedOperationException("Synthetic span");
         }
     }
 
@@ -171,12 +256,11 @@ public class SourceBuffer {
         //---------------------------------------------------------------------
         // Methods
 
-        public String filename() {
-            return filename;
-        }
 
-        public String text() {
-            return source.substring(start, end);
-        }
+        @Override public SourceBuffer buffer() { return SourceBuffer.this; }
+        @Override public String filename() { return filename; }
+        @Override public String text() { return source.substring(start, end); }
+        @Override public int start() { return start; }
+        @Override public int end() { return end; }
     }
 }
