@@ -61,7 +61,7 @@ class Interpreter {
                 var condition = evaluate(stmt.condition());
                 if (!Joe.isTruthy(condition)) {
                     var message = joe.stringify(evaluate(stmt.message()));
-                    throw new AssertError(stmt.keyword().line(), message);
+                    throw new AssertError(stmt.keyword().span(), message);
                 }
             }
             case Stmt.Block stmt -> {
@@ -76,13 +76,13 @@ class Interpreter {
                     if (object instanceof JoeClass sc) {
                         if (!sc.canBeExtended()) {
                             throw new RuntimeError(
-                                stmt.superclass().name().line(),
+                                stmt.superclass().name().span(),
                                 "Type " + sc.name() + " cannot be subclassed.");
                         }
                         superclass = sc;
                     } else {
                         throw new RuntimeError(
-                            stmt.superclass().name().line(),
+                            stmt.superclass().name().span(),
                             "Superclass must be a class.");
                     }
                 }
@@ -349,7 +349,7 @@ class Interpreter {
                         } else if (left instanceof String || right instanceof String) {
                             yield joe.stringify(left) + joe.stringify(right);
                         } else {
-                            throw new RuntimeError(expr.op().line(),
+                            throw new RuntimeError(expr.op().span(),
                                 "'+' cannot combine the given operands.");
                         }
 
@@ -461,7 +461,7 @@ class Interpreter {
                     superclass.bind(instance, expr.method().lexeme());
 
                 if (method == null) {
-                    throw new RuntimeError(expr.method().line(),
+                    throw new RuntimeError(expr.method().span(),
                         "Undefined property '" +
                             expr.method().lexeme() + "'.");
                 }
@@ -543,7 +543,7 @@ class Interpreter {
                 if (instance.canIterate()) {
                     yield instance.getItems();
                 } else {
-                    throw new RuntimeError(token.line(),
+                    throw new RuntimeError(token.span(),
                         "Expected iterable, got: " +
                             joe.typeName(arg) + " '" +
                             joe.codify(arg) + "'.");
@@ -562,21 +562,21 @@ class Interpreter {
     {
         if (left instanceof Double && right instanceof Double) return;
 
-        throw new RuntimeError(operator.line(), "Operands must be numbers.");
+        throw new RuntimeError(operator.span(), "Operands must be numbers.");
     }
 
     private RuntimeError notSimilar(Token operator) {
-        return new RuntimeError(operator.line(),
+        return new RuntimeError(operator.span(),
             "Expected two doubles or two strings.");
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
         if (operand instanceof Double) return;
-        throw new RuntimeError(operator.line(), "Operand must be a number.");
+        throw new RuntimeError(operator.span(), "Operand must be a number.");
     }
 
     private void checkNumericTarget(Token operator, Object operand) {
         if (operand instanceof Double) return;
-        throw new RuntimeError(operator.line(), "Target of operand must contain a number.");
+        throw new RuntimeError(operator.span(), "Target of operand must contain a number.");
     }
 }

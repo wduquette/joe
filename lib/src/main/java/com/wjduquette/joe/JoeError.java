@@ -12,10 +12,10 @@ public class JoeError extends RuntimeException {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    /** The source line number. */
-    private final int line;
+    // The span of source text associate with the error, or null.
+    private final SourceBuffer.Span span;
 
-    /** Script level "stack frames" */
+    // Script level "stack frames"
     private final List<String> frames = new ArrayList<>();
 
     //-------------------------------------------------------------------------
@@ -28,19 +28,19 @@ public class JoeError extends RuntimeException {
      * @param frames The stack frame strings.
      */
     public JoeError(String message, String... frames) {
-        this(-1, message, frames);
+        this(null, message, frames);
     }
 
     /**
      * Creates an error with line number info and an optional number
      * of stack frame strings.
-     * @param line The line number
+     * @param span The source span
      * @param message The error message.
      * @param frames The stack frame strings.
      */
-    public JoeError(int line, String message, String... frames) {
+    public JoeError(SourceBuffer.Span span, String message, String... frames) {
         super(message);
-        this.line = line;
+        this.span = span;
         this.frames.addAll(List.of(frames));
     }
 
@@ -50,7 +50,7 @@ public class JoeError extends RuntimeException {
      * @return The line number
      */
     public int line() {
-        return line;
+        return span != null ? span.startLine() : -1;
     }
 
     /**

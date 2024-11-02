@@ -43,7 +43,7 @@ class Environment {
 
         if (enclosing != null) return enclosing.get(name);
 
-        throw new RuntimeError(name.line(),
+        throw new RuntimeError(name.span(),
             "Undefined variable '" + name.lexeme() + "'.");
     }
 
@@ -58,7 +58,7 @@ class Environment {
             return;
         }
 
-        throw new RuntimeError(name.line(),
+        throw new RuntimeError(name.span(),
             "Undefined variable '" + name.lexeme() + "'.");
     }
 
