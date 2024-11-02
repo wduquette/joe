@@ -361,7 +361,7 @@ public class ParserTest extends Ted {
     // Scans and returns the parse errors
     private List<String> parse(String input) {
         details.clear();
-        var scanner = new Scanner(input, detail ->
+        var scanner = new Scanner("-", input, detail ->
             details.add(detail.message())
         );
         var tokens = scanner.scanTokens();

@@ -51,26 +51,28 @@ public class WalkerEngine implements Engine {
      * @throws JoeError on all runtime errors.
      */
     @SuppressWarnings("UnusedReturnValue")
-    public Object runFile(String path)
+    public Object runFile(String scriptPath)
         throws IOException, SyntaxError, JoeError
     {
-        byte[] bytes = Files.readAllBytes(Paths.get(path));
+        var path = Paths.get(scriptPath);
+        byte[] bytes = Files.readAllBytes(Paths.get(scriptPath));
         var script = new String(bytes, Charset.defaultCharset());
 
-        return run(script);
+        return run(path.getFileName().toString(), script);
     }
 
     /**
      * Executes the script, throwing an appropriate error on failure.
+     * @param filename The source of the input.
      * @param source The input
      * @return The script's result
      * @throws SyntaxError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
-    public Object run(String source) throws SyntaxError, JoeError {
+    public Object run(String filename, String source) throws SyntaxError, JoeError {
         var details = new ArrayList<SyntaxError.Detail>();
 
-        Scanner scanner = new Scanner(source, details::add);
+        Scanner scanner = new Scanner(filename, source, details::add);
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(tokens, details::add);
         var statements = parser.parse();

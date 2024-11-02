@@ -33,22 +33,25 @@ public interface Engine {
 
     /**
      * Reads the given file and executes its content as a script.
-     * @param path The file's path
+     * @param scriptPath The file's path
      * @return The script's result
      * @throws IOException if the file cannot be read.
      * @throws SyntaxError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
-    Object runFile(String path)
+    Object runFile(String scriptPath)
         throws IOException, SyntaxError, JoeError;
 
     /**
      * Executes the script, throwing an appropriate error on failure.
+     * The filename is usually the bare file name of the script file,
+     * but can be any string relevant to the application, e.g., "%repl%".
+     * @param filename The filename
      * @param source The input
      * @return The script's result
      * @throws SyntaxError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
-    Object run(String source) throws SyntaxError, JoeError;
+    Object run(String filename, String source) throws SyntaxError, JoeError;
 
 }

@@ -2,6 +2,7 @@ package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Keyword;
+import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 
 import java.util.*;
@@ -53,6 +54,7 @@ class Scanner {
     // Instance Variables
 
     private final String source;
+    private final SourceBuffer buffer;
     private final Consumer<SyntaxError.Detail> reporter;
     private final List<Token> tokens = new ArrayList<>();
     private int start = 0;
@@ -62,14 +64,33 @@ class Scanner {
     //-------------------------------------------------------------------------
     // Constructor
 
-    Scanner(String source, Consumer<SyntaxError.Detail> reporter) {
+    /**
+     * Creates a new scanner for the given filename and source text, using
+     * the given error reporter.  The *filename* is usually the bare filename
+     * of the source script, but can be any string meaningful to the
+     * application.
+     *
+     * @param filename The filename
+     * @param source The source text
+     * @param reporter The error reporter
+     */
+    Scanner(
+        String filename,
+        String source,
+        Consumer<SyntaxError.Detail> reporter
+    ) {
         this.source = source;
+        this.buffer = new SourceBuffer(filename, source);
         this.reporter = reporter;
     }
 
     //-------------------------------------------------------------------------
     // Public API
 
+    /**
+     * Scans the source text and returns a list of tokens.
+     * @return The list
+     */
     List<Token> scanTokens() {
         while (!isAtEnd()) {
             // We are at the beginning of the next lexeme.
@@ -80,6 +101,18 @@ class Scanner {
         tokens.add(new Token(EOF, "", null, line));
         return tokens;
     }
+
+    /**
+     * Returns the source buffer.
+     * @return the buffer.
+     */
+    SourceBuffer buffer() {
+        return buffer;
+    }
+
+
+    //-------------------------------------------------------------------------
+    // The Scanner
 
     private void scanToken() {
         char c = advance();
