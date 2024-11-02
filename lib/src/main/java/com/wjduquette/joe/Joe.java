@@ -379,6 +379,18 @@ public class Joe {
     }
 
     /**
+     * Returns a "typeName 'value'" string using `typeName()` and
+     * `stringify()`.
+     * @param value The value
+     * @return The string.
+     */
+    public String typedValue(Object value) {
+        return value != null
+            ? typeName(value) + " '" + stringify(value) + "'"
+            : "'null'";
+    }
+
+    /**
      * Converts a value to a string as it would appear in Monica code.
      * This is intended primarily for use in error messages, but
      * could also be used during code generation.

@@ -24,6 +24,8 @@ class TestPackage extends JoePackage {
     public TestPackage() {
         super("joe.test");
         globalFunction("assertEquals", this::_assertEquals);
+        globalFunction("assertTrue",   this::_assertTrue);
+        globalFunction("assertFalse",  this::_assertFalse);
         globalFunction("fail",         this::_fail);
         scriptResource(getClass(), "pkg.joe.test.joe");
         type(PathProxy.TYPE);
@@ -36,13 +38,47 @@ class TestPackage extends JoePackage {
     // informative assertion error if not.
     private Object _assertEquals(Joe joe, Args args) {
         Joe.exactArity(args, 2, "assertEquals(got, expected)");
-        var got = args.getRemaining(0);
-        var expected = args.getRemaining(1);
+        var got      = args.next();
+        var expected = args.next();
 
         if (!Joe.isEqual(got, expected)) {
-            throw new AssertError("Expected '" +
-                joe.stringify(expected) + "', got: '" +
-                joe.stringify(got) + "'.");
+            throw new AssertError("Expected " +
+                joe.typedValue(expected) + ", got: " +
+                joe.typedValue(got) + ".");
+        }
+
+        return null;
+    }
+
+    //**
+    // @function assertTrue
+    // @args condition
+    // Verifies that *condition* is truthy, producing an
+    // informative assertion error if not.
+    private Object _assertTrue(Joe joe, Args args) {
+        Joe.exactArity(args, 1, "assertTrue(condition)");
+        var condition = args.next();
+
+        if (!Joe.isTruthy(condition)) {
+            throw new AssertError("Expected truthy value, got: " +
+                joe.typedValue(condition) + ".");
+        }
+
+        return null;
+    }
+
+    //**
+    // @function assertFalse
+    // @args condition
+    // Verifies that *condition* is falsey, producing an
+    // informative assertion error if not.
+    private Object _assertFalse(Joe joe, Args args) {
+        Joe.exactArity(args, 1, "assertFalse(condition)");
+        var condition = args.next();
+
+        if (Joe.isTruthy(condition)) {
+            throw new AssertError("Expected falsey value, got: " +
+                joe.typedValue(condition) + ".");
         }
 
         return null;
@@ -55,6 +91,6 @@ class TestPackage extends JoePackage {
     // test immediately.
     private Object _fail(Joe joe, Args args) {
         Joe.exactArity(args, 1, "fail(message)");
-        throw new AssertError(joe.stringify(args.getRemaining(0)));
+        throw new AssertError(joe.stringify(args.next()));
     }
 }

@@ -2829,6 +2829,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.test.html"><code>joe.test</code> package (Joe Test Tool API)</a>
 <ul>
 <li><a href="library/pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertFalse">assertFalse(<em>condition</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertTrue">assertTrue(<em>condition</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
@@ -4272,6 +4274,8 @@ for use in <code>joe test</code> test suites.</p>
 <p><strong><a href="library/pkg.joe.test.html#functions">Functions</a></strong></p>
 <ul>
 <li><a href="library/pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertFalse">assertFalse(<em>condition</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertTrue">assertTrue(<em>condition</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
@@ -4294,6 +4298,18 @@ other packages so that they can be tested:</p>
 <hr />
 <p><strong>assertEquals(<em>got</em>, <em>expected</em>)</strong></p>
 <p>Verifies that <em>got</em> equals the <em>expected</em> value, producing an
+informative assertion error if not.</p>
+<p><span id="function.assertFalse"> </span></p>
+<h3 id="assertfalse"><a class="header" href="#assertfalse">assertFalse()</a></h3>
+<hr />
+<p><strong>assertFalse(<em>condition</em>)</strong></p>
+<p>Verifies that <em>condition</em> is falsey, producing an
+informative assertion error if not.</p>
+<p><span id="function.assertTrue"> </span></p>
+<h3 id="asserttrue"><a class="header" href="#asserttrue">assertTrue()</a></h3>
+<hr />
+<p><strong>assertTrue(<em>condition</em>)</strong></p>
+<p>Verifies that <em>condition</em> is truthy, producing an
 informative assertion error if not.</p>
 <p><span id="function.check"> </span></p>
 <h3 id="check"><a class="header" href="#check">check()</a></h3>
@@ -5979,6 +5995,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.test.html"><code>joe.test</code> package (Joe Test Tool API)</a>
 <ul>
 <li><a href="library/pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertFalse">assertFalse(<em>condition</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertTrue">assertTrue(<em>condition</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>

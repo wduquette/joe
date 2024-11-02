@@ -6,7 +6,25 @@ function testAssertEquals() {
 
     function bad() { assertEquals("abc", 5); }
     checkCatch(bad)
-        .message("Expected '5', got: 'abc'.");
+        .message("Expected Number '5', got: String 'abc'.");
+}
+
+function testAssertTrue() {
+    assertTrue(true);
+    assertTrue("abc");
+
+    function bad() { assertTrue(false); }
+    checkCatch(bad)
+        .message("Expected truthy value, got: Boolean 'false'.");
+}
+
+function testAssertFalse() {
+    assertFalse(false);
+    assertFalse(null);
+
+    function bad() { assertFalse(true); }
+    checkCatch(bad)
+        .message("Expected falsey value, got: Boolean 'true'.");
 }
 
 function testFail() {
