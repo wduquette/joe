@@ -1,7 +1,6 @@
 package com.wjduquette.joe;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.List;
 import com.wjduquette.joe.SourceBuffer.Span;
 
