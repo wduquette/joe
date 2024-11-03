@@ -147,7 +147,7 @@ public class Joe {
             System.err.println("Could not load script resource '" +
                 resource + "' relative to class " +
                 cls.getCanonicalName() + ":\n" + ex.getMessage());
-            ex.printErrorsByLine(System.err);
+            ex.printDetails(System.err);
             System.exit(1);
         } catch (JoeError ex) {
             System.err.println("Could not install script resource '" +

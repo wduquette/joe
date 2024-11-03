@@ -69,7 +69,7 @@ public class RunTool implements Tool {
                 "\n*** " + ex.getMessage());
             System.exit(1);
         } catch (SyntaxError ex) {
-            ex.printErrorsByLine();
+            ex.printDetails();
             System.err.println(ex.getMessage());
             System.exit(65);
         } catch (JoeError ex) {
