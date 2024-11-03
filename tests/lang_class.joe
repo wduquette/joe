@@ -80,6 +80,51 @@ function testCanSubclass() {
     check(kid.getColor()).eq(#red);
 }
 
+function testThisInNestedFunction() {
+    class Nest {
+        method init() { @name = "Howard"; }
+        method whoAmI() {
+            function getName() {
+                return this.name;
+            }
+            return getName();
+        }
+    }
+
+    assertEquals(Nest().whoAmI(), "Howard");
+}
+
+function testAtInNestedFunction() {
+    class Nest {
+        method init() { @name = "Howard"; }
+        method whoAmI() {
+            function getName() {
+                return @name;
+            }
+            return getName();
+        }
+    }
+
+    assertEquals(Nest().whoAmI(), "Howard");
+}
+
+function testSuperInNestedFunction() {
+    class Parent {
+        method name() { return "Howard"; }
+    }
+    class Child extends Parent {
+        method name() {
+            function getName() {
+                return "*" + super.name() + "*";
+            }
+            return getName();
+        }
+    }
+
+    assertEquals(Child().name(), "*Howard*");
+}
+
+
 //-----------------------------------------------------------------------------
 // `@` operator
 
