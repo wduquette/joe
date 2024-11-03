@@ -26,6 +26,7 @@ class TestPackage extends JoePackage {
         globalFunction("assertEquals", this::_assertEquals);
         globalFunction("assertTrue",   this::_assertTrue);
         globalFunction("assertFalse",  this::_assertFalse);
+        globalFunction("catchError",   this::_catchError);
         globalFunction("fail",         this::_fail);
         scriptResource(getClass(), "pkg.joe.test.joe");
         type(PathProxy.TYPE);
@@ -82,6 +83,26 @@ class TestPackage extends JoePackage {
         }
 
         return null;
+    }
+
+    //**
+    // @function catchError
+    // @args callable
+    // @result String
+    // This simplified version of the standard
+    // [[joe#function.catch]] function executes the *callable* and catches
+    // the resulting [[joe.Error]], returning the error's message or.  The
+    // test fails if the *callable* does not throw an error.
+    private Object _catchError(Joe joe, Args args) {
+        Joe.exactArity(args, 1, "catchError(callable)");
+        Object result;
+        try {
+            result = joe.call(args.next());
+        } catch (JoeError ex) {
+            return ex.getMessage();
+        }
+
+        throw joe.expected("error", result);
     }
 
     //**

@@ -33,6 +33,18 @@ function testFail() {
         .message("Called fail()");
 }
 
+function testCatchError_good() {
+    function bad() { throw "Simulated error."; }
+    assertEquals(catchError(bad), "Simulated error.");
+}
+
+function testCatchError_bad() {
+    function ok() { return #ok; }
+    function bad() { catchError(ok); }
+    assertEquals(catchError(bad),
+       "Expected error, got: Keyword '#ok'.");
+}
+
 function testCheck_eq() {
     check("abc").eq("abc");
 
