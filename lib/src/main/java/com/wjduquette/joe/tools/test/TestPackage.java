@@ -28,6 +28,7 @@ class TestPackage extends JoePackage {
         globalFunction("assertFalse",  this::_assertFalse);
         globalFunction("catchError",   this::_catchError);
         globalFunction("fail",         this::_fail);
+        globalFunction("skip",         this::_skip);
         scriptResource(getClass(), "pkg.joe.test.joe");
         type(PathProxy.TYPE);
     }
@@ -113,5 +114,16 @@ class TestPackage extends JoePackage {
     private Object _fail(Joe joe, Args args) {
         Joe.exactArity(args, 1, "fail(message)");
         throw new AssertError(joe.stringify(args.next()));
+    }
+
+    //**
+    // @function skip
+    // @args message
+    // Skips the current test with the given message without executing it
+    // further.  The test will be counted as "Skipped" in the final test
+    // results.
+    private Object _skip(Joe joe, Args args) {
+        Joe.exactArity(args, 1, "skip(message)");
+        throw new TestTool.SkipError(joe.stringify(args.next()));
     }
 }

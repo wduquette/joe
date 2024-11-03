@@ -50,6 +50,7 @@ public class TestTool implements Tool {
     private final List<String> testScripts = new ArrayList<>();
     private int loadErrorCount = 0;
     private int successCount = 0;
+    private int skipCount = 0;
     private int failureCount = 0;
     private int errorCount = 0;
 
@@ -94,12 +95,14 @@ public class TestTool implements Tool {
         }
 
         // NEXT, print the final results
-        var total = successCount + failureCount + errorCount;
+        var total = successCount + skipCount + failureCount + errorCount;
         println();
-        println("Successes: " + successCount);
-        println("Failures:  " + failureCount);
-        println("Error:     " + errorCount);
-        println("Total:     " + total);
+        System.out.printf("Successes  %5d\n", successCount);
+        System.out.printf("Skipped    %5d\n", skipCount);
+        System.out.printf("Failures   %5d\n", failureCount);
+        System.out.printf("Errors     %5d\n", errorCount);
+        System.out.printf("---------- -----\n");
+        System.out.printf("Total      %5d\n", total);
 
         if (loadErrorCount != 0) {
             println("\n*** " + loadErrorCount + " test file(s) failed to load.");
@@ -162,6 +165,12 @@ public class TestTool implements Tool {
                 try {
                     callable.call(joe, Args.EMPTY);
                     ++successCount;
+                } catch (SkipError ex) {
+                    if (!verbose) {
+                        System.out.printf("%-30s in file %s\n", test, scriptPath);
+                    }
+                    println("  SKIPPED: " + ex.getMessage());
+                    ++skipCount;
                 } catch (AssertError ex) {
                     if (!verbose) {
                         System.out.printf("%-30s in file %s\n", test, scriptPath);
@@ -177,6 +186,14 @@ public class TestTool implements Tool {
                 }
             }
         }
+    }
+
+    //-------------------------------------------------------------------------
+    // SkipException
+
+    // Used by the "skip()" function.
+    public static class SkipError extends JoeError {
+        public SkipError(String message) { super(message); }
     }
 
     //-------------------------------------------------------------------------

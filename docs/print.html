@@ -352,6 +352,11 @@ which is a native type that can be subclassed by Joe classes.</li>
 multiple <code>@type</code> entities</li>
 </ul>
 </li>
+<li><code>joe test</code>
+<ul>
+<li>Added <code>assertTrue</code>, <code>assertFalse</code>, <code>catchError</code>, and <code>skip</code> functions.</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>
@@ -2831,9 +2836,11 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertFalse">assertFalse(<em>condition</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertTrue">assertTrue(<em>condition</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.catchError">catchError(<em>callable</em>)</a> → String</li>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.skip">skip(<em>message</em>)</a></li>
 <li><a href="library/type.joe.test.CatchChecker.html">CatchChecker</a>
 <ul>
 <li><a href="library/type.joe.test.CatchChecker.html#init">CatchChecker(<em>tuple</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
@@ -4276,9 +4283,11 @@ for use in <code>joe test</code> test suites.</p>
 <li><a href="library/pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertFalse">assertFalse(<em>condition</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertTrue">assertTrue(<em>condition</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.catchError">catchError(<em>callable</em>)</a> → String</li>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.skip">skip(<em>message</em>)</a></li>
 </ul>
 <p><strong>Types</strong></p>
 <ul>
@@ -4311,6 +4320,14 @@ informative assertion error if not.</p>
 <p><strong>assertTrue(<em>condition</em>)</strong></p>
 <p>Verifies that <em>condition</em> is truthy, producing an
 informative assertion error if not.</p>
+<p><span id="function.catchError"> </span></p>
+<h3 id="catcherror"><a class="header" href="#catcherror">catchError()</a></h3>
+<hr />
+<p><strong>catchError(<em>callable</em>) → String</strong></p>
+<p>This simplified version of the standard
+<a href="library/pkg.joe.html#function.catch"><code>catch()</code></a> function executes the <em>callable</em> and catches
+the resulting <a href="library/type.joe.Error.html"><code>Error</code></a>, returning the error's message or.  The
+test fails if the <em>callable</em> does not throw an error.</p>
 <p><span id="function.check"> </span></p>
 <h3 id="check"><a class="header" href="#check">check()</a></h3>
 <hr />
@@ -4328,6 +4345,13 @@ the error result.</p>
 <p><strong>fail(<em>message</em>)</strong></p>
 <p>Throws an assertion error with the given <em>message</em>, failing the
 test immediately.</p>
+<p><span id="function.skip"> </span></p>
+<h3 id="skip"><a class="header" href="#skip">skip()</a></h3>
+<hr />
+<p><strong>skip(<em>message</em>)</strong></p>
+<p>Skips the current test with the given message without executing it
+further.  The test will be counted as "Skipped" in the final test
+results.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="catchchecker-type-joetest"><a class="header" href="#catchchecker-type-joetest"><code>CatchChecker</code> type (<code>joe.test</code>)</a></h1>
 <hr />
 <p>A fluent test checker for <code>catch()</code> results.
@@ -5997,9 +6021,11 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertFalse">assertFalse(<em>condition</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertTrue">assertTrue(<em>condition</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.catchError">catchError(<em>callable</em>)</a> → String</li>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.skip">skip(<em>message</em>)</a></li>
 <li><a href="library/type.joe.test.CatchChecker.html">CatchChecker</a>
 <ul>
 <li><a href="library/type.joe.test.CatchChecker.html#init">CatchChecker(<em>tuple</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>

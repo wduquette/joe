@@ -35,6 +35,8 @@
     - Added `@enum` entity for documenting enum types.
     - Added `@mixin` entity for documentation to be included into
       multiple `@type` entities
+  - `joe test`
+    - Added `assertTrue`, `assertFalse`, `catchError`, and `skip` functions.
      
 - Miscellaneous
   - Removed the `Joe::recodify(Stmt)` and `Joe::recodify(List<Stmt>)` methods.
