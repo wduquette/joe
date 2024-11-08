@@ -307,16 +307,11 @@ method:</p>
 }
 </code></pre>
 <h2 id="stringification"><a class="header" href="#stringification">Stringification</a></h2>
-<p>When Joe converts a value to a string, it can do so in two ways:</p>
-<ul>
-<li>Via <code>Joe::stringify()</code>, which is intended to produce a string for display.</li>
-<li>Via <code>Joe::codify()</code>, which is intended to produce a string that looks more
-like the code you'd see in a script to create the value.</li>
-</ul>
-<p>Both of these default to the value's normal Java <code>toString()</code>.</p>
-<p>To change how a value is stringified, override <code>TypeProxy::stringify</code>.  For
-example, <code>NumberProxy</code> ensures that integer-valued numbers are displayed
-without a trailing <code>.0</code>:</p>
+<p>When Joe converts a value to a string, it does so via <code>Joe::stringify</code>.  For
+proxied types, this defaults to returning the value's normal Java <code>toString()</code>.</p>
+<p>To change how a value is stringified at the script level, override
+<code>TypeProxy::stringify</code>.  For example, <code>NumberProxy</code> ensures that
+integer-valued numbers are displayed without a trailing <code>.0</code>:</p>
 <pre><code class="language-java">@Override
 public String stringify(Joe joe, Object value) {
     assert value instanceof Double;
@@ -328,9 +323,6 @@ public String stringify(Joe joe, Object value) {
     return text;
 }
 </code></pre>
-<p>Similarly, to override how a value is "codified", which usually affects how
-it appears in error messages, override <code>TypeProxy::codify</code>.  By default,
-this method just calls the proxy's <code>stringify</code>.</p>
 <h2 id="iterability"><a class="header" href="#iterability">Iterability</a></h2>
 <p>Joe's <code>foreach</code> statement, and its <code>in</code> and <code>ni</code> operators,<br />
 can iterate over or search the following kinds of collection values:</p>

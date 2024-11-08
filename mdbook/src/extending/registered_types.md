@@ -149,17 +149,12 @@ public class AssertErrorProxy extends TypeProxy<AssertError> {
 
 ## Stringification
 
-When Joe converts a value to a string, it can do so in two ways:
+When Joe converts a value to a string, it does so via `Joe::stringify`.  For
+proxied types, this defaults to returning the value's normal Java `toString()`.
 
-- Via `Joe::stringify()`, which is intended to produce a string for display.
-- Via `Joe::codify()`, which is intended to produce a string that looks more 
-  like the code you'd see in a script to create the value.
-
-Both of these default to the value's normal Java `toString()`.
-
-To change how a value is stringified, override `TypeProxy::stringify`.  For
-example, `NumberProxy` ensures that integer-valued numbers are displayed
-without a trailing `.0`:
+To change how a value is stringified at the script level, override 
+`TypeProxy::stringify`.  For example, `NumberProxy` ensures that 
+integer-valued numbers are displayed without a trailing `.0`:
 
 ```java
 @Override
@@ -173,10 +168,6 @@ public String stringify(Joe joe, Object value) {
     return text;
 }
 ```
-
-Similarly, to override how a value is "codified", which usually affects how
-it appears in error messages, override `TypeProxy::codify`.  By default,
-this method just calls the proxy's `stringify`.
 
 ## Iterability
 

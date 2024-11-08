@@ -41,9 +41,9 @@
     - Added `assertTrue`, `assertFalse`, `assertError`, and `skip` functions.
      
 - Miscellaneous
-  - Removed the `Joe::recodify(Stmt)` and `Joe::recodify(List<Stmt>)` methods.
-    - They were unused and `Codifier` is likely to be replaced altogether
-      in the near future.
+  - Removed `Joe::codify`.
+  - Removed the various flavors of `Joe::recodify`.
+
   
 ## Changes in 0.3.0 (2024-10-11)
 
