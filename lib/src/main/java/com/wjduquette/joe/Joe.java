@@ -576,65 +576,6 @@ public class Joe {
     // Argument parsing and error handling helpers
 
     /**
-     * Returns a "Wrong number of arguments" JoeError for a method or function
-     * with the given signature.  This is primarily used by the arity checker
-     * methods, but can also be used by native functions and methods at need.
-     * @param signature The signature
-     * @return The error, to be thrown.
-     */
-    public static JoeError arityFailure(String signature) {
-        return new JoeError("Wrong number of arguments, expected: " + signature);
-    }
-
-    /**
-     * Throws an arity check failure if the arguments list contains the wrong
-     * number of arguments.
-     * @param args The argument list
-     * @param arity The expected arity
-     * @param signature The signature string.
-     * @throws JoeError on failure
-     */
-    public static void exactArity(Args args, int arity, String signature) {
-        if (args.remaining() != arity) {
-            throw arityFailure(signature);
-        }
-    }
-
-    /**
-     * Throws an arity check failure if the arguments list contains fewer
-     * than the minimum number of arguments.
-     * @param args The argument list
-     * @param minArity The minimum arity
-     * @param signature The signature string.
-     * @throws JoeError on failure
-     */
-    public static void minArity(Args args, int minArity, String signature) {
-        if (args.remaining() < minArity) {
-            throw arityFailure(signature);
-        }
-    }
-
-    /**
-     * Throws an arity check failure if the arguments list contains the wrong
-     * number of arguments.
-     * @param args The argument list
-     * @param minArity The minimum arity
-     * @param maxArity The maximum arity
-     * @param signature The signature string.
-     * @throws JoeError on failure
-     */
-    public static void arityRange(
-        Args args,
-        int minArity,
-        int maxArity,
-        String signature)
-    {
-        if (args.remaining() < minArity || args.remaining() > maxArity) {
-            throw arityFailure(signature);
-        }
-    }
-
-    /**
      * Factory, constructs a JoeError to be thrown by the caller.
      * @param what What kind of value the caller expected
      * @param got The value the caller got

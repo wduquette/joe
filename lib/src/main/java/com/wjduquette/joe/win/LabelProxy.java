@@ -49,7 +49,7 @@ class LabelProxy extends FXProxy<Label> {
     // @args [text]
     // Returns a `Label`.
     private Object _initializer(Joe joe, Args args) {
-        Joe.arityRange(args, 0, 1, "Label([text])");
+        args.arityRange(0, 1, "Label([text])");
         if (args.isEmpty()) {
             return new Label();
         } else {
@@ -66,7 +66,7 @@ class LabelProxy extends FXProxy<Label> {
     // @result this
     // Sets the label's text.
     private Object _text(Label node, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "text(text)");
+        args.exactArity(1, "text(text)");
         node.setText(joe.stringify(args.next()));
         return node;
     }

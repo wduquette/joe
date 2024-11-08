@@ -147,8 +147,8 @@ public class StringProxy extends TypeProxy<String> {
     // @args value
     // Converts the value into its string representation.
     private Object _init(Joe joe, Args args) {
-        Joe.exactArity(args, 1, "String(value)");
-        return joe.stringify(args.getRemaining(0));
+        args.exactArity(1, "String(value)");
+        return joe.stringify(args.next(0));
     }
 
     //-------------------------------------------------------------------------
@@ -161,7 +161,7 @@ public class StringProxy extends TypeProxy<String> {
     // Formats the values into a string given the format string. See
     // [[String#topic.formatting]], below, for the format string syntax.
     private Object _format(Joe joe, Args args) {
-        Joe.minArity(args, 1, "format(fmt, [values...])");
+        args.minArity(1, "format(fmt, [values...])");
         var fmt = joe.toString(args.next());
         return StringFormatter.format(joe, fmt, args.remainderAsList());
     }
@@ -173,7 +173,7 @@ public class StringProxy extends TypeProxy<String> {
     // Given a delimiter and a list, joins the string representations of the
     // list items into a single string, delimited by the given delimiter.
     private Object _join(Joe joe, Args args) {
-        Joe.exactArity(args, 2, "join(delimiter, list)");
+        args.exactArity(2, "join(delimiter, list)");
         var delim = joe.stringify(args.next());
         var list = joe.toList(args.next());
         return list.stream()
@@ -191,8 +191,8 @@ public class StringProxy extends TypeProxy<String> {
     // @result String
     // Returns the character at the *index* as a string.
     private Object _charAt(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "charAt(index)");
-        var index = joe.toIndex(args.getRemaining(0), value.length());
+        args.exactArity(1, "charAt(index)");
+        var index = joe.toIndex(args.next(0), value.length());
         var c = value.charAt(index);
         return Character.toString(c);
     }
@@ -203,8 +203,8 @@ public class StringProxy extends TypeProxy<String> {
     // @result Boolean
     // Returns `true` if this contains the *target*, and `false` otherwise.
     private Object _contains(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "contains(target)");
-        var target = joe.stringify(args.getRemaining(0));
+        args.exactArity(1, "contains(target)");
+        var target = joe.stringify(args.next(0));
         return value.contains(target);
     }
 
@@ -214,8 +214,8 @@ public class StringProxy extends TypeProxy<String> {
     // @result Boolean
     // Returns `true` if this string ends with the suffix, and `false` otherwise.
     private Object _endsWith(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "endsWith(suffix)");
-        var suffix = joe.stringify(args.getRemaining(0));
+        args.exactArity(1, "endsWith(suffix)");
+        var suffix = joe.stringify(args.next(0));
         return value.endsWith(suffix);
     }
 
@@ -226,8 +226,8 @@ public class StringProxy extends TypeProxy<String> {
     // Returns `true` if this string is equal to the string representation
     // of the *other* value, ignoring case, and `false` otherwise.
     private Object _equalsIgnoreCase(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "other");
-        return value.equalsIgnoreCase(joe.stringify(args.getRemaining(0)));
+        args.exactArity(1, "other");
+        return value.equalsIgnoreCase(joe.stringify(args.next(0)));
     }
 
     //**
@@ -240,8 +240,8 @@ public class StringProxy extends TypeProxy<String> {
     // newline; this is easier to add than to remove, and is often unwanted,
     // so Joe trims it.
     private Object _indent(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "indent(n)");
-        var n = joe.toInteger(args.getRemaining(0));
+        args.exactArity(1, "indent(n)");
+        var n = joe.toInteger(args.next(0));
         return value.indent(n).stripTrailing();
     }
 
@@ -254,7 +254,7 @@ public class StringProxy extends TypeProxy<String> {
     // at *beginIndex*, which defaults to 0, and ends at *endIndex*, which
     // defaults to the end of the string.
     private Object _indexOf(String value, Joe joe, Args args) {
-        Joe.arityRange(args, 1, 3, "indexOf(target, [beginIndex], [endIndex])");
+        args.arityRange(1, 3, "indexOf(target, [beginIndex], [endIndex])");
         var target = joe.stringify(args.next());
 
         if (!args.hasNext()) {
@@ -277,7 +277,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns `true` if this string is empty or contains only
     // whitespace, and `false` otherwise.
     private Object _isBlank(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "isBlank()");
+        args.exactArity(0, "isBlank()");
         return value.isBlank();
     }
 
@@ -286,7 +286,7 @@ public class StringProxy extends TypeProxy<String> {
     // @result Boolean
     // Returns `true` if this string is the empty string, and `false` otherwise.
     private Object _isEmpty(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "isEmpty()");
+        args.exactArity(0, "isEmpty()");
         return value.isEmpty();
     }
 
@@ -299,7 +299,7 @@ public class StringProxy extends TypeProxy<String> {
     // at *fromIndex*, which defaults to 0, and proceeds towards the start of
     // the string.
     private Object _lastIndexOf(String value, Joe joe, Args args) {
-        Joe.arityRange(args, 1, 2, "lastIndexOf(target, [fromIndex]");
+        args.arityRange(1, 2, "lastIndexOf(target, [fromIndex]");
         var target = joe.stringify(args.next());
         if (!args.hasNext()) {
             return (double) value.lastIndexOf(target);
@@ -315,7 +315,7 @@ public class StringProxy extends TypeProxy<String> {
     // @result Double
     // Gets the string's length.
     private Object _length(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "length()");
+        args.exactArity(0, "length()");
         return (double)value.length();
     }
 
@@ -324,7 +324,7 @@ public class StringProxy extends TypeProxy<String> {
     // @result List
     // Returns a list consisting of the lines of text in the string.
     private Object _lines(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "lines()");
+        args.exactArity(0, "lines()");
         return new ListValue(value.lines().toList());
     }
 
@@ -335,7 +335,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns `true` if this string matches the regex pattern, and
     // `false` otherwise.
     private Object _matches(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "matches(pattern)");
+        args.exactArity(1, "matches(pattern)");
         return value.matches(joe.toString(args.next()));
     }
 
@@ -345,7 +345,7 @@ public class StringProxy extends TypeProxy<String> {
     // @result String
     // Creates a string containing this string repeated *count* times.
     private Object _repeat(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "repeat(count)");
+        args.exactArity(1, "repeat(count)");
         var arg = args.next();
         var count = joe.toInteger(arg);
 
@@ -363,7 +363,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns the string created by replacing every occurrence of the
     // *target* string in this string with the *replacement* string.
     private Object _replace(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 2, "replace(target,replacement)");
+        args.exactArity(2, "replace(target,replacement)");
         return value.replace(
             joe.stringify(args.next()),
             joe.stringify(args.next())
@@ -377,7 +377,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns the string created by replacing each substring of this
     // string that matches the *regex* with the replacement string.
     private Object _replaceAll(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 2, "replaceAll(regex, replacement)");
+        args.exactArity(2, "replaceAll(regex, replacement)");
         return value.replaceAll(
             joe.toString(args.next()),
             joe.stringify(args.next())
@@ -391,7 +391,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns the string created by replacing the first substring of this
     // string that matches the *regex* with the replacement string.
     private Object _replaceFirst(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 2, "replaceFirst(regex, replacement)");
+        args.exactArity(2, "replaceFirst(regex, replacement)");
         return value.replaceFirst(
             joe.toString(args.next()),
             joe.stringify(args.next())
@@ -407,7 +407,7 @@ public class StringProxy extends TypeProxy<String> {
     // expression pattern.  The delimiter substrings are not included
     // in the list.
     private Object _split(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "split(delimiter)");
+        args.exactArity(1, "split(delimiter)");
         var delim = joe.toString(args.next());
         var tokens = value.split(delim);
         return new ListValue(Arrays.asList(tokens));
@@ -422,7 +422,7 @@ public class StringProxy extends TypeProxy<String> {
     // expression pattern.  The delimiter substrings are included
     // as tokens in the list.
     private Object _splitWithDelimiters(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "splitWithDelimiters(delimiter)");
+        args.exactArity(1, "splitWithDelimiters(delimiter)");
         var delim = joe.toString(args.next());
         var tokens = value.splitWithDelimiters(delim, 0);
         return new ListValue(Arrays.asList(tokens));
@@ -434,8 +434,8 @@ public class StringProxy extends TypeProxy<String> {
     // @result Boolean
     // Returns `true` if this string starts with the prefix, and `false` otherwise.
     private Object _startsWith(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "startsWith(prefix)");
-        var prefix = joe.stringify(args.getRemaining(0));
+        args.exactArity(1, "startsWith(prefix)");
+        var prefix = joe.stringify(args.next(0));
         return value.startsWith(prefix);
     }
 
@@ -444,7 +444,7 @@ public class StringProxy extends TypeProxy<String> {
     // @result String
     // Returns this string, stripped of all leading and trailing whitespace.
     private Object _strip(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "strip()");
+        args.exactArity(0, "strip()");
         return value.strip();
     }
 
@@ -454,7 +454,7 @@ public class StringProxy extends TypeProxy<String> {
     // Strips the indent from each line of the string, preserving relative
     // indentation.
     private Object _stripIndent(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "stripIndent()");
+        args.exactArity(0, "stripIndent()");
         return value.stripIndent();
     }
 
@@ -463,7 +463,7 @@ public class StringProxy extends TypeProxy<String> {
     // @result String
     // Returns this string, stripped of all leading whitespace.
     private Object _stripLeading(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "stripLeading()");
+        args.exactArity(0, "stripLeading()");
         return value.stripLeading();
     }
 
@@ -472,7 +472,7 @@ public class StringProxy extends TypeProxy<String> {
     // @result String
     // Returns this string, stripped of all trailing whitespace.
     private Object _stripTrailing(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "stripTrailing()");
+        args.exactArity(0, "stripTrailing()");
         return value.stripTrailing();
     }
 
@@ -484,7 +484,7 @@ public class StringProxy extends TypeProxy<String> {
     // *beginIndex* and ends at the *endIndex*; *endIndex* defaults
     // to the end of the string.
     private Object _substring(String value, Joe joe, Args args) {
-        Joe.arityRange(args, 1, 2, "substring(beginIndex, [endIndex]");
+        args.arityRange(1, 2, "substring(beginIndex, [endIndex]");
         if (args.remaining() == 1) {
             return value.substring(
                 joe.toIndex(args.next(), value.length())
@@ -502,7 +502,7 @@ public class StringProxy extends TypeProxy<String> {
     // @result String
     // Returns this string converted to lowercase.
     private Object _toLowerCase(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "toLowerCase()");
+        args.exactArity(0, "toLowerCase()");
         return value.toLowerCase();
     }
 
@@ -511,7 +511,7 @@ public class StringProxy extends TypeProxy<String> {
     // @result String
     // Returns this string.
     private Object _toString(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "toString()");
+        args.exactArity(0, "toString()");
         return value;
     }
 
@@ -520,7 +520,7 @@ public class StringProxy extends TypeProxy<String> {
     // @result String
     // Returns this string converted to uppercase.
     private Object _toUpperCase(String value, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "toUpperCase()");
+        args.exactArity(0, "toUpperCase()");
         return value.toUpperCase();
     }
 }

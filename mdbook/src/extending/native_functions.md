@@ -27,7 +27,7 @@ For example, a simple function to square a number would look like this:
 
 ```java
 Object _square(Joe joe, ArgQueue args) {
-    Joe.exactArity(args, 1, "square(x)");  // Arity check
+    args.exactArity(1, "square(x)");       // Arity check
     var x = joe.toDouble(args.next());     // Argument conversion
     return x*x;                            // Computation
 }
@@ -51,53 +51,52 @@ arguments.  There are several cases:
 
 ### Exact Arity
 
-The `Joe.exactArity()` method checks that the function has received exactly a 
+The `Args::exactArity` method checks that the function has received exactly a 
 specific number of arguments, as shown in the `_square()` example above.  It
-takes three arguments:
+takes two arguments:
 
 ```java
-Joe.exactArity(args, 1, "square(x)");
+args.exactArity(1, "square(x)");
 ```
 
-- *args*, the native function's list of arguments.
 - The number of arguments expected.
 - A string representing the function's signature.
 
 If *args* doesn't contain exactly the correct number of arguments, 
-`exactArity()` will use `Joe.arityFailure()` to throw a `JoeError`
+`exactArity()` will use `Args.arityFailure()` to throw a `JoeError`
 with this message:
 
 `    Wrong number of arguments, expected: square(x)`
 
 ### Minimum Arity and Arity Ranges
 
-Similarly, the `Joe.minArity()` method checks that the *args* contains
+Similarly, the `Args::minArity` method checks that the *args* contains
 at least a minimum number of arguments.  For example, 
 [`Number.max()`](../library/type.joe.Number.md#static.max) requires
 at least 1 argument but can take any number of arguments.
 
 ```java
-Joe.minArity(args, 1, "Number.max(number,...)");
+args.minArity(1, "Number.max(number,...)");
 ```
 
-And the `Joe.arityRange()` method checks that the number of arguments
+And the `Args::arityRange` method checks that the number of arguments
 false within a certain range.  For example, the 
 [`String`](../library/type.joe.String.md) type's 
 [`substring()`](../library/type.joe.String.md#method.substring) method takes
 1 or 2 arguments:
 
 ```java
-Joe.arityRange(args, 1, 2, "substring(beginIndex, [endIndex])");
+args.arityRange(1, 2, "substring(beginIndex, [endIndex])");
 ```
 
 ### More Complex Cases
 
 In rare cases, it's simplest for the native function to access the 
-`ArgQueue`'s size directly, and throw a Joe `arityFailure` explicitly:
+`Args`'s size directly, and throw an `arityFailure` explicitly:
 
 ```java
 if (args.size() > 7) {
-    throw Joe.arityFailure("myFunc(a, b, c, ...)");
+    throw Args.arityFailure("myFunc(a, b, c, ...)");
 }
 ```
 

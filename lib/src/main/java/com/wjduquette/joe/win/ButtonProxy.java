@@ -58,7 +58,7 @@ class ButtonProxy extends FXProxy<Button> {
     // the text.  If the *action* is also given, it must be a no-arg
     // callable; it will be invoked when the button is pressed.
     private Object _initializer(Joe joe, Args args) {
-        Joe.arityRange(args, 0, 2, "Button([text],[action])");
+        args.arityRange(0, 2, "Button([text],[action])");
         return switch(args.size()) {
             case 0 -> new Button();
             case 1 -> new Button(joe.stringify(args.next()));
@@ -81,7 +81,7 @@ class ButtonProxy extends FXProxy<Button> {
     // Adds a no-arg *callable* to the button as its action; pressing the
     // button will invoke the callable.
     private Object _action(Button node, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "action(callable)");
+        args.exactArity(1, "action(callable)");
         node.setOnAction(evt -> joe.call(args.next()));
         return node;
     }
@@ -92,7 +92,7 @@ class ButtonProxy extends FXProxy<Button> {
     // @result this
     // Sets the button's *text*.
     private Object _text(Button node, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "text(text)");
+        args.exactArity(1, "text(text)");
         node.setText(joe.stringify(args.next()));
         return node;
     }

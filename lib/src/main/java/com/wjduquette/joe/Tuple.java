@@ -216,7 +216,7 @@ public class Tuple implements JoeObject, HasToString {
     // @result String
     // Returns the tuple's string representation.
     private static Object _toString(Tuple tuple, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "toString()");
+        args.exactArity(0, "toString()");
 
         return tuple.toString(joe);
     }

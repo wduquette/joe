@@ -301,7 +301,7 @@ buy him lunch.</p>
 </ul>
 </li>
 <li>
-<p>Extending</p>
+<p>Extending/Embedding API</p>
 <ul>
 <li>It is now possible to define native types that more fully resemble
 Joe classes and instances, e.g., the new <code>TextBuilder</code>.
@@ -311,6 +311,8 @@ instances.</li>
 <li><code>TextBuilder</code> can be extended by Joe classes.</li>
 </ul>
 </li>
+<li>Moved the arity checking methods (e.g., <code>Joe.exactArity()</code>) from
+<code>Joe</code> to <code>Args</code>.</li>
 </ul>
 </li>
 <li>
@@ -354,7 +356,7 @@ multiple <code>@type</code> entities</li>
 </li>
 <li><code>joe test</code>
 <ul>
-<li>Added <code>assertTrue</code>, <code>assertFalse</code>, <code>catchError</code>, and <code>skip</code> functions.</li>
+<li>Added <code>assertTrue</code>, <code>assertFalse</code>, <code>assertError</code>, and <code>skip</code> functions.</li>
 </ul>
 </li>
 </ul>
@@ -1420,7 +1422,7 @@ call to some Java API.</li>
 <p>Joe provides the tools to make each of these steps simple and concise.</p>
 <p>For example, a simple function to square a number would look like this:</p>
 <pre><code class="language-java">Object _square(Joe joe, ArgQueue args) {
-    Joe.exactArity(args, 1, "square(x)");  // Arity check
+    args.exactArity(1, "square(x)");       // Arity check
     var x = joe.toDouble(args.next());     // Argument conversion
     return x*x;                            // Computation
 }
@@ -1436,39 +1438,38 @@ joe.install("square", this::_square);
 methods for checking that a native function has received the correct number of
 arguments.  There are several cases:</p>
 <h3 id="exact-arity"><a class="header" href="#exact-arity">Exact Arity</a></h3>
-<p>The <code>Joe.exactArity()</code> method checks that the function has received exactly a
+<p>The <code>Args::exactArity</code> method checks that the function has received exactly a
 specific number of arguments, as shown in the <code>_square()</code> example above.  It
-takes three arguments:</p>
-<pre><code class="language-java">Joe.exactArity(args, 1, "square(x)");
+takes two arguments:</p>
+<pre><code class="language-java">args.exactArity(1, "square(x)");
 </code></pre>
 <ul>
-<li><em>args</em>, the native function's list of arguments.</li>
 <li>The number of arguments expected.</li>
 <li>A string representing the function's signature.</li>
 </ul>
 <p>If <em>args</em> doesn't contain exactly the correct number of arguments,
-<code>exactArity()</code> will use <code>Joe.arityFailure()</code> to throw a <code>JoeError</code>
+<code>exactArity()</code> will use <code>Args.arityFailure()</code> to throw a <code>JoeError</code>
 with this message:</p>
 <p><code>    Wrong number of arguments, expected: square(x)</code></p>
 <h3 id="minimum-arity-and-arity-ranges"><a class="header" href="#minimum-arity-and-arity-ranges">Minimum Arity and Arity Ranges</a></h3>
-<p>Similarly, the <code>Joe.minArity()</code> method checks that the <em>args</em> contains
+<p>Similarly, the <code>Args::minArity</code> method checks that the <em>args</em> contains
 at least a minimum number of arguments.  For example,
 <a href="extending/../library/type.joe.Number.html#static.max"><code>Number.max()</code></a> requires
 at least 1 argument but can take any number of arguments.</p>
-<pre><code class="language-java">Joe.minArity(args, 1, "Number.max(number,...)");
+<pre><code class="language-java">args.minArity(1, "Number.max(number,...)");
 </code></pre>
-<p>And the <code>Joe.arityRange()</code> method checks that the number of arguments
+<p>And the <code>Args::arityRange</code> method checks that the number of arguments
 false within a certain range.  For example, the
 <a href="extending/../library/type.joe.String.html"><code>String</code></a> type's
 <a href="extending/../library/type.joe.String.html#method.substring"><code>substring()</code></a> method takes
 1 or 2 arguments:</p>
-<pre><code class="language-java">Joe.arityRange(args, 1, 2, "substring(beginIndex, [endIndex])");
+<pre><code class="language-java">args.arityRange(1, 2, "substring(beginIndex, [endIndex])");
 </code></pre>
 <h3 id="more-complex-cases"><a class="header" href="#more-complex-cases">More Complex Cases</a></h3>
 <p>In rare cases, it's simplest for the native function to access the
-<code>ArgQueue</code>'s size directly, and throw a Joe <code>arityFailure</code> explicitly:</p>
+<code>Args</code>'s size directly, and throw an <code>arityFailure</code> explicitly:</p>
 <pre><code class="language-java">if (args.size() &gt; 7) {
-    throw Joe.arityFailure("myFunc(a, b, c, ...)");
+    throw Args.arityFailure("myFunc(a, b, c, ...)");
 }
 </code></pre>
 <h2 id="argument-conversion"><a class="header" href="#argument-conversion">Argument Conversion</a></h2>
@@ -1741,7 +1742,7 @@ as a property of a list object.</p>
     ...
     
     private Object _join(Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 2, "join(delimiter, list)");
+        args.exactArity(2, "join(delimiter, list)");
         ...
     }
 }
@@ -1817,7 +1818,7 @@ here is the implementation of the <code>String</code> type's
     ...
 
     private Object _length(String value, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "length()");
+        args.exactArity(0, "length()");
         return (double)value.length();
     }
 }

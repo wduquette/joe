@@ -49,7 +49,7 @@ class ControlProxy extends FXProxy<Control> {
     // @result this
     // Sets the control's [[Tooltip]], or null for none.
     private Object _tooltip(Control node, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "tooltip(tooltip)");
+        args.exactArity(0, "tooltip(tooltip)");
         node.setTooltip(joe.toClass(args.next(), Tooltip.class));
         return node;
     }
@@ -60,7 +60,7 @@ class ControlProxy extends FXProxy<Control> {
     // @result this
     // Gives the control a tooltip with the given *text*.
     private Object _tooltipText(Control node, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "tooltipText(text)");
+        args.exactArity(0, "tooltipText(text)");
         node.setTooltip(new Tooltip(joe.stringify(args.next())));
         return node;
     }

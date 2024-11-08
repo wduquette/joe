@@ -45,8 +45,8 @@ public class KeywordProxy extends TypeProxy<Keyword> {
     // Creates a new keyword given its name, without or without
     // the leading `#`.
     private Object _init(Joe joe, Args args) {
-        Joe.exactArity(args, 1, "Keyword(name)");
-        var arg = args.getRemaining(0);
+        args.exactArity(1, "Keyword(name)");
+        var arg = args.next(0);
         var name = joe.toString(arg);
 
         if (name.startsWith("#")) {
@@ -69,7 +69,7 @@ public class KeywordProxy extends TypeProxy<Keyword> {
     // @result String
     // Gets the keyword's name, omitting the leading `#`.
     private Object _name(Keyword keyword, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "name()");
+        args.exactArity(0, "name()");
         return keyword.name();
     }
 
@@ -78,7 +78,7 @@ public class KeywordProxy extends TypeProxy<Keyword> {
     // @result String
     // Gets the keyword's string representation, including the leading `#`.
     private Object _toString(Keyword keyword, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "toString()");
+        args.exactArity(0, "toString()");
         return keyword.toString();
     }
 }
