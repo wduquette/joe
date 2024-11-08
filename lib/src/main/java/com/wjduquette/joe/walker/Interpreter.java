@@ -545,8 +545,7 @@ class Interpreter {
                 } else {
                     throw new RuntimeError(token.span(),
                         "Expected iterable, got: " +
-                            joe.typeName(arg) + " '" +
-                            joe.codify(arg) + "'.");
+                            joe.typedValue(arg) + ".");
                 }
             }
         };

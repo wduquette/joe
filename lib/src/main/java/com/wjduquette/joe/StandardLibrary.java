@@ -15,7 +15,6 @@ class StandardLibrary extends JoePackage {
         // @title Joe Standard Library
         // The `joe` package contains Joe's standard library.
         globalFunction("catch",     this::_catch);
-        globalFunction("codify",    this::_codify);
         globalFunction("compare",   this::_compare);
         globalFunction("print",     this::_print);
         globalFunction("printf",    this::_printf);
@@ -59,12 +58,6 @@ class StandardLibrary extends JoePackage {
         } catch (JoeError ex) {
             return Tuple.of(joe, ERROR, ex);
         }
-    }
-
-    private Object _codify(Joe joe, Args args) {
-        args.exactArity(1, "codify(value)");
-
-        return joe.codify(args.next(0));
     }
 
     //**

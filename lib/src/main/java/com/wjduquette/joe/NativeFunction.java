@@ -38,7 +38,7 @@ public class NativeFunction implements JoeCallable, HasTypeName {
             return callable.call(joe, args);
         } catch (JoeError ex) {
             ex.getFrames().add("In native " + kind + " " + name() +
-                "(" + joe.codify(args) + ")");
+                "(" + joe.join(", ", args.asList()) + ")");
             throw ex;
         } catch (Exception ex) {
             throw new JoeError("Error in " + name + "(): " +

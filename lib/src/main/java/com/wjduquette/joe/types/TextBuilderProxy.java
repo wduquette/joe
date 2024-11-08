@@ -48,7 +48,6 @@ public class TextBuilderProxy extends TypeProxy<TextBuilder> {
         return new TextBuilder(joeClass);
     }
 
-
     //-------------------------------------------------------------------------
     // Initializer Implementation
 

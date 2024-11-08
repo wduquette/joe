@@ -379,6 +379,18 @@ public class Joe {
     }
 
     /**
+     * Returns a collection of Joe values as a delimited string.
+     * @param delimiter The delimiter
+     * @param values The values
+     * @return The string
+     */
+    public String join(String delimiter, Collection<Object> values) {
+        return values.stream()
+            .map(this::stringify)
+            .collect(Collectors.joining(delimiter));
+    }
+
+    /**
      * Returns a "typeName 'value'" string using `typeName()` and
      * `stringify()`.
      * @param value The value
@@ -388,38 +400,6 @@ public class Joe {
         return value != null
             ? typeName(value) + " '" + stringify(value) + "'"
             : "'null'";
-    }
-
-    /**
-     * Converts a value to a string as it would appear in Monica code.
-     * This is intended primarily for use in error messages, but
-     * could also be used during code generation.
-     * @param value The value
-     * @return The value
-     */
-    public String codify(Object value) {
-        if (value == null) {
-            return "null";
-        }
-
-        // TODO: Move to StringProxy
-        if (value instanceof String string) {
-            return "\"" + escape(string) + "\"";
-        }
-
-        if (value instanceof Args args) {
-            return args.asList().stream()
-                .map(this::codify)
-                .collect(Collectors.joining(", "));
-        }
-
-        var proxy = lookupProxy(value);
-
-        if (proxy != null) {
-            return proxy.codify(this, value);
-        }
-
-        return stringify(value);
     }
 
     /**
@@ -583,8 +563,7 @@ public class Joe {
      */
     public JoeError expected(String what, Object got) {
         var message = "Expected " + what + ", got: " +
-            (got != null ? typeName(got) + " " : "") +
-            "'"  + codify(got) + "'.";
+            typedValue(got) + ".";
         return new JoeError(message);
     }
 

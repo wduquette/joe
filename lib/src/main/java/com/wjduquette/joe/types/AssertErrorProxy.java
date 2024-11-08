@@ -41,7 +41,7 @@ public class AssertErrorProxy extends TypeProxy<AssertError> {
         assert value instanceof AssertError;
         var err = (AssertError)value;
         return "AssertError[type=" + err.getClass().getSimpleName()
-            + ", message='" + joe.codify(err.getMessage()) + "']";
+            + ", message='" + err.getMessage() + "']";
     }
 
     //-------------------------------------------------------------------------

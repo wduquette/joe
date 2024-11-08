@@ -260,7 +260,7 @@ public class Tuple implements JoeObject, HasToString {
         var list = new ArrayList<String>();
         for (var e : fields.entrySet()) {
             list.add(e.getKey().toString());
-            list.add(joe.codify(e.getValue()));
+            list.add(joe.stringify(e.getValue()));
         }
 
         return "Tuple(" + String.join(", ", list) + ")";

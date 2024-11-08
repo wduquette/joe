@@ -7,7 +7,7 @@ function testInitializer() {
     check(Keyword("#abc")).eq(#abc);
 
     checkCatch(\-> Keyword("a@"))
-        .message("Expected keyword name, got: String '\"a@\"'.");
+        .message("Expected keyword name, got: String 'a@'.");
 }
 
 function testName() {

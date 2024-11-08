@@ -166,18 +166,6 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
         return value.toString();
     }
 
-    /**
-     * Returns a codified value, i.e., a value as it could be entered
-     * in code, or a "&lt;...&gt;" token otherwise.
-     * Defaults to the stringified value.
-     * @param joe The engine
-     * @param value The value
-     * @return The string
-     */
-    public String codify(Joe joe, Object value) {
-        return stringify(joe, value);
-    }
-
     //-------------------------------------------------------------------------
     // Initializer implementation
 

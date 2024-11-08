@@ -4,7 +4,6 @@ import com.wjduquette.joe.*;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
 /**
  * The Joe List type's proxy.
@@ -75,14 +74,7 @@ public class ListProxy extends TypeProxy<JoeList> {
 
     @Override
     public String stringify(Joe joe, Object object) {
-        assert object instanceof JoeList;
-        var list = (JoeList)object;
-
-        return "List("
-            + list.stream()
-                .map(joe::codify)
-                .collect(Collectors.joining(", "))
-            + ")";
+        return "List(" + joe.join(", ", (JoeList)object) + ")";
     }
 
     //-------------------------------------------------------------------------

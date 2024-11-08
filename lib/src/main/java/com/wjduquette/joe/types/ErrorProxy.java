@@ -42,7 +42,7 @@ public class ErrorProxy extends TypeProxy<JoeError> {
         assert value instanceof JoeError;
         var err = (JoeError)value;
         return "Error[type=" + err.getClass().getSimpleName()
-            + ", message='" + joe.codify(err.getMessage()) + "']";
+            + ", message='" + err.getMessage() + "']";
     }
 
     //-------------------------------------------------------------------------

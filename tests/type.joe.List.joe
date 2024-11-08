@@ -286,7 +286,7 @@ function testSorted_mismatch() {
 function testSorted_badComp() {
     var list = List(5, 4, 3, 2, 1);
     checkCatch(\-> list.sorted(\a,b -> "abc"))
-        .message("Expected number, got: String '\"abc\"'.");
+        .message("Expected number, got: String 'abc'.");
 }
 
 

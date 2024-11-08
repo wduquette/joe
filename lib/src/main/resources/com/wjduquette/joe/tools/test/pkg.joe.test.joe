@@ -101,8 +101,7 @@ class ValueChecker {
         foreach (var arg : args) {
             if (!@value.contains(arg)) {
                 fail("Expected collection to contain " +
-                    typeName(arg) + " '" + arg + "' got: '" +
-                    args + "'.");
+                    _typedValue(arg) + ", got: '" + stringify(args) + "'.");
             }
         }
     }
@@ -219,6 +218,6 @@ function _typedValue(value) {
     if (value == null) {
         return "'null'";
     } else {
-        return typeName(value) + " '" + codify(value) + "'";
+        return typeName(value) + " '" + stringify(value) + "'";
     }
 }

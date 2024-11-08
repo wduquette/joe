@@ -53,12 +53,8 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // key/value pairs.
     private Object _init(Joe joe, Args args) {
         if (args.size() % 2 != 0) {
-            var argList = args.asList().stream()
-                .map(joe::codify)
-                .collect(Collectors.joining(", "));
-
             throw new JoeError("Expected an even number of arguments, got: '" +
-                argList + "'.");
+                joe.join(", ", args.asList()) + "'.");
         }
 
         var map = new MapValue();
@@ -80,7 +76,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
 
         return "Map("
             + map.entrySet().stream()
-                .map(e -> joe.codify(e.getKey()) + "=" + joe.codify(e.getValue()))
+                .map(e -> joe.stringify(e.getKey()) + "=" + joe.stringify(e.getValue()))
                 .collect(Collectors.joining(", "))
             + ")";
     }

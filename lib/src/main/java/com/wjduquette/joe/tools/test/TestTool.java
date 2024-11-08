@@ -153,37 +153,69 @@ public class TestTool implements Tool {
 
         if (verbose) {
             println();
+            runVerbosely(joe, tests);
+        } else {
+            runQuietly(joe, scriptPath, tests);
         }
+    }
 
+    private void runVerbosely(Joe joe, List<String> tests) {
         for (var test : tests) {
             var value = joe.getVar(test);
-            if (value instanceof JoeCallable callable) {
-                if (verbose) {
-                    System.out.printf("%-30s in file %s\n", test, scriptPath);
-                }
+            if (!(value instanceof JoeCallable callable)) {
+                continue;
+            }
 
-                try {
-                    callable.call(joe, Args.EMPTY);
-                    ++successCount;
-                } catch (SkipError ex) {
-                    if (!verbose) {
-                        System.out.printf("%-30s in file %s\n", test, scriptPath);
-                    }
-                    println("  SKIPPED: " + ex.getMessage());
-                    ++skipCount;
-                } catch (AssertError ex) {
-                    if (!verbose) {
-                        System.out.printf("%-30s in file %s\n", test, scriptPath);
-                    }
-                    println("  FAILED: " + ex.getMessage());
-                    ++failureCount;
-                } catch (JoeError ex) {
-                    if (!verbose) {
-                        System.out.printf("%-30s in file %s\n", test, scriptPath);
-                    }
-                    println("  ERROR: " + ex.getMessage());
-                    ++errorCount;
-                }
+            println("+++ " + test);
+
+            try {
+                callable.call(joe, Args.EMPTY);
+                ++successCount;
+            } catch (SkipError ex) {
+                println("  SKIPPED: " + ex.getMessage());
+                ++skipCount;
+            } catch (AssertError ex) {
+                println("  FAILED: " + ex.getMessage());
+                ++failureCount;
+            } catch (JoeError ex) {
+                println("  ERROR: " + ex.getMessage());
+                ++errorCount;
+            }
+        }
+    }
+
+    private void runQuietly(Joe joe, String scriptPath, List<String> tests) {
+        for (var test : tests) {
+            var value = joe.getVar(test);
+            if (!(value instanceof JoeCallable callable)) {
+                continue;
+            }
+
+            String result;
+            Exception error;
+
+            try {
+                callable.call(joe, Args.EMPTY);
+                ++successCount;
+                result = null;
+                error = null;
+            } catch (SkipError ex) {
+                ++skipCount;
+                result = "SKIPPED";
+                error = ex;
+            } catch (AssertError ex) {
+                ++failureCount;
+                result = "FAILED";
+                error = ex;
+            } catch (JoeError ex) {
+                ++errorCount;
+                result = "ERROR";
+                error = ex;
+            }
+
+            if (error != null) {
+                System.out.printf("%-8s %s %s, %s\n",
+                    result + ":", scriptPath, test, error.getMessage());
             }
         }
     }

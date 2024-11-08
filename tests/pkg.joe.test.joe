@@ -53,7 +53,7 @@ function testCheck_eq() {
 
     function bad() { check("abc").eq("def"); }
     checkCatch(bad)
-        .message("Expected String '\"def\"', got: String '\"abc\"'.");
+        .message("Expected String 'def', got: String 'abc'.");
 }
 
 function testCheck_isTrue() {
@@ -80,7 +80,7 @@ function testCheck_isNull() {
 
     function bad() { check("abc").isNull(); }
     checkCatch(bad)
-        .message("Expected null, got: String '\"abc\"'.");
+        .message("Expected null, got: String 'abc'.");
 }
 
 function testCheck_isNonNull() {
@@ -103,7 +103,7 @@ function testCheck_containsAll() {
     check(List(#a, #b, #c)).containsAll(#a, #b);
 
     checkCatch(\-> check(List(#a)).containsAll(#a, #b))
-        .message("Expected collection to contain Keyword '#b' got: 'List(#a, #b)'.");
+        .message("Expected collection to contain Keyword '#b', got: 'List(#a, #b)'.");
 }
 
 function testCheck_hasTypeName() {
@@ -114,7 +114,7 @@ function testCheck_hasTypeName() {
 
     function bad() { check(true).hasTypeName("String"); }
     checkCatch(bad)
-        .message("Expected type name 'String', got: String '\"Boolean\"'.");
+        .message("Expected type name 'String', got: String 'Boolean'.");
 }
 
 function testCheckCatch_isOK() {
@@ -139,7 +139,7 @@ function testCheckCatch_fail_isError() {
     function bad() { checkCatch(_good).isError(); }
 
     checkCatch(bad)
-        .message("Expected an error, got: String '\"abc\"'.");
+        .message("Expected an error, got: String 'abc'.");
 }
 
 function testCheckCatch_fail_message() {

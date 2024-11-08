@@ -3,7 +3,6 @@ package com.wjduquette.joe.types;
 import com.wjduquette.joe.*;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 public class SetProxy extends TypeProxy<JoeSet> {
     /** The proxy's TYPE constant. */
@@ -59,11 +58,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
         assert object instanceof JoeSet;
         var set = (JoeSet)object;
 
-        return "Set("
-            + set.stream()
-                .map(joe::codify)
-                .collect(Collectors.joining(", "))
-            + ")";
+        return "Set(" + joe.join(", ", set) + ")";
     }
 
     //-------------------------------------------------------------------------

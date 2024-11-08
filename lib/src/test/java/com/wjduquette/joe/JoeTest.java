@@ -46,16 +46,6 @@ public class JoeTest extends Ted {
     }
 
     @Test
-    public void testCodify() {
-        test("testCodify");
-        check(joe.codify(null)).eq("null");
-        check(joe.codify(2.0)).eq("2");
-        check(joe.codify(2.5)).eq("2.5");
-        check(joe.codify(true)).eq("true");
-        check(joe.codify("abc")).eq("\"abc\"");
-    }
-
-    @Test
     public void testEscape() {
         test("testEscape");
         check(Joe.escape("-abcd-")).eq("-abcd-");
