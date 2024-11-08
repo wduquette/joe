@@ -44,7 +44,7 @@ public class BooleanProxy extends TypeProxy<Boolean> {
     //
     // **Note:** this is consistent with the Java behavior.
     private Object _valueOf(Joe joe, Args args) {
-        Joe.exactArity(args, 1, "Boolean.valueOf(value)");
+        args.exactArity(1, "Boolean.valueOf(value)");
         var arg = args.next();
         return arg != null && Boolean.parseBoolean(joe.toString(args));
     }

@@ -76,7 +76,7 @@ class HBoxProxy extends FXProxy<HBox> {
     // Gets how the [[Node]] will resize itself to the height of
     // its parent [[HBox]].
     private Object _getHgrow(Joe joe, Args args) {
-        Joe.exactArity(args, 1, "HBox.getHgrow(node)");
+        args.exactArity(1, "HBox.getHgrow(node)");
         return HBox.getHgrow(joe.toClass(args.next(), Node.class));
     }
 
@@ -86,7 +86,7 @@ class HBoxProxy extends FXProxy<HBox> {
     // @result Insets
     // Gets the [[Node]]'s margin in its parent [[HBox]].
     private Object _getMargin(Joe joe, Args args) {
-        Joe.exactArity(args, 1, "HBox.getMargin(node)");
+        args.exactArity(1, "HBox.getMargin(node)");
         return HBox.getMargin(joe.toClass(args.next(), Node.class));
     }
 
@@ -96,7 +96,7 @@ class HBoxProxy extends FXProxy<HBox> {
     // Sets how the [[Node]] will resize itself to the height of
     // its parent [[HBox]], given a [[Priority]] value.
     private Object _setHgrow(Joe joe, Args args) {
-        Joe.exactArity(args, 2, "HBox.setHgrow(node, priority)");
+        args.exactArity(2, "HBox.setHgrow(node, priority)");
         HBox.setHgrow(
             joe.toClass(args.next(), Node.class),
             joe.toClass(args.next(), Priority.class)
@@ -110,7 +110,7 @@ class HBoxProxy extends FXProxy<HBox> {
     // Gets the [[Node]]'s margin in its parent [[HBox]] given an
     // [[Insets]] object.
     private Object _setMargin(Joe joe, Args args) {
-        Joe.exactArity(args, 2, "HBox.setMargin(node, insets)");
+        args.exactArity(2, "HBox.setMargin(node, insets)");
         HBox.setMargin(
             joe.toClass(args.next(), Node.class),
             joe.toClass(args.next(), Insets.class)
@@ -126,7 +126,7 @@ class HBoxProxy extends FXProxy<HBox> {
     // @init
     // Returns a `HBox`.
     private Object _initializer(Joe joe, Args args) {
-        Joe.exactArity(args, 0, "HBox()");
+        args.exactArity(0, "HBox()");
         return make(this);
     }
 
@@ -139,7 +139,7 @@ class HBoxProxy extends FXProxy<HBox> {
     // @result this
     // Sets the vertical space in *pixels* between each child.
     private Object _spacing(HBox node, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "spacing(pixels)");
+        args.exactArity(1, "spacing(pixels)");
         node.setSpacing(joe.toDouble(args.next()));
         return node;
     }

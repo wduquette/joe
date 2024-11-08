@@ -122,7 +122,7 @@ public class ConsolePackage extends JoePackage {
         // Returns a list of the arguments passed to the command line, as
         // filtered by the application.
         private Object _args(Joe joe, Args args) {
-            Joe.exactArity(args, 0, "Console.args()");
+            args.exactArity(0, "Console.args()");
             return joe.readonlyList(argList);
         }
 
@@ -134,7 +134,7 @@ public class ConsolePackage extends JoePackage {
         // the path is relative, it is treated as relative to the
         // current working directory.
         private Object _cd(Joe joe, Args args) {
-            Joe.exactArity(args, 1, "Console.cd(path)");
+            args.exactArity(1, "Console.cd(path)");
             cwd = toResolvedPath(joe, args.next());
             return cwd;
         }
@@ -145,7 +145,7 @@ public class ConsolePackage extends JoePackage {
         // Exits the application with the given exit *code*, which defaults
         // to 0.
         private Object _exit(Joe joe, Args args) {
-            Joe.arityRange(args, 0, 1, "Console.exit([code])");
+            args.arityRange(0, 1, "Console.exit([code])");
             int code = 0;
             if (args.size() == 1) {
                 code = joe.toInteger(args.next());
@@ -161,7 +161,7 @@ public class ConsolePackage extends JoePackage {
         // parent directories.  If the path is relative, it is treated as
         // relative to the current working directory.
         private Object _mkdir(Joe joe, Args args) {
-            Joe.exactArity(args, 1, "Console.mkdir(path)");
+            args.exactArity(1, "Console.mkdir(path)");
             var path = toResolvedPath(joe, args.next());
             try {
                 Files.createDirectories(path);
@@ -178,7 +178,7 @@ public class ConsolePackage extends JoePackage {
         // @result Path
         // Returns the current working directory.
         private Object _pwd(Joe joe, Args args) {
-            Joe.exactArity(args, 0, "Console.pwd()");
+            args.exactArity(0, "Console.pwd()");
             return cwd;
         }
 
@@ -187,7 +187,7 @@ public class ConsolePackage extends JoePackage {
         // @result String
         // Returns a string from standard input, or null at EOF.
         private Object _read(Joe joe, Args args) {
-            Joe.exactArity(args, 0, "Console.read()");
+            args.exactArity(0, "Console.read()");
             if (inputReader == null) {
                 inputReader = new BufferedReader(new InputStreamReader(System.in));
             }
@@ -205,7 +205,7 @@ public class ConsolePackage extends JoePackage {
         // @args filePath, text
         // Writes the *text* as a file at the given *filePath*.
         private Object _writeFile(Joe joe, Args args) {
-            Joe.exactArity(args, 2, "Console.writeFile(filePath, text)");
+            args.exactArity(2, "Console.writeFile(filePath, text)");
             var filePath = toResolvedPath(joe, args.next());
             var text = joe.toString(args.next());
             try {
@@ -223,7 +223,7 @@ public class ConsolePackage extends JoePackage {
         // Reads the contents of the file at the given *filePath* and
         // returns it as a string.
         private Object _readFile(Joe joe, Args args) {
-            Joe.exactArity(args, 1, "Console.readFile(filePath)");
+            args.exactArity(1, "Console.readFile(filePath)");
             var filePath = toResolvedPath(joe, args.next());
             try {
                 return Files.readString(filePath);
@@ -239,7 +239,7 @@ public class ConsolePackage extends JoePackage {
         // Reads the contents of the file at the given *filePath* and
         // returns it as a list of line strings
         private Object _readLines(Joe joe, Args args) {
-            Joe.exactArity(args, 1, "Console.readLines(filePath)");
+            args.exactArity(1, "Console.readLines(filePath)");
             var filePath = toResolvedPath(joe, args.next());
             var result = new ListValue();
             try {

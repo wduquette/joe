@@ -93,7 +93,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result this
     // Empties the map.
     private Object _clear(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "clear()");
+        args.exactArity(0, "clear()");
 
         map.clear();
         return map;
@@ -105,7 +105,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result Boolean
     // Returns `true` if the map contains the *key*, and `false` otherwise.
     private Object _containsKey(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "containsKey(key)");
+        args.exactArity(1, "containsKey(key)");
 
         return map.containsKey(args.next());
     }
@@ -117,7 +117,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // Returns `true` if the map has at least one key with the given
     // *value*, and `false` otherwise.
     private Object _containsValue(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "containsValue(value)");
+        args.exactArity(1, "containsValue(value)");
 
         return map.containsValue(args.next());
     }
@@ -127,7 +127,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result Map
     // Returns a shallow copy of this map.
     private Object _copy(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "copy()");
+        args.exactArity(0, "copy()");
 
         return new MapValue(map);
     }
@@ -138,7 +138,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result value
     // Gets the *key*'s value, or null if the key is not found.
     private Object _get(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "get(key)");
+        args.exactArity(1, "get(key)");
 
         return map.get(args.next());
     }
@@ -149,7 +149,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result value
     // Gets the *key*'s value, or the *defaultValue* if the key is not found.
     private Object _getOrDefault(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 2, "getOrDefault(key, defaultValue)");
+        args.exactArity(2, "getOrDefault(key, defaultValue)");
 
         return map.getOrDefault(args.next(), args.next());
     }
@@ -159,7 +159,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result Boolean
     // Returns `true` if the map is empty, and `false` otherwise.
     private Object _isEmpty(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "isEmpty()");
+        args.exactArity(0, "isEmpty()");
 
         return map.isEmpty();
     }
@@ -169,7 +169,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result Set
     // Returns a set of the keys in the map.
     private Object _keySet(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "keySet()");
+        args.exactArity(0, "keySet()");
 
         return SetWrapper.readOnly(joe, map.keySet());
     }
@@ -180,7 +180,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result value
     // Adds the *key/*value* pair to the map, returning the replaced value.
     private Object _put(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 2, "put(key, value)");
+        args.exactArity(2, "put(key, value)");
 
         return map.put(args.next(), args.next());
     }
@@ -191,7 +191,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result this
     // Adds the content of the map to this map.
     private Object _putAll(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "putAll(map)");
+        args.exactArity(1, "putAll(map)");
         var arg = args.next();
 
         if (arg instanceof Map<?,?> other) {
@@ -209,7 +209,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result value
     // Removes and returns the *key*'s value, or null if the key wasn't found.
     private Object _remove(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "remove(key)");
+        args.exactArity(1, "remove(key)");
 
         return map.remove(args.next());
     }
@@ -219,7 +219,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result Number
     // Returns the number of key/value pairs in the map.
     private Object _size(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "size()");
+        args.exactArity(0, "size()");
 
         return (double)map.size();
     }
@@ -229,7 +229,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result String
     // Returns the map's string representation.
     private Object _toString(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "toString()");
+        args.exactArity(0, "toString()");
 
         return stringify(joe, map);
     }
@@ -239,7 +239,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
     // @result List
     // Returns a list of the values in the map.
     private Object _values(JoeMap map, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "values()");
+        args.exactArity(0, "values()");
 
         return new ListValue(map.values());
     }

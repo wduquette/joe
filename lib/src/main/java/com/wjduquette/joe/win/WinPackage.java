@@ -176,7 +176,7 @@ public class WinPackage extends JoePackage {
         // the given *css* text. The styles are therefore accessible to
         // the entire scene.
         private Object _css(Joe joe, Args args) {
-            Joe.exactArity(args, 1, "css(css)");
+            args.exactArity(1, "css(css)");
             var css = joe.toString(args.next());
 
             // %-encode for inclusion in a URL
@@ -204,7 +204,7 @@ public class WinPackage extends JoePackage {
         // `Scene`'s `stylesheets` property as a `file:` URL. The styles are
         // therefore accessible to // the entire scene.
         private Object _cssFile(Joe joe, Args args) {
-            Joe.exactArity(args, 1, "cssFile(filename)");
+            args.exactArity(1, "cssFile(filename)");
             var filename = joe.toString(args.next());
 
             stage.getScene().getStylesheets()
@@ -217,7 +217,7 @@ public class WinPackage extends JoePackage {
         // @result VBox
         // Returns the root window, a [[VBox]].
         private Object _root(Joe joe, Args args) {
-            Joe.exactArity(args, 0, "Win.root()");
+            args.exactArity(0, "Win.root()");
             return root;
         }
 
@@ -228,7 +228,7 @@ public class WinPackage extends JoePackage {
         // Sets the preferred size of the root window.  The width and height
         // must be positive.
         private Object _setSize(Joe joe, Args args) {
-            Joe.exactArity(args, 2, "Win.setSize(width, title)");
+            args.exactArity(2, "Win.setSize(width, title)");
             var width = joe.toDouble(args.next());
             var height = joe.toDouble(args.next());
             if (width <= 0 || height <= 0) {
@@ -245,7 +245,7 @@ public class WinPackage extends JoePackage {
         // @result this
         // Sets the title of the root window.
         private Object _setTitle(Joe joe, Args args) {
-            Joe.exactArity(args, 1, "Win.setTitle(title)");
+            args.exactArity(1, "Win.setTitle(title)");
             var title = joe.toString(args.next());
             stage.setTitle(title);
             return this;

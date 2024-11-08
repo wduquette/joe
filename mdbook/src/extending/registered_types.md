@@ -244,7 +244,7 @@ public class StringProxy extends TypeProxy<String> {
     ...
     
     private Object _join(Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 2, "join(delimiter, list)");
+        args.exactArity(2, "join(delimiter, list)");
         ...
     }
 }
@@ -338,7 +338,7 @@ public class StringProxy extends TypeProxy<String> {
     ...
 
     private Object _length(String value, Joe joe, ArgQueue args) {
-        Joe.exactArity(args, 0, "length()");
+        args.exactArity(0, "length()");
         return (double)value.length();
     }
 }

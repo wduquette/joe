@@ -50,7 +50,7 @@ class InsetsProxy extends TypeProxy<Insets> {
                 joe.toDouble(args.next()),
                 joe.toDouble(args.next())
             );
-            default -> throw Joe.arityFailure(
+            default -> throw Args.arityFailure(
                 "Insets(pixels) or Insets(top, right, bottom, left)");
         };
     }
@@ -63,7 +63,7 @@ class InsetsProxy extends TypeProxy<Insets> {
     // @result Number
     // Gets the width of the margin on the bottom of the node, in pixels.
     private Object _getBottom(Insets insets, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "getBottom()");
+        args.exactArity(0, "getBottom()");
         return insets.getBottom();
     }
 
@@ -72,7 +72,7 @@ class InsetsProxy extends TypeProxy<Insets> {
     // @result Number
     // Gets the width of the margin on the left of the node, in pixels.
     private Object _getLeft(Insets insets, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "getLeft()");
+        args.exactArity(0, "getLeft()");
         return insets.getLeft();
     }
 
@@ -81,7 +81,7 @@ class InsetsProxy extends TypeProxy<Insets> {
     // @result Number
     // Gets the width of the margin on the right of the node, in pixels.
     private Object _getRight(Insets insets, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "getRight()");
+        args.exactArity(0, "getRight()");
         return insets.getRight();
     }
 
@@ -90,7 +90,7 @@ class InsetsProxy extends TypeProxy<Insets> {
     // @result Number
     // Gets the width of the margin on the top of the node, in pixels.
     private Object _getTop(Insets insets, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "getTop()");
+        args.exactArity(0, "getTop()");
         return insets.getTop();
     }
 }

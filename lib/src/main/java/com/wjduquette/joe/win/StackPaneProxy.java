@@ -75,7 +75,7 @@ class StackPaneProxy extends FXProxy<StackPane> {
     // @result Pos
     // Gets the [[Node]]'s alignment in its parent [[StackPane]].
     private Object _getAlignment(Joe joe, Args args) {
-        Joe.exactArity(args, 1, "StackPane.getAlignment(node)");
+        args.exactArity(1, "StackPane.getAlignment(node)");
         return StackPane.getAlignment(joe.toClass(args.next(), Node.class));
     }
 
@@ -85,7 +85,7 @@ class StackPaneProxy extends FXProxy<StackPane> {
     // @result Insets
     // Gets the [[Node]]'s margin in its parent [[StackPane]].
     private Object _getMargin(Joe joe, Args args) {
-        Joe.exactArity(args, 1, "StackPane.getMargin(node)");
+        args.exactArity(1, "StackPane.getMargin(node)");
         return StackPane.getMargin(joe.toClass(args.next(), Node.class));
     }
 
@@ -95,7 +95,7 @@ class StackPaneProxy extends FXProxy<StackPane> {
     // Sets how [[Node]] *node* will position itself within its
     // parent [[StackPane]], given a [[Pos]] value.
     private Object _setAlignment(Joe joe, Args args) {
-        Joe.exactArity(args, 2, "StackPane.setAlignment(node, pos)");
+        args.exactArity(2, "StackPane.setAlignment(node, pos)");
         StackPane.setAlignment(
             joe.toClass(args.next(), Node.class),
             joe.toClass(args.next(), Pos.class)
@@ -109,7 +109,7 @@ class StackPaneProxy extends FXProxy<StackPane> {
     // Gets the [[Node]]'s margin in its parent [[StackPane]] given an
     // [[Insets]] object.
     private Object _setMargin(Joe joe, Args args) {
-        Joe.exactArity(args, 2, "StackPane.setMargin(node, insets)");
+        args.exactArity(2, "StackPane.setMargin(node, insets)");
         StackPane.setMargin(
             joe.toClass(args.next(), Node.class),
             joe.toClass(args.next(), Insets.class)
@@ -124,7 +124,7 @@ class StackPaneProxy extends FXProxy<StackPane> {
     // @init
     // Returns a `StackPane`.
     private Object _initializer(Joe joe, Args args) {
-        Joe.exactArity(args, 0, "StackPane()");
+        args.exactArity(0, "StackPane()");
         return make(this);
     }
 

@@ -44,7 +44,7 @@ class PaneProxy extends FXProxy<Pane> {
     // @init
     // Returns a `Pane`.
     private Object _initializer(Joe joe, Args args) {
-        Joe.exactArity(args, 0, "Pane()");
+        args.exactArity(0, "Pane()");
         return new Pane();
     }
 
@@ -57,7 +57,7 @@ class PaneProxy extends FXProxy<Pane> {
     // @result this
     // Adds a [[Node]] to the end of the pane's *children* list.
     private Object _child(Pane pane, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "child(node)");
+        args.exactArity(1, "child(node)");
         pane.getChildren().add(joe.toClass(args.next(), Node.class));
         return pane;
     }
@@ -68,7 +68,7 @@ class PaneProxy extends FXProxy<Pane> {
     // Gets the list of the node's children, which can be updated freely.
     // All items must belong some [[Node]] subclass.
     private Object _children(Pane pane, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "children()");
+        args.exactArity(0, "children()");
         return joe.wrapList(pane.getChildren(), Node.class);
     }
 }

@@ -6,12 +6,14 @@
   - Added the `@` operator.
     - In class methods, `@name` is identical to `this.name`.
 
-- Extending
+- Extending/Embedding API
   - It is now possible to define native types that more fully resemble 
     Joe classes and instances, e.g., the new `TextBuilder`.
     - Instances of `TextBuilder` have data fields, just like Joe class
       instances.
     - `TextBuilder` can be extended by Joe classes.
+  - Moved the arity checking methods (e.g., `Joe.exactArity()`) from
+    `Joe` to `Args`.
 
 - Library
   - Added experimental `joe.win` package for creating JavaFX GUIs in Joe.
@@ -36,7 +38,7 @@
     - Added `@mixin` entity for documentation to be included into
       multiple `@type` entities
   - `joe test`
-    - Added `assertTrue`, `assertFalse`, `catchError`, and `skip` functions.
+    - Added `assertTrue`, `assertFalse`, `assertError`, and `skip` functions.
      
 - Miscellaneous
   - Removed the `Joe::recodify(Stmt)` and `Joe::recodify(List<Stmt>)` methods.

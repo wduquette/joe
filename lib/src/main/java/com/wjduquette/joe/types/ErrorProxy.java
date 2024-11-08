@@ -53,7 +53,7 @@ public class ErrorProxy extends TypeProxy<JoeError> {
     // @args message, [frames...]
     // Creates an `Error` with the given *message*.
     private Object _initializer(Joe joe, Args args) {
-        Joe.minArity(args, 1, "Error(message, [frames...])");
+        args.minArity(1, "Error(message, [frames...])");
         var error = new JoeError(joe.stringify(args.next()));
 
         while (args.hasNext()) {
@@ -72,7 +72,7 @@ public class ErrorProxy extends TypeProxy<JoeError> {
     // Returns the list of stack frame strings.  Clients may add to the list
     // and rethrow the error.
     private Object _stackFrames(JoeError error, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "stackFrames()");
+        args.exactArity(0, "stackFrames()");
         return joe.wrapList(error.getFrames(), String.class);
     }
 
@@ -82,7 +82,7 @@ public class ErrorProxy extends TypeProxy<JoeError> {
     // Returns the complete error, including the initial error messages
     // and all stack frames.
     private Object _stackTrace(JoeError error, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "stackTrace()");
+        args.exactArity(0, "stackTrace()");
         return error.getJoeStackTrace();
     }
 
@@ -91,7 +91,7 @@ public class ErrorProxy extends TypeProxy<JoeError> {
     // @result text
     // Gets the actual error message
     private Object _message(JoeError error, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "message()");
+        args.exactArity(0, "message()");
         return error.getMessage();
     }
 
@@ -100,7 +100,7 @@ public class ErrorProxy extends TypeProxy<JoeError> {
     // @result name
     // Gets the name of the concrete error type.
     private Object _type(JoeError error, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "type()");
+        args.exactArity(0, "type()");
         return error.getClass().getSimpleName();
     }
 }

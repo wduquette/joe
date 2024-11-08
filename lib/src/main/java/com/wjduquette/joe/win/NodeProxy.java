@@ -67,7 +67,7 @@ class NodeProxy extends FXProxy<Node> {
     // *flag* defaults to `true`.  While `true`, this node and its
     // descendants in the scene graph will be disabled.
     private Object _disable(Node node, Joe joe, Args args) {
-        Joe.arityRange(args, 0, 1, "disable([flag])");
+        args.arityRange(0, 1, "disable([flag])");
         var flag = args.isEmpty() || Joe.isTruthy(args.next());
         node.setDisable(flag);
         return node;
@@ -84,7 +84,7 @@ class NodeProxy extends FXProxy<Node> {
     // This method is equivalent to the JavaFX `HBox.setHgrow()`
     // method.
     private Object _hgrow(Node node, Joe joe, Args args) {
-        Joe.arityRange(args, 0, 1, "hgrow([priority]");
+        args.arityRange(0, 1, "hgrow([priority]");
         if (args.isEmpty()) {
             HBox.setHgrow(node, Priority.ALWAYS);
         } else {
@@ -99,7 +99,7 @@ class NodeProxy extends FXProxy<Node> {
     // @result this
     // Sets the node's `#id` property to the given *id* string.
     private Object _id(Node node, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "id(id)");
+        args.exactArity(1, "id(id)");
         var id = joe.toString(args.next());
         node.setId(id);
         return node;
@@ -110,7 +110,7 @@ class NodeProxy extends FXProxy<Node> {
     // @result joe.Boolean
     // Returns `true` if the node has been disabled, and `false` otherwise.
     private Object _isDisabled(Node node, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "isDisabled()");
+        args.exactArity(0, "isDisabled()");
         return node.isDisabled();
     }
 
@@ -122,7 +122,7 @@ class NodeProxy extends FXProxy<Node> {
     //
     // See [[joe.win#topic.css]] for more on using CSS.
     private Object _styleClasses(Node node, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "styleClasses()");
+        args.exactArity(0, "styleClasses()");
         return joe.wrapList(node.getStyleClass(), String.class);
     }
 
@@ -135,7 +135,7 @@ class NodeProxy extends FXProxy<Node> {
     //
     // See [[joe.win#topic.css]] for more on using CSS.
     private Object _styles(Node node, Joe joe, Args args) {
-        Joe.minArity(args, 1, "styles(style, ...)");
+        args.minArity(1, "styles(style, ...)");
         var styles = args.asList().stream()
             .map(joe::toString)
             .collect(Collectors.joining(";\n"));
@@ -154,7 +154,7 @@ class NodeProxy extends FXProxy<Node> {
     // This method is equivalent to the JavaFX `VBox.setVgrow()`
     // method.
     private Object _vgrow(Node node, Joe joe, Args args) {
-        Joe.arityRange(args, 0, 1, "vgrow([priority]");
+        args.arityRange(0, 1, "vgrow([priority]");
         if (args.isEmpty()) {
             VBox.setVgrow(node, Priority.ALWAYS);
         } else {

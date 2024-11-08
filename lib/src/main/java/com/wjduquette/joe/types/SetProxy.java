@@ -75,7 +75,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @result Boolean
     // Adds the *value* to the set, returning true if it wasn't already present.
     private Object _add(JoeSet set, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "add(value)");
+        args.exactArity(1, "add(value)");
 
         return set.add(args.next());
     }
@@ -86,7 +86,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @result Boolean
     // Adds the content of the *collection* to this set.
     private Object _addAll(JoeSet set, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "addAll(collection)");
+        args.exactArity(1, "addAll(collection)");
         var arg = args.next();
 
         if (arg instanceof Collection<?> other) {
@@ -101,7 +101,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @result this
     // Empties the set.
     private Object _clear(JoeSet set, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "clear()");
+        args.exactArity(0, "clear()");
 
         set.clear();
         return set;
@@ -113,7 +113,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @result Boolean
     // Returns `true` if the set contains the *value*, and `false` otherwise.
     private Object _contains(JoeSet set, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "contains(value)");
+        args.exactArity(1, "contains(value)");
 
         return set.contains(args.next());
     }
@@ -123,7 +123,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @result Set
     // Returns a shallow copy of this set.
     private Object _copy(JoeSet set, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "copy()");
+        args.exactArity(0, "copy()");
 
         return new SetValue(set);
     }
@@ -134,7 +134,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @result Boolean
     // Returns `true` if the set is empty, and `false` otherwise.
     private Object _isEmpty(JoeSet set, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "isEmpty()");
+        args.exactArity(0, "isEmpty()");
 
         return set.isEmpty();
     }
@@ -146,7 +146,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // Removes the value, return `true` if it was present and `false`
     // otherwise.
     private Object _remove(JoeSet set, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "remove(value)");
+        args.exactArity(1, "remove(value)");
 
         return set.remove(args.next());
     }
@@ -158,7 +158,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // Removes all values in the *collection* from the set, returning `true`
     // if the set changed and `false` otherwise.
     private Object _removeAll(JoeSet set, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "removeAll(collection)");
+        args.exactArity(1, "removeAll(collection)");
 
         var arg = args.next();
         if (arg instanceof Collection<?> other) {
@@ -173,7 +173,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @result Number
     // Returns the number of values in the set.
     private Object _size(JoeSet set, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "size()");
+        args.exactArity(0, "size()");
 
         return (double)set.size();
     }
@@ -183,7 +183,7 @@ public class SetProxy extends TypeProxy<JoeSet> {
     // @result String
     // Returns the set's string representation.
     private Object _toString(JoeSet set, Joe joe, Args args) {
-        Joe.exactArity(args, 0, "toString()");
+        args.exactArity(0, "toString()");
 
         return stringify(joe, set);
     }

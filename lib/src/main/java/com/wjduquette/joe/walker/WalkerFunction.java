@@ -94,9 +94,9 @@ final class WalkerFunction implements JoeCallable, HasTypeName {
             ? declaration.params().size() - 1
             : declaration.params().size();
         if (isVarArgs) {
-            Joe.minArity(args, expected, signature);
+            args.minArity(expected, signature);
         } else {
-            Joe.exactArity(args, expected, signature);
+            args.exactArity(expected, signature);
         }
 
         // NEXT, create the environment for the arguments.

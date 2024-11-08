@@ -85,7 +85,7 @@ class RegionProxy extends FXProxy<Region> {
     // @result this
     // Sets the node's preferred, minimum, and maximum height in pixels.
     private Object _height(Region node, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "height(height)");
+        args.exactArity(1, "height(height)");
         var pixels = joe.toDouble(args.next());
         node.setMinHeight(pixels);
         node.setMaxHeight(pixels);
@@ -109,7 +109,7 @@ class RegionProxy extends FXProxy<Region> {
                 joe.toDouble(args.next()),
                 joe.toDouble(args.next())
             );
-            default -> throw Joe.arityFailure(
+            default -> throw Args.arityFailure(
                 "padding(pixels) or padding(top, right, bottom, left)");
         };
 
@@ -123,7 +123,7 @@ class RegionProxy extends FXProxy<Region> {
     // @result this
     // Sets the node's preferred height in pixels.
     private Object _prefHeight(Region node, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "prefHeight(height)");
+        args.exactArity(1, "prefHeight(height)");
         node.setPrefHeight(joe.toDouble(args.next()));
         return node;
     }
@@ -134,7 +134,7 @@ class RegionProxy extends FXProxy<Region> {
     // @result this
     // Sets the node's preferred width in pixels.
     private Object _prefWidth(Region node, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "prefWidth(width)");
+        args.exactArity(1, "prefWidth(width)");
         node.setPrefWidth(joe.toDouble(args.next()));
         return node;
     }
@@ -145,7 +145,7 @@ class RegionProxy extends FXProxy<Region> {
     // @result this
     // Sets the node's preferred, minimum, and maximum width in pixels.
     private Object _width(Region node, Joe joe, Args args) {
-        Joe.exactArity(args, 1, "width(width)");
+        args.exactArity(1, "width(width)");
         var pixels = joe.toDouble(args.next());
         node.setMinWidth(pixels);
         node.setMaxWidth(pixels);

@@ -187,7 +187,7 @@
 </ul>
 </li>
 <li>
-<p>Extending</p>
+<p>Extending/Embedding API</p>
 <ul>
 <li>It is now possible to define native types that more fully resemble
 Joe classes and instances, e.g., the new <code>TextBuilder</code>.
@@ -197,6 +197,8 @@ instances.</li>
 <li><code>TextBuilder</code> can be extended by Joe classes.</li>
 </ul>
 </li>
+<li>Moved the arity checking methods (e.g., <code>Joe.exactArity()</code>) from
+<code>Joe</code> to <code>Args</code>.</li>
 </ul>
 </li>
 <li>
@@ -240,7 +242,7 @@ multiple <code>@type</code> entities</li>
 </li>
 <li><code>joe test</code>
 <ul>
-<li>Added <code>assertTrue</code>, <code>assertFalse</code>, <code>catchError</code>, and <code>skip</code> functions.</li>
+<li>Added <code>assertTrue</code>, <code>assertFalse</code>, <code>assertError</code>, and <code>skip</code> functions.</li>
 </ul>
 </li>
 </ul>
