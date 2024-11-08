@@ -56,7 +56,7 @@ public class AssertErrorProxy extends TypeProxy<AssertError> {
         Joe.minArity(args, 1, "AssertError(message,[frames...])");
         var error = new AssertError(joe.stringify(args.next()));
 
-        while (args.hasRemaining()) {
+        while (args.hasNext()) {
             error.getFrames().add(joe.stringify(args.next()));
         }
 

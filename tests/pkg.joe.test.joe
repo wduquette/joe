@@ -1,12 +1,14 @@
-// Sample test script
+// Tests for the joe.test Test API
+
+//-------------------------------------------------------------------------
+// Basic Test API
 
 function testAssertEquals() {
     assertEquals(5, 5);
     assertEquals("abc", "abc");
 
     function bad() { assertEquals("abc", 5); }
-    checkCatch(bad)
-        .message("Expected Number '5', got: String 'abc'.");
+    assertError(bad, "Expected Number '5', got: String 'abc'.");
 }
 
 function testAssertTrue() {
@@ -14,8 +16,7 @@ function testAssertTrue() {
     assertTrue("abc");
 
     function bad() { assertTrue(false); }
-    checkCatch(bad)
-        .message("Expected truthy value, got: Boolean 'false'.");
+    assertError(bad, "Expected truthy value, got: Boolean 'false'.");
 }
 
 function testAssertFalse() {
@@ -23,27 +24,29 @@ function testAssertFalse() {
     assertFalse(null);
 
     function bad() { assertFalse(true); }
-    checkCatch(bad)
-        .message("Expected falsey value, got: Boolean 'true'.");
+    assertError(bad, "Expected falsey value, got: Boolean 'true'.");
 }
 
 function testFail() {
     function bad() { fail("Called fail()"); }
-    checkCatch(bad)
-        .message("Called fail()");
+    assertError(bad, "Called fail()");
 }
 
-function testCatchError_good() {
+function testAssertError_gotError() {
     function bad() { throw "Simulated error."; }
-    assertEquals(catchError(bad), "Simulated error.");
+    assertError(bad, "Simulated error."
+        , "In function bad()"
+    );
 }
 
-function testCatchError_bad() {
+function testAssertError_noError() {
     function ok() { return #ok; }
-    function bad() { catchError(ok); }
-    assertEquals(catchError(bad),
-       "Expected error, got: Keyword '#ok'.");
+    function bad() { assertError(ok, "Error message"); }
+    assertError(bad, "Expected error, got: Keyword '#ok'.");
 }
+
+//-------------------------------------------------------------------------
+// Advanced Test API
 
 function testCheck_eq() {
     check("abc").eq("abc");

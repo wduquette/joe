@@ -24,9 +24,9 @@ class TestPackage extends JoePackage {
     public TestPackage() {
         super("joe.test");
         globalFunction("assertEquals", this::_assertEquals);
-        globalFunction("assertTrue",   this::_assertTrue);
+        globalFunction("assertError",  this::_assertError);
         globalFunction("assertFalse",  this::_assertFalse);
-        globalFunction("catchError",   this::_catchError);
+        globalFunction("assertTrue",   this::_assertTrue);
         globalFunction("fail",         this::_fail);
         globalFunction("skip",         this::_skip);
         scriptResource(getClass(), "pkg.joe.test.joe");
@@ -53,19 +53,54 @@ class TestPackage extends JoePackage {
     }
 
     //**
-    // @function assertTrue
-    // @args condition
-    // Verifies that *condition* is truthy, producing an
-    // informative assertion error if not.
-    private Object _assertTrue(Joe joe, Args args) {
-        Joe.exactArity(args, 1, "assertTrue(condition)");
-        var condition = args.next();
+    // @function assertError
+    // @args callable, [message], [frames...]
+    // Executes a *callable* expecting it to throw an error and
+    // failing the test if it does not.  The error must have the
+    // given *message* and stack *frames*, if they are provided.
+    //
+    // When stack *frames* are provided, the error must include at
+    // least the provided number of frame strings, and those strings
+    // must match.
+    private Object _assertError(Joe joe, Args args) {
+        Joe.minArity(args, 1, "assertError(callable,[message],[frames...])");
 
-        if (!Joe.isTruthy(condition)) {
-            throw new AssertError("Expected truthy value, got: " +
-                joe.typedValue(condition) + ".");
+        // FIRST, execute the callable and get the result or the error.
+        Object result = null;
+        JoeError error = null;
+        try {
+            result = joe.call(args.next());
+        } catch (JoeError ex) {
+            error = ex;
         }
 
+        // NEXT, fail if we didn't get an error.
+        if (error == null) {
+            throw new AssertError("Expected error, got: " +
+                joe.typedValue(result) + ".");
+        }
+
+        // NEXT, fail if the error message isn't as expected.
+        if (args.hasNext()) {
+            var message = joe.stringify(args.next());
+            if (!Joe.isEqual(message, error.getMessage())) {
+                throw new AssertError("Expected error message '" + message +
+                    "', got: " + joe.typedValue(error.getMessage()) + ".");
+            }
+        }
+
+        // NEXT, fail if a stack frame isn't as expected.
+        var frames = args.remainderAsList();
+
+        for (int i = 0; i < frames.size(); i++) {
+            if (!Joe.isEqual(frames.get(i), error.getFrames().get(i))) {
+                throw new AssertError("Expected frames[" + i + "] == '" +
+                    frames.get(i) + "', got: '" +
+                    error.getFrames().get(i) + "'.");
+            }
+        }
+
+        // NEXT, all is as expected.
         return null;
     }
 
@@ -87,23 +122,20 @@ class TestPackage extends JoePackage {
     }
 
     //**
-    // @function catchError
-    // @args callable
-    // @result String
-    // This simplified version of the standard
-    // [[joe#function.catch]] function executes the *callable* and catches
-    // the resulting [[joe.Error]], returning the error's message or.  The
-    // test fails if the *callable* does not throw an error.
-    private Object _catchError(Joe joe, Args args) {
-        Joe.exactArity(args, 1, "catchError(callable)");
-        Object result;
-        try {
-            result = joe.call(args.next());
-        } catch (JoeError ex) {
-            return ex.getMessage();
+    // @function assertTrue
+    // @args condition
+    // Verifies that *condition* is truthy, producing an
+    // informative assertion error if not.
+    private Object _assertTrue(Joe joe, Args args) {
+        Joe.exactArity(args, 1, "assertTrue(condition)");
+        var condition = args.next();
+
+        if (!Joe.isTruthy(condition)) {
+            throw new AssertError("Expected truthy value, got: " +
+                joe.typedValue(condition) + ".");
         }
 
-        throw joe.expected("error", result);
+        return null;
     }
 
     //**

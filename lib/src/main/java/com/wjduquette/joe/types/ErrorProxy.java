@@ -56,7 +56,7 @@ public class ErrorProxy extends TypeProxy<JoeError> {
         Joe.minArity(args, 1, "Error(message, [frames...])");
         var error = new JoeError(joe.stringify(args.next()));
 
-        while (args.hasRemaining()) {
+        while (args.hasNext()) {
             error.getFrames().add(joe.stringify(args.next()));
         }
 

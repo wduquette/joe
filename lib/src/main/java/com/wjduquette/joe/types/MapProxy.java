@@ -63,7 +63,7 @@ public class MapProxy extends TypeProxy<JoeMap> {
 
         var map = new MapValue();
 
-        while (args.hasRemaining()) {
+        while (args.hasNext()) {
             map.put(args.next(), args.next());
         }
 

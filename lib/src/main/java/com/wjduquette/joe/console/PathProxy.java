@@ -204,7 +204,7 @@ public class PathProxy extends TypeProxy<Path> {
         Joe.arityRange(args, 1, 2, "subpath(start, [end])");
         var start = joe.toIndex(args.next(), path.getNameCount());
 
-        if (!args.hasRemaining()) {
+        if (!args.hasNext()) {
             return path.subpath(start, path.getNameCount());
         } else {
             var end = joe.toIndex(args.next(), path.getNameCount());

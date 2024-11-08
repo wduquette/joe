@@ -257,7 +257,7 @@ public class StringProxy extends TypeProxy<String> {
         Joe.arityRange(args, 1, 3, "indexOf(target, [beginIndex], [endIndex])");
         var target = joe.stringify(args.next());
 
-        if (!args.hasRemaining()) {
+        if (!args.hasNext()) {
             return (double) value.indexOf(target);
         } else if (args.remaining() == 1) {
             return (double) value.indexOf(target,
@@ -301,7 +301,7 @@ public class StringProxy extends TypeProxy<String> {
     private Object _lastIndexOf(String value, Joe joe, Args args) {
         Joe.arityRange(args, 1, 2, "lastIndexOf(target, [fromIndex]");
         var target = joe.stringify(args.next());
-        if (!args.hasRemaining()) {
+        if (!args.hasNext()) {
             return (double) value.lastIndexOf(target);
         } else {
             return (double) value.lastIndexOf(target,

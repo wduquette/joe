@@ -180,9 +180,9 @@ for use in <code>joe test</code> test suites.</p>
 <p><strong><a href="#functions">Functions</a></strong></p>
 <ul>
 <li><a href="pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
+<li><a href="pkg.joe.test.html#function.assertError">assertError(<em>callable</em>, [<em>message</em>], [<em>frames</em>...])</a></li>
 <li><a href="pkg.joe.test.html#function.assertFalse">assertFalse(<em>condition</em>)</a></li>
 <li><a href="pkg.joe.test.html#function.assertTrue">assertTrue(<em>condition</em>)</a></li>
-<li><a href="pkg.joe.test.html#function.catchError">catchError(<em>callable</em>)</a> → String</li>
 <li><a href="pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
@@ -207,6 +207,16 @@ other packages so that they can be tested:</p>
 <p><strong>assertEquals(<em>got</em>, <em>expected</em>)</strong></p>
 <p>Verifies that <em>got</em> equals the <em>expected</em> value, producing an
 informative assertion error if not.</p>
+<p><span id="function.assertError"> </span></p>
+<h3 id="asserterror"><a class="header" href="#asserterror">assertError()</a></h3>
+<hr />
+<p><strong>assertError(<em>callable</em>, [<em>message</em>], [<em>frames</em>...])</strong></p>
+<p>Executes a <em>callable</em> expecting it to throw an error and
+failing the test if it does not.  The error must have the
+given <em>message</em> and stack <em>frames</em>, if they are provided.</p>
+<p>When stack <em>frames</em> are provided, the error must include at
+least the provided number of frame strings, and those strings
+must match.</p>
 <p><span id="function.assertFalse"> </span></p>
 <h3 id="assertfalse"><a class="header" href="#assertfalse">assertFalse()</a></h3>
 <hr />
@@ -219,14 +229,6 @@ informative assertion error if not.</p>
 <p><strong>assertTrue(<em>condition</em>)</strong></p>
 <p>Verifies that <em>condition</em> is truthy, producing an
 informative assertion error if not.</p>
-<p><span id="function.catchError"> </span></p>
-<h3 id="catcherror"><a class="header" href="#catcherror">catchError()</a></h3>
-<hr />
-<p><strong>catchError(<em>callable</em>) → String</strong></p>
-<p>This simplified version of the standard
-<a href="pkg.joe.html#function.catch"><code>catch()</code></a> function executes the <em>callable</em> and catches
-the resulting <a href="type.joe.Error.html"><code>Error</code></a>, returning the error's message or.  The
-test fails if the <em>callable</em> does not throw an error.</p>
 <p><span id="function.check"> </span></p>
 <h3 id="check"><a class="header" href="#check">check()</a></h3>
 <hr />

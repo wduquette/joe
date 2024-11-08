@@ -88,7 +88,7 @@ public final class Args {
      * those not yet retrieved using {@code next()}.
      * @return true or false
      */
-    public boolean hasRemaining() {
+    public boolean hasNext() {
         return next < args.length;
     }
 
