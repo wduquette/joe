@@ -13,13 +13,32 @@ import java.util.stream.Collectors;
  * polling using the {@code next()} method.
  */
 public final class Args {
+    //-------------------------------------------------------------------------
+    // Static constants and methods
+
     /**
      * An empty argument queue.
      */
     public static final Args EMPTY = new Args();
 
+    /**
+     * Creates an `Args` given zero or more argument values.
+     * @param args The values
+     * @return The `Args
+     */
     public static Args of(Object... args) {
         return new Args(args);
+    }
+
+    /**
+     * Returns a "Wrong number of arguments" JoeError for a method or function
+     * with the given signature.  This is primarily used by the arity checker
+     * methods, but can also be used by native functions and methods at need.
+     * @param signature The signature
+     * @return The error, to be thrown.
+     */
+    public static JoeError arityFailure(String signature) {
+        return new JoeError("Wrong number of arguments, expected: " + signature);
     }
 
     //-------------------------------------------------------------------------
@@ -47,7 +66,57 @@ public final class Args {
     }
 
     //-------------------------------------------------------------------------
-    // Public API
+    // Arity Checks
+
+    /**
+     * Throws an arity check failure if the {@code size()} of the arguments
+     * array differs from the expected number of arguments.
+     * @param arity The expected arity
+     * @param signature The signature string.
+     * @throws JoeError on failure
+     */
+    public void exactArity(int arity, String signature) {
+        if (size() != arity) {
+            throw arityFailure(signature);
+        }
+    }
+
+    /**
+     * Throws an arity check failure if the {@code size()} of the arguments
+     * array is less than the expected minimum number of arguments.
+     * @param minArity The minimum arity
+     * @param signature The signature string.
+     * @throws JoeError on failure
+     */
+    public void minArity(int minArity, String signature) {
+        if (size() < minArity) {
+            throw arityFailure(signature);
+        }
+    }
+
+    /**
+     * Throws an arity check failure if the {@code size()} of the arguments
+     * falls outside the expected range.
+     * @param minArity The minimum arity
+     * @param maxArity The maximum arity
+     * @param signature The signature string.
+     * @throws JoeError on failure
+     */
+    public void arityRange(
+        int minArity,
+        int maxArity,
+        String signature)
+    {
+        if (size() < minArity || size() > maxArity) {
+            throw arityFailure(signature);
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    // Args Array API
+    //
+    // This portion of the API deals with the provided arguments as a
+    // constant array.
 
     /**
      * The total number of arguments.
@@ -73,6 +142,29 @@ public final class Args {
     public Object get(int index) {
         return args[index];
     }
+
+    /**
+     * Returns the original argument array.
+     * @return The array
+     */
+    public Object[] asArray() {
+        return args;
+    }
+
+    /**
+     * Returns the original arguments as a list;
+     * @return The list
+     */
+    public ListValue asList() {
+        var list = new ListValue();
+        Collections.addAll(list, args);
+        return list;
+    }
+
+    //-------------------------------------------------------------------------
+    // Argument Queue API
+    //
+    // This portion of the API deals with arguments array as a queue.
 
     /**
      * Returns the number of remaining arguments, i.e., those not yet retrieved
@@ -110,7 +202,7 @@ public final class Args {
      * @param index The index
      * @return the argument
      */
-    public Object getRemaining(int index) {
+    public Object next(int index) {
         if (index < 0 || index >= remaining()) {
             throw new IllegalArgumentException(
                 "Expected index in range 0 < index < " + remaining() +
@@ -139,23 +231,8 @@ public final class Args {
         return list;
     }
 
-    /**
-     * Returns the original argument array.
-     * @return The array
-     */
-    public Object[] asArray() {
-        return args;
-    }
-
-    /**
-     * Returns the original arguments as a list;
-     * @return The list
-     */
-    public ListValue asList() {
-        var list = new ListValue();
-        Collections.addAll(list, args);
-        return list;
-    }
+    //-------------------------------------------------------------------------
+    // Object API
 
     @Override
     public String toString() {

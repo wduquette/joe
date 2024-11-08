@@ -46,7 +46,7 @@ public class KeywordProxy extends TypeProxy<Keyword> {
     // the leading `#`.
     private Object _init(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Keyword(name)");
-        var arg = args.getRemaining(0);
+        var arg = args.next(0);
         var name = joe.toString(arg);
 
         if (name.startsWith("#")) {

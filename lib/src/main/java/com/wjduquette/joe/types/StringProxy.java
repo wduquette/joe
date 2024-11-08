@@ -148,7 +148,7 @@ public class StringProxy extends TypeProxy<String> {
     // Converts the value into its string representation.
     private Object _init(Joe joe, Args args) {
         Joe.exactArity(args, 1, "String(value)");
-        return joe.stringify(args.getRemaining(0));
+        return joe.stringify(args.next(0));
     }
 
     //-------------------------------------------------------------------------
@@ -192,7 +192,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns the character at the *index* as a string.
     private Object _charAt(String value, Joe joe, Args args) {
         Joe.exactArity(args, 1, "charAt(index)");
-        var index = joe.toIndex(args.getRemaining(0), value.length());
+        var index = joe.toIndex(args.next(0), value.length());
         var c = value.charAt(index);
         return Character.toString(c);
     }
@@ -204,7 +204,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns `true` if this contains the *target*, and `false` otherwise.
     private Object _contains(String value, Joe joe, Args args) {
         Joe.exactArity(args, 1, "contains(target)");
-        var target = joe.stringify(args.getRemaining(0));
+        var target = joe.stringify(args.next(0));
         return value.contains(target);
     }
 
@@ -215,7 +215,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns `true` if this string ends with the suffix, and `false` otherwise.
     private Object _endsWith(String value, Joe joe, Args args) {
         Joe.exactArity(args, 1, "endsWith(suffix)");
-        var suffix = joe.stringify(args.getRemaining(0));
+        var suffix = joe.stringify(args.next(0));
         return value.endsWith(suffix);
     }
 
@@ -227,7 +227,7 @@ public class StringProxy extends TypeProxy<String> {
     // of the *other* value, ignoring case, and `false` otherwise.
     private Object _equalsIgnoreCase(String value, Joe joe, Args args) {
         Joe.exactArity(args, 1, "other");
-        return value.equalsIgnoreCase(joe.stringify(args.getRemaining(0)));
+        return value.equalsIgnoreCase(joe.stringify(args.next(0)));
     }
 
     //**
@@ -241,7 +241,7 @@ public class StringProxy extends TypeProxy<String> {
     // so Joe trims it.
     private Object _indent(String value, Joe joe, Args args) {
         Joe.exactArity(args, 1, "indent(n)");
-        var n = joe.toInteger(args.getRemaining(0));
+        var n = joe.toInteger(args.next(0));
         return value.indent(n).stripTrailing();
     }
 
@@ -435,7 +435,7 @@ public class StringProxy extends TypeProxy<String> {
     // Returns `true` if this string starts with the prefix, and `false` otherwise.
     private Object _startsWith(String value, Joe joe, Args args) {
         Joe.exactArity(args, 1, "startsWith(prefix)");
-        var prefix = joe.stringify(args.getRemaining(0));
+        var prefix = joe.stringify(args.next(0));
         return value.startsWith(prefix);
     }
 

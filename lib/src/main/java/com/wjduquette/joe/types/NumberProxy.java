@@ -159,7 +159,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // Returns the absolute value of the given *number*.
     private Object _abs(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.abs(num)");
-        return Math.abs(joe.toDouble(args.getRemaining(0)));
+        return Math.abs(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -169,7 +169,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // Returns the arc cosine of the number
     private Object _acos(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.acos(num)");
-        return Math.acos(joe.toDouble(args.getRemaining(0)));
+        return Math.acos(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -179,7 +179,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // Returns the arc sine of the number.
     private Object _asin(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.asin(num)");
-        return Math.asin(joe.toDouble(args.getRemaining(0)));
+        return Math.asin(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -189,7 +189,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // Returns the arc tangent of the number.
     private Object _atan(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.atan(num)");
-        return Math.atan(joe.toDouble(args.getRemaining(0)));
+        return Math.atan(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -201,8 +201,8 @@ public class NumberProxy extends TypeProxy<Double> {
     private Object _atan2(Joe joe, Args args) {
         Joe.exactArity(args, 2, "Number.atan2(x, y)");
         return Math.atan2(
-            joe.toDouble(args.getRemaining(0)),
-            joe.toDouble(args.getRemaining(0))
+            joe.toDouble(args.next(0)),
+            joe.toDouble(args.next(0))
         );
     }
 
@@ -214,7 +214,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // equal to *num*.
     private Object _ceil(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.ceil(num)");
-        return Math.ceil(joe.toDouble(args.getRemaining(0)));
+        return Math.ceil(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -225,9 +225,9 @@ public class NumberProxy extends TypeProxy<Double> {
     private Object _clamp(Joe joe, Args args) {
         Joe.exactArity(args, 3, "Number.clamp(num, min, max)");
         return Math.clamp(
-            joe.toDouble(args.getRemaining(0)),
-            joe.toDouble(args.getRemaining(0)),
-            joe.toDouble(args.getRemaining(0))
+            joe.toDouble(args.next(0)),
+            joe.toDouble(args.next(0)),
+            joe.toDouble(args.next(0))
         );
     }
 
@@ -238,7 +238,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // Returns the cosine of angle *a*.
     private Object _cos(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.cos(a)");
-        return Math.cos(joe.toDouble(args.getRemaining(0)));
+        return Math.cos(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -248,7 +248,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // Returns [[Number#constant.E]] raised the *num* power.
     private Object _exp(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.exp(num)");
-        return Math.exp(joe.toDouble(args.getRemaining(0)));
+        return Math.exp(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -259,7 +259,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // equal to *num*.
     private Object _floor(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.floor(num)");
-        return Math.floor(joe.toDouble(args.getRemaining(0)));
+        return Math.floor(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -271,8 +271,8 @@ public class NumberProxy extends TypeProxy<Double> {
     private Object _hypot(Joe joe, Args args) {
         Joe.exactArity(args, 2, "Number.hypot(x, y)");
         return Math.hypot(
-            joe.toDouble(args.getRemaining(0)),
-            joe.toDouble(args.getRemaining(0))
+            joe.toDouble(args.next(0)),
+            joe.toDouble(args.next(0))
         );
     }
 
@@ -283,7 +283,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // Returns the natural logarithm of the number.
     private Object _log(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.log(num)");
-        return Math.log(joe.toDouble(args.getRemaining(0)));
+        return Math.log(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -293,7 +293,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // Returns the base-10 logarithm of the number.
     private Object _log10(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.log10(num)");
-        return Math.log10(joe.toDouble(args.getRemaining(0)));
+        return Math.log10(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -305,8 +305,8 @@ public class NumberProxy extends TypeProxy<Double> {
     // single [[List]].
     private Object _max(Joe joe, Args args) {
         Joe.minArity(args, 1, "Number.max(num...)");
-        List<?> list = (args.remaining() == 1 && args.getRemaining(0) instanceof List<?>)
-            ? joe.toList(args.getRemaining(0))
+        List<?> list = (args.remaining() == 1 && args.next(0) instanceof List<?>)
+            ? joe.toList(args.next(0))
             : args.asList();
         return list.stream()
             .map(joe::toDouble)
@@ -323,8 +323,8 @@ public class NumberProxy extends TypeProxy<Double> {
     private Object _min(Joe joe, Args args) {
         Joe.minArity(args, 1, "Number.min(num...)");
 
-        List<?> list = (args.remaining() == 1 && args.getRemaining(0) instanceof List<?>)
-            ? joe.toList(args.getRemaining(0))
+        List<?> list = (args.remaining() == 1 && args.next(0) instanceof List<?>)
+            ? joe.toList(args.next(0))
             : args.asList();
         return list.stream()
             .map(joe::toDouble)
@@ -339,8 +339,8 @@ public class NumberProxy extends TypeProxy<Double> {
     private Object _pow(Joe joe, Args args) {
         Joe.exactArity(args, 2, "Number.pow(a, b)");
         return Math.pow(
-            joe.toDouble(args.getRemaining(0)),
-            joe.toDouble(args.getRemaining(0))
+            joe.toDouble(args.next(0)),
+            joe.toDouble(args.next(0))
         );
     }
 
@@ -361,7 +361,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // toward positive infinity.
     private Object _round(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.round(num)");
-        return (double)Math.round(joe.toDouble(args.getRemaining(0)));
+        return (double)Math.round(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -371,7 +371,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // Returns the sine of the angle.
     private Object _sin(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.sin(a)");
-        return Math.sin(joe.toDouble(args.getRemaining(0)));
+        return Math.sin(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -381,7 +381,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // Returns the square root of the number.
     private Object _sqrt(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.sqrt(num)");
-        return Math.sqrt(joe.toDouble(args.getRemaining(0)));
+        return Math.sqrt(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -391,7 +391,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // Returns the tangent of the angle.
     private Object _tan(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.tan(a)");
-        return Math.tan(joe.toDouble(args.getRemaining(0)));
+        return Math.tan(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -401,7 +401,7 @@ public class NumberProxy extends TypeProxy<Double> {
     // Converts an angle in radians to an angle in degrees.
     private Object _toDegrees(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.toDegrees(radians)");
-        return Math.toDegrees(joe.toDouble(args.getRemaining(0)));
+        return Math.toDegrees(joe.toDouble(args.next(0)));
     }
 
     //**
@@ -411,6 +411,6 @@ public class NumberProxy extends TypeProxy<Double> {
     // Converts an angle in degrees to an angle in radians.
     private Object _toRadians(Joe joe, Args args) {
         Joe.exactArity(args, 1, "Number.toRadians(degrees)");
-        return Math.toRadians(joe.toDouble(args.getRemaining(0)));
+        return Math.toRadians(joe.toDouble(args.next(0)));
     }
 }

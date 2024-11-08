@@ -21,7 +21,7 @@ public class ArgsTest extends Ted {
 
         checkThrow(() -> args.next())
             .containsString("next() called when Args queue is empty.");
-        checkThrow(() -> args.getRemaining(0))
+        checkThrow(() -> args.next(0))
             .containsString("Expected index in range 0");
     }
 

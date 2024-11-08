@@ -63,7 +63,7 @@ class StandardLibrary extends JoePackage {
     private Object _codify(Joe joe, Args args) {
         Joe.exactArity(args, 1, "codify(value)");
 
-        return joe.codify(args.getRemaining(0));
+        return joe.codify(args.next(0));
     }
 
     //**
@@ -118,7 +118,7 @@ class StandardLibrary extends JoePackage {
         if (!args.hasNext()) {
             joe.println();
         } else {
-            joe.println(joe.stringify(args.getRemaining(0)));
+            joe.println(joe.stringify(args.next(0)));
         }
         return null;
     }
@@ -132,7 +132,7 @@ class StandardLibrary extends JoePackage {
     private Object _stringify(Joe joe, Args args) {
         Joe.exactArity(args, 1, "stringify(value)");
 
-        return joe.stringify(args.getRemaining(0));
+        return joe.stringify(args.next(0));
     }
 
     //**
@@ -143,6 +143,6 @@ class StandardLibrary extends JoePackage {
     private Object _typeName(Joe joe, Args args) {
         Joe.exactArity(args, 1, "typeName(value)");
 
-        return joe.typeName(args.getRemaining(0));
+        return joe.typeName(args.next(0));
     }
 }
