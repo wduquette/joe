@@ -38,7 +38,8 @@ public final class Args {
      * @return The error, to be thrown.
      */
     public static JoeError arityFailure(String signature) {
-        return new JoeError("Wrong number of arguments, expected: " + signature);
+        return new JoeError("Wrong number of arguments, expected: " +
+            signature + ".");
     }
 
     //-------------------------------------------------------------------------

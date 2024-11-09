@@ -54,7 +54,7 @@ function testStackFrames() {
 
 function testNativeFunction_stackFrames() {
     checkCatch(\-> println(1, 2))
-        .message("Wrong number of arguments, expected: println([text])")
+        .message("Wrong number of arguments, expected: println([text]).")
         .stackFrames(
             "In native function println(1, 2)",
             "In lambda \\ -> ..."
