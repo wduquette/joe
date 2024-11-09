@@ -1,5 +1,8 @@
-// foreach statement tests.
+// Tests for the `foreach` statement
+//
+// Language tests should confine themselves to the basic test API.
 
+// Basic foreach loop
 function testForeach_simple() {
     var list = List("a", "b", "c");
     var result = List();
@@ -7,9 +10,10 @@ function testForeach_simple() {
     foreach (var i : list) 
         result.add(i);
 
-    check(result).eq(list);
+    assertEquals(result, list);
 }
 
+// Basic foreach loop with block.
 function testForeach_block() {
     var list = List("a", "b", "c");
     var result = List();
@@ -18,9 +22,10 @@ function testForeach_block() {
         result.add(i);
     }
 
-    check(result).eq(list);
+    assertEquals(result, list);
 }
 
+// Basic foreach loop with break.
 function testForeach_break() {
     var list = List("a", "b", "c");
     var result = List();
@@ -30,9 +35,10 @@ function testForeach_break() {
         result.add(i);
     }
 
-    check(result).eq(List("a"));
+    assertEquals(result, List("a"));
 }
 
+// Basic foreach loop with continue
 function testForeach_continue() {
     var list = List("a", "b", "c");
     var result = List();
@@ -42,14 +48,14 @@ function testForeach_continue() {
         result.add(i);
     }
 
-    check(result).eq(List("a", "c"));
+    assertEquals(result, List("a", "c"));
 }
 
-function testForeach_continue() {
+// Test that the foreach loop has its own scope.
+function testForeach_hasOwnScope() {
     foreach (var i : List(1)) {
         // Do nothing
     }
 
-    checkCatch(\-> i)
-        .message("Undefined variable 'i'.");
+    assertError(\-> i, "Undefined variable 'i'.");
 }
