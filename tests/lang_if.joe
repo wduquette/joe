@@ -1,0 +1,39 @@
+// Tests for the `if` statement.
+
+function testIf() {
+    var a = #unset;
+    var b = #unset;
+
+    if (true) a = #set;
+    if (false) b = #set;
+
+    assertEquals(a, #set);
+    assertEquals(b, #unset);
+}
+
+function testIfElse() {
+    function get(value) {
+        if (value) {
+            return #true;
+        } else {
+            return #false;
+        }
+    }
+    assertEquals(get(true), #true);
+    assertEquals(get(false), #false);
+}
+
+function testIfElseIfElse() {
+    function get(value) {
+        if (value == 1) {
+            return #a;
+        } else if (value == 2) {
+            return #b;
+        } else {
+            return #c;
+        }
+    }
+    assertEquals(get(1), #a);
+    assertEquals(get(2), #b);
+    assertEquals(get(3), #c);
+}
