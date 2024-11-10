@@ -382,6 +382,11 @@ class Interpreter {
             // a JoeObject, i.e., a JoeInstance or a ProxiedValue.
             case Expr.Get expr -> {
                 Object object = evaluate(expr.object());
+                if (object == null) {
+                    throw new JoeError(
+                        "Tried to retrieve '" + expr.name().lexeme() +
+                        "' property from null value.");
+                }
                 JoeObject instance = joe.getJoeObject(object);
                 yield instance.get(expr.name().lexeme());
             }
