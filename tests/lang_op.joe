@@ -2,18 +2,18 @@
 
 function testAnd() {
     // With booleans
-    check(true && true).eq(true);
-    check(true && false).eq(false);
-    check(false && true).eq(false);
-    check(false && false).eq(false);
+    assertTrue(true && true);
+    assertFalse(true && false);
+    assertFalse(false && true);
+    assertFalse(false && false);
 
     // Returns first argument if first is falsey.
-    check(false && 1).eq(false);
-    check(null && 1).eq(null);
+    assertFalse(false && 1);
+    assertEquals(null && 1, null);
 
     // Returns second argument if first is truthy
-    check(1 && 2).eq(2);
-    check(1 && null).eq(null);
+    assertEquals(1 && 2, 2);
+    assertEquals(1 && null, null);
 }
 
 function testAssignment() {
@@ -21,218 +21,200 @@ function testAssignment() {
     var b;
     var c;
     c = b = a;
-    check(c).eq(b).eq(a).eq(1);
+    assertEquals(a, 1);
+    assertEquals(b, 1);
+    assertEquals(c, 1);
 }
 
 function testComparison() {
-    check(0 < 1).isTrue();
-    check(1 < 1).isFalse();
+    assertTrue(0 < 1);
+    assertFalse(1 < 1);
 
-    check(0 <= 1).isTrue();
-    check(1 <= 1).isTrue();
-    check(2 <= 1).isFalse();
+    assertTrue(0 <= 1);
+    assertTrue(1 <= 1);
+    assertFalse(2 <= 1);
 
-    check(0 > 0).isFalse();
-    check(1 > 0).isTrue();
+    assertFalse(0 > 0);
+    assertTrue(1 > 0);
 
-    check(1 >= 0).isTrue();
-    check(1 >= 1).isTrue();
-    check(1 >= 2).isFalse();
+    assertTrue(1 >= 0);
+    assertTrue(1 >= 1);
+    assertFalse(1 >= 2);
 }
 
 function testDivide() {
-    check(4/2).eq(2);
-    check(String(4/0)).eq("Infinity");  // TODO: support Infinity,  NaN
+    assertEquals(4/2, 2);
+    assertEquals(String(4/0), "Infinity");  // TODO: support Infinity,  NaN
 
     function bad() { 4 / "abc"; }
-    checkCatch(bad)
-        .message("Operands must be numbers.");
+    assertError(bad, "Operands must be numbers.");
 }
 
 function testEquality() {
-    check(1 == 1).isTrue();
-    check("a" == "a").isTrue();
-    check(#k == #k).isTrue();
-    check(1 == 2).isFalse();
-    check("a" == #k).isFalse();
+    assertTrue(1 == 1);
+    assertTrue("a" == "a");
+    assertTrue(#k == #k);
+    assertFalse(1 == 2);
+    assertFalse("a" == #k);
 
-    check(1 != 1).isFalse();
-    check(1 != 2).isTrue();
-    check("a" != #k).isTrue();
+    assertFalse(1 != 1);
+    assertTrue(1 != 2);
+    assertTrue("a" != #k);
 }
 
 function testMinus() {
-    check(4 - 1).eq(3);
-    check(1 - 4).eq(-3);
+    assertEquals(4 - 1, 3);
+    assertEquals(1 - 4, -3);
 
     function bad() { 4 - "abc"; }
-    checkCatch(bad)
-        .message("Operands must be numbers.");
+    assertError(bad, "Operands must be numbers.");
 }
 
 function testNot() {
-    check(!true).isFalse();
-    check(!1).isFalse();
-    check(!false).isTrue();
-    check(!null).isTrue();
+    assertFalse(!true);
+    assertFalse(!1);
+    assertTrue(!false);
+    assertTrue(!null);
 }
 
 function testOr() {
     // With booleans
-    check(true || true).eq(true);
-    check(true || false).eq(true);
-    check(false || true).eq(true);
-    check(false || false).eq(false);
+    assertTrue(true || true);
+    assertTrue(true || false);
+    assertTrue(false || true);
+    assertFalse(false || false);
 
     // Returns first argument if first is truthy.
-    check(true || false).eq(true);
-    check(1 || null).eq(1);
+    assertTrue(true || false);
+    assertEquals(1 || null, 1);
 
     // Returns second argument if first is falsy
-    check(false || 2).eq(2);
-    check(null || 4).eq(4);
+    assertEquals(false || 2, 2);
+    assertEquals(null || 4, 4);
 }
 
 function testPlus() {
-    check(1 + 2).eq(3);
-    check("a" + "b").eq("ab");
-    check("a" + 1).eq("a1");
-    check(1 + "a").eq("1a");
+    assertEquals(1 + 2, 3);
+    assertEquals("a" + "b", "ab");
+    assertEquals("a" + 1, "a1");
+    assertEquals(1 + "a", "1a");
 
     function bad() { #a + #b; }
-    checkCatch(bad)
-        .message("'+' cannot combine the given operands.");
+    assertError(bad, "'+' cannot combine the given operands.");
 }
 
 function testTernary() {
-    check(true ? "a" : "b").eq("a");
-    check(false ? "a" : "b").eq("b");
+    assertEquals(true ? "a" : "b", "a");
+    assertEquals(false ? "a" : "b", "b");
 }
 
 function testTimes() {
-    check(4 * 2).eq(8);
+    assertEquals(4 * 2, 8);
 
     function bad() { 4 * "abc"; }
-    checkCatch(bad)
-        .message("Operands must be numbers.");
+    assertError(bad, "Operands must be numbers.");
 }
 
 function testIN() {
     var list = List(#a, #b, #c);
-    check(#a in list).isTrue();
-    check(#d in list).isFalse();
+    assertTrue(#a in list);
+    assertFalse(#d in list);
 
-    checkCatch(\-> #a in #a)
-        .message("Expected iterable, got: Keyword '#a'.");
+    assertError(\-> #a in #a, "Expected iterable, got: Keyword '#a'.");
 }
 
 function testNI() {
     var list = List(#a, #b, #c);
-    check(#a ni list).isFalse();
-    check(#d ni list).isTrue();
+    assertFalse(#a ni list);
+    assertTrue(#d ni list);
 
-    checkCatch(\-> #a ni #a)
-        .message("Expected iterable, got: Keyword '#a'.");
+    assertError(\-> #a ni #a, "Expected iterable, got: Keyword '#a'.");
 }
 
 function testPlusEquals_var() {
     var x = 5;
     var s = "abc";
-    check(x += 7).eq(12);
-    check(x).eq(12);
-    check(s += "def").eq("abcdef");
-    check(s).eq("abcdef");
+    assertEquals(x += 7, 12);
+    assertEquals(x, 12);
+    assertEquals(s += "def", "abcdef");
+    assertEquals(s, "abcdef");
 
-    checkCatch(\-> x += "abc")
-        .message("Operands must be numbers.");
+    assertError(\-> x += "abc", "Operands must be numbers.");
 }
 
 function testPlusEquals_property() {
     var thing = Thing();
     thing.x = 5;
     thing.s = "abc";
-    check(thing.x += 7).eq(12);
-    check(thing.x).eq(12);
-    check(thing.s += "def").eq("abcdef");
-    check(thing.s).eq("abcdef");
+    assertEquals(thing.x += 7, 12);
+    assertEquals(thing.x, 12);
+    assertEquals(thing.s += "def", "abcdef");
+    assertEquals(thing.s, "abcdef");
 
-    checkCatch(\-> thing.x += "abc")
-        .message("Operands must be numbers.");
+    assertError(\-> thing.x += "abc", "Operands must be numbers.");
 }
 
 function testMinusEquals_var() {
     var x = 5;
     var s = "abc";
-    check(x -= 7).eq(-2);
-    check(x).eq(-2);
+    assertEquals(x -= 7, -2);
+    assertEquals(x, -2);
 
-    checkCatch(\-> x -= "abc")
-        .message("Operands must be numbers.");
-    checkCatch(\-> s -= 7)
-        .message("Operands must be numbers.");
+    assertError(\-> x -= "abc", "Operands must be numbers.");
+    assertError(\-> s -= 7, "Operands must be numbers.");
 }
 
 function testMinusEquals_property() {
     var thing = Thing();
     thing.x = 5;
     thing.s = "abc";
-    check(thing.x -= 7).eq(-2);
-    check(thing.x).eq(-2);
+    assertEquals(thing.x -= 7, -2);
+    assertEquals(thing.x, -2);
 
-    checkCatch(\-> thing.x -= "abc")
-        .message("Operands must be numbers.");
-    checkCatch(\-> thing.s -= 7)
-        .message("Operands must be numbers.");
+    assertError(\-> thing.x -= "abc", "Operands must be numbers.");
+    assertError(\-> thing.s -= 7, "Operands must be numbers.");
 }
 
 function testStarEquals_var() {
     var x = 5;
     var s = "abc";
-    check(x *= 7).eq(35);
-    check(x).eq(35);
+    assertEquals(x *= 7, 35);
+    assertEquals(x, 35);
 
-    checkCatch(\-> x *= "abc")
-        .message("Operands must be numbers.");
-    checkCatch(\-> s *= 7)
-        .message("Operands must be numbers.");
+    assertError(\-> x *= "abc", "Operands must be numbers.");
+    assertError(\-> s *= 7, "Operands must be numbers.");
 }
 
 function testStarEquals_property() {
     var thing = Thing();
     thing.x = 5;
     thing.s = "abc";
-    check(thing.x *= 7).eq(35);
-    check(thing.x).eq(35);
+    assertEquals(thing.x *= 7, 35);
+    assertEquals(thing.x, 35);
 
-    checkCatch(\-> thing.x *= "abc")
-        .message("Operands must be numbers.");
-    checkCatch(\-> thing.s *= 7)
-        .message("Operands must be numbers.");
+    assertError(\-> thing.x *= "abc", "Operands must be numbers.");
+    assertError(\-> thing.s *= 7, "Operands must be numbers.");
 }
 
 function testSlashEquals_var() {
     var x = 50;
     var s = "abc";
-    check(x /= 5).eq(10);
-    check(x).eq(10);
+    assertEquals(x /= 5, 10);
+    assertEquals(x, 10);
 
-    checkCatch(\-> x /= "abc")
-        .message("Operands must be numbers.");
-    checkCatch(\-> s /= 7)
-        .message("Operands must be numbers.");
+    assertError(\-> x /= "abc", "Operands must be numbers.");
+    assertError(\-> s /= 7, "Operands must be numbers.");
 }
 
 function testSlashEquals_property() {
     var thing = Thing();
     thing.x = 50;
     thing.s = "abc";
-    check(thing.x /= 5).eq(10);
-    check(thing.x).eq(10);
+    assertEquals(thing.x /= 5, 10);
+    assertEquals(thing.x, 10);
 
-    checkCatch(\-> thing.x /= "abc")
-        .message("Operands must be numbers.");
-    checkCatch(\-> thing.s /= 7)
-        .message("Operands must be numbers.");
+    assertError(\-> thing.x /= "abc", "Operands must be numbers.");
+    assertError(\-> thing.s /= 7, "Operands must be numbers.");
 }
 
 //-----------------------------------------------------------------------------
@@ -240,28 +222,28 @@ function testSlashEquals_property() {
 
 function testPlusPlus_pre_var() {
     var x = 0;
-    check(++x).eq(1);
-    check(x).eq(1);
+    assertEquals(++x, 1);
+    assertEquals(x, 1);
 }
 
 function testPlusPlus_post_var() {
     var x = 0;
-    check(x++).eq(0);
-    check(x).eq(1);
+    assertEquals(x++, 0);
+    assertEquals(x, 1);
 }
 
 function testPlusPlus_pre_prop() {
     var t = Thing();
     t.x = 0;
-    check(++t.x).eq(1);
-    check(t.x).eq(1);
+    assertEquals(++t.x, 1);
+    assertEquals(t.x, 1);
 }
 
 function testPlusPlus_post_prop() {
     var t = Thing();
     t.x = 0;
-    check(t.x++).eq(0);
-    check(t.x).eq(1);
+    assertEquals(t.x++, 0);
+    assertEquals(t.x, 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -269,28 +251,28 @@ function testPlusPlus_post_prop() {
 
 function testMinusMinus_pre_var() {
     var x = 0;
-    check(--x).eq(-1);
-    check(x).eq(-1);
+    assertEquals(--x, -1);
+    assertEquals(x, -1);
 }
 
 function testMinusMinus_post_var() {
     var x = 0;
-    check(x--).eq(0);
-    check(x).eq(-1);
+    assertEquals(x--, 0);
+    assertEquals(x, -1);
 }
 
 function testMinusMinus_pre_prop() {
     var t = Thing();
     t.x = 0;
-    check(--t.x).eq(-1);
-    check(t.x).eq(-1);
+    assertEquals(--t.x, -1);
+    assertEquals(t.x, -1);
 }
 
 function testMinusMinus_post_prop() {
     var t = Thing();
     t.x = 0;
-    check(t.x--).eq(0);
-    check(t.x).eq(-1);
+    assertEquals(t.x--, 0);
+    assertEquals(t.x, -1);
 }
 
 //-----------------------------------------------------------------------------
