@@ -139,7 +139,9 @@ class Interpreter {
                     execute(stmt.init());
                 }
 
-                while (Joe.isTruthy(evaluate(stmt.condition()))) {
+                while (stmt.condition() == null
+                    || Joe.isTruthy(evaluate(stmt.condition()))
+                ) {
                     try {
                         execute(stmt.body());
                     } catch (Break ex) {
@@ -147,7 +149,9 @@ class Interpreter {
                     } catch (Continue ex) {
                         // Nothing else to do
                     }
-                    evaluate(stmt.incr());
+                    if (stmt.incr() != null) {
+                        evaluate(stmt.incr());
+                    }
                 }
             }
             case Stmt.ForEach stmt -> {
