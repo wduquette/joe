@@ -187,7 +187,6 @@ class Parser {
         // Condition
         Expr condition = null;
         if (!check(SEMICOLON)) {
-            System.out.println("B1");
             condition = expression();
         }
         consume(SEMICOLON, "Expected ';' after loop condition.");
