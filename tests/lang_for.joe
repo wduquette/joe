@@ -1,4 +1,6 @@
 // Tests for the `for` statement.
+//
+// Language tests should confine themselves to the basic test API.
 
 function testBasic() {
     var sum = 0;

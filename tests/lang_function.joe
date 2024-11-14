@@ -1,4 +1,6 @@
-// Tests for Joe functions
+// Tests for Joe `function` declarations
+//
+// Language tests should confine themselves to the basic test API.
 
 // Can declare and call functions.
 function testDeclareFunction() {

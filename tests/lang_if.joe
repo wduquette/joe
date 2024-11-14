@@ -1,4 +1,6 @@
 // Tests for the `if` statement.
+//
+// Language tests should confine themselves to the basic test API.
 
 function testIf() {
     var a = #unset;

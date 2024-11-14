@@ -1,4 +1,6 @@
 // Literal Values
+//
+// Language tests should confine themselves to the basic test API.
 
 //-------------------------------------------------------------------------
 // Numbers

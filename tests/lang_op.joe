@@ -1,4 +1,6 @@
 // Operator Tests
+//
+// Language tests should confine themselves to the basic test API.
 
 function testAnd() {
     // With booleans
