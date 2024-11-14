@@ -145,7 +145,7 @@ class Parser {
         } else {
             var conditionText =
                 source.span(conditionStart, conditionEnd).text().strip();
-            message = new Expr.Literal("Assertion unmet: " + conditionText);
+            message = new Expr.Literal("Assertion unmet: " + conditionText + ".");
         }
 
         consume(SEMICOLON, "Expected ';' after assertion.");
@@ -187,7 +187,6 @@ class Parser {
         // Condition
         Expr condition = null;
         if (!check(SEMICOLON)) {
-            System.out.println("B1");
             condition = expression();
         }
         consume(SEMICOLON, "Expected ';' after loop condition.");

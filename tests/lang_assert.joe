@@ -1,0 +1,17 @@
+// Tests for the `assert` statement.
+//
+// Language tests should confine themselves to the basic test API.
+
+function testAssert_met() {
+    assert 1 + 1 == 2;
+}
+
+function testAssert_unmet_noMessage() {
+    function bad() { assert 1 + 1 == 3; }
+    assertError(bad, "Assertion unmet: 1 + 1 == 3.");
+}
+
+function testAssert_unmet_message() {
+    function bad() { assert 1 + 1 == 3, "Bad math!"; }
+    assertError(bad, "Bad math!");
+}

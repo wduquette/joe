@@ -139,7 +139,9 @@ class Interpreter {
                     execute(stmt.init());
                 }
 
-                while (Joe.isTruthy(evaluate(stmt.condition()))) {
+                while (stmt.condition() == null
+                    || Joe.isTruthy(evaluate(stmt.condition()))
+                ) {
                     try {
                         execute(stmt.body());
                     } catch (Break ex) {
@@ -147,7 +149,9 @@ class Interpreter {
                     } catch (Continue ex) {
                         // Nothing else to do
                     }
-                    evaluate(stmt.incr());
+                    if (stmt.incr() != null) {
+                        evaluate(stmt.incr());
+                    }
                 }
             }
             case Stmt.ForEach stmt -> {
@@ -378,6 +382,11 @@ class Interpreter {
             // a JoeObject, i.e., a JoeInstance or a ProxiedValue.
             case Expr.Get expr -> {
                 Object object = evaluate(expr.object());
+                if (object == null) {
+                    throw new JoeError(
+                        "Tried to retrieve '" + expr.name().lexeme() +
+                        "' property from null value.");
+                }
                 JoeObject instance = joe.getJoeObject(object);
                 yield instance.get(expr.name().lexeme());
             }

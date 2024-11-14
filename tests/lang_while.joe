@@ -1,4 +1,4 @@
-// Tests the while loop
+// Tests the `while` statement
 
 function testWhile_simple() {
     var list = List();
@@ -7,8 +7,9 @@ function testWhile_simple() {
         i = i + 1;
         list.add(i);
     }
-    check(i).eq(4);
-    check(list).eq(List(1,2,3,4));
+
+    assertEquals(i, 4);
+    assertEquals(list, List(1,2,3,4));
 }
 
 function testWhile_continue() {
@@ -19,8 +20,9 @@ function testWhile_continue() {
         if (i == 2) continue;
         list.add(i);
     }
-    check(i).eq(4);
-    check(list).eq(List(1,3,4));
+
+    assertEquals(i, 4);
+    assertEquals(list, List(1,3,4));
 }
 
 function testWhile_break() {
@@ -31,6 +33,7 @@ function testWhile_break() {
         if (i == 3) break;
         list.add(i);
     }
-    check(i).eq(3);
-    check(list).eq(List(1,2));
+
+    assertEquals(i, 3);
+    assertEquals(list, List(1,2));
 }
