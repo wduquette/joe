@@ -1,0 +1,51 @@
+// Literal Values
+
+//-------------------------------------------------------------------------
+// Numbers
+
+function testScientificNotation() {
+    assertEquals(123.45e3, 123450);
+    assertEquals(123.45e-2, 1.2345);
+}
+
+function testInteger() {
+    assertEquals(12345, 12345.0);
+}
+
+function testHex() {
+    assertEquals(0xff, 255);
+    assertEquals(0xABCD, 43981);
+}
+
+//-------------------------------------------------------------------------
+// Keywords
+
+function testKeywords() {
+    assertEquals(#abc, Keyword("#abc"));
+}
+
+//-------------------------------------------------------------------------
+// Strings
+
+function testTextBlock() {
+    var block = """
+        First line
+      "quoted middle"
+    Last line
+    """;
+    assertEquals(block, "    First line\n  \"quoted middle\"\nLast line");
+}
+
+function testRawString() {
+    var raw = 'a\b\c';
+    assertEquals(raw, "a\\b\\c");
+}
+
+function testRawTextBlock() {
+    var block = '''
+        First\ line
+      "quoted middle"
+    Last 'line'
+    ''';
+    assertEquals(block, "    First\\ line\n  \"quoted middle\"\nLast 'line'");
+}
