@@ -39,10 +39,13 @@
       multiple `@type` entities
   - `joe test`
     - Added `assertTrue`, `assertFalse`, `assertError`, and `skip` functions.
+  - `joe version`
+    - New tool, outputs the Joe version and build date.
      
 - Miscellaneous
   - Removed `Joe::codify`.
   - Removed the various flavors of `Joe::recodify`.
+  - Added Ant `build.xml` for building releases.
 
   
 ## Changes in 0.3.0 (2024-10-11)
