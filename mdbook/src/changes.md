@@ -1,6 +1,10 @@
 # Change Log
 
-## Changes in 0.4.0 (Forthcoming)
+## Changes in 0.5.0 (Forthcoming)
+
+- None yet.
+
+## Changes in 0.4.0 
 
 - Language
   - Added the `@` operator.
