@@ -5,6 +5,7 @@ import com.wjduquette.joe.types.EnumProxy;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.Tooltip;
@@ -85,6 +86,7 @@ public class WinPackage extends JoePackage {
         type(ControlProxy.TYPE);
         type(ButtonProxy.TYPE);
         type(LabelProxy.TYPE);
+        type(SeparatorProxy.TYPE);
         type(TabPaneProxy.TYPE);
 
         // Panes
@@ -114,6 +116,11 @@ public class WinPackage extends JoePackage {
         // @constant TOP_RIGHT
         type(new EnumProxy<>("Pos", Pos.class));
 
+        //**
+        // @enum Orientation
+        // @constant HORIZONTAL
+        // @constant VERTICAL
+        type(new EnumProxy<>("Orientation", Orientation.class));
 
         //**
         // @enum Priority
