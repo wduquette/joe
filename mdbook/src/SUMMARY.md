@@ -65,11 +65,16 @@
     - [Insets Type](library/type.joe.win.Insets.md);
     - [Label Type](library/type.joe.win.Label.md);
     - [Node Type](library/type.joe.win.Node.md);
+    - [Orientation Type](library/type.joe.win.Orientation.md);
     - [Pane Type](library/type.joe.win.Pane.md);
     - [Pos Type](library/type.joe.win.Pos.md);
     - [Priority Type](library/type.joe.win.Priority.md);
     - [Region Type](library/type.joe.win.Region.md);
+    - [Separator Type](library/type.joe.win.Separator.md);
+    - [Side Type](library/type.joe.win.Side.md);
     - [StackPane Type](library/type.joe.win.StackPane.md);
+    - [Tab Type](library/type.joe.win.Tab.md);
+    - [TabPane Type](library/type.joe.win.TabPane.md);
     - [VBox Type](library/type.joe.win.VBox.md);
     - [Win Type](library/type.joe.win.Win.md);
   - [Library API Index](./library/index.md)
