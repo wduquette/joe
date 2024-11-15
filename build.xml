@@ -61,7 +61,11 @@ To do a complete clean build:
         <mkdir dir="${tartree}"/>
 
         <mkdir dir="${tartree}/bin"/>
-        <copy file="${basedir}/bin/joe" todir="${tartree}/bin"/>
+        <copy file="${basedir}/bin/joe.template" tofile="${tartree}/bin/joe">
+            <filterset>
+                <filter token="VERSION" value="${version}"/>
+            </filterset>
+        </copy>
         <exec executable="chmod" dir="${tartree}/bin">
             <arg line="+x joe"/>
         </exec>
@@ -107,7 +111,6 @@ To do a complete clean build:
 
     <!-- target: dist -->
     <target name="dist">
-        <!-- TODO: create bin/joe from joe.template -->
         <tar destfile="${release}/${tarfile}"
              longfile="posix"
              compression="gzip">
