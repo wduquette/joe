@@ -2,6 +2,7 @@ package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.tools.ReplTool;
 import com.wjduquette.joe.tools.RunTool;
+import com.wjduquette.joe.tools.VersionTool;
 import com.wjduquette.joe.tools.doc.DocTool;
 import com.wjduquette.joe.tools.win.WinTool;
 import com.wjduquette.joe.tools.test.TestTool;
@@ -30,6 +31,7 @@ public class App {
      */
     public static void main(String[] args) {
         var launcher = new ToolLauncher(NAME, List.of(
+            VersionTool.INFO,
             RunTool.INFO,
             ReplTool.INFO,
             TestTool.INFO,

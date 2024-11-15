@@ -27,6 +27,7 @@
 ---
 
 # Joe Tools
+- [`joe version`](joe_version.md)
 - [`joe run`](joe_run.md)
 - [`joe repl`](joe_repl.md)
 - [`joe test`](joe_test.md)
