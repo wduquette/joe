@@ -42,6 +42,7 @@ class TabPaneProxy extends FXProxy<TabPane> {
         fxProperty("rotateGraphic", TabPane::rotateGraphicProperty, Joe::toBoolean);
 
         // Methods
+        method("tab",  this::_tab);
         method("tabs", this::_tabs);
     }
 
@@ -59,6 +60,18 @@ class TabPaneProxy extends FXProxy<TabPane> {
 
     //-------------------------------------------------------------------------
     // Methods
+
+    //**
+    // @method tab
+    // @args tab
+    // @result this
+    // Adds a [[Tab]] to the pane.
+    private Object _tab(TabPane pane, Joe joe, Args args) {
+        args.exactArity(1, "tab(tab)");
+        var tab = joe.toClass(args.next(), Tab.class);
+        pane.getTabs().add(tab);
+        return pane;
+    }
 
     //**
     // @method tabs
