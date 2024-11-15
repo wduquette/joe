@@ -59,6 +59,7 @@ To do a complete clean build:
         <mkdir dir="${release}"/>
         <mkdir dir="${classes}"/>
         <mkdir dir="${tartree}"/>
+        <mkdir dir="${tartree}/lib"/>
 
         <mkdir dir="${tartree}/bin"/>
         <copy file="${basedir}/bin/joe.template" tofile="${tartree}/bin/joe">
@@ -84,7 +85,7 @@ To do a complete clean build:
 
     <!-- target: jar -->
     <target name="jar" depends="compile">
-        <jar destfile="${tartree}/jars/${jarfile}">
+        <jar destfile="${tartree}/lib/${jarfile}">
             <fileset dir="${classes}"/>
             <fileset dir="${srcdir}"/>
             <fileset dir="${resdir}"/>
