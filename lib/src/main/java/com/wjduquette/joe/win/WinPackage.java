@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -42,6 +43,7 @@ public class WinPackage extends JoePackage {
     //     - [[Control]]: Nodes to interact with
     //       - [[Button]]: A button
     //       - [[Label]]: A label
+    //       - [[TabPane]]: A `TabPane`
     //     - [[Pane]]: Nodes that manage children
     //       - [[HBox]]: A row of widgets
     //       - [[StackPane]]: Widgets stacked like cards in a deck
@@ -76,12 +78,14 @@ public class WinPackage extends JoePackage {
 
         // Base classes
         type(NodeProxy.TYPE);
+        type(TabProxy.TYPE);
         type(RegionProxy.TYPE);
 
         // Controls
         type(ControlProxy.TYPE);
         type(ButtonProxy.TYPE);
         type(LabelProxy.TYPE);
+        type(TabPaneProxy.TYPE);
 
         // Panes
         type(PaneProxy.TYPE);
@@ -121,6 +125,16 @@ public class WinPackage extends JoePackage {
         // @constant SOMETIMES
         // @constant NEVER
         type(new EnumProxy<>("Priority", Priority.class));
+
+        //**
+        // @enum Side
+        // A `Side` of a rectangular region.
+        //
+        // @constant BOTTOM
+        // @constant LEFT
+        // @constant RIGHT
+        // @constant TOP
+        type(new EnumProxy<>("Side", Side.class));
 
         // Utility Classes
         type(InsetsProxy.TYPE);
