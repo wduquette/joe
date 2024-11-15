@@ -1,14 +1,12 @@
 package com.wjduquette.joe.walker;
 
-import com.wjduquette.joe.JoeCallable;
-import com.wjduquette.joe.JoeClass;
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 class WalkerInstance implements JoeObject {
+    private final static String TO_STRING = "toString";
     private final JoeClass joeClass;
     private final Map<String, Object> fields = new HashMap<>();
 
@@ -30,6 +28,10 @@ class WalkerInstance implements JoeObject {
         JoeCallable method = joeClass.bind(this, name);
         if (method != null) return method;
 
+        if (name.equals(TO_STRING)) {
+            return (JoeCallable)(joe, args) -> this.toString();
+        }
+
         throw new JoeError("Undefined property '" + name + "'.");
     }
 
@@ -40,6 +42,12 @@ class WalkerInstance implements JoeObject {
 
     public JoeClass joeClass() {
         return joeClass;
+    }
+
+    @Override
+    public String toString(Joe joe) {
+        var callable = get(TO_STRING);
+        return (String)joe.call(callable);
     }
 
     @Override

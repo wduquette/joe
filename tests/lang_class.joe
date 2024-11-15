@@ -111,6 +111,27 @@ function testInitializer() {
 }
 
 //-----------------------------------------------------------------------------
+// toString()
+
+// Default toString()
+function testToString_default() {
+    class Thing {}
+    var thing = Thing();
+    assertTrue(thing.toString().startsWith("<Thing"));
+    assertEquals(stringify(thing), thing.toString());
+}
+
+// Custom toString()
+function testToString_custom() {
+    class Thing {
+        method toString() { return "I'm a Thing!"; }
+    }
+    var thing = Thing();
+    assertEquals(thing.toString(), "I'm a Thing!");
+    assertEquals(stringify(thing), thing.toString());
+}
+
+//-----------------------------------------------------------------------------
 // Static Methods
 
 // A class can define static methods, which can then be called.
