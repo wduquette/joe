@@ -90,7 +90,7 @@ To do a complete clean build:
             <fileset dir="${srcdir}"/>
             <fileset dir="${resdir}"/>
             <manifest>
-                <attribute name="Program-Version" value="${version}"/>
+                <attribute name="Implementation-Version" value="${version}"/>
                 <attribute name="Built-Date" value="${build.date}"/>
                 <attribute name="Main-Class" value="${app}"/>
             </manifest>
