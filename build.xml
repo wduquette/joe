@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Ant build script for Joe.
-(Why Ant? I understand Ant.  Gradle is totally opaque.)
+This build script is used for doing release builds. Yes, I know, Ant
+is old; but it's also understandable and readable and well-documented,
+and I can make it do what I want without feeling like I'm messing with
+things Man Was Not Meant To Know.
+
+To do a complete clean build:
+
+- Update the `version` property, below.
+- Execute `ant`.
+- The release tarball is `release/joe-${version}.tar`.
 -->
-<project name="joe" basedir="." default="main">
+<project name="joe" basedir="." default="all">
+    <!-- Update the following before cutting a release -->
     <property name="version"     value="0.4.0"/>
+
+    <!-- These should rarely need to be touched. -->
     <property name="srcdir"      value="${basedir}/lib/src/main/java"/>
     <property name="resdir"      value="${basedir}/lib/src/main/resources"/>
     <property name="release"     value="${basedir}/release"/>
@@ -34,7 +46,7 @@
     </path>
 
     <!-- target: main -->
-    <target name="main" depends="clean,build,docs,dist"/>
+    <target name="all" depends="clean,build,docs,dist"/>
     <target name="build" depends="init,compile,jar"/>
 
     <!-- target: clean -->
@@ -47,9 +59,14 @@
         <mkdir dir="${release}"/>
         <mkdir dir="${classes}"/>
         <mkdir dir="${tartree}"/>
+        <mkdir dir="${tartree}/lib"/>
 
         <mkdir dir="${tartree}/bin"/>
-        <copy file="${basedir}/bin/joe" todir="${tartree}/bin"/>
+        <copy file="${basedir}/bin/joe.template" tofile="${tartree}/bin/joe">
+            <filterset>
+                <filter token="VERSION" value="${version}"/>
+            </filterset>
+        </copy>
         <exec executable="chmod" dir="${tartree}/bin">
             <arg line="+x joe"/>
         </exec>
@@ -68,7 +85,7 @@
 
     <!-- target: jar -->
     <target name="jar" depends="compile">
-        <jar destfile="${tartree}/jars/${jarfile}">
+        <jar destfile="${tartree}/lib/${jarfile}">
             <fileset dir="${classes}"/>
             <fileset dir="${srcdir}"/>
             <fileset dir="${resdir}"/>
@@ -87,9 +104,11 @@
         <copy todir="${tartree}/docs">
             <fileset dir="${basedir}/docs"/>
         </copy>
-        <!-- TODO Build Javadoc! -->
+        <javadoc sourcepath="${srcdir}" destdir="${tartree}/docs/javadoc"
+                 Windowtitle="Joe ${version}">
+            <doctitle>Joe ${version}: The Joe Language</doctitle>
+        </javadoc>
     </target>
-
 
     <!-- target: dist -->
     <target name="dist">
