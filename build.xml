@@ -60,6 +60,8 @@ To do a complete clean build:
         <mkdir dir="${classes}"/>
         <mkdir dir="${tartree}"/>
         <mkdir dir="${tartree}/lib"/>
+        <copy file="${basedir}/README.md" todir="${tartree}"/>
+        <copy file="${basedir}/INSTALL.md" todir="${tartree}"/>
 
         <mkdir dir="${tartree}/bin"/>
         <copy file="${basedir}/bin/joe.template" tofile="${tartree}/bin/joe">

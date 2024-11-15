@@ -1,7 +1,30 @@
 # BUILD.md
 
-Notes for building a release.
+## Building for Development
 
-- Use gradle or IntelliJ to build the `joe-<version>.jar` file.
-- Build the Joe User's Guide and Joe Javadoc; see `joe/mdbook/README.md`.
-- TODO: Zip file with .jar, `/bin/joe`, installation instructions.
+- Let IntelliJ IDEA build it, OR
+- Use the Gradle wrapper
+
+## Building for Release
+
+Build the Joe User's Guide if necessary
+
+- See `joe/mdbook/README.md`
+- The user's guide is usually built as it changes, so that it will appear
+  in GitHub Pages.
+- The version number appears in `joe/mdbook/book.toml`.
+
+Use `ant` to build the distribution.
+
+- Update the `version` property in `joe/build.xml` if necessary.
+- Execute `ant`
+
+```shell
+$ cd joe
+$ ant
+```
+
+- Distribute `joe/release/joe-<version>/joe-<version>.tar`.
+
+
+
