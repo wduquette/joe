@@ -39,16 +39,21 @@ public class WinPackage extends JoePackage {
     //
     // The `joe.win` widget type hierarchy is a subset of the JavaFX hierarchy.
     //
+    // - [[MenuItem]]: A menu item
+    // - [[Menu]]: A menu
     // - [[Node]]: Base class
     //   - [[Region]]: Nodes with geometry
     //     - [[Control]]: Nodes to interact with
     //       - [[Button]]: A button
     //       - [[Label]]: A label
+    //       - [[MenuBar]]: A menu bar
+    //       - [[Separator]]: A horizontal or vertical separator
     //       - [[TabPane]]: A `TabPane`
     //     - [[Pane]]: Nodes that manage children
     //       - [[HBox]]: A row of widgets
     //       - [[StackPane]]: Widgets stacked like cards in a deck
     //       - [[VBox]]: A column of widgets
+    // - [[Tab]]: A tab in a [[TabPane]]
     //
     // @packageTopic css
     // @title Styling with CSS
@@ -79,13 +84,13 @@ public class WinPackage extends JoePackage {
 
         // Base classes
         type(NodeProxy.TYPE);
-        type(TabProxy.TYPE);
         type(RegionProxy.TYPE);
 
         // Controls
         type(ControlProxy.TYPE);
         type(ButtonProxy.TYPE);
         type(LabelProxy.TYPE);
+        type(MenuBarProxy.TYPE);
         type(SeparatorProxy.TYPE);
         type(TabPaneProxy.TYPE);
 
@@ -94,6 +99,11 @@ public class WinPackage extends JoePackage {
         type(StackPaneProxy.TYPE);
         type(VBoxProxy.TYPE);
         type(HBoxProxy.TYPE);
+
+        // Widgets that aren't Nodes
+        type(TabProxy.TYPE);
+        type(MenuProxy.TYPE);
+        type(MenuItemProxy.TYPE);
 
         // Enums
 
