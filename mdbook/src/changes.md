@@ -2,7 +2,12 @@
 
 ## Changes in 0.5.0 (Forthcoming)
 
-- None yet.
+- Language
+  - A default `toString()`  method is defined automatically for instances of 
+    Joe classes.
+    - And can be overridden by the class declaration.
+    - It is always the case that `stringify(instance) == instance.toString()` 
+      for instances of Joe classes.
 
 ## Changes in 0.4.0 
 
