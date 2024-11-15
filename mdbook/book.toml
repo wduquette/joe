@@ -3,7 +3,7 @@ authors = ["Will Duquette"]
 language = "en"
 multilingual = false
 src = "src"
-title = "Joe v0.3.0 User's Guide"
+title = "Joe v0.4.0 User's Guide"
 
 [build]
 build-dir = "../docs"             # the directory where the output is placed
