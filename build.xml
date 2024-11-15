@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ant build script for Joe.
+(Why Ant? I understand Ant.  Gradle is totally opaque.)
+-->
+<project name="joe" basedir="." default="main">
+    <property name="version"     value="0.4.0"/>
+    <property name="srcdir"      value="${basedir}/lib/src/main/java"/>
+    <property name="resdir"      value="${basedir}/lib/src/main/resources"/>
+    <property name="release"     value="${basedir}/release"/>
+    <property name="classes"     value="${release}/classes"/>
+    <property name="tartree"     value="${release}/joe-${version}"/>
+    <property name="jarfile"     value="${ant.project.name}-${version}.jar"/>
+    <property name="tarfile"     value="${ant.project.name}-${version}.tar"/>
+    <property name="app"         value="com.wjduquette.joe.app.App"/>
+
+    <!-- Get the build date -->
+    <tstamp>
+        <format property="build.date" timezone="UTC"
+                pattern="yyyy-MM-dd'T'HH:mm:ssZ"/>
+    </tstamp>
+
+    <!-- Identify the build -->
+    <echo message="Building ${ant-project-name}..."/>
+    <echo message="version    = ${version}"/>
+    <echo message="build.date = ${build.date}"/>
+
+    <!-- Set up the class path for the build. -->
+    <path id="master-classpath">
+        <!-- Uncomment if we have external dependencies. -->
+<!--        <fileset dir="${tartree}/lib">-->
+<!--            <include name="*.jar"/>-->
+<!--        </fileset>-->
+        <pathelement path="${classes}"/>
+    </path>
+
+    <!-- target: main -->
+    <target name="main" depends="clean,build,docs,dist"/>
+    <target name="build" depends="init,compile,jar"/>
+
+    <!-- target: clean -->
+    <target name="clean">
+        <delete dir="${release}" failonerror="true"/>
+    </target>
+
+    <!-- target: init -->
+    <target name="init">
+        <mkdir dir="${release}"/>
+        <mkdir dir="${classes}"/>
+        <mkdir dir="${tartree}"/>
+
+        <mkdir dir="${tartree}/bin"/>
+        <copy file="${basedir}/bin/joe" todir="${tartree}/bin"/>
+        <exec executable="chmod" dir="${tartree}/bin">
+            <arg line="+x joe"/>
+        </exec>
+    </target>
+
+    <!-- target: compile -->
+    <target name="compile" depends="init">
+        <javac srcdir="${srcdir}"
+               debug="true"
+               destdir="${classes}"
+               target="21"
+               includeAntRuntime="false">
+               <classpath refid="master-classpath"/>
+        </javac>
+    </target>
+
+    <!-- target: jar -->
+    <target name="jar" depends="compile">
+        <jar destfile="${tartree}/jars/${jarfile}">
+            <fileset dir="${classes}"/>
+            <fileset dir="${srcdir}"/>
+            <fileset dir="${resdir}"/>
+            <manifest>
+                <attribute name="Program-Version" value="${version}"/>
+                <attribute name="Built-Date" value="${build.date}"/>
+                <attribute name="Main-Class" value="${app}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <!-- target: docs -->
+    <target name="docs" depends="build">
+        <mkdir dir="${tartree}/docs"/>
+        <mkdir dir="${tartree}/docs/javadoc"/>
+        <copy todir="${tartree}/docs">
+            <fileset dir="${basedir}/docs"/>
+        </copy>
+        <!-- TODO Build Javadoc! -->
+    </target>
+
+
+    <!-- target: dist -->
+    <target name="dist">
+        <tar destfile="${release}/${tarfile}"
+             longfile="posix"
+             compression="gzip">
+            <!-- Tar the launcher script with executable flag. -->
+            <tarfileset dir="${tartree}"
+                        prefix="joe-${version}">
+                <exclude name="bin/joe"/>
+            </tarfileset>
+            <tarfileset dir="${tartree}"
+                        prefix="joe-${version}"
+                        filemode="550">
+                <include name="bin/joe"/>
+            </tarfileset>
+        </tar>
+    </target>
+</project>
