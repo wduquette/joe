@@ -1,9 +1,11 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class JoeListView extends ListView<Object> implements JoeObject {
     //-------------------------------------------------------------------------
@@ -17,6 +19,9 @@ public class JoeListView extends ListView<Object> implements JoeObject {
 
     // Whether a programmatic select*() call is in progress.
     private boolean inSelect = false;
+
+    // The client's stringifier
+    private Function<Object,String> stringifier = null;
 
     // The client's `onSelect` handler
     private Consumer<JoeListView> onSelect = null;
@@ -32,6 +37,9 @@ public class JoeListView extends ListView<Object> implements JoeObject {
     public JoeListView(Joe joe, JoeClass joeClass) {
         this.joe = joe;
         this.core = new JoeObjectCore(joeClass, this);
+
+        // Use MyCell instead of the standard ListCell.
+        setCellFactory(p -> new MyCell());
 
         // Call the user's onSelect handler when the **user** selects
         // an item in the list.
@@ -58,6 +66,13 @@ public class JoeListView extends ListView<Object> implements JoeObject {
         }
     }
 
+    // Stringifies a value for display by MyCell.
+    private String stringifyValue(Object value) {
+        return stringifier != null
+            ? stringifier.apply(value)
+            : joe.stringify(value);
+    }
+
     //-------------------------------------------------------------------------
     // JoeListView public API
 
@@ -75,6 +90,24 @@ public class JoeListView extends ListView<Object> implements JoeObject {
      */
     public void setOnSelect(Consumer<JoeListView> handler) {
         this.onSelect = handler;
+    }
+
+    /**
+     * Gets the widget's stringifier, or null if none is set.
+     * @return The stringifier
+     */
+    @SuppressWarnings("unused")
+    public Function<Object, String> getStringifier() {
+        return stringifier;
+    }
+
+    /**
+     * Gets the widget's stringifier, the function used to convert values to
+     * strings for display (in place of Joe::stringify), or null if none is set.
+     * @param function The stringifier
+     */
+    public void setStringifier(Function<Object, String> function) {
+        this.stringifier = function;
     }
 
     /**
@@ -113,6 +146,21 @@ public class JoeListView extends ListView<Object> implements JoeObject {
             getSelectionModel().select(item);
         } finally {
             inSelect = false;
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    // MyCell
+
+    private class MyCell extends ListCell<Object> {
+        @Override
+        protected void updateItem(Object item, boolean empty) {
+            super.updateItem(item, empty);
+            if (item == null || empty) {
+                setText("");
+            } else {
+                setText(stringifyValue(item));
+            }
         }
     }
 }

@@ -51,6 +51,7 @@ class ListViewProxy extends FXProxy<JoeListView> {
         method("placeholderText",  this::_placeholderText);
         method("selectIndex",      this::_selectIndex);
         method("selectItem",       this::_selectItem);
+        method("stringifier",      this::_stringifier);
     }
 
     //-------------------------------------------------------------------------
@@ -155,4 +156,16 @@ class ListViewProxy extends FXProxy<JoeListView> {
         return node;
     }
 
+    private Object _stringifier(JoeListView node, Joe joe, Args args) {
+        args.exactArity(1, "stringifier(callable)");
+
+        var handler = args.next();
+
+        if (handler instanceof JoeCallable callable) {
+            node.setStringifier(v -> joe.call(callable, v).toString());
+        } else {
+            throw joe.expected("callable", handler);
+        }
+        return node;
+    }
 }
