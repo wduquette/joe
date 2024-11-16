@@ -91,8 +91,7 @@ public class WinPackage extends JoePackage {
         type(ControlProxy.TYPE);
         type(ButtonProxy.TYPE);
         type(LabelProxy.TYPE);
-        // TODO: When ready.
-//        type(ListViewProxy.TYPE);
+        type(ListViewProxy.TYPE);
         type(MenuBarProxy.TYPE);
         type(SeparatorProxy.TYPE);
         type(TabPaneProxy.TYPE);
