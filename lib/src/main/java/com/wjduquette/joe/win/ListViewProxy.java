@@ -15,7 +15,7 @@ class ListViewProxy extends FXProxy<JoeListView> {
 
     //**
     // @package joe.win
-    // @type JoeListView
+    // @type ListView
     // @extends Control
     // The `ListView` type is a JavaFX scrolling list widget.
     // Joe classes can extend the `ListView` type.
@@ -36,10 +36,8 @@ class ListViewProxy extends FXProxy<JoeListView> {
         // | Property         | Type            | Description            |
         // | ---------------- | --------------- | ---------------------- |
         // | `#placeholder`   | [[Node]]        | Empty list message     |
-        // | `#selectedIndex` | [[joe.Number]]  | Index of select item   |
-        // | `#selectedItem`  | any             | Value of selected item |
 
-        fxProperty("placeholder", ListView::placeholderProperty, WinPackage::toNode);
+        fxProperty("placeholder", JoeListView::placeholderProperty, WinPackage::toNode);
 
         // Methods
         method("getSelectedIndex", this::_getSelectedIndex);
@@ -120,6 +118,13 @@ class ListViewProxy extends FXProxy<JoeListView> {
         return joe.wrapList(node.getItems(), Object.class);
     }
 
+    //**
+    // @method onSelect
+    // @args callable
+    // @result this
+    // Specifies a callable to be called when the user selects an
+    // item in the list.  The callable must take one argument,
+    // the `ListView` itself.
     private Object _onSelect(JoeListView node, Joe joe, Args args) {
         args.exactArity(1, "onSelect(callable)");
         var handler = args.next();
@@ -132,17 +137,37 @@ class ListViewProxy extends FXProxy<JoeListView> {
         return node;
     }
 
+    //**
+    // @method placeholder
+    // @args node
+    // @result this
+    // Sets the widget's placeholder graphic, a [[Node]] to display when
+    // the widget's [[ListView#method.items]] list is empty.
     private Object _placeholder(JoeListView node, Joe joe, Args args) {
         args.exactArity(1, "placeholder(node)");
         node.setPlaceholder(WinPackage.toNode(joe, args.next()));
         return node;
     }
+
+    //**
+    // @method placeholderText
+    // @args text
+    // @result this
+    // Sets the widget's placeholder graphic to a label displaying
+    // the given text. The placeholder is shown when
+    // the widget's [[ListView#method.items]] list is empty.
     private Object _placeholderText(JoeListView node, Joe joe, Args args) {
         args.exactArity(1, "placeholderText(text)");
         node.setPlaceholder(new Label(joe.stringify(args.next())));
         return node;
     }
 
+    //**
+    // @method selectIndex
+    // @args index
+    // @result this
+    // Selects the item at the given *index*.  Throws an error if the
+    // index is not in range.
     private Object _selectIndex(JoeListView node, Joe joe, Args args) {
         args.exactArity(1, "selectIndex(index)");
         var index = joe.toIndex(args.next(), node.getItems().size());
@@ -150,12 +175,25 @@ class ListViewProxy extends FXProxy<JoeListView> {
         return node;
     }
 
+    //**
+    // @method selectItem
+    // @args item
+    // @result this
+    // Selects the given *item*.  The call is a no-op if the *item*
+    // isn't contained in the widget's list of items.
     private Object _selectItem(JoeListView node, Joe joe, Args args) {
         args.exactArity(1, "selectItem(item)");
         node.selectItem(args.next());
         return node;
     }
 
+    //**
+    // @method stringifier
+    // @args callable
+    // @result this
+    // Sets the widget's stringifier to the given *callable*, which
+    // must take one argument, a list item, and return a string
+    // representation for that item.
     private Object _stringifier(JoeListView node, Joe joe, Args args) {
         args.exactArity(1, "stringifier(callable)");
 

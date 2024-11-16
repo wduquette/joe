@@ -64,6 +64,7 @@
     - [HBox Type](library/type.joe.win.HBox.md);
     - [Insets Type](library/type.joe.win.Insets.md);
     - [Label Type](library/type.joe.win.Label.md);
+    - [ListView Type](library/type.joe.win.ListView.md);
     - [Menu Type](library/type.joe.win.Menu.md);
     - [MenuBar Type](library/type.joe.win.MenuBar.md);
     - [MenuItem Type](library/type.joe.win.MenuItem.md);

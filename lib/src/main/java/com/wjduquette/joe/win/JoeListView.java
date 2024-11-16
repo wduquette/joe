@@ -1,12 +1,20 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * A JavaFX ListView for displaying arbitrary Joe values.  Supports
+ * extension by Joe classes, value-to-string conversion using
+ * Joe::stringify or the client's own stringifier, and safe selection without
+ * logic loops.
+ */
 public class JoeListView extends ListView<Object> implements JoeObject {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -101,6 +109,10 @@ public class JoeListView extends ListView<Object> implements JoeObject {
         return stringifier;
     }
 
+    public ReadOnlyIntegerProperty selectedIndexProperty() {
+        return getSelectionModel().selectedIndexProperty();
+    }
+
     /**
      * Gets the widget's stringifier, the function used to convert values to
      * strings for display (in place of Joe::stringify), or null if none is set.
@@ -152,6 +164,8 @@ public class JoeListView extends ListView<Object> implements JoeObject {
     //-------------------------------------------------------------------------
     // MyCell
 
+    // A ListCell that converts an object to a string using
+    // either Joe::stringify or the client's stringifier.
     private class MyCell extends ListCell<Object> {
         @Override
         protected void updateItem(Object item, boolean empty) {
