@@ -91,6 +91,7 @@ public class WinPackage extends JoePackage {
         type(ListViewProxy.TYPE);
         type(MenuBarProxy.TYPE);
         type(SeparatorProxy.TYPE);
+        type(SplitPaneProxy.TYPE);
         type(TabPaneProxy.TYPE);
 
         // Panes
@@ -319,6 +320,10 @@ public class WinPackage extends JoePackage {
 
     static Pos toPos(Joe joe, Object arg) {
         return joe.toEnum(arg, Pos.class);
+    }
+
+    static Orientation toOrientation(Joe joe, Object arg) {
+        return joe.toEnum(arg, Orientation.class);
     }
 
     static Priority toPriority(Joe joe, Object arg) {

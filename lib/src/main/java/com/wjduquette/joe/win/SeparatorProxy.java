@@ -35,8 +35,7 @@ class SeparatorProxy extends FXProxy<Separator> {
         // | `#orientation` | [[Orientation]] | Horizontal or vertical |
 
         // Properties
-        fxProperty("orientation", Separator::orientationProperty,
-            (joe,value) -> joe.toEnum(value, Orientation.class));
+        fxProperty("orientation", Separator::orientationProperty, WinPackage::toOrientation);
 
         // Methods
         method("horizontal", this::_horizontal);

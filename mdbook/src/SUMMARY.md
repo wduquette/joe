@@ -78,6 +78,7 @@
     - [Region Type](library/type.joe.win.Region.md);
     - [Separator Type](library/type.joe.win.Separator.md);
     - [Side Type](library/type.joe.win.Side.md);
+    - [SplitPane Type](library/type.joe.win.SplitPane.md);
     - [StackPane Type](library/type.joe.win.StackPane.md);
     - [Tab Type](library/type.joe.win.Tab.md);
     - [TabPane Type](library/type.joe.win.TabPane.md);
