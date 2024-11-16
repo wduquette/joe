@@ -12,7 +12,7 @@ import java.util.Map;
  * StandardLibrary.java defines the type's constructor as a global
  * function `Tuple()`.
  */
-public class Tuple implements JoeObject, HasToString {
+public class Tuple implements JoeObject {
     //-------------------------------------------------------------------------
     // Static Variables
     public static final Keyword ANY = new Keyword("_");

@@ -371,8 +371,8 @@ public class Joe {
     public String stringify(Object value) {
         if (value == null) return "null";
 
-        if (value instanceof HasToString jts) {
-            return jts.toString(this);
+        if (value instanceof JoeObject obj) {
+            return obj.toString(this);
         }
 
         return getJoeObject(value).toString();
