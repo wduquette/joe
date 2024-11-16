@@ -3,6 +3,7 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import javafx.scene.Node;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -47,6 +48,15 @@ class NodeProxy extends FXProxy<Node> {
 
         // Methods
         method("disable",         this::_disable);
+        method("gridColumn",      this::_gridColumn);
+        method("gridColumnSpan",  this::_gridColumnSpan);
+        method("gridHalignment",  this::_gridHalignment);
+        method("gridHgrow",       this::_gridHgrow);
+        method("gridMargin",      this::_gridMargin);
+        method("gridRow",         this::_gridRow);
+        method("gridRowSpan",     this::_gridRowSpan);
+        method("gridValignment",  this::_gridValignment);
+        method("gridVgrow",       this::_gridVgrow);
         method("hgrow",           this::_hgrow);
         method("id",              this::_id);
         method("isDisabled",      this::_isDisabled);
@@ -74,6 +84,152 @@ class NodeProxy extends FXProxy<Node> {
     }
 
     //**
+    // @method gridColumn
+    // @args index
+    // @result this
+    // Sets the [[GridPane]] `column` constraint for the node to the
+    // given column *index*.
+    //
+    // This method is equivalent to the JavaFX `GridPane.setColumnIndex()`
+    // method.
+    private Object _gridColumn(Node node, Joe joe, Args args) {
+        args.exactArity(1, "gridColumn(index)");
+        GridPane.setColumnIndex(node, joe.toInteger(args.next()));
+        return node;
+    }
+
+    //**
+    // @method gridColumnSpan
+    // @args span
+    // @result this
+    // Sets the [[GridPane]] `columnSpan` constraint for the node to the
+    // given  *span*, which must be a positive number.
+    //
+    // This method is equivalent to the JavaFX `GridPane.setColumnSpan()`
+    // method.
+    private Object _gridColumnSpan(Node node, Joe joe, Args args) {
+        args.exactArity(1, "gridColumnSpan(span)");
+        GridPane.setColumnSpan(node, WinPackage.toSpan(joe, args.next()));
+        return node;
+    }
+
+    //**
+    // @method gridHalignment
+    // @args hpos
+    // @result this
+    // Sets the [[GridPane]] `halignment` constraint for the node to the
+    // given [[HPos]].
+    //
+    // This method is equivalent to the JavaFX `GridPane.setHalignment()`
+    // method.
+    private Object _gridHalignment(Node node, Joe joe, Args args) {
+        args.exactArity(1, "gridHalignment(hpos)");
+        GridPane.setHalignment(node, WinPackage.toHPos(joe, args.next()));
+        return node;
+    }
+
+    //**
+    // @method gridHgrow
+    // @args [priority]
+    // @result this
+    // Sets the [[GridPane]] `hgrow` constraint for the node to the
+    // given [[Priority]], or to `Priority.ALWAYS` if the priority
+    // is omitted.
+    //
+    // This method is equivalent to the JavaFX `GridPane.setHgrow()`
+    // method.
+    private Object _gridHgrow(Node node, Joe joe, Args args) {
+        args.arityRange(0, 1, "gridHgrow([priority])");
+        if (args.isEmpty()) {
+            GridPane.setHgrow(node, Priority.ALWAYS);
+        } else {
+            GridPane.setHgrow(node, WinPackage.toPriority(joe, args.next()));
+        }
+        return node;
+    }
+
+    //**
+    // @method gridMargin
+    // @args insets
+    // @result this
+    // Sets the [[GridPane]] `margin` constraint for the node to the
+    // given [[Insets]].
+    //
+    // This method is equivalent to the JavaFX `GridPane.setMargin()`
+    // method.
+    private Object _gridMargin(Node node, Joe joe, Args args) {
+        args.exactArity(1, "gridMargin(insets)");
+        GridPane.setMargin(node, WinPackage.toInsets(joe, args.next()));
+        return node;
+    }
+
+    //**
+    // @method gridRow
+    // @args index
+    // @result this
+    // Sets the [[GridPane]] `row` constraint for the node to the
+    // given row *index*.
+    //
+    // This method is equivalent to the JavaFX `GridPane.setRowIndex()`
+    // method.
+    private Object _gridRow(Node node, Joe joe, Args args) {
+        args.exactArity(1, "gridRow(index)");
+        GridPane.setRowIndex(node, joe.toInteger(args.next()));
+        return node;
+    }
+
+    //**
+    // @method gridRowSpan
+    // @args span
+    // @result this
+    // Sets the [[GridPane]] `rowSpan` constraint for the node to the
+    // given  *span*, which must be a positive number.
+    //
+    // This method is equivalent to the JavaFX `GridPane.setRowSpan()`
+    // method.
+    private Object _gridRowSpan(Node node, Joe joe, Args args) {
+        args.exactArity(1, "gridRowSpan(span)");
+        GridPane.setRowSpan(node, WinPackage.toSpan(joe, args.next()));
+        return node;
+    }
+
+
+    //**
+    // @method gridValignment
+    // @args vpos
+    // @result this
+    // Sets the [[GridPane]] `valignment` constraint for the node to the
+    // given [[VPos]].
+    //
+    // This method is equivalent to the JavaFX `GridPane.setValignment()`
+    // method.
+    private Object _gridValignment(Node node, Joe joe, Args args) {
+        args.exactArity(1, "gridValignment(vpos)");
+        GridPane.setValignment(node, WinPackage.toVPos(joe, args.next()));
+        return node;
+    }
+
+    //**
+    // @method gridVgrow
+    // @args [priority]
+    // @result this
+    // Sets the [[GridPane]] `vgrow` constraint for the node to the
+    // given [[Priority]], or to `Priority.ALWAYS` if the priority
+    // is omitted.
+    //
+    // This method is equivalent to the JavaFX `GridPane.setVgrow()`
+    // method.
+    private Object _gridVgrow(Node node, Joe joe, Args args) {
+        args.arityRange(0, 1, "gridVgrow([priority])");
+        if (args.isEmpty()) {
+            GridPane.setVgrow(node, Priority.ALWAYS);
+        } else {
+            GridPane.setVgrow(node, WinPackage.toPriority(joe, args.next()));
+        }
+        return node;
+    }
+
+    //**
     // @method hgrow
     // @args [priority]
     // @result this
@@ -84,11 +240,11 @@ class NodeProxy extends FXProxy<Node> {
     // This method is equivalent to the JavaFX `HBox.setHgrow()`
     // method.
     private Object _hgrow(Node node, Joe joe, Args args) {
-        args.arityRange(0, 1, "hgrow([priority]");
+        args.arityRange(0, 1, "hgrow([priority])");
         if (args.isEmpty()) {
             HBox.setHgrow(node, Priority.ALWAYS);
         } else {
-            HBox.setHgrow(node, joe.toEnum(args.next(), Priority.class));
+            HBox.setHgrow(node, WinPackage.toPriority(joe, args.next()));
         }
         return node;
     }
@@ -154,11 +310,11 @@ class NodeProxy extends FXProxy<Node> {
     // This method is equivalent to the JavaFX `VBox.setVgrow()`
     // method.
     private Object _vgrow(Node node, Joe joe, Args args) {
-        args.arityRange(0, 1, "vgrow([priority]");
+        args.arityRange(0, 1, "vgrow([priority])");
         if (args.isEmpty()) {
             VBox.setVgrow(node, Priority.ALWAYS);
         } else {
-            VBox.setVgrow(node, joe.toEnum(args.next(), Priority.class));
+            VBox.setVgrow(node, WinPackage.toPriority(joe, args.next()));
         }
         return node;
     }
