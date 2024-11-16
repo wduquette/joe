@@ -47,7 +47,7 @@ public interface JoeObject extends HasTypeName {
      * @param joe The interpreter
      * @return The string.
      */
-    default String toString(Joe joe) {
+    default String stringify(Joe joe) {
         return toString();
     }
 }

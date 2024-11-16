@@ -218,7 +218,7 @@ public class Tuple implements JoeObject {
     private static Object _toString(Tuple tuple, Joe joe, Args args) {
         args.exactArity(0, "toString()");
 
-        return tuple.toString(joe);
+        return tuple.stringify(joe);
     }
 
     //-------------------------------------------------------------------------
@@ -256,7 +256,7 @@ public class Tuple implements JoeObject {
     // HasToString API
 
     @Override
-    public String toString(Joe joe) {
+    public String stringify(Joe joe) {
         var list = new ArrayList<String>();
         for (var e : fields.entrySet()) {
             list.add(e.getKey().toString());

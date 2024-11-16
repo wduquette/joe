@@ -45,7 +45,7 @@ class WalkerInstance implements JoeObject {
     }
 
     @Override
-    public String toString(Joe joe) {
+    public String stringify(Joe joe) {
         var callable = get(TO_STRING);
         return (String)joe.call(callable);
     }

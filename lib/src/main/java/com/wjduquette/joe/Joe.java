@@ -372,7 +372,7 @@ public class Joe {
         if (value == null) return "null";
 
         if (value instanceof JoeObject obj) {
-            return obj.toString(this);
+            return obj.stringify(this);
         }
 
         return getJoeObject(value).toString();

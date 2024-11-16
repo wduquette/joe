@@ -56,7 +56,7 @@ record BoundValue(Joe joe, TypeProxy<?> proxy, Object value)
         return proxy.getItems(value);
     }
 
-    @Override public String toString(Joe joe) {
+    @Override public String stringify(Joe joe) {
         if (proxy != null) {
             return proxy.stringify(joe, value);
         } else {
@@ -65,6 +65,6 @@ record BoundValue(Joe joe, TypeProxy<?> proxy, Object value)
     }
 
     @Override public String toString() {
-        return toString(joe);
+        return stringify(joe);
     }
 }
