@@ -8,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -90,6 +91,8 @@ public class WinPackage extends JoePackage {
         type(ControlProxy.TYPE);
         type(ButtonProxy.TYPE);
         type(LabelProxy.TYPE);
+        // TODO: When ready.
+//        type(ListViewProxy.TYPE);
         type(MenuBarProxy.TYPE);
         type(SeparatorProxy.TYPE);
         type(TabPaneProxy.TYPE);
@@ -288,6 +291,10 @@ public class WinPackage extends JoePackage {
 
     static EventHandler<ActionEvent> toAction(Joe joe, Object arg) {
         return evt -> joe.call(arg, evt);
+    }
+
+    static Node toNode(Joe joe, Object arg) {
+        return joe.toClass(arg, Node.class);
     }
 
     static Insets toInsets(Joe joe, Object arg) {
