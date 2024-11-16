@@ -5,7 +5,10 @@ import com.wjduquette.joe.types.EnumProxy;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -37,15 +40,21 @@ public class WinPackage extends JoePackage {
     //
     // The `joe.win` widget type hierarchy is a subset of the JavaFX hierarchy.
     //
+    // - [[MenuItem]]: A menu item
+    // - [[Menu]]: A menu
     // - [[Node]]: Base class
     //   - [[Region]]: Nodes with geometry
     //     - [[Control]]: Nodes to interact with
     //       - [[Button]]: A button
     //       - [[Label]]: A label
+    //       - [[MenuBar]]: A menu bar
+    //       - [[Separator]]: A horizontal or vertical separator
+    //       - [[TabPane]]: A `TabPane`
     //     - [[Pane]]: Nodes that manage children
     //       - [[HBox]]: A row of widgets
     //       - [[StackPane]]: Widgets stacked like cards in a deck
     //       - [[VBox]]: A column of widgets
+    // - [[Tab]]: A tab in a [[TabPane]]
     //
     // @packageTopic css
     // @title Styling with CSS
@@ -82,12 +91,22 @@ public class WinPackage extends JoePackage {
         type(ControlProxy.TYPE);
         type(ButtonProxy.TYPE);
         type(LabelProxy.TYPE);
+        // TODO: When ready.
+//        type(ListViewProxy.TYPE);
+        type(MenuBarProxy.TYPE);
+        type(SeparatorProxy.TYPE);
+        type(TabPaneProxy.TYPE);
 
         // Panes
         type(PaneProxy.TYPE);
         type(StackPaneProxy.TYPE);
         type(VBoxProxy.TYPE);
         type(HBoxProxy.TYPE);
+
+        // Widgets that aren't Nodes
+        type(TabProxy.TYPE);
+        type(MenuProxy.TYPE);
+        type(MenuItemProxy.TYPE);
 
         // Enums
 
@@ -110,6 +129,11 @@ public class WinPackage extends JoePackage {
         // @constant TOP_RIGHT
         type(new EnumProxy<>("Pos", Pos.class));
 
+        //**
+        // @enum Orientation
+        // @constant HORIZONTAL
+        // @constant VERTICAL
+        type(new EnumProxy<>("Orientation", Orientation.class));
 
         //**
         // @enum Priority
@@ -121,6 +145,16 @@ public class WinPackage extends JoePackage {
         // @constant SOMETIMES
         // @constant NEVER
         type(new EnumProxy<>("Priority", Priority.class));
+
+        //**
+        // @enum Side
+        // A `Side` of a rectangular region.
+        //
+        // @constant BOTTOM
+        // @constant LEFT
+        // @constant RIGHT
+        // @constant TOP
+        type(new EnumProxy<>("Side", Side.class));
 
         // Utility Classes
         type(InsetsProxy.TYPE);
@@ -257,6 +291,10 @@ public class WinPackage extends JoePackage {
 
     static EventHandler<ActionEvent> toAction(Joe joe, Object arg) {
         return evt -> joe.call(arg, evt);
+    }
+
+    static Node toNode(Joe joe, Object arg) {
+        return joe.toClass(arg, Node.class);
     }
 
     static Insets toInsets(Joe joe, Object arg) {

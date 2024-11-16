@@ -8,6 +8,11 @@
     - And can be overridden by the class declaration.
     - It is always the case that `stringify(instance) == instance.toString()` 
       for instances of Joe classes.
+- Library
+  - `joe.win` Package
+    - Added JavaFX widgets: `Menu`, `MenuBar`, `MenuItem`, `Separator`, 
+      `Tab`, `TabPane`
+    - Added JavaFX enums: `Orientation`, `Side`
 
 ## Changes in 0.4.0 
 
