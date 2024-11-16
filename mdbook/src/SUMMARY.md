@@ -61,7 +61,9 @@
   - [GUI API (joe.win)](./library/pkg.joe.win.md)
     - [Control Type](library/type.joe.win.Control.md);
     - [Button Type](library/type.joe.win.Button.md);
+    - [GridPane Type](library/type.joe.win.GridPane.md);
     - [HBox Type](library/type.joe.win.HBox.md);
+    - [HPos Type](library/type.joe.win.HPos.md);
     - [Insets Type](library/type.joe.win.Insets.md);
     - [Label Type](library/type.joe.win.Label.md);
     - [ListView Type](library/type.joe.win.ListView.md);
@@ -80,6 +82,7 @@
     - [Tab Type](library/type.joe.win.Tab.md);
     - [TabPane Type](library/type.joe.win.TabPane.md);
     - [VBox Type](library/type.joe.win.VBox.md);
+    - [VPos Type](library/type.joe.win.VPos.md);
     - [Win Type](library/type.joe.win.Win.md);
   - [Library API Index](./library/index.md)
 

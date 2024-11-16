@@ -4,10 +4,7 @@ import com.wjduquette.joe.*;
 import com.wjduquette.joe.types.EnumProxy;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
-import javafx.geometry.Side;
+import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
@@ -98,6 +95,7 @@ public class WinPackage extends JoePackage {
 
         // Panes
         type(PaneProxy.TYPE);
+        type(GridPaneProxy.TYPE);
         type(StackPaneProxy.TYPE);
         type(VBoxProxy.TYPE);
         type(HBoxProxy.TYPE);
@@ -108,6 +106,19 @@ public class WinPackage extends JoePackage {
         type(MenuItemProxy.TYPE);
 
         // Enums
+
+        //**
+        // @enum HPos
+        // @constant CENTER
+        // @constant LEFT
+        // @constant RIGHT
+        type(new EnumProxy<>("HPos", HPos.class));
+
+        //**
+        // @enum Orientation
+        // @constant HORIZONTAL
+        // @constant VERTICAL
+        type(new EnumProxy<>("Orientation", Orientation.class));
 
         //**
         // @enum Pos
@@ -129,12 +140,6 @@ public class WinPackage extends JoePackage {
         type(new EnumProxy<>("Pos", Pos.class));
 
         //**
-        // @enum Orientation
-        // @constant HORIZONTAL
-        // @constant VERTICAL
-        type(new EnumProxy<>("Orientation", Orientation.class));
-
-        //**
         // @enum Priority
         // The `Priority` enum's values indicate when a widget
         // should resize itself to fit its parent widget.  The
@@ -154,6 +159,14 @@ public class WinPackage extends JoePackage {
         // @constant RIGHT
         // @constant TOP
         type(new EnumProxy<>("Side", Side.class));
+
+        //**
+        // @enum VPos
+        // @constant BASELINE
+        // @constant BOTTOM
+        // @constant CENTER
+        // @constant TOP
+        type(new EnumProxy<>("VPos", VPos.class));
 
         // Utility Classes
         type(InsetsProxy.TYPE);
@@ -292,19 +305,39 @@ public class WinPackage extends JoePackage {
         return evt -> joe.call(arg, evt);
     }
 
-    static Node toNode(Joe joe, Object arg) {
-        return joe.toClass(arg, Node.class);
+    static HPos toHPos(Joe joe, Object arg) {
+        return joe.toEnum(arg, HPos.class);
     }
 
     static Insets toInsets(Joe joe, Object arg) {
         return joe.toClass(arg, Insets.class);
     }
 
+    static Node toNode(Joe joe, Object arg) {
+        return joe.toClass(arg, Node.class);
+    }
+
     static Pos toPos(Joe joe, Object arg) {
         return joe.toEnum(arg, Pos.class);
     }
 
+    static Priority toPriority(Joe joe, Object arg) {
+        return joe.toEnum(arg, Priority.class);
+    }
+
+    static int toSpan(Joe joe, Object arg) {
+        var span = joe.toInteger(arg);
+        if (span <= 0) {
+            throw joe.expected("positive span", arg);
+        }
+        return span;
+    }
+
     static Tooltip toTooltip(Joe joe, Object arg) {
         return joe.toClass(arg, Tooltip.class);
+    }
+
+    static VPos toVPos(Joe joe, Object arg) {
+        return joe.toEnum(arg, VPos.class);
     }
 }
