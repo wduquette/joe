@@ -42,11 +42,13 @@ class ListViewProxy extends FXProxy<JoeListView> {
         fxProperty("placeholder", ListView::placeholderProperty, WinPackage::toNode);
 
         // Methods
+        method("getSelectedIndex", this::_getSelectedIndex);
+        method("getSelectedItem",  this::_getSelectedItem);
+        method("item",             this::_item);
+        method("items",            this::_items);
         method("onSelect",         this::_onSelect);
         method("placeholder",      this::_placeholder);
         method("placeholderText",  this::_placeholderText);
-        method("item",             this::_item);
-        method("items",            this::_items);
         method("selectIndex",      this::_selectIndex);
         method("selectItem",       this::_selectItem);
     }
@@ -78,6 +80,24 @@ class ListViewProxy extends FXProxy<JoeListView> {
 
     //-------------------------------------------------------------------------
     // Methods
+
+    //**
+    // @method getSelectedIndex
+    // @result joe.Number
+    // Gets the index of the selected item, or -1 if there is no selection.
+    private Object _getSelectedIndex(JoeListView node, Joe joe, Args args) {
+        args.exactArity(0, "getSelectedIndex()");
+        return (double)node.getSelectionModel().getSelectedIndex();
+    }
+
+    //**
+    // @method getSelectedItem
+    // @result item
+    // Gets the selected item, or `null` if there is no selection.
+    private Object _getSelectedItem(JoeListView node, Joe joe, Args args) {
+        args.exactArity(0, "getSelectedItem()");
+        return node.getSelectionModel().getSelectedItem();
+    }
 
     //**
     // @method item
