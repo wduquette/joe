@@ -62,7 +62,7 @@ class VBoxProxy extends FXProxy<VBox> {
     }
 
     @Override
-    public JoeObject make(JoeClass joeClass) {
+    public JoeObject make(Joe joe, JoeClass joeClass) {
         return new JoeVBox(joeClass);
     }
 
@@ -127,7 +127,7 @@ class VBoxProxy extends FXProxy<VBox> {
     // Returns a `VBox`.
     private Object _initializer(Joe joe, Args args) {
         args.exactArity(0, "VBox()");
-        return make(this);
+        return make(joe, this);
     }
 
     //-------------------------------------------------------------------------

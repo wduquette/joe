@@ -60,7 +60,7 @@ class ListViewProxy extends FXProxy<JoeListView> {
     }
 
     @Override
-    public JoeObject make(JoeClass joeClass) {
+    public JoeObject make(Joe joe, JoeClass joeClass) {
         return new JoeListView(joeClass);
     }
 
@@ -73,7 +73,7 @@ class ListViewProxy extends FXProxy<JoeListView> {
     // Returns a `ListView`.
     private Object _initializer(Joe joe, Args args) {
         args.exactArity(0, "ListView()");
-        return make(this);
+        return make(joe, this);
     }
 
     //-------------------------------------------------------------------------

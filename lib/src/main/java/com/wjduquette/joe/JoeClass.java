@@ -31,10 +31,12 @@ public interface JoeClass extends JoeCallable {
 
     /**
      * Creates an instance of the class.
+     *
+     * @param joe The interpreter
      * @param joeClass The actual parent class, either this class or a subclass.
      * @return The instance
      */
-    default JoeObject make(JoeClass joeClass) {
+    default JoeObject make(Joe joe, JoeClass joeClass) {
         throw new UnsupportedOperationException();
     }
 }

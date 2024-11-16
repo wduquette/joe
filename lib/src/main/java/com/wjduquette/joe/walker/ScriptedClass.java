@@ -51,9 +51,9 @@ class ScriptedClass implements JoeClass, JoeObject {
 
 
     @Override
-    public JoeObject make(JoeClass joeClass) {
+    public JoeObject make(Joe joe, JoeClass joeClass) {
         if (superclass != null) {
-            return superclass.make(this);
+            return superclass.make(joe, this);
         } else {
             return new WalkerInstance(joeClass);
         }
@@ -81,7 +81,7 @@ class ScriptedClass implements JoeClass, JoeObject {
 
     @Override
     public Object call(Joe joe, Args args) {
-        JoeObject instance = make(this);
+        JoeObject instance = make(joe, this);
         JoeCallable initializer = bind(instance, INIT);
         if (initializer != null) {
             initializer.call(joe, args);

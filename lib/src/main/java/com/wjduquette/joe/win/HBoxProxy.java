@@ -62,7 +62,7 @@ class HBoxProxy extends FXProxy<HBox> {
     }
 
     @Override
-    public JoeObject make(JoeClass joeClass) {
+    public JoeObject make(Joe joe, JoeClass joeClass) {
         return new JoeHBox(joeClass);
     }
 
@@ -127,7 +127,7 @@ class HBoxProxy extends FXProxy<HBox> {
     // Returns a `HBox`.
     private Object _initializer(Joe joe, Args args) {
         args.exactArity(0, "HBox()");
-        return make(this);
+        return make(joe, this);
     }
 
     //-------------------------------------------------------------------------

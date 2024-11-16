@@ -44,7 +44,7 @@ public class TextBuilderProxy extends TypeProxy<TextBuilder> {
     }
 
     @Override
-    public JoeObject make(JoeClass joeClass) {
+    public JoeObject make(Joe joe, JoeClass joeClass) {
         return new TextBuilder(joeClass);
     }
 
@@ -56,7 +56,7 @@ public class TextBuilderProxy extends TypeProxy<TextBuilder> {
     // Creates an empty `TextBuilder`.
     private Object _init(Joe joe, Args args) {
         args.exactArity(0, "TextBuilder()");
-        return make(this);
+        return make(null, this);
     }
 
     //-------------------------------------------------------------------------

@@ -61,7 +61,7 @@ class StackPaneProxy extends FXProxy<StackPane> {
     }
 
     @Override
-    public JoeObject make(JoeClass joeClass) {
+    public JoeObject make(Joe joe, JoeClass joeClass) {
         return new JoeStackPane(joeClass);
     }
 
@@ -125,7 +125,7 @@ class StackPaneProxy extends FXProxy<StackPane> {
     // Returns a `StackPane`.
     private Object _initializer(Joe joe, Args args) {
         args.exactArity(0, "StackPane()");
-        return make(this);
+        return make(joe, this);
     }
 
     //-------------------------------------------------------------------------

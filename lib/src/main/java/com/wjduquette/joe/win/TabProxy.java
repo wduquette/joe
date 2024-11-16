@@ -68,7 +68,7 @@ class TabProxy extends FXProxy<Tab> {
     }
 
     @Override
-    public JoeObject make(JoeClass joeClass) {
+    public JoeObject make(Joe joe, JoeClass joeClass) {
         var tab = new JoeTab(joeClass);
         tab.setClosable(false);
         return tab;
@@ -82,7 +82,7 @@ class TabProxy extends FXProxy<Tab> {
     // Returns a `Tab`.
     private Object _initializer(Joe joe, Args args) {
         args.exactArity(0, "Tab()");
-        return make(this);
+        return make(joe, this);
     }
 
     //-------------------------------------------------------------------------
