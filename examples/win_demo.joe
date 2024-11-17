@@ -3,9 +3,39 @@ Win.setTitle("joe win: Demo")
    .setSize(600, 400)
    ;
 
+// The Page class
+class Page extends VBox {
+    method init(name) { @name = name; }
+    method toString() { return @name; }
+}
+
+// GridPanePage
+class GridPanePage extends Page {
+    method init() {
+        super.init("GridPane");
+        this.child(GridPane().hgap(5).vgap(5)
+            .at(0, 1, Label("Row 1"))
+            .at(0, 2, Label("Row 2"))
+            .at(1, 0, Label("Column 1"))
+            .at(2, 0, Label("Column 2"))
+            .at(1, 1, Label("Alice Aardvark"))
+            .at(2, 1, Label("Alice Badger"))
+            .at(1, 2, Label("Bob Aardvark"))
+            .at(2, 2, Label("Bob Badger"))
+        );
+    }
+}
+
 // Define components
 var pageList = ListView();
 var pagePane = StackPane();
+
+var pages = List(
+    GridPanePage()
+);
+
+//-----------------------------------------------------------------------------
+// Build and display the GUI
 
 Win.root()
     .spacing(5)
@@ -20,6 +50,7 @@ Win.root()
         .item(pageList
             .splitResizeWithParent(false)
             .prefWidth(200)
+            .items(pages)
         )
         .item(pagePane)
         .setDivider(0, 0.3)
