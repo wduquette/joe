@@ -1,0 +1,28 @@
+// win_demo.joe: testing `joe win`
+Win.setTitle("joe win: Demo")
+   .setSize(600, 400)
+   ;
+
+// Define components
+var pageList = ListView();
+var pagePane = StackPane();
+
+Win.root()
+    .spacing(5)
+    .child(MenuBar()
+        .menu(Menu().text("File")
+            .item(MenuItem().text("Exit")
+                .action(\-> Console.exit())
+            )
+        )
+    )
+    .child(SplitPane().vgrow().horizontal()
+        .item(pageList
+            .splitResizeWithParent(false)
+            .prefWidth(200)
+        )
+        .item(pagePane)
+        .setDivider(0, 0.3)
+    )
+    ;
+

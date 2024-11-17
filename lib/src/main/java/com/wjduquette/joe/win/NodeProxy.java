@@ -3,6 +3,7 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import javafx.scene.Node;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -47,22 +48,23 @@ class NodeProxy extends FXProxy<Node> {
         fxProperty("visible", Node::visibleProperty, Joe::toBoolean);
 
         // Methods
-        method("disable",         this::_disable);
-        method("gridColumn",      this::_gridColumn);
-        method("gridColumnSpan",  this::_gridColumnSpan);
-        method("gridHalignment",  this::_gridHalignment);
-        method("gridHgrow",       this::_gridHgrow);
-        method("gridMargin",      this::_gridMargin);
-        method("gridRow",         this::_gridRow);
-        method("gridRowSpan",     this::_gridRowSpan);
-        method("gridValignment",  this::_gridValignment);
-        method("gridVgrow",       this::_gridVgrow);
-        method("hgrow",           this::_hgrow);
-        method("id",              this::_id);
-        method("isDisabled",      this::_isDisabled);
-        method("styleClasses",    this::_styleClasses);
-        method("styles",          this::_styles);
-        method("vgrow",           this::_vgrow);
+        method("disable",               this::_disable);
+        method("gridColumn",            this::_gridColumn);
+        method("gridColumnSpan",        this::_gridColumnSpan);
+        method("gridHalignment",        this::_gridHalignment);
+        method("gridHgrow",             this::_gridHgrow);
+        method("gridMargin",            this::_gridMargin);
+        method("gridRow",               this::_gridRow);
+        method("gridRowSpan",           this::_gridRowSpan);
+        method("gridValignment",        this::_gridValignment);
+        method("gridVgrow",             this::_gridVgrow);
+        method("hgrow",                 this::_hgrow);
+        method("id",                    this::_id);
+        method("isDisabled",            this::_isDisabled);
+        method("splitResizeWithParent", this::_splitResizeWithParent);
+        method("styleClasses",          this::_styleClasses);
+        method("styles",                this::_styles);
+        method("vgrow",                 this::_vgrow);
     }
 
 
@@ -268,6 +270,25 @@ class NodeProxy extends FXProxy<Node> {
     private Object _isDisabled(Node node, Joe joe, Args args) {
         args.exactArity(0, "isDisabled()");
         return node.isDisabled();
+    }
+
+    //**
+    // @method splitResizeWithParent
+    // @args flag
+    // @result this
+    // If *flag* is `true` (the default value) the node's "split" will resize
+    // when its parent [[SplitPane]] is resized, preserving its
+    // divider fraction.  If `false`, the divider fraction will change to
+    // keep the node's width or height constant. Use this to prevent sidebars
+    // from resizing when the window is resized.
+    //
+    // This is equivalent to the
+    // JavaFX `SplitPane.setResizeWithParent()` method.
+    private Object _splitResizeWithParent(Node node, Joe joe, Args args) {
+        args.exactArity(1, "splitResizeWithParent(flag)");
+        var flag = args.isEmpty() || Joe.isTruthy(args.next());
+        SplitPane.setResizableWithParent(node, flag);
+        return node;
     }
 
     //**
