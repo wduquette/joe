@@ -43,4 +43,9 @@ public class JoeObjectCore {
     public void set(String name, Object value) {
         fields.put(name, value);
     }
+
+    public String stringify(Joe joe) {
+        // TEMP
+        return host.toString();
+    }
 }
