@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JoeObjectCore {
+    private final static String TO_STRING = "toString";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -33,11 +35,13 @@ public class JoeObjectCore {
             value = joeClass.bind(host, name);
         }
 
-        if (value != null) {
-            return value;
-        } else {
-            throw new JoeError("Undefined property: '" + name + "'.");
+        if (value != null) return value;
+
+        if (name.equals(TO_STRING)) {
+            return (JoeCallable)(joe, args) -> this.defaultToString();
         }
+
+        throw new JoeError("Undefined property: '" + name + "'.");
     }
 
     public void set(String name, Object value) {
@@ -45,7 +49,11 @@ public class JoeObjectCore {
     }
 
     public String stringify(Joe joe) {
-        // TEMP
-        return host.toString();
+        var callable = get(TO_STRING);
+        return (String)joe.call(callable);
+    }
+
+    public String defaultToString() {
+        return typeName() + "@" + host.hashCode();
     }
 }

@@ -1,7 +1,6 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;

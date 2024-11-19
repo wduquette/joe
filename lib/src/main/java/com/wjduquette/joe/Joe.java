@@ -369,13 +369,12 @@ public class Joe {
      * @return The string
      */
     public String stringify(Object value) {
-        if (value == null) return "null";
-
-        if (value instanceof JoeObject obj) {
-            return obj.stringify(this);
-        }
-
-        return getJoeObject(value).toString();
+        return switch(value) {
+            case null -> "null";
+            case String s -> s;
+            case JoeObject obj -> obj.stringify(this);
+            default -> getJoeObject(value).stringify(this);
+        };
     }
 
     /**
