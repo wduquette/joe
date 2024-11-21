@@ -35,6 +35,15 @@ var pages = List(
 );
 
 //-----------------------------------------------------------------------------
+// Logic
+
+function showSelectedPage(pageList) {
+    pagePane.children().clear();
+    var selected = pageList.getSelectedItem();
+    selected != null && pagePane.child(selected);
+}
+
+//-----------------------------------------------------------------------------
 // Build and display the GUI
 
 Win.root()
@@ -51,8 +60,9 @@ Win.root()
             .splitResizeWithParent(false)
             .prefWidth(200)
             .items(pages)
+            .onSelect(showSelectedPage)
         )
-        .item(pagePane)
+        .item(pagePane.padding(10))
         .setDivider(0, 0.3)
     )
     ;

@@ -114,7 +114,7 @@ class RegionProxy extends FXProxy<Region> {
         };
 
         node.setPadding(insets);
-        return this;
+        return node;
     }
 
     //**
