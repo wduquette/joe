@@ -544,11 +544,7 @@ public class Joe {
      * @return The result of calling the callable.
      */
     public Object call(Object callee, Object... args) {
-        if (callee instanceof JoeCallable callable) {
-            return callable.call(this, new Args(args));
-        } else {
-            throw expected("callable", callee);
-        }
+        return engine.call(callee, args);
     }
 
     //-------------------------------------------------------------------------

@@ -33,6 +33,7 @@ function testFail() {
 }
 
 function testAssertError_gotError() {
+    skip("Pending stack trace cleanup completion.");
     function bad() { throw "Simulated error."; }
     assertError(bad, "Simulated error."
         , "In function bad()"

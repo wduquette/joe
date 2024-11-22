@@ -173,10 +173,10 @@ public class TestTool implements Tool {
                 println("  SKIPPED: " + ex.getMessage());
                 ++skipCount;
             } catch (AssertError ex) {
-                println("  FAILED: " + ex.getMessage());
+                println("  FAILED: " + ex.getJoeStackTrace());
                 ++failureCount;
             } catch (JoeError ex) {
-                println("  ERROR: " + ex.getMessage());
+                println("  ERROR: " + ex.getJoeStackTrace());
                 ++errorCount;
             }
         }

@@ -381,7 +381,7 @@ class Interpreter {
                             "In " + callable.callableType() + " " +
                                 callable.signature());
                     } catch (Exception ex) {
-                        throw new RuntimeError(expr.paren().span(),
+                        throw new UnexpectedError(expr.paren().span(),
                             "Error in " + callable.callableType() +
                             " " + callable.signature() + ": " +
                             ex.getMessage());
