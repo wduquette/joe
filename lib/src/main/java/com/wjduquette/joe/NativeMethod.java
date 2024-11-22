@@ -7,18 +7,18 @@ package com.wjduquette.joe;
 public class NativeMethod<V> implements JoeCallable, HasTypeName {
     private final V value;
     private final String name;
-    private final JoeValueCallable<V> callable;
+    private final JoeValueLambda<V> valueLambda;
 
     /**
      * Creates a native function
      * @param value The bound value
      * @param name The function's name
-     * @param callable The function's callable, usually a method reference.
+     * @param valueLambda The function's callable, usually a method reference.
      */
-    public NativeMethod(V value, String name, JoeValueCallable<V> callable) {
+    public NativeMethod(V value, String name, JoeValueLambda<V> valueLambda) {
         this.value = value;
         this.name = name;
-        this.callable = callable;
+        this.valueLambda = valueLambda;
     }
 
     /**
@@ -35,7 +35,7 @@ public class NativeMethod<V> implements JoeCallable, HasTypeName {
     @Override
     public Object call(Joe joe, Args args) {
         try {
-            return callable.call(value, joe, args);
+            return valueLambda.call(value, joe, args);
         } catch (JoeError ex) {
             throw ex.addInfo("In " + joe.typeName(value) + " method " +
                 name() + "(" + joe.join(", ", args.asList()) + ")");
@@ -43,6 +43,16 @@ public class NativeMethod<V> implements JoeCallable, HasTypeName {
             throw new JoeError("Error in " + name + "(): " +
                 ex.getMessage());
         }
+    }
+
+    @Override
+    public String callableType() {
+        return "native method";
+    }
+
+    @Override
+    public String signature() {
+        return name() + "(...)";
     }
 
     //-------------------------------------------------------------------------

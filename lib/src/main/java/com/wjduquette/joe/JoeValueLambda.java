@@ -4,7 +4,7 @@ package com.wjduquette.joe;
  * An interface for a native method, defined as part of a `TypeProxy`.
  * @param <V> The value type
  */
-public interface JoeValueCallable<V> {
+public interface JoeValueLambda<V> {
     /**
      * Calls the callable
      * @param value the value to which the method is bound

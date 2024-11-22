@@ -80,6 +80,14 @@ class ScriptedClass implements JoeClass, JoeObject {
     }
 
     @Override
+    public boolean canBeExtended() {
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
+    // JoeCallable API
+
+    @Override
     public Object call(Joe joe, Args args) {
         JoeObject instance = make(joe, this);
         JoeCallable initializer = bind(instance, INIT);
@@ -90,8 +98,24 @@ class ScriptedClass implements JoeClass, JoeObject {
     }
 
     @Override
-    public boolean canBeExtended() {
-        return true;
+    public String callableType() {
+        return "class";
+    }
+
+    @Override
+    public String signature() {
+        var method = methods.get(INIT);
+        if (method == null) {
+            return name + "()";
+        } else {
+            return name + method.signature().substring(INIT.length());
+        }
+    }
+
+    @Override
+    public SourceBuffer.Span context() {
+        // TODO: The class doesn't know its context at this time.
+        return null;
     }
 
     //-------------------------------------------------------------------------

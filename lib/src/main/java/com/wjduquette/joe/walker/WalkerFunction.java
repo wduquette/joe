@@ -87,6 +87,9 @@ final class WalkerFunction implements JoeCallable, HasTypeName {
             isInitializer);
     }
 
+    //-------------------------------------------------------------------------
+    // JoeCallable API
+
     @Override
     public Object call(Joe joe, Args args) {
         // FIRST, check the arity
@@ -130,6 +133,19 @@ final class WalkerFunction implements JoeCallable, HasTypeName {
             throw ex;
         }
     }
+
+    @Override
+    public String callableType() {
+        return kind();
+    }
+
+    @Override
+    public String signature() {
+        return signature;
+    }
+
+    //-------------------------------------------------------------------------
+    // Object API
 
     @Override
     public String toString() {
