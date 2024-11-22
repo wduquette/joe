@@ -1,7 +1,5 @@
 package com.wjduquette.joe.walker;
 
-import com.wjduquette.joe.SourceBuffer;
-
 import static com.wjduquette.joe.SourceBuffer.Span;
 
 record Token(
@@ -10,7 +8,7 @@ record Token(
     Object literal
 ) {
     public static Token synthetic(String lexeme) {
-        return new Token(null, SourceBuffer.synthetic(lexeme), null);
+        return new Token(null, null, lexeme);
     }
 
     /**
@@ -18,11 +16,7 @@ record Token(
      * @return The lexeme
      */
     public String lexeme() {
-        return span.text();
-    }
-
-    public int line() {
-        return span.startLine();
+        return span != null ? span.text() : (String)literal;
     }
 
     @Override
