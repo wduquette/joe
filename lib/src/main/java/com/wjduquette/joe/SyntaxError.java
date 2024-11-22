@@ -18,13 +18,6 @@ public class SyntaxError extends RuntimeException {
      * @param message The error message.
      */
     public record Detail(Span span, String message) {
-        public Detail {
-            if (span.isSynthetic()) {
-                throw new IllegalArgumentException(
-                    "SyntaxError.Detail created with synthetic span: " + span);
-            }
-        }
-
         public int line() {
             return span.startLine();
         }
