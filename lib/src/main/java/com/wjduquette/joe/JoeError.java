@@ -22,9 +22,6 @@ public class JoeError extends RuntimeException {
     // location of the error in a function up through the call chain.
     private final SourceBuffer.Span span;
 
-    // TO BE REMOVED! Script level "stack frames"
-    private final List<String> frames = new ArrayList<>();
-
     //-------------------------------------------------------------------------
     // Constructor
 
@@ -32,10 +29,9 @@ public class JoeError extends RuntimeException {
      * Creates an error with no line number info and an optional number
      * of stack frame strings.
      * @param message The error message.
-     * @param frames The stack frame strings.
      */
-    public JoeError(String message, String... frames) {
-        this(null, message, frames);
+    public JoeError(String message) {
+        this(null, message);
     }
 
     /**
@@ -43,12 +39,10 @@ public class JoeError extends RuntimeException {
      * of stack frame strings.
      * @param span The source span
      * @param message The error message.
-     * @param frames The stack frame strings.
      */
-    public JoeError(SourceBuffer.Span span, String message, String... frames) {
+    public JoeError(SourceBuffer.Span span, String message) {
         super(message);
         this.span = span;
-        this.frames.addAll(List.of(frames));
     }
 
     //-------------------------------------------------------------------------
@@ -117,8 +111,12 @@ public class JoeError extends RuntimeException {
      * Gets the complete stack trace string.
      * @return The stack trace
      */
-    public String getNewJoeStackTrace() {
-        return getMessage() + "\n" + getTraceReport().indent(2);
+    public String getJoeStackTrace() {
+        if (traces.isEmpty()) {
+            return getMessage();
+        } else {
+            return getMessage() + "\n" + getTraceReport().indent(2);
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -131,25 +129,5 @@ public class JoeError extends RuntimeException {
      */
     public int line() {
         return span != null ? span.startLine() : -1;
-    }
-
-    /**
-     * Use this to add stack frames to an existing error.
-     * @return The list of stack frame strings.
-     */
-    @SuppressWarnings("unused")
-    public List<String> getFrames() {
-        return frames;
-    }
-
-    /**
-     * Gets the script-level stack trace based on the provided stack
-     * frame strings.
-     * @return The stack trace
-     */
-    public String getJoeStackTrace() {
-        return frames.isEmpty()
-            ? getMessage()
-            : getMessage() + "\n  " + String.join("\n  ", frames);
     }
 }

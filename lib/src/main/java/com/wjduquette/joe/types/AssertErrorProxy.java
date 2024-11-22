@@ -57,7 +57,7 @@ public class AssertErrorProxy extends TypeProxy<AssertError> {
         var error = new AssertError(joe.stringify(args.next()));
 
         while (args.hasNext()) {
-            error.getFrames().add(joe.stringify(args.next()));
+            error.addInfo(joe.stringify(args.next()));
         }
 
         return error;

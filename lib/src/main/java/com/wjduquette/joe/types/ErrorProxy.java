@@ -50,14 +50,14 @@ public class ErrorProxy extends TypeProxy<JoeError> {
 
     //**
     // @init
-    // @args message, [frames...]
-    // Creates an `Error` with the given *message*.
+    // @args message, [trace, ...]
+    // Creates an `Error` with the given *message* and optional traces.
     private Object _initializer(Joe joe, Args args) {
-        args.minArity(1, "Error(message, [frames...])");
+        args.minArity(1, "Error(message, [trace, ...])");
         var error = new JoeError(joe.stringify(args.next()));
 
         while (args.hasNext()) {
-            error.getFrames().add(joe.stringify(args.next()));
+            error.addInfo(joe.stringify(args.next()));
         }
 
         return error;
@@ -72,8 +72,10 @@ public class ErrorProxy extends TypeProxy<JoeError> {
     // Returns the list of stack frame strings.  Clients may add to the list
     // and rethrow the error.
     private Object _stackFrames(JoeError error, Joe joe, Args args) {
-        args.exactArity(0, "stackFrames()");
-        return joe.wrapList(error.getFrames(), String.class);
+        // TODO Ponder and replace
+        throw new UnsupportedOperationException("TODO: Fix this!");
+//        args.exactArity(0, "stackFrames()");
+//        return joe.wrapList(error.getFrames(), String.class);
     }
 
     //**

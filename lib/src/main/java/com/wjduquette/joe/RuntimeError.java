@@ -7,9 +7,8 @@ package com.wjduquette.joe;
 public class RuntimeError extends JoeError {
     public RuntimeError(
         SourceBuffer.Span span,
-        String message,
-        String... frames
+        String message
     ) {
-        super(span, message, frames);
+        super(span, message);
     }
 }

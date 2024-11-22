@@ -7,10 +7,9 @@ public class AssertError extends JoeError {
     /**
      * Creates an assert error with the given message.
      * @param message The message
-     * @param frames Explanatory "stack frames"
      */
-    public AssertError(String message, String... frames) {
-        super(message, frames);
+    public AssertError(String message) {
+        super(message);
     }
 
     /**
