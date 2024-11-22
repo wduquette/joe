@@ -122,9 +122,6 @@ final class WalkerFunction implements JoeCallable, HasTypeName {
         } catch (Return returnValue) {
             if (isInitializer) return closure.getAt(0, "this");
             return returnValue.value;
-        } catch (JoeError ex) {
-            throw ex.addFrame(declaration.name().span(),
-                "In " + kind() + " " + signature());
         }
     }
 

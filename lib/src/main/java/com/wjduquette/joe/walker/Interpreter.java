@@ -374,9 +374,19 @@ class Interpreter {
                 }
 
                 if (callee instanceof JoeCallable callable) {
-                    yield callable.call(joe, new Args(args));
+                    try {
+                        yield callable.call(joe, new Args(args));
+                    } catch (JoeError ex) {
+                        throw ex.addFrame(expr.paren().span(),
+                            "In " + callable.callableType() + " " +
+                                callable.signature());
+                    } catch (Exception ex) {
+                        throw new RuntimeError(expr.paren().span(),
+                            "Error in " + callable.callableType() +
+                            " " + callable.signature() + ": " +
+                            ex.getMessage());
+                    }
                 } else {
-                    // TODO add recodify(expr.callee()) as a stack frame!
                     throw joe.expected("a callable", callee);
                 }
             }

@@ -34,15 +34,7 @@ public class NativeMethod<V> implements JoeCallable, HasTypeName {
 
     @Override
     public Object call(Joe joe, Args args) {
-        try {
-            return valueLambda.call(value, joe, args);
-        } catch (JoeError ex) {
-            throw ex.addFrame(null,
-                "In method " + signature());
-        } catch (Exception ex) {
-            throw new JoeError("Error in " + name + "(): " +
-                ex.getMessage());
-        }
+        return valueLambda.call(value, joe, args);
     }
 
     @Override
