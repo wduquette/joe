@@ -38,15 +38,6 @@ public class JoeError extends RuntimeException {
     // Pending Context
 
     /**
-     * Gets the error's context in the source code, or null if it was
-     * thrown by native code.
-     * @return The context
-     */
-    protected Span pendingContext() {
-        return pendingContext;
-    }
-
-    /**
      * Sets the error's context for use by the next catcher of this exception.
      * @param pendingContext The context
      */
@@ -106,18 +97,25 @@ public class JoeError extends RuntimeException {
         var list = new ArrayList<String>();
         for (var trace : traces) {
             if (trace.hasContext()) {
-                list.add(
-                    trace.message() + " (" +
-                    trace.context().buffer().filename() + ":" +
-                    trace.context().startLine() + ")"
-                );
+                list.add(trace.message() + " " + location(trace.context()));
             } else {
                 list.add(trace.message());
             }
         }
 
+        if (pendingContext != null) {
+            list.add("In <script> " + location(pendingContext));
+        }
+
         return String.join("\n", list);
     }
+
+    private String location(Span context) {
+        return "(" +
+            context.buffer().filename() + ":" +
+            context.startLine() + ")";
+    }
+
 
     /**
      * Gets the complete stack trace string.
