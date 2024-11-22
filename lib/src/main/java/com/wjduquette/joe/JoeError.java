@@ -42,7 +42,7 @@ public class JoeError extends RuntimeException {
      * thrown by native code.
      * @return The context
      */
-    public Span pendingContext() {
+    protected Span pendingContext() {
         return pendingContext;
     }
 
@@ -50,7 +50,7 @@ public class JoeError extends RuntimeException {
      * Sets the error's context for use by the next catcher of this exception.
      * @param pendingContext The context
      */
-    public JoeError pendingContext(Span pendingContext) {
+    protected JoeError pendingContext(Span pendingContext) {
         this.pendingContext = pendingContext;
         return this;
     }
