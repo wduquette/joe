@@ -17,10 +17,10 @@ public class JoeError extends RuntimeException {
     // The stack trace and information messages included in the error.
     private final List<Trace> traces = new ArrayList<>();
 
-    // TO BE REPLACED! The span of source text associate with the error, or null.
-    // We will replace this with the pendingContext, used to pass the
-    // location of the error in a function up through the call chain.
-    private final SourceBuffer.Span span;
+    // The context of the error.  This is initially set by `RuntimeError`,
+    // and is reset as the error is passed up the call chain so that it
+    // has the correct value as the caller adds it to the stack trace.
+    private SourceBuffer.Span pendingContext = null;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -31,18 +31,27 @@ public class JoeError extends RuntimeException {
      * @param message The error message.
      */
     public JoeError(String message) {
-        this(null, message);
+        super(message);
+    }
+
+    //-------------------------------------------------------------------------
+    // Pending Context
+
+    /**
+     * Gets the error's context in the source code, or null if it was
+     * thrown by native code.
+     * @return The context
+     */
+    public Span getPendingContext() {
+        return pendingContext;
     }
 
     /**
-     * Creates an error with line number info and an optional number
-     * of stack frame strings.
-     * @param span The source span
-     * @param message The error message.
+     * Sets the error's context for use by the next catcher of this exception.
+     * @param pendingContext The context
      */
-    public JoeError(SourceBuffer.Span span, String message) {
-        super(message);
-        this.span = span;
+    public void setPendingContext(Span pendingContext) {
+        this.pendingContext = pendingContext;
     }
 
     //-------------------------------------------------------------------------
@@ -128,6 +137,6 @@ public class JoeError extends RuntimeException {
      * @return The line number
      */
     public int line() {
-        return span != null ? span.startLine() : -1;
+        return pendingContext != null ? pendingContext.startLine() : -1;
     }
 }
