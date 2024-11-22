@@ -387,7 +387,7 @@ class Interpreter {
                             ex.getMessage());
                     }
                 } else {
-                    throw joe.expected("a callable", callee);
+                    throw expected(expr.paren().span(), "a callable", callee);
                 }
             }
             // Get an object property.  The expression must evaluate to
@@ -574,6 +574,13 @@ class Interpreter {
 
     //-------------------------------------------------------------------------
     // Error Checking
+
+    private JoeError expected(SourceBuffer.Span context, String what, Object got) {
+        var message = "Expected " + what + ", got: " +
+            joe.typedValue(got) + ".";
+        return new RuntimeError(context, message);
+    }
+
 
     private void checkNumberOperands(
         Token operator,
