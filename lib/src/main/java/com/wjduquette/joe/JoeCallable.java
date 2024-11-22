@@ -28,8 +28,13 @@ public interface JoeCallable {
     String signature();
 
     /**
-     * Returns true if the callable is scripted, and false otherwise.
+     * Returns true if the callable is scripted, and false if it is native.
      * @return true or false;
      */
     boolean isScripted();
+
+    /**
+     * Returns true if the callable is native, and false if it is scripted.
+     */
+    default boolean isNative() { return !isScripted(); }
 }
