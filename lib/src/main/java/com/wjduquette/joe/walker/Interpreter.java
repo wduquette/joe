@@ -209,9 +209,11 @@ class Interpreter {
             case Stmt.Throw stmt -> {
                 var value = evaluate(stmt.value());
                 if (value instanceof JoeError error) {
-                    throw error;
+                    throw error.addFrame(stmt.keyword().span(),
+                        "Rethrowing existing error.");
                 } else {
-                    throw new JoeError(joe.stringify(value));
+                    throw new RuntimeError(stmt.keyword().span(),
+                        joe.stringify(value));
                 }
             }
             case Stmt.Var stmt -> {
