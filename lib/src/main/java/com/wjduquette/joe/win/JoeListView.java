@@ -1,7 +1,6 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -61,6 +60,7 @@ public class JoeListView extends ListView<Object> implements JoeObject {
     @Override public String typeName() { return core.typeName(); }
     @Override public Object get(String name) { return core.get(name); }
     @Override public void set(String name, Object value) { core.set(name, value); }
+    @Override public String stringify(Joe joe) { return core.stringify(joe); }
 
     //-------------------------------------------------------------------------
     // JoeListView Logic

@@ -119,8 +119,8 @@ class SplitPaneProxy extends FXProxy<SplitPane> {
     // Sets the value of divider with the given *index* to the given
     // position.
     private Object _setDivider(SplitPane node, Joe joe, Args args) {
-        args.exactArity(1, "setDivider(index)");
-        var index = joe.toIndex(args.next(), node.getItems().size() - 2);
+        args.exactArity(2, "setDivider(index, fraction)");
+        var index = joe.toIndex(args.next(), node.getItems().size() - 1);
         var position = toFraction(joe, args.next());
         node.setDividerPosition(index, position);
         return node;

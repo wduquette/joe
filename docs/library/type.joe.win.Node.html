@@ -198,6 +198,7 @@ all widgets.</p>
 <li><a href="type.joe.win.Node.html#method.listenTo"><em>node</em>.listenTo(<em>keyword</em>, <em>listener</em>)</a> → this</li>
 <li><a href="type.joe.win.Node.html#method.properties"><em>node</em>.properties()</a> → <a href="type.joe.Set.html">joe.Set</a></li>
 <li><a href="type.joe.win.Node.html#method.setProperty"><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>)</a> → this</li>
+<li><a href="type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="type.joe.List.html">joe.List</a></li>
 <li><a href="type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
@@ -341,6 +342,17 @@ The listener should be a callable taking the three arguments:</p>
 <p><strong><em>node</em>.setProperty(<em>keyword</em>, <em>value</em>) → this</strong></p>
 <p>Sets the <em>value</em> of the property with the given <em>keyword</em>.
 The <em>value</em> must be assignable to the property's value type.</p>
+<p><span id="method.splitResizeWithParent"> </span></p>
+<h3 id="nodesplitresizewithparent"><a class="header" href="#nodesplitresizewithparent"><em>node</em>.splitResizeWithParent()</a></h3>
+<hr />
+<p><strong><em>node</em>.splitResizeWithParent(<em>flag</em>) → this</strong></p>
+<p>If <em>flag</em> is <code>true</code> (the default value) the node's "split" will resize
+when its parent <a href="type.joe.win.SplitPane.html"><code>SplitPane</code></a> is resized, preserving its
+divider fraction.  If <code>false</code>, the divider fraction will change to
+keep the node's width or height constant. Use this to prevent sidebars
+from resizing when the window is resized.</p>
+<p>This is equivalent to the
+JavaFX <code>SplitPane.setResizeWithParent()</code> method.</p>
 <p><span id="method.styleClasses"> </span></p>
 <h3 id="nodestyleclasses"><a class="header" href="#nodestyleclasses"><em>node</em>.styleClasses()</a></h3>
 <hr />

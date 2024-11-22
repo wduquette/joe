@@ -2,7 +2,6 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 
 /**
  * Proxy for a JavaFX JoeListView.
@@ -40,6 +39,7 @@ class ListViewProxy extends FXProxy<JoeListView> {
         fxProperty("placeholder", JoeListView::placeholderProperty, WinPackage::toNode);
 
         // Methods
+        method("getItems",         this::_getItems);
         method("getSelectedIndex", this::_getSelectedIndex);
         method("getSelectedItem",  this::_getSelectedItem);
         method("item",             this::_item);
@@ -81,6 +81,15 @@ class ListViewProxy extends FXProxy<JoeListView> {
     // Methods
 
     //**
+    // @method getItems
+    // @result joe.List
+    // Gets the list of the widget's items, which can be updated freely.
+    private Object _getItems(JoeListView node, Joe joe, Args args) {
+        args.exactArity(0, "getItems()");
+        return joe.wrapList(node.getItems(), Object.class);
+    }
+
+    //**
     // @method getSelectedIndex
     // @result joe.Number
     // Gets the index of the selected item, or -1 if there is no selection.
@@ -111,11 +120,14 @@ class ListViewProxy extends FXProxy<JoeListView> {
 
     //**
     // @method items
-    // @result joe.List
-    // Gets the list of the widget's items, which can be updated freely.
+    // @args list
+    // @result this
+    // Adds the contents of the *list* to the widgets list of items.
     private Object _items(JoeListView node, Joe joe, Args args) {
-        args.exactArity(0, "items()");
-        return joe.wrapList(node.getItems(), Object.class);
+        args.exactArity(1, "items(list)");
+        var list = joe.toList(args.next());
+        node.getItems().addAll(list);
+        return node;
     }
 
     //**

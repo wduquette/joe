@@ -31,6 +31,21 @@ public class FXProxy<V> extends TypeProxy<V> {
         method("listenTo",    this::_listenTo);
         method("properties",  this::_properties);
         method("setProperty", this::_setProperty);
+        method("toString",    this::_toString);
+    }
+
+    //-------------------------------------------------------------------------
+    // Overridable methods
+
+    /**
+     * Returns a stringified value, i.e., a value for display.
+     * Defaults to the value's toString().
+     * @param joe The engine
+     * @param value The value
+     * @return The string
+     */
+    public String stringify(Joe joe, Object value) {
+        return name() + "@" + value.hashCode();
     }
 
     //-------------------------------------------------------------------------
@@ -123,6 +138,16 @@ public class FXProxy<V> extends TypeProxy<V> {
         var def = toDef(joe, args.next());
         def.setProperty(joe, obj, args.next());
         return obj;
+    }
+
+
+    //**
+    // @method toString
+    // @result joe.String
+    // Returns the value's string representation.
+    private Object _toString(V obj, Joe joe, Args args) {
+        args.exactArity(0, "toString()");
+        return stringify(joe, obj);
     }
 
     //-------------------------------------------------------------------------
