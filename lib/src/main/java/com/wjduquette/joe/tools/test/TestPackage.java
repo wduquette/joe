@@ -97,8 +97,11 @@ class TestPackage extends JoePackage {
         var traces = error.getTraces();
 
         for (int i = 0; i < frames.size(); i++) {
-            if (!Joe.isEqual(frames.get(i), traces.get(i).message())) {
-                throw new AssertError("Expected frames[" + i + "] == '" +
+            if (i >= traces.size()) {
+                throw new AssertError("Expected trace[" + i + "] == '" +
+                    frames.get(i) + "', error has no matching trace.");
+            } else if (!Joe.isEqual(frames.get(i), traces.get(i).message())) {
+                throw new AssertError("Expected trace[" + i + "] == '" +
                     frames.get(i) + "', got: '" +
                     traces.get(i).message() + "'.");
             }
