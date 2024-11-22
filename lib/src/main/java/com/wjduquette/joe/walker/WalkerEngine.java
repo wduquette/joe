@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class WalkerEngine implements Engine {
     //-------------------------------------------------------------------------
@@ -112,7 +113,19 @@ public class WalkerEngine implements Engine {
      */
     public Object call(Object callee, Object... args) {
         if (callee instanceof JoeCallable callable) {
-            return callable.call(joe, new Args(args));
+            try {
+                return callable.call(joe, new Args(args));
+            } catch (JoeError ex) {
+                var list = new ArrayList<>(List.of(args));
+                list.add(0, callee);
+                var arguments = list.stream()
+                    .map(joe::stringify)
+                    .collect(Collectors.joining(", "));
+                throw ex
+                    .addInfo("In " + callable.callableType() + " " +
+                        callable.signature())
+                    .addInfo("In java call(" + arguments + ")");
+            }
         } else {
             throw joe.expected("callable", callee);
         }

@@ -167,7 +167,7 @@ public class TestTool implements Tool {
             println("+++ " + test);
 
             try {
-                callable.call(joe, Args.EMPTY);
+                joe.call(callable);
                 ++successCount;
             } catch (SkipError ex) {
                 println("  SKIPPED: " + ex.getMessage());
@@ -193,7 +193,7 @@ public class TestTool implements Tool {
             Exception error;
 
             try {
-                callable.call(joe, Args.EMPTY);
+                joe.call(callable);
                 ++successCount;
                 result = null;
                 error = null;
