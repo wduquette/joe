@@ -114,7 +114,7 @@ class Interpreter {
                 }
 
                 JoeClass klass = new ScriptedClass(stmt.name().lexeme(),
-                    superclass, staticMethods, methods);
+                    stmt.classSpan(), superclass, staticMethods, methods);
 
                 if (superclass != null) {
                     // Pop the "super" environment.

@@ -1,5 +1,4 @@
 package com.wjduquette.joe;
-import com.wjduquette.joe.SourceBuffer.Span;
 
 /**
  * An object that can be called as a function in a Joe script.
@@ -29,20 +28,8 @@ public interface JoeCallable {
     String signature();
 
     /**
-     * Returns true if this is a scripted callable, and false if it is a
-     * native callable.
-     * @return true or false
+     * Returns true if the callable is scripted, and false otherwise.
+     * @return true or false;
      */
-    default boolean isScripted() {
-        return context() != null;
-    }
-
-    /**
-     * Gets the context of the callable in the source code, or null if
-     * !isScriped().
-     * @return The context.
-     */
-    default Span context() {
-        return null;
-    }
+    boolean isScripted();
 }

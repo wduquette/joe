@@ -144,6 +144,11 @@ final class WalkerFunction implements JoeCallable, HasTypeName {
         return signature;
     }
 
+    @Override
+    public boolean isScripted() {
+        return true;
+    }
+
     //-------------------------------------------------------------------------
     // Object API
 

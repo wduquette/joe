@@ -4,6 +4,7 @@ import com.wjduquette.joe.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.wjduquette.joe.SourceBuffer.Span;
 
 /**
  * A class defined in a Joe script.
@@ -14,6 +15,9 @@ class ScriptedClass implements JoeClass, JoeObject {
 
     // The class name
     private final String name;
+
+    // The class's span in the source code.
+    private final Span classSpan;
 
     // The superclass, or null
     private final JoeClass superclass;
@@ -36,14 +40,23 @@ class ScriptedClass implements JoeClass, JoeObject {
      */
     ScriptedClass(
         String name,
+        Span classSpan,
         JoeClass superclass,
         Map<String, WalkerFunction> staticMethods,
         Map<String, WalkerFunction> methods
     ) {
         this.name = name;
+        this.classSpan = classSpan;
         this.superclass = superclass;
         this.staticMethods = staticMethods;
         this.methods = methods;
+    }
+
+    //-------------------------------------------------------------------------
+    // ScriptedClass API
+
+    public Span classSpan() {
+        return classSpan;
     }
 
     //-------------------------------------------------------------------------
@@ -113,9 +126,8 @@ class ScriptedClass implements JoeClass, JoeObject {
     }
 
     @Override
-    public SourceBuffer.Span context() {
-        // TODO: The class doesn't know its context at this time.
-        return null;
+    public boolean isScripted() {
+        return true;
     }
 
     //-------------------------------------------------------------------------

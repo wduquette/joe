@@ -192,6 +192,11 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
         return name + "(...)";
     }
 
+    @Override
+    public boolean isScripted() {
+        return false;
+    }
+
     //-------------------------------------------------------------------------
     // Iterability
 

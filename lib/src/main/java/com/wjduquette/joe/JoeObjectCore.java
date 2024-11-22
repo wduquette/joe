@@ -10,6 +10,7 @@ public class JoeObjectCore {
     // Instance Variables
 
     private final JoeClass joeClass;
+
     private final Object host;
     private final Map<String,Object> fields = new HashMap<>();
 

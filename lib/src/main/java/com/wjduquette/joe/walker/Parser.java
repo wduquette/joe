@@ -65,6 +65,7 @@ class Parser {
 
     private Stmt classDeclaration() {
         // Class Name
+        int start = previous().span().start();
         Token name = consume(IDENTIFIER, "Expected class name.");
 
         // Superclass
@@ -100,8 +101,10 @@ class Parser {
         }
 
         consume(RIGHT_BRACE, "Expected '}' after class body.");
+        int end = previous().span().end();
+        var classSpan = source.span(start, end);
 
-        return new Stmt.Class(name, superclass,
+        return new Stmt.Class(name, classSpan, superclass,
             staticMethods, methods, staticInitializer);
     }
 

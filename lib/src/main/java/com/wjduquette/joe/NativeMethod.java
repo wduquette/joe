@@ -55,6 +55,11 @@ public class NativeMethod<V> implements JoeCallable, HasTypeName {
         return name() + "(...)";
     }
 
+    @Override
+    public boolean isScripted() {
+        return false;
+    }
+
     //-------------------------------------------------------------------------
     // HasTypeName API
 
