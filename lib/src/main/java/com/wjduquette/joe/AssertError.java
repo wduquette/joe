@@ -21,6 +21,6 @@ public class AssertError extends JoeError {
      */
     public AssertError(Span context, String message) {
         super(message);
-        setPendingContext(context);
+        pendingContext(context);
     }
 }

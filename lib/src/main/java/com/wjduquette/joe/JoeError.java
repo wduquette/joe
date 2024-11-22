@@ -42,7 +42,7 @@ public class JoeError extends RuntimeException {
      * thrown by native code.
      * @return The context
      */
-    public Span getPendingContext() {
+    public Span pendingContext() {
         return pendingContext;
     }
 
@@ -50,8 +50,9 @@ public class JoeError extends RuntimeException {
      * Sets the error's context for use by the next catcher of this exception.
      * @param pendingContext The context
      */
-    public void setPendingContext(Span pendingContext) {
+    public JoeError pendingContext(Span pendingContext) {
         this.pendingContext = pendingContext;
+        return this;
     }
 
     //-------------------------------------------------------------------------
@@ -63,12 +64,14 @@ public class JoeError extends RuntimeException {
 
     /**
      * Adds a call frame trace to the error.
-     * @param context A span indicating the location of the error in the source.
+     * @param newContext A span indicating the new local context, or null for
+     *                   native code.
      * @param message The trace message
      * @return this
      */
-    public final JoeError addFrame(Span context, String message) {
-        traces.add(new Trace(context, message));
+    public final JoeError addFrame(Span newContext, String message) {
+        traces.add(new Trace(pendingContext, message));
+        pendingContext = newContext;
         return this;
     }
 

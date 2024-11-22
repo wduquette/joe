@@ -37,7 +37,8 @@ public class NativeMethod<V> implements JoeCallable, HasTypeName {
         try {
             return valueLambda.call(value, joe, args);
         } catch (JoeError ex) {
-            throw ex.addInfo("In " + joe.typeName(value) + " method " +
+            throw ex.addFrame(null,
+                "In " + joe.typeName(value) + " method " +
                 name() + "(" + joe.join(", ", args.asList()) + ")");
         } catch (Exception ex) {
             throw new JoeError("Error in " + name + "(): " +

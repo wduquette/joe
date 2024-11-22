@@ -17,6 +17,6 @@ public class RuntimeError extends JoeError {
      */
     public RuntimeError(Span context, String message) {
         super(message);
-        setPendingContext(context);
+        pendingContext(context);
     }
 }

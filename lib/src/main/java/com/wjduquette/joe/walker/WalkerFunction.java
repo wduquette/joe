@@ -124,10 +124,12 @@ final class WalkerFunction implements JoeCallable, HasTypeName {
             return returnValue.value;
         } catch (JoeError ex) {
             if (!kind().equals("lambda")) {
-                ex.addInfo("In " + kind() + " " + name() +
+                ex.addFrame(declaration.name().span(),
+                    "In " + kind() + " " + name() +
                     "(" + joe.join(", ", args.asList()) + ")");
             } else {
-                ex.addInfo("In " + kind() + " \\" +
+                ex.addFrame(declaration.name().span(),
+                    "In " + kind() + " \\" +
                     joe.join(", ", args.asList()) + " -> ...");
             }
             throw ex;
