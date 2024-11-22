@@ -12,14 +12,6 @@ public record Trace(
     Span context,
     String message
 ) {
-    public static Trace frame(Span context, String message) {
-        return new Trace(context, message);
-    }
-
-    public static Trace info(String message) {
-        return new Trace(null, message);
-    }
-
     public boolean hasContext() {
         return context != null;
     }
