@@ -9,7 +9,7 @@ import com.wjduquette.joe.SourceBuffer.Span;
 /**
  * A class defined in a Joe script.
  */
-class ScriptedClass implements JoeClass, JoeObject {
+class WalkerClass implements JoeClass, JoeObject {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -38,7 +38,7 @@ class ScriptedClass implements JoeClass, JoeObject {
      * @param superclass The superclass, or null
      * @param methods The map of methods by name
      */
-    ScriptedClass(
+    WalkerClass(
         String name,
         Span classSpan,
         JoeClass superclass,

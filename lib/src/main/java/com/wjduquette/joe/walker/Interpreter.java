@@ -113,7 +113,7 @@ class Interpreter {
                     methods.put(method.name().lexeme(), function);
                 }
 
-                JoeClass klass = new ScriptedClass(stmt.name().lexeme(),
+                JoeClass klass = new WalkerClass(stmt.name().lexeme(),
                     stmt.classSpan(), superclass, staticMethods, methods);
 
                 if (superclass != null) {
