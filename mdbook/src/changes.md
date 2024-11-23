@@ -8,10 +8,14 @@
     - And can be overridden by the class declaration.
     - It is always the case that `stringify(instance) == instance.toString()` 
       for instances of Joe classes.
+  - Greatly improved `JoeError`'s stack trace output.  It now includes, for
+    each stack level,
+    - Complete function signatures, where available
+    - Source file and line number, where available
 - Library
   - `joe.win` Package
     - Added JavaFX widgets: `Menu`, `MenuBar`, `MenuItem`, `Separator`, 
-      `Tab`, `TabPane`
+      `Tab`, `TabPane`, `ListView`, `SplitPane`, `GridPane`
     - Added JavaFX enums: `Orientation`, `Side`
 
 ## Changes in 0.4.0 
