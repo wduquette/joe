@@ -66,6 +66,17 @@ public class JoeError extends RuntimeException {
     }
 
     /**
+     * Adds a call frame trace to the error, retaining the current
+     * context.
+     * @param message The trace message
+     * @return this
+     */
+    public final JoeError addFrame(String message) {
+        traces.add(new Trace(pendingContext, message));
+        return this;
+    }
+
+    /**
      * Adds an informational trace to the error.
      * @param message The message
      * @return this

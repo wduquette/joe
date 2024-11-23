@@ -105,7 +105,11 @@ class WalkerClass implements JoeClass, JoeObject {
         JoeObject instance = make(joe, this);
         JoeCallable initializer = bind(instance, INIT);
         if (initializer != null) {
-            initializer.call(joe, args);
+            try {
+                initializer.call(joe, args);
+            } catch (JoeError ex) {
+                throw ex.addFrame("In method " + initializer.signature());
+            }
         }
         return instance;
     }

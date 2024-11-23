@@ -88,7 +88,7 @@ class Parser {
                 methods.add(functionDeclaration("method"));
             } else if (match(STATIC)) {
                 if (match(METHOD)) {
-                    staticMethods.add(functionDeclaration("method"));
+                    staticMethods.add(functionDeclaration("static method"));
                 } else {
                     consume(LEFT_BRACE,
                         "Expected 'method' or '{' after 'static'.");
