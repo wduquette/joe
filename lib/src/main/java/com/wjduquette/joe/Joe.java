@@ -106,8 +106,18 @@ public class Joe {
      * Installs a native function into Joe's global environment.
      * @param function The function
      */
-    public void installGlobalFunction(NativeFunction function) {
+    void installGlobalFunction(NativeFunction function) {
         engine.setVar(function.name(), function);
+    }
+
+    /**
+     * Installs a JoeLambda into Joe's global environment as a
+     * native function
+     * @param joeLambda The lambda
+     */
+    public void installGlobalFunction(String name, JoeLambda joeLambda) {
+        engine.setVar(name,
+            new NativeFunction(name, "function", joeLambda));
     }
 
     /**
@@ -538,6 +548,16 @@ public class Joe {
     }
 
     /**
+     * Returns true if the callee is callable in the current engine,
+     * and false otherwise.
+     * @param callee The callee
+     * @return true or false
+     */
+    public boolean isCallable(Object callee) {
+        return engine.isCallable(callee);
+    }
+
+    /**
      * Calls a JoeCallable value with the given arguments.
      * @param callee A Joe value which must be callable.
      * @param args The arguments to pass to the callable
@@ -613,7 +633,7 @@ public class Joe {
             return num;
         }
 
-        throw expected("double", arg);
+        throw expected("number", arg);
     }
 
     /**

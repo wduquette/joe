@@ -126,7 +126,14 @@ class Interpreter {
 
                 // Static Initialization
                 if (!stmt.staticInitializer().isEmpty()) {
-                    executeBlock(stmt.staticInitializer(), environment);
+                    try {
+                        executeBlock(stmt.staticInitializer(), environment);
+                    } catch (JoeError ex) {
+                        var buff = stmt.classSpan().buffer();
+                        var context = buff.lineSpan(stmt.classSpan().endLine());
+                        throw ex.addFrame(context,
+                            "In static initializer for " + stmt.name().lexeme());
+                    }
                 }
                 return null;
             }
@@ -377,9 +384,13 @@ class Interpreter {
                     try {
                         yield callable.call(joe, new Args(args));
                     } catch (JoeError ex) {
-                        throw ex.addFrame(expr.paren().span(),
-                            "In " + callable.callableType() + " " +
-                                callable.signature());
+                        var msg = "In " + callable.callableType() + " " +
+                            callable.signature();
+                        if (callable.isScripted()) {
+                            throw ex.addFrame(expr.paren().span(), msg);
+                        } else {
+                            throw ex.addInfo(expr.paren().span(), msg);
+                        }
                     } catch (Exception ex) {
                         throw new UnexpectedError(expr.paren().span(),
                             "Error in " + callable.callableType() +

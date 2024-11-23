@@ -105,6 +105,11 @@ public class WalkerEngine implements Engine {
         return interpreter.interpret(statements);
     }
 
+    @Override
+    public boolean isCallable(Object callee) {
+        return callee instanceof JoeCallable;
+    }
+
     /**
      * Calls a JoeCallable value with the given arguments.
      * @param callee A Joe value which must be callable.
@@ -122,7 +127,7 @@ public class WalkerEngine implements Engine {
                     .map(joe::stringify)
                     .collect(Collectors.joining(", "));
                 throw ex
-                    .addInfo("In " + callable.callableType() + " " +
+                    .addFrame("In " + callable.callableType() + " " +
                         callable.signature())
                     .addInfo("In java call(" + arguments + ")");
             }

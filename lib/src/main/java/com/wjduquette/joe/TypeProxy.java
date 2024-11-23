@@ -184,7 +184,7 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
 
     @Override
     public String callableType() {
-        return "type initializer";
+        return "native initializer";
     }
 
     @Override

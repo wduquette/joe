@@ -87,6 +87,19 @@ public class JoeError extends RuntimeException {
     }
 
     /**
+     * Adds an informational trace to the error, with a context to be
+     * used by the subsequent frame.
+     * @param context The context
+     * @param message The message
+     * @return this
+     */
+    public final JoeError addInfo(Span context, String message) {
+        traces.add(new Trace(null, message));
+        pendingContext = context;
+        return this;
+    }
+
+    /**
      * Returns the list of accumulated trace records.
      * Traces can be stack frames or informational.  Stack frames proper
      * will have source context; informational traces will not, and will

@@ -103,8 +103,8 @@ public class JoeTest extends Ted {
     }
 
     @Test
-    public void testStackTrace_errorInLambda() {
-        test("testStackTrace_errorInLambda");
+    public void testStackTrace_lambda() {
+        test("testStackTrace_lambda");
         var script = """
             function a(x) {
                 return b(x);
@@ -158,8 +158,8 @@ public class JoeTest extends Ted {
     }
 
     @Test
-    public void testStackTrace_errorInInstanceInitializer() {
-        test("testStackTrace_scriptedMethods");
+    public void testStackTrace_instanceInitializer() {
+        test("testStackTrace_instanceInitializer");
         var script = """
             class Thing {
                 method init(x) {
@@ -208,6 +208,139 @@ public class JoeTest extends Ted {
             """;
         dumpScript(script);
         check(traceOf(script)).eq(trace);
+    }
+
+    @Test
+    public void testStackTrace_staticInitializer() {
+        test("testStackTrace_staticInitializer");
+        var script = """
+            class Thing {
+                static {
+                    throw "Simulated error!";
+                }
+            }
+            """;
+        var trace = """
+            Simulated error!
+              In static initializer for Thing (*test*:3)
+              In <script> (*test*:5)
+            """;
+        dumpScript(script);
+        check(traceOf(script)).eq(trace);
+    }
+
+    @Test
+    public void testStackTrace_nativeFunction() {
+        test("testStackTrace_nativeFunction");
+        joe.installGlobalFunction("passThrough", this::_passThrough);
+        var script = """
+            function a(x) {
+                return passThrough(x);
+            }
+            a(false);
+            """;
+        var trace = """
+            Expected callable, got: Boolean 'false'.
+              In native function passThrough(...)
+              In function a(x) (*test*:2)
+              In <script> (*test*:4)
+            """;
+        dumpScript(script);
+        check(traceOf(script)).eq(trace);
+    }
+
+    @Test
+    public void testStackTrace_nativeMethod() {
+        test("testStackTrace_nativeMethod");
+        var script = """
+            function a(x) {
+                return Number.abs(x);
+            }
+            a(false);
+            """;
+        var trace = """
+            Expected number, got: Boolean 'false'.
+              In native static method abs(...)
+              In function a(x) (*test*:2)
+              In <script> (*test*:4)
+            """;
+        dumpScript(script);
+        check(traceOf(script)).eq(trace);
+    }
+
+    @Test
+    public void testStackTrace_nativeInitializer() {
+        test("testStackTrace_nativeInitializer");
+        var script = """
+            function a(x) {
+                return Number(x);
+            }
+            a(false);
+            """;
+        var trace = """
+            Expected numeric string, got: String 'false'.
+              In native initializer Number(...)
+              In function a(x) (*test*:2)
+              In <script> (*test*:4)
+            """;
+        dumpScript(script);
+        check(traceOf(script)).eq(trace);
+    }
+
+    @Test
+    public void testStackTrace_nativePassThrough() {
+        test("testStackTrace_nativeThrough");
+        joe.installGlobalFunction("passThrough", this::_passThrough);
+        var script = """
+            function a(x) {
+                return passThrough(c);
+            }
+            function c() {
+                throw "Simulated error!";
+            }
+            a(0);
+            """;
+        var trace = """
+            Simulated error!
+              In function c() (*test*:5)
+              In java call(<function c()>)
+              In native function passThrough(...)
+              In function a(x) (*test*:2)
+              In <script> (*test*:7)
+            """;
+        dumpScript(script);
+        check(traceOf(script)).eq(trace);
+    }
+
+    @Test
+    public void testStackTrace_nonCallableInScript() {
+        test("testStackTrace_nonCallableInScript");
+        var script = """
+            function a(x) {
+                return b(x);
+            }
+            function b(x) {
+                return x();
+            }
+            a(0);
+            """;
+        var trace = """
+            Expected a callable, got: Number '0'.
+              In function b(x) (*test*:5)
+              In function a(x) (*test*:2)
+              In <script> (*test*:7)
+            """;
+        dumpScript(script);
+        check(traceOf(script)).eq(trace);
+    }
+
+    private Object _passThrough(Joe joe, Args args) {
+        args.exactArity(1, "passThrough(callable)");
+        var callee = args.next();
+        if (!joe.isCallable(callee)) {
+            throw joe.expected("callable", callee);
+        }
+        return joe.call(callee);
     }
 
     private String traceOf(String script) {
