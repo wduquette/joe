@@ -56,6 +56,8 @@ class StandardLibrary extends JoePackage {
             var result = joe.call(args.next());
             return Tuple.of(joe, OK, result);
         } catch (JoeError ex) {
+            ex.setPendingContext(null);
+            ex.addInfo("Called from catch()");
             return Tuple.of(joe, ERROR, ex);
         }
     }

@@ -39,9 +39,10 @@ public class JoeError extends RuntimeException {
 
     /**
      * Sets the error's context for use by the next catcher of this exception.
+     * For internal use only.
      * @param pendingContext The context
      */
-    protected void setPendingContext(Span pendingContext) {
+    void setPendingContext(Span pendingContext) {
         this.pendingContext = pendingContext;
     }
 
