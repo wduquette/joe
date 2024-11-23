@@ -3,17 +3,15 @@
 // AssertError inherits its methods from Error.
 
 function testInitializer_noFrames() {
-    skip("Pending stack trace cleanup completion.");
     var err = AssertError("Failure");
     check(err.message()).eq("Failure");
-    check(err.stackFrames()).isEmpty();
+    check(err.traces()).isEmpty();
 }
 
 function testInitializer_frames() {
-    skip("Pending stack trace cleanup completion.");
     var err = AssertError("Failure", "A", "B");
     check(err.message()).eq("Failure");
-    check(err.stackFrames()).eq(List("A", "B"));
+    check(err.traces()).eq(List("A", "B"));
 }
 
 function testCanThrow() {

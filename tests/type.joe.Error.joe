@@ -3,27 +3,23 @@
 // Tests for the `Error` type
 
 function testInitializer_simple() {
-    skip("Pending stack trace cleanup completion.");
     var error = Error("Message");
     check(error.message()).eq("Message");
     check(error.type()).eq("JoeError");
-    check(error.stackFrames()).isEmpty();
+    check(error.traces()).isEmpty();
     check(error.stackTrace()).eq(error.message());
 }
 
-function testInitializer_withFrames() {
-    skip("Pending stack trace cleanup completion.");
+function testInitializer_withTraces() {
     var error = Error("Message", "A", "B");
     check(error.message()).eq("Message");
     check(error.type()).eq("JoeError");
-    check(error.stackFrames()).eq(List("A", "B"));
-    check(error.stackTrace()).eq(error.message() + "\n  A" + "\n  B");
+    check(error.traces()).eq(List("A", "B"));
 }
 
-function testStackFrames_mutable() {
-    skip("Pending stack trace cleanup completion.");
+function testAddInfo() {
     var error = Error("Message");
-    check(error.stackFrames()).isEmpty();
-    error.stackFrames().add("A");
-    check(error.stackFrames()).eq(List("A"));
+    check(error.traces()).isEmpty();
+    error.addInfo("A");
+    check(error.traces()).eq(List("A"));
 }
