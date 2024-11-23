@@ -90,13 +90,20 @@ class TestPackage extends JoePackage {
         }
 
         // NEXT, fail if a stack frame isn't as expected.
+        // NOTE: we compare trace messages, but not the context span;
+        // context often derives from the location of the test in the
+        // test script, which is inherently fragile.
         var frames = args.remainderAsList();
+        var traces = error.getTraces();
 
         for (int i = 0; i < frames.size(); i++) {
-            if (!Joe.isEqual(frames.get(i), error.getFrames().get(i))) {
-                throw new AssertError("Expected frames[" + i + "] == '" +
+            if (i >= traces.size()) {
+                throw new AssertError("Expected trace[" + i + "] == '" +
+                    frames.get(i) + "', error has no matching trace.");
+            } else if (!Joe.isEqual(frames.get(i), traces.get(i).message())) {
+                throw new AssertError("Expected trace[" + i + "] == '" +
                     frames.get(i) + "', got: '" +
-                    error.getFrames().get(i) + "'.");
+                    traces.get(i).message() + "'.");
             }
         }
 

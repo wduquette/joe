@@ -113,8 +113,8 @@ class Interpreter {
                     methods.put(method.name().lexeme(), function);
                 }
 
-                JoeClass klass = new ScriptedClass(stmt.name().lexeme(),
-                    superclass, staticMethods, methods);
+                JoeClass klass = new WalkerClass(stmt.name().lexeme(),
+                    stmt.classSpan(), superclass, staticMethods, methods);
 
                 if (superclass != null) {
                     // Pop the "super" environment.
@@ -126,7 +126,14 @@ class Interpreter {
 
                 // Static Initialization
                 if (!stmt.staticInitializer().isEmpty()) {
-                    executeBlock(stmt.staticInitializer(), environment);
+                    try {
+                        executeBlock(stmt.staticInitializer(), environment);
+                    } catch (JoeError ex) {
+                        var buff = stmt.classSpan().buffer();
+                        var context = buff.lineSpan(stmt.classSpan().endLine());
+                        throw ex.addFrame(context,
+                            "In static initializer for " + stmt.name().lexeme());
+                    }
                 }
                 return null;
             }
@@ -209,9 +216,11 @@ class Interpreter {
             case Stmt.Throw stmt -> {
                 var value = evaluate(stmt.value());
                 if (value instanceof JoeError error) {
-                    throw error;
+                    throw error.addFrame(stmt.keyword().span(),
+                        "Rethrowing existing error.");
                 } else {
-                    throw new JoeError(joe.stringify(value));
+                    throw new RuntimeError(stmt.keyword().span(),
+                        joe.stringify(value));
                 }
             }
             case Stmt.Var stmt -> {
@@ -372,10 +381,24 @@ class Interpreter {
                 }
 
                 if (callee instanceof JoeCallable callable) {
-                    yield callable.call(joe, new Args(args));
+                    try {
+                        yield callable.call(joe, new Args(args));
+                    } catch (JoeError ex) {
+                        var msg = "In " + callable.callableType() + " " +
+                            callable.signature();
+                        if (callable.isScripted()) {
+                            throw ex.addFrame(expr.paren().span(), msg);
+                        } else {
+                            throw ex.addInfo(expr.paren().span(), msg);
+                        }
+                    } catch (Exception ex) {
+                        throw new UnexpectedError(expr.paren().span(),
+                            "Error in " + callable.callableType() +
+                            " " + callable.signature() + ": " +
+                            ex.getMessage());
+                    }
                 } else {
-                    // TODO add recodify(expr.callee()) as a stack frame!
-                    throw joe.expected("a callable", callee);
+                    throw expected(expr.paren().span(), "a callable", callee);
                 }
             }
             // Get an object property.  The expression must evaluate to
@@ -562,6 +585,13 @@ class Interpreter {
 
     //-------------------------------------------------------------------------
     // Error Checking
+
+    private JoeError expected(SourceBuffer.Span context, String what, Object got) {
+        var message = "Expected " + what + ", got: " +
+            joe.typedValue(got) + ".";
+        return new RuntimeError(context, message);
+    }
+
 
     private void checkNumberOperands(
         Token operator,

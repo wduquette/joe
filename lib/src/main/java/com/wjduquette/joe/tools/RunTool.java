@@ -73,9 +73,7 @@ public class RunTool implements Tool {
             System.err.println(ex.getMessage());
             System.exit(65);
         } catch (JoeError ex) {
-            if (ex.line() >= 0) {
-                System.err.print("[line " + ex.line() + "] ");
-            }
+            System.err.print("*** Error in script: ");
             System.err.println(ex.getJoeStackTrace());
             System.exit(70);
         }

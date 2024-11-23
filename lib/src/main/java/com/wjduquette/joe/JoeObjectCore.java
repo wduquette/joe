@@ -10,8 +10,12 @@ public class JoeObjectCore {
     // Instance Variables
 
     private final JoeClass joeClass;
+
     private final Object host;
     private final Map<String,Object> fields = new HashMap<>();
+
+    // Default "toString()" implementation.
+    private final JoeCallable _toString;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -19,6 +23,8 @@ public class JoeObjectCore {
     public JoeObjectCore(JoeClass joeClass, Object host) {
         this.joeClass = joeClass;
         this.host = host;
+        this._toString = new NativeMethod<>(this, "toString",
+            (objc, joe, args) -> this.defaultToString());
     }
 
     //-------------------------------------------------------------------------
@@ -38,7 +44,7 @@ public class JoeObjectCore {
         if (value != null) return value;
 
         if (name.equals(TO_STRING)) {
-            return (JoeCallable)(joe, args) -> this.defaultToString();
+            return _toString;
         }
 
         throw new JoeError("Undefined property: '" + name + "'.");

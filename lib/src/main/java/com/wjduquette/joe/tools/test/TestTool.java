@@ -101,7 +101,7 @@ public class TestTool implements Tool {
         System.out.printf("Skipped    %5d\n", skipCount);
         System.out.printf("Failures   %5d\n", failureCount);
         System.out.printf("Errors     %5d\n", errorCount);
-        System.out.printf("---------- -----\n");
+        System.out.println("---------- -----");
         System.out.printf("Total      %5d\n", total);
 
         if (loadErrorCount != 0) {
@@ -134,9 +134,7 @@ public class TestTool implements Tool {
             System.out.println(ex.getMessage());
             ++loadErrorCount;
         } catch (JoeError ex) {
-            if (ex.line() >= 0) {
-                System.err.print("[line " + ex.line() + "] ");
-            }
+            System.out.print("*** Error in script: ");
             println(ex.getJoeStackTrace());
             ++loadErrorCount;
         }
@@ -169,16 +167,16 @@ public class TestTool implements Tool {
             println("+++ " + test);
 
             try {
-                callable.call(joe, Args.EMPTY);
+                joe.call(callable);
                 ++successCount;
             } catch (SkipError ex) {
                 println("  SKIPPED: " + ex.getMessage());
                 ++skipCount;
             } catch (AssertError ex) {
-                println("  FAILED: " + ex.getMessage());
+                println("  FAILED: " + ex.getJoeStackTrace());
                 ++failureCount;
             } catch (JoeError ex) {
-                println("  ERROR: " + ex.getMessage());
+                println("  ERROR: " + ex.getJoeStackTrace());
                 ++errorCount;
             }
         }
@@ -195,7 +193,7 @@ public class TestTool implements Tool {
             Exception error;
 
             try {
-                callable.call(joe, Args.EMPTY);
+                joe.call(callable);
                 ++successCount;
                 result = null;
                 error = null;

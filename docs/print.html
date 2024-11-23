@@ -2635,7 +2635,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.html#function.typeName">typeName(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.AssertError.html">AssertError</a> extends <a href="library/type.joe.Error.html">Error</a>
 <ul>
-<li><a href="library/type.joe.AssertError.html#init">AssertError(<em>message</em>, [<em>frames</em>...])</a> → <a href="library/type.joe.AssertError.html">AssertError</a></li>
+<li><a href="library/type.joe.AssertError.html#init">AssertError(<em>message</em>, [<em>trace</em>, ...])</a> → <a href="library/type.joe.AssertError.html">AssertError</a></li>
 </ul>
 </li>
 <li><a href="library/type.joe.Boolean.html">Boolean</a>
@@ -2645,10 +2645,11 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.Error.html">Error</a>
 <ul>
-<li><a href="library/type.joe.Error.html#init">Error(<em>message</em>, [<em>frames</em>...])</a> → <a href="library/type.joe.Error.html">Error</a></li>
+<li><a href="library/type.joe.Error.html#init">Error(<em>message</em>, [<em>trace</em>, ...])</a> → <a href="library/type.joe.Error.html">Error</a></li>
+<li><a href="library/type.joe.Error.html#method.addInfo"><em>error</em>.addInfo(<em>message</em>)</a> → this</li>
 <li><a href="library/type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
-<li><a href="library/type.joe.Error.html#method.stackFrames"><em>error</em>.stackFrames()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.Error.html#method.stackTrace"><em>error</em>.stackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
+<li><a href="library/type.joe.Error.html#method.traces"><em>error</em>.traces()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.Error.html#method.type"><em>error</em>.type()</a> → name</li>
 </ul>
 </li>
@@ -2965,10 +2966,11 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.ListView.html">ListView</a> extends <a href="library/type.joe.win.Control.html">Control</a>
 <ul>
 <li><a href="library/type.joe.win.ListView.html#init">ListView()</a> → <a href="library/type.joe.win.ListView.html">ListView</a></li>
+<li><a href="library/type.joe.win.ListView.html#method.getItems"><em>listView</em>.getItems()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.ListView.html#method.getSelectedIndex"><em>listView</em>.getSelectedIndex()</a> → <a href="library/type.joe.Number.html">joe.Number</a></li>
 <li><a href="library/type.joe.win.ListView.html#method.getSelectedItem"><em>listView</em>.getSelectedItem()</a> → item</li>
 <li><a href="library/type.joe.win.ListView.html#method.item"><em>listView</em>.item(<em>item</em>)</a> → this</li>
-<li><a href="library/type.joe.win.ListView.html#method.items"><em>listView</em>.items()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
+<li><a href="library/type.joe.win.ListView.html#method.items"><em>listView</em>.items(<em>list</em>)</a> → this</li>
 <li><a href="library/type.joe.win.ListView.html#method.onSelect"><em>listView</em>.onSelect(<em>callable</em>)</a> → this</li>
 <li><a href="library/type.joe.win.ListView.html#method.placeholder"><em>listView</em>.placeholder(<em>node</em>)</a> → this</li>
 <li><a href="library/type.joe.win.ListView.html#method.placeholderText"><em>listView</em>.placeholderText(<em>text</em>)</a> → this</li>
@@ -2992,6 +2994,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Menu.html#method.styleClasses"><em>menu</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Menu.html#method.styles"><em>menu</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Menu.html#method.text"><em>menu</em>.text(<em>text</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Menu.html#method.toString"><em>menu</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 </ul>
 </li>
 <li><a href="library/type.joe.win.MenuBar.html">MenuBar</a> extends <a href="library/type.joe.win.Control.html">Control</a>
@@ -3015,6 +3018,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.MenuItem.html#method.styleClasses"><em>menuItem</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.MenuItem.html#method.styles"><em>menuItem</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.MenuItem.html#method.text"><em>menuItem</em>.text(<em>text</em>)</a> → this</li>
+<li><a href="library/type.joe.win.MenuItem.html#method.toString"><em>menuItem</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 </ul>
 </li>
 <li><a href="library/type.joe.win.Node.html">Node</a>
@@ -3039,6 +3043,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 </li>
@@ -3162,6 +3167,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Tab.html#method.styles"><em>tab</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Tab.html#method.tabPane"><em>tab</em>.tabPane()</a> → <a href="library/type.joe.win.TabPane.html">TabPane</a></li>
 <li><a href="library/type.joe.win.Tab.html#method.text"><em>tab</em>.text(<em>text</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Tab.html#method.toString"><em>tab</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 </ul>
 </li>
 <li><a href="library/type.joe.win.TabPane.html">TabPane</a> extends <a href="library/type.joe.win.Control.html">Control</a>
@@ -3297,20 +3303,21 @@ script can catch errors thrown during execution using
 the <a href="library/pkg.joe.html#function.catch"><code>catch()</code></a> function.</p>
 <p><strong><a href="library/type.joe.AssertError.html#init">Initializer</a></strong></p>
 <ul>
-<li><a href="library/type.joe.AssertError.html#init">AssertError(<em>message</em>, [<em>frames</em>...])</a> → <a href="library/type.joe.AssertError.html">AssertError</a></li>
+<li><a href="library/type.joe.AssertError.html#init">AssertError(<em>message</em>, [<em>trace</em>, ...])</a> → <a href="library/type.joe.AssertError.html">AssertError</a></li>
 </ul>
 <p><strong>Error Methods</strong></p>
 <ul>
+<li><a href="library/type.joe.Error.html#method.addInfo"><em>error</em>.addInfo(<em>message</em>)</a> → this</li>
 <li><a href="library/type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
-<li><a href="library/type.joe.Error.html#method.stackFrames"><em>error</em>.stackFrames()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.Error.html#method.stackTrace"><em>error</em>.stackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
+<li><a href="library/type.joe.Error.html#method.traces"><em>error</em>.traces()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.Error.html#method.type"><em>error</em>.type()</a> → name</li>
 </ul>
 <h2 id="init"><a class="header" href="#init">AssertError Initializer</a></h2>
 <hr />
-<p><strong>AssertError(<em>message</em>, [<em>frames</em>...]) → <a href="library/type.joe.AssertError.html">AssertError</a></strong></p>
-<p>Creates an <code>AssertError</code> with the given <em>message</em> and stack frame
-strings.</p>
+<p><strong>AssertError(<em>message</em>, [<em>trace</em>, ...]) → <a href="library/type.joe.AssertError.html">AssertError</a></strong></p>
+<p>Creates an <code>AssertError</code> with the given <em>message</em> and informational
+trace messages.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="boolean-type-joe"><a class="header" href="#boolean-type-joe"><code>Boolean</code> type (<code>joe</code>)</a></h1>
 <hr />
 <p>The <code>Boolean</code> type has the expected values <code>true</code> and <code>false</code>.</p>
@@ -3335,38 +3342,46 @@ execution of a <code>Joe</code> script. A script can catch errors
 thrown during execution using the <a href="library/pkg.joe.html#function.catch"><code>catch()</code></a> function.</p>
 <p><strong><a href="library/type.joe.Error.html#init">Initializer</a></strong></p>
 <ul>
-<li><a href="library/type.joe.Error.html#init">Error(<em>message</em>, [<em>frames</em>...])</a> → <a href="library/type.joe.Error.html">Error</a></li>
+<li><a href="library/type.joe.Error.html#init">Error(<em>message</em>, [<em>trace</em>, ...])</a> → <a href="library/type.joe.Error.html">Error</a></li>
 </ul>
 <p><strong><a href="library/type.joe.Error.html#methods">Methods</a></strong></p>
 <ul>
+<li><a href="library/type.joe.Error.html#method.addInfo"><em>error</em>.addInfo(<em>message</em>)</a> → this</li>
 <li><a href="library/type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
-<li><a href="library/type.joe.Error.html#method.stackFrames"><em>error</em>.stackFrames()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.Error.html#method.stackTrace"><em>error</em>.stackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
+<li><a href="library/type.joe.Error.html#method.traces"><em>error</em>.traces()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.Error.html#method.type"><em>error</em>.type()</a> → name</li>
 </ul>
 <h2 id="init"><a class="header" href="#init">Error Initializer</a></h2>
 <hr />
-<p><strong>Error(<em>message</em>, [<em>frames</em>...]) → <a href="library/type.joe.Error.html">Error</a></strong></p>
-<p>Creates an <code>Error</code> with the given <em>message</em>.</p>
+<p><strong>Error(<em>message</em>, [<em>trace</em>, ...]) → <a href="library/type.joe.Error.html">Error</a></strong></p>
+<p>Creates an <code>Error</code> with the given <em>message</em> and optional information
+trace messages.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
+<p><span id="method.addInfo"> </span></p>
+<h3 id="erroraddinfo"><a class="header" href="#erroraddinfo"><em>error</em>.addInfo()</a></h3>
+<hr />
+<p><strong><em>error</em>.addInfo(<em>message</em>) → this</strong></p>
+<p>Adds an information message to the list of traces.</p>
 <p><span id="method.message"> </span></p>
 <h3 id="errormessage"><a class="header" href="#errormessage"><em>error</em>.message()</a></h3>
 <hr />
 <p><strong><em>error</em>.message() → text</strong></p>
 <p>Gets the actual error message</p>
-<p><span id="method.stackFrames"> </span></p>
-<h3 id="errorstackframes"><a class="header" href="#errorstackframes"><em>error</em>.stackFrames()</a></h3>
-<hr />
-<p><strong><em>error</em>.stackFrames() → <a href="library/type.joe.List.html">List</a></strong></p>
-<p>Returns the list of stack frame strings.  Clients may add to the list
-and rethrow the error.</p>
 <p><span id="method.stackTrace"> </span></p>
 <h3 id="errorstacktrace"><a class="header" href="#errorstacktrace"><em>error</em>.stackTrace()</a></h3>
 <hr />
 <p><strong><em>error</em>.stackTrace() → <a href="library/type.joe.String.html">String</a></strong></p>
 <p>Returns the complete error, including the initial error messages
 and all stack frames.</p>
+<p><span id="method.traces"> </span></p>
+<h3 id="errortraces"><a class="header" href="#errortraces"><em>error</em>.traces()</a></h3>
+<hr />
+<p><strong><em>error</em>.traces() → <a href="library/type.joe.List.html">List</a></strong></p>
+<p>Returns the list of trace strings.  Clients may add to the list
+using <a href="library/type.joe.Error.html#method.addInfo"><code>addInfo()</code></a>.
+and rethrow the error.</p>
 <p><span id="method.type"> </span></p>
 <h3 id="errortype"><a class="header" href="#errortype"><em>error</em>.type()</a></h3>
 <hr />
@@ -5053,6 +5068,7 @@ controls like the <a href="library/type.joe.win.Label.html"><code>Label</code></
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties"><a class="header" href="#properties">Properties</a></h2>
@@ -5123,6 +5139,7 @@ labels like <a href="library/type.joe.win.Button.html"><code>Button</code></a> w
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties-1"><a class="header" href="#properties-1">Properties</a></h2>
@@ -5207,6 +5224,7 @@ Joe classes can extend the <code>GridPane</code> type.</p>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties-2"><a class="header" href="#properties-2">Properties</a></h2>
@@ -5296,6 +5314,7 @@ widgets. Joe classes can extend the <code>HBox</code> type.</p>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties-3"><a class="header" href="#properties-3">Properties</a></h2>
@@ -5506,6 +5525,7 @@ labels like <a href="library/type.joe.win.Label.html"><code>Label</code></a> wid
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties-4"><a class="header" href="#properties-4">Properties</a></h2>
@@ -5536,10 +5556,11 @@ Joe classes can extend the <code>ListView</code> type.</p>
 </ul>
 <p><strong><a href="library/type.joe.win.ListView.html#methods">Methods</a></strong></p>
 <ul>
+<li><a href="library/type.joe.win.ListView.html#method.getItems"><em>listView</em>.getItems()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.ListView.html#method.getSelectedIndex"><em>listView</em>.getSelectedIndex()</a> → <a href="library/type.joe.Number.html">joe.Number</a></li>
 <li><a href="library/type.joe.win.ListView.html#method.getSelectedItem"><em>listView</em>.getSelectedItem()</a> → item</li>
 <li><a href="library/type.joe.win.ListView.html#method.item"><em>listView</em>.item(<em>item</em>)</a> → this</li>
-<li><a href="library/type.joe.win.ListView.html#method.items"><em>listView</em>.items()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
+<li><a href="library/type.joe.win.ListView.html#method.items"><em>listView</em>.items(<em>list</em>)</a> → this</li>
 <li><a href="library/type.joe.win.ListView.html#method.onSelect"><em>listView</em>.onSelect(<em>callable</em>)</a> → this</li>
 <li><a href="library/type.joe.win.ListView.html#method.placeholder"><em>listView</em>.placeholder(<em>node</em>)</a> → this</li>
 <li><a href="library/type.joe.win.ListView.html#method.placeholderText"><em>listView</em>.placeholderText(<em>text</em>)</a> → this</li>
@@ -5583,6 +5604,7 @@ Joe classes can extend the <code>ListView</code> type.</p>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties-5"><a class="header" href="#properties-5">Properties</a></h2>
@@ -5597,6 +5619,11 @@ those inherited from superclasses.</p>
 <p>Returns a <code>ListView</code>.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
+<p><span id="method.getItems"> </span></p>
+<h3 id="listviewgetitems"><a class="header" href="#listviewgetitems"><em>listView</em>.getItems()</a></h3>
+<hr />
+<p><strong><em>listView</em>.getItems() → <a href="library/type.joe.List.html">joe.List</a></strong></p>
+<p>Gets the list of the widget's items, which can be updated freely.</p>
 <p><span id="method.getSelectedIndex"> </span></p>
 <h3 id="listviewgetselectedindex"><a class="header" href="#listviewgetselectedindex"><em>listView</em>.getSelectedIndex()</a></h3>
 <hr />
@@ -5615,8 +5642,8 @@ those inherited from superclasses.</p>
 <p><span id="method.items"> </span></p>
 <h3 id="listviewitems"><a class="header" href="#listviewitems"><em>listView</em>.items()</a></h3>
 <hr />
-<p><strong><em>listView</em>.items() → <a href="library/type.joe.List.html">joe.List</a></strong></p>
-<p>Gets the list of the widget's items, which can be updated freely.</p>
+<p><strong><em>listView</em>.items(<em>list</em>) → this</strong></p>
+<p>Adds the contents of the <em>list</em> to the widgets list of items.</p>
 <p><span id="method.onSelect"> </span></p>
 <h3 id="listviewonselect"><a class="header" href="#listviewonselect"><em>listView</em>.onSelect()</a></h3>
 <hr />
@@ -5678,6 +5705,7 @@ in a parent <a href="library/type.joe.win.Menu.html"><code>Menu</code></a>.  It 
 <li><a href="library/type.joe.win.Menu.html#method.styleClasses"><em>menu</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Menu.html#method.styles"><em>menu</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Menu.html#method.text"><em>menu</em>.text(<em>text</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Menu.html#method.toString"><em>menu</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 </ul>
 <h2 id="properties-6"><a class="header" href="#properties-6">Properties</a></h2>
 <p>All <code>Node</code> widgets have the following properties.</p>
@@ -5769,6 +5797,11 @@ multiple style strings, which will be joined with semicolons.</p>
 <hr />
 <p><strong><em>menu</em>.text(<em>text</em>) → this</strong></p>
 <p>Sets the menu's text.</p>
+<p><span id="method.toString"> </span></p>
+<h3 id="menutostring"><a class="header" href="#menutostring"><em>menu</em>.toString()</a></h3>
+<hr />
+<p><strong><em>menu</em>.toString() → <a href="library/type.joe.String.html">joe.String</a></strong></p>
+<p>Returns the value's string representation.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="menubar-type-joewin"><a class="header" href="#menubar-type-joewin"><code>MenuBar</code> type (<code>joe.win</code>)</a></h1>
 <hr />
 <p><strong>Extends</strong>: <a href="library/type.joe.win.Control.html">Control</a><br></p>
@@ -5819,6 +5852,7 @@ labels like <a href="library/type.joe.win.MenuBar.html"><code>MenuBar</code></a>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties-7"><a class="header" href="#properties-7">Properties</a></h2>
@@ -5864,6 +5898,7 @@ All items must be instances of <a href="library/type.joe.win.Menu.html"><code>Me
 <li><a href="library/type.joe.win.MenuItem.html#method.styleClasses"><em>menuItem</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.MenuItem.html#method.styles"><em>menuItem</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.MenuItem.html#method.text"><em>menuItem</em>.text(<em>text</em>)</a> → this</li>
+<li><a href="library/type.joe.win.MenuItem.html#method.toString"><em>menuItem</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 </ul>
 <h2 id="properties-8"><a class="header" href="#properties-8">Properties</a></h2>
 <p>All <code>Node</code> widgets have the following properties.</p>
@@ -5951,6 +5986,11 @@ multiple style strings, which will be joined with semicolons.</p>
 <hr />
 <p><strong><em>menuItem</em>.text(<em>text</em>) → this</strong></p>
 <p>Sets the item's text.</p>
+<p><span id="method.toString"> </span></p>
+<h3 id="menuitemtostring"><a class="header" href="#menuitemtostring"><em>menuItem</em>.toString()</a></h3>
+<hr />
+<p><strong><em>menuItem</em>.toString() → <a href="library/type.joe.String.html">joe.String</a></strong></p>
+<p>Returns the value's string representation.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="node-type-joewin"><a class="header" href="#node-type-joewin"><code>Node</code> type (<code>joe.win</code>)</a></h1>
 <hr />
 <p><strong>Extended By</strong>: <a href="library/type.joe.win.Region.html">Region</a><br></p>
@@ -5979,6 +6019,7 @@ all widgets.</p>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties-9"><a class="header" href="#properties-9">Properties</a></h2>
@@ -6145,6 +6186,11 @@ be valid CSS style class names.</p>
 <p>Sets the node's FXCSS <code>#style</code> property.  The caller can pass
 multiple style strings, which will be joined with semicolons.</p>
 <p>See <a href="library/pkg.joe.win.html#topic.css">Styling with CSS</a> for more on using CSS.</p>
+<p><span id="method.toString"> </span></p>
+<h3 id="nodetostring"><a class="header" href="#nodetostring"><em>node</em>.toString()</a></h3>
+<hr />
+<p><strong><em>node</em>.toString() → <a href="library/type.joe.String.html">joe.String</a></strong></p>
+<p>Returns the value's string representation.</p>
 <p><span id="method.vgrow"> </span></p>
 <h3 id="nodevgrow"><a class="header" href="#nodevgrow"><em>node</em>.vgrow()</a></h3>
 <hr />
@@ -6266,6 +6312,7 @@ in the <code>values()</code> list.</p>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties-10"><a class="header" href="#properties-10">Properties</a></h2>
@@ -6511,6 +6558,7 @@ in the <code>values()</code> list.</p>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="constants"><a class="header" href="#constants">Constants</a></h2>
@@ -6616,6 +6664,7 @@ If a single value is given, it is used for all four sides.</p>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties-12"><a class="header" href="#properties-12">Properties</a></h2>
@@ -6770,6 +6819,7 @@ movable dividers between them.</p>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <p>If there are N children, then there are N-1 dividers between them,
@@ -6878,6 +6928,7 @@ Joe classes can extend the <code>StackPane</code> type.</p>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties-14"><a class="header" href="#properties-14">Properties</a></h2>
@@ -6937,6 +6988,7 @@ Joe classes can extend the <code>Tab</code> type.</p>
 <li><a href="library/type.joe.win.Tab.html#method.styles"><em>tab</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Tab.html#method.tabPane"><em>tab</em>.tabPane()</a> → <a href="library/type.joe.win.TabPane.html">TabPane</a></li>
 <li><a href="library/type.joe.win.Tab.html#method.text"><em>tab</em>.text(<em>text</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Tab.html#method.toString"><em>tab</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 </ul>
 <h2 id="properties-15"><a class="header" href="#properties-15">Properties</a></h2>
 <p>All <code>Node</code> widgets have the following properties.</p>
@@ -7034,6 +7086,11 @@ none.</p>
 <hr />
 <p><strong><em>tab</em>.text(<em>text</em>) → this</strong></p>
 <p>Sets the label's text.</p>
+<p><span id="method.toString"> </span></p>
+<h3 id="tabtostring"><a class="header" href="#tabtostring"><em>tab</em>.toString()</a></h3>
+<hr />
+<p><strong><em>tab</em>.toString() → <a href="library/type.joe.String.html">joe.String</a></strong></p>
+<p>Returns the value's string representation.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="tabpane-type-joewin"><a class="header" href="#tabpane-type-joewin"><code>TabPane</code> type (<code>joe.win</code>)</a></h1>
 <hr />
 <p><strong>Extends</strong>: <a href="library/type.joe.win.Control.html">Control</a><br></p>
@@ -7084,6 +7141,7 @@ contain <a href="library/type.joe.win.Tab.html"><code>Tab</code></a> objects.</p
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties-16"><a class="header" href="#properties-16">Properties</a></h2>
@@ -7165,6 +7223,7 @@ widgets. Joe classes can extend the <code>VBox</code> type.</p>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties-17"><a class="header" href="#properties-17">Properties</a></h2>
@@ -7356,7 +7415,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.html#function.typeName">typeName(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.AssertError.html">AssertError</a> extends <a href="library/type.joe.Error.html">Error</a>
 <ul>
-<li><a href="library/type.joe.AssertError.html#init">AssertError(<em>message</em>, [<em>frames</em>...])</a> → <a href="library/type.joe.AssertError.html">AssertError</a></li>
+<li><a href="library/type.joe.AssertError.html#init">AssertError(<em>message</em>, [<em>trace</em>, ...])</a> → <a href="library/type.joe.AssertError.html">AssertError</a></li>
 </ul>
 </li>
 <li><a href="library/type.joe.Boolean.html">Boolean</a>
@@ -7366,10 +7425,11 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.Error.html">Error</a>
 <ul>
-<li><a href="library/type.joe.Error.html#init">Error(<em>message</em>, [<em>frames</em>...])</a> → <a href="library/type.joe.Error.html">Error</a></li>
+<li><a href="library/type.joe.Error.html#init">Error(<em>message</em>, [<em>trace</em>, ...])</a> → <a href="library/type.joe.Error.html">Error</a></li>
+<li><a href="library/type.joe.Error.html#method.addInfo"><em>error</em>.addInfo(<em>message</em>)</a> → this</li>
 <li><a href="library/type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
-<li><a href="library/type.joe.Error.html#method.stackFrames"><em>error</em>.stackFrames()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.Error.html#method.stackTrace"><em>error</em>.stackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
+<li><a href="library/type.joe.Error.html#method.traces"><em>error</em>.traces()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.Error.html#method.type"><em>error</em>.type()</a> → name</li>
 </ul>
 </li>
@@ -7686,10 +7746,11 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.ListView.html">ListView</a> extends <a href="library/type.joe.win.Control.html">Control</a>
 <ul>
 <li><a href="library/type.joe.win.ListView.html#init">ListView()</a> → <a href="library/type.joe.win.ListView.html">ListView</a></li>
+<li><a href="library/type.joe.win.ListView.html#method.getItems"><em>listView</em>.getItems()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.ListView.html#method.getSelectedIndex"><em>listView</em>.getSelectedIndex()</a> → <a href="library/type.joe.Number.html">joe.Number</a></li>
 <li><a href="library/type.joe.win.ListView.html#method.getSelectedItem"><em>listView</em>.getSelectedItem()</a> → item</li>
 <li><a href="library/type.joe.win.ListView.html#method.item"><em>listView</em>.item(<em>item</em>)</a> → this</li>
-<li><a href="library/type.joe.win.ListView.html#method.items"><em>listView</em>.items()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
+<li><a href="library/type.joe.win.ListView.html#method.items"><em>listView</em>.items(<em>list</em>)</a> → this</li>
 <li><a href="library/type.joe.win.ListView.html#method.onSelect"><em>listView</em>.onSelect(<em>callable</em>)</a> → this</li>
 <li><a href="library/type.joe.win.ListView.html#method.placeholder"><em>listView</em>.placeholder(<em>node</em>)</a> → this</li>
 <li><a href="library/type.joe.win.ListView.html#method.placeholderText"><em>listView</em>.placeholderText(<em>text</em>)</a> → this</li>
@@ -7713,6 +7774,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Menu.html#method.styleClasses"><em>menu</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Menu.html#method.styles"><em>menu</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Menu.html#method.text"><em>menu</em>.text(<em>text</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Menu.html#method.toString"><em>menu</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 </ul>
 </li>
 <li><a href="library/type.joe.win.MenuBar.html">MenuBar</a> extends <a href="library/type.joe.win.Control.html">Control</a>
@@ -7736,6 +7798,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.MenuItem.html#method.styleClasses"><em>menuItem</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.MenuItem.html#method.styles"><em>menuItem</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.MenuItem.html#method.text"><em>menuItem</em>.text(<em>text</em>)</a> → this</li>
+<li><a href="library/type.joe.win.MenuItem.html#method.toString"><em>menuItem</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 </ul>
 </li>
 <li><a href="library/type.joe.win.Node.html">Node</a>
@@ -7760,6 +7823,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="library/type.joe.List.html">joe.List</a></li>
 <li><a href="library/type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="library/type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 <li><a href="library/type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 </li>
@@ -7883,6 +7947,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.win.Tab.html#method.styles"><em>tab</em>.styles(<em>style</em>, ...)</a> → this</li>
 <li><a href="library/type.joe.win.Tab.html#method.tabPane"><em>tab</em>.tabPane()</a> → <a href="library/type.joe.win.TabPane.html">TabPane</a></li>
 <li><a href="library/type.joe.win.Tab.html#method.text"><em>tab</em>.text(<em>text</em>)</a> → this</li>
+<li><a href="library/type.joe.win.Tab.html#method.toString"><em>tab</em>.toString()</a> → <a href="library/type.joe.String.html">joe.String</a></li>
 </ul>
 </li>
 <li><a href="library/type.joe.win.TabPane.html">TabPane</a> extends <a href="library/type.joe.win.Control.html">Control</a>

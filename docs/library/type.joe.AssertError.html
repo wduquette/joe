@@ -183,20 +183,21 @@ script can catch errors thrown during execution using
 the <a href="pkg.joe.html#function.catch"><code>catch()</code></a> function.</p>
 <p><strong><a href="#init">Initializer</a></strong></p>
 <ul>
-<li><a href="type.joe.AssertError.html#init">AssertError(<em>message</em>, [<em>frames</em>...])</a> → <a href="type.joe.AssertError.html">AssertError</a></li>
+<li><a href="type.joe.AssertError.html#init">AssertError(<em>message</em>, [<em>trace</em>, ...])</a> → <a href="type.joe.AssertError.html">AssertError</a></li>
 </ul>
 <p><strong>Error Methods</strong></p>
 <ul>
+<li><a href="type.joe.Error.html#method.addInfo"><em>error</em>.addInfo(<em>message</em>)</a> → this</li>
 <li><a href="type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
-<li><a href="type.joe.Error.html#method.stackFrames"><em>error</em>.stackFrames()</a> → <a href="type.joe.List.html">List</a></li>
 <li><a href="type.joe.Error.html#method.stackTrace"><em>error</em>.stackTrace()</a> → <a href="type.joe.String.html">String</a></li>
+<li><a href="type.joe.Error.html#method.traces"><em>error</em>.traces()</a> → <a href="type.joe.List.html">List</a></li>
 <li><a href="type.joe.Error.html#method.type"><em>error</em>.type()</a> → name</li>
 </ul>
 <h2 id="init"><a class="header" href="#init">AssertError Initializer</a></h2>
 <hr />
-<p><strong>AssertError(<em>message</em>, [<em>frames</em>...]) → <a href="type.joe.AssertError.html">AssertError</a></strong></p>
-<p>Creates an <code>AssertError</code> with the given <em>message</em> and stack frame
-strings.</p>
+<p><strong>AssertError(<em>message</em>, [<em>trace</em>, ...]) → <a href="type.joe.AssertError.html">AssertError</a></strong></p>
+<p>Creates an <code>AssertError</code> with the given <em>message</em> and informational
+trace messages.</p>
 
                     </main>
 

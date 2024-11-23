@@ -38,7 +38,7 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
     private NativeFunction initializer = null;
 
     // The instance methods
-    private final Map<String, JoeValueCallable<V>> methods = new HashMap<>();
+    private final Map<String, JoeValueLambda<V>> methods = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -76,10 +76,10 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
     /**
      * Defines a static method for the type.
      * @param name The method name
-     * @param callable The callable that implements the method.
+     * @param joeLambda The lambda that implements the method.
      */
-    public void staticMethod(String name, JoeCallable callable) {
-        staticMethods.put(name, new NativeFunction(name, "static method", callable));
+    public void staticMethod(String name, JoeLambda joeLambda) {
+        staticMethods.put(name, new NativeFunction(name, "static method", joeLambda));
     }
 
     /**
@@ -106,10 +106,10 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
     /**
      * Defines an initializer for this type.  This defines a global
      * function named after the type.
-     * @param callable The callable
+     * @param joeLambda The lambda that implements the initializer
      */
-    public void initializer(JoeCallable callable) {
-        this.initializer = new NativeFunction(name, "initializer", callable);
+    public void initializer(JoeLambda joeLambda) {
+        this.initializer = new NativeFunction(name, "initializer", joeLambda);
     }
 
     /**
@@ -127,7 +127,7 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
      * @param name The method name
      * @param callable The value callable that implements the method.
      */
-    public void method(String name, JoeValueCallable<V> callable) {
+    public void method(String name, JoeValueLambda<V> callable) {
         methods.put(name, callable);
     }
 
@@ -167,7 +167,7 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
     }
 
     //-------------------------------------------------------------------------
-    // Initializer implementation
+    // JoeCallable implementation (for type constructor)
 
     @Override
     public Object call(Joe joe, Args args) {
@@ -180,6 +180,21 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
             throw new JoeError("Type " + name +
                 " cannot be instantiated at the script level.");
         }
+    }
+
+    @Override
+    public String callableType() {
+        return "native initializer";
+    }
+
+    @Override
+    public String signature() {
+        return name + "(...)";
+    }
+
+    @Override
+    public boolean isScripted() {
+        return false;
     }
 
     //-------------------------------------------------------------------------

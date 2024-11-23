@@ -49,15 +49,15 @@ public class AssertErrorProxy extends TypeProxy<AssertError> {
 
     //**
     // @init
-    // @args message, [frames...]
-    // Creates an `AssertError` with the given *message* and stack frame
-    // strings.
+    // @args message, [trace, ...]
+    // Creates an `AssertError` with the given *message* and informational
+    // trace messages.
     private Object _initializer(Joe joe, Args args) {
-        args.minArity(1, "AssertError(message,[frames...])");
+        args.minArity(1, "AssertError(message,[trace, ...])");
         var error = new AssertError(joe.stringify(args.next()));
 
         while (args.hasNext()) {
-            error.getFrames().add(joe.stringify(args.next()));
+            error.addInfo(joe.stringify(args.next()));
         }
 
         return error;

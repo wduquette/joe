@@ -1,9 +1,6 @@
 package com.wjduquette.joe.types;
 
-import com.wjduquette.joe.Args;
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.TypeProxy;
+import com.wjduquette.joe.*;
 
 /**
  * The type proxy for {@link JoeError} values.
@@ -31,9 +28,10 @@ public class ErrorProxy extends TypeProxy<JoeError> {
 
         initializer(this::_initializer);
 
-        method("stackFrames", this::_stackFrames);
-        method("stackTrace",  this::_stackTrace);
+        method("addInfo",     this::_addInfo);
         method("message",     this::_message);
+        method("stackTrace",  this::_stackTrace);
+        method("traces",      this::_traces);
         method("type",        this::_type);
     }
 
@@ -50,14 +48,15 @@ public class ErrorProxy extends TypeProxy<JoeError> {
 
     //**
     // @init
-    // @args message, [frames...]
-    // Creates an `Error` with the given *message*.
+    // @args message, [trace, ...]
+    // Creates an `Error` with the given *message* and optional information
+    // trace messages.
     private Object _initializer(Joe joe, Args args) {
-        args.minArity(1, "Error(message, [frames...])");
+        args.minArity(1, "Error(message, [trace, ...])");
         var error = new JoeError(joe.stringify(args.next()));
 
         while (args.hasNext()) {
-            error.getFrames().add(joe.stringify(args.next()));
+            error.addInfo(joe.stringify(args.next()));
         }
 
         return error;
@@ -67,13 +66,22 @@ public class ErrorProxy extends TypeProxy<JoeError> {
     // Method Implementations
 
     //**
-    // @method stackFrames
-    // @result List
-    // Returns the list of stack frame strings.  Clients may add to the list
-    // and rethrow the error.
-    private Object _stackFrames(JoeError error, Joe joe, Args args) {
-        args.exactArity(0, "stackFrames()");
-        return joe.wrapList(error.getFrames(), String.class);
+    // @method addInfo
+    // @args message
+    // @result this
+    // Adds an information message to the list of traces.
+    private Object _addInfo(JoeError error, Joe joe, Args args) {
+        args.exactArity(1, "addInfo(message)");
+        return error.addInfo(joe.stringify(args.next()));
+    }
+
+    //**
+    // @method message
+    // @result text
+    // Gets the actual error message
+    private Object _message(JoeError error, Joe joe, Args args) {
+        args.exactArity(0, "message()");
+        return error.getMessage();
     }
 
     //**
@@ -87,13 +95,18 @@ public class ErrorProxy extends TypeProxy<JoeError> {
     }
 
     //**
-    // @method message
-    // @result text
-    // Gets the actual error message
-    private Object _message(JoeError error, Joe joe, Args args) {
-        args.exactArity(0, "message()");
-        return error.getMessage();
+    // @method traces
+    // @result List
+    // Returns the list of trace strings.  Clients may add to the list
+    // using [[Error#method.addInfo]].
+    // and rethrow the error.
+    private Object _traces(JoeError error, Joe joe, Args args) {
+        args.exactArity(0, "traces()");
+        return new ListValue(error.getTraces().stream()
+            .map(Trace::message)
+            .toList());
     }
+
 
     //**
     // @method type

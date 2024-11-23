@@ -98,14 +98,4 @@ public class SourceBufferTest extends Ted {
         check(buff.lineSpan(1).text()).eq("abc\n");
         check(buff.lineSpan(2).text()).eq("def");
     }
-
-    @Test
-    public void testSynthetic() {
-        var span = SourceBuffer.synthetic("xyz");
-        check(span.text()).eq("xyz");
-        checkThrow(span::buffer);
-        checkThrow(span::filename);
-        checkThrow(span::start);
-        checkThrow(span::end);
-    }
 }

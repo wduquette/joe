@@ -4,16 +4,20 @@ import com.wjduquette.joe.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.wjduquette.joe.SourceBuffer.Span;
 
 /**
  * A class defined in a Joe script.
  */
-class ScriptedClass implements JoeClass, JoeObject {
+class WalkerClass implements JoeClass, JoeObject {
     //-------------------------------------------------------------------------
     // Instance Variables
 
     // The class name
     private final String name;
+
+    // The class's span in the source code.
+    private final Span classSpan;
 
     // The superclass, or null
     private final JoeClass superclass;
@@ -34,16 +38,25 @@ class ScriptedClass implements JoeClass, JoeObject {
      * @param superclass The superclass, or null
      * @param methods The map of methods by name
      */
-    ScriptedClass(
+    WalkerClass(
         String name,
+        Span classSpan,
         JoeClass superclass,
         Map<String, WalkerFunction> staticMethods,
         Map<String, WalkerFunction> methods
     ) {
         this.name = name;
+        this.classSpan = classSpan;
         this.superclass = superclass;
         this.staticMethods = staticMethods;
         this.methods = methods;
+    }
+
+    //-------------------------------------------------------------------------
+    // ScriptedClass API
+
+    public Span classSpan() {
+        return classSpan;
     }
 
     //-------------------------------------------------------------------------
@@ -80,17 +93,44 @@ class ScriptedClass implements JoeClass, JoeObject {
     }
 
     @Override
+    public boolean canBeExtended() {
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
+    // JoeCallable API
+
+    @Override
     public Object call(Joe joe, Args args) {
         JoeObject instance = make(joe, this);
         JoeCallable initializer = bind(instance, INIT);
         if (initializer != null) {
-            initializer.call(joe, args);
+            try {
+                initializer.call(joe, args);
+            } catch (JoeError ex) {
+                throw ex.addFrame("In method " + initializer.signature());
+            }
         }
         return instance;
     }
 
     @Override
-    public boolean canBeExtended() {
+    public String callableType() {
+        return "class";
+    }
+
+    @Override
+    public String signature() {
+        var method = methods.get(INIT);
+        if (method == null) {
+            return name + "()";
+        } else {
+            return name + method.signature().substring(INIT.length());
+        }
+    }
+
+    @Override
+    public boolean isScripted() {
         return true;
     }
 

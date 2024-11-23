@@ -10,8 +10,13 @@ class WalkerInstance implements JoeObject {
     private final JoeClass joeClass;
     private final Map<String, Object> fields = new HashMap<>();
 
+    // Default "toString()" implementation.
+    private final JoeCallable _toString;
+
     WalkerInstance(JoeClass joeClass) {
         this.joeClass = joeClass;
+        this._toString = new NativeMethod<>(this, "toString",
+            (objc, joe, args) -> this.toString());
     }
 
     @Override
@@ -29,7 +34,7 @@ class WalkerInstance implements JoeObject {
         if (method != null) return method;
 
         if (name.equals(TO_STRING)) {
-            return (JoeCallable)(joe, args) -> this.toString();
+            return _toString;
         }
 
         throw new JoeError("Undefined property '" + name + "'.");

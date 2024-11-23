@@ -54,4 +54,19 @@ public interface Engine {
      */
     Object run(String filename, String source) throws SyntaxError, JoeError;
 
+    /**
+     * Calls a JoeCallable value with the given arguments.
+     * @param callee A Joe value which must be callable.
+     * @param args The arguments to pass to the callable
+     * @return The result of calling the callable.
+     */
+    Object call(Object callee, Object... args);
+
+    /**
+     * Returns true if the callee is callable in this engine,
+     * and false otherwise.
+     * @param callee The callee
+     * @return true or false
+     */
+    boolean isCallable(Object callee);
 }

@@ -17,7 +17,7 @@ public class Tuple implements JoeObject {
     // Static Variables
     public static final Keyword ANY = new Keyword("_");
 
-    private static final Map<String, JoeValueCallable<Tuple>> METHODS =
+    private static final Map<String, JoeValueLambda<Tuple>> METHODS =
         new HashMap<>();
 
     static {

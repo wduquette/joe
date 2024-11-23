@@ -87,6 +87,9 @@ final class WalkerFunction implements JoeCallable, HasTypeName {
             isInitializer);
     }
 
+    //-------------------------------------------------------------------------
+    // JoeCallable API
+
     @Override
     public Object call(Joe joe, Args args) {
         // FIRST, check the arity
@@ -119,17 +122,26 @@ final class WalkerFunction implements JoeCallable, HasTypeName {
         } catch (Return returnValue) {
             if (isInitializer) return closure.getAt(0, "this");
             return returnValue.value;
-        } catch (JoeError ex) {
-            if (!kind().equals("lambda")) {
-                ex.getFrames().add("In " + kind() + " " + name() +
-                    "(" + joe.join(", ", args.asList()) + ")");
-            } else {
-                ex.getFrames().add("In " + kind() + " \\" +
-                    joe.join(", ", args.asList()) + " -> ...");
-            }
-            throw ex;
         }
     }
+
+    @Override
+    public String callableType() {
+        return kind();
+    }
+
+    @Override
+    public String signature() {
+        return signature;
+    }
+
+    @Override
+    public boolean isScripted() {
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
+    // Object API
 
     @Override
     public String toString() {

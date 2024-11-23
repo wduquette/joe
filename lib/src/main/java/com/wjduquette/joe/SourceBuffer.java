@@ -5,20 +5,6 @@ import java.util.List;
 
 public class SourceBuffer {
     //-------------------------------------------------------------------------
-    // Static API
-
-    /**
-     * Creates a synthetic span, unrelated to an actual source script.
-     * Methods that require a `SourceBuffer` throw
-     * `UnsupportedOperationException`.
-     * @param text The text
-     * @return The span.
-     */
-    public static Span synthetic(String text) {
-        return new SyntheticSpan(text);
-    }
-
-    //-------------------------------------------------------------------------
     // Instance Variables
 
     // The buffer's ID; this is usually the filename of a script file.
@@ -133,7 +119,7 @@ public class SourceBuffer {
      * @return The span
      */
     public Span span(int start, int end) {
-        return new BufferSpan(start, end);
+        return new Span(start, end);
     }
 
     public Span lineSpan(int line) {
@@ -160,115 +146,21 @@ public class SourceBuffer {
     /**
      * A span of text from a source file.
      */
-    public interface Span {
-        /**
-         * The source buffer to which this span belongs.
-         * @return The buffer
-         */
-        SourceBuffer buffer();
-
-        /**
-         * The filename from which the span was drawn (or some other identifier).
-         * @return the filename
-         */
-        String filename();
-
-        /**
-         * The text of the span.
-         * @return The text.
-         */
-        String text();
-
-        /**
-         * The start index of this span.
-         * @return The index
-         */
-        int start();
-
-        /**
-         * The end index of this span.
-         * @return The index
-         */
-        int end();
-
-        /**
-         * Gets the number of the line containing the start of the span.
-         * @return The line
-         */
-        default int startLine() {
-            return buffer().index2line(start());
-        }
-
-        /**
-         * Gets the number of the line containing the end of the span.
-         * @return The line
-         */
-        default int endLine() {
-            return buffer().index2line(end());
-        }
-
-        /**
-         * Gets the position (line,column) of the start of the span
-         * in the source.
-         * @return The position
-         */
-        default Position startPosition() {
-            return buffer().index2position(start());
-        }
-
-        /**
-         * Gets the position (line,column) of the end of the span
-         * in the source.
-         * @return The position
-         */
-        default Position endPosition() {
-            return buffer().index2position(end());
-        }
-
-        /**
-         * Whether is a synthetic span or not.  Synthetic spans are
-         * used internally, but should not be exposed to the client.
-         */
-        default boolean isSynthetic() {
-            return false;
-        }
-    }
-
-    private record SyntheticSpan(String text) implements Span {
-        @Override public boolean isSynthetic() { return true; }
-
-        @Override public SourceBuffer buffer() {
-            throw new UnsupportedOperationException("Synthetic span");
-        }
-
-        @Override public String filename() {
-            throw new UnsupportedOperationException("Synthetic span");
-        }
-
-        @Override public int start() {
-            throw new UnsupportedOperationException("Synthetic span");
-        }
-
-        @Override public int end() {
-            throw new UnsupportedOperationException("Synthetic span");
-        }
-
-        @Override public String toString() {
-            return "Span[" + text + "]";
-        }
-    }
-
-    private class BufferSpan implements Span {
+    public class Span {
         //---------------------------------------------------------------------
         // Instance variables
 
+        // Index of first source character in the span.
         private final int start;
+
+        // Index of the character following the last source character in
+        // the span.  Might be source.length().
         private final int end;
 
         //---------------------------------------------------------------------
         // Constructor
 
-        public BufferSpan(int start, int end) {
+        public Span(int start, int end) {
             this.start = start;
             this.end = end;
         }
@@ -276,17 +168,73 @@ public class SourceBuffer {
         //---------------------------------------------------------------------
         // Methods
 
+        /**
+         * The source buffer to which this span belongs.
+         * @return The buffer
+         */
+        public SourceBuffer buffer() { return SourceBuffer.this; }
 
-        @Override public SourceBuffer buffer() { return SourceBuffer.this; }
-        @Override public String filename() { return filename; }
-        @Override public String text() { return source.substring(start, end); }
-        @Override public int start() { return start; }
-        @Override public int end() { return end; }
+        /**
+         * The filename from which the span was drawn (or some other identifier).
+         * @return the filename
+         */
+        public String filename() { return filename; }
+
+        /**
+         * The text of the span.
+         * @return The text.
+         */
+        public String text() { return source.substring(start, end); }
+
+        /**
+         * The start index of this span.
+         * @return The index
+         */
+        public int start() { return start; }
+
+        /**
+         * The end index of this span.
+         * @return The index
+         */
+        public int end() { return end; }
+
+        /**
+         * Gets the number of the line containing the start of the span.
+         * @return The line
+         */
+        public int startLine() {
+            return index2line(start());
+        }
+
+        /**
+         * Gets the number of the line containing the end of the span.
+         * @return The line
+         */
+        public int endLine() {
+            return index2line(end());
+        }
+
+        /**
+         * Gets the position (line,column) of the start of the span
+         * in the source.
+         * @return The position
+         */
+        public Position startPosition() {
+            return index2position(start());
+        }
+
+        /**
+         * Gets the position (line,column) of the end of the span
+         * in the source.
+         * @return The position
+         */
+        public Position endPosition() {
+            return index2position(end());
+        }
 
         @Override public String toString() {
             return "Span[" + filename + ",@" + startPosition() +
                 " (" + start + ")," + text() + "]";
         }
-
     }
 }

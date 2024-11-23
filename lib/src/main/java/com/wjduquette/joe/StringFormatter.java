@@ -62,11 +62,9 @@ public class StringFormatter {
                     } else if (arg instanceof Integer num) {
                         yield (double)num;
                     }
-                    throw new JoeError(
-                        "Conversion expected a number, got: " +
-                            joe.typeName(arg) + " '" +
-                            joe.stringify(arg) + "'.",
-                        "In format '" + fmt + "'.");
+                    throw new JoeError("Conversion expected a number, got: " +
+                            joe.typedValue(arg) + ".")
+                        .addInfo("In format '" + fmt + "'.");
                 }
                 case INT -> {
                     if (arg instanceof Double d) {
@@ -74,11 +72,9 @@ public class StringFormatter {
                     } else if (arg instanceof Integer) {
                         yield arg;
                     }
-                    throw new JoeError(
-                        "Conversion expected a number, got: " +
-                            joe.typeName(arg) + " '" +
-                            joe.stringify(arg) + "'.",
-                        "In format '" + fmt + "'.");
+                    throw new JoeError("Conversion expected a number, got: " +
+                            joe.typedValue(arg) + ".")
+                        .addInfo("In format '" + fmt + "'.");
                 }
             };
         }

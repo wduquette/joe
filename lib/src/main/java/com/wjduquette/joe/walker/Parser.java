@@ -65,6 +65,7 @@ class Parser {
 
     private Stmt classDeclaration() {
         // Class Name
+        int start = previous().span().start();
         Token name = consume(IDENTIFIER, "Expected class name.");
 
         // Superclass
@@ -87,7 +88,7 @@ class Parser {
                 methods.add(functionDeclaration("method"));
             } else if (match(STATIC)) {
                 if (match(METHOD)) {
-                    staticMethods.add(functionDeclaration("method"));
+                    staticMethods.add(functionDeclaration("static method"));
                 } else {
                     consume(LEFT_BRACE,
                         "Expected 'method' or '{' after 'static'.");
@@ -100,8 +101,10 @@ class Parser {
         }
 
         consume(RIGHT_BRACE, "Expected '}' after class body.");
+        int end = previous().span().end();
+        var classSpan = source.span(start, end);
 
-        return new Stmt.Class(name, superclass,
+        return new Stmt.Class(name, classSpan, superclass,
             staticMethods, methods, staticInitializer);
     }
 

@@ -1,6 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import java.util.List;
+import com.wjduquette.joe.SourceBuffer.Span;
 
 /**
  * The statements that can appear in a Joe AST.
@@ -36,6 +37,7 @@ sealed interface Stmt
     /**
      * A class declaration
      * @param name The class name
+     * @param classSpan The class's span in the source script.
      * @param superclass The superclass variable, or null for none
      * @param staticMethods The class object's static methods
      * @param methods The class's instance methods
@@ -43,6 +45,7 @@ sealed interface Stmt
      */
     record Class(
         Token name,
+        Span classSpan,
         Expr.Variable superclass,
         List<Stmt.Function> staticMethods,
         List<Stmt.Function> methods,

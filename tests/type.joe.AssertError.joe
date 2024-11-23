@@ -5,13 +5,13 @@
 function testInitializer_noFrames() {
     var err = AssertError("Failure");
     check(err.message()).eq("Failure");
-    check(err.stackFrames()).isEmpty();
+    check(err.traces()).isEmpty();
 }
 
 function testInitializer_frames() {
     var err = AssertError("Failure", "A", "B");
     check(err.message()).eq("Failure");
-    check(err.stackFrames()).eq(List("A", "B"));
+    check(err.traces()).eq(List("A", "B"));
 }
 
 function testCanThrow() {

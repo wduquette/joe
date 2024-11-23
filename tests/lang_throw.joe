@@ -5,24 +5,25 @@
 function testThrowString() {
     assertError(\-> { throw "Simulated Error."; }
         , "Simulated Error."
-        , "In lambda \\ -> ...");
+        , "In lambda \\");
 }
 
 function testThrowAnything() {
     assertError(\-> { throw #bogus; }
         , "#bogus"
-        , "In lambda \\ -> ...");
+        , "In lambda \\");
 }
 
 function testRethrow_withFrame() {
     var tuple = catch(\-> { throw "Simulated Error."; });
     var err = tuple.error;
-    err.stackFrames().add("Added detail.");
+    err.addInfo("Added detail.");
+    println(err.stackTrace());
     assertError(\-> { throw err; }
         , "Simulated Error."
-        , "In lambda \\ -> ..."
-        , "Added detail."
-        , "In lambda \\ -> ...");
+        , "In lambda \\"
+        , "In java call(<lambda \\>)"
+        , "Added detail.");
 }
 
 function testStackFrames() {
@@ -40,17 +41,17 @@ function testStackFrames() {
 
     assertError(\-> bob(2, 3)
         , "Simulated Error"
-        , "In function ted(2, 10)"
-        , "In function dave(2, 5)"
-        , "In function bob(2, 3)"
-        , "In lambda \\ -> ..."
+        , "In function ted(a, b)"
+        , "In function dave(x, y)"
+        , "In function bob(a, b)"
+        , "In lambda \\"
     );
 }
 
 function testNativeFunction_stackFrames() {
     assertError(\-> println(1, 2)
         , "Wrong number of arguments, expected: println([text])."
-        , "In native function println(1, 2)"
-        , "In lambda \\ -> ..."
+        , "In native function println(...)"
+        , "In lambda \\"
     );
 }
