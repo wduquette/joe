@@ -118,9 +118,21 @@ public class JoeError extends RuntimeException {
      */
     public String getTraceReport() {
         var list = new ArrayList<String>();
+        var includedSourceContext = false;
         for (var trace : traces) {
             if (trace.hasContext()) {
                 list.add(trace.message() + " " + location(trace.context()));
+                if (!includedSourceContext) {
+                    includedSourceContext = true;
+
+                    var buff = trace.context().buffer();
+                    var line = trace.context().startLine();
+                    var first = (Math.max(line - 1, 1));
+                    var last = (Math.min(line + 1, buff.lineCount()));
+                    for (var i = first; i <= last; i++) {
+                        list.add(String.format("  %03d %s", i, buff.line(i)));
+                    }
+                }
             } else {
                 list.add(trace.message());
             }

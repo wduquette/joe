@@ -94,6 +94,9 @@ public class JoeTest extends Ted {
         var trace = """
             Simulated error!
               In function c(x) (*test*:8)
+                007 function c(x) {
+                008     throw "Simulated error!";
+                009 }
               In function b(x) (*test*:5)
               In function a(x) (*test*:2)
               In <script> (*test*:10)
@@ -120,6 +123,9 @@ public class JoeTest extends Ted {
         var trace = """
             Simulated Error
               In lambda \\ (*test*:5)
+                004 function b(x) {
+                005     return c(\\-> {throw "Simulated Error"; });
+                006 }
               In function c(callable) (*test*:8)
               In function b(x) (*test*:5)
               In function a(x) (*test*:2)
@@ -149,6 +155,9 @@ public class JoeTest extends Ted {
         var trace = """
             Simulated error!
               In method c(x) (*test*:9)
+                008     method c(x) {
+                009         throw "Simulated error!";
+                010     }
               In method b(x) (*test*:6)
               In method a(x) (*test*:3)
               In <script> (*test*:12)
@@ -174,6 +183,9 @@ public class JoeTest extends Ted {
         var trace = """
             Simulated error!
               In method init(x) (*test*:3)
+                002     method init(x) {
+                003         throw "Simulated error!";
+                004     }
               In class Thing(x) (*test*:3)
               In function make(x) (*test*:7)
               In <script> (*test*:9)
@@ -202,6 +214,9 @@ public class JoeTest extends Ted {
         var trace = """
             Simulated error!
               In static method c(x) (*test*:9)
+                008     static method c(x) {
+                009         throw "Simulated error!";
+                010     }
               In static method b(x) (*test*:6)
               In static method a(x) (*test*:3)
               In <script> (*test*:12)
@@ -223,6 +238,9 @@ public class JoeTest extends Ted {
         var trace = """
             Simulated error!
               In static initializer for Thing (*test*:3)
+                002     static {
+                003         throw "Simulated error!";
+                004     }
               In <script> (*test*:5)
             """;
         dumpScript(script);
@@ -243,6 +261,9 @@ public class JoeTest extends Ted {
             Expected callable, got: Boolean 'false'.
               In native function passThrough(...)
               In function a(x) (*test*:2)
+                001 function a(x) {
+                002     return passThrough(x);
+                003 }
               In <script> (*test*:4)
             """;
         dumpScript(script);
@@ -262,6 +283,9 @@ public class JoeTest extends Ted {
             Expected number, got: Boolean 'false'.
               In native static method abs(...)
               In function a(x) (*test*:2)
+                001 function a(x) {
+                002     return Number.abs(x);
+                003 }
               In <script> (*test*:4)
             """;
         dumpScript(script);
@@ -281,6 +305,9 @@ public class JoeTest extends Ted {
             Expected numeric string, got: String 'false'.
               In native initializer Number(...)
               In function a(x) (*test*:2)
+                001 function a(x) {
+                002     return Number(x);
+                003 }
               In <script> (*test*:4)
             """;
         dumpScript(script);
@@ -289,7 +316,7 @@ public class JoeTest extends Ted {
 
     @Test
     public void testStackTrace_nativePassThrough() {
-        test("testStackTrace_nativeThrough");
+        test("testStackTrace_nativePassThrough");
         joe.installGlobalFunction("passThrough", this::_passThrough);
         var script = """
             function a(x) {
@@ -303,6 +330,9 @@ public class JoeTest extends Ted {
         var trace = """
             Simulated error!
               In function c() (*test*:5)
+                004 function c() {
+                005     throw "Simulated error!";
+                006 }
               In java call(<function c()>)
               In native function passThrough(...)
               In function a(x) (*test*:2)
@@ -327,6 +357,9 @@ public class JoeTest extends Ted {
         var trace = """
             Expected a callable, got: Number '0'.
               In function b(x) (*test*:5)
+                004 function b(x) {
+                005     return x();
+                006 }
               In function a(x) (*test*:2)
               In <script> (*test*:7)
             """;
