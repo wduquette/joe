@@ -184,10 +184,11 @@ Joe classes can extend the <code>ListView</code> type.</p>
 </ul>
 <p><strong><a href="#methods">Methods</a></strong></p>
 <ul>
+<li><a href="type.joe.win.ListView.html#method.getItems"><em>listView</em>.getItems()</a> → <a href="type.joe.List.html">joe.List</a></li>
 <li><a href="type.joe.win.ListView.html#method.getSelectedIndex"><em>listView</em>.getSelectedIndex()</a> → <a href="type.joe.Number.html">joe.Number</a></li>
 <li><a href="type.joe.win.ListView.html#method.getSelectedItem"><em>listView</em>.getSelectedItem()</a> → item</li>
 <li><a href="type.joe.win.ListView.html#method.item"><em>listView</em>.item(<em>item</em>)</a> → this</li>
-<li><a href="type.joe.win.ListView.html#method.items"><em>listView</em>.items()</a> → <a href="type.joe.List.html">joe.List</a></li>
+<li><a href="type.joe.win.ListView.html#method.items"><em>listView</em>.items(<em>list</em>)</a> → this</li>
 <li><a href="type.joe.win.ListView.html#method.onSelect"><em>listView</em>.onSelect(<em>callable</em>)</a> → this</li>
 <li><a href="type.joe.win.ListView.html#method.placeholder"><em>listView</em>.placeholder(<em>node</em>)</a> → this</li>
 <li><a href="type.joe.win.ListView.html#method.placeholderText"><em>listView</em>.placeholderText(<em>text</em>)</a> → this</li>
@@ -231,6 +232,7 @@ Joe classes can extend the <code>ListView</code> type.</p>
 <li><a href="type.joe.win.Node.html#method.splitResizeWithParent"><em>node</em>.splitResizeWithParent(<em>flag</em>)</a> → this</li>
 <li><a href="type.joe.win.Node.html#method.styleClasses"><em>node</em>.styleClasses()</a> → <a href="type.joe.List.html">joe.List</a></li>
 <li><a href="type.joe.win.Node.html#method.styles"><em>node</em>.styles(<em>style</em>, ...)</a> → this</li>
+<li><a href="type.joe.win.Node.html#method.toString"><em>node</em>.toString()</a> → <a href="type.joe.String.html">joe.String</a></li>
 <li><a href="type.joe.win.Node.html#method.vgrow"><em>node</em>.vgrow([<em>priority</em>])</a> → this</li>
 </ul>
 <h2 id="properties"><a class="header" href="#properties">Properties</a></h2>
@@ -245,6 +247,11 @@ those inherited from superclasses.</p>
 <p>Returns a <code>ListView</code>.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
+<p><span id="method.getItems"> </span></p>
+<h3 id="listviewgetitems"><a class="header" href="#listviewgetitems"><em>listView</em>.getItems()</a></h3>
+<hr />
+<p><strong><em>listView</em>.getItems() → <a href="type.joe.List.html">joe.List</a></strong></p>
+<p>Gets the list of the widget's items, which can be updated freely.</p>
 <p><span id="method.getSelectedIndex"> </span></p>
 <h3 id="listviewgetselectedindex"><a class="header" href="#listviewgetselectedindex"><em>listView</em>.getSelectedIndex()</a></h3>
 <hr />
@@ -263,8 +270,8 @@ those inherited from superclasses.</p>
 <p><span id="method.items"> </span></p>
 <h3 id="listviewitems"><a class="header" href="#listviewitems"><em>listView</em>.items()</a></h3>
 <hr />
-<p><strong><em>listView</em>.items() → <a href="type.joe.List.html">joe.List</a></strong></p>
-<p>Gets the list of the widget's items, which can be updated freely.</p>
+<p><strong><em>listView</em>.items(<em>list</em>) → this</strong></p>
+<p>Adds the contents of the <em>list</em> to the widgets list of items.</p>
 <p><span id="method.onSelect"> </span></p>
 <h3 id="listviewonselect"><a class="header" href="#listviewonselect"><em>listView</em>.onSelect()</a></h3>
 <hr />

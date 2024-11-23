@@ -181,38 +181,46 @@ execution of a <code>Joe</code> script. A script can catch errors
 thrown during execution using the <a href="pkg.joe.html#function.catch"><code>catch()</code></a> function.</p>
 <p><strong><a href="#init">Initializer</a></strong></p>
 <ul>
-<li><a href="type.joe.Error.html#init">Error(<em>message</em>, [<em>frames</em>...])</a> → <a href="type.joe.Error.html">Error</a></li>
+<li><a href="type.joe.Error.html#init">Error(<em>message</em>, [<em>trace</em>, ...])</a> → <a href="type.joe.Error.html">Error</a></li>
 </ul>
 <p><strong><a href="#methods">Methods</a></strong></p>
 <ul>
+<li><a href="type.joe.Error.html#method.addInfo"><em>error</em>.addInfo(<em>message</em>)</a> → this</li>
 <li><a href="type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
-<li><a href="type.joe.Error.html#method.stackFrames"><em>error</em>.stackFrames()</a> → <a href="type.joe.List.html">List</a></li>
 <li><a href="type.joe.Error.html#method.stackTrace"><em>error</em>.stackTrace()</a> → <a href="type.joe.String.html">String</a></li>
+<li><a href="type.joe.Error.html#method.traces"><em>error</em>.traces()</a> → <a href="type.joe.List.html">List</a></li>
 <li><a href="type.joe.Error.html#method.type"><em>error</em>.type()</a> → name</li>
 </ul>
 <h2 id="init"><a class="header" href="#init">Error Initializer</a></h2>
 <hr />
-<p><strong>Error(<em>message</em>, [<em>frames</em>...]) → <a href="type.joe.Error.html">Error</a></strong></p>
-<p>Creates an <code>Error</code> with the given <em>message</em>.</p>
+<p><strong>Error(<em>message</em>, [<em>trace</em>, ...]) → <a href="type.joe.Error.html">Error</a></strong></p>
+<p>Creates an <code>Error</code> with the given <em>message</em> and optional information
+trace messages.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
+<p><span id="method.addInfo"> </span></p>
+<h3 id="erroraddinfo"><a class="header" href="#erroraddinfo"><em>error</em>.addInfo()</a></h3>
+<hr />
+<p><strong><em>error</em>.addInfo(<em>message</em>) → this</strong></p>
+<p>Adds an information message to the list of traces.</p>
 <p><span id="method.message"> </span></p>
 <h3 id="errormessage"><a class="header" href="#errormessage"><em>error</em>.message()</a></h3>
 <hr />
 <p><strong><em>error</em>.message() → text</strong></p>
 <p>Gets the actual error message</p>
-<p><span id="method.stackFrames"> </span></p>
-<h3 id="errorstackframes"><a class="header" href="#errorstackframes"><em>error</em>.stackFrames()</a></h3>
-<hr />
-<p><strong><em>error</em>.stackFrames() → <a href="type.joe.List.html">List</a></strong></p>
-<p>Returns the list of stack frame strings.  Clients may add to the list
-and rethrow the error.</p>
 <p><span id="method.stackTrace"> </span></p>
 <h3 id="errorstacktrace"><a class="header" href="#errorstacktrace"><em>error</em>.stackTrace()</a></h3>
 <hr />
 <p><strong><em>error</em>.stackTrace() → <a href="type.joe.String.html">String</a></strong></p>
 <p>Returns the complete error, including the initial error messages
 and all stack frames.</p>
+<p><span id="method.traces"> </span></p>
+<h3 id="errortraces"><a class="header" href="#errortraces"><em>error</em>.traces()</a></h3>
+<hr />
+<p><strong><em>error</em>.traces() → <a href="type.joe.List.html">List</a></strong></p>
+<p>Returns the list of trace strings.  Clients may add to the list
+using <a href="type.joe.Error.html#method.addInfo"><code>addInfo()</code></a>.
+and rethrow the error.</p>
 <p><span id="method.type"> </span></p>
 <h3 id="errortype"><a class="header" href="#errortype"><em>error</em>.type()</a></h3>
 <hr />
