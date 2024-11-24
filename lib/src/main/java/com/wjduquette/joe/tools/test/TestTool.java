@@ -130,7 +130,7 @@ public class TestTool implements Tool {
                 "\n*** " + ex.getMessage());
             ++loadErrorCount;
         } catch (SyntaxError ex) {
-            ex.printDetails();
+            System.out.println(ex.getErrorReport());
             System.out.println(ex.getMessage());
             ++loadErrorCount;
         } catch (JoeError ex) {

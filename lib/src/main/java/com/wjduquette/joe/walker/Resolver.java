@@ -1,7 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.JoeClass;
-import com.wjduquette.joe.SyntaxError;
+import com.wjduquette.joe.Trace;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +30,7 @@ class Resolver {
     }
 
     private final Interpreter interpreter;
-    private final Consumer<SyntaxError.Detail> reporter;
+    private final Consumer<Trace> reporter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
     private ClassType currentClass = ClassType.NONE;
@@ -40,7 +40,7 @@ class Resolver {
 
     Resolver(
         Interpreter interpreter,
-        Consumer<SyntaxError.Detail> reporter)
+        Consumer<Trace> reporter)
     {
         this.interpreter = interpreter;
         this.reporter = reporter;
@@ -333,6 +333,6 @@ class Resolver {
     // Saves the error detail.
     void error(Token token, String message) {
         var msg = "Error at '" + token.lexeme() + "': " + message;
-        reporter.accept(new SyntaxError.Detail(token.span(), msg));
+        reporter.accept(new Trace(token.span(), msg));
     }
 }

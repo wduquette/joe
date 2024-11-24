@@ -76,7 +76,7 @@ public class WinTool extends FXTool {
                 "\n*** " + ex.getMessage());
             System.exit(1);
         } catch (SyntaxError ex) {
-            ex.printDetails();
+            System.err.println(ex.getErrorReport());
             System.err.println(ex.getMessage());
             System.exit(65);
         } catch (JoeError ex) {

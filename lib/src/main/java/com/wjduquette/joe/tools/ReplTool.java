@@ -96,9 +96,10 @@ public class ReplTool implements Tool {
                     System.out.println("-> " + joe.stringify(result));
                 }
             } catch (SyntaxError ex) {
-                ex.printDetails();
+                System.out.println(ex.getErrorReport());
+                System.out.println("*** " + ex.getMessage());
             } catch (JoeError ex) {
-                System.err.println("*** " + ex.getJoeStackTrace());
+                System.out.println("*** " + ex.getJoeStackTrace());
             }
         }
     }

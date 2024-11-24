@@ -78,25 +78,25 @@ public class WalkerEngine implements Engine {
      * @throws JoeError on all runtime errors.
      */
     public Object run(String filename, String source) throws SyntaxError, JoeError {
-        var details = new ArrayList<SyntaxError.Detail>();
+        var traces = new ArrayList<Trace>();
 
-        Scanner scanner = new Scanner(filename, source, details::add);
+        Scanner scanner = new Scanner(filename, source, traces::add);
         List<Token> tokens = scanner.scanTokens();
         var buffer = scanner.buffer();
-        Parser parser = new Parser(buffer, tokens, details::add);
+        Parser parser = new Parser(buffer, tokens, traces::add);
         var statements = parser.parse();
 
         // Stop if there was a syntax error.
-        if (!details.isEmpty()) {
-            throw new SyntaxError("Syntax error in input, halting.", details);
+        if (!traces.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.", traces);
         }
 
-        Resolver resolver = new Resolver(interpreter, details::add);
+        Resolver resolver = new Resolver(interpreter, traces::add);
         resolver.resolve(statements);
 
         // Stop if there was a resolution error.
-        if (!details.isEmpty()) {
-            throw new SyntaxError("Syntax error in input, halting.", details);
+        if (!traces.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.", traces);
         }
 
         // Save the buffer, for later introspection.

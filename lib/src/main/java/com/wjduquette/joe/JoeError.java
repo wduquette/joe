@@ -125,14 +125,7 @@ public class JoeError extends RuntimeException {
                 list.add(trace.message() + " " + location(trace.context()));
                 if (!includedSourceContext) {
                     includedSourceContext = true;
-
-                    var buff = trace.context().buffer();
-                    var line = trace.context().startLine();
-                    var first = (Math.max(line - 1, 1));
-                    var last = (Math.min(line + 1, buff.lineCount()));
-                    for (var i = first; i <= last; i++) {
-                        list.add(String.format("  %03d %s", i, buff.line(i)));
-                    }
+                    list.add(errorLines(trace.context(), "  "));
                 }
             } else {
                 list.add(trace.message());
@@ -143,6 +136,19 @@ public class JoeError extends RuntimeException {
             list.add("In <script> " + location(pendingContext));
         }
 
+        return String.join("\n", list);
+    }
+
+    protected String errorLines(Span span, String leader) {
+        var line = span.startLine();
+        var start = Math.max(line - 1, 1);
+        var end = Math.min(line + 1, span.buffer().lineCount());
+
+        var list = new ArrayList<String>();
+        for (int i = start; i <= end; i++) {
+            list.add(String.format("%s%03d %s",
+                leader, i, span.buffer().line(i)));
+        }
         return String.join("\n", list);
     }
 

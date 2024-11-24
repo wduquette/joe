@@ -1,6 +1,6 @@
 package com.wjduquette.joe.walker;
 import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.SyntaxError;
+import com.wjduquette.joe.Trace;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ class Parser {
 
     private final SourceBuffer source;
     private final List<Token> tokens;
-    private final Consumer<SyntaxError.Detail> reporter;
+    private final Consumer<Trace> reporter;
     private int current = 0;
 
     //-------------------------------------------------------------------------
@@ -27,7 +27,7 @@ class Parser {
     Parser(
         SourceBuffer source,
         List<Token> tokens,
-        Consumer<SyntaxError.Detail> reporter)
+        Consumer<Trace> reporter)
     {
         this.source = source;
         this.reporter = reporter;
@@ -661,7 +661,7 @@ class Parser {
         var msg = token.type() == TokenType.EOF
             ? "Error at end: " + message
             : "Error at '" + token.lexeme() + "': " + message;
-        reporter.accept(new SyntaxError.Detail(token.span(), msg));
+        reporter.accept(new Trace(token.span(), msg));
     }
 
     // Saves the error detail, with synchronization.

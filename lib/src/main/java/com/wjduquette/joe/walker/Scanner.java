@@ -1,9 +1,6 @@
 package com.wjduquette.joe.walker;
 
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.Keyword;
-import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.SyntaxError;
+import com.wjduquette.joe.*;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -55,7 +52,7 @@ class Scanner {
 
     private final String source;
     private final SourceBuffer buffer;
-    private final Consumer<SyntaxError.Detail> reporter;
+    private final Consumer<Trace> reporter;
     private final List<Token> tokens = new ArrayList<>();
     private int start = 0;
     private int current = 0;
@@ -76,7 +73,7 @@ class Scanner {
     Scanner(
         String filename,
         String source,
-        Consumer<SyntaxError.Detail> reporter
+        Consumer<Trace> reporter
     ) {
         this.source = source;
         this.buffer = new SourceBuffer(filename, source);
@@ -517,6 +514,6 @@ class Scanner {
 
     private void error(String message) {
         reporter.accept(
-            new SyntaxError.Detail(buffer.span(start, current), message));
+            new Trace(buffer.span(start, current), message));
     }
 }

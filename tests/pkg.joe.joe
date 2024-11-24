@@ -12,7 +12,6 @@ function testCatch_error() {
     function bad() { throw "Simulated error!"; }
     var tuple = catch(bad);
     check(tuple.is(#error));
-    println(tuple.error.stackTrace());
     check(tuple.error.traces()).eq(List(
         "In function bad()",
         "In java call(<function bad()>)",
