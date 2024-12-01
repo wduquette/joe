@@ -86,6 +86,22 @@ public class EdgarTest extends Ted {
         check(expand("isPass=<<Edgar.isPass(2)>>")).eq("isPass=true");
     }
 
+    @Test
+    public void testLoadConfiguration() {
+        var config = """
+            Edgar.setPassCount(2)
+                 .setMacroStart("{{")
+                 .setMacroEnd("}}");
+            var title = "Howdy!";
+            """;
+        var source = """
+            Title: {{title}} on pass {{Edgar.getPass()}}.
+            """;
+        edgar.loadConfiguration("*config*", config);
+        var out = expand(source).strip();
+        check(out).eq("Title: Howdy! on pass 2.");
+    }
+
     private String expand(String source) {
         return edgar.expand("*expand*", source);
     }

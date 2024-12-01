@@ -33,6 +33,12 @@ public class Edgar {
         return joe;
     }
 
+    public void loadConfiguration(String fileName, String source)
+        throws JoeError
+    {
+        joe.run(fileName, source);
+    }
+
     public String getMacroStart() {
         return macroStart;
     }
