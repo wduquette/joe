@@ -1,9 +1,9 @@
-package com.wjduquette.joe.expander;
+package com.wjduquette.joe.edgar;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 
-public class Expander {
+public class Edgar {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -14,7 +14,7 @@ public class Expander {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Expander(Joe joe) {
+    public Edgar(Joe joe) {
         this.joe = joe;
     }
 

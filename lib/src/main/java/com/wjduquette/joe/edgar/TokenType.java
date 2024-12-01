@@ -1,4 +1,4 @@
-package com.wjduquette.joe.expander;
+package com.wjduquette.joe.edgar;
 
 public enum TokenType {
     TEXT,

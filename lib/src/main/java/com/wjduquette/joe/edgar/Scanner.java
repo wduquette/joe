@@ -1,8 +1,8 @@
-package com.wjduquette.joe.expander;
+package com.wjduquette.joe.edgar;
 
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SourceBuffer;
-import static com.wjduquette.joe.expander.TokenType.*;
+import static com.wjduquette.joe.edgar.TokenType.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ public class Scanner {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Expander expander;
+    private final Edgar edgar;
     private final SourceBuffer buff;
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
@@ -21,8 +21,8 @@ public class Scanner {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Scanner(Expander expander, String name, String source) {
-        this.expander = expander;
+    public Scanner(Edgar edgar, String name, String source) {
+        this.edgar = edgar;
         this.buff = new SourceBuffer(name, source);
         this.source = source;
     }
@@ -44,11 +44,11 @@ public class Scanner {
     private void scanToken() {
         switch (previousType()) {
             case TEXT -> {
-                current = start + expander.getTemplateStart().length();
+                current = start + edgar.getTemplateStart().length();
                 addToken(START);
             }
             case START -> {
-                current = source.indexOf(expander.getTemplateEnd(), start);
+                current = source.indexOf(edgar.getTemplateEnd(), start);
                 if (current != -1) {
                     addToken(MACRO);
                 } else {
@@ -57,11 +57,11 @@ public class Scanner {
                 }
             }
             case MACRO -> {
-                current = start + expander.getTemplateEnd().length();
+                current = start + edgar.getTemplateEnd().length();
                 addToken(END);
             }
             case END -> {
-                current = source.indexOf(expander.getTemplateStart(), start);
+                current = source.indexOf(edgar.getTemplateStart(), start);
                 if (current == -1) {
                     current = source.length();
                 }

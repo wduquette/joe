@@ -1,4 +1,4 @@
-package com.wjduquette.joe.expander;
+package com.wjduquette.joe.edgar;
 
 import com.wjduquette.joe.SourceBuffer;
 
