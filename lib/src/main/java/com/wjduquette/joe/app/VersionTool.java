@@ -1,6 +1,7 @@
-package com.wjduquette.joe.tools;
+package com.wjduquette.joe.app;
 
-import com.wjduquette.joe.app.App;
+import com.wjduquette.joe.tools.Tool;
+import com.wjduquette.joe.tools.ToolInfo;
 
 import java.util.ArrayDeque;
 import java.util.List;
