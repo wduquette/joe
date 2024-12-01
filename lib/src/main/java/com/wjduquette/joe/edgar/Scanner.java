@@ -44,11 +44,11 @@ public class Scanner {
     private void scanToken() {
         switch (previousType()) {
             case TEXT -> {
-                current = start + edgar.getTemplateStart().length();
+                current = start + edgar.getMacroStart().length();
                 addToken(START);
             }
             case START -> {
-                current = source.indexOf(edgar.getTemplateEnd(), start);
+                current = source.indexOf(edgar.getMacroEnd(), start);
                 if (current != -1) {
                     addToken(MACRO);
                 } else {
@@ -57,11 +57,11 @@ public class Scanner {
                 }
             }
             case MACRO -> {
-                current = start + edgar.getTemplateEnd().length();
+                current = start + edgar.getMacroEnd().length();
                 addToken(END);
             }
             case END -> {
-                current = source.indexOf(edgar.getTemplateStart(), start);
+                current = source.indexOf(edgar.getMacroStart(), start);
                 if (current == -1) {
                     current = source.length();
                 }

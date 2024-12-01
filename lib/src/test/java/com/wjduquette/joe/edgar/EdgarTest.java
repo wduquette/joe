@@ -22,7 +22,7 @@ public class EdgarTest extends Ted {
     public void testExpander_number() {
         test("testExpander_number");
 
-        var out = edgar.expand("A<<5>>B");
+        var out = expand("A<<5>>B");
         check(out).eq("A5B");
     }
 
@@ -30,17 +30,17 @@ public class EdgarTest extends Ted {
     public void testExpander_call() {
         test("testExpander_call");
 
-        var out = edgar.expand("A<<Number.abs(-5)>>B");
+        var out = expand("A<<Number.abs(-5)>>B");
         check(out).eq("A5B");
     }
 
     @Test
     public void testExpander_specialDelimiters() {
         test("testExpander_specialDelimiters");
-        edgar.setTemplateStart("(*");
-        edgar.setTemplateEnd("*)");
+        edgar.setMacroStart("(*");
+        edgar.setMacroEnd("*)");
 
-        var out = edgar.expand("<<A(*5*)B>>");
+        var out = expand("<<A(*5*)B>>");
         check(out).eq("<<A5B>>");
     }
 
@@ -49,7 +49,7 @@ public class EdgarTest extends Ted {
         test("testExpander_macroError");
 
         try {
-            edgar.expand("A<<Number.nonesuch(5)>>B");
+            expand("A<<Number.nonesuch(5)>>B");
             fail("Should have thrown an error");
         } catch (JoeError ex) {
             check(ex.getMessage()).eq("Undefined property 'nonesuch'.");
@@ -62,10 +62,31 @@ public class EdgarTest extends Ted {
         test("testExpander_unterminatedMacro");
 
         try {
-            edgar.expand("A<<5>B");
+            expand("A<<5>B");
             fail("Should have thrown an error");
         } catch (JoeError ex) {
             check(ex.getMessage()).eq("Unterminated macro at (1,4) in source.");
         }
+    }
+
+    @Test
+    public void testEdgarPass_single() {
+        check(expand("passes=<<Edgar.getPassCount()>>")).eq("passes=1");
+        check(expand("pass=<<Edgar.getPass()>>")).eq("pass=1");
+        check(expand("isPass=<<Edgar.isPass(1)>>")).eq("isPass=true");
+        check(expand("isPass=<<Edgar.isPass(2)>>")).eq("isPass=false");
+    }
+
+    @Test
+    public void testEdgarPass_double() {
+        edgar.setPassCount(2);
+        check(expand("passes=<<Edgar.getPassCount()>>")).eq("passes=2");
+        check(expand("pass=<<Edgar.getPass()>>")).eq("pass=2");
+        check(expand("isPass=<<Edgar.isPass(1)>>")).eq("isPass=false");
+        check(expand("isPass=<<Edgar.isPass(2)>>")).eq("isPass=true");
+    }
+
+    private String expand(String source) {
+        return edgar.expand("*expand*", source);
     }
 }
