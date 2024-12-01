@@ -260,6 +260,18 @@ public class Joe {
         return engine.run(filename, source);
     }
 
+    /**
+     * Checks whether the source "is complete", i.e, whether it can
+     * be compiled.  The result is not executed.  This is useful
+     * in REPLs, so that the user can enter a newline in a string or
+     * function call or block and keep editing if it is not complete.
+     * @param source The source text
+     * @return true or false
+     */
+    public boolean isComplete(String source) {
+        return engine.isComplete(source);
+    }
+
     //-------------------------------------------------------------------------
     // Internal Support -- for use within this package
 

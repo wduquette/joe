@@ -105,6 +105,29 @@ public class WalkerEngine implements Engine {
         return interpreter.interpret(statements);
     }
 
+
+    @Override
+    public boolean isComplete(String source) {
+        var traces = new ArrayList<Trace>();
+
+        Scanner scanner = new Scanner("*isComplete*", source, traces::add);
+        List<Token> tokens = scanner.scanTokens();
+        var buffer = scanner.buffer();
+        Parser parser = new Parser(buffer, tokens, traces::add);
+        var statements = parser.parse();
+
+        // Stop now if there was a syntax error.
+        if (!traces.isEmpty()) {
+            return false;
+        }
+
+        Resolver resolver = new Resolver(interpreter, traces::add);
+        resolver.resolve(statements);
+
+        // Check for resolution errors.
+        return traces.isEmpty();
+    }
+
     @Override
     public boolean isCallable(Object callee) {
         return callee instanceof JoeCallable;
