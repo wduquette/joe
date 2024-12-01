@@ -53,7 +53,7 @@ public class ExpanderTest extends Ted {
             fail("Should have thrown an error");
         } catch (JoeError ex) {
             check(ex.getMessage()).eq("Undefined property 'nonesuch'.");
-            check(ex.getTraceReport()).eq("In expander source at 1,4");
+            check(ex.getTraceReport()).eq("At (1,4) in source");
         }
     }
 

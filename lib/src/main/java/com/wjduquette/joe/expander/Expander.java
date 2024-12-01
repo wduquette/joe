@@ -52,8 +52,8 @@ public class Expander {
                         var result = joe.run("*expand*", token.text() + ";");
                         buff.append(joe.stringify(result));
                     } catch (JoeError ex) {
-                        throw ex.addInfo("In expander source at " +
-                            token.span().startPosition());
+                        throw ex.addInfo("At (" +
+                            token.span().startPosition() + ") in source");
                     }
                 }
                 default -> {} // Do nothing
