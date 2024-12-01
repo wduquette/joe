@@ -77,7 +77,7 @@ public class ScannerTest extends Ted {
     public void testUnterminatedMacro() {
         test("testUnterminatedMacro");
         checkThrow(() -> scan("Foo <<bar> baz."))
-            .containsString("Unterminated macro at line 1.");
+            .containsString("Unterminated macro at (1,4) in source.");
     }
 
     @Test

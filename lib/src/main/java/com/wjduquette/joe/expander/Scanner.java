@@ -52,8 +52,8 @@ public class Scanner {
                 if (current != -1) {
                     addToken(MACRO);
                 } else {
-                    throw new JoeError("Unterminated macro at line " +
-                        buff.index2line(start) + ".");
+                    throw new JoeError("Unterminated macro at (" +
+                        buff.index2position(start) + ") in source.");
                 }
             }
             case MACRO -> {

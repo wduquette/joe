@@ -1,6 +1,7 @@
 package com.wjduquette.joe.expander;
 
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeError;
 
 public class Expander {
     //-------------------------------------------------------------------------
@@ -39,12 +40,26 @@ public class Expander {
     //-------------------------------------------------------------------------
     // Expansion
 
-    public String expand(String source) {
+    public String expand(String source) throws JoeError {
         var tokens = new Scanner(this, "*expand*", source).getTokens();
+        var buff = new StringBuilder();
+
         for (var token : tokens) {
-            System.out.println(token);
+            switch (token.type()) {
+                case TEXT -> buff.append(token.text());
+                case MACRO -> {
+                    try {
+                        var result = joe.run("*expand*", token.text() + ";");
+                        buff.append(joe.stringify(result));
+                    } catch (JoeError ex) {
+                        throw ex.addInfo("In expander source at " +
+                            token.span().startPosition());
+                    }
+                }
+                default -> {} // Do nothing
+            }
         }
 
-        return null;
+        return buff.toString();
     }
 }
