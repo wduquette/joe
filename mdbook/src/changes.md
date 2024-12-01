@@ -12,11 +12,19 @@
     each stack level,
     - Complete function signatures, where available
     - Source file and line number, where available
+
+- Extending/Embedding API
+  - Added `Joe::isComplete`
+
 - Library
   - `joe.win` Package
     - Added JavaFX widgets: `Menu`, `MenuBar`, `MenuItem`, `Separator`, 
       `Tab`, `TabPane`, `ListView`, `SplitPane`, `GridPane`
     - Added JavaFX enums: `Orientation`, `Side`
+
+- Bugs fixed
+  - Test script `print`/`println` output is now hidden unless `joe test` is
+    run with the `--verbose` option.
 
 ## Changes in 0.4.0 
 
