@@ -121,6 +121,8 @@ public class TestTool implements Tool {
         // NEXT, configure the engine.
         var joe = new Joe();
         joe.installPackage(TestPackage.PACKAGE);
+        // Only print script output if the verbose flag is set.
+        joe.setOutputHandler(this::testPrinter);
 
         // FIRST, load the script.
         try {
@@ -154,6 +156,12 @@ public class TestTool implements Tool {
             runVerbosely(joe, tests);
         } else {
             runQuietly(joe, scriptPath, tests);
+        }
+    }
+
+    private void testPrinter(String message) {
+        if (verbose) {
+            System.out.print(message);
         }
     }
 
