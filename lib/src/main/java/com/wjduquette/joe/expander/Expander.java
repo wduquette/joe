@@ -5,8 +5,6 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.TypeProxy;
 
-import static com.wjduquette.joe.expander.TokenType.MACRO;
-
 public class Expander {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -15,8 +13,6 @@ public class Expander {
     private String macroStart = "<<";
     private String macroEnd = ">>";
     private boolean processing = false;
-    private int passCount = 1;
-    private int pass = 0;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -69,25 +65,6 @@ public class Expander {
         this.macroEnd = end;
     }
 
-    public int getPassCount() {
-        return passCount;
-    }
-
-    public void setPassCount(int passes) {
-        if (processing) {
-            throw new JoeError(
-                "Attempt to configure Edgar while processing input.");
-        }
-        if (passes < 1) {
-            throw joe.expected("positive pass count", (double)passes);
-        }
-        this.passCount = passes;
-    }
-
-    public int getPass() {
-        return pass;
-    }
-
     //-------------------------------------------------------------------------
     // Expansion
 
@@ -101,18 +78,7 @@ public class Expander {
             var tokens = new Scanner(this, name, source).getTokens();
             var buff = new StringBuilder();
 
-            // Preliminary passes
-            for (int i = 1; i <= passCount - 1; i++) {
-                pass = i;
-                for (var token : tokens) {
-                    if (token.type() == MACRO) {
-                        evaluate(token);
-                    }
-                }
-            }
-
             // Rendering pass
-            pass = passCount;
             for (var token : tokens) {
                 switch (token.type()) {
                     case TEXT -> buff.append(token.text());
@@ -147,33 +113,13 @@ public class Expander {
 
             staticMethod("getMacroEnd",       this::_getMacroEnd);
             staticMethod("getMacroStart",     this::_getMacroStart);
-            staticMethod("getPassCount",      this::_getPassCount);
-            staticMethod("isPass",            this::_isPass);
-            staticMethod("getPass",           this::_getPass);
             staticMethod("setMacroEnd",       this::_setMacroEnd);
             staticMethod("setMacroStart",     this::_setMacroStart);
-            staticMethod("setPassCount",      this::_setPassCount);
-        }
-
-        private Object _isPass(Joe joe, Args args) {
-            args.exactArity(1, "isPass(pass)");
-            var value = joe.toInteger(args.next());
-            return pass == value;
         }
 
         private Object _getMacroEnd(Joe joe, Args args) {
             args.exactArity(0, "getMacroEnd()");
             return getMacroEnd();
-        }
-
-        private Object _getPass(Joe joe, Args args) {
-            args.exactArity(0, "getPass()");
-            return (double)getPass();
-        }
-
-        private Object _getPassCount(Joe joe, Args args) {
-            args.exactArity(0, "getPassCount()");
-            return (double)getPassCount();
         }
 
         private Object _getMacroStart(Joe joe, Args args) {
@@ -185,13 +131,6 @@ public class Expander {
             args.exactArity(1, "setMacroEnd(delimiter)");
 
             setMacroEnd(joe.stringify(args.next()));
-            return this;
-        }
-
-        private Object _setPassCount(Joe joe, Args args) {
-            args.exactArity(1, "setPassCount(pass)");
-            var value = joe.toInteger(args.next());
-            setPassCount(value);
             return this;
         }
 

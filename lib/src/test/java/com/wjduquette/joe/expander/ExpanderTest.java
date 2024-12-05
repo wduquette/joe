@@ -70,36 +70,18 @@ public class ExpanderTest extends Ted {
     }
 
     @Test
-    public void testEdgarPass_single() {
-        check(expand("passes=<<Edgar.getPassCount()>>")).eq("passes=1");
-        check(expand("pass=<<Edgar.getPass()>>")).eq("pass=1");
-        check(expand("isPass=<<Edgar.isPass(1)>>")).eq("isPass=true");
-        check(expand("isPass=<<Edgar.isPass(2)>>")).eq("isPass=false");
-    }
-
-    @Test
-    public void testEdgarPass_double() {
-        expander.setPassCount(2);
-        check(expand("passes=<<Edgar.getPassCount()>>")).eq("passes=2");
-        check(expand("pass=<<Edgar.getPass()>>")).eq("pass=2");
-        check(expand("isPass=<<Edgar.isPass(1)>>")).eq("isPass=false");
-        check(expand("isPass=<<Edgar.isPass(2)>>")).eq("isPass=true");
-    }
-
-    @Test
     public void testLoadConfiguration() {
         var config = """
-            Edgar.setPassCount(2)
-                 .setMacroStart("{{")
+            Edgar.setMacroStart("{{")
                  .setMacroEnd("}}");
             var title = "Howdy!";
             """;
         var source = """
-            Title: {{title}} on pass {{Edgar.getPass()}}.
+            Title: {{title}}.
             """;
         expander.loadConfiguration("*config*", config);
         var out = expand(source).strip();
-        check(out).eq("Title: Howdy! on pass 2.");
+        check(out).eq("Title: Howdy!.");
     }
 
     private String expand(String source) {
