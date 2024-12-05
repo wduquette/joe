@@ -1,8 +1,8 @@
-package com.wjduquette.joe.edgar;
+package com.wjduquette.joe.expander;
 
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SourceBuffer;
-import static com.wjduquette.joe.edgar.TokenType.*;
+import static com.wjduquette.joe.expander.TokenType.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ public class Scanner {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Edgar edgar;
+    private final Expander expander;
     private final SourceBuffer buff;
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
@@ -21,8 +21,8 @@ public class Scanner {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Scanner(Edgar edgar, String name, String source) {
-        this.edgar = edgar;
+    public Scanner(Expander expander, String name, String source) {
+        this.expander = expander;
         this.buff = new SourceBuffer(name, source);
         this.source = source;
     }
@@ -44,11 +44,11 @@ public class Scanner {
     private void scanToken() {
         switch (previousType()) {
             case TEXT -> {
-                current = start + edgar.getMacroStart().length();
+                current = start + expander.getMacroStart().length();
                 addToken(START);
             }
             case START -> {
-                current = source.indexOf(edgar.getMacroEnd(), start);
+                current = source.indexOf(expander.getMacroEnd(), start);
                 if (current != -1) {
                     addToken(MACRO);
                 } else {
@@ -57,11 +57,11 @@ public class Scanner {
                 }
             }
             case MACRO -> {
-                current = start + edgar.getMacroEnd().length();
+                current = start + expander.getMacroEnd().length();
                 addToken(END);
             }
             case END -> {
-                current = source.indexOf(edgar.getMacroStart(), start);
+                current = source.indexOf(expander.getMacroStart(), start);
                 if (current == -1) {
                     current = source.length();
                 }

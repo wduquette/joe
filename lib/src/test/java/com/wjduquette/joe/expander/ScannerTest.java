@@ -1,4 +1,4 @@
-package com.wjduquette.joe.edgar;
+package com.wjduquette.joe.expander;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
@@ -9,16 +9,16 @@ import org.junit.Test;
 import java.util.List;
 
 import static com.wjduquette.joe.checker.Checker.*;
-import static com.wjduquette.joe.edgar.TokenType.*;
+import static com.wjduquette.joe.expander.TokenType.*;
 
 public class ScannerTest extends Ted {
     Joe joe;
-    Edgar edgar;
+    Expander expander;
 
     @Before
     public void setup() {
         this.joe = new Joe();
-        this.edgar = new Edgar(joe);
+        this.expander = new Expander(joe);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class ScannerTest extends Ted {
     }
 
     private List<Token> scan(String source) throws JoeError {
-        var scanner = new Scanner(edgar, "*scan*", source);
+        var scanner = new Scanner(expander, "*scan*", source);
         return scanner.getTokens();
     }
 }

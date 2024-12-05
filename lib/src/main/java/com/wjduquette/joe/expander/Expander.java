@@ -1,13 +1,13 @@
-package com.wjduquette.joe.edgar;
+package com.wjduquette.joe.expander;
 
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.TypeProxy;
 
-import static com.wjduquette.joe.edgar.TokenType.MACRO;
+import static com.wjduquette.joe.expander.TokenType.MACRO;
 
-public class Edgar {
+public class Expander {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -21,7 +21,7 @@ public class Edgar {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Edgar(Joe joe) {
+    public Expander(Joe joe) {
         this.joe = joe;
         joe.installType(new EdgarProxy());
     }

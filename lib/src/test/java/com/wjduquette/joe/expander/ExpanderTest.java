@@ -1,4 +1,4 @@
-package com.wjduquette.joe.edgar;
+package com.wjduquette.joe.expander;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
@@ -8,14 +8,14 @@ import org.junit.Test;
 
 import static com.wjduquette.joe.checker.Checker.*;
 
-public class EdgarTest extends Ted {
+public class ExpanderTest extends Ted {
     Joe joe;
-    Edgar edgar;
+    Expander expander;
 
     @Before
     public void setup() {
         this.joe = new Joe();
-        this.edgar = new Edgar(joe);
+        this.expander = new Expander(joe);
     }
 
     @Test
@@ -37,8 +37,8 @@ public class EdgarTest extends Ted {
     @Test
     public void testExpander_specialDelimiters() {
         test("testExpander_specialDelimiters");
-        edgar.setMacroStart("(*");
-        edgar.setMacroEnd("*)");
+        expander.setMacroStart("(*");
+        expander.setMacroEnd("*)");
 
         var out = expand("<<A(*5*)B>>");
         check(out).eq("<<A5B>>");
@@ -79,7 +79,7 @@ public class EdgarTest extends Ted {
 
     @Test
     public void testEdgarPass_double() {
-        edgar.setPassCount(2);
+        expander.setPassCount(2);
         check(expand("passes=<<Edgar.getPassCount()>>")).eq("passes=2");
         check(expand("pass=<<Edgar.getPass()>>")).eq("pass=2");
         check(expand("isPass=<<Edgar.isPass(1)>>")).eq("isPass=false");
@@ -97,12 +97,12 @@ public class EdgarTest extends Ted {
         var source = """
             Title: {{title}} on pass {{Edgar.getPass()}}.
             """;
-        edgar.loadConfiguration("*config*", config);
+        expander.loadConfiguration("*config*", config);
         var out = expand(source).strip();
         check(out).eq("Title: Howdy! on pass 2.");
     }
 
     private String expand(String source) {
-        return edgar.expand("*expand*", source);
+        return expander.expand("*expand*", source);
     }
 }
