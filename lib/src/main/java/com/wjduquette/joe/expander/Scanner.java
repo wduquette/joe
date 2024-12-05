@@ -44,11 +44,11 @@ public class Scanner {
     private void scanToken() {
         switch (previousType()) {
             case TEXT -> {
-                current = start + expander.getMacroStart().length();
+                current = start + expander.left().length();
                 addToken(START);
             }
             case START -> {
-                current = source.indexOf(expander.getMacroEnd(), start);
+                current = source.indexOf(expander.right(), start);
                 if (current != -1) {
                     addToken(MACRO);
                 } else {
@@ -57,11 +57,11 @@ public class Scanner {
                 }
             }
             case MACRO -> {
-                current = start + expander.getMacroEnd().length();
+                current = start + expander.right().length();
                 addToken(END);
             }
             case END -> {
-                current = source.indexOf(expander.getMacroStart(), start);
+                current = source.indexOf(expander.left(), start);
                 if (current == -1) {
                     current = source.length();
                 }

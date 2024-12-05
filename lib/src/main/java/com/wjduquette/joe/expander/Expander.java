@@ -5,13 +5,16 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.TypeProxy;
 
+/**
+ * A Joe "macro expander", based on the Tcllib textutil::expander package.
+ */
 public class Expander {
     //-------------------------------------------------------------------------
     // Instance Variables
 
     private final Joe joe;
-    private String macroStart = "<<";
-    private String macroEnd = ">>";
+    private String left = "<<";
+    private String right = ">>";
     private boolean processing = false;
 
     //-------------------------------------------------------------------------
@@ -19,7 +22,7 @@ public class Expander {
 
     public Expander(Joe joe) {
         this.joe = joe;
-        joe.installType(new EdgarProxy());
+        joe.installType(new ExpanderProxy());
     }
 
     //-------------------------------------------------------------------------
@@ -35,34 +38,27 @@ public class Expander {
         joe.run(fileName, source);
     }
 
-    public String getMacroStart() {
-        return macroStart;
+    public String left() {
+        return left;
     }
 
-    public void setMacroStart(String start) {
+    public String right() {
+        return right;
+    }
+
+    public void setBrackets(String left, String right) {
         if (processing) {
             throw new JoeError(
                 "Attempt to configure Edgar while processing input.");
         }
-        if (start == null || start.isEmpty()) {
-            throw joe.expected("macro start delimiter", start);
+        if (left == null || left.isEmpty()) {
+            throw joe.expected("left macro bracket", right);
         }
-        this.macroStart = start;
-    }
-
-    public String getMacroEnd() {
-        return macroEnd;
-    }
-
-    public void setMacroEnd(String end) {
-        if (processing) {
-            throw new JoeError(
-                "Attempt to configure Edgar while processing input.");
+        if (right == null || right.isEmpty()) {
+            throw joe.expected("right macro bracket", right);
         }
-        if (end == null || end.isEmpty()) {
-            throw joe.expected("macro end delimiter", end);
-        }
-        this.macroEnd = end;
+        this.left = left;
+        this.right = right;
     }
 
     //-------------------------------------------------------------------------
@@ -106,38 +102,33 @@ public class Expander {
     //-------------------------------------------------------------------------
     // Edgar API
 
-    private class EdgarProxy extends TypeProxy<Void> {
-        EdgarProxy() {
-            super("Edgar");
+    private class ExpanderProxy extends TypeProxy<Void> {
+        ExpanderProxy() {
+            super("Expander");
             staticType();
 
-            staticMethod("getMacroEnd",       this::_getMacroEnd);
-            staticMethod("getMacroStart",     this::_getMacroStart);
-            staticMethod("setMacroEnd",       this::_setMacroEnd);
-            staticMethod("setMacroStart",     this::_setMacroStart);
+            staticMethod("left",         this::_left);
+            staticMethod("right",        this::_right);
+            staticMethod("setBrackets",  this::_setBrackets);
         }
 
-        private Object _getMacroEnd(Joe joe, Args args) {
-            args.exactArity(0, "getMacroEnd()");
-            return getMacroEnd();
+        private Object _left(Joe joe, Args args) {
+            args.exactArity(0, "left()");
+            return left();
         }
 
-        private Object _getMacroStart(Joe joe, Args args) {
-            args.exactArity(0, "getMacroStart()");
-            return getMacroStart();
+        private Object _right(Joe joe, Args args) {
+            args.exactArity(0, "right()");
+            return right();
         }
 
-        private Object _setMacroEnd(Joe joe, Args args) {
-            args.exactArity(1, "setMacroEnd(delimiter)");
+        private Object _setBrackets(Joe joe, Args args) {
+            args.exactArity(2, "setBrackets(left, right)");
 
-            setMacroEnd(joe.stringify(args.next()));
-            return this;
-        }
+            setBrackets(
+                joe.stringify(args.next()),
+                joe.stringify(args.next()));
 
-        private Object _setMacroStart(Joe joe, Args args) {
-            args.exactArity(1, "setMacroStart(delimiter)");
-
-            setMacroStart(joe.stringify(args.next()));
             return this;
         }
     }

@@ -35,10 +35,9 @@ public class ExpanderTest extends Ted {
     }
 
     @Test
-    public void testExpander_specialDelimiters() {
-        test("testExpander_specialDelimiters");
-        expander.setMacroStart("(*");
-        expander.setMacroEnd("*)");
+    public void testExpander_setBrackets() {
+        test("testExpander_setBrackets");
+        expander.setBrackets("(*", "*)");
 
         var out = expand("<<A(*5*)B>>");
         check(out).eq("<<A5B>>");
@@ -72,8 +71,7 @@ public class ExpanderTest extends Ted {
     @Test
     public void testLoadConfiguration() {
         var config = """
-            Edgar.setMacroStart("{{")
-                 .setMacroEnd("}}");
+            Expander.setBrackets("{{", "}}");
             var title = "Howdy!";
             """;
         var source = """
