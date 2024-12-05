@@ -4,6 +4,9 @@ import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.TypeProxy;
+import com.wjduquette.joe.types.EnumProxy;
+
+import java.util.Objects;
 
 /**
  * A Joe "macro expander", based on the Tcllib textutil::expander package.
@@ -15,14 +18,35 @@ public class Expander {
     private final Joe joe;
     private String left = "<<";
     private String right = ">>";
+    private ErrorMode errorMode = ErrorMode.FAIL;
     private boolean processing = false;
 
     //-------------------------------------------------------------------------
     // Constructor
 
+    public Expander() {
+        this(new Joe());
+    }
+
     public Expander(Joe joe) {
         this.joe = joe;
+
+        //**
+        // @package joe.expander
+        // TODO
         joe.installType(new ExpanderProxy());
+
+
+        //**
+        // @enum ErrorMode
+        // How the `Expander` will handle macros that throw errors.
+        // @constant FAIL
+        // The error will propagate to the client (default).
+        // @constant MACRO
+        // The macro will output itself, with brackets.
+        // @constant IGNORE
+        // The macro will be ignored, producing no output.
+        joe.installType(new EnumProxy<>("ErrorMode", ErrorMode.class));
     }
 
     //-------------------------------------------------------------------------
@@ -61,6 +85,15 @@ public class Expander {
         this.right = right;
     }
 
+    @SuppressWarnings("unused")
+    public ErrorMode getErrorMode() {
+        return errorMode;
+    }
+
+    public void setErrorMode(ErrorMode mode) {
+        this.errorMode = Objects.requireNonNull(mode);
+    }
+
     //-------------------------------------------------------------------------
     // Expansion
 
@@ -94,8 +127,14 @@ public class Expander {
             var result = joe.run("*expand*", macro.text() + ";");
             return joe.stringify(result);
         } catch (JoeError ex) {
-            throw ex.addInfo("At (" +
-                macro.span().startPosition() + ") in source");
+            return switch (errorMode) {
+                case IGNORE -> "";
+                case MACRO -> left() + macro.text() + right();
+                case FAIL -> throw ex
+                    .addInfo("In macro '" + macro.text() + "'")
+                    .addInfo("At (" + macro.span().startPosition() +
+                        ") in source");
+            };
         }
     }
 
@@ -107,9 +146,11 @@ public class Expander {
             super("Expander");
             staticType();
 
+            staticMethod("getErrorMode", this::_getErrorMode);
             staticMethod("left",         this::_left);
             staticMethod("right",        this::_right);
             staticMethod("setBrackets",  this::_setBrackets);
+            staticMethod("setErrorMode", this::_setErrorMode);
         }
 
         private Object _left(Joe joe, Args args) {
@@ -131,5 +172,27 @@ public class Expander {
 
             return this;
         }
+
+        private Object _getErrorMode(Joe joe, Args args) {
+            args.exactArity(0, "getErrorMode()");
+            return errorMode;
+        }
+
+        private Object _setErrorMode(Joe joe, Args args) {
+            args.exactArity(1, "setErrorMode(mode)");
+            var mode = joe.toEnum(args.next(), ErrorMode.class);
+
+            setErrorMode(mode);
+            return this;
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    // Error Mode
+
+    public enum ErrorMode {
+        FAIL,
+        MACRO,
+        IGNORE
     }
 }

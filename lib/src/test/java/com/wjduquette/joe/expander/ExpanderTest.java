@@ -9,13 +9,11 @@ import org.junit.Test;
 import static com.wjduquette.joe.checker.Checker.*;
 
 public class ExpanderTest extends Ted {
-    Joe joe;
     Expander expander;
 
     @Before
     public void setup() {
-        this.joe = new Joe();
-        this.expander = new Expander(joe);
+        this.expander = new Expander();
     }
 
     @Test
@@ -44,16 +42,35 @@ public class ExpanderTest extends Ted {
     }
 
     @Test
-    public void testExpander_macroError() {
-        test("testExpander_macroError");
+    public void testErrorMode_fail() {
+        test("testErrorMode_fail");
 
         try {
             expand("A<<Number.nonesuch(5)>>B");
             fail("Should have thrown an error");
         } catch (JoeError ex) {
             check(ex.getMessage()).eq("Undefined property 'nonesuch'.");
-            check(ex.getTraceReport()).eq("At (1,4) in source");
+            check(ex.getTraceReport())
+                .eq("In macro 'Number.nonesuch(5)'\nAt (1,4) in source");
         }
+    }
+
+    @Test
+    public void testErrorMode_macro() {
+        test("testErrorMode_macro");
+
+        expander.setErrorMode(Expander.ErrorMode.MACRO);
+        var source = "A<<Number.nonesuch(5)>>B";
+        check(expand(source)).eq(source);
+    }
+
+    @Test
+    public void testErrorMode_ignore() {
+        test("testErrorMode_ignore");
+
+        expander.setErrorMode(Expander.ErrorMode.IGNORE);
+        var source = "A<<Number.nonesuch(5)>>B";
+        check(expand(source)).eq("AB");
     }
 
     @Test
