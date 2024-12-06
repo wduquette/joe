@@ -1,6 +1,5 @@
 package com.wjduquette.joe.expander;
 
-import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.Ted;
 import org.junit.Before;
@@ -97,6 +96,36 @@ public class ExpanderTest extends Ted {
         expander.loadConfiguration("*config*", config);
         var out = expand(source).strip();
         check(out).eq("Title: Howdy!.");
+    }
+
+    @Test
+    public void testContextStack_empty() {
+        test("testContextStack_empty");
+        var source = """
+            Current=[<<Expander.current()>>]
+            """;
+        check(expand(source).stripTrailing())
+            .eq("Current=[null]");
+    }
+
+    @Test
+    public void testContextStack_pushPop_ok() {
+        test("testContextStack_pushPop_ok");
+        var source = """
+            +++<<Expander.push(#test)>>abcd<<Expander.pop(#test)>>+++
+            """;
+        check(expand(source).stripTrailing())
+            .eq("+++abcd+++");
+    }
+
+    @Test
+    public void testContextStack_pushPop_mismatch() {
+        test("testContextStack_pushPop_mismatch");
+        var source = """
+            +++<<Expander.push(#a)>>abcd<<Expander.pop(#b)>>+++
+            """;
+        checkThrow(() -> expand(source))
+            .containsString("Expected context '#a', got: Keyword '#b'");
     }
 
     private String expand(String source) {
