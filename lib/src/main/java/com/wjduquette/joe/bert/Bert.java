@@ -6,6 +6,8 @@ public class Bert {
     public static void main(String[] args) {
         System.out.println("Bert!");
         var chunk = new Chunk();
+        chunk.write(Opcode.CONSTANT);
+        chunk.write(chunk.addConstant("Howdy!"));
         chunk.write(Opcode.RETURN);
 
         var dis = new Disassembler();

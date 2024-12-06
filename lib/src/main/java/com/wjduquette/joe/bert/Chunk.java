@@ -1,6 +1,8 @@
 package com.wjduquette.joe.bert;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Chunk is used to accumulate the byte-code, etc., for a script or
@@ -37,36 +39,85 @@ class Chunk {
     // Instance Variables
 
     // The compiled "byte" code.
-    private char[] code;
+    private char[] code = new char[8];
 
-    // The number of items added to the array.
+    // The number of items in the code array.
     private int size = 0;
+
+    // The array of constants
+    private Object[] constants = new Object[8];
+    private char constantSize = 0;
+    private final Map<Object,Character> cache = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
 
     Chunk() {
-        code = new char[8];
+        // Nothing to do
     }
 
     //-------------------------------------------------------------------------
     // Methods
 
+    /**
+     * Writes a char value to the code array, growing the array as needed.
+     * @param value The value
+     */
     void write(char value) {
         // FIRST, grow the array if necessary
         if (size == code.length) {
             code = Arrays.copyOf(code, 2*code.length);
         }
 
-        // NEXT, emit the value.
+        // NEXT, add the value.
         code[size++] = value;
     }
 
-    int size() {
+    /**
+     * Gets the size of the code array.
+     * @return The size
+     */
+    int codeSize() {
         return size;
     }
 
-    char get(int offset) {
-        return code[offset];
+    /**
+     * Gets the value at the given index in the code array
+     * @param index The index
+     * @return The value
+     */
+    char get(int index) {
+        return code[index];
+    }
+
+    /**
+     * Adds a constant to the chunk, and returns its index.  If the
+     * constant had already been added, returns the existing index.
+     * @param constant The constant value
+     * @return the index
+     */
+    char addConstant(Object constant) {
+        // TODO: Check for max constants.
+        var index = cache.get(constant);
+
+        if (index == null) {
+            if (constantSize == constants.length) {
+                constants = Arrays.copyOf(constants, 2*constants.length);
+            }
+            index = constantSize++;
+            constants[index] = constant;
+            cache.put(constant, index);
+        }
+
+        return index;
+    }
+
+    /**
+     * Gets the constant at the given index.
+     * @param index The index
+     * @return The constant value
+     */
+    Object getConstant(int index) {
+        return constants[index];
     }
 }

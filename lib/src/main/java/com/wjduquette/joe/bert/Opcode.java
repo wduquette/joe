@@ -6,12 +6,14 @@ public class Opcode {
     //-------------------------------------------------------------------------
     // Opcode Definitions
 
-    public static final char RETURN = 0;
+    public static final char CONSTANT = 0;
+    public static final char RETURN = 1;
 
     //-------------------------------------------------------------------------
     // Opcode names
 
     private static final String[] names = {
+        "CONSTANT",
         "RETURN"
     };
 
