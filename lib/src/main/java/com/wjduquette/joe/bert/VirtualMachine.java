@@ -47,11 +47,11 @@ class VirtualMachine {
     // Methods
 
     void interpret(String source) {
-        compiler.compile(source);
-//        this.chunk = chunk;
-//        this.ip = 0;
-//        resetStack();
-//        run();
+        this.chunk = new Chunk();
+        compiler.compile(source, chunk);
+        this.ip = 0;
+        resetStack();
+        run();
     }
 
     // At present this uses Chunk directly.  Later the chunk info will

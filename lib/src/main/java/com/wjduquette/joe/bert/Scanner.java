@@ -74,11 +74,12 @@ public class Scanner {
      */
     Scanner(
         String filename,
-        String source
+        String source,
+        Consumer<Trace> reporter
     ) {
         this.source = source;
         this.buffer = new SourceBuffer(filename, source);
-        this.reporter = this::dumpTrace;
+        this.reporter = reporter;
     }
 
     Token scanToken() {
@@ -213,9 +214,5 @@ public class Scanner {
     private Token errorToken(String message) {
         reporter.accept(new Trace(buffer.span(start, current), message));
         return new Token(ERROR, null, null);
-    }
-
-    private void dumpTrace(Trace trace) {
-        Bert.println("[" + trace.line() + "] " + trace.message());
     }
 }
