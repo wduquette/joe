@@ -9,6 +9,6 @@ public class Bert {
         chunk.write(Opcode.RETURN);
 
         var dis = new Disassembler();
-        dis.disassemble("test chunk", chunk);
+        System.out.println(dis.disassemble("test chunk", chunk));
     }
 }

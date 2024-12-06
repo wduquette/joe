@@ -21,36 +21,47 @@ public class Disassembler {
     //-------------------------------------------------------------------------
     // Methods
 
-    void disassemble(String name, Chunk chunk) {
+    String disassemble(String name, Chunk chunk) {
         this.chunk = chunk;
+        var buff = new StringBuilder();
 
-        System.out.println("== " + name + "==");
+        buff.append("== ").append(name).append("==\n");
 
         for (int ip = 0; ip < chunk.size(); ) {
-            ip = instruction(ip);
+            var pair = instruction(ip);
+            buff.append(pair.result).append("\n");
+            ip = pair.next;
         }
+
+        return buff.toString();
     }
 
-    int disassembleInstruction(Chunk chunk, int offset) {
+    String disassembleInstruction(Chunk chunk, int offset) {
         this.chunk = chunk;
-        return instruction(offset);
+        return instruction(offset).result;
     }
 
-    private int instruction(int ip) {
-        System.out.printf("%04d ", ip);
-
+    private Pair instruction(int ip) {
         var opcode = chunk.get(ip);
         return switch (opcode) {
             case RETURN -> simpleInstruction(opcode, ip);
-            default -> {
-                System.out.println("Unknown opcode: " + opcode + ".");
-                yield ip + 1;
-            }
+            default -> unknownOpcode(opcode, ip);
         };
     }
 
-    private int simpleInstruction(char opcode, int ip) {
-        System.out.println(Opcode.name(opcode));
-        return ip + 1;
+    private Pair simpleInstruction(char opcode, int ip) {
+        var text = String.format("%04d %s", ip, Opcode.name(opcode));
+        return new Pair(text, ip + 1);
     }
+
+    private Pair unknownOpcode(char opcode, int ip) {
+        var text = String.format("%04d Unknown opcode %03d", ip, opcode);
+        return new Pair(text, ip + 1);
+    }
+
+    //-------------------------------------------------------------------------
+    // Helpers
+
+    // The result of disassembling a single instruction.
+    private record Pair(String result, int next) { }
 }
