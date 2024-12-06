@@ -1,5 +1,7 @@
 package com.wjduquette.joe.bert;
 
+import java.util.Arrays;
+
 import static com.wjduquette.joe.bert.Opcode.*;
 
 class VirtualMachine {
@@ -26,7 +28,7 @@ class VirtualMachine {
     private int ip;
 
     // The value stack
-    private final Object[] stack = new Object[DEFAULT_STACK_SIZE];
+    private Object[] stack = new Object[DEFAULT_STACK_SIZE];
 
     // The number of items on the stack.  The top item is at
     // stack[top - 1].
@@ -121,8 +123,9 @@ class VirtualMachine {
     }
 
     private void push(Object value) {
-        // TODO: grow the stack instead of overflowing.
-        // Growth will be limited by the call stack, not by this.
+        if (top == stack.length) {
+            stack = Arrays.copyOf(stack, 2*stack.length);
+        }
         stack[top++] = value;
     }
 
