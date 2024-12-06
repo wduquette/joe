@@ -13,6 +13,13 @@ class Chunk {
     //-------------------------------------------------------------------------
     // # clox Notes
     //
+    // ## Chars instead of Bytes
+    //
+    // `clox` uses actual bytes, unsigned 8-bit integers.  Java has no
+    // unsigned 8-bit type, so we use `char`, an unsigned 16-bit integer.
+    // Using `char` also gives us more than enough headroom for jump offsets
+    // and constant table indices.
+    //
     // ## Chunk Structure
     //
     // This is the analogue of the `Chunk` in Nystrom Ch 14.  In `clox`,
@@ -28,18 +35,19 @@ class Chunk {
     // compilation; and then a more concise set of data will be copied to
     // the `Function` object to minimize access time.
     //
-    // ## Chars instead of Bytes
-    //
-    // `clox` uses actual bytes, unsigned 8-bit integers.  Java has no
-    // unsigned 8-bit type, so we use `char`, an unsigned 16-bit integer.
-    // Using `char` also gives us more than enough headroom for jump offsets
-    // and constant table indices.
+    // - A code[] array that's exactly the right size.
+    // - A constants[] array that's exactly the right size, with no cache.
+    // - A LineInfo value that will return the source line for each
+    //   code index.
 
     //-------------------------------------------------------------------------
     // Instance Variables
 
     // The compiled "byte" code.
     private char[] code = new char[8];
+
+    // The source line number associated with each opcode
+    private int[] lines = new int[8];
 
     // The number of items in the code array.
     private int size = 0;
@@ -62,14 +70,17 @@ class Chunk {
     /**
      * Writes a char value to the code array, growing the array as needed.
      * @param value The value
+     * @param line The line in the source code.
      */
-    void write(char value) {
+    void write(char value, int line) {
         // FIRST, grow the array if necessary
         if (size == code.length) {
             code = Arrays.copyOf(code, 2*code.length);
+            lines = Arrays.copyOf(lines, 2*code.length);
         }
 
         // NEXT, add the value.
+        lines[size] = line;
         code[size++] = value;
     }
 
@@ -86,8 +97,12 @@ class Chunk {
      * @param index The index
      * @return The value
      */
-    char get(int index) {
+    char code(int index) {
         return code[index];
+    }
+
+    int line(int index) {
+        return lines[index];
     }
 
     /**

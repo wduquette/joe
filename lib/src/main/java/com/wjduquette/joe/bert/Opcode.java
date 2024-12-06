@@ -26,6 +26,7 @@ public class Opcode {
      * @return The name
      */
     public static String name(char opcode) {
-        return names[opcode];
+        return opcode <= names.length
+            ? names[opcode] : "Unknown";
     }
 }

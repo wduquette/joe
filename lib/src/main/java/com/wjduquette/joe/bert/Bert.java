@@ -6,9 +6,9 @@ public class Bert {
     public static void main(String[] args) {
         System.out.println("Bert!");
         var chunk = new Chunk();
-        chunk.write(Opcode.CONSTANT);
-        chunk.write(chunk.addConstant("Howdy!"));
-        chunk.write(Opcode.RETURN);
+        chunk.write(Opcode.CONSTANT, 1);
+        chunk.write(chunk.addConstant("Howdy!"), 1);
+        chunk.write(Opcode.RETURN, 2);
 
         var dis = new Disassembler();
         System.out.println(dis.disassemble("test chunk", chunk));

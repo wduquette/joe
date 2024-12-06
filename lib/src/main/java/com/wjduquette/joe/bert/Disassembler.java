@@ -29,45 +29,64 @@ public class Disassembler {
 
         for (int ip = 0; ip < chunk.codeSize(); ) {
             var pair = instruction(ip);
-            buff.append(pair.result).append("\n");
+            buff.append(chunkPrefix(ip))
+                .append(pair.result)
+                .append("\n");
             ip = pair.next;
         }
 
         return buff.toString();
     }
 
-    String disassembleInstruction(Chunk chunk, int offset) {
+    String disassembleInstruction(Chunk chunk, int ip) {
         this.chunk = chunk;
-        return instruction(offset).result;
+        return singlePrefix(ip) + instruction(ip).result;
     }
 
     private Pair instruction(int ip) {
-        var opcode = chunk.get(ip);
+        var opcode = chunk.code(ip);
         return switch (opcode) {
-            case CONSTANT -> constantInstruction(opcode, ip);
-            case RETURN -> simpleInstruction(opcode, ip);
-            default -> unknownOpcode(opcode, ip);
+            case CONSTANT -> constantInstruction(ip);
+            case RETURN -> simpleInstruction(ip);
+            default -> unknownOpcode(ip);
         };
     }
 
-    private Pair constantInstruction(char opcode, int ip) {
-        int index = chunk.get(ip + 1);
+    private Pair constantInstruction(int ip) {
+        int index = chunk.code(ip + 1);
         var constant = chunk.getConstant(index);
-        var text = String.format("%04d %-9s %04d '%s'",
-            ip, Opcode.name(opcode), index,
-            Bert.stringify(constant));
+        var text = String.format(" %04d '%s'",
+            index, Bert.stringify(constant));
         return new Pair(text, ip + 2);
     }
 
-    private Pair simpleInstruction(char opcode, int ip) {
-        var text = String.format("%04d %s", ip, Opcode.name(opcode));
+    private Pair simpleInstruction(int ip) {
+        return new Pair("", ip + 1);
+    }
+
+    private Pair unknownOpcode(int ip) {
+        var opcode = chunk.code(ip);
+        var text = String.format(" %03d", (int)opcode);
         return new Pair(text, ip + 1);
     }
 
-    private Pair unknownOpcode(char opcode, int ip) {
-        var text = String.format("%04d Unknown opcode %03d",
-            ip, (int)opcode);
-        return new Pair(text, ip + 1);
+    private String singlePrefix(int ip) {
+        char opcode = chunk.code(ip);
+        return String.format("%04d %4d %-9s",
+            ip, chunk.line(ip), Opcode.name(opcode));
+    }
+
+    private String chunkPrefix(int ip) {
+        String line;
+        char opcode = chunk.code(ip);
+
+        if (ip > 0 && chunk.line(ip) == chunk.line(ip - 1)) {
+            line = "   | ";
+        } else {
+            line = String.format("%4d ", chunk.line(ip));
+        }
+
+        return String.format("%04d %s %-9s", ip, line, Opcode.name(opcode));
     }
 
     //-------------------------------------------------------------------------
