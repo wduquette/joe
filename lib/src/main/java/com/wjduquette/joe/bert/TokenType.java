@@ -1,0 +1,37 @@
+package com.wjduquette.joe.bert;
+
+enum TokenType {
+    // Single-character tokens.
+    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
+    AT, BACK_SLASH, COLON, COMMA, DOT, MINUS, PLUS, QUESTION,
+    SEMICOLON, SLASH, STAR,
+
+    // One or two character tokens.
+    AND,
+    BANG, BANG_EQUAL,
+    EQUAL, EQUAL_EQUAL,
+    GREATER, GREATER_EQUAL,
+    MINUS_EQUAL,
+    MINUS_GREATER,
+    MINUS_MINUS,
+    LESS, LESS_EQUAL,
+    OR,
+    PLUS_EQUAL,
+    PLUS_PLUS,
+    SLASH_EQUAL,
+    STAR_EQUAL,
+
+    // Literals.
+    IDENTIFIER, STRING, NUMBER, KEYWORD,
+
+    // Reserved Words.
+    ASSERT, BREAK, CASE, CLASS, CONTINUE, DEFAULT, ELSE, EXTENDS,
+    FALSE, FOR, FOREACH, FUNCTION, IF, IN, METHOD, NI, NULL, RETURN,
+    STATIC, SUPER, SWITCH, THIS, THROW, TRUE, VAR, WHILE,
+
+    // Temporary Reserved Word
+    PRINT,
+
+    ERROR,
+    EOF
+}

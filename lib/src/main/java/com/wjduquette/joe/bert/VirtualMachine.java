@@ -17,6 +17,9 @@ class VirtualMachine {
     // The Disassembler
     private final Disassembler disassembler = new Disassembler();
 
+    // The Compiler
+    private final Compiler compiler = new Compiler();
+
     //
     // Runtime Data
     //
@@ -43,11 +46,12 @@ class VirtualMachine {
     //-------------------------------------------------------------------------
     // Methods
 
-    void interpret(Chunk chunk) {
-        this.chunk = chunk;
-        this.ip = 0;
-        resetStack();
-        run();
+    void interpret(String source) {
+        compiler.compile(source);
+//        this.chunk = chunk;
+//        this.ip = 0;
+//        resetStack();
+//        run();
     }
 
     // At present this uses Chunk directly.  Later the chunk info will
