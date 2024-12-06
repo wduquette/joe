@@ -18,6 +18,11 @@ public class Bert {
         vm.interpret(chunk);
     }
 
+    // Stand in for BertEngine::isDebug
+    public static boolean isDebug() {
+        return true;
+    }
+
     // Stand in for Joe::stringify
     public static String stringify(Object value) {
         return switch (value) {

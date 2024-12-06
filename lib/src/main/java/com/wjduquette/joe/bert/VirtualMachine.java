@@ -9,6 +9,7 @@ class VirtualMachine {
     // The current chunk.  Later, this will be a `Function`.
     private Chunk chunk = null;
     private int ip;
+    private final Disassembler disassembler = new Disassembler();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -29,6 +30,9 @@ class VirtualMachine {
     // be in `Function` in a more efficient form.
     private void run() {
         for (;;) {
+            if (Bert.isDebug()) {
+                Bert.println(disassembler.disassembleInstruction(chunk, ip));
+            }
             var opcode = chunk.code(ip++);
             switch (opcode) {
                 case CONSTANT -> {

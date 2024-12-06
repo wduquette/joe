@@ -72,8 +72,8 @@ public class Disassembler {
 
     private String singlePrefix(int ip) {
         char opcode = chunk.code(ip);
-        return String.format("%04d %4d %-9s",
-            ip, chunk.line(ip), Opcode.name(opcode));
+        return String.format("%04d @%04d %-9s",
+            chunk.line(ip), ip, Opcode.name(opcode));
     }
 
     private String chunkPrefix(int ip) {
@@ -83,10 +83,10 @@ public class Disassembler {
         if (ip > 0 && chunk.line(ip) == chunk.line(ip - 1)) {
             line = "   | ";
         } else {
-            line = String.format("%4d ", chunk.line(ip));
+            line = String.format("%04d ", chunk.line(ip));
         }
 
-        return String.format("%04d %s %-9s", ip, line, Opcode.name(opcode));
+        return String.format("%s @%04d %-9s", line, ip, Opcode.name(opcode));
     }
 
     //-------------------------------------------------------------------------
