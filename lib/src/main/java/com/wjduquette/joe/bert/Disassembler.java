@@ -50,12 +50,12 @@ public class Disassembler {
         };
     }
 
-    // TODO: Need to use stringify().
     private Pair constantInstruction(char opcode, int ip) {
         int index = chunk.get(ip + 1);
         var constant = chunk.getConstant(index);
         var text = String.format("%04d %-9s %04d '%s'",
-            ip, Opcode.name(opcode), index, constant.toString());
+            ip, Opcode.name(opcode), index,
+            Bert.stringify(constant));
         return new Pair(text, ip + 2);
     }
 

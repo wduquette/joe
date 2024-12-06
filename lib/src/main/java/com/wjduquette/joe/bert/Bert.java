@@ -13,4 +13,8 @@ public class Bert {
         var dis = new Disassembler();
         System.out.println(dis.disassemble("test chunk", chunk));
     }
+
+    public static String stringify(Object value) {
+        return value.toString();
+    }
 }
