@@ -1,25 +1,22 @@
 package com.wjduquette.joe.types;
 
-import com.wjduquette.joe.JoeClass;
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.JoeObject;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.wjduquette.joe.*;
 
 public class TextBuilder implements JoeObject {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final JoeClass joeClass;
-    private final Map<String,Object> fields = new HashMap<>();
+    // The object infrastructure
+    private final JoeObjectCore core;
+
+    // The buffer
     private StringBuilder buff = new StringBuilder();
 
     //-------------------------------------------------------------------------
     // Constructor
 
     public TextBuilder(JoeClass joeClass) {
-        this.joeClass = joeClass;
+        this.core = new JoeObjectCore(joeClass, this);
     }
 
     //-------------------------------------------------------------------------
@@ -34,36 +31,16 @@ public class TextBuilder implements JoeObject {
         return this;
     }
 
-    //-------------------------------------------------------------------------
-    // JoeObject API
-
-    @Override
-    public String typeName() {
-        return joeClass.name();
-    }
-
-    @Override
-    public Object get(String name) {
-        var value = fields.get(name);
-
-        if (value == null) {
-            value = joeClass.bind(this, name);
-        }
-
-        if (value != null) {
-            return value;
-        } else {
-            throw new JoeError("Undefined property: '" + name + "'.");
-        }
-    }
-
-    @Override
-    public void set(String name, Object value) {
-        fields.put(name, value);
-    }
-
-    @Override
     public String toString() {
         return buff.toString();
     }
+
+    //-------------------------------------------------------------------------
+    // JoeObject API
+
+    @Override public String typeName() { return core.typeName(); }
+    @Override public Object get(String name) { return core.get(name); }
+    @Override public void set(String name, Object value) { core.set(name, value); }
+    @Override public String stringify(Joe joe) { return core.stringify(joe); }
+
 }
