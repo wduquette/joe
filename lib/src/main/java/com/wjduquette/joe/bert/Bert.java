@@ -12,9 +12,22 @@ public class Bert {
 
         var dis = new Disassembler();
         System.out.println(dis.disassemble("test chunk", chunk));
+
+        var vm = new VirtualMachine();
+        println("== Execution ==");
+        vm.interpret(chunk);
     }
 
+    // Stand in for Joe::stringify
     public static String stringify(Object value) {
-        return value.toString();
+        return switch (value) {
+            case null -> "null";
+            default -> value.toString();
+        };
+    }
+
+    // Stand in for Joe::println
+    public static void println(String text) {
+        System.out.println(text);
     }
 }
