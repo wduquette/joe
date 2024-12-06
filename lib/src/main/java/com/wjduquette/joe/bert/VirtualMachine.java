@@ -58,10 +58,31 @@ class VirtualMachine {
             }
             var opcode = chunk.code(ip++);
             switch (opcode) {
-                case CONSTANT -> push(readConstant());
+                case ADD -> {
+                    var b = (double)pop();
+                    var a = (double)pop();
+                    push(a + b);
+                }
+                case CONST -> push(readConstant());
+                case DIV -> {
+                    var b = (double)pop();
+                    var a = (double)pop();
+                    push(a / b);
+                }
+                case MUL -> {
+                    var b = (double)pop();
+                    var a = (double)pop();
+                    push(a * b);
+                }
+                case NEGATE -> push(-(double)pop()); // Needs check!
                 case RETURN -> {
                     Bert.println(Bert.stringify(pop()));
                     return;
+                }
+                case SUB -> {
+                    var b = (double)pop();
+                    var a = (double)pop();
+                    push(a - b);
                 }
                 default -> throw new IllegalStateException(
                     "Unknown opcode: " + opcode + ".");

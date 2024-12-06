@@ -46,8 +46,9 @@ public class Disassembler {
     private Pair instruction(int ip) {
         var opcode = chunk.code(ip);
         return switch (opcode) {
-            case CONSTANT -> constantInstruction(ip);
-            case RETURN -> simpleInstruction(ip);
+            case CONST -> constantInstruction(ip);
+            case ADD, DIV, MUL, NEGATE, RETURN, SUB
+                -> simpleInstruction(ip);
             default -> unknownOpcode(ip);
         };
     }
@@ -72,7 +73,7 @@ public class Disassembler {
 
     private String singlePrefix(int ip) {
         char opcode = chunk.code(ip);
-        return String.format("%04d @%04d %-9s",
+        return String.format("%04d @%04d %-6s",
             chunk.line(ip), ip, Opcode.name(opcode));
     }
 
@@ -86,7 +87,7 @@ public class Disassembler {
             line = String.format("%04d ", chunk.line(ip));
         }
 
-        return String.format("%s @%04d %-9s", line, ip, Opcode.name(opcode));
+        return String.format("%s @%04d %-6s", line, ip, Opcode.name(opcode));
     }
 
     //-------------------------------------------------------------------------
