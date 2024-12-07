@@ -68,7 +68,7 @@ class Compiler {
     }
 
     //-------------------------------------------------------------------------
-    // Parser
+    // Parser: Statements
 
     private void declaration() {
         if (match(VAR)) {
@@ -125,6 +125,8 @@ class Compiler {
     private void statement() {
         if (match(IF)) {
             ifStatement();
+        } else if (match(FOR)) {
+            forStatement();
         } else if (match(PRINT)) {
             printStatement();
         } else if (match(WHILE)) {
@@ -149,6 +151,49 @@ class Compiler {
         expression();
         consume(SEMICOLON, "Expected ';' after expression.");
         emit(Opcode.POP);
+    }
+
+    private void forStatement() {
+        beginScope();
+        consume(LEFT_PAREN, "Expected '(' after 'for'.");
+
+        // Initializer
+        if (match(SEMICOLON)) {
+            // No initializer
+        } else if (match(VAR)) {
+            varDeclaration();
+        } else {
+            expressionStatement();
+        }
+
+        // Condition
+        int loopStart = currentChunk().codeSize();
+        int exitJump = -1;
+        if (!match(SEMICOLON)) {
+            expression();
+            consume(SEMICOLON, "Expected ';' after loop condition.");
+
+            // Jump out of the loop if the condition is false.
+            exitJump = emitJump(Opcode.JIF);
+        }
+
+        if (!match(RIGHT_PAREN)) {
+            int bodyJump = emitJump(Opcode.JUMP);
+            int incrementStart = currentChunk().codeSize();
+            expression();
+            emit(Opcode.POP);
+            consume(RIGHT_PAREN, "Expected ')' after 'for' clauses.");
+            emitLoop(loopStart);
+            loopStart = incrementStart;
+            patchJump(bodyJump);
+        }
+
+        statement();
+        emitLoop(loopStart);
+        if (exitJump != -1) {
+            patchJump(exitJump);
+        }
+        endScope();
     }
 
     private void ifStatement() {
@@ -184,6 +229,8 @@ class Compiler {
         emit(Opcode.PRINT);
     }
 
+    //-------------------------------------------------------------------------
+    // Parser: Expressions
 
     private void expression() {
         parsePrecedence(Level.ASSIGNMENT);
