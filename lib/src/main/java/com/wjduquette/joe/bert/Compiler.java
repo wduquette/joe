@@ -127,6 +127,8 @@ class Compiler {
             ifStatement();
         } else if (match(PRINT)) {
             printStatement();
+        } else if (match(WHILE)) {
+            whileStatement();
         } else if (match(LEFT_BRACE)) {
             beginScope();
             block();
@@ -161,6 +163,19 @@ class Compiler {
 
         if (match(ELSE)) statement();
         patchJump(elseJump);
+    }
+
+    private void whileStatement() {
+        int loopStart = currentChunk().codeSize();
+        consume(LEFT_PAREN, "Expected '(' after 'while'.");
+        expression();
+        consume(RIGHT_PAREN, "Expected '(' after condition.");
+
+        int exitJump = emitJump(Opcode.JIF);
+        statement();
+        emitLoop(loopStart);
+
+        patchJump(exitJump);
     }
 
     private void printStatement() {
@@ -448,6 +463,13 @@ class Compiler {
         emit(opcode);
         emit(Character.MAX_VALUE);
         return currentChunk().codeSize() - 1;
+    }
+
+    private void emitLoop(int loopStart) {
+        emit(Opcode.LOOP);
+        int offset = currentChunk().codeSize() - loopStart + 1;
+        if (offset > Character.MAX_VALUE) error("Loop body too large.");
+        emit((char)offset);
     }
 
     private void patchJump(int offset) {
