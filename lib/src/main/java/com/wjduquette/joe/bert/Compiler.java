@@ -106,11 +106,11 @@ class Compiler {
         }
     }
 
-    private void number() {
+    private void literal() {
         emitConstant(parser.previous.literal());
     }
 
-    private void literal() {
+    private void symbol() {
         switch (parser.previous.type()) {
             case FALSE -> emit(Opcode.FALSE);
             case NULL -> emit(Opcode.NULL);
@@ -283,8 +283,8 @@ class Compiler {
         rule(STAR_EQUAL,      null,           null,         Level.NONE);
         // Literals
         rule(IDENTIFIER,      null,           null,         Level.NONE);
-        rule(STRING,          null,           null,         Level.NONE);
-        rule(NUMBER,          this::number,   null,         Level.NONE);
+        rule(STRING,          this::literal,  null,         Level.NONE);
+        rule(NUMBER,          this::literal,  null,         Level.NONE);
         rule(KEYWORD,         null,           null,         Level.NONE);
         // Reserved words
         rule(ASSERT,          null,           null,         Level.NONE);
@@ -295,7 +295,7 @@ class Compiler {
         rule(DEFAULT,         null,           null,         Level.NONE);
         rule(ELSE,            null,           null,         Level.NONE);
         rule(EXTENDS,         null,           null,         Level.NONE);
-        rule(FALSE,           this::literal,  null,         Level.NONE);
+        rule(FALSE,           this::symbol,   null,         Level.NONE);
         rule(FOR,             null,           null,         Level.NONE);
         rule(FOREACH,         null,           null,         Level.NONE);
         rule(FUNCTION,        null,           null,         Level.NONE);
@@ -303,14 +303,14 @@ class Compiler {
         rule(IN,              null,           null,         Level.NONE);
         rule(METHOD,          null,           null,         Level.NONE);
         rule(NI,              null,           null,         Level.NONE);
-        rule(NULL,            this::literal,  null,         Level.NONE);
+        rule(NULL,            this::symbol,   null,         Level.NONE);
         rule(RETURN,          null,           null,         Level.NONE);
         rule(STATIC,          null,           null,         Level.NONE);
         rule(SUPER,           null,           null,         Level.NONE);
         rule(SWITCH,          null,           null,         Level.NONE);
         rule(THIS,            null,           null,         Level.NONE);
         rule(THROW,           null,           null,         Level.NONE);
-        rule(TRUE,            this::literal,  null,         Level.NONE);
+        rule(TRUE,            this::symbol,   null,         Level.NONE);
         rule(VAR,             null,           null,         Level.NONE);
         rule(WHILE,           null,           null,         Level.NONE);
         rule(PRINT,           null,           null,         Level.NONE);
