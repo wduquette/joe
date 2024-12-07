@@ -1,0 +1,260 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Appendix: Virtual Machine - Joe v0.5.0 User&#x27;s Guide</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="changes.html">Change Log</a></li><li class="chapter-item expanded affix "><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Language Reference</li><li class="chapter-item expanded "><a href="language.html"><strong aria-hidden="true">1.</strong> The Joe Language</a></li><li class="chapter-item expanded "><a href="types.html"><strong aria-hidden="true">2.</strong> Types and Values</a></li><li class="chapter-item expanded "><a href="operators.html"><strong aria-hidden="true">3.</strong> Operators</a></li><li class="chapter-item expanded "><a href="statements.html"><strong aria-hidden="true">4.</strong> Statements</a></li><li class="chapter-item expanded "><a href="functions.html"><strong aria-hidden="true">5.</strong> Functions</a></li><li class="chapter-item expanded "><a href="classes.html"><strong aria-hidden="true">6.</strong> Classes</a></li><li class="chapter-item expanded affix "><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Embedding and Extending Joe</li><li class="chapter-item expanded "><a href="embedding/embedding.html"><strong aria-hidden="true">7.</strong> Embedding Joe</a></li><li class="chapter-item expanded "><a href="extending/extending.html"><strong aria-hidden="true">8.</strong> Extending Joe</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="extending/java_types.html"><strong aria-hidden="true">8.1.</strong> Joe and Java Data Types</a></li><li class="chapter-item "><a href="extending/native_functions.html"><strong aria-hidden="true">8.2.</strong> Native Functions</a></li><li class="chapter-item "><a href="extending/registered_types.html"><strong aria-hidden="true">8.3.</strong> Registered Types</a></li><li class="chapter-item "><a href="extending/packages.html"><strong aria-hidden="true">8.4.</strong> Joe Packages</a></li></ol></li><li class="chapter-item expanded "><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Joe Tools</li><li class="chapter-item expanded "><a href="joe_version.html"><strong aria-hidden="true">9.</strong> joe version</a></li><li class="chapter-item expanded "><a href="joe_run.html"><strong aria-hidden="true">10.</strong> joe run</a></li><li class="chapter-item expanded "><a href="joe_repl.html"><strong aria-hidden="true">11.</strong> joe repl</a></li><li class="chapter-item expanded "><a href="joe_test.html"><strong aria-hidden="true">12.</strong> joe test</a></li><li class="chapter-item expanded "><a href="joe_doc.html"><strong aria-hidden="true">13.</strong> joe doc</a></li><li class="chapter-item expanded affix "><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Library Reference</li><li class="chapter-item expanded "><a href="library/index.html"><strong aria-hidden="true">14.</strong> Library API</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="library/pkg.joe.html"><strong aria-hidden="true">14.1.</strong> Joe Standard Library (joe)</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="library/type.joe.AssertError.html"><strong aria-hidden="true">14.1.1.</strong> AssertError Type</a></li><li class="chapter-item "><a href="library/type.joe.Boolean.html"><strong aria-hidden="true">14.1.2.</strong> Boolean Type</a></li><li class="chapter-item "><a href="library/type.joe.Error.html"><strong aria-hidden="true">14.1.3.</strong> Error Type</a></li><li class="chapter-item "><a href="library/type.joe.Keyword.html"><strong aria-hidden="true">14.1.4.</strong> Keyword Type</a></li><li class="chapter-item "><a href="library/type.joe.List.html"><strong aria-hidden="true">14.1.5.</strong> List Type</a></li><li class="chapter-item "><a href="library/type.joe.Map.html"><strong aria-hidden="true">14.1.6.</strong> Map Type</a></li><li class="chapter-item "><a href="library/type.joe.Number.html"><strong aria-hidden="true">14.1.7.</strong> Number Type</a></li><li class="chapter-item "><a href="library/type.joe.Set.html"><strong aria-hidden="true">14.1.8.</strong> Set Type</a></li><li class="chapter-item "><a href="library/type.joe.String.html"><strong aria-hidden="true">14.1.9.</strong> String Type</a></li><li class="chapter-item "><a href="library/type.joe.TextBuilder.html"><strong aria-hidden="true">14.1.10.</strong> TextBuilder Type</a></li><li class="chapter-item "><a href="library/type.joe.Tuple.html"><strong aria-hidden="true">14.1.11.</strong> Tuple Type</a></li></ol></li><li class="chapter-item "><a href="library/pkg.joe.test.html"><strong aria-hidden="true">14.2.</strong> Joe Test Tool API (joe.test)</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="library/type.joe.test.CatchChecker.html"><strong aria-hidden="true">14.2.1.</strong> CatchChecker Type</a></li><li class="chapter-item "><a href="library/type.joe.test.ValueChecker.html"><strong aria-hidden="true">14.2.2.</strong> ValueChecker Type</a></li></ol></li><li class="chapter-item "><a href="library/pkg.joe.doc.html"><strong aria-hidden="true">14.3.</strong> JoeDoc Configuration API (joe.doc)</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="library/type.joe.doc.DocConfig.html"><strong aria-hidden="true">14.3.1.</strong> DocConfig Type</a></li></ol></li><li class="chapter-item "><a href="library/pkg.joe.console.html"><strong aria-hidden="true">14.4.</strong> Console API (joe.console)</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="library/type.joe.console.Console.html"><strong aria-hidden="true">14.4.1.</strong> Console Type</a></li><li class="chapter-item "><a href="library/type.joe.console.Path.html"><strong aria-hidden="true">14.4.2.</strong> Path Type</a></li></ol></li><li class="chapter-item "><a href="library/pkg.joe.win.html"><strong aria-hidden="true">14.5.</strong> GUI API (joe.win)</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="library/type.joe.win.Control.html"><strong aria-hidden="true">14.5.1.</strong> Control Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Button.html"><strong aria-hidden="true">14.5.2.</strong> Button Type</a></li><li class="chapter-item "><a href="library/type.joe.win.GridPane.html"><strong aria-hidden="true">14.5.3.</strong> GridPane Type</a></li><li class="chapter-item "><a href="library/type.joe.win.HBox.html"><strong aria-hidden="true">14.5.4.</strong> HBox Type</a></li><li class="chapter-item "><a href="library/type.joe.win.HPos.html"><strong aria-hidden="true">14.5.5.</strong> HPos Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Insets.html"><strong aria-hidden="true">14.5.6.</strong> Insets Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Label.html"><strong aria-hidden="true">14.5.7.</strong> Label Type</a></li><li class="chapter-item "><a href="library/type.joe.win.ListView.html"><strong aria-hidden="true">14.5.8.</strong> ListView Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Menu.html"><strong aria-hidden="true">14.5.9.</strong> Menu Type</a></li><li class="chapter-item "><a href="library/type.joe.win.MenuBar.html"><strong aria-hidden="true">14.5.10.</strong> MenuBar Type</a></li><li class="chapter-item "><a href="library/type.joe.win.MenuItem.html"><strong aria-hidden="true">14.5.11.</strong> MenuItem Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Node.html"><strong aria-hidden="true">14.5.12.</strong> Node Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Orientation.html"><strong aria-hidden="true">14.5.13.</strong> Orientation Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Pane.html"><strong aria-hidden="true">14.5.14.</strong> Pane Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Pos.html"><strong aria-hidden="true">14.5.15.</strong> Pos Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Priority.html"><strong aria-hidden="true">14.5.16.</strong> Priority Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Region.html"><strong aria-hidden="true">14.5.17.</strong> Region Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Separator.html"><strong aria-hidden="true">14.5.18.</strong> Separator Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Side.html"><strong aria-hidden="true">14.5.19.</strong> Side Type</a></li><li class="chapter-item "><a href="library/type.joe.win.SplitPane.html"><strong aria-hidden="true">14.5.20.</strong> SplitPane Type</a></li><li class="chapter-item "><a href="library/type.joe.win.StackPane.html"><strong aria-hidden="true">14.5.21.</strong> StackPane Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Tab.html"><strong aria-hidden="true">14.5.22.</strong> Tab Type</a></li><li class="chapter-item "><a href="library/type.joe.win.TabPane.html"><strong aria-hidden="true">14.5.23.</strong> TabPane Type</a></li><li class="chapter-item "><a href="library/type.joe.win.VBox.html"><strong aria-hidden="true">14.5.24.</strong> VBox Type</a></li><li class="chapter-item "><a href="library/type.joe.win.VPos.html"><strong aria-hidden="true">14.5.25.</strong> VPos Type</a></li><li class="chapter-item "><a href="library/type.joe.win.Win.html"><strong aria-hidden="true">14.5.26.</strong> Win Type</a></li></ol></li><li class="chapter-item "><a href="library/index.html"><strong aria-hidden="true">14.6.</strong> Library API Index</a></li></ol></li><li class="chapter-item expanded "><li class="spacer"></li><li class="chapter-item expanded affix "><a href="grammar.html">Appendix: Joe Grammar</a></li><li class="chapter-item expanded affix "><a href="vm.html" class="active">Appendix: Virtual Machine</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Joe v0.5.0 User&#x27;s Guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="appendix-virtual-machine-instruction-set"><a class="header" href="#appendix-virtual-machine-instruction-set">Appendix: Virtual Machine Instruction Set</a></h1>
+<p>This is the instruction set for the experimental (and not yet
+complete) Bert byte-engine.</p>
+<div class="table-wrapper"><table><thead><tr><th>Opcode/argument</th><th>Stack effect</th><th>Description</th></tr></thead><tbody>
+<tr><td>ADD</td><td><em>a b</em> → <em>a</em> + <em>b</em></td><td>Add</td></tr>
+<tr><td>CONST <em>constant</em></td><td>∅ → <em>a</em></td><td>Load constant</td></tr>
+<tr><td>DIV</td><td><em>a b</em> → <em>a</em> / <em>b</em></td><td>Divide</td></tr>
+<tr><td>EQ</td><td><em>a b</em> → <em>a</em> == <em>b</em></td><td>Compare: equal</td></tr>
+<tr><td>FALSE</td><td>∅ → false</td><td>Load <code>false</code></td></tr>
+<tr><td>GE</td><td><em>a b</em> → <em>a</em> &gt;= <em>b</em></td><td>Compare: greater or equal</td></tr>
+<tr><td>GLODEF <em>constant</em></td><td><em>a</em> → ∅</td><td>Define gLobal</td></tr>
+<tr><td>GLOGET <em>constant</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
+<tr><td>GLOSET <em>constant</em></td><td><em>a</em> → <em>a</em></td><td>Set global</td></tr>
+<tr><td>GT</td><td><em>a b</em> → <em>a</em> &gt; <em>b</em></td><td>Compare: greater</td></tr>
+<tr><td>JIF <em>offset</em></td><td><em>cond</em> → ∅</td><td>Jump if false</td></tr>
+<tr><td>JIFKEEP <em>offset</em></td><td><em>cond</em> → <em>cond</em></td><td>Jump if false, keep value</td></tr>
+<tr><td>JITKEEP <em>offset</em></td><td><em>cond</em> → <em>cond</em></td><td>Jump if true, keep value</td></tr>
+<tr><td>JUMP <em>offset</em></td><td></td><td>Jump forwards</td></tr>
+<tr><td>LE</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less or equal</td></tr>
+<tr><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
+<tr><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
+<tr><td>LOOP <em>offset</em></td><td></td><td>Jump backwards</td></tr>
+<tr><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
+<tr><td>MUL</td><td><em>a b</em> → <em>a</em> * <em>b</em></td><td>Multiply</td></tr>
+<tr><td>NE</td><td><em>a b</em> → <em>a</em> &lt; <em>b</em></td><td>Compare: not equal</td></tr>
+<tr><td>NEGATE</td><td><em>a</em> → -<em>a</em></td><td>Negate</td></tr>
+<tr><td>NOT</td><td><em>a</em> → !<em>a</em></td><td>Not</td></tr>
+<tr><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
+<tr><td>POP</td><td><em>a</em> → ∅</td><td>Pop</td></tr>
+<tr><td>RETURN</td><td></td><td>Return</td></tr>
+<tr><td>SUB</td><td><em>a b</em> → <em>a</em> - <em>b</em></td><td>Subtract</td></tr>
+<tr><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
+</tbody></table>
+</div>
+<ul>
+<li><em>constant</em>: Index into the chunk's constants table</li>
+<li><em>offset</em>: A jump offset</li>
+<li><em>slot</em>: A stack slot</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="grammar.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="grammar.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

@@ -90,3 +90,4 @@
 ---
 
 [Appendix: Joe Grammar](grammar.md)
+[Appendix: Virtual Machine](vm.md)
