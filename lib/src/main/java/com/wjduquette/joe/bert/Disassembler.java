@@ -25,7 +25,19 @@ public class Disassembler {
         this.chunk = chunk;
         var buff = new StringBuilder();
 
-        buff.append("== ").append(name).append("==\n");
+        buff.append("=== ").append(name).append("===\n");
+
+        for (int i = 0; i < chunk.numConstants(); i++) {
+            buff.append("[")
+                .append(i)
+                .append("] = '")
+                .append(Bert.stringify(chunk.getConstant(i)))
+                .append("'\n");
+        }
+
+        if (chunk.numConstants() > 0) {
+            buff.append("\n");
+        }
 
         for (int ip = 0; ip < chunk.codeSize(); ) {
             var pair = instruction(ip);

@@ -58,7 +58,7 @@ class Chunk {
 
     // The array of constants
     private Object[] constants = new Object[8];
-    private char constantSize = 0;
+    private char numConstants = 0;
     private final Map<Object,Character> cache = new HashMap<>();
 
     //-------------------------------------------------------------------------
@@ -124,10 +124,10 @@ class Chunk {
         var index = cache.get(constant);
 
         if (index == null) {
-            if (constantSize == constants.length) {
+            if (numConstants == constants.length) {
                 constants = Arrays.copyOf(constants, 2*constants.length);
             }
-            index = constantSize++;
+            index = numConstants++;
             constants[index] = constant;
             cache.put(constant, index);
         }
@@ -142,5 +142,9 @@ class Chunk {
      */
     Object getConstant(int index) {
         return constants[index];
+    }
+
+    int numConstants() {
+        return numConstants;
     }
 }
