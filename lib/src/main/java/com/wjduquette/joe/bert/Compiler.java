@@ -93,6 +93,7 @@ class Compiler {
 
         // Emit the instruction
         switch (op) {
+            case BANG -> emit(Opcode.NOT);
             case MINUS -> emit(Opcode.NEGATE);
             default -> throw new IllegalStateException(
                 "Unexpected operator: " + op);
@@ -238,7 +239,9 @@ class Compiler {
 
     private final ParseRule[] rules = new ParseRule[TokenType.values().length];
 
+    // Tokens are in the same order as in TokenType
     private void populateRulesTable() {
+        // Single Character
         rule(LEFT_PAREN,      this::grouping, null,         Level.NONE);
         rule(RIGHT_PAREN,     null,           null,         Level.NONE);
         rule(LEFT_BRACE,      null,           null,         Level.NONE);
@@ -248,33 +251,36 @@ class Compiler {
         rule(COLON,           null,           null,         Level.NONE);
         rule(COMMA,           null,           null,         Level.NONE);
         rule(DOT,             null,           null,         Level.NONE);
-        rule(MINUS,           this::unary,    this::binary, Level.TERM);
-        rule(PLUS,            null,           this::binary, Level.TERM);
         rule(QUESTION,        null,           null,         Level.TERM);
         rule(SEMICOLON,       null,           null,         Level.NONE);
-        rule(SLASH,           null,           this::binary, Level.FACTOR);
-        rule(STAR,            null,           this::binary, Level.FACTOR);
+        // One or two character
         rule(AND,             null,           null,         Level.NONE);
-        rule(BANG,            null,           null,         Level.NONE);
+        rule(BANG,            this::unary,    null,         Level.NONE);
         rule(BANG_EQUAL,      null,           null,         Level.NONE);
         rule(EQUAL,           null,           null,         Level.NONE);
         rule(EQUAL_EQUAL,     null,           null,         Level.NONE);
         rule(GREATER,         null,           null,         Level.NONE);
         rule(GREATER_EQUAL,   null,           null,         Level.NONE);
+        rule(MINUS,           this::unary,    this::binary, Level.TERM);
         rule(MINUS_EQUAL,     null,           null,         Level.NONE);
         rule(MINUS_GREATER,   null,           null,         Level.NONE);
         rule(MINUS_MINUS,     null,           null,         Level.NONE);
         rule(LESS,            null,           null,         Level.NONE);
         rule(LESS_EQUAL,      null,           null,         Level.NONE);
         rule(OR,              null,           null,         Level.NONE);
+        rule(PLUS,            null,           this::binary, Level.TERM);
         rule(PLUS_EQUAL,      null,           null,         Level.NONE);
         rule(PLUS_PLUS,       null,           null,         Level.NONE);
+        rule(SLASH,           null,           this::binary, Level.FACTOR);
         rule(SLASH_EQUAL,     null,           null,         Level.NONE);
+        rule(STAR,            null,           this::binary, Level.FACTOR);
         rule(STAR_EQUAL,      null,           null,         Level.NONE);
+        // Literals
         rule(IDENTIFIER,      null,           null,         Level.NONE);
         rule(STRING,          null,           null,         Level.NONE);
         rule(NUMBER,          this::number,   null,         Level.NONE);
         rule(KEYWORD,         null,           null,         Level.NONE);
+        // Reserved words
         rule(ASSERT,          null,           null,         Level.NONE);
         rule(BREAK,           null,           null,         Level.NONE);
         rule(CASE,            null,           null,         Level.NONE);

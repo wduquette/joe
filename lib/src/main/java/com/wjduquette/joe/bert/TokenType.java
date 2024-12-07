@@ -3,23 +3,20 @@ package com.wjduquette.joe.bert;
 enum TokenType {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-    AT, BACK_SLASH, COLON, COMMA, DOT, MINUS, PLUS, QUESTION,
-    SEMICOLON, SLASH, STAR,
+    AT, BACK_SLASH, COLON, COMMA, DOT, QUESTION,
+    SEMICOLON,
 
     // One or two character tokens.
     AND,
     BANG, BANG_EQUAL,
     EQUAL, EQUAL_EQUAL,
     GREATER, GREATER_EQUAL,
-    MINUS_EQUAL,
-    MINUS_GREATER,
-    MINUS_MINUS,
+    MINUS, MINUS_EQUAL, MINUS_GREATER, MINUS_MINUS,
     LESS, LESS_EQUAL,
     OR,
-    PLUS_EQUAL,
-    PLUS_PLUS,
-    SLASH_EQUAL,
-    STAR_EQUAL,
+    PLUS, PLUS_EQUAL, PLUS_PLUS,
+    SLASH, SLASH_EQUAL,
+    STAR, STAR_EQUAL,
 
     // Literals.
     IDENTIFIER, STRING, NUMBER, KEYWORD,

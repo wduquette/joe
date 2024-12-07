@@ -11,11 +11,12 @@ public class Opcode {
     public static final char DIV = 2;
     public static final char FALSE = 3;
     public static final char MUL = 4;
-    public static final char NULL = 5;
-    public static final char NEGATE = 6;
-    public static final char RETURN = 7;
-    public static final char SUB = 8;
-    public static final char TRUE = 9;
+    public static final char NEGATE = 5;
+    public static final char NOT = 6;
+    public static final char NULL = 7;
+    public static final char RETURN = 8;
+    public static final char SUB = 9;
+    public static final char TRUE = 10;
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -27,6 +28,7 @@ public class Opcode {
         "FALSE",
         "MUL",
         "NEGATE",
+        "NOT",
         "NULL",
         "RETURN",
         "SUB",

@@ -92,6 +92,7 @@ class VirtualMachine {
                     checkNumericOperand(a);
                     push(-(double)pop()); // Needs check!
                 }
+                case NOT -> push(Bert.isFalsey(pop()));
                 case NULL -> push(null);
                 case RETURN -> {
                     Bert.println(Bert.stringify(pop()));

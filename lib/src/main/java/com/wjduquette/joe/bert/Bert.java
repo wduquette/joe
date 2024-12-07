@@ -1,5 +1,6 @@
 package com.wjduquette.joe.bert;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SyntaxError;
 
@@ -68,6 +69,10 @@ public class Bert {
 
     //-------------------------------------------------------------------------
     // Stand-ins
+
+    public static boolean isFalsey(Object value) {
+        return !Joe.isTruthy(value);
+    }
 
     // Stand in for BertEngine::isDebug
     public static boolean isDebug() {
