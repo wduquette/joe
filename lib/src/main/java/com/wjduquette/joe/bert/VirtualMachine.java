@@ -1,5 +1,8 @@
 package com.wjduquette.joe.bert;
 
+import com.wjduquette.joe.RuntimeError;
+import com.wjduquette.joe.SourceBuffer;
+
 import java.util.Arrays;
 
 import static com.wjduquette.joe.bert.Opcode.*;
@@ -65,34 +68,69 @@ class VirtualMachine {
             var opcode = chunk.code(ip++);
             switch (opcode) {
                 case ADD -> {
-                    var b = (double)pop();
-                    var a = (double)pop();
-                    push(a + b);
+                    var b = pop();
+                    var a = pop();
+                    checkNumericOperands(opcode, a, b);
+                    push((double)a + (double)b);
                 }
                 case CONST -> push(readConstant());
                 case DIV -> {
-                    var b = (double)pop();
-                    var a = (double)pop();
-                    push(a / b);
+                    var b = pop();
+                    var a = pop();
+                    checkNumericOperands(opcode, a, b);
+                    push((double)a / (double)b);
                 }
                 case MUL -> {
-                    var b = (double)pop();
-                    var a = (double)pop();
-                    push(a * b);
+                    var b = pop();
+                    var a = pop();
+                    checkNumericOperands(opcode, a, b);
+                    push((double)a * (double)b);
                 }
-                case NEGATE -> push(-(double)pop()); // Needs check!
+                case NEGATE -> {
+                    var a = pop();
+                    checkNumericOperand(a);
+                    push(-(double)pop()); // Needs check!
+                }
                 case RETURN -> {
                     Bert.println(Bert.stringify(pop()));
                     return;
                 }
                 case SUB -> {
-                    var b = (double)pop();
-                    var a = (double)pop();
-                    push(a - b);
+                    var b = pop();
+                    var a = pop();
+                    checkNumericOperands(opcode, a, b);
+                    push((double)a - (double)b);
                 }
                 default -> throw new IllegalStateException(
                     "Unknown opcode: " + opcode + ".");
             }
+        }
+    }
+
+    private SourceBuffer.Span ipSpan() {
+        return chunk.span(ip - 1);
+    }
+
+    private void checkNumericOperands(char opcode, Object a, Object b) {
+        if (a instanceof Double && b instanceof Double) {
+            return;
+        }
+        var op = switch(opcode) {
+            case ADD -> "+";
+            case DIV -> "/";
+            case MUL -> "*";
+            case SUB -> "-";
+            default -> throw new IllegalStateException(
+                "Unexpected opcode: " + opcode);
+        };
+        throw new RuntimeError(ipSpan(),
+            "The '" + op + "' operator expects two numeric operands.");
+    }
+
+    private void checkNumericOperand(Object a) {
+        if (!(a instanceof Double)) {
+            throw new RuntimeError(ipSpan(),
+                "Expected numeric operand, got: '" + Bert.stringify(a) + "'.");
         }
     }
 

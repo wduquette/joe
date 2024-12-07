@@ -1,5 +1,7 @@
 package com.wjduquette.joe.bert;
 
+import com.wjduquette.joe.SourceBuffer;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +44,8 @@ class Chunk {
 
     //-------------------------------------------------------------------------
     // Instance Variables
+
+    private final SourceBuffer buffer = null;
 
     // The compiled "byte" code.
     private char[] code = new char[8];
@@ -103,6 +107,10 @@ class Chunk {
 
     int line(int index) {
         return lines[index];
+    }
+
+    SourceBuffer.Span span(int index) {
+        return buffer != null ? buffer.lineSpan(lines[index]) : null;
     }
 
     /**

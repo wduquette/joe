@@ -32,6 +32,7 @@ class Compiler {
         this.scanner = new Scanner("*script*", source, errors::add);
         this.compilingChunk = chunk;
 
+
         errors.clear();
         parser.hadError = false;
         parser.panicMode = false;
