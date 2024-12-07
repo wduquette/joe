@@ -80,6 +80,7 @@ class VirtualMachine {
                     checkNumericOperands(opcode, a, b);
                     push((double)a / (double)b);
                 }
+                case FALSE -> push(false);
                 case MUL -> {
                     var b = pop();
                     var a = pop();
@@ -91,6 +92,7 @@ class VirtualMachine {
                     checkNumericOperand(a);
                     push(-(double)pop()); // Needs check!
                 }
+                case NULL -> push(null);
                 case RETURN -> {
                     Bert.println(Bert.stringify(pop()));
                     return;
@@ -101,6 +103,7 @@ class VirtualMachine {
                     checkNumericOperands(opcode, a, b);
                     push((double)a - (double)b);
                 }
+                case TRUE -> push(true);
                 default -> throw new IllegalStateException(
                     "Unknown opcode: " + opcode + ".");
             }

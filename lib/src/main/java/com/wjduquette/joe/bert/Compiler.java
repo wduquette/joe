@@ -85,7 +85,7 @@ class Compiler {
         }
     }
 
-    void unary() {
+    private void unary() {
         var op = parser.previous.type();
 
         // Compile the operand
@@ -98,8 +98,19 @@ class Compiler {
                 "Unexpected operator: " + op);
         }
     }
-    void number() {
+
+    private void number() {
         emitConstant(parser.previous.literal());
+    }
+
+    private void literal() {
+        switch (parser.previous.type()) {
+            case FALSE -> emit(Opcode.FALSE);
+            case NULL -> emit(Opcode.NULL);
+            case TRUE -> emit(Opcode.TRUE);
+            default -> throw new IllegalStateException(
+                "Unexpected literal: " + parser.previous.type());
+        }
     }
 
     private void parsePrecedence(int level) {
@@ -272,7 +283,7 @@ class Compiler {
         rule(DEFAULT,         null,           null,         Level.NONE);
         rule(ELSE,            null,           null,         Level.NONE);
         rule(EXTENDS,         null,           null,         Level.NONE);
-        rule(FALSE,           null,           null,         Level.NONE);
+        rule(FALSE,           this::literal,  null,         Level.NONE);
         rule(FOR,             null,           null,         Level.NONE);
         rule(FOREACH,         null,           null,         Level.NONE);
         rule(FUNCTION,        null,           null,         Level.NONE);
@@ -280,14 +291,14 @@ class Compiler {
         rule(IN,              null,           null,         Level.NONE);
         rule(METHOD,          null,           null,         Level.NONE);
         rule(NI,              null,           null,         Level.NONE);
-        rule(NULL,            null,           null,         Level.NONE);
+        rule(NULL,            this::literal,  null,         Level.NONE);
         rule(RETURN,          null,           null,         Level.NONE);
         rule(STATIC,          null,           null,         Level.NONE);
         rule(SUPER,           null,           null,         Level.NONE);
         rule(SWITCH,          null,           null,         Level.NONE);
         rule(THIS,            null,           null,         Level.NONE);
         rule(THROW,           null,           null,         Level.NONE);
-        rule(TRUE,            null,           null,         Level.NONE);
+        rule(TRUE,            this::literal,  null,         Level.NONE);
         rule(VAR,             null,           null,         Level.NONE);
         rule(WHILE,           null,           null,         Level.NONE);
         rule(PRINT,           null,           null,         Level.NONE);
