@@ -139,6 +139,18 @@ class VirtualMachine {
                         throw error("The '>' operator expects two Numbers or two Strings.");
                     }
                 }
+                case JIF -> {
+                    var offset = readArg();
+                    if (Bert.isFalsey(pop())) ip += offset;
+                }
+                case JIFKEEP -> {
+                    var offset = readArg();
+                    if (Bert.isFalsey(peek(0))) ip += offset;
+                }
+                case JUMP -> {
+                    var offset = readArg();
+                    ip += offset;
+                }
                 case LE -> {
                     var b = pop();
                     var a = pop();
@@ -152,6 +164,10 @@ class VirtualMachine {
                 }
                 case LOCGET -> push(stack[readSlot()]);
                 case LOCSET -> stack[readSlot()] = peek(0);
+                case LOOP -> {
+                    var offset = readArg();
+                    ip -= offset;
+                }
                 case LT -> {
                     var b = pop();
                     var a = pop();
@@ -251,6 +267,11 @@ class VirtualMachine {
 
     //-------------------------------------------------------------------------
     // Instruction decoding
+
+    // Reads an instruction argument from the chunk.
+    private char readArg() {
+        return chunk.code(ip++);
+    }
 
     // Reads a stack slot argument from the chunk.
     private char readSlot() {

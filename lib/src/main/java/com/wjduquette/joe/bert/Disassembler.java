@@ -60,6 +60,10 @@ public class Disassembler {
         return switch (opcode) {
             case LOCGET, LOCSET
                 -> charInstruction(ip);
+            case JIF, JIFKEEP, JUMP
+                -> jumpInstruction(ip, 1);
+            case LOOP
+                -> jumpInstruction(ip, -1);
             case CONST, GLODEF, GLOGET, GLOSET
                 -> constantInstruction(ip);
             case ADD, DIV, EQ, FALSE, GE, GT, LE, LT, MUL,
@@ -82,6 +86,14 @@ public class Disassembler {
             index, Bert.stringify(constant));
         return new Pair(text, ip + 2);
     }
+
+    private Pair jumpInstruction(int ip, int sign) {
+        char jump = chunk.code(ip + 1);
+        var text = String.format(" %04d -> %d", (int)jump,
+            ip + 2 + sign*jump);
+        return new Pair(text, ip + 2);
+    }
+
 
     private Pair simpleInstruction(int ip) {
         return new Pair("", ip + 1);

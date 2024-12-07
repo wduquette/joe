@@ -123,7 +123,9 @@ class Compiler {
     }
 
     private void statement() {
-        if (match(PRINT)) {
+        if (match(IF)) {
+            ifStatement();
+        } else if (match(PRINT)) {
             printStatement();
         } else if (match(LEFT_BRACE)) {
             beginScope();
@@ -145,6 +147,20 @@ class Compiler {
         expression();
         consume(SEMICOLON, "Expected ';' after expression.");
         emit(Opcode.POP);
+    }
+
+    private void ifStatement() {
+        consume(LEFT_PAREN, "Expected '(' after 'if'.");
+        expression();
+        consume(RIGHT_PAREN, "Expected '(' after condition.");
+
+        int thenJump = emitJump(Opcode.JIF);
+        statement();
+        int elseJump = emitJump(Opcode.JUMP);
+        patchJump(thenJump);
+
+        if (match(ELSE)) statement();
+        patchJump(elseJump);
     }
 
     private void printStatement() {
@@ -410,6 +426,23 @@ class Compiler {
 
     private void emitConstant(Object value) {
         emit(Opcode.CONST, currentChunk().addConstant(value));
+    }
+
+    private int emitJump(char opcode) {
+        emit(opcode);
+        emit(Character.MAX_VALUE);
+        return currentChunk().codeSize() - 1;
+    }
+
+    private void patchJump(int offset) {
+        // -1 to adjust for the bytecode for the jump offset itself.
+        int jump = currentChunk().codeSize() - offset - 1;
+
+        if (jump > Character.MAX_VALUE) {
+            error("Too much code to jump over.");
+        }
+
+        currentChunk().setCode(offset, (char)jump);
     }
 
     private void emitReturn() {

@@ -109,6 +109,10 @@ class Chunk {
         return code[index];
     }
 
+    void setCode(int index, char value) {
+        code[index] = value;
+    }
+
     int line(int index) {
         return lines[index];
     }
