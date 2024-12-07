@@ -147,6 +147,10 @@ class VirtualMachine {
                     var offset = readArg();
                     if (Bert.isFalsey(peek(0))) ip += offset;
                 }
+                case JITKEEP -> {
+                    var offset = readArg();
+                    if (Bert.isTruthy(peek(0))) ip += offset;
+                }
                 case JUMP -> {
                     var offset = readArg();
                     ip += offset;

@@ -110,6 +110,20 @@ public class Scanner {
             case '=' -> makeToken(match('=') ? EQUAL_EQUAL : EQUAL);
             case '<' -> makeToken(match('=') ? LESS_EQUAL : LESS);
             case '>' -> makeToken(match('=') ? GREATER_EQUAL : GREATER);
+            case '&' -> {
+                if (match('&')) {
+                    yield makeToken(AND);
+                } else {
+                    yield errorToken("Unexpected character.");
+                }
+            }
+            case '|' -> {
+                if (match('|')) {
+                    yield makeToken(OR);
+                } else {
+                    yield errorToken("Unexpected character.");
+                }
+            }
             case '"' -> string();
             default -> errorToken("Unexpected character.");
         };

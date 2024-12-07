@@ -60,7 +60,7 @@ public class Disassembler {
         return switch (opcode) {
             case LOCGET, LOCSET
                 -> charInstruction(ip);
-            case JIF, JIFKEEP, JUMP
+            case JIF, JIFKEEP, JITKEEP, JUMP
                 -> jumpInstruction(ip, 1);
             case LOOP
                 -> jumpInstruction(ip, -1);

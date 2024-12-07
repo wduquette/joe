@@ -18,24 +18,25 @@ public class Opcode {
     public static final char GT      = 9;
     public static final char JIF     = 10;
     public static final char JIFKEEP = 11;
-    public static final char JUMP    = 12;
-    public static final char LE      = 13;
-    public static final char LOCGET  = 14;
-    public static final char LOCSET  = 15;
-    public static final char LOOP    = 16;
-    public static final char LT      = 17;
-    public static final char MUL     = 18;
-    public static final char NE      = 19;
-    public static final char NEGATE  = 20;
-    public static final char NOT     = 21;
-    public static final char NULL    = 22;
-    public static final char POP     = 23;
-    public static final char RETURN  = 24;
-    public static final char SUB     = 25;
-    public static final char TRUE    = 26;
+    public static final char JITKEEP = 12;
+    public static final char JUMP    = 13;
+    public static final char LE      = 14;
+    public static final char LOCGET  = 15;
+    public static final char LOCSET  = 16;
+    public static final char LOOP    = 17;
+    public static final char LT      = 18;
+    public static final char MUL     = 19;
+    public static final char NE      = 20;
+    public static final char NEGATE  = 21;
+    public static final char NOT     = 22;
+    public static final char NULL    = 23;
+    public static final char POP     = 24;
+    public static final char RETURN  = 25;
+    public static final char SUB     = 26;
+    public static final char TRUE    = 27;
 
     // Temporary
-    public static final char PRINT   = 27;
+    public static final char PRINT   = 28;
 
 
     //-------------------------------------------------------------------------
@@ -54,6 +55,7 @@ public class Opcode {
         "GT",
         "JIF",
         "JIFKEEP",
+        "JITKEEP",
         "JUMP",
         "LOOP",
         "LE",

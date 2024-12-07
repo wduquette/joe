@@ -70,6 +70,11 @@ public class Bert {
     //-------------------------------------------------------------------------
     // Stand-ins
 
+    // Stand in for Joe.isTruthy
+    public static boolean isTruthy(Object value) {
+        return Joe.isTruthy(value);
+    }
+
     // Stand in for Joe.isFalsey (which doesn't exist yet)
     public static boolean isFalsey(Object value) {
         return !Joe.isTruthy(value);

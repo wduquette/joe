@@ -200,6 +200,22 @@ class Compiler {
         }
     }
 
+    void and(boolean canAssign) {
+        // On false, the tested value becomes the value of the expression.
+        int endJump = emitJump(Opcode.JIFKEEP);
+        emit(Opcode.POP);
+        parsePrecedence(Level.AND);
+        patchJump(endJump);
+    }
+
+    void or(boolean canAssign) {
+        // On true, the tested value becomes the value of the expression.
+        int endJump = emitJump(Opcode.JITKEEP);
+        emit(Opcode.POP);
+        parsePrecedence(Level.OR);
+        patchJump(endJump);
+    }
+
     private void unary(boolean canAssign) {
         var op = parser.previous.type();
 
@@ -530,7 +546,7 @@ class Compiler {
         rule(QUESTION,        null,           null,         Level.TERM);
         rule(SEMICOLON,       null,           null,         Level.NONE);
         // One or two character
-        rule(AND,             null,           null,         Level.NONE);
+        rule(AND,             null,           this::and,    Level.AND);
         rule(BANG,            this::unary,    null,         Level.NONE);
         rule(BANG_EQUAL,      null,           this::binary, Level.EQUALITY);
         rule(EQUAL,           null,           null,         Level.NONE);
@@ -543,7 +559,7 @@ class Compiler {
         rule(MINUS_EQUAL,     null,           null,         Level.NONE);
         rule(MINUS_GREATER,   null,           null,         Level.NONE);
         rule(MINUS_MINUS,     null,           null,         Level.NONE);
-        rule(OR,              null,           null,         Level.NONE);
+        rule(OR,              null,           this::or,     Level.OR);
         rule(PLUS,            null,           this::binary, Level.TERM);
         rule(PLUS_EQUAL,      null,           null,         Level.NONE);
         rule(PLUS_PLUS,       null,           null,         Level.NONE);
