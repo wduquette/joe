@@ -14,21 +14,22 @@ public class Opcode {
     public static final char GE     = 5;
     public static final char GLODEF = 6;
     public static final char GLOGET = 7;
-    public static final char GT     = 8;
-    public static final char LE     = 9;
-    public static final char LT     = 10;
-    public static final char MUL    = 11;
-    public static final char NE     = 12;
-    public static final char NEGATE = 13;
-    public static final char NOT    = 14;
-    public static final char NULL   = 15;
-    public static final char POP    = 16;
-    public static final char RETURN = 17;
-    public static final char SUB    = 18;
-    public static final char TRUE   = 19;
+    public static final char GLOSET = 8;
+    public static final char GT     = 9;
+    public static final char LE     = 10;
+    public static final char LT     = 11;
+    public static final char MUL    = 12;
+    public static final char NE     = 13;
+    public static final char NEGATE = 14;
+    public static final char NOT    = 15;
+    public static final char NULL   = 16;
+    public static final char POP    = 17;
+    public static final char RETURN = 18;
+    public static final char SUB    = 19;
+    public static final char TRUE   = 20;
 
     // Temporary
-    public static final char PRINT  = 20;
+    public static final char PRINT  = 21;
 
 
     //-------------------------------------------------------------------------
@@ -42,6 +43,7 @@ public class Opcode {
         "FALSE",
         "GE",
         "GLODEF",
+        "GLOGET",
         "GLOSET",
         "GT",
         "LE",

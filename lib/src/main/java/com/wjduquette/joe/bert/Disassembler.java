@@ -46,7 +46,7 @@ public class Disassembler {
     private Pair instruction(int ip) {
         var opcode = chunk.code(ip);
         return switch (opcode) {
-            case CONST, GLODEF, GLOGET
+            case CONST, GLODEF, GLOGET, GLOSET
                 -> constantInstruction(ip);
             case ADD, DIV, EQ, FALSE, GE, GT, LE, LT, MUL,
                 NE, NEGATE, NOT, NULL, POP, PRINT, RETURN, SUB, TRUE

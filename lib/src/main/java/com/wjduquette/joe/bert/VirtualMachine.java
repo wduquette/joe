@@ -118,6 +118,16 @@ class VirtualMachine {
                         throw error("Undefined variable: '" + name + "'.");
                     }
                 }
+                case GLOSET -> {
+                    var name = readString();
+                    if (globals.containsKey(name)) {
+                        globals.put(name, peek(0));
+                        // NOTE: we leave the value on the stack, since
+                        // assignment is an expression.
+                    } else {
+                        throw error("Undefined variable: '" + name + "'.");
+                    }
+                }
                 case GT -> {
                     var b = pop();
                     var a = pop();
@@ -272,4 +282,7 @@ class VirtualMachine {
         return stack[--top];
     }
 
+    private Object peek(int depth) {
+        return stack[top - depth - 1];
+    }
 }

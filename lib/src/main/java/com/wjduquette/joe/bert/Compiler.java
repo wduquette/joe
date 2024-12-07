@@ -138,12 +138,12 @@ class Compiler {
         parsePrecedence(Level.ASSIGNMENT);
     }
 
-    void grouping() {
+    void grouping(boolean canAssign) {
         expression();
         consume(RIGHT_PAREN, "Expected ')' after expression.");
     }
 
-    void binary() {
+    void binary(boolean canAssign) {
         var op = parser.previous.type();
         var rule = getRule(op);
         parsePrecedence(rule.level + 1);
@@ -164,7 +164,7 @@ class Compiler {
         }
     }
 
-    private void unary() {
+    private void unary(boolean canAssign) {
         var op = parser.previous.type();
 
         // Compile the operand
@@ -179,15 +179,15 @@ class Compiler {
         }
     }
 
-    private void variable() {
-        namedVariable(parser.previous);
+    private void variable(boolean canAssign) {
+        namedVariable(parser.previous, canAssign);
     }
 
-    private void literal() {
+    private void literal(boolean canAssign) {
         emitConstant(parser.previous.literal());
     }
 
-    private void symbol() {
+    private void symbol(boolean canAssign) {
         switch (parser.previous.type()) {
             case FALSE -> emit(Opcode.FALSE);
             case NULL -> emit(Opcode.NULL);
@@ -206,12 +206,17 @@ class Compiler {
             return;
         }
 
-        prefixRule.parse();
+        var canAssign = level <= Level.ASSIGNMENT;
+        prefixRule.parse(canAssign);
 
         while (level <= getRule(parser.current.type()).level) {
             advance();
             var infixRule = getRule(parser.previous.type()).infix;
-            infixRule.parse();
+            infixRule.parse(canAssign);
+        }
+
+        if (canAssign && match(EQUAL)) {
+            error("Invalid assignment target.");
         }
     }
 
@@ -236,9 +241,14 @@ class Compiler {
         emit(Opcode.GLODEF, global);
     }
 
-    private void namedVariable(Token name) {
+    private void namedVariable(Token name, boolean canAssign) {
         char index = identifierConstant(name);
-        emit(Opcode.GLOGET, index);
+        if (canAssign && match(EQUAL)) {
+            expression();
+            emit(Opcode.GLOSET, index);
+        } else {
+            emit(Opcode.GLOGET, index);
+        }
     }
 
 
@@ -345,7 +355,7 @@ class Compiler {
     }
 
     private interface ParseFunction {
-        void parse();
+        void parse(boolean canAssign);
     }
 
     private record ParseRule(
