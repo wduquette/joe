@@ -80,12 +80,46 @@ class VirtualMachine {
                     checkNumericOperands(opcode, a, b);
                     push((double)a / (double)b);
                 }
+                case EQ -> {
+                    var b = pop();
+                    var a = pop();
+                    push(Bert.isEqual(a, b));
+                }
                 case FALSE -> push(false);
+                case GE -> {
+                    var b = pop();
+                    var a = pop();
+                    checkNumericOperands(opcode, a, b);
+                    push((double)a >= (double)b);
+                }
+                case GT -> {
+                    var b = pop();
+                    var a = pop();
+                    checkNumericOperands(opcode, a, b);
+                    push((double)a > (double)b);
+                }
+                case LE -> {
+                    var b = pop();
+                    var a = pop();
+                    checkNumericOperands(opcode, a, b);
+                    push((double)a <= (double)b);
+                }
+                case LT -> {
+                    var b = pop();
+                    var a = pop();
+                    checkNumericOperands(opcode, a, b);
+                    push((double)a < (double)b);
+                }
                 case MUL -> {
                     var b = pop();
                     var a = pop();
                     checkNumericOperands(opcode, a, b);
                     push((double)a * (double)b);
+                }
+                case NE -> {
+                    var b = pop();
+                    var a = pop();
+                    push(!Bert.isEqual(a, b));
                 }
                 case NEGATE -> {
                     var a = pop();

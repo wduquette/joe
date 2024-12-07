@@ -76,6 +76,12 @@ class Compiler {
         parsePrecedence(rule.level + 1);
 
         switch (op) {
+            case BANG_EQUAL -> emit(Opcode.NE);
+            case EQUAL_EQUAL -> emit(Opcode.EQ);
+            case GREATER -> emit(Opcode.GT);
+            case GREATER_EQUAL -> emit(Opcode.GE);
+            case LESS -> emit(Opcode.LT);
+            case LESS_EQUAL -> emit(Opcode.LE);
             case PLUS ->  emit(Opcode.ADD);
             case MINUS -> emit(Opcode.SUB);
             case STAR  -> emit(Opcode.MUL);
@@ -256,17 +262,17 @@ class Compiler {
         // One or two character
         rule(AND,             null,           null,         Level.NONE);
         rule(BANG,            this::unary,    null,         Level.NONE);
-        rule(BANG_EQUAL,      null,           null,         Level.NONE);
+        rule(BANG_EQUAL,      null,           this::binary, Level.EQUALITY);
         rule(EQUAL,           null,           null,         Level.NONE);
-        rule(EQUAL_EQUAL,     null,           null,         Level.NONE);
-        rule(GREATER,         null,           null,         Level.NONE);
-        rule(GREATER_EQUAL,   null,           null,         Level.NONE);
+        rule(EQUAL_EQUAL,     null,           this::binary, Level.EQUALITY);
+        rule(GREATER,         null,           this::binary, Level.COMPARISON);
+        rule(GREATER_EQUAL,   null,           this::binary, Level.COMPARISON);
+        rule(LESS,            null,           this::binary, Level.COMPARISON);
+        rule(LESS_EQUAL,      null,           this::binary, Level.COMPARISON);
         rule(MINUS,           this::unary,    this::binary, Level.TERM);
         rule(MINUS_EQUAL,     null,           null,         Level.NONE);
         rule(MINUS_GREATER,   null,           null,         Level.NONE);
         rule(MINUS_MINUS,     null,           null,         Level.NONE);
-        rule(LESS,            null,           null,         Level.NONE);
-        rule(LESS_EQUAL,      null,           null,         Level.NONE);
         rule(OR,              null,           null,         Level.NONE);
         rule(PLUS,            null,           this::binary, Level.TERM);
         rule(PLUS_EQUAL,      null,           null,         Level.NONE);

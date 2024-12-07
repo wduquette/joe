@@ -70,8 +70,14 @@ public class Bert {
     //-------------------------------------------------------------------------
     // Stand-ins
 
+    // Stand in for Joe.isFalsey (which doesn't exist yet)
     public static boolean isFalsey(Object value) {
         return !Joe.isTruthy(value);
+    }
+
+    // Stand in for Joe.isEqual
+    public static boolean isEqual(Object a, Object b) {
+        return Joe.isEqual(a, b);
     }
 
     // Stand in for BertEngine::isDebug

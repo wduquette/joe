@@ -47,7 +47,8 @@ public class Disassembler {
         var opcode = chunk.code(ip);
         return switch (opcode) {
             case CONST -> constantInstruction(ip);
-            case ADD, DIV, FALSE, MUL, NEGATE, NOT, NULL, RETURN, SUB, TRUE
+            case ADD, DIV, EQ, FALSE, GE, GT, LE, LT, MUL,
+                NE, NEGATE, NOT, NULL, RETURN, SUB, TRUE
                 -> simpleInstruction(ip);
             default -> unknownOpcode(ip);
         };
