@@ -78,7 +78,7 @@ class VirtualMachine {
                         push(Bert.stringify(a) + s);
                     } else {
                         throw new RuntimeError(ipSpan(),
-                            "The '+' operator expects two Numbers or two Strings.");
+                    "The '+' operator expects two Numbers or at least one String.");
                     }
                 }
                 case CONST -> push(readConstant());
@@ -97,26 +97,50 @@ class VirtualMachine {
                 case GE -> {
                     var b = pop();
                     var a = pop();
-                    checkNumericOperands(opcode, a, b);
-                    push((double)a >= (double)b);
+                    if (a instanceof Double x && b instanceof Double y) {
+                        push(x >= y);
+                    } else if (a instanceof String s && b instanceof String t) {
+                        push(s.compareTo(t) >= 0);
+                    } else {
+                        throw new RuntimeError(ipSpan(),
+                        "The '>=' operator expects two Numbers or two Strings.");
+                    }
                 }
                 case GT -> {
                     var b = pop();
                     var a = pop();
-                    checkNumericOperands(opcode, a, b);
-                    push((double)a > (double)b);
+                    if (a instanceof Double x && b instanceof Double y) {
+                        push(x > y);
+                    } else if (a instanceof String s && b instanceof String t) {
+                        push(s.compareTo(t) > 0);
+                    } else {
+                        throw new RuntimeError(ipSpan(),
+                            "The '>' operator expects two Numbers or two Strings.");
+                    }
                 }
                 case LE -> {
                     var b = pop();
                     var a = pop();
-                    checkNumericOperands(opcode, a, b);
-                    push((double)a <= (double)b);
+                    if (a instanceof Double x && b instanceof Double y) {
+                        push(x <= y);
+                    } else if (a instanceof String s && b instanceof String t) {
+                        push(s.compareTo(t) <= 0);
+                    } else {
+                        throw new RuntimeError(ipSpan(),
+                            "The '<=' operator expects two Numbers or two Strings.");
+                    }
                 }
                 case LT -> {
                     var b = pop();
                     var a = pop();
-                    checkNumericOperands(opcode, a, b);
-                    push((double)a < (double)b);
+                    if (a instanceof Double x && b instanceof Double y) {
+                        push(x < y);
+                    } else if (a instanceof String s && b instanceof String t) {
+                        push(s.compareTo(t) < 0);
+                    } else {
+                        throw new RuntimeError(ipSpan(),
+                            "The '<' operator expects two Numbers or two Strings.");
+                    }
                 }
                 case MUL -> {
                     var b = pop();
