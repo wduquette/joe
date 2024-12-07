@@ -156,7 +156,13 @@ class VirtualMachine {
         var op = switch(opcode) {
             case ADD -> "+";
             case DIV -> "/";
+            case EQ -> "==";
+            case GE -> ">=";
+            case GT -> ">";
+            case LE -> "<=";
+            case LT -> "<";
             case MUL -> "*";
+            case NE -> "!=";
             case SUB -> "-";
             default -> throw new IllegalStateException(
                 "Unexpected opcode: " + opcode);
