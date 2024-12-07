@@ -1,5 +1,7 @@
 package com.wjduquette.joe.bert;
 
+import java.util.ArrayList;
+
 import static com.wjduquette.joe.bert.Opcode.*;
 
 /**
@@ -23,6 +25,7 @@ public class Disassembler {
 
     String disassemble(String name, Chunk chunk) {
         this.chunk = chunk;
+        // FIRST, get the title and constants table.
         var buff = new StringBuilder();
 
         buff.append("=== ").append(name).append("===\n");
@@ -39,15 +42,48 @@ public class Disassembler {
             buff.append("\n");
         }
 
+        // NEXT, get the two data columns
+        var left = new ArrayList<String>();
+        var right = new ArrayList<String>();
+
+
+        var source = chunk.source();
         for (int ip = 0; ip < chunk.codeSize(); ) {
+            if (chunk.source() != null && startsNewLine(ip)) {
+                right.add(source.line(chunk.line(ip)));
+            } else {
+                right.add("");
+            }
             var pair = instruction(ip);
-            buff.append(chunkPrefix(ip))
-                .append(pair.result)
-                .append("\n");
+            left.add(chunkPrefix(ip) + pair.result);
+
             ip = pair.next;
         }
 
+        var leftWidth = left.stream()
+            .mapToInt(String::length)
+            .max()
+            .orElse(0);
+
+        for (var i = 0; i < left.size(); i++) {
+            if (right.get(i).isEmpty()) {
+                buff.append(left.get(i))
+                    .append("\n");
+            } else {
+                buff.append(pad(left.get(i), leftWidth))
+                    .append(" ; ")
+                    .append(right.get(i))
+                    .append("\n");
+            }
+        }
+
         return buff.toString();
+    }
+
+    private String pad(String text, int width) {
+        return text.length() >= width
+            ? text
+            : text + " ".repeat(width - text.length());
     }
 
     String disassembleInstruction(Chunk chunk, int ip) {
@@ -81,9 +117,11 @@ public class Disassembler {
 
     private Pair constantInstruction(int ip) {
         int index = chunk.code(ip + 1);
-        var constant = chunk.getConstant(index);
-        var text = String.format(" %04d '%s'",
-            index, Bert.stringify(constant));
+        var constant = Bert.stringify(chunk.getConstant(index));
+        if (constant.length() > 10) {
+            constant = constant.substring(0, 7) + "...";
+        }
+        var text = String.format(" %04d '%s'", index, constant);
         return new Pair(text, ip + 2);
     }
 
@@ -115,13 +153,17 @@ public class Disassembler {
         String line;
         char opcode = chunk.code(ip);
 
-        if (ip > 0 && chunk.line(ip) == chunk.line(ip - 1)) {
-            line = "   | ";
-        } else {
+        if (startsNewLine(ip)) {
             line = String.format("%04d ", chunk.line(ip));
+        } else {
+            line = "   | ";
         }
 
         return String.format("%s @%04d %-6s", line, ip, Opcode.name(opcode));
+    }
+
+    private boolean startsNewLine(int ip) {
+        return ip == 0 || chunk.line(ip) != chunk.line(ip - 1);
     }
 
     //-------------------------------------------------------------------------

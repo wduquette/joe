@@ -75,6 +75,10 @@ class Chunk {
         this.source = source;
     }
 
+    SourceBuffer source() {
+        return source;
+    }
+
     /**
      * Writes a char value to the code array, growing the array as needed.
      * @param value The value
@@ -85,6 +89,11 @@ class Chunk {
         if (size == code.length) {
             code = Arrays.copyOf(code, 2*code.length);
             lines = Arrays.copyOf(lines, 2*code.length);
+        }
+
+        // NEXT, we see line == 1 on EOF.  Retain the previous line number.
+        if (line == -1 && lines.length > 0) {
+            line = lines[size - 1];
         }
 
         // NEXT, add the value.
