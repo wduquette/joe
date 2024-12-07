@@ -160,8 +160,9 @@ class VirtualMachine {
                 }
                 case NOT -> push(Bert.isFalsey(pop()));
                 case NULL -> push(null);
+                case PRINT -> Bert.println(Bert.stringify(pop()));
+                case POP -> pop();
                 case RETURN -> {
-                    Bert.println(Bert.stringify(pop()));
                     return;
                 }
                 case SUB -> {

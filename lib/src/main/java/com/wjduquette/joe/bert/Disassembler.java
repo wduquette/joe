@@ -48,7 +48,7 @@ public class Disassembler {
         return switch (opcode) {
             case CONST -> constantInstruction(ip);
             case ADD, DIV, EQ, FALSE, GE, GT, LE, LT, MUL,
-                NE, NEGATE, NOT, NULL, RETURN, SUB, TRUE
+                NE, NEGATE, NOT, NULL, POP, PRINT, RETURN, SUB, TRUE
                 -> simpleInstruction(ip);
             default -> unknownOpcode(ip);
         };

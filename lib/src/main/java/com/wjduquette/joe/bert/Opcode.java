@@ -20,9 +20,14 @@ public class Opcode {
     public static final char NEGATE = 11;
     public static final char NOT = 12;
     public static final char NULL = 13;
-    public static final char RETURN = 14;
-    public static final char SUB = 15;
-    public static final char TRUE = 16;
+    public static final char POP = 14;
+    public static final char RETURN = 15;
+    public static final char SUB = 16;
+    public static final char TRUE = 17;
+
+    // Temporary
+    public static final char PRINT = 18;
+
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -42,9 +47,13 @@ public class Opcode {
         "NEGATE",
         "NOT",
         "NULL",
+        "POP",
         "RETURN",
         "SUB",
-        "TRUE"
+        "TRUE",
+
+        // Temporary
+        "PRINT"
     };
 
     //-------------------------------------------------------------------------

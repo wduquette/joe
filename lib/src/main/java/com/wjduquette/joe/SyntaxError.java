@@ -40,9 +40,15 @@ public class SyntaxError extends JoeError {
     }
 
     private String verbose(Trace trace) {
-        return "[line " + trace.line() + "] " + trace.message() + "\n" +
-            "  In script '" + trace.context().filename() + "':\n" +
-            errorLines(trace.context(), "    ");
+        // Note: for syntax errors there should always be a context.
+        // Once Bert is fully functional, this if-check can be removed.
+        if (trace.context() != null) {
+            return "[line " + trace.line() + "] " + trace.message() + "\n" +
+                "  In script '" + trace.context().filename() + "':\n" +
+                errorLines(trace.context(), "    ");
+        } else {
+            return trace.message();
+        }
     }
 
     public String getErrorReport() {

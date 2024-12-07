@@ -38,8 +38,9 @@ class Compiler {
         parser.panicMode = false;
 
         advance();
-        expression();
-        consume(EOF, "Expected end of expression.");
+        while (!match(EOF)) {
+            declaration();
+        }
         endCompiler();
 
         if (!errors.isEmpty()) {
@@ -60,6 +61,30 @@ class Compiler {
 
     //-------------------------------------------------------------------------
     // Parser
+
+    private void declaration() {
+        statement();
+    }
+
+    private void statement() {
+        if (match(PRINT)) {
+            printStatement();
+        } else {
+            expressionStatement();
+        }
+    }
+
+    private void expressionStatement() {
+        expression();
+        consume(SEMICOLON, "Expected ';' after expression.");
+        emit(Opcode.POP);
+    }
+
+    private void printStatement() {
+        expression();
+        consume(SEMICOLON, "Expected ';' after value.");
+        emit(Opcode.PRINT);
+    }
 
     private void expression() {
         parsePrecedence(Level.ASSIGNMENT);
@@ -140,6 +165,16 @@ class Compiler {
 
     //-------------------------------------------------------------------------
     // Parsing Tools
+
+    private boolean match(TokenType type) {
+        if (!check(type)) return false;
+        advance();
+        return true;
+    }
+
+    private boolean check(TokenType type) {
+        return parser.current.type() == type;
+    }
 
     private void advance() {
         parser.previous = parser.current;
