@@ -65,10 +65,13 @@ class VirtualMachine {
     // At present this uses Chunk directly.  Later the chunk info will
     // be in `Function` in a more efficient form.
     private void run() {
+        if (Bert.isDebug()) {
+            Bert.printf("%-40s ", " ");
+            Bert.println("| " + stackText());
+        }
         for (;;) {
             if (Bert.isDebug()) {
-                Bert.println("           stack: " + stackText());
-                Bert.println(disassembler.disassembleInstruction(chunk, ip));
+                Bert.printf("%-40s ", disassembler.disassembleInstruction(chunk, ip));
             }
             var opcode = chunk.code(ip++);
             switch (opcode) {
@@ -201,9 +204,15 @@ class VirtualMachine {
                 }
                 case NOT -> push(Bert.isFalsey(pop()));
                 case NULL -> push(null);
-                case PRINT -> Bert.println(Bert.stringify(pop()));
+                case PRINT -> {
+                    var value = Bert.stringify(pop());
+                    Bert.println(value);
+                }
                 case POP -> pop();
                 case RETURN -> {
+                    if (Bert.isDebug()) {
+                        Bert.println("| " + stackText());
+                    }
                     return;
                 }
                 case SUB -> {
@@ -215,6 +224,9 @@ class VirtualMachine {
                 case TRUE -> push(true);
                 default -> throw new IllegalStateException(
                     "Unknown opcode: " + opcode + ".");
+            }
+            if (Bert.isDebug()) {
+                Bert.println("| " + stackText());
             }
         }
     }
