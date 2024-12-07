@@ -4,6 +4,8 @@ import com.wjduquette.joe.RuntimeError;
 import com.wjduquette.joe.SourceBuffer;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.wjduquette.joe.bert.Opcode.*;
 
@@ -26,6 +28,9 @@ class VirtualMachine {
     //
     // Runtime Data
     //
+
+    // The global environment.
+    private final Map<String,Object> globals = new HashMap<>();
 
     // The current chunk.  Later, this will be a `Function`.
     private Chunk chunk = null;
@@ -77,8 +82,7 @@ class VirtualMachine {
                     } else if (b instanceof String s) {
                         push(Bert.stringify(a) + s);
                     } else {
-                        throw new RuntimeError(ipSpan(),
-                    "The '+' operator expects two Numbers or at least one String.");
+                        throw error("The '+' operator expects two Numbers or at least one String.");
                     }
                 }
                 case CONST -> push(readConstant());
@@ -102,8 +106,16 @@ class VirtualMachine {
                     } else if (a instanceof String s && b instanceof String t) {
                         push(s.compareTo(t) >= 0);
                     } else {
-                        throw new RuntimeError(ipSpan(),
-                        "The '>=' operator expects two Numbers or two Strings.");
+                        throw error("The '>=' operator expects two Numbers or two Strings.");
+                    }
+                }
+                case GLODEF -> globals.put(readString(), pop());
+                case GLOGET -> {
+                    var name = readString();
+                    if (globals.containsKey(name)) {
+                        push(globals.get(name));
+                    } else {
+                        throw error("Undefined variable: '" + name + "'.");
                     }
                 }
                 case GT -> {
@@ -114,8 +126,7 @@ class VirtualMachine {
                     } else if (a instanceof String s && b instanceof String t) {
                         push(s.compareTo(t) > 0);
                     } else {
-                        throw new RuntimeError(ipSpan(),
-                            "The '>' operator expects two Numbers or two Strings.");
+                        throw error("The '>' operator expects two Numbers or two Strings.");
                     }
                 }
                 case LE -> {
@@ -126,8 +137,7 @@ class VirtualMachine {
                     } else if (a instanceof String s && b instanceof String t) {
                         push(s.compareTo(t) <= 0);
                     } else {
-                        throw new RuntimeError(ipSpan(),
-                            "The '<=' operator expects two Numbers or two Strings.");
+                        throw error("The '<=' operator expects two Numbers or two Strings.");
                     }
                 }
                 case LT -> {
@@ -138,8 +148,7 @@ class VirtualMachine {
                     } else if (a instanceof String s && b instanceof String t) {
                         push(s.compareTo(t) < 0);
                     } else {
-                        throw new RuntimeError(ipSpan(),
-                            "The '<' operator expects two Numbers or two Strings.");
+                        throw error("The '<' operator expects two Numbers or two Strings.");
                     }
                 }
                 case MUL -> {
@@ -200,15 +209,19 @@ class VirtualMachine {
             default -> throw new IllegalStateException(
                 "Unexpected opcode: " + opcode);
         };
-        throw new RuntimeError(ipSpan(),
+        throw error(
             "The '" + op + "' operator expects two numeric operands.");
     }
 
     private void checkNumericOperand(Object a) {
         if (!(a instanceof Double)) {
-            throw new RuntimeError(ipSpan(),
-                "Expected numeric operand, got: '" + Bert.stringify(a) + "'.");
+            throw error("Expected numeric operand, got: '" +
+                Bert.stringify(a) + "'.");
         }
+    }
+
+    private RuntimeError error(String message) {
+        return new RuntimeError(ipSpan(), message);
     }
 
     private String stackText() {
@@ -232,6 +245,13 @@ class VirtualMachine {
     private Object readConstant() {
         var index = chunk.code(ip++);
         return chunk.getConstant(index);
+    }
+
+    // Reads a constant index from the chunk, and returns the indexed
+    // constant as a string.
+    private String readString() {
+        var index = chunk.code(ip++);
+        return (String)chunk.getConstant(index);
     }
 
     //-------------------------------------------------------------------------

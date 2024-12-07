@@ -63,7 +63,55 @@ class Compiler {
     // Parser
 
     private void declaration() {
-        statement();
+        if (match(VAR)) {
+            varDeclaration();
+        } else {
+            statement();
+        }
+
+        if (parser.panicMode) synchronize();
+    }
+
+    private void varDeclaration() {
+        char global = parseVariable("Expected variable name.");
+
+        if (match(EQUAL)) {
+            expression();
+        } else {
+            emit(Opcode.NULL);
+        }
+        consume(SEMICOLON, "Expected ';' after variable declaration.");
+        defineVariable(global);
+    }
+
+    private void synchronize() {
+        parser.panicMode = false;
+
+        while (parser.current.type() != EOF) {
+            if (parser.previous.type() == SEMICOLON) return;
+            switch (parser.current.type()) {
+                case ASSERT:
+                case BREAK:
+                case CLASS:
+                case CONTINUE:
+                case FOR:
+                case FOREACH:
+                case FUNCTION:
+                case IF:
+                case METHOD:
+                case PRINT:
+                case RETURN:
+                case SWITCH:
+                case THROW:
+                case VAR:
+                case WHILE:
+                    return;
+
+                default: // Do nothing.
+            }
+
+            advance();
+        }
     }
 
     private void statement() {
@@ -131,6 +179,10 @@ class Compiler {
         }
     }
 
+    private void variable() {
+        namedVariable(parser.previous);
+    }
+
     private void literal() {
         emitConstant(parser.previous.literal());
     }
@@ -162,6 +214,33 @@ class Compiler {
             infixRule.parse();
         }
     }
+
+    //-------------------------------------------------------------------------
+    // Variable Management
+
+    // Consumes an IDENTIFIER and returns the constant index
+    // for the identifier's name constant.
+    private char parseVariable(String errorMessage) {
+        consume(IDENTIFIER, errorMessage);
+        return identifierConstant(parser.previous);
+    }
+
+    // Adds a string constant to the current chunk's
+    // constants table for the given identifier.
+    private char identifierConstant(Token name) {
+        return currentChunk().addConstant(name.lexeme());
+    }
+
+    // Emits the instruction to define the variable.
+    private void defineVariable(char global) {
+        emit(Opcode.GLODEF, global);
+    }
+
+    private void namedVariable(Token name) {
+        char index = identifierConstant(name);
+        emit(Opcode.GLOGET, index);
+    }
+
 
     //-------------------------------------------------------------------------
     // Parsing Tools
@@ -317,7 +396,7 @@ class Compiler {
         rule(STAR,            null,           this::binary, Level.FACTOR);
         rule(STAR_EQUAL,      null,           null,         Level.NONE);
         // Literals
-        rule(IDENTIFIER,      null,           null,         Level.NONE);
+        rule(IDENTIFIER,      this::variable, null,         Level.NONE);
         rule(STRING,          this::literal,  null,         Level.NONE);
         rule(NUMBER,          this::literal,  null,         Level.NONE);
         rule(KEYWORD,         null,           null,         Level.NONE);
