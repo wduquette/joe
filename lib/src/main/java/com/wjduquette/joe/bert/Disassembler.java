@@ -58,6 +58,8 @@ public class Disassembler {
     private Pair instruction(int ip) {
         var opcode = chunk.code(ip);
         return switch (opcode) {
+            case LOCGET, LOCSET
+                -> charInstruction(ip);
             case CONST, GLODEF, GLOGET, GLOSET
                 -> constantInstruction(ip);
             case ADD, DIV, EQ, FALSE, GE, GT, LE, LT, MUL,
@@ -65,6 +67,12 @@ public class Disassembler {
                 -> simpleInstruction(ip);
             default -> unknownOpcode(ip);
         };
+    }
+
+    private Pair charInstruction(int ip) {
+        char arg = chunk.code(ip + 1);
+        var text = String.format(" %04d", (int)arg);
+        return new Pair(text, ip + 2);
     }
 
     private Pair constantInstruction(int ip) {

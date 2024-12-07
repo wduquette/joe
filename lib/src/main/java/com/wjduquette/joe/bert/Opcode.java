@@ -17,19 +17,21 @@ public class Opcode {
     public static final char GLOSET = 8;
     public static final char GT     = 9;
     public static final char LE     = 10;
-    public static final char LT     = 11;
-    public static final char MUL    = 12;
-    public static final char NE     = 13;
-    public static final char NEGATE = 14;
-    public static final char NOT    = 15;
-    public static final char NULL   = 16;
-    public static final char POP    = 17;
-    public static final char RETURN = 18;
-    public static final char SUB    = 19;
-    public static final char TRUE   = 20;
+    public static final char LOCGET = 11;
+    public static final char LOCSET = 12;
+    public static final char LT     = 13;
+    public static final char MUL    = 14;
+    public static final char NE     = 15;
+    public static final char NEGATE = 16;
+    public static final char NOT    = 17;
+    public static final char NULL   = 18;
+    public static final char POP    = 19;
+    public static final char RETURN = 20;
+    public static final char SUB    = 21;
+    public static final char TRUE   = 22;
 
     // Temporary
-    public static final char PRINT  = 21;
+    public static final char PRINT  = 23;
 
 
     //-------------------------------------------------------------------------
@@ -47,6 +49,8 @@ public class Opcode {
         "GLOSET",
         "GT",
         "LE",
+        "LOCGET",
+        "LOCSET",
         "LT",
         "MUL",
         "NE",

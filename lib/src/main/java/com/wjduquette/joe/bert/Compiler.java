@@ -10,11 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Compiler {
+    public static final int MAX_LOCALS = 256;
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
     private final List<Trace> errors = new ArrayList<>();
     private final Parser parser = new Parser();
+    private FunctionCompiler current = null;
     private Scanner scanner;
     private Chunk compilingChunk;
     private final Disassembler disassembler = new Disassembler();
@@ -33,6 +36,7 @@ class Compiler {
     public void compile(String source, Chunk chunk) {
         var buffer = new SourceBuffer("*script*", source);
         scanner = new Scanner(buffer, errors::add);
+        current = new FunctionCompiler();
         compilingChunk = chunk;
         // Ideally, we would set this at creation time.
         chunk.setSource(buffer);
@@ -121,9 +125,20 @@ class Compiler {
     private void statement() {
         if (match(PRINT)) {
             printStatement();
+        } else if (match(LEFT_BRACE)) {
+            beginScope();
+            block();
+            endScope();
         } else {
             expressionStatement();
         }
+    }
+
+    private void block() {
+        while (!check(RIGHT_BRACE) && !check(EOF)) {
+            declaration();
+        }
+        consume(RIGHT_BRACE, "Expected '}' after block.");
     }
 
     private void expressionStatement() {
@@ -137,6 +152,7 @@ class Compiler {
         consume(SEMICOLON, "Expected ';' after value.");
         emit(Opcode.PRINT);
     }
+
 
     private void expression() {
         parsePrecedence(Level.ASSIGNMENT);
@@ -226,12 +242,18 @@ class Compiler {
 
     //-------------------------------------------------------------------------
     // Variable Management
+    //
+    // TODO: Refactor
+    // See what's here that can be folded into FunctionCompiler or
+    // Local or whatever.  As it is, it's confusing.
 
     // Consumes an IDENTIFIER and returns the constant index
     // for the identifier's name constant.
     private char parseVariable(String errorMessage) {
         consume(IDENTIFIER, errorMessage);
-        return identifierConstant(parser.previous);
+        declareVariable();
+        if (current.scopeDepth > 0) return 0;       // Local
+        return identifierConstant(parser.previous); // Global
     }
 
     // Adds a string constant to the current chunk's
@@ -242,19 +264,97 @@ class Compiler {
 
     // Emits the instruction to define the variable.
     private void defineVariable(char global) {
-        emit(Opcode.GLODEF, global);
+        if (current.scopeDepth > 0) {
+            // Local
+            markLocalInitialized();
+            return;
+        }
+        emit(Opcode.GLODEF, global);            // Global
     }
 
     private void namedVariable(Token name, boolean canAssign) {
-        char index = identifierConstant(name);
+        char getOp;
+        char setOp;
+
+        int arg = resolveLocal(current, name);
+
+        if (arg != -1) {
+            getOp = Opcode.LOCGET;
+            setOp = Opcode.LOCSET;
+        } else {
+            arg = identifierConstant(name);
+            getOp = Opcode.GLOGET;
+            setOp = Opcode.GLOSET;
+        }
         if (canAssign && match(EQUAL)) {
             expression();
-            emit(Opcode.GLOSET, index);
+            emit(setOp, (char)arg);
         } else {
-            emit(Opcode.GLOGET, index);
+            emit(getOp, (char)arg);
         }
     }
 
+    private void declareVariable() {
+        if (current.scopeDepth == 0) return; // Global
+        var name = parser.previous;
+
+        // Check for duplicate declarations in current scope.
+        for (var i = current.localCount - 1; i >= 0; i--) {
+            var local = current.locals[i];
+
+            // Stop checking once we get to a lower scope depth.
+            if (local.depth != -1 && local.depth < current.scopeDepth) {
+                break;
+            }
+
+            if (name.lexeme().equals(local.name.lexeme())) {
+                error("Duplicate variable declaration in this scope.");
+            }
+        }
+
+        addLocal(name);
+    }
+
+    private void addLocal(Token name) {
+        if (current.localCount == MAX_LOCALS) {
+            error("Too many local variables in function.");
+        }
+        current.locals[current.localCount++] =
+            new Local(name);
+    }
+
+    private void markLocalInitialized() {
+        current.locals[current.localCount - 1].depth
+            = current.scopeDepth;
+    }
+
+    private int resolveLocal(FunctionCompiler compiler, Token name) {
+        for (var i = compiler.localCount - 1; i >= 0; i--) {
+            var local = compiler.locals[i];
+            if (name.lexeme().equals(local.name.lexeme())) {
+                if (local.depth == -1) {
+                    error("Can't read local variable in its own initializer.");
+                }
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private void beginScope() {
+        current.scopeDepth++;
+    }
+
+    private void endScope() {
+        current.scopeDepth--;
+
+        while (current.localCount > 0
+            && current.locals[current.localCount - 1].depth > current.scopeDepth)
+        {
+            emit(Opcode.POP);
+            current.localCount--;
+        }
+    }
 
     //-------------------------------------------------------------------------
     // Parsing Tools
@@ -325,12 +425,6 @@ class Compiler {
         emit(value2);
     }
 
-    private void emit(char value1, char value2, char value3) {
-        emit(value1);
-        emit(value2);
-        emit(value3);
-    }
-
     //-------------------------------------------------------------------------
     // Helper Classes
 
@@ -367,6 +461,21 @@ class Compiler {
         ParseFunction infix,
         int level
     ) {}
+
+    private static class Local {
+        final Token name;
+        int depth = - 1;
+
+        Local(Token name) {
+            this.name = name;
+        }
+    }
+
+    private static class FunctionCompiler {
+        Local[] locals = new Local[MAX_LOCALS];
+        int localCount = 0;
+        int scopeDepth = 0;
+    }
 
     //-------------------------------------------------------------------------
     // Parser Rules

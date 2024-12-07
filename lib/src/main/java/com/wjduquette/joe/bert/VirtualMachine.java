@@ -150,6 +150,8 @@ class VirtualMachine {
                         throw error("The '<=' operator expects two Numbers or two Strings.");
                     }
                 }
+                case LOCGET -> push(stack[readSlot()]);
+                case LOCSET -> stack[readSlot()] = peek(0);
                 case LT -> {
                     var b = pop();
                     var a = pop();
@@ -249,6 +251,11 @@ class VirtualMachine {
 
     //-------------------------------------------------------------------------
     // Instruction decoding
+
+    // Reads a stack slot argument from the chunk.
+    private char readSlot() {
+        return chunk.code(ip++);
+    }
 
     // Reads a constant index from the chunk, and returns the indexed
     // constant.
