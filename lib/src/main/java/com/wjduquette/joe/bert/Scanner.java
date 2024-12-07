@@ -64,21 +64,18 @@ public class Scanner {
     // Constructor
 
     /**
-     * Creates a new scanner for the given filename and source text, using
-     * the given error reporter.  The *filename* is usually the bare filename
-     * of the source script, but can be any string meaningful to the
-     * application.
+     * Creates a new scanner for the given source buffer, using
+     * the given error reporter.
      *
-     * @param filename The filename
-     * @param source The source text
+     * @param buffer The SourceBuffer
+     * @param reporter The error handler.
      */
     Scanner(
-        String filename,
-        String source,
+        SourceBuffer buffer,
         Consumer<Trace> reporter
     ) {
-        this.source = source;
-        this.buffer = new SourceBuffer(filename, source);
+        this.buffer = buffer;
+        this.source = buffer.source();
         this.reporter = reporter;
     }
 

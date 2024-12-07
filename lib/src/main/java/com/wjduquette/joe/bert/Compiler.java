@@ -1,5 +1,6 @@
 package com.wjduquette.joe.bert;
 
+import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
 
@@ -28,10 +29,13 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Compilation
 
+    // TODO: Need the script name
     public void compile(String source, Chunk chunk) {
-        this.scanner = new Scanner("*script*", source, errors::add);
-        this.compilingChunk = chunk;
-
+        var buffer = new SourceBuffer("*script*", source);
+        scanner = new Scanner(buffer, errors::add);
+        compilingChunk = chunk;
+        // Ideally, we would set this at creation time.
+        chunk.setSource(buffer);
 
         errors.clear();
         parser.hadError = false;

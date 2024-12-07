@@ -45,7 +45,7 @@ class Chunk {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final SourceBuffer buffer = null;
+    private SourceBuffer source = null;
 
     // The compiled "byte" code.
     private char[] code = new char[8];
@@ -70,6 +70,10 @@ class Chunk {
 
     //-------------------------------------------------------------------------
     // Methods
+
+    void setSource(SourceBuffer source) {
+        this.source = source;
+    }
 
     /**
      * Writes a char value to the code array, growing the array as needed.
@@ -110,7 +114,7 @@ class Chunk {
     }
 
     SourceBuffer.Span span(int index) {
-        return buffer != null ? buffer.lineSpan(lines[index]) : null;
+        return source != null ? source.lineSpan(lines[index]) : null;
     }
 
     /**
