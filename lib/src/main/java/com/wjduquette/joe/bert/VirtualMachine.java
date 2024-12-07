@@ -70,8 +70,16 @@ class VirtualMachine {
                 case ADD -> {
                     var b = pop();
                     var a = pop();
-                    checkNumericOperands(opcode, a, b);
-                    push((double)a + (double)b);
+                    if (a instanceof Double x && b instanceof Double y) {
+                        push(x + y);
+                    } else if (a instanceof String s) {
+                        push(s + Bert.stringify(b));
+                    } else if (b instanceof String s) {
+                        push(Bert.stringify(a) + s);
+                    } else {
+                        throw new RuntimeError(ipSpan(),
+                            "The '+' operator expects two Numbers or two Strings.");
+                    }
                 }
                 case CONST -> push(readConstant());
                 case DIV -> {

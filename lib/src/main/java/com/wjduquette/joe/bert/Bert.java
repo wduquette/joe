@@ -89,6 +89,12 @@ public class Bert {
     public static String stringify(Object value) {
         return switch (value) {
             case null -> "null";
+            case Double d -> {
+                var s = d.toString();
+                yield s.endsWith(".0")
+                    ? s.substring(0, s.length() - 2)
+                    : s;
+            }
             default -> value.toString();
         };
     }
