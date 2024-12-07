@@ -66,6 +66,8 @@ class VirtualMachine {
     // be in `Function` in a more efficient form.
     private void run() {
         if (Bert.isDebug()) {
+            // NOTE: Ultimately, the execution trace is going to need to be
+            // redirected to a file.
             Bert.printf("%-40s ", " ");
             Bert.println("| " + stackText());
         }
@@ -207,6 +209,9 @@ class VirtualMachine {
                 case PRINT -> {
                     var value = Bert.stringify(pop());
                     Bert.println(value);
+                    if (Bert.isDebug()) {
+                        Bert.printf("%-40s ", " ");
+                    }
                 }
                 case POP -> pop();
                 case RETURN -> {
