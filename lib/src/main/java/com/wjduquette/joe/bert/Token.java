@@ -25,6 +25,6 @@ record Token(
 
     @Override
     public String toString() {
-        return type + "[" + lexeme() + "," + literal + "," + span.startLine() + "]";
+        return type + "[" + lexeme() + "," + literal + "," + line() + "]";
     }
 }

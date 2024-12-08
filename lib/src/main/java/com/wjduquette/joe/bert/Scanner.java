@@ -83,7 +83,9 @@ public class Scanner {
         skipWhitespace();
         start = current;
 
-        if (isAtEnd()) return new Token(EOF, null, null);
+        if (isAtEnd()) {
+            return new Token(EOF, buffer.span(start, current), null);
+        }
 
         char c = advance();
 
@@ -114,18 +116,18 @@ public class Scanner {
                 if (match('&')) {
                     yield makeToken(AND);
                 } else {
-                    yield errorToken("Unexpected character.");
+                    yield errorToken("unexpected character.");
                 }
             }
             case '|' -> {
                 if (match('|')) {
                     yield makeToken(OR);
                 } else {
-                    yield errorToken("Unexpected character.");
+                    yield errorToken("unexpected character.");
                 }
             }
             case '"' -> string();
-            default -> errorToken("Unexpected character.");
+            default -> errorToken("unexpected character.");
         };
     }
 
@@ -150,7 +152,7 @@ public class Scanner {
         while (peek() != '"' && !isAtEnd()) advance();
 
         if (isAtEnd()) {
-            return errorToken("Unterminated string.");
+            return errorToken("unterminated string.");
         }
 
         // Closing quote
@@ -223,7 +225,11 @@ public class Scanner {
     }
 
     private Token errorToken(String message) {
-        reporter.accept(new Trace(buffer.span(start, current), message));
+        var where = isAtEnd() ? "end"
+            : "'" + source.substring(start, current) + "'";
+
+        reporter.accept(new Trace(buffer.span(start, current),
+            "At " + where + ", " + message));
         return new Token(ERROR, null, null);
     }
 }

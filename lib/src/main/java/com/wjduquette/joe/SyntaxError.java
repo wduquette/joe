@@ -33,7 +33,9 @@ public class SyntaxError extends JoeError {
         var list = new ArrayList<String>();
         list.add(verbose(getTraces().removeFirst()));
         getTraces().stream()
-            .map(t -> "[line " + t.line() + "] " + t.message())
+            .map(t -> t.hasContext()
+                ? "[line " + t.line() + "] " + t.message()
+                : t.message())
             .forEach(list::add);
 
         return String.join("\n", list);
@@ -42,7 +44,7 @@ public class SyntaxError extends JoeError {
     private String verbose(Trace trace) {
         // Note: for syntax errors there should always be a context.
         // Once Bert is fully functional, this if-check can be removed.
-        if (trace.context() != null) {
+        if (trace.hasContext()) {
             return "[line " + trace.line() + "] " + trace.message() + "\n" +
                 "  In script '" + trace.context().filename() + "':\n" +
                 errorLines(trace.context(), "    ");

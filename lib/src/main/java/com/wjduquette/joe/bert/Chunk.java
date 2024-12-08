@@ -94,7 +94,7 @@ class Chunk implements CodeChunk {
         }
 
         // NEXT, we see line == 1 on EOF.  Retain the previous line number.
-        if (line == -1 && lines.length > 0) {
+        if (line == -1 && size > 0) {
             line = lines[size - 1];
         }
 
