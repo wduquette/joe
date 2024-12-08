@@ -19,7 +19,6 @@ class Compiler {
     private final Parser parser = new Parser();
     private FunctionCompiler current = null;
     private Scanner scanner;
-    private Chunk compilingChunk;
     private final Disassembler disassembler = new Disassembler();
 
     //-------------------------------------------------------------------------
@@ -32,14 +31,10 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Compilation
 
-    // TODO: Need the script name
-    public void compile(String source, Chunk chunk) {
-        var buffer = new SourceBuffer("*script*", source);
+    public Function compile(String scriptName, String source) {
+        var buffer = new SourceBuffer(scriptName, source);
         scanner = new Scanner(buffer, errors::add);
-        current = new FunctionCompiler();
-        compilingChunk = chunk;
-        // Ideally, we would set this at creation time.
-        chunk.setSource(buffer);
+        current = new FunctionCompiler("*script*", FunctionType.SCRIPT, buffer);
 
         errors.clear();
         parser.hadError = false;
@@ -49,22 +44,30 @@ class Compiler {
         while (!match(EOF)) {
             declaration();
         }
-        endCompiler();
+
+        var function = endFunction();
 
         if (!errors.isEmpty()) {
             throw new SyntaxError("Error while compiling script", errors);
         }
+
+        return function;
     }
 
     private Chunk currentChunk() {
-        return compilingChunk;
+        return current.chunk;
     }
 
-    private void endCompiler() {
+    private Function endFunction() {
         emitReturn();
+
+        var function = new Function(current.chunk);
+
         if (!parser.hadError && Bert.isDebug()) {
-            Bert.println(disassembler.disassemble("*script*", currentChunk()));
+            Bert.println(disassembler.disassemble(function));
         }
+
+        return function;
     }
 
     //-------------------------------------------------------------------------
@@ -590,9 +593,23 @@ class Compiler {
     }
 
     private static class FunctionCompiler {
+        Chunk chunk;
         Local[] locals = new Local[MAX_LOCALS];
         int localCount = 0;
         int scopeDepth = 0;
+
+        FunctionCompiler(String name, FunctionType type, SourceBuffer source) {
+            chunk = new Chunk();
+            chunk.name = name;
+            chunk.type = type;
+            chunk.source = source;
+
+            // Every function has an implicit stack slot for the VM's own use.
+            // For methods, this slot will be filled by the instance.
+            var local = new Local(Token.synthetic(""));
+            local.depth = 0;
+            locals[localCount++] = local;
+        }
     }
 
     //-------------------------------------------------------------------------

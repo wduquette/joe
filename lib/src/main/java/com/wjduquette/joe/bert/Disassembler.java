@@ -11,7 +11,7 @@ public class Disassembler {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private transient Chunk chunk;
+    private transient CodeChunk chunk;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -23,12 +23,15 @@ public class Disassembler {
     //-------------------------------------------------------------------------
     // Methods
 
-    String disassemble(String name, Chunk chunk) {
+    String disassemble(CodeChunk chunk) {
         this.chunk = chunk;
         // FIRST, get the title and constants table.
         var buff = new StringBuilder();
 
-        buff.append("=== ").append(name).append("===\n");
+        buff.append("=== ")
+            .append(chunk.type())
+            .append(" ")
+            .append(chunk.name()).append(" ===\n");
 
         for (int i = 0; i < chunk.numConstants(); i++) {
             buff.append("[")
@@ -86,7 +89,7 @@ public class Disassembler {
             : text + " ".repeat(width - text.length());
     }
 
-    String disassembleInstruction(Chunk chunk, int ip) {
+    String disassembleInstruction(CodeChunk chunk, int ip) {
         this.chunk = chunk;
         return singlePrefix(ip) + instruction(ip).result;
     }

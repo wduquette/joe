@@ -11,6 +11,7 @@ import static com.wjduquette.joe.bert.Opcode.*;
 
 class VirtualMachine {
     public static final int DEFAULT_STACK_SIZE = 256;
+    public static final int MAX_FRAMES = 64;
 
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -32,18 +33,17 @@ class VirtualMachine {
     // The global environment.
     private final Map<String,Object> globals = new HashMap<>();
 
-    // The current chunk.  Later, this will be a `Function`.
-    private Chunk chunk = null;
-
-    // The instruction pointer, an index into this chunk's code[].
-    private int ip;
-
     // The value stack
     private Object[] stack = new Object[DEFAULT_STACK_SIZE];
 
     // The number of items on the stack.  The top item is at
     // stack[top - 1].
     private int top = 0;
+
+    // The call frame stack
+    private final CallFrame[] frames = new CallFrame[MAX_FRAMES];
+    private int frameCount;
+    private CallFrame frame; // The current frame.  Managed by run().
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -55,16 +55,25 @@ class VirtualMachine {
     // Methods
 
     void interpret(String source) {
-        this.chunk = new Chunk();
-        compiler.compile(source, chunk);
-        this.ip = 0;
+        var function = compiler.compile("*script*", source);
         resetStack();
+        frames[frameCount++] = new CallFrame(function);
+        stack[top++] = function;
         run();
     }
+
+    private void resetStack() {
+        top = 0;
+        frameCount = 0;
+    }
+
 
     // At present this uses Chunk directly.  Later the chunk info will
     // be in `Function` in a more efficient form.
     private void run() {
+        // Get the top call frame
+        frame = frames[frameCount - 1];
+
         if (Bert.isDebug()) {
             // NOTE: Ultimately, the execution trace is going to need to be
             // redirected to a file.
@@ -73,9 +82,11 @@ class VirtualMachine {
         }
         for (;;) {
             if (Bert.isDebug()) {
-                Bert.printf("%-40s ", disassembler.disassembleInstruction(chunk, ip));
+                Bert.printf("%-40s ",
+                    disassembler.disassembleInstruction(
+                        frame.function, frame.ip));
             }
-            var opcode = chunk.code(ip++);
+            var opcode = frame.function.code[frame.ip++];
             switch (opcode) {
                 case ADD -> {
                     var b = pop();
@@ -146,19 +157,19 @@ class VirtualMachine {
                 }
                 case JIF -> {
                     var offset = readArg();
-                    if (Bert.isFalsey(pop())) ip += offset;
+                    if (Bert.isFalsey(pop())) frame.ip += offset;
                 }
                 case JIFKEEP -> {
                     var offset = readArg();
-                    if (Bert.isFalsey(peek(0))) ip += offset;
+                    if (Bert.isFalsey(peek(0))) frame.ip += offset;
                 }
                 case JITKEEP -> {
                     var offset = readArg();
-                    if (Bert.isTruthy(peek(0))) ip += offset;
+                    if (Bert.isTruthy(peek(0))) frame.ip += offset;
                 }
                 case JUMP -> {
                     var offset = readArg();
-                    ip += offset;
+                    frame.ip += offset;
                 }
                 case LE -> {
                     var b = pop();
@@ -171,11 +182,17 @@ class VirtualMachine {
                         throw error("The '<=' operator expects two Numbers or two Strings.");
                     }
                 }
-                case LOCGET -> push(stack[readSlot()]);
-                case LOCSET -> stack[readSlot()] = peek(0);
+                case LOCGET -> {
+                    var slot = readSlot();
+                    push(stack[frame.base + slot]);
+                }
+                case LOCSET -> {
+                    var slot = readSlot();
+                    stack[frame.base + slot] = peek(0);
+                }
                 case LOOP -> {
                     var offset = readArg();
-                    ip -= offset;
+                    frame.ip -= offset;
                 }
                 case LT -> {
                     var b = pop();
@@ -237,7 +254,8 @@ class VirtualMachine {
     }
 
     private SourceBuffer.Span ipSpan() {
-        return chunk.span(ip - 1);
+        var line = frame.function.line(frame.ip);
+        return frame.function.source().lineSpan(line);
     }
 
     private void checkNumericOperands(char opcode, Object a, Object b) {
@@ -291,34 +309,30 @@ class VirtualMachine {
 
     // Reads an instruction argument from the chunk.
     private char readArg() {
-        return chunk.code(ip++);
+        return frame.function.code[frame.ip++];
     }
 
     // Reads a stack slot argument from the chunk.
     private char readSlot() {
-        return chunk.code(ip++);
+        return frame.function.code[frame.ip++];
     }
 
     // Reads a constant index from the chunk, and returns the indexed
     // constant.
     private Object readConstant() {
-        var index = chunk.code(ip++);
-        return chunk.getConstant(index);
+        var index = frame.function.code[frame.ip++];
+        return frame.function.constants[index];
     }
 
     // Reads a constant index from the chunk, and returns the indexed
     // constant as a string.
     private String readString() {
-        var index = chunk.code(ip++);
-        return (String)chunk.getConstant(index);
+        var index = frame.function.code[frame.ip++];
+        return (String)frame.function.constants[index];
     }
 
     //-------------------------------------------------------------------------
-    // Stack Operations
-
-    private void resetStack() {
-        top = 0;
-    }
+    // Value Stack Operations
 
     private void push(Object value) {
         if (top == stack.length) {
@@ -333,5 +347,25 @@ class VirtualMachine {
 
     private Object peek(int depth) {
         return stack[top - depth - 1];
+    }
+
+    //-------------------------------------------------------------------------
+    // Call Stack Operations
+
+    private class CallFrame {
+        // The function
+        Function function;
+
+        // The instruction pointer within the frame.
+        int ip;
+
+        // The stack slot for function local 0
+        int base;
+
+        CallFrame(Function function) {
+            this.function = function;
+            this.ip = 0;
+            this.base = top;
+        }
     }
 }

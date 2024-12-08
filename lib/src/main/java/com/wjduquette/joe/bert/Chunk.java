@@ -11,7 +11,7 @@ import java.util.Map;
  * function.  The code array grows as needed.  When compilation is
  * complete, the products are copied to an immutable fixed-size Function.
  */
-class Chunk {
+class Chunk implements CodeChunk {
     //-------------------------------------------------------------------------
     // # clox Notes
     //
@@ -45,20 +45,30 @@ class Chunk {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private SourceBuffer source = null;
+    // The function's name and arity; null for a top-level script.
+    String name = null;
 
-    // The compiled "byte" code.
-    private char[] code = new char[8];
+    // The function's type
+    FunctionType type = FunctionType.SCRIPT;
+
+    // The function's arity
+    int arity = 0;
+
+    // The function's source buffer
+    SourceBuffer source = null;
 
     // The source line number associated with each opcode
-    private int[] lines = new int[8];
+    int[] lines = new int[8];
+
+    // The compiled "byte" code.
+    char[] code = new char[8];
 
     // The number of items in the code array.
-    private int size = 0;
+    int size = 0;
 
     // The array of constants
-    private Object[] constants = new Object[8];
-    private char numConstants = 0;
+    Object[] constants = new Object[8];
+    char numConstants = 0;
     private final Map<Object,Character> cache = new HashMap<>();
 
     //-------------------------------------------------------------------------
@@ -69,15 +79,7 @@ class Chunk {
     }
 
     //-------------------------------------------------------------------------
-    // Methods
-
-    void setSource(SourceBuffer source) {
-        this.source = source;
-    }
-
-    SourceBuffer source() {
-        return source;
-    }
+    // Compilation API
 
     /**
      * Writes a char value to the code array, growing the array as needed.
@@ -102,35 +104,6 @@ class Chunk {
     }
 
     /**
-     * Gets the size of the code array.
-     * @return The size
-     */
-    int codeSize() {
-        return size;
-    }
-
-    /**
-     * Gets the value at the given index in the code array
-     * @param index The index
-     * @return The value
-     */
-    char code(int index) {
-        return code[index];
-    }
-
-    void setCode(int index, char value) {
-        code[index] = value;
-    }
-
-    int line(int index) {
-        return lines[index];
-    }
-
-    SourceBuffer.Span span(int index) {
-        return source != null ? source.lineSpan(lines[index]) : null;
-    }
-
-    /**
      * Adds a constant to the chunk, and returns its index.  If the
      * constant had already been added, returns the existing index.
      * @param constant The constant value
@@ -152,16 +125,19 @@ class Chunk {
         return index;
     }
 
-    /**
-     * Gets the constant at the given index.
-     * @param index The index
-     * @return The constant value
-     */
-    Object getConstant(int index) {
-        return constants[index];
+    void setCode(int index, char value) {
+        code[index] = value;
     }
 
-    int numConstants() {
-        return numConstants;
-    }
+    //-------------------------------------------------------------------------
+    // CodeChunk API
+
+    @Override public SourceBuffer source() { return source; }
+    @Override public FunctionType type() { return type; }
+    @Override public String name() { return name; }
+    @Override public int codeSize() { return size; }
+    @Override public char code(int index) { return code[index]; }
+    @Override public int line(int index) { return lines[index]; }
+    @Override public int numConstants() { return numConstants; }
+    @Override public Object getConstant(int index) { return constants[index]; }
 }
