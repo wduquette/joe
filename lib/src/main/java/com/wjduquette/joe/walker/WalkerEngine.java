@@ -158,4 +158,29 @@ public class WalkerEngine implements Engine {
             throw joe.expected("callable", callee);
         }
     }
+
+    public String dump(String scriptName, String source) {
+        var traces = new ArrayList<Trace>();
+
+        Scanner scanner = new Scanner(scriptName, source, traces::add);
+        List<Token> tokens = scanner.scanTokens();
+        var buffer = scanner.buffer();
+        Parser parser = new Parser(buffer, tokens, traces::add);
+        var statements = parser.parse();
+
+        // Stop if there was a syntax error.
+        if (!traces.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.", traces);
+        }
+
+        Resolver resolver = new Resolver(interpreter, traces::add);
+        resolver.resolve(statements);
+
+        // Stop if there was a resolution error.
+        if (!traces.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.", traces);
+        }
+
+        return new Dumper().dump(statements);
+    }
 }
