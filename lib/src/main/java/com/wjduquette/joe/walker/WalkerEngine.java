@@ -159,6 +159,22 @@ public class WalkerEngine implements Engine {
         }
     }
 
+    /**
+     * Compiles the given file and returns a compilation dump.
+     * @param scriptPath The file's path
+     * @return The script's result
+     * @throws IOException if the file cannot be read.
+     * @throws SyntaxError if the script could not be compiled.
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public String dumpFile(String scriptPath) throws IOException, SyntaxError {
+        var path = Paths.get(scriptPath);
+        byte[] bytes = Files.readAllBytes(path);
+        var script = new String(bytes, Charset.defaultCharset());
+
+        return dump(path.getFileName().toString(), script);
+    }
+
     public String dump(String scriptName, String source) {
         var traces = new ArrayList<Trace>();
 

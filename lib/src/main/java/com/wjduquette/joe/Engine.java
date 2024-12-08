@@ -55,6 +55,28 @@ public interface Engine {
     Object run(String filename, String source) throws SyntaxError, JoeError;
 
     /**
+     * Compiles the script and returns a compilation dump,
+     * throwing an appropriate error on failure.
+     * @param scriptPath The file's path
+     * @return The dump
+     * @throws IOException if the file cannot be read.
+     * @throws SyntaxError if the script could not be compiled.
+     */
+    String dumpFile(String scriptPath) throws IOException, SyntaxError;
+
+    /**
+     * Compiles the script and returns a compilation dump,
+     * throwing an appropriate error on failure.
+     * The filename is usually the bare file name of the script file,
+     * but can be any string relevant to the application, e.g., "%repl%".
+     * @param filename The filename
+     * @param source The input
+     * @return The dump
+     * @throws SyntaxError if the script could not be compiled.
+     */
+    String dump(String filename, String source) throws SyntaxError;
+
+    /**
      * Checks whether the source "is complete", i.e, whether it can
      * be compiled.  The result is not executed.  This is useful
      * in REPLs, so that the user can enter a newline in a string or

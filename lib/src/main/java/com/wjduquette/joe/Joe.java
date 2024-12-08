@@ -261,6 +261,34 @@ public class Joe {
     }
 
     /**
+     * Compiles the given file and returns a compilation dump.
+     * @param path The file's path
+     * @return The dump's result
+     * @throws IOException if the file cannot be read.
+     * @throws SyntaxError if the script could not be compiled.
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public Object dumpFile(String path)
+        throws IOException, SyntaxError
+    {
+        return engine.dumpFile(path);
+    }
+
+    /**
+     * Compiles the script, throwing an appropriate error on failure, and
+     * returns a compilation dump.
+     * The filename is usually the bare file name of the script file,
+     * but can be any string relevant to the application, e.g., "%repl%".
+     * @param filename The filename
+     * @param source The input
+     * @return The dump
+     * @throws SyntaxError if the script could not be compiled.
+     */
+    public String dump(String filename, String source) throws SyntaxError {
+        return engine.dump(filename, source);
+    }
+
+    /**
      * Checks whether the source "is complete", i.e, whether it can
      * be compiled.  The result is not executed.  This is useful
      * in REPLs, so that the user can enter a newline in a string or
