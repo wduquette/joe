@@ -112,6 +112,15 @@ sealed interface Expr
     record Super(Token keyword, Token method) implements Expr {}
 
     /**
+     * A ternary operation
+     * @param condition The condition
+     * @param op The question mark operator token
+     * @param trueExpr The true expression
+     * @param falseExpr The false expression
+     */
+    record Ternary(Expr condition, Token op, Expr trueExpr, Expr falseExpr) implements Expr {}
+
+    /**
      * In a class method, the magic "this" variable.
      * @param keyword The "this" keyword
      */
@@ -123,15 +132,6 @@ sealed interface Expr
      * @param right The expression yielding the value to be operated upon.
      */
     record Unary(Token op, Expr right) implements Expr {}
-
-    /**
-     * A ternary operation
-     * @param condition The condition
-     * @param op The question mark operator token
-     * @param trueExpr The true expression
-     * @param falseExpr The false expression
-     */
-    record Ternary(Expr condition, Token op, Expr trueExpr, Expr falseExpr) implements Expr {}
 
     /**
      * A get of a variable's value.

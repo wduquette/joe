@@ -14,7 +14,7 @@ class Dumper {
 
     public String dump(List<Stmt> statements) {
         buff = new StringBuilder();
-        indent = 0;
+        indent = -1;
 
         dumpStatements(statements);
         return buff.toString();
@@ -27,26 +27,22 @@ class Dumper {
     }
 
     private void dumpStatement(Stmt statement) {
+        ++indent;
         switch (statement) {
             case null -> {}
-            case Stmt.Assert stmt ->
+            case Stmt.Assert stmt -> {
                 buff.append(indent())
                     .append("Stmt.Assert ")
-                    .append(stmt.condition())
-                    .append(", ")
                     .append(stmt.message())
                     .append("\n");
+                dumpExpression(stmt.condition());
+            }
             case Stmt.Block stmt -> {
                 buff.append(indent())
                     .append("Stmt.Block {\n");
-
-                ++indent;
                 dumpStatements(stmt.statements());
-                --indent;
-
                 buff.append(indent())
                     .append("}\n");
-
             }
             case Stmt.Break ignored ->
                 buff.append(indent()).append("Stmt.Break\n");
@@ -70,68 +66,48 @@ class Dumper {
                 ) {
                     buff.append(indent())
                         .append("Static initializer:\n");
-
-                    ++indent;
                     dumpStatements(stmt.staticInitializer());
-                    --indent;
                 }
 
                 if (stmt.staticMethods() != null) {
                     buff.append(indent())
                         .append("Static Methods:\n");
-
-                    ++indent;
                     for (var func : stmt.staticMethods()) {
                         dumpStatement(func);
                     }
-                    --indent;
                 }
 
                 if (stmt.methods() != null) {
                     buff.append(indent())
                         .append("Instance Methods:\n");
-
-                    ++indent;
                     for (var func : stmt.methods()) {
                         dumpStatement(func);
                     }
-                    --indent;
                 }
 
                 --indent;
             }
             case Stmt.Continue ignored ->
                 buff.append(indent()).append("Stmt.Continue\n");
-            case Stmt.Expression stmt ->
+            case Stmt.Expression stmt -> {
                 buff.append(indent())
-                    .append("Stmt.Expression ")
-                    .append(stmt.expr())
-                    .append("\n");
+                    .append("Stmt.Expression\n");
+                dumpExpression(stmt.expr());
+            }
             case Stmt.For stmt -> {
                 buff.append(indent())
                     .append("Stmt.For\n");
-                ++indent;
                 dumpStatement(stmt.init());
-                buff.append(indent())
-                    .append(stmt.condition())
-                    .append("\n")
-                    .append(indent())
-                    .append(stmt.incr())
-                    .append("\n");
-                ++indent;
+                dumpExpression(stmt.condition());
+                dumpExpression(stmt.incr());
                 dumpStatement(stmt.body());
-                --indent;
-
-                --indent;
             }
             case Stmt.ForEach stmt -> {
                 buff.append(indent())
-                    .append("Stmt.ForEach ")
-                    .append(stmt.listExpr())
-                    .append("\n");
-                ++indent;
+                    .append("Stmt.ForEach\n");
+
+                dumpExpression(stmt.listExpr());
                 dumpStatement(stmt.body());
-                --indent;
             }
             case Stmt.Function stmt -> {
                 var params = stmt.params().stream()
@@ -145,16 +121,12 @@ class Dumper {
                     .append("(")
                     .append(params)
                     .append(")\n");
-
-                ++indent;
                 dumpStatements(stmt.body());
-                --indent;
             }
             case Stmt.If stmt -> {
                 buff.append(indent())
-                    .append("Stmt.If ")
-                    .append(stmt.condition())
-                    .append("\n");
+                    .append("Stmt.If\n");
+                dumpExpression(stmt.condition());
                 ++indent;
                 buff.append(indent()).append("Then:\n");
                 dumpStatement(stmt.thenBranch());
@@ -164,11 +136,11 @@ class Dumper {
                 }
                 --indent;
             }
-            case Stmt.Return stmt ->
+            case Stmt.Return stmt -> {
                 buff.append(indent())
-                    .append("Stmt.Return ")
-                    .append(stmt.value())
-                    .append("\n");
+                    .append("Stmt.Return\n");
+                dumpExpression(stmt.value());
+            }
             case Stmt.Switch stmt -> {
                 buff.append(indent())
                     .append("Stmt.Switch ")
@@ -177,37 +149,147 @@ class Dumper {
                 ++indent;
                 for (var c : stmt.cases()) {
                     buff.append(indent())
-                        .append("Case ")
-                        .append(c.values())
-                        .append("\n");
-                    ++indent;
+                        .append("Case\n");
+                    for (var value : c.values()) {
+                        dumpExpression(value);
+                    }
                     dumpStatement(c.statement());
-                    --indent;
                 }
                 --indent;
             }
-            case Stmt.Throw stmt ->
+            case Stmt.Throw stmt -> {
                 buff.append(indent())
-                    .append("Stmt.Throw ")
-                    .append(stmt.value())
-                    .append("\n");
-            case Stmt.Var stmt ->
+                    .append("Stmt.Throw\n");
+                dumpExpression(stmt.value());
+            }
+            case Stmt.Var stmt -> {
                 buff.append(indent())
                     .append("Stmt.Var ")
                     .append(stmt.name().lexeme())
-                    .append(" = ")
-                    .append(stmt.initializer())
-                    .append("\n");
+                    .append(" =\n");
+                dumpExpression(stmt.initializer());
+            }
             case Stmt.While stmt -> {
                 buff.append(indent())
-                    .append("Stmt.While ")
-                    .append(stmt.condition())
-                    .append("\n");
-                ++indent;
+                    .append("Stmt.While\n");
+                dumpExpression(stmt.condition());
                 dumpStatement(stmt.body());
-                --indent;
             }
         }
+        --indent;
+    }
+
+    private void dumpExpression(Expr expr) {
+        if (expr == null) {
+            return;
+        }
+
+        ++indent;
+
+        buff.append(indent())
+            .append("Expr.")
+            .append(expr.getClass().getSimpleName())
+            .append(" ");
+        switch (expr) {
+            case Expr.Assign e -> {
+                buff.append(e.name().lexeme())
+                    .append(" ")
+                    .append(e.op().lexeme())
+                    .append("\n");
+                dumpExpression(e.value());
+            }
+            case Expr.Binary e -> {
+                buff.append(e.op().lexeme())
+                    .append("\n");
+                dumpExpression(e.left());
+                dumpExpression(e.right());
+            }
+            case Expr.Call e -> {
+                buff.append("\n");
+                dumpExpression(e.callee());
+                for (var arg : e.arguments()) {
+                    dumpExpression(arg);
+                }
+            }
+            case Expr.Get e -> {
+                buff.append(e.name().lexeme())
+                    .append(" of:\n");
+                dumpExpression(e.object());
+            }
+            case Expr.Grouping e -> {
+                buff.append(" (\n");
+                dumpExpression(e.expr());
+                buff.append(indent())
+                    .append(")\n");
+            }
+            case Expr.Lambda e -> {
+                buff.append("\n");
+                ++indent;
+                dumpStatement(e.declaration());
+                --indent;
+            }
+            case Expr.Literal e ->
+                buff.append(e.value().getClass().getSimpleName())
+                    .append(" '")
+                    .append(e.value())
+                    .append("'\n");
+            case Expr.Logical e -> {
+                buff.append(e.op().lexeme())
+                    .append("\n");
+                dumpExpression(e.left());
+                dumpExpression(e.right());
+            }
+            case Expr.PrePostAssign e -> {
+                if (e.isPre()) {
+                    buff.append(e.op().lexeme())
+                        .append(e.name().lexeme())
+                        .append("\n");
+                } else {
+                    buff.append(e.name().lexeme())
+                        .append(e.op().lexeme())
+                        .append("\n");
+                }
+            }
+            case Expr.PrePostSet e -> {
+                if (e.isPre()) {
+                    buff.append(e.op().lexeme())
+                        .append(e.name().lexeme())
+                        .append(" of\n");
+                } else {
+                    buff.append(e.name().lexeme())
+                        .append(e.op().lexeme())
+                        .append(" of\n");
+                }
+                dumpExpression(e.object());
+            }
+            case Expr.Set e -> {
+                buff.append(e.name().lexeme())
+                    .append(" of\n");
+                dumpExpression(e.object());
+            }
+            case Expr.Super e ->
+                buff.append(e.method().lexeme()).append("\n");
+            case Expr.Ternary e -> {
+                buff.append("\n");
+                dumpExpression(e.condition());
+                dumpExpression(e.trueExpr());
+                dumpExpression(e.falseExpr());
+            }
+            case Expr.This e ->
+                buff.append("'")
+                    .append(e.keyword().lexeme())
+                    .append("'\n");
+            case Expr.Unary e -> {
+                buff.append(e.op().lexeme())
+                    .append("\n");
+                dumpExpression(e.right());
+            }
+            case Expr.Variable e ->
+                buff.append(e.name().lexeme())
+                    .append("\n");
+        }
+
+        --indent;
     }
 
     private String indent() {
