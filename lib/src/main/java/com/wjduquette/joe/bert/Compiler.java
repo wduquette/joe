@@ -1,5 +1,6 @@
 package com.wjduquette.joe.bert;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
@@ -15,17 +16,20 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    private final Joe joe;
 
     private final List<Trace> errors = new ArrayList<>();
     private final Parser parser = new Parser();
     private FunctionCompiler current = null;
     private Scanner scanner;
-    private final Disassembler disassembler = new Disassembler();
+    private final Disassembler disassembler;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    Compiler() {
+    Compiler(Joe joe) {
+        this.joe = joe;
+        this.disassembler = new Disassembler(joe);
         populateRulesTable();
     }
 
@@ -64,8 +68,8 @@ class Compiler {
 
         var function = new Function(current.chunk);
 
-        if (!parser.hadError && Bert.isDebug()) {
-            Bert.println(disassembler.disassemble(function));
+        if (!parser.hadError && joe.isDebug()) {
+            joe.println(disassembler.disassemble(function));
         }
 
         return function;

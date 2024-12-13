@@ -62,7 +62,7 @@ public class BertEngine implements Engine {
 
     @Override
     public String dump(String filename, String source) throws SyntaxError {
-        var compiler = new Compiler();
+        var compiler = new Compiler(joe);
 
         // Dumps to System.out at present.
         compiler.compile(filename, source);

@@ -26,7 +26,7 @@ class VirtualMachine {
     //
 
     // The Disassembler
-    private final Disassembler disassembler = new Disassembler();
+    private final Disassembler disassembler;
 
     // The Compiler
     private final Compiler compiler;
@@ -55,7 +55,8 @@ class VirtualMachine {
 
     VirtualMachine(Joe joe) {
         this.joe = joe;
-        this.compiler = new Compiler();
+        this.compiler = new Compiler(joe);
+        this.disassembler = new Disassembler(joe);
     }
 
     //-------------------------------------------------------------------------

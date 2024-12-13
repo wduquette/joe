@@ -1,5 +1,7 @@
 package com.wjduquette.joe.bert;
 
+import com.wjduquette.joe.Joe;
+
 import java.util.ArrayList;
 
 import static com.wjduquette.joe.bert.Opcode.*;
@@ -11,13 +13,14 @@ public class Disassembler {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    private final Joe joe;
     private transient CodeChunk chunk;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Disassembler() {
-        // Nothing to do
+    public Disassembler(Joe joe) {
+        this.joe = joe;
     }
 
     //-------------------------------------------------------------------------
@@ -37,7 +40,7 @@ public class Disassembler {
             buff.append("[")
                 .append(i)
                 .append("] = '")
-                .append(Bert.stringify(chunk.getConstant(i)))
+                .append(joe.stringify(chunk.getConstant(i)))
                 .append("'\n");
         }
 
@@ -120,7 +123,7 @@ public class Disassembler {
 
     private Pair constantInstruction(int ip) {
         int index = chunk.code(ip + 1);
-        var constant = Bert.stringify(chunk.getConstant(index));
+        var constant = joe.stringify(chunk.getConstant(index));
         if (constant.length() > 10) {
             constant = constant.substring(0, 7) + "...";
         }
