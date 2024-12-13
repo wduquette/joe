@@ -186,6 +186,8 @@ class Compiler {
             forStatement();
         } else if (match(PRINT)) {
             printStatement();
+        } else if (match(RETURN)) {
+            returnStatement();
         } else if (match(WHILE)) {
             whileStatement();
         } else if (match(LEFT_BRACE)) {
@@ -207,7 +209,15 @@ class Compiler {
     private void expressionStatement() {
         expression();
         consume(SEMICOLON, "Expected ';' after expression.");
-        emit(Opcode.POP);
+
+        // Normal statements should not leave anything on the stack, so we
+        // pop it.  But if this is the last statement in the script, we
+        // want to return its value.
+        if (parser.current.type() == EOF) {
+            emit(Opcode.RETURN);
+        } else {
+            emit(Opcode.POP);
+        }
     }
 
     private void forStatement() {
@@ -265,6 +275,16 @@ class Compiler {
 
         if (match(ELSE)) statement();
         patchJump(elseJump);
+    }
+
+    private void returnStatement() {
+        if (match(SEMICOLON)) {
+            emitReturn();
+        } else {
+            expression();
+            consume(SEMICOLON, "Expected ';' after return value.");
+            emit(Opcode.RETURN);
+        }
     }
 
     private void whileStatement() {
@@ -612,6 +632,7 @@ class Compiler {
     }
 
     private void emitReturn() {
+        emit(Opcode.NULL);
         emit(Opcode.RETURN);
     }
 

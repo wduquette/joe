@@ -99,12 +99,11 @@ class VirtualMachine {
         stack[top++] = function;
         call(function, 0);
         try {
-            run();
+            return run();
         } catch (JoeError ex) {
             unwindStack(ex, 0);
             throw ex;
         }
-        return null; // Can't return anything yet.
     }
 
     private void unwindStack(JoeError error, int bottomFrame) {
@@ -125,9 +124,7 @@ class VirtualMachine {
         frameCount = 0;
     }
 
-    // At present this uses Chunk directly.  Later the chunk info will
-    // be in `Function` in a more efficient form.
-    private void run() {
+    private Object run() {
         // Get the top call frame
         frame = frames[frameCount - 1];
 
@@ -295,10 +292,27 @@ class VirtualMachine {
                 }
                 case POP -> pop();
                 case RETURN -> {
+                    var result = pop();
+                    frameCount--;
+                    if (frameCount == 0) {
+                        pop(); // The script function's stack entry
+                        if (joe.isDebug()) {
+                            joe.println("| " + stackText());
+                        }
+                        return result;
+                    }
+
+                    // Pop the call frame's stack entries
+                    top = frame.base;
+
+                    // Push the result back on the stack, and reset
+                    // back to the caller's call frame
+                    push(result);
+                    frame = frames[frameCount - 1];
+
                     if (joe.isDebug()) {
                         joe.println("| " + stackText());
                     }
-                    return;
                 }
                 case SUB -> {
                     var b = pop();
@@ -435,8 +449,6 @@ class VirtualMachine {
         }
 
         var frame = new CallFrame(function);
-        System.out.println("Adding frames[" + frameCount + "] for " +
-            function.name());
         frames[frameCount++] = frame;
         frame.base = top - argCount - 1;
     }
