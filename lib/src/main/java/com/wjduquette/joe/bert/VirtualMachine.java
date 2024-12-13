@@ -115,7 +115,7 @@ class VirtualMachine {
             var span = function.source().lineSpan(line);
             var message = "In " +
                 function.type().text() + " " +
-                function.name();
+                function.name() + " @" + frame.ip;
             error.addFrame(span, message);
         }
     }
@@ -435,6 +435,8 @@ class VirtualMachine {
         }
 
         var frame = new CallFrame(function);
+        System.out.println("Adding frames[" + frameCount + "] for " +
+            function.name());
         frames[frameCount++] = frame;
         frame.base = top - argCount - 1;
     }

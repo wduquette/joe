@@ -44,6 +44,7 @@ class Compiler {
         buffer = new SourceBuffer(scriptName, source);
         scanner = new Scanner(buffer, errors::add);
         current = new FunctionCompiler(null, FunctionType.SCRIPT, buffer);
+        current.chunk.span = buffer.all();
 
         errors.clear();
         parser.hadError = false;
@@ -64,25 +65,10 @@ class Compiler {
     }
 
     public String dump(String scriptName, String source) {
-        buffer = new SourceBuffer(scriptName, source);
-        scanner = new Scanner(buffer, errors::add);
-        current = new FunctionCompiler(null, FunctionType.SCRIPT, buffer);
-
-        errors.clear();
-        parser.hadError = false;
-        parser.panicMode = false;
-
         dump = new StringBuilder();
         disassembler = new Disassembler(joe);
-        advance();
-        while (!match(EOF)) {
-            declaration();
-        }
-        endFunction();
 
-        if (!errors.isEmpty()) {
-            throw new SyntaxError("Error while compiling script", errors);
-        }
+        compile(scriptName, source);
 
         var output = dump.toString();
         dump = null;
@@ -96,7 +82,7 @@ class Compiler {
 
     private Function endFunction() {
         emitReturn();
-        var function = new Function(current.chunk);
+        var function = new Function(currentChunk());
         if (dump != null) {
             dump.append(disassembler.disassemble(function)).append("\n");
         }
@@ -120,13 +106,14 @@ class Compiler {
     }
 
     private void functionDeclaration() {
+        int start = parser.previous.span().start();
         var global = parseVariable("Expected function name.");
         markVariableInitialized();
-        function(FunctionType.FUNCTION);
+        function(start, FunctionType.FUNCTION);
         defineVariable(global);
     }
 
-    private void function(FunctionType type) {
+    private void function(int start, FunctionType type) {
         this.current = new FunctionCompiler(current, type, buffer);
         beginScope();
 
@@ -143,6 +130,8 @@ class Compiler {
         consume(RIGHT_PAREN, "Expected ')' after function name.");
         consume(LEFT_BRACE, "Expected '{' before function body.");
         block();
+        var end = parser.previous.span().end();
+        currentChunk().span = buffer.span(start, end);
 
         var function = endFunction();
         emit(Opcode.CONST, currentChunk().addConstant(function));

@@ -122,6 +122,14 @@ public class SourceBuffer {
         return new Span(start, end);
     }
 
+    /**
+     * Gets a span for the entire source.
+     * @return The span
+     */
+    public Span all() {
+        return span(0, source.length());
+    }
+
     public Span lineSpan(int line) {
         if (0 < line && line <= lines.size()) {
             var start = lines.get(line - 1);

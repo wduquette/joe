@@ -52,8 +52,10 @@ public class Disassembler {
         var left = new ArrayList<String>();
         var right = new ArrayList<String>();
 
-
         var source = chunk.source();
+        left.add(String.format("%04d", chunk.span().startLine()));
+        right.add(source.line(chunk.span().startLine()));
+
         for (int ip = 0; ip < chunk.codeSize(); ) {
             if (chunk.source() != null && startsNewLine(ip)) {
                 right.add(source.line(chunk.line(ip)));

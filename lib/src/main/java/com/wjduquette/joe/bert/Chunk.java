@@ -45,7 +45,7 @@ class Chunk implements CodeChunk {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The function's name and arity; null for a top-level script.
+    // The function's name
     String name = null;
 
     // The function's type
@@ -56,6 +56,9 @@ class Chunk implements CodeChunk {
 
     // The function's source buffer
     SourceBuffer source = null;
+
+    // The function's span in the source.
+    SourceBuffer.Span span = null;
 
     // The source line number associated with each opcode
     int[] lines = new int[8];
@@ -133,6 +136,7 @@ class Chunk implements CodeChunk {
     // CodeChunk API
 
     @Override public SourceBuffer source() { return source; }
+    @Override public SourceBuffer.Span span() { return span; }
     @Override public FunctionType type() { return type; }
     @Override public String name() { return name; }
     @Override public int codeSize() { return size; }

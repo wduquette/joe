@@ -25,6 +25,8 @@ public class Function implements CodeChunk {
     // The function's arity
     final int arity;
 
+    private final SourceBuffer.Span span;
+
     //
     // Chunk info
     //
@@ -50,6 +52,7 @@ public class Function implements CodeChunk {
         this.type = chunk.type;
         this.arity = chunk.arity;
         this.source = chunk.source();
+        this.span = chunk.span;
         this.constants = Arrays.copyOf(chunk.constants, chunk.numConstants);
         this.code = Arrays.copyOf(chunk.code, chunk.size);
         this.lines = Arrays.copyOf(chunk.lines, chunk.size);
@@ -59,6 +62,7 @@ public class Function implements CodeChunk {
     // CodeChunk API
 
     @Override public SourceBuffer source() { return source; }
+    @Override public SourceBuffer.Span span() { return span; }
     @Override public FunctionType type() { return type; }
     @Override public String name() { return name; }
     @Override public int codeSize() { return code.length; }
@@ -72,9 +76,6 @@ public class Function implements CodeChunk {
 
     @Override
     public String toString() {
-        return switch (type) {
-            case FUNCTION -> "<fn " + name + ">";
-            case SCRIPT -> "<script>";
-        };
+        return "<fn " + name + ">";
     }
 }

@@ -10,6 +10,12 @@ public interface CodeChunk {
     SourceBuffer source();
 
     /**
+     * The chunk's overall span in the source.
+     * @return the span
+     */
+    SourceBuffer.Span span();
+
+    /**
      * Gets the chunk's function type.
      * @return The type
      */
