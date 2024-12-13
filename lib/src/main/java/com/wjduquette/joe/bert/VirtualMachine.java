@@ -1,9 +1,6 @@
 package com.wjduquette.joe.bert;
 
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.RuntimeError;
-import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -433,6 +430,11 @@ class VirtualMachine {
     private void callValue(Object callee, int argCount) {
         switch (callee) {
             case Function f -> call(f, argCount);
+            case NativeFunction f -> {
+                var args = new Args(Arrays.copyOfRange(stack, top - argCount, top));
+                top -= argCount + 1;
+                push(f.call(joe, args));
+            }
             default ->
                 throw error("Expected callable, got: " + joe.typedValue(callee) + ".");
         }

@@ -65,13 +65,17 @@ public class Joe {
      */
     public Joe() {
         this(WALKER);
-
-        if (engine instanceof WalkerEngine) {
-            // TODO: Once BERT is far enough along, install for both engines.
-            StandardLibrary.PACKAGE.install(this);
-        }
+        StandardLibrary.PACKAGE.install(this);
     }
 
+    /**
+     * Creates a clean instance of Joe using the given engine type, which
+     * must be either {@code Joe.WALKER} (the default) or
+     * {@code Joe.BERT}, the experimental byte-engine.
+     *
+     * <p>The instance include the complete Joe standard library, but
+     * nothing else.</p>
+     */
     public Joe(String engineType) {
         switch (engineType) {
             case WALKER -> engine = new WalkerEngine(this);
@@ -79,6 +83,7 @@ public class Joe {
             default -> throw new IllegalArgumentException(
                 "Invalid Engine type: '" + engineType + "'.");
         }
+
     }
 
     //-------------------------------------------------------------------------
