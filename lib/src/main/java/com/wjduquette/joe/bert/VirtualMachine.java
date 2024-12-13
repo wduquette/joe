@@ -55,7 +55,7 @@ class VirtualMachine {
 
     VirtualMachine(Joe joe) {
         this.joe = joe;
-        this.compiler = new Compiler(joe);
+        this.compiler = new Compiler();
         this.disassembler = new Disassembler(joe);
     }
 
@@ -94,6 +94,9 @@ class VirtualMachine {
 
     Object interpret(String scriptName, String source) {
         var function = compiler.compile(scriptName, source);
+        if (joe.isDebug()) {
+            joe.println(disassembler.disassemble(function));
+        }
         resetStack();
         frames[frameCount++] = new CallFrame(function);
         stack[top++] = function;

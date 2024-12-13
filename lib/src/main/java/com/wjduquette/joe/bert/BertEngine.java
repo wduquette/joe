@@ -15,7 +15,6 @@ public class BertEngine implements Engine {
 
     private final Joe joe;
     private final VirtualMachine vm;
-    private boolean debug = false;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -62,11 +61,11 @@ public class BertEngine implements Engine {
 
     @Override
     public String dump(String filename, String source) throws SyntaxError {
-        var compiler = new Compiler(joe);
+        var compiler = new Compiler();
+        var disassembler = new Disassembler(joe);
 
-        // Dumps to System.out at present.
-        compiler.compile(filename, source);
-        return null;
+        var function = compiler.compile(filename, source);
+        return disassembler.disassemble(function);
     }
 
     @Override
