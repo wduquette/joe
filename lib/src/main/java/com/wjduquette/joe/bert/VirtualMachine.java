@@ -56,7 +56,7 @@ class VirtualMachine {
 
     VirtualMachine(Joe joe) {
         this.joe = joe;
-        this.compiler = new Compiler();
+        this.compiler = new Compiler(joe);
         this.disassembler = new Disassembler(joe);
     }
 
@@ -95,9 +95,6 @@ class VirtualMachine {
 
     Object interpret(String scriptName, String source) {
         var function = compiler.compile(scriptName, source);
-        if (joe.isDebug()) {
-            joe.println(disassembler.disassemble(function));
-        }
         resetStack();
         stack[top++] = function;
         call(function, 0);
@@ -428,8 +425,6 @@ class VirtualMachine {
     }
 
     private void call(Function function, int argCount) {
-        System.out.println("Calling " + function.name() + " with " + argCount);
-        System.out.println("Arity is " + function.arity);
         if (argCount != function.arity) {
             throw error("Expected " + function.arity + " arguments, got: " +
                 argCount + ".");

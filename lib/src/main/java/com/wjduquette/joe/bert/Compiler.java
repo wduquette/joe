@@ -1,5 +1,6 @@
 package com.wjduquette.joe.bert;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
@@ -16,17 +17,23 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    private final Joe joe;
     private final List<Trace> errors = new ArrayList<>();
     private SourceBuffer buffer;
     private Scanner scanner;
     private final Parser parser = new Parser();
     private FunctionCompiler current = null;
 
+    // Used for debugging/dumping
+    private transient Disassembler disassembler;
+    private transient StringBuilder dump = null;
+
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    Compiler() {
+    Compiler(Joe joe) {
+        this.joe = joe;
         populateRulesTable();
     }
 
@@ -56,6 +63,33 @@ class Compiler {
         return function;
     }
 
+    public String dump(String scriptName, String source) {
+        buffer = new SourceBuffer(scriptName, source);
+        scanner = new Scanner(buffer, errors::add);
+        current = new FunctionCompiler(null, FunctionType.SCRIPT, buffer);
+
+        errors.clear();
+        parser.hadError = false;
+        parser.panicMode = false;
+
+        dump = new StringBuilder();
+        disassembler = new Disassembler(joe);
+        advance();
+        while (!match(EOF)) {
+            declaration();
+        }
+        endFunction();
+
+        if (!errors.isEmpty()) {
+            throw new SyntaxError("Error while compiling script", errors);
+        }
+
+        var output = dump.toString();
+        dump = null;
+        disassembler = null;
+        return output;
+    }
+
     private Chunk currentChunk() {
         return current.chunk;
     }
@@ -63,6 +97,9 @@ class Compiler {
     private Function endFunction() {
         emitReturn();
         var function = new Function(current.chunk);
+        if (dump != null) {
+            dump.append(disassembler.disassemble(function)).append("\n");
+        }
         current = current.enclosing;
         return function;
     }

@@ -61,11 +61,8 @@ public class BertEngine implements Engine {
 
     @Override
     public String dump(String filename, String source) throws SyntaxError {
-        var compiler = new Compiler();
-        var disassembler = new Disassembler(joe);
-
-        var function = compiler.compile(filename, source);
-        return disassembler.disassemble(function);
+        var compiler = new Compiler(joe);
+        return compiler.dump(filename, source);
     }
 
     @Override
