@@ -249,6 +249,10 @@ public class Joe {
         print(System.lineSeparator());
     }
 
+    public void printf(String format, Object... args) {
+        print(String.format(format, args));
+    }
+
     /**
      * Prints the text using the client's output handler.
      * @param text The text
@@ -570,6 +574,16 @@ public class Joe {
         if (value == null) return false;
         if (value instanceof Boolean) return (boolean)value;
         return true;
+    }
+
+    /**
+     * Returns true if the object is "falsey", i.e., null or boolean
+     * {@code false}, and true otherwise.
+     * @param value The value
+     * @return true or false
+     */
+    public static boolean isFalsey(Object value) {
+        return !isTruthy(value);
     }
 
     /**

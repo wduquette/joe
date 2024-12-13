@@ -111,16 +111,16 @@ class VirtualMachine {
         // Get the top call frame
         frame = frames[frameCount - 1];
 
-        if (Bert.isDebug()) {
+        if (joe.isDebug()) {
             // NOTE: Ultimately, the execution trace is going to need to be
             // redirected to a file. OR, redirect output and save it until
             // the end of the instruction.
-            Bert.printf("%-40s ", " ");
-            Bert.println("| " + stackText());
+            joe.printf("%-40s ", " ");
+            joe.println("| " + stackText());
         }
         for (;;) {
-            if (Bert.isDebug()) {
-                Bert.printf("%-40s ",
+            if (joe.isDebug()) {
+                joe.printf("%-40s ",
                     disassembler.disassembleInstruction(
                         frame.function, frame.ip));
             }
@@ -132,9 +132,9 @@ class VirtualMachine {
                     if (a instanceof Double x && b instanceof Double y) {
                         push(x + y);
                     } else if (a instanceof String s) {
-                        push(s + Bert.stringify(b));
+                        push(s + joe.stringify(b));
                     } else if (b instanceof String s) {
-                        push(Bert.stringify(a) + s);
+                        push(joe.stringify(a) + s);
                     } else {
                         throw error("The '+' operator expects two Numbers or at least one String.");
                     }
@@ -149,7 +149,7 @@ class VirtualMachine {
                 case EQ -> {
                     var b = pop();
                     var a = pop();
-                    push(Bert.isEqual(a, b));
+                    push(Joe.isEqual(a, b));
                 }
                 case FALSE -> push(false);
                 case GE -> {
@@ -195,15 +195,15 @@ class VirtualMachine {
                 }
                 case JIF -> {
                     var offset = readArg();
-                    if (Bert.isFalsey(pop())) frame.ip += offset;
+                    if (Joe.isFalsey(pop())) frame.ip += offset;
                 }
                 case JIFKEEP -> {
                     var offset = readArg();
-                    if (Bert.isFalsey(peek(0))) frame.ip += offset;
+                    if (Joe.isFalsey(peek(0))) frame.ip += offset;
                 }
                 case JITKEEP -> {
                     var offset = readArg();
-                    if (Bert.isTruthy(peek(0))) frame.ip += offset;
+                    if (Joe.isTruthy(peek(0))) frame.ip += offset;
                 }
                 case JUMP -> {
                     var offset = readArg();
@@ -252,26 +252,26 @@ class VirtualMachine {
                 case NE -> {
                     var b = pop();
                     var a = pop();
-                    push(!Bert.isEqual(a, b));
+                    push(!Joe.isEqual(a, b));
                 }
                 case NEGATE -> {
                     var a = pop();
                     checkNumericOperand(a);
                     push(-(double)pop()); // Needs check!
                 }
-                case NOT -> push(Bert.isFalsey(pop()));
+                case NOT -> push(Joe.isFalsey(pop()));
                 case NULL -> push(null);
                 case PRINT -> {
-                    var value = Bert.stringify(pop());
-                    Bert.println(value);
-                    if (Bert.isDebug()) {
-                        Bert.printf("%-40s ", " ");
+                    var value = joe.stringify(pop());
+                    joe.println(value);
+                    if (joe.isDebug()) {
+                        joe.printf("%-40s ", " ");
                     }
                 }
                 case POP -> pop();
                 case RETURN -> {
-                    if (Bert.isDebug()) {
-                        Bert.println("| " + stackText());
+                    if (joe.isDebug()) {
+                        joe.println("| " + stackText());
                     }
                     return;
                 }
@@ -285,8 +285,8 @@ class VirtualMachine {
                 default -> throw new IllegalStateException(
                     "Unknown opcode: " + opcode + ".");
             }
-            if (Bert.isDebug()) {
-                Bert.println("| " + stackText());
+            if (joe.isDebug()) {
+                joe.println("| " + stackText());
             }
         }
     }
@@ -321,7 +321,7 @@ class VirtualMachine {
     private void checkNumericOperand(Object a) {
         if (!(a instanceof Double)) {
             throw error("Expected numeric operand, got: '" +
-                Bert.stringify(a) + "'.");
+                joe.stringify(a) + "'.");
         }
     }
 
@@ -336,7 +336,7 @@ class VirtualMachine {
         var buff = new StringBuilder();
         for (var slot = 0; slot < top; slot++) {
             buff.append("[ ")
-                .append(Bert.stringify(stack[slot]))
+                .append(joe.stringify(stack[slot]))
                 .append(" ]");
         }
         return buff.toString();
