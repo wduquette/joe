@@ -34,7 +34,6 @@ public class WalkerEngine implements Engine {
     //-------------------------------------------------------------------------
     // Engine API
 
-
     @Override
     public Set<String> getVarNames() {
         return interpreter.globals().getVarNames();
@@ -59,6 +58,7 @@ public class WalkerEngine implements Engine {
      * @throws JoeError on all runtime errors.
      */
     @SuppressWarnings("UnusedReturnValue")
+    @Override
     public Object runFile(String scriptPath)
         throws IOException, SyntaxError, JoeError
     {
@@ -77,6 +77,7 @@ public class WalkerEngine implements Engine {
      * @throws SyntaxError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
+    @Override
     public Object run(String filename, String source) throws SyntaxError, JoeError {
         var traces = new ArrayList<Trace>();
 
@@ -139,6 +140,7 @@ public class WalkerEngine implements Engine {
      * @param args The arguments to pass to the callable
      * @return The result of calling the callable.
      */
+    @Override
     public Object call(Object callee, Object... args) {
         if (callee instanceof JoeCallable callable) {
             try {
@@ -175,6 +177,7 @@ public class WalkerEngine implements Engine {
         return dump(path.getFileName().toString(), script);
     }
 
+    @Override
     public String dump(String scriptName, String source) {
         var traces = new ArrayList<Trace>();
 
@@ -198,5 +201,15 @@ public class WalkerEngine implements Engine {
         }
 
         return new Dumper().dump(statements);
+    }
+
+    @Override
+    public boolean isDebug() {
+        return false;
+    }
+
+    @Override
+    public void setDebug(boolean flag) {
+        // Do nothing; there is no debugging code.
     }
 }

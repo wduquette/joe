@@ -39,6 +39,8 @@ public class ReplTool implements Tool {
         The options are as follows:
         
         --bert, -b     Use the experimental "Bert" byte-engine.
+        --debug, -d    Enable debugging output.  This is mostly of use to
+                       the Joe maintainer.
         """,
         ReplTool::main
     );
@@ -71,11 +73,13 @@ public class ReplTool implements Tool {
     private void run(String[] args) {
         var argq = new ArrayDeque<>(List.of(args));
         var engineType = Joe.WALKER;
+        var debug = false;
 
         while (!argq.isEmpty() && argq.peek().startsWith("-")) {
             var opt = argq.poll();
             switch (opt) {
                 case "--bert", "-b" -> engineType = Joe.BERT;
+                case "--debug", "-d" -> debug = true;
                 default -> {
                     System.err.println("Unknown option: '" + opt + "'.");
                     System.exit(64);
@@ -84,6 +88,7 @@ public class ReplTool implements Tool {
         }
 
         this.joe = new Joe(engineType);
+        joe.setDebug(debug);
 
         if (engineType.equals(Joe.WALKER)) {
             var consolePackage = new ConsolePackage();

@@ -19,6 +19,7 @@ public class BertEngine implements Engine {
 
     private final Joe joe;
     private final VirtualMachine vm;
+    private boolean debug = false;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -98,5 +99,15 @@ public class BertEngine implements Engine {
     public boolean isComplete(String source) {
         // TODO: Implement properly
         return true;
+    }
+
+    @Override
+    public boolean isDebug() {
+        return debug;
+    }
+
+    @Override
+    public void setDebug(boolean flag) {
+        this.debug = flag;
     }
 }

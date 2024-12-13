@@ -101,4 +101,16 @@ public interface Engine {
      * @return true or false
      */
     boolean isCallable(Object callee);
+
+    /**
+     * Gets whether the engine's debug flag is set.
+     * @return true or false
+     */
+    boolean isDebug();
+
+    /**
+     * Sets the engine's debug flag
+     * @param flag true or false
+     */
+    void setDebug(boolean flag);
 }

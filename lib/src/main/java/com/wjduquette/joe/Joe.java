@@ -189,6 +189,24 @@ public class Joe {
         }
     }
 
+    /**
+     * Gets whether Joe is configured for debugging output.
+     * @return true or false
+     */
+    @SuppressWarnings("unused")
+    public boolean isDebug() {
+        return engine.isDebug();
+    }
+
+    /**
+     * Sets whether Joe is configured for debugging output.  This
+     * is primarily of use to the Joe maintainer.
+     * @param flag true or false
+     */
+    public void setDebug(boolean flag) {
+        engine.setDebug(flag);
+    }
+
     //-------------------------------------------------------------------------
     // Output Handling
 
