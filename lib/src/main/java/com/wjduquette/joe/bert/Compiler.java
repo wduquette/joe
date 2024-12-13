@@ -11,14 +11,17 @@ import java.util.List;
 
 class Compiler {
     public static final int MAX_LOCALS = 256;
+    public static final int MAX_PARAMETERS = 255;
 
     //-------------------------------------------------------------------------
     // Instance Variables
 
     private final List<Trace> errors = new ArrayList<>();
+    private SourceBuffer buffer;
+    private Scanner scanner;
     private final Parser parser = new Parser();
     private FunctionCompiler current = null;
-    private Scanner scanner;
+
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -31,9 +34,9 @@ class Compiler {
     // Compilation
 
     public Function compile(String scriptName, String source) {
-        var buffer = new SourceBuffer(scriptName, source);
+        buffer = new SourceBuffer(scriptName, source);
         scanner = new Scanner(buffer, errors::add);
-        current = new FunctionCompiler("*script*", FunctionType.SCRIPT, buffer);
+        current = new FunctionCompiler(null, FunctionType.SCRIPT, buffer);
 
         errors.clear();
         parser.hadError = false;
@@ -59,20 +62,53 @@ class Compiler {
 
     private Function endFunction() {
         emitReturn();
-        return new Function(current.chunk);
+        var function = new Function(current.chunk);
+        current = current.enclosing;
+        return function;
     }
 
     //-------------------------------------------------------------------------
     // Parser: Statements
 
     private void declaration() {
-        if (match(VAR)) {
+        if (match(FUNCTION)) {
+            functionDeclaration();
+        } else if (match(VAR)) {
             varDeclaration();
         } else {
             statement();
         }
 
         if (parser.panicMode) synchronize();
+    }
+
+    private void functionDeclaration() {
+        var global = parseVariable("Expected function name.");
+        markVariableInitialized();
+        function(FunctionType.FUNCTION);
+        defineVariable(global);
+    }
+
+    private void function(FunctionType type) {
+        this.current = new FunctionCompiler(current, type, buffer);
+        beginScope();
+
+        consume(LEFT_PAREN, "Expected '(' after function name.");
+        if (!check(RIGHT_PAREN)) {
+            ++current.chunk.arity;
+            if (current.chunk.arity > MAX_PARAMETERS) {
+                errorAtCurrent(
+                    "Can't have more than " + MAX_PARAMETERS + "parameters.");
+            }
+            var constant = parseVariable("Expected parameter name.");
+            defineVariable(constant);
+        }
+        consume(RIGHT_PAREN, "Expected ')' after function name.");
+        consume(LEFT_BRACE, "Expected '{' before function body.");
+        block();
+
+        var function = endFunction();
+        emit(Opcode.CONST, currentChunk().addConstant(function));
     }
 
     private void varDeclaration() {
@@ -355,7 +391,7 @@ class Compiler {
     private void defineVariable(char global) {
         if (current.scopeDepth > 0) {
             // Local
-            markLocalInitialized();
+            markVariableInitialized();
             return;
         }
         emit(Opcode.GLODEF, global);            // Global
@@ -412,7 +448,10 @@ class Compiler {
             new Local(name);
     }
 
-    private void markLocalInitialized() {
+    // Marks local variables "initialized", so that they can be
+    // referred to in expressions.  This is a no-op for global variables.
+    private void markVariableInitialized() {
+        if (current.scopeDepth == 0) return;
         current.locals[current.localCount - 1].depth
             = current.scopeDepth;
     }
@@ -584,15 +623,23 @@ class Compiler {
         }
     }
 
-    private static class FunctionCompiler {
-        Chunk chunk;
-        Local[] locals = new Local[MAX_LOCALS];
+    private class FunctionCompiler {
+        final FunctionCompiler enclosing;
+        final Chunk chunk;
+        final Local[] locals = new Local[MAX_LOCALS];
         int localCount = 0;
         int scopeDepth = 0;
 
-        FunctionCompiler(String name, FunctionType type, SourceBuffer source) {
-            chunk = new Chunk();
-            chunk.name = name;
+        FunctionCompiler(
+            FunctionCompiler enclosing,
+            FunctionType type,
+            SourceBuffer source
+        ) {
+            this.enclosing = enclosing;
+            this.chunk = new Chunk();
+            chunk.name = type == FunctionType.SCRIPT
+                ? "*script*"
+                : parser.previous.lexeme();
             chunk.type = type;
             chunk.source = source;
 
