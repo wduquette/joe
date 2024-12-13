@@ -5,7 +5,10 @@ import com.wjduquette.joe.types.*;
 import com.wjduquette.joe.walker.WalkerEngine;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -267,17 +270,21 @@ public class Joe {
 
     /**
      * Reads the given file and executes its content as a script.
-     * @param path The file's path
+     * @param scriptPath The file's path
      * @return The script's result
      * @throws IOException if the file cannot be read.
      * @throws SyntaxError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
     @SuppressWarnings("UnusedReturnValue")
-    public Object runFile(String path)
+    public Object runFile(String scriptPath)
         throws IOException, SyntaxError, JoeError
     {
-        return engine.runFile(path);
+        var path = Paths.get(scriptPath);
+        byte[] bytes = Files.readAllBytes(path);
+        var script = new String(bytes, Charset.defaultCharset());
+
+        return run(path.getFileName().toString(), script);
     }
 
     /**
@@ -296,16 +303,20 @@ public class Joe {
 
     /**
      * Compiles the given file and returns a compilation dump.
-     * @param path The file's path
+     * @param scriptPath The file's path
      * @return The dump's result
      * @throws IOException if the file cannot be read.
      * @throws SyntaxError if the script could not be compiled.
      */
     @SuppressWarnings("UnusedReturnValue")
-    public Object dumpFile(String path)
+    public Object dumpFile(String scriptPath)
         throws IOException, SyntaxError
     {
-        return engine.dumpFile(path);
+        var path = Paths.get(scriptPath);
+        byte[] bytes = Files.readAllBytes(path);
+        var script = new String(bytes, Charset.defaultCharset());
+
+        return dump(path.getFileName().toString(), script);
     }
 
     /**
@@ -330,6 +341,7 @@ public class Joe {
      * @param source The source text
      * @return true or false
      */
+    @SuppressWarnings("unused")
     public boolean isComplete(String source) {
         return engine.isComplete(source);
     }

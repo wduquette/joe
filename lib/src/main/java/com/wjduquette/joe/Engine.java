@@ -1,6 +1,5 @@
 package com.wjduquette.joe;
 
-import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -32,17 +31,6 @@ public interface Engine {
     void setVar(String name, Object value);
 
     /**
-     * Reads the given file and executes its content as a script.
-     * @param scriptPath The file's path
-     * @return The script's result
-     * @throws IOException if the file cannot be read.
-     * @throws SyntaxError if the script could not be compiled.
-     * @throws JoeError on all runtime errors.
-     */
-    Object runFile(String scriptPath)
-        throws IOException, SyntaxError, JoeError;
-
-    /**
      * Executes the script, throwing an appropriate error on failure.
      * The filename is usually the bare file name of the script file,
      * but can be any string relevant to the application, e.g., "%repl%".
@@ -53,16 +41,6 @@ public interface Engine {
      * @throws JoeError on all runtime errors.
      */
     Object run(String filename, String source) throws SyntaxError, JoeError;
-
-    /**
-     * Compiles the script and returns a compilation dump,
-     * throwing an appropriate error on failure.
-     * @param scriptPath The file's path
-     * @return The dump
-     * @throws IOException if the file cannot be read.
-     * @throws SyntaxError if the script could not be compiled.
-     */
-    String dumpFile(String scriptPath) throws IOException, SyntaxError;
 
     /**
      * Compiles the script and returns a compilation dump,

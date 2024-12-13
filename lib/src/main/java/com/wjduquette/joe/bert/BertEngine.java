@@ -5,10 +5,6 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SyntaxError;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Set;
 
 // Temporary main program.  Later this will be `BertEngine`, and we will
@@ -54,17 +50,6 @@ public class BertEngine implements Engine {
         return vm.interpret(scriptName, source);
     }
 
-
-    @Override
-    public Object runFile(String scriptPath)
-        throws IOException, JoeError
-    {
-        var path = Paths.get(scriptPath);
-        byte[] bytes = Files.readAllBytes(path);
-        var script = new String(bytes, Charset.defaultCharset());
-        return run(path.getFileName().toString(), script);
-    }
-
     @Override
     public Object call(Object callee, Object... args) {
         throw new UnsupportedOperationException("TODO");
@@ -73,17 +58,6 @@ public class BertEngine implements Engine {
     @Override
     public boolean isCallable(Object callee) {
         throw new UnsupportedOperationException("TODO");
-    }
-
-
-    @Override
-    public String dumpFile(String scriptPath)
-        throws IOException, SyntaxError
-    {
-        var path = Paths.get(scriptPath);
-        byte[] bytes = Files.readAllBytes(path);
-        var script = new String(bytes, Charset.defaultCharset());
-        return dump(path.getFileName().toString(), script);
     }
 
     @Override
