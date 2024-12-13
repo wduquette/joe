@@ -74,14 +74,4 @@ public class BertEngine implements Engine {
         // TODO: Implement properly
         return true;
     }
-
-    @Override
-    public boolean isDebug() {
-        return debug;
-    }
-
-    @Override
-    public void setDebug(boolean flag) {
-        this.debug = flag;
-    }
 }

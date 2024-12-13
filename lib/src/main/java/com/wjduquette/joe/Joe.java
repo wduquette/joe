@@ -46,6 +46,7 @@ public class Joe {
     // Instance Variables
 
     private final Engine engine;
+    private boolean debug = false;
 
     // Type Registry
     private final Map<Class<?>, TypeProxy<?>> proxyTable = new HashMap<>();
@@ -196,9 +197,8 @@ public class Joe {
      * Gets whether Joe is configured for debugging output.
      * @return true or false
      */
-    @SuppressWarnings("unused")
     public boolean isDebug() {
-        return engine.isDebug();
+        return debug;
     }
 
     /**
@@ -207,7 +207,7 @@ public class Joe {
      * @param flag true or false
      */
     public void setDebug(boolean flag) {
-        engine.setDebug(flag);
+        this.debug = flag;
     }
 
     //-------------------------------------------------------------------------

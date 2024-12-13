@@ -162,14 +162,4 @@ public class WalkerEngine implements Engine {
 
         return new Dumper().dump(statements);
     }
-
-    @Override
-    public boolean isDebug() {
-        return false;
-    }
-
-    @Override
-    public void setDebug(boolean flag) {
-        // Do nothing; there is no debugging code.
-    }
 }
