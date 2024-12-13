@@ -67,7 +67,6 @@ class VirtualMachine {
         frameCount = 0;
     }
 
-
     // At present this uses Chunk directly.  Later the chunk info will
     // be in `Function` in a more efficient form.
     private void run() {
@@ -76,7 +75,8 @@ class VirtualMachine {
 
         if (Bert.isDebug()) {
             // NOTE: Ultimately, the execution trace is going to need to be
-            // redirected to a file.
+            // redirected to a file. OR, redirect output and save it until
+            // the end of the instruction.
             Bert.printf("%-40s ", " ");
             Bert.println("| " + stackText());
         }
