@@ -65,7 +65,6 @@ public class Joe {
      */
     public Joe() {
         this(WALKER);
-        StandardLibrary.PACKAGE.install(this);
     }
 
     /**
@@ -84,6 +83,7 @@ public class Joe {
                 "Invalid Engine type: '" + engineType + "'.");
         }
 
+        StandardLibrary.PACKAGE.install(this);
     }
 
     //-------------------------------------------------------------------------
