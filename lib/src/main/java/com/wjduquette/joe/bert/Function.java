@@ -23,7 +23,7 @@ public class Function implements CodeChunk {
     private final FunctionType type;
 
     // The function's arity
-    private final int arity;
+    final int arity;
 
     //
     // Chunk info

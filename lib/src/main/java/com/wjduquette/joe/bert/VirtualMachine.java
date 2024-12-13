@@ -1,6 +1,7 @@
 package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.RuntimeError;
 import com.wjduquette.joe.SourceBuffer;
 
@@ -98,10 +99,28 @@ class VirtualMachine {
             joe.println(disassembler.disassemble(function));
         }
         resetStack();
-        frames[frameCount++] = new CallFrame(function);
         stack[top++] = function;
-        run();
+        call(function, 0);
+        try {
+            run();
+        } catch (JoeError ex) {
+            unwindStack(ex, 0);
+            throw ex;
+        }
         return null; // Can't return anything yet.
+    }
+
+    private void unwindStack(JoeError error, int bottomFrame) {
+        for (var i = frameCount - 1; i >= bottomFrame; i--) {
+            var frame = frames[i];
+            var function = frame.function;
+            var line = function.line(frame.ip);
+            var span = function.source().lineSpan(line);
+            var message = "In " +
+                function.type().text() + " " +
+                function.name();
+            error.addFrame(span, message);
+        }
     }
 
     private void resetStack() {
@@ -142,6 +161,11 @@ class VirtualMachine {
                     } else {
                         throw error("The '+' operator expects two Numbers or at least one String.");
                     }
+                }
+                case CALL -> {
+                    var argCount = readArg();
+                    callValue(peek(argCount), argCount);
+                    frame = frames[frameCount - 1];
                 }
                 case CONST -> push(readConstant());
                 case DIV -> {
@@ -393,6 +417,32 @@ class VirtualMachine {
 
     //-------------------------------------------------------------------------
     // Call Stack Operations
+
+    // Invoked by Opcode.CALL for all calls
+    private void callValue(Object callee, int argCount) {
+        switch (callee) {
+            case Function f -> call(f, argCount);
+            default ->
+                throw error("Expected callable, got: " + joe.typedValue(callee) + ".");
+        }
+    }
+
+    private void call(Function function, int argCount) {
+        System.out.println("Calling " + function.name() + " with " + argCount);
+        System.out.println("Arity is " + function.arity);
+        if (argCount != function.arity) {
+            throw error("Expected " + function.arity + " arguments, got: " +
+                argCount + ".");
+        }
+
+        if (frameCount == MAX_FRAMES) {
+            throw error("Call stack overflow.");
+        }
+
+        var frame = new CallFrame(function);
+        frames[frameCount++] = frame;
+        frame.base = top - argCount - 1;
+    }
 
     private class CallFrame {
         // The function

@@ -342,6 +342,27 @@ class Compiler {
         }
     }
 
+    private void call(boolean canAssign) {
+        var argCount = argumentList();
+        emit(Opcode.CALL, argCount);
+    }
+
+    private char argumentList() {
+        char count = 0;
+
+        if (!check(RIGHT_PAREN)) {
+            do {
+                expression();
+                count++;
+                if (count > MAX_PARAMETERS) {
+                    error("Can't have more than 255 arguments.");
+                }
+            } while (match(COMMA));
+        }
+        consume(RIGHT_PAREN, "Expected ')' after arguments.");
+        return count;
+    }
+
     private void parsePrecedence(int level) {
         advance();
         var prefixRule = getRule(parser.previous.type()).prefix;
@@ -658,8 +679,11 @@ class Compiler {
 
     // Tokens are in the same order as in TokenType
     private void populateRulesTable() {
-        // Single Character
-        rule(LEFT_PAREN,      this::grouping, null,         Level.NONE);
+        //                                                  Infix
+        //   Token            Prefix          Infix         precedence
+        //   ---------------- --------------- ------------- ----------------
+        //   Single Character
+        rule(LEFT_PAREN,      this::grouping, this::call,   Level.CALL);
         rule(RIGHT_PAREN,     null,           null,         Level.NONE);
         rule(LEFT_BRACE,      null,           null,         Level.NONE);
         rule(RIGHT_BRACE,     null,           null,         Level.NONE);
@@ -670,7 +694,7 @@ class Compiler {
         rule(DOT,             null,           null,         Level.NONE);
         rule(QUESTION,        null,           null,         Level.TERM);
         rule(SEMICOLON,       null,           null,         Level.NONE);
-        // One or two character
+        //   One or two character
         rule(AND,             null,           this::and,    Level.AND);
         rule(BANG,            this::unary,    null,         Level.NONE);
         rule(BANG_EQUAL,      null,           this::binary, Level.EQUALITY);
@@ -692,12 +716,12 @@ class Compiler {
         rule(SLASH_EQUAL,     null,           null,         Level.NONE);
         rule(STAR,            null,           this::binary, Level.FACTOR);
         rule(STAR_EQUAL,      null,           null,         Level.NONE);
-        // Literals
+        //   Literals
         rule(IDENTIFIER,      this::variable, null,         Level.NONE);
         rule(STRING,          this::literal,  null,         Level.NONE);
         rule(NUMBER,          this::literal,  null,         Level.NONE);
         rule(KEYWORD,         null,           null,         Level.NONE);
-        // Reserved words
+        //   Reserved words
         rule(ASSERT,          null,           null,         Level.NONE);
         rule(BREAK,           null,           null,         Level.NONE);
         rule(CASE,            null,           null,         Level.NONE);
