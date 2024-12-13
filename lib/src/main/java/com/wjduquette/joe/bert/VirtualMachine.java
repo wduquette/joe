@@ -1,11 +1,13 @@
 package com.wjduquette.joe.bert;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.RuntimeError;
 import com.wjduquette.joe.SourceBuffer;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static com.wjduquette.joe.bert.Opcode.*;
 
@@ -16,6 +18,9 @@ class VirtualMachine {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The top-level
+    private final Joe joe;
+
     //
     // Components
     //
@@ -24,7 +29,7 @@ class VirtualMachine {
     private final Disassembler disassembler = new Disassembler();
 
     // The Compiler
-    private final Compiler compiler = new Compiler();
+    private final Compiler compiler;
 
     //
     // Runtime Data
@@ -48,18 +53,51 @@ class VirtualMachine {
     //-------------------------------------------------------------------------
     // Constructor
 
-    VirtualMachine() {
+    VirtualMachine(Joe joe) {
+        this.joe = joe;
+        this.compiler = new Compiler();
     }
 
     //-------------------------------------------------------------------------
-    // Methods
+    // Variable Access
 
-    void interpret(String source) {
-        var function = compiler.compile("*script*", source);
+    /**
+     * Gets the set of global variable names.
+     * @return The set
+     */
+    Set<String> getVarNames() {
+        return globals.keySet();
+    }
+
+    /**
+     * Gets the value of the named variable, or null if there is none.
+     * @param name The name
+     * @return The value, or null
+     */
+    Object getVar(String name) {
+        return globals.get(name);
+    }
+
+    /**
+     * Sets the value of the named variable, replacing any previous value.
+     * @param name The name
+     * @param value The value
+     */
+    void setVar(String name, Object value) {
+        globals.put(name, value);
+    }
+
+
+    //-------------------------------------------------------------------------
+    // Execution
+
+    Object interpret(String scriptName, String source) {
+        var function = compiler.compile(scriptName, source);
         resetStack();
         frames[frameCount++] = new CallFrame(function);
         stack[top++] = function;
         run();
+        return null; // Can't return anything yet.
     }
 
     private void resetStack() {

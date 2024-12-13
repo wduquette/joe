@@ -18,10 +18,13 @@ public class DumpTool implements Tool {
      */
     public static final ToolInfo INFO = new ToolInfo(
         "dump",
-        "file.joe",
+        "[options...] file.joe",
         "Compiles the Joe script and dumps the compiled form.",
         """
-        Dumps compilation details for the script.
+        Dumps compilation details for the script.  The options
+        are as follows:
+        
+        --bert, -b     Use the experimental "Bert" byte-engine.
         """,
         DumpTool::main
     );
@@ -53,7 +56,20 @@ public class DumpTool implements Tool {
             System.exit(64);
         }
 
-        var joe = new Joe();
+        var engineType = Joe.WALKER;
+
+        while (!argq.isEmpty() && argq.peek().startsWith("-")) {
+            var opt = argq.poll();
+            switch (opt) {
+                case "--bert", "-b" -> engineType = Joe.BERT;
+                default -> {
+                    System.err.println("Unknown option: '" + opt + "'.");
+                    System.exit(64);
+                }
+            }
+        }
+
+        var joe = new Joe(engineType);
         var path = argq.poll();
 
         try {

@@ -1,5 +1,6 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.bert.BertEngine;
 import com.wjduquette.joe.types.*;
 import com.wjduquette.joe.walker.WalkerEngine;
 
@@ -16,6 +17,9 @@ import java.util.stream.Collectors;
 public class Joe {
     //-------------------------------------------------------------------------
     // Static constants
+
+    public static final String WALKER = "walker";
+    public static final String BERT = "bert";
 
     /**
      * The set of Joe's reserved words.
@@ -56,9 +60,21 @@ public class Joe {
      * standard library, but nothing else.
      */
     public Joe() {
-        engine = new WalkerEngine(this);
+        this(WALKER);
 
-        StandardLibrary.PACKAGE.install(this);
+        if (engine instanceof WalkerEngine) {
+            // TODO: Once BERT is far enough along, install for both engines.
+            StandardLibrary.PACKAGE.install(this);
+        }
+    }
+
+    public Joe(String engineType) {
+        switch (engineType) {
+            case WALKER -> engine = new WalkerEngine(this);
+            case BERT -> engine = new BertEngine(this);
+            default -> throw new IllegalArgumentException(
+                "Invalid Engine type: '" + engineType + "'.");
+        }
     }
 
     //-------------------------------------------------------------------------

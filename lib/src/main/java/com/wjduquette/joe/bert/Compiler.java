@@ -15,6 +15,7 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+
     private final List<Trace> errors = new ArrayList<>();
     private final Parser parser = new Parser();
     private FunctionCompiler current = null;
