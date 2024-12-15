@@ -36,13 +36,12 @@ public class Disassembler {
             .append(" ")
             .append(chunk.name()).append(" ===\n");
 
-        var rle = new RLEArray(chunk.lines());
+        var compressed = RLE.encodedLength(chunk.lines());
         var full = (double)chunk.codeSize();
-        var compressed = (double)rle.encoded().length;
         var percentage = 100.0*compressed/full;
         buff.append("Lines RLE size: ")
             .append(String.format("%d/%d = %.1f%%",
-                rle.encoded().length, chunk.codeSize(), percentage))
+                compressed, chunk.codeSize(), percentage))
             .append("\n");
 
         for (int i = 0; i < chunk.numConstants(); i++) {
