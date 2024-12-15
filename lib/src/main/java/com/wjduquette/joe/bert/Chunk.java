@@ -144,4 +144,7 @@ class Chunk implements CodeChunk {
     @Override public int line(int index) { return lines[index]; }
     @Override public int numConstants() { return numConstants; }
     @Override public Object getConstant(int index) { return constants[index]; }
+
+    // TEMP
+    @Override public int[] lines() { return lines; }
 }

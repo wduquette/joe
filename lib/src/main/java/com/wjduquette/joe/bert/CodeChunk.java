@@ -61,4 +61,6 @@ public interface CodeChunk {
      * @return The line number
      */
     int line(int index);
+
+    int[] lines();
 }

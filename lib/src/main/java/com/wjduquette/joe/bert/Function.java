@@ -71,6 +71,9 @@ public class Function implements CodeChunk {
     @Override public int numConstants() { return constants.length; }
     @Override public Object getConstant(int index) { return constants[index]; }
 
+    // TEMP
+    @Override public int[] lines() { return lines; }
+
     //-------------------------------------------------------------------------
     // Object API
 
