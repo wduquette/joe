@@ -54,13 +54,30 @@ public class JoeError extends RuntimeException {
     // usually add information to the following stack frame.
 
     /**
-     * Adds a call frame trace to the error.
+     * Adds a call frame trace to the error, using the new context as
+     * the error context and saving the new context as the pending
+     * context.
      * @param newContext A span indicating the new local context, or null for
      *                   native code.
      * @param message The trace message
      * @return this
      */
     public final JoeError addFrame(Span newContext, String message) {
+        traces.add(new Trace(newContext, message));
+        pendingContext = newContext;
+        return this;
+    }
+
+    /**
+     * Adds a call frame trace to the error, using the pending context as
+     * the error context and saving the new context as the pending
+     * context.
+     * @param newContext A span indicating the new local context, or null for
+     *                   native code.
+     * @param message The trace message
+     * @return this
+     */
+    public final JoeError addPendingFrame(Span newContext, String message) {
         traces.add(new Trace(pendingContext, message));
         pendingContext = newContext;
         return this;

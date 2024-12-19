@@ -131,7 +131,7 @@ class Interpreter {
                     } catch (JoeError ex) {
                         var buff = stmt.classSpan().buffer();
                         var context = buff.lineSpan(stmt.classSpan().endLine());
-                        throw ex.addFrame(context,
+                        throw ex.addPendingFrame(context,
                             "In static initializer for " + stmt.name().lexeme());
                     }
                 }
@@ -216,7 +216,7 @@ class Interpreter {
             case Stmt.Throw stmt -> {
                 var value = evaluate(stmt.value());
                 if (value instanceof JoeError error) {
-                    throw error.addFrame(stmt.keyword().span(),
+                    throw error.addPendingFrame(stmt.keyword().span(),
                         "Rethrowing existing error.");
                 } else {
                     throw new RuntimeError(stmt.keyword().span(),
@@ -387,7 +387,7 @@ class Interpreter {
                         var msg = "In " + callable.callableType() + " " +
                             callable.signature();
                         if (callable.isScripted()) {
-                            throw ex.addFrame(expr.paren().span(), msg);
+                            throw ex.addPendingFrame(expr.paren().span(), msg);
                         } else {
                             throw ex.addInfo(expr.paren().span(), msg);
                         }

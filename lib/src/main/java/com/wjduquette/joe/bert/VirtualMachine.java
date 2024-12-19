@@ -107,11 +107,12 @@ class VirtualMachine {
         for (var i = frameCount - 1; i >= bottomFrame; i--) {
             var frame = frames[i];
             var function = frame.function;
+
             var line = function.line(frame.ip);
             var span = function.source().lineSpan(line);
             var message = "In " +
                 function.type().text() + " " +
-                function.name() + " @" + frame.ip;
+                function.name();
             error.addFrame(span, message);
         }
     }
