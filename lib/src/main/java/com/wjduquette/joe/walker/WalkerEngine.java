@@ -79,7 +79,11 @@ public class WalkerEngine implements Engine {
         // Save the buffer, for later introspection.
         buffers.put(filename, buffer);
 
-        return interpreter.interpret(statements);
+        try {
+            return interpreter.interpret(statements);
+        } catch (Return ex) {
+            return ex.value;
+        }
     }
 
 
