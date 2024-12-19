@@ -47,6 +47,10 @@ public class Function implements CodeChunk {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates a function from the compiled chunk.
+     * @param chunk The chunk.
+     */
     Function(Chunk chunk) {
         this.name = chunk.name;
         this.type = chunk.type;
@@ -79,6 +83,6 @@ public class Function implements CodeChunk {
 
     @Override
     public String toString() {
-        return "<fn " + name + ">";
+        return "<" + type.text() + " " + name + ">";
     }
 }

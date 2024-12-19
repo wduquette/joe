@@ -121,6 +121,7 @@ public class Disassembler {
             case ADD, DIV, EQ, FALSE, GE, GT, LE, LT, MUL,
                 NE, NEGATE, NOT, NULL, POP, PRINT, RETURN, SUB, TRUE
                 -> simpleInstruction(ip);
+            case CLOSURE -> closureInstruction(ip);
             default -> unknownOpcode(ip);
         };
     }
@@ -130,6 +131,14 @@ public class Disassembler {
         var text = String.format(" %04d", (int)arg);
         return new Pair(text, ip + 2);
     }
+
+    private Pair closureInstruction(int ip) {
+        int index = chunk.code(ip + 1);
+        var func = (Function)chunk.getConstant(index);
+        var text = String.format(" %04d '%s'", index, func.toString());
+        return new Pair(text, ip + 2);
+    }
+
 
     private Pair constantInstruction(int ip) {
         int index = chunk.code(ip + 1);

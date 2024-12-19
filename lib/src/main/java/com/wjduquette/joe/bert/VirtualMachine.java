@@ -91,10 +91,10 @@ class VirtualMachine {
     // Execution
 
     Object interpret(String scriptName, String source) {
-        var function = compiler.compile(scriptName, source);
+        var closure = new Closure(compiler.compile(scriptName, source));
         resetStack();
-        stack[top++] = function;
-        call(function, 0);
+        stack[top++] = closure;
+        call(closure, 0);
         try {
             return run();
         } catch (JoeError ex) {
@@ -106,7 +106,7 @@ class VirtualMachine {
     private void unwindStack(JoeError error, int bottomFrame) {
         for (var i = frameCount - 1; i >= bottomFrame; i--) {
             var frame = frames[i];
-            var function = frame.function;
+            var function = frame.closure.function;
 
             var line = function.line(frame.ip);
             var span = function.source().lineSpan(line);
@@ -137,9 +137,9 @@ class VirtualMachine {
             if (joe.isDebug()) {
                 joe.printf("%-40s ",
                     disassembler.disassembleInstruction(
-                        frame.function, frame.ip));
+                        frame.closure.function, frame.ip));
             }
-            var opcode = frame.function.code[frame.ip++];
+            var opcode = frame.closure.function.code[frame.ip++];
             switch (opcode) {
                 case ADD -> {
                     var b = pop();
@@ -158,6 +158,10 @@ class VirtualMachine {
                     var argCount = readArg();
                     callValue(peek(argCount), argCount);
                     frame = frames[frameCount - 1];
+                }
+                case CLOSURE -> {
+                    var function = readFunction();
+                    push(new Closure(function));
                 }
                 case CONST -> push(readConstant());
                 case DIV -> {
@@ -329,8 +333,8 @@ class VirtualMachine {
     }
 
     private SourceBuffer.Span ipSpan() {
-        var line = frame.function.line(frame.ip);
-        return frame.function.source().lineSpan(line);
+        var line = frame.closure.function.line(frame.ip);
+        return frame.closure.function.source().lineSpan(line);
     }
 
     private void checkNumericOperands(char opcode, Object a, Object b) {
@@ -384,26 +388,33 @@ class VirtualMachine {
 
     // Reads an instruction argument from the chunk.
     private char readArg() {
-        return frame.function.code[frame.ip++];
+        return frame.closure.function.code[frame.ip++];
+    }
+
+    // Reads an index from the chunk, and returns the indexed
+    // constant as a Function.
+    private Function readFunction() {
+        var index = frame.closure.function.code[frame.ip++];
+        return (Function)frame.closure.function.constants[index];
     }
 
     // Reads a stack slot argument from the chunk.
     private char readSlot() {
-        return frame.function.code[frame.ip++];
+        return frame.closure.function.code[frame.ip++];
     }
 
     // Reads a constant index from the chunk, and returns the indexed
     // constant.
     private Object readConstant() {
-        var index = frame.function.code[frame.ip++];
-        return frame.function.constants[index];
+        var index = frame.closure.function.code[frame.ip++];
+        return frame.closure.function.constants[index];
     }
 
     // Reads a constant index from the chunk, and returns the indexed
     // constant as a string.
     private String readString() {
-        var index = frame.function.code[frame.ip++];
-        return (String)frame.function.constants[index];
+        var index = frame.closure.function.code[frame.ip++];
+        return (String)frame.closure.function.constants[index];
     }
 
     //-------------------------------------------------------------------------
@@ -430,7 +441,7 @@ class VirtualMachine {
     // Invoked by Opcode.CALL for all calls
     private void callValue(Object callee, int argCount) {
         switch (callee) {
-            case Function f -> call(f, argCount);
+            case Closure f -> call(f, argCount);
             case NativeFunction f -> {
                 var args = new Args(Arrays.copyOfRange(stack, top - argCount, top));
                 top -= argCount + 1;
@@ -441,9 +452,9 @@ class VirtualMachine {
         }
     }
 
-    private void call(Function function, int argCount) {
-        if (argCount != function.arity) {
-            throw error("Expected " + function.arity + " arguments, got: " +
+    private void call(Closure closure, int argCount) {
+        if (argCount != closure.function.arity) {
+            throw error("Expected " + closure.function.arity + " arguments, got: " +
                 argCount + ".");
         }
 
@@ -451,14 +462,14 @@ class VirtualMachine {
             throw error("Call stack overflow.");
         }
 
-        var frame = new CallFrame(function);
+        var frame = new CallFrame(closure);
         frames[frameCount++] = frame;
         frame.base = top - argCount - 1;
     }
 
     private class CallFrame {
-        // The function
-        Function function;
+        // The closure being executed
+        Closure closure;
 
         // The instruction pointer within the frame.
         int ip;
@@ -466,8 +477,8 @@ class VirtualMachine {
         // The stack slot for function local 0
         int base;
 
-        CallFrame(Function function) {
-            this.function = function;
+        CallFrame(Closure closure) {
+            this.closure = closure;
             this.ip = 0;
             this.base = top;
         }

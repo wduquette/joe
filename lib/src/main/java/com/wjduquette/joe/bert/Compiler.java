@@ -134,7 +134,7 @@ class Compiler {
         currentChunk().span = buffer.span(start, end);
 
         var function = endFunction();
-        emit(Opcode.CONST, currentChunk().addConstant(function));
+        emit(Opcode.CLOSURE, currentChunk().addConstant(function));
     }
 
     private void varDeclaration() {
