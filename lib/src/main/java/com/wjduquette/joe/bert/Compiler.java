@@ -575,7 +575,7 @@ class Compiler {
 
         // See if we already know about this upvalue.
         for (var i = 0; i < upvalueCount; i++) {
-            Upvalue upvalue = compiler.upvalues[i];
+            UpvalueInfo upvalue = compiler.upvalues[i];
             if (upvalue.index == index && upvalue.isLocal == isLocal) {
                 return i;
             }
@@ -587,7 +587,7 @@ class Compiler {
         }
 
         // Allocate a new upvalue.
-        compiler.upvalues[upvalueCount] = new Upvalue(index, isLocal);
+        compiler.upvalues[upvalueCount] = new UpvalueInfo(index, isLocal);
         return compiler.upvalueCount++;
     }
 
@@ -753,7 +753,7 @@ class Compiler {
         int localCount = 0;
         int scopeDepth = 0;
         int upvalueCount = 0;
-        final Upvalue[] upvalues = new Upvalue[MAX_LOCALS];
+        final UpvalueInfo[] upvalues = new UpvalueInfo[MAX_LOCALS];
 
         FunctionCompiler(
             FunctionCompiler enclosing,
@@ -773,6 +773,23 @@ class Compiler {
             var local = new Local(Token.synthetic(""));
             local.depth = 0;
             locals[localCount++] = local;
+        }
+    }
+
+    // Compilation information about upvalues.
+    // TODO: Consider making this a record.
+    static class UpvalueInfo {
+        char index;
+        boolean isLocal;
+
+        UpvalueInfo(char index, boolean isLocal) {
+            this.index = index;
+            this.isLocal = isLocal;
+        }
+
+        @Override
+        public String toString() {
+            return "Upvalue[index=" + (int)index + ", isLocal=" + isLocal + "]";
         }
     }
 
@@ -877,4 +894,5 @@ class Compiler {
     private ParseRule getRule(TokenType type) {
         return rules[type.ordinal()];
     }
+
 }
