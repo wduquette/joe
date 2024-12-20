@@ -8,4 +8,9 @@ class Upvalue {
         this.index = index;
         this.isLocal = isLocal;
     }
+
+    @Override
+    public String toString() {
+        return "Upvalue[index=" + (int)index + ", isLocal=" + isLocal + "]";
+    }
 }
