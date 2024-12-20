@@ -789,7 +789,7 @@ class Compiler {
 
         @Override
         public String toString() {
-            return "Upvalue[index=" + (int)index + ", isLocal=" + isLocal + "]";
+            return "UpvalueInfo[index=" + (int)index + ", isLocal=" + isLocal + "]";
         }
     }
 
