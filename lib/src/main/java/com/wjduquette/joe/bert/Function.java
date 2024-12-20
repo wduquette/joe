@@ -25,7 +25,8 @@ public class Function implements CodeChunk {
     // The function's arity
     final int arity;
 
-    private final SourceBuffer.Span span;
+    // The number of upvalues the function closes over.
+    final int upvalueCount;
 
     //
     // Chunk info
@@ -33,6 +34,9 @@ public class Function implements CodeChunk {
 
     // The source buffer
     private final SourceBuffer source;
+
+    // The function's span in the source code.
+    private final SourceBuffer.Span span;
 
     // The constants table
     final Object[] constants;
@@ -51,7 +55,7 @@ public class Function implements CodeChunk {
      * Creates a function from the compiled chunk.
      * @param chunk The chunk.
      */
-    Function(Chunk chunk) {
+    Function(Chunk chunk, int upvalueCount) {
         this.name = chunk.name;
         this.type = chunk.type;
         this.arity = chunk.arity;
@@ -60,6 +64,7 @@ public class Function implements CodeChunk {
         this.constants = Arrays.copyOf(chunk.constants, chunk.numConstants);
         this.code = Arrays.copyOf(chunk.code, chunk.size);
         this.lines = Arrays.copyOf(chunk.lines, chunk.size);
+        this.upvalueCount = upvalueCount;
     }
 
     //-------------------------------------------------------------------------

@@ -36,9 +36,12 @@ public class Opcode {
     public static final char RETURN  = 27;
     public static final char SUB     = 28;
     public static final char TRUE    = 29;
+    public static final char UPGET   = 30;
+    public static final char UPSET   = 31;
+
 
     // Temporary
-    public static final char PRINT   = 30;
+    public static final char PRINT   = 32;
 
 
     //-------------------------------------------------------------------------
@@ -75,6 +78,8 @@ public class Opcode {
         "RETURN",
         "SUB",
         "TRUE",
+        "UPGET",
+        "UPSET",
 
         // Temporary
         "PRINT"

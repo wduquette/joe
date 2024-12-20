@@ -110,7 +110,7 @@ public class Disassembler {
     private Pair instruction(int ip) {
         var opcode = chunk.code(ip);
         return switch (opcode) {
-            case CALL, LOCGET, LOCSET
+            case CALL, LOCGET, LOCSET, UPGET, UPSET
                 -> charInstruction(ip);
             case JIF, JIFKEEP, JITKEEP, JUMP
                 -> jumpInstruction(ip, 1);

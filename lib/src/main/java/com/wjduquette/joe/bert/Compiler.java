@@ -82,7 +82,7 @@ class Compiler {
 
     private Function endFunction() {
         emitReturn();
-        var function = new Function(currentChunk());
+        var function = new Function(currentChunk(), current.upvalueCount);
         if (dump != null) {
             dump.append(disassembler.disassemble(function)).append("\n");
         }
@@ -473,6 +473,9 @@ class Compiler {
         if (arg != -1) {
             getOp = Opcode.LOCGET;
             setOp = Opcode.LOCSET;
+        } else if ((arg = resolveUpvalue(current, name)) != -1) {
+            getOp = Opcode.UPGET;
+            setOp = Opcode.UPSET;
         } else {
             arg = identifierConstant(name);
             getOp = Opcode.GLOGET;
@@ -534,6 +537,44 @@ class Compiler {
             }
         }
         return -1;
+    }
+
+    private int resolveUpvalue(FunctionCompiler compiler, Token name) {
+        // If there's no enclosing FunctionCompiler, then this is
+        // necessarily a global.
+        if (compiler.enclosing == null) return -1;
+
+        // We know it isn't in this scope; look for it in the enclosing scope.
+        int local = resolveLocal(compiler.enclosing, name);
+        // TEMP: seems like we need a recursive call of some kind to find it
+        // in scopes further out.
+
+        if (local != -1) {
+            return addUpvalue(compiler, (char)local, true);
+        }
+
+        return -1;
+    }
+
+    private int addUpvalue(FunctionCompiler compiler, char index, boolean isLocal) {
+        int upvalueCount = compiler.upvalueCount;
+
+        // See if we already know about this upvalue.
+        for (var i = 0; i < upvalueCount; i++) {
+            Upvalue upvalue = compiler.upvalues[i];
+            if (upvalue.index == index && upvalue.isLocal == isLocal) {
+                return i;
+            }
+        }
+
+        if (upvalueCount == MAX_LOCALS) {
+            error("Too many closure variables in function.");
+            return 0;
+        }
+
+        // Allocate a new upvalue.
+        compiler.upvalues[upvalueCount] = new Upvalue(index, isLocal);
+        return compiler.upvalueCount++;
     }
 
     private void beginScope() {
@@ -697,6 +738,8 @@ class Compiler {
         final Local[] locals = new Local[MAX_LOCALS];
         int localCount = 0;
         int scopeDepth = 0;
+        int upvalueCount = 0;
+        final Upvalue[] upvalues = new Upvalue[MAX_LOCALS];
 
         FunctionCompiler(
             FunctionCompiler enclosing,
@@ -718,6 +761,7 @@ class Compiler {
             locals[localCount++] = local;
         }
     }
+
 
     //-------------------------------------------------------------------------
     // Parser Rules
