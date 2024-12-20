@@ -133,8 +133,15 @@ class Compiler {
         var end = parser.previous.span().end();
         currentChunk().span = buffer.span(start, end);
 
+        var compiler = current;  // Save the compiler; endFunction pops it.
         var function = endFunction();
         emit(Opcode.CLOSURE, currentChunk().addConstant(function));
+
+        // Emit data about the upvalues.
+        for (int i = 0; i < function.upvalueCount; i++) {
+            emit((char)(compiler.upvalues[i].isLocal ? 1 : 0));
+            emit(compiler.upvalues[i].index);
+        }
     }
 
     private void varDeclaration() {
@@ -540,17 +547,24 @@ class Compiler {
     }
 
     private int resolveUpvalue(FunctionCompiler compiler, Token name) {
-        // If there's no enclosing FunctionCompiler, then this is
+        // FIRST, if there's no enclosing FunctionCompiler, then this is
         // necessarily a global.
         if (compiler.enclosing == null) return -1;
 
-        // We know it isn't in this scope; look for it in the enclosing scope.
+        // NEXT, we already know it isn't in this scope; look for it as a
+        // local in the enclosing scope.
         int local = resolveLocal(compiler.enclosing, name);
-        // TEMP: seems like we need a recursive call of some kind to find it
-        // in scopes further out.
 
         if (local != -1) {
             return addUpvalue(compiler, (char)local, true);
+        }
+
+        // NEXT, it might be defined in a scope that encloses the enclosing
+        // scope. That scope might no longer be on the stack, so look for it
+        // as an upvalue, not as a local.
+        int upvalue = resolveUpvalue(compiler.enclosing, name);
+        if (upvalue != -1) {
+            return addUpvalue(compiler, (char)upvalue, false);
         }
 
         return -1;

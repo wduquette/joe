@@ -133,10 +133,19 @@ public class Disassembler {
     }
 
     private Pair closureInstruction(int ip) {
-        int index = chunk.code(ip + 1);
-        var func = (Function)chunk.getConstant(index);
-        var text = String.format(" %04d '%s'", index, func.toString());
-        return new Pair(text, ip + 2);
+        ip++;
+        int constIndex = chunk.code(ip++);
+        var func = (Function)chunk.getConstant(constIndex);
+        var buff = new StringBuilder();
+        buff.append(String.format(" %04d '%s'", constIndex, func.toString()));
+
+        for (var i = 0; i < func.upvalueCount; i++) {
+            int isLocal = chunk.code(ip++);
+            int index = chunk.code(ip++);
+            buff.append(String.format("\n   |  @%04d         %s %d",
+                ip - 2, isLocal == 1 ? "local" : "upvalue", index));
+        }
+        return new Pair(buff.toString(), ip);
     }
 
 
@@ -170,7 +179,7 @@ public class Disassembler {
 
     private String singlePrefix(int ip) {
         char opcode = chunk.code(ip);
-        return String.format("%04d @%04d %-6s",
+        return String.format("%04d @%04d %-7s",
             chunk.line(ip), ip, Opcode.name(opcode));
     }
 
@@ -184,7 +193,7 @@ public class Disassembler {
             line = "   | ";
         }
 
-        return String.format("%s @%04d %-6s", line, ip, Opcode.name(opcode));
+        return String.format("%s @%04d %-7s", line, ip, Opcode.name(opcode));
     }
 
     private boolean startsNewLine(int ip) {
