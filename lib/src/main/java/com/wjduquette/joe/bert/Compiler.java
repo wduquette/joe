@@ -556,6 +556,7 @@ class Compiler {
         int local = resolveLocal(compiler.enclosing, name);
 
         if (local != -1) {
+            compiler.enclosing.locals[local].isCaptured = true;
             return addUpvalue(compiler, (char)local, true);
         }
 
@@ -601,7 +602,11 @@ class Compiler {
         while (current.localCount > 0
             && current.locals[current.localCount - 1].depth > current.scopeDepth)
         {
-            emit(Opcode.POP);
+            if (current.locals[current.localCount -1].isCaptured) {
+                emit(Opcode.UPCLOSE);
+            } else {
+                emit(Opcode.POP);
+            }
             current.localCount--;
         }
     }
@@ -740,6 +745,7 @@ class Compiler {
     private static class Local {
         final Token name;
         int depth = - 1;
+        boolean isCaptured = false;
 
         Local(Token name) {
             this.name = name;

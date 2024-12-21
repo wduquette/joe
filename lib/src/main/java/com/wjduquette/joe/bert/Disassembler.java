@@ -150,13 +150,14 @@ public class Disassembler {
                 return ip + 2;
             }
             case ADD, DIV, EQ, FALSE, GE, GT, LE, LT, MUL,
-                NE, NEGATE, NOT, NULL, POP, PRINT, RETURN, SUB, TRUE
+                NE, NEGATE, NOT, NULL, POP, PRINT, RETURN, SUB, TRUE, UPCLOSE
             -> {
                 // Pattern: opcode
                 lines.add(new Line(ip, prefix));
                 return ip + 1;
             }
             case CLOSURE -> {
+                // Pattern: CLOSURE index [,isLocal, index]...
                 var start = ip++;
                 int constIndex = chunk.code(ip++);
                 var func = (Function)chunk.getConstant(constIndex);

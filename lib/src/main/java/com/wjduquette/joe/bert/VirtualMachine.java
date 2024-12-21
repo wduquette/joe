@@ -48,6 +48,10 @@ class VirtualMachine {
     private int frameCount;
     private CallFrame frame; // The current frame.  Managed by run().
 
+    // The open upvalues list.  This is an intrusive list, linked by
+    // `Upval.next`, so openValues is simply the top upvalue on the list.
+    Upval openUpvalues = null;
+
     //-------------------------------------------------------------------------
     // Constructor
 
@@ -307,6 +311,7 @@ class VirtualMachine {
                 case POP -> pop();
                 case RETURN -> {
                     var result = pop();
+                    closeUpvalues(frame.base);
                     frameCount--;
                     if (frameCount == 0) {
                         pop(); // The script function's stack entry
@@ -335,6 +340,12 @@ class VirtualMachine {
                     push((double)a - (double)b);
                 }
                 case TRUE -> push(true);
+                case UPCLOSE -> {
+                    // Close and then pop the upvalue whose value is on the
+                    // top of the stack.
+                    closeUpvalues(top - 1);
+                    pop();
+                }
                 case UPGET -> {
                     int slot = readArg();
                     push(frame.closure.upvalues[slot].get());
@@ -508,8 +519,42 @@ class VirtualMachine {
     // Upvalues
 
     private Upval captureUpvalue(int slot) {
+        // FIRST, look for an existing upvalue.
+        Upval prev = null;
+        var upval = openUpvalues;
+        while (upval != null && upval.slot > slot) {
+            prev = upval;
+            upval = upval.next;
+        }
+
+        if (upval != null && upval.slot == slot) {
+            return upval;
+        }
+
+        // NEXT, we need a new upvalue.  Create it, and insert it into
+        // the list of open upvalues.
         var createdUpvalue = new Upval(slot);
+        createdUpvalue.next = upval;
+
+        if (prev == null) {
+            openUpvalues = createdUpvalue;
+        } else {
+            prev.next = createdUpvalue;
+        }
+
         return createdUpvalue;
+    }
+
+    // Close all upvalues with slot >= last.
+    private void closeUpvalues(int last) {
+        while (openUpvalues != null && openUpvalues.slot >= last) {
+            var upval = openUpvalues;
+            openUpvalues = upval.next;
+
+            // Move the value to upval.closed and clear upval.slot and
+            // upval.next
+            upval.close();
+        }
     }
 
     private class Upval implements Upvalue {
@@ -551,6 +596,7 @@ class VirtualMachine {
         public void close() {
             closed = stack[slot];
             slot = -1;
+            next = null;
         }
 
         @Override
