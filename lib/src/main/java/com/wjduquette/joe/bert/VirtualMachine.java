@@ -161,7 +161,19 @@ class VirtualMachine {
                 }
                 case CLOSURE -> {
                     var function = readFunction();
-                    push(new Closure(function));
+                    var closure = new Closure(function);
+                    push(closure);
+                    for (int i = 0; i < closure.upvalues.length; i++) {
+                        boolean isLocal = readArg() == 1;
+                        int index = readArg();
+
+                        if (isLocal) {
+                            closure.upvalues[i] =
+                                captureUpvalue(frame.base + index);
+                        } else {
+                            closure.upvalues[i] = frame.closure.upvalues[index];
+                        }
+                    }
                 }
                 case CONST -> push(readConstant());
                 case DIV -> {
@@ -323,6 +335,14 @@ class VirtualMachine {
                     push((double)a - (double)b);
                 }
                 case TRUE -> push(true);
+                case UPGET -> {
+                    int slot = readArg();
+                    push(frame.closure.upvalues[slot].get());
+                }
+                case UPSET -> {
+                    int slot = readArg();
+                    frame.closure.upvalues[slot].set(peek(0));
+                }
                 default -> throw new IllegalStateException(
                     "Unknown opcode: " + opcode + ".");
             }
@@ -487,6 +507,11 @@ class VirtualMachine {
     //-------------------------------------------------------------------------
     // Upvalues
 
+    private Upval captureUpvalue(int slot) {
+        var createdUpvalue = new Upval(slot);
+        return createdUpvalue;
+    }
+
     private class Upval implements Upvalue {
         //-------------------------------------------------------------------------
         // Instance variables
@@ -495,10 +520,18 @@ class VirtualMachine {
         Upval next = null;
 
         // A stack slot index, or -1
-        private int slot = 0;
+        private int slot;
 
         // The Upval's value if slot == -1
         private Object closed = null;
+
+        //-------------------------------------------------------------------------
+        // Constructor
+
+        // Creates a new upval, initially pointing at the stack slot.
+        Upval(int slot) {
+            this.slot = slot;
+        }
 
         //-------------------------------------------------------------------------
         // Methods
