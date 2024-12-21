@@ -483,4 +483,46 @@ class VirtualMachine {
             this.base = top;
         }
     }
+
+    //-------------------------------------------------------------------------
+    // Upvalues
+
+    private class Upval implements Upvalue {
+        //-------------------------------------------------------------------------
+        // Instance variables
+
+        // The next upval in the open value linked list.
+        Upval next = null;
+
+        // A stack slot index, or -1
+        private int slot = 0;
+
+        // The Upval's value if slot == -1
+        private Object closed = null;
+
+        //-------------------------------------------------------------------------
+        // Methods
+
+        public Object get() {
+            return slot >= 0 ? stack[slot] : closed;
+        }
+
+        public void set(Object value) {
+            if (slot >= 0) {
+                stack[slot] = value;
+            } else {
+                closed = value;
+            }
+        }
+
+        public void close() {
+            closed = stack[slot];
+            slot = -1;
+        }
+
+        @Override
+        public String toString() {
+            return "Upvalue[slot=" + slot + ", closed=" + closed + "]";
+        }
+    }
 }

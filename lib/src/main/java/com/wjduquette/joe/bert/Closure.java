@@ -5,11 +5,13 @@ public class Closure {
     // Instance Variables
 
     final Function function;
+    final Upvalue[] upvalues;
 
     //-------------------------------------------------------------------------
     // Constructor
 
     Closure(Function function) {
         this.function = function;
+        this.upvalues = new Upvalue[function.upvalueCount];
     }
 }
