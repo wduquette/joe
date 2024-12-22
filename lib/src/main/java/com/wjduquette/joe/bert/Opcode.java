@@ -40,11 +40,6 @@ public class Opcode {
     public static final char UPGET   = 31;
     public static final char UPSET   = 32;
 
-
-    // Temporary
-    public static final char PRINT   = 33;
-
-
     //-------------------------------------------------------------------------
     // Opcode names
 
@@ -81,10 +76,7 @@ public class Opcode {
         "TRUE",
         "UPCLOSE",
         "UPGET",
-        "UPSET",
-
-        // Temporary
-        "PRINT"
+        "UPSET"
     };
 
     //-------------------------------------------------------------------------

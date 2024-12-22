@@ -26,9 +26,6 @@ enum TokenType {
     FALSE, FOR, FOREACH, FUNCTION, IF, IN, METHOD, NI, NULL, RETURN,
     STATIC, SUPER, SWITCH, THIS, THROW, TRUE, VAR, WHILE,
 
-    // Temporary Reserved Word
-    PRINT,
-
     ERROR,
     EOF
 }

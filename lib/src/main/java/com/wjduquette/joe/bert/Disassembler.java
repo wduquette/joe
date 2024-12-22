@@ -150,7 +150,7 @@ public class Disassembler {
                 return ip + 2;
             }
             case ADD, DIV, EQ, FALSE, GE, GT, LE, LT, MUL,
-                NE, NEGATE, NOT, NULL, POP, PRINT, RETURN, SUB, TRUE, UPCLOSE
+                NE, NEGATE, NOT, NULL, POP, RETURN, SUB, TRUE, UPCLOSE
             -> {
                 // Pattern: opcode
                 lines.add(new Line(ip, prefix));

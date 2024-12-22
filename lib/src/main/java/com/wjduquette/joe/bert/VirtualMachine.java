@@ -329,13 +329,6 @@ class VirtualMachine {
                 }
                 case NOT -> push(Joe.isFalsey(pop()));
                 case NULL -> push(null);
-                case PRINT -> {
-                    var value = joe.stringify(pop());
-                    joe.println(value);
-                    if (joe.isDebug()) {
-                        joe.printf("%-40s ", " ");
-                    }
-                }
                 case POP -> pop();
                 case RETURN -> {
                     var result = pop();

@@ -1,5 +1,6 @@
 package com.wjduquette.joe.bert;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Trace;
 
@@ -31,7 +32,6 @@ public class Scanner {
         reserved("method",   METHOD);
         reserved("ni",       NI);
         reserved("null",     NULL);
-        reserved("print",    PRINT); // Temporary
         reserved("return",   RETURN);
         reserved("static",   STATIC);
         reserved("super",    SUPER);
@@ -44,10 +44,9 @@ public class Scanner {
     }
 
     private static void reserved(String word, TokenType token) {
-        // TODO: Fix this after we get rid of PRINT.
-//        if (!Joe.RESERVED_WORDS.contains(word)) {
-//            throw new IllegalStateException("Not reserved: '" + word + "'.");
-//        }
+        if (!Joe.RESERVED_WORDS.contains(word)) {
+            throw new IllegalStateException("Not reserved: '" + word + "'.");
+        }
         reserved.put(word, token);
     }
 

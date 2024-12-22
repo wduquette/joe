@@ -6,6 +6,5 @@ function testAssertEquals() {
 
     function bad() { assertEquals("abc", 5); }
     assertError(bad, "Expected Number '5', got: String 'abc'.");
-    println("Success!");
 }
 

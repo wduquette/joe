@@ -171,7 +171,6 @@ class Compiler {
                 case FUNCTION:
                 case IF:
                 case METHOD:
-                case PRINT:
                 case RETURN:
                 case SWITCH:
                 case THROW:
@@ -191,8 +190,6 @@ class Compiler {
             ifStatement();
         } else if (match(FOR)) {
             forStatement();
-        } else if (match(PRINT)) {
-            printStatement();
         } else if (match(RETURN)) {
             returnStatement();
         } else if (match(WHILE)) {
@@ -305,12 +302,6 @@ class Compiler {
         emitLoop(loopStart);
 
         patchJump(exitJump);
-    }
-
-    private void printStatement() {
-        expression();
-        consume(SEMICOLON, "Expected ';' after value.");
-        emit(Opcode.PRINT);
     }
 
     //-------------------------------------------------------------------------
@@ -876,7 +867,6 @@ class Compiler {
         rule(TRUE,            this::symbol,   null,         Level.NONE);
         rule(VAR,             null,           null,         Level.NONE);
         rule(WHILE,           null,           null,         Level.NONE);
-        rule(PRINT,           null,           null,         Level.NONE);
         rule(ERROR,           null,           null,         Level.NONE);
         rule(EOF,             null,           null,         Level.NONE);
 
