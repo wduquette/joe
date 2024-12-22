@@ -1,9 +1,6 @@
 package com.wjduquette.joe.bert;
 
-import com.wjduquette.joe.Engine;
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.SyntaxError;
+import com.wjduquette.joe.*;
 
 import java.util.Set;
 
@@ -51,12 +48,13 @@ public class BertEngine implements Engine {
 
     @Override
     public Object call(Object callee, Object... args) {
-        throw new UnsupportedOperationException("TODO");
+        return vm.callFromJava(callee, args);
     }
 
     @Override
     public boolean isCallable(Object callee) {
-        throw new UnsupportedOperationException("TODO");
+        return callee instanceof JoeCallable
+            || callee instanceof Closure;
     }
 
     @Override

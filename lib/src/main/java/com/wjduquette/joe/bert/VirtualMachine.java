@@ -107,6 +107,32 @@ class VirtualMachine {
         }
     }
 
+    Object callFromJava(Object callee, Object[] args) {
+        switch (callee) {
+            case Closure closure -> {
+                var base = top;
+                var argc = args.length;
+                stack[top++] = closure;
+                for (var i = 0; i < args.length; i++) {
+                    stack[top++] = args[i];
+                }
+
+                call(closure, argc);
+                try {
+                    return run();
+                } catch (JoeError ex) {
+                    unwindStack(ex, base);
+                    throw ex;
+                }
+            }
+            case JoeCallable jc -> {
+                return jc.call(joe, new Args(args));
+            }
+            default ->
+                throw error("Expected callable, got: " + joe.typedValue(callee) + ".");
+        }
+    }
+
     private void unwindStack(JoeError error, int bottomFrame) {
         for (var i = frameCount - 1; i >= bottomFrame; i--) {
             var frame = frames[i];
@@ -203,7 +229,9 @@ class VirtualMachine {
                         throw error("The '>=' operator expects two Numbers or two Strings.");
                     }
                 }
-                case GLODEF -> globals.put(readString(), pop());
+                case GLODEF -> {
+                    globals.put(readString(), pop());
+                }
                 case GLOGET -> {
                     var name = readString();
                     if (globals.containsKey(name)) {
@@ -473,7 +501,7 @@ class VirtualMachine {
     private void callValue(Object callee, int argCount) {
         switch (callee) {
             case Closure f -> call(f, argCount);
-            case NativeFunction f -> {
+            case JoeCallable f -> {
                 var args = new Args(Arrays.copyOfRange(stack, top - argCount, top));
                 top -= argCount + 1;
                 push(f.call(joe, args));
