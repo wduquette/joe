@@ -113,8 +113,8 @@ class VirtualMachine {
                 var base = top;
                 var argc = args.length;
                 stack[top++] = closure;
-                for (var i = 0; i < args.length; i++) {
-                    stack[top++] = args[i];
+                for (Object arg : args) {
+                    stack[top++] = arg;
                 }
 
                 call(closure, argc);
@@ -229,9 +229,7 @@ class VirtualMachine {
                         throw error("The '>=' operator expects two Numbers or two Strings.");
                     }
                 }
-                case GLODEF -> {
-                    globals.put(readString(), pop());
-                }
+                case GLODEF -> globals.put(readString(), pop());
                 case GLOGET -> {
                     var name = readString();
                     if (globals.containsKey(name)) {
