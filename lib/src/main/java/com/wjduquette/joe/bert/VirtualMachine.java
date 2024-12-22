@@ -94,6 +94,14 @@ class VirtualMachine {
     //-------------------------------------------------------------------------
     // Execution
 
+    /**
+     * Compiles and executes a script.  The scriptName is usually the script's
+     * file name.
+     * @param scriptName The name of the script
+     * @param source The text of the script
+     * @return The result of executing the script.
+     * @throws JoeError on compilation or execution error.
+     */
     Object interpret(String scriptName, String source) {
         var closure = new Closure(compiler.compile(scriptName, source));
         resetStack();
@@ -107,6 +115,13 @@ class VirtualMachine {
         }
     }
 
+    /**
+     * Calls a callable from Java, passing it the given arguments.
+     * The callee must be a callable according to `BertEngine::isCallable`.
+     * @param callee The callee
+     * @param args The arguments
+     * @return The result of calling the callable.
+     */
     Object callFromJava(Object callee, Object[] args) {
         switch (callee) {
             case Closure closure -> {
@@ -133,6 +148,8 @@ class VirtualMachine {
         }
     }
 
+    // Unwinds the stack back to and including the bottomFrame, adding
+    // frame traces to the error.
     private void unwindStack(JoeError error, int bottomFrame) {
         for (var i = frameCount - 1; i >= bottomFrame; i--) {
             var frame = frames[i];
