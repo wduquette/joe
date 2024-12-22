@@ -14,4 +14,12 @@ public class Closure {
         this.function = function;
         this.upvalues = new Upvalue[function.upvalueCount];
     }
+
+    //-------------------------------------------------------------------------
+    // Methods
+
+    @Override
+    public String toString() {
+        return "Closure[" + function + "]";
+    }
 }
