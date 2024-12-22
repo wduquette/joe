@@ -140,7 +140,7 @@ class VirtualMachine {
                     throw ex;
                 }
             }
-            case JoeCallable jc -> {
+            case NativeCallable jc -> {
                 return jc.call(joe, new Args(args));
             }
             default ->
@@ -509,7 +509,7 @@ class VirtualMachine {
     private void callValue(Object callee, int argCount) {
         switch (callee) {
             case Closure f -> call(f, argCount);
-            case JoeCallable f -> {
+            case NativeCallable f -> {
                 var args = new Args(Arrays.copyOfRange(stack, top - argCount, top));
                 top -= argCount + 1;
                 push(f.call(joe, args));

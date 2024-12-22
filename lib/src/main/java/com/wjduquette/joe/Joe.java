@@ -719,7 +719,7 @@ public class Joe {
      * @return The comparator
      */
     public Comparator<Object> toComparator(Object arg) {
-        if (arg instanceof JoeCallable) {
+        if (arg instanceof NativeCallable) {
             return (Object a, Object b) -> toInteger(call(arg, a, b));
         } else {
             throw expected("comparator", arg);

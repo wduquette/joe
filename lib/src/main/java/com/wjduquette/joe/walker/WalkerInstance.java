@@ -11,7 +11,7 @@ class WalkerInstance implements JoeObject {
     private final Map<String, Object> fields = new HashMap<>();
 
     // Default "toString()" implementation.
-    private final JoeCallable _toString;
+    private final NativeCallable _toString;
 
     WalkerInstance(JoeClass joeClass) {
         this.joeClass = joeClass;
@@ -30,7 +30,7 @@ class WalkerInstance implements JoeObject {
             return fields.get(name);
         }
 
-        JoeCallable method = joeClass.bind(this, name);
+        NativeCallable method = joeClass.bind(this, name);
         if (method != null) return method;
 
         if (name.equals(TO_STRING)) {

@@ -111,7 +111,7 @@ public class WalkerEngine implements Engine {
 
     @Override
     public boolean isCallable(Object callee) {
-        return callee instanceof JoeCallable;
+        return callee instanceof NativeCallable;
     }
 
     /**
@@ -122,7 +122,7 @@ public class WalkerEngine implements Engine {
      */
     @Override
     public Object call(Object callee, Object... args) {
-        if (callee instanceof JoeCallable callable) {
+        if (callee instanceof NativeCallable callable) {
             try {
                 return callable.call(joe, new Args(args));
             } catch (JoeError ex) {

@@ -380,7 +380,7 @@ class Interpreter {
                     args[i] = evaluate(expr.arguments().get(i));
                 }
 
-                if (callee instanceof JoeCallable callable) {
+                if (callee instanceof NativeCallable callable) {
                     try {
                         yield callable.call(joe, new Args(args));
                     } catch (JoeError ex) {
@@ -489,7 +489,7 @@ class Interpreter {
                     distance, "super");
                 JoeObject instance = (JoeObject)environment.getAt(
                     distance - 1, "this");
-                JoeCallable method =
+                NativeCallable method =
                     superclass.bind(instance, expr.method().lexeme());
 
                 if (method == null) {
