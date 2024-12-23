@@ -3,7 +3,7 @@ package com.wjduquette.joe.tools.test;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.console.PathProxy;
 
-class TestPackage extends JoePackage {
+public class TestPackage extends JoePackage {
     // See also pkg.joe.test.Joe for the rest of the package.
 
     //**
