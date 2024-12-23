@@ -106,10 +106,11 @@ class VirtualMachine {
         var closure = new Closure(compiler.compile(scriptName, source));
         resetStack();
         stack[top++] = closure;
-        call(closure, 0);
+        call(closure, 0, true);
         try {
             return run();
         } catch (JoeError ex) {
+//            System.out.println("Unwinding stack on error: " + ex);
             unwindStack(ex, 0);
             throw ex;
         }
@@ -125,6 +126,7 @@ class VirtualMachine {
     Object callFromJava(Object callee, Object[] args) {
         switch (callee) {
             case Closure closure -> {
+//                System.out.println("callFromJava closure: " + callee);
                 var base = top;
                 var argc = args.length;
                 stack[top++] = closure;
@@ -132,16 +134,22 @@ class VirtualMachine {
                     stack[top++] = arg;
                 }
 
-                call(closure, argc);
+                call(closure, argc, true);
                 try {
-                    return run();
+                    var result = run();
+//                    System.out.println("cfj result=" + result);
+                    return result;
                 } catch (JoeError ex) {
+//                    System.out.println("cfj error=" + ex);
                     unwindStack(ex, base);
                     throw ex;
                 }
             }
             case NativeCallable jc -> {
-                return jc.call(joe, new Args(args));
+//                System.out.println("callFromJava native: " + callee);
+                var result = jc.call(joe, new Args(args));
+//                System.out.println("  cfj result=" + result);
+                return result;
             }
             default ->
                 throw error("Expected callable, got: " + joe.typedValue(callee) + ".");
@@ -349,12 +357,22 @@ class VirtualMachine {
                     var result = pop();
                     closeUpvalues(frame.base);
                     frameCount--;
-                    if (frameCount == 0) {
-                        pop(); // The script function's stack entry
+
+                    // We return from run() if the relevant closure was
+                    // called from Java, i.e., via `interpret()` or
+                    // via `callFromJava()`.
+                    if (frame.calledFromJava) {
+//                        System.out.println("RETURN calledFromJava " + frame.closure);
+                        // Pop the call frame's stack entries
+                        top = frame.base;
+
                         if (joe.isDebug()) {
                             joe.println("| " + stackText());
                         }
                         return result;
+//                    } else {
+//                        System.out.println("RETURN !calledFromJava " + frame.closure);
+//                        System.out.println("frameCount=" + frameCount);
                     }
 
                     // Pop the call frame's stack entries
@@ -508,7 +526,7 @@ class VirtualMachine {
     // Invoked by Opcode.CALL for all calls
     private void callValue(Object callee, int argCount) {
         switch (callee) {
-            case Closure f -> call(f, argCount);
+            case Closure f -> call(f, argCount, false);
             case NativeCallable f -> {
                 var args = new Args(Arrays.copyOfRange(stack, top - argCount, top));
                 top -= argCount + 1;
@@ -519,7 +537,7 @@ class VirtualMachine {
         }
     }
 
-    private void call(Closure closure, int argCount) {
+    private void call(Closure closure, int argCount, boolean calledFromJava) {
         if (argCount != closure.function.arity) {
             throw error("Expected " + closure.function.arity + " arguments, got: " +
                 argCount + ".");
@@ -529,7 +547,7 @@ class VirtualMachine {
             throw error("Call stack overflow.");
         }
 
-        var frame = new CallFrame(closure);
+        var frame = new CallFrame(closure, calledFromJava);
         frames[frameCount++] = frame;
         frame.base = top - argCount - 1;
     }
@@ -544,8 +562,13 @@ class VirtualMachine {
         // The stack slot for function local 0
         int base;
 
-        CallFrame(Closure closure) {
+        // True if this call frame represents a call to `interpret()` or
+        // `callFromJava()`.
+        final boolean calledFromJava;
+
+        CallFrame(Closure closure, boolean calledFromJava) {
             this.closure = closure;
+            this.calledFromJava = calledFromJava;
             this.ip = 0;
             this.base = top;
         }

@@ -1,6 +1,7 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.bert.BertEngine;
+import com.wjduquette.joe.tools.test.TestPackage;
 import com.wjduquette.joe.types.*;
 import com.wjduquette.joe.walker.WalkerEngine;
 
@@ -78,7 +79,14 @@ public class Joe {
     public Joe(String engineType) {
         switch (engineType) {
             case WALKER -> engine = new WalkerEngine(this);
-            case BERT -> engine = new BertEngine(this);
+            case BERT -> {
+                engine = new BertEngine(this);
+                // TEMPORARY
+                installGlobalFunction("joeCall", (j,a) -> {
+                    a.exactArity(1, "joeCall(callable)");
+                    return call(a.next());
+                });
+            }
             default -> throw new IllegalArgumentException(
                 "Invalid Engine type: '" + engineType + "'.");
         }
