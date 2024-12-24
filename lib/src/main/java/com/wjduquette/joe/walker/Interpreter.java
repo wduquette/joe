@@ -363,7 +363,7 @@ class Interpreter {
                             yield joe.stringify(left) + joe.stringify(right);
                         } else {
                             throw new RuntimeError(expr.op().span(),
-                                "'+' cannot combine the given operands.");
+                                "The '+' operator expects two Numbers or at least one String.");
                         }
 
                     }
@@ -600,12 +600,13 @@ class Interpreter {
     {
         if (left instanceof Double && right instanceof Double) return;
 
-        throw new RuntimeError(operator.span(), "Operands must be numbers.");
+        throw new RuntimeError(operator.span(),
+            "The '" + operator.lexeme() + "' operator expects two numeric operands.");
     }
 
     private RuntimeError notSimilar(Token operator) {
         return new RuntimeError(operator.span(),
-            "Expected two doubles or two strings.");
+            "The '" + operator.lexeme() + "' operator expects two Numbers or two Strings.");
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
