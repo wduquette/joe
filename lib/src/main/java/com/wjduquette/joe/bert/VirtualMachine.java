@@ -539,7 +539,7 @@ class VirtualMachine {
 
     private void call(Closure closure, int argCount, boolean calledFromJava) {
         if (argCount != closure.function.arity) {
-            throw error("Expected " + closure.function.arity + " arguments, got: " +
+            throw error("Callable " + closure + " expected " + closure.function.arity + " arguments, got: " +
                 argCount + ".");
         }
 
