@@ -119,15 +119,17 @@ class Compiler {
 
         consume(LEFT_PAREN, "Expected '(' after function name.");
         if (!check(RIGHT_PAREN)) {
-            ++current.chunk.arity;
-            if (current.chunk.arity > MAX_PARAMETERS) {
-                errorAtCurrent(
-                    "Can't have more than " + MAX_PARAMETERS + "parameters.");
-            }
-            var constant = parseVariable("Expected parameter name.");
-            defineVariable(constant);
+            do {
+                ++current.chunk.arity;
+                if (current.chunk.arity > MAX_PARAMETERS) {
+                    errorAtCurrent(
+                        "Can't have more than " + MAX_PARAMETERS + "parameters.");
+                }
+                var constant = parseVariable("Expected parameter name.");
+                defineVariable(constant);
+            } while (match(COMMA));
         }
-        consume(RIGHT_PAREN, "Expected ')' after function name.");
+        consume(RIGHT_PAREN, "Expected ')' after parameters.");
         consume(LEFT_BRACE, "Expected '{' before function body.");
         block();
         var end = parser.previous.span().end();
