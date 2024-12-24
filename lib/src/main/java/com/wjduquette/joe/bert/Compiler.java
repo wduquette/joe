@@ -839,7 +839,7 @@ class Compiler {
         rule(IDENTIFIER,      this::variable, null,         Level.NONE);
         rule(STRING,          this::literal,  null,         Level.NONE);
         rule(NUMBER,          this::literal,  null,         Level.NONE);
-        rule(KEYWORD,         null,           null,         Level.NONE);
+        rule(KEYWORD,         this::literal,  null,         Level.NONE);
         //   Reserved words
         rule(ASSERT,          null,           null,         Level.NONE);
         rule(BREAK,           null,           null,         Level.NONE);

@@ -1,6 +1,7 @@
 package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Trace;
 
@@ -126,6 +127,7 @@ public class Scanner {
                 }
             }
             case '"' -> string();
+            case '#' -> keyword();
             default -> errorToken("unexpected character.");
         };
     }
@@ -179,6 +181,18 @@ public class Scanner {
         var type = reserved.get(lexeme);
 
         return makeToken(type != null ? type : IDENTIFIER);
+    }
+
+    private Token keyword() {
+        if (!isAlpha(peek())) {
+            return errorToken("Expected keyword name.");
+        }
+        while (isAlpha(peek()) || isDigit(peek())) advance();
+
+        var keyword = new Keyword(
+            source.substring(start + 1, current));
+
+        return makeToken(KEYWORD, keyword);
     }
 
     private boolean isAtEnd() {
