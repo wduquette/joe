@@ -126,7 +126,6 @@ class VirtualMachine {
     Object callFromJava(Object callee, Object[] args) {
         switch (callee) {
             case Closure closure -> {
-//                System.out.println("callFromJava closure: " + callee);
                 var base = top;
                 var argc = args.length;
                 stack[top++] = closure;
@@ -136,20 +135,14 @@ class VirtualMachine {
 
                 call(closure, argc, true);
                 try {
-                    var result = run();
-//                    System.out.println("cfj result=" + result);
-                    return result;
+                    return run();
                 } catch (JoeError ex) {
-//                    System.out.println("cfj error=" + ex);
                     unwindStack(ex, base);
                     throw ex;
                 }
             }
             case NativeCallable jc -> {
-//                System.out.println("callFromJava native: " + callee);
-                var result = jc.call(joe, new Args(args));
-//                System.out.println("  cfj result=" + result);
-                return result;
+                return jc.call(joe, new Args(args));
             }
             default ->
                 throw error("Expected callable, got: " + joe.typedValue(callee) + ".");
@@ -362,7 +355,6 @@ class VirtualMachine {
                     // called from Java, i.e., via `interpret()` or
                     // via `callFromJava()`.
                     if (frame.calledFromJava) {
-//                        System.out.println("RETURN calledFromJava " + frame.closure);
                         // Pop the call frame's stack entries
                         top = frame.base;
 
@@ -370,9 +362,6 @@ class VirtualMachine {
                             joe.println("| " + stackText());
                         }
                         return result;
-//                    } else {
-//                        System.out.println("RETURN !calledFromJava " + frame.closure);
-//                        System.out.println("frameCount=" + frameCount);
                     }
 
                     // Pop the call frame's stack entries
