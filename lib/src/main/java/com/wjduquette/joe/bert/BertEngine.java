@@ -4,8 +4,6 @@ import com.wjduquette.joe.*;
 
 import java.util.Set;
 
-// Temporary main program.  Later this will be `BertEngine`, and we will
-// invoke it from the main app.
 public class BertEngine implements Engine {
     //-------------------------------------------------------------------------
     // Instance Variables
