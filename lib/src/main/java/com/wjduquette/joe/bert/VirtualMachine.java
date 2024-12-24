@@ -348,7 +348,7 @@ class VirtualMachine {
                 case NEGATE -> {
                     var a = pop();
                     checkNumericOperand(a);
-                    push(-(double)pop()); // Needs check!
+                    push(-(double)a);
                 }
                 case NOT -> push(Joe.isFalsey(pop()));
                 case NULL -> push(null);
