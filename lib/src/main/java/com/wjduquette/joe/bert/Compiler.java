@@ -423,6 +423,18 @@ class Compiler {
         return count;
     }
 
+    private void dot(boolean canAssign) {
+        consume(IDENTIFIER, "Expected property name after '.'.");
+        char nameConstant = identifierConstant(parser.previous);
+
+        if (canAssign && match(EQUAL)) {
+            expression();
+            emit(Opcode.PROPSET, nameConstant);
+        } else {
+            emit(Opcode.PROPGET, nameConstant);
+        }
+    }
+
     private void parsePrecedence(int level) {
         advance();
         var prefixRule = getRule(parser.previous.type()).prefix;
@@ -826,7 +838,7 @@ class Compiler {
         rule(BACK_SLASH,      null,           null,         Level.NONE);
         rule(COLON,           null,           null,         Level.NONE);
         rule(COMMA,           null,           null,         Level.NONE);
-        rule(DOT,             null,           null,         Level.NONE);
+        rule(DOT,             null,           this::dot,    Level.CALL);
         rule(QUESTION,        null,           null,         Level.TERM);
         rule(SEMICOLON,       null,           null,         Level.NONE);
         //   One or two character

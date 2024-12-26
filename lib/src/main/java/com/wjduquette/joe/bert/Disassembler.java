@@ -116,6 +116,7 @@ public class Disassembler {
 
         switch (opcode) {
             case CALL, LOCGET, LOCSET, UPGET, UPSET -> {
+                // Char Instructions (instructions with one arbitrary char arg)
                 // Pattern: opcode charValue
                 char arg = chunk.code(ip + 1);
                 var text = String.format(" %04d", (int)arg);
@@ -123,6 +124,7 @@ public class Disassembler {
                 return ip + 2;
             }
             case JIF, JIFKEEP, JITKEEP, JUMP -> {
+                // Jump Instructions (forwards)
                 // Pattern: opcode jumpOffset (forwards)
                 char jump = chunk.code(ip + 1);
                 var text = String.format(" %04d -> %d", (int)jump,
@@ -131,6 +133,7 @@ public class Disassembler {
                 return ip + 2;
             }
             case LOOP -> {
+                // Jump Instructions (backwards)
                 // Pattern: opcode jumpOffset (backwards)
                 char jump = chunk.code(ip + 1);
                 var text = String.format(" %04d -> %d", (int)jump,
@@ -138,7 +141,8 @@ public class Disassembler {
                 lines.add(new Line(ip, prefix + text));
                 return ip + 2;
             }
-            case CLASS, CONST, GLODEF, GLOGET, GLOSET -> {
+            case CLASS, CONST, GLODEF, GLOGET, GLOSET, PROPGET, PROPSET -> {
+                // Constant Instructions
                 // Pattern: opcode constantIndex
                 int index = chunk.code(ip + 1);
                 var constant = joe.stringify(chunk.getConstant(index));
@@ -152,11 +156,13 @@ public class Disassembler {
             case ADD, DIV, EQ, FALSE, GE, GT, LE, LT, MUL,
                 NE, NEGATE, NOT, NULL, POP, RETURN, SUB, TRUE, UPCLOSE
             -> {
+                // Simple Instructions
                 // Pattern: opcode
                 lines.add(new Line(ip, prefix));
                 return ip + 1;
             }
             case CLOSURE -> {
+                // Closure Instruction
                 // Pattern: CLOSURE index [,isLocal, index]...
                 var start = ip++;
                 int constIndex = chunk.code(ip++);
@@ -177,6 +183,7 @@ public class Disassembler {
                 return ip;
             }
             default -> {
+                // Unknown Instructions
                 // Pattern: opcode (unknown, presume no argument)
                 var text = String.format(" %03d", (int)opcode);
                 lines.add(new Line(ip, prefix + text));

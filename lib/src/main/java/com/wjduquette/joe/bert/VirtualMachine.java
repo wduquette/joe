@@ -347,6 +347,34 @@ class VirtualMachine {
                 case NOT -> push(Joe.isFalsey(pop()));
                 case NULL -> push(null);
                 case POP -> pop();
+                case PROPGET -> {
+                    var target = peek(0);
+                    var name = readString();
+                    if (target instanceof BertInstance instance) {
+                        if (instance.fields.containsKey(name)) {
+                            pop(); // The instance
+                            push(instance.fields.get(name));
+                        } else {
+                            throw error("Undefined property: '" + name + "'.");
+                        }
+                    } else {
+                        throw error("Expected Joe object, got: " +
+                            joe.typedValue(target));
+                    }
+                }
+                case PROPSET -> {
+                    var target = peek(1);
+                    var name = readString();
+                    if (target instanceof BertInstance instance) {
+                        var value = pop();
+                        instance.fields.put(name, value);
+                        pop();       // Pop the instance
+                        push(value); // Push the value; this is an assignment
+                    } else {
+                        throw error("Expected Joe object, got: " +
+                            joe.typedValue(target));
+                    }
+                }
                 case RETURN -> {
                     var result = pop();
                     closeUpvalues(frame.base);

@@ -34,12 +34,14 @@ public class Opcode {
     public static final char NOT     = 25;
     public static final char NULL    = 26;
     public static final char POP     = 27;
-    public static final char RETURN  = 28;
-    public static final char SUB     = 29;
-    public static final char TRUE    = 30;
-    public static final char UPCLOSE = 31;
-    public static final char UPGET   = 32;
-    public static final char UPSET   = 33;
+    public static final char PROPGET = 28;
+    public static final char PROPSET = 29;
+    public static final char RETURN  = 30;
+    public static final char SUB     = 31;
+    public static final char TRUE    = 32;
+    public static final char UPCLOSE = 33;
+    public static final char UPGET   = 34;
+    public static final char UPSET   = 35;
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -73,6 +75,8 @@ public class Opcode {
         "NOT",
         "NULL",
         "POP",
+        "PROPGET",
+        "PROPSET",
         "RETURN",
         "SUB",
         "TRUE",
