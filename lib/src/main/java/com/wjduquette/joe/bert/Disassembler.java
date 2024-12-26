@@ -138,7 +138,7 @@ public class Disassembler {
                 lines.add(new Line(ip, prefix + text));
                 return ip + 2;
             }
-            case CONST, GLODEF, GLOGET, GLOSET -> {
+            case CLASS, CONST, GLODEF, GLOGET, GLOSET -> {
                 // Pattern: opcode constantIndex
                 int index = chunk.code(ip + 1);
                 var constant = joe.stringify(chunk.getConstant(index));

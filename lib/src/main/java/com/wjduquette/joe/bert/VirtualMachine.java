@@ -207,6 +207,7 @@ class VirtualMachine {
                     callValue(peek(argCount), argCount);
                     frame = frames[frameCount - 1];
                 }
+                case CLASS -> push(new BertClass(readString()));
                 case CLOSURE -> {
                     var function = readFunction();
                     var closure = new Closure(function);
@@ -520,6 +521,9 @@ class VirtualMachine {
                 var args = new Args(Arrays.copyOfRange(stack, top - argCount, top));
                 top -= argCount + 1;
                 push(f.call(joe, args));
+            }
+            case BertClass klass -> {
+                stack[top - argCount - 1] = new BertInstance(klass);
             }
             default ->
                 throw error("Expected callable, got: " + joe.typedValue(callee) + ".");

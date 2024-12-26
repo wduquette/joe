@@ -94,7 +94,9 @@ class Compiler {
     // Parser: Statements
 
     private void declaration() {
-        if (match(FUNCTION)) {
+        if (match(CLASS)) {
+            classDeclaration();
+        } else if (match(FUNCTION)) {
             functionDeclaration();
         } else if (match(VAR)) {
             varDeclaration();
@@ -103,6 +105,18 @@ class Compiler {
         }
 
         if (parser.panicMode) synchronize();
+    }
+
+    private void classDeclaration() {
+        consume(IDENTIFIER, "Expected class name.");
+        char nameConstant = identifierConstant(parser.previous);
+        declareVariable();
+
+        emit(Opcode.CLASS, nameConstant);
+        defineVariable(nameConstant);
+
+        consume(LEFT_BRACE, "Expected '{' before class body.");
+        consume(RIGHT_BRACE, "Expected '}' after class body.");
     }
 
     private void functionDeclaration() {
