@@ -23,6 +23,7 @@ class Compiler {
     private Scanner scanner;
     private final Parser parser = new Parser();
     private FunctionCompiler current = null;
+    private ClassCompiler currentClass = null;
 
     // Used for debugging/dumping
     private transient Disassembler disassembler;
@@ -116,6 +117,9 @@ class Compiler {
         emit(Opcode.CLASS, nameConstant);
         defineVariable(nameConstant);
 
+        // Remember the current class.
+        currentClass = new ClassCompiler(currentClass);
+
         namedVariable(className, false);
         consume(LEFT_BRACE, "Expected '{' before class body.");
 
@@ -128,6 +132,8 @@ class Compiler {
         }
         consume(RIGHT_BRACE, "Expected '}' after class body.");
         emit(Opcode.POP); // Pop the class itself
+
+        currentClass = currentClass.enclosing;
     }
 
     private void method() {
@@ -422,6 +428,13 @@ class Compiler {
             default -> throw new IllegalStateException(
                 "Unexpected literal: " + parser.previous.type());
         }
+    }
+
+    private void this_(boolean canAssign) {
+        if (currentClass == null) {
+            error("Can't use 'this' outside of a class.");
+        }
+        variable(false);
     }
 
     private void call(boolean canAssign) {
@@ -817,14 +830,28 @@ class Compiler {
 
             // Every function has an implicit stack slot for the VM's own use.
             // For methods, this slot will be filled by the instance.
-            var local = new Local(Token.synthetic(""));
+            Local local;
+            if (type == FunctionType.METHOD) {
+                local = new Local(Token.synthetic("this"));
+            } else {
+                local = new Local(Token.synthetic(""));
+            }
             local.depth = 0;
             locals[localCount++] = local;
         }
     }
 
+    // The class currently being compiled.
+    private static class ClassCompiler {
+        ClassCompiler enclosing;
+
+        ClassCompiler(ClassCompiler enclosing) {
+            this.enclosing = enclosing;
+        }
+    }
+
+
     // Compilation information about upvalues.
-    // TODO: Consider making this a record.
     static class UpvalueInfo {
         char index;
         boolean isLocal;
@@ -912,7 +939,7 @@ class Compiler {
         rule(STATIC,          null,           null,         Level.NONE);
         rule(SUPER,           null,           null,         Level.NONE);
         rule(SWITCH,          null,           null,         Level.NONE);
-        rule(THIS,            null,           null,         Level.NONE);
+        rule(THIS,            this::this_,    null,         Level.NONE);
         rule(THROW,           null,           null,         Level.NONE);
         rule(TRUE,            this::symbol,   null,         Level.NONE);
         rule(VAR,             null,           null,         Level.NONE);

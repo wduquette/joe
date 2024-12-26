@@ -366,7 +366,7 @@ class VirtualMachine {
                             break;
                         }
 
-                        // NEXT, got a method
+                        // NEXT, got a method?
                         var method = instance.klass.methods.get(name);
 
                         if (method != null) {
@@ -570,7 +570,10 @@ class VirtualMachine {
                 top -= argCount + 1;
                 push(f.call(joe, args));
             }
-            case BoundMethod bound -> call(bound.method(), argCount, false);
+            case BoundMethod bound -> {
+                stack[top - argCount - 1] = bound.receiver();
+                call(bound.method(), argCount, false);
+            }
             case BertClass klass -> {
                 stack[top - argCount - 1] = new BertInstance(klass);
             }
