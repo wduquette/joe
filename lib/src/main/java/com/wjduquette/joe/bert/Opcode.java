@@ -28,20 +28,21 @@ public class Opcode {
     public static final char LOCSET  = 19;
     public static final char LOOP    = 20;
     public static final char LT      = 21;
-    public static final char MUL     = 22;
-    public static final char NE      = 23;
-    public static final char NEGATE  = 24;
-    public static final char NOT     = 25;
-    public static final char NULL    = 26;
-    public static final char POP     = 27;
-    public static final char PROPGET = 28;
-    public static final char PROPSET = 29;
-    public static final char RETURN  = 30;
-    public static final char SUB     = 31;
-    public static final char TRUE    = 32;
-    public static final char UPCLOSE = 33;
-    public static final char UPGET   = 34;
-    public static final char UPSET   = 35;
+    public static final char METHOD  = 22;
+    public static final char MUL     = 23;
+    public static final char NE      = 24;
+    public static final char NEGATE  = 25;
+    public static final char NOT     = 26;
+    public static final char NULL    = 27;
+    public static final char POP     = 28;
+    public static final char PROPGET = 29;
+    public static final char PROPSET = 30;
+    public static final char RETURN  = 31;
+    public static final char SUB     = 32;
+    public static final char TRUE    = 33;
+    public static final char UPCLOSE = 34;
+    public static final char UPGET   = 35;
+    public static final char UPSET   = 36;
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -69,6 +70,7 @@ public class Opcode {
         "LOCSET",
         "LOOP",
         "LT",
+        "METHOD",
         "MUL",
         "NE",
         "NEGATE",

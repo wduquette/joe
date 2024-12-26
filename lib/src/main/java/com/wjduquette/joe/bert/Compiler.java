@@ -109,14 +109,36 @@ class Compiler {
 
     private void classDeclaration() {
         consume(IDENTIFIER, "Expected class name.");
+        var className = parser.previous;
         char nameConstant = identifierConstant(parser.previous);
         declareVariable();
 
         emit(Opcode.CLASS, nameConstant);
         defineVariable(nameConstant);
 
+        namedVariable(className, false);
         consume(LEFT_BRACE, "Expected '{' before class body.");
+
+        while (!check(RIGHT_BRACE) && !check(EOF)) {
+            if (match(METHOD)) {
+                method();
+            } else {
+                errorAtCurrent("Expected 'method'.");
+            }
+        }
         consume(RIGHT_BRACE, "Expected '}' after class body.");
+        emit(Opcode.POP); // Pop the class itself
+    }
+
+    private void method() {
+        int start = parser.previous.span().start();
+        consume(IDENTIFIER, "Expected method name after 'method'.");
+        char nameConstant = identifierConstant(parser.previous);
+
+        var type = FunctionType.METHOD;
+        function(start, type);
+
+        emit(Opcode.METHOD, nameConstant);
     }
 
     private void functionDeclaration() {

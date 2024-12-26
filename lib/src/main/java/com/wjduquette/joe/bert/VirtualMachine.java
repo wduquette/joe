@@ -328,6 +328,14 @@ class VirtualMachine {
                         throw error("The '<' operator expects two Numbers or two Strings.");
                     }
                 }
+                case METHOD -> {
+                    // NOTE: This was defineMethod in clox
+                    var name = readString();
+                    var method = (Closure)peek(0);
+                    var klass = (BertClass)peek(1);
+                    klass.methods.put(name, method);
+                    pop(); // Pop the method
+                }
                 case MUL -> {
                     var b = pop();
                     var a = pop();
@@ -351,12 +359,24 @@ class VirtualMachine {
                     var target = peek(0);
                     var name = readString();
                     if (target instanceof BertInstance instance) {
+                        // FIRST, got a field?
                         if (instance.fields.containsKey(name)) {
                             pop(); // The instance
                             push(instance.fields.get(name));
-                        } else {
-                            throw error("Undefined property: '" + name + "'.");
+                            break;
                         }
+
+                        // NEXT, got a method
+                        var method = instance.klass.methods.get(name);
+
+                        if (method != null) {
+                            var bound = new BoundMethod(instance, method);
+                            pop(); // The instance
+                            push(bound);
+                            break;
+                        }
+
+                        throw error("Undefined property: '" + name + "'.");
                     } else {
                         throw error("Expected Joe object, got: " +
                             joe.typedValue(target));
@@ -550,6 +570,7 @@ class VirtualMachine {
                 top -= argCount + 1;
                 push(f.call(joe, args));
             }
+            case BoundMethod bound -> call(bound.method(), argCount, false);
             case BertClass klass -> {
                 stack[top - argCount - 1] = new BertInstance(klass);
             }
