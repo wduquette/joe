@@ -576,6 +576,12 @@ class VirtualMachine {
             }
             case BertClass klass -> {
                 stack[top - argCount - 1] = new BertInstance(klass);
+                var initializer = klass.methods.get("init");
+                if (initializer != null) {
+                    call(initializer, argCount, false);
+                } else if (argCount != 0) {
+                    throw error("Expected 0 arguments but got " + argCount + ".");
+                }
             }
             default ->
                 throw error("Expected callable, got: " + joe.typedValue(callee) + ".");

@@ -13,6 +13,7 @@ import java.util.List;
 class Compiler {
     public static final int MAX_LOCALS = 256;
     public static final int MAX_PARAMETERS = 255;
+    public static final String INIT = "init";
 
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -141,7 +142,8 @@ class Compiler {
         consume(IDENTIFIER, "Expected method name after 'method'.");
         char nameConstant = identifierConstant(parser.previous);
 
-        var type = FunctionType.METHOD;
+        var type = parser.previous.lexeme().equals(INIT)
+            ? FunctionType.INITIALIZER : FunctionType.METHOD;
         function(start, type);
 
         emit(Opcode.METHOD, nameConstant);
@@ -329,6 +331,9 @@ class Compiler {
         if (match(SEMICOLON)) {
             emitReturn();
         } else {
+            if (current.chunk.type == FunctionType.INITIALIZER) {
+                error("Can't return a value from an initializer.");
+            }
             expression();
             consume(SEMICOLON, "Expected ';' after return value.");
             emit(Opcode.RETURN);
@@ -746,7 +751,11 @@ class Compiler {
     }
 
     private void emitReturn() {
-        emit(Opcode.NULL);
+        if (current.chunk.type == FunctionType.INITIALIZER) {
+            emit(Opcode.LOCGET, (char)0);
+        } else {
+            emit(Opcode.NULL);
+        }
         emit(Opcode.RETURN);
     }
 
@@ -831,7 +840,9 @@ class Compiler {
             // Every function has an implicit stack slot for the VM's own use.
             // For methods, this slot will be filled by the instance.
             Local local;
-            if (type == FunctionType.METHOD) {
+            if (type == FunctionType.METHOD ||
+                type == FunctionType.INITIALIZER
+            ) {
                 local = new Local(Token.synthetic("this"));
             } else {
                 local = new Local(Token.synthetic(""));

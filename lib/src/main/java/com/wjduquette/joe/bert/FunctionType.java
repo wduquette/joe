@@ -3,6 +3,7 @@ package com.wjduquette.joe.bert;
 public enum FunctionType {
     FUNCTION("function"),
     METHOD("method"),
+    INITIALIZER("initializer"),
     SCRIPT("script");
 
     private final String text;
