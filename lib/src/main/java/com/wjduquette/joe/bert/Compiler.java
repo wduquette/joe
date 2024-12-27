@@ -118,16 +118,10 @@ class Compiler {
         return output;
     }
 
-    // The current function's chunk.
-    // TODO: Replace with current.chunk.
-    private Chunk currentChunk() {
-        return current.chunk;
-    }
-
     // Completes compilation of the current function and returns it.
     private Function endFunction() {
         emitReturn();
-        var function = new Function(currentChunk(), current.upvalueCount);
+        var function = new Function(current.chunk, current.upvalueCount);
         if (dump != null) {
             dump.append(disassembler.disassemble(function)).append("\n");
         }
@@ -241,11 +235,11 @@ class Compiler {
         consume(LEFT_BRACE, "Expected '{' before function body.");
         block();
         var end = parser.previous.span().end();
-        currentChunk().span = buffer.span(start, end);
+        current.chunk.span = buffer.span(start, end);
 
         var compiler = current;  // Save the compiler; endFunction pops it.
         var function = endFunction();
-        emit(Opcode.CLOSURE, currentChunk().addConstant(function));
+        emit(Opcode.CLOSURE, current.chunk.addConstant(function));
 
         // Emit data about the upvalues.
         for (int i = 0; i < function.upvalueCount; i++) {
@@ -348,7 +342,7 @@ class Compiler {
         }
 
         // Condition
-        int loopStart = currentChunk().codeSize();
+        int loopStart = current.chunk.codeSize();
         int exitJump = -1;
         if (!match(SEMICOLON)) {
             expression();
@@ -360,7 +354,7 @@ class Compiler {
 
         if (!match(RIGHT_PAREN)) {
             int bodyJump = emitJump(Opcode.JUMP);
-            int incrementStart = currentChunk().codeSize();
+            int incrementStart = current.chunk.codeSize();
             expression();
             emit(Opcode.POP);
             consume(RIGHT_PAREN, "Expected ')' after 'for' clauses.");
@@ -405,7 +399,7 @@ class Compiler {
     }
 
     private void whileStatement() {
-        int loopStart = currentChunk().codeSize();
+        int loopStart = current.chunk.codeSize();
         consume(LEFT_PAREN, "Expected '(' after 'while'.");
         expression();
         consume(RIGHT_PAREN, "Expected '(' after condition.");
@@ -598,7 +592,7 @@ class Compiler {
     // constants table for the given identifier and returns
     // the constant's index.
     private char identifierConstant(Token name) {
-        return currentChunk().addConstant(name.lexeme());
+        return current.chunk.addConstant(name.lexeme());
     }
 
     // Emits the instruction to define the variable.
@@ -823,31 +817,31 @@ class Compiler {
     // Code Generation
 
     private void emitConstant(Object value) {
-        emit(Opcode.CONST, currentChunk().addConstant(value));
+        emit(Opcode.CONST, current.chunk.addConstant(value));
     }
 
     private int emitJump(char opcode) {
         emit(opcode);
         emit(Character.MAX_VALUE);
-        return currentChunk().codeSize() - 1;
+        return current.chunk.codeSize() - 1;
     }
 
     private void emitLoop(int loopStart) {
         emit(Opcode.LOOP);
-        int offset = currentChunk().codeSize() - loopStart + 1;
+        int offset = current.chunk.codeSize() - loopStart + 1;
         if (offset > Character.MAX_VALUE) error("Loop body too large.");
         emit((char)offset);
     }
 
     private void patchJump(int offset) {
         // -1 to adjust for the bytecode for the jump offset itself.
-        int jump = currentChunk().codeSize() - offset - 1;
+        int jump = current.chunk.codeSize() - offset - 1;
 
         if (jump > Character.MAX_VALUE) {
             error("Too much code to jump over.");
         }
 
-        currentChunk().setCode(offset, (char)jump);
+        current.chunk.setCode(offset, (char)jump);
     }
 
     private void emitReturn() {
@@ -860,7 +854,7 @@ class Compiler {
     }
 
     private void emit(char value) {
-        currentChunk().write(value, parser.previous.line());
+        current.chunk.write(value, parser.previous.line());
     }
 
     private void emit(char value1, char value2) {
