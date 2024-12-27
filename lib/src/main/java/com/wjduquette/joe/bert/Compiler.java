@@ -134,13 +134,13 @@ class Compiler {
             beginScope();
             addLocal(Token.synthetic(VAR_SUPER));
             defineVariable((char)0);
-            namedVariable(className, false);
+            getOrSetVariable(className, false);
             emit(Opcode.INHERIT);
         }
 
         // Load the class onto the stack before processing the class
         // body
-        namedVariable(className, false);
+        getOrSetVariable(className, false);
         consume(LEFT_BRACE, "Expected '{' before class body.");
 
         while (!check(RIGHT_BRACE) && !check(EOF)) {
@@ -440,7 +440,7 @@ class Compiler {
     }
 
     private void variable(boolean canAssign) {
-        namedVariable(parser.previous, canAssign);
+        getOrSetVariable(parser.previous, canAssign);
     }
 
     private void literal(boolean canAssign) {
@@ -473,8 +473,8 @@ class Compiler {
         consume(DOT, "Expected '.' after 'super'.");
         consume(IDENTIFIER, "Expected superclass method name.");
         char nameConstant = identifierConstant(parser.previous);
-        namedVariable(Token.synthetic("this"), false);
-        namedVariable(Token.synthetic("super"), false);
+        getOrSetVariable(Token.synthetic("this"), false);
+        getOrSetVariable(Token.synthetic("super"), false);
         emit(Opcode.SUPGET, nameConstant);
     }
 
@@ -536,13 +536,15 @@ class Compiler {
 
     //-------------------------------------------------------------------------
     // Variable Management
-    //
-    // TODO: Refactor
-    // See what's here that can be folded into FunctionCompiler or
-    // Local or whatever.  As it is, it's confusing.
 
-    // Consumes an IDENTIFIER and returns the constant index
-    // for the identifier's name constant.
+    // Parses a variable name as part of a declaration.  The name can be:
+    //
+    // - A variable name in a `var` declaration
+    // - A function or parameter name in a `function` or `method` declaration.
+    //
+    // Declares the variable.  If the variable is a global, returns an
+    // index to the variable's name in the constants table.  Otherwise,
+    // returns 0.
     private char parseVariable(String errorMessage) {
         consume(IDENTIFIER, errorMessage);
         declareVariable();
@@ -551,7 +553,8 @@ class Compiler {
     }
 
     // Adds a string constant to the current chunk's
-    // constants table for the given identifier.
+    // constants table for the given identifier and returns
+    // the constant's index.
     private char identifierConstant(Token name) {
         return currentChunk().addConstant(name.lexeme());
     }
@@ -566,7 +569,11 @@ class Compiler {
         emit(Opcode.GLODEF, global);            // Global
     }
 
-    private void namedVariable(Token name, boolean canAssign) {
+    // Given the variable name, emits the relevant *GET or *SET
+    // instruction based on the context.  A *SET instruction will
+    // be preceded by the compiled expression to assign to the
+    // variable.
+    private void getOrSetVariable(Token name, boolean canAssign) {
         char getOp;
         char setOp;
 
@@ -591,6 +598,8 @@ class Compiler {
         }
     }
 
+    // Declares the variable.  Checking for duplicate declarations in the
+    // current local scope.
     private void declareVariable() {
         if (current.scopeDepth == 0) return; // Global
         var name = parser.previous;
@@ -612,6 +621,7 @@ class Compiler {
         addLocal(name);
     }
 
+    // Adds a local variable with the given name to the current scope.
     private void addLocal(Token name) {
         if (current.localCount == MAX_LOCALS) {
             error("Too many local variables in function.");
@@ -628,6 +638,9 @@ class Compiler {
             = current.scopeDepth;
     }
 
+    // Resolves the name as the name of the local variable in the current
+    // scope.  Returns the local's index in the current scope, or -1 if
+    // no variable was found.
     private int resolveLocal(FunctionCompiler compiler, Token name) {
         for (var i = compiler.localCount - 1; i >= 0; i--) {
             var local = compiler.locals[i];
@@ -641,6 +654,9 @@ class Compiler {
         return -1;
     }
 
+    // Resolves the name as the name of an upvalue.  Returns -1 if the
+    // variable is global, and the upvalue index otherwise.  Captures
+    // locals as upvalues.
     private int resolveUpvalue(FunctionCompiler compiler, Token name) {
         // FIRST, if there's no enclosing FunctionCompiler, then this is
         // necessarily a global.
@@ -666,6 +682,9 @@ class Compiler {
         return -1;
     }
 
+    // Adds an upvalue to the current function.  `index` is the index of the
+    // upvalue in this function; `isLocal` is true if the upvalue is defined
+    // for this scope, and false if it's for an enclosing scope.
     private int addUpvalue(FunctionCompiler compiler, char index, boolean isLocal) {
         int upvalueCount = compiler.upvalueCount;
 
@@ -687,10 +706,13 @@ class Compiler {
         return compiler.upvalueCount++;
     }
 
+    // Increments the scope depth.
     private void beginScope() {
         current.scopeDepth++;
     }
 
+    // Decrements the scope depth, cleaning up any local variables defined
+    // in the scope.  Upvalues are closed, other locals are simply popped.
     private void endScope() {
         current.scopeDepth--;
 
