@@ -228,7 +228,10 @@ println(x);     // Prints "5"
 <h2 id="return"><a class="header" href="#return">Return</a></h2>
 <p>The <code>return</code> statement is used to return from functions and methods.  As in
 Java, it takes an optional expression to return a value.</p>
-<p>It's an error to invoke the <code>return</code> statement at the top-level of a script.</p>
+<p>When used at script level, <code>return</code> terminates the script, optionally
+returning a value.  This value is displayed in the REPL and is
+accessible via Joe's <a href="embedding/embedding.html">embedding</a> API, but is
+not displayed by <code>joe run</code>.</p>
 <h2 id="if-statements"><a class="header" href="#if-statements">If Statements</a></h2>
 <p><code>if</code> statements are defined as in Java.</p>
 <pre><code class="language-joe">if (x == 5) {

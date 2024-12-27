@@ -13,6 +13,13 @@
     - Complete function signatures, where available
     - Source file and line number, where available
 
+- Bert Byte-code Engine
+  - Added `BertEngine`, an experimental byte-code execution engine, following
+    Nystrom's `clox` design in Java.
+  - At present, `Bert` implements the Lox-equivalent subset of the Joe
+    language.
+  - `Bert` is enabled by the `-b` option on most `joe *` tools.
+
 - Extending/Embedding API
   - Added `Joe::isComplete`
 
