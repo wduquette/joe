@@ -2,6 +2,8 @@
 
 //-------------------------------------------------------------------------
 // Basic Test API
+//
+// Section copied to bert/pkg_test.joe
 
 function testAssertEquals() {
     assertEquals(5, 5);

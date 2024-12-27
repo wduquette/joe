@@ -1,10 +1,14 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.bert.BertEngine;
 import com.wjduquette.joe.types.*;
 import com.wjduquette.joe.walker.WalkerEngine;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -16,6 +20,9 @@ import java.util.stream.Collectors;
 public class Joe {
     //-------------------------------------------------------------------------
     // Static constants
+
+    public static final String WALKER = "walker";
+    public static final String BERT = "bert";
 
     /**
      * The set of Joe's reserved words.
@@ -39,6 +46,7 @@ public class Joe {
     // Instance Variables
 
     private final Engine engine;
+    private boolean debug = false;
 
     // Type Registry
     private final Map<Class<?>, TypeProxy<?>> proxyTable = new HashMap<>();
@@ -56,7 +64,24 @@ public class Joe {
      * standard library, but nothing else.
      */
     public Joe() {
-        engine = new WalkerEngine(this);
+        this(WALKER);
+    }
+
+    /**
+     * Creates a clean instance of Joe using the given engine type, which
+     * must be either {@code Joe.WALKER} (the default) or
+     * {@code Joe.BERT}, the experimental byte-engine.
+     *
+     * <p>The instance include the complete Joe standard library, but
+     * nothing else.</p>
+     */
+    public Joe(String engineType) {
+        switch (engineType) {
+            case WALKER -> engine = new WalkerEngine(this);
+            case BERT -> engine = new BertEngine(this);
+            default -> throw new IllegalArgumentException(
+                "Invalid Engine type: '" + engineType + "'.");
+        }
 
         StandardLibrary.PACKAGE.install(this);
     }
@@ -173,6 +198,23 @@ public class Joe {
         }
     }
 
+    /**
+     * Gets whether Joe is configured for debugging output.
+     * @return true or false
+     */
+    public boolean isDebug() {
+        return debug;
+    }
+
+    /**
+     * Sets whether Joe is configured for debugging output.  This
+     * is primarily of use to the Joe maintainer.
+     * @param flag true or false
+     */
+    public void setDebug(boolean flag) {
+        this.debug = flag;
+    }
+
     //-------------------------------------------------------------------------
     // Output Handling
 
@@ -212,6 +254,10 @@ public class Joe {
         print(System.lineSeparator());
     }
 
+    public void printf(String format, Object... args) {
+        print(String.format(format, args));
+    }
+
     /**
      * Prints the text using the client's output handler.
      * @param text The text
@@ -233,17 +279,21 @@ public class Joe {
 
     /**
      * Reads the given file and executes its content as a script.
-     * @param path The file's path
+     * @param scriptPath The file's path
      * @return The script's result
      * @throws IOException if the file cannot be read.
      * @throws SyntaxError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
     @SuppressWarnings("UnusedReturnValue")
-    public Object runFile(String path)
+    public Object runFile(String scriptPath)
         throws IOException, SyntaxError, JoeError
     {
-        return engine.runFile(path);
+        var path = Paths.get(scriptPath);
+        byte[] bytes = Files.readAllBytes(path);
+        var script = new String(bytes, Charset.defaultCharset());
+
+        return run(path.getFileName().toString(), script);
     }
 
     /**
@@ -261,6 +311,38 @@ public class Joe {
     }
 
     /**
+     * Compiles the given file and returns a compilation dump.
+     * @param scriptPath The file's path
+     * @return The dump's result
+     * @throws IOException if the file cannot be read.
+     * @throws SyntaxError if the script could not be compiled.
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public Object dumpFile(String scriptPath)
+        throws IOException, SyntaxError
+    {
+        var path = Paths.get(scriptPath);
+        byte[] bytes = Files.readAllBytes(path);
+        var script = new String(bytes, Charset.defaultCharset());
+
+        return dump(path.getFileName().toString(), script);
+    }
+
+    /**
+     * Compiles the script, throwing an appropriate error on failure, and
+     * returns a compilation dump.
+     * The filename is usually the bare file name of the script file,
+     * but can be any string relevant to the application, e.g., "%repl%".
+     * @param filename The filename
+     * @param source The input
+     * @return The dump
+     * @throws SyntaxError if the script could not be compiled.
+     */
+    public String dump(String filename, String source) throws SyntaxError {
+        return engine.dump(filename, source);
+    }
+
+    /**
      * Checks whether the source "is complete", i.e, whether it can
      * be compiled.  The result is not executed.  This is useful
      * in REPLs, so that the user can enter a newline in a string or
@@ -268,6 +350,7 @@ public class Joe {
      * @param source The source text
      * @return true or false
      */
+    @SuppressWarnings("unused")
     public boolean isComplete(String source) {
         return engine.isComplete(source);
     }
@@ -499,6 +582,16 @@ public class Joe {
     }
 
     /**
+     * Returns true if the object is "falsey", i.e., null or boolean
+     * {@code false}, and true otherwise.
+     * @param value The value
+     * @return true or false
+     */
+    public static boolean isFalsey(Object value) {
+        return !isTruthy(value);
+    }
+
+    /**
      * Returns true if the two values are equal, and false otherwise.
      * This is essentially equivalent to {@code Objects.equals(a, b)}.
      * @param a The first value
@@ -626,7 +719,7 @@ public class Joe {
      * @return The comparator
      */
     public Comparator<Object> toComparator(Object arg) {
-        if (arg instanceof JoeCallable) {
+        if (arg instanceof NativeCallable) {
             return (Object a, Object b) -> toInteger(call(arg, a, b));
         } else {
             throw expected("comparator", arg);

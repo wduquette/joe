@@ -3,9 +3,7 @@ package com.wjduquette.joe.tools.test;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.console.PathProxy;
 
-class TestPackage extends JoePackage {
-    public static final JoePackage PACKAGE = new TestPackage();
-
+public class TestPackage extends JoePackage {
     // See also pkg.joe.test.Joe for the rest of the package.
 
     //**
@@ -21,7 +19,7 @@ class TestPackage extends JoePackage {
     //
     // - From [[joe.console]], [[joe.console.Path]]
 
-    public TestPackage() {
+    public TestPackage(String engine) {
         super("joe.test");
         globalFunction("assertEquals", this::_assertEquals);
         globalFunction("assertError",  this::_assertError);
@@ -29,8 +27,10 @@ class TestPackage extends JoePackage {
         globalFunction("assertTrue",   this::_assertTrue);
         globalFunction("fail",         this::_fail);
         globalFunction("skip",         this::_skip);
-        scriptResource(getClass(), "pkg.joe.test.joe");
-        type(PathProxy.TYPE);
+        if (engine.equals(Joe.WALKER)) {
+            scriptResource(getClass(), "pkg.joe.test.joe");
+            type(PathProxy.TYPE);
+        }
     }
 
     //**

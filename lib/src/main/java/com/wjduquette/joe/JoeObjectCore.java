@@ -15,7 +15,7 @@ public class JoeObjectCore {
     private final Map<String,Object> fields = new HashMap<>();
 
     // Default "toString()" implementation.
-    private final JoeCallable _toString;
+    private final NativeCallable _toString;
 
     //-------------------------------------------------------------------------
     // Constructor

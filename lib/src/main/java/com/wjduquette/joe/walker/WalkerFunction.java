@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * A function implemented in Joe.
  */
-final class WalkerFunction implements JoeCallable, HasTypeName {
+final class WalkerFunction implements NativeCallable, HasTypeName {
     private final Interpreter interpreter;
     private final Stmt.Function declaration;
     private final Environment closure;

@@ -31,17 +31,30 @@ function testAssignment() {
 function testComparison() {
     assertTrue(0 < 1);
     assertFalse(1 < 1);
+    assertTrue("a" < "b");
+    assertFalse("b" < "a");
 
     assertTrue(0 <= 1);
     assertTrue(1 <= 1);
     assertFalse(2 <= 1);
+    assertTrue("a" <= "b");
+    assertTrue("a" <= "a");
+    assertFalse("b" <= "a");
 
     assertFalse(0 > 0);
     assertTrue(1 > 0);
+    assertFalse("a" > "a");
+    assertTrue("b" > "a");
 
     assertTrue(1 >= 0);
     assertTrue(1 >= 1);
     assertFalse(1 >= 2);
+    assertTrue("b" >= "a");
+    assertTrue("b" >= "b");
+    assertFalse("b" >= "c");
+
+    function bad() { "a" > 1; }
+    assertError(bad, "The '>' operator expects two Numbers or two Strings.");
 }
 
 function testDivide() {
@@ -49,7 +62,7 @@ function testDivide() {
     assertEquals(String(4/0), "Infinity");  // TODO: support Infinity,  NaN
 
     function bad() { 4 / "abc"; }
-    assertError(bad, "Operands must be numbers.");
+    assertError(bad, "The '/' operator expects two numeric operands.");
 }
 
 function testEquality() {
@@ -69,7 +82,7 @@ function testMinus() {
     assertEquals(1 - 4, -3);
 
     function bad() { 4 - "abc"; }
-    assertError(bad, "Operands must be numbers.");
+    assertError(bad, "The '-' operator expects two numeric operands.");
 }
 
 function testNot() {
@@ -102,7 +115,7 @@ function testPlus() {
     assertEquals(1 + "a", "1a");
 
     function bad() { #a + #b; }
-    assertError(bad, "'+' cannot combine the given operands.");
+    assertError(bad, "The '+' operator expects two Numbers or at least one String.");
 }
 
 function testTernary() {
@@ -114,7 +127,7 @@ function testTimes() {
     assertEquals(4 * 2, 8);
 
     function bad() { 4 * "abc"; }
-    assertError(bad, "Operands must be numbers.");
+    assertError(bad, "The '*' operator expects two numeric operands.");
 }
 
 function testIN() {
@@ -141,7 +154,8 @@ function testPlusEquals_var() {
     assertEquals(s += "def", "abcdef");
     assertEquals(s, "abcdef");
 
-    assertError(\-> x += "abc", "Operands must be numbers.");
+    assertError(\-> x += "abc",
+        "The '+=' operator expects two numeric operands.");
 }
 
 function testPlusEquals_property() {
@@ -153,7 +167,8 @@ function testPlusEquals_property() {
     assertEquals(thing.s += "def", "abcdef");
     assertEquals(thing.s, "abcdef");
 
-    assertError(\-> thing.x += "abc", "Operands must be numbers.");
+    assertError(\-> thing.x += "abc",
+        "The '+=' operator expects two numeric operands.");
 }
 
 function testMinusEquals_var() {
@@ -162,8 +177,10 @@ function testMinusEquals_var() {
     assertEquals(x -= 7, -2);
     assertEquals(x, -2);
 
-    assertError(\-> x -= "abc", "Operands must be numbers.");
-    assertError(\-> s -= 7, "Operands must be numbers.");
+    assertError(\-> x -= "abc",
+        "The '-=' operator expects two numeric operands.");
+    assertError(\-> s -= 7,
+        "The '-=' operator expects two numeric operands.");
 }
 
 function testMinusEquals_property() {
@@ -173,8 +190,10 @@ function testMinusEquals_property() {
     assertEquals(thing.x -= 7, -2);
     assertEquals(thing.x, -2);
 
-    assertError(\-> thing.x -= "abc", "Operands must be numbers.");
-    assertError(\-> thing.s -= 7, "Operands must be numbers.");
+    assertError(\-> thing.x -= "abc",
+        "The '-=' operator expects two numeric operands.");
+    assertError(\-> thing.s -= 7,
+        "The '-=' operator expects two numeric operands.");
 }
 
 function testStarEquals_var() {
@@ -183,8 +202,10 @@ function testStarEquals_var() {
     assertEquals(x *= 7, 35);
     assertEquals(x, 35);
 
-    assertError(\-> x *= "abc", "Operands must be numbers.");
-    assertError(\-> s *= 7, "Operands must be numbers.");
+    assertError(\-> x *= "abc",
+        "The '*=' operator expects two numeric operands.");
+    assertError(\-> s *= 7,
+        "The '*=' operator expects two numeric operands.");
 }
 
 function testStarEquals_property() {
@@ -194,8 +215,10 @@ function testStarEquals_property() {
     assertEquals(thing.x *= 7, 35);
     assertEquals(thing.x, 35);
 
-    assertError(\-> thing.x *= "abc", "Operands must be numbers.");
-    assertError(\-> thing.s *= 7, "Operands must be numbers.");
+    assertError(\-> thing.x *= "abc",
+        "The '*=' operator expects two numeric operands.");
+    assertError(\-> thing.s *= 7,
+        "The '*=' operator expects two numeric operands.");
 }
 
 function testSlashEquals_var() {
@@ -204,8 +227,10 @@ function testSlashEquals_var() {
     assertEquals(x /= 5, 10);
     assertEquals(x, 10);
 
-    assertError(\-> x /= "abc", "Operands must be numbers.");
-    assertError(\-> s /= 7, "Operands must be numbers.");
+    assertError(\-> x /= "abc",
+        "The '/=' operator expects two numeric operands.");
+    assertError(\-> s /= 7,
+        "The '/=' operator expects two numeric operands.");
 }
 
 function testSlashEquals_property() {
@@ -215,8 +240,10 @@ function testSlashEquals_property() {
     assertEquals(thing.x /= 5, 10);
     assertEquals(thing.x, 10);
 
-    assertError(\-> thing.x /= "abc", "Operands must be numbers.");
-    assertError(\-> thing.s /= 7, "Operands must be numbers.");
+    assertError(\-> thing.x /= "abc",
+        "The '/=' operator expects two numeric operands.");
+    assertError(\-> thing.s /= 7,
+        "The '/=' operator expects two numeric operands.");
 }
 
 //-----------------------------------------------------------------------------

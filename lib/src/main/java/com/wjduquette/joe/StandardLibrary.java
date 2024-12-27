@@ -16,6 +16,7 @@ class StandardLibrary extends JoePackage {
         // The `joe` package contains Joe's standard library.
         globalFunction("catch",     this::_catch);
         globalFunction("compare",   this::_compare);
+        globalFunction("millis",    this::_millis);
         globalFunction("print",     this::_print);
         globalFunction("printf",    this::_printf);
         globalFunction("println",   this::_println);
@@ -73,6 +74,16 @@ class StandardLibrary extends JoePackage {
     private Object _compare(Joe joe, Args args) {
         args.exactArity(2, "compare(a, b)");
         return (double)Joe.compare(args.next(), args.next());
+    }
+
+    //**
+    // @function millis
+    // @result Number
+    //
+    // Returns Java's `System.currentTimeMillis()`.
+    private Object _millis(Joe joe, Args args) {
+        args.exactArity(0, "millis()");
+        return (double)System.currentTimeMillis();
     }
 
     //**

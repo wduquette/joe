@@ -1,0 +1,44 @@
+// Verify that the test runner can work with Joe.
+
+function testAssertEquals() {
+    assertEquals(5, 5);
+    assertEquals("abc", "abc");
+
+    function bad() { assertEquals("abc", 5); }
+    assertError(bad, "Expected Number '5', got: String 'abc'.");
+}
+
+function testAssertTrue() {
+    assertTrue(true);
+    assertTrue("abc");
+
+    function bad() { assertTrue(false); }
+    assertError(bad, "Expected truthy value, got: Boolean 'false'.");
+}
+
+function testAssertFalse() {
+    assertFalse(false);
+    assertFalse(null);
+
+    function bad() { assertFalse(true); }
+    assertError(bad, "Expected falsey value, got: Boolean 'true'.");
+}
+
+function testFail() {
+    function bad() { fail("Called fail()"); }
+    assertError(bad, "Called fail()");
+}
+
+// Requires: throw
+//function testAssertError_gotError() {
+//    function bad() { throw "Simulated error."; }
+//    assertError(bad, "Simulated error."
+//        , "In function bad()"
+//    );
+//}
+
+function testAssertError_noError() {
+    function ok() { return "ok"; }
+    function bad() { assertError(ok, "Error message"); }
+    assertError(bad, "Expected error, got: String 'ok'.");
+}

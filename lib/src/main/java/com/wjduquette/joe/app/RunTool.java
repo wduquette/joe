@@ -20,10 +20,14 @@ public class RunTool implements Tool {
      */
     public static final ToolInfo INFO = new ToolInfo(
         "run",
-        "file.joe",
+        "[options...] file.joe",
         "Executes a Joe script.",
         """
-        Executes the script.
+        Executes the script.  The options are as follows:
+        
+        --bert, -b     Use the experimental "Bert" byte-engine.
+        --debug, -d    Enable debugging output.  This is mostly of use to
+                       the Joe maintainer.
         """,
         RunTool::main
     );
@@ -55,13 +59,31 @@ public class RunTool implements Tool {
             System.exit(64);
         }
 
-        var joe = new Joe();
+        var engineType = Joe.WALKER;
+        var debug = false;
+
+        while (!argq.isEmpty() && argq.peek().startsWith("-")) {
+            var opt = argq.poll();
+            switch (opt) {
+                case "--bert", "-b" -> engineType = Joe.BERT;
+                case "--debug", "-d" -> debug = true;
+                default -> {
+                    System.err.println("Unknown option: '" + opt + "'.");
+                    System.exit(64);
+                }
+            }
+        }
+
+        var joe = new Joe(engineType);
+        joe.setDebug(debug);
         var path = argq.poll();
 
-        var consolePackage = new ConsolePackage();
-        consolePackage.setScript(path);
-        consolePackage.getArgs().addAll(argq);
-        joe.installPackage(consolePackage);
+        if (engineType.equals(Joe.WALKER)) {
+            var consolePackage = new ConsolePackage();
+            consolePackage.setScript(path);
+            consolePackage.getArgs().addAll(argq);
+            joe.installPackage(consolePackage);
+        }
 
         try {
             joe.runFile(path);

@@ -16,7 +16,9 @@ record BoundValue(Joe joe, TypeProxy<?> proxy, Object value)
 
     @Override
     public String typeName() {
-        return proxy.name();
+        return proxy != null
+            ? proxy.name()
+            : value.getClass().getName();
     }
 
     @Override

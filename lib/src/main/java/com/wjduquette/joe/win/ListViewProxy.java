@@ -141,7 +141,7 @@ class ListViewProxy extends FXProxy<JoeListView> {
         args.exactArity(1, "onSelect(callable)");
         var handler = args.next();
 
-        if (handler instanceof JoeCallable callable) {
+        if (handler instanceof NativeCallable callable) {
             node.setOnSelect(n -> joe.call(callable, n));
         } else {
             throw joe.expected("callable", handler);
@@ -211,7 +211,7 @@ class ListViewProxy extends FXProxy<JoeListView> {
 
         var handler = args.next();
 
-        if (handler instanceof JoeCallable callable) {
+        if (handler instanceof NativeCallable callable) {
             node.setStringifier(v -> joe.call(callable, v).toString());
         } else {
             throw joe.expected("callable", handler);

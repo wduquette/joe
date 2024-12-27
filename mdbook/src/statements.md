@@ -74,7 +74,10 @@ println(x);     // Prints "5"
 The `return` statement is used to return from functions and methods.  As in 
 Java, it takes an optional expression to return a value.
 
-It's an error to invoke the `return` statement at the top-level of a script.
+When used at script level, `return` terminates the script, optionally
+returning a value.  This value is displayed in the REPL and is
+accessible via Joe's [embedding](embedding/embedding.md) API, but is
+not displayed by `joe run`. 
 
 ## If Statements
 

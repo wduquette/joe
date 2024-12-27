@@ -78,7 +78,7 @@ class WalkerClass implements JoeClass, JoeObject {
     }
 
     @Override
-    public JoeCallable bind(Object value, String name) {
+    public NativeCallable bind(Object value, String name) {
         var method = methods.get(name);
 
         if (method != null) {
@@ -103,7 +103,7 @@ class WalkerClass implements JoeClass, JoeObject {
     @Override
     public Object call(Joe joe, Args args) {
         JoeObject instance = make(joe, this);
-        JoeCallable initializer = bind(instance, INIT);
+        NativeCallable initializer = bind(instance, INIT);
         if (initializer != null) {
             try {
                 initializer.call(joe, args);

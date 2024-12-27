@@ -2,10 +2,6 @@ package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,7 +30,6 @@ public class WalkerEngine implements Engine {
     //-------------------------------------------------------------------------
     // Engine API
 
-
     @Override
     public Set<String> getVarNames() {
         return interpreter.globals().getVarNames();
@@ -51,25 +46,6 @@ public class WalkerEngine implements Engine {
     }
 
     /**
-     * Reads the given file and executes its content as a script.
-     * @param scriptPath The file's path
-     * @return The script's result
-     * @throws IOException if the file cannot be read.
-     * @throws SyntaxError if the script could not be compiled.
-     * @throws JoeError on all runtime errors.
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    public Object runFile(String scriptPath)
-        throws IOException, SyntaxError, JoeError
-    {
-        var path = Paths.get(scriptPath);
-        byte[] bytes = Files.readAllBytes(path);
-        var script = new String(bytes, Charset.defaultCharset());
-
-        return run(path.getFileName().toString(), script);
-    }
-
-    /**
      * Executes the script, throwing an appropriate error on failure.
      * @param filename The source of the input.
      * @param source The input
@@ -77,6 +53,7 @@ public class WalkerEngine implements Engine {
      * @throws SyntaxError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
+    @Override
     public Object run(String filename, String source) throws SyntaxError, JoeError {
         var traces = new ArrayList<Trace>();
 
@@ -102,7 +79,11 @@ public class WalkerEngine implements Engine {
         // Save the buffer, for later introspection.
         buffers.put(filename, buffer);
 
-        return interpreter.interpret(statements);
+        try {
+            return interpreter.interpret(statements);
+        } catch (Return ex) {
+            return ex.value;
+        }
     }
 
 
@@ -130,7 +111,7 @@ public class WalkerEngine implements Engine {
 
     @Override
     public boolean isCallable(Object callee) {
-        return callee instanceof JoeCallable;
+        return callee instanceof NativeCallable;
     }
 
     /**
@@ -139,8 +120,9 @@ public class WalkerEngine implements Engine {
      * @param args The arguments to pass to the callable
      * @return The result of calling the callable.
      */
+    @Override
     public Object call(Object callee, Object... args) {
-        if (callee instanceof JoeCallable callable) {
+        if (callee instanceof NativeCallable callable) {
             try {
                 return callable.call(joe, new Args(args));
             } catch (JoeError ex) {
@@ -157,5 +139,31 @@ public class WalkerEngine implements Engine {
         } else {
             throw joe.expected("callable", callee);
         }
+    }
+
+    @Override
+    public String dump(String scriptName, String source) {
+        var traces = new ArrayList<Trace>();
+
+        Scanner scanner = new Scanner(scriptName, source, traces::add);
+        List<Token> tokens = scanner.scanTokens();
+        var buffer = scanner.buffer();
+        Parser parser = new Parser(buffer, tokens, traces::add);
+        var statements = parser.parse();
+
+        // Stop if there was a syntax error.
+        if (!traces.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.", traces);
+        }
+
+        Resolver resolver = new Resolver(interpreter, traces::add);
+        resolver.resolve(statements);
+
+        // Stop if there was a resolution error.
+        if (!traces.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.", traces);
+        }
+
+        return new Dumper().dump(statements);
     }
 }

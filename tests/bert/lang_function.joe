@@ -1,0 +1,62 @@
+// Tests for Joe `function` declarations
+//
+// Language tests should confine themselves to the basic test API.
+
+// Can declare and call functions.
+function testDeclareFunction() {
+    function info() { return "I'm a Thing!"; }
+    assertEquals(info(), "I'm a Thing!");
+}
+
+// Call something that's not callable.
+function testNotCallable() {
+    var notAFunction = 123;
+    function bad() { notAFunction(); }
+    assertError(bad, "Expected callable, got: Number '123'.");
+}
+
+// Functions return null by default.
+function testReturnsNull() {
+    function f() { }
+    assertEquals(f(), null);
+}
+
+// Function arity is checked.
+function testFunction_tooFewArgs() {
+    function twoArgs(name, value) { }
+
+    function bad() { twoArgs(#a); }
+//    assertError(bad, "Wrong number of arguments, expected: twoArgs(name, value).");
+}
+
+// Function arity is checked.
+function testFunction_tooManyArgs() {
+    function twoArgs(name, value) { }
+
+    function bad() { twoArgs(#a, #b, #c); }
+//    assertError(bad, "Wrong number of arguments, expected: twoArgs(name, value).");
+}
+
+//// Varargs function
+//function testFunction_varargs_good() {
+//    function varArgs(first, args) {
+//        return first + "," + stringify(args);
+//    }
+//
+//    assertEquals(varArgs(#a), "#a,List()");
+//    assertEquals(varArgs(#a,#b), "#a,List(#b)");
+//    assertEquals(varArgs(#a,#b,#c), "#a,List(#b, #c)");
+//
+//    function bad() { varArgs(); }
+//    assertError(bad,
+//        "Wrong number of arguments, expected: varArgs(first, args).");
+//}
+
+// Functions can capture enclosing scope.
+function testFunctionsCaptureScope() {
+    var greeting = #howdy;
+    function howdy() { return greeting; }
+
+    assertEquals(howdy(), #howdy);
+}
+

@@ -31,6 +31,7 @@ public class App {
             VersionTool.INFO,
             RunTool.INFO,
             ReplTool.INFO,
+            DumpTool.INFO,
             TestTool.INFO,
             DocTool.INFO,
             WinTool.INFO

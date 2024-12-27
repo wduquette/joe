@@ -159,10 +159,10 @@ class Resolver {
                 if (stmt.elseBranch() != null) resolve(stmt.elseBranch());
             }
             case Stmt.Return stmt -> {
-                if (currentFunction == FunctionType.NONE) {
-                    error(stmt.keyword(),
-                        "Attempted 'return' from top-level code.");
-                }
+//                if (currentFunction == FunctionType.NONE) {
+//                    error(stmt.keyword(),
+//                        "Attempted 'return' from top-level code.");
+//                }
 
                 if (currentFunction == FunctionType.STATIC_INITIALIZER) {
                     error(stmt.keyword(),

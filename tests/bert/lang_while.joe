@@ -1,0 +1,43 @@
+// Tests the `while` statement
+
+function testWhile_simple() {
+    var sum = 0;
+    var i = 0;
+    while (i < 4) {
+        i = i + 1;
+        sum = sum + i;
+    }
+
+    assertEquals(i, 4);
+    assertEquals(sum, 10);
+}
+
+// Requires continue
+
+//function testWhile_continue() {
+//    var sum = 0;
+//    var i = 0;
+//    while (i < 4) {
+//        i = i + 1;
+//        if (i == 2) continue;
+//        list.add(i);
+//    }
+//
+//    assertEquals(i, 4);
+//    assertEquals(list, List(1,3,4));
+//}
+
+
+// Requires break
+//function testWhile_break() {
+//    var list = List();
+//    var i = 0;
+//    while (i < 4) {
+//        i = i + 1;
+//        if (i == 3) break;
+//        list.add(i);
+//    }
+//
+//    assertEquals(i, 3);
+//    assertEquals(list, List(1,2));
+//}

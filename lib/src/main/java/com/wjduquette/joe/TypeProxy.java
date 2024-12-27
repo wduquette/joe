@@ -234,7 +234,7 @@ public class TypeProxy<V> implements JoeObject, JoeClass {
      * @throws JoeError if the method is not found.
      */
     @SuppressWarnings("unchecked")
-    public JoeCallable bind(Object value, String name) {
+    public NativeCallable bind(Object value, String name) {
         var method = methods.get(name);
 
         if (method != null) {

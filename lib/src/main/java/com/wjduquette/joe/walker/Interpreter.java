@@ -131,7 +131,7 @@ class Interpreter {
                     } catch (JoeError ex) {
                         var buff = stmt.classSpan().buffer();
                         var context = buff.lineSpan(stmt.classSpan().endLine());
-                        throw ex.addFrame(context,
+                        throw ex.addPendingFrame(context,
                             "In static initializer for " + stmt.name().lexeme());
                     }
                 }
@@ -216,7 +216,7 @@ class Interpreter {
             case Stmt.Throw stmt -> {
                 var value = evaluate(stmt.value());
                 if (value instanceof JoeError error) {
-                    throw error.addFrame(stmt.keyword().span(),
+                    throw error.addPendingFrame(stmt.keyword().span(),
                         "Rethrowing existing error.");
                 } else {
                     throw new RuntimeError(stmt.keyword().span(),
@@ -363,7 +363,7 @@ class Interpreter {
                             yield joe.stringify(left) + joe.stringify(right);
                         } else {
                             throw new RuntimeError(expr.op().span(),
-                                "'+' cannot combine the given operands.");
+                                "The '+' operator expects two Numbers or at least one String.");
                         }
 
                     }
@@ -380,14 +380,14 @@ class Interpreter {
                     args[i] = evaluate(expr.arguments().get(i));
                 }
 
-                if (callee instanceof JoeCallable callable) {
+                if (callee instanceof NativeCallable callable) {
                     try {
                         yield callable.call(joe, new Args(args));
                     } catch (JoeError ex) {
                         var msg = "In " + callable.callableType() + " " +
                             callable.signature();
                         if (callable.isScripted()) {
-                            throw ex.addFrame(expr.paren().span(), msg);
+                            throw ex.addPendingFrame(expr.paren().span(), msg);
                         } else {
                             throw ex.addInfo(expr.paren().span(), msg);
                         }
@@ -489,7 +489,7 @@ class Interpreter {
                     distance, "super");
                 JoeObject instance = (JoeObject)environment.getAt(
                     distance - 1, "this");
-                JoeCallable method =
+                NativeCallable method =
                     superclass.bind(instance, expr.method().lexeme());
 
                 if (method == null) {
@@ -600,12 +600,13 @@ class Interpreter {
     {
         if (left instanceof Double && right instanceof Double) return;
 
-        throw new RuntimeError(operator.span(), "Operands must be numbers.");
+        throw new RuntimeError(operator.span(),
+            "The '" + operator.lexeme() + "' operator expects two numeric operands.");
     }
 
     private RuntimeError notSimilar(Token operator) {
         return new RuntimeError(operator.span(),
-            "Expected two doubles or two strings.");
+            "The '" + operator.lexeme() + "' operator expects two Numbers or two Strings.");
     }
 
     private void checkNumberOperand(Token operator, Object operand) {

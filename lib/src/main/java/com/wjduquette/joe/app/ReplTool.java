@@ -10,6 +10,7 @@ import com.wjduquette.joe.tools.ToolInfo;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayDeque;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ public class ReplTool implements Tool {
      */
     public static final ToolInfo INFO = new ToolInfo(
         "repl",
-        "",
+        "[options...]",
         "Invokes a simple Joe REPL.",
         """
         Invokes the REPL.
@@ -34,9 +35,12 @@ public class ReplTool implements Tool {
             > 1 + 1;
             -> 2
             >
+            
+        The options are as follows:
         
-        NOTE: At present, the REPL doesn't offer history, multi-line
-        input, etc.
+        --bert, -b     Use the experimental "Bert" byte-engine.
+        --debug, -d    Enable debugging output.  This is mostly of use to
+                       the Joe maintainer.
         """,
         ReplTool::main
     );
@@ -44,7 +48,7 @@ public class ReplTool implements Tool {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Joe joe;
+    private Joe joe;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -53,7 +57,6 @@ public class ReplTool implements Tool {
      * Creates the tool
      */
     public ReplTool() {
-        this.joe = new Joe();
     }
 
     //-------------------------------------------------------------------------
@@ -68,11 +71,31 @@ public class ReplTool implements Tool {
     }
 
     private void run(String[] args) {
-        var consolePackage = new ConsolePackage();
-        consolePackage.setScript("<repl>");
-        consolePackage.getArgs().addAll(List.of(args));
-        joe.installPackage(consolePackage);
+        var argq = new ArrayDeque<>(List.of(args));
+        var engineType = Joe.WALKER;
+        var debug = false;
 
+        while (!argq.isEmpty() && argq.peek().startsWith("-")) {
+            var opt = argq.poll();
+            switch (opt) {
+                case "--bert", "-b" -> engineType = Joe.BERT;
+                case "--debug", "-d" -> debug = true;
+                default -> {
+                    System.err.println("Unknown option: '" + opt + "'.");
+                    System.exit(64);
+                }
+            }
+        }
+
+        this.joe = new Joe(engineType);
+        joe.setDebug(debug);
+
+        if (engineType.equals(Joe.WALKER)) {
+            var consolePackage = new ConsolePackage();
+            consolePackage.setScript("<repl>");
+            consolePackage.getArgs().addAll(List.of(args));
+            joe.installPackage(consolePackage);
+        }
 
         try {
             runPrompt();

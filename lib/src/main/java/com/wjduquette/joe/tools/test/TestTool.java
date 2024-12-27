@@ -27,6 +27,10 @@ public class TestTool implements Tool {
         
         Options:
         
+        --bert, -b
+           Use the experimental "Bert" byte-engine.  A minimum of features
+           are available.
+           
         --verbose, -v
             Enable verbose output.  Normally only failures and the final
             summary are included in the output.  If this is given, all test
@@ -46,6 +50,7 @@ public class TestTool implements Tool {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    String engineType = Joe.WALKER;
     boolean verbose = false;
     private final List<String> testScripts = new ArrayList<>();
     private int loadErrorCount = 0;
@@ -84,6 +89,7 @@ public class TestTool implements Tool {
             var arg = argq.poll();
 
             switch (arg) {
+                case "--bert", "-b" -> engineType = Joe.BERT;
                 case "-v", "--verbose" -> verbose = true;
                 default -> testScripts.add(arg);
             }
@@ -119,8 +125,9 @@ public class TestTool implements Tool {
         }
 
         // NEXT, configure the engine.
-        var joe = new Joe();
-        joe.installPackage(TestPackage.PACKAGE);
+        var joe = new Joe(engineType);
+        joe.installPackage(new TestPackage(engineType));
+
         // Only print script output if the verbose flag is set.
         joe.setOutputHandler(this::testPrinter);
 
@@ -167,8 +174,8 @@ public class TestTool implements Tool {
 
     private void runVerbosely(Joe joe, List<String> tests) {
         for (var test : tests) {
-            var value = joe.getVar(test);
-            if (!(value instanceof JoeCallable callable)) {
+            var callable = joe.getVar(test);
+            if (!joe.isCallable(callable)) {
                 continue;
             }
 
@@ -192,8 +199,8 @@ public class TestTool implements Tool {
 
     private void runQuietly(Joe joe, String scriptPath, List<String> tests) {
         for (var test : tests) {
-            var value = joe.getVar(test);
-            if (!(value instanceof JoeCallable callable)) {
+            var callable = joe.getVar(test);
+            if (!joe.isCallable(callable)) {
                 continue;
             }
 
