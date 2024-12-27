@@ -12,6 +12,10 @@ import static com.wjduquette.joe.bert.Opcode.*;
 class VirtualMachine {
     public static final int DEFAULT_STACK_SIZE = 256;
     public static final int MAX_FRAMES = 64;
+    private enum Origin {
+        /** Called from Java code. */ JAVA,
+        /** Called from Joe code. */  JOE
+    }
 
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -106,11 +110,10 @@ class VirtualMachine {
         var closure = new Closure(compiler.compile(scriptName, source));
         resetStack();
         stack[top++] = closure;
-        call(closure, 0, true);
+        call(closure, 0, Origin.JAVA);
         try {
             return run();
         } catch (JoeError ex) {
-//            System.out.println("Unwinding stack on error: " + ex);
             unwindStack(ex, 0);
             throw ex;
         }
@@ -133,7 +136,7 @@ class VirtualMachine {
                     stack[top++] = arg;
                 }
 
-                call(closure, argc, true);
+                call(closure, argc, Origin.JAVA);
                 try {
                     return run();
                 } catch (JoeError ex) {
@@ -410,7 +413,7 @@ class VirtualMachine {
                     // We return from run() if the relevant closure was
                     // called from Java, i.e., via `interpret()` or
                     // via `callFromJava()`.
-                    if (frame.calledFromJava) {
+                    if (frame.origin == Origin.JAVA) {
                         // Pop the call frame's stack entries
                         top = frame.base;
 
@@ -596,7 +599,7 @@ class VirtualMachine {
     // Invoked by Opcode.CALL for all calls
     private void callValue(Object callee, int argCount) {
         switch (callee) {
-            case Closure f -> call(f, argCount, false);
+            case Closure f -> call(f, argCount, Origin.JOE);
             case NativeCallable f -> {
                 var args = new Args(Arrays.copyOfRange(stack, top - argCount, top));
                 top -= argCount + 1;
@@ -604,13 +607,13 @@ class VirtualMachine {
             }
             case BoundMethod bound -> {
                 stack[top - argCount - 1] = bound.receiver();
-                call(bound.method(), argCount, false);
+                call(bound.method(), argCount, Origin.JOE);
             }
             case BertClass klass -> {
                 stack[top - argCount - 1] = new BertInstance(klass);
                 var initializer = klass.methods.get("init");
                 if (initializer != null) {
-                    call(initializer, argCount, false);
+                    call(initializer, argCount, Origin.JOE);
                 } else if (argCount != 0) {
                     throw error("Expected 0 arguments but got " + argCount + ".");
                 }
@@ -620,7 +623,7 @@ class VirtualMachine {
         }
     }
 
-    private void call(Closure closure, int argCount, boolean calledFromJava) {
+    private void call(Closure closure, int argCount, Origin origin) {
         if (argCount != closure.function.arity) {
             throw error("Callable " + closure + " expected " + closure.function.arity + " arguments, got: " +
                 argCount + ".");
@@ -630,7 +633,7 @@ class VirtualMachine {
             throw error("Call stack overflow.");
         }
 
-        var frame = new CallFrame(closure, calledFromJava);
+        var frame = new CallFrame(closure, origin);
         frames[frameCount++] = frame;
         frame.base = top - argCount - 1;
     }
@@ -645,13 +648,13 @@ class VirtualMachine {
         // The stack slot for function local 0
         int base;
 
-        // True if this call frame represents a call to `interpret()` or
-        // `callFromJava()`.
-        final boolean calledFromJava;
+        // Origin.JAVA if this call frame represents a call to `interpret()` or
+        // `callFromJava()`, and Origin.JOE otherwise.
+        final Origin origin;
 
-        CallFrame(Closure closure, boolean calledFromJava) {
+        CallFrame(Closure closure, Origin origin) {
             this.closure = closure;
-            this.calledFromJava = calledFromJava;
+            this.origin = origin;
             this.ip = 0;
             this.base = top;
         }
