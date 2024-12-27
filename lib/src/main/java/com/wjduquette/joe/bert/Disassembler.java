@@ -142,7 +142,7 @@ public class Disassembler {
                 return ip + 2;
             }
             case CLASS, CONST, GLODEF, GLOGET, GLOSET, METHOD,
-                PROPGET, PROPSET
+                PROPGET, PROPSET, SUPGET
             -> {
                 // Constant Instructions
                 // Pattern: opcode constantIndex
@@ -155,7 +155,7 @@ public class Disassembler {
                 lines.add(new Line(ip, prefix + text));
                 return ip + 2;
             }
-            case ADD, DIV, EQ, FALSE, GE, GT, LE, LT, MUL,
+            case ADD, DIV, EQ, FALSE, GE, GT, INHERIT, LE, LT, MUL,
                 NE, NEGATE, NOT, NULL, POP, RETURN, SUB, TRUE, UPCLOSE
             -> {
                 // Simple Instructions

@@ -278,6 +278,18 @@ class VirtualMachine {
                         throw error("The '>' operator expects two Numbers or two Strings.");
                     }
                 }
+                case INHERIT -> {
+                    var superclass = peek(1);
+                    if (!(superclass instanceof BertClass)) {
+                        throw error("Expected superclass, got: " +
+                            joe.typedValue(superclass));
+                    }
+                    var subclass = (BertClass)peek(0);
+                    subclass.methods.putAll(((BertClass)superclass).methods);
+                    pop();  // Subclass
+                    // NOTE: Superclass is still on the stack, I think
+                    // as the `super` variable.  Seems weird, though.
+                }
                 case JIF -> {
                     var offset = readArg();
                     if (Joe.isFalsey(pop())) frame.ip += offset;
@@ -367,12 +379,7 @@ class VirtualMachine {
                         }
 
                         // NEXT, got a method?
-                        var method = instance.klass.methods.get(name);
-
-                        if (method != null) {
-                            var bound = new BoundMethod(instance, method);
-                            pop(); // The instance
-                            push(bound);
+                        if (bindMethod(instance.klass, instance, name)) {
                             break;
                         }
 
@@ -431,6 +438,14 @@ class VirtualMachine {
                     checkNumericOperands(opcode, a, b);
                     push((double)a - (double)b);
                 }
+                case SUPGET -> {
+                    var name = readString();
+                    var superclass = (BertClass)pop();
+                    var instance = (BertInstance)pop();
+                    if (!bindMethod(superclass, instance, name)) {
+                        throw error("Undefined property: '" + name + "'.");
+                    }
+                }
                 case TRUE -> push(true);
                 case UPCLOSE -> {
                     // Close and then pop the upvalue whose value is on the
@@ -452,6 +467,23 @@ class VirtualMachine {
             if (joe.isDebug()) {
                 joe.println("| " + stackText());
             }
+        }
+    }
+
+    private boolean bindMethod(
+        BertClass cls,
+        BertInstance instance,
+        String name
+    ) {
+        var method = cls.methods.get(name);
+
+        if (method != null) {
+            var bound = new BoundMethod(instance, method);
+            pop(); // The instance
+            push(bound);
+            return true;
+        } else {
+            return false;
         }
     }
 

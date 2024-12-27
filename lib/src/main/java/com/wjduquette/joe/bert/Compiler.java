@@ -14,6 +14,7 @@ class Compiler {
     public static final int MAX_LOCALS = 256;
     public static final int MAX_PARAMETERS = 255;
     public static final String INIT = "init";
+    public static final String VAR_SUPER = "super";
 
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -119,8 +120,26 @@ class Compiler {
         defineVariable(nameConstant);
 
         // Remember the current class.
-        currentClass = new ClassCompiler(currentClass);
+        var classCompiler = new ClassCompiler(currentClass);
+        currentClass = classCompiler;
 
+        if (match(EXTENDS)) {
+            consume(IDENTIFIER, "Expected superclass name after 'extends'.");
+            variable(false);
+            if (className.lexeme().equals(parser.previous.lexeme())) {
+                error("A class can't inherit from itself.");
+            }
+
+            classCompiler.hasSuperclass = true;
+            beginScope();
+            addLocal(Token.synthetic(VAR_SUPER));
+            defineVariable((char)0);
+            namedVariable(className, false);
+            emit(Opcode.INHERIT);
+        }
+
+        // Load the class onto the stack before processing the class
+        // body
         namedVariable(className, false);
         consume(LEFT_BRACE, "Expected '{' before class body.");
 
@@ -133,6 +152,9 @@ class Compiler {
         }
         consume(RIGHT_BRACE, "Expected '}' after class body.");
         emit(Opcode.POP); // Pop the class itself
+        if (classCompiler.hasSuperclass) {
+            endScope();
+        }
 
         currentClass = currentClass.enclosing;
     }
@@ -440,6 +462,20 @@ class Compiler {
             error("Can't use 'this' outside of a class.");
         }
         variable(false);
+    }
+
+    private void super_(boolean canAssign) {
+        if (currentClass == null) {
+            error("Can't use 'super' outside of a class.");
+        } else if (!currentClass.hasSuperclass) {
+            error("Can't use 'super' in a class with no superclass.");
+        }
+        consume(DOT, "Expected '.' after 'super'.");
+        consume(IDENTIFIER, "Expected superclass method name.");
+        char nameConstant = identifierConstant(parser.previous);
+        namedVariable(Token.synthetic("this"), false);
+        namedVariable(Token.synthetic("super"), false);
+        emit(Opcode.SUPGET, nameConstant);
     }
 
     private void call(boolean canAssign) {
@@ -855,6 +891,7 @@ class Compiler {
     // The class currently being compiled.
     private static class ClassCompiler {
         ClassCompiler enclosing;
+        boolean hasSuperclass = false;
 
         ClassCompiler(ClassCompiler enclosing) {
             this.enclosing = enclosing;
@@ -948,7 +985,7 @@ class Compiler {
         rule(NULL,            this::symbol,   null,         Level.NONE);
         rule(RETURN,          null,           null,         Level.NONE);
         rule(STATIC,          null,           null,         Level.NONE);
-        rule(SUPER,           null,           null,         Level.NONE);
+        rule(SUPER,           this::super_,   null,         Level.NONE);
         rule(SWITCH,          null,           null,         Level.NONE);
         rule(THIS,            this::this_,    null,         Level.NONE);
         rule(THROW,           null,           null,         Level.NONE);
