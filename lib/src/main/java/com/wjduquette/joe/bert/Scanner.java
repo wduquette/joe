@@ -92,8 +92,13 @@ public class Scanner {
         if (isAlpha(c)) {
             return identifier();
         }
+
         if (isDigit(c)) {
-            return number();
+            if (c == '0' && peek() == 'x') {
+                return hexNumber();
+            } else {
+                return number();
+            }
         }
 
         return switch (c) {
@@ -150,7 +155,41 @@ public class Scanner {
     }
 
     private Token string() {
-        while (peek() != '"' && !isAtEnd()) advance();
+        var buff = new StringBuilder();
+
+        while (peek() != '"' && !isAtEnd()) {
+            var c = peek();
+
+            switch (c) {
+                case '\\' -> {
+                    if (!isAtEnd()) {
+                        advance(); // Skip past the backslash
+                        var escape = advance();
+                        switch (escape) {
+                            case '\\' -> buff.append('\\');
+                            case 't' -> buff.append('\t');
+                            case 'b' -> buff.append('\b');
+                            case 'n' -> buff.append('\n');
+                            case 'r' -> buff.append('\r');
+                            case 'f' -> buff.append('\f');
+                            case '"' -> buff.append('"');
+                            case 'u' -> {
+                                var err = unicode(buff);
+                                if (err != null) {
+                                    return err;
+                                }
+                            }
+                            default -> errorToken(
+                                "unexpected escape.");
+                        }
+                    }
+                }
+                case '\n' -> {
+                    return errorToken("Newline in single-line string.");
+                }
+                default -> buff.append(advance());
+            }
+        }
 
         if (isAtEnd()) {
             return errorToken("unterminated string.");
@@ -158,7 +197,33 @@ public class Scanner {
 
         // Closing quote
         advance();
-        return makeToken(STRING, source.substring(start + 1, current - 1));
+        return makeToken(STRING, buff.toString());
+    }
+
+    private Token unicode(StringBuilder buff) {
+        var mark = current;
+
+        while (current - mark < 4 && isHexDigit(peek())) {
+            advance();
+        }
+
+        var hexCode = source.substring(mark, current);
+
+        if (current - mark == 4) {
+            var hex = Integer.parseInt(hexCode, 16);
+            buff.append(unicodeToString(hex));
+            return null;
+        } else {
+            return errorToken("incomplete Unicode escape.");
+        }
+    }
+
+    private String unicodeToString(int hex) {
+        try {
+            return Character.toString(hex);
+        } catch (Exception ex) {
+            return "\uFFFD";
+        }
     }
 
     private Token number() {
@@ -170,8 +235,35 @@ public class Scanner {
             while (isDigit(peek())) advance();
         }
 
+        // Look for an exponent.
+        if (peek() == 'e' || peek() == 'E') {
+            advance(); // Consume the "e"
+
+            if (peek() == '+' || peek() == '-') {
+                advance(); // Consume the sign
+            }
+
+            if (!isDigit(peek())) {
+                return errorToken("expected exponent.");
+            }
+
+            while (isDigit(peek())) advance();
+        }
+
         return makeToken(NUMBER,
             Double.valueOf(source.substring(start, current)));
+    }
+
+    private Token hexNumber() {
+        advance();  // Consume the x
+        while (isHexDigit(peek())) advance();
+
+        try {
+            var num = Integer.parseInt(source.substring(start + 2, current), 16);
+            return makeToken(NUMBER, (double)num);
+        } catch (Exception ex) {
+            return errorToken("invalid hex literal.");
+        }
     }
 
     private Token identifier() {
@@ -204,7 +296,8 @@ public class Scanner {
     }
 
     private char peekNext() {
-        return isAtEnd() ? '\0' : source.charAt(current + 1);
+        return current == source.length() - 1
+            ? '\0' : source.charAt(current + 1);
     }
 
     private char advance() {
@@ -227,6 +320,12 @@ public class Scanner {
         return (c >= 'a' && c <= 'z')
             || (c >= 'A' && c <= 'Z')
             || c == '_';
+    }
+
+    private boolean isHexDigit(char c) {
+        return (c >= '0' && c <= '9')
+            || (c >= 'A' && c <= 'F')
+            || (c >= 'a' && c <= 'f');
     }
 
     private Token makeToken(TokenType type) {

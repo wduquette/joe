@@ -1,0 +1,248 @@
+package com.wjduquette.joe.bert;
+
+import com.wjduquette.joe.Keyword;
+import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.Ted;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.wjduquette.joe.bert.TokenType.*;
+import static com.wjduquette.joe.bert.TokenType.WHILE;
+import static com.wjduquette.joe.checker.Checker.check;
+
+public class ScannerTest extends Ted {
+    private Scanner scanner;
+    private final List<String> details = new ArrayList<>();
+
+    //-------------------------------------------------------------------------
+    // Reserved Words
+
+    @Test
+    public void testReserved() {
+        test("testReserved)");
+        check(scanType("assert")).eq(ASSERT);
+        check(scanType("break")).eq(BREAK);
+        check(scanType("case")).eq(CASE);
+        check(scanType("class")).eq(CLASS);
+        check(scanType("continue")).eq(CONTINUE);
+        check(scanType("default")).eq(DEFAULT);
+        check(scanType("else")).eq(ELSE);
+        check(scanType("extends")).eq(EXTENDS);
+        check(scanType("false")).eq(FALSE);
+        check(scanType("for")).eq(FOR);
+        check(scanType("foreach")).eq(FOREACH);
+        check(scanType("function")).eq(FUNCTION);
+        check(scanType("if")).eq(IF);
+        check(scanType("in")).eq(IN);
+        check(scanType("method")).eq(METHOD);
+        check(scanType("ni")).eq(NI);
+        check(scanType("null")).eq(NULL);
+        check(scanType("return")).eq(RETURN);
+        check(scanType("static")).eq(STATIC);
+        check(scanType("super")).eq(SUPER);
+        check(scanType("switch")).eq(SWITCH);
+        check(scanType("this")).eq(THIS);
+        check(scanType("throw")).eq(THROW);
+        check(scanType("true")).eq(TRUE);
+        check(scanType("var")).eq(VAR);
+        check(scanType("while")).eq(WHILE);
+    }
+
+    //-------------------------------------------------------------------------
+    // One and two character tokens
+
+    @Test
+    public void testSimple() {
+        test("testSimple");
+        check(scanType("(")).eq(LEFT_PAREN);
+        check(scanType(")")).eq(RIGHT_PAREN);
+        check(scanType("{")).eq(LEFT_BRACE);
+        check(scanType("}")).eq(RIGHT_BRACE);
+        check(scanType(";")).eq(SEMICOLON);
+        check(scanType(",")).eq(COMMA);
+        check(scanType(".")).eq(DOT);
+        check(scanType("-")).eq(MINUS);
+        check(scanType("+")).eq(PLUS);
+        check(scanType("/")).eq(SLASH);
+        check(scanType("*")).eq(STAR);
+        check(scanType("!")).eq(BANG);
+        check(scanType("!=")).eq(BANG_EQUAL);
+        check(scanType("=")).eq(EQUAL);
+        check(scanType("==")).eq(EQUAL_EQUAL);
+        check(scanType("<")).eq(LESS);
+        check(scanType("<=")).eq(LESS_EQUAL);
+        check(scanType(">")).eq(GREATER);
+        check(scanType(">=")).eq(GREATER_EQUAL);
+        check(scanType("&&")).eq(AND);
+        check(scanType("||")).eq(OR);
+    }
+
+    //-------------------------------------------------------------------------
+    // Identifiers
+
+    @Test
+    public void testIdentifier() {
+        test("testIdentifier");
+        var token = scanToken("abc123");
+        check(token.type()).eq(IDENTIFIER);
+        check(token.lexeme()).eq("abc123");
+
+        token = scanToken("_abc123");
+        check(token.type()).eq(IDENTIFIER);
+        check(token.lexeme()).eq("_abc123");
+    }
+
+    //-------------------------------------------------------------------------
+    // Keywords
+
+    @Test
+    public void testKeyword() {
+        test("testKeyword");
+        var token = scanToken("#abc123");
+        check(token.type()).eq(KEYWORD);
+        check(token.literal()).eq(new Keyword("abc123"));
+
+        token = scanToken("#_abc123");
+        check(token.type()).eq(KEYWORD);
+        check(token.literal()).eq(new Keyword("_abc123"));
+    }
+
+    //-------------------------------------------------------------------------
+    // Numeric Literals
+
+    @Test
+    public void testNumbers() {
+        test("testNumbers");
+        check(scanLiteral("123")).eq(123.0);
+        check(scanLiteral("123.4")).eq(123.4);
+        check(scanLiteral("123.4e2")).eq(12340.0);
+        check(scanLiteral("123.4E2")).eq(12340.0);
+        check(scanLiteral("123.4e+2")).eq(12340.0);
+        check(scanLiteral("123.4e-2")).eq(1.234);
+        check(scanLiteral("0xff")).eq(255.0);
+        check(scanLiteral("0xFF")).eq(255.0);
+    }
+
+    //-------------------------------------------------------------------------
+    // String Literals
+
+    @Test
+    public void testStringEscapes() {
+        test("testStringEscapes");
+        check(scanString("\"abc\"")).eq("abc");
+        check(scanString("\"-\\\\-\"")).eq("-\\-");
+        check(scanString("\"-\\t-\"")).eq("-\t-");
+        check(scanString("\"-\\b-\"")).eq("-\b-");
+        check(scanString("\"-\\n-\"")).eq("-\n-");
+        check(scanString("\"-\\r-\"")).eq("-\r-");
+        check(scanString("\"-\\f-\"")).eq("-\f-");
+        check(scanString("\"-\\\"-\"")).eq("-\"-");
+        check(scanString("\"-\\u2192-\"")).eq("-→-");
+
+        check(scanString("\"-\\\"")).eq(null);
+    }
+
+    @Test
+    public void testError_unterminatedString() {
+        test("testError_unterminatedString");
+        check(scanError("\"abc"))
+            .hasString("At end, unterminated string.");
+    }
+
+    @Test
+    public void testError_unexpectedEscape() {
+        test("testError_unexpectedEscape");
+        check(scanError("\"\\x\""))
+            .hasString("At '\"\\x', unexpected escape.");
+    }
+
+
+    @Test
+    public void testError_incompleteUnicodeEscape() {
+        test("testError_incompleteUnicodeEscape");
+        check(scanError("\"\\u123\""))
+            .hasString("At '\"\\u123', incomplete Unicode escape.");
+    }
+
+    //-------------------------------------------------------------------------
+    // Miscellaneous Errors
+
+    @Test
+    public void testError_incompleteAnd() {
+        test("testError_incompleteAnd");
+        check(scanError("&-"))
+            .hasString("At '&', unexpected character.");
+    }
+
+    @Test
+    public void testError_incompleteOr() {
+        test("testError_incompleteOr");
+        check(scanError("|-"))
+            .hasString("At '|', unexpected character.");
+    }
+
+    @Test
+    public void testError_unexpectedChar() {
+        test("testError_unexpectedChar");
+        check(scanError("^1"))
+            .hasString("At '^', unexpected character.");
+    }
+
+    //-------------------------------------------------------------------------
+    // Helpers
+
+    private void scanInput(String input) {
+        details.clear();
+
+        var source = new SourceBuffer("-", input);
+        scanner = new Scanner(source, detail -> {
+            System.out.println("detail: " + detail);
+            details.add(detail.message());
+        });
+    }
+
+    private Token next() {
+        return scanner.scanToken();
+    }
+
+    // Scans and returns the first error
+    private String scanError(String input) {
+        scanInput(input);
+
+        // Scan until end.
+        Token token;
+        do {
+            token = next();
+        } while (token.type() != TokenType.EOF);
+
+        return details.isEmpty() ? null : details.getFirst();
+    }
+
+    private Token scanToken(String input) {
+        scanInput(input);
+        return next();
+    }
+
+    private Object scanLiteral(String input) {
+        scanInput(input);
+        return next().literal();
+    }
+
+    private TokenType scanType(String input) {
+        scanInput(input);
+        var token = next();
+
+        return token.type();
+    }
+
+    private String scanString(String input) {
+        scanInput(input);
+        var token = next();
+
+        return token.type() == TokenType.STRING
+            ? (String)token.literal()
+            : null;
+    }
+}
