@@ -20,6 +20,6 @@ public class Closure {
 
     @Override
     public String toString() {
-        return "Closure[" + function + "]";
+        return "<" + function.type().text() + " " + function.name() + ">";
     }
 }

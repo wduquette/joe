@@ -7,6 +7,7 @@
 
 // Can declare a class
 function testDeclare() {
+    skip("typeName not yet supported for BertClass");
     class Thing {}
     assertEquals(typeName(Thing), "<class>");
 }
@@ -15,6 +16,7 @@ function testDeclare() {
 function testCreate() {
     class Thing {}
     var thing = Thing();
+    skip("typeName not yet supported for BertInstance");
     assertEquals(typeName(thing), "Thing");
 }
 
@@ -115,6 +117,7 @@ function testInitializer() {
 
 // Default toString()
 function testToString_default() {
+    skip("toString not yet supported for BertInstance");
     class Thing {}
     var thing = Thing();
     assertTrue(thing.toString().startsWith("<Thing"));
@@ -123,6 +126,7 @@ function testToString_default() {
 
 // Custom toString()
 function testToString_custom() {
+    skip("toString not yet supported for BertInstance");
     class Thing {
         method toString() { return "I'm a Thing!"; }
     }

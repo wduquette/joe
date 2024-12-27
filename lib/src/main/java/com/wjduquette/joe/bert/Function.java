@@ -88,6 +88,6 @@ public class Function implements CodeChunk {
 
     @Override
     public String toString() {
-        return "<" + type.text() + " " + name + ">";
+        return "Function[" + type.text() + "," + name + "]";
     }
 }

@@ -441,7 +441,7 @@ class VirtualMachine {
                 case SUPGET -> {
                     var name = readString();
                     var superclass = (BertClass)pop();
-                    var instance = (BertInstance)pop();
+                    var instance = (BertInstance)peek(0);
                     if (!bindMethod(superclass, instance, name)) {
                         throw error("Undefined property: '" + name + "'.");
                     }

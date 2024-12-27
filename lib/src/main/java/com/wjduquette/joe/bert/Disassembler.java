@@ -176,7 +176,7 @@ public class Disassembler {
                 for (var i = 0; i < func.upvalueCount; i++) {
                     int isLocal = chunk.code(ip);
                     int index = chunk.code(ip + 1);
-                    var upText = String.format("   |  @%04d         %s %d",
+                    var upText = String.format("   | @%04d         %s %d              ",
                         ip, isLocal == 1 ? "local" : "upvalue", index);
                     lines.add(new Line(ip, upText));
                     ip += 2;
