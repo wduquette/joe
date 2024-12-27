@@ -11,20 +11,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Compiler {
+    // The maximum number of local variables in a function.
     public static final int MAX_LOCALS = 256;
+
+    // The maximum number of parameters in a function
     public static final int MAX_PARAMETERS = 255;
+
+    // The name of a class's "init" method
     public static final String INIT = "init";
+
+    // The `this` variable
+    public static final String VAR_THIS = "this";
+
+    // The `super` "variable".
     public static final String VAR_SUPER = "super";
 
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The Joe runtime
     private final Joe joe;
+
+    // The errors found during compilation
     private final List<Trace> errors = new ArrayList<>();
+
+    // The source being compiled
     private SourceBuffer buffer;
+
+    // The scanner
     private Scanner scanner;
+
+    // A structure containing parser values.
     private final Parser parser = new Parser();
+
+    // The function currently being compiled.
     private FunctionCompiler current = null;
+
+    // The class currently being compiled, or null
     private ClassCompiler currentClass = null;
 
     // Used for debugging/dumping
@@ -35,6 +58,10 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates a new compiler
+     * @param joe The Joe runtime
+     */
     Compiler(Joe joe) {
         this.joe = joe;
         populateRulesTable();
@@ -43,6 +70,12 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Compilation
 
+    /**
+     * Compiles the script source
+     * @param scriptName The script's name, e.g., the file name
+     * @param source The script's source.
+     * @return The script as a `Function`.
+     */
     public Function compile(String scriptName, String source) {
         buffer = new SourceBuffer(scriptName, source);
         scanner = new Scanner(buffer, errors::add);
@@ -67,6 +100,12 @@ class Compiler {
         return function;
     }
 
+    /**
+     * Gets a disassembler dump of the compiled script
+     * @param scriptName The script's name, e.g., the file name
+     * @param source The script's source.
+     * @return The dump.
+     */
     public String dump(String scriptName, String source) {
         dump = new StringBuilder();
         disassembler = new Disassembler(joe);
@@ -79,10 +118,13 @@ class Compiler {
         return output;
     }
 
+    // The current function's chunk.
+    // TODO: Replace with current.chunk.
     private Chunk currentChunk() {
         return current.chunk;
     }
 
+    // Completes compilation of the current function and returns it.
     private Function endFunction() {
         emitReturn();
         var function = new Function(currentChunk(), current.upvalueCount);
@@ -473,8 +515,8 @@ class Compiler {
         consume(DOT, "Expected '.' after 'super'.");
         consume(IDENTIFIER, "Expected superclass method name.");
         char nameConstant = identifierConstant(parser.previous);
-        getOrSetVariable(Token.synthetic("this"), false);
-        getOrSetVariable(Token.synthetic("super"), false);
+        getOrSetVariable(Token.synthetic(VAR_THIS), false);
+        getOrSetVariable(Token.synthetic(VAR_SUPER), false);
         emit(Opcode.SUPGET, nameConstant);
     }
 
@@ -829,6 +871,7 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Helper Classes
 
+    // The state of the parser.
     private static class Parser {
         Token current = null;
         Token previous = null;
@@ -853,19 +896,34 @@ class Compiler {
         private final static int PRIMARY      = 10;
     }
 
+    // A parsing function for the Pratt parser.
     private interface ParseFunction {
         void parse(boolean canAssign);
     }
 
+    // A record in the Pratt parser table.
     private record ParseRule(
+        // Function to parse a token found in the prefix position,
+        // or null.
         ParseFunction prefix,
+
+        // Function to parse a token found in the infix position,
+        // or null.
         ParseFunction infix,
+
+        // The precedence level for infix tokens.
         int level
     ) {}
 
+    // A local variable.
     private static class Local {
+        // The name of the variable
         final Token name;
+
+        // Its scope depth
         int depth = - 1;
+
+        // Whether it has been captured as an Upvalue
         boolean isCaptured = false;
 
         Local(Token name) {
@@ -873,13 +931,27 @@ class Compiler {
         }
     }
 
+    // State for the function currently being compiled.
     private class FunctionCompiler {
+        // The enclosing function, or null.
         final FunctionCompiler enclosing;
+
+        // The chunk into which byte-code is compiled.
         final Chunk chunk;
+
+        // Information about the function's local variables
         final Local[] locals = new Local[MAX_LOCALS];
+
+        // The actual number of local variables
         int localCount = 0;
+
+        // The current scope depth in this function.
         int scopeDepth = 0;
+
+        // The number of upvalues in this function
         int upvalueCount = 0;
+
+        // The locals that have been captured as upvalues.
         final UpvalueInfo[] upvalues = new UpvalueInfo[MAX_LOCALS];
 
         FunctionCompiler(
@@ -901,7 +973,7 @@ class Compiler {
             if (type == FunctionType.METHOD ||
                 type == FunctionType.INITIALIZER
             ) {
-                local = new Local(Token.synthetic("this"));
+                local = new Local(Token.synthetic(VAR_THIS));
             } else {
                 local = new Local(Token.synthetic(""));
             }
@@ -943,7 +1015,13 @@ class Compiler {
 
     private final ParseRule[] rules = new ParseRule[TokenType.values().length];
 
-    // Tokens are in the same order as in TokenType
+    // Tokens are in the same order as in TokenType.  All tokens must appear
+    // in this table.
+    //
+    // - The prefix function will be non-null only if the token can appear
+    //   at the start of an expression.
+    // - The infix function will be non-null only if the token can appear
+    //   as an operator within an expression.
     private void populateRulesTable() {
         //                                                  Infix
         //   Token            Prefix          Infix         precedence
