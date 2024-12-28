@@ -7,7 +7,7 @@ import com.wjduquette.joe.JoeObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BertClass implements JoeObject {
+public class BertClass implements BertCallable, JoeObject {
     //-------------------------------------------------------------------------
     // Instance Variables
 

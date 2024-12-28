@@ -128,24 +128,29 @@ class VirtualMachine {
      */
     Object callFromJava(Object callee, Object[] args) {
         switch (callee) {
-            case Closure closure -> {
+            case NativeCallable jc -> {
+                // NOTE: callValue could handle this, but that would
+                // require first pushing the args onto the stack and
+                // then copying them back into an Object[] array.
+                return jc.call(joe, new Args(args));
+            }
+            case BertCallable bc -> {
+                // FIRST, set up the stack
                 var base = top;
                 var argc = args.length;
-                stack[top++] = closure;
+                stack[top++] = bc;
                 for (Object arg : args) {
                     stack[top++] = arg;
                 }
 
-                call(closure, argc, Origin.JAVA);
+                callValue(bc, argc, Origin.JAVA);
+
                 try {
                     return run();
                 } catch (JoeError ex) {
                     unwindStack(ex, base);
                     throw ex;
                 }
-            }
-            case NativeCallable jc -> {
-                return jc.call(joe, new Args(args));
             }
             default ->
                 throw error("Expected callable, got: " + joe.typedValue(callee) + ".");
@@ -207,7 +212,7 @@ class VirtualMachine {
                 }
                 case CALL -> {
                     var argCount = readArg();
-                    callValue(peek(argCount), argCount);
+                    callValue(peek(argCount), argCount, Origin.JOE);
                     frame = frames[frameCount - 1];
                 }
                 case CLASS -> push(new BertClass(readString()));
@@ -374,24 +379,8 @@ class VirtualMachine {
                     var target = peek(0);
                     var name = readString();
 
-                    // Handle BertInstances
-                    if (target instanceof BertInstance instance) {
-                        // FIRST, got a field?
-                        if (instance.fields.containsKey(name)) {
-                            pop(); // The instance
-                            push(instance.fields.get(name));
-                            break;
-                        }
-
-                        // NEXT, got a method?
-                        if (bindMethod(instance.klass, instance, name)) {
-                            break;
-                        }
-
-                        throw error("Undefined property: '" + name + "'.");
-                    }
-
-                    // Handle other Joe objects
+                    // Note: this works for all JoeObjects, including
+                    // `BertClass` and `BertInstance`.
                     var joeObject = joe.getJoeObject(target);
                     pop();
                     push(joeObject.get(name));
@@ -399,15 +388,6 @@ class VirtualMachine {
                 case PROPSET -> {
                     var target = peek(1);
                     var name = readString();
-
-                    // Handle BertInstances
-                    if (target instanceof BertInstance instance) {
-                        var value = pop();
-                        instance.fields.put(name, value);
-                        pop();       // Pop the instance
-                        push(value); // Push the value; this is an assignment
-                        break;
-                    }
 
                     // Handle JoeObjects
                     var joeObject = joe.getJoeObject(target);
@@ -608,9 +588,9 @@ class VirtualMachine {
     // Call Stack Operations
 
     // Invoked by Opcode.CALL for all calls
-    private void callValue(Object callee, int argCount) {
+    private void callValue(Object callee, int argCount, Origin origin) {
         switch (callee) {
-            case Closure f -> call(f, argCount, Origin.JOE);
+            case Closure f -> call(f, argCount, origin);
             case NativeCallable f -> {
                 var args = new Args(Arrays.copyOfRange(stack, top - argCount, top));
                 top -= argCount + 1;
@@ -618,13 +598,13 @@ class VirtualMachine {
             }
             case BoundMethod bound -> {
                 stack[top - argCount - 1] = bound.receiver();
-                call(bound.method(), argCount, Origin.JOE);
+                call(bound.method(), argCount, origin);
             }
             case BertClass klass -> {
                 stack[top - argCount - 1] = new BertInstance(klass);
                 var initializer = klass.methods.get("init");
                 if (initializer != null) {
-                    call(initializer, argCount, Origin.JOE);
+                    call(initializer, argCount, origin);
                 } else if (argCount != 0) {
                     throw error(Args.arityFailureMessage(klass.name() + "()"));
                 }

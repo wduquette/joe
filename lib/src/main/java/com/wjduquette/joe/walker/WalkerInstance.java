@@ -7,6 +7,10 @@ import java.util.Map;
 
 class WalkerInstance implements JoeObject {
     private final static String TO_STRING = "toString";
+
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
     private final JoeClass joeClass;
     private final Map<String, Object> fields = new HashMap<>();
 

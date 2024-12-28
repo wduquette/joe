@@ -52,7 +52,7 @@ public class BertEngine implements Engine {
     @Override
     public boolean isCallable(Object callee) {
         return callee instanceof NativeCallable
-            || callee instanceof Closure;
+            || callee instanceof BertCallable;
     }
 
     @Override
