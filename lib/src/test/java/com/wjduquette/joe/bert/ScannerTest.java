@@ -11,6 +11,7 @@ import java.util.List;
 import static com.wjduquette.joe.bert.TokenType.*;
 import static com.wjduquette.joe.bert.TokenType.WHILE;
 import static com.wjduquette.joe.checker.Checker.check;
+import static com.wjduquette.joe.checker.Checker.fail;
 
 public class ScannerTest extends Ted {
     private Scanner scanner;
@@ -129,8 +130,8 @@ public class ScannerTest extends Ted {
     // String Literals
 
     @Test
-    public void testStringEscapes() {
-        test("testStringEscapes");
+    public void testString_escapes() {
+        test("testString_escapes");
         check(scanString("\"abc\"")).eq("abc");
         check(scanString("\"-\\\\-\"")).eq("-\\-");
         check(scanString("\"-\\t-\"")).eq("-\t-");
@@ -140,30 +141,88 @@ public class ScannerTest extends Ted {
         check(scanString("\"-\\f-\"")).eq("-\f-");
         check(scanString("\"-\\\"-\"")).eq("-\"-");
         check(scanString("\"-\\u2192-\"")).eq("-→-");
-
-        check(scanString("\"-\\\"")).eq(null);
     }
 
     @Test
-    public void testError_unterminatedString() {
-        test("testError_unterminatedString");
+    public void testString_unterminated() {
+        test("testUnterminatedString");
         check(scanError("\"abc"))
             .hasString("At end, unterminated string.");
     }
 
     @Test
-    public void testError_unexpectedEscape() {
-        test("testError_unexpectedEscape");
-        check(scanError("\"\\x\""))
-            .hasString("At '\"\\x', unexpected escape.");
+    public void testString_unescapedNewline() {
+        test("testString_unescapedNewline");
+        check(scanError("\"a\nbc\""))
+            .hasString("At '\"a', unescaped newline in single-line string.");
     }
 
+    @Test
+    public void testString_invalidEscape() {
+        test("testString_invalidEscape");
+        check(scanError("\"\\x\""))
+            .hasString("At '\"\\x', invalid escape.");
+    }
 
     @Test
-    public void testError_incompleteUnicodeEscape() {
-        test("testError_incompleteUnicodeEscape");
+    public void testString_incompleteUnicodeEscape() {
+        test("testString_incompleteUnicodeEscape");
         check(scanError("\"\\u123\""))
             .hasString("At '\"\\u123', incomplete Unicode escape.");
+    }
+
+    //-------------------------------------------------------------------------
+    // Text Blocks
+
+    // Adds text block boilerplate to a simple text string.
+    private String block(String text) {
+        return "\"\"\"\n" + text + "\n\"\"\"";
+    }
+
+    @Test
+    public void testTextBlock_outdent() {
+        test("testTextBlock_outdent");
+        check(scanString(block("      First\n  Second")))
+            .eq("""
+                    First
+                Second
+                """.stripTrailing());
+    }
+
+    @Test
+    public void testTextBlock_escapes() {
+        test("testTextBlock_escapes");
+        check(scanString(block("abc"))).eq("abc");
+        check(scanString(block("-\\\\-"))).eq("-\\-");
+        check(scanString(block("-\\t-"))).eq("-\t-");
+        check(scanString(block("-\\b-"))).eq("-\b-");
+        check(scanString(block("-\\n-"))).eq("-\n-");
+        // stripIndent mungs '\r', quite reasonably.
+        check(scanString(block("-\\r-"))).eq("-\n-");
+        check(scanString(block("-\\f-"))).eq("-\f-");
+        check(scanString(block("-\\\"-"))).eq("-\"-");
+        check(scanString(block("-\\u2192-"))).eq("-→-");
+    }
+
+    @Test
+    public void testTextBlock_unterminated() {
+        test("testUnterminatedString");
+        check(scanError("\"\"\"abc"))
+            .hasString("At end, unterminated text block.");
+    }
+
+    @Test
+    public void testTextBlock_invalidEscape() {
+        test("testTextBlock_invalidEscape");
+        check(scanError(block("\\x")))
+            .hasString("At '\"\"\"\n\\x', invalid escape.");
+    }
+
+    @Test
+    public void testTextBlock_incompleteUnicodeEscape() {
+        test("testTextBlock_incompleteUnicodeEscape");
+        check(scanError(block("\\u123")))
+            .hasString("At '\"\"\"\n\\u123', incomplete Unicode escape.");
     }
 
     //-------------------------------------------------------------------------
@@ -238,11 +297,21 @@ public class ScannerTest extends Ted {
     }
 
     private String scanString(String input) {
+        println("scanString[" + input + "]");
         scanInput(input);
         var token = next();
 
         return token.type() == TokenType.STRING
             ? (String)token.literal()
             : null;
+    }
+
+    @SuppressWarnings("unused")
+    private void dumpChars(String title, String chars) {
+        println("dumpChars " + title);
+        for (var i = 0; i < chars.length(); i++) {
+            var c = chars.charAt(i);
+            println("  [" + i + "] = " + (int)c);
+        }
     }
 }

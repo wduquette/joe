@@ -287,7 +287,7 @@ class Scanner {
                             case '"' -> buff.append('"');
                             case 'u' -> unicode(buff);
                             default -> error(
-                                "Unexpected escape: '\\" + escape + "'.");
+                                "Invalid escape: '\\" + escape + "'.");
                         }
                     }
                 }
@@ -341,7 +341,7 @@ class Scanner {
                             case '"' -> buff.append('"');
                             case 'u' -> unicode(buff);
                             default -> error(
-                                "Unexpected escape: '\\" + escape + "'.");
+                                "Invalid escape: '\\" + escape + "'.");
                         }
                     }
                 }
