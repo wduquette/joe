@@ -373,6 +373,8 @@ class VirtualMachine {
                 case PROPGET -> {
                     var target = peek(0);
                     var name = readString();
+
+                    // Handle BertInstances
                     if (target instanceof BertInstance instance) {
                         // FIRST, got a field?
                         if (instance.fields.containsKey(name)) {
@@ -387,23 +389,32 @@ class VirtualMachine {
                         }
 
                         throw error("Undefined property: '" + name + "'.");
-                    } else {
-                        throw error("Expected Joe object, got: " +
-                            joe.typedValue(target));
                     }
+
+                    // Handle other Joe objects
+                    var joeObject = joe.getJoeObject(target);
+                    pop();
+                    push(joeObject.get(name));
                 }
                 case PROPSET -> {
                     var target = peek(1);
                     var name = readString();
+
+                    // Handle BertInstances
                     if (target instanceof BertInstance instance) {
                         var value = pop();
                         instance.fields.put(name, value);
                         pop();       // Pop the instance
                         push(value); // Push the value; this is an assignment
-                    } else {
-                        throw error("Expected Joe object, got: " +
-                            joe.typedValue(target));
+                        break;
                     }
+
+                    // Handle JoeObjects
+                    var joeObject = joe.getJoeObject(target);
+                    var value = pop();
+                    joeObject.set(name, value);
+                    pop();       // Pop the instance
+                    push(value); // Push the value; this is an assignment.
                 }
                 case RETURN -> {
                     var result = pop();
