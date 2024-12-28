@@ -132,6 +132,7 @@ public class Scanner {
                 }
             }
             case '"' -> string();
+            case '\'' -> rawString();
             case '#' -> keyword();
             default -> errorToken("unexpected character.");
         };
@@ -155,6 +156,10 @@ public class Scanner {
     }
 
     private Token string() {
+        if (matchNext("\"\"")) {
+            return textBlock();
+        }
+
         var buff = new StringBuilder();
 
         while (peek() != '"' && !isAtEnd()) {
@@ -180,12 +185,12 @@ public class Scanner {
                                 }
                             }
                             default -> errorToken(
-                                "unexpected escape.");
+                                "invalid escape.");
                         }
                     }
                 }
                 case '\n' -> {
-                    return errorToken("Newline in single-line string.");
+                    return errorToken("unescaped newline in single-line string.");
                 }
                 default -> buff.append(advance());
             }
@@ -198,6 +203,64 @@ public class Scanner {
         // Closing quote
         advance();
         return makeToken(STRING, buff.toString());
+    }
+
+    private Token textBlock() {
+        var buff = new StringBuilder();
+
+        while (!isAtEnd()) {
+            var c = peek();
+
+            switch (c) {
+                case '"' -> {
+                    if (matchNext("\"\"\"")) {
+                        // Add the unescaped string.
+                        return makeToken(STRING, outdent(buff.toString()));
+                    } else {
+                        buff.append(advance());
+                    }
+                }
+                case '\\' -> {
+                    if (!isAtEnd()) {
+                        advance(); // Skip past the backslash
+                        var escape = advance();
+                        switch (escape) {
+                            case '\\' -> buff.append('\\');
+                            case 't' -> buff.append('\t');
+                            case 'b' -> buff.append('\b');
+                            case 'n' -> buff.append('\n');
+                            case 'r' -> buff.append('\r');
+                            case 'f' -> buff.append('\f');
+                            case '"' -> buff.append('"');
+                            case 'u' -> unicode(buff);
+                            default -> {
+                                return errorToken(
+                                    "invalid escape.");
+                            }
+                        }
+                    }
+                }
+                default -> buff.append(advance());
+            }
+        }
+
+        return errorToken("unterminated text block.");
+    }
+
+    private String outdent(String text) {
+        // FIRST, remove leading blank lines.
+        while (true) {
+            var ndx = text.indexOf('\n');
+
+            if (ndx >= 0 && text.substring(0, ndx).isBlank()) {
+                text = text.substring(ndx + 1);
+            } else {
+                break;
+            }
+        }
+
+        // NEXT, strip the indent and return.
+        return text.stripTrailing().stripIndent();
     }
 
     private Token unicode(StringBuilder buff) {
@@ -224,6 +287,51 @@ public class Scanner {
         } catch (Exception ex) {
             return "\uFFFD";
         }
+    }
+
+    private Token rawString() {
+        if (matchNext("''")) {
+            return rawTextBlock();
+        }
+
+        while (peek() != '\'' && !isAtEnd()) {
+            var c = advance();
+
+            if (c == '\n') {
+                return errorToken("newline in raw string.");
+            }
+        }
+
+        if (isAtEnd()) {
+            return errorToken("unterminated raw string.");
+        }
+
+        // The closing quote
+        advance();
+
+        // Add the raw string.
+        return makeToken(STRING, source.substring(start+1,current-1));
+    }
+
+    private Token rawTextBlock() {
+        while (!isAtEnd()) {
+            var c = peek();
+
+            switch (c) {
+                case '\'' -> {
+                    if (matchNext("'''")) {
+                        // Add the string.
+                        var string = source.substring(start+3,current-3);
+                        return makeToken(STRING, outdent(string));
+                    } else {
+                        advance();
+                    }
+                }
+                default -> advance();
+            }
+        }
+
+        return errorToken("unterminated raw text block.");
     }
 
     private Token number() {
@@ -300,6 +408,11 @@ public class Scanner {
             ? '\0' : source.charAt(current + 1);
     }
 
+    private char peekNext(int delta) {
+        if (current + delta >= source.length()) return '\0';
+        return source.charAt(current + delta);
+    }
+
     private char advance() {
         current++;
         return source.charAt(current - 1);
@@ -309,6 +422,16 @@ public class Scanner {
         if (isAtEnd()) return false;
         if (source.charAt(current) != expected) return false;
         current ++;
+        return true;
+    }
+
+    private boolean matchNext(String expected) {
+        for (int i = 0; i < expected.length(); i++) {
+            if (peekNext(i) != expected.charAt(i)) {
+                return false;
+            }
+        }
+        current += expected.length();
         return true;
     }
 
