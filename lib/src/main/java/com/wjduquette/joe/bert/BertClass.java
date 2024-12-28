@@ -1,9 +1,13 @@
 package com.wjduquette.joe.bert;
 
+import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeError;
+import com.wjduquette.joe.JoeObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class BertClass {
+public class BertClass implements JoeObject {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -26,6 +30,32 @@ public class BertClass {
     public String name() {
         return name;
     }
+
+    //-------------------------------------------------------------------------
+    // JoeObject API
+
+    @Override
+    public String typeName() {
+        return "<class>";
+    }
+
+    @Override
+    public Object get(String name) {
+        // TODO: Support static fields and methods
+        throw new JoeError("Undefined property '" + name + "'.");
+    }
+
+    @Override
+    public void set(String name, Object value) {
+        // TODO: Support static fields
+        throw new JoeError("Undefined property '" + name + "'.");
+    }
+
+    @Override
+    public String stringify(Joe joe) {
+        return "<class " + name + ">";
+    }
+
 
     //-------------------------------------------------------------------------
     // Object API
