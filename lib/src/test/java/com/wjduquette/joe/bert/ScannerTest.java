@@ -11,7 +11,6 @@ import java.util.List;
 import static com.wjduquette.joe.bert.TokenType.*;
 import static com.wjduquette.joe.bert.TokenType.WHILE;
 import static com.wjduquette.joe.checker.Checker.check;
-import static com.wjduquette.joe.checker.Checker.fail;
 
 public class ScannerTest extends Ted {
     private Scanner scanner;
@@ -238,7 +237,7 @@ public class ScannerTest extends Ted {
 
     @Test
     public void testTextBlock_unterminated() {
-        test("testUnterminatedString");
+        test("testTextBlock_unterminated");
         check(scanError("\"\"\"abc"))
             .hasString("At end, unterminated text block.");
     }
@@ -255,6 +254,38 @@ public class ScannerTest extends Ted {
         test("testTextBlock_incompleteUnicodeEscape");
         check(scanError(block("\\u123")))
             .hasString("At '\"\"\"\n\\u123', incomplete Unicode escape.");
+    }
+
+    //-------------------------------------------------------------------------
+    // Raw Text Blocks
+
+    // Adds raw text block boilerplate to a simple text string.
+    private String raw(String text) {
+        return "'''\n" + text + "\n'''";
+    }
+
+    @Test
+    public void testRawBlock_outdent() {
+        test("testRawBlock_outdent");
+        check(scanString(raw("      First\n  Second")))
+            .eq("""
+                    First
+                Second
+                """.stripTrailing());
+    }
+
+    @Test
+    public void testRawBlock_escapes() {
+        test("testRawBlock_escapes");
+        check(scanString(raw("abc"))).eq("abc");
+        check(scanString(raw("-\\n-"))).eq("-\\n-");
+    }
+
+    @Test
+    public void testRawBlock_unterminated() {
+        test("testRawBlock_unterminated");
+        check(scanError("'''abc"))
+            .hasString("At end, unterminated raw text block.");
     }
 
     //-------------------------------------------------------------------------

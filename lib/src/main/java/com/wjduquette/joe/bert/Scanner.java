@@ -260,8 +260,7 @@ public class Scanner {
         }
 
         // NEXT, strip the indent and return.
-        var outdent = text.stripTrailing().stripIndent();
-        return outdent;
+        return text.stripTrailing().stripIndent();
     }
 
     private Token unicode(StringBuilder buff) {
