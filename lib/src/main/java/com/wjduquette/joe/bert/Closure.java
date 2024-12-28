@@ -1,6 +1,11 @@
 package com.wjduquette.joe.bert;
 
-public class Closure {
+/**
+ * A Closure is a Bert `Function` wrapped up with its captured local variables.
+ * The `Compiler` produces `Functions`, which includes methods; but at runtime
+ * every `Function` is wrapped as a `Closure`.
+ */
+public class Closure implements BertCallable {
     //-------------------------------------------------------------------------
     // Instance Variables
 
