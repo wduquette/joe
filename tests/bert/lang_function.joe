@@ -26,7 +26,7 @@ function testFunction_tooFewArgs() {
     function twoArgs(name, value) { }
 
     function bad() { twoArgs(#a); }
-//    assertError(bad, "Wrong number of arguments, expected: twoArgs(name, value).");
+    assertError(bad, "Wrong number of arguments, expected: twoArgs(name, value).");
 }
 
 // Function arity is checked.
@@ -34,7 +34,7 @@ function testFunction_tooManyArgs() {
     function twoArgs(name, value) { }
 
     function bad() { twoArgs(#a, #b, #c); }
-//    assertError(bad, "Wrong number of arguments, expected: twoArgs(name, value).");
+    assertError(bad, "Wrong number of arguments, expected: twoArgs(name, value).");
 }
 
 //// Varargs function

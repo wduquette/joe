@@ -121,7 +121,10 @@ class Compiler {
     // Completes compilation of the current function and returns it.
     private Function endFunction() {
         emitReturn();
-        var function = new Function(current.chunk, current.upvalueCount);
+        var function = new Function(
+            current.parameters,
+            current.chunk,
+            current.upvalueCount);
         if (dump != null) {
             dump.append(disassembler.disassemble(function)).append("\n");
         }
@@ -229,6 +232,7 @@ class Compiler {
                 }
                 var constant = parseVariable("Expected parameter name.");
                 defineVariable(constant);
+                current.parameters.add(parser.previous.lexeme());
             } while (match(COMMA));
         }
         consume(RIGHT_PAREN, "Expected ')' after parameters.");
@@ -929,6 +933,9 @@ class Compiler {
     private class FunctionCompiler {
         // The enclosing function, or null.
         final FunctionCompiler enclosing;
+
+        // The names of the function's parameters.
+        final List<String> parameters = new ArrayList<>();
 
         // The chunk into which byte-code is compiled.
         final Chunk chunk;

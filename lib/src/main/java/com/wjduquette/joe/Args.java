@@ -35,11 +35,21 @@ public final class Args {
      * with the given signature.  This is primarily used by the arity checker
      * methods, but can also be used by native functions and methods at need.
      * @param signature The signature
-     * @return The error, to be thrown.
+     * @return The error to be thrown.
      */
     public static JoeError arityFailure(String signature) {
-        return new JoeError("Wrong number of arguments, expected: " +
-            signature + ".");
+        return new JoeError(arityFailureMessage(signature));
+    }
+
+    /**
+     * Returns a "Wrong number of arguments" message string for a method or
+     * function with the given signature.  This is primarily used by the
+     * current `Engine` when generating runtime errors.
+     * @param signature The signature
+     * @return The error message.
+     */
+    public static String arityFailureMessage(String signature) {
+        return "Wrong number of arguments, expected: " + signature + ".";
     }
 
     //-------------------------------------------------------------------------

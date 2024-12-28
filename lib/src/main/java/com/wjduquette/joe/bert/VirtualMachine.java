@@ -615,7 +615,7 @@ class VirtualMachine {
                 if (initializer != null) {
                     call(initializer, argCount, Origin.JOE);
                 } else if (argCount != 0) {
-                    throw error("Expected 0 arguments but got " + argCount + ".");
+                    throw error(Args.arityFailureMessage(klass.name() + "()"));
                 }
             }
             default ->
@@ -625,8 +625,7 @@ class VirtualMachine {
 
     private void call(Closure closure, int argCount, Origin origin) {
         if (argCount != closure.function.arity) {
-            throw error("Callable " + closure + " expected " + closure.function.arity + " arguments, got: " +
-                argCount + ".");
+            throw error(Args.arityFailureMessage(closure.function.signature()));
         }
 
         if (frameCount == MAX_FRAMES) {
