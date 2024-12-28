@@ -145,7 +145,7 @@ public class ScannerTest extends Ted {
 
     @Test
     public void testString_unterminated() {
-        test("testUnterminatedString");
+        test("testString_unterminated");
         check(scanError("\"abc"))
             .hasString("At end, unterminated string.");
     }
@@ -169,6 +169,38 @@ public class ScannerTest extends Ted {
         test("testString_incompleteUnicodeEscape");
         check(scanError("\"\\u123\""))
             .hasString("At '\"\\u123', incomplete Unicode escape.");
+    }
+
+    //-------------------------------------------------------------------------
+    // Raw Text Strings
+
+    @Test
+    public void testRawString_ok() {
+        test("testRawString_ok");
+        check(scanString("'abc'")).eq("abc");
+        check(scanString("'-\\\\-'")).eq("-\\\\-");
+        check(scanString("'-\\x-'")).eq("-\\x-");
+        check(scanString("'-\\t-'")).eq("-\\t-");
+        check(scanString("'-\\b-'")).eq("-\\b-");
+        check(scanString("'-\\n-'")).eq("-\\n-");
+        check(scanString("'-\\r-'")).eq("-\\r-");
+        check(scanString("'-\\f-'")).eq("-\\f-");
+        check(scanString("'-\\\"-'")).eq("-\\\"-");
+        check(scanString("'-\\u2192-'")).eq("-\\u2192-");
+    }
+
+    @Test
+    public void testRawString_unterminated() {
+        test("testRawString_unterminated");
+        check(scanError("'abc"))
+            .hasString("At end, unterminated raw string.");
+    }
+
+    @Test
+    public void testRawString_newline() {
+        test("testRawString_newline");
+        check(scanError("'a\nbc'"))
+            .hasString("At ''a\n', newline in raw string.");
     }
 
     //-------------------------------------------------------------------------

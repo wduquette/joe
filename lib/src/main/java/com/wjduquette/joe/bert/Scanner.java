@@ -132,6 +132,7 @@ public class Scanner {
                 }
             }
             case '"' -> string();
+            case '\'' -> rawString();
             case '#' -> keyword();
             default -> errorToken("unexpected character.");
         };
@@ -287,6 +288,51 @@ public class Scanner {
         } catch (Exception ex) {
             return "\uFFFD";
         }
+    }
+
+    private Token rawString() {
+        if (matchNext("''")) {
+            return rawTextBlock();
+        }
+
+        while (peek() != '\'' && !isAtEnd()) {
+            var c = advance();
+
+            if (c == '\n') {
+                return errorToken("newline in raw string.");
+            }
+        }
+
+        if (isAtEnd()) {
+            return errorToken("unterminated raw string.");
+        }
+
+        // The closing quote
+        advance();
+
+        // Add the raw string.
+        return makeToken(STRING, source.substring(start+1,current-1));
+    }
+
+    private Token rawTextBlock() {
+        while (!isAtEnd()) {
+            var c = peek();
+
+            switch (c) {
+                case '\'' -> {
+                    if (matchNext("'''")) {
+                        // Add the string.
+                        var string = source.substring(start+3,current-3);
+                        return makeToken(STRING, outdent(string));
+                    } else {
+                        advance();
+                    }
+                }
+                default -> advance();
+            }
+        }
+
+        return errorToken("unterminated raw text block.");
     }
 
     private Token number() {
