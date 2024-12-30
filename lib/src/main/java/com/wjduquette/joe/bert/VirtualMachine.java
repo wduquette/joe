@@ -442,10 +442,11 @@ class VirtualMachine {
                 }
                 case TRUE -> push(true);
                 case UPCLOSE -> {
-                    // Close and then pop the upvalue whose value is on the
+                    // Close and then pop the *n* upvalues on the
                     // top of the stack.
-                    closeUpvalues(top - 1);
-                    pop();
+                    int n = readArg();
+                    closeUpvalues(top - n);
+                    top -= n;
                 }
                 case UPGET -> {
                     int slot = readArg();

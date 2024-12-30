@@ -294,10 +294,13 @@ class Compiler {
     }
 
     private void statement() {
-        if (match(IF)) {
-            ifStatement();
-        } else if (match(FOR)) {
+//        if (match(BREAK)) {
+//            breakStatement();
+//        } else
+        if (match(FOR)) {
             forStatement();
+        } else if (match(IF)) {
+            ifStatement();
         } else if (match(RETURN)) {
             returnStatement();
         } else if (match(WHILE)) {
@@ -331,6 +334,10 @@ class Compiler {
             emit(Opcode.POP);
         }
     }
+
+//    private void breakStatement() {
+//
+//    }
 
     private void forStatement() {
         beginScope();
@@ -756,11 +763,16 @@ class Compiler {
     private void endScope() {
         current.scopeDepth--;
 
+        // TODO: Consider this optimization
+        //
+        // - Determine the number *n* of locals being popped, and whether any of
+        //   them have been captured.
+        // - Emit `POPN n` if none have been captured, and `UPCLOSE n` otherwise.
         while (current.localCount > 0
             && current.locals[current.localCount - 1].depth > current.scopeDepth)
         {
             if (current.locals[current.localCount -1].isCaptured) {
-                emit(Opcode.UPCLOSE);
+                emit(Opcode.UPCLOSE, (char)1);
             } else {
                 emit(Opcode.POP);
             }
