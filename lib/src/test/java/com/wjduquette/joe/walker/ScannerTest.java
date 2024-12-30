@@ -52,7 +52,7 @@ public class ScannerTest extends Ted {
     public void testError_unexpectedEscape() {
         test("testError_unexpectedEscape");
         check(scan("\"\\x\""))
-            .hasString("Unexpected escape: '\\x'.");
+            .hasString("Invalid escape: '\\x'.");
     }
 
     @Test
