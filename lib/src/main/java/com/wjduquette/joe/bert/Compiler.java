@@ -356,6 +356,8 @@ class Compiler {
     }
 
     private void forStatement() {
+        currentLoop = new LoopCompiler(currentLoop, current.scopeDepth);
+
         beginScope();
         consume(LEFT_PAREN, "Expected '(' after 'for'.");
 
@@ -392,10 +394,14 @@ class Compiler {
 
         statement();
         emitLoop(loopStart);
+
         if (exitJump != -1) {
             patchJump(exitJump);
         }
         endScope();
+
+        currentLoop.breakJumps.forEach(this::patchJump);
+        currentLoop = currentLoop.enclosing;
     }
 
     private void ifStatement() {

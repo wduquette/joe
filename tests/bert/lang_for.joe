@@ -31,26 +31,28 @@ function testNoUpdater() {
     assertEquals(sum, 6);
 }
 
-// Requires break, continue
 
-//function testBreak() {
-//    var sum = 0;
-//    for (var i = 1; i <= 10; i = i + 1) {
-//        sum = sum + i;
-//        if (i == 3) break;
-//    }
-//    assertEquals(sum, 6);
-//}
-//
-//function testNoCondition() {
-//    var sum = 0;
-//    for (var i = 1; ; i = i + 1) {
-//        sum = sum + i;
-//        if (i == 3) break;
-//    }
-//    assertEquals(sum, 6);
-//}
-//
+function testBreak() {
+    var sum = 0;
+    for (var i = 1; i <= 10; i = i + 1) {
+        sum = sum + i;
+        if (i == 3) break;
+    }
+    assertEquals(sum, 6);
+}
+
+function testNoCondition() {
+    var sum = 0;
+    for (var i = 1; ; i = i + 1) {
+        sum = sum + i;
+        if (i == 3) break;
+    }
+    assertEquals(sum, 6);
+}
+
+
+// Requires continue
+
 //function testContinue() {
 //    var sumBefore = 0;
 //    var sumAfter = 0;
