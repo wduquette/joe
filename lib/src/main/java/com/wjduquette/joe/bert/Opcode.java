@@ -43,10 +43,11 @@ public class Opcode {
     public static final char RETURN  = 34;
     public static final char SUB     = 35;
     public static final char SUPGET  = 36;
-    public static final char TRUE    = 37;
-    public static final char UPCLOSE = 38;
-    public static final char UPGET   = 39;
-    public static final char UPSET   = 40;
+    public static final char THROW   = 37;
+    public static final char TRUE    = 38;
+    public static final char UPCLOSE = 39;
+    public static final char UPGET   = 40;
+    public static final char UPSET   = 41;
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -89,6 +90,7 @@ public class Opcode {
         "RETURN",
         "SUB",
         "SUPGET",
+        "THROW",
         "TRUE",
         "UPCLOSE",
         "UPGET",

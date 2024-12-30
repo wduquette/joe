@@ -442,6 +442,14 @@ class VirtualMachine {
                         throw error("Undefined property: '" + name + "'.");
                     }
                 }
+                case THROW -> {
+                    var value = pop();
+                    if (value instanceof JoeError err) {
+                        throw err.addInfo("Rethrowing existing error.");
+                    } else {
+                        throw error(joe.stringify(value));
+                    }
+                }
                 case TRUE -> push(true);
                 case UPCLOSE -> {
                     // Close and then pop the *n* upvalues on the

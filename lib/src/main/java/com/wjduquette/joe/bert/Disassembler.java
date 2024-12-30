@@ -115,6 +115,14 @@ public class Disassembler {
         var prefix = isChunk ? chunkPrefix(ip) : singlePrefix(ip);
 
         switch (opcode) {
+            case ADD, DIV, EQ, FALSE, GE, GT, INHERIT, LE, LT, MUL,
+                NE, NEGATE, NOT, NULL, POP, RETURN, SUB, THROW, TRUE
+                -> {
+                // Simple Instructions
+                // Pattern: opcode
+                lines.add(new Line(ip, prefix));
+                return ip + 1;
+            }
             case CALL, LOCGET, LOCSET, POPN, UPCLOSE, UPGET, UPSET -> {
                 // Char Instructions (instructions with one arbitrary char arg)
                 // Pattern: opcode charValue
@@ -154,14 +162,6 @@ public class Disassembler {
                 var text = String.format(" %04d '%s'", index, constant);
                 lines.add(new Line(ip, prefix + text));
                 return ip + 2;
-            }
-            case ADD, DIV, EQ, FALSE, GE, GT, INHERIT, LE, LT, MUL,
-                NE, NEGATE, NOT, NULL, POP, RETURN, SUB, TRUE
-            -> {
-                // Simple Instructions
-                // Pattern: opcode
-                lines.add(new Line(ip, prefix));
-                return ip + 1;
             }
             case CLOSURE -> {
                 // Closure Instruction

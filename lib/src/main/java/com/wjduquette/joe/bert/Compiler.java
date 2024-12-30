@@ -307,6 +307,8 @@ class Compiler {
             ifStatement();
         } else if (match(RETURN)) {
             returnStatement();
+        } else if (match(THROW)) {
+            throwStatement();
         } else if (match(WHILE)) {
             whileStatement();
         } else if (match(LEFT_BRACE)) {
@@ -451,6 +453,12 @@ class Compiler {
             consume(SEMICOLON, "Expected ';' after return value.");
             emit(Opcode.RETURN);
         }
+    }
+
+    private void throwStatement() {
+        expression();
+        consume(SEMICOLON, "Expected ';' after 'throw' value.");
+        emit(Opcode.THROW);
     }
 
     private void whileStatement() {
