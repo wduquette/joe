@@ -12,20 +12,18 @@ function testWhile_simple() {
     assertEquals(sum, 10);
 }
 
-// Requires continue
+function testWhile_continue() {
+    var sum = 0;
+    var i = 0;
+    while (i < 4) {
+        i = i + 1;
+        if (i == 2) continue;
+        sum = sum + i;
+    }
 
-//function testWhile_continue() {
-//    var sum = 0;
-//    var i = 0;
-//    while (i < 4) {
-//        i = i + 1;
-//        if (i == 2) continue;
-//        list.add(i);
-//    }
-//
-//    assertEquals(i, 4);
-//    assertEquals(list, List(1,3,4));
-//}
+    assertEquals(i, 4);
+    assertEquals(sum, 8);  // 1 + 3 + 4
+}
 
 
 function testWhile_break_noLocals() {

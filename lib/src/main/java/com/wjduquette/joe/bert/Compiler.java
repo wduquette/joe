@@ -299,6 +299,8 @@ class Compiler {
     private void statement() {
         if (match(BREAK)) {
             breakStatement();
+        } else if (match(CONTINUE)) {
+            continueStatement();
         } else if (match(FOR)) {
             forStatement();
         } else if (match(IF)) {
@@ -348,17 +350,35 @@ class Compiler {
 
         // NEXT, end any open scopes. The  count might be 0; endScope()
         // accounts for that.
-        popLocals(currentLoop.scopeDepth);
+        popLocals(currentLoop.breakDepth);
 
         // NEXT, emit the jump
         var jump = emitJump(Opcode.JUMP);
         currentLoop.breakJumps.add((char)jump);
     }
 
-    private void forStatement() {
-        currentLoop = new LoopCompiler(currentLoop, current.scopeDepth);
+    private void continueStatement() {
+        consume(SEMICOLON, "Expected ';' after 'continue'.");
 
+        // FIRST, are we in a loop?
+        if (currentLoop == null) {
+            error("Found 'continue' outside of any loop.");
+            return;
+        }
+
+        // NEXT, end any open scopes. The  count might be 0; endScope()
+        // accounts for that.
+        popLocals(currentLoop.continueDepth);
+
+        // NEXT, emit the jump
+        emitLoop(currentLoop.loopStart);
+    }
+
+    private void forStatement() {
+        currentLoop = new LoopCompiler(currentLoop);
+        currentLoop.breakDepth = current.scopeDepth;
         beginScope();
+
         consume(LEFT_PAREN, "Expected '(' after 'for'.");
 
         // Initializer
@@ -392,6 +412,8 @@ class Compiler {
             patchJump(bodyJump);
         }
 
+        currentLoop.continueDepth = current.scopeDepth;
+        currentLoop.loopStart = loopStart;
         statement();
         emitLoop(loopStart);
 
@@ -437,7 +459,10 @@ class Compiler {
         expression();
         consume(RIGHT_PAREN, "Expected '(' after condition.");
 
-        currentLoop = new LoopCompiler(currentLoop, current.scopeDepth);
+        currentLoop = new LoopCompiler(currentLoop);
+        currentLoop.breakDepth = current.scopeDepth;
+        currentLoop.continueDepth = current.scopeDepth;
+        currentLoop.loopStart = loopStart;
 
         int exitJump = emitJump(Opcode.JIF);
         statement();
@@ -1078,17 +1103,23 @@ class Compiler {
         // The enclosing loop, or null if none.
         final LoopCompiler enclosing;
 
+        // The scope depth before the entire loop is compiled.
+        // Allows break to know how many scopes to end.
+        int breakDepth = -1;
+
         // The scope depth before the loop body is compiled.
-        // Allows break/continue to know how many scopes to end.
-        final int scopeDepth;
+        // Allows continue to know how many scopes to end.
+        int continueDepth = -1;
 
         // The jump instruction indices for any `break` statements in the
         // body of the loop.
         List<Character> breakJumps = new ArrayList<>();
 
-        LoopCompiler(LoopCompiler enclosing, int scopeDepth) {
+        // The chunk index to loop back to on continue
+        int loopStart = -1;
+
+        LoopCompiler(LoopCompiler enclosing) {
             this.enclosing = enclosing;
-            this.scopeDepth = scopeDepth;
         }
     }
 

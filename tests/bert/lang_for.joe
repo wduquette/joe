@@ -50,17 +50,14 @@ function testNoCondition() {
     assertEquals(sum, 6);
 }
 
-
-// Requires continue
-
-//function testContinue() {
-//    var sumBefore = 0;
-//    var sumAfter = 0;
-//    for (var i = 1; i <= 6; i = i + 1) {
-//        sumBefore = sumBefore + i;
-//        if (i > 3) continue;
-//        sumAfter = sumAfter + i;
-//    }
-//    assertEquals(sumBefore, 21);
-//    assertEquals(sumAfter, 6);
-//}
+function testContinue() {
+    var sumBefore = 0;
+    var sumAfter = 0;
+    for (var i = 1; i <= 6; i = i + 1) {
+        sumBefore = sumBefore + i;
+        if (i > 3) continue;
+        sumAfter = sumAfter + i;
+    }
+    assertEquals(sumBefore, 21);
+    assertEquals(sumAfter, 6);
+}
