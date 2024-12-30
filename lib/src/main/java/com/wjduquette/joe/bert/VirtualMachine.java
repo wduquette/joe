@@ -232,6 +232,7 @@ class VirtualMachine {
                         }
                     }
                 }
+                case COMMENT -> readConstant(); // NO-OP
                 case CONST -> push(readConstant());
                 case DIV -> {
                     var b = pop();
@@ -375,6 +376,7 @@ class VirtualMachine {
                 case NOT -> push(Joe.isFalsey(pop()));
                 case NULL -> push(null);
                 case POP -> pop();
+                case POPN -> top -= readArg();
                 case PROPGET -> {
                     var target = peek(0);
                     var name = readString();
@@ -442,10 +444,11 @@ class VirtualMachine {
                 }
                 case TRUE -> push(true);
                 case UPCLOSE -> {
-                    // Close and then pop the upvalue whose value is on the
+                    // Close and then pop the *n* upvalues on the
                     // top of the stack.
-                    closeUpvalues(top - 1);
-                    pop();
+                    int n = readArg();
+                    closeUpvalues(top - n);
+                    top -= n;
                 }
                 case UPGET -> {
                     int slot = readArg();

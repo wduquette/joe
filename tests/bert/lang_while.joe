@@ -28,16 +28,34 @@ function testWhile_simple() {
 //}
 
 
-// Requires break
-//function testWhile_break() {
-//    var list = List();
-//    var i = 0;
-//    while (i < 4) {
-//        i = i + 1;
-//        if (i == 3) break;
-//        list.add(i);
-//    }
-//
-//    assertEquals(i, 3);
-//    assertEquals(list, List(1,2));
-//}
+function testWhile_break_noLocals() {
+    var sum = 0;
+    var i = 0;
+    while (i < 4) {
+        i = i + 1;
+        if (i == 3) {
+            break;
+        }
+        sum = sum + i;
+    }
+
+    assertEquals(i, 3);
+    assertEquals(sum, 3);
+}
+
+function testWhile_break_locals() {
+    var sum = 0;
+    var i = 0;
+    while (i < 4) {
+        i = i + 1;
+        var x = 2*i;
+
+        if (i == 3) {
+            break;
+        }
+        sum = sum + x;
+    }
+
+    assertEquals(i, 3);
+    assertEquals(sum, 6);
+}

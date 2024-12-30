@@ -10,41 +10,43 @@ public class Opcode {
     public static final char CALL    = 1;
     public static final char CLASS   = 2;
     public static final char CLOSURE = 3;
-    public static final char CONST   = 4;
-    public static final char DIV     = 5;
-    public static final char EQ      = 6;
-    public static final char FALSE   = 7;
-    public static final char GE      = 8;
-    public static final char GLODEF  = 9;
-    public static final char GLOGET  = 10;
-    public static final char GLOSET  = 11;
-    public static final char GT      = 12;
-    public static final char INHERIT = 13;
-    public static final char JIF     = 14;
-    public static final char JIFKEEP = 15;
-    public static final char JITKEEP = 16;
-    public static final char JUMP    = 17;
-    public static final char LE      = 18;
-    public static final char LOCGET  = 19;
-    public static final char LOCSET  = 20;
-    public static final char LOOP    = 21;
-    public static final char LT      = 22;
-    public static final char METHOD  = 23;
-    public static final char MUL     = 24;
-    public static final char NE      = 25;
-    public static final char NEGATE  = 26;
-    public static final char NOT     = 27;
-    public static final char NULL    = 28;
-    public static final char POP     = 29;
-    public static final char PROPGET = 30;
-    public static final char PROPSET = 31;
-    public static final char RETURN  = 32;
-    public static final char SUB     = 33;
-    public static final char SUPGET  = 34;
-    public static final char TRUE    = 35;
-    public static final char UPCLOSE = 36;
-    public static final char UPGET   = 37;
-    public static final char UPSET   = 38;
+    public static final char COMMENT = 4;
+    public static final char CONST   = 5;
+    public static final char DIV     = 6;
+    public static final char EQ      = 7;
+    public static final char FALSE   = 8;
+    public static final char GE      = 9;
+    public static final char GLODEF  = 10;
+    public static final char GLOGET  = 11;
+    public static final char GLOSET  = 12;
+    public static final char GT      = 13;
+    public static final char INHERIT = 14;
+    public static final char JIF     = 15;
+    public static final char JIFKEEP = 16;
+    public static final char JITKEEP = 17;
+    public static final char JUMP    = 18;
+    public static final char LE      = 19;
+    public static final char LOCGET  = 20;
+    public static final char LOCSET  = 21;
+    public static final char LOOP    = 22;
+    public static final char LT      = 23;
+    public static final char METHOD  = 24;
+    public static final char MUL     = 25;
+    public static final char NE      = 26;
+    public static final char NEGATE  = 27;
+    public static final char NOT     = 28;
+    public static final char NULL    = 29;
+    public static final char POP     = 30;
+    public static final char POPN    = 31;
+    public static final char PROPGET = 32;
+    public static final char PROPSET = 33;
+    public static final char RETURN  = 34;
+    public static final char SUB     = 35;
+    public static final char SUPGET  = 36;
+    public static final char TRUE    = 37;
+    public static final char UPCLOSE = 38;
+    public static final char UPGET   = 39;
+    public static final char UPSET   = 40;
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -54,6 +56,7 @@ public class Opcode {
         "CALL",
         "CLASS",
         "CLOSURE",
+        "COMMENT",
         "CONST",
         "DIV",
         "EQ",
@@ -80,6 +83,7 @@ public class Opcode {
         "NOT",
         "NULL",
         "POP",
+        "POPN",
         "PROPGET",
         "PROPSET",
         "RETURN",

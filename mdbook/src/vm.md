@@ -10,6 +10,7 @@ complete) Bert byte-engine.
 | 1  | CALL *argc*       | *f args* → *f(args)* | Call callable             |
 | 2  | CLASS *name*      | ∅ → *cls*            | Create class              |
 | 3  | CLOSURE *def*     | ∅ → *f*              | Load closure              |
+| 4  | COMMENT *name*    | ∅ → ∅                | No-op comment             |
 | 4  | CONST *constant*  | ∅ → *a*              | Load constant             |
 | 5  | DIV               | *a b* → *a* / *b*    | Divide                    |
 | 6  | EQ                | *a b* → *a* == *b*   | Compare: equal            |
@@ -35,17 +36,19 @@ complete) Bert byte-engine.
 | 26 | NEGATE            | *a* → -*a*           | Negate                    |
 | 27 | NOT               | *a* → !*a*           | Not                       |
 | 28 | NULL              | ∅ → null             | Load `null`               |
-| 29 | POP               | *a* → ∅              | Pop                       |
-| 30 | PROPGET *name*    | *obj* → *a*          | Get property value        |
-| 31 | PROPSET *name*    | *obj a* → *a*        | Set property value        |
-| 32 | RETURN            | *a* → ∅              | Return                    |
-| 33 | SUB               | *a b* → *a* - *b*    | Subtract                  |
-| 34 | SUPGET *name*     | *obj sup* → *f*      | Get superclass method     |
-| 35 | TRUE              | ∅ → true             | Load `true`               |
-| 36 | UPCLOSE           | *a* → ∅              | Close upvalue             |
-| 37 | UPGET *slot*      | ∅ → *a*              | Get upvalue               |
-| 38 | UPSET *slot*      | *a* → *a*            | Set upvalue               |
+| 29 | POP               | *a* → ∅              | Pops one value            |
+| 30 | POPN *n*          | *a...* → ∅           | Pops *n* values           |
+| 31 | PROPGET *name*    | *obj* → *a*          | Get property value        |
+| 32 | PROPSET *name*    | *obj a* → *a*        | Set property value        |
+| 33 | RETURN            | *a* → ∅              | Return                    |
+| 34 | SUB               | *a b* → *a* - *b*    | Subtract                  |
+| 35 | SUPGET *name*     | *obj sup* → *f*      | Get superclass method     |
+| 36 | TRUE              | ∅ → true             | Load `true`               |
+| 37 | UPCLOSE *n*       | *v...* → ∅           | Closes *n* upvalue(s)     |
+| 38 | UPGET *slot*      | ∅ → *a*              | Get upvalue               |
+| 39 | UPSET *slot*      | *a* → *a*            | Set upvalue               |
 
+## Variable Names
 
 - *a*, *b*: Arbitrary values
 - *argc*: An argument count
@@ -54,9 +57,32 @@ complete) Bert byte-engine.
 - *constant*: Index into the chunk's constants table
 - *def*: Function info: the `Function` itself plus upvalue details
 - *f*: A closure, e.g., a function or method
+- *n*: A count
 - *name*: An index into the chunk's constants table for a name constant.
 - *offset*: A jump offset
 - *obj*: An object, e.g., a class instance
 - *slot*: A stack slot
 - *sub*: A subclass
 - *sup*: A superclass
+- *v*: A local variable
+
+## COMMENT
+---
+**COMMENT** *name* | ∅ → ∅
+
+A no-op instruction used to insert comments into disassembly listings
+and execution traces.  Used for VM debugging.
+
+## POPN
+---
+**POPN** *n* | *a...* → ∅ 
+
+Pops *n* values from the stack.
+
+## UPCLOSE
+---
+**UPCLOSE** *n* | *v...* → ∅
+
+Pops *n* local variables from the stack, closing any of them that are 
+open upvalues. This is used when ending a scope, and by `break` and `continue` 
+when ending a scope prematurely.
