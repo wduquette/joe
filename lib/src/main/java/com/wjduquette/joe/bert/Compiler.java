@@ -297,7 +297,9 @@ class Compiler {
     }
 
     private void statement() {
-        if (match(BREAK)) {
+        if (match(ASSERT)) {
+            assertStatement();
+        } else if (match(BREAK)) {
             breakStatement();
         } else if (match(CONTINUE)) {
             continueStatement();
@@ -339,6 +341,25 @@ class Compiler {
         } else {
             emit(Opcode.POP);
         }
+    }
+
+    private void assertStatement() {
+        // Compile the condition expression, retaining the expression's span.
+        var start = parser.previous.span().end();
+        expression();
+        var end = parser.previous.span().end();
+
+        if (match(COMMA)) {
+            // Compile the message expression
+            expression();
+        } else {
+            var message = "Assertion unmet: " +
+                buffer.span(start, end).text().strip() + ".";
+            emitConstant(message);
+        }
+        emit(Opcode.ASSERT);
+
+        consume(SEMICOLON, "Expected ';' after assertion.");
     }
 
     private void breakStatement() {

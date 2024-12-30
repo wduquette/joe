@@ -115,31 +115,36 @@ public class Disassembler {
         var prefix = isChunk ? chunkPrefix(ip) : singlePrefix(ip);
 
         switch (opcode) {
-            case ADD, DIV, EQ, FALSE, GE, GT, INHERIT, LE, LT, MUL,
+            // Simple Instructions
+            // Pattern: opcode
+            case ADD, ASSERT, DIV, EQ, FALSE, GE, GT, INHERIT, LE, LT, MUL,
                 NE, NEGATE, NOT, NULL, POP, RETURN, SUB, THROW, TRUE
                 -> {
-                // Simple Instructions
-                // Pattern: opcode
                 lines.add(new Line(ip, prefix));
                 return ip + 1;
             }
+
+            // Char Instructions (instructions with one arbitrary char arg)
+            // Pattern: opcode charValue
             case CALL, LOCGET, LOCSET, POPN, UPCLOSE, UPGET, UPSET -> {
-                // Char Instructions (instructions with one arbitrary char arg)
-                // Pattern: opcode charValue
                 char arg = chunk.code(ip + 1);
                 var text = String.format(" %04d", (int)arg);
                 lines.add(new Line(ip, prefix + text));
                 return ip + 2;
             }
+
+            // Forward Jump Instructions
+            // Pattern: opcode jumpOffset
             case JIF, JIFKEEP, JITKEEP, JUMP -> {
-                // Jump Instructions (forwards)
-                // Pattern: opcode jumpOffset (forwards)
                 char jump = chunk.code(ip + 1);
                 var text = String.format(" %04d -> %d", (int)jump,
                     ip + 2 + jump);  // Add jump
                 lines.add(new Line(ip, prefix + text));
                 return ip + 2;
             }
+
+            // Backward Jump Instructions
+            // Pattern: opcode jumpOffset
             case LOOP -> {
                 // Jump Instructions (backwards)
                 // Pattern: opcode jumpOffset (backwards)
@@ -149,11 +154,12 @@ public class Disassembler {
                 lines.add(new Line(ip, prefix + text));
                 return ip + 2;
             }
+
+            // Constant Instructions
+            // Pattern: opcode constantIndex
             case CLASS, COMMENT, CONST, GLODEF, GLOGET, GLOSET, METHOD,
                 PROPGET, PROPSET, SUPGET
             -> {
-                // Constant Instructions
-                // Pattern: opcode constantIndex
                 int index = chunk.code(ip + 1);
                 var constant = joe.stringify(chunk.getConstant(index));
                 if (constant.length() > 10) {
@@ -163,9 +169,10 @@ public class Disassembler {
                 lines.add(new Line(ip, prefix + text));
                 return ip + 2;
             }
+
+            // Closure Instruction
+            // Pattern: CLOSURE index [,isLocal, index]...
             case CLOSURE -> {
-                // Closure Instruction
-                // Pattern: CLOSURE index [,isLocal, index]...
                 var start = ip++;
                 int constIndex = chunk.code(ip++);
                 var func = (Function)chunk.getConstant(constIndex);
@@ -184,9 +191,10 @@ public class Disassembler {
 
                 return ip;
             }
+
+            // Unknown Instructions
+            // Pattern: opcode (unknown, presume no argument)
             default -> {
-                // Unknown Instructions
-                // Pattern: opcode (unknown, presume no argument)
                 var text = String.format(" %03d", (int)opcode);
                 lines.add(new Line(ip, prefix + text));
                 return ip + 1;

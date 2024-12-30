@@ -210,6 +210,13 @@ class VirtualMachine {
                         throw error("The '+' operator expects two Numbers or at least one String.");
                     }
                 }
+                case ASSERT -> {
+                    var message = pop();
+                    var condition = pop();
+                    if (Joe.isFalsey(condition)) {
+                        throw new AssertError(ipSpan(), joe.stringify(message));
+                    }
+                }
                 case CALL -> {
                     var argCount = readArg();
                     callValue(peek(argCount), argCount, Origin.JOE);
