@@ -232,6 +232,7 @@ class VirtualMachine {
                         }
                     }
                 }
+                case COMMENT -> readConstant(); // NO-OP
                 case CONST -> push(readConstant());
                 case DIV -> {
                     var b = pop();

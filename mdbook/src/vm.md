@@ -10,6 +10,7 @@ complete) Bert byte-engine.
 | 1  | CALL *argc*       | *f args* → *f(args)* | Call callable             |
 | 2  | CLASS *name*      | ∅ → *cls*            | Create class              |
 | 3  | CLOSURE *def*     | ∅ → *f*              | Load closure              |
+| 4  | COMMENT *name*    | ∅ → ∅                | No-op comment             |
 | 4  | CONST *constant*  | ∅ → *a*              | Load constant             |
 | 5  | DIV               | *a b* → *a* / *b*    | Divide                    |
 | 6  | EQ                | *a b* → *a* == *b*   | Compare: equal            |
@@ -64,6 +65,13 @@ complete) Bert byte-engine.
 - *sub*: A subclass
 - *sup*: A superclass
 - *v*: A local variable
+
+## COMMENT
+---
+**COMMENT** *name* | ∅ → ∅
+
+A no-op instruction used to insert comments into disassembly listings
+and execution traces.  Used for VM debugging.
 
 ## POPN
 ---

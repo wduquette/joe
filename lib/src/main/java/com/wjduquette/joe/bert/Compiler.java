@@ -50,6 +50,9 @@ class Compiler {
     // The class currently being compiled, or null
     private ClassCompiler currentClass = null;
 
+    // The loop currently being compiled, or null
+    private LoopCompiler currentLoop = null;
+
     // Used for debugging/dumping
     private transient Disassembler disassembler;
     private transient StringBuilder dump = null;
@@ -294,10 +297,9 @@ class Compiler {
     }
 
     private void statement() {
-//        if (match(BREAK)) {
-//            breakStatement();
-//        } else
-        if (match(FOR)) {
+        if (match(BREAK)) {
+            breakStatement();
+        } else if (match(FOR)) {
             forStatement();
         } else if (match(IF)) {
             ifStatement();
@@ -335,9 +337,23 @@ class Compiler {
         }
     }
 
-//    private void breakStatement() {
-//
-//    }
+    private void breakStatement() {
+        consume(SEMICOLON, "Expected ';' after 'break'.");
+
+        // FIRST, are we in a loop?
+        if (currentLoop == null) {
+            error("Found 'break' outside of any loop.");
+            return;
+        }
+
+        // NEXT, end any open scopes. The  count might be 0; endScope()
+        // accounts for that.
+        popLocals(currentLoop.scopeDepth);
+
+        // NEXT, emit the jump
+        var jump = emitJump(Opcode.JUMP);
+        currentLoop.breakJumps.add((char)jump);
+    }
 
     private void forStatement() {
         beginScope();
@@ -415,11 +431,15 @@ class Compiler {
         expression();
         consume(RIGHT_PAREN, "Expected '(' after condition.");
 
+        currentLoop = new LoopCompiler(currentLoop, current.scopeDepth);
+
         int exitJump = emitJump(Opcode.JIF);
         statement();
         emitLoop(loopStart);
 
+        currentLoop.breakJumps.forEach(this::patchJump);
         patchJump(exitJump);
+        currentLoop = currentLoop.enclosing;
     }
 
     //-------------------------------------------------------------------------
@@ -758,7 +778,7 @@ class Compiler {
         current.scopeDepth++;
     }
 
-    // Decrements the scope depth, cleaning up any local variables defined
+    // Decrements the scope depth by 1, cleaning up any local variables defined
     // in the scope.  Upvalues are closed, other locals are simply popped.
     private void endScope() {
         // FIRST, decrement the scope.
@@ -779,6 +799,35 @@ class Compiler {
             }
             varCount++;
             current.localCount--;
+        }
+
+        // NEXT, generate `POPN` or `UPCLOSE` accordingly.
+        if (varCount > 0) {
+            emit(opcode, (char)varCount);
+        }
+    }
+
+    // Pops any locals down to the given depth, closing upvalues as needed.
+    // This used by `break` and `continue`; it emits code to pop the
+    // requisite number of locals without modifying the compiler's
+    // info about locals.
+    private void popLocals(int depth) {
+        // FIRST, Determine the number of variables going out of scope, and
+        // whether any of them have been captured.
+        int varCount = 0;
+        char opcode = Opcode.POPN;
+
+        var localCount = current.localCount;
+        while (localCount > 0) {
+            var local = current.locals[localCount - 1];
+            if (local.depth <= depth) break;
+
+            if (local.isCaptured) {
+                // Got at least one captured variable.
+                opcode = Opcode.UPCLOSE;
+            }
+            varCount++;
+            localCount--;
         }
 
         // NEXT, generate `POPN` or `UPCLOSE` accordingly.
@@ -874,6 +923,13 @@ class Compiler {
             emit(Opcode.NULL);
         }
         emit(Opcode.RETURN);
+    }
+
+    // Emits a comment instruction; used when debugging the compiler.
+    @SuppressWarnings("unused")
+    private void emitComment(String comment) {
+        var index = current.chunk.addConstant(comment);
+        emit(Opcode.COMMENT, index);
     }
 
     private void emit(char value) {
@@ -1004,11 +1060,29 @@ class Compiler {
 
     // The class currently being compiled.
     private static class ClassCompiler {
-        ClassCompiler enclosing;
+        final ClassCompiler enclosing;
         boolean hasSuperclass = false;
 
         ClassCompiler(ClassCompiler enclosing) {
             this.enclosing = enclosing;
+        }
+    }
+
+    private static class LoopCompiler {
+        // The enclosing loop, or null if none.
+        final LoopCompiler enclosing;
+
+        // The scope depth before the loop body is compiled.
+        // Allows break/continue to know how many scopes to end.
+        final int scopeDepth;
+
+        // The jump instruction indices for any `break` statements in the
+        // body of the loop.
+        List<Character> breakJumps = new ArrayList<>();
+
+        LoopCompiler(LoopCompiler enclosing, int scopeDepth) {
+            this.enclosing = enclosing;
+            this.scopeDepth = scopeDepth;
         }
     }
 
