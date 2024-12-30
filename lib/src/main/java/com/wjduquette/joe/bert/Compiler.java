@@ -761,22 +761,29 @@ class Compiler {
     // Decrements the scope depth, cleaning up any local variables defined
     // in the scope.  Upvalues are closed, other locals are simply popped.
     private void endScope() {
+        // FIRST, decrement the scope.
         current.scopeDepth--;
 
-        // TODO: Consider this optimization
-        //
-        // - Determine the number *n* of locals being popped, and whether any of
-        //   them have been captured.
-        // - Emit `POPN n` if none have been captured, and `UPCLOSE n` otherwise.
+        // NEXT, Determine the number of variables going out of scope, and
+        // whether any of them have been captured.
+        int varCount = 0;
+        char opcode = Opcode.POPN;
+
         while (current.localCount > 0
             && current.locals[current.localCount - 1].depth > current.scopeDepth)
         {
+
             if (current.locals[current.localCount -1].isCaptured) {
-                emit(Opcode.UPCLOSE, (char)1);
-            } else {
-                emit(Opcode.POP);
+                // Got at least one captured variable.
+                opcode = Opcode.UPCLOSE;
             }
+            varCount++;
             current.localCount--;
+        }
+
+        // NEXT, generate `POPN` or `UPCLOSE` accordingly.
+        if (varCount > 0) {
+            emit(opcode, (char)varCount);
         }
     }
 

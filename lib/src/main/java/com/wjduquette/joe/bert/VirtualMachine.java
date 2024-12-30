@@ -375,6 +375,7 @@ class VirtualMachine {
                 case NOT -> push(Joe.isFalsey(pop()));
                 case NULL -> push(null);
                 case POP -> pop();
+                case POPN -> top -= readArg();
                 case PROPGET -> {
                     var target = peek(0);
                     var name = readString();
