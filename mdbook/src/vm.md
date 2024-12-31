@@ -28,37 +28,39 @@ registers:
 | 14 | GLOGET *name*     | ∅ → *a*              | Get global                |
 | 15 | GLOSET *name*     | *a* → *a*            | Set global                |
 | 16 | GT                | *a b* → *a* > *b*    | Compare: greater          |
-| 17 | INCR              | *a* → *a'*           | a' = a + 1                |
-| 18 | INHERIT           | *sup sub* → *sup*    | Inheritance               |
-| 19 | JIF *offset*      | *cond* → ∅           | Jump if false             |
-| 20 | JIFKEEP *offset*  | *cond* → *cond*      | Jump if false, keep value |
-| 21 | JITKEEP *offset*  | *cond* → *cond*      | Jump if true, keep value  |
-| 22 | JUMP *offset*     |                      | Jump forwards             |
-| 23 | LE                | *a b* → *a* <= *b*   | Compare: less or equal    |
-| 24 | LOCGET *slot*     | ∅ → *a*              | Get local                 |
-| 25 | LOCSET *slot*     | *a* → *a*            | Set local                 |
-| 26 | LOOP *offset*     |                      | Jump backwards            |
-| 27 | LT                | *a b* → *a* <= *b*   | Compare: less than        |
-| 28 | METHOD *name*     | *cls f* → *cls*      | Add method to class       |
-| 29 | MUL               | *a b* → *a* * *b*    | Multiply                  |
-| 30 | NE                | *a b* → *a* < *b*    | Compare: not equal        |
-| 31 | NEGATE            | *a* → -*a*           | Negate                    |
-| 32 | NOT               | *a* → !*a*           | Not                       |
-| 33 | NULL              | ∅ → null             | Load `null`               |
-| 34 | POP               | *a* → ∅              | Pops one value            |
-| 35 | POPN *n*          | *a...* → ∅           | Pops *n* values           |
-| 36 | PROPGET *name*    | *obj* → *a*          | Get property value        |
-| 37 | PROPSET *name*    | *obj a* → *a*        | Set property value        |
-| 38 | RETURN            | *a* → ∅              | Return                    |
-| 39 | SUB               | *a b* → *a* - *b*    | Subtract                  |
-| 40 | SUPGET *name*     | *obj sup* → *f*      | Get superclass method     |
-| 41 | TGET              | ∅ → *a*              | *a* = T                   |
-| 42 | TRUE              | ∅ → true             | Load `true`               |
-| 43 | TPUT              | *a* → *a*            | T = *a*                   |
-| 44 | THROW             | *a* → ∅              | Throw error               |
-| 45 | UPCLOSE *n*       | *v...* → ∅           | Closes *n* upvalue(s)     |
-| 46 | UPGET *slot*      | ∅ → *a*              | Get upvalue               |
-| 47 | UPSET *slot*      | *a* → *a*            | Set upvalue               |
+| 17 | IN                | *a coll* → bool      | a in collection           |
+| 18 | INCR              | *a* → *a'*           | a' = a + 1                |
+| 19 | INHERIT           | *sup sub* → *sup*    | Inheritance               |
+| 20 | JIF *offset*      | *cond* → ∅           | Jump if false             |
+| 21 | JIFKEEP *offset*  | *cond* → *cond*      | Jump if false, keep value |
+| 22 | JITKEEP *offset*  | *cond* → *cond*      | Jump if true, keep value  |
+| 23 | JUMP *offset*     |                      | Jump forwards             |
+| 24 | LE                | *a b* → *a* <= *b*   | Compare: less or equal    |
+| 25 | LOCGET *slot*     | ∅ → *a*              | Get local                 |
+| 26 | LOCSET *slot*     | *a* → *a*            | Set local                 |
+| 27 | LOOP *offset*     |                      | Jump backwards            |
+| 28 | LT                | *a b* → *a* <= *b*   | Compare: less than        |
+| 29 | METHOD *name*     | *cls f* → *cls*      | Add method to class       |
+| 30 | MUL               | *a b* → *a* * *b*    | Multiply                  |
+| 31 | NE                | *a b* → *a* < *b*    | Compare: not equal        |
+| 32 | NEGATE            | *a* → -*a*           | Negate                    |
+| 33 | NI                | *a coll* → bool      | a not in collection       |
+| 34 | NOT               | *a* → !*a*           | Not                       |
+| 35 | NULL              | ∅ → null             | Load `null`               |
+| 36 | POP               | *a* → ∅              | Pops one value            |
+| 37 | POPN *n*          | *a...* → ∅           | Pops *n* values           |
+| 38 | PROPGET *name*    | *obj* → *a*          | Get property value        |
+| 39 | PROPSET *name*    | *obj a* → *a*        | Set property value        |
+| 40 | RETURN            | *a* → ∅              | Return                    |
+| 41 | SUB               | *a b* → *a* - *b*    | Subtract                  |
+| 42 | SUPGET *name*     | *obj sup* → *f*      | Get superclass method     |
+| 43 | TGET              | ∅ → *a*              | *a* = T                   |
+| 44 | TRUE              | ∅ → true             | Load `true`               |
+| 45 | TPUT              | *a* → *a*            | T = *a*                   |
+| 46 | THROW             | *a* → ∅              | Throw error               |
+| 47 | UPCLOSE *n*       | *v...* → ∅           | Closes *n* upvalue(s)     |
+| 48 | UPGET *slot*      | ∅ → *a*              | Get upvalue               |
+| 49 | UPSET *slot*      | *a* → *a*            | Set upvalue               |
 
 ## Variable Names
 

@@ -333,8 +333,24 @@ function testTernary() {
 //-----------------------------------------------------------------------------
 // in/ni Operators
 
-//function testIN() {
-//function testNI() {
+function testIN() {
+    var list = List(#a, #b, #c);
+    assertTrue(#a in list);
+    assertFalse(#d in list);
+
+    function bad() { return #a in #a; }
+    assertError(bad, "Expected iterable, got: Keyword '#a'.");
+}
+
+function testNI() {
+    var list = List(#a, #b, #c);
+    assertFalse(#a ni list);
+    assertTrue(#d ni list);
+
+    function bad() { return #a ni #a; }
+    assertError(bad, "Expected iterable, got: Keyword '#a'.");
+}
+
 
 //-----------------------------------------------------------------------------
 // Helpers

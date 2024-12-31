@@ -2,10 +2,7 @@ package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.wjduquette.joe.bert.Opcode.*;
 
@@ -304,6 +301,11 @@ class VirtualMachine {
                         throw error("The '>' operator expects two Numbers or two Strings.");
                     }
                 }
+                case IN -> {
+                    var collection = checkCollection(pop());
+                    var item = pop();
+                    push(collection.contains(item));
+                }
                 case INCR -> {
                     var a = pop();
                     checkNumericOperand("++", a);
@@ -394,6 +396,11 @@ class VirtualMachine {
                     var a = pop();
                     checkNumericOperand(a);
                     push(-(double)a);
+                }
+                case NI -> {
+                    var collection = checkCollection(pop());
+                    var item = pop();
+                    push(!collection.contains(item));
                 }
                 case NOT -> push(Joe.isFalsey(pop()));
                 case NULL -> push(null);
@@ -554,6 +561,23 @@ class VirtualMachine {
         if (!(a instanceof Double)) {
             throw error("The '" + op + "' operator expects a numeric operand.");
         }
+    }
+
+    // Gets the argument as a collection, if possible
+    private Collection<?> checkCollection(Object arg) {
+        return switch (arg) {
+            case Collection<?> c -> c;
+            case JoeIterable i -> i.getItems();
+            default -> {
+                var instance = joe.getJoeObject(arg);
+                if (instance.canIterate()) {
+                    yield instance.getItems();
+                } else {
+                    throw error("Expected iterable, got: " +
+                            joe.typedValue(arg) + ".");
+                }
+            }
+        };
     }
 
     private RuntimeError error(String message) {

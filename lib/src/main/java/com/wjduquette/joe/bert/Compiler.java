@@ -540,10 +540,12 @@ class Compiler {
             case EQUAL_EQUAL -> emit(Opcode.EQ);
             case GREATER -> emit(Opcode.GT);
             case GREATER_EQUAL -> emit(Opcode.GE);
+            case IN -> emit(Opcode.IN);
             case LESS -> emit(Opcode.LT);
             case LESS_EQUAL -> emit(Opcode.LE);
             case PLUS ->  emit(Opcode.ADD);
             case MINUS -> emit(Opcode.SUB);
+            case NI -> emit(Opcode.NI);
             case STAR  -> emit(Opcode.MUL);
             case SLASH -> emit(Opcode.DIV);
             default -> throw new IllegalStateException(
@@ -1412,9 +1414,9 @@ class Compiler {
         rule(FOREACH,         null,           null,          Level.NONE);
         rule(FUNCTION,        null,           null,          Level.NONE);
         rule(IF,              null,           null,          Level.NONE);
-        rule(IN,              null,           null,          Level.NONE);
+        rule(IN,              null,           this::binary,  Level.COMPARISON);
         rule(METHOD,          null,           null,          Level.NONE);
-        rule(NI,              null,           null,          Level.NONE);
+        rule(NI,              null,           this::binary,  Level.COMPARISON);
         rule(NULL,            this::symbol,   null,          Level.NONE);
         rule(RETURN,          null,           null,          Level.NONE);
         rule(STATIC,          null,           null,          Level.NONE);
