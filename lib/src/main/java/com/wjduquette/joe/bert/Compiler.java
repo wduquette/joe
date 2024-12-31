@@ -754,6 +754,10 @@ class Compiler {
             updateVar(getOp, setOp, (char)arg, Opcode.MUL);
         } else if (canAssign && match(SLASH_EQUAL)) {
             updateVar(getOp, setOp, (char)arg, Opcode.DIV);
+        } else if (canAssign && match(PLUS_PLUS)) {
+            postIncrDecrVar(getOp, setOp, (char)arg, Opcode.INCR);
+        } else if (canAssign && match(MINUS_MINUS)) {
+            postIncrDecrVar(getOp, setOp, (char)arg, Opcode.DECR);
         } else {
             emit(getOp, (char)arg);
         }
@@ -770,6 +774,23 @@ class Compiler {
         expression();
         emit(mathOp);
         emit(setOp, arg);
+    }
+
+    // Emits the code to update a variable
+    private void postIncrDecrVar(char getOp, char setOp, char arg, char mathOp) {
+        //                    | ∅         ; Initial state
+        // *GET        var    | a         ; a = var
+        // TPUT               | a         ; T = a
+        // INCR               | a'        ; a' = a + 1
+        // *SET        var    | a'        ; var = a'
+        // POP                | ∅         ;
+        // TGET               | a         ; push T
+        emit(getOp, arg);
+        emit(Opcode.TPUT);
+        emit(mathOp);
+        emit(setOp, arg);
+        emit(Opcode.POP);
+        emit(Opcode.TGET);
     }
 
     // Declares the variable.  Checking for duplicate declarations in the
