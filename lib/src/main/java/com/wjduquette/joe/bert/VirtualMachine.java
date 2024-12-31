@@ -40,6 +40,9 @@ class VirtualMachine {
     // The global environment.
     private final Map<String,Object> globals = new HashMap<>();
 
+    // Registers
+    private Object registerT = null;
+
     // The value stack
     private Object[] stack = new Object[DEFAULT_STACK_SIZE];
 
@@ -176,6 +179,7 @@ class VirtualMachine {
     private void resetStack() {
         top = 0;
         frameCount = 0;
+        registerT = null;
     }
 
     private Object run() {
@@ -241,6 +245,11 @@ class VirtualMachine {
                 }
                 case COMMENT -> readConstant(); // NO-OP
                 case CONST -> push(readConstant());
+                case DECR -> {
+                    var a = pop();
+                    checkNumericOperand("--", a);
+                    push((double)a - 1);
+                }
                 case DIV -> {
                     var b = pop();
                     var a = pop();
@@ -294,6 +303,11 @@ class VirtualMachine {
                     } else {
                         throw error("The '>' operator expects two Numbers or two Strings.");
                     }
+                }
+                case INCR -> {
+                    var a = pop();
+                    checkNumericOperand("++", a);
+                    push((double)a + 1);
                 }
                 case INHERIT -> {
                     var superclass = peek(1);
@@ -450,6 +464,7 @@ class VirtualMachine {
                         throw error("Undefined property: '" + name + "'.");
                     }
                 }
+                case TGET -> push(registerT);
                 case THROW -> {
                     var value = pop();
                     if (value instanceof JoeError err) {
@@ -458,6 +473,7 @@ class VirtualMachine {
                         throw error(joe.stringify(value));
                     }
                 }
+                case TPUT -> registerT = peek(0);
                 case TRUE -> push(true);
                 case UPCLOSE -> {
                     // Close and then pop the *n* upvalues on the
@@ -531,6 +547,12 @@ class VirtualMachine {
         if (!(a instanceof Double)) {
             throw error("Expected numeric operand, got: '" +
                 joe.stringify(a) + "'.");
+        }
+    }
+
+    private void checkNumericOperand(String op, Object a) {
+        if (!(a instanceof Double)) {
+            throw error("The '" + op + "' operator expects a numeric operand.");
         }
     }
 
