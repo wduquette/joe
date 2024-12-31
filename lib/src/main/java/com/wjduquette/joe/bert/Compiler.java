@@ -633,9 +633,32 @@ class Compiler {
         if (canAssign && match(EQUAL)) {
             expression();
             emit(Opcode.PROPSET, nameConstant);
+        } else if (canAssign && match(PLUS_EQUAL)) {
+            updateProperty(nameConstant, Opcode.ADD);
+        } else if (canAssign && match(MINUS_EQUAL)) {
+            updateProperty(nameConstant, Opcode.SUB);
+        } else if (canAssign && match(STAR_EQUAL)) {
+            updateProperty(nameConstant, Opcode.MUL);
+        } else if (canAssign && match(SLASH_EQUAL)) {
+            updateProperty(nameConstant, Opcode.DIV);
         } else {
             emit(Opcode.PROPGET, nameConstant);
         }
+    }
+
+    // Emits the code to update a property
+    private void updateProperty(char name, char mathOp) {
+        //                | o         ; Object on stack
+        // DUP            | o o       ; Duplicate object
+        // PROPGET name   | o a       ; a = o.name
+        // expr           | o a b     ; b = expr
+        // mathOp         | o c       ; E.g., c = a + b
+        // PROPSET name   | c         ; o.name = c, retaining c
+        emit(Opcode.DUP);
+        emit(Opcode.PROPGET, name);
+        expression();
+        emit(mathOp);
+        emit(Opcode.PROPSET, name);
     }
 
     private void parsePrecedence(int level) {
