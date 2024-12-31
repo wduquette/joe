@@ -552,17 +552,73 @@ class Compiler {
     }
 
     private void unary(boolean canAssign) {
-        var op = parser.previous.type();
+        var op = parser.previous;
 
         // Compile the operand
         parsePrecedence(Level.UNARY);
+        var last = parser.previous;  // The last token in the expression.
 
         // Emit the instruction
-        switch (op) {
+        switch (op.type()) {
             case BANG -> emit(Opcode.NOT);
             case MINUS -> emit(Opcode.NEGATE);
+            case PLUS_PLUS, MINUS_MINUS -> preIncrDecr(op, last);
             default -> throw new IllegalStateException(
                 "Unexpected operator: " + op);
+        }
+    }
+
+    private void preIncrDecr(Token op, Token last) {
+        var mathOp = op.type() == TokenType.PLUS_PLUS
+            ? Opcode.INCR : Opcode.DECR;
+
+        if (last.type() == TokenType.IDENTIFIER) {
+            preIncrDecrIdentifier(mathOp);
+        } else {
+            error("Invalid '" + op.lexeme() + "' target.");
+        }
+    }
+
+    private void preIncrDecrIdentifier(char mathOp) {
+        // FIRST, get the last instruction and its argument, and back
+        // them out.
+        char getOp = current.chunk.code[current.chunk.size - 2];
+        char arg = current.chunk.code[current.chunk.size - 1];
+        current.chunk.size -= 2;
+
+        // NEXT, get the relevant set operation.
+        char setOp = switch (getOp) {
+            case Opcode.GLOGET -> Opcode.GLOSET;
+            case Opcode.LOCGET -> Opcode.LOCSET;
+            case Opcode.UPGET -> Opcode.UPSET;
+            case Opcode.PROPGET -> Opcode.PROPSET;
+            default -> throw new IllegalStateException(
+                "Unexpected opcode: " + getOp);
+        };
+
+        if (getOp == Opcode.PROPGET) {
+            // Increment/decrement a property
+            //
+            //                | o         ; Initial state
+            // DUP            | o o       ; Copy the object
+            // PROPGET name   | o a       ; a = o.name
+            // mathOp         | o a'      ; E.g., a' = a + 1
+            // PROPSET name   | a'        ; o.name = a'
+
+            emit(Opcode.DUP);
+            emit(Opcode.PROPGET, arg);
+            emit(mathOp);
+            emit(Opcode.PROPSET, arg);
+        } else {
+            // Increment/decrement a variable
+            //
+            //                    | ∅         ; Initial state
+            // *GET        var    | a         ; a = var
+            // mathOp             | a'        ; e.g., a' = a + 1
+            // *SET        var    | a'        ; var = a'
+            emit(getOp, arg);
+            emit(mathOp);
+            emit(setOp, arg);
         }
     }
 
@@ -641,6 +697,10 @@ class Compiler {
             updateProperty(nameConstant, Opcode.MUL);
         } else if (canAssign && match(SLASH_EQUAL)) {
             updateProperty(nameConstant, Opcode.DIV);
+        } else if (canAssign && match(PLUS_PLUS)) {
+            postIncrDecrProperty(nameConstant, Opcode.INCR);
+        } else if (canAssign && match(MINUS_MINUS)) {
+            postIncrDecrProperty(nameConstant, Opcode.DECR);
         } else {
             emit(Opcode.PROPGET, nameConstant);
         }
@@ -660,6 +720,27 @@ class Compiler {
         emit(mathOp);
         emit(Opcode.PROPSET, name);
     }
+
+    // Emits the code to post-increment/decrement a property
+    private void postIncrDecrProperty(char name, char mathOp) {
+        //                | o         ; Initial state
+        // DUP            | o o       ; Copy the object
+        // PROPGET name   | o a       ; a = o.name
+        // TPUT           | o a       ; T = a
+        // mathOp         | o a'      ; E.g., a' = a + 1
+        // PROPSET name   | a'        ; o.name = a'
+        // POP            | ∅         ;
+        // TGET           | a         ; push T
+
+        emit(Opcode.DUP);
+        emit(Opcode.PROPGET, name);
+        emit(Opcode.TPUT);
+        emit(mathOp);
+        emit(Opcode.PROPSET, name);
+        emit(Opcode.POP);
+        emit(Opcode.TGET);
+    }
+
 
     private void parsePrecedence(int level) {
         advance();
@@ -776,7 +857,7 @@ class Compiler {
         emit(setOp, arg);
     }
 
-    // Emits the code to update a variable
+    // Emits the code to post-increment/decrement a variable
     private void postIncrDecrVar(char getOp, char setOp, char arg, char mathOp) {
         //                    | ∅         ; Initial state
         // *GET        var    | a         ; a = var
@@ -1279,11 +1360,11 @@ class Compiler {
         rule(MINUS,           this::unary,    this::binary, Level.TERM);
         rule(MINUS_EQUAL,     null,           null,         Level.NONE);
         rule(MINUS_GREATER,   null,           null,         Level.NONE);
-        rule(MINUS_MINUS,     null,           null,         Level.NONE);
+        rule(MINUS_MINUS,     this::unary,    null,         Level.NONE);
         rule(OR,              null,           this::or,     Level.OR);
         rule(PLUS,            null,           this::binary, Level.TERM);
         rule(PLUS_EQUAL,      null,           null,         Level.NONE);
-        rule(PLUS_PLUS,       null,           null,         Level.NONE);
+        rule(PLUS_PLUS,       this::unary,    null,         Level.NONE);
         rule(SLASH,           null,           this::binary, Level.FACTOR);
         rule(SLASH_EQUAL,     null,           null,         Level.NONE);
         rule(STAR,            null,           this::binary, Level.FACTOR);

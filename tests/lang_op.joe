@@ -249,17 +249,17 @@ function testPlusPlus_pre_var() {
     assertEquals(x, 1);
 }
 
-function testPlusPlus_post_var() {
-    var x = 0;
-    assertEquals(x++, 0);
-    assertEquals(x, 1);
-}
-
 function testPlusPlus_pre_prop() {
     var t = Thing();
     t.x = 0;
     assertEquals(++t.x, 1);
     assertEquals(t.x, 1);
+}
+
+function testPlusPlus_post_var() {
+    var x = 0;
+    assertEquals(x++, 0);
+    assertEquals(x, 1);
 }
 
 function testPlusPlus_post_prop() {
@@ -278,17 +278,17 @@ function testMinusMinus_pre_var() {
     assertEquals(x, -1);
 }
 
-function testMinusMinus_post_var() {
-    var x = 0;
-    assertEquals(x--, 0);
-    assertEquals(x, -1);
-}
-
 function testMinusMinus_pre_prop() {
     var t = Thing();
     t.x = 0;
     assertEquals(--t.x, -1);
     assertEquals(t.x, -1);
+}
+
+function testMinusMinus_post_var() {
+    var x = 0;
+    assertEquals(x--, 0);
+    assertEquals(x, -1);
 }
 
 function testMinusMinus_post_prop() {

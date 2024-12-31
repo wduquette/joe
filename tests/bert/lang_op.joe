@@ -266,18 +266,61 @@ function testSlashEquals_property() {
 //-----------------------------------------------------------------------------
 // ++
 
-//function testPlusPlus_pre_var() {
-//function testPlusPlus_post_var() {
-//function testPlusPlus_pre_prop() {
-//function testPlusPlus_post_prop() {
+function testPlusPlus_pre_var() {
+    var x = 0;
+    assertEquals(++x, 1);
+    assertEquals(x, 1);
+}
+
+function testPlusPlus_pre_prop() {
+    var t = Thing();
+    t.x = 0;
+    assertEquals(++t.x, 1);
+    assertEquals(t.x, 1);
+}
+
+function testPlusPlus_post_var() {
+    var x = 0;
+    assertEquals(x++, 0);
+    assertEquals(x, 1);
+}
+
+function testPlusPlus_post_prop() {
+    var t = Thing();
+    t.x = 0;
+    assertEquals(t.x++, 0);
+    assertEquals(t.x, 1);
+}
 
 //-----------------------------------------------------------------------------
 // --
 
-//function testMinusMinus_pre_var() {
-//function testMinusMinus_post_var() {
-//function testMinusMinus_pre_prop() {
-//function testMinusMinus_post_prop() {
+function testMinusMinus_pre_var() {
+    var x = 0;
+    assertEquals(--x, -1);
+    assertEquals(x, -1);
+}
+
+function testMinusMinus_pre_prop() {
+    var t = Thing();
+    t.x = 0;
+    assertEquals(--t.x, -1);
+    assertEquals(t.x, -1);
+}
+
+function testMinusMinus_post_var() {
+    var x = 0;
+    assertEquals(x--, 0);
+    assertEquals(x, -1);
+}
+
+function testMinusMinus_post_prop() {
+    var t = Thing();
+    t.x = 0;
+    assertEquals(t.x--, 0);
+    assertEquals(t.x, -1);
+}
+
 
 //-----------------------------------------------------------------------------
 // Ternary Operator
