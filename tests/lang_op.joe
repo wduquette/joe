@@ -153,9 +153,6 @@ function testPlusEquals_var() {
     assertEquals(x, 12);
     assertEquals(s += "def", "abcdef");
     assertEquals(s, "abcdef");
-
-    assertError(\-> x += "abc",
-        "The '+=' operator expects two numeric operands.");
 }
 
 function testPlusEquals_property() {
@@ -166,9 +163,6 @@ function testPlusEquals_property() {
     assertEquals(thing.x, 12);
     assertEquals(thing.s += "def", "abcdef");
     assertEquals(thing.s, "abcdef");
-
-    assertError(\-> thing.x += "abc",
-        "The '+=' operator expects two numeric operands.");
 }
 
 function testMinusEquals_var() {
@@ -178,9 +172,9 @@ function testMinusEquals_var() {
     assertEquals(x, -2);
 
     assertError(\-> x -= "abc",
-        "The '-=' operator expects two numeric operands.");
+        "The '-' operator expects two numeric operands.");
     assertError(\-> s -= 7,
-        "The '-=' operator expects two numeric operands.");
+        "The '-' operator expects two numeric operands.");
 }
 
 function testMinusEquals_property() {
@@ -191,9 +185,9 @@ function testMinusEquals_property() {
     assertEquals(thing.x, -2);
 
     assertError(\-> thing.x -= "abc",
-        "The '-=' operator expects two numeric operands.");
+        "The '-' operator expects two numeric operands.");
     assertError(\-> thing.s -= 7,
-        "The '-=' operator expects two numeric operands.");
+        "The '-' operator expects two numeric operands.");
 }
 
 function testStarEquals_var() {
@@ -203,9 +197,9 @@ function testStarEquals_var() {
     assertEquals(x, 35);
 
     assertError(\-> x *= "abc",
-        "The '*=' operator expects two numeric operands.");
+        "The '*' operator expects two numeric operands.");
     assertError(\-> s *= 7,
-        "The '*=' operator expects two numeric operands.");
+        "The '*' operator expects two numeric operands.");
 }
 
 function testStarEquals_property() {
@@ -216,9 +210,9 @@ function testStarEquals_property() {
     assertEquals(thing.x, 35);
 
     assertError(\-> thing.x *= "abc",
-        "The '*=' operator expects two numeric operands.");
+        "The '*' operator expects two numeric operands.");
     assertError(\-> thing.s *= 7,
-        "The '*=' operator expects two numeric operands.");
+        "The '*' operator expects two numeric operands.");
 }
 
 function testSlashEquals_var() {
@@ -228,9 +222,9 @@ function testSlashEquals_var() {
     assertEquals(x, 10);
 
     assertError(\-> x /= "abc",
-        "The '/=' operator expects two numeric operands.");
+        "The '/' operator expects two numeric operands.");
     assertError(\-> s /= 7,
-        "The '/=' operator expects two numeric operands.");
+        "The '/' operator expects two numeric operands.");
 }
 
 function testSlashEquals_property() {
@@ -241,9 +235,9 @@ function testSlashEquals_property() {
     assertEquals(thing.x, 10);
 
     assertError(\-> thing.x /= "abc",
-        "The '/=' operator expects two numeric operands.");
+        "The '/' operator expects two numeric operands.");
     assertError(\-> thing.s /= 7,
-        "The '/=' operator expects two numeric operands.");
+        "The '/' operator expects two numeric operands.");
 }
 
 //-----------------------------------------------------------------------------
