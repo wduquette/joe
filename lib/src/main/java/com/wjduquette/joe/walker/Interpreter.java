@@ -398,7 +398,7 @@ class Interpreter {
                             ex.getMessage());
                     }
                 } else {
-                    throw expected(expr.paren().span(), "a callable", callee);
+                    throw expected(expr.paren().span(), "callable", callee);
                 }
             }
             // Get an object property.  The expression must evaluate to
