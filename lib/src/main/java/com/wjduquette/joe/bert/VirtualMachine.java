@@ -247,6 +247,7 @@ class VirtualMachine {
                     checkNumericOperands(opcode, a, b);
                     push((double)a / (double)b);
                 }
+                case DUP -> push(peek(0));
                 case EQ -> {
                     var b = pop();
                     var a = pop();
