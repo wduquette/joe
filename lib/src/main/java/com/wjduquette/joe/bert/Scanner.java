@@ -109,10 +109,10 @@ public class Scanner {
             case ';' -> makeToken(SEMICOLON);
             case ',' -> makeToken(COMMA);
             case '.' -> makeToken(DOT);
-            case '-' -> makeToken(MINUS);
-            case '+' -> makeToken(PLUS);
-            case '/' -> makeToken(SLASH);
-            case '*' -> makeToken(STAR);
+            case '-' -> makeToken(match('=') ? MINUS_EQUAL : MINUS);
+            case '+' -> makeToken(match('=') ? PLUS_EQUAL : PLUS);
+            case '/' -> makeToken(match('=') ? SLASH_EQUAL : SLASH);
+            case '*' -> makeToken(match('=') ? STAR_EQUAL : STAR);
             case '!' -> makeToken(match('=') ? BANG_EQUAL : BANG);
             case '=' -> makeToken(match('=') ? EQUAL_EQUAL : EQUAL);
             case '<' -> makeToken(match('=') ? LESS_EQUAL : LESS);

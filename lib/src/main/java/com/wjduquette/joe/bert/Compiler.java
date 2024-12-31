@@ -701,6 +701,7 @@ class Compiler {
     // be preceded by the compiled expression to assign to the
     // variable.
     private void getOrSetVariable(Token name, boolean canAssign) {
+        // FIRST, get the relevant *SET/*GET opcodes.
         char getOp;
         char setOp;
 
@@ -717,12 +718,35 @@ class Compiler {
             getOp = Opcode.GLOGET;
             setOp = Opcode.GLOSET;
         }
+
+        // NEXT, handle assignment operators
         if (canAssign && match(EQUAL)) {
             expression();
             emit(setOp, (char)arg);
+        } else if (canAssign && match(PLUS_EQUAL)) {
+            updateVar(getOp, setOp, (char)arg, Opcode.ADD);
+        } else if (canAssign && match(MINUS_EQUAL)) {
+            updateVar(getOp, setOp, (char)arg, Opcode.SUB);
+        } else if (canAssign && match(STAR_EQUAL)) {
+            updateVar(getOp, setOp, (char)arg, Opcode.MUL);
+        } else if (canAssign && match(SLASH_EQUAL)) {
+            updateVar(getOp, setOp, (char)arg, Opcode.DIV);
         } else {
             emit(getOp, (char)arg);
         }
+    }
+
+    // Emits the code to update a variable
+    private void updateVar(char getOp, char setOp, char arg, char mathOp) {
+        //                | ∅         ; Initial stack
+        // *GET    var    | a         ; a = var
+        // expr           | a b       ; b = expr
+        // mathOp         | c         ; E.g., c = a + b
+        // *SET    var    | c         ; var = c, retaining c
+        emit(getOp, arg);
+        expression();
+        emit(mathOp);
+        emit(setOp, arg);
     }
 
     // Declares the variable.  Checking for duplicate declarations in the
