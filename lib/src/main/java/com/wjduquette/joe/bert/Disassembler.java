@@ -117,7 +117,7 @@ public class Disassembler {
         switch (opcode) {
             // Simple Instructions
             // Pattern: opcode
-            case ADD, ASSERT, DIV, EQ, FALSE, GE, GT, INHERIT, LE, LT, MUL,
+            case ADD, ASSERT, DIV, DUP, EQ, FALSE, GE, GT, INHERIT, LE, LT, MUL,
                 NE, NEGATE, NOT, NULL, POP, RETURN, SUB, THROW, TRUE
                 -> {
                 lines.add(new Line(ip, prefix));

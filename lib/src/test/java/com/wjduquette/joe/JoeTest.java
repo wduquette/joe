@@ -355,7 +355,7 @@ public class JoeTest extends Ted {
             a(0);
             """;
         var trace = """
-            Expected a callable, got: Number '0'.
+            Expected callable, got: Number '0'.
               In function b(x) (*test*:5)
                 004 function b(x) {
                 005     return x();

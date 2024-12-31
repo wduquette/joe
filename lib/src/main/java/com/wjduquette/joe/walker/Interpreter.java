@@ -398,7 +398,7 @@ class Interpreter {
                             ex.getMessage());
                     }
                 } else {
-                    throw expected(expr.paren().span(), "a callable", callee);
+                    throw expected(expr.paren().span(), "callable", callee);
                 }
             }
             // Get an object property.  The expression must evaluate to
@@ -547,19 +547,31 @@ class Interpreter {
     private Object computeExtendedAssignment(
         Object left, Token op, Object right
     ) {
-        // FIRST, check for concatenation
-        if (left instanceof String s && op.type() == TokenType.PLUS_EQUAL) {
-            return s + joe.stringify(right);
-        }
-
-        // NEXT, both must be numbers.
-        checkNumberOperands(op, left, right);
-
         return switch(op.type()) {
-            case PLUS_EQUAL -> (double)left + (double)right;
-            case MINUS_EQUAL -> (double)left - (double)right;
-            case STAR_EQUAL -> (double)left * (double)right;
-            case SLASH_EQUAL -> (double)left / (double)right;
+            case PLUS_EQUAL -> {
+                if (left instanceof String s) {
+                    yield s + joe.stringify(right);
+                } else if (right instanceof String s) {
+                    yield joe.stringify(left) + s;
+                } else if (left instanceof Double a && right instanceof Double b) {
+                    yield a + b;
+                } else {
+                    throw new RuntimeError(op.span(),
+                        "The '+' operator expects two Numbers or at least one String.");
+                }
+            }
+            case MINUS_EQUAL -> {
+                checkNumberOperands(op, left, right);
+                yield (double)left - (double)right;
+            }
+            case STAR_EQUAL -> {
+                checkNumberOperands(op, left, right);
+                yield (double)left * (double)right;
+            }
+            case SLASH_EQUAL -> {
+                checkNumberOperands(op, left, right);
+                yield (double)left / (double)right;
+            }
             default -> throw new IllegalStateException(
                 "Unexpected operator: " + op.type());
         };
@@ -600,8 +612,10 @@ class Interpreter {
     {
         if (left instanceof Double && right instanceof Double) return;
 
+        var op = operator.lexeme().substring(0, 1);
+
         throw new RuntimeError(operator.span(),
-            "The '" + operator.lexeme() + "' operator expects two numeric operands.");
+            "The '" + op + "' operator expects two numeric operands.");
     }
 
     private RuntimeError notSimilar(Token operator) {

@@ -65,15 +65,11 @@ println(x > 50 ? "big" : "small"); // Prints "big"
 
 ## Assignment Operators
 
-The `=`, `+=`, `-=`, `*=`, and `/=` operators work as they do in Java.
+The `=`, `+=`, `-=`, `*=`, and `/=` operators work essentially as they do in 
+Java.
 
-In particular:
-
-- The `+=` operator can concatenate strings if the variable
-  or property on the left-hand side contains a string; the right operand
-  will be converted to a string.
-
-- An assignment expression yields the assigned value.
+In addition, the `+=` operator concatenates strings if either the left or 
+right-hand side is a string, just as `+` does.
 
 ```joe
 x = y = 5;  // Assigns 5 to x and y.

@@ -129,7 +129,6 @@ function testNot() {
 //-----------------------------------------------------------------------------
 // Assignment operators
 
-
 function testAssignment() {
     var a = 1;
     var b;
@@ -140,14 +139,129 @@ function testAssignment() {
     assertEquals(c, 1);
 }
 
-//function testPlusEquals_var() {
-//function testPlusEquals_property() {
-//function testMinusEquals_var() {
-//function testMinusEquals_property() {
-//function testStarEquals_var() {
-//function testStarEquals_property() {
-//function testSlashEquals_var() {
-//function testSlashEquals_property() {
+function testPlusEquals_var() {
+    var x = 5;
+    var s = "abc";
+    assertEquals(x += 7, 12);
+    assertEquals(x, 12);
+    assertEquals(s += "def", "abcdef");
+    assertEquals(s, "abcdef");
+    assertEquals(x += "abc", "12abc");
+
+    var y = 5;
+    function bad1() { y += #abc; }
+    assertError(bad1,
+        "The '+' operator expects two Numbers or at least one String.");
+}
+
+function testPlusEquals_property() {
+    var thing = Thing();
+    thing.x = 5;
+    thing.s = "abc";
+    assertEquals(thing.x += 7, 12);
+    assertEquals(thing.x, 12);
+    assertEquals(thing.s += "def", "abcdef");
+    assertEquals(thing.s, "abcdef");
+    assertEquals(thing.x += "abc", "12abc");
+
+    thing.y = 5;
+    function bad1() { thing.y += #abc; }
+    assertError(bad1,
+        "The '+' operator expects two Numbers or at least one String.");
+}
+
+function testMinusEquals_var() {
+    var x = 5;
+    var s = "abc";
+    assertEquals(x -= 7, -2);
+    assertEquals(x, -2);
+
+    function bad1() { x -= "abc"; }
+    function bad2() { s -= 5; }
+
+    assertError(bad1,
+        "The '-' operator expects two numeric operands.");
+    assertError(bad2,
+        "The '-' operator expects two numeric operands.");
+}
+
+function testMinusEquals_property() {
+    var thing = Thing();
+    thing.x = 5;
+    thing.s = "abc";
+    assertEquals(thing.x -= 7, -2);
+    assertEquals(thing.x, -2);
+
+    function bad1() { thing.x -= "abc"; }
+    function bad2() { thing.s -= 5; }
+
+    assertError(bad1,
+        "The '-' operator expects two numeric operands.");
+    assertError(bad2,
+        "The '-' operator expects two numeric operands.");
+}
+
+function testStarEquals_var() {
+    var x = 5;
+    var s = "abc";
+    assertEquals(x *= 7, 35);
+    assertEquals(x, 35);
+
+    function bad1() { x *= "abc"; }
+    function bad2() { s *= 5; }
+
+    assertError(bad1,
+        "The '*' operator expects two numeric operands.");
+    assertError(bad2,
+        "The '*' operator expects two numeric operands.");
+}
+
+function testStarEquals_property() {
+    var thing = Thing();
+    thing.x = 5;
+    thing.s = "abc";
+    assertEquals(thing.x *= 7, 35);
+    assertEquals(thing.x, 35);
+
+    function bad1() { thing.x *= "abc"; }
+    function bad2() { thing.s *= 5; }
+
+    assertError(bad1,
+        "The '*' operator expects two numeric operands.");
+    assertError(bad2,
+        "The '*' operator expects two numeric operands.");
+}
+
+function testSlashEquals_var() {
+    var x = 50;
+    var s = "abc";
+    assertEquals(x /= 5, 10);
+    assertEquals(x, 10);
+
+    function bad1() { x /= "abc"; }
+    function bad2() { s /= 5; }
+
+    assertError(bad1,
+        "The '/' operator expects two numeric operands.");
+    assertError(bad2,
+        "The '/' operator expects two numeric operands.");
+}
+
+function testSlashEquals_property() {
+    var thing = Thing();
+    thing.x = 50;
+    thing.s = "abc";
+    assertEquals(thing.x /= 5, 10);
+    assertEquals(thing.x, 10);
+
+    function bad1() { thing.x /= "abc"; }
+    function bad2() { thing.s /= 5; }
+
+    assertError(bad1,
+        "The '/' operator expects two numeric operands.");
+    assertError(bad2,
+        "The '/' operator expects two numeric operands.");
+}
 
 //-----------------------------------------------------------------------------
 // ++
@@ -179,4 +293,4 @@ function testAssignment() {
 //-----------------------------------------------------------------------------
 // Helpers
 
-//class Thing {}
+class Thing {}

@@ -216,18 +216,10 @@ println(y || 1); // Prints 1
 println(x &gt; 50 ? "big" : "small"); // Prints "big"
 </code></pre>
 <h2 id="assignment-operators"><a class="header" href="#assignment-operators">Assignment Operators</a></h2>
-<p>The <code>=</code>, <code>+=</code>, <code>-=</code>, <code>*=</code>, and <code>/=</code> operators work as they do in Java.</p>
-<p>In particular:</p>
-<ul>
-<li>
-<p>The <code>+=</code> operator can concatenate strings if the variable
-or property on the left-hand side contains a string; the right operand
-will be converted to a string.</p>
-</li>
-<li>
-<p>An assignment expression yields the assigned value.</p>
-</li>
-</ul>
+<p>The <code>=</code>, <code>+=</code>, <code>-=</code>, <code>*=</code>, and <code>/=</code> operators work essentially as they do in
+Java.</p>
+<p>In addition, the <code>+=</code> operator concatenates strings if either the left or
+right-hand side is a string, just as <code>+</code> does.</p>
 <pre><code class="language-joe">x = y = 5;  // Assigns 5 to x and y.
 </code></pre>
 <h2 id="pre--and-post-incrementdecrement-operators"><a class="header" href="#pre--and-post-incrementdecrement-operators">Pre- and Post-Increment/Decrement Operators</a></h2>

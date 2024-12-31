@@ -12,43 +12,44 @@ complete) Bert byte-engine.
 | 3  | CLASS *name*      | ∅ → *cls*            | Create class              |
 | 4  | CLOSURE *def*     | ∅ → *f*              | Load closure              |
 | 5  | COMMENT *name*    | ∅ → ∅                | No-op comment             |
-| 5  | CONST *constant*  | ∅ → *a*              | Load constant             |
-| 6  | DIV               | *a b* → *a* / *b*    | Divide                    |
-| 7  | EQ                | *a b* → *a* == *b*   | Compare: equal            |
-| 8  | FALSE             | ∅ → false            | Load `false`              |
-| 9  | GE                | *a b* → *a* >= *b*   | Compare: greater or equal |
-| 10 | GLODEF *name*     | *a* → ∅              | Define global             |
-| 11 | GLOGET *name*     | ∅ → *a*              | Get global                |
-| 12 | GLOSET *name*     | *a* → *a*            | Set global                |
-| 13 | GT                | *a b* → *a* > *b*    | Compare: greater          |
-| 14 | INHERIT           | *sup sub* → *sup*    | Inheritance               |
-| 15 | JIF *offset*      | *cond* → ∅           | Jump if false             |
-| 16 | JIFKEEP *offset*  | *cond* → *cond*      | Jump if false, keep value |
-| 17 | JITKEEP *offset*  | *cond* → *cond*      | Jump if true, keep value  |
-| 18 | JUMP *offset*     |                      | Jump forwards             |
-| 19 | LE                | *a b* → *a* <= *b*   | Compare: less or equal    |
-| 20 | LOCGET *slot*     | ∅ → *a*              | Get local                 |
-| 21 | LOCSET *slot*     | *a* → *a*            | Set local                 |
-| 22 | LOOP *offset*     |                      | Jump backwards            |
-| 23 | LT                | *a b* → *a* <= *b*   | Compare: less than        |
-| 24 | METHOD *name*     | *cls f* → *cls*      | Add method to class       |
-| 25 | MUL               | *a b* → *a* * *b*    | Multiply                  |
-| 26 | NE                | *a b* → *a* < *b*    | Compare: not equal        |
-| 27 | NEGATE            | *a* → -*a*           | Negate                    |
-| 28 | NOT               | *a* → !*a*           | Not                       |
-| 29 | NULL              | ∅ → null             | Load `null`               |
-| 30 | POP               | *a* → ∅              | Pops one value            |
-| 31 | POPN *n*          | *a...* → ∅           | Pops *n* values           |
-| 32 | PROPGET *name*    | *obj* → *a*          | Get property value        |
-| 33 | PROPSET *name*    | *obj a* → *a*        | Set property value        |
-| 34 | RETURN            | *a* → ∅              | Return                    |
-| 35 | SUB               | *a b* → *a* - *b*    | Subtract                  |
-| 36 | SUPGET *name*     | *obj sup* → *f*      | Get superclass method     |
-| 37 | TRUE              | ∅ → true             | Load `true`               |
-| 38 | THROW             | *a* → ∅              | Throw error               |
-| 39 | UPCLOSE *n*       | *v...* → ∅           | Closes *n* upvalue(s)     |
-| 40 | UPGET *slot*      | ∅ → *a*              | Get upvalue               |
-| 41 | UPSET *slot*      | *a* → *a*            | Set upvalue               |
+| 6  | CONST *constant*  | ∅ → *a*              | Load constant             |
+| 7  | DIV               | *a b* → *a* / *b*    | Divide                    |
+| 8  | DUP               | *a* → *a* *a*        | Duplicate                 |
+| 9  | EQ                | *a b* → *a* == *b*   | Compare: equal            |
+| 10 | FALSE             | ∅ → false            | Load `false`              |
+| 11 | GE                | *a b* → *a* >= *b*   | Compare: greater or equal |
+| 12 | GLODEF *name*     | *a* → ∅              | Define global             |
+| 13 | GLOGET *name*     | ∅ → *a*              | Get global                |
+| 14 | GLOSET *name*     | *a* → *a*            | Set global                |
+| 15 | GT                | *a b* → *a* > *b*    | Compare: greater          |
+| 16 | INHERIT           | *sup sub* → *sup*    | Inheritance               |
+| 17 | JIF *offset*      | *cond* → ∅           | Jump if false             |
+| 18 | JIFKEEP *offset*  | *cond* → *cond*      | Jump if false, keep value |
+| 19 | JITKEEP *offset*  | *cond* → *cond*      | Jump if true, keep value  |
+| 20 | JUMP *offset*     |                      | Jump forwards             |
+| 21 | LE                | *a b* → *a* <= *b*   | Compare: less or equal    |
+| 22 | LOCGET *slot*     | ∅ → *a*              | Get local                 |
+| 23 | LOCSET *slot*     | *a* → *a*            | Set local                 |
+| 24 | LOOP *offset*     |                      | Jump backwards            |
+| 25 | LT                | *a b* → *a* <= *b*   | Compare: less than        |
+| 26 | METHOD *name*     | *cls f* → *cls*      | Add method to class       |
+| 27 | MUL               | *a b* → *a* * *b*    | Multiply                  |
+| 28 | NE                | *a b* → *a* < *b*    | Compare: not equal        |
+| 29 | NEGATE            | *a* → -*a*           | Negate                    |
+| 30 | NOT               | *a* → !*a*           | Not                       |
+| 31 | NULL              | ∅ → null             | Load `null`               |
+| 32 | POP               | *a* → ∅              | Pops one value            |
+| 33 | POPN *n*          | *a...* → ∅           | Pops *n* values           |
+| 34 | PROPGET *name*    | *obj* → *a*          | Get property value        |
+| 35 | PROPSET *name*    | *obj a* → *a*        | Set property value        |
+| 36 | RETURN            | *a* → ∅              | Return                    |
+| 37 | SUB               | *a b* → *a* - *b*    | Subtract                  |
+| 38 | SUPGET *name*     | *obj sup* → *f*      | Get superclass method     |
+| 39 | TRUE              | ∅ → true             | Load `true`               |
+| 40 | THROW             | *a* → ∅              | Throw error               |
+| 41 | UPCLOSE *n*       | *v...* → ∅           | Closes *n* upvalue(s)     |
+| 42 | UPGET *slot*      | ∅ → *a*              | Get upvalue               |
+| 43 | UPSET *slot*      | *a* → *a*            | Set upvalue               |
 
 ## Variable Names
 
