@@ -641,10 +641,17 @@ class Compiler {
     }
 
     private void this_(boolean canAssign) {
+        var last = parser.previous;
         if (currentClass == null) {
-            error("Can't use 'this' outside of a class.");
+            error("Can't use '" + last.lexeme() + "' outside of a class.");
         }
-        variable(false);
+
+        if (parser.previous.type() == TokenType.THIS) {
+            variable(false);
+        } else {
+            getOrSetVariable(Token.synthetic(VAR_THIS), canAssign);
+            dot(canAssign);
+        }
     }
 
     private void super_(boolean canAssign) {
@@ -1340,7 +1347,7 @@ class Compiler {
         rule(RIGHT_PAREN,     null,           null,         Level.NONE);
         rule(LEFT_BRACE,      null,           null,         Level.NONE);
         rule(RIGHT_BRACE,     null,           null,         Level.NONE);
-        rule(AT,              null,           null,         Level.NONE);
+        rule(AT,              this::this_,    null,         Level.NONE);
         rule(BACK_SLASH,      null,           null,         Level.NONE);
         rule(COLON,           null,           null,         Level.NONE);
         rule(COMMA,           null,           null,         Level.NONE);

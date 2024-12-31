@@ -106,6 +106,7 @@ public class Scanner {
             case ')' -> makeToken(RIGHT_PAREN);
             case '{' -> makeToken(LEFT_BRACE);
             case '}' -> makeToken(RIGHT_BRACE);
+            case '@' -> makeToken(AT);
             case ';' -> makeToken(SEMICOLON);
             case ',' -> makeToken(COMMA);
             case '.' -> makeToken(DOT);
@@ -329,6 +330,7 @@ public class Scanner {
         return makeToken(STRING, source.substring(start+1,current-1));
     }
 
+    @SuppressWarnings("SwitchStatementWithTooFewBranches")
     private Token rawTextBlock() {
         while (!isAtEnd()) {
             var c = peek();

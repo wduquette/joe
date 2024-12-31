@@ -305,21 +305,21 @@ function testSubclass_callSuper() {
 //-----------------------------------------------------------------------------
 // `@` operator
 
-//// `@` can be used instead of `this.`
-//function testCanUseAt() {
-//    class Thing {
-//        method init(name, color) {
-//            @name = name;
-//            @color = color;
-//        }
-//
-//        method info() {
-//            return "name='" + @name + "' color='" + @color + "'";
-//        }
-//    }
-//    var thing = Thing("Fred", "red");
-//    assertEquals(thing.info(), "name='Fred' color='red'");
-//}
+// `@` can be used instead of `this.`
+function testCanUseAt() {
+    class Thing {
+        method init(name, color) {
+            @name = name;
+            @color = color;
+        }
+
+        method info() {
+            return "name='" + @name + "' color='" + @color + "'";
+        }
+    }
+    var thing = Thing("Fred", "red");
+    assertEquals(thing.info(), "name='Fred' color='red'");
+}
 
 //-------------------------------------------------------------------------
 // Nested Scopes
@@ -339,20 +339,20 @@ function testThisInNestedFunction() {
     assertEquals(Nest().whoAmI(), "Howard");
 }
 
-//// `@` is available in functions nested in methods
-//function testAtInNestedFunction() {
-//    class Nest {
-//        method init() { @name = "Howard"; }
-//        method whoAmI() {
-//            function getName() {
-//                return @name;
-//            }
-//            return getName();
-//        }
-//    }
-//
-//    assertEquals(Nest().whoAmI(), "Howard");
-//}
+// `@` is available in functions nested in methods
+function testAtInNestedFunction() {
+    class Nest {
+        method init() { @name = "Howard"; }
+        method whoAmI() {
+            function getName() {
+                return @name;
+            }
+            return getName();
+        }
+    }
+
+    assertEquals(Nest().whoAmI(), "Howard");
+}
 
 // `super` is available in functions nested in methods
 function testSuperInNestedFunction() {
