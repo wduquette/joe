@@ -514,6 +514,22 @@ class Compiler {
         consume(RIGHT_PAREN, "Expected ')' after expression.");
     }
 
+    void ternary(boolean canAssign) {
+        //                 | cond
+        // JIF else        |
+        // thenExpr        | a
+        // JUMP end        | a
+        // else: elseExpr  | b
+        // end:            | a or b
+        var elseJump = emitJump(Opcode.JIF);
+        expression();
+        var endJump = emitJump(Opcode.JUMP);
+        patchJump(elseJump);
+        consume(COLON, "expected ':' after then expression.");
+        expression();
+        patchJump(endJump);
+    }
+
     void binary(boolean canAssign) {
         var op = parser.previous.type();
         var rule = getRule(op);
@@ -1174,15 +1190,16 @@ class Compiler {
         private Level() {} // Not Instantiable
         private final static int NONE         = 0;
         private final static int ASSIGNMENT   = 1;  // =
-        private final static int OR           = 2;  // ||
-        private final static int AND          = 3;  // &&
-        private final static int EQUALITY     = 4;  // == !=
-        private final static int COMPARISON   = 5;  // < > <= >=
-        private final static int TERM         = 6;  // + -
-        private final static int FACTOR       = 7;  // * /
-        private final static int UNARY        = 8;  // ! -
-        private final static int CALL         = 9;  // . ()
-        private final static int PRIMARY      = 10;
+        private final static int TERNARY      = 2;  // ? :
+        private final static int OR           = 3;  // ||
+        private final static int AND          = 4;  // &&
+        private final static int EQUALITY     = 5;  // == !=
+        private final static int COMPARISON   = 6;  // < > <= >=
+        private final static int TERM         = 7;  // + -
+        private final static int FACTOR       = 8;  // * /
+        private final static int UNARY        = 9;  // ! -
+        private final static int CALL         = 10; // . ()
+        private final static int PRIMARY      = 11;
     }
 
     // A parsing function for the Pratt parser.
@@ -1343,73 +1360,73 @@ class Compiler {
         //   Token            Prefix          Infix         precedence
         //   ---------------- --------------- ------------- ----------------
         //   Single Character
-        rule(LEFT_PAREN,      this::grouping, this::call,   Level.CALL);
-        rule(RIGHT_PAREN,     null,           null,         Level.NONE);
-        rule(LEFT_BRACE,      null,           null,         Level.NONE);
-        rule(RIGHT_BRACE,     null,           null,         Level.NONE);
-        rule(AT,              this::this_,    null,         Level.NONE);
-        rule(BACK_SLASH,      null,           null,         Level.NONE);
-        rule(COLON,           null,           null,         Level.NONE);
-        rule(COMMA,           null,           null,         Level.NONE);
-        rule(DOT,             null,           this::dot,    Level.CALL);
-        rule(QUESTION,        null,           null,         Level.TERM);
-        rule(SEMICOLON,       null,           null,         Level.NONE);
+        rule(LEFT_PAREN,      this::grouping, this::call,    Level.CALL);
+        rule(RIGHT_PAREN,     null,           null,          Level.NONE);
+        rule(LEFT_BRACE,      null,           null,          Level.NONE);
+        rule(RIGHT_BRACE,     null,           null,          Level.NONE);
+        rule(AT,              this::this_,    null,          Level.NONE);
+        rule(BACK_SLASH,      null,           null,          Level.NONE);
+        rule(COLON,           null,           null,          Level.NONE);
+        rule(COMMA,           null,           null,          Level.NONE);
+        rule(DOT,             null,           this::dot,     Level.CALL);
+        rule(QUESTION,        null,           this::ternary, Level.TERNARY);
+        rule(SEMICOLON,       null,           null,          Level.NONE);
         //   One or two character
-        rule(AND,             null,           this::and,    Level.AND);
-        rule(BANG,            this::unary,    null,         Level.NONE);
-        rule(BANG_EQUAL,      null,           this::binary, Level.EQUALITY);
-        rule(EQUAL,           null,           null,         Level.NONE);
-        rule(EQUAL_EQUAL,     null,           this::binary, Level.EQUALITY);
-        rule(GREATER,         null,           this::binary, Level.COMPARISON);
-        rule(GREATER_EQUAL,   null,           this::binary, Level.COMPARISON);
-        rule(LESS,            null,           this::binary, Level.COMPARISON);
-        rule(LESS_EQUAL,      null,           this::binary, Level.COMPARISON);
-        rule(MINUS,           this::unary,    this::binary, Level.TERM);
-        rule(MINUS_EQUAL,     null,           null,         Level.NONE);
-        rule(MINUS_GREATER,   null,           null,         Level.NONE);
-        rule(MINUS_MINUS,     this::unary,    null,         Level.NONE);
-        rule(OR,              null,           this::or,     Level.OR);
-        rule(PLUS,            null,           this::binary, Level.TERM);
-        rule(PLUS_EQUAL,      null,           null,         Level.NONE);
-        rule(PLUS_PLUS,       this::unary,    null,         Level.NONE);
-        rule(SLASH,           null,           this::binary, Level.FACTOR);
-        rule(SLASH_EQUAL,     null,           null,         Level.NONE);
-        rule(STAR,            null,           this::binary, Level.FACTOR);
-        rule(STAR_EQUAL,      null,           null,         Level.NONE);
+        rule(AND,             null,           this::and,     Level.AND);
+        rule(BANG,            this::unary,    null,          Level.NONE);
+        rule(BANG_EQUAL,      null,           this::binary,  Level.EQUALITY);
+        rule(EQUAL,           null,           null,          Level.NONE);
+        rule(EQUAL_EQUAL,     null,           this::binary,  Level.EQUALITY);
+        rule(GREATER,         null,           this::binary,  Level.COMPARISON);
+        rule(GREATER_EQUAL,   null,           this::binary,  Level.COMPARISON);
+        rule(LESS,            null,           this::binary,  Level.COMPARISON);
+        rule(LESS_EQUAL,      null,           this::binary,  Level.COMPARISON);
+        rule(MINUS,           this::unary,    this::binary,  Level.TERM);
+        rule(MINUS_EQUAL,     null,           null,          Level.NONE);
+        rule(MINUS_GREATER,   null,           null,          Level.NONE);
+        rule(MINUS_MINUS,     this::unary,    null,          Level.NONE);
+        rule(OR,              null,           this::or,      Level.OR);
+        rule(PLUS,            null,           this::binary,  Level.TERM);
+        rule(PLUS_EQUAL,      null,           null,          Level.NONE);
+        rule(PLUS_PLUS,       this::unary,    null,          Level.NONE);
+        rule(SLASH,           null,           this::binary,  Level.FACTOR);
+        rule(SLASH_EQUAL,     null,           null,          Level.NONE);
+        rule(STAR,            null,           this::binary,  Level.FACTOR);
+        rule(STAR_EQUAL,      null,           null,          Level.NONE);
         //   Literals
-        rule(IDENTIFIER,      this::variable, null,         Level.NONE);
-        rule(STRING,          this::literal,  null,         Level.NONE);
-        rule(NUMBER,          this::literal,  null,         Level.NONE);
-        rule(KEYWORD,         this::literal,  null,         Level.NONE);
+        rule(IDENTIFIER,      this::variable, null,          Level.NONE);
+        rule(STRING,          this::literal,  null,          Level.NONE);
+        rule(NUMBER,          this::literal,  null,          Level.NONE);
+        rule(KEYWORD,         this::literal,  null,          Level.NONE);
         //   Reserved words
-        rule(ASSERT,          null,           null,         Level.NONE);
-        rule(BREAK,           null,           null,         Level.NONE);
-        rule(CASE,            null,           null,         Level.NONE);
-        rule(CLASS,           null,           null,         Level.NONE);
-        rule(CONTINUE,        null,           null,         Level.NONE);
-        rule(DEFAULT,         null,           null,         Level.NONE);
-        rule(ELSE,            null,           null,         Level.NONE);
-        rule(EXTENDS,         null,           null,         Level.NONE);
-        rule(FALSE,           this::symbol,   null,         Level.NONE);
-        rule(FOR,             null,           null,         Level.NONE);
-        rule(FOREACH,         null,           null,         Level.NONE);
-        rule(FUNCTION,        null,           null,         Level.NONE);
-        rule(IF,              null,           null,         Level.NONE);
-        rule(IN,              null,           null,         Level.NONE);
-        rule(METHOD,          null,           null,         Level.NONE);
-        rule(NI,              null,           null,         Level.NONE);
-        rule(NULL,            this::symbol,   null,         Level.NONE);
-        rule(RETURN,          null,           null,         Level.NONE);
-        rule(STATIC,          null,           null,         Level.NONE);
-        rule(SUPER,           this::super_,   null,         Level.NONE);
-        rule(SWITCH,          null,           null,         Level.NONE);
-        rule(THIS,            this::this_,    null,         Level.NONE);
-        rule(THROW,           null,           null,         Level.NONE);
-        rule(TRUE,            this::symbol,   null,         Level.NONE);
-        rule(VAR,             null,           null,         Level.NONE);
-        rule(WHILE,           null,           null,         Level.NONE);
-        rule(ERROR,           null,           null,         Level.NONE);
-        rule(EOF,             null,           null,         Level.NONE);
+        rule(ASSERT,          null,           null,          Level.NONE);
+        rule(BREAK,           null,           null,          Level.NONE);
+        rule(CASE,            null,           null,          Level.NONE);
+        rule(CLASS,           null,           null,          Level.NONE);
+        rule(CONTINUE,        null,           null,          Level.NONE);
+        rule(DEFAULT,         null,           null,          Level.NONE);
+        rule(ELSE,            null,           null,          Level.NONE);
+        rule(EXTENDS,         null,           null,          Level.NONE);
+        rule(FALSE,           this::symbol,   null,          Level.NONE);
+        rule(FOR,             null,           null,          Level.NONE);
+        rule(FOREACH,         null,           null,          Level.NONE);
+        rule(FUNCTION,        null,           null,          Level.NONE);
+        rule(IF,              null,           null,          Level.NONE);
+        rule(IN,              null,           null,          Level.NONE);
+        rule(METHOD,          null,           null,          Level.NONE);
+        rule(NI,              null,           null,          Level.NONE);
+        rule(NULL,            this::symbol,   null,          Level.NONE);
+        rule(RETURN,          null,           null,          Level.NONE);
+        rule(STATIC,          null,           null,          Level.NONE);
+        rule(SUPER,           this::super_,   null,          Level.NONE);
+        rule(SWITCH,          null,           null,          Level.NONE);
+        rule(THIS,            this::this_,    null,          Level.NONE);
+        rule(THROW,           null,           null,          Level.NONE);
+        rule(TRUE,            this::symbol,   null,          Level.NONE);
+        rule(VAR,             null,           null,          Level.NONE);
+        rule(WHILE,           null,           null,          Level.NONE);
+        rule(ERROR,           null,           null,          Level.NONE);
+        rule(EOF,             null,           null,          Level.NONE);
 
         for (var type : TokenType.values()) {
             if (rules[type.ordinal()] == null) {

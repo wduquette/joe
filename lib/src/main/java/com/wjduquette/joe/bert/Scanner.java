@@ -110,6 +110,8 @@ public class Scanner {
             case ';' -> makeToken(SEMICOLON);
             case ',' -> makeToken(COMMA);
             case '.' -> makeToken(DOT);
+            case '?' -> makeToken(QUESTION);
+            case ':' -> makeToken(COLON);
             case '-' -> {
                 if (match('=')) {
                     yield makeToken(MINUS_EQUAL);

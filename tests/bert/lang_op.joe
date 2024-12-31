@@ -325,7 +325,10 @@ function testMinusMinus_post_prop() {
 //-----------------------------------------------------------------------------
 // Ternary Operator
 
-//function testTernary() {
+function testTernary() {
+    assertEquals(true ? "a" : "b", "a");
+    assertEquals(false ? "a" : "b", "b");
+}
 
 //-----------------------------------------------------------------------------
 // in/ni Operators
