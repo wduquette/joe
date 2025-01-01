@@ -37,20 +37,20 @@ function testFunction_tooManyArgs() {
     assertError(bad, "Wrong number of arguments, expected: twoArgs(name, value).");
 }
 
-//// Varargs function
-//function testFunction_varargs_good() {
-//    function varArgs(first, args) {
-//        return first + "," + stringify(args);
-//    }
-//
-//    assertEquals(varArgs(#a), "#a,List()");
-//    assertEquals(varArgs(#a,#b), "#a,List(#b)");
-//    assertEquals(varArgs(#a,#b,#c), "#a,List(#b, #c)");
-//
-//    function bad() { varArgs(); }
-//    assertError(bad,
-//        "Wrong number of arguments, expected: varArgs(first, args).");
-//}
+// Varargs function
+function testFunction_varargs_good() {
+    function varArgs(first, args) {
+        return first + "," + stringify(args);
+    }
+
+    assertEquals(varArgs(#a), "#a,List()");
+    assertEquals(varArgs(#a,#b), "#a,List(#b)");
+    assertEquals(varArgs(#a,#b,#c), "#a,List(#b, #c)");
+
+    function bad() { varArgs(); }
+    assertError(bad,
+        "Wrong number of arguments, expected: varArgs(first, args).");
+}
 
 // Functions can capture enclosing scope.
 function testFunctionsCaptureScope() {

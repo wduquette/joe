@@ -26,6 +26,9 @@ class Compiler {
     // The `super` "variable".
     public static final String VAR_SUPER = "super";
 
+    // The name of a function's varargs parameter.
+    public static final String ARGS = "args";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -259,16 +262,30 @@ class Compiler {
     }
 
     private void parseArguments(TokenType until, String lexeme) {
+        var parmCount = 0;
+        var gotArgs = false;
+
         if (!check(until)) {
             do {
-                ++current.chunk.arity;
-                if (current.chunk.arity > MAX_PARAMETERS) {
+                if (gotArgs) {
+                    errorAtCurrent(
+                        "If present, 'args' must be the final parameter.");
+                }
+                ++parmCount;
+                if (parmCount > MAX_PARAMETERS) {
                     errorAtCurrent(
                         "Can't have more than " + MAX_PARAMETERS + "parameters.");
                 }
                 var constant = parseVariable("Expected parameter name.");
                 defineVariable(constant);
-                current.parameters.add(parser.previous.lexeme());
+                var name = parser.previous.lexeme();
+                if (current.parameters.contains(name)) {
+                    error("Duplicate parameter name.");
+                }
+                current.parameters.add(name);
+                gotArgs = ARGS.equals(name);
+
+                // Check for duplicates
             } while (match(COMMA));
         }
         consume(until, "Expected '" + lexeme + "' after parameters.");

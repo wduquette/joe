@@ -51,9 +51,6 @@ class Chunk implements CodeChunk {
     // The function's type
     FunctionType type = FunctionType.SCRIPT;
 
-    // The function's arity
-    int arity = 0;
-
     // The function's source buffer
     SourceBuffer source = null;
 

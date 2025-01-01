@@ -1,6 +1,7 @@
 package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.types.ListValue;
 
 import java.util.*;
 
@@ -680,7 +681,22 @@ class VirtualMachine {
     }
 
     private void call(Closure closure, int argCount, Origin origin) {
-        if (argCount != closure.function.arity) {
+        if (closure.function.isVarargs) {
+            // FIRST, make sure we've got the minimum arguments.
+            if (argCount < closure.function.arity) {
+                throw error(Args.arityFailureMessage(closure.function.signature()));
+            }
+
+            // NEXT, replace excess arguments with a single ListValue
+            var args = new ListValue();
+            var argsSize = argCount - closure.function.arity;
+            for (var i = 0; i < argsSize; i++) {
+                args.add(stack[top - argsSize + i]);
+            }
+            top -= argsSize;
+            push(args);
+            argCount = closure.function.arity + 1;
+        } else if (argCount != closure.function.arity) {
             throw error(Args.arityFailureMessage(closure.function.signature()));
         }
 

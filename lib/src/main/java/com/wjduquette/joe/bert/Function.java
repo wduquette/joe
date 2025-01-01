@@ -10,6 +10,8 @@ import java.util.List;
  * get compiled to a Function.
  */
 public class Function implements CodeChunk {
+    private static final String ARGS = "args";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -23,8 +25,13 @@ public class Function implements CodeChunk {
     // The function's type
     private final FunctionType type;
 
-    // The function's arity
+    // The function's arity.  If isVarargs is true, this is the minimum
+    // arity.
     final int arity;
+
+    // Whether the function is a varargs function (has the `args`
+    // parameter).
+    final boolean isVarargs;
 
     // The function's parameter names
     final List<String> parameters;
@@ -62,7 +69,13 @@ public class Function implements CodeChunk {
         // Operational data
         this.name = chunk.name;
         this.type = chunk.type;
-        this.arity = chunk.arity;
+        if (!parameters.isEmpty() && parameters.getLast().equals(ARGS)) {
+            this.arity = parameters.size() - 1;
+            this.isVarargs = true;
+        } else {
+            this.arity = parameters.size();
+            this.isVarargs = false;
+        }
         this.constants = Arrays.copyOf(chunk.constants, chunk.numConstants);
         this.code = Arrays.copyOf(chunk.code, chunk.size);
         this.upvalueCount = upvalueCount;
