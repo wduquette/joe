@@ -44,7 +44,7 @@ class Environment {
         if (enclosing != null) return enclosing.get(name);
 
         throw new RuntimeError(name.span(),
-            "Undefined variable '" + name.lexeme() + "'.");
+            "Undefined variable: '" + name.lexeme() + "'.");
     }
 
     void assign(Token name, Object value) {

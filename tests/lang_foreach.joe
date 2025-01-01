@@ -57,5 +57,5 @@ function testForeach_hasOwnScope() {
         // Do nothing
     }
 
-    assertError(\-> i, "Undefined variable 'i'.");
+    assertError(\-> i, "Undefined variable: 'i'.");
 }
