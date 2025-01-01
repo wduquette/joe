@@ -96,7 +96,12 @@ public class Function implements CodeChunk {
      * @return The signature
      */
     public String signature() {
-        return name + "(" + String.join(", ", parameters) + ")";
+        if (type == FunctionType.LAMBDA) {
+            return "\\" + String.join(",", parameters);
+
+        } else {
+            return name + "(" + String.join(", ", parameters) + ")";
+        }
     }
 
     //-------------------------------------------------------------------------
