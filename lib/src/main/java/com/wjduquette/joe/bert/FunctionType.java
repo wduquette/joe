@@ -2,6 +2,7 @@ package com.wjduquette.joe.bert;
 
 public enum FunctionType {
     FUNCTION("function"),
+    LAMBDA("lambda"),
     METHOD("method"),
     INITIALIZER("initializer"),
     SCRIPT("script");

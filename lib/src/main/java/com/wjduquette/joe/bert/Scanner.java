@@ -79,6 +79,9 @@ public class Scanner {
         this.reporter = reporter;
     }
 
+    //-------------------------------------------------------------------------
+    // API
+
     Token scanToken() {
         skipWhitespace();
         start = current;
@@ -107,6 +110,7 @@ public class Scanner {
             case '{' -> makeToken(LEFT_BRACE);
             case '}' -> makeToken(RIGHT_BRACE);
             case '@' -> makeToken(AT);
+            case '\\' -> makeToken(BACK_SLASH);
             case ';' -> makeToken(SEMICOLON);
             case ',' -> makeToken(COMMA);
             case '.' -> makeToken(DOT);
@@ -117,6 +121,8 @@ public class Scanner {
                     yield makeToken(MINUS_EQUAL);
                 } else if (match('-')) {
                     yield makeToken(MINUS_MINUS);
+                } else if (match('>')) {
+                    yield makeToken(MINUS_GREATER);
                 } else {
                     yield makeToken(MINUS);
                 }

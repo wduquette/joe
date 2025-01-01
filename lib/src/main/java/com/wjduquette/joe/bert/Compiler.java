@@ -221,26 +221,29 @@ class Compiler {
         defineVariable(global);
     }
 
+    private void lambda(boolean canAssign) {
+        int start = parser.previous.span().start();
+        function(start, FunctionType.LAMBDA);
+    }
+
     private void function(int start, FunctionType type) {
         this.current = new FunctionCompiler(current, type, buffer);
         beginScope();
 
-        consume(LEFT_PAREN, "Expected '(' after function name.");
-        if (!check(RIGHT_PAREN)) {
-            do {
-                ++current.chunk.arity;
-                if (current.chunk.arity > MAX_PARAMETERS) {
-                    errorAtCurrent(
-                        "Can't have more than " + MAX_PARAMETERS + "parameters.");
-                }
-                var constant = parseVariable("Expected parameter name.");
-                defineVariable(constant);
-                current.parameters.add(parser.previous.lexeme());
-            } while (match(COMMA));
+        if (type != FunctionType.LAMBDA) {
+            consume(LEFT_PAREN, "Expected '(' after function name.");
+            parseArguments(RIGHT_PAREN, ")");
+            consume(LEFT_BRACE, "Expected '{' before function body.");
+            block();
+        } else {
+            parseArguments(MINUS_GREATER, "->");
+            if (match(LEFT_BRACE)) {
+                block();
+            } else {
+                expression();
+                emit(Opcode.RETURN);
+            }
         }
-        consume(RIGHT_PAREN, "Expected ')' after parameters.");
-        consume(LEFT_BRACE, "Expected '{' before function body.");
-        block();
         var end = parser.previous.span().end();
         current.chunk.span = buffer.span(start, end);
 
@@ -253,6 +256,22 @@ class Compiler {
             emit((char)(compiler.upvalues[i].isLocal ? 1 : 0));
             emit(compiler.upvalues[i].index);
         }
+    }
+
+    private void parseArguments(TokenType until, String lexeme) {
+        if (!check(until)) {
+            do {
+                ++current.chunk.arity;
+                if (current.chunk.arity > MAX_PARAMETERS) {
+                    errorAtCurrent(
+                        "Can't have more than " + MAX_PARAMETERS + "parameters.");
+                }
+                var constant = parseVariable("Expected parameter name.");
+                defineVariable(constant);
+                current.parameters.add(parser.previous.lexeme());
+            } while (match(COMMA));
+        }
+        consume(until, "Expected '" + lexeme + "' after parameters.");
     }
 
     private void varDeclaration() {
@@ -1272,9 +1291,11 @@ class Compiler {
         ) {
             this.enclosing = enclosing;
             this.chunk = new Chunk();
-            chunk.name = type == FunctionType.SCRIPT
-                ? "*script*"
-                : parser.previous.lexeme();
+            switch (type) {
+                case SCRIPT -> chunk.name = "*script*";
+                case LAMBDA -> chunk.name = "*lambda*";
+                default -> chunk.name = parser.previous.lexeme();
+            }
             chunk.type = type;
             chunk.source = source;
 
@@ -1367,7 +1388,7 @@ class Compiler {
         rule(LEFT_BRACE,      null,           null,          Level.NONE);
         rule(RIGHT_BRACE,     null,           null,          Level.NONE);
         rule(AT,              this::this_,    null,          Level.NONE);
-        rule(BACK_SLASH,      null,           null,          Level.NONE);
+        rule(BACK_SLASH,      this::lambda,   null,          Level.NONE);
         rule(COLON,           null,           null,          Level.NONE);
         rule(COMMA,           null,           null,          Level.NONE);
         rule(DOT,             null,           this::dot,     Level.CALL);

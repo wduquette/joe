@@ -60,3 +60,25 @@ function testFunctionsCaptureScope() {
     assertEquals(howdy(), #howdy);
 }
 
+//-----------------------------------------------------------------------------
+// Lambda
+
+function testLambda_expr() {
+    var f = \-> 5;
+    assertEquals(f(), 5);
+
+    var g = \x,y -> x + y;
+    assertEquals(g(2,3), 5);
+}
+
+function testLambda_block() {
+    var f = \-> {
+        return 5;
+    };
+    assertEquals(f(), 5);
+
+    var g = \x,y -> {
+        return x + y;
+    };
+    assertEquals(g(2,3), 5);
+}
