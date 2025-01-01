@@ -10,6 +10,7 @@ import static com.wjduquette.joe.bert.TokenType.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 class Compiler {
     // The maximum number of local variables in a function.
     public static final int MAX_LOCALS = 256;
@@ -31,6 +32,9 @@ class Compiler {
 
     // The hidden variable used to hold a `switch` value
     private static final String VAR_SWITCH = "*switch*";
+
+    // The hidden variable used to hold a `foreach` iterator value
+    private static final String VAR_ITERATOR = "*switch*";
 
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -344,6 +348,8 @@ class Compiler {
             continueStatement();
         } else if (match(FOR)) {
             forStatement();
+        } else if (match(FOREACH)) {
+            foreachStatement();
         } else if (match(IF)) {
             ifStatement();
         } else if (match(RETURN)) {
@@ -490,6 +496,55 @@ class Compiler {
         currentLoop = currentLoop.enclosing;
     }
 
+    private void foreachStatement() {
+        currentLoop = new LoopCompiler(currentLoop);
+        currentLoop.breakDepth = current.scopeDepth;
+        beginScope();
+
+        consume(LEFT_PAREN, "Expected '(' after 'foreach'.");
+
+        // Loop variable
+        consume(VAR, "Expected 'var' before loop variable.");
+        parseVariable("Expected variable name.");
+        var itemName = parser.previous;
+        emit(Opcode.NULL);
+        defineVariable((char)0); // Loop variable is always local
+
+        consume(COLON, "Expected ':' after loop variable.");
+
+        // Collection expression
+        defineHiddenVariable(VAR_ITERATOR); // Gets collection
+        emit(Opcode.ITER);                  // Convert collection to iterator
+
+        consume(RIGHT_PAREN, "Expected ')' after collection expression.");
+
+        // Start the loop
+        int loopStart = current.chunk.codeSize();
+        currentLoop.continueDepth = current.scopeDepth;
+        currentLoop.loopStart = loopStart;
+
+        // Check to see if we have any more items
+        emit(Opcode.HASNEXT);
+        var exitJump = emitJump(Opcode.JIF);
+
+        // Get the next item and update the loop variable
+        emit(Opcode.GETNEXT);
+        var arg = resolveLocal(current, itemName);
+        emit(Opcode.LOCSET, (char)arg);
+        emit(Opcode.POP); // Pop the item value
+
+        // Execute the body
+        statement();
+        emitLoop(loopStart);
+
+        // Patch any breaks
+        patchJump(exitJump);
+        endScope();
+
+        currentLoop.breakJumps.forEach(this::patchJump);
+        currentLoop = currentLoop.enclosing;
+    }
+
     private void ifStatement() {
         consume(LEFT_PAREN, "Expected '(' after 'if'.");
         expression();
@@ -577,7 +632,7 @@ class Compiler {
         int loopStart = current.chunk.codeSize();
         consume(LEFT_PAREN, "Expected '(' after 'while'.");
         expression();
-        consume(RIGHT_PAREN, "Expected '(' after condition.");
+        consume(RIGHT_PAREN, "Expected ')' after condition.");
 
         currentLoop = new LoopCompiler(currentLoop);
         currentLoop.breakDepth = current.scopeDepth;

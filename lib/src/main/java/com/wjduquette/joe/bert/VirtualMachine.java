@@ -272,6 +272,16 @@ class VirtualMachine {
                         throw error("The '>=' operator expects two Numbers or two Strings.");
                     }
                 }
+                case GETNEXT -> {
+                    var iterator = peek(0);
+                    if (iterator instanceof Iterator<?> iter) {
+                        push(iter.next());
+                    } else {
+                        throw new IllegalStateException(
+                            "GETNEXT expected iterator, got " +
+                                joe.typedValue(iterator));
+                    }
+                }
                 case GLODEF -> globals.put(readString(), pop());
                 case GLOGET -> {
                     var name = readString();
@@ -302,6 +312,16 @@ class VirtualMachine {
                         throw error("The '>' operator expects two Numbers or two Strings.");
                     }
                 }
+                case HASNEXT -> {
+                    var iterator = peek(0);
+                    if (iterator instanceof Iterator<?> iter) {
+                        push(iter.hasNext());
+                    } else {
+                        throw new IllegalStateException(
+                            "HASNEXT expected iterator, got " +
+                            joe.typedValue(iterator));
+                    }
+                }
                 case IN -> {
                     var collection = checkCollection(pop());
                     var item = pop();
@@ -323,6 +343,10 @@ class VirtualMachine {
                     pop();  // Subclass
                     // NOTE: Superclass is still on the stack, I think
                     // as the `super` variable.  Seems weird, though.
+                }
+                case ITER -> {
+                    var collection = checkCollection(pop());
+                    push(collection.iterator());
                 }
                 case JIF -> {
                     var offset = readArg();

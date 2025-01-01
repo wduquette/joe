@@ -19,43 +19,46 @@ public class Opcode {
     public static final char EQ      = 10;
     public static final char FALSE   = 11;
     public static final char GE      = 12;
-    public static final char GLODEF  = 13;
-    public static final char GLOGET  = 14;
-    public static final char GLOSET  = 15;
-    public static final char GT      = 16;
-    public static final char IN      = 17;
-    public static final char INCR    = 18;
-    public static final char INHERIT = 19;
-    public static final char JIF     = 20;
-    public static final char JIFKEEP = 21;
-    public static final char JITKEEP = 22;
-    public static final char JUMP    = 23;
-    public static final char LE      = 24;
-    public static final char LOCGET  = 25;
-    public static final char LOCSET  = 26;
-    public static final char LOOP    = 27;
-    public static final char LT      = 28;
-    public static final char METHOD  = 29;
-    public static final char MUL     = 30;
-    public static final char NE      = 31;
-    public static final char NEGATE  = 32;
-    public static final char NI      = 33;
-    public static final char NOT     = 34;
-    public static final char NULL    = 35;
-    public static final char POP     = 36;
-    public static final char POPN    = 37;
-    public static final char PROPGET = 38;
-    public static final char PROPSET = 39;
-    public static final char RETURN  = 40;
-    public static final char SUB     = 41;
-    public static final char SUPGET  = 42;
-    public static final char TGET    = 43;
-    public static final char THROW   = 44;
-    public static final char TPUT    = 45;
-    public static final char TRUE    = 46;
-    public static final char UPCLOSE = 47;
-    public static final char UPGET   = 48;
-    public static final char UPSET   = 49;
+    public static final char GETNEXT = 13;
+    public static final char GLODEF  = 14;
+    public static final char GLOGET  = 15;
+    public static final char GLOSET  = 16;
+    public static final char GT      = 17;
+    public static final char HASNEXT = 18;
+    public static final char IN      = 19;
+    public static final char INCR    = 20;
+    public static final char INHERIT = 21;
+    public static final char ITER    = 22;
+    public static final char JIF     = 23;
+    public static final char JIFKEEP = 24;
+    public static final char JITKEEP = 25;
+    public static final char JUMP    = 26;
+    public static final char LE      = 27;
+    public static final char LOCGET  = 28;
+    public static final char LOCSET  = 29;
+    public static final char LOOP    = 30;
+    public static final char LT      = 31;
+    public static final char METHOD  = 32;
+    public static final char MUL     = 33;
+    public static final char NE      = 34;
+    public static final char NEGATE  = 35;
+    public static final char NI      = 36;
+    public static final char NOT     = 37;
+    public static final char NULL    = 38;
+    public static final char POP     = 39;
+    public static final char POPN    = 40;
+    public static final char PROPGET = 41;
+    public static final char PROPSET = 42;
+    public static final char RETURN  = 43;
+    public static final char SUB     = 44;
+    public static final char SUPGET  = 45;
+    public static final char TGET    = 46;
+    public static final char THROW   = 47;
+    public static final char TPUT    = 48;
+    public static final char TRUE    = 49;
+    public static final char UPCLOSE = 50;
+    public static final char UPGET   = 51;
+    public static final char UPSET   = 52;
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -74,13 +77,16 @@ public class Opcode {
         "EQ",
         "FALSE",
         "GE",
+        "GETNEXT",
         "GLODEF",
         "GLOGET",
         "GLOSET",
         "GT",
+        "HASNEXT",
         "IN",
         "INCR",
         "INHERIT",
+        "ITER",
         "JIF",
         "JIFKEEP",
         "JITKEEP",

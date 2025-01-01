@@ -24,43 +24,46 @@ registers:
 | 10 | EQ                | *a b* → *a* == *b*   | Compare: equal            |
 | 11 | FALSE             | ∅ → false            | Load `false`              |
 | 12 | GE                | *a b* → *a* >= *b*   | Compare: greater or equal |
-| 13 | GLODEF *name*     | *a* → ∅              | Define global             |
-| 14 | GLOGET *name*     | ∅ → *a*              | Get global                |
-| 15 | GLOSET *name*     | *a* → *a*            | Set global                |
-| 16 | GT                | *a b* → *a* > *b*    | Compare: greater          |
-| 17 | IN                | *a coll* → bool      | a in collection           |
-| 18 | INCR              | *a* → *a'*           | a' = a + 1                |
-| 19 | INHERIT           | *sup sub* → *sup*    | Inheritance               |
-| 20 | JIF *offset*      | *cond* → ∅           | Jump if false             |
-| 21 | JIFKEEP *offset*  | *cond* → *cond*      | Jump if false, keep value |
-| 22 | JITKEEP *offset*  | *cond* → *cond*      | Jump if true, keep value  |
-| 23 | JUMP *offset*     |                      | Jump forwards             |
-| 24 | LE                | *a b* → *a* <= *b*   | Compare: less or equal    |
-| 25 | LOCGET *slot*     | ∅ → *a*              | Get local                 |
-| 26 | LOCSET *slot*     | *a* → *a*            | Set local                 |
-| 27 | LOOP *offset*     |                      | Jump backwards            |
-| 28 | LT                | *a b* → *a* <= *b*   | Compare: less than        |
-| 29 | METHOD *name*     | *cls f* → *cls*      | Add method to class       |
-| 30 | MUL               | *a b* → *a* * *b*    | Multiply                  |
-| 31 | NE                | *a b* → *a* < *b*    | Compare: not equal        |
-| 32 | NEGATE            | *a* → -*a*           | Negate                    |
-| 33 | NI                | *a coll* → bool      | a not in collection       |
-| 34 | NOT               | *a* → !*a*           | Not                       |
-| 35 | NULL              | ∅ → null             | Load `null`               |
-| 36 | POP               | *a* → ∅              | Pops one value            |
-| 37 | POPN *n*          | *a...* → ∅           | Pops *n* values           |
-| 38 | PROPGET *name*    | *obj* → *a*          | Get property value        |
-| 39 | PROPSET *name*    | *obj a* → *a*        | Set property value        |
-| 40 | RETURN            | *a* → ∅              | Return                    |
-| 41 | SUB               | *a b* → *a* - *b*    | Subtract                  |
-| 42 | SUPGET *name*     | *obj sup* → *f*      | Get superclass method     |
-| 43 | TGET              | ∅ → *a*              | *a* = T                   |
-| 44 | TRUE              | ∅ → true             | Load `true`               |
-| 45 | TPUT              | *a* → *a*            | T = *a*                   |
-| 46 | THROW             | *a* → ∅              | Throw error               |
-| 47 | UPCLOSE *n*       | *v...* → ∅           | Closes *n* upvalue(s)     |
-| 48 | UPGET *slot*      | ∅ → *a*              | Get upvalue               |
-| 49 | UPSET *slot*      | *a* → *a*            | Set upvalue               |
+| 13 | GETNEXT           | *iter* → *a*         | a = iter.next()           |
+| 14 | GLODEF *name*     | *a* → ∅              | Define global             |
+| 15 | GLOGET *name*     | ∅ → *a*              | Get global                |
+| 16 | GLOSET *name*     | *a* → *a*            | Set global                |
+| 17 | GT                | *a b* → *a* > *b*    | Compare: greater          |
+| 18 | HASNEXT           | *iter* → *flag*      | flag = iter.hasNext()     |
+| 19 | IN                | *a coll* → bool      | a in collection           |
+| 20 | INCR              | *a* → *a'*           | a' = a + 1                |
+| 21 | INHERIT           | *sup sub* → *sup*    | Inheritance               |
+| 22 | ITER              | *coll* → *iter*      | iter = coll.iterator()    |
+| 23 | JIF *offset*      | *cond* → ∅           | Jump if false             |
+| 24 | JIFKEEP *offset*  | *cond* → *cond*      | Jump if false, keep value |
+| 25 | JITKEEP *offset*  | *cond* → *cond*      | Jump if true, keep value  |
+| 26 | JUMP *offset*     |                      | Jump forwards             |
+| 27 | LE                | *a b* → *a* <= *b*   | Compare: less or equal    |
+| 28 | LOCGET *slot*     | ∅ → *a*              | Get local                 |
+| 29 | LOCSET *slot*     | *a* → *a*            | Set local                 |
+| 30 | LOOP *offset*     |                      | Jump backwards            |
+| 31 | LT                | *a b* → *a* <= *b*   | Compare: less than        |
+| 32 | METHOD *name*     | *cls f* → *cls*      | Add method to class       |
+| 33 | MUL               | *a b* → *a* * *b*    | Multiply                  |
+| 34 | NE                | *a b* → *a* < *b*    | Compare: not equal        |
+| 35 | NEGATE            | *a* → -*a*           | Negate                    |
+| 36 | NI                | *a coll* → bool      | a not in collection       |
+| 37 | NOT               | *a* → !*a*           | Not                       |
+| 38 | NULL              | ∅ → null             | Load `null`               |
+| 39 | POP               | *a* → ∅              | Pops one value            |
+| 40 | POPN *n*          | *a...* → ∅           | Pops *n* values           |
+| 41 | PROPGET *name*    | *obj* → *a*          | Get property value        |
+| 42 | PROPSET *name*    | *obj a* → *a*        | Set property value        |
+| 43 | RETURN            | *a* → ∅              | Return                    |
+| 44 | SUB               | *a b* → *a* - *b*    | Subtract                  |
+| 45 | SUPGET *name*     | *obj sup* → *f*      | Get superclass method     |
+| 46 | TGET              | ∅ → *a*              | *a* = T                   |
+| 47 | TRUE              | ∅ → true             | Load `true`               |
+| 48 | TPUT              | *a* → *a*            | T = *a*                   |
+| 49 | THROW             | *a* → ∅              | Throw error               |
+| 50 | UPCLOSE *n*       | *v...* → ∅           | Closes *n* upvalue(s)     |
+| 51 | UPGET *slot*      | ∅ → *a*              | Get upvalue               |
+| 52 | UPSET *slot*      | *a* → *a*            | Set upvalue               |
 
 ## Variable Names
 
@@ -71,6 +74,7 @@ registers:
 - *constant*: Index into the chunk's constants table
 - *def*: Function info: the `Function` itself plus upvalue details
 - *f*: A closure, e.g., a function or method
+- *iter*: A collection iterator
 - *n*: A count
 - *name*: An index into the chunk's constants table for a name constant.
 - *offset*: A jump offset
