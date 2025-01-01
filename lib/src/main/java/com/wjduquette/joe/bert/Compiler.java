@@ -29,6 +29,9 @@ class Compiler {
     // The name of a function's varargs parameter.
     public static final String ARGS = "args";
 
+    // The hidden variable used to hold a `switch` value
+    private static final String VAR_SWITCH = "*switch*";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -345,6 +348,8 @@ class Compiler {
             ifStatement();
         } else if (match(RETURN)) {
             returnStatement();
+        } else if (match(SWITCH)) {
+            switchStatement();
         } else if (match(THROW)) {
             throwStatement();
         } else if (match(WHILE)) {
@@ -488,7 +493,7 @@ class Compiler {
     private void ifStatement() {
         consume(LEFT_PAREN, "Expected '(' after 'if'.");
         expression();
-        consume(RIGHT_PAREN, "Expected '(' after condition.");
+        consume(RIGHT_PAREN, "Expected ')' after condition.");
 
         int thenJump = emitJump(Opcode.JIF);
         statement();
@@ -510,6 +515,56 @@ class Compiler {
             consume(SEMICOLON, "Expected ';' after return value.");
             emit(Opcode.RETURN);
         }
+    }
+
+    private void switchStatement() {
+        beginScope();
+        consume(LEFT_PAREN, "Expected '(' after 'switch'.");
+        defineHiddenVariable(VAR_SWITCH);
+        consume(RIGHT_PAREN, "Expected ')' after switch expression.");
+        consume(LEFT_BRACE, "Expected '{' before switch body.");
+
+        // Jump targets
+        var endJumps = new ArrayList<Character>();
+        int nextJump = -1;
+
+        while (match(CASE)) {
+            // Allow the previous case to jump here if it doesn't match.
+            if (nextJump != -1) {
+                patchJump(nextJump);
+            }
+
+            // Parse the case expression and compare it with the switch vallue.
+            emit(Opcode.DUP); // Duplicate the switch value
+            expression();
+            emit(Opcode.EQ);
+
+            // Jump to the next case if no match.
+            nextJump = emitJump(Opcode.JIF);
+
+
+            // Parse the case body.
+            consume(MINUS_GREATER, "Expected '->' after case expression.");
+            statement();
+            endJumps.add((char)emitJump(Opcode.JUMP));
+        }
+
+        // Look for the `default ->` case.
+        if (nextJump != -1) {
+            patchJump(nextJump);
+        }
+        if (match(DEFAULT)) {
+            consume(MINUS_GREATER, "Expected '->' after 'default'.");
+            statement();
+        }
+
+        consume(RIGHT_BRACE, "Expected '}' before switch body.");
+
+        // Patch all the end jumps.
+        endJumps.forEach(this::patchJump);
+
+        // End the scope, removing the "*switch*" variable.
+        endScope();
     }
 
     private void throwStatement() {
@@ -842,6 +897,19 @@ class Compiler {
         declareVariable();
         if (current.scopeDepth > 0) return 0;       // Local
         return identifierConstant(parser.previous); // Global
+    }
+
+    // Creates a hidden variable in the current scope, giving it the
+    // value of the next `expression()`.  Hidden variable names should look
+    // like "*identifier*", so as not to conflict with real variables.
+    @SuppressWarnings("SameParameterValue")
+    private void defineHiddenVariable(String name) {
+        var nameToken = Token.synthetic(name);
+        addLocal(nameToken);
+        var constant = current.scopeDepth > 0
+            ? 0 : identifierConstant(nameToken);
+        expression();
+        defineVariable(constant);
     }
 
     // Adds a string constant to the current chunk's

@@ -1,0 +1,79 @@
+// lang_switch: switch statement tests.
+
+function testSimple() {
+    function cases(x) {
+        switch (x) {
+            case 1 -> return "a";
+            case 2 -> return "b";
+            case 3 -> return "c";
+            default -> return "?";
+        }
+    }
+
+    assertEquals(cases(1), "a");
+    assertEquals(cases(2), "b");
+    assertEquals(cases(3), "c");
+    assertEquals(cases(4), "?");
+}
+
+//function testMulti() {
+//    function cases(x) {
+//        switch (x) {
+//            case 1, 2, 3 -> return "abc";
+//            case 4, 5, 6 -> return "def";
+//            case 7, 8, 9 -> return "ghi";
+//            default -> return "?";
+//        }
+//    }
+//
+//    assertEquals(cases(1), "abc");
+//    assertEquals(cases(2), "abc");
+//    assertEquals(cases(3), "abc");
+//    assertEquals(cases(4), "def");
+//    assertEquals(cases(5), "def");
+//    assertEquals(cases(6), "def");
+//    assertEquals(cases(7), "ghi");
+//    assertEquals(cases(8), "ghi");
+//    assertEquals(cases(9), "ghi");
+//    assertEquals(cases(0), "?");
+//}
+
+function testNoDefault() {
+    function cases(x) {
+        switch (x) {
+            case 1 -> return "a";
+            case 2 -> return "b";
+            case 3 -> return "c";
+        }
+        return "?";
+    }
+
+    assertEquals(cases(1), "a");
+    assertEquals(cases(2), "b");
+    assertEquals(cases(3), "c");
+    assertEquals(cases(4), "?");
+}
+
+function testBlocks() {
+    function cases(x) {
+        switch (x) {
+            case 1 -> {
+                return "a";
+            }
+            case 2 -> {
+                return "b";
+            }
+            case 3 -> {
+                return "c";
+            }
+            default -> {
+                return "?";
+            }
+        }
+    }
+
+    assertEquals(cases(1), "a");
+    assertEquals(cases(2), "b");
+    assertEquals(cases(3), "c");
+    assertEquals(cases(4), "?");
+}
