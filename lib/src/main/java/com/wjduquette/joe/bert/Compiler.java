@@ -904,12 +904,13 @@ class Compiler {
     // like "*identifier*", so as not to conflict with real variables.
     @SuppressWarnings("SameParameterValue")
     private void defineHiddenVariable(String name) {
+        if (current.scopeDepth == 0) {
+            throw new IllegalStateException("Hidden variables must be local.");
+        }
         var nameToken = Token.synthetic(name);
         addLocal(nameToken);
-        var constant = current.scopeDepth > 0
-            ? 0 : identifierConstant(nameToken);
         expression();
-        defineVariable(constant);
+        markVariableInitialized();
     }
 
     // Adds a string constant to the current chunk's
