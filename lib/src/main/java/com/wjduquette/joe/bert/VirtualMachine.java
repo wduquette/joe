@@ -356,6 +356,10 @@ class VirtualMachine {
                     var offset = readArg();
                     if (Joe.isFalsey(peek(0))) frame.ip += offset;
                 }
+                case JIT -> {
+                    var offset = readArg();
+                    if (Joe.isTruthy(pop())) frame.ip += offset;
+                }
                 case JITKEEP -> {
                     var offset = readArg();
                     if (Joe.isTruthy(peek(0))) frame.ip += offset;

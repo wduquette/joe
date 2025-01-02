@@ -137,7 +137,7 @@ public class Disassembler {
 
             // Forward Jump Instructions
             // Pattern: opcode jumpOffset
-            case JIF, JIFKEEP, JITKEEP, JUMP -> {
+            case JIF, JIFKEEP, JIT, JITKEEP, JUMP -> {
                 char jump = chunk.code(ip + 1);
                 var text = String.format(" %04d -> %d", (int)jump,
                     ip + 2 + jump);  // Add jump

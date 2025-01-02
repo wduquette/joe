@@ -584,19 +584,25 @@ class Compiler {
         int nextJump = -1;
 
         while (match(CASE)) {
+            var caseJumps = new ArrayList<Character>();
+
             // Allow the previous case to jump here if it doesn't match.
             if (nextJump != -1) {
                 patchJump(nextJump);
             }
 
-            // Parse the case expression and compare it with the switch vallue.
-            emit(Opcode.DUP); // Duplicate the switch value
-            expression();
-            emit(Opcode.EQ);
+            do {
+                // Parse the case expression and compare it with the switch vallue.
+                emit(Opcode.DUP); // Duplicate the switch value
+                expression();
+                emit(Opcode.EQ);
 
-            // Jump to the next case if no match.
-            nextJump = emitJump(Opcode.JIF);
+                // Jump to the next case if no match.
+                caseJumps.add((char)emitJump(Opcode.JIT));
+            } while (match(COMMA));
 
+            nextJump = emitJump(Opcode.JUMP);
+            caseJumps.forEach(this::patchJump);
 
             // Parse the case body.
             consume(MINUS_GREATER, "Expected '->' after case expression.");

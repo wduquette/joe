@@ -1039,8 +1039,8 @@ the classic C-like syntax:</p>
 }
 </code></pre>
 <ul>
-<li>The switch value and the case values can be any Joe values or
-expressions.</li>
+<li>The switch value and the case values can be any Joe value <em>or
+expression</em>.</li>
 <li>There must be at least one <code>case</code> clause.</li>
 <li>Each <code>case</code> can have one or more values to match.</li>
 <li>Each case's body can be a single statement or a block.</li>
@@ -8191,43 +8191,46 @@ an atomic operation.</li>
 <tr><td>10</td><td>EQ</td><td><em>a b</em> → <em>a</em> == <em>b</em></td><td>Compare: equal</td></tr>
 <tr><td>11</td><td>FALSE</td><td>∅ → false</td><td>Load <code>false</code></td></tr>
 <tr><td>12</td><td>GE</td><td><em>a b</em> → <em>a</em> &gt;= <em>b</em></td><td>Compare: greater or equal</td></tr>
-<tr><td>13</td><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
-<tr><td>14</td><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
-<tr><td>15</td><td>GLOSET <em>name</em></td><td><em>a</em> → <em>a</em></td><td>Set global</td></tr>
-<tr><td>16</td><td>GT</td><td><em>a b</em> → <em>a</em> &gt; <em>b</em></td><td>Compare: greater</td></tr>
-<tr><td>17</td><td>IN</td><td><em>a coll</em> → bool</td><td>a in collection</td></tr>
-<tr><td>18</td><td>INCR</td><td><em>a</em> → <em>a'</em></td><td>a' = a + 1</td></tr>
-<tr><td>19</td><td>INHERIT</td><td><em>sup sub</em> → <em>sup</em></td><td>Inheritance</td></tr>
-<tr><td>20</td><td>JIF <em>offset</em></td><td><em>cond</em> → ∅</td><td>Jump if false</td></tr>
-<tr><td>21</td><td>JIFKEEP <em>offset</em></td><td><em>cond</em> → <em>cond</em></td><td>Jump if false, keep value</td></tr>
-<tr><td>22</td><td>JITKEEP <em>offset</em></td><td><em>cond</em> → <em>cond</em></td><td>Jump if true, keep value</td></tr>
-<tr><td>23</td><td>JUMP <em>offset</em></td><td></td><td>Jump forwards</td></tr>
-<tr><td>24</td><td>LE</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less or equal</td></tr>
-<tr><td>25</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
-<tr><td>26</td><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
-<tr><td>27</td><td>LOOP <em>offset</em></td><td></td><td>Jump backwards</td></tr>
-<tr><td>28</td><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
-<tr><td>29</td><td>METHOD <em>name</em></td><td><em>cls f</em> → <em>cls</em></td><td>Add method to class</td></tr>
-<tr><td>30</td><td>MUL</td><td><em>a b</em> → <em>a</em> * <em>b</em></td><td>Multiply</td></tr>
-<tr><td>31</td><td>NE</td><td><em>a b</em> → <em>a</em> &lt; <em>b</em></td><td>Compare: not equal</td></tr>
-<tr><td>32</td><td>NEGATE</td><td><em>a</em> → -<em>a</em></td><td>Negate</td></tr>
-<tr><td>33</td><td>NI</td><td><em>a coll</em> → bool</td><td>a not in collection</td></tr>
-<tr><td>34</td><td>NOT</td><td><em>a</em> → !<em>a</em></td><td>Not</td></tr>
-<tr><td>35</td><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
-<tr><td>36</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
-<tr><td>37</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
-<tr><td>38</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
-<tr><td>39</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
-<tr><td>40</td><td>RETURN</td><td><em>a</em> → ∅</td><td>Return</td></tr>
-<tr><td>41</td><td>SUB</td><td><em>a b</em> → <em>a</em> - <em>b</em></td><td>Subtract</td></tr>
-<tr><td>42</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
-<tr><td>43</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
-<tr><td>44</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
-<tr><td>45</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
-<tr><td>46</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
-<tr><td>47</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
-<tr><td>48</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
-<tr><td>49</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
+<tr><td>13</td><td>GETNEXT</td><td><em>iter</em> → <em>a</em></td><td>a = iter.next()</td></tr>
+<tr><td>14</td><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
+<tr><td>15</td><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
+<tr><td>16</td><td>GLOSET <em>name</em></td><td><em>a</em> → <em>a</em></td><td>Set global</td></tr>
+<tr><td>17</td><td>GT</td><td><em>a b</em> → <em>a</em> &gt; <em>b</em></td><td>Compare: greater</td></tr>
+<tr><td>18</td><td>HASNEXT</td><td><em>iter</em> → <em>flag</em></td><td>flag = iter.hasNext()</td></tr>
+<tr><td>19</td><td>IN</td><td><em>a coll</em> → bool</td><td>a in collection</td></tr>
+<tr><td>20</td><td>INCR</td><td><em>a</em> → <em>a'</em></td><td>a' = a + 1</td></tr>
+<tr><td>21</td><td>INHERIT</td><td><em>sup sub</em> → <em>sup</em></td><td>Inheritance</td></tr>
+<tr><td>22</td><td>ITER</td><td><em>coll</em> → <em>iter</em></td><td>iter = coll.iterator()</td></tr>
+<tr><td>23</td><td>JIF <em>offset</em></td><td><em>cond</em> → ∅</td><td>Jump if false</td></tr>
+<tr><td>24</td><td>JIFKEEP <em>offset</em></td><td><em>cond</em> → <em>cond</em></td><td>Jump if false, keep value</td></tr>
+<tr><td>25</td><td>JITKEEP <em>offset</em></td><td><em>cond</em> → <em>cond</em></td><td>Jump if true, keep value</td></tr>
+<tr><td>26</td><td>JUMP <em>offset</em></td><td></td><td>Jump forwards</td></tr>
+<tr><td>27</td><td>LE</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less or equal</td></tr>
+<tr><td>28</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
+<tr><td>29</td><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
+<tr><td>30</td><td>LOOP <em>offset</em></td><td></td><td>Jump backwards</td></tr>
+<tr><td>31</td><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
+<tr><td>32</td><td>METHOD <em>name</em></td><td><em>cls f</em> → <em>cls</em></td><td>Add method to class</td></tr>
+<tr><td>33</td><td>MUL</td><td><em>a b</em> → <em>a</em> * <em>b</em></td><td>Multiply</td></tr>
+<tr><td>34</td><td>NE</td><td><em>a b</em> → <em>a</em> &lt; <em>b</em></td><td>Compare: not equal</td></tr>
+<tr><td>35</td><td>NEGATE</td><td><em>a</em> → -<em>a</em></td><td>Negate</td></tr>
+<tr><td>36</td><td>NI</td><td><em>a coll</em> → bool</td><td>a not in collection</td></tr>
+<tr><td>37</td><td>NOT</td><td><em>a</em> → !<em>a</em></td><td>Not</td></tr>
+<tr><td>38</td><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
+<tr><td>39</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
+<tr><td>40</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
+<tr><td>41</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
+<tr><td>42</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
+<tr><td>43</td><td>RETURN</td><td><em>a</em> → ∅</td><td>Return</td></tr>
+<tr><td>44</td><td>SUB</td><td><em>a b</em> → <em>a</em> - <em>b</em></td><td>Subtract</td></tr>
+<tr><td>45</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
+<tr><td>46</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
+<tr><td>47</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
+<tr><td>48</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
+<tr><td>49</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
+<tr><td>50</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
+<tr><td>51</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
+<tr><td>52</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
 </tbody></table>
 </div>
 <h2 id="variable-names"><a class="header" href="#variable-names">Variable Names</a></h2>
@@ -8239,6 +8242,7 @@ an atomic operation.</li>
 <li><em>constant</em>: Index into the chunk's constants table</li>
 <li><em>def</em>: Function info: the <code>Function</code> itself plus upvalue details</li>
 <li><em>f</em>: A closure, e.g., a function or method</li>
+<li><em>iter</em>: A collection iterator</li>
 <li><em>n</em>: A count</li>
 <li><em>name</em>: An index into the chunk's constants table for a name constant.</li>
 <li><em>offset</em>: A jump offset</li>

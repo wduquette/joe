@@ -152,8 +152,8 @@ switch (x) {
 }
 ```
 
-- The switch value and the case values can be any Joe values or
-  expressions.
+- The switch value and the case values can be any Joe value *or
+  expression*.
 - There must be at least one `case` clause.
 - Each `case` can have one or more values to match.
 - Each case's body can be a single statement or a block.
