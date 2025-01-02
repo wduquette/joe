@@ -131,46 +131,46 @@ function testToString_custom() {
     assertEquals(stringify(thing), thing.toString());
 }
 
-////-----------------------------------------------------------------------------
-//// Static Methods
-//
-//// A class can define static methods, which can then be called.
-//function testDeclareStaticMethod() {
-//    class WithStatics {
-//        static method greeting() {
-//            return #howdy;
-//        }
-//    }
-//
-//    assertEquals(WithStatics.greeting(), #howdy);
-//}
-//
-//// Static Methods can call each other.
-//function testStaticMethods() {
-//    class WithStatics {
-//        static method greeting() {
-//            return #howdy;
-//        }
-//        static method howdy() {
-//            return WithStatics.greeting();
-//        }
-//    }
-//
-//    assertEquals(WithStatics.howdy(), #howdy);
-//}
-//
-//// Static methods can capture enclosing scope.
-//function testStaticMethodsCaptureScope() {
-//    var greeting = #howdy;
-//
-//    class WithStatics {
-//        static method howdy() {
-//            return greeting;
-//        }
-//    }
-//
-//    assertEquals(WithStatics.howdy(), #howdy);
-//}
+//-----------------------------------------------------------------------------
+// Static Methods
+
+// A class can define static methods, which can then be called.
+function testDeclareStaticMethod() {
+    class WithStatics {
+        static method greeting() {
+            return #howdy;
+        }
+    }
+
+    assertEquals(WithStatics.greeting(), #howdy);
+}
+
+// Static Methods can call each other.
+function testStaticMethods() {
+    class WithStatics {
+        static method greeting() {
+            return #howdy;
+        }
+        static method howdy() {
+            return WithStatics.greeting();
+        }
+    }
+
+    assertEquals(WithStatics.howdy(), #howdy);
+}
+
+// Static methods can capture enclosing scope.
+function testStaticMethodsCaptureScope() {
+    var greeting = #howdy;
+
+    class WithStatics {
+        static method howdy() {
+            return greeting;
+        }
+    }
+
+    assertEquals(WithStatics.howdy(), #howdy);
+}
 
 //-----------------------------------------------------------------------------
 // Static Fields
@@ -193,15 +193,15 @@ function testStaticFields_instanceMethods() {
     assertEquals(Thing().howdy(), #howdy);
 }
 
-//// Static methods can use static class fields
-//function testStaticFields_staticMethods() {
-//    class Thing {
-//        static method howdy() { return Thing.greeting; }
-//    }
-//    Thing.greeting = #howdy;
-//
-//    assertEquals(Thing.howdy(), #howdy);
-//}
+// Static methods can use static class fields
+function testStaticFields_staticMethods() {
+    class Thing {
+        static method howdy() { return Thing.greeting; }
+    }
+    Thing.greeting = #howdy;
+
+    assertEquals(Thing.howdy(), #howdy);
+}
 
 ////-----------------------------------------------------------------------------
 //// Static Initializer

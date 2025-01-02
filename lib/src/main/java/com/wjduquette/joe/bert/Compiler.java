@@ -196,10 +196,17 @@ class Compiler {
         consume(LEFT_BRACE, "Expected '{' before class body.");
 
         while (!check(RIGHT_BRACE) && !check(EOF)) {
+            var isStatic = match(STATIC);
+
             if (match(METHOD)) {
-                method();
+                if (isStatic) {
+                    staticMethod();
+                } else {
+                    method();
+                }
             } else {
                 errorAtCurrent("Expected 'method'.");
+                advance();
             }
         }
         consume(RIGHT_BRACE, "Expected '}' after class body.");
@@ -220,6 +227,15 @@ class Compiler {
             ? FunctionType.INITIALIZER : FunctionType.METHOD;
         function(start, type);
 
+        emit(Opcode.METHOD, nameConstant);
+    }
+
+    private void staticMethod() {
+        int start = parser.previous.span().start();
+        consume(IDENTIFIER, "Expected method name after 'static method'.");
+        char nameConstant = identifierConstant(parser.previous);
+
+        function(start, FunctionType.STATIC_METHOD);
         emit(Opcode.METHOD, nameConstant);
     }
 
