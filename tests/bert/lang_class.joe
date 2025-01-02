@@ -203,42 +203,42 @@ function testStaticFields_staticMethods() {
     assertEquals(Thing.howdy(), #howdy);
 }
 
-////-----------------------------------------------------------------------------
-//// Static Initializer
-//
-//// The static initializer can initialize static fields
-//function testStaticInitializer_initVars() {
-//    class Thing {
-//        static {
-//            Thing.greeting = #howdy;
-//        }
-//    }
-//
-//    assertEquals(Thing.greeting, #howdy);
-//}
-//
-//// The static initializer can call static methods
-//function testStaticInitializer_initCallsStatics() {
-//    class Thing {
-//        static {
-//            Thing.greeting = Thing.defaultGreeting();
-//        }
-//        static method defaultGreeting() { return #howdy; }
-//    }
-//
-//    assertEquals(Thing.greeting, #howdy);
-//}
-//
-//// The static initializer can create instances
-//function testStaticInitializer_initCallsStatics() {
-//    class Thing {
-//        static {
-//            Thing.instance = Thing();
-//        }
-//    }
-//
-//    assertEquals(typeName(Thing.instance), "Thing");
-//}
+//-----------------------------------------------------------------------------
+// Static Initializer
+
+// The static initializer can initialize static fields
+function testStaticInitializer_initVars() {
+    class Thing {
+        static {
+            Thing.greeting = #howdy;
+        }
+    }
+
+    assertEquals(Thing.greeting, #howdy);
+}
+
+// The static initializer can call static methods
+function testStaticInitializer_initCallsStatics() {
+    class Thing {
+        static method defaultGreeting() { return #howdy; }
+        static {
+            Thing.greeting = Thing.defaultGreeting();
+        }
+    }
+
+    assertEquals(Thing.greeting, #howdy);
+}
+
+// The static initializer can create instances
+function testStaticInitializer_initCallsStatics() {
+    class Thing {
+        static {
+            Thing.instance = Thing();
+        }
+    }
+
+    assertEquals(typeName(Thing.instance), "Thing");
+}
 
 //-----------------------------------------------------------------------------
 // Subclasses

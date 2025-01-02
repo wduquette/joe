@@ -198,14 +198,19 @@ class Compiler {
         while (!check(RIGHT_BRACE) && !check(EOF)) {
             var isStatic = match(STATIC);
 
-            if (match(METHOD)) {
+            if (isStatic && match(LEFT_BRACE)) {
+                // Static initializer
+                emit(Opcode.POP);                  // Pop the class
+                block();                           // The initializer
+                emit(Opcode.CONST, nameConstant);  // Push the class again.
+            } else if (match(METHOD)) {
                 if (isStatic) {
                     staticMethod();
                 } else {
                     method();
                 }
             } else {
-                errorAtCurrent("Expected 'method'.");
+                errorAtCurrent("Unexpected class member.");
                 advance();
             }
         }
