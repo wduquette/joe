@@ -62,23 +62,23 @@ function testMethod_tooManyArgs() {
     assertError(bad, "Wrong number of arguments, expected: twoArgs(name, value).");
 }
 
-//// Varargs method
-//function testMethod_varargs_good() {
-//    class Thing {
-//        method varArgs(first, args) {
-//            return first + "," + stringify(args);
-//        }
-//    }
-//    var thing = Thing();
-//
-//    assertEquals(thing.varArgs(#a), "#a,List()");
-//    assertEquals(thing.varArgs(#a,#b), "#a,List(#b)");
-//    assertEquals(thing.varArgs(#a,#b,#c), "#a,List(#b, #c)");
-//
-//    function bad() { thing.varArgs(); }
-//    assertError(bad,
-//        "Wrong number of arguments, expected: varArgs(first, args).");
-//}
+// Varargs method
+function testMethod_varargs_good() {
+    class Thing {
+        method varArgs(first, args) {
+            return first + "," + stringify(args);
+        }
+    }
+    var thing = Thing();
+
+    assertEquals(thing.varArgs(#a), "#a,List()");
+    assertEquals(thing.varArgs(#a,#b), "#a,List(#b)");
+    assertEquals(thing.varArgs(#a,#b,#c), "#a,List(#b, #c)");
+
+    function bad() { thing.varArgs(); }
+    assertError(bad,
+        "Wrong number of arguments, expected: varArgs(first, args).");
+}
 
 // Methods can capture enclosing scope.
 function testMethodsCaptureScope() {
@@ -171,30 +171,30 @@ function testToString_custom() {
 //
 //    assertEquals(WithStatics.howdy(), #howdy);
 //}
-//
-////-----------------------------------------------------------------------------
-//// Static Fields
-//
-//// Script can set and get static class fields
-//function testStaticFields() {
-//    class Thing {}
-//    Thing.greeting = #howdy;
-//
-//    assertEquals(Thing.greeting, #howdy);
-//}
-//
-//// Methods can use static class fields
-//function testStaticFields() {
-//    class Thing {
-//        method howdy() { return Thing.greeting; }
-//    }
-//    Thing.greeting = #howdy;
-//
-//    assertEquals(Thing().howdy(), #howdy);
-//}
-//
+
+//-----------------------------------------------------------------------------
+// Static Fields
+
+// Script can set and get static class fields
+function testStaticFields() {
+    class Thing {}
+    Thing.greeting = #howdy;
+
+    assertEquals(Thing.greeting, #howdy);
+}
+
+// Methods can use static class fields
+function testStaticFields_instanceMethods() {
+    class Thing {
+        method howdy() { return Thing.greeting; }
+    }
+    Thing.greeting = #howdy;
+
+    assertEquals(Thing().howdy(), #howdy);
+}
+
 //// Static methods can use static class fields
-//function testStaticFields() {
+//function testStaticFields_staticMethods() {
 //    class Thing {
 //        static method howdy() { return Thing.greeting; }
 //    }
@@ -202,7 +202,7 @@ function testToString_custom() {
 //
 //    assertEquals(Thing.howdy(), #howdy);
 //}
-//
+
 ////-----------------------------------------------------------------------------
 //// Static Initializer
 //
