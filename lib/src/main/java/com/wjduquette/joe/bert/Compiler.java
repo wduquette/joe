@@ -195,14 +195,21 @@ class Compiler {
         getOrSetVariable(className, false);
         consume(LEFT_BRACE, "Expected '{' before class body.");
 
+        var staticInitStart = -1;
+        int classEnd = -1;
         while (!check(RIGHT_BRACE) && !check(EOF)) {
             var isStatic = match(STATIC);
 
             if (isStatic && match(LEFT_BRACE)) {
                 // Static initializer
+                // Jump after the initializer
+                var staticInitEnd = emitJump(Opcode.JUMP);
+                staticInitStart = current.chunk.size;
                 emit(Opcode.POP);                  // Pop the class
                 block();                           // The initializer
                 emit(Opcode.CONST, nameConstant);  // Push the class again.
+                classEnd = emitJump(Opcode.JUMP);
+                patchJump(staticInitEnd);
             } else if (match(METHOD)) {
                 if (isStatic) {
                     staticMethod();
@@ -215,6 +222,12 @@ class Compiler {
             }
         }
         consume(RIGHT_BRACE, "Expected '}' after class body.");
+        if (staticInitStart != -1) {
+            emitLoop(staticInitStart);
+        }
+        if (classEnd != -1) {
+            patchJump(classEnd);
+        }
         emit(Opcode.POP); // Pop the class itself
         if (classCompiler.hasSuperclass) {
             endScope();

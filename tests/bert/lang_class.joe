@@ -220,10 +220,10 @@ function testStaticInitializer_initVars() {
 // The static initializer can call static methods
 function testStaticInitializer_initCallsStatics() {
     class Thing {
-        static method defaultGreeting() { return #howdy; }
         static {
             Thing.greeting = Thing.defaultGreeting();
         }
+        static method defaultGreeting() { return #howdy; }
     }
 
     assertEquals(Thing.greeting, #howdy);
