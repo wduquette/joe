@@ -195,14 +195,39 @@ class Compiler {
         getOrSetVariable(className, false);
         consume(LEFT_BRACE, "Expected '{' before class body.");
 
+        var staticInitStart = -1;
+        int classEnd = -1;
         while (!check(RIGHT_BRACE) && !check(EOF)) {
-            if (match(METHOD)) {
-                method();
+            var isStatic = match(STATIC);
+
+            if (isStatic && match(LEFT_BRACE)) {
+                // Static initializer
+                // Jump after the initializer
+                var staticInitEnd = emitJump(Opcode.JUMP);
+                staticInitStart = current.chunk.size;
+                emit(Opcode.POP);                  // Pop the class
+                block();                           // The initializer
+                emit(Opcode.CONST, nameConstant);  // Push the class again.
+                classEnd = emitJump(Opcode.JUMP);
+                patchJump(staticInitEnd);
+            } else if (match(METHOD)) {
+                if (isStatic) {
+                    staticMethod();
+                } else {
+                    method();
+                }
             } else {
-                errorAtCurrent("Expected 'method'.");
+                errorAtCurrent("Unexpected class member.");
+                advance();
             }
         }
         consume(RIGHT_BRACE, "Expected '}' after class body.");
+        if (staticInitStart != -1) {
+            emitLoop(staticInitStart);
+        }
+        if (classEnd != -1) {
+            patchJump(classEnd);
+        }
         emit(Opcode.POP); // Pop the class itself
         if (classCompiler.hasSuperclass) {
             endScope();
@@ -220,6 +245,15 @@ class Compiler {
             ? FunctionType.INITIALIZER : FunctionType.METHOD;
         function(start, type);
 
+        emit(Opcode.METHOD, nameConstant);
+    }
+
+    private void staticMethod() {
+        int start = parser.previous.span().start();
+        consume(IDENTIFIER, "Expected method name after 'static method'.");
+        char nameConstant = identifierConstant(parser.previous);
+
+        function(start, FunctionType.STATIC_METHOD);
         emit(Opcode.METHOD, nameConstant);
     }
 

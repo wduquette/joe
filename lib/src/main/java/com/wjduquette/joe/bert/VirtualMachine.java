@@ -407,7 +407,15 @@ class VirtualMachine {
                     var name = readString();
                     var method = (Closure)peek(0);
                     var klass = (BertClass)peek(1);
-                    klass.methods.put(name, method);
+                    switch (method.function.type()) {
+                        case METHOD, INITIALIZER ->
+                            klass.methods.put(name, method);
+                        case STATIC_METHOD ->
+                            klass.staticMethods.put(name, method);
+                        default -> throw new IllegalStateException(
+                            "Invalid closure type in METHOD instruction: " +
+                            method.function.type());
+                    }
                     pop(); // Pop the method
                 }
                 case MUL -> {

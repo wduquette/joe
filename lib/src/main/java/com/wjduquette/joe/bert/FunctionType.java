@@ -4,6 +4,7 @@ public enum FunctionType {
     FUNCTION("function"),
     LAMBDA("lambda"),
     METHOD("method"),
+    STATIC_METHOD("static method"),
     INITIALIZER("initializer"),
     SCRIPT("script");
 
