@@ -174,9 +174,11 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="appendix-virtual-machine-instruction-set"><a class="header" href="#appendix-virtual-machine-instruction-set">Appendix: Virtual Machine Instruction Set</a></h1>
-<p>This is the instruction set for the experimental (and not yet
-complete) Bert byte-engine.  The byte-engine is a stack machine with a few
-registers:</p>
+<p>This appendix describes the Bert byte-engine's virtual machine.</p>
+<p><strong>NOTE:</strong> this information is for the benefit of the language maintainer.
+The VM's architecture and instruction set details are not part of the
+language specification, and can change without notice.</p>
+<p>The byte-engine is a stack machine with a few registers:</p>
 <ul>
 <li><code>ip</code> is the instruction pointer within the current function.</li>
 <li><code>T</code> is the temporary register, used to stash a value momentarily during

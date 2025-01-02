@@ -1,8 +1,12 @@
 # Appendix: Virtual Machine Instruction Set
 
-This is the instruction set for the experimental (and not yet
-complete) Bert byte-engine.  The byte-engine is a stack machine with a few
-registers:
+This appendix describes the Bert byte-engine's virtual machine.  
+
+**NOTE:** this information is for the benefit of the language maintainer.
+The VM's architecture and instruction set details are not part of the
+language specification, and can change without notice.
+
+The byte-engine is a stack machine with a few registers:
 
 - `ip` is the instruction pointer within the current function.
 - `T` is the temporary register, used to stash a value momentarily during
