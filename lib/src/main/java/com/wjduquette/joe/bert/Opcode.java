@@ -31,34 +31,35 @@ public class Opcode {
     public static final char ITER    = 22;
     public static final char JIF     = 23;
     public static final char JIFKEEP = 24;
-    public static final char JITKEEP = 25;
-    public static final char JUMP    = 26;
-    public static final char LE      = 27;
-    public static final char LOCGET  = 28;
-    public static final char LOCSET  = 29;
-    public static final char LOOP    = 30;
-    public static final char LT      = 31;
-    public static final char METHOD  = 32;
-    public static final char MUL     = 33;
-    public static final char NE      = 34;
-    public static final char NEGATE  = 35;
-    public static final char NI      = 36;
-    public static final char NOT     = 37;
-    public static final char NULL    = 38;
-    public static final char POP     = 39;
-    public static final char POPN    = 40;
-    public static final char PROPGET = 41;
-    public static final char PROPSET = 42;
-    public static final char RETURN  = 43;
-    public static final char SUB     = 44;
-    public static final char SUPGET  = 45;
-    public static final char TGET    = 46;
-    public static final char THROW   = 47;
-    public static final char TPUT    = 48;
-    public static final char TRUE    = 49;
-    public static final char UPCLOSE = 50;
-    public static final char UPGET   = 51;
-    public static final char UPSET   = 52;
+    public static final char JIT     = 25;
+    public static final char JITKEEP = 26;
+    public static final char JUMP    = 27;
+    public static final char LE      = 28;
+    public static final char LOCGET  = 29;
+    public static final char LOCSET  = 30;
+    public static final char LOOP    = 31;
+    public static final char LT      = 32;
+    public static final char METHOD  = 33;
+    public static final char MUL     = 34;
+    public static final char NE      = 35;
+    public static final char NEGATE  = 36;
+    public static final char NI      = 37;
+    public static final char NOT     = 38;
+    public static final char NULL    = 39;
+    public static final char POP     = 40;
+    public static final char POPN    = 41;
+    public static final char PROPGET = 42;
+    public static final char PROPSET = 43;
+    public static final char RETURN  = 44;
+    public static final char SUB     = 45;
+    public static final char SUPGET  = 46;
+    public static final char TGET    = 47;
+    public static final char THROW   = 48;
+    public static final char TPUT    = 49;
+    public static final char TRUE    = 50;
+    public static final char UPCLOSE = 51;
+    public static final char UPGET   = 52;
+    public static final char UPSET   = 53;
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -89,6 +90,7 @@ public class Opcode {
         "ITER",
         "JIF",
         "JIFKEEP",
+        "JIT",
         "JITKEEP",
         "JUMP",
         "LE",
