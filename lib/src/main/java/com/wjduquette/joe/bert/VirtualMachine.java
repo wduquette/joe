@@ -447,6 +447,10 @@ class VirtualMachine {
                     var target = peek(0);
                     var name = readString();
 
+                    if (target == null) {
+                        throw error("Cannot retrieve property, target is null.");
+                    }
+
                     // Note: this works for all JoeObjects, including
                     // `BertClass` and `BertInstance`.
                     var joeObject = joe.getJoeObject(target);
@@ -456,6 +460,10 @@ class VirtualMachine {
                 case PROPSET -> {
                     var target = peek(1);
                     var name = readString();
+
+                    if (target == null) {
+                        throw error("Cannot retrieve property, target is null.");
+                    }
 
                     // Handle JoeObjects
                     var joeObject = joe.getJoeObject(target);
