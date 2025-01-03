@@ -27,10 +27,8 @@ public class TestPackage extends JoePackage {
         globalFunction("assertTrue",   this::_assertTrue);
         globalFunction("fail",         this::_fail);
         globalFunction("skip",         this::_skip);
-        if (engine.equals(Joe.WALKER)) {
-            scriptResource(getClass(), "pkg.joe.test.joe");
-            type(PathProxy.TYPE);
-        }
+        scriptResource(getClass(), "pkg.joe.test.joe");
+        type(PathProxy.TYPE);
     }
 
     //**
