@@ -371,7 +371,9 @@ public class Joe {
      * @return The proxy, or null
      */
     TypeProxy<?> lookupProxy(Object object) {
-        return lookupProxyByClass(object.getClass());
+        return object != null
+            ? lookupProxyByClass(object.getClass())
+            : null;
     }
 
     /**
