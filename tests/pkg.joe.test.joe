@@ -151,16 +151,10 @@ function testCheckCatch_fail_isError() {
 }
 
 function testCheckCatch_fail_message() {
-    println("In testCheckCatch_fail_message");
-    var tuple = catch(_error);
-    fail("WHOOPS!");
-    println("tuple=" + tuple);
-    checkCatch(_error).message("Ouch");
+    function bad() { checkCatch(_error).message("Ouch"); }
 
-//    function bad() { checkCatch(_error).message("Ouch"); }
-//
-//    checkCatch(bad)
-//        .message("Expected message 'Ouch', got: 'Simulated Error'.");
+    checkCatch(bad)
+        .message("Expected message 'Ouch', got: 'Simulated Error'.");
 }
 
 function testCheckCatch_fail_type() {
