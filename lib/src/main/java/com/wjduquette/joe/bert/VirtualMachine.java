@@ -214,10 +214,7 @@ class VirtualMachine {
                 }
                 case ASSERT -> {
                     var message = pop();
-                    var condition = pop();
-                    if (Joe.isFalsey(condition)) {
-                        throw new AssertError(ipSpan(), joe.stringify(message));
-                    }
+                    throw new AssertError(ipSpan(), joe.stringify(message));
                 }
                 case CALL -> {
                     var argCount = readArg();

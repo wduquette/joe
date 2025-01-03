@@ -16,7 +16,7 @@ The byte-engine is a stack machine with a few registers:
 |    | Mnemonic/argument | Stack effect         | Description               |
 |----|-------------------|----------------------|---------------------------|
 | 0  | ADD               | *a b* → *a* + *b*    | Add                       |
-| 1  | ASSERT            | *cond msg* → ∅       | Assert condition          |
+| 1  | ASSERT            | *msg* → ∅            | Throws AssertError        |
 | 2  | CALL *argc*       | *f args* → *f(args)* | Call callable             |
 | 3  | CLASS *name*      | ∅ → *cls*            | Create class              |
 | 4  | CLOSURE *def*     | ∅ → *f*              | Load closure              |
