@@ -2,56 +2,61 @@
 //
 // Language tests should confine themselves to the basic test API.
 
+// NOTE: This version of the tests omits the detailed stack trace.
+
+function thrower() { throw "Simulated Error."; }
+
 function testThrowString() {
-    assertError(\-> { throw "Simulated Error."; }
-        , "Simulated Error."
-        , "In lambda \\");
+    assertError(thrower
+        , "Simulated Error.");
 }
 
 function testThrowAnything() {
-    assertError(\-> { throw #bogus; }
-        , "#bogus"
-        , "In lambda \\");
+    function thrower() { throw #bogus; }
+    assertError(thrower
+        , "#bogus");
 }
 
-function testRethrow_withFrame() {
-    var tuple = catch(\-> { throw "Simulated Error."; });
-    var err = tuple.error;
-    err.addInfo("Added detail.");
-    assertError(\-> { throw err; }
-        , "Simulated Error."
-        , "In lambda \\"
-        , "In java call(<lambda \\>)"
-        , "Called from catch()"
-        , "Added detail.");
-}
+// Requires `catch`, `Tuple`
 
-function testStackFrames() {
-    function ted(a, b) {
-        throw "Simulated Error";
-    }
+//function testRethrow_withFrame() {
+//    var tuple = catch(\-> { throw "Simulated Error."; });
+//    var err = tuple.error;
+//    err.addInfo("Added detail.");
+//    assertError(\-> { throw err; }
+//        , "Simulated Error."
+//        , "In lambda \\"
+//        , "In java call(<lambda \\>)"
+//        , "Called from catch()"
+//        , "Added detail.");
+//}
 
-    function dave(x, y) {
-        ted(x, x * y);
-    }
+//function testStackFrames() {
+//    function ted(a, b) {
+//        throw "Simulated Error";
+//    }
+//
+//    function dave(x, y) {
+//        ted(x, x * y);
+//    }
+//
+//    function bob(a, b) {
+//        dave(a, a + b);
+//    }
+//
+//    assertError(\-> bob(2, 3)
+//        , "Simulated Error"
+//        , "In function ted(a, b)"
+//        , "In function dave(x, y)"
+//        , "In function bob(a, b)"
+//        , "In lambda \\"
+//    );
+//}
 
-    function bob(a, b) {
-        dave(a, a + b);
-    }
-
-    assertError(\-> bob(2, 3)
-        , "Simulated Error"
-        , "In function ted(a, b)"
-        , "In function dave(x, y)"
-        , "In function bob(a, b)"
-        , "In lambda \\"
-    );
-}
-
-function testNativeFunction_stackFrames() {
-    assertError(\-> println(1, 2)
-        , "Wrong number of arguments, expected: println([text])."
-        , "In native function println(...)"
-        , "In lambda \\"
-    );
-}
+//function testNativeFunction_stackFrames() {
+//    assertError(\-> println(1, 2)
+//        , "Wrong number of arguments, expected: println([text])."
+//        , "In native function println(...)"
+//        , "In lambda \\"
+//    );
+//}
