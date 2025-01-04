@@ -240,6 +240,25 @@ function testStaticInitializer_initCallsStatics() {
     assertEquals(typeName(Thing.instance), "Thing");
 }
 
+// A class can have multiple static initializers
+function testStaticInitializer_multiple() {
+    // The methods are added just to show separation between the
+    // compiled initializer blocks.
+    class Thing {
+        static { Thing.a = 1; }
+        method a() { return Thing.a; }
+        static { Thing.b = 2; }
+        method b() { return Thing.b; }
+    }
+
+    assertEquals(Thing.a, 1);
+    assertEquals(Thing.b, 2);
+
+    var thing = Thing();
+    assertEquals(thing.a(), 1);
+    assertEquals(thing.b(), 2);
+}
+
 //-----------------------------------------------------------------------------
 // Subclasses
 
