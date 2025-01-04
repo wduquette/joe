@@ -2,33 +2,60 @@
 //
 // Language tests should confine themselves to the basic test API.
 
-function testAnd() {
-    // With booleans
-    assertTrue(true && true);
-    assertFalse(true && false);
-    assertFalse(false && true);
-    assertFalse(false && false);
+//-----------------------------------------------------------------------------
+// Arithmetic Operators
 
-    // Returns first argument if first is falsey.
-    assertFalse(false && 1);
-    assertEquals(null && 1, null);
+function testPlus() {
+    assertEquals(1 + 2, 3);
+    assertEquals("a" + "b", "ab");
+    assertEquals("a" + 1, "a1");
+    assertEquals(1 + "a", "1a");
 
-    // Returns second argument if first is truthy
-    assertEquals(1 && 2, 2);
-    assertEquals(1 && null, null);
+    function bad() { #a + #b; }
+    assertError(bad, "The '+' operator expects two Numbers or at least one String.");
 }
 
-function testAssignment() {
-    var a = 1;
-    var b;
-    var c;
-    c = b = a;
-    assertEquals(a, 1);
-    assertEquals(b, 1);
-    assertEquals(c, 1);
+function testMinus() {
+    assertEquals(4 - 1, 3);
+    assertEquals(1 - 4, -3);
+
+    function bad() { 4 - "abc"; }
+    assertError(bad, "The '-' operator expects two numeric operands.");
 }
 
-function testComparison() {
+function testTimes() {
+    assertEquals(4 * 2, 8);
+
+    function bad() { 4 * "abc"; }
+    assertError(bad, "The '*' operator expects two numeric operands.");
+}
+
+function testDivide() {
+    assertEquals(4/2, 2);
+    assertEquals(String(4/0), "Infinity");  // TODO: support Infinity,  NaN
+
+    function bad() { 4 / "abc"; }
+    assertError(bad, "The '/' operator expects two numeric operands.");
+}
+
+//-----------------------------------------------------------------------------
+// Test Comparisons
+
+function testEquals() {
+    assertTrue(1 == 1);
+    assertTrue("a" == "a");
+    assertTrue(#k == #k);
+    assertFalse(1 == 2);
+    assertFalse("a" == #k);
+}
+
+function testNotEquals() {
+    assertFalse(1 != 1);
+    assertTrue(1 != 2);
+    assertTrue("a" != #k);
+}
+
+function testComparisons() {
     assertTrue(0 < 1);
     assertFalse(1 < 1);
     assertTrue("a" < "b");
@@ -57,39 +84,23 @@ function testComparison() {
     assertError(bad, "The '>' operator expects two Numbers or two Strings.");
 }
 
-function testDivide() {
-    assertEquals(4/2, 2);
-    assertEquals(String(4/0), "Infinity");  // TODO: support Infinity,  NaN
+//-----------------------------------------------------------------------------
+// Logical Operators
 
-    function bad() { 4 / "abc"; }
-    assertError(bad, "The '/' operator expects two numeric operands.");
-}
+function testAnd() {
+    // With booleans
+    assertTrue(true && true);
+    assertFalse(true && false);
+    assertFalse(false && true);
+    assertFalse(false && false);
 
-function testEquality() {
-    assertTrue(1 == 1);
-    assertTrue("a" == "a");
-    assertTrue(#k == #k);
-    assertFalse(1 == 2);
-    assertFalse("a" == #k);
+    // Returns first argument if first is falsey.
+    assertFalse(false && 1);
+    assertEquals(null && 1, null);
 
-    assertFalse(1 != 1);
-    assertTrue(1 != 2);
-    assertTrue("a" != #k);
-}
-
-function testMinus() {
-    assertEquals(4 - 1, 3);
-    assertEquals(1 - 4, -3);
-
-    function bad() { 4 - "abc"; }
-    assertError(bad, "The '-' operator expects two numeric operands.");
-}
-
-function testNot() {
-    assertFalse(!true);
-    assertFalse(!1);
-    assertTrue(!false);
-    assertTrue(!null);
+    // Returns second argument if first is truthy
+    assertEquals(1 && 2, 2);
+    assertEquals(1 && null, null);
 }
 
 function testOr() {
@@ -108,42 +119,24 @@ function testOr() {
     assertEquals(null || 4, 4);
 }
 
-function testPlus() {
-    assertEquals(1 + 2, 3);
-    assertEquals("a" + "b", "ab");
-    assertEquals("a" + 1, "a1");
-    assertEquals(1 + "a", "1a");
-
-    function bad() { #a + #b; }
-    assertError(bad, "The '+' operator expects two Numbers or at least one String.");
+function testNot() {
+    assertFalse(!true);
+    assertFalse(!1);
+    assertTrue(!false);
+    assertTrue(!null);
 }
 
-function testTernary() {
-    assertEquals(true ? "a" : "b", "a");
-    assertEquals(false ? "a" : "b", "b");
-}
+//-----------------------------------------------------------------------------
+// Assignment operators
 
-function testTimes() {
-    assertEquals(4 * 2, 8);
-
-    function bad() { 4 * "abc"; }
-    assertError(bad, "The '*' operator expects two numeric operands.");
-}
-
-function testIN() {
-    var list = List(#a, #b, #c);
-    assertTrue(#a in list);
-    assertFalse(#d in list);
-
-    assertError(\-> #a in #a, "Expected iterable, got: Keyword '#a'.");
-}
-
-function testNI() {
-    var list = List(#a, #b, #c);
-    assertFalse(#a ni list);
-    assertTrue(#d ni list);
-
-    assertError(\-> #a ni #a, "Expected iterable, got: Keyword '#a'.");
+function testAssignment() {
+    var a = 1;
+    var b;
+    var c;
+    c = b = a;
+    assertEquals(a, 1);
+    assertEquals(b, 1);
+    assertEquals(c, 1);
 }
 
 function testPlusEquals_var() {
@@ -153,6 +146,12 @@ function testPlusEquals_var() {
     assertEquals(x, 12);
     assertEquals(s += "def", "abcdef");
     assertEquals(s, "abcdef");
+    assertEquals(x += "abc", "12abc");
+
+    var y = 5;
+    function bad1() { y += #abc; }
+    assertError(bad1,
+        "The '+' operator expects two Numbers or at least one String.");
 }
 
 function testPlusEquals_property() {
@@ -163,6 +162,12 @@ function testPlusEquals_property() {
     assertEquals(thing.x, 12);
     assertEquals(thing.s += "def", "abcdef");
     assertEquals(thing.s, "abcdef");
+    assertEquals(thing.x += "abc", "12abc");
+
+    thing.y = 5;
+    function bad1() { thing.y += #abc; }
+    assertError(bad1,
+        "The '+' operator expects two Numbers or at least one String.");
 }
 
 function testMinusEquals_var() {
@@ -171,9 +176,12 @@ function testMinusEquals_var() {
     assertEquals(x -= 7, -2);
     assertEquals(x, -2);
 
-    assertError(\-> x -= "abc",
+    function bad1() { x -= "abc"; }
+    function bad2() { s -= 5; }
+
+    assertError(bad1,
         "The '-' operator expects two numeric operands.");
-    assertError(\-> s -= 7,
+    assertError(bad2,
         "The '-' operator expects two numeric operands.");
 }
 
@@ -184,9 +192,12 @@ function testMinusEquals_property() {
     assertEquals(thing.x -= 7, -2);
     assertEquals(thing.x, -2);
 
-    assertError(\-> thing.x -= "abc",
+    function bad1() { thing.x -= "abc"; }
+    function bad2() { thing.s -= 5; }
+
+    assertError(bad1,
         "The '-' operator expects two numeric operands.");
-    assertError(\-> thing.s -= 7,
+    assertError(bad2,
         "The '-' operator expects two numeric operands.");
 }
 
@@ -196,9 +207,12 @@ function testStarEquals_var() {
     assertEquals(x *= 7, 35);
     assertEquals(x, 35);
 
-    assertError(\-> x *= "abc",
+    function bad1() { x *= "abc"; }
+    function bad2() { s *= 5; }
+
+    assertError(bad1,
         "The '*' operator expects two numeric operands.");
-    assertError(\-> s *= 7,
+    assertError(bad2,
         "The '*' operator expects two numeric operands.");
 }
 
@@ -209,9 +223,12 @@ function testStarEquals_property() {
     assertEquals(thing.x *= 7, 35);
     assertEquals(thing.x, 35);
 
-    assertError(\-> thing.x *= "abc",
+    function bad1() { thing.x *= "abc"; }
+    function bad2() { thing.s *= 5; }
+
+    assertError(bad1,
         "The '*' operator expects two numeric operands.");
-    assertError(\-> thing.s *= 7,
+    assertError(bad2,
         "The '*' operator expects two numeric operands.");
 }
 
@@ -221,9 +238,12 @@ function testSlashEquals_var() {
     assertEquals(x /= 5, 10);
     assertEquals(x, 10);
 
-    assertError(\-> x /= "abc",
+    function bad1() { x /= "abc"; }
+    function bad2() { s /= 5; }
+
+    assertError(bad1,
         "The '/' operator expects two numeric operands.");
-    assertError(\-> s /= 7,
+    assertError(bad2,
         "The '/' operator expects two numeric operands.");
 }
 
@@ -234,9 +254,12 @@ function testSlashEquals_property() {
     assertEquals(thing.x /= 5, 10);
     assertEquals(thing.x, 10);
 
-    assertError(\-> thing.x /= "abc",
+    function bad1() { thing.x /= "abc"; }
+    function bad2() { thing.s /= 5; }
+
+    assertError(bad1,
         "The '/' operator expects two numeric operands.");
-    assertError(\-> thing.s /= 7,
+    assertError(bad2,
         "The '/' operator expects two numeric operands.");
 }
 
@@ -297,6 +320,37 @@ function testMinusMinus_post_prop() {
     assertEquals(t.x--, 0);
     assertEquals(t.x, -1);
 }
+
+
+//-----------------------------------------------------------------------------
+// Ternary Operator
+
+function testTernary() {
+    assertEquals(true ? "a" : "b", "a");
+    assertEquals(false ? "a" : "b", "b");
+}
+
+//-----------------------------------------------------------------------------
+// in/ni Operators
+
+function testIN() {
+    var list = List(#a, #b, #c);
+    assertTrue(#a in list);
+    assertFalse(#d in list);
+
+    function bad() { return #a in #a; }
+    assertError(bad, "Expected iterable, got: Keyword '#a'.");
+}
+
+function testNI() {
+    var list = List(#a, #b, #c);
+    assertFalse(#a ni list);
+    assertTrue(#d ni list);
+
+    function bad() { return #a ni #a; }
+    assertError(bad, "Expected iterable, got: Keyword '#a'.");
+}
+
 
 //-----------------------------------------------------------------------------
 // Helpers

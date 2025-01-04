@@ -60,6 +60,7 @@ function testFields() {
 // Subclassing
 
 function testSubclass_canExtend() {
+    if (engine() == "bert") skip("JoeClass-integration required.");
     class Buff extends TextBuilder {
         method init(leader) {
             this.leader = leader;
@@ -74,6 +75,7 @@ function testSubclass_canExtend() {
 }
 
 function testSubclass_canUseSuper() {
+    if (engine() == "bert") skip("JoeClass-integration required.");
     class Buff extends TextBuilder {
         method println(text) {
             super.println(text);

@@ -137,7 +137,8 @@ class VirtualMachine {
             }
             case BertCallable bc -> {
                 // FIRST, set up the stack
-                var base = top;
+                var oldTop = top;
+                var oldFrameCount = frameCount;
                 var argc = args.length;
                 stack[top++] = bc;
                 for (Object arg : args) {
@@ -149,13 +150,27 @@ class VirtualMachine {
                 try {
                     return run();
                 } catch (JoeError ex) {
-                    unwindStack(ex, base);
+                    unwindStack(ex, oldFrameCount);
+                    // Result the stack to the old values.
+                    top = oldTop;
+                    frameCount = oldFrameCount;
                     throw ex;
                 }
             }
             default ->
                 throw error("Expected callable, got: " + joe.typedValue(callee) + ".");
         }
+    }
+
+    @SuppressWarnings("unused")
+    private void dumpState() {
+        System.out.println("dumpState:");
+        System.out.println("  Stack         = " + stackText());
+        System.out.println("  top           = " + top);
+        System.out.println("  frameCount    = " + frameCount);
+        System.out.println("  frame.closure = " + frame.closure);
+        System.out.println("  frame.base    = " + frame.base);
+        System.out.println("  frame.ip      = " + frame.ip);
     }
 
     // Unwinds the stack back to and including the bottomFrame, adding
@@ -214,10 +229,7 @@ class VirtualMachine {
                 }
                 case ASSERT -> {
                     var message = pop();
-                    var condition = pop();
-                    if (Joe.isFalsey(condition)) {
-                        throw new AssertError(ipSpan(), joe.stringify(message));
-                    }
+                    throw new AssertError(ipSpan(), joe.stringify(message));
                 }
                 case CALL -> {
                     var argCount = readArg();
@@ -447,6 +459,10 @@ class VirtualMachine {
                     var target = peek(0);
                     var name = readString();
 
+                    if (target == null) {
+                        throw error("Cannot retrieve property, target is null.");
+                    }
+
                     // Note: this works for all JoeObjects, including
                     // `BertClass` and `BertInstance`.
                     var joeObject = joe.getJoeObject(target);
@@ -456,6 +472,10 @@ class VirtualMachine {
                 case PROPSET -> {
                     var target = peek(1);
                     var name = readString();
+
+                    if (target == null) {
+                        throw error("Cannot retrieve property, target is null.");
+                    }
 
                     // Handle JoeObjects
                     var joeObject = joe.getJoeObject(target);

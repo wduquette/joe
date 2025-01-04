@@ -6,6 +6,15 @@ import com.wjduquette.joe.console.PathProxy;
 public class TestPackage extends JoePackage {
     // See also pkg.joe.test.Joe for the rest of the package.
 
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
+    // The name of the engine in use.
+    private final String engine;
+
+    //-------------------------------------------------------------------------
+    // Constructor
+
     //**
     // @package joe.test
     // @title Joe Test Tool API
@@ -21,16 +30,17 @@ public class TestPackage extends JoePackage {
 
     public TestPackage(String engine) {
         super("joe.test");
+        this.engine = engine;
+
         globalFunction("assertEquals", this::_assertEquals);
         globalFunction("assertError",  this::_assertError);
         globalFunction("assertFalse",  this::_assertFalse);
         globalFunction("assertTrue",   this::_assertTrue);
+        globalFunction("engine",       this::_engine);
         globalFunction("fail",         this::_fail);
         globalFunction("skip",         this::_skip);
-        if (engine.equals(Joe.WALKER)) {
-            scriptResource(getClass(), "pkg.joe.test.joe");
-            type(PathProxy.TYPE);
-        }
+        scriptResource(getClass(), "pkg.joe.test.joe");
+        type(PathProxy.TYPE);
     }
 
     //**
@@ -143,6 +153,15 @@ public class TestPackage extends JoePackage {
         }
 
         return null;
+    }
+
+    //**
+    // @function engine
+    // @result String
+    // Returns the name of the engine in use, "walker" or "bert".
+    private Object _engine(Joe joe, Args args) {
+        args.exactArity(0, "engine()");
+        return engine;
     }
 
     //**

@@ -36,6 +36,12 @@ function testFail() {
 
 function testAssertError_gotError() {
     function bad() { throw "Simulated error."; }
+    assertError(bad, "Simulated error.");
+}
+
+function testAssertError_gotError_withTrace() {
+    if (engine() == "bert") skip("Requires stack trace unification.");
+    function bad() { throw "Simulated error."; }
     assertError(bad, "Simulated error."
         , "In function bad()"
     );

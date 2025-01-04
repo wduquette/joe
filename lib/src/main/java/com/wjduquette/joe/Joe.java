@@ -371,7 +371,9 @@ public class Joe {
      * @return The proxy, or null
      */
     TypeProxy<?> lookupProxy(Object object) {
-        return lookupProxyByClass(object.getClass());
+        return object != null
+            ? lookupProxyByClass(object.getClass())
+            : null;
     }
 
     /**
@@ -719,7 +721,7 @@ public class Joe {
      * @return The comparator
      */
     public Comparator<Object> toComparator(Object arg) {
-        if (arg instanceof NativeCallable) {
+        if (isCallable(arg)) {
             return (Object a, Object b) -> toInteger(call(arg, a, b));
         } else {
             throw expected("comparator", arg);

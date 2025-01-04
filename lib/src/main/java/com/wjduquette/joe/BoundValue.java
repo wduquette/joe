@@ -32,8 +32,7 @@ record BoundValue(Joe joe, TypeProxy<?> proxy, Object value)
             }
         } else {
             throw new JoeError("Values of type " +
-                value.getClass().getName() +
-                " have no gettable properties.");
+                typeName() + " have no gettable properties.");
         }
     }
 

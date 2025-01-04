@@ -429,6 +429,7 @@ class Compiler {
         var start = parser.previous.span().end();
         expression();
         var end = parser.previous.span().end();
+        var endJump = emitJump(Opcode.JIT);
 
         if (match(COMMA)) {
             // Compile the message expression
@@ -441,6 +442,7 @@ class Compiler {
         emit(Opcode.ASSERT);
 
         consume(SEMICOLON, "Expected ';' after assertion.");
+        patchJump(endJump);
     }
 
     private void breakStatement() {

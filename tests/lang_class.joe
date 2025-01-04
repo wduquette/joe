@@ -184,7 +184,7 @@ function testStaticFields() {
 }
 
 // Methods can use static class fields
-function testStaticFields() {
+function testStaticFields_instanceMethods() {
     class Thing {
         method howdy() { return Thing.greeting; }
     }
@@ -194,7 +194,7 @@ function testStaticFields() {
 }
 
 // Static methods can use static class fields
-function testStaticFields() {
+function testStaticFields_staticMethods() {
     class Thing {
         static method howdy() { return Thing.greeting; }
     }

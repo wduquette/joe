@@ -8,6 +8,19 @@ function testDeclareFunction() {
     assertEquals(info(), "I'm a Thing!");
 }
 
+// Call something that's not callable.
+function testNotCallable() {
+    var notAFunction = 123;
+    function bad() { notAFunction(); }
+    assertError(bad, "Expected callable, got: Number '123'.");
+}
+
+// Functions return null by default.
+function testReturnsNull() {
+    function f() { }
+    assertEquals(f(), null);
+}
+
 // Function arity is checked.
 function testFunction_tooFewArgs() {
     function twoArgs(name, value) { }
@@ -47,4 +60,25 @@ function testFunctionsCaptureScope() {
     assertEquals(howdy(), #howdy);
 }
 
+//-----------------------------------------------------------------------------
+// Lambda
 
+function testLambda_expr() {
+    var f = \-> 5;
+    assertEquals(f(), 5);
+
+    var g = \x,y -> x + y;
+    assertEquals(g(2,3), 5);
+}
+
+function testLambda_block() {
+    var f = \-> {
+        return 5;
+    };
+    assertEquals(f(), 5);
+
+    var g = \x,y -> {
+        return x + y;
+    };
+    assertEquals(g(2,3), 5);
+}
