@@ -12,6 +12,14 @@ function testCatch_error() {
     function bad() { throw "Simulated error!"; }
     var tuple = catch(bad);
     check(tuple.is(#error));
+}
+
+function testCatch_error_withTrace() {
+    if (engine() == "bert") skip("Requires stack trace unification.");
+    function bad() { throw "Simulated error!"; }
+    var tuple = catch(bad);
+    check(tuple.is(#error));
+
     check(tuple.error.traces()).eq(List(
         "In function bad()",
         "In java call(<function bad()>)",
