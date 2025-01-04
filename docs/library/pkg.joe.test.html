@@ -185,6 +185,7 @@ for use in <code>joe test</code> test suites.</p>
 <li><a href="pkg.joe.test.html#function.assertTrue">assertTrue(<em>condition</em>)</a></li>
 <li><a href="pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="type.joe.test.CatchChecker.html">CatchChecker</a></li>
+<li><a href="pkg.joe.test.html#function.engine">engine()</a> → String</li>
 <li><a href="pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
 <li><a href="pkg.joe.test.html#function.skip">skip(<em>message</em>)</a></li>
 </ul>
@@ -240,6 +241,11 @@ informative assertion error if not.</p>
 <p><strong>checkCatch(<em>callable</em>) → <a href="type.joe.test.CatchChecker.html">CatchChecker</a></strong></p>
 <p>Executes a no-arg <em>callable</em> and returns a checker for checking
 the error result.</p>
+<p><span id="function.engine"> </span></p>
+<h3 id="engine"><a class="header" href="#engine">engine()</a></h3>
+<hr />
+<p><strong>engine() → String</strong></p>
+<p>Returns the name of the engine in use, "walker" or "bert".</p>
 <p><span id="function.fail"> </span></p>
 <h3 id="fail"><a class="header" href="#fail">fail()</a></h3>
 <hr />
