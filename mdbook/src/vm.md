@@ -15,62 +15,62 @@ The byte-engine is a stack machine with a few registers:
 ## Instruction Set
 
 
-|    | Mnemonic/argument | Stack effect         | Description               |
-|----|-------------------|----------------------|---------------------------|
-| 0  | ADD               | *a b* → *c*          | c = a + b                 |
-| 1  | ASSERT            | *msg* → ∅            | Throws AssertError        |
-| 2  | CALL *argc*       | *f args* → *c*       | c = f(args)               |
-| 3  | CLASS *name*      | ∅ → *cls*            | Create class              |
-| 4  | CLOSURE *func*    | ∅ → *f*              | Load closure              |
-| 5  | COMMENT *name*    | ∅ → ∅                | No-op comment             |
-| 6  | CONST *constant*  | ∅ → *a*              | Load constant             |
-| 7  | DECR              | *a* → *b*            | b = a - 1                 |
-| 8  | DIV               | *a b* → *c*          | c = a/b                   |
-| 9  | DUP               | *a* → *a* *a*        | Duplicate                 |
-| 10 | EQ                | *a b* → *c*          | *c* = *a* == *b*          |
-| 11 | FALSE             | ∅ → false            | Load `false`              |
-| 12 | GE                | *a b* → *c*          | c = a >= b                |
-| 13 | GETNEXT           | *iter* → *a*         | a = iter.next()           |
-| 14 | GLODEF *name*     | *a* → ∅              | Define global             |
-| 15 | GLOGET *name*     | ∅ → *a*              | Get global                |
-| 16 | GLOSET *name*     | *a* → *a*            | Set global                |
-| 17 | GT                | *a b* → *a* > *b*    | Compare: greater          |
-| 18 | HASNEXT           | *iter* → *flag*      | flag = iter.hasNext()     |
-| 19 | IN                | *a coll* → bool      | a in collection           |
-| 20 | INCR              | *a* → *b*            | b = a + 1                 |
-| 21 | INHERIT           | *sup sub* → *sup*    | Inheritance               |
-| 22 | ITER              | *coll* → *iter*      | iter = coll.iterator()    |
-| 23 | JIF *offset*      | *cond* → ∅           | Jump if false             |
-| 24 | JIFKEEP *offset*  | *cond* → *cond*      | Jump if false, keep value |
-| 25 | JIT *offset*      | *cond* → ∅           | Jump if true              |
-| 26 | JITKEEP *offset*  | *cond* → *cond*      | Jump if true, keep value  |
-| 27 | JUMP *offset*     |                      | Jump forwards             |
-| 28 | LE                | *a b* → *a* <= *b*   | Compare: less or equal    |
-| 29 | LOCGET *slot*     | ∅ → *a*              | Get local                 |
-| 30 | LOCSET *slot*     | *a* → *a*            | Set local                 |
-| 31 | LOOP *offset*     |                      | Jump backwards            |
-| 32 | LT                | *a b* → *a* <= *b*   | Compare: less than        |
-| 33 | METHOD *name*     | *cls f* → *cls*      | Add method to class       |
-| 34 | MUL               | *a b* → *a* * *b*    | Multiply                  |
-| 35 | NE                | *a b* → *a* < *b*    | Compare: not equal        |
-| 36 | NEGATE            | *a* → -*a*           | Negate                    |
-| 37 | NI                | *a coll* → bool      | a not in collection       |
-| 38 | NOT               | *a* → !*a*           | Not                       |
-| 39 | NULL              | ∅ → null             | Load `null`               |
-| 40 | POP               | *a* → ∅              | Pops one value            |
-| 41 | POPN *n*          | *a...* → ∅           | Pops *n* values           |
-| 42 | PROPGET *name*    | *obj* → *a*          | Get property value        |
-| 43 | PROPSET *name*    | *obj a* → *a*        | Set property value        |
-| 44 | RETURN            | *a* → ∅              | Return                    |
-| 45 | SUB               | *a b* → *a* - *b*    | Subtract                  |
-| 46 | SUPGET *name*     | *obj sup* → *f*      | Get superclass method     |
-| 47 | TGET              | ∅ → *a*              | *a* = T                   |
-| 48 | TRUE              | ∅ → true             | Load `true`               |
-| 49 | TPUT              | *a* → *a*            | T = *a*                   |
-| 50 | THROW             | *a* → ∅              | Throw error               |
-| 51 | UPCLOSE *n*       | *v...* → ∅           | Closes *n* upvalue(s)     |
-| 52 | UPGET *slot*      | ∅ → *a*              | Get upvalue               |
-| 53 | UPSET *slot*      | *a* → *a*            | Set upvalue               |
+|    | Mnemonic/argument | Stack effect       | Description               |
+|----|-------------------|--------------------|---------------------------|
+| 0  | ADD               | *a b* → *c*        | c = a + b                 |
+| 1  | ASSERT            | *msg* → ∅          | Throws AssertError        |
+| 2  | CALL *argc*       | *f args* → *c*     | c = f(args)               |
+| 3  | CLASS *name*      | ∅ → *cls*          | Create class              |
+| 4  | CLOSURE *func*    | ∅ → *f*            | Load closure              |
+| 5  | COMMENT *name*    | ∅ → ∅              | No-op comment             |
+| 6  | CONST *constant*  | ∅ → *a*            | Load constant             |
+| 7  | DECR              | *a* → *b*          | b = a - 1                 |
+| 8  | DIV               | *a b* → *c*        | c = a/b                   |
+| 9  | DUP               | *a* → *a* *a*      | Duplicate                 |
+| 10 | EQ                | *a b* → *c*        | c = a == b                |
+| 11 | FALSE             | ∅ → false          | Load `false`              |
+| 12 | GE                | *a b* → *c*        | c = a >= b                |
+| 13 | GETNEXT           | *iter* → *a*       | a = iter.next()           |
+| 14 | GLODEF *name*     | *a* → ∅            | Define global             |
+| 15 | GLOGET *name*     | ∅ → *a*            | Get global                |
+| 16 | GLOSET *name*     | *a* → *a*          | Set global                |
+| 17 | GT                | *a b* → *a* > *b*  | Compare: greater          |
+| 18 | HASNEXT           | *iter* → *flag*    | flag = iter.hasNext()     |
+| 19 | IN                | *a coll* → *flag*  | a in collection           |
+| 20 | INCR              | *a* → *b*          | b = a + 1                 |
+| 21 | INHERIT           | *sup sub* → *sup*  | Inheritance               |
+| 22 | ITER              | *coll* → *iter*    | iter = coll.iterator()    |
+| 23 | JIF *offset*      | *flag* → ∅         | Jump if false             |
+| 24 | JIFKEEP *offset*  | *flag* → *flag*    | Jump if false, keep value |
+| 25 | JIT *offset*      | *flag* → ∅         | Jump if true              |
+| 26 | JITKEEP *offset*  | *flag* → *flag*    | Jump if true, keep value  |
+| 27 | JUMP *offset*     | ∅ → ∅              | Jump forwards             |
+| 28 | LE                | *a b* → *a* <= *b* | Compare: less or equal    |
+| 29 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
+| 30 | LOCSET *slot*     | *a* → *a*          | Set local                 |
+| 31 | LOOP *offset*     | ∅ → ∅              | Jump backwards            |
+| 32 | LT                | *a b* → *a* <= *b* | Compare: less than        |
+| 33 | METHOD *name*     | *cls f* → *cls*    | Add method to class       |
+| 34 | MUL               | *a b* → *c*        | c = a*b                   |
+| 35 | NE                | *a b* → *c*        | c = a != b                |
+| 36 | NEGATE            | *a* → *b*          | b = -a                    |
+| 37 | NI                | *a coll* → *flag*  | a not in collection       |
+| 38 | NOT               | *a* → *b*          | b = !a                    |
+| 39 | NULL              | ∅ → null           | Load `null`               |
+| 40 | POP               | *a* → ∅            | Pops one value            |
+| 41 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
+| 42 | PROPGET *name*    | *obj* → *a*        | Get property value        |
+| 43 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
+| 44 | RETURN            | *a* → *a*          | Return                    |
+| 45 | SUB               | *a b* → *c*        | c = a - b                 |
+| 46 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
+| 47 | TGET              | ∅ → *a*            | *a* = T                   |
+| 48 | THROW             | *a* → ∅            | Throw error               |
+| 49 | TPUT              | *a* → *a*          | T = *a*                   |
+| 50 | TRUE              | ∅ → true           | Load `true`               |
+| 51 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
+| 52 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
+| 53 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
 
 **Stack Effects:** in the stack effect column, the top of the stack is on the 
 right.  
@@ -82,20 +82,27 @@ with *a* just below it.
 **Variable Names:** In the above table (and in the descriptions below), 
 the italicized names are used as follows:
 
+- ∅: Indicates that the instruction expects nothing on the
+  stack or leaves nothing on the stack, depending on its position.
 - *a*, *b*, *c*: Arbitrary values
 - *argc*: An argument count
 - *args*: A callable's arguments; 0 or more, depending on *argc*
 - *cls*: A class
-- *constant*: Index into the chunk's constants table
-- *f*: A closure, e.g., a function or method
-- *func*: A scripted function definition: the `Function` itself plus upvalue
-  details, suitable for building into a `Closure` in the current scope.
-- *iter*: A collection iterator
+- *coll*: An iterable collection: a Java `Collection<?>` or a value with
+  a `TypeProxy<T>` that supports iteration
+- *constant*: An index into the chunk's constants table for an arbitrary 
+  constant.
+- *f*: A callable, native or scripted
+- *flag*: A boolean flag, `true` or `false`.
+- *func*: A scripted function definition: the `Function` itself plus its 
+  upvalue data, suitable for building into a `Closure` in the current scope.
+  Used only by the `CLOSURE` instruction.
+- *iter*: A collection iterator, as used to compile `foreach` loops
 - *msg*: A message string
 - *n*: A count
-- *name*: An index into the chunk's constants table for a name constant.
+- *name*: An index into the chunk's constants table for a name constant
+- *obj*: An object, e.g., a class instance, or any `JoeObject`
 - *offset*: A jump offset
-- *obj*: An object, e.g., a class instance
 - *slot*: A stack slot
 - *sub*: A subclass
 - *sup*: A superclass
@@ -209,6 +216,52 @@ Pushes `false` onto the stack.
 
 Yields `true` if *a* is greater than or equal to *b*, and `false` otherwise.
 
+### GETNEXT
+---
+**GETNEXT** | *iter* → *a*
+
+Gets the next value from *iter*, which must be an iterator created by the 
+`ITER` instruction.  This instruction should always be paired with `HASNEXT`.
+
+### GLODEF
+---
+**GLODEF *name*** | *a* → ∅
+
+Defines a global variable called *name*, assigning it the value *a*.
+
+### GLOGET
+---
+**GLOGET *name*** | ∅ → *a*
+
+Retrieves the value of global variable *name* and pushes it on the stack.
+
+### GLOSET
+---
+**GLOSET *name*** | *a* → *a*
+
+Assigns value *a* to global variable *name*, leaving *a* on the stack.
+
+### GT
+---
+**GT** | *a* *b* → *c*, where *c* = (*a* > *b*)
+
+Yields `true` if *a* is greater than or equal to *b*, and `false` otherwise.
+
+### HASNEXT
+---
+**HASNEXT** | *iter* → *flag*
+
+Gets whether iterator *iter* has another value.  The *iter* must be an
+iterator created by the `ITER` instruction.
+
+### IN
+---
+**IN** | *a* *coll* → *flag*
+
+Pushes `true` if value *a* is in collection *coll*, and `false` otherwise.  The
+*coll* can be any Java `Collection<?>` or a value whose `TypeProxy<T>` makes it
+iterable.
+
 ### INCR
 ---
 **INCR** | *a* → *b*, where *b* = (*a* + 1)
@@ -221,11 +274,198 @@ Increments value *a*. `INCR` is used to implement the `++` operator.
   error message would be confusing.
 - `ADD` will concatenate strings, but `++` is only for use with numbers.
 
+### INHERIT
+---
+**INHERIT** | *sup* *sub* → *sup*
+
+This instruction is used when compiling a class definition.  Given superclass
+*sup* and the class being defined, *sub*, copies all of *sup*'s methods to 
+*sub*'s methods table, thereby inheriting *sup*'s behavior.  **NOTE**: If Joe 
+were modified to allow methods to be added to superclasses, this implementation 
+would need to change.
+
+### ITER
+---
+**ITER** | *coll* → *iter*
+
+Give collection *coll*, creates a Java `Iterator<?>` for the collection.  The
+*coll* can be any Java `Collection<?>` or value whose `TypeProxy<?>` 
+provides iterability.  This is used to implement the `foreach` statement.
+
+### JIF
+---
+**JIF *offset*** | *flag* → ∅
+
+Jumps forward by *offset* if *flag* is false.
+
+### JIFKEEP
+---
+**JIFKEEP *offset*** | *flag* → *flag*
+
+Jumps forward by *offset* if *flag* is false, retaining the flag on the
+stack.
+
+### JIT
+---
+**JIT *offset*** | *flag* → ∅
+
+Jumps forward by *offset* if *flag* is true.
+
+### JITKEEP
+---
+**JITKEEP *offset*** | *flag* → *flag*
+
+Jumps forward by *offset* if *flag* is true, retaining the flag on the
+stack.
+
+### JUMP
+---
+**JUMP *offset*** | ∅ → ∅
+
+Jumps forward by *offset*.
+
+### LE
+---
+**LE** | *a* *b* → *c*, where *c* = (*a* <= *b*)
+
+### LOCGET
+---
+**LOCGET *slot*** | ∅ → *a*
+
+Gets the value of the local variable in the given stack *slot*, 
+relative to the current call frame.
+
+### LOCSET
+---
+**LOCSET *slot*** | *a* → *a*
+
+Sets the value of the local variable in the given stack *slot*, 
+relative to the current call frame, to *a*, leaving the value on the
+stack.
+
+### LOOP
+---
+**LOOP *offset*** | ∅ → ∅
+
+Jumps backward by *offset*.
+
+### LT
+---
+**LT** | *a* *b* → *c*, where *c* = (*a* < *b*)
+
+### METHOD
+---
+**METHOD *name*** | *cls* *f* → *cls*
+
+This instruction is used when compiling a class definition. Adds closure *f* 
+to class *cls* as a method.  It is illegal to add a method to a class after
+its definition.
+
+### MUL
+---
+**MUL** | *a* *b* → *c, where *c* = (*a* * *b*)
+
+Computes the product of *a* and *b*. 
+
+### NE
+---
+**NE** | *a* *b* → *c*, where *c* = (*a* != *b*)
+
+Pushes `true` if *a* and *b* are not equal, and *false* otherwise.
+
+### NEGATE
+---
+**NEGATE** | *a* → *b*, where *b* = (-*a*)
+
+Negates *a*.
+
+### NI
+---
+**NI** | *a* *coll* → *flag*
+
+Pushes `false` if value *a* is in collection *coll*, and `true` otherwise.  The
+*coll* can be any Java `Collection<?>` or a value whose `TypeProxy<T>` makes it
+iterable.
+
+### NOT
+---
+**NOT** | *a* → *b*, where *b* = (!*a*)
+
+### NULL
+---
+**NULL** | ∅ → `null`
+
+Pushes `null` on the stack.
+
+### POP
+---
+**POP** | *a* -> ∅
+
+Pops one value from the stack.
+
 ### POPN
 ---
 **POPN** *n* | *a...* → ∅ 
 
 Pops *n* values from the stack.
+
+### PROPGET
+---
+**PROPGET *name*** | *obj* → *a*
+
+Gets the value of property *name* of object *obj*.
+
+### PROPSET
+---
+**PROPSET *name*** | *obj* *a* → *a*
+
+Sets property *name* of object *obj* to *a*, leaving *a* on the stack.
+
+### RETURN
+---
+**RETURN** | *a* → *a* 
+
+Returns *a* from the current function/call frame.  If the function was invoked
+from Java via `VirtualMachine::execute` or `VirtualMachine::callFromJava`, the
+result is popped and returned to the Java caller.
+
+### SUB
+---
+**SUB** | *a* *b* → *c, where *c* = (*a* - *b*)
+
+Computes the difference of *a* and *b*.
+
+### SUPGET
+---
+**SUPGET *name*** | *obj* *sup* → *f*
+
+Retrieves method *name* for superclass *sup* of object *obj*.
+This is used to compile the `super.<method>` syntax.  
+
+### TGET
+---
+**TGET** | ∅ → *a*
+
+Pushes the value of the T register onto the stack.
+
+### THROW
+---
+**THROW** | *a* -> ∅
+
+Throws a `MonicaError` given *a*, which may be a `MonicaError` or a
+string, creating a new `MonicaError` in the latter case.
+
+### TPUT
+---
+**TPUT** | *a* → *a*
+
+Loads *a* into the T register, leaving it on the stack.
+
+### TRUE
+---
+**TRUE** | ∅ → `true`
+
+Pushes `true` onto the stack.
 
 ### UPCLOSE
 ---
@@ -234,3 +474,22 @@ Pops *n* values from the stack.
 Pops *n* local variables from the stack, closing any of them that are 
 open upvalues. This is used when ending a scope, and by `break` and `continue` 
 when ending a scope prematurely.
+
+### UPGET
+---
+**UPGET *slot*** | ∅ → *a*
+
+Gets the value of the local variable in the given stack *slot*,
+relative to the current call frame.  This is used when the local
+variable has been captured by a closure.
+
+### UPSET
+---
+**UPSET *slot*** | *a* → *a*
+
+Sets the value of the local variable in the given stack *slot*,
+relative to the current call frame, to *a*, leaving the value on the
+stack.  This is used when the local
+variable has been captured by a closure.
+
+
