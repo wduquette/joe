@@ -8,7 +8,7 @@ import java.util.function.Function;
  * metadata and services for the type.
  * @param <V> The native value type
  */
-public class TypeProxy<V> implements JoeObject, JoeClass {
+public class TypeProxy<V> implements JoeObject, JoeClass, NativeCallable {
     //-------------------------------------------------------------------------
     // Instance Variables
 

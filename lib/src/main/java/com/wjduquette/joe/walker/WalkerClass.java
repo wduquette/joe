@@ -9,7 +9,7 @@ import com.wjduquette.joe.SourceBuffer.Span;
 /**
  * A class defined in a Joe script.
  */
-class WalkerClass implements JoeClass, JoeObject {
+class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -53,10 +53,23 @@ class WalkerClass implements JoeClass, JoeObject {
     }
 
     //-------------------------------------------------------------------------
-    // ScriptedClass API
+    // WalkerClass API
 
     public Span classSpan() {
         return classSpan;
+    }
+
+    public Object call(Joe joe, Args args) {
+        JoeObject instance = make(joe, this);
+        NativeCallable initializer = bind(instance, INIT);
+        if (initializer != null) {
+            try {
+                initializer.call(joe, args);
+            } catch (JoeError ex) {
+                throw ex.addFrame("In method " + initializer.signature());
+            }
+        }
+        return instance;
     }
 
     //-------------------------------------------------------------------------
@@ -99,20 +112,6 @@ class WalkerClass implements JoeClass, JoeObject {
 
     //-------------------------------------------------------------------------
     // JoeCallable API
-
-    @Override
-    public Object call(Joe joe, Args args) {
-        JoeObject instance = make(joe, this);
-        NativeCallable initializer = bind(instance, INIT);
-        if (initializer != null) {
-            try {
-                initializer.call(joe, args);
-            } catch (JoeError ex) {
-                throw ex.addFrame("In method " + initializer.signature());
-            }
-        }
-        return instance;
-    }
 
     @Override
     public String callableType() {

@@ -1,6 +1,6 @@
 package com.wjduquette.joe;
 
-public interface JoeClass extends NativeCallable {
+public interface JoeClass extends JoeCallable {
     /**
      * The name for a class's initializer method.
      */

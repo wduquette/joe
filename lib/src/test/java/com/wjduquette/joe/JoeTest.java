@@ -10,6 +10,8 @@ public class JoeTest extends Ted {
     private Joe joe;
 
     @Before public void setup() {
+        // TODO: Need to test both Walker and Bert.
+        // When unifying stack trace behavior.
         this.joe = new Joe();
     }
 

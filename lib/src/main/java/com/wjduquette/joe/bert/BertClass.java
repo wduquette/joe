@@ -7,6 +7,8 @@ import com.wjduquette.joe.JoeObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.wjduquette.joe.bert.Compiler.INIT;
+
 public class BertClass implements BertCallable, JoeObject {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -64,6 +66,29 @@ public class BertClass implements BertCallable, JoeObject {
     @Override
     public String stringify(Joe joe) {
         return "<class " + name + ">";
+    }
+
+    //-------------------------------------------------------------------------
+    // JoeCallable API
+
+    @Override
+    public String callableType() {
+        return "class";
+    }
+
+    @Override
+    public boolean isScripted() {
+        return true;
+    }
+
+    @Override
+    public String signature() {
+        var init = methods.get(INIT);
+        if (init != null) {
+            return name + init.signature().substring(4);
+        } else {
+            return name + "()";
+        }
     }
 
     //-------------------------------------------------------------------------
