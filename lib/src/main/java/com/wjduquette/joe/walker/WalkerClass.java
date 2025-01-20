@@ -61,10 +61,10 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
 
     public Object call(Joe joe, Args args) {
         JoeObject instance = make(joe, this);
-        NativeCallable initializer = bind(instance, INIT);
+        JoeCallable initializer = bind(instance, INIT);
         if (initializer != null) {
             try {
-                initializer.call(joe, args);
+                joe.call(initializer, args.asArray());
             } catch (JoeError ex) {
                 throw ex.addFrame("In method " + initializer.signature());
             }
@@ -91,7 +91,7 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     }
 
     @Override
-    public NativeCallable bind(Object value, String name) {
+    public JoeCallable bind(Object value, String name) {
         var method = methods.get(name);
 
         if (method != null) {

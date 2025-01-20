@@ -34,7 +34,8 @@ class WalkerInstance implements JoeObject {
             return fields.get(name);
         }
 
-        NativeCallable method = joeClass.bind(this, name);
+        JoeCallable method = joeClass.bind(this, name);
+
         if (method != null) return method;
 
         if (name.equals(TO_STRING)) {

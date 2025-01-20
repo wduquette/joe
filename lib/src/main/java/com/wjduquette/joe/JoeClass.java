@@ -19,7 +19,7 @@ public interface JoeClass extends JoeCallable {
      * @param name The method name
      * @return The bound callable
      */
-    NativeCallable bind(Object value, String name);
+    JoeCallable bind(Object value, String name);
 
     /**
      * Whether or not this class can be extended by a subclass.
