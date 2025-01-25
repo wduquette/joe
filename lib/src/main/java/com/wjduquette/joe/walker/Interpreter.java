@@ -489,7 +489,7 @@ class Interpreter {
                     distance, "super");
                 JoeObject instance = (JoeObject)environment.getAt(
                     distance - 1, "this");
-                NativeCallable method =
+                JoeCallable method =
                     superclass.bind(instance, expr.method().lexeme());
 
                 if (method == null) {

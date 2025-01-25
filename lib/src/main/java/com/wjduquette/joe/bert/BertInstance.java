@@ -11,7 +11,7 @@ public class BertInstance implements JoeObject {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    final BertClass klass;
+    final JoeClass klass;
     final Map<String,Object> fields = new HashMap<>();
 
     // Default "toString()" implementation.
@@ -20,7 +20,7 @@ public class BertInstance implements JoeObject {
     //-------------------------------------------------------------------------
     // Constructor
 
-    BertInstance(BertClass klass) {
+    BertInstance(JoeClass klass) {
         this.klass = klass;
         this._toString = new NativeMethod<>(this, "toString",
             (objc, joe, args) -> this.toString());
@@ -40,10 +40,10 @@ public class BertInstance implements JoeObject {
             return fields.get(name);
         }
 
-        var method = klass.methods.get(name);
+        var method = klass.bind(this, name);
 
         if (method != null) {
-            return new BoundMethod(this, method);
+            return method;
         }
 
         if (name.equals(TO_STRING)) {
@@ -62,7 +62,6 @@ public class BertInstance implements JoeObject {
     public String stringify(Joe joe) {
         var callable = get(TO_STRING);
         return (String)joe.call(callable);
-//        return toString();
     }
 
 

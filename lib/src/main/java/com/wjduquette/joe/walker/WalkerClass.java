@@ -9,7 +9,7 @@ import com.wjduquette.joe.SourceBuffer.Span;
 /**
  * A class defined in a Joe script.
  */
-class WalkerClass implements JoeClass, JoeObject {
+class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -53,10 +53,23 @@ class WalkerClass implements JoeClass, JoeObject {
     }
 
     //-------------------------------------------------------------------------
-    // ScriptedClass API
+    // WalkerClass API
 
     public Span classSpan() {
         return classSpan;
+    }
+
+    public Object call(Joe joe, Args args) {
+        JoeObject instance = make(joe, this);
+        JoeCallable initializer = bind(instance, INIT);
+        if (initializer != null) {
+            try {
+                joe.call(initializer, args.asArray());
+            } catch (JoeError ex) {
+                throw ex.addFrame("In method " + initializer.signature());
+            }
+        }
+        return instance;
     }
 
     //-------------------------------------------------------------------------
@@ -66,7 +79,7 @@ class WalkerClass implements JoeClass, JoeObject {
     @Override
     public JoeObject make(Joe joe, JoeClass joeClass) {
         if (superclass != null) {
-            return superclass.make(joe, this);
+            return superclass.make(joe, joeClass);
         } else {
             return new WalkerInstance(joeClass);
         }
@@ -78,7 +91,7 @@ class WalkerClass implements JoeClass, JoeObject {
     }
 
     @Override
-    public NativeCallable bind(Object value, String name) {
+    public JoeCallable bind(Object value, String name) {
         var method = methods.get(name);
 
         if (method != null) {
@@ -99,20 +112,6 @@ class WalkerClass implements JoeClass, JoeObject {
 
     //-------------------------------------------------------------------------
     // JoeCallable API
-
-    @Override
-    public Object call(Joe joe, Args args) {
-        JoeObject instance = make(joe, this);
-        NativeCallable initializer = bind(instance, INIT);
-        if (initializer != null) {
-            try {
-                initializer.call(joe, args);
-            } catch (JoeError ex) {
-                throw ex.addFrame("In method " + initializer.signature());
-            }
-        }
-        return instance;
-    }
 
     @Override
     public String callableType() {

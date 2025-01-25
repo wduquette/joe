@@ -42,6 +42,23 @@ public class Closure implements BertCallable, JoeObject {
             "Values of type <function> have no properties.");
     }
 
+    //-------------------------------------------------------------------------
+    // JoeCallable API
+
+    @Override
+    public String callableType() {
+        return function.type().text();
+    }
+
+    @Override
+    public boolean isScripted() {
+        return true;
+    }
+
+    @Override
+    public String signature() {
+        return function.signature();
+    }
 
     //-------------------------------------------------------------------------
     // Object API

@@ -1,6 +1,6 @@
 package com.wjduquette.joe;
 
-public interface JoeClass extends NativeCallable {
+public interface JoeClass extends JoeCallable {
     /**
      * The name for a class's initializer method.
      */
@@ -19,7 +19,7 @@ public interface JoeClass extends NativeCallable {
      * @param name The method name
      * @return The bound callable
      */
-    NativeCallable bind(Object value, String name);
+    JoeCallable bind(Object value, String name);
 
     /**
      * Whether or not this class can be extended by a subclass.

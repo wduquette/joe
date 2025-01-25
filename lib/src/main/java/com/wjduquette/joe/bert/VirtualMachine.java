@@ -346,13 +346,21 @@ class VirtualMachine {
                 }
                 case INHERIT -> {
                     var superclass = peek(1);
-                    if (!(superclass instanceof BertClass)) {
+
+                    if (superclass instanceof JoeClass jc) {
+                        // FIRST, can this superclass be extended?
+                        if (jc.canBeExtended()) {
+                            var subclass = (BertClass) peek(0);
+                            subclass.inheritSuperclass(jc);
+                            pop();  // Subclass
+                        } else {
+                            throw error("Superclass '" + jc.name() +
+                                "' cannot be extended.");
+                        }
+                    } else {
                         throw error("Expected superclass, got: " +
                             joe.typedValue(superclass));
                     }
-                    var subclass = (BertClass)peek(0);
-                    subclass.methods.putAll(((BertClass)superclass).methods);
-                    pop();  // Subclass
                     // NOTE: Superclass is still on the stack, I think
                     // as the `super` variable.  Seems weird, though.
                 }
@@ -522,9 +530,14 @@ class VirtualMachine {
                 }
                 case SUPGET -> {
                     var name = readString();
-                    var superclass = (BertClass)pop();
-                    var instance = (BertInstance)peek(0);
-                    if (!bindMethod(superclass, instance, name)) {
+                    var superclass = (JoeClass)pop();
+                    var instance = (JoeObject)peek(0);
+                    var method = superclass.bind(instance, name);
+
+                    if (method != null) {
+                        pop(); // The instance
+                        push(method);
+                    } else {
                         throw error("Undefined property: '" + name + "'.");
                     }
                 }
@@ -560,23 +573,6 @@ class VirtualMachine {
             if (joe.isDebug()) {
                 joe.println("| " + stackText());
             }
-        }
-    }
-
-    private boolean bindMethod(
-        BertClass cls,
-        BertInstance instance,
-        String name
-    ) {
-        var method = cls.methods.get(name);
-
-        if (method != null) {
-            var bound = new BoundMethod(instance, method);
-            pop(); // The instance
-            push(bound);
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -723,7 +719,7 @@ class VirtualMachine {
                 call(bound.method(), argCount, origin);
             }
             case BertClass klass -> {
-                stack[top - argCount - 1] = new BertInstance(klass);
+                stack[top - argCount - 1] = klass.make(joe, klass);
                 var initializer = klass.methods.get("init");
                 if (initializer != null) {
                     call(initializer, argCount, origin);

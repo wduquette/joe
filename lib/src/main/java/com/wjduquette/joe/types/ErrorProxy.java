@@ -28,11 +28,12 @@ public class ErrorProxy extends TypeProxy<JoeError> {
 
         initializer(this::_initializer);
 
-        method("addInfo",     this::_addInfo);
-        method("message",     this::_message);
-        method("stackTrace",  this::_stackTrace);
-        method("traces",      this::_traces);
-        method("type",        this::_type);
+        method("addInfo",         this::_addInfo);
+        method("javaStackTrace",  this::_javaStackTrace);
+        method("message",         this::_message);
+        method("stackTrace",      this::_stackTrace);
+        method("traces",          this::_traces);
+        method("type",            this::_type);
     }
 
     @Override
@@ -73,6 +74,16 @@ public class ErrorProxy extends TypeProxy<JoeError> {
     private Object _addInfo(JoeError error, Joe joe, Args args) {
         args.exactArity(1, "addInfo(message)");
         return error.addInfo(joe.stringify(args.next()));
+    }
+
+    //**
+    // @method javaStackTrace
+    // @result String
+    // Returns the complete error, including the initial error messages
+    // and all stack frames.
+    private Object _javaStackTrace(JoeError error, Joe joe, Args args) {
+        args.exactArity(0, "javaStackTrace()");
+        return error.getJavaStackTrace();
     }
 
     //**

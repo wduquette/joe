@@ -10,6 +10,8 @@ public class JoeTest extends Ted {
     private Joe joe;
 
     @Before public void setup() {
+        // TODO: Need to test both Walker and Bert.
+        // When unifying stack trace behavior.
         this.joe = new Joe();
     }
 
@@ -186,6 +188,8 @@ public class JoeTest extends Ted {
                 002     method init(x) {
                 003         throw "Simulated error!";
                 004     }
+              In java call(<method init(x)>, 0)
+              In method init(x) (*test*:3)
               In class Thing(x) (*test*:3)
               In function make(x) (*test*:7)
               In <script> (*test*:9)

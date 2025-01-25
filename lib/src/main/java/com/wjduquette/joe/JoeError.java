@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -186,6 +188,17 @@ public class JoeError extends RuntimeException {
         } else {
             return getMessage() + "\n" + getTraceReport().indent(2);
         }
+    }
+
+    /**
+     * Gets the Java stack trace for this exception.
+     * @return The trace.
+     */
+    public String getJavaStackTrace() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream recordingStream = new PrintStream(baos);
+        printStackTrace(recordingStream);
+        return baos.toString();
     }
 
     //-------------------------------------------------------------------------
