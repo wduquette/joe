@@ -345,14 +345,6 @@ class VirtualMachine {
                     push((double)a + 1);
                 }
                 case INHERIT -> {
-//                    var superclass = peek(1);
-//                    if (!(superclass instanceof BertClass)) {
-//                        throw error("Expected superclass, got: " +
-//                            joe.typedValue(superclass));
-//                    }
-//                    var subclass = (BertClass)peek(0);
-//                    subclass.methods.putAll(((BertClass)superclass).methods);
-//                    pop();  // Subclass
                     var superclass = peek(1);
 
                     if (superclass instanceof JoeClass jc) {
@@ -537,15 +529,9 @@ class VirtualMachine {
                     push((double)a - (double)b);
                 }
                 case SUPGET -> {
-//                    var name = readString();
-//                    var superclass = (BertClass)pop();
-//                    var instance = (BertInstance)peek(0);
-//                    if (!bindMethod(superclass, instance, name)) {
-//                        throw error("Undefined property: '" + name + "'.");
-//                    }
                     var name = readString();
                     var superclass = (JoeClass)pop();
-                    var instance = (BertInstance)peek(0);
+                    var instance = (JoeObject)peek(0);
                     var method = superclass.bind(instance, name);
 
                     if (method != null) {
@@ -589,23 +575,6 @@ class VirtualMachine {
             }
         }
     }
-
-//    private boolean bindMethod(
-//        BertClass cls,
-//        BertInstance instance,
-//        String name
-//    ) {
-//        var method = cls.methods.get(name);
-//
-//        if (method != null) {
-//            var bound = new BoundMethod(instance, method);
-//            pop(); // The instance
-//            push(bound);
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
 
     private SourceBuffer.Span ipSpan() {
         var line = frame.closure.function.line(frame.ip);
@@ -750,7 +719,7 @@ class VirtualMachine {
                 call(bound.method(), argCount, origin);
             }
             case BertClass klass -> {
-                stack[top - argCount - 1] = new BertInstance(klass);
+                stack[top - argCount - 1] = klass.make(joe, klass);
                 var initializer = klass.methods.get("init");
                 if (initializer != null) {
                     call(initializer, argCount, origin);
