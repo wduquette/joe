@@ -1,20 +1,24 @@
 package com.wjduquette.joe.bert;
 
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.wjduquette.joe.bert.Compiler.INIT;
-
-public class BertClass implements BertCallable, JoeObject {
+public class BertClass implements BertCallable, JoeClass, JoeObject {
     //-------------------------------------------------------------------------
     // Instance Variables
 
     // The class name (and the name of its global variable)
     private final String name;
+
+    // This class's immediate superclass, whether scripted or native, if any.
+    // See inheritSuperclass() and bind() for details
+    private JoeClass superclass = null;
+
+    // This class's closest native ancestor class, if any.
+    // See inheritSuperclass() and bind() for details
+    private JoeClass nativeAncestor = null;
 
     // Static methods and constants
     final Map<String, Closure> staticMethods = new HashMap<>();
@@ -24,17 +28,83 @@ public class BertClass implements BertCallable, JoeObject {
     final Map<String,Closure> methods = new HashMap<>();
 
     //-------------------------------------------------------------------------
-    // Constructor
+    // Constructor and building methods
 
+    /**
+     * Create the class object.  It is initially empty, having only a name;
+     * later instructions will build up its content.
+     * @param name The name
+     */
     BertClass(String name) {
         this.name = name;
     }
+
+    /**
+     * Make this class inherit from the superclass.  If the superclass is a
+     * Bert class, this class will copy its methods and inherit its native
+     * ancestor.  Otherwise, the superclass is this class's superclass and
+     * its native ancestor.  See bind().
+     * @param superclass The superclass.
+     */
+    void inheritSuperclass(JoeClass superclass) {
+        // FIRST, save the superclass.
+        if (this.superclass != null) {
+            throw new IllegalStateException(
+                "Class '" + name + "' already has a superclass.");
+        }
+
+        this.superclass = superclass;
+
+        if (superclass instanceof BertClass bertClass) {
+            methods.putAll(bertClass.methods);
+            nativeAncestor = bertClass.nativeAncestor;
+        } else {
+            nativeAncestor = superclass;
+        }
+    }
+
 
     //-------------------------------------------------------------------------
     // BertClass API
 
     public String name() {
         return name;
+    }
+
+    public JoeClass getSuperclass() {
+        return superclass;
+    }
+
+    //-------------------------------------------------------------------------
+    // JoeClass API
+
+    @Override
+    public JoeCallable bind(Object value, String name) {
+        var method = methods.get(name);
+
+        if (method != null) {
+            return new BoundMethod(this, method);
+        }
+
+        if (nativeAncestor != null) {
+            return nativeAncestor.bind(value, name);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public boolean canBeExtended() {
+        return true;
+    }
+
+    @Override
+    public JoeObject make(Joe joe, JoeClass joeClass) {
+        if (superclass != null) {
+            return superclass.make(joe, joeClass);
+        } else {
+            return new BertInstance(joeClass);
+        }
     }
 
     //-------------------------------------------------------------------------
