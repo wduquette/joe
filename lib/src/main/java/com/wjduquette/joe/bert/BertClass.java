@@ -83,7 +83,7 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
         var method = methods.get(name);
 
         if (method != null) {
-            return new BoundMethod(this, method);
+            return new BoundMethod(value, method);
         }
 
         if (nativeAncestor != null) {
