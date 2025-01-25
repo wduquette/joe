@@ -79,7 +79,7 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     @Override
     public JoeObject make(Joe joe, JoeClass joeClass) {
         if (superclass != null) {
-            return superclass.make(joe, this);
+            return superclass.make(joe, joeClass);
         } else {
             return new WalkerInstance(joeClass);
         }
