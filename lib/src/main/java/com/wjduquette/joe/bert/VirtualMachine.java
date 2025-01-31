@@ -725,7 +725,12 @@ class VirtualMachine {
             case NativeCallable f -> {
                 var args = new Args(Arrays.copyOfRange(stack, top - argCount, top));
                 top -= argCount + 1;
-                push(f.call(joe, args));
+                try {
+                    push(f.call(joe, args));
+                } catch (JoeError ex) {
+                    ex.addFrame("In " + f.callableType() + " " + f.signature());
+                    throw ex;
+                }
             }
             case BoundMethod bound -> {
                 stack[top - argCount - 1] = bound.receiver();
