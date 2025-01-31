@@ -180,7 +180,10 @@ class VirtualMachine {
             var frame = frames[i];
             var function = frame.closure.function;
 
-            var line = function.line(frame.ip);
+            // Note: frame.ip is the *next* instruction, the one that
+            // didn't actually execute yet.
+            var lastIP = Math.max(0, frame.ip - 1);
+            var line = function.line(lastIP);
             var span = function.source().lineSpan(line);
             var message = "In " +
                 function.type().text() + " " +
@@ -576,8 +579,13 @@ class VirtualMachine {
         }
     }
 
+    // Gets the span for the source line that includes that last
+    // executed instruction.
     private SourceBuffer.Span ipSpan() {
-        var line = frame.closure.function.line(frame.ip);
+        // NOTE: frame.ip points at the *next* instruction, not the
+        // last one that executed.
+        var ip = Math.max(frame.ip - 1, 0);
+        var line = frame.closure.function.line(ip);
         return frame.closure.function.source().lineSpan(line);
     }
 
