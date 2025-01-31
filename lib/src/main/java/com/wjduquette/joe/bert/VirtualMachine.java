@@ -187,7 +187,7 @@ class VirtualMachine {
             var span = function.source().lineSpan(line);
             var message = "In " +
                 function.type().text() + " " +
-                function.name();
+                function.signature();
             error.addFrame(span, message);
         }
     }
