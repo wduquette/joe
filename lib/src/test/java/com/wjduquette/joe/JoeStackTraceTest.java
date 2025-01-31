@@ -6,14 +6,15 @@ import org.junit.Test;
 import static com.wjduquette.joe.checker.Checker.check;
 import static com.wjduquette.joe.checker.Checker.fail;
 
-@SuppressWarnings("ConstantValue")
 public class JoeStackTraceTest extends Ted {
-    private Joe joe;
+    private Joe walker;
+    private Joe bert;
 
     @Before public void setup() {
         // TODO: Need to test both Walker and Bert.
         // When unifying stack trace behavior.
-        this.joe = new Joe();
+        this.walker = new Joe(Joe.WALKER);
+        this.bert = new Joe(Joe.BERT);
     }
 
 
@@ -54,7 +55,7 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:10)
             """;
         dumpScript(script);
-        check(traceOf(script)).eq(trace);
+        check(traceOf(walker, script)).eq(trace);
     }
 
     @Test
@@ -84,7 +85,7 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:10)
             """;
         dumpScript(script);
-        check(traceOf(script)).eq(trace);
+        check(traceOf(walker, script)).eq(trace);
     }
 
     @Test
@@ -115,7 +116,7 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:12)
             """;
         dumpScript(script);
-        check(traceOf(script)).eq(trace);
+        check(traceOf(walker, script)).eq(trace);
     }
 
     @Test
@@ -145,7 +146,7 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:9)
             """;
         dumpScript(script);
-        check(traceOf(script)).eq(trace);
+        check(traceOf(walker, script)).eq(trace);
     }
 
     @Test
@@ -176,7 +177,7 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:12)
             """;
         dumpScript(script);
-        check(traceOf(script)).eq(trace);
+        check(traceOf(walker, script)).eq(trace);
     }
 
     @Test
@@ -198,13 +199,13 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:5)
             """;
         dumpScript(script);
-        check(traceOf(script)).eq(trace);
+        check(traceOf(walker, script)).eq(trace);
     }
 
     @Test
     public void testStackTrace_nativeFunction() {
         test("testStackTrace_nativeFunction");
-        joe.installGlobalFunction("passThrough", this::_passThrough);
+        walker.installGlobalFunction("passThrough", this::_passThrough);
         var script = """
             function a(x) {
                 return passThrough(x);
@@ -221,7 +222,7 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:4)
             """;
         dumpScript(script);
-        check(traceOf(script)).eq(trace);
+        check(traceOf(walker, script)).eq(trace);
     }
 
     @Test
@@ -243,7 +244,7 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:4)
             """;
         dumpScript(script);
-        check(traceOf(script)).eq(trace);
+        check(traceOf(walker, script)).eq(trace);
     }
 
     @Test
@@ -265,13 +266,13 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:4)
             """;
         dumpScript(script);
-        check(traceOf(script)).eq(trace);
+        check(traceOf(walker, script)).eq(trace);
     }
 
     @Test
     public void testStackTrace_nativePassThrough() {
         test("testStackTrace_nativePassThrough");
-        joe.installGlobalFunction("passThrough", this::_passThrough);
+        walker.installGlobalFunction("passThrough", this::_passThrough);
         var script = """
             function a(x) {
                 return passThrough(c);
@@ -293,7 +294,7 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:7)
             """;
         dumpScript(script);
-        check(traceOf(script)).eq(trace);
+        check(traceOf(walker, script)).eq(trace);
     }
 
     @Test
@@ -318,7 +319,7 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:7)
             """;
         dumpScript(script);
-        check(traceOf(script)).eq(trace);
+        check(traceOf(walker, script)).eq(trace);
     }
 
     private Object _passThrough(Joe joe, Args args) {
@@ -330,7 +331,7 @@ public class JoeStackTraceTest extends Ted {
         return joe.call(callee);
     }
 
-    private String traceOf(String script) {
+    private String traceOf(Joe joe, String script) {
         try {
             joe.run("*test*", script);
             fail("traceOf expects to throw an error.");
