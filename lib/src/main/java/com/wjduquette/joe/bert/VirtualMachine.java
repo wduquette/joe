@@ -185,10 +185,15 @@ class VirtualMachine {
             var lastIP = Math.max(0, frame.ip - 1);
             var line = function.line(lastIP);
             var span = function.source().lineSpan(line);
-            var message = "In " +
-                function.type().text() + " " +
-                function.signature();
-            error.addFrame(span, message);
+            if (function.type() == FunctionType.SCRIPT) {
+                var message = "In <script>";
+                error.addFrame(span, message);
+            } else {
+                var message = "In " +
+                    function.type().text() + " " +
+                    function.signature();
+                error.addFrame(span, message);
+            }
         }
     }
 

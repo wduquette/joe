@@ -81,6 +81,9 @@ public class WalkerEngine implements Engine {
 
         try {
             return interpreter.interpret(statements);
+        } catch (JoeError ex) {
+            ex.addFrame("In <script>");
+            throw ex;
         } catch (Return ex) {
             return ex.value;
         }

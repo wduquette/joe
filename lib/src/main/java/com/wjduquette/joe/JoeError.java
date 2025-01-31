@@ -151,10 +151,6 @@ public class JoeError extends RuntimeException {
             }
         }
 
-        if (pendingContext != null) {
-            list.add("In <script> " + location(pendingContext));
-        }
-
         return String.join("\n", list);
     }
 
