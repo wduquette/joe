@@ -133,7 +133,12 @@ class VirtualMachine {
                 // NOTE: callValue could handle this, but that would
                 // require first pushing the args onto the stack and
                 // then copying them back into an Object[] array.
-                return jc.call(joe, new Args(args));
+                try {
+                    return jc.call(joe, new Args(args));
+                } catch (JoeError ex) {
+                    ex.addInfo("In " + jc.callableType() + " " + jc.signature());
+                    throw ex;
+                }
             }
             case BertCallable bc -> {
                 // FIRST, set up the stack
@@ -154,6 +159,9 @@ class VirtualMachine {
                     // Result the stack to the old values.
                     top = oldTop;
                     frameCount = oldFrameCount;
+
+                    ex.addInfo("In java call(<" +
+                        bc.callableType() + " " + bc.signature() + ">)");
                     throw ex;
                 }
             }
@@ -728,7 +736,7 @@ class VirtualMachine {
                 try {
                     push(f.call(joe, args));
                 } catch (JoeError ex) {
-                    ex.addFrame("In " + f.callableType() + " " + f.signature());
+                    ex.addInfo("In " + f.callableType() + " " + f.signature());
                     throw ex;
                 }
             }
