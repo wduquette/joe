@@ -3,7 +3,8 @@ package com.wjduquette.joe;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.wjduquette.joe.checker.Checker.check;
+import java.util.ArrayList;
+
 import static com.wjduquette.joe.checker.Checker.fail;
 
 public class JoeStackTraceTest extends Ted {
@@ -11,10 +12,10 @@ public class JoeStackTraceTest extends Ted {
     private Joe bert;
 
     @Before public void setup() {
-        // TODO: Need to test both Walker and Bert.
-        // When unifying stack trace behavior.
         this.walker = new Joe(Joe.WALKER);
         this.bert = new Joe(Joe.BERT);
+        walker.installGlobalFunction("passThrough", this::_passThrough);
+        bert.installGlobalFunction("passThrough", this::_passThrough);
     }
 
 
@@ -54,8 +55,10 @@ public class JoeStackTraceTest extends Ted {
               In function a(x) (*test*:2)
               In <script> (*test*:10)
             """;
+
         dumpScript(script);
-        check(traceOf(walker, script)).eq(trace);
+        checkRun(walker, script, trace);
+        checkRun(bert, script, trace);
     }
 
     @Test
@@ -85,7 +88,8 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:10)
             """;
         dumpScript(script);
-        check(traceOf(walker, script)).eq(trace);
+        checkRun(walker, script, trace);
+        checkRun(bert, script, trace);
     }
 
     @Test
@@ -116,7 +120,8 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:12)
             """;
         dumpScript(script);
-        check(traceOf(walker, script)).eq(trace);
+        checkRun(walker, script, trace);
+        checkRun(bert, script, trace);
     }
 
     @Test
@@ -146,7 +151,8 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:9)
             """;
         dumpScript(script);
-        check(traceOf(walker, script)).eq(trace);
+        checkRun(walker, script, trace);
+        checkRun(bert, script, trace);
     }
 
     @Test
@@ -177,7 +183,8 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:12)
             """;
         dumpScript(script);
-        check(traceOf(walker, script)).eq(trace);
+        checkRun(walker, script, trace);
+        checkRun(bert, script, trace);
     }
 
     @Test
@@ -199,13 +206,13 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:5)
             """;
         dumpScript(script);
-        check(traceOf(walker, script)).eq(trace);
+        checkRun(walker, script, trace);
+        checkRun(bert, script, trace);
     }
 
     @Test
     public void testStackTrace_nativeFunction() {
         test("testStackTrace_nativeFunction");
-        walker.installGlobalFunction("passThrough", this::_passThrough);
         var script = """
             function a(x) {
                 return passThrough(x);
@@ -222,7 +229,8 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:4)
             """;
         dumpScript(script);
-        check(traceOf(walker, script)).eq(trace);
+        checkRun(walker, script, trace);
+        checkRun(bert, script, trace);
     }
 
     @Test
@@ -244,7 +252,8 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:4)
             """;
         dumpScript(script);
-        check(traceOf(walker, script)).eq(trace);
+        checkRun(walker, script, trace);
+        checkRun(bert, script, trace);
     }
 
     @Test
@@ -266,7 +275,8 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:4)
             """;
         dumpScript(script);
-        check(traceOf(walker, script)).eq(trace);
+        checkRun(walker, script, trace);
+        checkRun(bert, script, trace);
     }
 
     @Test
@@ -294,7 +304,8 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:7)
             """;
         dumpScript(script);
-        check(traceOf(walker, script)).eq(trace);
+        checkRun(walker, script, trace);
+        checkRun(bert, script, trace);
     }
 
     @Test
@@ -319,7 +330,8 @@ public class JoeStackTraceTest extends Ted {
               In <script> (*test*:7)
             """;
         dumpScript(script);
-        check(traceOf(walker, script)).eq(trace);
+        checkRun(walker, script, trace);
+        checkRun(bert, script, trace);
     }
 
     private Object _passThrough(Joe joe, Args args) {
@@ -331,7 +343,28 @@ public class JoeStackTraceTest extends Ted {
         return joe.call(callee);
     }
 
-    private String traceOf(Joe joe, String script) {
+    private void checkRun(Joe joe, String script, String expected) {
+        var engine = (joe == bert) ? "Bert" : "Walker";
+        var got = "";
+        try {
+            joe.run("*test*", script);
+            fail("traceOf expects to throw an error.");
+            return; // Make the compiler happy.
+        } catch (JoeError ex) {
+            got = ex.getJoeStackTrace();
+        }
+
+        if (got.equals(expected)) {
+            return;
+        }
+
+        System.out.println(toColumns(
+            "Expected Trace:\n" + expected,
+            "From " + engine + " engine:\n" + got));
+        fail("Stack traces do not match!");
+    }
+
+    private String runTrace(Joe joe, String script) {
         try {
             joe.run("*test*", script);
             fail("traceOf expects to throw an error.");
@@ -341,11 +374,35 @@ public class JoeStackTraceTest extends Ted {
         }
     }
 
+    private String toColumns(String a, String b) {
+        var aLines = a.lines().toList();
+        var bLines = b.lines().toList();
+        int aMax = aLines.stream()
+            .mapToInt(String::length)
+            .max().orElse(0);
+
+        var n = Math.max(aLines.size(), bLines.size());
+        var result = new ArrayList<String>();
+        for (var i = 0; i < n; i++) {
+            var aLine = i < aLines.size() ? aLines.get(i) : "";
+            var bLine = i < bLines.size() ? bLines.get(i) : "";
+            var line = pad(aLine, aMax) + "  " + bLine;
+            result.add(line);
+        }
+
+        return String.join("\n", result);
+    }
+
+    private String pad(String s, int width) {
+        return (s + " ".repeat(width)).substring(0, width);
+    }
+
     private void dumpScript(String script) {
         var lines = script.lines().toList();
 
         for (var i = 1; i <= lines.size(); i++) {
             System.out.printf("%02d %s\n", i, lines.get(i - 1));
         }
+        System.out.println();
     }
 }
