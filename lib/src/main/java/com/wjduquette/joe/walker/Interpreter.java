@@ -131,8 +131,10 @@ class Interpreter {
                     } catch (JoeError ex) {
                         var buff = stmt.classSpan().buffer();
                         var context = buff.lineSpan(stmt.classSpan().endLine());
-                        throw ex.addPendingFrame(context,
-                            "In static initializer for " + stmt.name().lexeme());
+                        throw ex
+                            .addPendingFrame(context, "In static initializer")
+                            .addPendingFrame(context,
+                                "In class " + stmt.name().lexeme());
                     }
                 }
                 return null;
