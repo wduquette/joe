@@ -185,9 +185,19 @@ class VirtualMachine {
     // frame traces to the error.
     private void unwindStack(JoeError error, int bottomFrame) {
         for (var i = frameCount - 1; i >= bottomFrame; i--) {
+            // FIRST, get the frame and function.
             var frame = frames[i];
             var function = frame.closure.function;
 
+            // NEXT, add the postTrace stack levels, if any.
+            if (frame.postTraces != null) {
+                while (!frame.postTraces.isEmpty()) {
+                    var trace = frame.postTraces.pop();
+                    error.addPendingFrame(trace.context(), trace.message());
+                }
+            }
+
+            // NEXT, add the frame's own stack level.
             // Note: frame.ip is the *next* instruction, the one that
             // didn't actually execute yet.
             var lastIP = Math.max(0, frame.ip - 1);
@@ -203,6 +213,7 @@ class VirtualMachine {
                 error.addFrame(span, message);
             }
 
+            // NEXT, add the preTrace stack trace, if any.
             if (frame.preTrace != null) {
                 error.addFrame(frame.preTrace.context(), frame.preTrace.message());
             }
@@ -572,6 +583,13 @@ class VirtualMachine {
                 }
                 case TPUT -> registerT = peek(0);
                 case TRUE -> push(true);
+                case TRCPOP -> frame.postTraces.pop();
+                case TRCPUSH -> {
+                    if (frame.postTraces == null) {
+                        frame.postTraces = new Stack<>();
+                    }
+                    frame.postTraces.push((Trace)readConstant());
+                }
                 case UPCLOSE -> {
                     // Close and then pop the *n* upvalues on the
                     // top of the stack.
@@ -811,7 +829,13 @@ class VirtualMachine {
         // `callFromJava()`, and Origin.JOE otherwise.
         final Origin origin;
 
-        // Pre-trace: used to add a pseudo call frame just below this
+        // A stack of pseudo-CallFrame traces, used to add stack levels to
+        // the error stack trace within this call frame.  This is used when
+        // executing class static initializer blocks, to add the class itself
+        // to the stack trace.
+        Stack<Trace> postTraces = null;
+
+        // Pre-trace: used to add a pseudo-CallFrame just below this
         // call frame.  The pre-trace will be used to add a stack level to the
         // error stack trace, but is otherwise ignored.  This is used when
         // a class's init() method is implicitly invoked on a call to

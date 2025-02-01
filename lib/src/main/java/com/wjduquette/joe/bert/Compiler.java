@@ -199,10 +199,16 @@ class Compiler {
         int classEnd = -1;
         while (!check(RIGHT_BRACE) && !check(EOF)) {
             var isStatic = match(STATIC);
+            var staticSpan = parser.previous.span();
 
             if (isStatic && match(LEFT_BRACE)) {
                 // Static initializer
                 current.inStaticInitializer = true;
+
+                // Compute the trace for the initializer block
+                var trace = new Trace(staticSpan,
+                    "In static initializer for " + className.lexeme());
+                var index = current.chunk.addConstant(trace);
 
                 // Jump after the initializer
                 var afterInit = emitJump(Opcode.JUMP);
@@ -214,7 +220,9 @@ class Compiler {
                 if (firstInit == -1) firstInit = current.chunk.size;
 
                 emit(Opcode.POP);                  // Pop the class
+                emit(Opcode.TRCPUSH, index);
                 block();                           // The initializer
+                emit(Opcode.TRCPOP);
                 emit(Opcode.CONST, nameConstant);  // Push the class again.
 
                 // NEXT, jump to the end of the class declaration; or

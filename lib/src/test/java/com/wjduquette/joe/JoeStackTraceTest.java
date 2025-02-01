@@ -201,11 +201,11 @@ public class JoeStackTraceTest extends Ted {
                 002     static {
                 003         throw "Simulated error!";
                 004     }
-              In <script> (*test*:5)
+              In <script> (*test*:3)
             """;
         dumpScript(script);
-        checkRun(walker, script, trace);
-//        checkRun(bert, script, trace);
+//        checkRun(walker, script, trace);
+        checkRun(bert, script, trace);
     }
 
     @Test

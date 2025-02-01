@@ -67,6 +67,9 @@ The byte-engine is a stack machine with a few registers:
 | 47 | TGET              | ∅ → *a*            | *a* = T                   |
 | 48 | THROW             | *a* → ∅            | Throw error               |
 | 49 | TPUT              | *a* → *a*          | T = *a*                   |
+| 50 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
+| 51 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
+| 50 | TRUE              | ∅ → true           | Load `true`               |
 | 50 | TRUE              | ∅ → true           | Load `true`               |
 | 51 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
 | 52 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
@@ -106,6 +109,7 @@ the italicized names are used as follows:
 - *slot*: A stack slot
 - *sub*: A subclass
 - *sup*: A superclass
+- *trace*: A callable trace added to the current call-frame.
 - *v*: A local variable
 
 ## Instructions
@@ -460,6 +464,24 @@ string, creating a new `MonicaError` in the latter case.
 **TPUT** | *a* → *a*
 
 Loads *a* into the T register, leaving it on the stack.
+
+### TRCPOP
+---
+**TRCPOP** | ∅ → ∅
+
+Pops a post-trace from the current `CallFrame`.  See `TRCPUSH`.
+
+### TRCPUSH
+---
+**TRCPUSH** *trace* | ∅ → ∅
+
+Pushes a post-trace into the current `CallFrame`.  The *trace* is a 
+`Trace` constant identifying a particular scope in a loaded script.
+If an error is thrown while the post-trace is present in the `CallFrame`,
+the trace will be included in the error stack trace.
+
+This is used to add the `class` as a stack level when errors are found
+in a class static initializer block.
 
 ### TRUE
 ---

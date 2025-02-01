@@ -56,10 +56,12 @@ public class Opcode {
     public static final char TGET    = 47;
     public static final char THROW   = 48;
     public static final char TPUT    = 49;
-    public static final char TRUE    = 50;
-    public static final char UPCLOSE = 51;
-    public static final char UPGET   = 52;
-    public static final char UPSET   = 53;
+    public static final char TRCPOP  = 50;
+    public static final char TRCPUSH = 51;
+    public static final char TRUE    = 52;
+    public static final char UPCLOSE = 53;
+    public static final char UPGET   = 54;
+    public static final char UPSET   = 55;
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -115,6 +117,8 @@ public class Opcode {
         "TGET",
         "THROW",
         "TPUT",
+        "TRCPOP",
+        "TRCPUSH",
         "TRUE",
         "UPCLOSE",
         "UPGET",
