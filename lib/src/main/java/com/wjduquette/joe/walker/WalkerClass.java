@@ -61,12 +61,13 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
 
     public Object call(Joe joe, Args args) {
         JoeObject instance = make(joe, this);
-        JoeCallable initializer = bind(instance, INIT);
+        var initializer = (WalkerFunction)bind(instance, INIT);
         if (initializer != null) {
             try {
-                joe.call(initializer, args.asArray());
+                initializer.call(joe, args);
             } catch (JoeError ex) {
-                throw ex.addFrame("In method " + initializer.signature());
+                throw ex.addPendingFrame(initializer.span(),
+                    "In initializer " + initializer.signature());
             }
         }
         return instance;
