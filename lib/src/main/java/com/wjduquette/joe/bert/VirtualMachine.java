@@ -202,6 +202,10 @@ class VirtualMachine {
                     function.signature();
                 error.addFrame(span, message);
             }
+
+            if (frame.preTrace != null) {
+                error.addFrame(frame.preTrace.context(), frame.preTrace.message());
+            }
         }
     }
 
@@ -748,7 +752,12 @@ class VirtualMachine {
                 stack[top - argCount - 1] = klass.make(joe, klass);
                 var initializer = klass.methods.get("init");
                 if (initializer != null) {
-                    call(initializer, argCount, origin);
+                    var frame = call(initializer, argCount, origin);
+
+                    // Add a trace level for the class itself.
+                    frame.preTrace = new Trace(
+                        initializer.function.span(),
+                        "In " + klass.callableType() + " " + klass.signature());
                 } else if (argCount != 0) {
                     throw error(Args.arityFailureMessage(klass.name() + "()"));
                 }
@@ -758,7 +767,7 @@ class VirtualMachine {
         }
     }
 
-    private void call(Closure closure, int argCount, Origin origin) {
+    private CallFrame call(Closure closure, int argCount, Origin origin) {
         if (closure.function.isVarargs) {
             // FIRST, make sure we've got the minimum arguments.
             if (argCount < closure.function.arity) {
@@ -785,6 +794,7 @@ class VirtualMachine {
         var frame = new CallFrame(closure, origin);
         frames[frameCount++] = frame;
         frame.base = top - argCount - 1;
+        return frame;
     }
 
     private class CallFrame {
@@ -800,6 +810,16 @@ class VirtualMachine {
         // Origin.JAVA if this call frame represents a call to `interpret()` or
         // `callFromJava()`, and Origin.JOE otherwise.
         final Origin origin;
+
+        // Pre-trace: used to add a pseudo call frame just below this
+        // call frame.  The pre-trace will be used to add a stack level to the
+        // error stack trace, but is otherwise ignored.  This is used when
+        // a class's init() method is implicitly invoked on a call to
+        // a `BertClass`, to add the class stack frame.
+        Trace preTrace = null;
+
+        //---------------------------------------------------------------------
+        // Constructors
 
         CallFrame(Closure closure, Origin origin) {
             this.closure = closure;
