@@ -197,14 +197,15 @@ public class JoeStackTraceTest extends Ted {
             """;
         var trace = """
             Simulated error!
-              In static initializer for Thing (*test*:3)
+              In static initializer (*test*:3)
                 002     static {
                 003         throw "Simulated error!";
                 004     }
-              In <script> (*test*:3)
+              In class Thing (*test*:2)
+              In <script> (*test*:5)
             """;
         dumpScript(script);
-//        checkRun(walker, script, trace);
+        checkRun(walker, script, trace);
         checkRun(bert, script, trace);
     }
 

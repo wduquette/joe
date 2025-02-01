@@ -190,9 +190,11 @@ class VirtualMachine {
             var function = frame.closure.function;
 
             // NEXT, add the postTrace stack levels, if any.
+            SourceBuffer.Span pendingSpan = null;
             if (frame.postTraces != null) {
                 while (!frame.postTraces.isEmpty()) {
                     var trace = frame.postTraces.pop();
+                    pendingSpan = trace.context();
                     error.addPendingFrame(trace.context(), trace.message());
                 }
             }
@@ -202,7 +204,8 @@ class VirtualMachine {
             // didn't actually execute yet.
             var lastIP = Math.max(0, frame.ip - 1);
             var line = function.line(lastIP);
-            var span = function.source().lineSpan(line);
+            var span = pendingSpan != null
+                ? pendingSpan : function.source().lineSpan(line);
             if (function.type() == FunctionType.SCRIPT) {
                 var message = "In <script>";
                 error.addFrame(span, message);
