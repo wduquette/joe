@@ -206,8 +206,7 @@ class Compiler {
                 current.inStaticInitializer = true;
 
                 // Compute the trace for the initializer block
-                var trace = new Trace(staticSpan,
-                    "In static initializer for " + className.lexeme());
+                var trace = new Trace(staticSpan, "In static initializer");
                 var index = current.chunk.addConstant(trace);
 
                 // Jump after the initializer
@@ -244,10 +243,16 @@ class Compiler {
         }
         consume(RIGHT_BRACE, "Expected '}' after class body.");
         if (firstInit != -1) {
+            var trace = new Trace(parser.previous.span(),
+                "In class " + className.lexeme());
+            var index = current.chunk.addConstant(trace);
+            emit(Opcode.TRCPUSH, index);
+
             emitLoop(firstInit);
         }
         if (classEnd != -1) {
             patchJump(classEnd);
+            emit(Opcode.TRCPOP);
         }
         emit(Opcode.POP); // Pop the class itself
         if (classCompiler.hasSuperclass) {
