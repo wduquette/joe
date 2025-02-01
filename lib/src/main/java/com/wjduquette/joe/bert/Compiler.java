@@ -202,6 +202,7 @@ class Compiler {
 
             if (isStatic && match(LEFT_BRACE)) {
                 // Static initializer
+                current.inStaticInitializer = true;
 
                 // Jump after the initializer
                 var afterInit = emitJump(Opcode.JUMP);
@@ -221,6 +222,7 @@ class Compiler {
                 // one.
                 classEnd = emitJump(Opcode.JUMP);
                 patchJump(afterInit);
+                current.inStaticInitializer = false;
             } else if (match(METHOD)) {
                 if (isStatic) {
                     staticMethod();
@@ -607,6 +609,10 @@ class Compiler {
     }
 
     private void returnStatement() {
+        if (current.inStaticInitializer) {
+            error("Can't return from a static initializer block.");
+        }
+
         if (match(SEMICOLON)) {
             emitReturn();
         } else {
@@ -1477,6 +1483,9 @@ class Compiler {
 
         // The locals that have been captured as upvalues.
         final UpvalueInfo[] upvalues = new UpvalueInfo[MAX_LOCALS];
+
+        // Whether we are in a class static initializer block or not.
+        boolean inStaticInitializer = false;
 
         FunctionCompiler(
             FunctionCompiler enclosing,
