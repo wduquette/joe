@@ -1,5 +1,10 @@
 package com.wjduquette.joe.bert;
 
+/**
+ * The different kinds of {@link Function} compiled by Bert's
+ * {@link Compiler}.  This is used for semantic error checking
+ * during compilation, and as introspection data at runtime.
+ */
 public enum FunctionType {
     FUNCTION("function"),
     LAMBDA("lambda"),

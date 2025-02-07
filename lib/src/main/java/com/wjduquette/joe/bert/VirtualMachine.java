@@ -7,6 +7,10 @@ import java.util.*;
 
 import static com.wjduquette.joe.bert.Opcode.*;
 
+/**
+ * The {@link BertEngine}'s virtual machine.  This is where the magic
+ * happens.
+ */
 class VirtualMachine {
     public static final int DEFAULT_STACK_SIZE = 256;
     public static final int MAX_FRAMES = 64;
@@ -60,6 +64,10 @@ class VirtualMachine {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an instance of the virtual machine
+     * @param joe The owning Joe interpreter.
+     */
     VirtualMachine(Joe joe) {
         this.joe = joe;
         this.compiler = new Compiler(joe);

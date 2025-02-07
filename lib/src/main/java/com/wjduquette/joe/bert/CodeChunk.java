@@ -2,6 +2,12 @@ package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.SourceBuffer;
 
+/**
+ * An interface for a buffer of compiled code, along with its constants table.
+ * {@link Chunk} is a mutable CodeChunk used during compilation; it has a number of
+ * features to make compilation easier.  A {@link Function} is an immutable
+ * CodeChunk along with function metadata.
+ */
 public interface CodeChunk {
     /**
      * Gets the chunk's source buffer.

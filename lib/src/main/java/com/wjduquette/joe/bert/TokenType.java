@@ -1,5 +1,8 @@
 package com.wjduquette.joe.bert;
 
+/**
+ * The {@link Token} types that can be returned by the {@link Scanner}.
+ */
 enum TokenType {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,

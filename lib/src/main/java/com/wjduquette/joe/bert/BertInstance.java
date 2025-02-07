@@ -5,13 +5,21 @@ import com.wjduquette.joe.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * BertInstance is the internal representation for instances of scripted
+ * classes—unless the scripted class has a native ancestor, in which
+ * case instances are proved by the native ancestor.
+ */
 public class BertInstance implements JoeObject {
     private final static String TO_STRING = "toString";
 
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The object's class, which will de facto be a BertClass.
     final JoeClass klass;
+
+    // The object's field values.
     final Map<String,Object> fields = new HashMap<>();
 
     // Default "toString()" implementation.
@@ -20,8 +28,16 @@ public class BertInstance implements JoeObject {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates the internal representation for an instance of a scripted
+     * class.
+     * @param klass The class.
+     */
     BertInstance(JoeClass klass) {
         this.klass = klass;
+
+        // The class might define its own explicit toString() method;
+        // but provide a default.
         this._toString = new NativeMethod<>(this, "toString",
             (objc, joe, args) -> this.toString());
     }

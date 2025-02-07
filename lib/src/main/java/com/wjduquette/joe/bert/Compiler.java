@@ -10,6 +10,15 @@ import static com.wjduquette.joe.bert.TokenType.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The Bert byte-compiler.  This is a single-pass compiler, parsing the
+ * source and producing compiled code simultaneously; there is no
+ * intermediate form.
+ *
+ * <p>The compiler uses a Pratt parser for parsing expressions; every
+ * {@link TokenType} must be represented in the parser table.  See
+ * {@code populateRulesTable} at the bottom of the file.</p>
+ */
 @SuppressWarnings("unused")
 class Compiler {
     // The maximum number of local variables in a function.
@@ -84,7 +93,8 @@ class Compiler {
     // Compilation
 
     /**
-     * Compiles the script source
+     * Compiles the script source as a no-arg function.
+     * Compilation errors are accumulated and thrown as a unit.
      * @param scriptName The script's name, e.g., the file name
      * @param source The script's source.
      * @return The script as a `Function`.
@@ -92,6 +102,11 @@ class Compiler {
     public Function compile(String scriptName, String source) {
         buffer = new SourceBuffer(scriptName, source);
         scanner = new Scanner(buffer, errors::add);
+
+        // The FunctionCompiler contains the Chunk for the function
+        // currently being compiled.  Each `function` or `method`
+        // declaration adds a new FunctionCompiler to the stack, so that
+        // each has its own Chunk.
         current = new FunctionCompiler(null, FunctionType.SCRIPT, buffer);
         current.chunk.span = buffer.all();
 
@@ -104,6 +119,7 @@ class Compiler {
             declaration();
         }
 
+        // Take the current chunk and package it as a Function.
         var function = endFunction();
 
         if (!errors.isEmpty()) {

@@ -125,6 +125,13 @@ class Chunk implements CodeChunk {
         return index;
     }
 
+    /**
+     * Sets the value of the particular location in the code[] array.
+     * This is used when patching previously compiled code, e.g.,
+     * by the {@link Compiler}'s {@code patchJump()} method.
+     * @param index The index
+     * @param value the value
+     */
     void setCode(int index, char value) {
         code[index] = value;
     }
@@ -141,7 +148,5 @@ class Chunk implements CodeChunk {
     @Override public int line(int index) { return lines[index]; }
     @Override public int numConstants() { return numConstants; }
     @Override public Object getConstant(int index) { return constants[index]; }
-
-    // TEMP
     @Override public int[] lines() { return lines; }
 }

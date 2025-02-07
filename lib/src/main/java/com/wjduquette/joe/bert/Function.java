@@ -8,6 +8,15 @@ import java.util.List;
 /**
  * A compiled function.  Functions proper, methods, and entire scripts all
  * get compiled to a Function.
+ *
+ * <p>A Function is an immutable {@link CodeChunk}, a buffer of compiled
+ * code.  It is not directly callable; callable functions can close over
+ * the local variable values present when the function is declared, which
+ * can happen any number of times.  Thus, the {@link VirtualMachine}
+ * wraps up each Function with the {@link Upvalue Upvalues} it closes over
+ * as a {@link Closure}, which is the real internal representation of
+ * a function reference.
+ * </p>
  */
 public class Function implements CodeChunk {
     private static final String ARGS = "args";

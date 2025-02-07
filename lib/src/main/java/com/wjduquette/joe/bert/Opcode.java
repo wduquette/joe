@@ -1,11 +1,24 @@
 package com.wjduquette.joe.bert;
 
+/**
+ * The instruction opcodes for Bert's {@link VirtualMachine}. Opcodes
+ * are represented as {@code char} constants, as that's the form they
+ * take in a {@link CodeChunk}, and anything else slows down compilation
+ * and execution.
+ */
 public class Opcode {
     private Opcode() {} // Not instantiable
 
     //-------------------------------------------------------------------------
     // Opcode Definitions
 
+    // Every opcode must appear in this table with a unique numeric constant.
+    // Opcodes should be in alphabetical order, and the related constants
+    // should be consecutive starting at 0 so that the constants and the
+    // {@code names} array are consistent.
+    //
+    // When adding an opcode, be sure to add its name to the {@code names}
+    // array, below.
     public static final char ADD     = 0;
     public static final char ASSERT  = 1;
     public static final char CALL    = 2;
@@ -66,6 +79,10 @@ public class Opcode {
     //-------------------------------------------------------------------------
     // Opcode names
 
+    // The name of each opcode, for use by the disassembler.
+    // The opcode itself is the index into this array; be sure to add
+    // a name for each added opcode.  Names and opcodes should both be
+    // listed in alphabetical order.
     private static final String[] names = {
         "ADD",
         "ASSERT",

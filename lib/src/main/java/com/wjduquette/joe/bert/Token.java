@@ -2,11 +2,22 @@ package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.SourceBuffer.Span;
 
+/**
+ * A token produce by Bert's scanner.
+ * @param type The token type
+ * @param span The span in the source code
+ * @param literal A literal value, e.g., for numbers, or null
+ */
 record Token(
     TokenType type,
     Span span,
     Object literal
 ) {
+    /**
+     * Creates a synthetic token representing a specific lexeme.
+     * @param lexeme The lexeme.
+     * @return The token.
+     */
     public static Token synthetic(String lexeme) {
         return new Token(null, null, lexeme);
     }
@@ -19,6 +30,11 @@ record Token(
         return span != null ? span.text() : (String)literal;
     }
 
+    /**
+     * Returns the starting line number for the token's span, or -1
+     * for synthetic tokens.
+     * @return The line number.
+     */
     public int line() {
         return span != null ? span.startLine() : -1;
     }

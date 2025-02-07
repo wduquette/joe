@@ -4,6 +4,9 @@ import com.wjduquette.joe.*;
 
 import java.util.Set;
 
+/**
+ * The Bert byte-code engine.
+ */
 public class BertEngine implements Engine {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -14,6 +17,10 @@ public class BertEngine implements Engine {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an instance of BertEngine for the owning Joe interpreter.
+     * @param joe The interpreter.
+     */
     public BertEngine(Joe joe) {
         this.joe = joe;
         this.vm = new VirtualMachine(joe);

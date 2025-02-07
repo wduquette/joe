@@ -11,9 +11,13 @@ import java.util.function.Consumer;
 
 import static com.wjduquette.joe.bert.TokenType.*;
 
+/**
+ * Bert's scanner.
+ */
 public class Scanner {
     private static final Map<String, TokenType> reserved;
 
+    // Define the table of reserved words.
     static {
         reserved = new HashMap<>();
         reserved("assert",   ASSERT);
@@ -54,9 +58,16 @@ public class Scanner {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The actual script source.
     private final String source;
+
+    // The SourceBuffer, used to produce Spans.
     private final SourceBuffer buffer;
+
+    // The error reporter.
     private final Consumer<Trace> reporter;
+
+    // The current scanning state.
     private int start = 0;
     private int current = 0;
 
@@ -82,6 +93,12 @@ public class Scanner {
     //-------------------------------------------------------------------------
     // API
 
+    /**
+     * Scans and returns the next token.  If an error is found, it will be
+     * reported via the error report, and scanToken() will return an ERROR
+     * token.
+     * @return The token.
+     */
     Token scanToken() {
         skipWhitespace();
         start = current;

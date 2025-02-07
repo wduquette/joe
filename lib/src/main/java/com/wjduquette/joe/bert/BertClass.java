@@ -5,6 +5,9 @@ import com.wjduquette.joe.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * BertClass is the internal representation for a scripted Joe class.
+ */
 public class BertClass implements BertCallable, JoeClass, JoeObject {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -31,8 +34,9 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
     // Constructor and building methods
 
     /**
-     * Create the class object.  It is initially empty, having only a name;
-     * later instructions will build up its content.
+     * Creates the class object.  It is initially empty, having only a name;
+     * the compiled class declaration builds it up over a number of
+     * instructions.
      * @param name The name
      */
     BertClass(String name) {
@@ -40,10 +44,10 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
     }
 
     /**
-     * Make this class inherit from the superclass.  If the superclass is a
+     * Makes this class inherit from its superclass.  If the superclass is a
      * Bert class, this class will copy its methods and inherit its native
      * ancestor.  Otherwise, the superclass is this class's superclass and
-     * its native ancestor.  See bind().
+     * also its native ancestor.  See {@code bind()}
      * @param superclass The superclass.
      */
     void inheritSuperclass(JoeClass superclass) {
@@ -67,16 +71,17 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
     //-------------------------------------------------------------------------
     // BertClass API
 
-    public String name() {
-        return name;
-    }
-
     public JoeClass getSuperclass() {
         return superclass;
     }
 
     //-------------------------------------------------------------------------
     // JoeClass API
+
+    @Override
+    public String name() {
+        return name;
+    }
 
     @Override
     public JoeCallable bind(Object value, String name) {

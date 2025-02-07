@@ -9,7 +9,13 @@ import java.util.stream.Collectors;
 import static com.wjduquette.joe.bert.Opcode.*;
 
 /**
- * A disassembler for compiled Bert code.
+ * A disassembler for compiled Bert code.  It can disassemble an entire
+ * {@link CodeChunk} or an individual instruction.
+ *
+ * <p>
+ * Every {@link VirtualMachine} instruction must be represented in the
+ * {@code decode()}.
+ * </p>
  */
 public class Disassembler {
     //-------------------------------------------------------------------------
@@ -21,6 +27,10 @@ public class Disassembler {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates a disassembler for this instance of Joe.
+     * @param joe The Joe interpreter.
+     */
     public Disassembler(Joe joe) {
         this.joe = joe;
     }
@@ -28,6 +38,18 @@ public class Disassembler {
     //-------------------------------------------------------------------------
     // Methods
 
+    /**
+     * Disassemble the chunk, returning a disassembly listing that includes
+     * the chunk's name and type, its constants table, and its compiled code.
+     *
+     * <p>When engine debugging is enabled, the {@link Compiler} calls this
+     * for each completed {@link Function} as it compiles the script.  Thus,
+     * the {@code joe dump} tool just sets the debugging flag and compiles
+     * the script.
+     * </p>
+     * @param chunk The chunk
+     * @return The string.
+     */
     String disassemble(CodeChunk chunk) {
         this.chunk = chunk;
         // FIRST, get the title and constants table.
@@ -98,6 +120,16 @@ public class Disassembler {
             : text + " ".repeat(width - text.length());
     }
 
+    /**
+     * Disassembles the instruction at the given offset into the
+     * code array.  It is up to the caller to make sure that the
+     * offset is the offset of an instruction opcode.  This is
+     * used by the {@link VirtualMachine} to output a code trace
+     * when the engine's debugging flag is enabled.
+     * @param chunk The chunk
+     * @param ip The offset into the chunk.
+     * @return The disassembly string for the specific instruction.
+     */
     String disassembleInstruction(CodeChunk chunk, int ip) {
         this.chunk = chunk;
         var lines = new ArrayList<Line>();
@@ -114,6 +146,9 @@ public class Disassembler {
         var opcode = chunk.code(ip);
         var prefix = isChunk ? chunkPrefix(ip) : singlePrefix(ip);
 
+        // The opcodes are grouped by argument pattern.  Add any new
+        // opcode to the case with the correct pattern, or add a
+        // new case if need be.
         switch (opcode) {
             // Simple Instructions
             // Pattern: opcode
@@ -204,12 +239,14 @@ public class Disassembler {
         }
     }
 
+    // The instruction prefix to use when disassembling a single instruction.
     private String singlePrefix(int ip) {
         char opcode = chunk.code(ip);
         return String.format("%04d @%04d %-7s",
             chunk.line(ip), ip, Opcode.name(opcode));
     }
 
+    // The instruction prefix to use when disassembling an entire chunk.
     private String chunkPrefix(int ip) {
         String line;
         char opcode = chunk.code(ip);
@@ -230,6 +267,8 @@ public class Disassembler {
     //-------------------------------------------------------------------------
     // Helpers
 
-    // A line of disassembly output, tied to its index in the code.
+    // A line of disassembly output, tied to its index in the code.  This
+    // allows decode() to return two values, the new ip and the decoded
+    // instruction string.
     private record Line(int ip, String text) {}
 }
