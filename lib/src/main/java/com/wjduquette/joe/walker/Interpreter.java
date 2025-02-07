@@ -395,9 +395,7 @@ class Interpreter {
                         }
                     } catch (Exception ex) {
                         throw new UnexpectedError(expr.paren().span(),
-                            "Error in " + callable.callableType() +
-                            " " + callable.signature() + ": " +
-                            ex.getMessage());
+                            "Unexpected Java error: " + ex, ex);
                     }
                 } else {
                     throw expected(expr.paren().span(), "callable", callee);

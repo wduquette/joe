@@ -3,8 +3,8 @@ package com.wjduquette.joe;
 import com.wjduquette.joe.SourceBuffer.Span;
 
 /**
- * An unexpected Java runtime error found during script execution by Joe's core
- * interpreter.
+ * An unexpected Java exception error caught during script execution by
+ * Joe's engine.
  */
 public class UnexpectedError extends JoeError {
     /**
@@ -14,9 +14,12 @@ public class UnexpectedError extends JoeError {
      *
      * @param context The context
      * @param message The error message
+     * @param cause The unexpected exception.
      */
-    public UnexpectedError(Span context, String message) {
-        super(message);
-        setPendingContext(context);
+    public UnexpectedError(Span context, String message, Throwable cause) {
+        super(message, cause);
+        if (context != null) {
+            setPendingContext(context);
+        }
     }
 }

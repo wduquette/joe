@@ -138,6 +138,9 @@ class VirtualMachine {
                 } catch (JoeError ex) {
                     ex.addInfo("In " + jc.callableType() + " " + jc.signature());
                     throw ex;
+                } catch (Exception ex) {
+                    throw new UnexpectedError(null,
+                        "Unexpected Java error: " + ex, ex);
                 }
             }
             case BertCallable bc -> {
@@ -763,6 +766,9 @@ class VirtualMachine {
                 } catch (JoeError ex) {
                     ex.addInfo("In " + f.callableType() + " " + f.signature());
                     throw ex;
+                } catch (Exception ex) {
+                    throw new UnexpectedError(null,
+                        "Unexpected Java error: " + ex, ex);
                 }
             }
             case BoundMethod bound -> {

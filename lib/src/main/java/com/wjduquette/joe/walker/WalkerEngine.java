@@ -138,6 +138,9 @@ public class WalkerEngine implements Engine {
                     .addFrame("In " + callable.callableType() + " " +
                         callable.signature())
                     .addInfo("In java call(" + arguments + ")");
+            } catch (Exception ex) {
+                throw new UnexpectedError(null,
+                    "Unexpected Java error: " + ex, ex);
             }
         } else {
             throw joe.expected("callable", callee);

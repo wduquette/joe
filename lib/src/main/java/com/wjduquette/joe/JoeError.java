@@ -28,12 +28,20 @@ public class JoeError extends RuntimeException {
     // Constructor
 
     /**
-     * Creates an error with no line number info and an optional number
-     * of stack frame strings.
+     * Creates a Joe compilation/execution error.
      * @param message The error message.
      */
     public JoeError(String message) {
         super(message);
+    }
+
+    /**
+     * Creates a Joe compilation/execution error with the given cause.
+     * @param message The error message.
+     * @param cause The causing exception.
+     */
+    public JoeError(String message, Throwable cause) {
+        super(message, cause);
     }
 
     //-------------------------------------------------------------------------
@@ -64,6 +72,7 @@ public class JoeError extends RuntimeException {
      * @param message The trace message
      * @return this
      */
+    @SuppressWarnings("UnusedReturnValue")
     public final JoeError addFrame(Span newContext, String message) {
         traces.add(new Trace(newContext, message));
         pendingContext = newContext;
