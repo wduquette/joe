@@ -16,15 +16,18 @@
 - Bert Byte-code Engine
   - Added `BertEngine`, an experimental byte-code execution engine, following
     Nystrom's `clox` design in Java.
-  - At present, `Bert` implements the Lox-equivalent subset of the Joe
-    language.
+  - `BertEngine` and `WalkerEngine` both implement the entire Joe language
+    and support the entire Joe standard library, as verified by the 
+    Joe test suites.
   - `Bert` is enabled by the `-b` option on most `joe *` tools.
 
 - Extending/Embedding API
-  - Added `Joe::isComplete`
+  - Added `Joe::isComplete`.
+  - It is now possible to create bindings for native types that can be extended
+    by scripted classes. 
 
 - Library
-  - `joe.win` Package
+  - Experimental `joe.win` Package
     - Added JavaFX widgets: `Menu`, `MenuBar`, `MenuItem`, `Separator`, 
       `Tab`, `TabPane`, `ListView`, `SplitPane`, `GridPane`
     - Added JavaFX enums: `Orientation`, `Side`
