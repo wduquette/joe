@@ -227,6 +227,12 @@ class VirtualMachine {
     }
 
     private void resetStack() {
+        // Clear the stack contents to null, so that values can be
+        // garbage-collected.  We could set stack cells to null
+        // on `pop()`, but we often pop many items at a time by resetting
+        // top.  Doing it here ensures that it gets done eventually.
+        Arrays.fill(stack, null);
+
         top = 0;
         frameCount = 0;
         registerT = null;
