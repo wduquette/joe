@@ -15,7 +15,6 @@ function testCatch_error() {
 }
 
 function testCatch_error_withTrace() {
-    if (engine() == "bert") skip("Requires stack trace unification.");
     function bad() { throw "Simulated error!"; }
     var tuple = catch(bad);
     check(tuple.is(#error));
