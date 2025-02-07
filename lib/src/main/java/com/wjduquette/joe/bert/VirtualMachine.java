@@ -133,7 +133,12 @@ class VirtualMachine {
                 // NOTE: callValue could handle this, but that would
                 // require first pushing the args onto the stack and
                 // then copying them back into an Object[] array.
-                return jc.call(joe, new Args(args));
+                try {
+                    return jc.call(joe, new Args(args));
+                } catch (JoeError ex) {
+                    ex.addInfo("In " + jc.callableType() + " " + jc.signature());
+                    throw ex;
+                }
             }
             case BertCallable bc -> {
                 // FIRST, set up the stack
@@ -154,6 +159,9 @@ class VirtualMachine {
                     // Result the stack to the old values.
                     top = oldTop;
                     frameCount = oldFrameCount;
+
+                    ex.addInfo("In java call(<" +
+                        bc.callableType() + " " + bc.signature() + ">)");
                     throw ex;
                 }
             }
@@ -177,15 +185,41 @@ class VirtualMachine {
     // frame traces to the error.
     private void unwindStack(JoeError error, int bottomFrame) {
         for (var i = frameCount - 1; i >= bottomFrame; i--) {
+            // FIRST, get the frame and function.
             var frame = frames[i];
             var function = frame.closure.function;
 
-            var line = function.line(frame.ip);
-            var span = function.source().lineSpan(line);
-            var message = "In " +
-                function.type().text() + " " +
-                function.name();
-            error.addFrame(span, message);
+            // NEXT, add the postTrace stack levels, if any.
+            SourceBuffer.Span pendingSpan = null;
+            if (frame.postTraces != null) {
+                while (!frame.postTraces.isEmpty()) {
+                    var trace = frame.postTraces.pop();
+                    pendingSpan = trace.context();
+                    error.addPendingFrame(trace.context(), trace.message());
+                }
+            }
+
+            // NEXT, add the frame's own stack level.
+            // Note: frame.ip is the *next* instruction, the one that
+            // didn't actually execute yet.
+            var lastIP = Math.max(0, frame.ip - 1);
+            var line = function.line(lastIP);
+            var span = pendingSpan != null
+                ? pendingSpan : function.source().lineSpan(line);
+            if (function.type() == FunctionType.SCRIPT) {
+                var message = "In <script>";
+                error.addFrame(span, message);
+            } else {
+                var message = "In " +
+                    function.type().text() + " " +
+                    function.signature();
+                error.addFrame(span, message);
+            }
+
+            // NEXT, add the preTrace stack trace, if any.
+            if (frame.preTrace != null) {
+                error.addFrame(frame.preTrace.context(), frame.preTrace.message());
+            }
         }
     }
 
@@ -552,6 +586,13 @@ class VirtualMachine {
                 }
                 case TPUT -> registerT = peek(0);
                 case TRUE -> push(true);
+                case TRCPOP -> frame.postTraces.pop();
+                case TRCPUSH -> {
+                    if (frame.postTraces == null) {
+                        frame.postTraces = new Stack<>();
+                    }
+                    frame.postTraces.push((Trace)readConstant());
+                }
                 case UPCLOSE -> {
                     // Close and then pop the *n* upvalues on the
                     // top of the stack.
@@ -576,8 +617,13 @@ class VirtualMachine {
         }
     }
 
+    // Gets the span for the source line that includes that last
+    // executed instruction.
     private SourceBuffer.Span ipSpan() {
-        var line = frame.closure.function.line(frame.ip);
+        // NOTE: frame.ip points at the *next* instruction, not the
+        // last one that executed.
+        var ip = Math.max(frame.ip - 1, 0);
+        var line = frame.closure.function.line(ip);
         return frame.closure.function.source().lineSpan(line);
     }
 
@@ -712,7 +758,12 @@ class VirtualMachine {
             case NativeCallable f -> {
                 var args = new Args(Arrays.copyOfRange(stack, top - argCount, top));
                 top -= argCount + 1;
-                push(f.call(joe, args));
+                try {
+                    push(f.call(joe, args));
+                } catch (JoeError ex) {
+                    ex.addInfo("In " + f.callableType() + " " + f.signature());
+                    throw ex;
+                }
             }
             case BoundMethod bound -> {
                 stack[top - argCount - 1] = bound.receiver();
@@ -722,7 +773,12 @@ class VirtualMachine {
                 stack[top - argCount - 1] = klass.make(joe, klass);
                 var initializer = klass.methods.get("init");
                 if (initializer != null) {
-                    call(initializer, argCount, origin);
+                    var frame = call(initializer, argCount, origin);
+
+                    // Add a trace level for the class itself.
+                    frame.preTrace = new Trace(
+                        initializer.function.span(),
+                        "In " + klass.callableType() + " " + klass.signature());
                 } else if (argCount != 0) {
                     throw error(Args.arityFailureMessage(klass.name() + "()"));
                 }
@@ -732,7 +788,7 @@ class VirtualMachine {
         }
     }
 
-    private void call(Closure closure, int argCount, Origin origin) {
+    private CallFrame call(Closure closure, int argCount, Origin origin) {
         if (closure.function.isVarargs) {
             // FIRST, make sure we've got the minimum arguments.
             if (argCount < closure.function.arity) {
@@ -759,6 +815,7 @@ class VirtualMachine {
         var frame = new CallFrame(closure, origin);
         frames[frameCount++] = frame;
         frame.base = top - argCount - 1;
+        return frame;
     }
 
     private class CallFrame {
@@ -774,6 +831,22 @@ class VirtualMachine {
         // Origin.JAVA if this call frame represents a call to `interpret()` or
         // `callFromJava()`, and Origin.JOE otherwise.
         final Origin origin;
+
+        // A stack of pseudo-CallFrame traces, used to add stack levels to
+        // the error stack trace within this call frame.  This is used when
+        // executing class static initializer blocks, to add the class itself
+        // to the stack trace.
+        Stack<Trace> postTraces = null;
+
+        // Pre-trace: used to add a pseudo-CallFrame just below this
+        // call frame.  The pre-trace will be used to add a stack level to the
+        // error stack trace, but is otherwise ignored.  This is used when
+        // a class's init() method is implicitly invoked on a call to
+        // a `BertClass`, to add the class stack frame.
+        Trace preTrace = null;
+
+        //---------------------------------------------------------------------
+        // Constructors
 
         CallFrame(Closure closure, Origin origin) {
             this.closure = closure;

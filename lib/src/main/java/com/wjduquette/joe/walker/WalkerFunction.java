@@ -72,6 +72,10 @@ final class WalkerFunction implements NativeCallable, HasTypeName {
         return declaration.name().lexeme();
     }
 
+    public SourceBuffer.Span span() {
+        return declaration.name().span();
+    }
+
     /**
      * Returns the "kind" of the function, e.g., "function", "method"
      * @return The kind

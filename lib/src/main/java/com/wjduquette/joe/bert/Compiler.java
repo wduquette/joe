@@ -199,9 +199,15 @@ class Compiler {
         int classEnd = -1;
         while (!check(RIGHT_BRACE) && !check(EOF)) {
             var isStatic = match(STATIC);
+            var staticSpan = parser.previous.span();
 
             if (isStatic && match(LEFT_BRACE)) {
                 // Static initializer
+                current.inStaticInitializer = true;
+
+                // Compute the trace for the initializer block
+                var trace = new Trace(staticSpan, "In static initializer");
+                var index = current.chunk.addConstant(trace);
 
                 // Jump after the initializer
                 var afterInit = emitJump(Opcode.JUMP);
@@ -213,7 +219,9 @@ class Compiler {
                 if (firstInit == -1) firstInit = current.chunk.size;
 
                 emit(Opcode.POP);                  // Pop the class
+                emit(Opcode.TRCPUSH, index);
                 block();                           // The initializer
+                emit(Opcode.TRCPOP);
                 emit(Opcode.CONST, nameConstant);  // Push the class again.
 
                 // NEXT, jump to the end of the class declaration; or
@@ -221,6 +229,7 @@ class Compiler {
                 // one.
                 classEnd = emitJump(Opcode.JUMP);
                 patchJump(afterInit);
+                current.inStaticInitializer = false;
             } else if (match(METHOD)) {
                 if (isStatic) {
                     staticMethod();
@@ -234,10 +243,16 @@ class Compiler {
         }
         consume(RIGHT_BRACE, "Expected '}' after class body.");
         if (firstInit != -1) {
+            var trace = new Trace(parser.previous.span(),
+                "In class " + className.lexeme());
+            var index = current.chunk.addConstant(trace);
+            emit(Opcode.TRCPUSH, index);
+
             emitLoop(firstInit);
         }
         if (classEnd != -1) {
             patchJump(classEnd);
+            emit(Opcode.TRCPOP);
         }
         emit(Opcode.POP); // Pop the class itself
         if (classCompiler.hasSuperclass) {
@@ -607,6 +622,10 @@ class Compiler {
     }
 
     private void returnStatement() {
+        if (current.inStaticInitializer) {
+            error("Can't return from a static initializer block.");
+        }
+
         if (match(SEMICOLON)) {
             emitReturn();
         } else {
@@ -1477,6 +1496,9 @@ class Compiler {
 
         // The locals that have been captured as upvalues.
         final UpvalueInfo[] upvalues = new UpvalueInfo[MAX_LOCALS];
+
+        // Whether we are in a class static initializer block or not.
+        boolean inStaticInitializer = false;
 
         FunctionCompiler(
             FunctionCompiler enclosing,
