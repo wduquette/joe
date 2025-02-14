@@ -64,7 +64,7 @@ public class Joe {
      * standard library, but nothing else.
      */
     public Joe() {
-        this(WALKER);
+        this(BERT);
     }
 
     /**
