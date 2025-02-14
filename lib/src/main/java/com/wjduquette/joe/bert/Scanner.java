@@ -7,7 +7,6 @@ import com.wjduquette.joe.Trace;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static com.wjduquette.joe.bert.TokenType.*;
 
@@ -65,7 +64,7 @@ public class Scanner {
     private final SourceBuffer buffer;
 
     // The error reporter.
-    private final Consumer<Trace> reporter;
+    private final ErrorReporter reporter;
 
     // The current scanning state.
     private int start = 0;
@@ -83,7 +82,7 @@ public class Scanner {
      */
     Scanner(
         SourceBuffer buffer,
-        Consumer<Trace> reporter
+        ErrorReporter reporter
     ) {
         this.buffer = buffer;
         this.source = buffer.source();
@@ -506,8 +505,9 @@ public class Scanner {
         var where = isAtEnd() ? "end"
             : "'" + source.substring(start, current) + "'";
 
-        reporter.accept(new Trace(buffer.span(start, current),
-            "At " + where + ", " + message));
+        reporter.reportError(new Trace(buffer.span(start, current),
+            "At " + where + ", " + message),
+            isAtEnd());
         return new Token(ERROR, null, null);
     }
 }

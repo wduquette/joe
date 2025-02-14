@@ -70,7 +70,12 @@ public class BertEngine implements Engine {
 
     @Override
     public boolean isComplete(String source) {
-        // TODO: Implement properly
-        return true;
+        var compiler = new Compiler(joe);
+        try {
+            compiler.compile("*isComplete*", source);
+            return true;
+        } catch (SyntaxError ex) {
+            return ex.isComplete();
+        }
     }
 }

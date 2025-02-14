@@ -14,7 +14,7 @@ public class WalkerEngine implements Engine {
 
     // Error traces accumulated during compilation
     private List<Trace> syntaxTraces = null;
-    private boolean gotIncompleteError = false;
+    private boolean gotIncompleteScript = false;
 
     // The interpreter
     private final Interpreter interpreter;
@@ -77,7 +77,7 @@ public class WalkerEngine implements Engine {
 
     private List<Stmt> parse(SourceBuffer buffer) throws SyntaxError {
         syntaxTraces = new ArrayList<>();
-        gotIncompleteError = false;
+        gotIncompleteScript = false;
 
         Scanner scanner = new Scanner(buffer, this::reportError);
         List<Token> tokens = scanner.scanTokens();
@@ -87,7 +87,7 @@ public class WalkerEngine implements Engine {
         // Stop if there was a syntax error.
         if (!syntaxTraces.isEmpty()) {
             throw new SyntaxError("Syntax error in input, halting.",
-                syntaxTraces, !gotIncompleteError);
+                syntaxTraces, !gotIncompleteScript);
         }
 
         return statements;
@@ -166,7 +166,7 @@ public class WalkerEngine implements Engine {
     private void reportError(Trace trace, boolean incomplete) {
         syntaxTraces.add(trace);
         if (incomplete) {
-            gotIncompleteError = true;
+            gotIncompleteScript = true;
         }
     }
 }

@@ -101,7 +101,7 @@ class Compiler {
      */
     public Function compile(String scriptName, String source) {
         buffer = new SourceBuffer(scriptName, source);
-        scanner = new Scanner(buffer, errors::add);
+        scanner = new Scanner(buffer, this::reportError);
 
         // The FunctionCompiler contains the Chunk for the function
         // currently being compiled.  Each `function` or `method`
@@ -123,11 +123,18 @@ class Compiler {
         var function = endFunction();
 
         if (!errors.isEmpty()) {
-            // TEMP: add code to detect incomplete scripts.
-            throw new SyntaxError("Error while compiling script", errors, true);
+            throw new SyntaxError("Error while compiling script", errors,
+                !parser.gotIncompleteScript);
         }
 
         return function;
+    }
+
+    private void reportError(Trace trace, boolean incomplete) {
+        errors.add(trace);
+        if (incomplete) {
+            parser.gotIncompleteScript = true;
+        }
     }
 
     /**
@@ -1366,6 +1373,9 @@ class Compiler {
         parser.panicMode = true;
         errors.add(new Trace(token.span(), message));
         parser.hadError = true;
+        if (token.type() == TokenType.EOF) {
+            parser.gotIncompleteScript = true;
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -1433,6 +1443,7 @@ class Compiler {
         Token previous = null;
         boolean hadError = false;
         boolean panicMode = false;
+        boolean gotIncompleteScript = false;
     }
 
     // Precedence levels

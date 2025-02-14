@@ -7,10 +7,12 @@ import static com.wjduquette.joe.checker.Checker.*;
 
 @SuppressWarnings("ConstantValue")
 public class JoeTest extends Ted {
-    private Joe joe;
+    private Joe walker;
+    private Joe bert;
 
     @Before public void setup() {
-        this.joe = new Joe();
+        walker = new Joe(Joe.WALKER);
+        bert = new Joe(Joe.BERT);
     }
 
     @Test
@@ -39,10 +41,10 @@ public class JoeTest extends Ted {
     @Test
     public void testStringify() {
         test("testStringify");
-        check(joe.stringify(null)).eq("null");
-        check(joe.stringify(2.0)).eq("2");
-        check(joe.stringify(2.5)).eq("2.5");
-        check(joe.stringify("abc")).eq("abc");
+        check(walker.stringify(null)).eq("null");
+        check(walker.stringify(2.0)).eq("2");
+        check(walker.stringify(2.5)).eq("2.5");
+        check(walker.stringify("abc")).eq("abc");
     }
 
     @Test
@@ -62,6 +64,47 @@ public class JoeTest extends Ted {
     public void testTypeName() {
         test("testTypeName");
 
-        check(joe.typeName(5.0)).eq("Number");
+        check(walker.typeName(5.0)).eq("Number");
+    }
+
+    @Test
+    public void testIsComplete() {
+        test("testIsComplete");
+
+        // Scanner
+        var completeString = """
+            var a = "abc";
+            """;
+        var incompleteString = "var a = \"abc;";
+
+        // Parser
+        var completeBlock = """
+            function dummy() { }
+            """;
+        var incompleteBlock = """
+            function dummy() {
+            """;
+        var normalError = """
+            a = "abc";
+            """;
+        var errorPlusIncomplete = "a = \"abc;";
+
+        check(walker.isComplete(completeString)).eq(true);
+        check(walker.isComplete(incompleteString)).eq(false);
+
+        check(walker.isComplete(completeBlock)).eq(true);
+        check(walker.isComplete(incompleteBlock)).eq(false);
+
+        check(walker.isComplete(normalError)).eq(true);
+        check(walker.isComplete(errorPlusIncomplete)).eq(false);
+
+        check(bert.isComplete(completeString)).eq(true);
+        check(bert.isComplete(incompleteString)).eq(false);
+
+        check(bert.isComplete(completeBlock)).eq(true);
+        check(bert.isComplete(incompleteBlock)).eq(false);
+
+        check(bert.isComplete(normalError)).eq(true);
+        check(bert.isComplete(errorPlusIncomplete)).eq(false);
     }
 }

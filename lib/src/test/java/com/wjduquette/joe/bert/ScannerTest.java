@@ -319,7 +319,7 @@ public class ScannerTest extends Ted {
         details.clear();
 
         var source = new SourceBuffer("-", input);
-        scanner = new Scanner(source, detail -> {
+        scanner = new Scanner(source, (detail, incomplete) -> {
             System.out.println("detail: " + detail);
             details.add(detail.message());
         });
