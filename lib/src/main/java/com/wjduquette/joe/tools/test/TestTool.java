@@ -6,6 +6,8 @@ import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +30,11 @@ public class TestTool implements Tool {
         Options:
         
         --bert, -b
-           Use the experimental "Bert" byte-engine.  A minimum of features
-           are available.
-           
+            Use the "Bert" byte-engine (the default).
+        
+        --walker, -w
+            Use the "Walker" AST-walker engine.
+        
         --verbose, -v
             Enable verbose output.  Normally only failures and the final
             summary are included in the output.  If this is given, all test
@@ -50,7 +54,7 @@ public class TestTool implements Tool {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    String engineType = Joe.WALKER;
+    String engineType = Joe.BERT;
     boolean verbose = false;
     private final List<String> testScripts = new ArrayList<>();
     private int loadErrorCount = 0;
@@ -90,15 +94,23 @@ public class TestTool implements Tool {
 
             switch (arg) {
                 case "--bert", "-b" -> engineType = Joe.BERT;
+                case "--walker", "-w" -> engineType = Joe.WALKER;
                 case "-v", "--verbose" -> verbose = true;
                 default -> testScripts.add(arg);
             }
         }
 
         // NEXT, run the tests.
+        var startTime = Instant.now();
+        System.out.println("Joe " + App.getVersion() + " (" +
+            engineType + " engine)");
         for (var path : testScripts) {
             runTest(path);
         }
+        var endTime = Instant.now();
+        var duration = Duration.between(startTime, endTime).toMillis() / 1000.0;
+
+        System.out.printf("Run-time: %.3f seconds\n", duration);
 
         // NEXT, print the final results
         var total = successCount + skipCount + failureCount + errorCount;

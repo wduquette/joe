@@ -24,7 +24,8 @@ public class DumpTool implements Tool {
         Dumps compilation details for the script.  The options
         are as follows:
         
-        --bert, -b     Use the experimental "Bert" byte-engine.
+        --bert,   -b   Use the "Bert" byte-engine (default)
+        --walker, -w   Use the "Walker" AST-walker engine.
         """,
         DumpTool::main
     );
@@ -56,12 +57,13 @@ public class DumpTool implements Tool {
             System.exit(64);
         }
 
-        var engineType = Joe.WALKER;
+        var engineType = Joe.BERT;
 
         while (!argq.isEmpty() && argq.peek().startsWith("-")) {
             var opt = argq.poll();
             switch (opt) {
                 case "--bert", "-b" -> engineType = Joe.BERT;
+                case "--walker", "-w" -> engineType = Joe.WALKER;
                 default -> {
                     System.err.println("Unknown option: '" + opt + "'.");
                     System.exit(64);
