@@ -288,7 +288,11 @@ about them.</p>
 buy him lunch.</p>
 </div>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="change-log"><a class="header" href="#change-log">Change Log</a></h1>
-<h2 id="changes-in-050-forthcoming"><a class="header" href="#changes-in-050-forthcoming">Changes in 0.5.0 (Forthcoming)</a></h2>
+<h2 id="changes-in-060-forthcoming"><a class="header" href="#changes-in-060-forthcoming">Changes in 0.6.0 (forthcoming)</a></h2>
+<ul>
+<li>None yet.</li>
+</ul>
+<h2 id="changes-in-050"><a class="header" href="#changes-in-050">Changes in 0.5.0</a></h2>
 <ul>
 <li>
 <p>Language</p>
@@ -313,23 +317,27 @@ each stack level,
 <li>
 <p>Bert Byte-code Engine</p>
 <ul>
-<li>Added <code>BertEngine</code>, an experimental byte-code execution engine, following
+<li>Added <code>BertEngine</code>, a byte-code execution engine, following
 Nystrom's <code>clox</code> design in Java.</li>
-<li>At present, <code>Bert</code> implements the Lox-equivalent subset of the Joe
-language.</li>
-<li><code>Bert</code> is enabled by the <code>-b</code> option on most <code>joe *</code> tools.</li>
+<li><code>BertEngine</code> and <code>WalkerEngine</code> both implement the entire Joe language
+and support the entire Joe standard library, as verified by the
+Joe test suites.</li>
+<li><code>BertEngine</code> is now enabled by default.</li>
+<li>The <code>WalkerEngine</code> can enabled by the <code>-w</code> option on relevant <code>joe</code> tools.</li>
 </ul>
 </li>
 <li>
 <p>Extending/Embedding API</p>
 <ul>
-<li>Added <code>Joe::isComplete</code></li>
+<li>Added <code>Joe::isComplete</code>.</li>
+<li>It is now possible to create bindings for native types that can be extended
+by scripted classes.</li>
 </ul>
 </li>
 <li>
 <p>Library</p>
 <ul>
-<li><code>joe.win</code> Package
+<li>Experimental <code>joe.win</code> Package
 <ul>
 <li>Added JavaFX widgets: <code>Menu</code>, <code>MenuBar</code>, <code>MenuItem</code>, <code>Separator</code>,
 <code>Tab</code>, <code>TabPane</code>, <code>ListView</code>, <code>SplitPane</code>, <code>GridPane</code></li>
@@ -2675,6 +2683,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <ul>
 <li><a href="library/type.joe.Error.html#init">Error(<em>message</em>, [<em>trace</em>, ...])</a> → <a href="library/type.joe.Error.html">Error</a></li>
 <li><a href="library/type.joe.Error.html#method.addInfo"><em>error</em>.addInfo(<em>message</em>)</a> → this</li>
+<li><a href="library/type.joe.Error.html#method.javaStackTrace"><em>error</em>.javaStackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
 <li><a href="library/type.joe.Error.html#method.stackTrace"><em>error</em>.stackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Error.html#method.traces"><em>error</em>.traces()</a> → <a href="library/type.joe.List.html">List</a></li>
@@ -3343,6 +3352,7 @@ the <a href="library/pkg.joe.html#function.catch"><code>catch()</code></a> funct
 <p><strong>Error Methods</strong></p>
 <ul>
 <li><a href="library/type.joe.Error.html#method.addInfo"><em>error</em>.addInfo(<em>message</em>)</a> → this</li>
+<li><a href="library/type.joe.Error.html#method.javaStackTrace"><em>error</em>.javaStackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
 <li><a href="library/type.joe.Error.html#method.stackTrace"><em>error</em>.stackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Error.html#method.traces"><em>error</em>.traces()</a> → <a href="library/type.joe.List.html">List</a></li>
@@ -3382,6 +3392,7 @@ thrown during execution using the <a href="library/pkg.joe.html#function.catch">
 <p><strong><a href="library/type.joe.Error.html#methods">Methods</a></strong></p>
 <ul>
 <li><a href="library/type.joe.Error.html#method.addInfo"><em>error</em>.addInfo(<em>message</em>)</a> → this</li>
+<li><a href="library/type.joe.Error.html#method.javaStackTrace"><em>error</em>.javaStackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
 <li><a href="library/type.joe.Error.html#method.stackTrace"><em>error</em>.stackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Error.html#method.traces"><em>error</em>.traces()</a> → <a href="library/type.joe.List.html">List</a></li>
@@ -3399,6 +3410,12 @@ trace messages.</p>
 <hr />
 <p><strong><em>error</em>.addInfo(<em>message</em>) → this</strong></p>
 <p>Adds an information message to the list of traces.</p>
+<p><span id="method.javaStackTrace"> </span></p>
+<h3 id="errorjavastacktrace"><a class="header" href="#errorjavastacktrace"><em>error</em>.javaStackTrace()</a></h3>
+<hr />
+<p><strong><em>error</em>.javaStackTrace() → <a href="library/type.joe.String.html">String</a></strong></p>
+<p>Returns the complete error, including the initial error messages
+and all stack frames.</p>
 <p><span id="method.message"> </span></p>
 <h3 id="errormessage"><a class="header" href="#errormessage"><em>error</em>.message()</a></h3>
 <hr />
@@ -7469,6 +7486,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <ul>
 <li><a href="library/type.joe.Error.html#init">Error(<em>message</em>, [<em>trace</em>, ...])</a> → <a href="library/type.joe.Error.html">Error</a></li>
 <li><a href="library/type.joe.Error.html#method.addInfo"><em>error</em>.addInfo(<em>message</em>)</a> → this</li>
+<li><a href="library/type.joe.Error.html#method.javaStackTrace"><em>error</em>.javaStackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
 <li><a href="library/type.joe.Error.html#method.stackTrace"><em>error</em>.stackTrace()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Error.html#method.traces"><em>error</em>.traces()</a> → <a href="library/type.joe.List.html">List</a></li>
@@ -8239,6 +8257,9 @@ an atomic operation.</li>
 <tr><td>47</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
 <tr><td>48</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
 <tr><td>49</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
+<tr><td>50</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
+<tr><td>51</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
+<tr><td>50</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
 <tr><td>50</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
 <tr><td>51</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
 <tr><td>52</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
@@ -8277,6 +8298,7 @@ Used only by the <code>CLOSURE</code> instruction.</li>
 <li><em>slot</em>: A stack slot</li>
 <li><em>sub</em>: A subclass</li>
 <li><em>sup</em>: A superclass</li>
+<li><em>trace</em>: A callable trace added to the current call-frame.</li>
 <li><em>v</em>: A local variable</li>
 </ul>
 <h2 id="instructions"><a class="header" href="#instructions">Instructions</a></h2>
@@ -8541,6 +8563,19 @@ string, creating a new <code>MonicaError</code> in the latter case.</p>
 <hr />
 <p><strong>TPUT</strong> | <em>a</em> → <em>a</em></p>
 <p>Loads <em>a</em> into the T register, leaving it on the stack.</p>
+<h3 id="trcpop"><a class="header" href="#trcpop">TRCPOP</a></h3>
+<hr />
+<p><strong>TRCPOP</strong> | ∅ → ∅</p>
+<p>Pops a post-trace from the current <code>CallFrame</code>.  See <code>TRCPUSH</code>.</p>
+<h3 id="trcpush"><a class="header" href="#trcpush">TRCPUSH</a></h3>
+<hr />
+<p><strong>TRCPUSH</strong> <em>trace</em> | ∅ → ∅</p>
+<p>Pushes a post-trace into the current <code>CallFrame</code>.  The <em>trace</em> is a
+<code>Trace</code> constant identifying a particular scope in a loaded script.
+If an error is thrown while the post-trace is present in the <code>CallFrame</code>,
+the trace will be included in the error stack trace.</p>
+<p>This is used to add the <code>class</code> as a stack level when errors are found
+in a class static initializer block.</p>
 <h3 id="true"><a class="header" href="#true">TRUE</a></h3>
 <hr />
 <p><strong>TRUE</strong> | ∅ → <code>true</code></p>

@@ -1,6 +1,10 @@
 # Change Log
 
-## Changes in 0.5.0 (Forthcoming)
+## Changes in 0.6.0 (forthcoming)
+
+- None yet.
+
+## Changes in 0.5.0 
 
 - Language
   - A default `toString()`  method is defined automatically for instances of 
@@ -14,12 +18,13 @@
     - Source file and line number, where available
 
 - Bert Byte-code Engine
-  - Added `BertEngine`, an experimental byte-code execution engine, following
+  - Added `BertEngine`, a byte-code execution engine, following
     Nystrom's `clox` design in Java.
   - `BertEngine` and `WalkerEngine` both implement the entire Joe language
     and support the entire Joe standard library, as verified by the 
     Joe test suites.
-  - `Bert` is enabled by the `-b` option on most `joe *` tools.
+  - `BertEngine` is now enabled by default.
+  - The `WalkerEngine` can enabled by the `-w` option on relevant `joe` tools.
 
 - Extending/Embedding API
   - Added `Joe::isComplete`.

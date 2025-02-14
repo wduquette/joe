@@ -186,6 +186,7 @@ thrown during execution using the <a href="pkg.joe.html#function.catch"><code>ca
 <p><strong><a href="#methods">Methods</a></strong></p>
 <ul>
 <li><a href="type.joe.Error.html#method.addInfo"><em>error</em>.addInfo(<em>message</em>)</a> → this</li>
+<li><a href="type.joe.Error.html#method.javaStackTrace"><em>error</em>.javaStackTrace()</a> → <a href="type.joe.String.html">String</a></li>
 <li><a href="type.joe.Error.html#method.message"><em>error</em>.message()</a> → text</li>
 <li><a href="type.joe.Error.html#method.stackTrace"><em>error</em>.stackTrace()</a> → <a href="type.joe.String.html">String</a></li>
 <li><a href="type.joe.Error.html#method.traces"><em>error</em>.traces()</a> → <a href="type.joe.List.html">List</a></li>
@@ -203,6 +204,12 @@ trace messages.</p>
 <hr />
 <p><strong><em>error</em>.addInfo(<em>message</em>) → this</strong></p>
 <p>Adds an information message to the list of traces.</p>
+<p><span id="method.javaStackTrace"> </span></p>
+<h3 id="errorjavastacktrace"><a class="header" href="#errorjavastacktrace"><em>error</em>.javaStackTrace()</a></h3>
+<hr />
+<p><strong><em>error</em>.javaStackTrace() → <a href="type.joe.String.html">String</a></strong></p>
+<p>Returns the complete error, including the initial error messages
+and all stack frames.</p>
 <p><span id="method.message"> </span></p>
 <h3 id="errormessage"><a class="header" href="#errormessage"><em>error</em>.message()</a></h3>
 <hr />

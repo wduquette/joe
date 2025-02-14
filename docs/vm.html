@@ -236,6 +236,9 @@ an atomic operation.</li>
 <tr><td>47</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
 <tr><td>48</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
 <tr><td>49</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
+<tr><td>50</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
+<tr><td>51</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
+<tr><td>50</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
 <tr><td>50</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
 <tr><td>51</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
 <tr><td>52</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
@@ -274,6 +277,7 @@ Used only by the <code>CLOSURE</code> instruction.</li>
 <li><em>slot</em>: A stack slot</li>
 <li><em>sub</em>: A subclass</li>
 <li><em>sup</em>: A superclass</li>
+<li><em>trace</em>: A callable trace added to the current call-frame.</li>
 <li><em>v</em>: A local variable</li>
 </ul>
 <h2 id="instructions"><a class="header" href="#instructions">Instructions</a></h2>
@@ -538,6 +542,19 @@ string, creating a new <code>MonicaError</code> in the latter case.</p>
 <hr />
 <p><strong>TPUT</strong> | <em>a</em> → <em>a</em></p>
 <p>Loads <em>a</em> into the T register, leaving it on the stack.</p>
+<h3 id="trcpop"><a class="header" href="#trcpop">TRCPOP</a></h3>
+<hr />
+<p><strong>TRCPOP</strong> | ∅ → ∅</p>
+<p>Pops a post-trace from the current <code>CallFrame</code>.  See <code>TRCPUSH</code>.</p>
+<h3 id="trcpush"><a class="header" href="#trcpush">TRCPUSH</a></h3>
+<hr />
+<p><strong>TRCPUSH</strong> <em>trace</em> | ∅ → ∅</p>
+<p>Pushes a post-trace into the current <code>CallFrame</code>.  The <em>trace</em> is a
+<code>Trace</code> constant identifying a particular scope in a loaded script.
+If an error is thrown while the post-trace is present in the <code>CallFrame</code>,
+the trace will be included in the error stack trace.</p>
+<p>This is used to add the <code>class</code> as a stack level when errors are found
+in a class static initializer block.</p>
 <h3 id="true"><a class="header" href="#true">TRUE</a></h3>
 <hr />
 <p><strong>TRUE</strong> | ∅ → <code>true</code></p>
