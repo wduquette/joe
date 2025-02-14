@@ -6,6 +6,8 @@ import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,11 +101,16 @@ public class TestTool implements Tool {
         }
 
         // NEXT, run the tests.
+        var startTime = Instant.now();
         System.out.println("Joe " + App.getVersion() + " (" +
             engineType + " engine)");
         for (var path : testScripts) {
             runTest(path);
         }
+        var endTime = Instant.now();
+        var duration = Duration.between(startTime, endTime).toMillis() / 1000.0;
+
+        System.out.printf("Run-time: %.3f seconds\n", duration);
 
         // NEXT, print the final results
         var total = successCount + skipCount + failureCount + errorCount;

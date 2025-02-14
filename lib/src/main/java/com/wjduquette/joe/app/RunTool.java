@@ -8,6 +8,8 @@ import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.List;
 
@@ -62,12 +64,14 @@ public class RunTool implements Tool {
 
         var engineType = Joe.BERT;
         var debug = false;
+        var measureRuntime = false;
 
         while (!argq.isEmpty() && argq.peek().startsWith("-")) {
             var opt = argq.poll();
             switch (opt) {
                 case "--bert", "-b" -> engineType = Joe.BERT;
                 case "--walker", "-w" -> engineType = Joe.WALKER;
+                case "--time", "-t" -> measureRuntime = true;
                 case "--debug", "-d" -> debug = true;
                 default -> {
                     System.err.println("Unknown option: '" + opt + "'.");
@@ -92,7 +96,14 @@ public class RunTool implements Tool {
                 System.out.println("Joe " + App.getVersion() + " (" +
                     joe.engineName() + " engine)");
             }
+            var startTime = Instant.now();
             joe.runFile(path);
+            var endTime = Instant.now();
+
+            if (measureRuntime) {
+                var duration = Duration.between(startTime, endTime).toMillis() / 1000.0;
+                System.out.printf("Run-time: %.3f seconds\n", duration);
+            }
         } catch (IOException ex) {
             System.err.println("Could not read script: " + path +
                 "\n*** " + ex.getMessage());
