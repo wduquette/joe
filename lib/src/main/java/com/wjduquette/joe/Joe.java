@@ -343,10 +343,13 @@ public class Joe {
     }
 
     /**
-     * Checks whether the source "is complete", i.e, whether it can
-     * be compiled.  The result is not executed.  This is useful
-     * in REPLs, so that the user can enter a newline in a string or
-     * function call or block and keep editing if it is not complete.
+     * Checks whether the source "is complete", i.e, whether it represents
+     * a complete script.  A script is incomplete if it ends with
+     * an incomplete construct, e.g., an unterminated string or block or
+     * expression.
+     *
+     * <p>This is useful in REPLs: if the script is incomplete, the REPL
+     * can allow the user to enter additional lines until it is complete.</p>
      * @param source The source text
      * @return true or false
      */
