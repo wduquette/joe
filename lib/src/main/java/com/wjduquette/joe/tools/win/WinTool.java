@@ -24,6 +24,13 @@ public class WinTool extends FXTool {
         Given a script, this tool displays a JavaFX GUI.  The tool provides
         the Joe standard library along with the optional joe.console and
         joe.win packages.  See the Joe User's Guide for details.
+        
+        Executes the script.  The options are as follows:
+        
+        --bert,   -b   Use the "Bert" byte-engine (default).
+        --walker, -w   Use the "Walker" AST-walker engine.
+        --debug,  -d   Enable debugging output.  This is mostly of use to
+                       the Joe maintainer.
         """,
         WinTool::main
     );
@@ -31,7 +38,8 @@ public class WinTool extends FXTool {
     //------------------------------------------------------------------------
     // Instance Variables
 
-    private final Joe joe = new Joe();
+    // Keeps joe from being collected.
+    private Joe joe;
     private final VBox root = new VBox();
 
     //------------------------------------------------------------------------
@@ -50,6 +58,31 @@ public class WinTool extends FXTool {
         if (args.isEmpty()) {
             printUsage(App.NAME);
             exit(64);
+        }
+
+        // NEXT, parse the options.
+        var engineType = Joe.BERT;
+        var debug = false;
+
+        while (!args.isEmpty() && args.peek().startsWith("-")) {
+            var opt = args.poll();
+            switch (opt) {
+                case "--bert", "-b" -> engineType = Joe.BERT;
+                case "--walker", "-w" -> engineType = Joe.WALKER;
+                case "--debug", "-d" -> debug = true;
+                default -> {
+                    System.err.println("Unknown option: '" + opt + "'.");
+                    System.exit(64);
+                }
+            }
+        }
+
+        var joe = new Joe(engineType);
+        joe.setDebug(debug);
+
+        if (debug) {
+            System.out.println("Joe " + App.getVersion() + " (" +
+                joe.engineName() + " engine)");
         }
 
         // NEXT, create the scene with default settings.

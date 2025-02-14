@@ -25,8 +25,9 @@ public class RunTool implements Tool {
         """
         Executes the script.  The options are as follows:
         
-        --bert, -b     Use the experimental "Bert" byte-engine.
-        --debug, -d    Enable debugging output.  This is mostly of use to
+        --bert,   -b   Use the "Bert" byte-engine (default).
+        --walker, -w   Use the "Walker" AST-walker engine.
+        --debug,  -d   Enable debugging output.  This is mostly of use to
                        the Joe maintainer.
         """,
         RunTool::main
@@ -59,13 +60,14 @@ public class RunTool implements Tool {
             System.exit(64);
         }
 
-        var engineType = Joe.WALKER;
+        var engineType = Joe.BERT;
         var debug = false;
 
         while (!argq.isEmpty() && argq.peek().startsWith("-")) {
             var opt = argq.poll();
             switch (opt) {
                 case "--bert", "-b" -> engineType = Joe.BERT;
+                case "--walker", "-w" -> engineType = Joe.WALKER;
                 case "--debug", "-d" -> debug = true;
                 default -> {
                     System.err.println("Unknown option: '" + opt + "'.");
@@ -86,6 +88,10 @@ public class RunTool implements Tool {
         }
 
         try {
+            if (debug) {
+                System.out.println("Joe " + App.getVersion() + " (" +
+                    joe.engineName() + " engine)");
+            }
             joe.runFile(path);
         } catch (IOException ex) {
             System.err.println("Could not read script: " + path +
