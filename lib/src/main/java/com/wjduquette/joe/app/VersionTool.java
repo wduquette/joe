@@ -5,8 +5,6 @@ import com.wjduquette.joe.tools.ToolInfo;
 
 import java.util.ArrayDeque;
 import java.util.List;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 
 /**
  * The implementation for the {@code joe version} tool.
@@ -52,8 +50,8 @@ public class VersionTool implements Tool {
             System.exit(64);
         }
 
-        try {
-            var attrs = getManifestAttributes();
+        var attrs = App.getManifestAttributes();
+        if (attrs != null) {
             var version = attrs.getValue("Implementation-Version");
             var date = attrs.getValue("Built-Date");
 
@@ -62,14 +60,8 @@ public class VersionTool implements Tool {
             } else {
                 println("Joe (dev build)");
             }
-        } catch (Exception ex) {
-            println("Failed to read Joe manifest: " + ex.getMessage());
-        }
-    }
-
-    private Attributes getManifestAttributes() throws Exception {
-        try (var stream = getClass().getResourceAsStream("/META-INF/MANIFEST.MF")) {
-            return new Manifest(stream).getMainAttributes();
+        } else {
+            println("Joe (dev build)");
         }
     }
 

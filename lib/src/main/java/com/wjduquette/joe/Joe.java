@@ -45,6 +45,7 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    private final String engineName;
     private final Engine engine;
     private boolean debug = false;
 
@@ -76,6 +77,7 @@ public class Joe {
      * nothing else.</p>
      */
     public Joe(String engineType) {
+        this.engineName = engineType;
         switch (engineType) {
             case WALKER -> engine = new WalkerEngine(this);
             case BERT -> engine = new BertEngine(this);
@@ -213,6 +215,14 @@ public class Joe {
      */
     public void setDebug(boolean flag) {
         this.debug = flag;
+    }
+
+    /**
+     * Gets the name of the execution engine.
+     * @return The name.
+     */
+    public String engineName() {
+        return engineName;
     }
 
     //-------------------------------------------------------------------------

@@ -6,6 +6,8 @@ import com.wjduquette.joe.tools.test.TestTool;
 import com.wjduquette.joe.tools.ToolLauncher;
 
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  * The top-level class for Joe's command-line tool.
@@ -17,6 +19,33 @@ public class App {
      * The expected name of Joe's command-lien app.
      */
     public static final String NAME = "joe";
+
+    /**
+     * Gets Joe's version number, or "?.?.?" if unavailable.
+     * @return The version number.
+     */
+    public static String getVersion() {
+        var attrs = getManifestAttributes();
+        if (attrs != null) {
+            var version = attrs.getValue("Implementation-Version");
+            if (version != null) {
+                return version;
+            }
+        }
+        return "?.?.?";
+    }
+
+    /**
+     * Get the manifest attributes, or return null on failure.
+     * @return The attributes, or null.
+     */
+    public static Attributes getManifestAttributes() {
+        try (var stream = App.class.getResourceAsStream("/META-INF/MANIFEST.MF")) {
+            return new Manifest(stream).getMainAttributes();
+        } catch (Exception ex) {
+            return null;
+        }
+    }
 
     //-------------------------------------------------------------------------
     // Main
