@@ -5,7 +5,6 @@ import com.wjduquette.joe.Trace;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static com.wjduquette.joe.walker.TokenType.*;
 
@@ -18,7 +17,7 @@ class Parser {
 
     private final SourceBuffer source;
     private final List<Token> tokens;
-    private final Consumer<Trace> reporter;
+    private final ErrorReporter reporter;
     private int current = 0;
 
     //-------------------------------------------------------------------------
@@ -27,7 +26,7 @@ class Parser {
     Parser(
         SourceBuffer source,
         List<Token> tokens,
-        Consumer<Trace> reporter)
+        ErrorReporter reporter)
     {
         this.source = source;
         this.reporter = reporter;
@@ -661,7 +660,8 @@ class Parser {
         var msg = token.type() == TokenType.EOF
             ? "Error at end: " + message
             : "Error at '" + token.lexeme() + "': " + message;
-        reporter.accept(new Trace(token.span(), msg));
+        reporter.reportError(new Trace(token.span(), msg),
+            token.type() == TokenType.EOF);
     }
 
     // Saves the error detail, with synchronization.

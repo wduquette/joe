@@ -12,6 +12,10 @@ public class WalkerEngine implements Engine {
     // The owning instance of Joe
     private final Joe joe;
 
+    // Error traces accumulated during compilation
+    private List<Trace> syntaxTraces = null;
+    private boolean gotIncompleteError = false;
+
     // The interpreter
     private final Interpreter interpreter;
 
@@ -47,37 +51,19 @@ public class WalkerEngine implements Engine {
 
     /**
      * Executes the script, throwing an appropriate error on failure.
-     * @param filename The source of the input.
+     * @param scriptName The source of the input.
      * @param source The input
      * @return The script's result
      * @throws SyntaxError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
     @Override
-    public Object run(String filename, String source) throws SyntaxError, JoeError {
-        var traces = new ArrayList<Trace>();
-
-        Scanner scanner = new Scanner(filename, source, traces::add);
-        List<Token> tokens = scanner.scanTokens();
-        var buffer = scanner.buffer();
-        Parser parser = new Parser(buffer, tokens, traces::add);
-        var statements = parser.parse();
-
-        // Stop if there was a syntax error.
-        if (!traces.isEmpty()) {
-            throw new SyntaxError("Syntax error in input, halting.", traces);
-        }
-
-        Resolver resolver = new Resolver(interpreter, traces::add);
-        resolver.resolve(statements);
-
-        // Stop if there was a resolution error.
-        if (!traces.isEmpty()) {
-            throw new SyntaxError("Syntax error in input, halting.", traces);
-        }
+    public Object run(String scriptName, String source) throws SyntaxError, JoeError {
+        var buffer = new SourceBuffer(scriptName, source);
+        var statements = parseAndResolve(buffer);
 
         // Save the buffer, for later introspection.
-        buffers.put(filename, buffer);
+        buffers.put(scriptName, buffer);
 
         try {
             return interpreter.interpret(statements);
@@ -89,27 +75,50 @@ public class WalkerEngine implements Engine {
         }
     }
 
+    private List<Stmt> parse(SourceBuffer buffer) throws SyntaxError {
+        syntaxTraces = new ArrayList<>();
+        gotIncompleteError = false;
+
+        Scanner scanner = new Scanner(buffer, this::reportError);
+        List<Token> tokens = scanner.scanTokens();
+        Parser parser = new Parser(buffer, tokens, this::reportError);
+        var statements = parser.parse();
+
+        // Stop if there was a syntax error.
+        if (!syntaxTraces.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.",
+                syntaxTraces, !gotIncompleteError);
+        }
+
+        return statements;
+    }
+
+    private List<Stmt> parseAndResolve(SourceBuffer buffer) {
+        var statements = parse(buffer);
+
+        Resolver resolver = new Resolver(interpreter, syntaxTraces::add);
+        resolver.resolve(statements);
+
+        // Stop if there was a resolution error.
+        if (!syntaxTraces.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.",
+                syntaxTraces, true);
+        }
+
+        return statements;
+    }
 
     @Override
     public boolean isComplete(String source) {
-        var traces = new ArrayList<Trace>();
-
-        Scanner scanner = new Scanner("*isComplete*", source, traces::add);
-        List<Token> tokens = scanner.scanTokens();
-        var buffer = scanner.buffer();
-        Parser parser = new Parser(buffer, tokens, traces::add);
-        var statements = parser.parse();
-
-        // Stop now if there was a syntax error.
-        if (!traces.isEmpty()) {
-            return false;
+        try {
+            // If it parsed without error, it's complete.  It might
+            // also have resolution errors, but that's irrelevant.
+            parse(new SourceBuffer("*isComplete*", source));
+            return true;
+        } catch (SyntaxError ex) {
+            // If there's an error, return the error's complete flag.
+            return ex.isComplete();
         }
-
-        Resolver resolver = new Resolver(interpreter, traces::add);
-        resolver.resolve(statements);
-
-        // Check for resolution errors.
-        return traces.isEmpty();
     }
 
     @Override
@@ -149,27 +158,15 @@ public class WalkerEngine implements Engine {
 
     @Override
     public String dump(String scriptName, String source) {
-        var traces = new ArrayList<Trace>();
-
-        Scanner scanner = new Scanner(scriptName, source, traces::add);
-        List<Token> tokens = scanner.scanTokens();
-        var buffer = scanner.buffer();
-        Parser parser = new Parser(buffer, tokens, traces::add);
-        var statements = parser.parse();
-
-        // Stop if there was a syntax error.
-        if (!traces.isEmpty()) {
-            throw new SyntaxError("Syntax error in input, halting.", traces);
-        }
-
-        Resolver resolver = new Resolver(interpreter, traces::add);
-        resolver.resolve(statements);
-
-        // Stop if there was a resolution error.
-        if (!traces.isEmpty()) {
-            throw new SyntaxError("Syntax error in input, halting.", traces);
-        }
-
+        var buffer = new SourceBuffer(scriptName, source);
+        var statements = parseAndResolve(buffer);
         return new Dumper().dump(statements);
+    }
+
+    private void reportError(Trace trace, boolean incomplete) {
+        syntaxTraces.add(trace);
+        if (incomplete) {
+            gotIncompleteError = true;
+        }
     }
 }

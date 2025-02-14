@@ -3,7 +3,6 @@ package com.wjduquette.joe.walker;
 import com.wjduquette.joe.*;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 import static com.wjduquette.joe.walker.TokenType.*;
 
@@ -52,7 +51,7 @@ class Scanner {
 
     private final String source;
     private final SourceBuffer buffer;
-    private final Consumer<Trace> reporter;
+    private final ErrorReporter reporter;
     private final List<Token> tokens = new ArrayList<>();
     private int start = 0;
     private int current = 0;
@@ -61,22 +60,18 @@ class Scanner {
     // Constructor
 
     /**
-     * Creates a new scanner for the given filename and source text, using
-     * the given error reporter.  The *filename* is usually the bare filename
-     * of the source script, but can be any string meaningful to the
-     * application.
+     * Creates a new scanner for the given source buffer, using
+     * the given error reporter.
      *
-     * @param filename The filename
-     * @param source The source text
+     * @param buffer The source buffer
      * @param reporter The error reporter
      */
     Scanner(
-        String filename,
-        String source,
-        Consumer<Trace> reporter
+        SourceBuffer buffer,
+        ErrorReporter reporter
     ) {
-        this.source = source;
-        this.buffer = new SourceBuffer(filename, source);
+        this.buffer = buffer;
+        this.source = buffer.source();
         this.reporter = reporter;
     }
 
@@ -98,15 +93,6 @@ class Scanner {
         tokens.add(new Token(EOF, endSpan, null));
         return tokens;
     }
-
-    /**
-     * Returns the source buffer.
-     * @return the buffer.
-     */
-    SourceBuffer buffer() {
-        return buffer;
-    }
-
 
     //-------------------------------------------------------------------------
     // The Scanner
@@ -300,7 +286,7 @@ class Scanner {
         }
 
         if (isAtEnd()) {
-            error("Unterminated string.");
+            errorAtEnd("Unterminated string.");
             return;
         }
 
@@ -349,7 +335,7 @@ class Scanner {
             }
         }
 
-        error("Unterminated text block.");
+        errorAtEnd("Unterminated text block.");
     }
 
     private void rawString() {
@@ -368,7 +354,7 @@ class Scanner {
         }
 
         if (isAtEnd()) {
-            error("Unterminated raw string.");
+            errorAtEnd("Unterminated raw string.");
             return;
         }
 
@@ -398,7 +384,7 @@ class Scanner {
             }
         }
 
-        error("Unterminated raw text block.");
+        errorAtEnd("Unterminated raw text block.");
     }
 
     private String outdent(String text) {
@@ -512,8 +498,15 @@ class Scanner {
         tokens.add(new Token(type, span, literal));
     }
 
+    // A normal syntax error
     private void error(String message) {
-        reporter.accept(
-            new Trace(buffer.span(start, current), message));
+        reporter.reportError(
+            new Trace(buffer.span(start, current), message), false);
+    }
+
+    // An error because there is an unterminated string of some kind.
+    private void errorAtEnd(String message) {
+        reporter.reportError(
+            new Trace(buffer.span(start, current), message), true);
     }
 }

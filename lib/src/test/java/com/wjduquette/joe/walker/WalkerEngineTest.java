@@ -75,6 +75,38 @@ public class WalkerEngineTest extends Ted {
         }
     }
 
+    @Test
+    public void testIsComplete() {
+        test("testIsComplete");
+
+        // Scanner
+        var completeString = """
+            var a = "abc";
+            """;
+        var incompleteString = "var a = \"abc;";
+
+        // Parser
+        var completeBlock = """
+            function dummy() { }
+            """;
+        var incompleteBlock = """
+            function dummy() {
+            """;
+        var normalError = """
+            a = "abc";
+            """;
+        var errorPlusIncomplete = "a = \"abc;";
+
+        check(joe.isComplete(completeString)).eq(true);
+        check(joe.isComplete(incompleteString)).eq(false);
+
+        check(joe.isComplete(completeBlock)).eq(true);
+        check(joe.isComplete(incompleteBlock)).eq(false);
+
+        check(joe.isComplete(normalError)).eq(true);
+        check(joe.isComplete(errorPlusIncomplete)).eq(false);
+    }
+
     //-------------------------------------------------------------------------
     // Helpers
 

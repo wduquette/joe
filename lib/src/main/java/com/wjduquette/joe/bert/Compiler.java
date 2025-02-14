@@ -123,7 +123,8 @@ class Compiler {
         var function = endFunction();
 
         if (!errors.isEmpty()) {
-            throw new SyntaxError("Error while compiling script", errors);
+            // TEMP: add code to detect incomplete scripts.
+            throw new SyntaxError("Error while compiling script", errors, true);
         }
 
         return function;

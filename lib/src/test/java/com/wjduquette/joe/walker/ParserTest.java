@@ -1,5 +1,6 @@
 package com.wjduquette.joe.walker;
 
+import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Ted;
 import org.junit.Test;
 
@@ -361,8 +362,9 @@ public class ParserTest extends Ted {
     // Scans and returns the parse errors
     private List<String> parse(String input) {
         details.clear();
-        var scanner = new Scanner("-", input, detail ->
-            details.add(detail.message())
+        var buffer = new SourceBuffer("-", input);
+        var scanner = new Scanner(buffer, (trace, incomplete) ->
+            details.add(trace.message())
         );
         var tokens = scanner.scanTokens();
 
@@ -371,7 +373,7 @@ public class ParserTest extends Ted {
                 String.join("\n  ", details));
         }
 
-        var parser = new Parser(scanner.buffer(), tokens, detail ->
+        var parser = new Parser(buffer, tokens, (detail, incomplete) ->
             details.add("[line " + detail.line() + "] " + detail.message())
         );
         parser.parse();

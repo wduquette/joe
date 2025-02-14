@@ -1,5 +1,6 @@
 package com.wjduquette.joe.walker;
 
+import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Ted;
 import org.junit.Test;
 
@@ -72,7 +73,8 @@ public class ScannerTest extends Ted {
     // Scans and returns the first error
     private String scan(String input) {
         details.clear();
-        var scanner = new Scanner("-", input, detail -> {
+        var buffer = new SourceBuffer("-", input);
+        var scanner = new Scanner(buffer, (detail, incomplete) -> {
             System.out.println("detail: " + detail);
             details.add(detail.message());
         });
@@ -81,7 +83,8 @@ public class ScannerTest extends Ted {
     }
 
     private String scanString(String input) {
-        var scanner = new Scanner("-", input, detail -> {});
+        var buffer = new SourceBuffer("-", input);
+        var scanner = new Scanner(buffer, (detail, incomplete) -> {});
         var result = scanner.scanTokens();
         if (result.isEmpty()) {
             return null;
