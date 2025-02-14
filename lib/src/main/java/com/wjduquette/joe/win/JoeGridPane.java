@@ -12,6 +12,10 @@ import javafx.scene.layout.GridPane;
 public class JoeGridPane extends GridPane implements JoeObject {
     private final JoeObjectCore core;
 
+    /**
+     * Creates a JoeGridPane.
+     * @param joeClass The Joe class for which this is the Java instance.
+     */
     public JoeGridPane(JoeClass joeClass) {
         this.core = new JoeObjectCore(joeClass, this);
     }

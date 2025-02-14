@@ -248,8 +248,14 @@ public class TestTool implements Tool {
     //-------------------------------------------------------------------------
     // SkipException
 
-    // Used by the "skip()" function.
+    /**
+     * An exception used by the test API's "skip()" function.
+     */
     public static class SkipError extends JoeError {
+        /**
+         * Creates the exception.
+         * @param message The skip message.
+         */
         public SkipError(String message) { super(message); }
     }
 

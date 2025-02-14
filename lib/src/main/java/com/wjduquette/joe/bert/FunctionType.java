@@ -6,12 +6,12 @@ package com.wjduquette.joe.bert;
  * during compilation, and as introspection data at runtime.
  */
 public enum FunctionType {
-    FUNCTION("function"),
-    LAMBDA("lambda"),
-    METHOD("method"),
-    STATIC_METHOD("static method"),
-    INITIALIZER("initializer"),
-    SCRIPT("script");
+    /** A normal function. */   FUNCTION("function"),
+    /** A lambda function. */   LAMBDA("lambda"),
+    /** An instance method. */  METHOD("method"),
+    /** A static method. */     STATIC_METHOD("static method"),
+    /** A class initializer. */ INITIALIZER("initializer"),
+    /** An entire script. */    SCRIPT("script");
 
     private final String text;
     FunctionType(String text) {

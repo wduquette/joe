@@ -4,7 +4,7 @@ package com.wjduquette.joe;
  * JoeCallable is a marker interface for objects that can be called as
  * functions by an Engine. It defines the methods that all callables
  * must provide to Joe client.  The client can call a JoeCallable directly
- * via the Joe::call method.</p>
+ * via the Joe::call method.
  *
  * <p><b>Note:</b> A scripted callable can only be called using the engine
  * in which it was defined.  In particular, different engines implement scripted
@@ -34,6 +34,7 @@ public interface JoeCallable {
 
     /**
      * Returns true if the callable is native, and false if it is scripted.
+     * @return true or false
      */
     default boolean isNative() { return !isScripted(); }
 }

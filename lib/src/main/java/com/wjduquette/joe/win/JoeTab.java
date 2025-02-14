@@ -6,9 +6,16 @@ import com.wjduquette.joe.JoeObject;
 import com.wjduquette.joe.JoeObjectCore;
 import javafx.scene.control.Tab;
 
+/**
+ * A JavaFX Tab that can be extended by Joe classes.
+ */
 public class JoeTab extends Tab implements JoeObject {
     private final JoeObjectCore core;
 
+    /**
+     * Creates a JoeTab.
+     * @param joeClass The Joe class for which this is the Java instance.
+     */
     public JoeTab(JoeClass joeClass) {
         this.core = new JoeObjectCore(joeClass, this);
     }

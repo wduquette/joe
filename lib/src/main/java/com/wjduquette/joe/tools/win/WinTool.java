@@ -15,7 +15,11 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Deque;
 
+/**
+ * A tool that runs a Joe script with the JavaFX WinPackage.
+ */
 public class WinTool extends FXTool {
+    /** The tool's metadata. */
     public static final ToolInfo INFO = new ToolInfo(
         "win",
         "script.joe args...",
@@ -45,6 +49,9 @@ public class WinTool extends FXTool {
     //------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates the tool.
+     */
     public WinTool() {
         super(INFO);
     }
@@ -125,6 +132,10 @@ public class WinTool extends FXTool {
     //------------------------------------------------------------------------
     // Main
 
+    /**
+     * Launches the tool
+     * @param args The command-line arguments.
+     */
     public static void main(String[] args) {
         launch(args);
     }

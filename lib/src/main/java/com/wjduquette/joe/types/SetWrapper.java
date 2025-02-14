@@ -8,6 +8,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * A wrapper for Java Sets that require special handling when used at
+ * the script level.
+ */
 public class SetWrapper implements JoeSet {
     //-------------------------------------------------------------------------
     // Static Methods

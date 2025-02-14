@@ -109,6 +109,10 @@ public class JoeListView extends ListView<Object> implements JoeObject {
         return stringifier;
     }
 
+    /**
+     * The widget's selected index property, derived from its selection model.
+     * @return The property.
+     */
     public ReadOnlyIntegerProperty selectedIndexProperty() {
         return getSelectionModel().selectedIndexProperty();
     }

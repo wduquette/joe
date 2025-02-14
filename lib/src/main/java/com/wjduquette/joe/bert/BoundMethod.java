@@ -13,6 +13,8 @@ package com.wjduquette.joe.bert;
  * When the virtual machine executes a BoundMethod it pushes the receiver
  * onto the stack, and then handles the Closure like any other function.
  * </p>
+ * @param receiver The object whose method is being bound.
+ * @param method The method's closure.
  */
 public record BoundMethod(Object receiver, Closure method)
     implements BertCallable

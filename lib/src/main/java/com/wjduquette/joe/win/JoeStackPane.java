@@ -6,9 +6,16 @@ import com.wjduquette.joe.JoeObject;
 import com.wjduquette.joe.JoeObjectCore;
 import javafx.scene.layout.StackPane;
 
+/**
+ * A JavaFX StackPane that can be extended by Joe classes.
+ */
 public class JoeStackPane extends StackPane implements JoeObject {
     private final JoeObjectCore core;
 
+    /**
+     * Creates a JoeStackPane.
+     * @param joeClass The Joe class for which this is the Java instance.
+     */
     public JoeStackPane(JoeClass joeClass) {
         this.core = new JoeObjectCore(joeClass, this);
     }

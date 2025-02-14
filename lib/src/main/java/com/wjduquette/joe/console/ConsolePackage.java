@@ -10,6 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * A package that provides basic file I/O and command line arguments to
+ * Joe scripts.
+ */
 public class ConsolePackage extends JoePackage {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -40,6 +44,9 @@ public class ConsolePackage extends JoePackage {
     // - Write to a file
     // - Query and set the current working directory
 
+    /**
+     * Creates an instance of the package.
+     */
     public ConsolePackage() {
         super("joe.console");
 
@@ -252,13 +259,17 @@ public class ConsolePackage extends JoePackage {
 
     }
 
-
-    //---------------------------------------------------------------------
-    // The PathProxy
-
     //---------------------------------------------------------------------
     // Helpers
 
+    /**
+     * Given an argument, converts it to a Path resolved against the
+     * current working directory.
+     * @param joe The interpreter
+     * @param arg The argument
+     * @return The resolved path
+     * @throws JoeError if the argument is not a path.
+     */
     public Path toResolvedPath(Joe joe, Object arg) {
         var path = PathProxy.toPath(joe, arg);
         return cwd.resolve(path).toAbsolutePath().normalize();

@@ -15,6 +15,9 @@ import java.util.Map;
 public class Tuple implements JoeObject {
     //-------------------------------------------------------------------------
     // Static Variables
+    /**
+     * A wildcard keyword.
+     */
     public static final Keyword ANY = new Keyword("_");
 
     private static final Map<String, JoeValueLambda<Tuple>> METHODS =

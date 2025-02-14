@@ -9,6 +9,7 @@ import java.util.Map;
  * A class to format strings for Joe.
  */
 public class StringFormatter {
+    private StringFormatter() {} // Not instantiable.
     private static final Map<String,List<ArgType>> formatCache = new HashMap<>();
 
     /**

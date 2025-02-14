@@ -16,12 +16,14 @@ public class JoeError extends RuntimeException {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The stack trace and information messages included in the error.
+    /** The stack trace and information messages included in the error. */
     private final List<Trace> traces = new ArrayList<>();
 
-    // The context of the error.  This is initially set by `RuntimeError`,
-    // and is reset as the error is passed up the call chain so that it
-    // has the correct value as the caller adds it to the stack trace.
+    /**
+     * The context of the error.  This is initially set by `RuntimeError`,
+     * and is reset as the error is passed up the call chain so that it
+     * has the correct value as the caller adds it to the stack trace.
+     */
     private SourceBuffer.Span pendingContext = null;
 
     //-------------------------------------------------------------------------
@@ -163,6 +165,13 @@ public class JoeError extends RuntimeException {
         return String.join("\n", list);
     }
 
+    /**
+     * Returns a block of source code, with line numbers, around
+     * the source location at which a runtime error occurred.
+     * @param span The source location
+     * @param leader An indent for each line.
+     * @return The string.
+     */
     protected String errorLines(Span span, String leader) {
         var line = span.startLine();
         var start = Math.max(line - 1, 1);

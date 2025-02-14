@@ -21,8 +21,11 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Static constants
 
-    public static final String WALKER = "walker";
+    /** Constant for selecting the byte-code language engine. */
     public static final String BERT = "bert";
+
+    /** Constant for selecting the AST-walker language engine. */
+    public static final String WALKER = "walker";
 
     /**
      * The set of Joe's reserved words.
@@ -75,6 +78,7 @@ public class Joe {
      *
      * <p>The instance include the complete Joe standard library, but
      * nothing else.</p>
+     * @param engineType BERT or WALKER
      */
     public Joe(String engineType) {
         this.engineName = engineType;
@@ -140,6 +144,7 @@ public class Joe {
     /**
      * Installs a JoeLambda into Joe's global environment as a
      * native function
+     * @param name The function's name
      * @param joeLambda The lambda
      */
     public void installGlobalFunction(String name, JoeLambda joeLambda) {
@@ -264,6 +269,11 @@ public class Joe {
         print(System.lineSeparator());
     }
 
+    /**
+     * Prints a formatted string to the client's output handler.
+     * @param format A String.format format string.
+     * @param args The arguments.
+     */
     public void printf(String format, Object... args) {
         print(String.format(format, args));
     }

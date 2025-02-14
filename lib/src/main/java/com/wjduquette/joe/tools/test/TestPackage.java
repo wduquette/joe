@@ -3,6 +3,9 @@ package com.wjduquette.joe.tools.test;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.console.PathProxy;
 
+/**
+ * The package that defines the test API for test scripts.
+ */
 public class TestPackage extends JoePackage {
     // See also pkg.joe.test.Joe for the rest of the package.
 
@@ -28,6 +31,10 @@ public class TestPackage extends JoePackage {
     //
     // - From [[joe.console]], [[joe.console.Path]]
 
+    /**
+     * Creates the package.
+     * @param engine The name of the language engine in use, e.g., BERT or WALKER.
+     */
     public TestPackage(String engine) {
         super("joe.test");
         this.engine = engine;

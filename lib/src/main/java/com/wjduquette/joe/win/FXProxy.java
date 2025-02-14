@@ -10,7 +10,7 @@ import java.util.Map;
  * A TypeProxy that includes support for JavaFX properties.  The documentation
  * for the related methods is defined as a JoeDoc @mixin; all direct subclasses
  * (e.g., NodeProxy, MenuItemProxy) should "@includeMixin FXProxy".
- * @param <V>
+ * @param <V> The proxied type
  */
 public class FXProxy<V> extends TypeProxy<V> {
     //-------------------------------------------------------------------------
@@ -24,6 +24,11 @@ public class FXProxy<V> extends TypeProxy<V> {
 
     //**
     // @mixin FXProxy
+
+    /**
+     * Creates an FXProxy for the given type.
+     * @param name The script-level type name.
+     */
     public FXProxy(String name) {
         super(name);
 
@@ -166,11 +171,35 @@ public class FXProxy<V> extends TypeProxy<V> {
     //-------------------------------------------------------------------------
     // Helper Classes
 
+    /**
+     * A functional interface for retrieving a JavaFX property from an
+     * object.
+     * @param <V> The object type
+     * @param <P> The property type
+     */
     public interface PropertyGetter<V, P> {
+        /**
+         * Gets the value of an object property.
+         * @param value The target object
+         * @return The property value
+         */
         Property<P> get(V value);
     }
 
+    /**
+     * A functional interface for converting an arbitrary Object to a
+     * value of property type P.  The converter is expected to throw a
+     * JoeError on conversion failure.
+     * @param <P> The property type.
+     */
     public interface ArgConverter<P> {
+        /**
+         * Converts the argument to a value of type P.
+         * @param joe The interpreter
+         * @param arg The argument
+         * @return The converted value
+         * @throws JoeError on conversion failure.
+         */
         P convert(Joe joe, Object arg);
     }
 

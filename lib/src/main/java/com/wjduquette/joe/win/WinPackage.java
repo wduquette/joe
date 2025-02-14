@@ -72,6 +72,11 @@ public class WinPackage extends JoePackage {
     // [*JavaFX CSS Reference Guide*](https://openjfx.io/javadoc/21/javafx.graphics/javafx/scene/doc-files/cssref.html)
     // for details.
 
+    /**
+     * Creates an instance of the package.
+     * @param stage The root stage window
+     * @param root The root widget in the scene graph
+     */
     public WinPackage(Stage stage, VBox root) {
         super("joe.win");
         this.stage = stage;

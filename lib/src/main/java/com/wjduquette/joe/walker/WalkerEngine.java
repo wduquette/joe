@@ -5,6 +5,10 @@ import com.wjduquette.joe.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A Joe language engine that parses scripts to an Abstract Syntax Tree (AST)
+ * and walks the AST to process/execute the script.
+ */
 public class WalkerEngine implements Engine {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -26,6 +30,10 @@ public class WalkerEngine implements Engine {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an instance of the engine.
+     * @param joe The Joe API
+     */
     public WalkerEngine(Joe joe) {
         this.joe = joe;
         interpreter = new Interpreter(joe);

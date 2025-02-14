@@ -11,6 +11,10 @@ public class SyntaxError extends JoeError {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    /**
+     * Whether the script containing the error was "complete" or not.
+     * See Joe::isComplete.
+     */
     private final boolean complete;
 
     //-------------------------------------------------------------------------
@@ -72,6 +76,10 @@ public class SyntaxError extends JoeError {
         }
     }
 
+    /**
+     * Gets the report of syntax errors.
+     * @return The string
+     */
     public String getErrorReport() {
         return getTraceReport();
     }

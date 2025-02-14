@@ -5,6 +5,9 @@ import com.wjduquette.joe.*;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * A type proxy for Joe's Map types.
+ */
 public class MapProxy extends TypeProxy<JoeMap> {
     /** The proxy's TYPE constant. */
     public static final MapProxy TYPE = new MapProxy();

@@ -80,10 +80,10 @@ public abstract class FXTool extends Application implements Tool {
 
     /**
      * Subclasses must implement this method.  All exceptions thrown will be
-     * caught and handles.
+     * caught and handled.
      * @param stage The primary stage
      * @param argq The argument queue
+     * @throws Exception on execution error.
      */
     public abstract void run(Stage stage, Deque<String> argq) throws Exception;
-
 }

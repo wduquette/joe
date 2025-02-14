@@ -14,10 +14,18 @@ public record Trace(
     Span context,
     String message
 ) {
+    /**
+     * Gets whether the trace is related to a specific source location.
+     * @return true or false
+     */
     public boolean hasContext() {
         return context != null;
     }
 
+    /**
+     * Gets the source location's line number.
+     * @return The line number.
+     */
     public int line() {
         return context.startLine();
     }

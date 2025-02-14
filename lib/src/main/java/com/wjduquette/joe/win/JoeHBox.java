@@ -6,9 +6,16 @@ import com.wjduquette.joe.JoeObject;
 import com.wjduquette.joe.JoeObjectCore;
 import javafx.scene.layout.HBox;
 
+/**
+ * A JavaFX HBox that can be extended by Joe classes.
+ */
 public class JoeHBox extends HBox implements JoeObject {
     private final JoeObjectCore core;
 
+    /**
+     * Creates a JoeHBox.
+     * @param joeClass The Joe class for which this is the Java instance.
+     */
     public JoeHBox(JoeClass joeClass) {
         this.core = new JoeObjectCore(joeClass, this);
     }

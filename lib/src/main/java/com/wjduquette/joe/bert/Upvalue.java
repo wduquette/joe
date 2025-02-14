@@ -6,6 +6,15 @@ package com.wjduquette.joe.bert;
  * when the enclosing scope leaves the call stack.
  */
 public interface Upvalue {
+    /**
+     * Gets the variable's value.
+     * @return The value
+     */
     Object get();
+
+    /**
+     * Sets the variable's value.
+     * @param value The value
+     */
     void set(Object value);
 }

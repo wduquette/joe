@@ -8,6 +8,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A wrapper for Java Maps that require special handling when used by
+ * scripts.
+ */
 public class MapWrapper implements JoeMap {
     //-------------------------------------------------------------------------
     // Static Methods

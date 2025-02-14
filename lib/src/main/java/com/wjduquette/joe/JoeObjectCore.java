@@ -3,6 +3,11 @@ package com.wjduquette.joe;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A class that implements the boilerplate for subclasses of native classes
+ * that implement JoeObject (e.g., JoeStackPane).  A JoeObjectCore is a
+ * component of instances of the subclass.
+ */
 public class JoeObjectCore {
     private final static String TO_STRING = "toString";
 
@@ -20,6 +25,11 @@ public class JoeObjectCore {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Initializes the core.
+     * @param joeClass The JoeClass of which the host is an instance.
+     * @param host The JoeObject instance of which this is a component.
+     */
     public JoeObjectCore(JoeClass joeClass, Object host) {
         this.joeClass = joeClass;
         this.host = host;
@@ -30,10 +40,19 @@ public class JoeObjectCore {
     //-------------------------------------------------------------------------
     // Object Method implementations
 
+    /**
+     * The type name.
+     * @return the name
+     */
     public String typeName() {
         return joeClass.name();
     }
 
+    /**
+     * Gets a field's value.
+     * @param name The field name.
+     * @return The value
+     */
     public Object get(String name) {
         var value = fields.get(name);
 
@@ -50,15 +69,30 @@ public class JoeObjectCore {
         throw new JoeError("Undefined property: '" + name + "'.");
     }
 
+    /**
+     * Sets a field's value.
+     * @param name The field name
+     * @param value The value
+     */
     public void set(String name, Object value) {
         fields.put(name, value);
     }
 
+    /**
+     * Computes the string representation for the object, taking its
+     * script-level toString() method into account.
+     * @param joe The interpreter
+     * @return The string
+     */
     public String stringify(Joe joe) {
         var callable = get(TO_STRING);
         return (String)joe.call(callable);
     }
 
+    /**
+     * The default string representation.
+     * @return the string.
+     */
     public String defaultToString() {
         return typeName() + "@" + host.hashCode();
     }

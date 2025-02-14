@@ -7,7 +7,11 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A TypeProxy for Java Paths.
+ */
 public class PathProxy extends TypeProxy<Path> {
+    /** The proxy, for installation. */
     public static final PathProxy TYPE = new PathProxy();
 
     //-----------------------------------------------------------------
@@ -240,6 +244,14 @@ public class PathProxy extends TypeProxy<Path> {
             .collect(Collectors.joining(", "));
     }
 
+    /**
+     * Given an argument, converts it to a Path.  The argument
+     * may be a Path or a String representing a Path.
+     * @param joe The interpreter
+     * @param arg The argument
+     * @return The path
+     * @throws JoeError on failure.
+     */
     public static Path toPath(Joe joe, Object arg) {
         try {
             return switch (arg) {

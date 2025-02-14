@@ -68,5 +68,9 @@ public interface CodeChunk {
      */
     int line(int index);
 
+    /**
+     * Gets the array of line number info by instruction.
+     * @return The array of lines.
+     */
     int[] lines();
 }

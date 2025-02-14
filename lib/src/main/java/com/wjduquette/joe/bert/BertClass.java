@@ -71,6 +71,10 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
     //-------------------------------------------------------------------------
     // BertClass API
 
+    /**
+     * Gets the class's immediate superclass, or null if none.
+     * @return The superclass.
+     */
     public JoeClass getSuperclass() {
         return superclass;
     }

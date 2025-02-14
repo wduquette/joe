@@ -6,9 +6,16 @@ import com.wjduquette.joe.JoeObject;
 import com.wjduquette.joe.JoeObjectCore;
 import javafx.scene.layout.VBox;
 
+/**
+ * A JavaFX VBox that can be extended by Joe classes.
+ */
 public class JoeVBox extends VBox implements JoeObject {
     private final JoeObjectCore core;
 
+    /**
+     * Creates a JoeVBox.
+     * @param joeClass The Joe class for which this is the Java instance.
+     */
     public JoeVBox(JoeClass joeClass) {
         this.core = new JoeObjectCore(joeClass, this);
     }

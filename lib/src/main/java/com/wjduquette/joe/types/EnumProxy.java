@@ -17,6 +17,14 @@ public class EnumProxy<E extends Enum<E>> extends TypeProxy<E> {
     //-------------------------------------------------------------------------
     // Static Methods
 
+    /**
+     * Given a string, returns the matching enum constant, or null if none.
+     * The name match is case-insensitive.
+     * @param cls The enum type's Class.
+     * @param name The constant name
+     * @return The constant
+     * @param <E> The enum type
+     */
     public static <E extends Enum<E>> E valueOf(Class<E> cls, String name) {
         for (var c : cls.getEnumConstants()) {
             if (c.name().equalsIgnoreCase(name)) {

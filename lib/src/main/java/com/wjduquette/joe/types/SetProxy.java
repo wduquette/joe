@@ -4,6 +4,9 @@ import com.wjduquette.joe.*;
 
 import java.util.Collection;
 
+/**
+ * A type proxy for Joe's Set types.
+ */
 public class SetProxy extends TypeProxy<JoeSet> {
     /** The proxy's TYPE constant. */
     public static final SetProxy TYPE = new SetProxy();

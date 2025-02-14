@@ -3,6 +3,12 @@ package com.wjduquette.joe;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A buffer containing a source script, and the script's name.  The buffer
+ * can convert between absolute character indices and (line,column) pairs,
+ * and can return a Span representing a substring of the content.  This is
+ * used to retain source location information for compiled Joe code.
+ */
 public class SourceBuffer {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -20,6 +26,11 @@ public class SourceBuffer {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates a buffer for a source script.
+     * @param filename The source filename or other relevant name.
+     * @param source The script source.
+     */
     public SourceBuffer(String filename, String source) {
         this.filename = filename;
         this.source = source;
@@ -39,14 +50,26 @@ public class SourceBuffer {
     //-------------------------------------------------------------------------
     // Methods
 
+    /**
+     * Gets the filename.
+     * @return The name.
+     */
     public String filename() {
         return filename;
     }
 
+    /**
+     * Gets the source text.
+     * @return The source.
+     */
     public String source() {
         return source;
     }
 
+    /**
+     * Gets the number of lines of code in the source.
+     * @return the count
+     */
     public int lineCount() {
         return lines.size();
     }
@@ -130,6 +153,11 @@ public class SourceBuffer {
         return span(0, source.length());
     }
 
+    /**
+     * Gets the span for a complete line of code.
+     * @param line The line number
+     * @return The span
+     */
     public Span lineSpan(int line) {
         if (0 < line && line <= lines.size()) {
             var start = lines.get(line - 1);
@@ -143,7 +171,13 @@ public class SourceBuffer {
     //-------------------------------------------------------------------------
     // Helper Types
 
-    // A character position at a line and column.
+
+    /**
+     * A character position at a line and column.
+     *
+     * @param line The line number
+     * @param column the column number
+     */
     public record Position(int line, int column) {
         @Override
         public String toString() {
@@ -168,6 +202,11 @@ public class SourceBuffer {
         //---------------------------------------------------------------------
         // Constructor
 
+        /**
+         * Creates a span
+         * @param start the start index
+         * @param end the end index
+         */
         public Span(int start, int end) {
             this.start = start;
             this.end = end;

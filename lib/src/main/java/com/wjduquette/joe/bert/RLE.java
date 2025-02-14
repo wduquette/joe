@@ -49,6 +49,11 @@ public class RLE {
         return encoded;
     }
 
+    /**
+     * Decodes a run-length encoded array of integers.
+     * @param encoded The encoded array
+     * @return The decoded array.
+     */
     public static int[] decode(int[] encoded) {
         var decoded = new int[decodedLength(encoded)];
 
@@ -65,6 +70,11 @@ public class RLE {
         return decoded;
     }
 
+    /**
+     * Computes the decoded length of an encoded array.
+     * @param encoded The encoded array.
+     * @return The length.
+     */
     public static int decodedLength(int[] encoded) {
         var total = 0;
         for (int i = 0; i < encoded.length; i += 2) {
