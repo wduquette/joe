@@ -79,12 +79,15 @@ arguments       → expression ( "," expression )* ;
 primary         → "true" | "false" | "nil"
                 | NUMBER | STRING | KEYWORD
                 | "this"
-                | "@"
+                | "@" IDENTIFIER
                 | IDENTIFIER 
-                | "\" parameters? "->" ( expression | block ) ; 
-                | "(" expression ")"
-                | "[" (expression ( "," expression )* ","? )? "]" ;
+                | lambda 
+                | grouping
+                | list 
                 | "super" "." IDENTIFIER ;
+grouping        → "(" expression ")"
+lambda          → "\" parameters? "->" ( expression | block ) ; 
+list            → "[" (expression ( "," expression )* ","? )? "]" ;
 ```
 
 ## JLox Grammar

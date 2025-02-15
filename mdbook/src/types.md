@@ -106,13 +106,26 @@ A keyword literal is an identifier preceded by a `#` character:
 
 ## Lists
 
-A [List](library/type.joe.List.md) is a Java `List<Object>` that 
-contains an ordered collection of arbitrary Joe values, and has much
-the same operations as Java lists.  See the link for the full API.
+A [List](library/type.joe.List.md) is a Java `List<Object>` that contains an ordered collection 
+of arbitrary Joe values, and has much the same operations as Java 
+lists.  See the link for the full API.
+
+Lists are usually created using Joe's list syntax:
 
 ```joe
-var list = List("a", "b", "c", "d");
+var list = ["a", "b", "c", "d"];
+
 println(list.get(2)); // Outputs "c".
+```
+
+List literals can have a trailing comma:
+
+```joe
+var list = [
+    "this",
+    "that",
+    "the other",
+];
 ```
 
 ## Maps

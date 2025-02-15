@@ -250,11 +250,15 @@ arguments       → expression ( "," expression )* ;
 primary         → "true" | "false" | "nil"
                 | NUMBER | STRING | KEYWORD
                 | "this"
-                | "@"
+                | "@" IDENTIFIER
                 | IDENTIFIER 
-                | "\" parameters? "-&gt;" ( expression | block ) ; 
-                | "(" expression ")" 
+                | lambda 
+                | grouping
+                | list 
                 | "super" "." IDENTIFIER ;
+grouping        → "(" expression ")"
+lambda          → "\" parameters? "-&gt;" ( expression | block ) ; 
+list            → "[" (expression ( "," expression )* ","? )? "]" ;
 </code></pre>
 <h2 id="jlox-grammar"><a class="header" href="#jlox-grammar">JLox Grammar</a></h2>
 <p>Here is Nystrom's JLox grammar, for comparison.</p>

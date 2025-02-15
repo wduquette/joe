@@ -259,11 +259,20 @@ program would use enumerations.</p>
 <li><code>#descending</code></li>
 </ul>
 <h2 id="lists"><a class="header" href="#lists">Lists</a></h2>
-<p>A <a href="library/type.joe.List.html">List</a> is a Java <code>List&lt;Object&gt;</code> that
-contains an ordered collection of arbitrary Joe values, and has much
-the same operations as Java lists.  See the link for the full API.</p>
-<pre><code class="language-joe">var list = List("a", "b", "c", "d");
+<p>A <a href="library/type.joe.List.html">List</a> is a Java <code>List&lt;Object&gt;</code> that contains an ordered collection
+of arbitrary Joe values, and has much the same operations as Java
+lists.  See the link for the full API.</p>
+<p>Lists are usually created using Joe's list syntax:</p>
+<pre><code class="language-joe">var list = ["a", "b", "c", "d"];
+
 println(list.get(2)); // Outputs "c".
+</code></pre>
+<p>List literals can have a trailing comma:</p>
+<pre><code class="language-joe">var list = [
+    "this",
+    "that",
+    "the other",
+];
 </code></pre>
 <h2 id="maps"><a class="header" href="#maps">Maps</a></h2>
 <p>A <a href="library/type.joe.Map.html">Map</a> is a Java <code>Map&lt;Object,Object&gt;</code>,
