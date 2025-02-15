@@ -1,6 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.types.ListValue;
 
 import java.util.*;
 
@@ -418,6 +419,14 @@ class Interpreter {
             // Return a callable for the given lambda
             case Expr.Lambda expr ->
                 new WalkerFunction(this, expr.declaration(), environment, false);
+            // A list literal
+            case Expr.ListLiteral expr -> {
+                var list = new ListValue();
+                for (var e : expr.list()) {
+                    list.add(evaluate(e));
+                }
+                yield list;
+            }
             // Any literal
             case Expr.Literal expr -> expr.value();
             // && and ||

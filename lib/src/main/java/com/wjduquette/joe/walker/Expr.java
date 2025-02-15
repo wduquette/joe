@@ -8,8 +8,8 @@ import java.util.List;
 sealed interface Expr
     permits Expr.Assign, Expr.Binary, Expr.Call,
             Expr.Get, Expr.Grouping,
-            Expr.Lambda, Expr.Literal, Expr.Logical, Expr.PrePostAssign,
-            Expr.PrePostSet, Expr.Set, Expr.Super,
+            Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
+            Expr.PrePostAssign, Expr.PrePostSet, Expr.Set, Expr.Super,
             Expr.This, Expr.Ternary, Expr.Unary, Expr.Variable
 {
     /**
@@ -61,6 +61,14 @@ sealed interface Expr
     record Lambda(
         Stmt.Function declaration
     ) implements Expr {}
+
+    /**
+     * A List literal: a list of expressions used to initialize a
+     * ListValue.
+     * @param bracket The opening left bracket
+     * @param list The list of expressions.
+     */
+    record ListLiteral(Token bracket, List<Expr> list) implements Expr {}
 
     /**
      * A literal value.

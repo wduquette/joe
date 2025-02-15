@@ -610,6 +610,26 @@ class Parser {
             return new Expr.Grouping(expr);
         }
 
+        if (match(LEFT_BRACKET)) {
+            var bracket = previous();
+            var list = new ArrayList<Expr>();
+
+            if (!check(RIGHT_BRACKET)) {
+                list.add(expression());
+
+                while (match(COMMA)) {
+                    // Allow trailing comma
+                    if (check(RIGHT_BRACKET)) break;
+                    list.add(expression());
+                }
+            }
+
+            consume(RIGHT_BRACKET, "Expected ']' after list items.");
+
+            return new Expr.ListLiteral(bracket, list);
+        }
+
+
         throw errorSync(peek(), "Expected expression.");
     }
 

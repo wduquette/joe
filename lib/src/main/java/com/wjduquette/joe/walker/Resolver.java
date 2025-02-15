@@ -222,6 +222,7 @@ class Resolver {
             case Expr.Grouping expr -> resolve(expr.expr());
             case Expr.Lambda expr ->
                 resolveFunction(expr.declaration(), FunctionType.LAMBDA);
+            case Expr.ListLiteral expr -> expr.list().forEach(this::resolve);
             case Expr.Literal ignored -> {}
             case Expr.Logical expr -> {
                 resolve(expr.left());

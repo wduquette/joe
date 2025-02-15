@@ -82,7 +82,8 @@ primary         → "true" | "false" | "nil"
                 | "@"
                 | IDENTIFIER 
                 | "\" parameters? "->" ( expression | block ) ; 
-                | "(" expression ")" 
+                | "(" expression ")"
+                | "[" (expression ( "," expression )* ","? )? "]" ;
                 | "super" "." IDENTIFIER ;
 ```
 

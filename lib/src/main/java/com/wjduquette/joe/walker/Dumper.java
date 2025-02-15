@@ -228,6 +228,7 @@ class Dumper {
                 dumpStatement(e.declaration());
                 --indent;
             }
+            case Expr.ListLiteral e -> e.list().forEach(this::dumpExpression);
             case Expr.Literal e ->
                 buff.append(e.value().getClass().getSimpleName())
                     .append(" '")
