@@ -19,11 +19,11 @@ function testCatch_error_withTrace() {
     var tuple = catch(bad);
     check(tuple.is(#error));
 
-    check(tuple.error.traces()).eq(List(
+    check(tuple.error.traces()).eq([
         "In function bad()",
         "In java call(<function bad()>)",
-        "Called from catch()"
-    ));
+        "Called from catch()",
+    ]);
 }
 
 //-----------------------------------------------------------------------------

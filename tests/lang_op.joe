@@ -334,7 +334,7 @@ function testTernary() {
 // in/ni Operators
 
 function testIN() {
-    var list = List(#a, #b, #c);
+    var list = [#a, #b, #c];
     assertTrue(#a in list);
     assertFalse(#d in list);
 
@@ -343,7 +343,7 @@ function testIN() {
 }
 
 function testNI() {
-    var list = List(#a, #b, #c);
+    var list = [#a, #b, #c];
     assertFalse(#a ni list);
     assertTrue(#d ni list);
 

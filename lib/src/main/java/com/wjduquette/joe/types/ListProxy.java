@@ -66,7 +66,8 @@ public class ListProxy extends TypeProxy<JoeList> {
     // @args values...
     // Creates a `List` of the argument values.
     private Object _init(Joe joe, Args args) {
-        return new ListValue(args.asList());
+        throw new JoeError("changing!");
+//        return new ListValue(args.asList());
     }
 
     //-------------------------------------------------------------------------

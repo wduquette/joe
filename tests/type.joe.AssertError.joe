@@ -11,7 +11,7 @@ function testInitializer_noFrames() {
 function testInitializer_frames() {
     var err = AssertError("Failure", "A", "B");
     check(err.message()).eq("Failure");
-    check(err.traces()).eq(List("A", "B"));
+    check(err.traces()).eq(["A", "B"]);
 }
 
 function testCanThrow() {

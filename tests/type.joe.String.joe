@@ -51,9 +51,9 @@ function testIsEmpty() {
 }
 
 function testJoin() {
-    check(String.join(",", List())).eq("");
-    check(String.join(",", List("a", "b"))).eq("a,b");
-    check(String.join(",", List(1, 2))).eq("1,2");
+    check(String.join(",", [])).eq("");
+    check(String.join(",", ["a", "b"])).eq("a,b");
+    check(String.join(",", [1, 2])).eq("1,2");
 }
 
 function testLastIndexOf() {
@@ -69,9 +69,9 @@ function testLength() {
 
 function testLines() {
     check(" abc ".lines())
-        .eq(List(" abc "));
+        .eq([" abc "]);
     check(" abc \n def ".lines())
-        .eq(List(" abc ", " def "));
+        .eq([" abc ", " def "]);
 }
 
 function testMatches() {
@@ -107,12 +107,12 @@ function testReplaceFirst() {
 
 function testSplit() {
     check("abc,def,ghi".split(","))
-    .eq(List("abc", "def", "ghi"));
+    .eq(["abc", "def", "ghi"]);
 }
 
 function testSplitWithDelimiters() {
     check("abc,def,ghi".splitWithDelimiters(","))
-    .eq(List("abc", ",", "def", ",", "ghi"));
+    .eq(["abc", ",", "def", ",", "ghi"]);
 }
 
 function testStartsWith() {
