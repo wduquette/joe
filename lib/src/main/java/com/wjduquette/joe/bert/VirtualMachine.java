@@ -450,6 +450,12 @@ class VirtualMachine {
                         throw error("The '<=' operator expects two Numbers or two Strings.");
                     }
                 }
+                case LISTADD -> {
+                    var item = pop();
+                    var list = (ListValue)peek(0);
+                    list.add(item);
+                }
+                case LISTNEW -> push(new ListValue());
                 case LOCGET -> {
                     var slot = readSlot();
                     push(stack[frame.base + slot]);

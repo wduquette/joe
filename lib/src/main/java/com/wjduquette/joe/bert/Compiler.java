@@ -890,6 +890,25 @@ class Compiler {
         emitConstant(parser.previous.literal());
     }
 
+    // List literal: [...]
+    private void list(boolean canAssign) {
+        emit(Opcode.LISTNEW);
+
+        if (!check(TokenType.RIGHT_BRACKET)) {
+            expression();
+            emit(Opcode.LISTADD);
+
+            while (match(TokenType.COMMA)) {
+                // Allow trailing comma
+                if (check(TokenType.RIGHT_BRACKET)) break;
+                expression();
+                emit(Opcode.LISTADD);
+            }
+        }
+
+        consume(TokenType.RIGHT_BRACKET, "Expected ']' after list items.");
+    }
+
     private void symbol(boolean canAssign) {
         switch (parser.previous.type()) {
             case FALSE -> emit(Opcode.FALSE);
@@ -1631,6 +1650,8 @@ class Compiler {
         rule(RIGHT_PAREN,     null,           null,          Level.NONE);
         rule(LEFT_BRACE,      null,           null,          Level.NONE);
         rule(RIGHT_BRACE,     null,           null,          Level.NONE);
+        rule(LEFT_BRACKET,    this::list,     null,          Level.NONE);
+        rule(RIGHT_BRACKET,   null,           null,          Level.NONE);
         rule(AT,              this::this_,    null,          Level.NONE);
         rule(BACK_SLASH,      this::lambda,   null,          Level.NONE);
         rule(COLON,           null,           null,          Level.NONE);
