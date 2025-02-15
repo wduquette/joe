@@ -1,0 +1,18 @@
+// lang_list.md: tests List-specific syntax.
+
+function testLiteral() {
+    assertTrue([].isEmpty());
+
+    var single = [#one];
+    assertEquals(single.size(), 1);
+    assertEquals(single.get(0), #one);
+
+    var double = [#one, #two];
+    assertEquals(double.size(), 2);
+    assertEquals(double.get(0), #one);
+    assertEquals(double.get(1), #two);
+
+    // Trailing comma is allowed in non-empty lists.
+    assertEquals([#one], [#one,]);
+    assertEquals([#one, #two], [#one, #two,]);
+}
