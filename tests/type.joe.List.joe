@@ -1,6 +1,25 @@
 // List type tests
 
 //-----------------------------------------------------------------------------
+// List()
+
+function testCreate_empty() {
+    check(List()).eq([]);
+}
+
+function testCreate_fromList() {
+    check(List([1, 2, 3])).eq([1, 2, 3]);
+}
+
+function testCreate_withSize() {
+    check(List(3)).eq([null, null, null]);
+}
+
+function testCreate_withSizeAndValue() {
+    check(List(3, "x")).eq(["x", "x", "x"]);
+}
+
+//-----------------------------------------------------------------------------
 // add()
 
 function testAdd_simple() {

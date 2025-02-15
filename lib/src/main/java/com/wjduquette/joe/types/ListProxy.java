@@ -63,11 +63,47 @@ public class ListProxy extends TypeProxy<JoeList> {
 
     //**
     // @init
-    // @args values...
-    // Creates a `List` of the argument values.
+    // @args
+    // @args other
+    // @args size, [initValue]
+    // Creates a new list as a copy of the *other* list, or as an empty
+    // list of the given *size*.  The list elements will be filled with the
+    // *initValue*, or with null if *initValue* is omitted.
     private Object _init(Joe joe, Args args) {
-        throw new JoeError("changing!");
-//        return new ListValue(args.asList());
+        args.arityRange(0, 2, "List() or List(other) or List(size, [initValue])");
+
+        if (args.isEmpty()) {
+            return new ListValue();
+        }
+
+        int size = 0;
+        Object initValue = null;
+
+        if (args.size() == 1) {
+            var arg = args.next();
+            if (arg instanceof Collection<?> c) {
+                return new ListValue(c);
+            } else if (arg instanceof Double) {
+                size = toListSize(joe, arg);
+            } else {
+                throw joe.expected("collection or size", arg);
+            }
+        }
+
+        if (args.size() == 2) {
+            size = toListSize(joe, args.next());
+            initValue = args.next();
+        }
+
+        return new ListValue(size, initValue);
+    }
+
+    private int toListSize(Joe joe, Object arg) {
+        var size = joe.toInteger(arg);
+        if (size < 0) {
+            throw joe.expected("size", arg);
+        }
+        return size;
     }
 
     //-------------------------------------------------------------------------
