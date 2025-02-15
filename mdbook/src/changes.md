@@ -2,7 +2,9 @@
 
 ## Changes in 0.6.0 (forthcoming)
 
-- None yet.
+- Language
+  - Lists may now be created with list literal syntax, e.g., `[1, 2, 3]`.
+    List items may be any arbitrary expression.
 
 ## Changes in 0.5.0 
 
