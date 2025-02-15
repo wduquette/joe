@@ -99,18 +99,18 @@ function testCheck_isNonNull() {
 }
 
 function testCheck_isEmpty() {
-    check(List()).isEmpty();
+    check([]).isEmpty();
     check("").isEmpty();
 
-    checkCatch(\-> check(List(1, 2)).isEmpty())
-        .message("Expected isEmpty(), got: List 'List(1, 2)'.");
+    checkCatch(\-> check([1, 2]).isEmpty())
+        .message("Expected isEmpty(), got: List '[1, 2]'.");
 }
 
 function testCheck_containsAll() {
-    check(List(#a, #b, #c)).containsAll(#a, #b);
+    check([#a, #b, #c]).containsAll(#a, #b);
 
-    checkCatch(\-> check(List(#a)).containsAll(#a, #b))
-        .message("Expected collection to contain Keyword '#b', got: 'List(#a, #b)'.");
+    checkCatch(\-> check([#a]).containsAll(#a, #b))
+        .message("Expected collection to contain Keyword '#b', got: List '[#a, #b]'.");
 }
 
 function testCheck_hasTypeName() {
