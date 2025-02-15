@@ -74,7 +74,7 @@ public class ListProxy extends TypeProxy<JoeList> {
 
     @Override
     public String stringify(Joe joe, Object object) {
-        return "List(" + joe.join(", ", (JoeList)object) + ")";
+        return "[" + joe.join(", ", (JoeList)object) + "]";
     }
 
     //-------------------------------------------------------------------------
