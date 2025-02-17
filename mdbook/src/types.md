@@ -110,15 +110,30 @@ A [List](library/type.joe.List.md) is a Java `List<Object>` that contains an ord
 of arbitrary Joe values, and has much the same operations as Java 
 lists.  See the link for the full API.
 
-Lists are usually created using Joe's list syntax:
+There are several ways to create and initialize lists.  First,
+build it up one element at a time:
+
+```joe
+var list = List();
+list.add("a");
+list.add("b");
+list.add("c");
+list.add("d");
+```
+
+Or use the Java-like `List.of(items...)` method:
+
+```joe
+var list = List.of("a", "b", "c", "d");
+```
+
+However, lists are usually created using Joe's list literal syntax:
 
 ```joe
 var list = ["a", "b", "c", "d"];
-
-println(list.get(2)); // Outputs "c".
 ```
 
-List literals can have a trailing comma:
+List literals are allowed to have a trailing comma:
 
 ```joe
 var list = [
@@ -128,15 +143,62 @@ var list = [
 ];
 ```
 
+Lists can be queried much as in Java:
+
+```joe
+var list = ["a", "b", "c", "d"];
+
+list.isEmpty();      // False
+list.size();         // 4
+list.get(1);         // "b"
+```
+
 ## Maps
 
 A [Map](library/type.joe.Map.md) is a Java `Map<Object,Object>`, 
-basic key/value store.  It has much the same operations as Java maps.
+key/value store.  It has much the same operations as Java maps.
 See the link for the full API.
 
+There are several ways to create and initialize lists.  First,
+build it up one entry at a time:
+
 ```joe
-var map = Map(#a, 1, #b, 2);
-println(map.get(#b)); // Outputs "2".
+var map = Map();
+map.put(#a, 1);
+map.put(#b, 2);
+map.put(#c, 3);
+```
+
+Or use the Java-like `Map.of(values...)` method:
+
+```joe
+var map = Map.of(#a, 1, #b, 2, #c, 3);
+```
+
+However, maps are usually created using Joe's map literal syntax:
+
+```joe
+var map = {#a: 1, #b: 2, #c, 3};
+```
+
+Map literals are allowed to have a trailing comma:
+
+```joe
+var map = [
+  #a: 1,
+  #b: 2,
+  #c: 3,
+];
+```
+
+Maps can be queried much as in Java:
+
+```joe
+var map = {#a: 1, #b: 2, #c, 3};
+
+map.isEmpty();      // False
+map.size();         // 3
+map.get(#b);        // 2
 ```
 
 ## Sets
