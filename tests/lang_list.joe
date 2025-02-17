@@ -30,3 +30,50 @@ function testIndexing_get() {
     assertError(\-> list[3],
         "List index out of range [0, 2]: 3.");
 }
+
+function testIndexing_equal() {
+    var list = [0, 0, 0];
+    list[0] = 1;
+    list[1] = 2;
+    list[2] = 3;
+    assertEquals(list, [1, 2, 3]);
+
+    assertError(\-> list["abc"] = 1,
+        "Expected list index, got: String 'abc'.");
+    assertError(\-> list[-1] = 1,
+        "List index out of range [0, 2]: -1.");
+    assertError(\-> list[3] = 1,
+        "List index out of range [0, 2]: 3.");
+}
+
+function testIndexing_plusEqual() {
+    var list = [1, 2, 3];
+    list[0] += 10;
+    list[1] += 20;
+    list[2] += 30;
+    assertEquals(list, [11, 22, 33]);
+}
+
+function testIndexing_minusEqual() {
+    var list = [10, 20, 30];
+    list[0] -= 1;
+    list[1] -= 2;
+    list[2] -= 3;
+    assertEquals(list, [9, 18, 27]);
+}
+
+function testIndexing_starEqual() {
+    var list = [1, 2, 3];
+    list[0] *= 10;
+    list[1] *= 20;
+    list[2] *= 30;
+    assertEquals(list, [10, 40, 90]);
+}
+
+function testIndexing_slashEqual() {
+    var list = [10, 20, 30];
+    list[0] /= 5;
+    list[1] /= 4;
+    list[2] /= 3;
+    assertEquals(list, [2, 5, 10]);
+}

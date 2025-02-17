@@ -424,18 +424,21 @@ class Interpreter {
                 if (target instanceof List<?> list) {
                     int i = checkListIndex(expr.bracket(), list, index);
                     yield list.get(i);
+                } else if (target instanceof Map<?,?> map) {
+                    yield map.get(index);
                 } else {
                     throw new RuntimeError(expr.bracket().span(),
                         "Expected indexed collection, got: " +
                         joe.typedValue(target));
                 }
             }
+            // expr[index] = value, etc.
             case Expr.IndexSet expr -> {
                 var target = evaluate(expr.collection());
                 var index = evaluate(expr.index());
                 var value = evaluate(expr.value());
 
-                if (target instanceof List<?> list) {
+                if (target instanceof JoeList list) {
                     int i = checkListIndex(expr.bracket(), list, index);
 
                     var right = value;
@@ -445,7 +448,17 @@ class Interpreter {
                         right = computeExtendedAssignment(left, expr.op(), right);
                     }
 
-                    listSet(list, i, right);
+                    list.set(i, right);
+                    yield right;
+                } if (target instanceof JoeMap map) {
+                    var right = value;
+
+                    if (expr.op().type() != TokenType.EQUAL) {
+                        var left = map.get(index);
+                        right = computeExtendedAssignment(left, expr.op(), right);
+                    }
+
+                    map.put(index, right);
                     yield right;
                 } else {
                     throw new RuntimeError(expr.bracket().span(),
@@ -595,13 +608,6 @@ class Interpreter {
         } else {
             return globals.get(name);
         }
-    }
-
-    // The list will be a ListValue, which is a List<Object>, or a
-    // ListWrapper, which will explicitly check the value's type.
-    @SuppressWarnings("unchecked")
-    private void listSet(List<?> list, int index, Object value) {
-        ((List<Object>)list).set(index, value);
     }
 
     // Given the value of a variable or property, and one of the extended
