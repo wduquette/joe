@@ -154,7 +154,8 @@ public class Disassembler {
             // Pattern: opcode
             case ADD, ASSERT, DECR, DIV, DUP, EQ, FALSE,
                 GE, GT, GETNEXT, HASNEXT, IN, INCR, INHERIT, ITER,
-                LE, LT, MUL, NE, NEGATE, NI, NOT, NULL,
+                LISTADD, LISTNEW, LE, LT,
+                MAPNEW, MAPPUT, MUL, NE, NEGATE, NI, NOT, NULL,
                 POP, RETURN, SUB, TGET, THROW, TPUT, TRUE, TRCPOP
                 -> {
                 lines.add(new Line(ip, prefix));

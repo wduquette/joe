@@ -2,6 +2,7 @@ package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.types.ListValue;
+import com.wjduquette.joe.types.MapValue;
 
 import java.util.*;
 
@@ -478,6 +479,13 @@ class VirtualMachine {
                     } else {
                         throw error("The '<' operator expects two Numbers or two Strings.");
                     }
+                }
+                case MAPNEW -> push(new MapValue());
+                case MAPPUT -> {
+                    var value = pop();
+                    var key = pop();
+                    var map = (MapValue)peek(0);
+                    map.put(key, value);
                 }
                 case METHOD -> {
                     // NOTE: This was defineMethod in clox

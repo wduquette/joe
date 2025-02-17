@@ -909,6 +909,29 @@ class Compiler {
         consume(TokenType.RIGHT_BRACKET, "Expected ']' after list items.");
     }
 
+    // map literal: [...]
+    private void map(boolean canAssign) {
+        emit(Opcode.MAPNEW);
+
+        if (!check(TokenType.RIGHT_BRACE)) {
+            expression();
+            consume(TokenType.COLON, "Expected ':' after map key.");
+            expression();
+            emit(Opcode.MAPPUT);
+
+            while (match(TokenType.COMMA)) {
+                // Allow trailing comma
+                if (check(TokenType.RIGHT_BRACE)) break;
+                expression();
+                consume(TokenType.COLON, "Expected ':' after map key.");
+                expression();
+                emit(Opcode.MAPPUT);
+            }
+        }
+
+        consume(TokenType.RIGHT_BRACE, "Expected '}' after map entries.");
+    }
+
     private void symbol(boolean canAssign) {
         switch (parser.previous.type()) {
             case FALSE -> emit(Opcode.FALSE);
@@ -1648,7 +1671,7 @@ class Compiler {
         //   Single Character
         rule(LEFT_PAREN,      this::grouping, this::call,    Level.CALL);
         rule(RIGHT_PAREN,     null,           null,          Level.NONE);
-        rule(LEFT_BRACE,      null,           null,          Level.NONE);
+        rule(LEFT_BRACE,      this::map,      null,          Level.NONE);
         rule(RIGHT_BRACE,     null,           null,          Level.NONE);
         rule(LEFT_BRACKET,    this::list,     null,          Level.NONE);
         rule(RIGHT_BRACKET,   null,           null,          Level.NONE);
