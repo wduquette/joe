@@ -52,6 +52,10 @@ function testIndexing_plusEqual() {
     list[1] += 20;
     list[2] += 30;
     assertEquals(list, [11, 22, 33]);
+
+    list[0] = "abc";
+    assertError(\-> list[0] -= 1,
+        "The '-' operator expects two numeric operands.");
 }
 
 function testIndexing_minusEqual() {
@@ -76,4 +80,34 @@ function testIndexing_slashEqual() {
     list[1] /= 4;
     list[2] /= 3;
     assertEquals(list, [2, 5, 10]);
+}
+
+function testPrePost_plus() {
+    var list = [1, 2, 3];
+    assertEquals(++list[0], 2);
+    assertEquals(list[0], 2);
+    assertEquals(list[0]++, 2);
+    assertEquals(list[0], 3);
+
+    list[0] = "abc";
+
+    assertError(\-> list[0]++,
+        "Target of '++' must contain a number.");
+    assertError(\-> ++list[0],
+        "Target of '++' must contain a number.");
+}
+
+function testPrePost_minus() {
+    var list = [10, 20, 30];
+    assertEquals(--list[0], 9);
+    assertEquals(list[0], 9);
+    assertEquals(list[0]--, 9);
+    assertEquals(list[0], 8);
+
+    list[0] = "abc";
+
+    assertError(\-> list[0]--,
+        "Target of '--' must contain a number.");
+    assertError(\-> --list[0],
+        "Target of '--' must contain a number.");
 }

@@ -239,6 +239,10 @@ class Resolver {
             }
             case Expr.MapLiteral expr -> expr.entries().forEach(this::resolve);
             case Expr.PrePostAssign expr -> resolveLocal(expr, expr.name());
+            case Expr.PrePostIndex expr -> {
+                resolve(expr.collection());
+                resolve(expr.index());
+            }
             case Expr.PrePostSet expr -> resolve(expr.object());
             case Expr.Set expr -> {
                 resolve(expr.value());

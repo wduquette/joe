@@ -450,7 +450,7 @@ class Interpreter {
 
                     list.set(i, right);
                     yield right;
-                } if (target instanceof JoeMap map) {
+                } else if (target instanceof JoeMap map) {
                     var right = value;
 
                     if (expr.op().type() != TokenType.EQUAL) {
@@ -517,6 +517,39 @@ class Interpreter {
                 } else {
                     globals.assign(expr.name(), assigned);
                 }
+                yield result;
+            }
+            // ++ and -- with an indexed collection
+            case Expr.PrePostIndex expr -> {
+                var target = evaluate(expr.collection());
+                var index = evaluate(expr.index());
+                Object prior;
+
+                if (target instanceof JoeList list) {
+                    int i = checkListIndex(expr.bracket(), list, index);
+                    prior = list.get(i);
+                } else if (target instanceof JoeMap map) {
+                    prior = map.get(index);
+                } else {
+                    throw new RuntimeError(expr.bracket().span(),
+                        "Expected indexed collection, got: " +
+                            joe.typedValue(target));
+                }
+
+                checkNumericTarget(expr.op(), prior);
+
+                double assigned = expr.op().type() == TokenType.PLUS_PLUS
+                    ? (double)prior + 1
+                    : (double)prior - 1;
+                var result = expr.isPre() ? assigned : prior;
+
+                if (target instanceof JoeList list) {
+                    int i = checkListIndex(expr.bracket(), list, index);
+                    list.set(i, assigned);
+                } else {
+                    ((JoeMap)target).put(index, assigned);
+                }
+
                 yield result;
             }
             // ++ and -- with an object property
@@ -699,7 +732,9 @@ class Interpreter {
 
     private void checkNumericTarget(Token operator, Object operand) {
         if (operand instanceof Double) return;
-        throw new RuntimeError(operator.span(), "Target of operand must contain a number.");
+        throw new RuntimeError(operator.span(), "Target of '" +
+            operator.lexeme() +
+            "' must contain a number.");
     }
 
     private int checkListIndex(Token bracket, List<?> list, Object index) {
