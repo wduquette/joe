@@ -53,30 +53,32 @@ The byte-engine is a stack machine with a few registers:
 | 32 | LOCSET *slot*     | *a* → *a*          | Set local                 |
 | 33 | LOOP *offset*     | ∅ → ∅              | Jump backwards            |
 | 34 | LT                | *a b* → *a* <= *b* | Compare: less than        |
-| 35 | METHOD *name*     | *cls f* → *cls*    | Add method to class       |
-| 36 | MUL               | *a b* → *c*        | c = a*b                   |
-| 37 | NE                | *a b* → *c*        | c = a != b                |
-| 38 | NEGATE            | *a* → *b*          | b = -a                    |
-| 39 | NI                | *a coll* → *flag*  | a not in collection       |
-| 40 | NOT               | *a* → *b*          | b = !a                    |
-| 41 | NULL              | ∅ → null           | Load `null`               |
-| 42 | POP               | *a* → ∅            | Pops one value            |
-| 43 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
-| 44 | PROPGET *name*    | *obj* → *a*        | Get property value        |
-| 45 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
-| 46 | RETURN            | *a* → *a*          | Return                    |
-| 47 | SUB               | *a b* → *c*        | c = a - b                 |
-| 48 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
-| 49 | TGET              | ∅ → *a*            | *a* = T                   |
-| 50 | THROW             | *a* → ∅            | Throw error               |
-| 51 | TPUT              | *a* → *a*          | T = *a*                   |
-| 52 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
-| 53 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
-| 52 | TRUE              | ∅ → true           | Load `true`               |
-| 52 | TRUE              | ∅ → true           | Load `true`               |
-| 53 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
-| 54 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
-| 55 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
+| 35 | MAPNEW            | ∅ → *map*          | Push empty ma p           |
+| 36 | MAPPUT            | *map k a* → *map*  | Add entry to map          |
+| 37 | METHOD *name*     | *cls f* → *cls*    | Add method to class       |
+| 38 | MUL               | *a b* → *c*        | c = a*b                   |
+| 39 | NE                | *a b* → *c*        | c = a != b                |
+| 40 | NEGATE            | *a* → *b*          | b = -a                    |
+| 41 | NI                | *a coll* → *flag*  | a not in collection       |
+| 42 | NOT               | *a* → *b*          | b = !a                    |
+| 43 | NULL              | ∅ → null           | Load `null`               |
+| 44 | POP               | *a* → ∅            | Pops one value            |
+| 45 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
+| 46 | PROPGET *name*    | *obj* → *a*        | Get property value        |
+| 47 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
+| 48 | RETURN            | *a* → *a*          | Return                    |
+| 49 | SUB               | *a b* → *c*        | c = a - b                 |
+| 50 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
+| 51 | TGET              | ∅ → *a*            | *a* = T                   |
+| 52 | THROW             | *a* → ∅            | Throw error               |
+| 53 | TPUT              | *a* → *a*          | T = *a*                   |
+| 54 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
+| 55 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
+| 54 | TRUE              | ∅ → true           | Load `true`               |
+| 54 | TRUE              | ∅ → true           | Load `true`               |
+| 55 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
+| 56 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
+| 57 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
 
 **Stack Effects:** in the stack effect column, the top of the stack is on the 
 right.  
@@ -104,6 +106,7 @@ the italicized names are used as follows:
   upvalue data, suitable for building into a `Closure` in the current scope.
   Used only by the `CLOSURE` instruction.
 - *iter*: A collection iterator, as used to compile `foreach` loops
+- *k*: A value used as a map key.
 - *list*: A list value
 - *msg*: A message string
 - *n*: A count
@@ -372,6 +375,18 @@ Jumps backward by *offset*.
 ### LT
 ---
 **LT** | *a* *b* → *c*, where *c* = (*a* < *b*)
+
+### MAPNEW
+---
+**MAPNEW** | ∅ → *map*
+
+Pushes an empty *map* value onto the stack.
+
+### MAPPUT
+---
+**MAPPUT** | *map* *k* *a* → *map*
+
+Pops *k* and *a* and puts {*k*: *a*} into the *map* value.
 
 ### METHOD
 ---

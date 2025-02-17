@@ -222,30 +222,32 @@ an atomic operation.</li>
 <tr><td>32</td><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
 <tr><td>33</td><td>LOOP <em>offset</em></td><td>∅ → ∅</td><td>Jump backwards</td></tr>
 <tr><td>34</td><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
-<tr><td>35</td><td>METHOD <em>name</em></td><td><em>cls f</em> → <em>cls</em></td><td>Add method to class</td></tr>
-<tr><td>36</td><td>MUL</td><td><em>a b</em> → <em>c</em></td><td>c = a*b</td></tr>
-<tr><td>37</td><td>NE</td><td><em>a b</em> → <em>c</em></td><td>c = a != b</td></tr>
-<tr><td>38</td><td>NEGATE</td><td><em>a</em> → <em>b</em></td><td>b = -a</td></tr>
-<tr><td>39</td><td>NI</td><td><em>a coll</em> → <em>flag</em></td><td>a not in collection</td></tr>
-<tr><td>40</td><td>NOT</td><td><em>a</em> → <em>b</em></td><td>b = !a</td></tr>
-<tr><td>41</td><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
-<tr><td>42</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
-<tr><td>43</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
-<tr><td>44</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
-<tr><td>45</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
-<tr><td>46</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
-<tr><td>47</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
-<tr><td>48</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
-<tr><td>49</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
-<tr><td>50</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
-<tr><td>51</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
-<tr><td>52</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
-<tr><td>53</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
-<tr><td>52</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
-<tr><td>52</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
-<tr><td>53</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
-<tr><td>54</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
-<tr><td>55</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
+<tr><td>35</td><td>MAPNEW</td><td>∅ → <em>map</em></td><td>Push empty ma p</td></tr>
+<tr><td>36</td><td>MAPPUT</td><td><em>map k a</em> → <em>map</em></td><td>Add entry to map</td></tr>
+<tr><td>37</td><td>METHOD <em>name</em></td><td><em>cls f</em> → <em>cls</em></td><td>Add method to class</td></tr>
+<tr><td>38</td><td>MUL</td><td><em>a b</em> → <em>c</em></td><td>c = a*b</td></tr>
+<tr><td>39</td><td>NE</td><td><em>a b</em> → <em>c</em></td><td>c = a != b</td></tr>
+<tr><td>40</td><td>NEGATE</td><td><em>a</em> → <em>b</em></td><td>b = -a</td></tr>
+<tr><td>41</td><td>NI</td><td><em>a coll</em> → <em>flag</em></td><td>a not in collection</td></tr>
+<tr><td>42</td><td>NOT</td><td><em>a</em> → <em>b</em></td><td>b = !a</td></tr>
+<tr><td>43</td><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
+<tr><td>44</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
+<tr><td>45</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
+<tr><td>46</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
+<tr><td>47</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
+<tr><td>48</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
+<tr><td>49</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
+<tr><td>50</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
+<tr><td>51</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
+<tr><td>52</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
+<tr><td>53</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
+<tr><td>54</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
+<tr><td>55</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
+<tr><td>54</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
+<tr><td>54</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
+<tr><td>55</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
+<tr><td>56</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
+<tr><td>57</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
 </tbody></table>
 </div>
 <p><strong>Stack Effects:</strong> in the stack effect column, the top of the stack is on the
@@ -272,6 +274,7 @@ constant.</li>
 upvalue data, suitable for building into a <code>Closure</code> in the current scope.
 Used only by the <code>CLOSURE</code> instruction.</li>
 <li><em>iter</em>: A collection iterator, as used to compile <code>foreach</code> loops</li>
+<li><em>k</em>: A value used as a map key.</li>
 <li><em>list</em>: A list value</li>
 <li><em>msg</em>: A message string</li>
 <li><em>n</em>: A count</li>
@@ -479,6 +482,14 @@ stack.</p>
 <h3 id="lt"><a class="header" href="#lt">LT</a></h3>
 <hr />
 <p><strong>LT</strong> | <em>a</em> <em>b</em> → <em>c</em>, where <em>c</em> = (<em>a</em> &lt; <em>b</em>)</p>
+<h3 id="mapnew"><a class="header" href="#mapnew">MAPNEW</a></h3>
+<hr />
+<p><strong>MAPNEW</strong> | ∅ → <em>map</em></p>
+<p>Pushes an empty <em>map</em> value onto the stack.</p>
+<h3 id="mapput"><a class="header" href="#mapput">MAPPUT</a></h3>
+<hr />
+<p><strong>MAPPUT</strong> | <em>map</em> <em>k</em> <em>a</em> → <em>map</em></p>
+<p>Pops <em>k</em> and <em>a</em> and puts {<em>k</em>: <em>a</em>} into the <em>map</em> value.</p>
 <h3 id="method"><a class="header" href="#method">METHOD</a></h3>
 <hr />
 <p><strong>METHOD <em>name</em></strong> | <em>cls</em> <em>f</em> → <em>cls</em></p>
