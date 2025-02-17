@@ -27,6 +27,9 @@ public class ListProxy extends TypeProxy<JoeList> {
         super("List");
         proxies(ListValue.class);    // Types that implement `JoeList`
         proxies(ListWrapper.class);
+
+        staticMethod("of",   this::_of);
+
         initializer(this::_init);
 
         method("add",         this::_add);
@@ -56,6 +59,18 @@ public class ListProxy extends TypeProxy<JoeList> {
         method("sublist",     this::_sublist);
         method("size",        this::_size);
         method("toString",    this::_toString);
+    }
+
+    //-------------------------------------------------------------------------
+    // Static Method Implementations
+
+    //**
+    // @static of
+    // @args items...
+    // @result List
+    // Creates a list containing the arguments.
+    private Object _of(Joe joe, Args args) {
+        return args.asList();
     }
 
     //-------------------------------------------------------------------------

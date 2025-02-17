@@ -1,6 +1,18 @@
 // List type tests
 
 //-----------------------------------------------------------------------------
+// List.of()
+
+function testOf_empty() {
+    check(List.of()).eq([]);
+}
+
+function testOf_items() {
+    check(List.of(1, 2, 3)).eq([1, 2, 3]);
+}
+
+
+//-----------------------------------------------------------------------------
 // List()
 
 function testCreate_empty() {
