@@ -868,6 +868,23 @@ public class Joe {
     }
 
     /**
+     * Requires that the argument is a JoeMap, and returns it as
+     * such.
+     * @param arg The argument
+     * @return The map
+     * @throws JoeError if the argument is not a JoeMap
+     */
+    public JoeMap toMap(Object arg) {
+        if (arg instanceof JoeMap map) {
+            return map;
+        } else if (arg instanceof Map<?,?> map) {
+            return new MapValue(map);
+        } else {
+            throw expected("Map", arg);
+        }
+    }
+
+    /**
      * Requires that the argument is a String, and returns it as
      * such. Contrast this with {@code stringify()}, which converts
      * the argument to its String representation.  Which to use is

@@ -2748,7 +2748,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.Map.html">Map</a>
 <ul>
-<li><a href="library/type.joe.Map.html#init">Map(<em>values</em>...)</a> → <a href="library/type.joe.Map.html">Map</a></li>
+<li><a href="library/type.joe.Map.html#static.of">Map.of(<em>values</em>...)</a></li>
+<li><a href="library/type.joe.Map.html#init">Map([<em>other</em>])</a> → <a href="library/type.joe.Map.html">Map</a></li>
 <li><a href="library/type.joe.Map.html#method.clear"><em>map</em>.clear()</a> → this</li>
 <li><a href="library/type.joe.Map.html#method.containsKey"><em>map</em>.containsKey(<em>key</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Map.html#method.containsValue"><em>map</em>.containsValue(<em>value</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
@@ -3722,9 +3723,13 @@ Maps created using the <a href="library/type.joe.Map.html#init"><code>Map()</cod
 of Joe keys and values; the map need not be homogeneous.  Maps
 received from Java code might be read-only or require a specific
 key/value types.</p>
+<p><strong><a href="library/type.joe.Map.html#statics">Static Methods</a></strong></p>
+<ul>
+<li><a href="library/type.joe.Map.html#static.of">Map.of(<em>values</em>...)</a></li>
+</ul>
 <p><strong><a href="library/type.joe.Map.html#init">Initializer</a></strong></p>
 <ul>
-<li><a href="library/type.joe.Map.html#init">Map(<em>values</em>...)</a> → <a href="library/type.joe.Map.html">Map</a></li>
+<li><a href="library/type.joe.Map.html#init">Map([<em>other</em>])</a> → <a href="library/type.joe.Map.html">Map</a></li>
 </ul>
 <p><strong><a href="library/type.joe.Map.html#methods">Methods</a></strong></p>
 <ul>
@@ -3743,11 +3748,19 @@ key/value types.</p>
 <li><a href="library/type.joe.Map.html#method.toString"><em>map</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Map.html#method.values"><em>map</em>.values()</a> → <a href="library/type.joe.List.html">List</a></li>
 </ul>
-<h2 id="init"><a class="header" href="#init">Map Initializer</a></h2>
+<h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
 <hr />
-<p><strong>Map(<em>values</em>...) → <a href="library/type.joe.Map.html">Map</a></strong></p>
+<p><span id="static.of"> </span></p>
+<h3 id="mapof"><a class="header" href="#mapof">Map.of()</a></h3>
+<hr />
+<p><strong>Map.of(<em>values</em>...)</strong></p>
 <p>Creates a <code>Map</code> of the argument values, which must be a flat list of
 key/value pairs.</p>
+<h2 id="init"><a class="header" href="#init">Map Initializer</a></h2>
+<hr />
+<p><strong>Map([<em>other</em>]) → <a href="library/type.joe.Map.html">Map</a></strong></p>
+<p>Creates a new <code>Map</code>, optionally initializing it with the entries from
+the <em>other</em> map.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
 <p><span id="method.clear"> </span></p>
@@ -7571,7 +7584,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.Map.html">Map</a>
 <ul>
-<li><a href="library/type.joe.Map.html#init">Map(<em>values</em>...)</a> → <a href="library/type.joe.Map.html">Map</a></li>
+<li><a href="library/type.joe.Map.html#static.of">Map.of(<em>values</em>...)</a></li>
+<li><a href="library/type.joe.Map.html#init">Map([<em>other</em>])</a> → <a href="library/type.joe.Map.html">Map</a></li>
 <li><a href="library/type.joe.Map.html#method.clear"><em>map</em>.clear()</a> → this</li>
 <li><a href="library/type.joe.Map.html#method.containsKey"><em>map</em>.containsKey(<em>key</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Map.html#method.containsValue"><em>map</em>.containsValue(<em>value</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>

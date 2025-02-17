@@ -1,39 +1,55 @@
 // type.joe.Map.joe: Map tests
 
+function testOf_empty() {
+    var map = Map.of();
+    check(map).eq({});
+    check(map.isEmpty()).isTrue();
+}
+
+function testOf_entries() {
+    var map = Map.of(#a, 1, #b, 2);
+    check(map.isEmpty()).isFalse();
+    check(map).eq({#a: 1, #b: 2});
+}
+
+function testOf_odd() {
+    assertError(\-> Map.of(#a),
+    "Expected an even number of arguments, got: '#a'."
+    );
+}
+
 function testInitializer() {
     var map1 = Map();
     check(map1.isEmpty()).isTrue();
     check(map1.size()).eq(0);
 
-    var map2 = Map(#a, 1, #b, 2);
+    var map2 = Map({#a: 1, #b: 2});
     check(map2.isEmpty()).isFalse();
     check(map2.size()).eq(2);
-
-    checkCatch(\-> Map(#a))
-        .message("Expected an even number of arguments, got: '#a'.");
+    check(map2).eq({#a: 1, #b: 2});
 }
 
 function testClear() {
-    var map = Map(#a, 1);
+    var map = {#a: 1};
     map.clear();
     check(map.isEmpty()).isTrue();
     check(map.size()).eq(0);
 }
 
 function testContainsKey() {
-    var map = Map(#a, 1);
+    var map = {#a: 1};
     check(map.containsKey(#a)).isTrue();
     check(map.containsKey(#b)).isFalse();
 }
 
 function testContainsValue() {
-    var map = Map(#a, 1);
+    var map = {#a: 1};
     check(map.containsValue(1)).isTrue();
     check(map.containsKey(2)).isFalse();
 }
 
 function testCopy() {
-    var map = Map(#a, 1);
+    var map = {#a: 1};
     var map2 = map.copy();
     check(map2).eq(map);
     map2.clear();
@@ -41,59 +57,60 @@ function testCopy() {
 }
 
 function testGet() {
-    var map = Map(#a, 1);
+    var map = {#a: 1};
     check(map.get(#a)).eq(1);
     check(map.get(#b)).isNull();
 }
 
 function testGetOrDefault() {
-    var map = Map(#a, 1);
+    var map = {#a: 1};
     check(map.getOrDefault(#a,0)).eq(1);
     check(map.getOrDefault(#b,0)).eq(0);
 }
 
 function testIsEmpty() {
-    check(Map().isEmpty()).isTrue();
-    check(Map(#a, 1).isEmpty()).isFalse();
+    check({}.isEmpty()).isTrue();
+    check({#a: 1}.isEmpty()).isFalse();
 }
 
 function testKeySet() {
-    var map = Map(#a, 1, #b, 2);
+    var map = {#a: 1, #b: 2};
     check(map.keySet()).containsAll(#a, #b);
 }
 
 function testPut() {
-    var map = Map();
+    var map = {};
     map.put(#a, 1);
+    check(map).eq({#a: 1});
     check(map.get(#a)).eq(1);
 }
 
 function testPutAll() {
-    var map1 = Map(#a, 1, #b, 2);
-    var map2 = Map(#c, 3);
+    var map1 = {#a: 1, #b: 2};
+    var map2 = {#c: 3};
     map2.putAll(map1);
-    check(map2).eq(Map(#a, 1, #b, 2, #c, 3));
+    check(map2).eq({#a: 1, #b: 2, #c: 3});
 }
 
 function testRemove() {
-    var map = Map(#a, 1, #b, 2, #c, 3);
+    var map = {#a: 1, #b: 2, #c: 3};
     check(map.remove(#b)).eq(2);
-    check(map).eq(Map(#a, 1, #c, 3));
+    check(map).eq({#a: 1, #c: 3});
     check(map.remove(#d)).eq(null);
-    check(map).eq(Map(#a, 1, #c, 3));
+    check(map).eq({#a: 1, #c: 3});
 }
 
 function testSize() {
-    check(Map().size()).eq(0);
-    check(Map(#a, 1, #b, 2).size()).eq(2);
+    check({}.size()).eq(0);
+    check({#a: 1, #b: 2}.size()).eq(2);
 }
 
 function testToString() {
-    check(Map(#a, 1, #b, 2).toString()).eq("{#a: 1, #b: 2}");
+    check({#a: 1, #b: 2}.toString()).eq("{#a: 1, #b: 2}");
 }
 
 function testValues() {
-    var map = Map(#a, 1, #b, 2);
+    var map = {#a: 1, #b: 2};
     check(map.values()).containsAll(1, 2);
 }
 

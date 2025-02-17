@@ -4,7 +4,7 @@ function testLiteral() {
     assertTrue({}.isEmpty());
 
     var map = {#a: 1, #b: 2};
-    assertEquals(map, Map(#a, 1, #b, 2));
+    assertEquals(map, Map.of(#a, 1, #b, 2));
     assertEquals(map.get(#a), 1);
     assertEquals(map.get(#b), 2);
 
