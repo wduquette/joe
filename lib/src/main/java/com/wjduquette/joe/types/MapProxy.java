@@ -77,11 +77,11 @@ public class MapProxy extends TypeProxy<JoeMap> {
         assert object instanceof JoeMap;
         var map = (JoeMap)object;
 
-        return "Map("
+        return "{"
             + map.entrySet().stream()
-                .map(e -> joe.stringify(e.getKey()) + "=" + joe.stringify(e.getValue()))
+                .map(e -> joe.stringify(e.getKey()) + ": " + joe.stringify(e.getValue()))
                 .collect(Collectors.joining(", "))
-            + ")";
+            + "}";
     }
 
     //-------------------------------------------------------------------------

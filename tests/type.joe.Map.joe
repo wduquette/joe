@@ -89,7 +89,7 @@ function testSize() {
 }
 
 function testToString() {
-    check(Map(#a, 1, #b, 2).toString()).eq("Map(#a=1, #b=2)");
+    check(Map(#a, 1, #b, 2).toString()).eq("{#a: 1, #b: 2}");
 }
 
 function testValues() {
