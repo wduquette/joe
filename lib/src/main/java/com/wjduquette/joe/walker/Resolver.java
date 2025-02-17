@@ -220,6 +220,15 @@ class Resolver {
             }
             case Expr.Get expr -> resolve(expr.object());
             case Expr.Grouping expr -> resolve(expr.expr());
+            case Expr.IndexGet expr -> {
+                resolve(expr.collection());
+                resolve(expr.index());
+            }
+            case Expr.IndexSet expr -> {
+                resolve(expr.collection());
+                resolve(expr.index());
+                resolve(expr.value());
+            }
             case Expr.Lambda expr ->
                 resolveFunction(expr.declaration(), FunctionType.LAMBDA);
             case Expr.ListLiteral expr -> expr.list().forEach(this::resolve);

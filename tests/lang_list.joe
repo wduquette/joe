@@ -16,3 +16,17 @@ function testLiteral() {
     assertEquals([#one], [#one,]);
     assertEquals([#one, #two], [#one, #two,]);
 }
+
+function testIndexing_get() {
+    var list = [#a, #b, #c];
+    assertEquals(list[0], #a);
+    assertEquals(list[1], #b);
+    assertEquals(list[2], #c);
+
+    assertError(\-> list["abc"],
+        "Expected list index, got: String 'abc'.");
+    assertError(\-> list[-1],
+        "List index out of range [0, 2]: -1.");
+    assertError(\-> list[3],
+        "List index out of range [0, 2]: 3.");
+}

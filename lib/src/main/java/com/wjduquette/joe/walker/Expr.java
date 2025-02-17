@@ -7,7 +7,7 @@ import java.util.List;
  */
 sealed interface Expr
     permits Expr.Assign, Expr.Binary, Expr.Call,
-            Expr.Get, Expr.Grouping,
+            Expr.Get, Expr.Grouping, Expr.IndexGet, Expr.IndexSet,
             Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
             Expr.MapLiteral, Expr.PrePostAssign, Expr.PrePostSet,
             Expr.Set, Expr.Super, Expr.This, Expr.Ternary,
@@ -54,6 +54,32 @@ sealed interface Expr
      * @param expr The expression in parentheses.
      */
     record Grouping(Expr expr) implements Expr {}
+
+    /**
+     * An index into a collection value.
+     * called function/method.
+     * @param collection The expression that yields the collection
+     * @param bracket A token, for line number info
+     * @param index The index expression
+     */
+    record IndexGet(Expr collection, Token bracket, Expr index) implements Expr {}
+
+    /**
+     * An index into a collection value.
+     * called function/method.
+     * @param collection The expression that yields the collection
+     * @param bracket A token, for line number info
+     * @param index The index expression
+     * @param op The operator
+     * @param value The value to set
+     */
+    record IndexSet(
+        Expr collection,
+        Token bracket,
+        Expr index,
+        Token op,
+        Expr value
+    ) implements Expr {}
 
     /**
      * A lambda function.

@@ -389,6 +389,9 @@ class Parser {
                 return new Expr.Assign(name, op, value);
             } else if (target instanceof Expr.Get get) {
                 return new Expr.Set(get.object(), get.name(), op, value);
+            } else if (target instanceof Expr.IndexGet get) {
+                return new Expr.IndexSet(
+                    get.collection(), get.bracket(), get.index(), op, value);
             }
 
             error(op, "Invalid assignment target.");
@@ -532,6 +535,11 @@ class Parser {
             } else if (match(DOT)) {
                 Token name = consume(IDENTIFIER, "Expected property name after '.'.");
                 expr = new Expr.Get(expr, name);
+            } else if (match(LEFT_BRACKET)) {
+                var bracket = previous();
+                var index = expression();
+                consume(RIGHT_BRACKET, "Expected ']' after index.");
+                expr = new Expr.IndexGet(expr, bracket, index);
             } else {
                 break;
             }

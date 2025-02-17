@@ -222,6 +222,14 @@ class Dumper {
                 buff.append(indent())
                     .append(")\n");
             }
+            case Expr.IndexGet e -> {
+                dumpExpression(e.collection());
+                dumpExpression(e.index());
+            }
+            case Expr.IndexSet e -> {
+                dumpExpression(e.collection());
+                dumpExpression(e.index());
+            }
             case Expr.Lambda e -> {
                 buff.append("\n");
                 ++indent;

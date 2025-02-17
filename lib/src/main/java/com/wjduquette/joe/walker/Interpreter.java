@@ -408,7 +408,7 @@ class Interpreter {
             case Expr.Get expr -> {
                 Object object = evaluate(expr.object());
                 if (object == null) {
-                    throw new JoeError(
+                    throw new RuntimeError(expr.name().span(),
                         "Tried to retrieve '" + expr.name().lexeme() +
                         "' property from null value.");
                 }
@@ -417,6 +417,42 @@ class Interpreter {
             }
             // (expr...)
             case Expr.Grouping expr -> evaluate(expr.expr());
+            // expr[index]
+            case Expr.IndexGet expr -> {
+                var target = evaluate(expr.collection());
+                var index = evaluate(expr.index());
+                if (target instanceof List<?> list) {
+                    int i = checkListIndex(expr.bracket(), list, index);
+                    yield list.get(i);
+                } else {
+                    throw new RuntimeError(expr.bracket().span(),
+                        "Expected indexed collection, got: " +
+                        joe.typedValue(target));
+                }
+            }
+            case Expr.IndexSet expr -> {
+                var target = evaluate(expr.collection());
+                var index = evaluate(expr.index());
+                var value = evaluate(expr.value());
+
+                if (target instanceof List<?> list) {
+                    int i = checkListIndex(expr.bracket(), list, index);
+
+                    var right = value;
+
+                    if (expr.op().type() != TokenType.EQUAL) {
+                        var left = list.get(i);
+                        right = computeExtendedAssignment(left, expr.op(), right);
+                    }
+
+                    listSet(list, i, right);
+                    yield right;
+                } else {
+                    throw new RuntimeError(expr.bracket().span(),
+                        "Expected indexed collection, got: " +
+                            joe.typedValue(target));
+                }
+            }
             // Return a callable for the given lambda
             case Expr.Lambda expr ->
                 new WalkerFunction(this, expr.declaration(), environment, false);
@@ -561,6 +597,13 @@ class Interpreter {
         }
     }
 
+    // The list will be a ListValue, which is a List<Object>, or a
+    // ListWrapper, which will explicitly check the value's type.
+    @SuppressWarnings("unchecked")
+    private void listSet(List<?> list, int index, Object value) {
+        ((List<Object>)list).set(index, value);
+    }
+
     // Given the value of a variable or property, and one of the extended
     // assignment operators, computes the new value of the variable or
     // property.
@@ -652,4 +695,19 @@ class Interpreter {
         if (operand instanceof Double) return;
         throw new RuntimeError(operator.span(), "Target of operand must contain a number.");
     }
+
+    private int checkListIndex(Token bracket, List<?> list, Object index) {
+        if (index instanceof Double d) {
+            int i = d.intValue();
+            if (i >= 0 && i < list.size()) {
+                return i;
+            } else {
+                throw new RuntimeError(bracket.span(),
+                    "List index out of range [0, " + (list.size() - 1) + "]: " + i + ".");
+            }
+        } else {
+            throw expected(bracket.span(), "list index", index);
+        }
+    }
+
 }
