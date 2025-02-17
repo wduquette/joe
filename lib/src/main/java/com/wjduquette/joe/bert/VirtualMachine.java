@@ -319,6 +319,10 @@ class VirtualMachine {
                     push((double)a / (double)b);
                 }
                 case DUP -> push(peek(0));
+                case DUP2 -> {
+                    push(peek(1));
+                    push(peek(1));
+                }
                 case EQ -> {
                     var b = pop();
                     var a = pop();
@@ -395,6 +399,38 @@ class VirtualMachine {
                     var a = pop();
                     checkNumericOperand("++", a);
                     push((double)a + 1);
+                }
+                case INDGET -> {
+                    var index = pop();
+                    var coll = pop();
+
+                    switch (coll) {
+                        case JoeList list -> {
+                            var i = checkListIndex(list, index);
+                            push(list.get(i));
+                        }
+                        case JoeMap map -> push(map.get(index));
+                        default ->
+                            throw error("Expected indexed collection, got: " +
+                                joe.typedValue(coll) + ".");
+                    }
+                }
+                case INDSET -> {
+                    var value = pop();
+                    var index = pop();
+                    var coll = pop();
+
+                    switch (coll) {
+                        case JoeList list -> {
+                            var i = checkListIndex(list, index);
+                            list.set(i, value);
+                        }
+                        case JoeMap map -> map.put(index, value);
+                        default ->
+                            throw error("Expected indexed collection, got: " +
+                                joe.typedValue(coll) + ".");
+                    }
+                    push(value);
                 }
                 case INHERIT -> {
                     var superclass = peek(1);
@@ -690,6 +726,21 @@ class VirtualMachine {
     private void checkNumericOperand(String op, Object a) {
         if (!(a instanceof Double)) {
             throw error("The '" + op + "' operator expects a numeric operand.");
+        }
+    }
+
+    private int checkListIndex(List<?> list, Object index) {
+        if (index instanceof Double d) {
+            int i = d.intValue();
+            if (i >= 0 && i < list.size()) {
+                return i;
+            } else {
+                throw error("List index out of range [0, " +
+                    (list.size() - 1) + "]: " + i + ".");
+            }
+        } else {
+            throw error("Expected list index, got: " +
+                joe.typedValue(index));
         }
     }
 

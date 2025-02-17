@@ -520,6 +520,9 @@ class Parser {
             return new Expr.PrePostAssign(name, op, isPre);
         } else if (target instanceof Expr.Get get) {
             return new Expr.PrePostSet(get.object(), get.name(), op, isPre);
+        } else if (target instanceof Expr.IndexGet get) {
+            return new Expr.PrePostIndex(
+                get.collection(), get.bracket(), get.index(), op, isPre);
         }
 
         error(op, "Invalid '" + op.lexeme() + "' target.");

@@ -26,59 +26,61 @@ The byte-engine is a stack machine with a few registers:
 | 6  | CONST *constant*  | ∅ → *a*            | Load constant             |
 | 7  | DECR              | *a* → *b*          | b = a - 1                 |
 | 8  | DIV               | *a b* → *c*        | c = a/b                   |
-| 9  | DUP               | *a* → *a* *a*      | Duplicate                 |
-| 10 | EQ                | *a b* → *c*        | c = a == b                |
-| 11 | FALSE             | ∅ → false          | Load `false`              |
-| 12 | GE                | *a b* → *c*        | c = a >= b                |
-| 13 | GETNEXT           | *iter* → *a*       | a = iter.next()           |
-| 14 | GLODEF *name*     | *a* → ∅            | Define global             |
-| 15 | GLOGET *name*     | ∅ → *a*            | Get global                |
-| 16 | GLOSET *name*     | *a* → *a*          | Set global                |
-| 17 | GT                | *a b* → *a* > *b*  | Compare: greater          |
-| 18 | HASNEXT           | *iter* → *flag*    | flag = iter.hasNext()     |
-| 19 | IN                | *a coll* → *flag*  | a in collection           |
-| 20 | INCR              | *a* → *b*          | b = a + 1                 |
-| 21 | INHERIT           | *sup sub* → *sup*  | Inheritance               |
-| 22 | ITER              | *coll* → *iter*    | iter = coll.iterator()    |
-| 23 | JIF *offset*      | *flag* → ∅         | Jump if false             |
-| 24 | JIFKEEP *offset*  | *flag* → *flag*    | Jump if false, keep value |
-| 25 | JIT *offset*      | *flag* → ∅         | Jump if true              |
-| 26 | JITKEEP *offset*  | *flag* → *flag*    | Jump if true, keep value  |
-| 27 | JUMP *offset*     | ∅ → ∅              | Jump forwards             |
-| 28 | LE                | *a b* → *a* <= *b* | Compare: less or equal    |
-| 29 | LISTADD           | *list a* → *list*  | Add item to list          |
-| 30 | LISTNEW           | ∅ → *list*         | Push empty list           |
-| 31 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
-| 31 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
-| 32 | LOCSET *slot*     | *a* → *a*          | Set local                 |
-| 33 | LOOP *offset*     | ∅ → ∅              | Jump backwards            |
-| 34 | LT                | *a b* → *a* <= *b* | Compare: less than        |
-| 35 | MAPNEW            | ∅ → *map*          | Push empty ma p           |
-| 36 | MAPPUT            | *map k a* → *map*  | Add entry to map          |
-| 37 | METHOD *name*     | *cls f* → *cls*    | Add method to class       |
-| 38 | MUL               | *a b* → *c*        | c = a*b                   |
-| 39 | NE                | *a b* → *c*        | c = a != b                |
-| 40 | NEGATE            | *a* → *b*          | b = -a                    |
-| 41 | NI                | *a coll* → *flag*  | a not in collection       |
-| 42 | NOT               | *a* → *b*          | b = !a                    |
-| 43 | NULL              | ∅ → null           | Load `null`               |
-| 44 | POP               | *a* → ∅            | Pops one value            |
-| 45 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
-| 46 | PROPGET *name*    | *obj* → *a*        | Get property value        |
-| 47 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
-| 48 | RETURN            | *a* → *a*          | Return                    |
-| 49 | SUB               | *a b* → *c*        | c = a - b                 |
-| 50 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
-| 51 | TGET              | ∅ → *a*            | *a* = T                   |
-| 52 | THROW             | *a* → ∅            | Throw error               |
-| 53 | TPUT              | *a* → *a*          | T = *a*                   |
-| 54 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
-| 55 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
-| 54 | TRUE              | ∅ → true           | Load `true`               |
-| 54 | TRUE              | ∅ → true           | Load `true`               |
-| 55 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
-| 56 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
-| 57 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
+| 9  | DUP               | *a* → *a* *a*      | Duplicate top             |
+| 10 | DUP2              | *a b* → *a b a b*  | Duplicate top 2           |
+| 11 | EQ                | *a b* → *c*        | c = a == b                |
+| 12 | FALSE             | ∅ → false          | Load `false`              |
+| 13 | GE                | *a b* → *c*        | c = a >= b                |
+| 14 | GETNEXT           | *iter* → *a*       | a = iter.next()           |
+| 15 | GLODEF *name*     | *a* → ∅            | Define global             |
+| 16 | GLOGET *name*     | ∅ → *a*            | Get global                |
+| 17 | GLOSET *name*     | *a* → *a*          | Set global                |
+| 18 | GT                | *a b* → *a* > *b*  | Compare: greater          |
+| 19 | HASNEXT           | *iter* → *flag*    | flag = iter.hasNext()     |
+| 20 | IN                | *a coll* → *flag*  | a in collection           |
+| 21 | INCR              | *a* → *b*          | b = a + 1                 |
+| 22 | INDGET            | *coll i* → *a*     | `a = coll[i]`             |
+| 23 | INDSET            | *coll i a* → *a*   | `coll[i] = a`             |
+| 24 | INHERIT           | *sup sub* → *sup*  | Inheritance               |
+| 25 | ITER              | *coll* → *iter*    | iter = coll.iterator()    |
+| 26 | JIF *offset*      | *flag* → ∅         | Jump if false             |
+| 27 | JIFKEEP *offset*  | *flag* → *flag*    | Jump if false, keep value |
+| 28 | JIT *offset*      | *flag* → ∅         | Jump if true              |
+| 29 | JITKEEP *offset*  | *flag* → *flag*    | Jump if true, keep value  |
+| 30 | JUMP *offset*     | ∅ → ∅              | Jump forwards             |
+| 31 | LE                | *a b* → *a* <= *b* | Compare: less or equal    |
+| 32 | LISTADD           | *list a* → *list*  | Add item to list          |
+| 33 | LISTNEW           | ∅ → *list*         | Push empty list           |
+| 34 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
+| 34 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
+| 35 | LOCSET *slot*     | *a* → *a*          | Set local                 |
+| 36 | LOOP *offset*     | ∅ → ∅              | Jump backwards            |
+| 37 | LT                | *a b* → *a* <= *b* | Compare: less than        |
+| 38 | MAPNEW            | ∅ → *map*          | Push empty ma p           |
+| 39 | MAPPUT            | *map k a* → *map*  | Add entry to map          |
+| 40 | METHOD *name*     | *cls f* → *cls*    | Add method to class       |
+| 41 | MUL               | *a b* → *c*        | c = a*b                   |
+| 42 | NE                | *a b* → *c*        | c = a != b                |
+| 43 | NEGATE            | *a* → *b*          | b = -a                    |
+| 44 | NI                | *a coll* → *flag*  | a not in collection       |
+| 45 | NOT               | *a* → *b*          | b = !a                    |
+| 46 | NULL              | ∅ → null           | Load `null`               |
+| 47 | POP               | *a* → ∅            | Pops one value            |
+| 48 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
+| 49 | PROPGET *name*    | *obj* → *a*        | Get property value        |
+| 50 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
+| 51 | RETURN            | *a* → *a*          | Return                    |
+| 52 | SUB               | *a b* → *c*        | c = a - b                 |
+| 53 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
+| 54 | TGET              | ∅ → *a*            | *a* = T                   |
+| 55 | THROW             | *a* → ∅            | Throw error               |
+| 56 | TPUT              | *a* → *a*          | T = *a*                   |
+| 57 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
+| 58 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
+| 59 | TRUE              | ∅ → true           | Load `true`               |
+| 60 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
+| 61 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
+| 62 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
 
 **Stack Effects:** in the stack effect column, the top of the stack is on the 
 right.  
@@ -208,6 +210,12 @@ Computes the quotient of *a* and *b*.
 
 Duplicates the value on the top of the stack.
 
+### DUP2
+---
+**DUP2** | *a b* → *a b a b*
+
+Duplicates the top two values on the stack.
+
 ### EQ
 ---
 **EQ** | *a* *b* → *c*, where *c* = (*a* == *b*).
@@ -284,6 +292,29 @@ Increments value *a*. `INCR` is used to implement the `++` operator.
 - `INCR` provides a `++`-specific error message if *a* is not numeric. `ADD`'s 
   error message would be confusing.
 - `ADD` will concatenate strings, but `++` is only for use with numbers.
+ 
+### INDGET
+---
+**INDGET** | *coll i* → *a*
+
+Retrieves the value at index *i* in the indexed collection *coll*, and pushes
+it on the stack.  
+
+- If *coll* is a Joe `List`, *i* must be an index to an existing item.
+- If *coll* is a Joe `Map`, *i* can be any Monica value; returns null if the
+  value doesn't exist.
+- It is a runtime error if *coll* is neither a `List` nor a `Map`.
+
+### INDSET
+---
+**INDSET** | *coll i a* → *a*
+
+Assigns the value *a* to index *i* in the indexed collection *coll*,
+leaving *a* on the stack.
+
+- If *coll* is a Joe `List`, *i* must be an index to an existing item.
+- If *coll* is a Joe `Map`, *i* can be any Monica value.
+- It is a runtime error if *coll* is neither a `List` nor a `Map`.
 
 ### INHERIT
 ---

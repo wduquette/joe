@@ -229,6 +229,7 @@ class Dumper {
             case Expr.IndexSet e -> {
                 dumpExpression(e.collection());
                 dumpExpression(e.index());
+                dumpExpression(e.value());
             }
             case Expr.Lambda e -> {
                 buff.append("\n");
@@ -259,6 +260,10 @@ class Dumper {
                         .append(e.op().lexeme())
                         .append("\n");
                 }
+            }
+            case Expr.PrePostIndex e -> {
+                dumpExpression(e.collection());
+                dumpExpression(e.index());
             }
             case Expr.PrePostSet e -> {
                 if (e.isPre()) {

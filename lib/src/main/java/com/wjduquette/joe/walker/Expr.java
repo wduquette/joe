@@ -9,7 +9,8 @@ sealed interface Expr
     permits Expr.Assign, Expr.Binary, Expr.Call,
             Expr.Get, Expr.Grouping, Expr.IndexGet, Expr.IndexSet,
             Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
-            Expr.MapLiteral, Expr.PrePostAssign, Expr.PrePostSet,
+            Expr.MapLiteral,
+            Expr.PrePostAssign, Expr.PrePostIndex, Expr.PrePostSet,
             Expr.Set, Expr.Super, Expr.This, Expr.Ternary,
             Expr.Unary, Expr.Variable
 {
@@ -128,6 +129,19 @@ sealed interface Expr
      */
     record PrePostAssign(Token name, Token op, boolean isPre) implements Expr {}
 
+    /**
+     * A pre-or-post increment/decrement to an indexed collection.
+     * @param collection The expression that yields the collection.
+     * @param bracket The bracket
+     * @param index The expression that yields the index.
+     * @param op The operator
+     * @param isPre Whether this is a pre-increment/decrement or not.
+     */
+    record PrePostIndex(
+        Expr collection,
+        Token bracket,
+        Expr index,
+        Token op, boolean isPre) implements Expr {}
     /**
      * A pre-or-post increment/decrement to an existing property.
      * @param object The expression that yields the object.
