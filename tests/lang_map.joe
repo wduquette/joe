@@ -1,0 +1,13 @@
+// lang_map.joe: Tests Map-specific syntax
+
+function testLiteral() {
+    assertTrue({}.isEmpty());
+
+    var map = {#a: 1, #b: 2};
+    assertEquals(map, Map(#a, 1, #b, 2));
+    assertEquals(map.get(#a), 1);
+    assertEquals(map.get(#b), 2);
+
+    // Trailing comma is allowed in non-empty maps
+    assertEquals({#a: 1,}, {#a: 1});
+}

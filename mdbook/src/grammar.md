@@ -88,6 +88,8 @@ primary         → "true" | "false" | "nil"
 grouping        → "(" expression ")"
 lambda          → "\" parameters? "->" ( expression | block ) ; 
 list            → "[" (expression ( "," expression )* ","? )? "]" ;
+map             → "{" (map_entry ( "," map_entry )* ","? )? "]" ;
+map_entry       → expression ":" expression ;
 ```
 
 ## JLox Grammar

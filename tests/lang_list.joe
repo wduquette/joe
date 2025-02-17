@@ -1,4 +1,4 @@
-// lang_list.md: tests List-specific syntax.
+// lang_list.joe: tests List-specific syntax.
 
 function testLiteral() {
     assertTrue([].isEmpty());

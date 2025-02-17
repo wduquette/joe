@@ -610,6 +610,7 @@ class Parser {
             return new Expr.Grouping(expr);
         }
 
+        // List literal
         if (match(LEFT_BRACKET)) {
             var bracket = previous();
             var list = new ArrayList<Expr>();
@@ -629,6 +630,29 @@ class Parser {
             return new Expr.ListLiteral(bracket, list);
         }
 
+        // Map literal
+        if (match(LEFT_BRACE)) {
+            var brace = previous();
+            var entries = new ArrayList<Expr>();
+
+            if (!check(RIGHT_BRACE)) {
+                entries.add(expression());
+                consume(COLON, "Expected ':' after map key.");
+                entries.add(expression());
+
+                while (match(COMMA)) {
+                    // Allow trailing comma
+                    if (check(RIGHT_BRACE)) break;
+                    entries.add(expression());
+                    consume(COLON, "Expected ':' after map key.");
+                    entries.add(expression());
+                }
+            }
+
+            consume(RIGHT_BRACE, "Expected '}' after map entries.");
+
+            return new Expr.MapLiteral(brace, entries);
+        }
 
         throw errorSync(peek(), "Expected expression.");
     }

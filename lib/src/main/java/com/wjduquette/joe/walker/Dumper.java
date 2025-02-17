@@ -240,6 +240,7 @@ class Dumper {
                 dumpExpression(e.left());
                 dumpExpression(e.right());
             }
+            case Expr.MapLiteral e -> e.entries().forEach(this::dumpExpression);
             case Expr.PrePostAssign e -> {
                 if (e.isPre()) {
                     buff.append(e.op().lexeme())

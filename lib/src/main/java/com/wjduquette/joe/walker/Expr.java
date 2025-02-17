@@ -9,8 +9,9 @@ sealed interface Expr
     permits Expr.Assign, Expr.Binary, Expr.Call,
             Expr.Get, Expr.Grouping,
             Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
-            Expr.PrePostAssign, Expr.PrePostSet, Expr.Set, Expr.Super,
-            Expr.This, Expr.Ternary, Expr.Unary, Expr.Variable
+            Expr.MapLiteral, Expr.PrePostAssign, Expr.PrePostSet,
+            Expr.Set, Expr.Super, Expr.This, Expr.Ternary,
+            Expr.Unary, Expr.Variable
 {
     /**
      * An assignment to an existing variable.
@@ -84,6 +85,14 @@ sealed interface Expr
      * @param right The right-hand expression
      */
     record Logical(Expr left, Token op, Expr right) implements Expr {}
+
+    /**
+     * A Map literal: a list of expression pairs used to initialize a
+     * MapValue.
+     * @param brace The opening left brace
+     * @param entries The flat list of expression pairs.
+     */
+    record MapLiteral(Token brace, List<Expr> entries) implements Expr {}
 
     /**
      * A pre-or-post increment/decrement to an existing variable.

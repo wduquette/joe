@@ -2,6 +2,7 @@ package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.types.ListValue;
+import com.wjduquette.joe.types.MapValue;
 
 import java.util.*;
 
@@ -440,6 +441,16 @@ class Interpreter {
                 }
 
                 yield evaluate(expr.right());
+            }
+            // A map literal
+            case Expr.MapLiteral expr -> {
+                var map = new MapValue();
+                for (var i = 0; i < expr.entries().size(); i += 2) {
+                    var key = evaluate(expr.entries().get(i));
+                    var value = evaluate(expr.entries().get(i + 1));
+                    map.put(key, value);
+                }
+                yield map;
             }
             // ++ and -- with a variable name
             case Expr.PrePostAssign expr -> {

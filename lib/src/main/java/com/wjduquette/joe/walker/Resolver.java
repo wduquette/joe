@@ -228,6 +228,7 @@ class Resolver {
                 resolve(expr.left());
                 resolve(expr.right());
             }
+            case Expr.MapLiteral expr -> expr.entries().forEach(this::resolve);
             case Expr.PrePostAssign expr -> resolveLocal(expr, expr.name());
             case Expr.PrePostSet expr -> resolve(expr.object());
             case Expr.Set expr -> {
