@@ -1018,33 +1018,36 @@ class Compiler {
     // Emits the code to update a property
     private void updateProperty(char name, char mathOp) {
         //                | o         ; Object on stack
-        // PROPCEL name   |           ; C = cell
-        // CELLGET        | a         ; a = C.get()
-        // expr           | a b       ; b = expr
-        // mathOp         | c         ; E.g., c = a + b
-        // CELLSET        | c         ; C.set(c)
-        emit(Opcode.PROPCEL, name);
-        emit(Opcode.CELLGET);
+        // DUP            | o o       ; Duplicate object
+        // PROPGET name   | o a       ; a = o.name
+        // expr           | o a b     ; b = expr
+        // mathOp         | o c       ; E.g., c = a + b
+        // PROPSET name   | c         ; o.name = c, retaining c
+        emit(Opcode.DUP);
+        emit(Opcode.PROPGET, name);
         expression();
         emit(mathOp);
-        emit(Opcode.CELLSET);
+        emit(Opcode.PROPSET, name);
     }
 
     // Emits the code to post-increment/decrement a property
     private void postIncrDecrProperty(char name, char mathOp) {
         //                | o         ; Initial state
-        // PROPCEL name   |           ; C = o.name
-        // CELLGET        | a         ; a = C.get()
-        // DUP            | a a
-        // mathOp         | a a'      ; E.g., a' = a + 1
-        // CELLSET        | a a'      ; C.set(a')
-        // POP            | a         ;
-        emit(Opcode.PROPCEL, name);
-        emit(Opcode.CELLGET);
+        // DUP            | o o       ; Copy the object
+        // PROPGET name   | o a       ; a = o.name
+        // TPUT           | o a       ; T = a
+        // mathOp         | o a'      ; E.g., a' = a + 1
+        // PROPSET name   | a'        ; o.name = a'
+        // POP            | ∅         ;
+        // TGET           | a         ; push T
+
         emit(Opcode.DUP);
+        emit(Opcode.PROPGET, name);
+        emit(Opcode.TPUT);
         emit(mathOp);
-        emit(Opcode.CELLSET);
+        emit(Opcode.PROPSET, name);
         emit(Opcode.POP);
+        emit(Opcode.TGET);
     }
 
 
