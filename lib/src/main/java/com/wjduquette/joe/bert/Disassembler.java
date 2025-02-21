@@ -152,7 +152,7 @@ public class Disassembler {
         switch (opcode) {
             // Simple Instructions
             // Pattern: opcode
-            case ADD, ASSERT, DECR, DIV, DUP, EQ, FALSE,
+            case ADD, ASSERT, CELLGET, CELLSET, DECR, DIV, DUP, EQ, FALSE,
                 GE, GT, GETNEXT, HASNEXT, IN, INCR, INHERIT, ITER,
                 LISTADD, LISTNEW, LE, LT,
                 MAPNEW, MAPPUT, MUL, NE, NEGATE, NI, NOT, NULL,
@@ -196,7 +196,7 @@ public class Disassembler {
             // Constant Instructions
             // Pattern: opcode constantIndex
             case CLASS, COMMENT, CONST, GLODEF, GLOGET, GLOSET, METHOD,
-                PROPGET, PROPSET, SUPGET, TRCPUSH
+                PROPCEL, PROPGET, PROPSET, SUPGET, TRCPUSH
             -> {
                 int index = chunk.code(ip + 1);
                 var constant = joe.stringify(chunk.getConstant(index));

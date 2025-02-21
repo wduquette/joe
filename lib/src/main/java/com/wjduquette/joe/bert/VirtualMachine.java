@@ -43,8 +43,11 @@ class VirtualMachine {
     // The global environment.
     private final Map<String,Object> globals = new HashMap<>();
 
-    // Registers
+    // Register T: used for transient values, to avoid stack gymnastics.
     private Object registerT = null;
+
+    // Register C: used for Cells, to avoid stack gymnastics.
+    private Cell registerC = null;
 
     // The value stack
     private Object[] stack = new Object[DEFAULT_STACK_SIZE];
@@ -245,6 +248,7 @@ class VirtualMachine {
         top = 0;
         frameCount = 0;
         registerT = null;
+        registerC = null;
     }
 
     private Object run() {
@@ -288,6 +292,8 @@ class VirtualMachine {
                     callValue(peek(argCount), argCount, Origin.JOE);
                     frame = frames[frameCount - 1];
                 }
+                case CELLGET -> push(registerC.get());
+                case CELLSET -> registerC.set(peek(0));
                 case CLASS -> push(new BertClass(readString()));
                 case CLOSURE -> {
                     var function = readFunction();
@@ -528,6 +534,18 @@ class VirtualMachine {
                 case NULL -> push(null);
                 case POP -> pop();
                 case POPN -> top -= readArg();
+                case PROPCEL -> {
+                    var target = pop();
+                    var name = readString();
+
+                    if (target == null) {
+                        throw error("Cannot retrieve property, target is null.");
+                    }
+
+                    var joeObject = joe.getJoeObject(target);
+
+                    registerC = new PropertyCell(joeObject, name);
+                }
                 case PROPGET -> {
                     var target = peek(0);
                     var name = readString();
@@ -888,6 +906,19 @@ class VirtualMachine {
             this.ip = 0;
             this.base = top;
         }
+    }
+
+    //-------------------------------------------------------------------------
+    // Cells
+
+    // A cell for reading and writing an object property, stored transiently
+    // in the C register.
+    private record PropertyCell(
+        JoeObject target,
+        String name
+    ) implements Cell {
+        public Object get()             { return target.get(name); }
+        public void   set(Object value) { target.set(name, value); }
     }
 
     //-------------------------------------------------------------------------

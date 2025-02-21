@@ -11,6 +11,8 @@ The byte-engine is a stack machine with a few registers:
 - `ip` is the instruction pointer within the current function.
 - `T` is the temporary register, used to stash a value momentarily during
   an atomic operation.
+- `C` is the cell register, used to stash a data cell momentarily during
+  an atomic operation.
 
 ## Instruction Set
 
@@ -20,65 +22,66 @@ The byte-engine is a stack machine with a few registers:
 | 0  | ADD               | *a b* → *c*        | c = a + b                 |
 | 1  | ASSERT            | *msg* → ∅          | Throws AssertError        |
 | 2  | CALL *argc*       | *f args* → *c*     | c = f(args)               |
-| 3  | CLASS *name*      | ∅ → *cls*          | Create class              |
-| 4  | CLOSURE *func*    | ∅ → *f*            | Load closure              |
-| 5  | COMMENT *name*    | ∅ → ∅              | No-op comment             |
-| 6  | CONST *constant*  | ∅ → *a*            | Load constant             |
-| 7  | DECR              | *a* → *b*          | b = a - 1                 |
-| 8  | DIV               | *a b* → *c*        | c = a/b                   |
-| 9  | DUP               | *a* → *a* *a*      | Duplicate                 |
-| 10 | EQ                | *a b* → *c*        | c = a == b                |
-| 11 | FALSE             | ∅ → false          | Load `false`              |
-| 12 | GE                | *a b* → *c*        | c = a >= b                |
-| 13 | GETNEXT           | *iter* → *a*       | a = iter.next()           |
-| 14 | GLODEF *name*     | *a* → ∅            | Define global             |
-| 15 | GLOGET *name*     | ∅ → *a*            | Get global                |
-| 16 | GLOSET *name*     | *a* → *a*          | Set global                |
-| 17 | GT                | *a b* → *a* > *b*  | Compare: greater          |
-| 18 | HASNEXT           | *iter* → *flag*    | flag = iter.hasNext()     |
-| 19 | IN                | *a coll* → *flag*  | a in collection           |
-| 20 | INCR              | *a* → *b*          | b = a + 1                 |
-| 21 | INHERIT           | *sup sub* → *sup*  | Inheritance               |
-| 22 | ITER              | *coll* → *iter*    | iter = coll.iterator()    |
-| 23 | JIF *offset*      | *flag* → ∅         | Jump if false             |
-| 24 | JIFKEEP *offset*  | *flag* → *flag*    | Jump if false, keep value |
-| 25 | JIT *offset*      | *flag* → ∅         | Jump if true              |
-| 26 | JITKEEP *offset*  | *flag* → *flag*    | Jump if true, keep value  |
-| 27 | JUMP *offset*     | ∅ → ∅              | Jump forwards             |
-| 28 | LE                | *a b* → *a* <= *b* | Compare: less or equal    |
-| 29 | LISTADD           | *list a* → *list*  | Add item to list          |
-| 30 | LISTNEW           | ∅ → *list*         | Push empty list           |
-| 31 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
-| 31 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
-| 32 | LOCSET *slot*     | *a* → *a*          | Set local                 |
-| 33 | LOOP *offset*     | ∅ → ∅              | Jump backwards            |
-| 34 | LT                | *a b* → *a* <= *b* | Compare: less than        |
-| 35 | MAPNEW            | ∅ → *map*          | Push empty ma p           |
-| 36 | MAPPUT            | *map k a* → *map*  | Add entry to map          |
-| 37 | METHOD *name*     | *cls f* → *cls*    | Add method to class       |
-| 38 | MUL               | *a b* → *c*        | c = a*b                   |
-| 39 | NE                | *a b* → *c*        | c = a != b                |
-| 40 | NEGATE            | *a* → *b*          | b = -a                    |
-| 41 | NI                | *a coll* → *flag*  | a not in collection       |
-| 42 | NOT               | *a* → *b*          | b = !a                    |
-| 43 | NULL              | ∅ → null           | Load `null`               |
-| 44 | POP               | *a* → ∅            | Pops one value            |
-| 45 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
-| 46 | PROPGET *name*    | *obj* → *a*        | Get property value        |
-| 47 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
-| 48 | RETURN            | *a* → *a*          | Return                    |
-| 49 | SUB               | *a b* → *c*        | c = a - b                 |
-| 50 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
-| 51 | TGET              | ∅ → *a*            | *a* = T                   |
-| 52 | THROW             | *a* → ∅            | Throw error               |
-| 53 | TPUT              | *a* → *a*          | T = *a*                   |
-| 54 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
-| 55 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
-| 54 | TRUE              | ∅ → true           | Load `true`               |
-| 54 | TRUE              | ∅ → true           | Load `true`               |
-| 55 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
-| 56 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
-| 57 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
+| 3  | CELLGET           | ∅ → *a*            | Get cell value            |
+| 4  | CELLSET           | *a* → *a*          | Set cell value            |
+| 5  | CLASS *name*      | ∅ → *cls*          | Create class              |
+| 6  | CLOSURE *func*    | ∅ → *f*            | Load closure              |
+| 7  | COMMENT *name*    | ∅ → ∅              | No-op comment             |
+| 8  | CONST *constant*  | ∅ → *a*            | Load constant             |
+| 9  | DECR              | *a* → *b*          | b = a - 1                 |
+| 10 | DIV               | *a b* → *c*        | c = a/b                   |
+| 11 | DUP               | *a* → *a* *a*      | Duplicate                 |
+| 12 | EQ                | *a b* → *c*        | c = a == b                |
+| 13 | FALSE             | ∅ → false          | Load `false`              |
+| 14 | GE                | *a b* → *c*        | c = a >= b                |
+| 15 | GETNEXT           | *iter* → *a*       | a = iter.next()           |
+| 16 | GLODEF *name*     | *a* → ∅            | Define global             |
+| 17 | GLOGET *name*     | ∅ → *a*            | Get global                |
+| 18 | GLOSET *name*     | *a* → *a*          | Set global                |
+| 19 | GT                | *a b* → *a* > *b*  | Compare: greater          |
+| 20 | HASNEXT           | *iter* → *flag*    | flag = iter.hasNext()     |
+| 21 | IN                | *a coll* → *flag*  | a in collection           |
+| 22 | INCR              | *a* → *b*          | b = a + 1                 |
+| 23 | INHERIT           | *sup sub* → *sup*  | Inheritance               |
+| 24 | ITER              | *coll* → *iter*    | iter = coll.iterator()    |
+| 25 | JIF *offset*      | *flag* → ∅         | Jump if false             |
+| 26 | JIFKEEP *offset*  | *flag* → *flag*    | Jump if false, keep value |
+| 27 | JIT *offset*      | *flag* → ∅         | Jump if true              |
+| 28 | JITKEEP *offset*  | *flag* → *flag*    | Jump if true, keep value  |
+| 29 | JUMP *offset*     | ∅ → ∅              | Jump forwards             |
+| 30 | LE                | *a b* → *a* <= *b* | Compare: less or equal    |
+| 31 | LISTADD           | *list a* → *list*  | Add item to list          |
+| 32 | LISTNEW           | ∅ → *list*         | Push empty list           |
+| 33 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
+| 34 | LOCSET *slot*     | *a* → *a*          | Set local                 |
+| 35 | LOOP *offset*     | ∅ → ∅              | Jump backwards            |
+| 36 | LT                | *a b* → *a* <= *b* | Compare: less than        |
+| 37 | MAPNEW            | ∅ → *map*          | Push empty ma p           |
+| 38 | MAPPUT            | *map k a* → *map*  | Add entry to map          |
+| 39 | METHOD *name*     | *cls f* → *cls*    | Add method to class       |
+| 40 | MUL               | *a b* → *c*        | c = a*b                   |
+| 41 | NE                | *a b* → *c*        | c = a != b                |
+| 42 | NEGATE            | *a* → *b*          | b = -a                    |
+| 43 | NI                | *a coll* → *flag*  | a not in collection       |
+| 44 | NOT               | *a* → *b*          | b = !a                    |
+| 45 | NULL              | ∅ → null           | Load `null`               |
+| 46 | POP               | *a* → ∅            | Pops one value            |
+| 47 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
+| 48 | PROPCEL *name*    | *obj* → ∅          | C = &obj.name             |
+| 49 | PROPGET *name*    | *obj* → *a*        | Get property value        |
+| 50 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
+| 51 | RETURN            | *a* → *a*          | Return                    |
+| 52 | SUB               | *a b* → *c*        | c = a - b                 |
+| 53 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
+| 54 | TGET              | ∅ → *a*            | *a* = T                   |
+| 55 | THROW             | *a* → ∅            | Throw error               |
+| 56 | TPUT              | *a* → *a*          | T = *a*                   |
+| 57 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
+| 58 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
+| 59 | TRUE              | ∅ → true           | Load `true`               |
+| 60 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
+| 61 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
+| 62 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
 
 **Stack Effects:** in the stack effect column, the top of the stack is on the 
 right.  
@@ -145,6 +148,18 @@ Calls callable *f* with *argc* arguments; the arguments are
 found in consecutive stack slots just above *f*.  The result *c* 
 replaces the function ands its arguments on the stack.  Callable
 *f* may be any valid native or Bert callable.
+
+### CELLGET
+---
+**CELLGET** | ∅ → *a*
+
+Pushes the value of the cell in the `C` register onto the stack.
+
+### CELLSET
+---
+**CELLSET** | *a* → *a*
+
+Assigns the value on top of the stack to the cell in the `C` register.
 
 ### CLASS
 ---
@@ -443,6 +458,13 @@ Pops one value from the stack.
 **POPN** *n* | *a...* → ∅ 
 
 Pops *n* values from the stack.
+
+### PROPCEL
+---
+**PROPCEL *name*** | *obj* → ∅ 
+
+Creates a cell for the *obj* and property *name*, and 
+assigns it to the `C` register.
 
 ### PROPGET
 ---
