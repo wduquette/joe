@@ -4,8 +4,8 @@
 
 // Basic foreach loop
 function testForeach_simple() {
-    var list = List("a", "b", "c");
-    var result = List();
+    var list = ["a", "b", "c"];
+    var result = [];
 
     foreach (var i : list) 
         result.add(i);
@@ -15,8 +15,8 @@ function testForeach_simple() {
 
 // Basic foreach loop with block.
 function testForeach_block() {
-    var list = List("a", "b", "c");
-    var result = List();
+    var list = ["a", "b", "c"];
+    var result = [];
 
     foreach (var i : list) {
         result.add(i);
@@ -27,33 +27,33 @@ function testForeach_block() {
 
 // Basic foreach loop with break.
 function testForeach_break() {
-    var list = List("a", "b", "c");
-    var result = List();
+    var list = ["a", "b", "c"];
+    var result = [];
 
     foreach (var i : list) {
         if (i == "b") break;
         result.add(i);
     }
 
-    assertEquals(result, List("a"));
+    assertEquals(result, ["a"]);
 }
 
 // Basic foreach loop with continue
 function testForeach_continue() {
-    var list = List("a", "b", "c");
-    var result = List();
+    var list = ["a", "b", "c"];
+    var result = [];
 
     foreach (var i : list) {
         if (i == "b") continue;
         result.add(i);
     }
 
-    assertEquals(result, List("a", "c"));
+    assertEquals(result, ["a", "c"]);
 }
 
 // Test that the foreach loop has its own scope.
 function testForeach_hasOwnScope() {
-    foreach (var i : List(1)) {
+    foreach (var i : [1]) {
         // Do nothing
     }
 

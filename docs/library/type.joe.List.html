@@ -179,9 +179,15 @@
 Lists created using the <a href="type.joe.List.html#init"><code>List()</code></a> initializer can contain any kind
 of Joe value; the list need not be homogeneous.  Lists received from
 Java code might be read-only or require a specific item type.</p>
+<p><strong><a href="#statics">Static Methods</a></strong></p>
+<ul>
+<li><a href="type.joe.List.html#static.of">List.of(<em>items</em>...)</a> → <a href="type.joe.List.html">List</a></li>
+</ul>
 <p><strong><a href="#init">Initializer</a></strong></p>
 <ul>
-<li><a href="type.joe.List.html#init">List(<em>values</em>...)</a> → <a href="type.joe.List.html">List</a></li>
+<li><a href="type.joe.List.html#init">List()</a> → <a href="type.joe.List.html">List</a></li>
+<li><a href="type.joe.List.html#init">List(<em>other</em>)</a> → <a href="type.joe.List.html">List</a></li>
+<li><a href="type.joe.List.html#init">List(<em>size</em>, [<em>initValue</em>])</a> → <a href="type.joe.List.html">List</a></li>
 </ul>
 <p><strong><a href="#methods">Methods</a></strong></p>
 <ul>
@@ -213,10 +219,21 @@ Java code might be read-only or require a specific item type.</p>
 <li><a href="type.joe.List.html#method.sublist"><em>list</em>.sublist(<em>start</em>, [<em>end</em>])</a> → <a href="type.joe.List.html">List</a></li>
 <li><a href="type.joe.List.html#method.toString"><em>list</em>.toString()</a> → <a href="type.joe.String.html">String</a></li>
 </ul>
+<h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
+<hr />
+<p><span id="static.of"> </span></p>
+<h3 id="listof"><a class="header" href="#listof">List.of()</a></h3>
+<hr />
+<p><strong>List.of(<em>items</em>...) → <a href="type.joe.List.html">List</a></strong></p>
+<p>Creates a list containing the arguments.</p>
 <h2 id="init"><a class="header" href="#init">List Initializer</a></h2>
 <hr />
-<p><strong>List(<em>values</em>...) → <a href="type.joe.List.html">List</a></strong></p>
-<p>Creates a <code>List</code> of the argument values.</p>
+<p><strong>List() → <a href="type.joe.List.html">List</a></strong><br>
+<strong>List(<em>other</em>) → <a href="type.joe.List.html">List</a></strong><br>
+<strong>List(<em>size</em>, [<em>initValue</em>]) → <a href="type.joe.List.html">List</a></strong></p>
+<p>Creates a new list as a copy of the <em>other</em> list, or as an empty
+list of the given <em>size</em>.  The list elements will be filled with the
+<em>initValue</em>, or with null if <em>initValue</em> is omitted.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
 <p><span id="method.add"> </span></p>

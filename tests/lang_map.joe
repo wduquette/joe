@@ -1,0 +1,65 @@
+// lang_map.joe: Tests Map-specific syntax
+
+function testLiteral() {
+    assertTrue({}.isEmpty());
+
+    var map = {#a: 1, #b: 2};
+    assertEquals(map, Map.of(#a, 1, #b, 2));
+    assertEquals(map.get(#a), 1);
+    assertEquals(map.get(#b), 2);
+
+    // Trailing comma is allowed in non-empty maps
+    assertEquals({#a: 1,}, {#a: 1});
+}
+
+function testIndexing_get() {
+    var map = {#a: 1, #b: 2, #c: 3};
+    assertEquals(map[#a], 1);
+    assertEquals(map[#b], 2);
+    assertEquals(map[#c], 3);
+}
+
+function testIndexing_equal() {
+    var map = {#a: 1, #b: 2, #c: 3};
+    map[#a] = 2;
+    map[#b] = 4;
+    map[#c] = 6;
+
+    assertEquals(map, {#a: 2, #b: 4, #c: 6});
+}
+
+function testIndexing_plusEqual() {
+    var map = {#a: 1, #b: 2, #c: 3};
+    map[#a] += 2;
+    map[#b] += 4;
+    map[#c] += 6;
+
+    assertEquals(map, {#a: 3, #b: 6, #c: 9});
+}
+
+function testIndexing_minusEqual() {
+    var map = {#a: 10, #b: 20, #c: 30};
+    map[#a] -= 1;
+    map[#b] -= 2;
+    map[#c] -= 3;
+
+    assertEquals(map, {#a: 9, #b: 18, #c: 27});
+}
+
+function testIndexing_starEqual() {
+    var map = {#a: 1, #b: 2, #c: 3};
+    map[#a] *= 2;
+    map[#b] *= 4;
+    map[#c] *= 6;
+
+    assertEquals(map, {#a: 2, #b: 8, #c: 18});
+}
+
+function testIndexing_minusEqual() {
+    var map = {#a: 10, #b: 20, #c: 30};
+    map[#a] /= 5;
+    map[#b] /= 4;
+    map[#c] /= 3;
+
+    assertEquals(map, {#a: 2, #b: 5, #c: 10});
+}

@@ -222,12 +222,22 @@ class Dumper {
                 buff.append(indent())
                     .append(")\n");
             }
+            case Expr.IndexGet e -> {
+                dumpExpression(e.collection());
+                dumpExpression(e.index());
+            }
+            case Expr.IndexSet e -> {
+                dumpExpression(e.collection());
+                dumpExpression(e.index());
+                dumpExpression(e.value());
+            }
             case Expr.Lambda e -> {
                 buff.append("\n");
                 ++indent;
                 dumpStatement(e.declaration());
                 --indent;
             }
+            case Expr.ListLiteral e -> e.list().forEach(this::dumpExpression);
             case Expr.Literal e ->
                 buff.append(e.value().getClass().getSimpleName())
                     .append(" '")
@@ -239,6 +249,7 @@ class Dumper {
                 dumpExpression(e.left());
                 dumpExpression(e.right());
             }
+            case Expr.MapLiteral e -> e.entries().forEach(this::dumpExpression);
             case Expr.PrePostAssign e -> {
                 if (e.isPre()) {
                     buff.append(e.op().lexeme())
@@ -249,6 +260,10 @@ class Dumper {
                         .append(e.op().lexeme())
                         .append("\n");
                 }
+            }
+            case Expr.PrePostIndex e -> {
+                dumpExpression(e.collection());
+                dumpExpression(e.index());
             }
             case Expr.PrePostSet e -> {
                 if (e.isPre()) {

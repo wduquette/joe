@@ -7,10 +7,12 @@ import java.util.List;
  */
 sealed interface Expr
     permits Expr.Assign, Expr.Binary, Expr.Call,
-            Expr.Get, Expr.Grouping,
-            Expr.Lambda, Expr.Literal, Expr.Logical, Expr.PrePostAssign,
-            Expr.PrePostSet, Expr.Set, Expr.Super,
-            Expr.This, Expr.Ternary, Expr.Unary, Expr.Variable
+            Expr.Get, Expr.Grouping, Expr.IndexGet, Expr.IndexSet,
+            Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
+            Expr.MapLiteral,
+            Expr.PrePostAssign, Expr.PrePostIndex, Expr.PrePostSet,
+            Expr.Set, Expr.Super, Expr.This, Expr.Ternary,
+            Expr.Unary, Expr.Variable
 {
     /**
      * An assignment to an existing variable.
@@ -55,12 +57,46 @@ sealed interface Expr
     record Grouping(Expr expr) implements Expr {}
 
     /**
+     * An index into a collection value.
+     * called function/method.
+     * @param collection The expression that yields the collection
+     * @param bracket A token, for line number info
+     * @param index The index expression
+     */
+    record IndexGet(Expr collection, Token bracket, Expr index) implements Expr {}
+
+    /**
+     * An index into a collection value.
+     * called function/method.
+     * @param collection The expression that yields the collection
+     * @param bracket A token, for line number info
+     * @param index The index expression
+     * @param op The operator
+     * @param value The value to set
+     */
+    record IndexSet(
+        Expr collection,
+        Token bracket,
+        Expr index,
+        Token op,
+        Expr value
+    ) implements Expr {}
+
+    /**
      * A lambda function.
      * @param declaration The function's declaration
      */
     record Lambda(
         Stmt.Function declaration
     ) implements Expr {}
+
+    /**
+     * A List literal: a list of expressions used to initialize a
+     * ListValue.
+     * @param bracket The opening left bracket
+     * @param list The list of expressions.
+     */
+    record ListLiteral(Token bracket, List<Expr> list) implements Expr {}
 
     /**
      * A literal value.
@@ -78,6 +114,14 @@ sealed interface Expr
     record Logical(Expr left, Token op, Expr right) implements Expr {}
 
     /**
+     * A Map literal: a list of expression pairs used to initialize a
+     * MapValue.
+     * @param brace The opening left brace
+     * @param entries The flat list of expression pairs.
+     */
+    record MapLiteral(Token brace, List<Expr> entries) implements Expr {}
+
+    /**
      * A pre-or-post increment/decrement to an existing variable.
      * @param name The variable's name token
      * @param op The operator
@@ -85,6 +129,19 @@ sealed interface Expr
      */
     record PrePostAssign(Token name, Token op, boolean isPre) implements Expr {}
 
+    /**
+     * A pre-or-post increment/decrement to an indexed collection.
+     * @param collection The expression that yields the collection.
+     * @param bracket The bracket
+     * @param index The expression that yields the index.
+     * @param op The operator
+     * @param isPre Whether this is a pre-increment/decrement or not.
+     */
+    record PrePostIndex(
+        Expr collection,
+        Token bracket,
+        Expr index,
+        Token op, boolean isPre) implements Expr {}
     /**
      * A pre-or-post increment/decrement to an existing property.
      * @param object The expression that yields the object.

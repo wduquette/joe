@@ -125,6 +125,8 @@ public class Scanner {
             case ')' -> makeToken(RIGHT_PAREN);
             case '{' -> makeToken(LEFT_BRACE);
             case '}' -> makeToken(RIGHT_BRACE);
+            case '[' -> makeToken(LEFT_BRACKET);
+            case ']' -> makeToken(RIGHT_BRACKET);
             case '@' -> makeToken(AT);
             case '\\' -> makeToken(BACK_SLASH);
             case ';' -> makeToken(SEMICOLON);

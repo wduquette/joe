@@ -31,4 +31,15 @@ public class ListValue
     public ListValue(Collection<?> values) {
         addAll(values);
     }
+
+    /**
+     * Creates a list with the given initial capacity.
+     * @param capacity The capacity
+     */
+    public ListValue(int capacity, Object initValue) {
+        super(capacity);
+        for (var i = 0; i < capacity; i++) {
+            add(initValue);
+        }
+    }
 }

@@ -71,9 +71,9 @@ function testMethod_varargs_good() {
     }
     var thing = Thing();
 
-    assertEquals(thing.varArgs(#a), "#a,List()");
-    assertEquals(thing.varArgs(#a,#b), "#a,List(#b)");
-    assertEquals(thing.varArgs(#a,#b,#c), "#a,List(#b, #c)");
+    assertEquals(thing.varArgs(#a), "#a,[]");
+    assertEquals(thing.varArgs(#a,#b), "#a,[#b]");
+    assertEquals(thing.varArgs(#a,#b,#c), "#a,[#b, #c]");
 
     function bad() { thing.varArgs(); }
     assertError(bad,

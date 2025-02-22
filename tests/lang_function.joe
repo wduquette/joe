@@ -43,9 +43,9 @@ function testFunction_varargs_good() {
         return first + "," + stringify(args);
     }
 
-    assertEquals(varArgs(#a), "#a,List()");
-    assertEquals(varArgs(#a,#b), "#a,List(#b)");
-    assertEquals(varArgs(#a,#b,#c), "#a,List(#b, #c)");
+    assertEquals(varArgs(#a), "#a,[]");
+    assertEquals(varArgs(#a,#b), "#a,[#b]");
+    assertEquals(varArgs(#a,#b,#c), "#a,[#b, #c]");
 
     function bad() { varArgs(); }
     assertError(bad,

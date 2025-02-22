@@ -389,6 +389,9 @@ class Parser {
                 return new Expr.Assign(name, op, value);
             } else if (target instanceof Expr.Get get) {
                 return new Expr.Set(get.object(), get.name(), op, value);
+            } else if (target instanceof Expr.IndexGet get) {
+                return new Expr.IndexSet(
+                    get.collection(), get.bracket(), get.index(), op, value);
             }
 
             error(op, "Invalid assignment target.");
@@ -517,6 +520,9 @@ class Parser {
             return new Expr.PrePostAssign(name, op, isPre);
         } else if (target instanceof Expr.Get get) {
             return new Expr.PrePostSet(get.object(), get.name(), op, isPre);
+        } else if (target instanceof Expr.IndexGet get) {
+            return new Expr.PrePostIndex(
+                get.collection(), get.bracket(), get.index(), op, isPre);
         }
 
         error(op, "Invalid '" + op.lexeme() + "' target.");
@@ -532,6 +538,11 @@ class Parser {
             } else if (match(DOT)) {
                 Token name = consume(IDENTIFIER, "Expected property name after '.'.");
                 expr = new Expr.Get(expr, name);
+            } else if (match(LEFT_BRACKET)) {
+                var bracket = previous();
+                var index = expression();
+                consume(RIGHT_BRACKET, "Expected ']' after index.");
+                expr = new Expr.IndexGet(expr, bracket, index);
             } else {
                 break;
             }
@@ -608,6 +619,50 @@ class Parser {
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expected ')' after expression.");
             return new Expr.Grouping(expr);
+        }
+
+        // List literal
+        if (match(LEFT_BRACKET)) {
+            var bracket = previous();
+            var list = new ArrayList<Expr>();
+
+            if (!check(RIGHT_BRACKET)) {
+                list.add(expression());
+
+                while (match(COMMA)) {
+                    // Allow trailing comma
+                    if (check(RIGHT_BRACKET)) break;
+                    list.add(expression());
+                }
+            }
+
+            consume(RIGHT_BRACKET, "Expected ']' after list items.");
+
+            return new Expr.ListLiteral(bracket, list);
+        }
+
+        // Map literal
+        if (match(LEFT_BRACE)) {
+            var brace = previous();
+            var entries = new ArrayList<Expr>();
+
+            if (!check(RIGHT_BRACE)) {
+                entries.add(expression());
+                consume(COLON, "Expected ':' after map key.");
+                entries.add(expression());
+
+                while (match(COMMA)) {
+                    // Allow trailing comma
+                    if (check(RIGHT_BRACE)) break;
+                    entries.add(expression());
+                    consume(COLON, "Expected ':' after map key.");
+                    entries.add(expression());
+                }
+            }
+
+            consume(RIGHT_BRACE, "Expected '}' after map entries.");
+
+            return new Expr.MapLiteral(brace, entries);
         }
 
         throw errorSync(peek(), "Expected expression.");

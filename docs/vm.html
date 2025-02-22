@@ -195,54 +195,61 @@ an atomic operation.</li>
 <tr><td>6</td><td>CONST <em>constant</em></td><td>∅ → <em>a</em></td><td>Load constant</td></tr>
 <tr><td>7</td><td>DECR</td><td><em>a</em> → <em>b</em></td><td>b = a - 1</td></tr>
 <tr><td>8</td><td>DIV</td><td><em>a b</em> → <em>c</em></td><td>c = a/b</td></tr>
-<tr><td>9</td><td>DUP</td><td><em>a</em> → <em>a</em> <em>a</em></td><td>Duplicate</td></tr>
-<tr><td>10</td><td>EQ</td><td><em>a b</em> → <em>c</em></td><td>c = a == b</td></tr>
-<tr><td>11</td><td>FALSE</td><td>∅ → false</td><td>Load <code>false</code></td></tr>
-<tr><td>12</td><td>GE</td><td><em>a b</em> → <em>c</em></td><td>c = a &gt;= b</td></tr>
-<tr><td>13</td><td>GETNEXT</td><td><em>iter</em> → <em>a</em></td><td>a = iter.next()</td></tr>
-<tr><td>14</td><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
-<tr><td>15</td><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
-<tr><td>16</td><td>GLOSET <em>name</em></td><td><em>a</em> → <em>a</em></td><td>Set global</td></tr>
-<tr><td>17</td><td>GT</td><td><em>a b</em> → <em>a</em> &gt; <em>b</em></td><td>Compare: greater</td></tr>
-<tr><td>18</td><td>HASNEXT</td><td><em>iter</em> → <em>flag</em></td><td>flag = iter.hasNext()</td></tr>
-<tr><td>19</td><td>IN</td><td><em>a coll</em> → <em>flag</em></td><td>a in collection</td></tr>
-<tr><td>20</td><td>INCR</td><td><em>a</em> → <em>b</em></td><td>b = a + 1</td></tr>
-<tr><td>21</td><td>INHERIT</td><td><em>sup sub</em> → <em>sup</em></td><td>Inheritance</td></tr>
-<tr><td>22</td><td>ITER</td><td><em>coll</em> → <em>iter</em></td><td>iter = coll.iterator()</td></tr>
-<tr><td>23</td><td>JIF <em>offset</em></td><td><em>flag</em> → ∅</td><td>Jump if false</td></tr>
-<tr><td>24</td><td>JIFKEEP <em>offset</em></td><td><em>flag</em> → <em>flag</em></td><td>Jump if false, keep value</td></tr>
-<tr><td>25</td><td>JIT <em>offset</em></td><td><em>flag</em> → ∅</td><td>Jump if true</td></tr>
-<tr><td>26</td><td>JITKEEP <em>offset</em></td><td><em>flag</em> → <em>flag</em></td><td>Jump if true, keep value</td></tr>
-<tr><td>27</td><td>JUMP <em>offset</em></td><td>∅ → ∅</td><td>Jump forwards</td></tr>
-<tr><td>28</td><td>LE</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less or equal</td></tr>
-<tr><td>29</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
-<tr><td>30</td><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
-<tr><td>31</td><td>LOOP <em>offset</em></td><td>∅ → ∅</td><td>Jump backwards</td></tr>
-<tr><td>32</td><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
-<tr><td>33</td><td>METHOD <em>name</em></td><td><em>cls f</em> → <em>cls</em></td><td>Add method to class</td></tr>
-<tr><td>34</td><td>MUL</td><td><em>a b</em> → <em>c</em></td><td>c = a*b</td></tr>
-<tr><td>35</td><td>NE</td><td><em>a b</em> → <em>c</em></td><td>c = a != b</td></tr>
-<tr><td>36</td><td>NEGATE</td><td><em>a</em> → <em>b</em></td><td>b = -a</td></tr>
-<tr><td>37</td><td>NI</td><td><em>a coll</em> → <em>flag</em></td><td>a not in collection</td></tr>
-<tr><td>38</td><td>NOT</td><td><em>a</em> → <em>b</em></td><td>b = !a</td></tr>
-<tr><td>39</td><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
-<tr><td>40</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
-<tr><td>41</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
-<tr><td>42</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
-<tr><td>43</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
-<tr><td>44</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
-<tr><td>45</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
-<tr><td>46</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
-<tr><td>47</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
-<tr><td>48</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
-<tr><td>49</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
-<tr><td>50</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
-<tr><td>51</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
-<tr><td>50</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
-<tr><td>50</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
-<tr><td>51</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
-<tr><td>52</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
-<tr><td>53</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
+<tr><td>9</td><td>DUP</td><td><em>a</em> → <em>a</em> <em>a</em></td><td>Duplicate top</td></tr>
+<tr><td>10</td><td>DUP2</td><td><em>a b</em> → <em>a b a b</em></td><td>Duplicate top 2</td></tr>
+<tr><td>11</td><td>EQ</td><td><em>a b</em> → <em>c</em></td><td>c = a == b</td></tr>
+<tr><td>12</td><td>FALSE</td><td>∅ → false</td><td>Load <code>false</code></td></tr>
+<tr><td>13</td><td>GE</td><td><em>a b</em> → <em>c</em></td><td>c = a &gt;= b</td></tr>
+<tr><td>14</td><td>GETNEXT</td><td><em>iter</em> → <em>a</em></td><td>a = iter.next()</td></tr>
+<tr><td>15</td><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
+<tr><td>16</td><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
+<tr><td>17</td><td>GLOSET <em>name</em></td><td><em>a</em> → <em>a</em></td><td>Set global</td></tr>
+<tr><td>18</td><td>GT</td><td><em>a b</em> → <em>a</em> &gt; <em>b</em></td><td>Compare: greater</td></tr>
+<tr><td>19</td><td>HASNEXT</td><td><em>iter</em> → <em>flag</em></td><td>flag = iter.hasNext()</td></tr>
+<tr><td>20</td><td>IN</td><td><em>a coll</em> → <em>flag</em></td><td>a in collection</td></tr>
+<tr><td>21</td><td>INCR</td><td><em>a</em> → <em>b</em></td><td>b = a + 1</td></tr>
+<tr><td>22</td><td>INDGET</td><td><em>coll i</em> → <em>a</em></td><td><code>a = coll[i]</code></td></tr>
+<tr><td>23</td><td>INDSET</td><td><em>coll i a</em> → <em>a</em></td><td><code>coll[i] = a</code></td></tr>
+<tr><td>24</td><td>INHERIT</td><td><em>sup sub</em> → <em>sup</em></td><td>Inheritance</td></tr>
+<tr><td>25</td><td>ITER</td><td><em>coll</em> → <em>iter</em></td><td>iter = coll.iterator()</td></tr>
+<tr><td>26</td><td>JIF <em>offset</em></td><td><em>flag</em> → ∅</td><td>Jump if false</td></tr>
+<tr><td>27</td><td>JIFKEEP <em>offset</em></td><td><em>flag</em> → <em>flag</em></td><td>Jump if false, keep value</td></tr>
+<tr><td>28</td><td>JIT <em>offset</em></td><td><em>flag</em> → ∅</td><td>Jump if true</td></tr>
+<tr><td>29</td><td>JITKEEP <em>offset</em></td><td><em>flag</em> → <em>flag</em></td><td>Jump if true, keep value</td></tr>
+<tr><td>30</td><td>JUMP <em>offset</em></td><td>∅ → ∅</td><td>Jump forwards</td></tr>
+<tr><td>31</td><td>LE</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less or equal</td></tr>
+<tr><td>32</td><td>LISTADD</td><td><em>list a</em> → <em>list</em></td><td>Add item to list</td></tr>
+<tr><td>33</td><td>LISTNEW</td><td>∅ → <em>list</em></td><td>Push empty list</td></tr>
+<tr><td>34</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
+<tr><td>34</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
+<tr><td>35</td><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
+<tr><td>36</td><td>LOOP <em>offset</em></td><td>∅ → ∅</td><td>Jump backwards</td></tr>
+<tr><td>37</td><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
+<tr><td>38</td><td>MAPNEW</td><td>∅ → <em>map</em></td><td>Push empty ma p</td></tr>
+<tr><td>39</td><td>MAPPUT</td><td><em>map k a</em> → <em>map</em></td><td>Add entry to map</td></tr>
+<tr><td>40</td><td>METHOD <em>name</em></td><td><em>cls f</em> → <em>cls</em></td><td>Add method to class</td></tr>
+<tr><td>41</td><td>MUL</td><td><em>a b</em> → <em>c</em></td><td>c = a*b</td></tr>
+<tr><td>42</td><td>NE</td><td><em>a b</em> → <em>c</em></td><td>c = a != b</td></tr>
+<tr><td>43</td><td>NEGATE</td><td><em>a</em> → <em>b</em></td><td>b = -a</td></tr>
+<tr><td>44</td><td>NI</td><td><em>a coll</em> → <em>flag</em></td><td>a not in collection</td></tr>
+<tr><td>45</td><td>NOT</td><td><em>a</em> → <em>b</em></td><td>b = !a</td></tr>
+<tr><td>46</td><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
+<tr><td>47</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
+<tr><td>48</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
+<tr><td>49</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
+<tr><td>50</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
+<tr><td>51</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
+<tr><td>52</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
+<tr><td>53</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
+<tr><td>54</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
+<tr><td>55</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
+<tr><td>56</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
+<tr><td>57</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
+<tr><td>58</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
+<tr><td>59</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
+<tr><td>60</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
+<tr><td>61</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
+<tr><td>62</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
 </tbody></table>
 </div>
 <p><strong>Stack Effects:</strong> in the stack effect column, the top of the stack is on the
@@ -269,6 +276,8 @@ constant.</li>
 upvalue data, suitable for building into a <code>Closure</code> in the current scope.
 Used only by the <code>CLOSURE</code> instruction.</li>
 <li><em>iter</em>: A collection iterator, as used to compile <code>foreach</code> loops</li>
+<li><em>k</em>: A value used as a map key.</li>
+<li><em>list</em>: A list value</li>
 <li><em>msg</em>: A message string</li>
 <li><em>n</em>: A count</li>
 <li><em>name</em>: An index into the chunk's constants table for a name constant</li>
@@ -355,6 +364,10 @@ message if <em>a</em> is not numeric. <code>SUB</code>'s error message would be 
 <hr />
 <p><strong>DUP</strong> | <em>a</em> → <em>a a</em></p>
 <p>Duplicates the value on the top of the stack.</p>
+<h3 id="dup2"><a class="header" href="#dup2">DUP2</a></h3>
+<hr />
+<p><strong>DUP2</strong> | <em>a b</em> → <em>a b a b</em></p>
+<p>Duplicates the top two values on the stack.</p>
 <h3 id="eq"><a class="header" href="#eq">EQ</a></h3>
 <hr />
 <p><strong>EQ</strong> | <em>a</em> <em>b</em> → <em>c</em>, where <em>c</em> = (<em>a</em> == <em>b</em>).</p>
@@ -410,6 +423,27 @@ iterable.</p>
 error message would be confusing.</li>
 <li><code>ADD</code> will concatenate strings, but <code>++</code> is only for use with numbers.</li>
 </ul>
+<h3 id="indget"><a class="header" href="#indget">INDGET</a></h3>
+<hr />
+<p><strong>INDGET</strong> | <em>coll i</em> → <em>a</em></p>
+<p>Retrieves the value at index <em>i</em> in the indexed collection <em>coll</em>, and pushes
+it on the stack.</p>
+<ul>
+<li>If <em>coll</em> is a Joe <code>List</code>, <em>i</em> must be an index to an existing item.</li>
+<li>If <em>coll</em> is a Joe <code>Map</code>, <em>i</em> can be any Monica value; returns null if the
+value doesn't exist.</li>
+<li>It is a runtime error if <em>coll</em> is neither a <code>List</code> nor a <code>Map</code>.</li>
+</ul>
+<h3 id="indset"><a class="header" href="#indset">INDSET</a></h3>
+<hr />
+<p><strong>INDSET</strong> | <em>coll i a</em> → <em>a</em></p>
+<p>Assigns the value <em>a</em> to index <em>i</em> in the indexed collection <em>coll</em>,
+leaving <em>a</em> on the stack.</p>
+<ul>
+<li>If <em>coll</em> is a Joe <code>List</code>, <em>i</em> must be an index to an existing item.</li>
+<li>If <em>coll</em> is a Joe <code>Map</code>, <em>i</em> can be any Monica value.</li>
+<li>It is a runtime error if <em>coll</em> is neither a <code>List</code> nor a <code>Map</code>.</li>
+</ul>
 <h3 id="inherit"><a class="header" href="#inherit">INHERIT</a></h3>
 <hr />
 <p><strong>INHERIT</strong> | <em>sup</em> <em>sub</em> → <em>sup</em></p>
@@ -449,6 +483,14 @@ stack.</p>
 <h3 id="le"><a class="header" href="#le">LE</a></h3>
 <hr />
 <p><strong>LE</strong> | <em>a</em> <em>b</em> → <em>c</em>, where <em>c</em> = (<em>a</em> &lt;= <em>b</em>)</p>
+<h3 id="listadd"><a class="header" href="#listadd">LISTADD</a></h3>
+<hr />
+<p><strong>LISTADD</strong> | <em>list</em> <em>a</em> → <em>list</em></p>
+<p>Pops <em>a</em> and adds it to the <em>list</em> value.</p>
+<h3 id="listnew"><a class="header" href="#listnew">LISTNEW</a></h3>
+<hr />
+<p><strong>LISTNEW</strong> | ∅ → <em>list</em></p>
+<p>Pushes an empty <em>list</em> value onto the stack.</p>
 <h3 id="locget"><a class="header" href="#locget">LOCGET</a></h3>
 <hr />
 <p><strong>LOCGET <em>slot</em></strong> | ∅ → <em>a</em></p>
@@ -467,6 +509,14 @@ stack.</p>
 <h3 id="lt"><a class="header" href="#lt">LT</a></h3>
 <hr />
 <p><strong>LT</strong> | <em>a</em> <em>b</em> → <em>c</em>, where <em>c</em> = (<em>a</em> &lt; <em>b</em>)</p>
+<h3 id="mapnew"><a class="header" href="#mapnew">MAPNEW</a></h3>
+<hr />
+<p><strong>MAPNEW</strong> | ∅ → <em>map</em></p>
+<p>Pushes an empty <em>map</em> value onto the stack.</p>
+<h3 id="mapput"><a class="header" href="#mapput">MAPPUT</a></h3>
+<hr />
+<p><strong>MAPPUT</strong> | <em>map</em> <em>k</em> <em>a</em> → <em>map</em></p>
+<p>Pops <em>k</em> and <em>a</em> and puts {<em>k</em>: <em>a</em>} into the <em>map</em> value.</p>
 <h3 id="method"><a class="header" href="#method">METHOD</a></h3>
 <hr />
 <p><strong>METHOD <em>name</em></strong> | <em>cls</em> <em>f</em> → <em>cls</em></p>

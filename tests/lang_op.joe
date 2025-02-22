@@ -128,6 +128,8 @@ function testNot() {
 
 //-----------------------------------------------------------------------------
 // Assignment operators
+//
+// See also lang_list.joe, lang_map.joe, for indexed references.
 
 function testAssignment() {
     var a = 1;
@@ -264,7 +266,9 @@ function testSlashEquals_property() {
 }
 
 //-----------------------------------------------------------------------------
-// ++
+// ++, --
+//
+// See also lang_list.joe, lang_map.joe, for indexed references.
 
 function testPlusPlus_pre_var() {
     var x = 0;
@@ -292,8 +296,11 @@ function testPlusPlus_post_prop() {
     assertEquals(t.x, 1);
 }
 
-//-----------------------------------------------------------------------------
-// --
+function testPlusPlus_nonNumber() {
+    var x = "abc";
+    assertError(\-> ++x, "Target of '++' must contain a number.");
+    assertError(\-> x++, "Target of '++' must contain a number.");
+}
 
 function testMinusMinus_pre_var() {
     var x = 0;
@@ -321,6 +328,12 @@ function testMinusMinus_post_prop() {
     assertEquals(t.x, -1);
 }
 
+function testMinusMinus_nonNumber() {
+    var x = "abc";
+    assertError(\-> ++x, "Target of '++' must contain a number.");
+    assertError(\-> x++, "Target of '++' must contain a number.");
+}
+
 
 //-----------------------------------------------------------------------------
 // Ternary Operator
@@ -334,7 +347,7 @@ function testTernary() {
 // in/ni Operators
 
 function testIN() {
-    var list = List(#a, #b, #c);
+    var list = [#a, #b, #c];
     assertTrue(#a in list);
     assertFalse(#d in list);
 
@@ -343,7 +356,7 @@ function testIN() {
 }
 
 function testNI() {
-    var list = List(#a, #b, #c);
+    var list = [#a, #b, #c];
     assertFalse(#a ni list);
     assertTrue(#d ni list);
 

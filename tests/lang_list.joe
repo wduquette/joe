@@ -1,0 +1,113 @@
+// lang_list.joe: tests List-specific syntax.
+
+function testLiteral() {
+    assertTrue([].isEmpty());
+
+    var single = [#one];
+    assertEquals(single.size(), 1);
+    assertEquals(single.get(0), #one);
+
+    var double = [#one, #two];
+    assertEquals(double.size(), 2);
+    assertEquals(double.get(0), #one);
+    assertEquals(double.get(1), #two);
+
+    // Trailing comma is allowed in non-empty lists.
+    assertEquals([#one], [#one,]);
+    assertEquals([#one, #two], [#one, #two,]);
+}
+
+function testIndexing_get() {
+    var list = [#a, #b, #c];
+    assertEquals(list[0], #a);
+    assertEquals(list[1], #b);
+    assertEquals(list[2], #c);
+
+    assertError(\-> list["abc"],
+        "Expected list index, got: String 'abc'.");
+    assertError(\-> list[-1],
+        "List index out of range [0, 2]: -1.");
+    assertError(\-> list[3],
+        "List index out of range [0, 2]: 3.");
+}
+
+function testIndexing_equal() {
+    var list = [0, 0, 0];
+    list[0] = 1;
+    list[1] = 2;
+    list[2] = 3;
+    assertEquals(list, [1, 2, 3]);
+
+    assertError(\-> list["abc"] = 1,
+        "Expected list index, got: String 'abc'.");
+    assertError(\-> list[-1] = 1,
+        "List index out of range [0, 2]: -1.");
+    assertError(\-> list[3] = 1,
+        "List index out of range [0, 2]: 3.");
+}
+
+function testIndexing_plusEqual() {
+    var list = [1, 2, 3];
+    list[0] += 10;
+    list[1] += 20;
+    list[2] += 30;
+    assertEquals(list, [11, 22, 33]);
+
+    list[0] = "abc";
+    assertError(\-> list[0] -= 1,
+        "The '-' operator expects two numeric operands.");
+}
+
+function testIndexing_minusEqual() {
+    var list = [10, 20, 30];
+    list[0] -= 1;
+    list[1] -= 2;
+    list[2] -= 3;
+    assertEquals(list, [9, 18, 27]);
+}
+
+function testIndexing_starEqual() {
+    var list = [1, 2, 3];
+    list[0] *= 10;
+    list[1] *= 20;
+    list[2] *= 30;
+    assertEquals(list, [10, 40, 90]);
+}
+
+function testIndexing_slashEqual() {
+    var list = [10, 20, 30];
+    list[0] /= 5;
+    list[1] /= 4;
+    list[2] /= 3;
+    assertEquals(list, [2, 5, 10]);
+}
+
+function testPrePost_plus() {
+    var list = [1, 2, 3];
+    assertEquals(++list[0], 2);
+    assertEquals(list[0], 2);
+    assertEquals(list[0]++, 2);
+    assertEquals(list[0], 3);
+
+    list[0] = "abc";
+
+    assertError(\-> list[0]++,
+        "Target of '++' must contain a number.");
+    assertError(\-> ++list[0],
+        "Target of '++' must contain a number.");
+}
+
+function testPrePost_minus() {
+    var list = [10, 20, 30];
+    assertEquals(--list[0], 9);
+    assertEquals(list[0], 9);
+    assertEquals(list[0]--, 9);
+    assertEquals(list[0], 8);
+
+    list[0] = "abc";
+
+    assertError(\-> list[0]--,
+        "Target of '--' must contain a number.");
+    assertError(\-> --list[0],
+        "Target of '--' must contain a number.");
+}

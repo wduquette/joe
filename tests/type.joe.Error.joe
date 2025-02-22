@@ -14,12 +14,12 @@ function testInitializer_withTraces() {
     var error = Error("Message", "A", "B");
     check(error.message()).eq("Message");
     check(error.type()).eq("JoeError");
-    check(error.traces()).eq(List("A", "B"));
+    check(error.traces()).eq(["A", "B"]);
 }
 
 function testAddInfo() {
     var error = Error("Message");
     check(error.traces()).isEmpty();
     error.addInfo("A");
-    check(error.traces()).eq(List("A"));
+    check(error.traces()).eq(["A"]);
 }

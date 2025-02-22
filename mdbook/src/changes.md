@@ -2,7 +2,17 @@
 
 ## Changes in 0.6.0 (forthcoming)
 
-- None yet.
+- Language
+  - Lists may now be created with list literal syntax, e.g., 
+    `[1, 2, 3]`.
+    - List items may be any arbitrary expression.
+  - Maps may now be created with map literal syntax, e.g., 
+    `{#a: 1, #b: 2, #c: 3}`.
+    - Map keys and values may be any arbitrary expressions.
+  - Both lists and maps may now be accessed using array notation, e.g.,
+    `var x = myList[i]`.
+    - Array notation is sugar for the `List` `get` and `set` methods, and
+      for the `Map` `get` and `put` methods.
 
 ## Changes in 0.5.0 
 

@@ -28,6 +28,9 @@ public class MapProxy extends TypeProxy<JoeMap> {
         super("Map");
         proxies(MapValue.class);    // Types that implement `JoeMap`
         proxies(MapWrapper.class);
+
+        staticMethod("of",      this::_of);
+
         initializer(this::_init);
 
         method("clear",         this::_clear);
@@ -47,14 +50,14 @@ public class MapProxy extends TypeProxy<JoeMap> {
     }
 
     //-------------------------------------------------------------------------
-    // Initializer Implementation
+    // Static Method Implementations
 
     //**
-    // @init
+    // @static of
     // @args values...
     // Creates a `Map` of the argument values, which must be a flat list of
     // key/value pairs.
-    private Object _init(Joe joe, Args args) {
+    private Object _of(Joe joe, Args args) {
         if (args.size() % 2 != 0) {
             throw new JoeError("Expected an even number of arguments, got: '" +
                 joe.join(", ", args.asList()) + "'.");
@@ -70,6 +73,25 @@ public class MapProxy extends TypeProxy<JoeMap> {
     }
 
     //-------------------------------------------------------------------------
+    // Initializer Implementation
+
+    //**
+    // @init
+    // @args [other]
+    // Creates a new `Map`, optionally initializing it with the entries from
+    // the *other* map.
+    private Object _init(Joe joe, Args args) {
+        args.arityRange(0, 1, "Map([other])");
+
+        var map = new MapValue();
+        if (args.size() == 1) {
+            map.putAll(joe.toMap(args.next()));
+        }
+
+        return map;
+    }
+
+    //-------------------------------------------------------------------------
     // Stringify
 
     @Override
@@ -77,11 +99,11 @@ public class MapProxy extends TypeProxy<JoeMap> {
         assert object instanceof JoeMap;
         var map = (JoeMap)object;
 
-        return "Map("
+        return "{"
             + map.entrySet().stream()
-                .map(e -> joe.stringify(e.getKey()) + "=" + joe.stringify(e.getValue()))
+                .map(e -> joe.stringify(e.getKey()) + ": " + joe.stringify(e.getValue()))
                 .collect(Collectors.joining(", "))
-            + ")";
+            + "}";
     }
 
     //-------------------------------------------------------------------------

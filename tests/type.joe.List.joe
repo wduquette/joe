@@ -1,20 +1,51 @@
 // List type tests
 
 //-----------------------------------------------------------------------------
+// List.of()
+
+function testOf_empty() {
+    check(List.of()).eq([]);
+}
+
+function testOf_items() {
+    check(List.of(1, 2, 3)).eq([1, 2, 3]);
+}
+
+
+//-----------------------------------------------------------------------------
+// List()
+
+function testCreate_empty() {
+    check(List()).eq([]);
+}
+
+function testCreate_fromList() {
+    check(List([1, 2, 3])).eq([1, 2, 3]);
+}
+
+function testCreate_withSize() {
+    check(List(3)).eq([null, null, null]);
+}
+
+function testCreate_withSizeAndValue() {
+    check(List(3, "x")).eq(["x", "x", "x"]);
+}
+
+//-----------------------------------------------------------------------------
 // add()
 
 function testAdd_simple() {
-    var list = List();
-    check(list.add(1)).eq(List(1));
-    check(list.add(2)).eq(List(1, 2));
-    check(list.add(3)).eq(List(1, 2, 3));
+    var list = [];
+    check(list.add(1)).eq([1]);
+    check(list.add(2)).eq([1, 2]);
+    check(list.add(3)).eq([1, 2, 3]);
 }
 
 function testAdd_index() {
-    var list = List();
-    check(list.add(1)).eq(List(1));
-    check(list.add(0, 2)).eq(List(2, 1));
-    check(list.add(1, 3)).eq(List(2, 3, 1));
+    var list = [];
+    check(list.add(1)).eq([1]);
+    check(list.add(0, 2)).eq([2, 1]);
+    check(list.add(1, 3)).eq([2, 3, 1]);
 
     checkCatch(\-> list.add(-1, 4))
         .message("Expected 0 <= index < 4, got: Number '-1'.");
@@ -24,18 +55,18 @@ function testAdd_index() {
 // addAll()
 
 function testAddAll_simple() {
-    var list = List(1, 2);
-    check(list.addAll(List(3, 4, 5))).eq(List(1, 2, 3, 4, 5));
+    var list = [1, 2];
+    check(list.addAll([3, 4, 5])).eq([1, 2, 3, 4, 5]);
 
     checkCatch(\-> list.addAll(6))
         .message("Expected List, got: Number '6'.");
 }
 
 function testAddAll_index() {
-    var list = List(1, 5);
-    check(list.addAll(1, List(2, 3, 4))).eq(List(1, 2, 3, 4, 5));
+    var list = [1, 5];
+    check(list.addAll(1, [2, 3, 4])).eq([1, 2, 3, 4, 5]);
 
-    checkCatch(\-> list.addAll(-1, List()))
+    checkCatch(\-> list.addAll(-1, []))
         .message("Expected 0 <= index < 6, got: Number '-1'.");
 }
 
@@ -43,15 +74,15 @@ function testAddAll_index() {
 // clear()
 
 function testClear() {
-    var list = List(1, 2, 3);
-    check(list.clear()).eq(List());
+    var list = [1, 2, 3];
+    check(list.clear()).eq([]);
 }
 
 //-----------------------------------------------------------------------------
 // contains()
 
 function testContains() {
-    var list = List(1, 2, 3);
+    var list = [1, 2, 3];
     check(list.contains(2)).eq(true);
     check(list.contains(4)).eq(false);
 }
@@ -60,37 +91,37 @@ function testContains() {
 // containsAll()
 
 function testContainsAll() {
-    var list = List(1, 2, 3);
-    check(list.containsAll(List(2, 3))).eq(true);
-    check(list.containsAll(List(4))).eq(false);
+    var list = [1, 2, 3];
+    check(list.containsAll([2, 3])).eq(true);
+    check(list.containsAll([4])).eq(false);
 }
 
 //-----------------------------------------------------------------------------
 // copy()
 
 function testCopy() {
-    var a = List(1, 2, 3);
+    var a = [1, 2, 3];
     var b = a.copy();
     a.clear();
     check(a.size()).eq(0);
-    check(b).eq(List(1, 2, 3));
+    check(b).eq([1, 2, 3]);
 }
 
 //-----------------------------------------------------------------------------
 // filter()
 
 function testFilter() {
-    var list = List(1, 2, 3, 4, 5);
+    var list = [1, 2, 3, 4, 5];
     check(list.filter(\item -> true)).eq(list);
-    check(list.filter(\item -> item > 3)).eq(List(4, 5));
-    check(list.filter(\item -> item == "a")).eq(List());
+    check(list.filter(\item -> item > 3)).eq([4, 5]);
+    check(list.filter(\item -> item == "a")).eq([]);
 }
 
 //-----------------------------------------------------------------------------
 // testGet()
 
 function testGet() {
-    var list = List(1, 2, 3);
+    var list = [1, 2, 3];
     check(list.get(0)).eq(1);
     check(list.get(2)).eq(3);
 
@@ -102,10 +133,10 @@ function testGet() {
 // testGetFirst()
 
 function testGetFirst() {
-    var list = List(1, 2, 3);
+    var list = [1, 2, 3];
     check(list.getFirst()).eq(1);
 
-    checkCatch(\-> List().getFirst())
+    checkCatch(\-> [].getFirst())
         .message("List is empty.");
 }
 
@@ -113,10 +144,10 @@ function testGetFirst() {
 // testGetLast()
 
 function testGetLast() {
-    var list = List(1, 2, 3);
+    var list = [1, 2, 3];
     check(list.getLast()).eq(3);
 
-    checkCatch(\-> List().getLast())
+    checkCatch(\-> [].getLast())
         .message("List is empty.");
 }
 
@@ -124,7 +155,7 @@ function testGetLast() {
 // indexOf()
 
 function testIndexOf() {
-    var list = List(1, 2, 3, 2, 1);
+    var list = [1, 2, 3, 2, 1];
     check(list.indexOf(2)).eq(1);
     check(list.indexOf(4)).eq(-1);
 }
@@ -133,15 +164,15 @@ function testIndexOf() {
 // isEmpty()
 
 function testIsEmpty() {
-    check(List(1).isEmpty()).eq(false);
-    check(List().isEmpty()).eq(true);
+    check([1].isEmpty()).eq(false);
+    check([].isEmpty()).eq(true);
 }
 
 //-----------------------------------------------------------------------------
 // lastIndexOf()
 
 function testLastIndexOf() {
-    var list = List(1, 2, 3, 2, 1);
+    var list = [1, 2, 3, 2, 1];
     check(list.lastIndexOf(2)).eq(3);
     check(list.lastIndexOf(4)).eq(-1);
 }
@@ -150,35 +181,35 @@ function testLastIndexOf() {
 // map()
 
 function testMap() {
-    var list = List(1, 2, 3);
-    check(list.map(\x -> 2*x)).eq(List(2, 4, 6));
+    var list = [1, 2, 3];
+    check(list.map(\x -> 2*x)).eq([2, 4, 6]);
 }
 
 //-----------------------------------------------------------------------------
 // testPeekFirst()
 
 function testPeekFirst() {
-    var list = List(1, 2, 3);
+    var list = [1, 2, 3];
     check(list.peekFirst()).eq(1);
-    check(List().peekFirst()).eq(null);
+    check([].peekFirst()).eq(null);
 }
 
 //-----------------------------------------------------------------------------
 // testPeekLast()
 
 function testPeekLast() {
-    var list = List(1, 2, 3);
+    var list = [1, 2, 3];
     check(list.peekLast()).eq(3);
-    check(List().peekLast()).eq(null);
+    check([].peekLast()).eq(null);
 }
 
 //-----------------------------------------------------------------------------
 // testRemove()
 
 function testRemove() {
-    var list = List(1, 2, 3);
+    var list = [1, 2, 3];
     check(list.remove(2)).eq(true);
-    check(list).eq(List(1, 3));
+    check(list).eq([1, 3]);
 
     check(list.remove(2)).eq(false);
 }
@@ -187,20 +218,20 @@ function testRemove() {
 // testRemoveAll()
 
 function testRemoveAll() {
-    var list = List(1, 2, 3);
-    check(list.removeAll(List(2))).eq(true);
-    check(list).eq(List(1, 3));
+    var list = [1, 2, 3];
+    check(list.removeAll([2])).eq(true);
+    check(list).eq([1, 3]);
 
-    check(list.removeAll(List(4))).eq(false);
+    check(list.removeAll([4])).eq(false);
 }
 
 //-----------------------------------------------------------------------------
 // testRemoveAt()
 
 function testRemoveAt() {
-    var list = List(1, 2, 3);
+    var list = [1, 2, 3];
     check(list.removeAt(1)).eq(2);
-    check(list).eq(List(1, 3));
+    check(list).eq([1, 3]);
 
     checkCatch(\-> list.removeAt(-1))
         .message("Expected 0 <= index < 2, got: Number '-1'.");
@@ -210,10 +241,10 @@ function testRemoveAt() {
 // testRemoveFirst()
 
 function testRemoveFirst() {
-    var list = List(1, 2, 3);
+    var list = [1, 2, 3];
     check(list.removeFirst()).eq(1);
 
-    checkCatch(\-> List().removeFirst())
+    checkCatch(\-> [].removeFirst())
         .message("List is empty.");
 }
 
@@ -221,10 +252,10 @@ function testRemoveFirst() {
 // testRemoveLast()
 
 function testRemoveLast() {
-    var list = List(1, 2, 3);
+    var list = [1, 2, 3];
     check(list.removeLast()).eq(3);
 
-    checkCatch(\-> List().removeLast())
+    checkCatch(\-> [].removeLast())
         .message("List is empty.");
 }
 
@@ -232,59 +263,59 @@ function testRemoveLast() {
 // reversed()
 
 function testReversed() {
-    var list = List(1, 2, 3);
-    check(list.reversed()).eq(List(3, 2, 1));
+    var list = [1, 2, 3];
+    check(list.reversed()).eq([3, 2, 1]);
 }
 
 //-----------------------------------------------------------------------------
 // set()
 
 function testSet() {
-    var list = List(1, 2, 3);
+    var list = [1, 2, 3];
     check(list.set(1, "x")).eq(2);
-    check(list).eq(List(1, "x", 3));
+    check(list).eq([1, "x", 3]);
 }
 
 //-----------------------------------------------------------------------------
 // size()
 
 function testSize() {
-    check(List().size()).eq(0);
-    check(List(1,2,3).size()).eq(3);
+    check([].size()).eq(0);
+    check([1,2,3].size()).eq(3);
 }
 
 //-----------------------------------------------------------------------------
 // sorted()
 
 function testSorted_goodNoComp() {
-    var list = List(5, 4, 3, 2, 1);
-    check(list.sorted()).eq(List(1, 2, 3, 4, 5));
+    var list = [5, 4, 3, 2, 1];
+    check(list.sorted()).eq([1, 2, 3, 4, 5]);
 
-    var list2 = List("e", "d", "c", "b", "a");
-    check(list2.sorted()).eq(List("a", "b", "c", "d", "e"));
+    var list2 = ["e", "d", "c", "b", "a"];
+    check(list2.sorted()).eq(["a", "b", "c", "d", "e"]);
 }
 
 function testSorted_goodComp() {
-    var list = List(5, 4, 3, 2, 1);
-    check(list.sorted(compare)).eq(List(1, 2, 3, 4, 5));
+    var list = [5, 4, 3, 2, 1];
+    check(list.sorted(compare)).eq([1, 2, 3, 4, 5]);
 
-    var list2 = List("e", "d", "c", "b", "a");
-    check(list2.sorted(compare)).eq(List("a", "b", "c", "d", "e"));
+    var list2 = ["e", "d", "c", "b", "a"];
+    check(list2.sorted(compare)).eq(["a", "b", "c", "d", "e"]);
 }
 
 function testSorted_descending() {
-    var list = List(1,2,3,4,5);
-    check(list.sorted(\a,b -> -compare(a,b))).eq(List(5,4,3,2,1));
+    var list = [1,2,3,4,5];
+    check(list.sorted(\a,b -> -compare(a,b))).eq([5,4,3,2,1]);
 }
 
 function testSorted_mismatch() {
-    var list = List(5, "d", 3, "b", 1);
+    var list = [5, "d", 3, "b", 1];
     checkCatch(\-> list.sorted())
         .message("Expected two strings or two numbers.");
 }
 
 function testSorted_badComp() {
-    var list = List(5, 4, 3, 2, 1);
+    var list = [5, 4, 3, 2, 1];
     checkCatch(\-> list.sorted(\a,b -> "abc"))
         .message("Expected number, got: String 'abc'.");
 }
@@ -294,8 +325,8 @@ function testSorted_badComp() {
 // sublist()
 
 function testSublist() {
-    var list = List(1, 2, 3, 4, 5);
-    check(list.sublist(1)).eq(List(2, 3, 4, 5));
-    check(list.sublist(1, 3)).eq(List(2, 3));
+    var list = [1, 2, 3, 4, 5];
+    check(list.sublist(1)).eq([2, 3, 4, 5]);
+    check(list.sublist(1, 3)).eq([2, 3]);
 }
 

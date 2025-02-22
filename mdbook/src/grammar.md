@@ -6,6 +6,9 @@ used in *Crafting Interpreters*.  Below that is the full
 
 ## Grammar
 
+Here is the grammar; see [Semantic Constraints](#semantic-constraints)
+for some conditions enforced by the compiler.
+
 ```
 // Statements
 program         → declaration* EOF ;
@@ -60,7 +63,9 @@ block           → "{" declaration* "}" ;
 
 // Expression
 expression      → assignment ;
-assignment      → ( call "." )? IDENTIFIER 
+assignment      → ( ( call "." )? IDENTIFIER 
+                    | call "[" primary "]"
+                  )
                   ( "=" | "+=" | "-=" | "*=" | "/=" ) 
                   assignment 
                 | ternary ;
@@ -74,17 +79,48 @@ factor          → unary ( ( "/" | "*" ) unary )* ;
 unary           → ( "++" | "==" | "-" | "!" ) unary 
                 | postfix ;
 postfix         → call ( "++" | "--" )? ;
-call            → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
+call            → primary ( "(" arguments? ")" 
+                          | "." IDENTIFIER     
+                          | "[" primary "]"
+                  )*  ;
 arguments       → expression ( "," expression )* ;
 primary         → "true" | "false" | "nil"
                 | NUMBER | STRING | KEYWORD
                 | "this"
-                | "@"
+                | "@" IDENTIFIER
                 | IDENTIFIER 
-                | "\" parameters? "->" ( expression | block ) ; 
-                | "(" expression ")" 
+                | lambda 
+                | grouping
+                | list 
                 | "super" "." IDENTIFIER ;
+grouping        → "(" expression ")"
+lambda          → "\" parameters? "->" ( expression | block ) ; 
+list            → "[" (expression ( "," expression )* ","? )? "]" ;
+map             → "{" (map_entry ( "," map_entry )* ","? )? "]" ;
+map_entry       → expression ":" expression ;
 ```
+
+## Semantic Constraints
+
+The Joe grammar has no clear distinction between lvalues and rvalues; as
+a result, it allows a number of expressions that are forbidden by the
+language engines.  At time of writing, I've not determined how to clean
+up the grammar to match.  
+
+The following expressions are valid lvalues:
+
+- Variable reference: `IDENTIFIER`
+- Property reference: `call "." IDENTIFIER`
+- Collection index: `call "[" primary "]"`
+
+Other valid `call` and `unary` expressions are not.  This primarily
+affects the increment/decrement operators: `++` and `--`.  For example,
+the following expressions are syntactically valid but will be rejected
+by the language engines:
+
+- `myFunc(a, b, c)++`
+- `--myFunc(a, b, c)`
+- `++!x`
 
 ## JLox Grammar
 

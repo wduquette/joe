@@ -259,18 +259,80 @@ program would use enumerations.</p>
 <li><code>#descending</code></li>
 </ul>
 <h2 id="lists"><a class="header" href="#lists">Lists</a></h2>
-<p>A <a href="library/type.joe.List.html">List</a> is a Java <code>List&lt;Object&gt;</code> that
-contains an ordered collection of arbitrary Joe values, and has much
-the same operations as Java lists.  See the link for the full API.</p>
-<pre><code class="language-joe">var list = List("a", "b", "c", "d");
-println(list.get(2)); // Outputs "c".
+<p>A <a href="library/type.joe.List.html">List</a> is a Java <code>List&lt;Object&gt;</code> that contains an ordered collection
+of arbitrary Joe values, and has much the same operations as Java
+lists.  See the link for the full API.</p>
+<p>There are several ways to create and initialize lists.  First,
+build it up one element at a time:</p>
+<pre><code class="language-joe">var list = List();
+list.add("a");
+list.add("b");
+list.add("c");
+list.add("d");
 </code></pre>
+<p>Or use the Java-like <code>List.of(items...)</code> method:</p>
+<pre><code class="language-joe">var list = List.of("a", "b", "c", "d");
+</code></pre>
+<p>However, lists are usually created using Joe's list literal syntax:</p>
+<pre><code class="language-joe">var list = ["a", "b", "c", "d"];
+</code></pre>
+<p>List literals are allowed to have a trailing comma:</p>
+<pre><code class="language-joe">var list = [
+    "this",
+    "that",
+    "the other",
+];
+</code></pre>
+<p>Lists can be queried much as in Java:</p>
+<pre><code class="language-joe">var list = ["a", "b", "c", "d"];
+
+list.isEmpty();      // False
+list.size();         // 4
+list.get(1);         // "b"
+</code></pre>
+<p>List items can also be accessed using array notation:</p>
+<pre><code class="language-joe">var list = ["a", "b", "c", "d"];
+
+var c = list[2];    // list.get(2)
+list[3] = "xyz";    // list.set(3, "xyz");
+</code></pre>
+<p>Indices are zero-based, and must refer to an existing item.</p>
 <h2 id="maps"><a class="header" href="#maps">Maps</a></h2>
 <p>A <a href="library/type.joe.Map.html">Map</a> is a Java <code>Map&lt;Object,Object&gt;</code>,
-basic key/value store.  It has much the same operations as Java maps.
+key/value store.  It has much the same operations as Java maps.
 See the link for the full API.</p>
-<pre><code class="language-joe">var map = Map(#a, 1, #b, 2);
-println(map.get(#b)); // Outputs "2".
+<p>There are several ways to create and initialize lists.  First,
+build it up one entry at a time:</p>
+<pre><code class="language-joe">var map = Map();
+map.put(#a, 1);
+map.put(#b, 2);
+map.put(#c, 3);
+</code></pre>
+<p>Or use the Java-like <code>Map.of(values...)</code> method:</p>
+<pre><code class="language-joe">var map = Map.of(#a, 1, #b, 2, #c, 3);
+</code></pre>
+<p>However, maps are usually created using Joe's map literal syntax:</p>
+<pre><code class="language-joe">var map = {#a: 1, #b: 2, #c, 3};
+</code></pre>
+<p>Map literals are allowed to have a trailing comma:</p>
+<pre><code class="language-joe">var map = [
+  #a: 1,
+  #b: 2,
+  #c: 3,
+];
+</code></pre>
+<p>Maps can be queried much as in Java:</p>
+<pre><code class="language-joe">var map = {#a: 1, #b: 2, #c, 3};
+
+map.isEmpty();      // False
+map.size();         // 3
+map.get(#b);        // 2
+</code></pre>
+<p>Maps can also be accessed using array notation:</p>
+<pre><code class="language-joe">var map = {#a: 1, #b: 2, #c, 3};
+
+var c = map[#c];   // map.get(#c);
+map[#d] = 4;       // map.put(#d, 4);
 </code></pre>
 <h2 id="sets"><a class="header" href="#sets">Sets</a></h2>
 <p>A <a href="library/type.joe.Set.html">Set</a> is a Java <code>Set&lt;Object&gt;</code>.  It has much

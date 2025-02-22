@@ -834,6 +834,8 @@ class Compiler {
 
         if (last.type() == TokenType.IDENTIFIER) {
             preIncrDecrIdentifier(mathOp);
+        } else if (last.type() == TokenType.RIGHT_BRACKET) {
+            preIncrDecrIndex(mathOp);
         } else {
             error("Invalid '" + op.lexeme() + "' target.");
         }
@@ -882,12 +884,72 @@ class Compiler {
         }
     }
 
+    private void preIncrDecrIndex(char mathOp) {
+        // FIRST, back out the last instruction, which will be INDGET.
+        current.chunk.size--;
+
+        // Increment/decrement an indexed reference
+        // ; ++x[i] or --x[i]
+        //           | x i              ; Indexed ref on stack
+        // DUP2      | x i → x i x i    ; Duplicate ref
+        // INDGET    | x i x i → x i a  ; a = x[i]
+        // op        | x i a → x i b    ; b = ++a or b = --a
+        // INDSET    | x i b → b        ; x[i] = b, retaining b
+
+        emit(Opcode.DUP2);
+        emit(Opcode.INDGET);
+        emit(mathOp);
+        emit(Opcode.INDSET);
+    }
+
     private void variable(boolean canAssign) {
         getOrSetVariable(parser.previous, canAssign);
     }
 
     private void literal(boolean canAssign) {
         emitConstant(parser.previous.literal());
+    }
+
+    // List literal: [...]
+    private void list(boolean canAssign) {
+        emit(Opcode.LISTNEW);
+
+        if (!check(TokenType.RIGHT_BRACKET)) {
+            expression();
+            emit(Opcode.LISTADD);
+
+            while (match(TokenType.COMMA)) {
+                // Allow trailing comma
+                if (check(TokenType.RIGHT_BRACKET)) break;
+                expression();
+                emit(Opcode.LISTADD);
+            }
+        }
+
+        consume(TokenType.RIGHT_BRACKET, "Expected ']' after list items.");
+    }
+
+    // map literal: [...]
+    private void map(boolean canAssign) {
+        emit(Opcode.MAPNEW);
+
+        if (!check(TokenType.RIGHT_BRACE)) {
+            expression();
+            consume(TokenType.COLON, "Expected ':' after map key.");
+            expression();
+            emit(Opcode.MAPPUT);
+
+            while (match(TokenType.COMMA)) {
+                // Allow trailing comma
+                if (check(TokenType.RIGHT_BRACE)) break;
+                expression();
+                consume(TokenType.COLON, "Expected ':' after map key.");
+                expression();
+                emit(Opcode.MAPPUT);
+            }
+        }
+
+        consume(TokenType.RIGHT_BRACE, "Expected '}' after map entries.");
     }
 
     private void symbol(boolean canAssign) {
@@ -1008,6 +1070,68 @@ class Compiler {
         emit(Opcode.TGET);
     }
 
+    // Handles `[i]`
+    private void index(boolean canAssign) {
+        // Index expression
+        expression();
+        consume(RIGHT_BRACKET, "Expected ']' after indexed expression.");
+
+        if (canAssign && match(EQUAL)) {
+            expression();
+            emit(Opcode.INDSET);
+        } else if (canAssign && match(PLUS_EQUAL)) {
+            updateIndex(Opcode.ADD);
+        } else if (canAssign && match(MINUS_EQUAL)) {
+            updateIndex(Opcode.SUB);
+        } else if (canAssign && match(STAR_EQUAL)) {
+            updateIndex(Opcode.MUL);
+        } else if (canAssign && match(SLASH_EQUAL)) {
+            updateIndex(Opcode.DIV);
+        } else if (canAssign && match(PLUS_PLUS)) {
+            postIncrDecrIndex(Opcode.INCR);
+        } else if (canAssign && match(MINUS_MINUS)) {
+            postIncrDecrIndex(Opcode.DECR);
+        } else {
+            emit(Opcode.INDGET);
+        }
+    }
+
+    // Emits the code to update an indexed reference
+    private void updateIndex(char mathOp) {
+        // ; x[i] op= expr
+        //          | x i              ; Index ref on stack
+        // DUP2     | x i → x i x i    ; Duplicate index ref
+        // INDGET   | x i x i → x i a  ; a = x[i]
+        // expr     | x i a → x i a b  ; b = expr
+        // op       | x i a b → x i c  ; E.g., c = a op b
+        // INDSET   | x i c → c        ; x[i] = c, retaining c
+        emit(Opcode.DUP2);
+        emit(Opcode.INDGET);
+        expression();
+        emit(mathOp);
+        emit(Opcode.INDSET);
+    }
+
+    // Emits the code to post-increment/decrement an indexed reference
+    private void postIncrDecrIndex(char mathOp) {
+        // ; x[i]++, x[i]--
+        //           | x i               ; Index ref on stack
+        // DUP2      | x i → x i x i     ; Duplicate index ref
+        // INDGET    | x i x i → x i a   ; a = x[i]
+        // TPUT      | x i a → x i a     ; T = a
+        // op        | x i a → x i b     ; b = a++ or b = a--
+        // INDSET    | x i b → b         ; x[i] = b
+        // POP       | b → ∅             ;
+        // TGET      | ∅ → a             ; push T
+
+        emit(Opcode.DUP2);
+        emit(Opcode.INDGET);
+        emit(Opcode.TPUT);
+        emit(mathOp);
+        emit(Opcode.INDSET);
+        emit(Opcode.POP);
+        emit(Opcode.TGET);
+    }
 
     private void parsePrecedence(int level) {
         advance();
@@ -1629,8 +1753,10 @@ class Compiler {
         //   Single Character
         rule(LEFT_PAREN,      this::grouping, this::call,    Level.CALL);
         rule(RIGHT_PAREN,     null,           null,          Level.NONE);
-        rule(LEFT_BRACE,      null,           null,          Level.NONE);
+        rule(LEFT_BRACE,      this::map,      null,          Level.NONE);
         rule(RIGHT_BRACE,     null,           null,          Level.NONE);
+        rule(LEFT_BRACKET,    this::list,     this::index,   Level.CALL);
+        rule(RIGHT_BRACKET,   null,           null,          Level.NONE);
         rule(AT,              this::this_,    null,          Level.NONE);
         rule(BACK_SLASH,      this::lambda,   null,          Level.NONE);
         rule(COLON,           null,           null,          Level.NONE);

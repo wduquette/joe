@@ -1,6 +1,8 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.types.ListValue;
+import com.wjduquette.joe.types.MapValue;
 
 import java.util.*;
 
@@ -406,7 +408,7 @@ class Interpreter {
             case Expr.Get expr -> {
                 Object object = evaluate(expr.object());
                 if (object == null) {
-                    throw new JoeError(
+                    throw new RuntimeError(expr.name().span(),
                         "Tried to retrieve '" + expr.name().lexeme() +
                         "' property from null value.");
                 }
@@ -415,9 +417,66 @@ class Interpreter {
             }
             // (expr...)
             case Expr.Grouping expr -> evaluate(expr.expr());
+            // expr[index]
+            case Expr.IndexGet expr -> {
+                var target = evaluate(expr.collection());
+                var index = evaluate(expr.index());
+                if (target instanceof List<?> list) {
+                    int i = checkListIndex(expr.bracket(), list, index);
+                    yield list.get(i);
+                } else if (target instanceof Map<?,?> map) {
+                    yield map.get(index);
+                } else {
+                    throw new RuntimeError(expr.bracket().span(),
+                        "Expected indexed collection, got: " +
+                        joe.typedValue(target) + ".");
+                }
+            }
+            // expr[index] = value, etc.
+            case Expr.IndexSet expr -> {
+                var target = evaluate(expr.collection());
+                var index = evaluate(expr.index());
+                var value = evaluate(expr.value());
+
+                if (target instanceof JoeList list) {
+                    int i = checkListIndex(expr.bracket(), list, index);
+
+                    var right = value;
+
+                    if (expr.op().type() != TokenType.EQUAL) {
+                        var left = list.get(i);
+                        right = computeExtendedAssignment(left, expr.op(), right);
+                    }
+
+                    list.set(i, right);
+                    yield right;
+                } else if (target instanceof JoeMap map) {
+                    var right = value;
+
+                    if (expr.op().type() != TokenType.EQUAL) {
+                        var left = map.get(index);
+                        right = computeExtendedAssignment(left, expr.op(), right);
+                    }
+
+                    map.put(index, right);
+                    yield right;
+                } else {
+                    throw new RuntimeError(expr.bracket().span(),
+                        "Expected indexed collection, got: " +
+                            joe.typedValue(target));
+                }
+            }
             // Return a callable for the given lambda
             case Expr.Lambda expr ->
                 new WalkerFunction(this, expr.declaration(), environment, false);
+            // A list literal
+            case Expr.ListLiteral expr -> {
+                var list = new ListValue();
+                for (var e : expr.list()) {
+                    list.add(evaluate(e));
+                }
+                yield list;
+            }
             // Any literal
             case Expr.Literal expr -> expr.value();
             // && and ||
@@ -431,6 +490,16 @@ class Interpreter {
                 }
 
                 yield evaluate(expr.right());
+            }
+            // A map literal
+            case Expr.MapLiteral expr -> {
+                var map = new MapValue();
+                for (var i = 0; i < expr.entries().size(); i += 2) {
+                    var key = evaluate(expr.entries().get(i));
+                    var value = evaluate(expr.entries().get(i + 1));
+                    map.put(key, value);
+                }
+                yield map;
             }
             // ++ and -- with a variable name
             case Expr.PrePostAssign expr -> {
@@ -448,6 +517,39 @@ class Interpreter {
                 } else {
                     globals.assign(expr.name(), assigned);
                 }
+                yield result;
+            }
+            // ++ and -- with an indexed collection
+            case Expr.PrePostIndex expr -> {
+                var target = evaluate(expr.collection());
+                var index = evaluate(expr.index());
+                Object prior;
+
+                if (target instanceof JoeList list) {
+                    int i = checkListIndex(expr.bracket(), list, index);
+                    prior = list.get(i);
+                } else if (target instanceof JoeMap map) {
+                    prior = map.get(index);
+                } else {
+                    throw new RuntimeError(expr.bracket().span(),
+                        "Expected indexed collection, got: " +
+                            joe.typedValue(target));
+                }
+
+                checkNumericTarget(expr.op(), prior);
+
+                double assigned = expr.op().type() == TokenType.PLUS_PLUS
+                    ? (double)prior + 1
+                    : (double)prior - 1;
+                var result = expr.isPre() ? assigned : prior;
+
+                if (target instanceof JoeList list) {
+                    int i = checkListIndex(expr.bracket(), list, index);
+                    list.set(i, assigned);
+                } else {
+                    ((JoeMap)target).put(index, assigned);
+                }
+
                 yield result;
             }
             // ++ and -- with an object property
@@ -630,6 +732,23 @@ class Interpreter {
 
     private void checkNumericTarget(Token operator, Object operand) {
         if (operand instanceof Double) return;
-        throw new RuntimeError(operator.span(), "Target of operand must contain a number.");
+        throw new RuntimeError(operator.span(), "Target of '" +
+            operator.lexeme() +
+            "' must contain a number.");
     }
+
+    private int checkListIndex(Token bracket, List<?> list, Object index) {
+        if (index instanceof Double d) {
+            int i = d.intValue();
+            if (i >= 0 && i < list.size()) {
+                return i;
+            } else {
+                throw new RuntimeError(bracket.span(),
+                    "List index out of range [0, " + (list.size() - 1) + "]: " + i + ".");
+            }
+        } else {
+            throw expected(bracket.span(), "list index", index);
+        }
+    }
+
 }
