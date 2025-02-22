@@ -1050,6 +1050,68 @@ class Compiler {
         emit(Opcode.TGET);
     }
 
+    // Handles `[i]`
+    private void index(boolean canAssign) {
+        // Index expression
+        expression();
+        consume(RIGHT_BRACKET, "Expected ']' after indexed expression.");
+
+        if (canAssign && match(EQUAL)) {
+            expression();
+            emit(Opcode.INDSET);
+        } else if (canAssign && match(PLUS_EQUAL)) {
+            updateIndex(Opcode.ADD);
+        } else if (canAssign && match(MINUS_EQUAL)) {
+            updateIndex(Opcode.SUB);
+        } else if (canAssign && match(STAR_EQUAL)) {
+            updateIndex(Opcode.MUL);
+        } else if (canAssign && match(SLASH_EQUAL)) {
+            updateIndex(Opcode.DIV);
+        } else if (canAssign && match(PLUS_PLUS)) {
+            postIncrDecrIndex(Opcode.INCR);
+        } else if (canAssign && match(MINUS_MINUS)) {
+            postIncrDecrIndex(Opcode.DECR);
+        } else {
+            emit(Opcode.INDGET);
+        }
+    }
+
+    // Emits the code to update an indexed reference
+    private void updateIndex(char mathOp) {
+        // ; x[i] op= expr
+        //          | x i              ; Index ref on stack
+        // DUP2     | x i → x i x i    ; Duplicate index ref
+        // INDGET   | x i x i → x i a  ; a = x[i]
+        // expr     | x i a → x i a b  ; b = expr
+        // op       | x i a b → x i c  ; E.g., c = a op b
+        // INDSET   | x i c → c        ; x[i] = c, retaining c
+        emit(Opcode.DUP2);
+        emit(Opcode.INDGET);
+        expression();
+        emit(mathOp);
+        emit(Opcode.INDSET);
+    }
+
+    // Emits the code to post-increment/decrement an indexed reference
+    private void postIncrDecrIndex(char mathOp) {
+        // ; x[i]++, x[i]--
+        //           | x i               ; Index ref on stack
+        // DUP2      | x i → x i x i     ; Duplicate index ref
+        // INDGET    | x i x i → x i a   ; a = x[i]
+        // TPUT      | x i a → x i a     ; T = a
+        // op        | x i a → x i b     ; b = a++ or b = a--
+        // INDSET    | x i b → b         ; x[i] = b
+        // POP       | b → ∅             ;
+        // TGET      | ∅ → a             ; push T
+
+        emit(Opcode.DUP2);
+        emit(Opcode.INDGET);
+        emit(Opcode.TPUT);
+        emit(mathOp);
+        emit(Opcode.INDSET);
+        emit(Opcode.POP);
+        emit(Opcode.TGET);
+    }
 
     private void parsePrecedence(int level) {
         advance();
@@ -1673,7 +1735,7 @@ class Compiler {
         rule(RIGHT_PAREN,     null,           null,          Level.NONE);
         rule(LEFT_BRACE,      this::map,      null,          Level.NONE);
         rule(RIGHT_BRACE,     null,           null,          Level.NONE);
-        rule(LEFT_BRACKET,    this::list,     null,          Level.NONE);
+        rule(LEFT_BRACKET,    this::list,     this::index,   Level.CALL);
         rule(RIGHT_BRACKET,   null,           null,          Level.NONE);
         rule(AT,              this::this_,    null,          Level.NONE);
         rule(BACK_SLASH,      this::lambda,   null,          Level.NONE);
