@@ -834,6 +834,8 @@ class Compiler {
 
         if (last.type() == TokenType.IDENTIFIER) {
             preIncrDecrIdentifier(mathOp);
+        } else if (last.type() == TokenType.RIGHT_BRACKET) {
+            preIncrDecrIndex(mathOp);
         } else {
             error("Invalid '" + op.lexeme() + "' target.");
         }
@@ -880,6 +882,24 @@ class Compiler {
             emit(mathOp);
             emit(setOp, arg);
         }
+    }
+
+    private void preIncrDecrIndex(char mathOp) {
+        // FIRST, back out the last instruction, which will be INDGET.
+        current.chunk.size--;
+
+        // Increment/decrement an indexed reference
+        // ; ++x[i] or --x[i]
+        //           | x i              ; Indexed ref on stack
+        // DUP2      | x i → x i x i    ; Duplicate ref
+        // INDGET    | x i x i → x i a  ; a = x[i]
+        // op        | x i a → x i b    ; b = ++a or b = --a
+        // INDSET    | x i b → b        ; x[i] = b, retaining b
+
+        emit(Opcode.DUP2);
+        emit(Opcode.INDGET);
+        emit(mathOp);
+        emit(Opcode.INDSET);
     }
 
     private void variable(boolean canAssign) {

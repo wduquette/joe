@@ -309,7 +309,7 @@ class VirtualMachine {
                 case CONST -> push(readConstant());
                 case DECR -> {
                     var a = pop();
-                    checkNumericOperand("--", a);
+                    checkPrePostOperand("--", a);
                     push((double)a - 1);
                 }
                 case DIV -> {
@@ -397,7 +397,7 @@ class VirtualMachine {
                 }
                 case INCR -> {
                     var a = pop();
-                    checkNumericOperand("++", a);
+                    checkPrePostOperand("++", a);
                     push((double)a + 1);
                 }
                 case INDGET -> {
@@ -723,9 +723,9 @@ class VirtualMachine {
         }
     }
 
-    private void checkNumericOperand(String op, Object a) {
+    private void checkPrePostOperand(String op, Object a) {
         if (!(a instanceof Double)) {
-            throw error("The '" + op + "' operator expects a numeric operand.");
+            throw error("Target of '" + op + "' must contain a number.");
         }
     }
 
@@ -740,7 +740,7 @@ class VirtualMachine {
             }
         } else {
             throw error("Expected list index, got: " +
-                joe.typedValue(index));
+                joe.typedValue(index) + ".");
         }
     }
 
