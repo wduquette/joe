@@ -153,6 +153,17 @@ list.size();         // 4
 list.get(1);         // "b"
 ```
 
+List items can also be accessed using array notation:
+
+```joe
+var list = ["a", "b", "c", "d"];
+
+var c = list[2];    // list.get(2)
+list[3] = "xyz";    // list.set(3, "xyz");
+```
+
+Indices are zero-based, and must refer to an existing item.
+
 ## Maps
 
 A [Map](library/type.joe.Map.md) is a Java `Map<Object,Object>`, 
@@ -199,6 +210,15 @@ var map = {#a: 1, #b: 2, #c, 3};
 map.isEmpty();      // False
 map.size();         // 3
 map.get(#b);        // 2
+```
+
+Maps can also be accessed using array notation:
+
+```joe
+var map = {#a: 1, #b: 2, #c, 3};
+
+var c = map[#c];   // map.get(#c);
+map[#d] = 4;       // map.put(#d, 4);
 ```
 
 ## Sets

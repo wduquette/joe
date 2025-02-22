@@ -290,6 +290,13 @@ list.isEmpty();      // False
 list.size();         // 4
 list.get(1);         // "b"
 </code></pre>
+<p>List items can also be accessed using array notation:</p>
+<pre><code class="language-joe">var list = ["a", "b", "c", "d"];
+
+var c = list[2];    // list.get(2)
+list[3] = "xyz";    // list.set(3, "xyz");
+</code></pre>
+<p>Indices are zero-based, and must refer to an existing item.</p>
 <h2 id="maps"><a class="header" href="#maps">Maps</a></h2>
 <p>A <a href="library/type.joe.Map.html">Map</a> is a Java <code>Map&lt;Object,Object&gt;</code>,
 key/value store.  It has much the same operations as Java maps.
@@ -320,6 +327,12 @@ map.put(#c, 3);
 map.isEmpty();      // False
 map.size();         // 3
 map.get(#b);        // 2
+</code></pre>
+<p>Maps can also be accessed using array notation:</p>
+<pre><code class="language-joe">var map = {#a: 1, #b: 2, #c, 3};
+
+var c = map[#c];   // map.get(#c);
+map[#d] = 4;       // map.put(#d, 4);
 </code></pre>
 <h2 id="sets"><a class="header" href="#sets">Sets</a></h2>
 <p>A <a href="library/type.joe.Set.html">Set</a> is a Java <code>Set&lt;Object&gt;</code>.  It has much

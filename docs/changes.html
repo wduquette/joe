@@ -178,8 +178,25 @@
 <ul>
 <li>Language
 <ul>
-<li>Lists may now be created with list literal syntax, e.g., <code>[1, 2, 3]</code>.
-List items may be any arbitrary expression.</li>
+<li>Lists may now be created with list literal syntax, e.g.,
+<code>[1, 2, 3]</code>.
+<ul>
+<li>List items may be any arbitrary expression.</li>
+</ul>
+</li>
+<li>Maps may now be created with map literal syntax, e.g.,
+<code>{#a: 1, #b: 2, #c: 3}</code>.
+<ul>
+<li>Map keys and values may be any arbitrary expressions.</li>
+</ul>
+</li>
+<li>Both lists and maps may now be accessed using array notation, e.g.,
+<code>var x = myList[i]</code>.
+<ul>
+<li>Array notation is sugar for the <code>List</code> <code>get</code> and <code>set</code> methods, and
+for the <code>Map</code> <code>get</code> and <code>put</code> methods.</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

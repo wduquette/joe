@@ -292,8 +292,25 @@ buy him lunch.</p>
 <ul>
 <li>Language
 <ul>
-<li>Lists may now be created with list literal syntax, e.g., <code>[1, 2, 3]</code>.
-List items may be any arbitrary expression.</li>
+<li>Lists may now be created with list literal syntax, e.g.,
+<code>[1, 2, 3]</code>.
+<ul>
+<li>List items may be any arbitrary expression.</li>
+</ul>
+</li>
+<li>Maps may now be created with map literal syntax, e.g.,
+<code>{#a: 1, #b: 2, #c: 3}</code>.
+<ul>
+<li>Map keys and values may be any arbitrary expressions.</li>
+</ul>
+</li>
+<li>Both lists and maps may now be accessed using array notation, e.g.,
+<code>var x = myList[i]</code>.
+<ul>
+<li>Array notation is sugar for the <code>List</code> <code>get</code> and <code>set</code> methods, and
+for the <code>Map</code> <code>get</code> and <code>put</code> methods.</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -854,6 +871,13 @@ list.isEmpty();      // False
 list.size();         // 4
 list.get(1);         // "b"
 </code></pre>
+<p>List items can also be accessed using array notation:</p>
+<pre><code class="language-joe">var list = ["a", "b", "c", "d"];
+
+var c = list[2];    // list.get(2)
+list[3] = "xyz";    // list.set(3, "xyz");
+</code></pre>
+<p>Indices are zero-based, and must refer to an existing item.</p>
 <h2 id="maps"><a class="header" href="#maps">Maps</a></h2>
 <p>A <a href="library/type.joe.Map.html">Map</a> is a Java <code>Map&lt;Object,Object&gt;</code>,
 key/value store.  It has much the same operations as Java maps.
@@ -884,6 +908,12 @@ map.put(#c, 3);
 map.isEmpty();      // False
 map.size();         // 3
 map.get(#b);        // 2
+</code></pre>
+<p>Maps can also be accessed using array notation:</p>
+<pre><code class="language-joe">var map = {#a: 1, #b: 2, #c, 3};
+
+var c = map[#c];   // map.get(#c);
+map[#d] = 4;       // map.put(#d, 4);
 </code></pre>
 <h2 id="sets"><a class="header" href="#sets">Sets</a></h2>
 <p>A <a href="library/type.joe.Set.html">Set</a> is a Java <code>Set&lt;Object&gt;</code>.  It has much
@@ -8149,6 +8179,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 used in <em>Crafting Interpreters</em>.  Below that is the full
 <a href="grammar.html#jlox-grammar">JLox grammar</a>.</p>
 <h2 id="grammar"><a class="header" href="#grammar">Grammar</a></h2>
+<p>Here is the grammar; see <a href="grammar.html#semantic-constraints">Semantic Constraints</a>
+for some conditions enforced by the compiler.</p>
 <pre><code>// Statements
 program         → declaration* EOF ;
 
@@ -8202,7 +8234,9 @@ block           → "{" declaration* "}" ;
 
 // Expression
 expression      → assignment ;
-assignment      → ( call "." )? IDENTIFIER 
+assignment      → ( ( call "." )? IDENTIFIER 
+                    | call "[" primary "]"
+                  )
                   ( "=" | "+=" | "-=" | "*=" | "/=" ) 
                   assignment 
                 | ternary ;
@@ -8216,7 +8250,10 @@ factor          → unary ( ( "/" | "*" ) unary )* ;
 unary           → ( "++" | "==" | "-" | "!" ) unary 
                 | postfix ;
 postfix         → call ( "++" | "--" )? ;
-call            → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
+call            → primary ( "(" arguments? ")" 
+                          | "." IDENTIFIER     
+                          | "[" primary "]"
+                  )*  ;
 arguments       → expression ( "," expression )* ;
 primary         → "true" | "false" | "nil"
                 | NUMBER | STRING | KEYWORD
@@ -8233,6 +8270,26 @@ list            → "[" (expression ( "," expression )* ","? )? "]" ;
 map             → "{" (map_entry ( "," map_entry )* ","? )? "]" ;
 map_entry       → expression ":" expression ;
 </code></pre>
+<h2 id="semantic-constraints"><a class="header" href="#semantic-constraints">Semantic Constraints</a></h2>
+<p>The Joe grammar has no clear distinction between lvalues and rvalues; as
+a result, it allows a number of expressions that are forbidden by the
+language engines.  At time of writing, I've not determined how to clean
+up the grammar to match.</p>
+<p>The following expressions are valid lvalues:</p>
+<ul>
+<li>Variable reference: <code>IDENTIFIER</code></li>
+<li>Property reference: <code>call "." IDENTIFIER</code></li>
+<li>Collection index: <code>call "[" primary "]"</code></li>
+</ul>
+<p>Other valid <code>call</code> and <code>unary</code> expressions are not.  This primarily
+affects the increment/decrement operators: <code>++</code> and <code>--</code>.  For example,
+the following expressions are syntactically valid but will be rejected
+by the language engines:</p>
+<ul>
+<li><code>myFunc(a, b, c)++</code></li>
+<li><code>--myFunc(a, b, c)</code></li>
+<li><code>++!x</code></li>
+</ul>
 <h2 id="jlox-grammar"><a class="header" href="#jlox-grammar">JLox Grammar</a></h2>
 <p>Here is Nystrom's JLox grammar, for comparison.</p>
 <pre><code>// Statements
@@ -8313,59 +8370,61 @@ an atomic operation.</li>
 <tr><td>6</td><td>CONST <em>constant</em></td><td>∅ → <em>a</em></td><td>Load constant</td></tr>
 <tr><td>7</td><td>DECR</td><td><em>a</em> → <em>b</em></td><td>b = a - 1</td></tr>
 <tr><td>8</td><td>DIV</td><td><em>a b</em> → <em>c</em></td><td>c = a/b</td></tr>
-<tr><td>9</td><td>DUP</td><td><em>a</em> → <em>a</em> <em>a</em></td><td>Duplicate</td></tr>
-<tr><td>10</td><td>EQ</td><td><em>a b</em> → <em>c</em></td><td>c = a == b</td></tr>
-<tr><td>11</td><td>FALSE</td><td>∅ → false</td><td>Load <code>false</code></td></tr>
-<tr><td>12</td><td>GE</td><td><em>a b</em> → <em>c</em></td><td>c = a &gt;= b</td></tr>
-<tr><td>13</td><td>GETNEXT</td><td><em>iter</em> → <em>a</em></td><td>a = iter.next()</td></tr>
-<tr><td>14</td><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
-<tr><td>15</td><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
-<tr><td>16</td><td>GLOSET <em>name</em></td><td><em>a</em> → <em>a</em></td><td>Set global</td></tr>
-<tr><td>17</td><td>GT</td><td><em>a b</em> → <em>a</em> &gt; <em>b</em></td><td>Compare: greater</td></tr>
-<tr><td>18</td><td>HASNEXT</td><td><em>iter</em> → <em>flag</em></td><td>flag = iter.hasNext()</td></tr>
-<tr><td>19</td><td>IN</td><td><em>a coll</em> → <em>flag</em></td><td>a in collection</td></tr>
-<tr><td>20</td><td>INCR</td><td><em>a</em> → <em>b</em></td><td>b = a + 1</td></tr>
-<tr><td>21</td><td>INHERIT</td><td><em>sup sub</em> → <em>sup</em></td><td>Inheritance</td></tr>
-<tr><td>22</td><td>ITER</td><td><em>coll</em> → <em>iter</em></td><td>iter = coll.iterator()</td></tr>
-<tr><td>23</td><td>JIF <em>offset</em></td><td><em>flag</em> → ∅</td><td>Jump if false</td></tr>
-<tr><td>24</td><td>JIFKEEP <em>offset</em></td><td><em>flag</em> → <em>flag</em></td><td>Jump if false, keep value</td></tr>
-<tr><td>25</td><td>JIT <em>offset</em></td><td><em>flag</em> → ∅</td><td>Jump if true</td></tr>
-<tr><td>26</td><td>JITKEEP <em>offset</em></td><td><em>flag</em> → <em>flag</em></td><td>Jump if true, keep value</td></tr>
-<tr><td>27</td><td>JUMP <em>offset</em></td><td>∅ → ∅</td><td>Jump forwards</td></tr>
-<tr><td>28</td><td>LE</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less or equal</td></tr>
-<tr><td>29</td><td>LISTADD</td><td><em>list a</em> → <em>list</em></td><td>Add item to list</td></tr>
-<tr><td>30</td><td>LISTNEW</td><td>∅ → <em>list</em></td><td>Push empty list</td></tr>
-<tr><td>31</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
-<tr><td>31</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
-<tr><td>32</td><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
-<tr><td>33</td><td>LOOP <em>offset</em></td><td>∅ → ∅</td><td>Jump backwards</td></tr>
-<tr><td>34</td><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
-<tr><td>35</td><td>MAPNEW</td><td>∅ → <em>map</em></td><td>Push empty ma p</td></tr>
-<tr><td>36</td><td>MAPPUT</td><td><em>map k a</em> → <em>map</em></td><td>Add entry to map</td></tr>
-<tr><td>37</td><td>METHOD <em>name</em></td><td><em>cls f</em> → <em>cls</em></td><td>Add method to class</td></tr>
-<tr><td>38</td><td>MUL</td><td><em>a b</em> → <em>c</em></td><td>c = a*b</td></tr>
-<tr><td>39</td><td>NE</td><td><em>a b</em> → <em>c</em></td><td>c = a != b</td></tr>
-<tr><td>40</td><td>NEGATE</td><td><em>a</em> → <em>b</em></td><td>b = -a</td></tr>
-<tr><td>41</td><td>NI</td><td><em>a coll</em> → <em>flag</em></td><td>a not in collection</td></tr>
-<tr><td>42</td><td>NOT</td><td><em>a</em> → <em>b</em></td><td>b = !a</td></tr>
-<tr><td>43</td><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
-<tr><td>44</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
-<tr><td>45</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
-<tr><td>46</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
-<tr><td>47</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
-<tr><td>48</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
-<tr><td>49</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
-<tr><td>50</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
-<tr><td>51</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
-<tr><td>52</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
-<tr><td>53</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
-<tr><td>54</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
-<tr><td>55</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
-<tr><td>54</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
-<tr><td>54</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
-<tr><td>55</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
-<tr><td>56</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
-<tr><td>57</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
+<tr><td>9</td><td>DUP</td><td><em>a</em> → <em>a</em> <em>a</em></td><td>Duplicate top</td></tr>
+<tr><td>10</td><td>DUP2</td><td><em>a b</em> → <em>a b a b</em></td><td>Duplicate top 2</td></tr>
+<tr><td>11</td><td>EQ</td><td><em>a b</em> → <em>c</em></td><td>c = a == b</td></tr>
+<tr><td>12</td><td>FALSE</td><td>∅ → false</td><td>Load <code>false</code></td></tr>
+<tr><td>13</td><td>GE</td><td><em>a b</em> → <em>c</em></td><td>c = a &gt;= b</td></tr>
+<tr><td>14</td><td>GETNEXT</td><td><em>iter</em> → <em>a</em></td><td>a = iter.next()</td></tr>
+<tr><td>15</td><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
+<tr><td>16</td><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
+<tr><td>17</td><td>GLOSET <em>name</em></td><td><em>a</em> → <em>a</em></td><td>Set global</td></tr>
+<tr><td>18</td><td>GT</td><td><em>a b</em> → <em>a</em> &gt; <em>b</em></td><td>Compare: greater</td></tr>
+<tr><td>19</td><td>HASNEXT</td><td><em>iter</em> → <em>flag</em></td><td>flag = iter.hasNext()</td></tr>
+<tr><td>20</td><td>IN</td><td><em>a coll</em> → <em>flag</em></td><td>a in collection</td></tr>
+<tr><td>21</td><td>INCR</td><td><em>a</em> → <em>b</em></td><td>b = a + 1</td></tr>
+<tr><td>22</td><td>INDGET</td><td><em>coll i</em> → <em>a</em></td><td><code>a = coll[i]</code></td></tr>
+<tr><td>23</td><td>INDSET</td><td><em>coll i a</em> → <em>a</em></td><td><code>coll[i] = a</code></td></tr>
+<tr><td>24</td><td>INHERIT</td><td><em>sup sub</em> → <em>sup</em></td><td>Inheritance</td></tr>
+<tr><td>25</td><td>ITER</td><td><em>coll</em> → <em>iter</em></td><td>iter = coll.iterator()</td></tr>
+<tr><td>26</td><td>JIF <em>offset</em></td><td><em>flag</em> → ∅</td><td>Jump if false</td></tr>
+<tr><td>27</td><td>JIFKEEP <em>offset</em></td><td><em>flag</em> → <em>flag</em></td><td>Jump if false, keep value</td></tr>
+<tr><td>28</td><td>JIT <em>offset</em></td><td><em>flag</em> → ∅</td><td>Jump if true</td></tr>
+<tr><td>29</td><td>JITKEEP <em>offset</em></td><td><em>flag</em> → <em>flag</em></td><td>Jump if true, keep value</td></tr>
+<tr><td>30</td><td>JUMP <em>offset</em></td><td>∅ → ∅</td><td>Jump forwards</td></tr>
+<tr><td>31</td><td>LE</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less or equal</td></tr>
+<tr><td>32</td><td>LISTADD</td><td><em>list a</em> → <em>list</em></td><td>Add item to list</td></tr>
+<tr><td>33</td><td>LISTNEW</td><td>∅ → <em>list</em></td><td>Push empty list</td></tr>
+<tr><td>34</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
+<tr><td>34</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
+<tr><td>35</td><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
+<tr><td>36</td><td>LOOP <em>offset</em></td><td>∅ → ∅</td><td>Jump backwards</td></tr>
+<tr><td>37</td><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
+<tr><td>38</td><td>MAPNEW</td><td>∅ → <em>map</em></td><td>Push empty ma p</td></tr>
+<tr><td>39</td><td>MAPPUT</td><td><em>map k a</em> → <em>map</em></td><td>Add entry to map</td></tr>
+<tr><td>40</td><td>METHOD <em>name</em></td><td><em>cls f</em> → <em>cls</em></td><td>Add method to class</td></tr>
+<tr><td>41</td><td>MUL</td><td><em>a b</em> → <em>c</em></td><td>c = a*b</td></tr>
+<tr><td>42</td><td>NE</td><td><em>a b</em> → <em>c</em></td><td>c = a != b</td></tr>
+<tr><td>43</td><td>NEGATE</td><td><em>a</em> → <em>b</em></td><td>b = -a</td></tr>
+<tr><td>44</td><td>NI</td><td><em>a coll</em> → <em>flag</em></td><td>a not in collection</td></tr>
+<tr><td>45</td><td>NOT</td><td><em>a</em> → <em>b</em></td><td>b = !a</td></tr>
+<tr><td>46</td><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
+<tr><td>47</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
+<tr><td>48</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
+<tr><td>49</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
+<tr><td>50</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
+<tr><td>51</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
+<tr><td>52</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
+<tr><td>53</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
+<tr><td>54</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
+<tr><td>55</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
+<tr><td>56</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
+<tr><td>57</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
+<tr><td>58</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
+<tr><td>59</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
+<tr><td>60</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
+<tr><td>61</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
+<tr><td>62</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
 </tbody></table>
 </div>
 <p><strong>Stack Effects:</strong> in the stack effect column, the top of the stack is on the
@@ -8480,6 +8539,10 @@ message if <em>a</em> is not numeric. <code>SUB</code>'s error message would be 
 <hr />
 <p><strong>DUP</strong> | <em>a</em> → <em>a a</em></p>
 <p>Duplicates the value on the top of the stack.</p>
+<h3 id="dup2"><a class="header" href="#dup2">DUP2</a></h3>
+<hr />
+<p><strong>DUP2</strong> | <em>a b</em> → <em>a b a b</em></p>
+<p>Duplicates the top two values on the stack.</p>
 <h3 id="eq"><a class="header" href="#eq">EQ</a></h3>
 <hr />
 <p><strong>EQ</strong> | <em>a</em> <em>b</em> → <em>c</em>, where <em>c</em> = (<em>a</em> == <em>b</em>).</p>
@@ -8534,6 +8597,27 @@ iterable.</p>
 <li><code>INCR</code> provides a <code>++</code>-specific error message if <em>a</em> is not numeric. <code>ADD</code>'s
 error message would be confusing.</li>
 <li><code>ADD</code> will concatenate strings, but <code>++</code> is only for use with numbers.</li>
+</ul>
+<h3 id="indget"><a class="header" href="#indget">INDGET</a></h3>
+<hr />
+<p><strong>INDGET</strong> | <em>coll i</em> → <em>a</em></p>
+<p>Retrieves the value at index <em>i</em> in the indexed collection <em>coll</em>, and pushes
+it on the stack.</p>
+<ul>
+<li>If <em>coll</em> is a Joe <code>List</code>, <em>i</em> must be an index to an existing item.</li>
+<li>If <em>coll</em> is a Joe <code>Map</code>, <em>i</em> can be any Monica value; returns null if the
+value doesn't exist.</li>
+<li>It is a runtime error if <em>coll</em> is neither a <code>List</code> nor a <code>Map</code>.</li>
+</ul>
+<h3 id="indset"><a class="header" href="#indset">INDSET</a></h3>
+<hr />
+<p><strong>INDSET</strong> | <em>coll i a</em> → <em>a</em></p>
+<p>Assigns the value <em>a</em> to index <em>i</em> in the indexed collection <em>coll</em>,
+leaving <em>a</em> on the stack.</p>
+<ul>
+<li>If <em>coll</em> is a Joe <code>List</code>, <em>i</em> must be an index to an existing item.</li>
+<li>If <em>coll</em> is a Joe <code>Map</code>, <em>i</em> can be any Monica value.</li>
+<li>It is a runtime error if <em>coll</em> is neither a <code>List</code> nor a <code>Map</code>.</li>
 </ul>
 <h3 id="inherit"><a class="header" href="#inherit">INHERIT</a></h3>
 <hr />

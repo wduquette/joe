@@ -178,6 +178,8 @@
 used in <em>Crafting Interpreters</em>.  Below that is the full
 <a href="#jlox-grammar">JLox grammar</a>.</p>
 <h2 id="grammar"><a class="header" href="#grammar">Grammar</a></h2>
+<p>Here is the grammar; see <a href="#semantic-constraints">Semantic Constraints</a>
+for some conditions enforced by the compiler.</p>
 <pre><code>// Statements
 program         → declaration* EOF ;
 
@@ -231,7 +233,9 @@ block           → "{" declaration* "}" ;
 
 // Expression
 expression      → assignment ;
-assignment      → ( call "." )? IDENTIFIER 
+assignment      → ( ( call "." )? IDENTIFIER 
+                    | call "[" primary "]"
+                  )
                   ( "=" | "+=" | "-=" | "*=" | "/=" ) 
                   assignment 
                 | ternary ;
@@ -245,7 +249,10 @@ factor          → unary ( ( "/" | "*" ) unary )* ;
 unary           → ( "++" | "==" | "-" | "!" ) unary 
                 | postfix ;
 postfix         → call ( "++" | "--" )? ;
-call            → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
+call            → primary ( "(" arguments? ")" 
+                          | "." IDENTIFIER     
+                          | "[" primary "]"
+                  )*  ;
 arguments       → expression ( "," expression )* ;
 primary         → "true" | "false" | "nil"
                 | NUMBER | STRING | KEYWORD
@@ -262,6 +269,26 @@ list            → "[" (expression ( "," expression )* ","? )? "]" ;
 map             → "{" (map_entry ( "," map_entry )* ","? )? "]" ;
 map_entry       → expression ":" expression ;
 </code></pre>
+<h2 id="semantic-constraints"><a class="header" href="#semantic-constraints">Semantic Constraints</a></h2>
+<p>The Joe grammar has no clear distinction between lvalues and rvalues; as
+a result, it allows a number of expressions that are forbidden by the
+language engines.  At time of writing, I've not determined how to clean
+up the grammar to match.</p>
+<p>The following expressions are valid lvalues:</p>
+<ul>
+<li>Variable reference: <code>IDENTIFIER</code></li>
+<li>Property reference: <code>call "." IDENTIFIER</code></li>
+<li>Collection index: <code>call "[" primary "]"</code></li>
+</ul>
+<p>Other valid <code>call</code> and <code>unary</code> expressions are not.  This primarily
+affects the increment/decrement operators: <code>++</code> and <code>--</code>.  For example,
+the following expressions are syntactically valid but will be rejected
+by the language engines:</p>
+<ul>
+<li><code>myFunc(a, b, c)++</code></li>
+<li><code>--myFunc(a, b, c)</code></li>
+<li><code>++!x</code></li>
+</ul>
 <h2 id="jlox-grammar"><a class="header" href="#jlox-grammar">JLox Grammar</a></h2>
 <p>Here is Nystrom's JLox grammar, for comparison.</p>
 <pre><code>// Statements
