@@ -110,6 +110,7 @@ class Scanner {
             case '\\' -> addToken(BACK_SLASH);
             case ':'  -> addToken(COLON);
             case ','  -> addToken(COMMA);
+            case '$'  -> addToken(DOLLAR);
             case '.'  -> addToken(DOT);
             case '-'  -> {
                 if (match('=')) {
@@ -371,18 +372,17 @@ class Scanner {
         while (!isAtEnd()) {
             var c = peek();
 
-            switch (c) {
-                case '\'' -> {
-                    if (matchNext("'''")) {
-                        // Add the string.
-                        var string = source.substring(start+3,current-3);
-                        addToken(STRING, outdent(string));
-                        return;
-                    } else {
-                        advance();
-                    }
+            if (c == '\'') {
+                if (matchNext("'''")) {
+                    // Add the string.
+                    var string = source.substring(start + 3, current - 3);
+                    addToken(STRING, outdent(string));
+                    return;
+                } else {
+                    advance();
                 }
-                default -> advance();
+            } else {
+                advance();
             }
         }
 
