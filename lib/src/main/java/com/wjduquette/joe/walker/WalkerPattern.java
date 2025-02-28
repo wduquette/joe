@@ -71,31 +71,6 @@ class WalkerPattern {
     }
 
     /**
-     * Adds a binding to the bindings list, and returns the
-     * {@link com.wjduquette.joe.patterns.Pattern.ValueBinding} for
-     * inclusion in the larger pattern.
-     * @param varName The variable name
-     * @return The pattern
-     */
-    public Pattern.ValueBinding addBinding(Token varName) {
-        int index = getBindingID(varName);
-        return new Pattern.ValueBinding(index);
-    }
-
-    /**
-     * Adds a subpattern binding to the bindings list, and returns the
-     * {@link com.wjduquette.joe.patterns.Pattern.PatternBinding} for
-     * inclusion in the larger pattern.
-     * @param varName The variable name
-     * @param subpattern The captured subpattern
-     * @return The pattern
-     */
-    public Pattern.PatternBinding addBinding(Token varName, Pattern subpattern) {
-        int index = getBindingID(varName);
-        return new Pattern.PatternBinding(index, subpattern);
-    }
-
-    /**
      * Given a binding variable name, adds it to the bindings list and
      * returns the binding ID.  Use this for binding IDs included in
      * other patterns.

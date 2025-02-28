@@ -719,13 +719,17 @@ class Parser {
 
             if (patternBindings.contains(varName.lexeme())) {
                 error(varName, "Duplicate binding variable in pattern.");
+            } else {
+                patternBindings.add(varName.lexeme());
             }
+
+            var id = wp.getBindingID(varName);
 
             if (isSubpattern && match(EQUAL)) {
                 var subpattern = parsePattern(wp, false);
-                return wp.addBinding(varName, subpattern);
+                return new Pattern.PatternBinding(id, subpattern);
             } else {
-                return wp.addBinding(varName);
+                return new Pattern.ValueBinding(id);
             }
         } else {
             throw errorSync(peek(), "Expected pattern.");
@@ -785,6 +789,7 @@ class Parser {
                 break;
             }
             var key = constantPattern(wp);
+            consume(COLON, "Expected ':' after map key.");
             var value = parsePattern(wp, true);
             map.put(key, value);
         } while (match(COMMA));

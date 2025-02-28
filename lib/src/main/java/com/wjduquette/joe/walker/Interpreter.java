@@ -210,6 +210,9 @@ class Interpreter {
                             varNames.get(i).lexeme(),
                             bindings.get(i));
                     }
+                } else {
+                    throw new RuntimeError(stmt.keyword().span(),
+                        "'let' pattern failed to match target value.");
                 }
             }
             case Stmt.Return stmt -> {

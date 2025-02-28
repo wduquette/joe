@@ -1,0 +1,103 @@
+// Tests the "let" statement and pattern syntax
+
+function testOneVar() {
+    let a = 1;
+    assertEquals(a, 1);
+}
+
+function testList_noMatch() {
+    assertError(\-> { let [a, b] = 5; },
+        "'let' pattern failed to match target value.");
+}
+
+function testList_noTail() {
+    let [a, b] = [1, 2];
+    assertEquals(a, 1);
+    assertEquals(b, 2);
+}
+
+function testList_emptyTail() {
+    let [a, b : c] = [1, 2];
+    assertEquals(a, 1);
+    assertEquals(b, 2);
+    assertEquals(c, []);
+}
+
+function testList_fullTail() {
+    let [a, b : c] = [1, 2, 3, 4];
+    assertEquals(a, 1);
+    assertEquals(b, 2);
+    assertEquals(c, [3, 4]);
+}
+
+function testLiteralConstant() {
+    // NOTE: We use list patterns here because `let` rejects a pattern
+    // that lacks a variable.
+
+    let [a, true] = [1, true];
+    assertEquals(a, 1);
+
+    let [b, false] = [2, false];
+    assertEquals(b, 2);
+
+    let [c, null] = [3, null];
+    assertEquals(c, 3);
+
+    let [d, 99] = [4, 99];
+    assertEquals(d, 4);
+
+    let [e, "abc"] = [5, "abc"];
+    assertEquals(e, 5);
+
+    let [f, #abc] = [6, #abc];
+    assertEquals(f, 6);
+
+    assertError(\-> { let [a, 4] = 5; },
+        "'let' pattern failed to match target value.");
+}
+
+function testWildcard() {
+    let [a, _] = [1, #abc];
+    assertEquals(a, 1);
+
+    let [b, _withName] = [2, #xyz];
+    assertEquals(b, 2);
+}
+
+function testMap_noMap() {
+    assertError(\-> { let {#abc: a} = 5; },
+        "'let' pattern failed to match target value.");
+}
+
+function testMap_missingKey() {
+    assertError(\-> { let {#abc: a} = {#def: 5}; },
+        "'let' pattern failed to match target value.");
+}
+
+function testMap_badValue() {
+    assertError(\-> { let {#abc: a, #def: 7} = {#abc: 5, #def: 6}; },
+        "'let' pattern failed to match target value.");
+}
+
+function testMap_good() {
+    let {"abc": a} = {"abc": 5, "def": 6};
+    assertEquals(a, 5);
+}
+
+function testNested() {
+    let [a, [b, c], d] = [1, [2, 3], 4];
+    assertEquals(a, 1);
+    assertEquals(b, 2);
+    assertEquals(c, 3);
+    assertEquals(d, 4);
+}
+
+function testCapture() {
+    let [a, b=[c, d], e] = [1, [2, 3], 4];
+    assertEquals(a, 1);
+    assertEquals(b, [2, 3]);
+    assertEquals(c, 2);
+    assertEquals(d, 3);
+    assertEquals(e, 4);
+}
+
