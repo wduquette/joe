@@ -1,8 +1,5 @@
 package com.wjduquette.joe.patterns;
 
-import com.wjduquette.joe.JoeList;
-import com.wjduquette.joe.JoeMap;
-
 import java.util.*;
 
 /**
@@ -66,7 +63,7 @@ public class Matcher {
                 // FIRST, check type and shape
                 var size = p.patterns().size();
 
-                if (!(value instanceof JoeList list)) yield false;
+                if (!(value instanceof List<?> list)) yield false;
                 if (size > list.size()) yield false;
                 if (p.tailId() == null && size < list.size()) yield false;
 
@@ -89,7 +86,7 @@ public class Matcher {
 
             case Pattern.MapPattern p -> {
                 // FIRST, check type.
-                if (!(value instanceof JoeMap map)) yield false;
+                if (!(value instanceof Map<?,?> map)) yield false;
 
                 // NEXT, match keys and values
                 for (var e : p.patterns().entrySet()) {
