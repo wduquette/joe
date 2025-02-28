@@ -136,6 +136,14 @@ class Dumper {
                 }
                 --indent;
             }
+            case Stmt.Let stmt -> {
+                // TODO: Add variables and constants
+                buff.append(indent())
+                    .append("Stmt.Let ")
+                    .append(stmt.pattern().getPattern())
+                    .append(" =\n");
+                dumpExpression(stmt.target());
+            }
             case Stmt.Return stmt -> {
                 buff.append(indent())
                     .append("Stmt.Return\n");

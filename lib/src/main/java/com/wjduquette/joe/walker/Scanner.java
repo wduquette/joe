@@ -25,6 +25,7 @@ class Scanner {
         reserved("function", FUNCTION);
         reserved("if",       IF);
         reserved("in",       IN);
+        reserved("let",      LET);
         reserved("method",   METHOD);
         reserved("ni",       NI);
         reserved("null",     NULL);

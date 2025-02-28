@@ -1,10 +1,9 @@
 package com.wjduquette.joe.walker;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Trace;
+import com.wjduquette.joe.patterns.Pattern;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static com.wjduquette.joe.walker.TokenType.*;
 
@@ -53,6 +52,7 @@ class Parser {
         try {
             if (match(CLASS)) return classDeclaration();
             if (match(FUNCTION)) return functionDeclaration("function");
+            if (match(LET)) return letDeclaration();
             if (match(VAR)) return varDeclaration();
 
             return statement();
@@ -105,6 +105,21 @@ class Parser {
 
         return new Stmt.Class(name, classSpan, superclass,
             staticMethods, methods, staticInitializer);
+    }
+
+    private Stmt letDeclaration() {
+        Token keyword = previous();
+        WalkerPattern pattern = pattern();
+
+        if (pattern.getBindings().isEmpty()) {
+            error(previous(), "'let' pattern must declare at least one variable.");
+        }
+
+        consume(EQUAL, "Expected '=' after pattern.");
+        var target = expression();
+        consume(SEMICOLON, "Expected ';' after target expression.");
+
+        return new Stmt.Let(keyword, pattern, target);
     }
 
     private Stmt varDeclaration() {
@@ -666,6 +681,117 @@ class Parser {
         }
 
         throw errorSync(peek(), "Expected expression.");
+    }
+
+    //-------------------------------------------------------------------------
+    // Patterns
+
+    // Used to ensure that there are no duplicate binding variables in a
+    // pattern.
+    private transient Set<String> patternBindings;
+
+    private WalkerPattern pattern() {
+        patternBindings = new HashSet<>();
+        var walkerPattern = new WalkerPattern();
+        var pattern = parsePattern(walkerPattern, false); // Not a subpattern
+        walkerPattern.setPattern(pattern);
+        patternBindings = null;
+        return walkerPattern;
+    }
+
+    private Pattern parsePattern(WalkerPattern wp, boolean isSubpattern) {
+        var constant = constantPattern(wp);
+
+        if (constant != null) {
+            return constant;
+        }
+
+        if (match(LEFT_BRACKET)) {
+            return listPattern(wp);
+        } else if (match(LEFT_BRACE)) {
+            return mapPattern(wp);
+        } else if (match(IDENTIFIER)) {
+            var varName = previous();
+
+            if (varName.lexeme().startsWith("_")) {
+                return new Pattern.Wildcard(varName.lexeme());
+            }
+
+            if (patternBindings.contains(varName.lexeme())) {
+                error(varName, "Duplicate binding variable in pattern.");
+            }
+
+            if (isSubpattern && match(EQUAL)) {
+                var subpattern = parsePattern(wp, false);
+                return wp.addBinding(varName, subpattern);
+            } else {
+                return wp.addBinding(varName);
+            }
+        } else {
+            throw errorSync(peek(), "Expected pattern.");
+        }
+    }
+
+    private Pattern.Constant constantPattern(WalkerPattern wp) {
+        if (match(TRUE)) {
+            return wp.addLiteralConstant(true);
+        } else if (match(FALSE)) {
+            return wp.addLiteralConstant(false);
+        } else if (match(NULL)) {
+            return wp.addLiteralConstant(null);
+        } else if (match(NUMBER) || match(STRING) || match(KEYWORD)) {
+            return wp.addLiteralConstant(previous().literal());
+        } else if (match(DOLLAR)) {
+            throw new UnsupportedOperationException("TODO");
+        } else {
+            return null;
+        }
+    }
+
+    private Pattern listPattern(WalkerPattern wp) {
+        var list = new ArrayList<Pattern>();
+
+        if (match(RIGHT_BRACKET)) {
+            return new Pattern.ListPattern(list, null);
+        }
+
+        do {
+            if (check(RIGHT_BRACKET) || check(COLON)) {
+                break;
+            }
+            list.add(parsePattern(wp, true));
+        } while (match(COMMA));
+
+        Integer tailId = null;
+        if (match(COLON)) {
+            var tailVar = consume(IDENTIFIER,
+                "Expected binding variable for list tail.");
+            tailId = wp.getBindingID(tailVar);
+        }
+        consume(RIGHT_BRACKET, "Expected ']' after list pattern.");
+
+        return new Pattern.ListPattern(list, tailId);
+    }
+
+    private Pattern mapPattern(WalkerPattern wp) {
+        var map = new LinkedHashMap<Pattern.Constant,Pattern>();
+
+        if (match(RIGHT_BRACE)) {
+            return new Pattern.MapPattern(map);
+        }
+
+        do {
+            if (check(RIGHT_BRACE)) {
+                break;
+            }
+            var key = constantPattern(wp);
+            var value = parsePattern(wp, true);
+            map.put(key, value);
+        } while (match(COMMA));
+
+        consume(RIGHT_BRACE, "Expected '}' after map pattern.");
+
+        return new Pattern.MapPattern(map);
     }
 
     //-------------------------------------------------------------------------

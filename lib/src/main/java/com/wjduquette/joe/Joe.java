@@ -37,7 +37,7 @@ public class Joe {
         Collections.addAll(set,
             "assert", "break", "case", "class", "continue", "default",
             "else", "extends", "false", "for", "foreach", "function",
-            "if", "in", "method", "ni", "null", "return",
+            "if", "in", "let", "match", "method", "ni", "null", "return",
             "static", "super", "switch",
             "this", "throw", "true",
             "var", "while"
