@@ -2,6 +2,7 @@ package com.wjduquette.joe.patterns;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A binding Pattern is used to destructure a complex data structure and
@@ -30,7 +31,15 @@ public sealed interface Pattern permits
      * integer ID, because the details depend on the language engine.
      * @param id The constant's ID
      */
-    record Constant(int id) implements Pattern {}
+    record Constant(int id) implements Pattern {
+        /**
+         * Returns "$id" as the string representation.
+         * @return The string
+         */
+        @Override public String toString() {
+            return "$" + id;
+        }
+    }
 
     /**
      * A pattern that matches any value at all.  A wildcard's name is an
@@ -40,7 +49,15 @@ public sealed interface Pattern permits
      * match.
      * @param name The wildcard name.
      */
-    record Wildcard(String name) implements Pattern {}
+    record Wildcard(String name) implements Pattern {
+        /**
+         * Returns the wildcard's name as the string representation.
+         * @return The string
+         */
+        @Override public String toString() {
+            return name;
+        }
+    }
 
     /**
      * A pattern that binds the matching target value to the binding variable
@@ -48,7 +65,15 @@ public sealed interface Pattern permits
      * IDs because the details depend on the language engine.
      * @param id A binding variable ID
      */
-    record ValueBinding(int id) implements Pattern {}
+    record ValueBinding(int id) implements Pattern {
+        /**
+         * Returns "?id" as the string representation.
+         * @return The string
+         */
+        @Override public String toString() {
+            return "?" + id;
+        }
+    }
 
     /**
      * A pattern that matches a subpattern and binds its value to a binding
@@ -56,7 +81,15 @@ public sealed interface Pattern permits
      * @param id A binding variable Id
      * @param subpattern The subpattern to match.
      */
-    record PatternBinding(int id, Pattern subpattern) implements Pattern {}
+    record PatternBinding(int id, Pattern subpattern) implements Pattern {
+        /**
+         * Returns "?id" as the string representation.
+         * @return The string
+         */
+        @Override public String toString() {
+            return "?" + id + " = " + subpattern;
+        }
+    }
 
     /**
      * A pattern that matches a target
@@ -72,7 +105,18 @@ public sealed interface Pattern permits
      * @param patterns The item patterns
      * @param tailId The ID for the tail binding, or null.
      */
-    record ListPattern(List<Pattern> patterns, Integer tailId) implements Pattern {}
+    record ListPattern(List<Pattern> patterns, Integer tailId)
+        implements Pattern
+    {
+        @Override public String toString() {
+            var list = patterns.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(", "));
+            return "[" + list +
+                (tailId != null ? " | ?" + tailId : "") +
+                "]";
+        }
+    }
 
     /**
      * A pattern that matches a target
@@ -82,6 +126,14 @@ public sealed interface Pattern permits
      * the key's value in the target map.
      * @param patterns The key constants and value patterns
      */
-    record MapPattern(Map<Constant,Pattern> patterns) implements Pattern {}
-
+    record MapPattern(Map<Constant,Pattern> patterns)
+        implements Pattern
+    {
+        @Override public String toString() {
+            var map = patterns.entrySet().stream()
+                .map(e -> e.getKey() + ": " + e.getValue())
+                .collect(Collectors.joining(", "));
+            return "{" + map + "}";
+        }
+    }
 }
