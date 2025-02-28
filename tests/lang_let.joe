@@ -64,6 +64,36 @@ function testWildcard() {
     assertEquals(b, 2);
 }
 
+function testInterpolatedExpression() {
+    var x = 10;
+    var y = 20;
+    let [a, $(x + y)] = [5, 30];
+    assertEquals(a, 5);
+}
+
+function testInterpolatedVariable() {
+    var first = "Joe";
+    let [$first, last] = ["Joe", "Pro"];
+    assertEquals(last, "Pro");
+}
+
+function testNested() {
+    let [a, [b, c], d] = [1, [2, 3], 4];
+    assertEquals(a, 1);
+    assertEquals(b, 2);
+    assertEquals(c, 3);
+    assertEquals(d, 4);
+}
+
+function testCapture() {
+    let [a, b=[c, d], e] = [1, [2, 3], 4];
+    assertEquals(a, 1);
+    assertEquals(b, [2, 3]);
+    assertEquals(c, 2);
+    assertEquals(d, 3);
+    assertEquals(e, 4);
+}
+
 function testMap_noMap() {
     assertError(\-> { let {#abc: a} = 5; },
         "'let' pattern failed to match target value.");
@@ -84,20 +114,8 @@ function testMap_good() {
     assertEquals(a, 5);
 }
 
-function testNested() {
-    let [a, [b, c], d] = [1, [2, 3], 4];
-    assertEquals(a, 1);
-    assertEquals(b, 2);
-    assertEquals(c, 3);
-    assertEquals(d, 4);
+function testMap_fancyKey() {
+    var key = #joe;
+    let {$key: value} = {#joe: #language};
+    assertEquals(value, #language);
 }
-
-function testCapture() {
-    let [a, b=[c, d], e] = [1, [2, 3], 4];
-    assertEquals(a, 1);
-    assertEquals(b, [2, 3]);
-    assertEquals(c, 2);
-    assertEquals(d, 3);
-    assertEquals(e, 4);
-}
-

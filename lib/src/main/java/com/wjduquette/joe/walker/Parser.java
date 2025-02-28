@@ -746,7 +746,15 @@ class Parser {
         } else if (match(NUMBER) || match(STRING) || match(KEYWORD)) {
             return wp.addLiteralConstant(previous().literal());
         } else if (match(DOLLAR)) {
-            throw new UnsupportedOperationException("TODO");
+            if (match(IDENTIFIER)) {
+                return wp.addVarConstant(previous());
+            } else {
+                consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
+                var expr = expression();
+                consume(RIGHT_PAREN,
+                    "Expected ')' after interpolated expression.");
+                return wp.addExprConstant(expr);
+            }
         } else {
             return null;
         }
