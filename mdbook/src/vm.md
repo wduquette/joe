@@ -49,38 +49,39 @@ The byte-engine is a stack machine with a few registers:
 | 29 | JITKEEP *offset*  | *flag* → *flag*    | Jump if true, keep value  |
 | 30 | JUMP *offset*     | ∅ → ∅              | Jump forwards             |
 | 31 | LE                | *a b* → *a* <= *b* | Compare: less or equal    |
-| 32 | LISTADD           | *list a* → *list*  | Add item to list          |
-| 33 | LISTNEW           | ∅ → *list*         | Push empty list           |
-| 34 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
-| 34 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
-| 35 | LOCSET *slot*     | *a* → *a*          | Set local                 |
-| 36 | LOOP *offset*     | ∅ → ∅              | Jump backwards            |
-| 37 | LT                | *a b* → *a* <= *b* | Compare: less than        |
-| 38 | MAPNEW            | ∅ → *map*          | Push empty ma p           |
-| 39 | MAPPUT            | *map k a* → *map*  | Add entry to map          |
-| 40 | METHOD *name*     | *cls f* → *cls*    | Add method to class       |
-| 41 | MUL               | *a b* → *c*        | c = a*b                   |
-| 42 | NE                | *a b* → *c*        | c = a != b                |
-| 43 | NEGATE            | *a* → *b*          | b = -a                    |
-| 44 | NI                | *a coll* → *flag*  | a not in collection       |
-| 45 | NOT               | *a* → *b*          | b = !a                    |
-| 46 | NULL              | ∅ → null           | Load `null`               |
-| 47 | POP               | *a* → ∅            | Pops one value            |
-| 48 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
-| 49 | PROPGET *name*    | *obj* → *a*        | Get property value        |
-| 50 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
-| 51 | RETURN            | *a* → *a*          | Return                    |
-| 52 | SUB               | *a b* → *c*        | c = a - b                 |
-| 53 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
-| 54 | TGET              | ∅ → *a*            | *a* = T                   |
-| 55 | THROW             | *a* → ∅            | Throw error               |
-| 56 | TPUT              | *a* → *a*          | T = *a*                   |
-| 57 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
-| 58 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
-| 59 | TRUE              | ∅ → true           | Load `true`               |
-| 60 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
-| 61 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
-| 62 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
+| 32 | LET *pattern*     | *list a* → ∅       | Bind target to pattern    |
+| 33 | LISTADD           | *list a* → *list*  | Add item to list          |
+| 34 | LISTNEW           | ∅ → *list*         | Push empty list           |
+| 35 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
+| 35 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
+| 36 | LOCSET *slot*     | *a* → *a*          | Set local                 |
+| 37 | LOOP *offset*     | ∅ → ∅              | Jump backwards            |
+| 38 | LT                | *a b* → *a* <= *b* | Compare: less than        |
+| 39 | MAPNEW            | ∅ → *map*          | Push empty ma p           |
+| 40 | MAPPUT            | *map k a* → *map*  | Add entry to map          |
+| 41 | METHOD *name*     | *cls f* → *cls*    | Add method to class       |
+| 42 | MUL               | *a b* → *c*        | c = a*b                   |
+| 43 | NE                | *a b* → *c*        | c = a != b                |
+| 44 | NEGATE            | *a* → *b*          | b = -a                    |
+| 45 | NI                | *a coll* → *flag*  | a not in collection       |
+| 46 | NOT               | *a* → *b*          | b = !a                    |
+| 47 | NULL              | ∅ → null           | Load `null`               |
+| 48 | POP               | *a* → ∅            | Pops one value            |
+| 49 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
+| 50 | PROPGET *name*    | *obj* → *a*        | Get property value        |
+| 51 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
+| 52 | RETURN            | *a* → *a*          | Return                    |
+| 53 | SUB               | *a b* → *c*        | c = a - b                 |
+| 54 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
+| 55 | TGET              | ∅ → *a*            | *a* = T                   |
+| 56 | THROW             | *a* → ∅            | Throw error               |
+| 57 | TPUT              | *a* → *a*          | T = *a*                   |
+| 58 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
+| 59 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
+| 60 | TRUE              | ∅ → true           | Load `true`               |
+| 61 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
+| 62 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
+| 63 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
 
 **Stack Effects:** in the stack effect column, the top of the stack is on the 
 right.  
@@ -369,6 +370,19 @@ Jumps forward by *offset*.
 ### LE
 ---
 **LE** | *a* *b* → *c*, where *c* = (*a* <= *b*)
+
+### LET
+---
+**LET *pattern** | *list* *a* → ∅
+
+The `LET` instruction implements the `let` statement.  It receives the
+`let` pattern as a constant index.  The *list* is a list of the constants,
+computed or literal, used in the pattern.  The value *a* is the target value
+to be matched.  
+
+If the match succeeds then the binding variables, whether global or local, will
+receive their bound values.  If the match fails then the instruction throws
+a `RuntimeError`.
 
 ### LISTADD
 ---
