@@ -33,6 +33,8 @@ public class Scanner {
         reserved("function", FUNCTION);
         reserved("if",       IF);
         reserved("in",       IN);
+        reserved("let",      LET);
+        reserved("match",    MATCH);
         reserved("method",   METHOD);
         reserved("ni",       NI);
         reserved("null",     NULL);
@@ -131,6 +133,7 @@ public class Scanner {
             case '\\' -> makeToken(BACK_SLASH);
             case ';' -> makeToken(SEMICOLON);
             case ',' -> makeToken(COMMA);
+            case '$' -> makeToken(DOLLAR);
             case '.' -> makeToken(DOT);
             case '?' -> makeToken(QUESTION);
             case ':' -> makeToken(COLON);

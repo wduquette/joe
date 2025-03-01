@@ -1761,6 +1761,7 @@ class Compiler {
         rule(BACK_SLASH,      this::lambda,   null,          Level.NONE);
         rule(COLON,           null,           null,          Level.NONE);
         rule(COMMA,           null,           null,          Level.NONE);
+        rule(DOLLAR,          null,           null,          Level.NONE);
         rule(DOT,             null,           this::dot,     Level.CALL);
         rule(QUESTION,        null,           this::ternary, Level.TERNARY);
         rule(SEMICOLON,       null,           null,          Level.NONE);
@@ -1806,6 +1807,8 @@ class Compiler {
         rule(FUNCTION,        null,           null,          Level.NONE);
         rule(IF,              null,           null,          Level.NONE);
         rule(IN,              null,           this::binary,  Level.COMPARISON);
+        rule(LET,             null,           null,          Level.NONE);
+        rule(MATCH,           null,           null,          Level.NONE);
         rule(METHOD,          null,           null,          Level.NONE);
         rule(NI,              null,           this::binary,  Level.COMPARISON);
         rule(NULL,            this::symbol,   null,          Level.NONE);
