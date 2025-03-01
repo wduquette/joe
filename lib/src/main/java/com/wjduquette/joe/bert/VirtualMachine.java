@@ -1,6 +1,8 @@
 package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.patterns.Matcher;
+import com.wjduquette.joe.patterns.Pattern;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 
@@ -359,6 +361,33 @@ class VirtualMachine {
                         throw error("Undefined variable: '" + name + "'.");
                     }
                 }
+                case GLOLET -> {
+                    var pattern = readPattern();
+                    var target = pop();
+                    var constants = (ListValue)pop();
+                    var bound = new HashMap<String,Object>();
+
+                    // FIRST, see if there's a match.  This is defining globals;
+                    // the global environment persists, so we don't want to
+                    // touch it unless the match is successful.  Save the
+                    // bindings as we go, and then add them to the global
+                    // environment as a group.
+                    if (!Matcher.bind(
+                        pattern,
+                        target,
+                        constants::get,
+                        (id, value) -> {
+                            var name = readString(id);
+                            bound.put(name, value);
+                        }
+                    )) {
+                        throw error(
+                            "'let' pattern failed to match target value.");
+                    }
+
+                    // NEXT, add the bindings to the global scope.
+                    globals.putAll(bound);
+                }
                 case GLOSET -> {
                     var name = readString();
                     if (globals.containsKey(name)) {
@@ -484,7 +513,8 @@ class VirtualMachine {
                     } else if (a instanceof String s && b instanceof String t) {
                         push(s.compareTo(t) <= 0);
                     } else {
-                        throw error("The '<=' operator expects two Numbers or two Strings.");
+                        throw error(
+                            "The '<=' operator expects two Numbers or two Strings.");
                     }
                 }
                 case LISTADD -> {
@@ -496,6 +526,25 @@ class VirtualMachine {
                 case LOCGET -> {
                     var slot = readSlot();
                     push(stack[frame.base + slot]);
+                }
+                case LOCLET -> {
+                    var pattern = readPattern();
+                    var target = pop();
+                    var constants = (ListValue)pop();
+
+                    // FIRST, see if there's a match.  This is defining locals,
+                    // so just push the bound values onto the stack.  They
+                    // are being processed in the order they were defined by
+                    // the compiler.
+                    if (!Matcher.bind(
+                        pattern,
+                        target,
+                        constants::get,
+                        (id, value) -> push(value)
+                    )) {
+                        throw error(
+                            "'let' pattern failed to match target value.");
+                    }
                 }
                 case LOCSET -> {
                     var slot = readSlot();
@@ -810,6 +859,18 @@ class VirtualMachine {
     private String readString() {
         var index = frame.closure.function.code[frame.ip++];
         return (String)frame.closure.function.constants[index];
+    }
+
+    // Returns the indexed constant as a string.
+    private String readString(int index) {
+        return (String)frame.closure.function.constants[index];
+    }
+
+    // Reads a constant index from the chunk, and returns the indexed
+    // constant as a Pattern.
+    private Pattern readPattern() {
+        var index = frame.closure.function.code[frame.ip++];
+        return (Pattern)frame.closure.function.constants[index];
     }
 
     //-------------------------------------------------------------------------

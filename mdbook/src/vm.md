@@ -34,54 +34,54 @@ The byte-engine is a stack machine with a few registers:
 | 14 | GETNEXT           | *iter* → *a*       | a = iter.next()           |
 | 15 | GLODEF *name*     | *a* → ∅            | Define global             |
 | 16 | GLOGET *name*     | ∅ → *a*            | Get global                |
-| 17 | GLOSET *name*     | *a* → *a*          | Set global                |
-| 18 | GT                | *a b* → *a* > *b*  | Compare: greater          |
-| 19 | HASNEXT           | *iter* → *flag*    | flag = iter.hasNext()     |
-| 20 | IN                | *a coll* → *flag*  | a in collection           |
-| 21 | INCR              | *a* → *b*          | b = a + 1                 |
-| 22 | INDGET            | *coll i* → *a*     | `a = coll[i]`             |
-| 23 | INDSET            | *coll i a* → *a*   | `coll[i] = a`             |
-| 24 | INHERIT           | *sup sub* → *sup*  | Inheritance               |
-| 25 | ITER              | *coll* → *iter*    | iter = coll.iterator()    |
-| 26 | JIF *offset*      | *flag* → ∅         | Jump if false             |
-| 27 | JIFKEEP *offset*  | *flag* → *flag*    | Jump if false, keep value |
-| 28 | JIT *offset*      | *flag* → ∅         | Jump if true              |
-| 29 | JITKEEP *offset*  | *flag* → *flag*    | Jump if true, keep value  |
-| 30 | JUMP *offset*     | ∅ → ∅              | Jump forwards             |
-| 31 | LE                | *a b* → *a* <= *b* | Compare: less or equal    |
-| 32 | LET *pattern*     | *list a* → ∅       | Bind target to pattern    |
+| 17 | GLOLET *pattern*  | *list a* → ∅       | Bind target to pattern    |
+| 18 | GLOSET *name*     | *a* → *a*          | Set global                |
+| 19 | GT                | *a b* → *a* > *b*  | Compare: greater          |
+| 20 | HASNEXT           | *iter* → *flag*    | flag = iter.hasNext()     |
+| 21 | IN                | *a coll* → *flag*  | a in collection           |
+| 22 | INCR              | *a* → *b*          | b = a + 1                 |
+| 23 | INDGET            | *coll i* → *a*     | `a = coll[i]`             |
+| 24 | INDSET            | *coll i a* → *a*   | `coll[i] = a`             |
+| 25 | INHERIT           | *sup sub* → *sup*  | Inheritance               |
+| 26 | ITER              | *coll* → *iter*    | iter = coll.iterator()    |
+| 27 | JIF *offset*      | *flag* → ∅         | Jump if false             |
+| 28 | JIFKEEP *offset*  | *flag* → *flag*    | Jump if false, keep value |
+| 29 | JIT *offset*      | *flag* → ∅         | Jump if true              |
+| 30 | JITKEEP *offset*  | *flag* → *flag*    | Jump if true, keep value  |
+| 31 | JUMP *offset*     | ∅ → ∅              | Jump forwards             |
+| 32 | LE                | *a b* → *a* <= *b* | Compare: less or equal    |
 | 33 | LISTADD           | *list a* → *list*  | Add item to list          |
 | 34 | LISTNEW           | ∅ → *list*         | Push empty list           |
 | 35 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
-| 35 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
-| 36 | LOCSET *slot*     | *a* → *a*          | Set local                 |
-| 37 | LOOP *offset*     | ∅ → ∅              | Jump backwards            |
-| 38 | LT                | *a b* → *a* <= *b* | Compare: less than        |
-| 39 | MAPNEW            | ∅ → *map*          | Push empty ma p           |
-| 40 | MAPPUT            | *map k a* → *map*  | Add entry to map          |
-| 41 | METHOD *name*     | *cls f* → *cls*    | Add method to class       |
-| 42 | MUL               | *a b* → *c*        | c = a*b                   |
-| 43 | NE                | *a b* → *c*        | c = a != b                |
-| 44 | NEGATE            | *a* → *b*          | b = -a                    |
-| 45 | NI                | *a coll* → *flag*  | a not in collection       |
-| 46 | NOT               | *a* → *b*          | b = !a                    |
-| 47 | NULL              | ∅ → null           | Load `null`               |
-| 48 | POP               | *a* → ∅            | Pops one value            |
-| 49 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
-| 50 | PROPGET *name*    | *obj* → *a*        | Get property value        |
-| 51 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
-| 52 | RETURN            | *a* → *a*          | Return                    |
-| 53 | SUB               | *a b* → *c*        | c = a - b                 |
-| 54 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
-| 55 | TGET              | ∅ → *a*            | *a* = T                   |
-| 56 | THROW             | *a* → ∅            | Throw error               |
-| 57 | TPUT              | *a* → *a*          | T = *a*                   |
-| 58 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
-| 59 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
-| 60 | TRUE              | ∅ → true           | Load `true`               |
-| 61 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
-| 62 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
-| 63 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
+| 36 | LOCLET *pattern*  | *list a* → ∅       | Bind target to pattern    |
+| 37 | LOCSET *slot*     | *a* → *a*          | Set local                 |
+| 38 | LOOP *offset*     | ∅ → ∅              | Jump backwards            |
+| 39 | LT                | *a b* → *a* <= *b* | Compare: less than        |
+| 40 | MAPNEW            | ∅ → *map*          | Push empty ma p           |
+| 41 | MAPPUT            | *map k a* → *map*  | Add entry to map          |
+| 42 | METHOD *name*     | *cls f* → *cls*    | Add method to class       |
+| 43 | MUL               | *a b* → *c*        | c = a*b                   |
+| 44 | NE                | *a b* → *c*        | c = a != b                |
+| 45 | NEGATE            | *a* → *b*          | b = -a                    |
+| 46 | NI                | *a coll* → *flag*  | a not in collection       |
+| 47 | NOT               | *a* → *b*          | b = !a                    |
+| 48 | NULL              | ∅ → null           | Load `null`               |
+| 49 | POP               | *a* → ∅            | Pops one value            |
+| 50 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
+| 51 | PROPGET *name*    | *obj* → *a*        | Get property value        |
+| 52 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
+| 53 | RETURN            | *a* → *a*          | Return                    |
+| 54 | SUB               | *a b* → *c*        | c = a - b                 |
+| 55 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
+| 56 | TGET              | ∅ → *a*            | *a* = T                   |
+| 57 | THROW             | *a* → ∅            | Throw error               |
+| 58 | TPUT              | *a* → *a*          | T = *a*                   |
+| 59 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
+| 60 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
+| 61 | TRUE              | ∅ → true           | Load `true`               |
+| 62 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
+| 63 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
+| 64 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
 
 **Stack Effects:** in the stack effect column, the top of the stack is on the 
 right.  
@@ -255,6 +255,18 @@ Defines a global variable called *name*, assigning it the value *a*.
 
 Retrieves the value of global variable *name* and pushes it on the stack.
 
+### GLOLET
+---
+**GLOLET *pattern** | *list* *a* → ∅
+
+The `GLOLET` instruction implements the `let` statement where the binding
+variables are bound in the global scope.  It receives the
+`let` pattern as a constant index.  The *list* is a list of the constants,
+computed or literal, used in the pattern.  The value *a* is the target value
+to be matched.  If the match succeeds then the values of the binding 
+variables will be added to the global environment. If the match fails then the
+instruction throws a `RuntimeError`.
+
 ### GLOSET
 ---
 **GLOSET *name*** | *a* → *a*
@@ -371,19 +383,6 @@ Jumps forward by *offset*.
 ---
 **LE** | *a* *b* → *c*, where *c* = (*a* <= *b*)
 
-### LET
----
-**LET *pattern** | *list* *a* → ∅
-
-The `LET` instruction implements the `let` statement.  It receives the
-`let` pattern as a constant index.  The *list* is a list of the constants,
-computed or literal, used in the pattern.  The value *a* is the target value
-to be matched.  
-
-If the match succeeds then the binding variables, whether global or local, will
-receive their bound values.  If the match fails then the instruction throws
-a `RuntimeError`.
-
 ### LISTADD
 ---
 **LISTADD** | *list* *a* → *list*
@@ -402,6 +401,20 @@ Pushes an empty *list* value onto the stack.
 
 Gets the value of the local variable in the given stack *slot*, 
 relative to the current call frame.
+
+### LOCLET
+---
+**LOCLET *pattern** | *list* *a* → ∅
+
+The `LOCLET` instruction implements the `let` statement where the binding
+variables are bound in a local scope.  It receives the
+`let` pattern as a constant index.  The *list* is a list of the constants,
+computed or literal, used in the pattern.  The value *a* is the target value
+to be matched.
+
+If the match succeeds then the values of the binding variables will be pushed
+onto the stack, initializing them as locals. If the match fails then the 
+instruction throws a `RuntimeError`.
 
 ### LOCSET
 ---
