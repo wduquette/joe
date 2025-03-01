@@ -257,7 +257,7 @@ Retrieves the value of global variable *name* and pushes it on the stack.
 
 ### GLOLET
 ---
-**GLOLET *pattern** | *list* *a* → ∅
+**GLOLET *pattern*** | *list* *a* → ∅
 
 The `GLOLET` instruction implements the `let` statement where the binding
 variables are bound in the global scope.  It receives the
@@ -404,7 +404,7 @@ relative to the current call frame.
 
 ### LOCLET
 ---
-**LOCLET *pattern** | *list* *a* → ∅
+**LOCLET *pattern*** | *list* *a* → ∅
 
 The `LOCLET` instruction implements the `let` statement where the binding
 variables are bound in a local scope.  It receives the

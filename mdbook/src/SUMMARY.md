@@ -13,6 +13,7 @@
 - [Statements](statements.md)
 - [Functions](functions.md)
 - [Classes](classes.md)
+- [Pattern Matching](patterns.md)
 
 ---
 

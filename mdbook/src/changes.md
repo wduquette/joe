@@ -13,6 +13,8 @@
     `var x = myList[i]`.
     - Array notation is sugar for the `List` `get` and `set` methods, and
       for the `Map` `get` and `put` methods.
+  - Added the `let` statement, which performs destructuring binds using
+    [pattern matching](patterns.md).
 
 ## Changes in 0.5.0 
 

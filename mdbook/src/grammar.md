@@ -9,6 +9,10 @@ used in *Crafting Interpreters*.  Below that is the full
 Here is the grammar; see [Semantic Constraints](#semantic-constraints)
 for some conditions enforced by the compiler.
 
+- [Statements](#statements)
+- [Expressions](#expressions)
+- [Patterns](#patterns)
+
 ## Statements
 
 ```
@@ -119,8 +123,8 @@ pattern         → constantPattern
                 | listPattern
                 | mapPattern 
                 | instancePattern 
-                | recordPattern 
-                ";"
+                | recordPattern ;
+                
 ```
 
 A `subpattern` is a pattern that appears as a subpattern in a larger
