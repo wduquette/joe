@@ -158,12 +158,13 @@ class Resolver {
                 resolve(stmt.thenBranch());
                 if (stmt.elseBranch() != null) resolve(stmt.elseBranch());
             }
+            case Stmt.Let stmt -> {
+                stmt.pattern().getBindings().forEach(this::declare);
+                stmt.pattern().getConstants().forEach(this::resolve);
+                resolve(stmt.target());
+                stmt.pattern().getBindings().forEach(this::define);
+            }
             case Stmt.Return stmt -> {
-//                if (currentFunction == FunctionType.NONE) {
-//                    error(stmt.keyword(),
-//                        "Attempted 'return' from top-level code.");
-//                }
-
                 if (currentFunction == FunctionType.STATIC_INITIALIZER) {
                     error(stmt.keyword(),
                         "Attempted 'return' from static initializer.");

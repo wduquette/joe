@@ -4,11 +4,11 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
+import com.wjduquette.joe.patterns.Pattern;
 
 import static com.wjduquette.joe.bert.TokenType.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * The Bert byte-compiler.  This is a single-pass compiler, parsing the
@@ -71,6 +71,9 @@ class Compiler {
 
     // The loop currently being compiled, or null
     private LoopCompiler currentLoop = null;
+
+    // The pattern currently being compiled, or null
+    private PatternCompiler currentPattern = null;
 
     // Used for debugging/dumping
     private transient Disassembler disassembler;
@@ -177,6 +180,8 @@ class Compiler {
             classDeclaration();
         } else if (match(FUNCTION)) {
             functionDeclaration();
+        } else if (match(LET)) {
+            letDeclaration();
         } else if (match(VAR)) {
             varDeclaration();
         } else {
@@ -189,8 +194,8 @@ class Compiler {
     private void classDeclaration() {
         consume(IDENTIFIER, "Expected class name.");
         var className = parser.previous;
-        char nameConstant = identifierConstant(parser.previous);
-        declareVariable();
+        char nameConstant = identifierConstant(className);
+        declareVariable(className);
 
         emit(Opcode.CLASS, nameConstant);
         defineVariable(nameConstant);
@@ -310,7 +315,7 @@ class Compiler {
     private void functionDeclaration() {
         int start = parser.previous.span().start();
         var global = parseVariable("Expected function name.");
-        markVariableInitialized();
+        markVarInitialized();
         function(start, FunctionType.FUNCTION);
         defineVariable(global);
     }
@@ -380,6 +385,35 @@ class Compiler {
             } while (match(COMMA));
         }
         consume(until, "Expected '" + lexeme + "' after parameters.");
+    }
+
+    private void letDeclaration() {
+        var keyword = parser.previous;
+
+        // Parse the pattern; this does all variable declarations as
+        // it goes.
+        pattern();
+
+        if (currentPattern.bindingVars.isEmpty()) {
+            errorAt(keyword,
+                "'let' pattern must declare at least one variable.");
+        }
+
+        // Mark bound variables initialized.  This is a no-op at
+        // global scope.
+        markVarsInitialized(currentPattern.bindingVars.size());
+
+        consume(EQUAL, "Expected '=' after pattern.");
+        expression();
+        consume(SEMICOLON, "Expected ';' after target expression.");
+
+        if (current.scopeDepth > 0) {
+            emit(Opcode.LOCLET, currentPattern.patternIndex);
+        } else {
+            emit(Opcode.GLOLET, currentPattern.patternIndex);
+        }
+
+        currentPattern = null;
     }
 
     private void varDeclaration() {
@@ -682,7 +716,8 @@ class Compiler {
             }
 
             do {
-                // Parse the case expression and compare it with the switch vallue.
+                // Parse the case expression and compare it with the
+                // switch value.
                 emit(Opcode.DUP); // Duplicate the switch value
                 expression();
                 emit(Opcode.EQ);
@@ -903,6 +938,14 @@ class Compiler {
     }
 
     private void variable(boolean canAssign) {
+        // When parsing a pattern, interpolated variables and expressions
+        // can reference a variable with the same name as a binding
+        // variable before the binding variable is declared.  This
+        // Adds interpolated variables to a list so we can check for
+        // this error.
+        if (current.scopeDepth > 0 && currentPattern != null) {
+            currentPattern.referencedLocals.add(parser.previous);
+        }
         getOrSetVariable(parser.previous, canAssign);
     }
 
@@ -1157,6 +1200,153 @@ class Compiler {
     }
 
     //-------------------------------------------------------------------------
+    // Patterns
+
+    private void pattern() {
+        currentPattern = new PatternCompiler();
+
+        // Prepare for constants
+        emit(Opcode.LISTNEW);
+
+        var pattern = parsePattern(false);
+        currentPattern.patternIndex = addConstant(pattern);
+
+        for (var name : currentPattern.referencedLocals) {
+            if (currentPattern.bindingVars.contains(name.lexeme())) {
+                errorAt(name,
+                    "Can't read local variable in its own initializer.");
+            }
+        }
+    }
+
+    private Pattern parsePattern(boolean isSubpattern) {
+        var constant = constantPattern();
+
+        if (constant != null) {
+            return constant;
+        }
+
+        if (match(LEFT_BRACKET)) {
+            return listPattern();
+        } else if (match(LEFT_BRACE)) {
+            return mapPattern();
+        } else if (match(IDENTIFIER)) {
+            var varName = parser.previous;
+
+            if (varName.lexeme().startsWith("_")) {
+                return new Pattern.Wildcard(varName.lexeme());
+            }
+
+            var id = addPatternVar(varName);
+
+            if (isSubpattern && match(EQUAL)) {
+                var subpattern = parsePattern(false);
+                return new Pattern.PatternBinding(id, subpattern);
+            } else {
+                return new Pattern.ValueBinding(id);
+            }
+        } else {
+            errorAtCurrent("Expected pattern.");
+            return new Pattern.Wildcard("_");
+        }
+    }
+
+    private int addPatternVar(Token varName) {
+        if (currentPattern.bindingVars.contains(varName.lexeme())) {
+            errorAt(varName, "Duplicate binding variable in pattern.");
+        } else {
+            currentPattern.bindingVars.add(varName.lexeme());
+        }
+
+        var id = addVariable(varName);
+
+        // If this is a global, the VM uses the returned ID as the index
+        // of the global variable's name in the constants table.  If it
+        // is a local, the ID is ignored; so give them nice consecutive
+        // IDs to make the pattern's string-rep easier to read.
+        if (current.scopeDepth == 0) {
+            return id;
+        } else {
+            return currentPattern.bindingVars.size() - 1;
+        }
+    }
+
+    private Pattern.Constant constantPattern() {
+        if (match(TRUE)) {
+            emit(Opcode.TRUE);
+        } else if (match(FALSE)) {
+            emit(Opcode.FALSE);
+        } else if (match(NULL)) {
+            emit(Opcode.NULL);
+        } else if (match(NUMBER) || match(STRING) || match(KEYWORD)) {
+            emitConstant(parser.previous.literal());
+        } else if (match(DOLLAR)) {
+            if (match(IDENTIFIER)) {
+                // Save the variable for shadow-checks
+                currentPattern.referencedLocals.add(parser.previous);
+                variable(false);  // Emit the *GET instruction.
+            } else {
+                consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
+                expression();
+                consume(RIGHT_PAREN,
+                    "Expected ')' after interpolated expression.");
+            }
+        } else {
+            return null;
+        }
+
+        emit(Opcode.LISTADD);
+        return new Pattern.Constant(currentPattern.constantCount++);
+    }
+
+    private Pattern listPattern() {
+        var list = new ArrayList<Pattern>();
+
+        if (match(RIGHT_BRACKET)) {
+            return new Pattern.ListPattern(list, null);
+        }
+
+        do {
+            if (check(RIGHT_BRACKET) || check(COLON)) {
+                break;
+            }
+            list.add(parsePattern(true));
+        } while (match(COMMA));
+
+        Integer tailId = null;
+        if (match(COLON)) {
+            consume(IDENTIFIER,
+                "Expected binding variable for list tail.");
+            tailId = addPatternVar(parser.previous);
+        }
+        consume(RIGHT_BRACKET, "Expected ']' after list pattern.");
+
+        return new Pattern.ListPattern(list, tailId);
+    }
+
+    private Pattern mapPattern() {
+        var map = new LinkedHashMap<Pattern.Constant,Pattern>();
+
+        if (match(RIGHT_BRACE)) {
+            return new Pattern.MapPattern(map);
+        }
+
+        do {
+            if (check(RIGHT_BRACE)) {
+                break;
+            }
+            var key = constantPattern();
+            consume(COLON, "Expected ':' after map key.");
+            var value = parsePattern(true);
+            map.put(key, value);
+        } while (match(COMMA));
+
+        consume(RIGHT_BRACE, "Expected '}' after map pattern.");
+
+        return new Pattern.MapPattern(map);
+    }
+
+    //-------------------------------------------------------------------------
     // Variable Management
 
     // Parses a variable name as part of a declaration.  The name can be:
@@ -1169,9 +1359,13 @@ class Compiler {
     // returns 0.
     private char parseVariable(String errorMessage) {
         consume(IDENTIFIER, errorMessage);
-        declareVariable();
-        if (current.scopeDepth > 0) return 0;       // Local
-        return identifierConstant(parser.previous); // Global
+        return addVariable(parser.previous);
+    }
+
+    private char addVariable(Token name) {
+        declareVariable(name);
+        if (current.scopeDepth > 0) return 0;    // Local
+        return identifierConstant(name);         // Global
     }
 
     // Creates a hidden variable in the current scope, giving it the
@@ -1185,7 +1379,7 @@ class Compiler {
         var nameToken = Token.synthetic(name);
         addLocal(nameToken);
         expression();
-        markVariableInitialized();
+        markVarInitialized();
     }
 
     // Adds a string constant to the current chunk's
@@ -1199,7 +1393,7 @@ class Compiler {
     private void defineVariable(char global) {
         if (current.scopeDepth > 0) {
             // Local
-            markVariableInitialized();
+            markVarInitialized();
             return;
         }
         emit(Opcode.GLODEF, global);            // Global
@@ -1281,9 +1475,8 @@ class Compiler {
 
     // Declares the variable.  Checking for duplicate declarations in the
     // current local scope.
-    private void declareVariable() {
+    private void declareVariable(Token name) {
         if (current.scopeDepth == 0) return; // Global
-        var name = parser.previous;
 
         // Check for duplicate declarations in current scope.
         for (var i = current.localCount - 1; i >= 0; i--) {
@@ -1311,12 +1504,22 @@ class Compiler {
             new Local(name);
     }
 
-    // Marks local variables "initialized", so that they can be
+    // Marks the newest local variable "initialized", so that they can be
     // referred to in expressions.  This is a no-op for global variables.
-    private void markVariableInitialized() {
+    private void markVarInitialized() {
         if (current.scopeDepth == 0) return;
         current.locals[current.localCount - 1].depth
             = current.scopeDepth;
+    }
+
+    // Marks the N newest local variables "initialized", so that they can be
+    // referred to in expressions.  This is a no-op for global variables.
+    private void markVarsInitialized(int count) {
+        if (current.scopeDepth == 0) return;
+        for (var i = 0; i < count; i++) {
+            current.locals[current.localCount - 1 - i].depth
+                = current.scopeDepth;
+        }
     }
 
     // Resolves the name as the name of the local variable in the current
@@ -1504,6 +1707,10 @@ class Compiler {
 
     //-------------------------------------------------------------------------
     // Code Generation
+
+    private char addConstant(Object value) {
+        return current.chunk.addConstant(value);
+    }
 
     private void emitConstant(Object value) {
         emit(Opcode.CONST, current.chunk.addConstant(value));
@@ -1716,6 +1923,24 @@ class Compiler {
         }
     }
 
+    // Data about a compiled pattern.
+    private static class PatternCompiler {
+        // The index of the pattern in the constants table
+        char patternIndex = 0;
+
+        // The number of constants parsed so far; used to generate
+        // Pattern.Constant IDs
+        int constantCount = 0;
+
+        // Names of binding variables in this pattern; used to detect
+        // duplicates.
+        final Set<String> bindingVars = new HashSet<>();
+
+        // Local variables referenced by this pattern's constants.
+        // Used to prevent constant expressions from referencing
+        // shadowed variables.
+        final List<Token> referencedLocals = new ArrayList<>();
+    }
 
     // Compilation information about upvalues.
     static class UpvalueInfo {
@@ -1761,6 +1986,7 @@ class Compiler {
         rule(BACK_SLASH,      this::lambda,   null,          Level.NONE);
         rule(COLON,           null,           null,          Level.NONE);
         rule(COMMA,           null,           null,          Level.NONE);
+        rule(DOLLAR,          null,           null,          Level.NONE);
         rule(DOT,             null,           this::dot,     Level.CALL);
         rule(QUESTION,        null,           this::ternary, Level.TERNARY);
         rule(SEMICOLON,       null,           null,          Level.NONE);
@@ -1806,6 +2032,8 @@ class Compiler {
         rule(FUNCTION,        null,           null,          Level.NONE);
         rule(IF,              null,           null,          Level.NONE);
         rule(IN,              null,           this::binary,  Level.COMPARISON);
+        rule(LET,             null,           null,          Level.NONE);
+        rule(MATCH,           null,           null,          Level.NONE);
         rule(METHOD,          null,           null,          Level.NONE);
         rule(NI,              null,           this::binary,  Level.COMPARISON);
         rule(NULL,            this::symbol,   null,          Level.NONE);

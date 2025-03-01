@@ -1,6 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.patterns.Matcher;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 
@@ -189,6 +190,29 @@ class Interpreter {
                     return execute(stmt.thenBranch());
                 } else if (stmt.elseBranch() != null) {
                     return execute(stmt.elseBranch());
+                }
+            }
+            case Stmt.Let stmt -> {
+                var constants = new ArrayList<>();
+                stmt.pattern().getConstants().forEach(e ->
+                    constants.add(evaluate(e)));
+                var target = evaluate(stmt.target());
+                var bindings = new ArrayList<>();
+                if (Matcher.bind(
+                    stmt.pattern().getPattern(),
+                    target,
+                    constants::get,
+                    bindings::add
+                )) {
+                    var varNames = stmt.pattern().getBindings();
+                    for (var i = 0; i < varNames.size(); i++) {
+                        environment.setVar(
+                            varNames.get(i).lexeme(),
+                            bindings.get(i));
+                    }
+                } else {
+                    throw new RuntimeError(stmt.keyword().span(),
+                        "'let' pattern failed to match target value.");
                 }
             }
             case Stmt.Return stmt -> {
@@ -602,7 +626,7 @@ class Interpreter {
 
                 yield method;
             }
-            // Handle `this.<property>` in methods.  Note: the expr's
+            // Handle `this.<property>` in methods.  Note: the expression's
             // keyword might be "@".
             case Expr.This expr -> lookupVariable(Token.synthetic("this"), expr);
             // The ternary `? :` operator

@@ -9,7 +9,7 @@ import com.wjduquette.joe.SourceBuffer.Span;
 sealed interface Stmt
     permits Stmt.Assert, Stmt.Block, Stmt.Break, Stmt.Class,
             Stmt.Continue, Stmt.Expression, Stmt.For, Stmt.ForEach,
-            Stmt.Function, Stmt.If, Stmt.Return, Stmt.Switch,
+            Stmt.Function, Stmt.If, Stmt.Let, Stmt.Return, Stmt.Switch,
             Stmt.Throw, Stmt.Var, Stmt.While
 {
     /**
@@ -96,6 +96,15 @@ sealed interface Stmt
      * @param elseBranch Statement or block to execute if false, or null
      */
     record If(Expr condition, Stmt thenBranch, Stmt elseBranch) implements Stmt {}
+
+    /**
+     * A "let" statement
+     * @param keyword The keyword, for error location
+     * @param pattern The pattern to match
+     * @param target The target expression
+     */
+    record Let(Token keyword, WalkerPattern pattern, Expr target)
+        implements Stmt {}
 
     /**
      * A "return" statement

@@ -9,12 +9,18 @@ used in *Crafting Interpreters*.  Below that is the full
 Here is the grammar; see [Semantic Constraints](#semantic-constraints)
 for some conditions enforced by the compiler.
 
+- [Statements](#statements)
+- [Expressions](#expressions)
+- [Patterns](#patterns)
+
+## Statements
+
 ```
-// Statements
 program         → declaration* EOF ;
 
 declaration     → classDecl
                 | funDecl
+                | letDecl
                 | varDecl
                 | statement ;
 
@@ -26,7 +32,9 @@ classItem       → "method" function
                 
 funDecl         → "function" function ;
 function        → IDENTIFIER "(" parameters? ")" block ;
-parameters      → IDENTITIFIER ( "," IDENTIFIER )* ;
+parameters      → IDENTIFIER ( "," IDENTIFIER )* ;
+
+letDecl         → "let" pattern "=" expression ";" ; 
 
 varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
                
@@ -60,8 +68,11 @@ switchStmt      → "switch" "(" expression ")" "{"
 throwStmt       → "throw" expression ";" ;
 whileStmt       → "while" "(" expression ")" statement ;
 block           → "{" declaration* "}" ;
+```
 
-// Expression
+## Expressions
+
+```
 expression      → assignment ;
 assignment      → ( ( call "." )? IDENTIFIER 
                     | call "[" primary "]"
@@ -99,6 +110,90 @@ list            → "[" (expression ( "," expression )* ","? )? "]" ;
 map             → "{" (map_entry ( "," map_entry )* ","? )? "]" ;
 map_entry       → expression ":" expression ;
 ```
+
+## Patterns
+
+A `pattern` is a destructuring pattern that can appear in a `let` statement,
+an `if let` statement, or as a `case` of a `match` statement.
+
+```
+pattern         → constantPattern
+                | wildcardPattern
+                | valueBinding
+                | listPattern
+                | mapPattern 
+                | instancePattern 
+                | recordPattern ;
+                
+```
+
+A `subpattern` is a pattern that appears as a subpattern in a larger
+pattern.  It can optionally include a binding variable, which will
+receive the value matched by the subpattern.
+
+```
+subpattern      | (IDENTIFIER "=")? pattern ;
+```
+
+A `constantPattern` matches a literal or computed constant.  Variables
+referenced in a `constantPattern` must be defined in the enclosing scope
+and not shadowed by one of the pattern's binding variables.
+
+```
+constantPattern → "true" | "false" | "null" | STRING | NUMBER | KEYWORD
+                | "$" IDENTIFIER
+                | "$" "(" expression ")" ;
+```
+
+A `valueBinding` binds the matched value, whatever it is, to a variable.
+
+```
+valueBinding    → IDENTIFIER ;
+```
+
+A `listPattern` is a list of subpatterns to be matched against the items
+of a list, with an optional binding variable for the tail of the list.
+
+```
+listPattern     → "[" 
+                      (subpattern ( "," subpattern )* ","? )?
+                      ( ":" IDENTIFIER )?
+                  "]";
+```
+
+A `mapPattern` is a map of key patterns and value patterns to be matched 
+against the entries of a map value.  All keys in the pattern must appear
+in the map, but the pattern need not exhaust the map.  The key patterns
+must be `constantPatterns`; Joe does not attempt to do full pattern
+matching on the map keys.
+
+```
+mapPattern      → "{"
+                      ( entryPattern ( "," entryPattern )* ","? )?
+                  "}" ;
+entryPattern    → constantPattern ":" subpattern ;
+```
+
+An `instancePattern` is similar to a `mapPattern`, but matches the type
+and fields of a Joe object. The first `IDENTIFIER` must match the 
+value's type name.
+
+```
+instancePattern → IDENTIFIER "{"
+                      ( fieldPattern ( "," fieldPattern )* ","? )?
+                  "}"
+fieldPattern    → IDENTIFIER ":" subpattern ;
+```
+
+A `recordPattern` matches the fields of a Joe record.  An instance of a
+Joe record can be matched by an `instancePattern`, but because a record has
+a fixed number of ordered fields it can also be matched in a `listPattern`-like
+fashion.
+
+```
+recordPattern   → IDENTIFIER listPattern ;
+```
+
 
 ## Semantic Constraints
 
