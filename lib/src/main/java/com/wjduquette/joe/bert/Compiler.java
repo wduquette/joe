@@ -938,6 +938,14 @@ class Compiler {
     }
 
     private void variable(boolean canAssign) {
+        // When parsing a pattern, interpolated variables and expressions
+        // can reference a variable with the same name as a binding
+        // variable before the binding variable is declared.  This
+        // Adds interpolated variables to a list so we can check for
+        // this error.
+        if (current.scopeDepth > 0 && currentPattern != null) {
+            currentPattern.referencedLocals.add(parser.previous);
+        }
         getOrSetVariable(parser.previous, canAssign);
     }
 
@@ -1201,8 +1209,6 @@ class Compiler {
         emit(Opcode.LISTNEW);
 
         var pattern = parsePattern(false);
-        System.out.println("bindings: " + currentPattern.bindingVars);
-        System.out.println("pattern: "  + pattern);
         currentPattern.patternIndex = addConstant(pattern);
 
         for (var name : currentPattern.referencedLocals) {
@@ -1275,18 +1281,16 @@ class Compiler {
         } else if (match(NUMBER) || match(STRING) || match(KEYWORD)) {
             emitConstant(parser.previous.literal());
         } else if (match(DOLLAR)) {
-            // TODO: Support these.  Need to accumulate referenced
-            // if in local scope.
             if (match(IDENTIFIER)) {
-//                return wp.addVarConstant(previous());
+                // Save the variable for shadow-checks
+                currentPattern.referencedLocals.add(parser.previous);
+                variable(false);  // Emit the *GET instruction.
             } else {
-//                consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
-//                var expr = expression();
-//                consume(RIGHT_PAREN,
-//                    "Expected ')' after interpolated expression.");
-//                return wp.addExprConstant(expr);
+                consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
+                expression();
+                consume(RIGHT_PAREN,
+                    "Expected ')' after interpolated expression.");
             }
-            throw new UnsupportedOperationException("TODO");
         } else {
             return null;
         }
