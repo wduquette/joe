@@ -48,6 +48,11 @@ record BoundValue(Joe joe, TypeProxy<?> proxy, Object value)
     }
 
     @Override
+    public boolean hasField(String name) {
+        return proxy.hasField(name);
+    }
+
+    @Override
     public boolean canIterate() {
         return proxy.canIterate();
     }

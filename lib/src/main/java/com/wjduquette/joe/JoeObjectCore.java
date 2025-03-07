@@ -49,6 +49,16 @@ public class JoeObjectCore {
     }
 
     /**
+     * Returns true if the object has the given field, and false otherwise.
+     * Note: this checks for actual fields, not method properties.
+     * @param name The field name
+     * @return true or false
+     */
+    public boolean hasField(String name) {
+        return fields.containsKey(name);
+    }
+
+    /**
      * Gets a field's value.
      * @param name The field name.
      * @return The value

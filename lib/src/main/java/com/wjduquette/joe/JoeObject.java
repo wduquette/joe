@@ -32,6 +32,14 @@ public interface JoeObject extends HasTypeName {
     void set(String name, Object value);
 
     /**
+     * Returns true if the object has the given field, and false otherwise.
+     * Note: this checks for actual fields, not method properties.
+     * @param name The field name
+     * @return true or false
+     */
+    boolean hasField(String name);
+
+    /**
      * Whether the object supports iteration with foreach or not.
      * @return true or false
      */

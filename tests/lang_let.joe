@@ -133,6 +133,16 @@ function testMap_withInstance_keywordKeys() {
     assertEquals(c, "red");
 }
 
+function testMap_withInstance_badKeyType() {
+    assertError(\-> { let {123: i, #color: c} = Thing(123, "red"); },
+        "'let' pattern failed to match target value.");
+}
+
+function testMap_withInstance_unknownKey() {
+    assertError(\-> { let {#nonesuch: i, #color: c} = Thing(123, "red"); },
+        "'let' pattern failed to match target value.");
+}
+
 function testMap_fancyKey() {
     var key = #joe;
     let {$key: value} = {#joe: #language};

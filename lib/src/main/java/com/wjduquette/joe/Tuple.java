@@ -234,6 +234,11 @@ public class Tuple implements JoeObject {
     }
 
     @Override
+    public boolean hasField(String name) {
+        return fields.containsKey(new Keyword(name));
+    }
+
+    @Override
     public Object get(String name) {
         var keyword = new Keyword(name);
         var value = fields.get(keyword);

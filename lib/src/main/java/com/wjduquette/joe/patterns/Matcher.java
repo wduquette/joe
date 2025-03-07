@@ -105,13 +105,10 @@ public class Matcher {
                 }
                 case JoeObject obj -> {
                     for (var e : p.patterns().entrySet()) {
-                        var key = getter.get(e.getKey().id());
-                        var field = key2field(key);
-                        if (field == null) yield false;
-                        // TODO: Check for field's existence.
-                        var fieldValue = obj.get(field);
+                        var field = key2field(getter.get(e.getKey().id()));
+                        if (!obj.hasField(field)) yield false;
 
-                        if (!bind(e.getValue(), fieldValue, getter, binder)) {
+                        if (!bind(e.getValue(), obj.get(field), getter, binder)) {
                             yield false;
                         }
                     }
