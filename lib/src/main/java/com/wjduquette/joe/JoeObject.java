@@ -15,7 +15,16 @@ public interface JoeObject extends HasTypeName {
     String typeName();
 
     /**
-     * Get the value of the named object property.
+     * Returns true if the object has the named field property, and
+     * false otherwise. Note: this checks only for actual fields, not
+     * for method properties.
+     * @param name The field name
+     * @return true or false
+     */
+    boolean hasField(String name);
+
+    /**
+     * Get the value of the named object property, a method or a field.
      * @param name The name
      * @return The value
      * @throws JoeError if the property does not exist
@@ -23,21 +32,13 @@ public interface JoeObject extends HasTypeName {
     Object get(String name);
 
     /**
-     * Sets the value of the named object property.
+     * Sets the value of the named field property.
      * @param name The name
      * @param value The value
      * @throws JoeError if the object does not allow the property to
      * be set.
      */
     void set(String name, Object value);
-
-    /**
-     * Returns true if the object has the given field, and false otherwise.
-     * Note: this checks for actual fields, not method properties.
-     * @param name The field name
-     * @return true or false
-     */
-    boolean hasField(String name);
 
     /**
      * Whether the object supports iteration with foreach or not.

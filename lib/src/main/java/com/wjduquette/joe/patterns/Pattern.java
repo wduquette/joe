@@ -23,7 +23,8 @@ public sealed interface Pattern permits
     Pattern.PatternBinding,
     Pattern.ValueBinding,
     Pattern.ListPattern,
-    Pattern.MapPattern
+    Pattern.MapPattern,
+    Pattern.InstancePattern
 {
     /**
      * A pattern that requires the target value to be exactly equal to a
@@ -134,6 +135,23 @@ public sealed interface Pattern permits
                 .map(e -> e.getKey() + ": " + e.getValue())
                 .collect(Collectors.joining(", "));
             return "{" + map + "}";
+        }
+    }
+
+    /**
+     * A pattern that matches a target
+     * {@link com.wjduquette.joe.JoeObject} on its type name and fields.
+     * The given type name must match the name of the target object's
+     * Joe type or one of its supertypes.  The field match is done
+     * by MapPattern.
+     * @param typeName The name of the desired type.
+     * @param fieldMap The key constants and value patterns
+     */
+    record InstancePattern(String typeName, MapPattern fieldMap)
+        implements Pattern
+    {
+        @Override public String toString() {
+            return typeName + fieldMap;
         }
     }
 }

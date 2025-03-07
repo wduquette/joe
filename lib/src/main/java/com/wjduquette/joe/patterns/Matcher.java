@@ -119,6 +119,13 @@ public class Matcher {
                 }
                 default -> false;
             };
+
+            case Pattern.InstancePattern p -> {
+                if (!(value instanceof JoeObject obj)) yield false;
+                if (!hasType(obj, p.typeName())) yield false;
+
+                yield bind(p.fieldMap(), obj, getter, binder);
+            }
         };
     }
 
@@ -130,5 +137,12 @@ public class Matcher {
         } else {
             return null;
         }
+    }
+
+    // Determines whether the type name is the name of the object's
+    // type or the name of one of its supertypes.
+    private static boolean hasType(JoeObject obj, String typeName) {
+        // TODO: Match on supertypes.
+        return obj.typeName().equals(typeName);
     }
 }

@@ -1,13 +1,11 @@
 package com.wjduquette.joe.patterns;
 
+import com.wjduquette.joe.JoeObject;
 import com.wjduquette.joe.Ted;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.wjduquette.joe.checker.Checker.check;
 
@@ -293,5 +291,78 @@ public class MatcherTest extends Ted {
         var value = Map.of("k1", "v1", "k2", "v2", "k3", "v3");
 
         check(bind(pattern, value)).eq(true);
+    }
+
+    @Test
+    public void testInstancePattern_bad_wrongType() {
+        test("testInstancePattern_bad_wrongType");
+
+        constants = List.of("id", "123", "color", "red");
+        var fieldMap = new Pattern.MapPattern(Map.of(
+            new Pattern.Constant(0),
+            new Pattern.Constant(1),
+            new Pattern.Constant(2),
+            new Pattern.Constant(3)
+        ));
+        var pattern = new Pattern.InstancePattern("Thing", fieldMap);
+
+        var gizmo = new TestObject("Gizmo", "123", "red");
+
+        check(bind(pattern, gizmo)).eq(false);
+    }
+
+    @Test
+    public void testInstancePattern_bad_wrongField() {
+        test("testInstancePattern_wrongField");
+
+        constants = List.of("id", "123", "style", "fancy");
+        var fieldMap = new Pattern.MapPattern(Map.of(
+            new Pattern.Constant(0),
+            new Pattern.Constant(1),
+            new Pattern.Constant(2),
+            new Pattern.Constant(3)
+        ));
+        var pattern = new Pattern.InstancePattern("Thing", fieldMap);
+
+        var thing = new TestObject("Thing", "123", "red");
+
+        check(bind(pattern, thing)).eq(false);
+    }
+
+    @Test
+    public void testInstancePattern_good() {
+        test("testInstancePattern_good");
+
+        constants = List.of("id", "123", "color", "red");
+        var fieldMap = new Pattern.MapPattern(Map.of(
+            new Pattern.Constant(0),
+            new Pattern.Constant(1),
+            new Pattern.Constant(2),
+            new Pattern.Constant(3)
+        ));
+        var pattern = new Pattern.InstancePattern("Thing", fieldMap);
+
+        var thing = new TestObject("Thing", "123", "red");
+
+        check(bind(pattern, thing)).eq(true);
+    }
+
+    //-------------------------------------------------------------------------
+    // Helper
+
+    private static class TestObject implements JoeObject {
+        final String typeName;
+        final Map<String, Object> fields = new HashMap<>();
+
+        TestObject(String typeName, String id, String color) {
+            this.typeName = typeName;
+            fields.put("id", id);
+            fields.put("color", color);
+        }
+
+        @Override public String typeName() { return typeName; }
+        @Override public boolean hasField(String name) { return fields.containsKey(name); }
+        @Override public Object get(String name) { return fields.get(name); }
+        @Override public void set(String name, Object value) { }
     }
 }
