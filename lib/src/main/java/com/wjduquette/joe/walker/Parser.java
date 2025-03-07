@@ -711,19 +711,21 @@ class Parser {
         } else if (match(LEFT_BRACE)) {
             return mapPattern(wp);
         } else if (match(IDENTIFIER)) {
-            var varName = previous();
+            var identifier = previous();
 
-            if (varName.lexeme().startsWith("_")) {
-                return new Pattern.Wildcard(varName.lexeme());
+            if (identifier.lexeme().startsWith("_")) {
+                return new Pattern.Wildcard(identifier.lexeme());
+            } else if (match(LEFT_BRACE)) {
+                return instancePattern(wp, identifier);
             }
 
-            if (patternBindings.contains(varName.lexeme())) {
-                error(varName, "Duplicate binding variable in pattern.");
+            if (patternBindings.contains(identifier.lexeme())) {
+                error(identifier, "Duplicate binding variable in pattern.");
             } else {
-                patternBindings.add(varName.lexeme());
+                patternBindings.add(identifier.lexeme());
             }
 
-            var id = wp.getBindingID(varName);
+            var id = wp.getBindingID(identifier);
 
             if (isSubpattern && match(EQUAL)) {
                 var subpattern = parsePattern(wp, false);
@@ -785,7 +787,7 @@ class Parser {
         return new Pattern.ListPattern(list, tailId);
     }
 
-    private Pattern mapPattern(WalkerPattern wp) {
+    private Pattern.MapPattern mapPattern(WalkerPattern wp) {
         var map = new LinkedHashMap<Pattern.Constant,Pattern>();
 
         if (match(RIGHT_BRACE)) {
@@ -805,6 +807,11 @@ class Parser {
         consume(RIGHT_BRACE, "Expected '}' after map pattern.");
 
         return new Pattern.MapPattern(map);
+    }
+
+    private Pattern instancePattern(WalkerPattern wp, Token identifier) {
+        var fieldMap = mapPattern(wp);
+        return new Pattern.InstancePattern(identifier.lexeme(), fieldMap);
     }
 
     //-------------------------------------------------------------------------
