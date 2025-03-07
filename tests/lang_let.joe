@@ -114,6 +114,25 @@ function testMap_good() {
     assertEquals(a, 5);
 }
 
+class Thing {
+    method init(id, color) {
+        @id = id;
+        @color = color;
+    }
+}
+
+function testMap_withInstance_stringKeys() {
+    let {"id": i, "color": c} = Thing(123, "red");
+    assertEquals(i, 123);
+    assertEquals(c, "red");
+}
+
+function testMap_withInstance_keywordKeys() {
+    let {#id: i, #color: c} = Thing(123, "red");
+    assertEquals(i, 123);
+    assertEquals(c, "red");
+}
+
 function testMap_fancyKey() {
     var key = #joe;
     let {$key: value} = {#joe: #language};

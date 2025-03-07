@@ -1,5 +1,8 @@
 package com.wjduquette.joe.patterns;
 
+import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.Keyword;
+
 import java.util.*;
 
 /**
@@ -84,21 +87,51 @@ public class Matcher {
                 yield true;
             }
 
-            case Pattern.MapPattern p -> {
-                // FIRST, check type.
-                if (!(value instanceof Map<?,?> map)) yield false;
+            case Pattern.MapPattern p -> switch (value) {
+                case Map<?,?> map -> {
+                    // NEXT, match keys and values
+                    for (var e : p.patterns().entrySet()) {
+                        var key = getter.get(e.getKey().id());
+                        if (!map.containsKey(key)) yield false;
 
-                // NEXT, match keys and values
-                for (var e : p.patterns().entrySet()) {
-                    var key = getter.get(e.getKey().id());
-                    if (!map.containsKey(key)) yield false;
-                    var item = map.get(key);
-                    if (!bind(e.getValue(), item, getter, binder)) yield false;
+                        var item = map.get(key);
+                        if (!bind(e.getValue(), item, getter, binder)) {
+                            yield false;
+                        }
+                    }
+
+                    // FINALLY, match succeeds
+                    yield true;
                 }
+                case JoeObject obj -> {
+                    for (var e : p.patterns().entrySet()) {
+                        var key = getter.get(e.getKey().id());
+                        var field = key2field(key);
+                        if (field == null) yield false;
+                        // TODO: Check for field's existence.
+                        var fieldValue = obj.get(field);
 
-                // FINALLY, match succeeds
-                yield true;
-            }
+                        if (!bind(e.getValue(), fieldValue, getter, binder)) {
+                            yield false;
+                        }
+                    }
+
+                    // FINALLY, match succeeds
+                    yield true;
+
+                }
+                default -> false;
+            };
         };
+    }
+
+    private static String key2field(Object key) {
+        if (key instanceof String s) {
+            return s;
+        } else if (key instanceof Keyword k) {
+            return k.name();
+        } else {
+            return null;
+        }
     }
 }
