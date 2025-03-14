@@ -54,7 +54,6 @@ public class Joe {
 
     // Type Registry
     private final Map<Class<?>, ProxyType<?>> proxyTable = new HashMap<>();
-    private final Set<Class<?>> opaqueTypes = new HashSet<>();
     private final Set<Class<?>> cachedTypes = new HashSet<>();
 
     // The handler for all script-generated output
@@ -160,7 +159,6 @@ public class Joe {
         // FIRST, clear the type cache, as things might get looked up
         // differently with the new type.
         cachedTypes.forEach(proxyTable::remove);
-        opaqueTypes.removeAll(cachedTypes);
         cachedTypes.clear();
 
         // NEXT, install the proxy into the proxy table.
@@ -420,11 +418,6 @@ public class Joe {
             return proxy;
         }
 
-        // NEXT, is it known to be opaque?
-        if (opaqueTypes.contains(cls)) {
-            return null;
-        }
-
         // NEXT, search for a registered superclass.
         var c = cls.getSuperclass();
 
@@ -458,10 +451,11 @@ public class Joe {
             c = c.getSuperclass();
         } while (c != null && c != Object.class);
 
-        // NEXT, remember that we could not find a proxy.
-        opaqueTypes.add(cls);
+        // NEXT, create a new OpaqueType.
+        var opaque = new OpaqueType(cls);
+        proxyTable.put(cls, opaque);
         cachedTypes.add(cls);
-        return null;
+        return opaque;
     }
 
     /**

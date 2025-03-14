@@ -1,0 +1,11 @@
+// Test for opaque types.
+
+function testToString() {
+    var string = JoeTest.OPAQUE.toString();
+    check(string.contains("TestPackage$OpaqueValue@")).isTrue();
+}
+
+function testTypeName() {
+    var name = Type.typeOf(JoeTest.OPAQUE).name();
+    check(name.endsWith("TestPackage$OpaqueValue")).isTrue();
+}

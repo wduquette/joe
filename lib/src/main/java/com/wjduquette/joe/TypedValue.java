@@ -5,11 +5,11 @@ import com.wjduquette.joe.types.ListValue;
 import java.util.Collection;
 
 /**
- * A value bound to its ProxyType, or null.  It is the responsibility
+ * A value bound to its ProxyType.  It is the responsibility
  * of the caller (i.e., the Joe engine) to make sure that the proxy and
  * the value are compatible
  * @param joe The instance of Joe.
- * @param proxy The proxy, or null
+ * @param proxy The proxy
  * @param value The value
  */
 record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
@@ -43,20 +43,13 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
 
     @Override
     public Object get(String name) {
-        if (proxy != null) {
-            // The value is of a proxied type, and so has
-            // method properties but not field properties.
-            var method = proxy.bind(value, name);
-            if (method != null) {
-                return method;
-            } else {
-                throw new JoeError("Undefined property '" + name + "'.");
-            }
+        // The value is of a proxied type, and so has
+        // method properties but not field properties.
+        var method = proxy.bind(value, name);
+        if (method != null) {
+            return method;
         } else {
-            // The value is of an opaque type, in which case it has
-            // no properties.
-            throw new JoeError("Values of type " +
-                typeName() + " have no gettable properties.");
+            throw new JoeError("Undefined property '" + name + "'.");
         }
     }
 

@@ -65,8 +65,7 @@ public class TypeType extends ProxyType<Void> {
     private Object _isOpaqueValue(Joe joe, Args args) {
         args.exactArity(1, "isOpaqueValue(value)");
         var obj = joe.getJoeObject(args.next());
-        // TODO: eventually should be `instanceof OpaqueType`, not null.
-        return obj.type() == null;
+        return obj.type() instanceof OpaqueType;
     }
 
     //**
