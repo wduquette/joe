@@ -64,7 +64,7 @@ public class ProxyType<V>
      * Declares that this is a static type, with no initializer or
      * instance methods.
      */
-    public void staticType() {
+    protected void staticType() {
         this.isStatic = true;
     }
 
@@ -74,7 +74,7 @@ public class ProxyType<V>
      * supertype's proxy.
      * @param superProxy The supertype's proxy
      */
-    public void extendsProxy(ProxyType<? super V> superProxy) {
+    protected void extendsProxy(ProxyType<? super V> superProxy) {
         this.superProxy = superProxy;
     }
 
@@ -83,7 +83,7 @@ public class ProxyType<V>
      * @param name The method name
      * @param joeLambda The lambda that implements the method.
      */
-    public void staticMethod(String name, JoeLambda joeLambda) {
+    protected void staticMethod(String name, JoeLambda joeLambda) {
         staticMethods.put(name, new NativeFunction(name, "static method", joeLambda));
     }
 
@@ -92,7 +92,7 @@ public class ProxyType<V>
      * @param name The constant name
      * @param value The value
      */
-    public void constant(String name, Object value) {
+    protected void constant(String name, Object value) {
         constants.put(name, value);
     }
 
@@ -104,7 +104,7 @@ public class ProxyType<V>
      * <p>A proxy can proxy any number of related types.</p>
      * @param type The proxied type.
      */
-    public void proxies(Class<? extends V> type) {
+    protected void proxies(Class<? extends V> type) {
         proxiedTypes.add(type);
     }
 
@@ -113,7 +113,7 @@ public class ProxyType<V>
      * function named after the type.
      * @param joeLambda The lambda that implements the initializer
      */
-    public void initializer(JoeLambda joeLambda) {
+    protected void initializer(JoeLambda joeLambda) {
         this.initializer = new NativeFunction(name, "initializer", joeLambda);
     }
 
@@ -123,7 +123,7 @@ public class ProxyType<V>
      * @param supplier The iterable supplier.
      */
     @SuppressWarnings("unused")
-    public void iterables(Function<V,Collection<?>> supplier) {
+    protected void iterables(Function<V,Collection<?>> supplier) {
         this.iterableSupplier = supplier;
     }
 
@@ -132,7 +132,7 @@ public class ProxyType<V>
      * @param name The method name
      * @param callable The value callable that implements the method.
      */
-    public void method(String name, JoeValueLambda<V> callable) {
+    protected void method(String name, JoeValueLambda<V> callable) {
         methods.put(name, callable);
     }
 
