@@ -5,10 +5,10 @@ import java.util.Map;
 
 /**
  * A class that implements the boilerplate for subclasses of native classes
- * that implement JoeValue (e.g., JoeStackPane).  A JoeObjectCore is a
+ * that implement JoeValue (e.g., JoeStackPane).  A JoeValueCore is a
  * component of instances of the subclass.
  */
-public class JoeObjectCore {
+public class JoeValueCore {
     private final static String TO_STRING = "toString";
 
     //-------------------------------------------------------------------------
@@ -30,7 +30,7 @@ public class JoeObjectCore {
      * @param joeClass The JoeClass of which the host is an instance.
      * @param host The JoeValue instance of which this is a component.
      */
-    public JoeObjectCore(JoeClass joeClass, Object host) {
+    public JoeValueCore(JoeClass joeClass, Object host) {
         this.joeClass = joeClass;
         this.host = host;
         this._toString = new NativeMethod<>(this, "toString",

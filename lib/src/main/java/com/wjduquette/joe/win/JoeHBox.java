@@ -7,14 +7,14 @@ import javafx.scene.layout.HBox;
  * A JavaFX HBox that can be extended by Joe classes.
  */
 public class JoeHBox extends HBox implements JoeValue {
-    private final JoeObjectCore core;
+    private final JoeValueCore core;
 
     /**
      * Creates a JoeHBox.
      * @param joeClass The Joe class for which this is the Java instance.
      */
     public JoeHBox(JoeClass joeClass) {
-        this.core = new JoeObjectCore(joeClass, this);
+        this.core = new JoeValueCore(joeClass, this);
     }
 
     @Override public JoeType type() { return core.type(); }

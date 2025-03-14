@@ -10,7 +10,7 @@ public class TextBuilder implements JoeValue {
     // Instance Variables
 
     // The object infrastructure
-    private final JoeObjectCore core;
+    private final JoeValueCore core;
 
     // The buffer
     private StringBuilder buff = new StringBuilder();
@@ -23,7 +23,7 @@ public class TextBuilder implements JoeValue {
      * @param joeClass The Joe class for which this is the Java instance.
      */
     public TextBuilder(JoeClass joeClass) {
-        this.core = new JoeObjectCore(joeClass, this);
+        this.core = new JoeValueCore(joeClass, this);
     }
 
     //-------------------------------------------------------------------------

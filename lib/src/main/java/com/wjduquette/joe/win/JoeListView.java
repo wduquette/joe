@@ -22,7 +22,7 @@ public class JoeListView extends ListView<Object> implements JoeValue {
     private final Joe joe;
 
     // The core, which handles JavaFX properties, etc.
-    private final JoeObjectCore core;
+    private final JoeValueCore core;
 
     // Whether a programmatic select*() call is in progress.
     private boolean inSelect = false;
@@ -43,7 +43,7 @@ public class JoeListView extends ListView<Object> implements JoeValue {
      */
     public JoeListView(Joe joe, JoeClass joeClass) {
         this.joe = joe;
-        this.core = new JoeObjectCore(joeClass, this);
+        this.core = new JoeValueCore(joeClass, this);
 
         // Use MyCell instead of the standard ListCell.
         setCellFactory(p -> new MyCell());
@@ -55,7 +55,7 @@ public class JoeListView extends ListView<Object> implements JoeValue {
     }
 
     //-------------------------------------------------------------------------
-    // JoeObjectCore delegations
+    // JoeValueCore delegations
 
     @Override public JoeType type() { return core.type(); }
     @Override public String typeName() { return core.typeName(); }
@@ -115,6 +115,7 @@ public class JoeListView extends ListView<Object> implements JoeValue {
      * The widget's selected index property, derived from its selection model.
      * @return The property.
      */
+    @SuppressWarnings("unused")
     public ReadOnlyIntegerProperty selectedIndexProperty() {
         return getSelectionModel().selectedIndexProperty();
     }
