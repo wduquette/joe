@@ -3,11 +3,17 @@ package com.wjduquette.joe;
 import java.util.Collection;
 
 /**
- * An interface for a Java type implemented to play well with Joe.  A
+ * An interface for a Java value type implemented to play well with Joe.  A
  * Joe object knows the name of its type, can have mutable or immutable
  * fields, can optionally be iterated over, and has a string representation.
  */
 public interface JoeObject extends HasTypeName {
+    /**
+     * Gets the object's type.
+     * @return The type.
+     */
+    JoeType type();
+
     /**
      * Gets the object's type name.
      * @return The name

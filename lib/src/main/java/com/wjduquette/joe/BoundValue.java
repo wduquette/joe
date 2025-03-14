@@ -13,6 +13,10 @@ import java.util.Collection;
 record BoundValue(Joe joe, TypeProxy<?> proxy, Object value)
     implements JoeObject
 {
+    @Override
+    public JoeType type() {
+        return proxy;
+    }
 
     @Override
     public String typeName() {

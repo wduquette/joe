@@ -41,6 +41,14 @@ public class JoeObjectCore {
     // Object Method implementations
 
     /**
+     * The script-level type of this object.
+     * @return The type
+     */
+    public JoeType type() {
+        return joeClass;
+    }
+
+    /**
      * The type name.
      * @return the name
      */

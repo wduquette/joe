@@ -1,6 +1,8 @@
 package com.wjduquette.joe.bert;
 
+import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.JoeType;
 
 /**
  * Closure is the {@link VirtualMachine}'s representation for compiled
@@ -41,6 +43,12 @@ public class Closure implements BertCallable, JoeObject {
 
     //-------------------------------------------------------------------------
     // JoeObject API
+
+    @Override
+    public JoeType type() {
+        // TODO: Fix this
+        throw new JoeError("Closure does not have a proper type!");
+    }
 
     @Override
     public String typeName() {

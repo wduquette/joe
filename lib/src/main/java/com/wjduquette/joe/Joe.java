@@ -835,6 +835,20 @@ public class Joe {
     }
 
     /**
+     * Returns the object as a Joe type object.
+     * @param arg The argument
+     * @return The type
+     * @throws JoeError if the argument is not a Joe type object
+     */
+    public JoeType toJoeType(Object arg) {
+        if (arg instanceof JoeType type) {
+            return type;
+        } else {
+            throw expected("Joe type", arg);
+        }
+    }
+
+    /**
      * Requires that the argument is a Keyword, and returns it as
      * such.
      * @param arg The argument

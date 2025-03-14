@@ -5,6 +5,7 @@ import com.wjduquette.joe.*;
 import java.util.HashMap;
 import java.util.Map;
 import com.wjduquette.joe.SourceBuffer.Span;
+import com.wjduquette.joe.types.TypeType;
 
 /**
  * A class defined in a Joe script.
@@ -137,6 +138,10 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     //-------------------------------------------------------------------------
     // JoeObject API
 
+    @Override
+    public JoeType type() {
+        return TypeType.TYPE;
+    }
 
     @Override
     public String typeName() {

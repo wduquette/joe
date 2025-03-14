@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.types.TypeType;
+
 import java.util.*;
 import java.util.function.Function;
 
@@ -143,6 +145,11 @@ public class TypeProxy<V>
 
     //-------------------------------------------------------------------------
     // JoeObject API
+
+    @Override
+    public JoeType type() {
+        return TypeType.TYPE;
+    }
 
     @Override
     public Object get(String name) {

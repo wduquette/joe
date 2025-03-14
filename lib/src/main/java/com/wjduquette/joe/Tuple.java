@@ -138,6 +138,11 @@ public class Tuple implements JoeObject {
         }
     }
 
+    @Override public JoeType type() {
+        // TODO: Fix or replace Tuple!
+        throw new JoeError("Tuple is not a proper type!");
+    }
+
     //-------------------------------------------------------------------------
     // Value Methods
 

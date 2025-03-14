@@ -24,6 +24,11 @@ class WalkerInstance implements JoeObject {
     }
 
     @Override
+    public JoeType type() {
+        return joeClass;
+    }
+
+    @Override
     public String typeName() {
         return joeClass.name();
     }

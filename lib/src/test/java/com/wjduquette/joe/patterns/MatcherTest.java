@@ -1,6 +1,7 @@
 package com.wjduquette.joe.patterns;
 
 import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.JoeType;
 import com.wjduquette.joe.Ted;
 import org.junit.Before;
 import org.junit.Test;
@@ -360,6 +361,7 @@ public class MatcherTest extends Ted {
             fields.put("color", color);
         }
 
+        @Override public JoeType type() { return null; }
         @Override public String typeName() { return typeName; }
         @Override public boolean hasField(String name) { return fields.containsKey(name); }
         @Override public Object get(String name) { return fields.get(name); }

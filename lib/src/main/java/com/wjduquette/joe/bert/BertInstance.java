@@ -46,6 +46,11 @@ public class BertInstance implements JoeObject {
     // JoeObject API
 
     @Override
+    public JoeType type() {
+        return klass;
+    }
+
+    @Override
     public String typeName() {
         return klass.name();
     }

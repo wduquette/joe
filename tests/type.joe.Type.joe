@@ -1,0 +1,34 @@
+// Type-type tests.
+
+//-------------------------------------------------------------------------
+// The Type type's own info
+
+function testName() {
+    check(Type.name()).eq("Type");
+}
+
+//-------------------------------------------------------------------------
+// Type and Value Introspection
+
+function testIsOpaqueValue() {
+    check(Type.isOpaqueValue(JoeTest.OPAQUE)).isTrue();
+    check(Type.isOpaqueValue("abc")).isFalse();
+}
+
+function testIsType() {
+    check(Type.isType(String)).isTrue();
+    check(Type.isType("abc")).isFalse();
+}
+
+function testNameOf() {
+    check(Type.nameOf(String)).eq("String");
+
+    assertError(\-> Type.nameOf("abc"),
+        "Expected Joe type, got: String 'abc'.");
+}
+
+function testTypeOf() {
+    check(Type.typeOf("abc")).eq(String);
+    check(Type.typeOf(String)).eq(Type);
+    check(Type.typeOf(Type)).eq(Type);
+}

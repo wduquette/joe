@@ -1,6 +1,7 @@
 package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.types.TypeType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,12 +81,15 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
     }
 
     //-------------------------------------------------------------------------
-    // JoeClass API
+    // JoeType API
 
     @Override
     public String name() {
         return name;
     }
+
+    //-------------------------------------------------------------------------
+    // JoeClass API
 
     @Override
     public JoeCallable bind(Object value, String name) {
@@ -118,6 +122,11 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
 
     //-------------------------------------------------------------------------
     // JoeObject API
+
+    @Override
+    public JoeType type() {
+        return TypeType.TYPE;
+    }
 
     @Override
     public String typeName() {

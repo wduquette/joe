@@ -1,9 +1,6 @@
 package com.wjduquette.joe.win;
 
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeClass;
-import com.wjduquette.joe.JoeObject;
-import com.wjduquette.joe.JoeObjectCore;
+import com.wjduquette.joe.*;
 import javafx.scene.layout.VBox;
 
 /**
@@ -20,6 +17,7 @@ public class JoeVBox extends VBox implements JoeObject {
         this.core = new JoeObjectCore(joeClass, this);
     }
 
+    @Override public JoeType type() { return core.type(); }
     @Override public String typeName() { return core.typeName(); }
     @Override public boolean hasField(String name) { return core.hasField(name); }
     @Override public Object get(String name) { return core.get(name); }
