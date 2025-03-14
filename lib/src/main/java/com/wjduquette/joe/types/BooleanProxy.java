@@ -2,12 +2,12 @@ package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.TypeProxy;
+import com.wjduquette.joe.ProxyType;
 
 /**
  * The type proxy for Joe's `Boolean` type.
  */
-public class BooleanProxy extends TypeProxy<Boolean> {
+public class BooleanProxy extends ProxyType<Boolean> {
     /**
      * The proxy's constant, used for installation.
      */

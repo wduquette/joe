@@ -53,7 +53,7 @@ public class Joe {
     private boolean debug = false;
 
     // Type Registry
-    private final Map<Class<?>, TypeProxy<?>> proxyTable = new HashMap<>();
+    private final Map<Class<?>, ProxyType<?>> proxyTable = new HashMap<>();
     private final Set<Class<?>> opaqueTypes = new HashSet<>();
     private final Set<Class<?>> cachedTypes = new HashSet<>();
 
@@ -154,9 +154,9 @@ public class Joe {
 
     /**
      * Installs a registered type's proxy into Joe's global environment.
-     * @param typeProxy The type proxy.
+     * @param proxyType The type proxy.
      */
-    public void installType(TypeProxy<?> typeProxy) {
+    public void installType(ProxyType<?> proxyType) {
         // FIRST, clear the type cache, as things might get looked up
         // differently with the new type.
         cachedTypes.forEach(proxyTable::remove);
@@ -164,12 +164,12 @@ public class Joe {
         cachedTypes.clear();
 
         // NEXT, install the proxy into the proxy table.
-        for (var cls : typeProxy.getProxiedTypes()) {
-            proxyTable.put(cls, typeProxy);
+        for (var cls : proxyType.getProxiedTypes()) {
+            proxyTable.put(cls, proxyType);
         }
 
         // NEXT, install the type into the environment.
-        engine.setVar(typeProxy.name(), typeProxy);
+        engine.setVar(proxyType.name(), proxyType);
     }
 
     /**
@@ -385,15 +385,15 @@ public class Joe {
      * Looks for a proxy for this object's class or its superclasses.
      *
      * <p><b>Note:</b> The construction of the proxyTable depends on
-     * the proxied types returned by each TypeProxy; and the proxiedTypes
-     * are constrained to be compatible with the TypeProxy's value type.
+     * the proxied types returned by each ProxyType; and the proxiedTypes
+     * are constrained to be compatible with the ProxyType's value type.
      * Thus, if this method returns a proxy, it will *always* be
      * compatible with the given object.
      * </p>
      * @param object The object for which we are looking up a proxy.
      * @return The proxy, or null
      */
-    TypeProxy<?> lookupProxy(Object object) {
+    ProxyType<?> lookupProxy(Object object) {
         return object != null
             ? lookupProxyByClass(object.getClass())
             : null;
@@ -413,7 +413,7 @@ public class Joe {
      * @param cls The class
      * @return The proxy, or null if not found.
      */
-    TypeProxy<?> lookupProxyByClass(Class<?> cls) {
+    ProxyType<?> lookupProxyByClass(Class<?> cls) {
         // FIRST, do have a known proxy?
         var proxy = proxyTable.get(cls);
         if (proxy != null) {

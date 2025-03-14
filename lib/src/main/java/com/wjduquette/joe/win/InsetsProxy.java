@@ -2,10 +2,10 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.TypeProxy;
+import com.wjduquette.joe.ProxyType;
 import javafx.geometry.Insets;
 
-class InsetsProxy extends TypeProxy<Insets> {
+class InsetsProxy extends ProxyType<Insets> {
     public static final InsetsProxy TYPE = new InsetsProxy();
 
     //-------------------------------------------------------------------------

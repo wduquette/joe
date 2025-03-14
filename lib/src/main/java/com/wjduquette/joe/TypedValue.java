@@ -3,14 +3,14 @@ package com.wjduquette.joe;
 import java.util.Collection;
 
 /**
- * A value bound to its TypeProxy, or null.  It is the responsibility
+ * A value bound to its ProxyType, or null.  It is the responsibility
  * of the caller (i.e., the Joe engine) to make sure that the proxy and
  * the value are compatible
  * @param joe The instance of Joe.
  * @param proxy The proxy, or null
  * @param value The value
  */
-record TypedValue(Joe joe, TypeProxy<?> proxy, Object value)
+record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
     implements JoeValue
 {
     @Override

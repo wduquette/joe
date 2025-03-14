@@ -14,7 +14,7 @@ public class JoePackage {
     private final String name;
 
     private final List<NativeFunction> globalFunctions = new ArrayList<>();
-    private final List<TypeProxy<?>> types = new ArrayList<>();
+    private final List<ProxyType<?>> types = new ArrayList<>();
     private final List<ScriptResource> scriptResources = new ArrayList<>();
 
     //-------------------------------------------------------------------------
@@ -43,10 +43,10 @@ public class JoePackage {
 
     /**
      * Adds a registered type to the package, given its proxy.
-     * @param typeProxy The proxy.
+     * @param proxyType The proxy.
      */
-    public final void type(TypeProxy<?> typeProxy) {
-        types.add(typeProxy);
+    public final void type(ProxyType<?> proxyType) {
+        types.add(proxyType);
     }
 
     /**

@@ -2,8 +2,8 @@ package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.ProxyType;
 import com.wjduquette.joe.StringFormatter;
-import com.wjduquette.joe.TypeProxy;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * The type proxy for Joe's String type.
  */
-public class StringProxy extends TypeProxy<String> {
+public class StringProxy extends ProxyType<String> {
     /** The type constant, for installation. */
     public static final StringProxy TYPE = new StringProxy();
 

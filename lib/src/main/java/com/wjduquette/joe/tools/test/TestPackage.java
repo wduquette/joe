@@ -196,7 +196,7 @@ public class TestPackage extends JoePackage {
     //-------------------------------------------------------------------------
     // JoeTest type
 
-    private static class JoeTestType extends TypeProxy<Void> {
+    private static class JoeTestType extends ProxyType<Void> {
         JoeTestType() {
             super("JoeTest");
 

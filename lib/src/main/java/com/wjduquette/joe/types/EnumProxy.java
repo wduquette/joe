@@ -2,7 +2,7 @@ package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.TypeProxy;
+import com.wjduquette.joe.ProxyType;
 
 import java.util.Collections;
 
@@ -13,7 +13,7 @@ import java.util.Collections;
  * by the `@enum` tag in `tools.doc.DocCommentParser`.</p>
  * @param <E> The enum type
  */
-public class EnumProxy<E extends Enum<E>> extends TypeProxy<E> {
+public class EnumProxy<E extends Enum<E>> extends ProxyType<E> {
     //-------------------------------------------------------------------------
     // Static Methods
 

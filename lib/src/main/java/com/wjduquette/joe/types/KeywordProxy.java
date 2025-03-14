@@ -3,12 +3,12 @@ package com.wjduquette.joe.types;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Keyword;
-import com.wjduquette.joe.TypeProxy;
+import com.wjduquette.joe.ProxyType;
 
 /**
  * The type proxy for Keyword values.
  */
-public class KeywordProxy extends TypeProxy<Keyword> {
+public class KeywordProxy extends ProxyType<Keyword> {
     /** The proxy's TYPE constant. */
     public static final KeywordProxy TYPE = new KeywordProxy();
 

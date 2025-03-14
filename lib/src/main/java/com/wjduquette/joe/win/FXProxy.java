@@ -7,12 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A TypeProxy that includes support for JavaFX properties.  The documentation
+ * A ProxyType that includes support for JavaFX properties.  The documentation
  * for the related methods is defined as a JoeDoc @mixin; all direct subclasses
  * (e.g., NodeProxy, MenuItemProxy) should "@includeMixin FXProxy".
  * @param <V> The proxied type
  */
-public class FXProxy<V> extends TypeProxy<V> {
+public class FXProxy<V> extends ProxyType<V> {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -62,7 +62,7 @@ public class FXProxy<V> extends TypeProxy<V> {
      * @param superProxy The supertype's proxy
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public void extendsProxy(TypeProxy<? super V> superProxy) {
+    public void extendsProxy(ProxyType<? super V> superProxy) {
         super.extendsProxy(superProxy);
         if (superProxy instanceof FXProxy fxProxy) {
             properties.putAll(fxProxy.properties);

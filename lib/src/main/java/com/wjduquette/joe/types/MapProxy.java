@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 /**
  * A type proxy for Joe's Map types.
  */
-public class MapProxy extends TypeProxy<JoeMap> {
+public class MapProxy extends ProxyType<JoeMap> {
     /** The proxy's TYPE constant. */
     public static final MapProxy TYPE = new MapProxy();
 

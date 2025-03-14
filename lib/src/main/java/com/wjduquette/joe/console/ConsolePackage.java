@@ -98,7 +98,7 @@ public class ConsolePackage extends JoePackage {
     //-------------------------------------------------------------------------
     // The Console Type
 
-    private class ConsoleProxy extends TypeProxy<Void> {
+    private class ConsoleProxy extends ProxyType<Void> {
         //---------------------------------------------------------------------
         // Constructor
 

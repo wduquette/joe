@@ -5,7 +5,7 @@ import com.wjduquette.joe.*;
 /**
  * The type proxy for {@link JoeError} values.
  */
-public class ErrorProxy extends TypeProxy<JoeError> {
+public class ErrorProxy extends ProxyType<JoeError> {
     /** The proxy's TYPE constant. */
     public static final ErrorProxy TYPE = new ErrorProxy();
 

@@ -188,7 +188,7 @@ public class WinPackage extends JoePackage {
     //-------------------------------------------------------------------------
     // The Gui Type
 
-    private class WinProxy extends TypeProxy<Void> {
+    private class WinProxy extends ProxyType<Void> {
         //---------------------------------------------------------------------
         // Constructor
 

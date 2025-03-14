@@ -2,14 +2,14 @@ package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.TypeProxy;
+import com.wjduquette.joe.ProxyType;
 
 import java.util.List;
 
 /**
  * The type proxy for Joe's Number type.
  */
-public class NumberProxy extends TypeProxy<Double> {
+public class NumberProxy extends ProxyType<Double> {
     /** The type constant. */
     public static final NumberProxy TYPE = new NumberProxy();
 

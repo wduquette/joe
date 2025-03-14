@@ -8,7 +8,7 @@ import java.util.HashSet;
 /**
  * The Joe List type's proxy.
  */
-public class ListProxy extends TypeProxy<JoeList> {
+public class ListProxy extends ProxyType<JoeList> {
     /** The proxy's TYPE constant. */
     public static final ListProxy TYPE = new ListProxy();
 

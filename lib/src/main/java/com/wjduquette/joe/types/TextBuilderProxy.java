@@ -3,9 +3,9 @@ package com.wjduquette.joe.types;
 import com.wjduquette.joe.*;
 
 /**
- * A TypeProxy for the TextBuilder type.
+ * A ProxyType for the TextBuilder type.
  */
-public class TextBuilderProxy extends TypeProxy<TextBuilder> {
+public class TextBuilderProxy extends ProxyType<TextBuilder> {
     /**
      * The proxy's TYPE constant.
      */

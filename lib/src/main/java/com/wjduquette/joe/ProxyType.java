@@ -6,11 +6,11 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * A proxy for a native Java type.  The proxy implements all required
- * metadata and services for the type.
+ * A JoeType that serves as a proxy for a native Java type.  The proxy type
+ * implements all required metadata and services for the native type.
  * @param <V> The native value type
  */
-public class TypeProxy<V>
+public class ProxyType<V>
     implements JoeClass, JoeValue, NativeCallable
 {
     //-------------------------------------------------------------------------
@@ -22,7 +22,7 @@ public class TypeProxy<V>
 
     // Static methods and constants
     private boolean isStatic = false;
-    private TypeProxy<? super V> superProxy = null;
+    private ProxyType<? super V> superProxy = null;
     private final Map<String, NativeFunction> staticMethods =
         new HashMap<>();
     private final Map<String, Object> constants = new HashMap<>();
@@ -52,7 +52,7 @@ public class TypeProxy<V>
      * name for the type, which need not match V's simple name.
      * @param name The name
      */
-    public TypeProxy(String name) {
+    public ProxyType(String name) {
         this.name = name;
     }
 
@@ -73,7 +73,7 @@ public class TypeProxy<V>
      * supertype's proxy.
      * @param superProxy The supertype's proxy
      */
-    public void extendsProxy(TypeProxy<? super V> superProxy) {
+    public void extendsProxy(ProxyType<? super V> superProxy) {
         this.superProxy = superProxy;
     }
 

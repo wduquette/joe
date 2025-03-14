@@ -7,7 +7,7 @@ import java.util.Collection;
 /**
  * A type proxy for Joe's Set types.
  */
-public class SetProxy extends TypeProxy<JoeSet> {
+public class SetProxy extends ProxyType<JoeSet> {
     /** The proxy's TYPE constant. */
     public static final SetProxy TYPE = new SetProxy();
 

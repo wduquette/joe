@@ -3,12 +3,12 @@ package com.wjduquette.joe.types;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.AssertError;
-import com.wjduquette.joe.TypeProxy;
+import com.wjduquette.joe.ProxyType;
 
 /**
  * The type proxy for {@link AssertError} values.
  */
-public class AssertErrorProxy extends TypeProxy<AssertError> {
+public class AssertErrorProxy extends ProxyType<AssertError> {
     /** The proxy's TYPE constant. */
     public static final AssertErrorProxy TYPE = new AssertErrorProxy();
 

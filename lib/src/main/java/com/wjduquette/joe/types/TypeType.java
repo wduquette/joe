@@ -7,7 +7,7 @@ import com.wjduquette.joe.*;
  * static type, and hosts the type introspection API.  Its own
  * At the script level, `Type.of(Type) == Type`.
  */
-public class TypeType extends TypeProxy<Void> {
+public class TypeType extends ProxyType<Void> {
     /** The proxy's TYPE constant. */
     public static final TypeType TYPE = new TypeType();
 
