@@ -10,7 +10,7 @@ import java.util.Collection;
  * @param proxy The proxy, or null
  * @param value The value
  */
-record BoundValue(Joe joe, TypeProxy<?> proxy, Object value)
+record TypedValue(Joe joe, TypeProxy<?> proxy, Object value)
     implements JoeValue
 {
     @Override

@@ -474,7 +474,7 @@ public class Joe {
         if (value instanceof JoeValue obj) {
             return obj;
         } else {
-            return new BoundValue(this, lookupProxy(value), value);
+            return new TypedValue(this, lookupProxy(value), value);
         }
     }
 
