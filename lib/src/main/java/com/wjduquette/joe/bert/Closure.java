@@ -48,6 +48,11 @@ public class Closure implements BertCallable, JoeObject {
     }
 
     @Override
+    public boolean hasField(String name) {
+        return false;
+    }
+
+    @Override
     public Object get(String name) {
         throw new UnsupportedOperationException(
             "Values of type <function> have no properties.");

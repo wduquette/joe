@@ -152,6 +152,11 @@ public class TypeProxy<V> implements JoeObject, JoeClass, NativeCallable {
         throw new JoeError("Type " + this.name + " has no settable properties.");
     }
 
+    @Override
+    public boolean hasField(String name) {
+        return constants.containsKey(name);
+    }
+
     //-------------------------------------------------------------------------
     // Overridable methods
 

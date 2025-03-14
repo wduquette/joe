@@ -1,9 +1,23 @@
 // Tests the "let" statement and pattern syntax
 
+//-----------------------------------------------------------------------------
+// Simple variable binding
+
 function testOneVar() {
     let a = 1;
     assertEquals(a, 1);
 }
+function testCapture() {
+    let [a, b=[c, d], e] = [1, [2, 3], 4];
+    assertEquals(a, 1);
+    assertEquals(b, [2, 3]);
+    assertEquals(c, 2);
+    assertEquals(d, 3);
+    assertEquals(e, 4);
+}
+
+//-----------------------------------------------------------------------------
+// List Patterns
 
 function testList_noMatch() {
     assertError(\-> { let [a, b] = 5; },
@@ -29,6 +43,17 @@ function testList_fullTail() {
     assertEquals(b, 2);
     assertEquals(c, [3, 4]);
 }
+
+function testNested() {
+    let [a, [b, c], d] = [1, [2, 3], 4];
+    assertEquals(a, 1);
+    assertEquals(b, 2);
+    assertEquals(c, 3);
+    assertEquals(d, 4);
+}
+
+//-----------------------------------------------------------------------------
+// Literal Constants
 
 function testLiteralConstant() {
     // NOTE: We use list patterns here because `let` rejects a pattern
@@ -56,13 +81,8 @@ function testLiteralConstant() {
         "'let' pattern failed to match target value.");
 }
 
-function testWildcard() {
-    let [a, _] = [1, #abc];
-    assertEquals(a, 1);
-
-    let [b, _withName] = [2, #xyz];
-    assertEquals(b, 2);
-}
+//-----------------------------------------------------------------------------
+// Interpolated Expressions
 
 function testInterpolatedExpression() {
     var x = 10;
@@ -77,22 +97,19 @@ function testInterpolatedVariable() {
     assertEquals(last, "Pro");
 }
 
-function testNested() {
-    let [a, [b, c], d] = [1, [2, 3], 4];
+//-----------------------------------------------------------------------------
+// Wildcards
+
+function testWildcard() {
+    let [a, _] = [1, #abc];
     assertEquals(a, 1);
+
+    let [b, _withName] = [2, #xyz];
     assertEquals(b, 2);
-    assertEquals(c, 3);
-    assertEquals(d, 4);
 }
 
-function testCapture() {
-    let [a, b=[c, d], e] = [1, [2, 3], 4];
-    assertEquals(a, 1);
-    assertEquals(b, [2, 3]);
-    assertEquals(c, 2);
-    assertEquals(d, 3);
-    assertEquals(e, 4);
-}
+//-----------------------------------------------------------------------------
+// Map Patterns
 
 function testMap_noMap() {
     assertError(\-> { let {#abc: a} = 5; },
@@ -114,8 +131,71 @@ function testMap_good() {
     assertEquals(a, 5);
 }
 
+function testMap_withInstance_stringKeys() {
+    let {"id": i, "color": c} = Thing(123, "red");
+    assertEquals(i, 123);
+    assertEquals(c, "red");
+}
+
+function testMap_withInstance_keywordKeys() {
+    let {#id: i, #color: c} = Thing(123, "red");
+    assertEquals(i, 123);
+    assertEquals(c, "red");
+}
+
+function testMap_withInstance_badKeyType() {
+    assertError(\-> { let {123: i, #color: c} = Thing(123, "red"); },
+        "'let' pattern failed to match target value.");
+}
+
+function testMap_withInstance_unknownKey() {
+    assertError(\-> { let {#nonesuch: i, #color: c} = Thing(123, "red"); },
+        "'let' pattern failed to match target value.");
+}
+
 function testMap_fancyKey() {
     var key = #joe;
     let {$key: value} = {#joe: #language};
     assertEquals(value, #language);
 }
+
+//-----------------------------------------------------------------------------
+// Instance Patterns
+
+function testInstance_notInstance() {
+    assertError(\-> { let Thing{#id: id} = "abc"; },
+        "'let' pattern failed to match target value.");
+}
+
+function testInstance_wrongType() {
+    var thing = Thing(123, "red");
+
+    assertError(\-> { let Gizmo{#id: id} = thing; },
+        "'let' pattern failed to match target value.");
+}
+
+function testInstance_badField() {
+    var thing = Thing(123, "red");
+
+    assertError(\-> { let Thing{#id: id, #style: s} = thing; },
+        "'let' pattern failed to match target value.");
+}
+
+function testInstance_good() {
+    var thing = Thing(123, "red");
+
+    let Thing{#id: i, #color: c} = thing;
+    assertEquals(i, thing.id);
+    assertEquals(c, thing.color);
+}
+
+//-----------------------------------------------------------------------------
+// Helpers
+
+class Thing {
+    method init(id, color) {
+        @id = id;
+        @color = color;
+    }
+}
+

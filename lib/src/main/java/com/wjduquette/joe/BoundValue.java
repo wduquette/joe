@@ -24,6 +24,8 @@ record BoundValue(Joe joe, TypeProxy<?> proxy, Object value)
     @Override
     public Object get(String name) {
         if (proxy != null) {
+            // The value is of a proxied type, in which case it has
+            // method properties but not field properties.
             var method = proxy.bind(value, name);
             if (method != null) {
                 return method;
@@ -31,6 +33,8 @@ record BoundValue(Joe joe, TypeProxy<?> proxy, Object value)
                 throw new JoeError("Undefined property '" + name + "'.");
             }
         } else {
+            // The value is of an opaque type, in which case it has
+            // no properties.
             throw new JoeError("Values of type " +
                 typeName() + " have no gettable properties.");
         }
@@ -38,13 +42,16 @@ record BoundValue(Joe joe, TypeProxy<?> proxy, Object value)
 
     @Override
     public void set(String name, Object value) {
-        if (proxy != null) {
-            proxy.set(name, value);
-        } else {
-            throw new JoeError("Values of type " +
-                value.getClass().getName() +
-                " have no settable properties.");
-        }
+        // The value is either of an opaque type or a proxied native type.
+        // Neither kind of type has field properties.
+        throw new JoeError("Values of type " +
+            value.getClass().getName() +
+            " have no field properties.");
+    }
+
+    @Override
+    public boolean hasField(String name) {
+        return false;
     }
 
     @Override

@@ -94,8 +94,10 @@ kinds of patterns:
 - [Binding Variables](#binding-variables)
 - [Wildcards](#wildcards)
 - [Constants](#constants)
+- [Interpolated Expressions](#interpolated-expressions)
 - [List Patterns](#list-patterns)
 - [Map Patterns](#map-patterns)
+- [Matching Instances with Map Patterns](#matching-instances-with-map-patterns)
 - [Instance Patterns](#instance-patterns)
 - [Record Patterns](#record-patterns)
 
@@ -161,18 +163,17 @@ var x = isPro(["Joe", "Pro"]);       // Returns true
 var y = isPro(["Joe", "Amateur"]);   // Returns false
 ```
 
-The simplest kind of constant pattern is a literal string, number, boolean,
-or `null`.  To use a previously computed value as a constant, interpolate
-its variable using `$`:
+The constant must be a literal 
+[string](types.md#strings),
+[number](types.md#numbers),
+[boolean](types.md#booleans),
+[keyword](types.md#keywords),
+or `null`.
 
-```joe
-var wanted = "Pro";
+### Interpolated Expressions
 
-let [first, $wanted] = ["Joe", "Pro"];   // Matches, first == "Joe"
-let [first, $wanted] = ["Joe", "Con"];   // Doesn't match.
-```
-
-Alternatively, a constant can be computed in-line:
+To use a computed value as a constant, interpolate
+it using `$(...)`.  
 
 ```joe
 var a = 5;
@@ -181,7 +182,19 @@ var b = 15;
 let [x, $(a + b)] = [10, 20];  // Matches; x == 10.
 ```
 
-## List Patterns
+Here, `$(a + b)` evaluates to `20`, which matches the second
+item in the target list.
+
+The parentheses may be omitted if the interpolated expression is just
+a variable name:
+
+```joe
+var wanted = "Pro";
+
+let [first, $wanted] = ["Joe", "Pro"];   
+```
+
+### List Patterns
 
 We've seen many list patterns in the above examples.  Syntactically,
 a list pattern is simply a list of patterns that matches a `List` of
@@ -210,16 +223,17 @@ The variables `a` and `b` will get `list[0]` and `list[1]`, and `tail`
 will get any remaining items, or the empty list if `list.size() == 2`.
 (The match will naturally fail if `list.size() < 2`.)
 
-## Map Patterns
+### Map Patterns
 
-A map pattern matches zero or more keys and values of
-a `Map` value.
+A map pattern matches objects with keys and values, e.g., 
+[`Map`](library/type.joe.Map.md) values. 
 
 - The keys must be [constants](#constants)
 - The values can be any pattern.
-- The `Map` being matched must contain all of the keys listed in the 
+- The target `Map` must contain all of the keys listed in the 
   pattern, and their values must match the corresponding value patterns.
-- The `Map` can contain any number of keys that don't appear in the pattern.
+- The target `Map` can contain any number of keys that don't appear in 
+  the pattern.
 
 Some examples:
 
@@ -229,10 +243,55 @@ let ($x: value} = someMap;                   // value = someMap.get(x)
 let {#a: [a, b, c], #b: x} = someMap;
 ```
 
+### Matching Instances with Map Patterns
+
+A map pattern can also match any Joe value with field properties, e.g.,
+an instance of a Joe `class`.  The pattern's keys match the field names
+and the pattern's values match the field values.
+
+- Key patterns must be string or Keyword [constants](#constants) that 
+  correspond to the field names, or interpolated expressions that evaluate 
+  to such strings or keywords.
+
+```joe
+class Thing {
+    method init(id, color) {
+        this.id = id;
+        this.color = color;
+    }
+}
+
+// These two statements are equivalent
+let {"id": i, "color": c} = Thing(123, "red");
+let {#id: i,  #color: c}  = Thing(123, "red");
+```
+
+As when matching `Map` values, the pattern can reference a subset of
+the object's fields.
+
 ## Instance Patterns
 
-Not yet implemented.
+An instance pattern is like a [map pattern](#map-patterns), but it can
+match on the value's type as well as on its fields.  For example,
+
+```joe
+class Thing {
+    method init(id, color) {
+        this.id = id;
+        this.color = color;
+    }
+}
+
+// These two statements are equivalent
+let Thing{"id": i, "color": c} = Thing(123, "red");
+let Thing{#id: i,  #color: c}  = Thing(123, "red");
+```
+
+An instance pattern consists of the name of the desired type, followed by
+a map pattern for its fields.  The pattern matches if all fields match,
+and if the given type name is the name of the value's type or one of its
+supertypes. (Supertype matching is not yet implemented.)
 
 ## Record Patterns
 
-Not yet implemented.
+Records and record patterns are not yet implemented.

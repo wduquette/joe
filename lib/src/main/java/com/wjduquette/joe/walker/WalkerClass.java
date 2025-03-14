@@ -144,6 +144,11 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     }
 
     @Override
+    public boolean hasField(String name) {
+        return fields.containsKey(name);
+    }
+
+    @Override
     public Object get(String name) {
         if (fields.containsKey(name)) {
             return fields.get(name);

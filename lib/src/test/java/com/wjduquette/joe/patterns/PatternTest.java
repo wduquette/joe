@@ -74,4 +74,16 @@ public class PatternTest extends Ted {
         var p = new Pattern.MapPattern(map);
         check(p.toString()).eq("{$3: _xyz, $4: ?7}");
     }
+
+    @Test
+    public void testInstancePattern() {
+        test("testInstancePattern");
+
+        var map = new LinkedHashMap<Pattern.Constant, Pattern>();
+        map.put(new Pattern.Constant(3), new Pattern.Wildcard("_xyz"));
+        map.put(new Pattern.Constant(4), new Pattern.ValueBinding(7));
+
+        var p = new Pattern.InstancePattern("Thing", new Pattern.MapPattern(map));
+        check(p.toString()).eq("Thing{$3: _xyz, $4: ?7}");
+    }
 }

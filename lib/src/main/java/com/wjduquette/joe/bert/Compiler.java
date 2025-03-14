@@ -1231,13 +1231,15 @@ class Compiler {
         } else if (match(LEFT_BRACE)) {
             return mapPattern();
         } else if (match(IDENTIFIER)) {
-            var varName = parser.previous;
+            var identifier = parser.previous;
 
-            if (varName.lexeme().startsWith("_")) {
-                return new Pattern.Wildcard(varName.lexeme());
+            if (identifier.lexeme().startsWith("_")) {
+                return new Pattern.Wildcard(identifier.lexeme());
+            } else if (match(LEFT_BRACE)) {
+                return instancePattern(identifier);
             }
 
-            var id = addPatternVar(varName);
+            var id = addPatternVar(identifier);
 
             if (isSubpattern && match(EQUAL)) {
                 var subpattern = parsePattern(false);
@@ -1324,7 +1326,7 @@ class Compiler {
         return new Pattern.ListPattern(list, tailId);
     }
 
-    private Pattern mapPattern() {
+    private Pattern.MapPattern mapPattern() {
         var map = new LinkedHashMap<Pattern.Constant,Pattern>();
 
         if (match(RIGHT_BRACE)) {
@@ -1344,6 +1346,11 @@ class Compiler {
         consume(RIGHT_BRACE, "Expected '}' after map pattern.");
 
         return new Pattern.MapPattern(map);
+    }
+
+    private Pattern instancePattern(Token identifier) {
+        var fieldMap = mapPattern();
+        return new Pattern.InstancePattern(identifier.lexeme(), fieldMap);
     }
 
     //-------------------------------------------------------------------------

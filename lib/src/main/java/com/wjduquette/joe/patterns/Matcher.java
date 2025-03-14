@@ -1,5 +1,8 @@
 package com.wjduquette.joe.patterns;
 
+import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.Keyword;
+
 import java.util.*;
 
 /**
@@ -84,21 +87,62 @@ public class Matcher {
                 yield true;
             }
 
-            case Pattern.MapPattern p -> {
-                // FIRST, check type.
-                if (!(value instanceof Map<?,?> map)) yield false;
+            case Pattern.MapPattern p -> switch (value) {
+                case Map<?,?> map -> {
+                    // NEXT, match keys and values
+                    for (var e : p.patterns().entrySet()) {
+                        var key = getter.get(e.getKey().id());
+                        if (!map.containsKey(key)) yield false;
 
-                // NEXT, match keys and values
-                for (var e : p.patterns().entrySet()) {
-                    var key = getter.get(e.getKey().id());
-                    if (!map.containsKey(key)) yield false;
-                    var item = map.get(key);
-                    if (!bind(e.getValue(), item, getter, binder)) yield false;
+                        var item = map.get(key);
+                        if (!bind(e.getValue(), item, getter, binder)) {
+                            yield false;
+                        }
+                    }
+
+                    // FINALLY, match succeeds
+                    yield true;
                 }
+                case JoeObject obj -> {
+                    for (var e : p.patterns().entrySet()) {
+                        var field = key2field(getter.get(e.getKey().id()));
+                        if (!obj.hasField(field)) yield false;
 
-                // FINALLY, match succeeds
-                yield true;
+                        if (!bind(e.getValue(), obj.get(field), getter, binder)) {
+                            yield false;
+                        }
+                    }
+
+                    // FINALLY, match succeeds
+                    yield true;
+
+                }
+                default -> false;
+            };
+
+            case Pattern.InstancePattern p -> {
+                if (!(value instanceof JoeObject obj)) yield false;
+                if (!hasType(obj, p.typeName())) yield false;
+
+                yield bind(p.fieldMap(), obj, getter, binder);
             }
         };
+    }
+
+    private static String key2field(Object key) {
+        if (key instanceof String s) {
+            return s;
+        } else if (key instanceof Keyword k) {
+            return k.name();
+        } else {
+            return null;
+        }
+    }
+
+    // Determines whether the type name is the name of the object's
+    // type or the name of one of its supertypes.
+    private static boolean hasType(JoeObject obj, String typeName) {
+        // TODO: Match on supertypes.
+        return obj.typeName().equals(typeName);
     }
 }
