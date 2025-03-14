@@ -176,6 +176,6 @@ public class MapWrapper implements JoeMap {
 
     @Override
     public String toString() {
-        return MapProxy.TYPE.stringify(joe, map);
+        return MapType.TYPE.stringify(joe, map);
     }
 }

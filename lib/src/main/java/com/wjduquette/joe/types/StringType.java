@@ -11,15 +11,15 @@ import java.util.stream.Collectors;
 /**
  * The type proxy for Joe's String type.
  */
-public class StringProxy extends ProxyType<String> {
+public class StringType extends ProxyType<String> {
     /** The type constant, for installation. */
-    public static final StringProxy TYPE = new StringProxy();
+    public static final StringType TYPE = new StringType();
 
     //-------------------------------------------------------------------------
     // Constructor
 
     /** Creates the proxy. */
-    public StringProxy() {
+    public StringType() {
         super("String");
 
         //**

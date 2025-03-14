@@ -234,6 +234,6 @@ public class ListWrapper implements JoeList {
 
     @Override
     public String toString() {
-        return ListProxy.TYPE.stringify(joe, list);
+        return ListType.TYPE.stringify(joe, list);
     }
 }

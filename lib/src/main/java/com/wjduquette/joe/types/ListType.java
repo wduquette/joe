@@ -8,9 +8,9 @@ import java.util.HashSet;
 /**
  * The Joe List type's proxy.
  */
-public class ListProxy extends ProxyType<JoeList> {
+public class ListType extends ProxyType<JoeList> {
     /** The proxy's TYPE constant. */
-    public static final ListProxy TYPE = new ListProxy();
+    public static final ListType TYPE = new ListType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -23,7 +23,7 @@ public class ListProxy extends ProxyType<JoeList> {
     // of Joe value; the list need not be homogeneous.  Lists received from
     // Java code might be read-only or require a specific item type.
     /** Creates the proxy. */
-    public ListProxy() {
+    public ListType() {
         super("List");
         proxies(ListValue.class);    // Types that implement `JoeList`
         proxies(ListWrapper.class);

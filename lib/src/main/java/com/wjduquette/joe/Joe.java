@@ -790,7 +790,7 @@ public class Joe {
         };
 
         if (name != null) {
-            var c = EnumProxy.valueOf(cls, name);
+            var c = EnumType.valueOf(cls, name);
             if (c != null) {
                 return c;
             }

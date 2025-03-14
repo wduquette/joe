@@ -7,11 +7,11 @@ import com.wjduquette.joe.ProxyType;
 /**
  * The type proxy for Joe's `Boolean` type.
  */
-public class BooleanProxy extends ProxyType<Boolean> {
+public class BooleanType extends ProxyType<Boolean> {
     /**
      * The proxy's constant, used for installation.
      */
-    public static final BooleanProxy TYPE = new BooleanProxy();
+    public static final BooleanType TYPE = new BooleanType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -24,7 +24,7 @@ public class BooleanProxy extends ProxyType<Boolean> {
     /**
      * Creates an instance of the proxy.
      */
-    public BooleanProxy() {
+    public BooleanType() {
         super("Boolean");
         staticType();
         proxies(Boolean.class);

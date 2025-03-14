@@ -8,9 +8,9 @@ import com.wjduquette.joe.ProxyType;
 /**
  * The type proxy for Keyword values.
  */
-public class KeywordProxy extends ProxyType<Keyword> {
+public class KeywordType extends ProxyType<Keyword> {
     /** The proxy's TYPE constant. */
-    public static final KeywordProxy TYPE = new KeywordProxy();
+    public static final KeywordType TYPE = new KeywordType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -18,7 +18,7 @@ public class KeywordProxy extends ProxyType<Keyword> {
     /**
      * Creates the proxy.
      */
-    public KeywordProxy() {
+    public KeywordType() {
         super("Keyword");
 
         //**

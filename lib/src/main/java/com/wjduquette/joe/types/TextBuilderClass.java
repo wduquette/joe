@@ -5,11 +5,11 @@ import com.wjduquette.joe.*;
 /**
  * A ProxyType for the TextBuilder type.
  */
-public class TextBuilderProxy extends ProxyType<TextBuilder> {
+public class TextBuilderClass extends ProxyType<TextBuilder> {
     /**
      * The proxy's TYPE constant.
      */
-    public static final TextBuilderProxy TYPE = new TextBuilderProxy();
+    public static final TextBuilderClass TYPE = new TextBuilderClass();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -25,7 +25,7 @@ public class TextBuilderProxy extends ProxyType<TextBuilder> {
     /**
      * Creates the proxy.
      */
-    public TextBuilderProxy() {
+    public TextBuilderClass() {
         super("TextBuilder");
         proxies(TextBuilder.class);
         initializer(this::_init);

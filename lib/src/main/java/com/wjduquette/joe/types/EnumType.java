@@ -13,7 +13,7 @@ import java.util.Collections;
  * by the `@enum` tag in `tools.doc.DocCommentParser`.</p>
  * @param <E> The enum type
  */
-public class EnumProxy<E extends Enum<E>> extends ProxyType<E> {
+public class EnumType<E extends Enum<E>> extends ProxyType<E> {
     //-------------------------------------------------------------------------
     // Static Methods
 
@@ -47,7 +47,7 @@ public class EnumProxy<E extends Enum<E>> extends ProxyType<E> {
      * @param name  The type's name in Joe code
      * @param cls The enum class
      */
-    public EnumProxy(String name, Class<E> cls) {
+    public EnumType(String name, Class<E> cls) {
         super(name);
         this.cls = cls;
         proxies(cls);

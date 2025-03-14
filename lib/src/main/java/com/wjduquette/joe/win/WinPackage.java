@@ -1,7 +1,7 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.types.EnumProxy;
+import com.wjduquette.joe.types.EnumType;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.*;
@@ -118,13 +118,13 @@ public class WinPackage extends JoePackage {
         // @constant CENTER
         // @constant LEFT
         // @constant RIGHT
-        type(new EnumProxy<>("HPos", HPos.class));
+        type(new EnumType<>("HPos", HPos.class));
 
         //**
         // @enum Orientation
         // @constant HORIZONTAL
         // @constant VERTICAL
-        type(new EnumProxy<>("Orientation", Orientation.class));
+        type(new EnumType<>("Orientation", Orientation.class));
 
         //**
         // @enum Pos
@@ -143,7 +143,7 @@ public class WinPackage extends JoePackage {
         // @constant TOP_CENTER
         // @constant TOP_LEFT
         // @constant TOP_RIGHT
-        type(new EnumProxy<>("Pos", Pos.class));
+        type(new EnumType<>("Pos", Pos.class));
 
         //**
         // @enum Priority
@@ -154,7 +154,7 @@ public class WinPackage extends JoePackage {
         // @constant ALWAYS
         // @constant SOMETIMES
         // @constant NEVER
-        type(new EnumProxy<>("Priority", Priority.class));
+        type(new EnumType<>("Priority", Priority.class));
 
         //**
         // @enum Side
@@ -164,7 +164,7 @@ public class WinPackage extends JoePackage {
         // @constant LEFT
         // @constant RIGHT
         // @constant TOP
-        type(new EnumProxy<>("Side", Side.class));
+        type(new EnumType<>("Side", Side.class));
 
         //**
         // @enum VPos
@@ -172,7 +172,7 @@ public class WinPackage extends JoePackage {
         // @constant BOTTOM
         // @constant CENTER
         // @constant TOP
-        type(new EnumProxy<>("VPos", VPos.class));
+        type(new EnumType<>("VPos", VPos.class));
 
         // Utility Classes
         type(InsetsProxy.TYPE);

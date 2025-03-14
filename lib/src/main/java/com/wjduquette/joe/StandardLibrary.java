@@ -26,16 +26,16 @@ class StandardLibrary extends JoePackage {
         // Documented in Tuple.java.
         globalFunction("Tuple", Tuple::new);
 
-        type(AssertErrorProxy.TYPE);
-        type(BooleanProxy.TYPE);
-        type(ErrorProxy.TYPE);
-        type(KeywordProxy.TYPE);
-        type(ListProxy.TYPE);
-        type(MapProxy.TYPE);
-        type(NumberProxy.TYPE);
-        type(SetProxy.TYPE);
-        type(StringProxy.TYPE);
-        type(TextBuilderProxy.TYPE);
+        type(AssertErrorType.TYPE);
+        type(BooleanType.TYPE);
+        type(ErrorType.TYPE);
+        type(KeywordType.TYPE);
+        type(ListType.TYPE);
+        type(MapType.TYPE);
+        type(NumberType.TYPE);
+        type(SetType.TYPE);
+        type(StringType.TYPE);
+        type(TextBuilderClass.TYPE);
         type(TypeType.TYPE);
     }
 

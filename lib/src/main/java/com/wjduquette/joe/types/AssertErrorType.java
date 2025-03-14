@@ -8,9 +8,9 @@ import com.wjduquette.joe.ProxyType;
 /**
  * The type proxy for {@link AssertError} values.
  */
-public class AssertErrorProxy extends ProxyType<AssertError> {
+public class AssertErrorType extends ProxyType<AssertError> {
     /** The proxy's TYPE constant. */
-    public static final AssertErrorProxy TYPE = new AssertErrorProxy();
+    public static final AssertErrorType TYPE = new AssertErrorType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -18,7 +18,7 @@ public class AssertErrorProxy extends ProxyType<AssertError> {
     /**
      * Creates an instance of the proxy.
      */
-    public AssertErrorProxy() {
+    public AssertErrorType() {
         super("AssertError");
 
         //**
@@ -31,7 +31,7 @@ public class AssertErrorProxy extends ProxyType<AssertError> {
         // script can catch errors thrown during execution using
         // the [[function.catch]] function.
         proxies(AssertError.class);
-        extendsProxy(ErrorProxy.TYPE);
+        extendsProxy(ErrorType.TYPE);
 
         initializer(this::_initializer);
     }

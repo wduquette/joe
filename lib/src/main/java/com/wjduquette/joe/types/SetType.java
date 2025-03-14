@@ -7,9 +7,9 @@ import java.util.Collection;
 /**
  * A type proxy for Joe's Set types.
  */
-public class SetProxy extends ProxyType<JoeSet> {
+public class SetType extends ProxyType<JoeSet> {
     /** The proxy's TYPE constant. */
-    public static final SetProxy TYPE = new SetProxy();
+    public static final SetType TYPE = new SetType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -23,7 +23,7 @@ public class SetProxy extends ProxyType<JoeSet> {
     // received from Java code might be read-only or require a specific
     // value type.
     /** Creates the proxy. */
-    public SetProxy() {
+    public SetType() {
         super("Set");
         proxies(SetValue.class);    // Types that implement `JoeSet`
         proxies(SetWrapper.class);

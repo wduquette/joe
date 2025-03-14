@@ -9,9 +9,9 @@ import java.util.List;
 /**
  * The type proxy for Joe's Number type.
  */
-public class NumberProxy extends ProxyType<Double> {
+public class NumberType extends ProxyType<Double> {
     /** The type constant. */
-    public static final NumberProxy TYPE = new NumberProxy();
+    public static final NumberType TYPE = new NumberType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -24,7 +24,7 @@ public class NumberProxy extends ProxyType<Double> {
     // gathered here are delegated directly to Java's `java.lang.Math`
     // class; numeric details are to be found there.
     /** Creates the proxy. */
-    public NumberProxy() {
+    public NumberType() {
         super("Number");
         staticType();
         proxies(Double.class);
