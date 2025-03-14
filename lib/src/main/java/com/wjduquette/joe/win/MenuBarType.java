@@ -4,11 +4,9 @@ import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 
-class MenuBarProxy extends FXProxy<MenuBar> {
-    public static final MenuBarProxy TYPE = new MenuBarProxy();
+class MenuBarType extends FXType<MenuBar> {
+    public static final MenuBarType TYPE = new MenuBarType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -19,9 +17,9 @@ class MenuBarProxy extends FXProxy<MenuBar> {
     // @extends Control
     // The `MenuBar` type is the base class for JavaFX
     // labels like [[MenuBar]] widgets.
-    public MenuBarProxy() {
+    public MenuBarType() {
         super("MenuBar");
-        extendsProxy(ControlProxy.TYPE);
+        extendsProxy(ControlType.TYPE);
         proxies(MenuBar.class);
 
         // Initializer

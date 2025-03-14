@@ -86,30 +86,30 @@ public class WinPackage extends JoePackage {
         type(new WinProxy());
 
         // Base classes
-        type(NodeProxy.TYPE);
-        type(RegionProxy.TYPE);
+        type(NodeType.TYPE);
+        type(RegionType.TYPE);
 
         // Controls
-        type(ControlProxy.TYPE);
-        type(ButtonProxy.TYPE);
-        type(LabelProxy.TYPE);
-        type(ListViewProxy.TYPE);
-        type(MenuBarProxy.TYPE);
-        type(SeparatorProxy.TYPE);
-        type(SplitPaneProxy.TYPE);
-        type(TabPaneProxy.TYPE);
+        type(ControlType.TYPE);
+        type(ButtonType.TYPE);
+        type(LabelType.TYPE);
+        type(ListViewClass.TYPE);
+        type(MenuBarType.TYPE);
+        type(SeparatorType.TYPE);
+        type(SplitPaneType.TYPE);
+        type(TabPaneType.TYPE);
 
         // Panes
-        type(PaneProxy.TYPE);
-        type(GridPaneProxy.TYPE);
-        type(StackPaneProxy.TYPE);
-        type(VBoxProxy.TYPE);
-        type(HBoxProxy.TYPE);
+        type(PaneType.TYPE);
+        type(GridPaneClass.TYPE);
+        type(StackPaneClass.TYPE);
+        type(VBoxClass.TYPE);
+        type(HBoxClass.TYPE);
 
         // Widgets that aren't Nodes
-        type(TabProxy.TYPE);
-        type(MenuProxy.TYPE);
-        type(MenuItemProxy.TYPE);
+        type(TabClass.TYPE);
+        type(MenuType.TYPE);
+        type(MenuItemType.TYPE);
 
         // Enums
 
@@ -175,7 +175,7 @@ public class WinPackage extends JoePackage {
         type(new EnumType<>("VPos", VPos.class));
 
         // Utility Classes
-        type(InsetsProxy.TYPE);
+        type(InsetsType.TYPE);
     }
 
 

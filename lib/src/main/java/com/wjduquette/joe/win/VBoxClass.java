@@ -9,8 +9,8 @@ import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-class VBoxProxy extends FXProxy<VBox> {
-    public static final VBoxProxy TYPE = new VBoxProxy();
+class VBoxClass extends FXType<VBox> {
+    public static final VBoxClass TYPE = new VBoxClass();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -21,10 +21,10 @@ class VBoxProxy extends FXProxy<VBox> {
     // @extends Pane
     // The `VBox` type is a [[Pane]] that manages a column of
     // widgets. Joe classes can extend the `VBox` type.
-    public VBoxProxy() {
+    public VBoxClass() {
         super("VBox");
         proxies(VBox.class);
-        extendsProxy(PaneProxy.TYPE);
+        extendsProxy(PaneType.TYPE);
 
         staticMethod("getMargin", this::_getMargin);
         staticMethod("getVgrow",  this::_getVgrow);
@@ -63,7 +63,7 @@ class VBoxProxy extends FXProxy<VBox> {
 
     @Override
     public JoeValue make(Joe joe, JoeClass joeClass) {
-        return new JoeVBox(joeClass);
+        return new VBoxInstance(joeClass);
     }
 
 

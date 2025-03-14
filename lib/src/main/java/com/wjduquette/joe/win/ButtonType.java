@@ -7,8 +7,8 @@ import javafx.scene.control.Button;
 /**
  * Proxy for a JavaFX Button.
  */
-class ButtonProxy extends FXProxy<Button> {
-    public static final ButtonProxy TYPE = new ButtonProxy();
+class ButtonType extends FXType<Button> {
+    public static final ButtonType TYPE = new ButtonType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -19,9 +19,9 @@ class ButtonProxy extends FXProxy<Button> {
     // @extends Control
     // The `Button` type is the base class for JavaFX
     // labels like [[Button]] widgets.
-    public ButtonProxy() {
+    public ButtonType() {
         super("Button");
-        extendsProxy(ControlProxy.TYPE);
+        extendsProxy(ControlType.TYPE);
         proxies(Button.class);
 
         // Initializer

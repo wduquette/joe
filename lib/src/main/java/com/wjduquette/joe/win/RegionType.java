@@ -5,8 +5,8 @@ import com.wjduquette.joe.Joe;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Region;
 
-class RegionProxy extends FXProxy<Region> {
-    public static final RegionProxy TYPE = new RegionProxy();
+class RegionType extends FXType<Region> {
+    public static final RegionType TYPE = new RegionType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -17,9 +17,9 @@ class RegionProxy extends FXProxy<Region> {
     // @extends Node
     // The `Region` type is the abstract base class for JavaFX
     // [[Node]] widgets that occupy space on the screen.
-    public RegionProxy() {
+    public RegionType() {
         super("Region");
-        extendsProxy(NodeProxy.TYPE);
+        extendsProxy(NodeType.TYPE);
         proxies(Region.class);
 
         // Constants

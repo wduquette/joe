@@ -5,8 +5,8 @@ import com.wjduquette.joe.Joe;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Separator;
 
-class SeparatorProxy extends FXProxy<Separator> {
-    public static final SeparatorProxy TYPE = new SeparatorProxy();
+class SeparatorType extends FXType<Separator> {
+    public static final SeparatorType TYPE = new SeparatorType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -16,9 +16,9 @@ class SeparatorProxy extends FXProxy<Separator> {
     // @type Separator
     // @extends Control
     // The [[Separator]] widget is a horizontal or vertical separator.
-    public SeparatorProxy() {
+    public SeparatorType() {
         super("Separator");
-        extendsProxy(ControlProxy.TYPE);
+        extendsProxy(ControlType.TYPE);
         proxies(Separator.class);
 
         // Initializer

@@ -1,19 +1,19 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 /**
- * A JavaFX GridPane that can be extended by Joe classes.
+ * A JavaFX VBox that can be extended by Joe classes.
  */
-public class JoeGridPane extends GridPane implements JoeValue {
+public class VBoxInstance extends VBox implements JoeValue {
     private final JoeValueCore core;
 
     /**
-     * Creates a JoeGridPane.
+     * Creates a VBoxInstance.
      * @param joeClass The Joe class for which this is the Java instance.
      */
-    public JoeGridPane(JoeClass joeClass) {
+    public VBoxInstance(JoeClass joeClass) {
         this.core = new JoeValueCore(joeClass, this);
     }
 

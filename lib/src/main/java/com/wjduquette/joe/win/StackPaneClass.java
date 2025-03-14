@@ -9,8 +9,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 
-class StackPaneProxy extends FXProxy<StackPane> {
-    public static final StackPaneProxy TYPE = new StackPaneProxy();
+class StackPaneClass extends FXType<StackPane> {
+    public static final StackPaneClass TYPE = new StackPaneClass();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -22,10 +22,10 @@ class StackPaneProxy extends FXProxy<StackPane> {
     // The `StackPane` type is a [[Pane]] that manages one or children
     // stacked one on top of each other like cards in a deck.
     // Joe classes can extend the `StackPane` type.
-    public StackPaneProxy() {
+    public StackPaneClass() {
         super("StackPane");
         proxies(StackPane.class);
-        extendsProxy(PaneProxy.TYPE);
+        extendsProxy(PaneType.TYPE);
 
         staticMethod("getAlignment", this::_getAlignment);
         staticMethod("getMargin",    this::_getMargin);
@@ -62,7 +62,7 @@ class StackPaneProxy extends FXProxy<StackPane> {
 
     @Override
     public JoeValue make(Joe joe, JoeClass joeClass) {
-        return new JoeStackPane(joeClass);
+        return new StackPaneInstance(joeClass);
     }
 
 

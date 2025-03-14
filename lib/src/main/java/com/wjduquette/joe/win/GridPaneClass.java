@@ -6,8 +6,8 @@ import com.wjduquette.joe.JoeClass;
 import com.wjduquette.joe.JoeValue;
 import javafx.scene.layout.GridPane;
 
-class GridPaneProxy extends FXProxy<GridPane> {
-    public static final GridPaneProxy TYPE = new GridPaneProxy();
+class GridPaneClass extends FXType<GridPane> {
+    public static final GridPaneClass TYPE = new GridPaneClass();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -19,10 +19,10 @@ class GridPaneProxy extends FXProxy<GridPane> {
     // The `GridPane` type is a [[Pane]] that manages one or children
     // stacked one on top of each other like cards in a deck.
     // Joe classes can extend the `GridPane` type.
-    public GridPaneProxy() {
+    public GridPaneClass() {
         super("GridPane");
         proxies(GridPane.class);
-        extendsProxy(PaneProxy.TYPE);
+        extendsProxy(PaneType.TYPE);
 
         // No initializer
         initializer(this::_initializer);
@@ -62,7 +62,7 @@ class GridPaneProxy extends FXProxy<GridPane> {
 
     @Override
     public JoeValue make(Joe joe, JoeClass joeClass) {
-        return new JoeGridPane(joeClass);
+        return new GridPaneInstance(joeClass);
     }
 
     //-------------------------------------------------------------------------

@@ -5,8 +5,8 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.ProxyType;
 import javafx.geometry.Insets;
 
-class InsetsProxy extends ProxyType<Insets> {
-    public static final InsetsProxy TYPE = new InsetsProxy();
+class InsetsType extends ProxyType<Insets> {
+    public static final InsetsType TYPE = new InsetsType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -16,7 +16,7 @@ class InsetsProxy extends ProxyType<Insets> {
     // @type Insets
     // The `Insets` type used to set margins and padding around
     // [[Node]] widgets.
-    public InsetsProxy() {
+    public InsetsType() {
         super("Insets");
         proxies(Insets.class);
 

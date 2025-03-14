@@ -5,8 +5,8 @@ import com.wjduquette.joe.Joe;
 import javafx.scene.control.Control;
 import javafx.scene.control.Tooltip;
 
-class ControlProxy extends FXProxy<Control> {
-    public static final ControlProxy TYPE = new ControlProxy();
+class ControlType extends FXType<Control> {
+    public static final ControlType TYPE = new ControlType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -17,9 +17,9 @@ class ControlProxy extends FXProxy<Control> {
     // @extends Region
     // The `Control` type is the base class for JavaFX
     // controls like the [[Label]] and [[Button]] widgets.
-    public ControlProxy() {
+    public ControlType() {
         super("Control");
-        extendsProxy(RegionProxy.TYPE);
+        extendsProxy(RegionType.TYPE);
         proxies(Control.class);
 
         //**

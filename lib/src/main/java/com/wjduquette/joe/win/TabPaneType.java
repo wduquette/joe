@@ -6,8 +6,8 @@ import javafx.geometry.Side;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
-class TabPaneProxy extends FXProxy<TabPane> {
-    public static final TabPaneProxy TYPE = new TabPaneProxy();
+class TabPaneType extends FXType<TabPane> {
+    public static final TabPaneType TYPE = new TabPaneType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -18,9 +18,9 @@ class TabPaneProxy extends FXProxy<TabPane> {
     // @extends Control
     // The `TabPane` type is the base class for JavaFX tab panes, which can
     // contain [[Tab]] objects.
-    public TabPaneProxy() {
+    public TabPaneType() {
         super("TabPane");
-        extendsProxy(ControlProxy.TYPE);
+        extendsProxy(ControlType.TYPE);
         proxies(TabPane.class);
 
         // Initializer

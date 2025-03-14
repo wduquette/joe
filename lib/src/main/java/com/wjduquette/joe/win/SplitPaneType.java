@@ -11,8 +11,8 @@ import java.util.List;
 /**
  * Proxy for a JavaFX SplitPane.
  */
-class SplitPaneProxy extends FXProxy<SplitPane> {
-    public static final SplitPaneProxy TYPE = new SplitPaneProxy();
+class SplitPaneType extends FXType<SplitPane> {
+    public static final SplitPaneType TYPE = new SplitPaneType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -27,9 +27,9 @@ class SplitPaneProxy extends FXProxy<SplitPane> {
     // If there are N children, then there are N-1 dividers between them,
     // indexed from 0 to N-2. The divider positions are fractions
     // between 0.0 and 1.0.
-    public SplitPaneProxy() {
+    public SplitPaneType() {
         super("SplitPane");
-        extendsProxy(ControlProxy.TYPE);
+        extendsProxy(ControlType.TYPE);
         proxies(SplitPane.class);
 
         // Initializer

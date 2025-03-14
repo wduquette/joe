@@ -1,19 +1,19 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 
 /**
- * A JavaFX HBox that can be extended by Joe classes.
+ * A JavaFX StackPane that can be extended by Joe classes.
  */
-public class JoeHBox extends HBox implements JoeValue {
+public class StackPaneInstance extends StackPane implements JoeValue {
     private final JoeValueCore core;
 
     /**
-     * Creates a JoeHBox.
+     * Creates a StackPaneInstance.
      * @param joeClass The Joe class for which this is the Java instance.
      */
-    public JoeHBox(JoeClass joeClass) {
+    public StackPaneInstance(JoeClass joeClass) {
         this.core = new JoeValueCore(joeClass, this);
     }
 

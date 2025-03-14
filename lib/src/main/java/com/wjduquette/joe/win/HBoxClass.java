@@ -9,8 +9,8 @@ import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.HBox;
 
-class HBoxProxy extends FXProxy<HBox> {
-    public static final HBoxProxy TYPE = new HBoxProxy();
+class HBoxClass extends FXType<HBox> {
+    public static final HBoxClass TYPE = new HBoxClass();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -21,10 +21,10 @@ class HBoxProxy extends FXProxy<HBox> {
     // @extends Pane
     // The `HBox` type is a [[Pane]] that manages a row of
     // widgets. Joe classes can extend the `HBox` type.
-    public HBoxProxy() {
+    public HBoxClass() {
         super("HBox");
         proxies(HBox.class);
-        extendsProxy(PaneProxy.TYPE);
+        extendsProxy(PaneType.TYPE);
 
         staticMethod("getHgrow",      this::_getHgrow);
         staticMethod("getMargin",     this::_getMargin);
@@ -63,7 +63,7 @@ class HBoxProxy extends FXProxy<HBox> {
 
     @Override
     public JoeValue make(Joe joe, JoeClass joeClass) {
-        return new JoeHBox(joeClass);
+        return new HBoxInstance(joeClass);
     }
 
     //-------------------------------------------------------------------------

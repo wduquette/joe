@@ -4,8 +4,8 @@ import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import javafx.scene.control.Label;
 
-class LabelProxy extends FXProxy<Label> {
-    public static final LabelProxy TYPE = new LabelProxy();
+class LabelType extends FXType<Label> {
+    public static final LabelType TYPE = new LabelType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -16,9 +16,9 @@ class LabelProxy extends FXProxy<Label> {
     // @extends Control
     // The `Label` type is the base class for JavaFX
     // labels like [[Label]] widgets.
-    public LabelProxy() {
+    public LabelType() {
         super("Label");
-        extendsProxy(ControlProxy.TYPE);
+        extendsProxy(ControlType.TYPE);
         proxies(Label.class);
 
         // Initializer

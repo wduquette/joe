@@ -11,8 +11,8 @@ import javafx.scene.layout.VBox;
 
 import java.util.stream.Collectors;
 
-class NodeProxy extends FXProxy<Node> {
-    public static final NodeProxy TYPE = new NodeProxy();
+class NodeType extends FXType<Node> {
+    public static final NodeType TYPE = new NodeType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -24,8 +24,8 @@ class NodeProxy extends FXProxy<Node> {
     // hierarchy. This abstract type provides features available for
     // all widgets.
     //
-    // @includeMixin FXProxy
-    public NodeProxy() {
+    // @includeMixin FXType
+    public NodeType() {
         super("Node");
         proxies(Node.class);
 

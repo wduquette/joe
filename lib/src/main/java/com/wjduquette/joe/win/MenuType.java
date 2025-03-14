@@ -7,8 +7,8 @@ import javafx.scene.control.MenuItem;
 
 import java.util.stream.Collectors;
 
-class MenuProxy extends FXProxy<Menu> {
-    public static final MenuProxy TYPE = new MenuProxy();
+class MenuType extends FXType<Menu> {
+    public static final MenuType TYPE = new MenuType();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -19,8 +19,8 @@ class MenuProxy extends FXProxy<Menu> {
     // The `Menu` widget is a menu in a [[MenuBar]] or a submenu
     // in a parent [[Menu]].  It contains [[MenuItem]] widgets.
     //
-    // @includeMixin FXProxy
-    public MenuProxy() {
+    // @includeMixin FXType
+    public MenuType() {
         super("Menu");
         proxies(Menu.class);
 

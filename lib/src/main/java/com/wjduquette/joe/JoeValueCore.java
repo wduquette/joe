@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * A class that implements the boilerplate for subclasses of native classes
- * that implement JoeValue (e.g., JoeStackPane).  A JoeValueCore is a
+ * that implement JoeValue (e.g., StackPaneInstance).  A JoeValueCore is a
  * component of instances of the subclass.
  */
 public class JoeValueCore {

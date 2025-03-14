@@ -14,7 +14,7 @@ import java.util.function.Function;
  * Joe::stringify or the client's own stringifier, and safe selection without
  * logic loops.
  */
-public class JoeListView extends ListView<Object> implements JoeValue {
+public class ListViewInstance extends ListView<Object> implements JoeValue {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -31,17 +31,17 @@ public class JoeListView extends ListView<Object> implements JoeValue {
     private Function<Object,String> stringifier = null;
 
     // The client's `onSelect` handler
-    private Consumer<JoeListView> onSelect = null;
+    private Consumer<ListViewInstance> onSelect = null;
 
     //-------------------------------------------------------------------------
     // Constructor
 
     /**
-     * Creates an instance of JoeListView
+     * Creates an instance of ListViewInstance
      * @param joe The Joe interpreter
-     * @param joeClass The class info, e.g., from `ListViewProxy`.
+     * @param joeClass The class info, e.g., from `ListViewClass`.
      */
-    public JoeListView(Joe joe, JoeClass joeClass) {
+    public ListViewInstance(Joe joe, JoeClass joeClass) {
         this.joe = joe;
         this.core = new JoeValueCore(joeClass, this);
 
@@ -66,7 +66,7 @@ public class JoeListView extends ListView<Object> implements JoeValue {
     @Override public String stringify(Joe joe) { return core.stringify(joe); }
 
     //-------------------------------------------------------------------------
-    // JoeListView Logic
+    // ListViewInstance Logic
 
     // Called when an item is selected, by the user or programmatically.
     // Calls the user's onSelect handler only if the item was selected
@@ -85,21 +85,21 @@ public class JoeListView extends ListView<Object> implements JoeValue {
     }
 
     //-------------------------------------------------------------------------
-    // JoeListView public API
+    // ListViewInstance public API
 
     /**
-     * Gets the onSelect handler, which takes the JoeListView as an argument.
+     * Gets the onSelect handler, which takes the ListViewInstance as an argument.
      * @return The handler
      */
     @SuppressWarnings("unused")
-    public Consumer<JoeListView> getOnSelect() {
+    public Consumer<ListViewInstance> getOnSelect() {
         return onSelect;
     }
     /**
-     * Sets the onSelect handler, which takes the JoeListView as an argument.
+     * Sets the onSelect handler, which takes the ListViewInstance as an argument.
      * @param handler The handler
      */
-    public void setOnSelect(Consumer<JoeListView> handler) {
+    public void setOnSelect(Consumer<ListViewInstance> handler) {
         this.onSelect = handler;
     }
 

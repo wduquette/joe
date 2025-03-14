@@ -9,8 +9,8 @@ import javafx.scene.control.Tab;
 
 import java.util.stream.Collectors;
 
-class TabProxy extends FXProxy<Tab> {
-    public static final TabProxy TYPE = new TabProxy();
+class TabClass extends FXType<Tab> {
+    public static final TabClass TYPE = new TabClass();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -21,8 +21,8 @@ class TabProxy extends FXProxy<Tab> {
     // The `Tab` widget contains a [[Node]] in a [[TabPane]].
     // Joe classes can extend the `Tab` type.
     //
-    // @includeMixin FXProxy
-    public TabProxy() {
+    // @includeMixin FXType
+    public TabClass() {
         super("Tab");
         proxies(Tab.class);
 
@@ -69,7 +69,7 @@ class TabProxy extends FXProxy<Tab> {
 
     @Override
     public JoeValue make(Joe joe, JoeClass joeClass) {
-        var tab = new JoeTab(joeClass);
+        var tab = new TabInstance(joeClass);
         tab.setClosable(false);
         return tab;
     }
