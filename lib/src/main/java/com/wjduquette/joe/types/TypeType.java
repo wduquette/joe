@@ -116,7 +116,7 @@ public class TypeType extends ProxyType<Void> {
     // @static typeOf
     // @args value
     // @result type
-    // Returns the Joe type of this *value*.
+    // Returns the Joe type of the given *value*.
     private Object _typeOf(Joe joe, Args args) {
         args.exactArity(1, "typeOf(value)");
         return joe.getJoeObject(args.next()).type();

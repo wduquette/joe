@@ -100,7 +100,7 @@ the italicized names are used as follows:
 - *args*: A callable's arguments; 0 or more, depending on *argc*
 - *cls*: A class
 - *coll*: An iterable collection: a Java `Collection<?>` or a value with
-  a `TypeProxy<T>` that supports iteration
+  a `ProxyType<T>` that supports iteration
 - *constant*: An index into the chunk's constants table for an arbitrary 
   constant.
 - *f*: A callable, native or scripted
@@ -291,7 +291,7 @@ iterator created by the `ITER` instruction.
 **IN** | *a* *coll* → *flag*
 
 Pushes `true` if value *a* is in collection *coll*, and `false` otherwise.  The
-*coll* can be any Java `Collection<?>` or a value whose `TypeProxy<T>` makes it
+*coll* can be any Java `Collection<?>` or a value whose `ProxyType<T>` makes it
 iterable.
 
 ### INCR
@@ -344,7 +344,7 @@ would need to change.
 **ITER** | *coll* → *iter*
 
 Give collection *coll*, creates a Java `Iterator<?>` for the collection.  The
-*coll* can be any Java `Collection<?>` or value whose `TypeProxy<?>` 
+*coll* can be any Java `Collection<?>` or value whose `ProxyType<?>` 
 provides iterability.  This is used to implement the `foreach` statement.
 
 ### JIF
@@ -477,7 +477,7 @@ Negates *a*.
 **NI** | *a* *coll* → *flag*
 
 Pushes `false` if value *a* is in collection *coll*, and `true` otherwise.  The
-*coll* can be any Java `Collection<?>` or a value whose `TypeProxy<T>` makes it
+*coll* can be any Java `Collection<?>` or a value whose `ProxyType<T>` makes it
 iterable.
 
 ### NOT

@@ -15,6 +15,17 @@
       for the `Map` `get` and `put` methods.
   - Added the `let` statement, which performs destructuring binds using
     [pattern matching](patterns.md).
+- Internals/Embedding/Extending
+  - Refactored the names of Joe's type-related interfaces and Java classes
+    for clarity.
+- Standard Library
+  - Added [`Type`](library/type.joe.Type.md) as the root of the Joe type system
+    and host of Joe's introspection (aka reflection) API.
+  - Added better support for opaque types.
+    - Values of opaque types are now provided with an _ad hoc_ proxy that 
+      provides a `toString()` method.
+    - `Type.typeOf(opaqueValue).name()` is `Class::getName` value for the 
+      Java type.
 
 ## Changes in 0.5.0 
 
