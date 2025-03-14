@@ -69,10 +69,6 @@ class WalkerInstance implements JoeValue {
         fields.put(name, value);
     }
 
-    public JoeClass joeClass() {
-        return joeClass;
-    }
-
     @Override
     public String stringify(Joe joe) {
         var callable = get(TO_STRING);
