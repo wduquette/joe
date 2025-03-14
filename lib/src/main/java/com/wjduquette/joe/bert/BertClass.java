@@ -69,24 +69,17 @@ public class BertClass implements BertCallable, JoeClass, JoeValue {
         }
     }
 
-
-    //-------------------------------------------------------------------------
-    // BertClass API
-
-    /**
-     * Gets the class's immediate superclass, or null if none.
-     * @return The superclass.
-     */
-    public JoeClass getSuperclass() {
-        return superclass;
-    }
-
     //-------------------------------------------------------------------------
     // JoeType API
 
     @Override
     public String name() {
         return name;
+    }
+
+    @Override
+    public JoeType supertype() {
+        return superclass;
     }
 
     //-------------------------------------------------------------------------

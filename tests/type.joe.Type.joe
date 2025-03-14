@@ -17,6 +17,13 @@ class Thing {
     }
 }
 
+class Gizmo extends Thing {
+    method init(id, color) { super.init(id, color); }
+}
+
+class MyTextBuilder extends TextBuilder {
+}
+
 function testFieldNames() {
     check(Type.fieldNames("abc")).eq([]);
     check(Type.fieldNames(String)).eq([]);
@@ -44,6 +51,23 @@ function testNameOf() {
 
     assertError(\-> Type.nameOf("abc"),
         "Expected Joe type, got: String 'abc'.");
+}
+
+function testSupertypeOf() {
+    // Native Type
+    check(Type.supertypeOf(String)).isNull();
+
+    // Scripted base class
+    check(Type.supertypeOf(Thing)).isNull();
+
+    // Subclass of scripted base class
+    check(Type.supertypeOf(Gizmo)).eq(Thing);
+
+    // Native base class
+    check(Type.supertypeOf(TextBuilder)).eq(null);
+
+    // Subclass of native base class
+    check(Type.supertypeOf(MyTextBuilder)).eq(TextBuilder);
 }
 
 function testTypeOf() {

@@ -11,4 +11,10 @@ public interface JoeType {
      * @return The name
      */
     String name();
+
+    /**
+     * Gets the type's supertype, or null if none.
+     * @return the supertype.
+     */
+    default JoeType supertype() { return null; }
 }

@@ -77,6 +77,19 @@ class WalkerClass implements JoeClass, JoeValue, NativeCallable {
     }
 
     //-------------------------------------------------------------------------
+    // JoeType API
+
+    @Override
+    public String name() {
+        return name;
+    }
+
+    @Override
+    public JoeType supertype() {
+        return superclass;
+    }
+
+    //-------------------------------------------------------------------------
     // JoeClass API
 
 
@@ -87,11 +100,6 @@ class WalkerClass implements JoeClass, JoeValue, NativeCallable {
         } else {
             return new WalkerInstance(joeClass);
         }
-    }
-
-    @Override
-    public String name() {
-        return name;
     }
 
     @Override

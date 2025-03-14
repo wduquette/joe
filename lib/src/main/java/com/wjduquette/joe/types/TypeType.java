@@ -33,6 +33,7 @@ public class TypeType extends ProxyType<Void> {
         staticMethod("isType",        this::_isType);
         staticMethod("name",          this::_name);
         staticMethod("nameOf",        this::_nameOf);
+        staticMethod("supertypeOf",   this::_supertypeOf);
         staticMethod("typeOf",        this::_typeOf);
     }
 
@@ -97,6 +98,18 @@ public class TypeType extends ProxyType<Void> {
         args.exactArity(1, "nameOf(type)");
         var type = joe.toJoeType(args.next());
         return type.name();
+    }
+
+    //**
+    // @static supertypeOf
+    // @args type
+    // @result type
+    // Returns the supertype of the given *type*, or null if the *type*
+    // has no supertype.
+    private Object _supertypeOf(Joe joe, Args args) {
+        args.exactArity(1, "supertypeOf(type)");
+        var type = joe.toJoeType(args.next());
+        return type.supertype();
     }
 
     //**
