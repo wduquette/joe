@@ -5,7 +5,7 @@ import com.wjduquette.joe.*;
 import java.util.HashMap;
 import java.util.Map;
 
-class WalkerInstance implements JoeObject {
+class WalkerInstance implements JoeValue {
     private final static String TO_STRING = "toString";
 
     //-------------------------------------------------------------------------

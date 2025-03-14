@@ -5,7 +5,7 @@ import com.wjduquette.joe.*;
 /**
  * A Joe-equivalent for the Java StringBuilder.
  */
-public class TextBuilder implements JoeObject {
+public class TextBuilder implements JoeValue {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -55,7 +55,7 @@ public class TextBuilder implements JoeObject {
     }
 
     //-------------------------------------------------------------------------
-    // JoeObject API
+    // JoeValue API
 
     @Override public JoeType type() { return core.type(); }
     @Override public String typeName() { return core.typeName(); }

@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * BertClass is the internal representation for a scripted Joe class.
  */
-public class BertClass implements BertCallable, JoeClass, JoeObject {
+public class BertClass implements BertCallable, JoeClass, JoeValue {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -112,7 +112,7 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
     }
 
     @Override
-    public JoeObject make(Joe joe, JoeClass joeClass) {
+    public JoeValue make(Joe joe, JoeClass joeClass) {
         if (superclass != null) {
             return superclass.make(joe, joeClass);
         } else {
@@ -121,7 +121,7 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
     }
 
     //-------------------------------------------------------------------------
-    // JoeObject API
+    // JoeValue API
 
     @Override
     public JoeType type() {

@@ -3,7 +3,7 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeClass;
-import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.JoeValue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
@@ -62,7 +62,7 @@ class VBoxProxy extends FXProxy<VBox> {
     }
 
     @Override
-    public JoeObject make(Joe joe, JoeClass joeClass) {
+    public JoeValue make(Joe joe, JoeClass joeClass) {
         return new JoeVBox(joeClass);
     }
 

@@ -1,6 +1,6 @@
 package com.wjduquette.joe.patterns;
 
-import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.JoeValue;
 import com.wjduquette.joe.JoeType;
 import com.wjduquette.joe.Ted;
 import org.junit.Before;
@@ -351,7 +351,7 @@ public class MatcherTest extends Ted {
     //-------------------------------------------------------------------------
     // Helper
 
-    private static class TestObject implements JoeObject {
+    private static class TestObject implements JoeValue {
         final String typeName;
         final Map<String, Object> fields = new HashMap<>();
 

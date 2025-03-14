@@ -11,7 +11,7 @@ import java.util.Collection;
  * @param value The value
  */
 record BoundValue(Joe joe, TypeProxy<?> proxy, Object value)
-    implements JoeObject
+    implements JoeValue
 {
     @Override
     public JoeType type() {

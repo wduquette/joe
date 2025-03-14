@@ -6,7 +6,7 @@ import javafx.scene.layout.GridPane;
 /**
  * A JavaFX GridPane that can be extended by Joe classes.
  */
-public class JoeGridPane extends GridPane implements JoeObject {
+public class JoeGridPane extends GridPane implements JoeValue {
     private final JoeObjectCore core;
 
     /**

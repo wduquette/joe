@@ -3,7 +3,7 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeClass;
-import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.JoeValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -61,7 +61,7 @@ class StackPaneProxy extends FXProxy<StackPane> {
     }
 
     @Override
-    public JoeObject make(Joe joe, JoeClass joeClass) {
+    public JoeValue make(Joe joe, JoeClass joeClass) {
         return new JoeStackPane(joeClass);
     }
 

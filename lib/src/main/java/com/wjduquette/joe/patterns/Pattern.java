@@ -1,5 +1,7 @@
 package com.wjduquette.joe.patterns;
 
+import com.wjduquette.joe.JoeValue;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -140,7 +142,7 @@ public sealed interface Pattern permits
 
     /**
      * A pattern that matches a target
-     * {@link com.wjduquette.joe.JoeObject} on its type name and fields.
+     * {@link JoeValue} on its type name and fields.
      * The given type name must match the name of the target object's
      * Joe type or one of its supertypes.  The field match is done
      * by MapPattern.

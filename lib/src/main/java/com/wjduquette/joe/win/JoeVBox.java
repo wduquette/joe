@@ -6,7 +6,7 @@ import javafx.scene.layout.VBox;
 /**
  * A JavaFX VBox that can be extended by Joe classes.
  */
-public class JoeVBox extends VBox implements JoeObject {
+public class JoeVBox extends VBox implements JoeValue {
     private final JoeObjectCore core;
 
     /**

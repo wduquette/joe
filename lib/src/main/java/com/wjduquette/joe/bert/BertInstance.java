@@ -10,7 +10,7 @@ import java.util.Map;
  * classes—unless the scripted class has a native ancestor, in which
  * case instances are proved by the native ancestor.
  */
-public class BertInstance implements JoeObject {
+public class BertInstance implements JoeValue {
     private final static String TO_STRING = "toString";
 
     //-------------------------------------------------------------------------
@@ -43,7 +43,7 @@ public class BertInstance implements JoeObject {
     }
 
     //-------------------------------------------------------------------------
-    // JoeObject API
+    // JoeValue API
 
     @Override
     public JoeType type() {

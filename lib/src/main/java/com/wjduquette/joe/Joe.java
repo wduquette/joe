@@ -465,13 +465,13 @@ public class Joe {
     }
 
     /**
-     * Given a value, gets a JoeObject: either an instance of a JoeClass,
+     * Given a value, gets a JoeValue: either an instance of a JoeClass,
      * or a ProxiedValue.
      * @param value The value
-     * @return The JoeObject
+     * @return The JoeValue
      */
-    public JoeObject getJoeObject(Object value) {
-        if (value instanceof JoeObject obj) {
+    public JoeValue getJoeObject(Object value) {
+        if (value instanceof JoeValue obj) {
             return obj;
         } else {
             return new BoundValue(this, lookupProxy(value), value);
@@ -502,7 +502,7 @@ public class Joe {
         return switch(value) {
             case null -> "null";
             case String s -> s;
-            case JoeObject obj -> obj.stringify(this);
+            case JoeValue obj -> obj.stringify(this);
             default -> getJoeObject(value).stringify(this);
         };
     }

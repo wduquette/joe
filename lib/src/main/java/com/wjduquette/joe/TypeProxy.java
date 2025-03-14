@@ -11,7 +11,7 @@ import java.util.function.Function;
  * @param <V> The native value type
  */
 public class TypeProxy<V>
-    implements JoeClass, JoeObject, NativeCallable
+    implements JoeClass, JoeValue, NativeCallable
 {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -144,7 +144,7 @@ public class TypeProxy<V>
     }
 
     //-------------------------------------------------------------------------
-    // JoeObject API
+    // JoeValue API
 
     @Override
     public JoeType type() {
@@ -272,7 +272,7 @@ public class TypeProxy<V>
     // Public Methods
 
     /**
-     * As a JoeObject, the proxy needs a typeName.  It's simply a
+     * As a JoeValue, the proxy needs a typeName.  It's simply a
      * "{@code &lt;type&gt;}".
      * @return The name.
      */

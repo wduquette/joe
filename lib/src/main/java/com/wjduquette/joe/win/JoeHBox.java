@@ -6,7 +6,7 @@ import javafx.scene.layout.HBox;
 /**
  * A JavaFX HBox that can be extended by Joe classes.
  */
-public class JoeHBox extends HBox implements JoeObject {
+public class JoeHBox extends HBox implements JoeValue {
     private final JoeObjectCore core;
 
     /**

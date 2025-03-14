@@ -6,7 +6,7 @@ import javafx.scene.layout.StackPane;
 /**
  * A JavaFX StackPane that can be extended by Joe classes.
  */
-public class JoeStackPane extends StackPane implements JoeObject {
+public class JoeStackPane extends StackPane implements JoeValue {
     private final JoeObjectCore core;
 
     /**

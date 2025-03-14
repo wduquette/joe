@@ -6,7 +6,7 @@ import javafx.scene.control.Tab;
 /**
  * A JavaFX Tab that can be extended by Joe classes.
  */
-public class JoeTab extends Tab implements JoeObject {
+public class JoeTab extends Tab implements JoeValue {
     private final JoeObjectCore core;
 
     /**

@@ -14,7 +14,7 @@ import java.util.function.Function;
  * Joe::stringify or the client's own stringifier, and safe selection without
  * logic loops.
  */
-public class JoeListView extends ListView<Object> implements JoeObject {
+public class JoeListView extends ListView<Object> implements JoeValue {
     //-------------------------------------------------------------------------
     // Instance Variables
 

@@ -10,7 +10,7 @@ import com.wjduquette.joe.types.TypeType;
 /**
  * A class defined in a Joe script.
  */
-class WalkerClass implements JoeClass, JoeObject, NativeCallable {
+class WalkerClass implements JoeClass, JoeValue, NativeCallable {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -61,7 +61,7 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     }
 
     public Object call(Joe joe, Args args) {
-        JoeObject instance = make(joe, this);
+        JoeValue instance = make(joe, this);
         var initializer = (WalkerFunction)bind(instance, INIT);
         if (initializer != null) {
             try {
@@ -79,7 +79,7 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
 
 
     @Override
-    public JoeObject make(Joe joe, JoeClass joeClass) {
+    public JoeValue make(Joe joe, JoeClass joeClass) {
         if (superclass != null) {
             return superclass.make(joe, joeClass);
         } else {
@@ -97,7 +97,7 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
         var method = methods.get(name);
 
         if (method != null) {
-            return method.bind((JoeObject)value);
+            return method.bind((JoeValue)value);
         }
 
         if (superclass != null) {
@@ -136,7 +136,7 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     }
 
     //-------------------------------------------------------------------------
-    // JoeObject API
+    // JoeValue API
 
     @Override
     public JoeType type() {

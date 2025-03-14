@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * A class that implements the boilerplate for subclasses of native classes
- * that implement JoeObject (e.g., JoeStackPane).  A JoeObjectCore is a
+ * that implement JoeValue (e.g., JoeStackPane).  A JoeObjectCore is a
  * component of instances of the subclass.
  */
 public class JoeObjectCore {
@@ -28,7 +28,7 @@ public class JoeObjectCore {
     /**
      * Initializes the core.
      * @param joeClass The JoeClass of which the host is an instance.
-     * @param host The JoeObject instance of which this is a component.
+     * @param host The JoeValue instance of which this is a component.
      */
     public JoeObjectCore(JoeClass joeClass, Object host) {
         this.joeClass = joeClass;

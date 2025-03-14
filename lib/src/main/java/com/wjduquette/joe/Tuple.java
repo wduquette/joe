@@ -12,7 +12,7 @@ import java.util.Map;
  * StandardLibrary.java defines the type's constructor as a global
  * function `Tuple()`.
  */
-public class Tuple implements JoeObject {
+public class Tuple implements JoeValue {
     //-------------------------------------------------------------------------
     // Static Variables
     /**
@@ -230,7 +230,7 @@ public class Tuple implements JoeObject {
     }
 
     //-------------------------------------------------------------------------
-    // JoeObject API
+    // JoeValue API
 
 
     @Override

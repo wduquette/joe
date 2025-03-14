@@ -3,7 +3,7 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeClass;
-import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.JoeValue;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 
@@ -68,7 +68,7 @@ class TabProxy extends FXProxy<Tab> {
     }
 
     @Override
-    public JoeObject make(Joe joe, JoeClass joeClass) {
+    public JoeValue make(Joe joe, JoeClass joeClass) {
         var tab = new JoeTab(joeClass);
         tab.setClosable(false);
         return tab;

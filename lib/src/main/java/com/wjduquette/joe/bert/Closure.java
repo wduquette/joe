@@ -1,7 +1,7 @@
 package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.JoeValue;
 import com.wjduquette.joe.JoeType;
 
 /**
@@ -19,7 +19,7 @@ import com.wjduquette.joe.JoeType;
  * can be used to create any number of Closures, each of which closes over
  * its own set of {@link Upvalue Upvalues}.</p>
  */
-public class Closure implements BertCallable, JoeObject {
+public class Closure implements BertCallable, JoeValue {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -42,7 +42,7 @@ public class Closure implements BertCallable, JoeObject {
     }
 
     //-------------------------------------------------------------------------
-    // JoeObject API
+    // JoeValue API
 
     @Override
     public JoeType type() {

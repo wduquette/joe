@@ -61,7 +61,7 @@ class ListViewProxy extends FXProxy<JoeListView> {
     }
 
     @Override
-    public JoeObject make(Joe joe, JoeClass joeClass) {
+    public JoeValue make(Joe joe, JoeClass joeClass) {
         return new JoeListView(joe, joeClass);
     }
 
