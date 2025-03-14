@@ -6,17 +6,11 @@ package com.wjduquette.joe;
  * type name and the type's methods table, and creates the Java instance
  * that represents values of the Joe type.
  */
-public interface JoeClass extends JoeCallable {
+public interface JoeClass extends JoeType, JoeCallable {
     /**
      * The name for a class's initializer method.
      */
     String INIT = "init";
-
-    /**
-     * Gets the class's name.
-     * @return The name
-     */
-    String name();
 
     /**
      * Returns a callable that binds the named method

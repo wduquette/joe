@@ -8,7 +8,9 @@ import java.util.function.Function;
  * metadata and services for the type.
  * @param <V> The native value type
  */
-public class TypeProxy<V> implements JoeObject, JoeClass, NativeCallable {
+public class TypeProxy<V>
+    implements JoeClass, JoeObject, NativeCallable
+{
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -129,6 +131,14 @@ public class TypeProxy<V> implements JoeObject, JoeClass, NativeCallable {
      */
     public void method(String name, JoeValueLambda<V> callable) {
         methods.put(name, callable);
+    }
+
+    //-------------------------------------------------------------------------
+    // JoeType API
+
+    @Override
+    public final String name() {
+        return name;
     }
 
     //-------------------------------------------------------------------------
@@ -253,15 +263,6 @@ public class TypeProxy<V> implements JoeObject, JoeClass, NativeCallable {
 
     //-------------------------------------------------------------------------
     // Public Methods
-
-    /**
-     * Gets the type's script-level name, which might not match its
-     * Java name.
-     * @return The name
-     */
-    public final String name() {
-        return name;
-    }
 
     /**
      * As a JoeObject, the proxy needs a typeName.  It's simply a
