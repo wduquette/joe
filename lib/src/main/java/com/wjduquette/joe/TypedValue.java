@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.types.ListValue;
+
 import java.util.Collection;
 
 /**
@@ -26,9 +28,23 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
     }
 
     @Override
+    public boolean hasField(String name) {
+        // The value is of a proxied type, and so has
+        // method properties but not field properties.
+        return false;
+    }
+
+    @Override
+    public JoeList getFieldNames() {
+        // The value is of a proxied type, and so has
+        // method properties but not field properties.
+        return new ListValue();
+    }
+
+    @Override
     public Object get(String name) {
         if (proxy != null) {
-            // The value is of a proxied type, in which case it has
+            // The value is of a proxied type, and so has
             // method properties but not field properties.
             var method = proxy.bind(value, name);
             if (method != null) {
@@ -51,11 +67,6 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
         throw new JoeError("Values of type " +
             value.getClass().getName() +
             " have no field properties.");
-    }
-
-    @Override
-    public boolean hasField(String name) {
-        return false;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.types.ListValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +24,9 @@ class WalkerInstance implements JoeValue {
             (objc, joe, args) -> this.toString());
     }
 
+    //-------------------------------------------------------------------------
+    // JoeValue API
+
     @Override
     public JoeType type() {
         return joeClass;
@@ -36,6 +40,11 @@ class WalkerInstance implements JoeValue {
     @Override
     public boolean hasField(String name) {
         return fields.containsKey(name);
+    }
+
+    @Override
+    public JoeList getFieldNames() {
+        return new ListValue(fields.keySet());
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.types.ListValue;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -241,6 +243,11 @@ public class Tuple implements JoeValue {
     @Override
     public boolean hasField(String name) {
         return fields.containsKey(new Keyword(name));
+    }
+
+    @Override
+    public JoeList getFieldNames() {
+        return new ListValue(fields.keySet());
     }
 
     @Override

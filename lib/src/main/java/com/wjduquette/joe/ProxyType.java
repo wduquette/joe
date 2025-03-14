@@ -1,5 +1,6 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.TypeType;
 
 import java.util.*;
@@ -152,6 +153,16 @@ public class ProxyType<V>
     }
 
     @Override
+    public boolean hasField(String name) {
+        return constants.containsKey(name);
+    }
+
+    @Override
+    public JoeList getFieldNames() {
+        return new ListValue(constants.keySet());
+    }
+
+    @Override
     public Object get(String name) {
         if (constants.containsKey(name)) {
             return constants.get(name);
@@ -167,11 +178,6 @@ public class ProxyType<V>
     @Override
     public void set(String name, Object value) {
         throw new JoeError("Type " + this.name + " has no settable properties.");
-    }
-
-    @Override
-    public boolean hasField(String name) {
-        return constants.containsKey(name);
     }
 
     //-------------------------------------------------------------------------

@@ -30,6 +30,12 @@ public interface JoeValue extends HasTypeName {
     boolean hasField(String name);
 
     /**
+     * Gets a list of the names of the value's known fields.
+     * @return The list
+     */
+    JoeList getFieldNames();
+
+    /**
      * Get the value of the named object property, a method or a field.
      * @param name The name
      * @return The value

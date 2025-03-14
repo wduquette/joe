@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.types.ListValue;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,6 +66,10 @@ public class JoeValueCore {
      */
     public boolean hasField(String name) {
         return fields.containsKey(name);
+    }
+
+    public JoeList getFieldNames() {
+        return new ListValue(fields.keySet());
     }
 
     /**

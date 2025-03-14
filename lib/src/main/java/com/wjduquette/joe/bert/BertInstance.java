@@ -1,6 +1,7 @@
 package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.types.ListValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,6 +54,11 @@ public class BertInstance implements JoeValue {
     @Override
     public String typeName() {
         return klass.name();
+    }
+
+    @Override
+    public JoeList getFieldNames() {
+        return new ListValue(fields.keySet());
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.wjduquette.joe.*;
 import java.util.HashMap;
 import java.util.Map;
 import com.wjduquette.joe.SourceBuffer.Span;
+import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.TypeType;
 
 /**
@@ -56,6 +57,7 @@ class WalkerClass implements JoeClass, JoeValue, NativeCallable {
     //-------------------------------------------------------------------------
     // WalkerClass API
 
+    @SuppressWarnings("unused")
     public Span classSpan() {
         return classSpan;
     }
@@ -151,6 +153,11 @@ class WalkerClass implements JoeClass, JoeValue, NativeCallable {
     @Override
     public boolean hasField(String name) {
         return fields.containsKey(name);
+    }
+
+    @Override
+    public JoeList getFieldNames() {
+        return new ListValue(fields.keySet());
     }
 
     @Override
