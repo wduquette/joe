@@ -28,6 +28,7 @@ public class TypeType extends ProxyType<Void> {
         // type and value introspection API.
         staticType();
 
+        staticMethod("fieldNames",    this::_fieldNames);
         staticMethod("isOpaqueValue", this::_isOpaqueValue);
         staticMethod("isType",        this::_isType);
         staticMethod("name",          this::_name);
@@ -37,6 +38,22 @@ public class TypeType extends ProxyType<Void> {
 
     //-------------------------------------------------------------------------
     // Static Method Implementations
+
+    //**
+    // @static fieldNames
+    // @args value
+    // @result List
+    // Returns a list of the names of the fields defined on the *value*.
+    //
+    // - If the *value* is a Joe type, returns the names of the type's
+    //   static fields.
+    // - Instances of the same Joe `class` might have different fields.
+    // - If the *value* has no fields, returns the empty list.
+    private Object _fieldNames(Joe joe, Args args) {
+        args.exactArity(1, "fieldNames(value)");
+        var value = joe.getJoeObject(args.next());
+        return value.getFieldNames();
+    }
 
     //**
     // @static isOpaqueValue

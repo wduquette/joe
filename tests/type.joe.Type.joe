@@ -10,6 +10,25 @@ function testName() {
 //-------------------------------------------------------------------------
 // Type and Value Introspection
 
+class Thing {
+    method init(id, color) {
+        this.id = id;
+        this.color = color;
+    }
+}
+
+function testFieldNames() {
+    check(Type.fieldNames("abc")).eq([]);
+    check(Type.fieldNames(String)).eq([]);
+
+    check(Type.fieldNames(Thing)).eq([]);
+    Thing.x = 5;
+    check(Type.fieldNames(Thing)).eq(["x"]);
+
+    var thing = Thing(123, "red");
+    check(Type.fieldNames(thing).sorted()).eq(["color", "id"]);
+}
+
 function testIsOpaqueValue() {
     check(Type.isOpaqueValue(JoeTest.OPAQUE)).isTrue();
     check(Type.isOpaqueValue("abc")).isFalse();
@@ -28,7 +47,11 @@ function testNameOf() {
 }
 
 function testTypeOf() {
+    var thing = Thing(123, "red");
+
     check(Type.typeOf("abc")).eq(String);
     check(Type.typeOf(String)).eq(Type);
+    check(Type.typeOf(thing)).eq(Thing);
+    check(Type.typeOf(Thing)).eq(Type);
     check(Type.typeOf(Type)).eq(Type);
 }
