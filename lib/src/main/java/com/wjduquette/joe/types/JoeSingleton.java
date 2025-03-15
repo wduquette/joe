@@ -36,7 +36,7 @@ public class JoeSingleton extends ProxyType<Void> {
     // Static Method Implementations
 
     //**
-    // @function compare
+    // @static compare
     // @args a, b
     // @result Number
     //
@@ -49,7 +49,7 @@ public class JoeSingleton extends ProxyType<Void> {
     }
 
     //**
-    // @function currentTimeMillis
+    // @static currentTimeMillis
     // @result Number
     //
     // Returns Java's `System.currentTimeMillis()`, the current time in
@@ -105,7 +105,7 @@ public class JoeSingleton extends ProxyType<Void> {
     }
 
     //**
-    // @function stringify
+    // @static stringify
     // @args value
     // @result String
     // Converts its value to a string for output.  This function

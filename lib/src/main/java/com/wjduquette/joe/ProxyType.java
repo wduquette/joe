@@ -64,10 +64,7 @@ public class ProxyType<V>
     // Static Method Implementations
 
 
-    //**
-    // @static name
-    // @result String
-    // Returns the name of this type.
+    // TODO: Make sure this gets into the docs for each type.
     private Object _name(Joe joe, Args args) {
         args.exactArity(0, "name()");
         return name();

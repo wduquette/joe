@@ -3,6 +3,8 @@ package com.wjduquette.joe;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.function.Supplier;
+
 import static com.wjduquette.joe.checker.Checker.*;
 
 @SuppressWarnings("ConstantValue")
@@ -107,4 +109,7 @@ public class JoeTest extends Ted {
         check(bert.isComplete(normalError)).eq(true);
         check(bert.isComplete(errorPlusIncomplete)).eq(false);
     }
+
+    private class Foo {}
+    private static class Bar {}
 }

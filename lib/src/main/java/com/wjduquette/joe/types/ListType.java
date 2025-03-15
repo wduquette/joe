@@ -454,7 +454,7 @@ public class ListType extends ProxyType<JoeList> {
     // is provided, the list must be a list of strings or a list
     // of numbers.  If a *comparator* is given, it must be a function
     // that takes two arguments and returns -1, 0, 1, like
-    // the standard [[function.compare]] function.
+    // the standard [[Joe#static.compare]] function.
     //
     // To sort in descending order, provide a *comparator* that reverses
     // the comparison.
