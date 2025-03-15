@@ -14,6 +14,7 @@
 - [Functions](functions.md)
 - [Classes](classes.md)
 - [Pattern Matching](patterns.md)
+- [Introspection](introspection.md)
 
 ---
 
