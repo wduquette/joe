@@ -8,14 +8,14 @@
 // Can declare a class
 function testDeclare() {
     class Thing {}
-    assertEquals(typeName(Thing), "<class>");
+    assertEquals(Joe.typeOf(Thing), Type);
 }
 
 // Can create instances
 function testCreate() {
     class Thing {}
     var thing = Thing();
-    assertEquals(typeName(thing), "Thing");
+    assertEquals(Joe.typeOf(thing), Thing);
 }
 
 //-----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ function testMethod_tooManyArgs() {
 function testMethod_varargs_good() {
     class Thing {
         method varArgs(first, args) {
-            return first + "," + stringify(args);
+            return first + "," + args;
         }
     }
     var thing = Thing();
@@ -118,7 +118,7 @@ function testToString_default() {
     class Thing {}
     var thing = Thing();
     assertTrue(thing.toString().startsWith("<Thing"));
-    assertEquals(stringify(thing), thing.toString());
+    assertEquals(Joe.stringify(thing), thing.toString());
 }
 
 // Custom toString()
@@ -128,7 +128,7 @@ function testToString_custom() {
     }
     var thing = Thing();
     assertEquals(thing.toString(), "I'm a Thing!");
-    assertEquals(stringify(thing), thing.toString());
+    assertEquals(Joe.stringify(thing), thing.toString());
 }
 
 //-----------------------------------------------------------------------------
@@ -237,7 +237,7 @@ function testStaticInitializer_initCallsStatics() {
         }
     }
 
-    assertEquals(typeName(Thing.instance), "Thing");
+    assertEquals(Joe.typeOf(Thing.instance), Thing);
 }
 
 // A class can have multiple static initializers

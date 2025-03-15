@@ -55,6 +55,22 @@ public class ProxyType<V>
      */
     public ProxyType(String name) {
         this.name = name;
+
+        // Every type has a name.
+        staticMethod("name", this::_name);
+    }
+
+    //-------------------------------------------------------------------------
+    // Static Method Implementations
+
+
+    //**
+    // @static name
+    // @result String
+    // Returns the name of this type.
+    private Object _name(Joe joe, Args args) {
+        args.exactArity(0, "name()");
+        return name();
     }
 
     //-------------------------------------------------------------------------
@@ -294,5 +310,10 @@ public class ProxyType<V>
      */
     public final Set<Class<?>> getProxiedTypes() {
         return Collections.unmodifiableSet(proxiedTypes);
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

@@ -15,13 +15,9 @@ class StandardLibrary extends JoePackage {
         // @title Joe Standard Library
         // The `joe` package contains Joe's standard library.
         globalFunction("catch",     this::_catch);
-        globalFunction("compare",   this::_compare);
-        globalFunction("millis",    this::_millis);
         globalFunction("print",     this::_print);
         globalFunction("printf",    this::_printf);
         globalFunction("println",   this::_println);
-        globalFunction("stringify", this::_stringify);
-        globalFunction("typeName",  this::_typeName);
 
         // Documented in Tuple.java.
         globalFunction("Tuple", Tuple::new);
@@ -29,6 +25,7 @@ class StandardLibrary extends JoePackage {
         type(AssertErrorType.TYPE);
         type(BooleanType.TYPE);
         type(ErrorType.TYPE);
+        type(JoeSingleton.TYPE);
         type(KeywordType.TYPE);
         type(ListType.TYPE);
         type(MapType.TYPE);
@@ -62,29 +59,6 @@ class StandardLibrary extends JoePackage {
             ex.addInfo("Called from catch()");
             return Tuple.of(joe, ERROR, ex);
         }
-    }
-
-    //**
-    // @function compare
-    // @args a, b
-    // @result Number
-    //
-    // Given two strings or two numbers *a* and *b*, returns -1, 0,
-    // or 1 as *a* < *b*, *a* == *b*, or *a* > *b*.  This function
-    // is useful when sorting collections.
-    private Object _compare(Joe joe, Args args) {
-        args.exactArity(2, "compare(a, b)");
-        return (double)Joe.compare(args.next(), args.next());
-    }
-
-    //**
-    // @function millis
-    // @result Number
-    //
-    // Returns Java's `System.currentTimeMillis()`.
-    private Object _millis(Joe joe, Args args) {
-        args.exactArity(0, "millis()");
-        return (double)System.currentTimeMillis();
     }
 
     //**
@@ -129,28 +103,5 @@ class StandardLibrary extends JoePackage {
             joe.println(joe.stringify(args.next(0)));
         }
         return null;
-    }
-
-    //**
-    // @function stringify
-    // @args value
-    // @result String
-    // Converts its value to a string for output.  This function
-    // is functionally equivalent to [[String#init]].
-    private Object _stringify(Joe joe, Args args) {
-        args.exactArity(1, "stringify(value)");
-
-        return joe.stringify(args.next(0));
-    }
-
-    //**
-    // @function typeName
-    // @args value
-    // @result String
-    // Returns the name of the value's type.
-    private Object _typeName(Joe joe, Args args) {
-        args.exactArity(1, "typeName(value)");
-
-        return joe.typeName(args.next(0));
     }
 }

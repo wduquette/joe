@@ -6,6 +6,6 @@ function testToString() {
 }
 
 function testTypeName() {
-    var name = Type.typeOf(JoeTest.OPAQUE).name();
+    var name = Joe.typeOf(JoeTest.OPAQUE).name();
     check(name.endsWith("TestPackage$OpaqueValue")).isTrue();
 }
