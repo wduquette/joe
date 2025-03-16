@@ -1,4 +1,4 @@
-// Tests for joe package functions
+// Tests for the `joe` package's global functions
 
 //-----------------------------------------------------------------------------
 // catch()
@@ -24,42 +24,5 @@ function testCatch_error_withTrace() {
         "In java call(<function bad()>)",
         "Called from catch()",
     ]);
-}
-
-//-----------------------------------------------------------------------------
-// compare()
-
-function testCompare_string() {
-    check(compare("a", "b")).eq(-1);
-    check(compare("b", "b")).eq(0);
-    check(compare("c", "b")).eq(1);
-}
-
-function testCompare_number() {
-    check(compare(0, 1)).eq(-1);
-    check(compare(1, 1)).eq(0);
-    check(compare(2, 1)).eq(1);
-}
-
-function testCompare_mismatch() {
-    checkCatch(\-> compare(1, #a))
-        .message("Expected two strings or two numbers.");
-}
-
-//-----------------------------------------------------------------------------
-// typeName()
-
-function testTypeName() {
-    function howdy() {}
-    class Thing {}
-    var thing = Thing();
-
-    check(typeName(1)).eq("Number");
-    check(typeName("abc")).eq("String");
-    check(typeName(thing)).eq("Thing");
-    check(typeName(howdy)).eq("<function>");
-    check(typeName(Thing)).eq("<class>");
-    check(typeName(typeName)).eq("<native function>");
-    check(typeName(String)).eq("<native type>");
 }
 

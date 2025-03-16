@@ -288,9 +288,19 @@ let Thing{#id: i,  #color: c}  = Thing(123, "red");
 ```
 
 An instance pattern consists of the name of the desired type, followed by
-a map pattern for its fields.  The pattern matches if all fields match,
-and if the given type name is the name of the value's type or one of its
-supertypes. (Supertype matching is not yet implemented.)
+a map pattern for its fields. For the pattern to match:
+
+- The named type must match value's type or one of its supertypes.
+  - Supertype matching is not yet implemented.
+- The value must have all of the specified fields.
+- The field patterns must match.
+
+Types are matched based on their names, i.e., in `let Thing{...} = thing;` the
+type will match if `Joe.typeOf(thing).name() == "Thing"`, ***not*** if 
+`Joe.typeOf(thing) == Thing`.  In other words, there is no requirement that
+the matched type is in scope; it is enough that the value being matched 
+knows its type and that its type's name is the name included in the pattern.
+See [Unscoped Types](introspection.md#unscoped-types) for more information.
 
 ## Record Patterns
 

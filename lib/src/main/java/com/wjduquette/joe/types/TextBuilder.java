@@ -5,12 +5,12 @@ import com.wjduquette.joe.*;
 /**
  * A Joe-equivalent for the Java StringBuilder.
  */
-public class TextBuilder implements JoeObject {
+public class TextBuilder implements JoeValue {
     //-------------------------------------------------------------------------
     // Instance Variables
 
     // The object infrastructure
-    private final JoeObjectCore core;
+    private final JoeValueCore core;
 
     // The buffer
     private StringBuilder buff = new StringBuilder();
@@ -23,7 +23,7 @@ public class TextBuilder implements JoeObject {
      * @param joeClass The Joe class for which this is the Java instance.
      */
     public TextBuilder(JoeClass joeClass) {
-        this.core = new JoeObjectCore(joeClass, this);
+        this.core = new JoeValueCore(joeClass, this);
     }
 
     //-------------------------------------------------------------------------
@@ -55,9 +55,11 @@ public class TextBuilder implements JoeObject {
     }
 
     //-------------------------------------------------------------------------
-    // JoeObject API
+    // JoeValue API
 
+    @Override public JoeType type() { return core.type(); }
     @Override public String typeName() { return core.typeName(); }
+    @Override public JoeList getFieldNames() { return core.getFieldNames(); }
     @Override public boolean hasField(String name) { return core.hasField(name); }
     @Override public Object get(String name) { return core.get(name); }
     @Override public void set(String name, Object value) { core.set(name, value); }

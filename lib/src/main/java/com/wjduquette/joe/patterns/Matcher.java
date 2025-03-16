@@ -1,6 +1,6 @@
 package com.wjduquette.joe.patterns;
 
-import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.JoeValue;
 import com.wjduquette.joe.Keyword;
 
 import java.util.*;
@@ -103,7 +103,7 @@ public class Matcher {
                     // FINALLY, match succeeds
                     yield true;
                 }
-                case JoeObject obj -> {
+                case JoeValue obj -> {
                     for (var e : p.patterns().entrySet()) {
                         var field = key2field(getter.get(e.getKey().id()));
                         if (!obj.hasField(field)) yield false;
@@ -121,7 +121,7 @@ public class Matcher {
             };
 
             case Pattern.InstancePattern p -> {
-                if (!(value instanceof JoeObject obj)) yield false;
+                if (!(value instanceof JoeValue obj)) yield false;
                 if (!hasType(obj, p.typeName())) yield false;
 
                 yield bind(p.fieldMap(), obj, getter, binder);
@@ -141,7 +141,7 @@ public class Matcher {
 
     // Determines whether the type name is the name of the object's
     // type or the name of one of its supertypes.
-    private static boolean hasType(JoeObject obj, String typeName) {
+    private static boolean hasType(JoeValue obj, String typeName) {
         // TODO: Match on supertypes.
         return obj.typeName().equals(typeName);
     }

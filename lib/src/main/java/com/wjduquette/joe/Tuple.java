@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.types.ListValue;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,7 +14,7 @@ import java.util.Map;
  * StandardLibrary.java defines the type's constructor as a global
  * function `Tuple()`.
  */
-public class Tuple implements JoeObject {
+public class Tuple implements JoeValue {
     //-------------------------------------------------------------------------
     // Static Variables
     /**
@@ -138,6 +140,11 @@ public class Tuple implements JoeObject {
         }
     }
 
+    @Override public JoeType type() {
+        // TODO: Fix or replace Tuple!
+        throw new JoeError("Tuple is not a proper type!");
+    }
+
     //-------------------------------------------------------------------------
     // Value Methods
 
@@ -225,7 +232,7 @@ public class Tuple implements JoeObject {
     }
 
     //-------------------------------------------------------------------------
-    // JoeObject API
+    // JoeValue API
 
 
     @Override
@@ -236,6 +243,11 @@ public class Tuple implements JoeObject {
     @Override
     public boolean hasField(String name) {
         return fields.containsKey(new Keyword(name));
+    }
+
+    @Override
+    public JoeList getFieldNames() {
+        return new ListValue(fields.keySet());
     }
 
     @Override

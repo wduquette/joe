@@ -14,6 +14,7 @@
 - [Functions](functions.md)
 - [Classes](classes.md)
 - [Pattern Matching](patterns.md)
+- [Introspection](introspection.md)
 
 ---
 
@@ -43,16 +44,20 @@
     - [AssertError Type](./library/type.joe.AssertError.md)
     - [Boolean Type](./library/type.joe.Boolean.md)
     - [Error Type](./library/type.joe.Error.md)
+    - [Joe Type](./library/type.joe.Type.md)
     - [Keyword Type](./library/type.joe.Keyword.md)
     - [List Type](./library/type.joe.List.md)
     - [Map Type](./library/type.joe.Map.md)
     - [Number Type](./library/type.joe.Number.md)
+    - [Opaque Type](./library/type.joe.Opaque.md)
     - [Set Type](./library/type.joe.Set.md)
     - [String Type](./library/type.joe.String.md)
     - [TextBuilder Type](./library/type.joe.TextBuilder.md)
     - [Tuple Type](./library/type.joe.Tuple.md)
+    - [Type Type](./library/type.joe.Type.md)
   - [Joe Test Tool API (joe.test)](./library/pkg.joe.test.md)
     - [CatchChecker Type](./library/type.joe.test.CatchChecker.md)
+    - [JoeTest Type](./library/type.joe.test.JoeTest.md)
     - [ValueChecker Type](./library/type.joe.test.ValueChecker.md)
   - [JoeDoc Configuration API (joe.doc)](./library/pkg.joe.doc.md)
     - [DocConfig Type](./library/type.joe.doc.DocConfig.md)

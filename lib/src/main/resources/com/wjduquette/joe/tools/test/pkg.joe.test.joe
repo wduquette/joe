@@ -107,12 +107,23 @@ class ValueChecker {
     }
 
     //**
+    // @method hasType
+    // @args type
+    // @result this
+    // Checks that the value has the given type.
+    method hasType(type) {
+        var got = Joe.typeOf(@value);
+        assert got == type,
+            @_expected2("type '" + type + "'", got);
+    }
+
+    //**
     // @method hasTypeName
     // @args name
     // @result this
-    // Checks that the value's `typeName()` is the given *name*.
+    // Checks that the value's type has the given name.
     method hasTypeName(name) {
-        var got = typeName(@value);
+        var got = Joe.typeOf(@value).name();
         assert got == name,
             @_expected2("type name '" + name + "'", got);
     }
@@ -218,6 +229,6 @@ function _typedValue(value) {
     if (value == null) {
         return "'null'";
     } else {
-        return typeName(value) + " '" + stringify(value) + "'";
+        return Joe.typeOf(value).name() + " '" + value + "'";
     }
 }

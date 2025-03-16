@@ -1,7 +1,7 @@
 package com.wjduquette.joe;
 
 /**
- * An interface for a native method, defined as part of a `TypeProxy`.
+ * An interface for a native method, defined as part of a `ProxyType`.
  * @param <V> The value type
  */
 public interface JoeValueLambda<V> {

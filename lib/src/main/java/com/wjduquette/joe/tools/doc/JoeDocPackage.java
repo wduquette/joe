@@ -19,7 +19,7 @@ class JoeDocPackage extends JoePackage {
         type(new DocConfigProxy());
     }
 
-    private class DocConfigProxy extends TypeProxy<Void> {
+    private class DocConfigProxy extends ProxyType<Void> {
         //---------------------------------------------------------------------
         // Instance Variables
 

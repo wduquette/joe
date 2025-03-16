@@ -1,0 +1,9 @@
+// Type-type tests.
+
+//-------------------------------------------------------------------------
+// The Type type's own info
+
+function testName() {
+    check(Type.name()).eq("Type");
+}
+

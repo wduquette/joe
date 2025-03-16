@@ -1,6 +1,8 @@
 package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.types.ListValue;
+import com.wjduquette.joe.types.TypeType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +10,7 @@ import java.util.Map;
 /**
  * BertClass is the internal representation for a scripted Joe class.
  */
-public class BertClass implements BertCallable, JoeClass, JoeObject {
+public class BertClass implements BertCallable, JoeClass, JoeValue {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -67,25 +69,21 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
         }
     }
 
-
     //-------------------------------------------------------------------------
-    // BertClass API
-
-    /**
-     * Gets the class's immediate superclass, or null if none.
-     * @return The superclass.
-     */
-    public JoeClass getSuperclass() {
-        return superclass;
-    }
-
-    //-------------------------------------------------------------------------
-    // JoeClass API
+    // JoeType API
 
     @Override
     public String name() {
         return name;
     }
+
+    @Override
+    public JoeType supertype() {
+        return superclass;
+    }
+
+    //-------------------------------------------------------------------------
+    // JoeClass API
 
     @Override
     public JoeCallable bind(Object value, String name) {
@@ -108,7 +106,7 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
     }
 
     @Override
-    public JoeObject make(Joe joe, JoeClass joeClass) {
+    public JoeValue make(Joe joe, JoeClass joeClass) {
         if (superclass != null) {
             return superclass.make(joe, joeClass);
         } else {
@@ -117,7 +115,12 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
     }
 
     //-------------------------------------------------------------------------
-    // JoeObject API
+    // JoeValue API
+
+    @Override
+    public JoeType type() {
+        return TypeType.TYPE;
+    }
 
     @Override
     public String typeName() {
@@ -127,6 +130,11 @@ public class BertClass implements BertCallable, JoeClass, JoeObject {
     @Override
     public boolean hasField(String name) {
         return fields.containsKey(name);
+    }
+
+    @Override
+    public JoeList getFieldNames() {
+        return new ListValue(fields.keySet());
     }
 
     @Override

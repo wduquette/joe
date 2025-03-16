@@ -40,7 +40,7 @@ function testFunction_tooManyArgs() {
 // Varargs function
 function testFunction_varargs_good() {
     function varArgs(first, args) {
-        return first + "," + stringify(args);
+        return first + "," + args;
     }
 
     assertEquals(varArgs(#a), "#a,[]");

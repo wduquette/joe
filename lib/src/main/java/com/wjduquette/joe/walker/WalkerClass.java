@@ -5,11 +5,13 @@ import com.wjduquette.joe.*;
 import java.util.HashMap;
 import java.util.Map;
 import com.wjduquette.joe.SourceBuffer.Span;
+import com.wjduquette.joe.types.ListValue;
+import com.wjduquette.joe.types.TypeType;
 
 /**
  * A class defined in a Joe script.
  */
-class WalkerClass implements JoeClass, JoeObject, NativeCallable {
+class WalkerClass implements JoeClass, JoeValue, NativeCallable {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -55,12 +57,13 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     //-------------------------------------------------------------------------
     // WalkerClass API
 
+    @SuppressWarnings("unused")
     public Span classSpan() {
         return classSpan;
     }
 
     public Object call(Joe joe, Args args) {
-        JoeObject instance = make(joe, this);
+        JoeValue instance = make(joe, this);
         var initializer = (WalkerFunction)bind(instance, INIT);
         if (initializer != null) {
             try {
@@ -74,11 +77,24 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     }
 
     //-------------------------------------------------------------------------
+    // JoeType API
+
+    @Override
+    public String name() {
+        return name;
+    }
+
+    @Override
+    public JoeType supertype() {
+        return superclass;
+    }
+
+    //-------------------------------------------------------------------------
     // JoeClass API
 
 
     @Override
-    public JoeObject make(Joe joe, JoeClass joeClass) {
+    public JoeValue make(Joe joe, JoeClass joeClass) {
         if (superclass != null) {
             return superclass.make(joe, joeClass);
         } else {
@@ -87,16 +103,11 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     }
 
     @Override
-    public String name() {
-        return name;
-    }
-
-    @Override
     public JoeCallable bind(Object value, String name) {
         var method = methods.get(name);
 
         if (method != null) {
-            return method.bind((JoeObject)value);
+            return method.bind((JoeValue)value);
         }
 
         if (superclass != null) {
@@ -135,8 +146,12 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     }
 
     //-------------------------------------------------------------------------
-    // JoeObject API
+    // JoeValue API
 
+    @Override
+    public JoeType type() {
+        return TypeType.TYPE;
+    }
 
     @Override
     public String typeName() {
@@ -146,6 +161,11 @@ class WalkerClass implements JoeClass, JoeObject, NativeCallable {
     @Override
     public boolean hasField(String name) {
         return fields.containsKey(name);
+    }
+
+    @Override
+    public JoeList getFieldNames() {
+        return new ListValue(fields.keySet());
     }
 
     @Override

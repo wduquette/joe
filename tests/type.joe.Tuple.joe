@@ -24,7 +24,7 @@ function testCreate_fail_wildcard() {
 function testToString() {
     var t = Tuple(#a, 1, #b, 2);
     check(t.toString()).eq("Tuple(#a, 1, #b, 2)");
-    check(stringify(t)).eq("Tuple(#a, 1, #b, 2)");
+    check(Joe.stringify(t)).eq("Tuple(#a, 1, #b, 2)");
 }
 
 function testIs() {

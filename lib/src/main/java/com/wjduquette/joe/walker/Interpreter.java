@@ -428,7 +428,7 @@ class Interpreter {
                 }
             }
             // Get an object property.  The expression must evaluate to
-            // a JoeObject, i.e., a JoeInstance or a ProxiedValue.
+            // a JoeValue, i.e., a JoeInstance or a ProxiedValue.
             case Expr.Get expr -> {
                 Object object = evaluate(expr.object());
                 if (object == null) {
@@ -436,7 +436,7 @@ class Interpreter {
                         "Tried to retrieve '" + expr.name().lexeme() +
                         "' property from null value.");
                 }
-                JoeObject instance = joe.getJoeObject(object);
+                JoeValue instance = joe.getJoeObject(object);
                 yield instance.get(expr.name().lexeme());
             }
             // (expr...)
@@ -579,7 +579,7 @@ class Interpreter {
             // ++ and -- with an object property
             case Expr.PrePostSet expr -> {
                 Object object = evaluate(expr.object());
-                JoeObject instance = joe.getJoeObject(object);
+                JoeValue instance = joe.getJoeObject(object);
                 var name = expr.name().lexeme();
                 var prior = instance.get(name);
                 checkNumericTarget(expr.op(), prior);
@@ -595,7 +595,7 @@ class Interpreter {
             // Assign a value to an object property using =, +=, -=, *=, /=
             case Expr.Set expr -> {
                 Object object = evaluate(expr.object());
-                JoeObject instance = joe.getJoeObject(object);
+                JoeValue instance = joe.getJoeObject(object);
 
                 Object right = evaluate(expr.value());
                 var name = expr.name().lexeme();
@@ -613,7 +613,7 @@ class Interpreter {
                 int distance = locals.get(expr);
                 JoeClass superclass = (JoeClass)environment.getAt(
                     distance, "super");
-                JoeObject instance = (JoeObject)environment.getAt(
+                JoeValue instance = (JoeValue)environment.getAt(
                     distance - 1, "this");
                 JoeCallable method =
                     superclass.bind(instance, expr.method().lexeme());

@@ -175,6 +175,6 @@ public class SetWrapper implements JoeSet {
 
     @Override
     public String toString() {
-        return SetProxy.TYPE.stringify(joe, set);
+        return SetType.TYPE.stringify(joe, set);
     }
 }

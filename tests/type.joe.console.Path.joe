@@ -2,7 +2,7 @@
 
 function testInitializer() {
     var p = Path("root/file.txt");
-    check(typeName(p)).eq("Path");
+    check(Joe.typeOf(p)).eq(Path);
     check(p.getFileName()).eq(Path("file.txt"));
     check(p.getParent()).eq(Path("root"));
     check(p.getNameCount()).eq(2);

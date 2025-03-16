@@ -1,7 +1,7 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.types.EnumProxy;
+import com.wjduquette.joe.types.EnumType;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.*;
@@ -86,30 +86,30 @@ public class WinPackage extends JoePackage {
         type(new WinProxy());
 
         // Base classes
-        type(NodeProxy.TYPE);
-        type(RegionProxy.TYPE);
+        type(NodeType.TYPE);
+        type(RegionType.TYPE);
 
         // Controls
-        type(ControlProxy.TYPE);
-        type(ButtonProxy.TYPE);
-        type(LabelProxy.TYPE);
-        type(ListViewProxy.TYPE);
-        type(MenuBarProxy.TYPE);
-        type(SeparatorProxy.TYPE);
-        type(SplitPaneProxy.TYPE);
-        type(TabPaneProxy.TYPE);
+        type(ControlType.TYPE);
+        type(ButtonType.TYPE);
+        type(LabelType.TYPE);
+        type(ListViewClass.TYPE);
+        type(MenuBarType.TYPE);
+        type(SeparatorType.TYPE);
+        type(SplitPaneType.TYPE);
+        type(TabPaneType.TYPE);
 
         // Panes
-        type(PaneProxy.TYPE);
-        type(GridPaneProxy.TYPE);
-        type(StackPaneProxy.TYPE);
-        type(VBoxProxy.TYPE);
-        type(HBoxProxy.TYPE);
+        type(PaneType.TYPE);
+        type(GridPaneClass.TYPE);
+        type(StackPaneClass.TYPE);
+        type(VBoxClass.TYPE);
+        type(HBoxClass.TYPE);
 
         // Widgets that aren't Nodes
-        type(TabProxy.TYPE);
-        type(MenuProxy.TYPE);
-        type(MenuItemProxy.TYPE);
+        type(TabClass.TYPE);
+        type(MenuType.TYPE);
+        type(MenuItemType.TYPE);
 
         // Enums
 
@@ -118,13 +118,13 @@ public class WinPackage extends JoePackage {
         // @constant CENTER
         // @constant LEFT
         // @constant RIGHT
-        type(new EnumProxy<>("HPos", HPos.class));
+        type(new EnumType<>("HPos", HPos.class));
 
         //**
         // @enum Orientation
         // @constant HORIZONTAL
         // @constant VERTICAL
-        type(new EnumProxy<>("Orientation", Orientation.class));
+        type(new EnumType<>("Orientation", Orientation.class));
 
         //**
         // @enum Pos
@@ -143,7 +143,7 @@ public class WinPackage extends JoePackage {
         // @constant TOP_CENTER
         // @constant TOP_LEFT
         // @constant TOP_RIGHT
-        type(new EnumProxy<>("Pos", Pos.class));
+        type(new EnumType<>("Pos", Pos.class));
 
         //**
         // @enum Priority
@@ -154,7 +154,7 @@ public class WinPackage extends JoePackage {
         // @constant ALWAYS
         // @constant SOMETIMES
         // @constant NEVER
-        type(new EnumProxy<>("Priority", Priority.class));
+        type(new EnumType<>("Priority", Priority.class));
 
         //**
         // @enum Side
@@ -164,7 +164,7 @@ public class WinPackage extends JoePackage {
         // @constant LEFT
         // @constant RIGHT
         // @constant TOP
-        type(new EnumProxy<>("Side", Side.class));
+        type(new EnumType<>("Side", Side.class));
 
         //**
         // @enum VPos
@@ -172,10 +172,10 @@ public class WinPackage extends JoePackage {
         // @constant BOTTOM
         // @constant CENTER
         // @constant TOP
-        type(new EnumProxy<>("VPos", VPos.class));
+        type(new EnumType<>("VPos", VPos.class));
 
         // Utility Classes
-        type(InsetsProxy.TYPE);
+        type(InsetsType.TYPE);
     }
 
 
@@ -188,7 +188,7 @@ public class WinPackage extends JoePackage {
     //-------------------------------------------------------------------------
     // The Gui Type
 
-    private class WinProxy extends TypeProxy<Void> {
+    private class WinProxy extends ProxyType<Void> {
         //---------------------------------------------------------------------
         // Constructor
 

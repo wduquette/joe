@@ -1,27 +1,32 @@
 # Registered Types
 
 A *registered type* is a Java data type for which Joe has been provided
-a *type proxy*: an object that provides information about the type.
+a *proxy type*: an object that provides information about the type.
 Most of Joe's standard types, e.g., 
 [`String`](../library/type.joe.String.md), are implemented in just this
-way.  This section explains how to define a `TypeProxy<V>` and register
+way.  This section explains how to define a `ProxyType<V>` and register
 it with Joe for use.
 
-## Defining A Type Proxy
+## Defining A Proxy Type
 
-A type proxy is a subclass of `TypeProxy<V>`, where `V` is the proxied type.
+A proxy type is a subclass of `ProxyType<V>`, where `V` is the proxied type.
 For example,
 
 ```java
-public class StringProxy extends TypeProxy<String> {
-    public StringProxy() {
+public class StringType extends ProxyType<String> {
+    public StringType() {
         ...
     }
     ...
 }
 ```
 
-The constructor defines the various aspects of the proxy.
+By convention, a Java proxy types have names ending
+with "Type", as in `StringType`.  If the type can be subclassed by a scripted
+Joe `class`, then the proxy type's name should end in "Class", as in 
+`TextBuilderClass`.
+
+The constructor defines the various aspects of the proxy:
 
 - [The Script-level Type Name](#the-script-level-type-name)
 - [The Proxied Types](#the-proxied-types)
@@ -34,7 +39,7 @@ The constructor defines the various aspects of the proxy.
 - [Initializer](#initializer)
 - [Static Types](#static-types)
 - [Instance Methods](#instance-methods)
-- [Installing a Type Proxy](#installing-a-type-proxy)
+- [Installing a Proxy Type](#installing-a-type-proxy)
 
 ## The Script-level Type Name
 
@@ -42,8 +47,8 @@ First, the proxy defines the script-level type name, which by convention
 should always begin with an uppercase letter.  For example:
 
 ```java
-public class StringProxy extends TypeProxy<String> {
-    public StringProxy() {
+public class StringType extends ProxyType<String> {
+    public StringType() {
         super("String");
         ...
     }
@@ -71,8 +76,8 @@ Usually a proxy will proxy the single type `V`, but if `V` is an interface
 the relevant classes need to be identified. Here's the first case:
 
 ```java
-public class StringProxy extends TypeProxy<String> {
-    public StringProxy() {
+public class StringType extends ProxyType<String> {
+    public StringType() {
         super("String");
         proxies(String.class);
     }
@@ -84,8 +89,8 @@ And here's an example of the second.  `JoeList` is an interface, so we must
 tell Joe which types the interpreter should look for.
 
 ```java
-public class ListProxy extends TypeProxy<JoeList> {
-    public ListProxy() {
+public class ListType extends ProxyType<JoeList> {
+    public ListType() {
         super("List");
         proxies(ListValue.class);
         proxies(ListWrapper.class);
@@ -96,13 +101,13 @@ public class ListProxy extends TypeProxy<JoeList> {
 
 ## Type Lookup
 
-At runtime, Joe sees a value and looks for the value's type proxy 
+At runtime, Joe sees a value and looks for the value's proxy type 
 in its type registry.  This section explains how
 the lookup is done, as it can get complicated.
 
 First, Joe maintains two lookup tables:
 
-- The `proxyTable`, a map from `Class` objects to `TypeProxy<?>` objects.
+- The `proxyTable`, a map from `Class` objects to `ProxyType<?>` objects.
 - The `opaqueTypes` table, a set if `Class` objects which are known not
   to have type proxies.
 
@@ -136,7 +141,7 @@ the subtype's proxy can "inherit" the supertype's methods via the `supertype()`
 method:
 
 ```java
-public class AssertErrorProxy extends TypeProxy<AssertError> {
+public class AssertErrorProxy extends ProxyType<AssertError> {
   public AssertErrorProxy() {
     super("AssertError");
     proxies(AssertError.class);
@@ -153,7 +158,7 @@ When Joe converts a value to a string, it does so via `Joe::stringify`.  For
 proxied types, this defaults to returning the value's normal Java `toString()`.
 
 To change how a value is stringified at the script level, override 
-`TypeProxy::stringify`.  For example, `NumberProxy` ensures that 
+`ProxyType::stringify`.  For example, `NumberType` ensures that 
 integer-valued numbers are displayed without a trailing `.0`:
 
 ```java
@@ -183,8 +188,8 @@ To make your registered type iterable, provide an iterables supplier, a
 function that accepts a value of your type and returns a `Collection<?>`.
 
 ```java
-public class MyTypeProxy extends TypeProxy<MyType> {
-  public MyTypeProxy() {
+public class MyProxyType extends ProxyType<MyType> {
+  public MyProxyType() {
     super("MyType");
         ...
         iterables(myValue -> myValue.getItems());
@@ -198,12 +203,12 @@ public class MyTypeProxy extends TypeProxy<MyType> {
 
 A proxy may define any number of named constants, to be presented at
 the script level as properties of the type object.  For example,
-`NumberProxy` defines several numeric constants.  A constant is defined
+`NumberType` defines several numeric constants.  A constant is defined
 by its property name and the relevant Joe value.
 
 ```java
-public class NumberProxy extends TypeProxy<Double> {
-    public NumberProxy() {
+public class NumberType extends ProxyType<Double> {
+    public NumberType() {
         super("Number");
         ...
         constant("E", Math.E);
@@ -226,8 +231,8 @@ A static method is simply a [native function](native_functions.md) defined
 as a property of a list object.
 
 ```java
-public class StringProxy extends TypeProxy<String> {
-    public StringProxy() {
+public class StringType extends ProxyType<String> {
+    public StringType() {
         ...
         staticMethod("join", this::_join);
         ...
@@ -251,8 +256,8 @@ For example, the `List` type provides this
 [initializer](../library/type.joe.List.md#init):
 
 ```java
-public class ListProxy extends TypeProxy<JoeList> {
-    public ListProxy() {
+public class ListType extends ProxyType<JoeList> {
+    public ListType() {
         super("List");
         ...
         initializer(this::_init);
@@ -266,8 +271,8 @@ public class ListProxy extends TypeProxy<JoeList> {
 
 ## Static Types
 
-A type proxy can be defined as a kind of library of static constants and
-methods.  The `NumberProxy` is just such a proxy.  Numbers have no methods
+A proxy type can be defined as a kind of library of static constants and
+methods.  The `NumberType` is just such a proxy.  Numbers have no methods
 in Joe, and they do not need an initializer as they can be typed directly
 into a script.  
 
@@ -276,8 +281,8 @@ things, this means that attempts to create an instance using the type's
 initializer will get a suitable error message.
 
 ```java
-public class NumberProxy extends TypeProxy<Double> {
-    public NumberProxy() {
+public class NumberType extends ProxyType<Double> {
+    public NumberType() {
         super("Number");
         staticType();
         proxies(Double.class);
@@ -294,8 +299,8 @@ a library to convert between Joe values and JSON strings.  It might look
 like this:
 
 ```java
-public class JSONProxy extends TypeProxy<Void> {
-    public JSONProxy() {
+public class JSONType extends ProxyType<Void> {
+    public JSONType() {
         super("JSON");
         staticType();
         
@@ -320,8 +325,8 @@ here is the implementation of the `String` type's
 [`length()`](../library/type.joe.String.md#method.length) method.
 
 ```java
-public class StringProxy extends TypeProxy<String> {
-    public StringProxy() {
+public class StringType extends ProxyType<String> {
+    public StringType() {
         ...
         method("length", this::_length);
         ...
@@ -340,27 +345,27 @@ The argument's type is type `V`, as defined in the proxy's `extends` clause.
 Otherwise, this is nothing more than a native function, and it is implemented
 in precisely the same way.
 
-## Installing a Type Proxy
+## Installing a Proxy Type
 
-Type proxies are installed using the `Joe::installType` method:
+Proxy types are installed using the `Joe::installType` method:
 
 ```java
 var joe = new Joe();
 
-joe.installType(new MyTypeProxy());
+joe.installType(new MyType());
 ```
 
 Installation creates the `MyType` object, and registers the type so that
 `MyType`'s instance methods can be used with all values of `MyType`.
 
-If a type proxy has no dynamic data, i.e., if it need not be configured with
+If a proxy type has no dynamic data, i.e., if it need not be configured with
 application-specific data in order to do its job, it is customary to create
 a single instance that can be reused with any number of instances of `Joe`.
 This is the case for all of the proxies in Joe's standard library.  For example,
 
 ```java
-public class StringProxy extends TypeProxy<String> {
-    public static final StringProxy TYPE = new StringProxy();
+public class StringType extends ProxyType<String> {
+    public static final StringType TYPE = new StringType();
     ...
 }
 ```
@@ -370,7 +375,7 @@ This can then be installed as follows:
 ```java
 var joe = new Joe();
 
-joe.installType(StringProxy.TYPE);
+joe.installType(StringType.TYPE);
 ```
 
 

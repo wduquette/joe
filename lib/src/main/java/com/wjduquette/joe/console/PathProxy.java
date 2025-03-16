@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * A TypeProxy for Java Paths.
+ * A ProxyType for Java Paths.
  */
-public class PathProxy extends TypeProxy<Path> {
+public class PathProxy extends ProxyType<Path> {
     /** The proxy, for installation. */
     public static final PathProxy TYPE = new PathProxy();
 

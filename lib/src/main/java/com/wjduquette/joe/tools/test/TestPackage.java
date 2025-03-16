@@ -47,6 +47,7 @@ public class TestPackage extends JoePackage {
         globalFunction("fail",         this::_fail);
         globalFunction("skip",         this::_skip);
         scriptResource(getClass(), "pkg.joe.test.joe");
+        type(new JoeTestType());
         type(PathProxy.TYPE);
     }
 
@@ -190,5 +191,30 @@ public class TestPackage extends JoePackage {
     private Object _skip(Joe joe, Args args) {
         args.exactArity(1, "skip(message)");
         throw new TestTool.SkipError(joe.stringify(args.next()));
+    }
+
+    //-------------------------------------------------------------------------
+    // JoeTest type
+
+    private static class JoeTestType extends ProxyType<Void> {
+        JoeTestType() {
+            super("JoeTest");
+
+            //**
+            // @type JoeTest
+            // An API for use by test scripts.
+            staticType();
+
+            //**
+            // @constant OPAQUE
+            // A value of an opaque type, for use in testing.
+            constant("OPAQUE", new OpaqueValue());
+        }
+    }
+
+    private static class OpaqueValue {
+        OpaqueValue() {
+            // nothing to do
+        }
     }
 }

@@ -113,11 +113,21 @@ function testCheck_containsAll() {
         .message("Expected collection to contain Keyword '#b', got: List '[#a, #b]'.");
 }
 
+function testCheck_hasType() {
+    check(true).hasType(Boolean);
+    check(1).hasType(Number);
+    check("abc").hasType(String);
+    check(null).hasType(null);
+
+    function bad() { check(true).hasType(String); }
+    checkCatch(bad)
+        .message("Expected type 'String', got: Type 'Boolean'.");
+}
+
 function testCheck_hasTypeName() {
     check(true).hasTypeName("Boolean");
     check(1).hasTypeName("Number");
     check("abc").hasTypeName("String");
-    check(null).hasTypeName(null);
 
     function bad() { check(true).hasTypeName("String"); }
     checkCatch(bad)

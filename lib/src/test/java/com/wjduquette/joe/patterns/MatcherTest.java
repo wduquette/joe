@@ -1,7 +1,10 @@
 package com.wjduquette.joe.patterns;
 
-import com.wjduquette.joe.JoeObject;
+import com.wjduquette.joe.JoeList;
+import com.wjduquette.joe.JoeValue;
+import com.wjduquette.joe.JoeType;
 import com.wjduquette.joe.Ted;
+import com.wjduquette.joe.types.ListValue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -350,7 +353,7 @@ public class MatcherTest extends Ted {
     //-------------------------------------------------------------------------
     // Helper
 
-    private static class TestObject implements JoeObject {
+    private static class TestObject implements JoeValue {
         final String typeName;
         final Map<String, Object> fields = new HashMap<>();
 
@@ -360,8 +363,10 @@ public class MatcherTest extends Ted {
             fields.put("color", color);
         }
 
+        @Override public JoeType type() { return null; }
         @Override public String typeName() { return typeName; }
         @Override public boolean hasField(String name) { return fields.containsKey(name); }
+        @Override public JoeList getFieldNames() { return new ListValue(fields.keySet()); }
         @Override public Object get(String name) { return fields.get(name); }
         @Override public void set(String name, Object value) { }
     }
