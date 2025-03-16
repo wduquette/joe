@@ -1,11 +1,6 @@
 package com.wjduquette.joe;
 
-import com.wjduquette.joe.types.ListValue;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A "Tuple" is an immutable object containing some number of fields
@@ -246,8 +241,8 @@ public class Tuple implements JoeValue {
     }
 
     @Override
-    public JoeList getFieldNames() {
-        return new ListValue(fields.keySet());
+    public List<String> getFieldNames() {
+        return fields.keySet().stream().map(Keyword::name).toList();
     }
 
     @Override

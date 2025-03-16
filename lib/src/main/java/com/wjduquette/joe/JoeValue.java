@@ -1,6 +1,7 @@
 package com.wjduquette.joe;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * An interface for a Java value type implemented to play well with Joe.  A
@@ -30,10 +31,10 @@ public interface JoeValue extends HasTypeName {
     boolean hasField(String name);
 
     /**
-     * Gets a list of the names of the value's known fields.
+     * Gets an unmodifiable list of the names of the value's known fields.
      * @return The list
      */
-    JoeList getFieldNames();
+    List<String> getFieldNames();
 
     /**
      * Get the value of the named object property, a method or a field.

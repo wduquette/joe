@@ -1,8 +1,8 @@
 package com.wjduquette.joe;
 
-import com.wjduquette.joe.types.ListValue;
-
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -68,8 +68,8 @@ public class JoeValueCore {
         return fields.containsKey(name);
     }
 
-    public JoeList getFieldNames() {
-        return new ListValue(fields.keySet());
+    public List<String> getFieldNames() {
+        return new ArrayList<>(fields.keySet());
     }
 
     /**

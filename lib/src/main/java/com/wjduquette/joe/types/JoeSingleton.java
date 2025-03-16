@@ -63,7 +63,8 @@ public class JoeSingleton extends ProxyType<Void> {
     // @static getFieldNames
     // @args value
     // @result List
-    // Returns a list of the names of the fields defined on the *value*.
+    // Returns a read-only list of the names of the fields defined on
+    // the *value*.
     //
     // If the *value* has no fields, this method returns the empty list.
     //
@@ -77,7 +78,7 @@ public class JoeSingleton extends ProxyType<Void> {
     private Object _getFieldNames(Joe joe, Args args) {
         args.exactArity(1, "getFieldNames(value)");
         var value = joe.getJoeObject(args.next());
-        return value.getFieldNames();
+        return joe.readonlyList(value.getFieldNames());
     }
 
     //**
