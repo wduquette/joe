@@ -3,6 +3,8 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.*;
 import javafx.scene.control.Tab;
 
+import java.util.List;
+
 /**
  * A JavaFX Tab that can be extended by Joe classes.
  */
@@ -19,7 +21,7 @@ public class TabInstance extends Tab implements JoeValue {
 
     @Override public JoeType type() { return core.type(); }
     @Override public String typeName() { return core.typeName(); }
-    @Override public JoeList getFieldNames() { return core.getFieldNames(); }
+    @Override public List<String> getFieldNames() { return core.getFieldNames(); }
     @Override public boolean hasField(String name) { return core.hasField(name); }
     @Override public Object get(String name) { return core.get(name); }
     @Override public void set(String name, Object value) { core.set(name, value); }

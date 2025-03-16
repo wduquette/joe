@@ -1,8 +1,7 @@
 package com.wjduquette.joe;
 
-import com.wjduquette.joe.types.ListValue;
-
 import java.util.Collection;
+import java.util.List;
 
 /**
  * A value bound to its ProxyType.  It is the responsibility
@@ -35,10 +34,10 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
     }
 
     @Override
-    public JoeList getFieldNames() {
+    public List<String> getFieldNames() {
         // The value is of a proxied type, and so has
         // method properties but not field properties.
-        return new ListValue();
+        return List.of();
     }
 
     @Override

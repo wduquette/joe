@@ -145,11 +145,11 @@ class ValueChecker {
 class CatchChecker {
     //**
     // @init
-    // @args tuple
+    // @args catchResult
     // Initializes the checker with the result of a `catch()`.
-    method init(tuple) {
-        @tuple = tuple;
-        @err = tuple.is(#error) ? tuple.error : null;
+    method init(catchResult) {
+        @catchResult = catchResult;
+        @err = catchResult.error;
     }
 
     //**
@@ -169,7 +169,7 @@ class CatchChecker {
     // Returns `true` if there was an error, and `false` otherwise.
     method isError() {
         assert @err != null, "Expected an error, got: "
-            + _typedValue(@tuple.ok) + ".";
+            + _typedValue(@catchResult.result) + ".";
         return this;
     }
 

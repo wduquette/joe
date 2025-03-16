@@ -134,11 +134,11 @@ file:
 //**
 // @function catch
 // @args callable
-// @result Tuple
+// @result CatchResult
 // Executes the callable, which must not require any arguments.
-// Returns `Tuple(#ok, returnValue)` on success and
-// `Tuple(#error, Error)` on error.
-
+// Returns a [[CatchResult]] indicating success or failure and providing
+// the returned result or the error message respectively.
+        
 ... java code ...
 ```
 

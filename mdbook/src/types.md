@@ -13,7 +13,6 @@ types:
 - [Lists](#lists)
 - [Maps](#maps)
 - [Sets](#sets)
-- [Tuples](#tuples)
 - [Errors](#errors)
 - [Functions and Methods](#functions-and-methods)
 - [Classes and Instances](#classes-and-instances)
@@ -230,23 +229,6 @@ the same operations as Java sets. See the link for the full API.
 var set = Set(#a, #b);
 println(set.contains(#b)); // Outputs "true".
 ```
-
-## Tuples
-
-A [`Tuple`](library/type.joe.Tuple.md) is an ordered set of named 
-fields whose names are determined at the time the `Tuple` is created.
-Tuples support pattern matching on the field names and values.
-
-```joe
-var tuple = Tuple(#flag, true, #result, 123);
-
-println("flag   = " + tuple.flag);
-println("result = " + tuple.result);
-```
-
-Tuples are intended as a flexible result type for functions that need 
-to return multiple values, e.g., a status and a value, two values, three
-values, etc.
 
 ## Errors
 

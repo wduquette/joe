@@ -5,6 +5,7 @@ import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -59,7 +60,7 @@ public class ListViewInstance extends ListView<Object> implements JoeValue {
 
     @Override public JoeType type() { return core.type(); }
     @Override public String typeName() { return core.typeName(); }
-    @Override public JoeList getFieldNames() { return core.getFieldNames(); }
+    @Override public List<String> getFieldNames() { return core.getFieldNames(); }
     @Override public boolean hasField(String name) { return core.hasField(name); }
     @Override public Object get(String name) { return core.get(name); }
     @Override public void set(String name, Object value) { core.set(name, value); }

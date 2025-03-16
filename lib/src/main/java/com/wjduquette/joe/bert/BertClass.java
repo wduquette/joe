@@ -1,10 +1,11 @@
 package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.TypeType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -133,8 +134,8 @@ public class BertClass implements BertCallable, JoeClass, JoeValue {
     }
 
     @Override
-    public JoeList getFieldNames() {
-        return new ListValue(fields.keySet());
+    public List<String> getFieldNames() {
+        return new ArrayList<>(fields.keySet());
     }
 
     @Override

@@ -4,8 +4,6 @@ import com.wjduquette.joe.types.*;
 
 class StandardLibrary extends JoePackage {
     public static final StandardLibrary PACKAGE = new StandardLibrary();
-    public static final Keyword OK = new Keyword("ok");
-    public static final Keyword ERROR = new Keyword("error");
 
     public StandardLibrary() {
         super("joe");
@@ -19,11 +17,9 @@ class StandardLibrary extends JoePackage {
         globalFunction("printf",    this::_printf);
         globalFunction("println",   this::_println);
 
-        // Documented in Tuple.java.
-        globalFunction("Tuple", Tuple::new);
-
         type(AssertErrorType.TYPE);
         type(BooleanType.TYPE);
+        type(CatchResultType.TYPE);
         type(ErrorType.TYPE);
         type(JoeSingleton.TYPE);
         type(KeywordType.TYPE);
@@ -44,20 +40,20 @@ class StandardLibrary extends JoePackage {
     //**
     // @function catch
     // @args callable
-    // @result Tuple
+    // @result CatchResult
     // Executes the callable, which must not require any arguments.
-    // Returns `Tuple(#ok, returnValue)` on success and
-    // `Tuple(#error, Error)` on error.
+    // Returns a [[CatchResult]] indicating success or failure and providing
+    // the returned result or the error message respectively.
     private Object _catch(Joe joe, Args args) {
         args.exactArity(1, "catch(callable)");
 
         try {
             var result = joe.call(args.next());
-            return Tuple.of(joe, OK, result);
+            return CatchResult.ok(result);
         } catch (JoeError ex) {
             ex.setPendingContext(null);
             ex.addInfo("Called from catch()");
-            return Tuple.of(joe, ERROR, ex);
+            return CatchResult.error(ex);
         }
     }
 

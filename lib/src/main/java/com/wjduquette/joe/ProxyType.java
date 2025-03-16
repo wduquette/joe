@@ -1,6 +1,5 @@
 package com.wjduquette.joe;
 
-import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.TypeType;
 
 import java.util.*;
@@ -171,8 +170,8 @@ public class ProxyType<V>
     }
 
     @Override
-    public JoeList getFieldNames() {
-        return new ListValue(constants.keySet());
+    public List<String> getFieldNames() {
+        return new ArrayList<>(constants.keySet());
     }
 
     @Override

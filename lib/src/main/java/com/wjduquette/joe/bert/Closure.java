@@ -1,10 +1,10 @@
 package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.JoeList;
 import com.wjduquette.joe.JoeValue;
 import com.wjduquette.joe.JoeType;
-import com.wjduquette.joe.types.ListValue;
+
+import java.util.List;
 
 /**
  * Closure is the {@link VirtualMachine}'s representation for compiled
@@ -63,8 +63,8 @@ public class Closure implements BertCallable, JoeValue {
     }
 
     @Override
-    public JoeList getFieldNames() {
-        return new ListValue();
+    public List<String> getFieldNames() {
+        return List.of();
     }
 
 
