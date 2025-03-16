@@ -24,6 +24,7 @@ class StandardLibrary extends JoePackage {
 
         type(AssertErrorType.TYPE);
         type(BooleanType.TYPE);
+        type(CatchResultType.TYPE);
         type(ErrorType.TYPE);
         type(JoeSingleton.TYPE);
         type(KeywordType.TYPE);
@@ -44,20 +45,20 @@ class StandardLibrary extends JoePackage {
     //**
     // @function catch
     // @args callable
-    // @result Tuple
+    // @result CatchResult
     // Executes the callable, which must not require any arguments.
-    // Returns `Tuple(#ok, returnValue)` on success and
-    // `Tuple(#error, Error)` on error.
+    // Returns a [[CatchResult]] indicating success or failure and providing
+    // the returned result or the error message respectively.
     private Object _catch(Joe joe, Args args) {
         args.exactArity(1, "catch(callable)");
 
         try {
             var result = joe.call(args.next());
-            return Tuple.of(joe, OK, result);
+            return CatchResult.ok(result);
         } catch (JoeError ex) {
             ex.setPendingContext(null);
             ex.addInfo("Called from catch()");
-            return Tuple.of(joe, ERROR, ex);
+            return CatchResult.error(ex);
         }
     }
 

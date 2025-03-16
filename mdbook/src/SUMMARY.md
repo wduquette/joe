@@ -43,6 +43,7 @@
   - [Joe Standard Library (joe)](./library/pkg.joe.md)
     - [AssertError Type](./library/type.joe.AssertError.md)
     - [Boolean Type](./library/type.joe.Boolean.md)
+    - [CatchResult Type](./library/type.joe.CatchResult.md)
     - [Error Type](./library/type.joe.Error.md)
     - [Joe Type](./library/type.joe.Type.md)
     - [Keyword Type](./library/type.joe.Keyword.md)

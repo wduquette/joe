@@ -4,22 +4,32 @@
 // catch()
 
 function testCatch_ok() {
-    var tuple = catch(\-> true);
-    check(tuple.has(#ok, true));
+    var cr = catch(\-> "abc");
+    check(cr.isOK()).isTrue();
+    check(cr.isError()).isFalse();
+    check(cr.result).eq("abc");
+    check(cr.error).isNull();
+
 }
 
 function testCatch_error() {
     function bad() { throw "Simulated error!"; }
-    var tuple = catch(bad);
-    check(tuple.is(#error));
+    var cr = catch(bad);
+    check(cr.isOK()).isFalse();
+    check(cr.isError()).isTrue();
+    check(cr.result).eq(null);
+    check(cr.error.message()).eq("Simulated error!");
 }
 
 function testCatch_error_withTrace() {
     function bad() { throw "Simulated error!"; }
-    var tuple = catch(bad);
-    check(tuple.is(#error));
+    var cr = catch(bad);
+    check(cr.isOK()).isFalse();
+    check(cr.isError()).isTrue();
+    check(cr.result).eq(null);
+    check(cr.error.message()).eq("Simulated error!");
 
-    check(tuple.error.traces()).eq([
+    check(cr.error.traces()).eq([
         "In function bad()",
         "In java call(<function bad()>)",
         "Called from catch()",
