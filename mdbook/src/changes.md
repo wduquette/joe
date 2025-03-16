@@ -32,6 +32,12 @@
       provides a `toString()` method.
     - `Joe.typeOf(opaqueValue).name()` is the `Class::getName` value for the 
       Java type.
+  - Added the `CatchResult` type as the result of the `catch()` method,
+    replacing the `Tuple` type.
+  - Deleted the `Tuple` type, as it now seems ill-conceived.
+- Extending and Embedding
+  - Added infrastructure for creating Java bindings for `JoeRecord` types,
+    i.e., immutable Java-like records.  See `CatchResult` for an example.
 
 ## Changes in 0.5.0 
 

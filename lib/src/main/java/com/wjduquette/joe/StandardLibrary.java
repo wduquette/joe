@@ -4,8 +4,6 @@ import com.wjduquette.joe.types.*;
 
 class StandardLibrary extends JoePackage {
     public static final StandardLibrary PACKAGE = new StandardLibrary();
-    public static final Keyword OK = new Keyword("ok");
-    public static final Keyword ERROR = new Keyword("error");
 
     public StandardLibrary() {
         super("joe");
@@ -18,9 +16,6 @@ class StandardLibrary extends JoePackage {
         globalFunction("print",     this::_print);
         globalFunction("printf",    this::_printf);
         globalFunction("println",   this::_println);
-
-        // Documented in Tuple.java.
-        globalFunction("Tuple", Tuple::new);
 
         type(AssertErrorType.TYPE);
         type(BooleanType.TYPE);
