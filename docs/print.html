@@ -349,8 +349,15 @@ replacing the <code>Tuple</code> type.</li>
 </li>
 <li>Extending and Embedding
 <ul>
-<li>Added infrastructure for creating Java bindings for <code>JoeRecord</code> types,
-i.e., immutable Java-like records.  See <code>CatchResult</code> for an example.</li>
+<li>Added infrastructure for creating Joe bindings for Java <code>record</code> types
+See <code>CatchResult</code> for an example.
+<ul>
+<li>The infrastructure can also be used with non-<code>record</code> types that should
+look like records at the script level, i.e., should have an immutable
+ordered list of immutable fields.</li>
+<li>Added <code>JoeType::isRecordType</code> to support this infrastructure.</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

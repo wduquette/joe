@@ -36,8 +36,12 @@
     replacing the `Tuple` type.
   - Deleted the `Tuple` type, as it now seems ill-conceived.
 - Extending and Embedding
-  - Added infrastructure for creating Java bindings for `JoeRecord` types,
-    i.e., immutable Java-like records.  See `CatchResult` for an example.
+  - Added infrastructure for creating Joe bindings for Java `record` types
+    See `CatchResult` for an example.
+    - The infrastructure can also be used with non-`record` types that should
+      look like records at the script level, i.e., should have an immutable
+      ordered list of immutable fields.
+    - Added `JoeType::isRecordType` to support this infrastructure.
 
 ## Changes in 0.5.0 
 
