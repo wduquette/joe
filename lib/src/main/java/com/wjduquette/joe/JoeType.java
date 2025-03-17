@@ -17,4 +17,14 @@ public interface JoeType {
      * @return the supertype.
      */
     default JoeType supertype() { return null; }
+
+    /**
+     * Gets whether this type has an immutable set of ordered fields,
+     * and thus can be matched as a record rather than as a map.
+     * The field values are typically also immutable, but the essential
+     * thing is that no new fields can be added at runtime.
+     * @return true or false
+     */
+    @SuppressWarnings("unused")
+    default boolean isRecordType() { return false; }
 }
