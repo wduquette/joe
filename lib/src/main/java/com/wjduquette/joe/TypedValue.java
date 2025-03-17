@@ -21,44 +21,27 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
 
     @Override
     public String typeName() {
-        return proxy != null
-            ? proxy.name()
-            : value.getClass().getName();
+        return proxy.name();
     }
 
     @Override
     public boolean hasField(String name) {
-        // The value is of a proxied type, and so has
-        // method properties but not field properties.
-        return false;
+        return proxy.hasField(value, name);
     }
 
     @Override
     public List<String> getFieldNames() {
-        // The value is of a proxied type, and so has
-        // method properties but not field properties.
-        return List.of();
+        return proxy.getFieldNames(value);
     }
 
     @Override
     public Object get(String name) {
-        // The value is of a proxied type, and so has
-        // method properties but not field properties.
-        var method = proxy.bind(value, name);
-        if (method != null) {
-            return method;
-        } else {
-            throw new JoeError("Undefined property '" + name + "'.");
-        }
+        return proxy.get(value, name);
     }
 
     @Override
-    public void set(String name, Object value) {
-        // The value is either of an opaque type or a proxied native type.
-        // Neither kind of type has field properties.
-        throw new JoeError("Values of type " +
-            value.getClass().getName() +
-            " have no field properties.");
+    public void set(String name, Object other) {
+        proxy.set(value, name, other);
     }
 
     @Override
@@ -72,11 +55,7 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
     }
 
     @Override public String stringify(Joe joe) {
-        if (proxy != null) {
-            return proxy.stringify(joe, value);
-        } else {
-            return value.toString();
-        }
+        return proxy.stringify(joe, value);
     }
 
     @Override public String toString() {

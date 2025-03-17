@@ -436,7 +436,7 @@ class Interpreter {
                         "Tried to retrieve '" + expr.name().lexeme() +
                         "' property from null value.");
                 }
-                JoeValue instance = joe.getJoeObject(object);
+                JoeValue instance = joe.getJoeValue(object);
                 yield instance.get(expr.name().lexeme());
             }
             // (expr...)
@@ -579,7 +579,7 @@ class Interpreter {
             // ++ and -- with an object property
             case Expr.PrePostSet expr -> {
                 Object object = evaluate(expr.object());
-                JoeValue instance = joe.getJoeObject(object);
+                JoeValue instance = joe.getJoeValue(object);
                 var name = expr.name().lexeme();
                 var prior = instance.get(name);
                 checkNumericTarget(expr.op(), prior);
@@ -595,7 +595,7 @@ class Interpreter {
             // Assign a value to an object property using =, +=, -=, *=, /=
             case Expr.Set expr -> {
                 Object object = evaluate(expr.object());
-                JoeValue instance = joe.getJoeObject(object);
+                JoeValue instance = joe.getJoeValue(object);
 
                 Object right = evaluate(expr.value());
                 var name = expr.name().lexeme();
@@ -709,7 +709,7 @@ class Interpreter {
             case Collection<?> c -> c;
             case JoeIterable i -> i.getItems();
             default -> {
-                var instance = joe.getJoeObject(arg);
+                var instance = joe.getJoeValue(arg);
                 if (instance.canIterate()) {
                     yield instance.getItems();
                 } else {
