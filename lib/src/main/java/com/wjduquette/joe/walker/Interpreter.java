@@ -215,6 +215,50 @@ class Interpreter {
                         "'let' pattern failed to match target value.");
                 }
             }
+            case Stmt.Record stmt -> {
+                // The type itself
+                environment.setVar(stmt.name().lexeme(), null);
+
+                // Static Methods
+                Map<String, WalkerFunction> staticMethods = new HashMap<>();
+                for (Stmt.Function method : stmt.staticMethods()) {
+                    WalkerFunction function =
+                        new WalkerFunction(this, method, environment, false);
+                    staticMethods.put(method.name().lexeme(), function);
+                }
+
+                Map<String, WalkerFunction> methods = new HashMap<>();
+                for (Stmt.Function method : stmt.methods()) {
+                    WalkerFunction function =
+                        new WalkerFunction(this, method, environment, false);
+                    methods.put(method.name().lexeme(), function);
+                }
+
+                WalkerRecord type = new WalkerRecord(
+                    stmt.name().lexeme(),
+                    stmt.typeSpan(),
+                    stmt.recordFields(),
+                    staticMethods,
+                    methods);
+
+                assert environment != null;
+                environment.assign(stmt.name(), type);
+
+                // Static Initialization
+                if (!stmt.staticInitializer().isEmpty()) {
+                    try {
+                        executeBlock(stmt.staticInitializer(), environment);
+                    } catch (JoeError ex) {
+                        var buff = stmt.typeSpan().buffer();
+                        var context = buff.lineSpan(stmt.typeSpan().endLine());
+                        throw ex
+                            .addPendingFrame(context, "In static initializer")
+                            .addPendingFrame(context,
+                                "In type " + stmt.name().lexeme());
+                    }
+                }
+                return null;
+            }
             case Stmt.Return stmt -> {
                 Object value = null;
                 if (stmt.value() != null) value = evaluate(stmt.value());

@@ -9,8 +9,8 @@ import com.wjduquette.joe.SourceBuffer.Span;
 sealed interface Stmt
     permits Stmt.Assert, Stmt.Block, Stmt.Break, Stmt.Class,
             Stmt.Continue, Stmt.Expression, Stmt.For, Stmt.ForEach,
-            Stmt.Function, Stmt.If, Stmt.Let, Stmt.Return, Stmt.Switch,
-            Stmt.Throw, Stmt.Var, Stmt.While
+            Stmt.Function, Stmt.If, Stmt.Let, Stmt.Record, Stmt.Return,
+            Stmt.Switch, Stmt.Throw, Stmt.Var, Stmt.While
 {
     /**
      * Asserts that the condition is truthy, throwing an AssertError
@@ -105,6 +105,24 @@ sealed interface Stmt
      */
     record Let(Token keyword, WalkerPattern pattern, Expr target)
         implements Stmt {}
+
+    /**
+     * A record declaration
+     * @param name The type's name
+     * @param typeSpan The type's span in the source script.
+     * @param recordFields The type's field names.
+     * @param staticMethods The class object's static methods
+     * @param methods The class's instance methods
+     * @param staticInitializer The static initializer statements
+     */
+    record Record(
+        Token name,
+        Span typeSpan,
+        List<String> recordFields,
+        List<Stmt.Function> staticMethods,
+        List<Stmt.Function> methods,
+        List<Stmt> staticInitializer
+    ) implements Stmt {}
 
     /**
      * A "return" statement

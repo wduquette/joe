@@ -164,6 +164,36 @@ class Resolver {
                 resolve(stmt.target());
                 stmt.pattern().getBindings().forEach(this::define);
             }
+            case Stmt.Record stmt -> {
+                ClassType enclosingClass = currentClass;
+                currentClass = ClassType.CLASS;
+
+                declare(stmt.name());
+                define(stmt.name());
+
+                // Static Methods and Initializer
+                for (Stmt.Function method : stmt.staticMethods()) {
+                    FunctionType declaration = FunctionType.STATIC_METHOD;
+                    resolveFunction(method, declaration);
+                }
+
+                if (!stmt.staticInitializer().isEmpty()) {
+                    var oldFunction = currentFunction;
+                    currentFunction = FunctionType.STATIC_INITIALIZER;
+                    resolve(stmt.staticInitializer());
+                    currentFunction = oldFunction;
+                }
+
+                // Instance methods
+                beginScope();
+                scopes.peek().put("this", true);
+                for (Stmt.Function method : stmt.methods()) {
+                    resolveFunction(method, FunctionType.METHOD);
+                }
+                endScope();
+
+                currentClass = enclosingClass;
+            }
             case Stmt.Return stmt -> {
                 if (currentFunction == FunctionType.STATIC_INITIALIZER) {
                     error(stmt.keyword(),
