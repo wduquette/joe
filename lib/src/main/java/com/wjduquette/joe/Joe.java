@@ -45,6 +45,11 @@ public class Joe {
         RESERVED_WORDS = Collections.unmodifiableSet(set);
     }
 
+    /**
+     * A Java `null`, as a `JoeValue`.
+     */
+    static final NullValue NULL = new NullValue();
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -380,38 +385,22 @@ public class Joe {
     // Internal Support -- for use within this package
 
     /**
-     * Looks for a proxy for this object's class or its superclasses.
+     * Finds the ProxyType for a proxied type.
      *
-     * <p><b>Note:</b> The construction of the proxyTable depends on
-     * the proxied types returned by each ProxyType; and the proxiedTypes
-     * are constrained to be compatible with the ProxyType's value type.
-     * Thus, if this method returns a proxy, it will *always* be
-     * compatible with the given object.
-     * </p>
-     * @param object The object for which we are looking up a proxy.
-     * @return The proxy, or null
-     */
-    ProxyType<?> lookupProxy(Object object) {
-        return object != null
-            ? lookupProxyByClass(object.getClass())
-            : null;
-    }
-
-    /**
-     * Looks for a type proxy by the proxied class, rather than by
-     * a value of a proxied class.
+     * <p>The search goes as follows: the class itself, then each superclass
+     * up to (but not including) `Object`; and then, starting again at the
+     * class itself, each of the class's interfaces, and so on again up
+     * to `Object`.</p>
      *
-     * <p>The search goes as follows:
-     * the class itself, each superclass up to (but not including)
-     * `Object`; and then, starting again at the class itself, each
-     * of the class's interfaces, and so on again up to `Object`.</p>
+     * <p>If no proxy is found then the type is deemed to be opaque, and an
+     * OpaqueType is created for it.</p>
      *
      * <p>Any successful result is cached, and so the second and subsequent
      * lookups should be quick.</p>
      * @param cls The class
-     * @return The proxy, or null if not found.
+     * @return The ProxyType.
      */
-    ProxyType<?> lookupProxyByClass(Class<?> cls) {
+    ProxyType<?> lookupProxy(Class<?> cls) {
         // FIRST, do have a known proxy?
         var proxy = proxyTable.get(cls);
         if (proxy != null) {
@@ -443,13 +432,17 @@ public class Joe {
         do {
             for (var type : c.getInterfaces()) {
                 proxy = proxyTable.get(type);
-                proxyTable.put(cls, proxy);
-                cachedTypes.add(cls);
-                return proxy;
+
+                if (proxy != null) {
+                    proxyTable.put(cls, proxy);
+                    cachedTypes.add(cls);
+                    return proxy;
+                }
             }
 
             c = c.getSuperclass();
         } while (c != null && c != Object.class);
+
 
         // NEXT, create a new OpaqueType.
         var opaque = new OpaqueType(cls);
@@ -459,17 +452,16 @@ public class Joe {
     }
 
     /**
-     * Given a value, gets a JoeValue: either an instance of a JoeClass,
-     * or a ProxiedValue.
+     * Given a value, gets it as a JoeValue.
      * @param value The value
      * @return The JoeValue
      */
-    public JoeValue getJoeObject(Object value) {
-        if (value instanceof JoeValue obj) {
-            return obj;
-        } else {
-            return new TypedValue(this, lookupProxy(value), value);
-        }
+    public JoeValue getJoeValue(Object value) {
+        if (value == null) return NULL;
+        if (value instanceof JoeValue obj) return obj;
+
+        var proxy = lookupProxy(value.getClass());
+        return new TypedValue(this, proxy, value);
     }
 
     //-------------------------------------------------------------------------
@@ -497,7 +489,7 @@ public class Joe {
             case null -> "null";
             case String s -> s;
             case JoeValue obj -> obj.stringify(this);
-            default -> getJoeObject(value).stringify(this);
+            default -> getJoeValue(value).stringify(this);
         };
     }
 
@@ -537,7 +529,7 @@ public class Joe {
             case HasTypeName htn -> htn.typeName();
             default -> {
                 // If it's a native type, try to get bind to a type proxy.
-                var bound = getJoeObject(value);
+                var bound = getJoeValue(value);
                 yield bound != null
                     ? bound.typeName()
                     : "<java " + value.getClass().getCanonicalName() + ">";
@@ -551,7 +543,7 @@ public class Joe {
      * @return The name
      */
     public String classTypeName(Class<?> cls) {
-        var proxy = lookupProxyByClass(cls);
+        var proxy = lookupProxy(cls);
         return proxy != null
             ? proxy.name() : cls.getSimpleName();
     }

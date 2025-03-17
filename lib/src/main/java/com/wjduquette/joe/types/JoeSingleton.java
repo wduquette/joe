@@ -77,7 +77,7 @@ public class JoeSingleton extends ProxyType<Void> {
     // fields.
     private Object _getFieldNames(Joe joe, Args args) {
         args.exactArity(1, "getFieldNames(value)");
-        var value = joe.getJoeObject(args.next());
+        var value = joe.getJoeValue(args.next());
         return joe.readonlyList(value.getFieldNames());
     }
 
@@ -90,7 +90,7 @@ public class JoeSingleton extends ProxyType<Void> {
     // defined Joe binding.
     private Object _isOpaque(Joe joe, Args args) {
         args.exactArity(1, "isOpaque(value)");
-        var obj = joe.getJoeObject(args.next());
+        var obj = joe.getJoeValue(args.next());
         return obj.type() instanceof OpaqueType;
     }
 
@@ -140,6 +140,6 @@ public class JoeSingleton extends ProxyType<Void> {
     // Returns the Joe type of the given *value*.
     private Object _typeOf(Joe joe, Args args) {
         args.exactArity(1, "typeOf(value)");
-        return joe.getJoeObject(args.next()).type();
+        return joe.getJoeValue(args.next()).type();
     }
 }

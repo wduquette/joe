@@ -21,9 +21,7 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
 
     @Override
     public String typeName() {
-        return proxy != null
-            ? proxy.name()
-            : value.getClass().getName();
+        return proxy.name();
     }
 
     @Override
@@ -72,11 +70,7 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
     }
 
     @Override public String stringify(Joe joe) {
-        if (proxy != null) {
-            return proxy.stringify(joe, value);
-        } else {
-            return value.toString();
-        }
+        return proxy.stringify(joe, value);
     }
 
     @Override public String toString() {
