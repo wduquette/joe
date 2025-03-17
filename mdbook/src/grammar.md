@@ -36,6 +36,12 @@ parameters      → IDENTIFIER ( "," IDENTIFIER )* ;
 
 letDecl         → "let" pattern "=" expression ";" ; 
 
+recordDecl      → "record" IDENTIFIER "(" parameters ")" 
+                  "{" recordItem* "}" ;
+recordItem      → "method" function
+                | "static" "method" function
+                | "static" block ; 
+                  
 varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
                
 statement       → exprStmt
