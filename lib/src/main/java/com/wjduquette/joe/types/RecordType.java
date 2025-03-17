@@ -36,6 +36,14 @@ public class RecordType<R> extends ProxyType<R> {
     }
 
     //-------------------------------------------------------------------------
+    // JoeType API
+
+    @Override
+    public boolean isRecordType() {
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
     // Builders
 
     /**
@@ -49,7 +57,7 @@ public class RecordType<R> extends ProxyType<R> {
     }
 
     //-------------------------------------------------------------------------
-    // Policy Methods
+    // ProxyType Policy Methods
 
     /**
      * Returns a stringified value, i.e., a value for display.
