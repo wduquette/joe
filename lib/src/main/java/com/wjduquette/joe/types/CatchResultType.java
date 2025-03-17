@@ -4,8 +4,6 @@ import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 
-import java.util.List;
-
 public class CatchResultType extends RecordType<CatchResult> {
     public static final CatchResultType TYPE = new CatchResultType();
 
@@ -13,7 +11,7 @@ public class CatchResultType extends RecordType<CatchResult> {
     // Constructor
 
     public CatchResultType() {
-        super("CatchResult", List.of("result", "error"));
+        super("CatchResult");
 
         //**
         // @package joe
@@ -21,6 +19,9 @@ public class CatchResultType extends RecordType<CatchResult> {
         // The result type of the standard [[function.catch]] function.
         // The record has two fields, `result` and `error`.
         proxies(CatchResult.class);
+
+        recordField("result", CatchResult::result);
+        recordField("error",  CatchResult::error);
 
         staticMethod("ok",    this::_ok);
         staticMethod("error", this::_error);
