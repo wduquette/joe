@@ -197,13 +197,80 @@ public class ProxyType<V>
 
     /**
      * Returns a stringified value, i.e., a value for display.
-     * Defaults to the value's toString().
+     * Defaults to the value's toString().  Subclasses may override.
      * @param joe The engine
-     * @param value The value
+     * @param value A value of the proxied type
      * @return The string
      */
     public String stringify(Joe joe, Object value) {
         return value.toString();
+    }
+
+    /**
+     * Returns true if the value has a field with the given name, and
+     * false otherwise.
+     *
+     * <p>Proxied types are assumed not to have fields, so this always
+     * returns false. Subclasses may override.</p>
+     * @param value A value of the proxied type
+     * @param fieldName The field name
+     * @return true or false
+     */
+    @SuppressWarnings("unused")
+    public boolean hasField(Object value, String fieldName) {
+        return false;
+    }
+
+    /**
+     * Returns a list of the names of the value's fields.  The
+     * list will be empty if the value has no fields.
+     *
+     * <p>Proxied types are assumed not to have fields, so this always
+     * returns the empty list. Subclasses may override.</p>
+     * @param value A value of the proxied type
+     * @return The list
+     */
+    @SuppressWarnings("unused")
+    public List<String> getFieldNames(Object value) {
+        return List.of();
+    }
+
+    /**
+     * Gets the value of the named property.  Throws an
+     * "Undefined property" error if there is no such property.
+     *
+     * <p>Proxied types are assumed not to have fields, so this only
+     * looks for method properties. Subclasses may override.</p>
+     * @param value A value of the proxied type
+     * @param propertyName The property name
+     * @return The property value
+     */
+    @SuppressWarnings("unused")
+    public Object get(Object value, String propertyName) {
+        var method = bind(value, propertyName);
+
+        if (method != null) {
+            return method;
+        } else {
+            throw new JoeError("Undefined property '" +
+                propertyName + "'.");
+        }
+    }
+
+    /**
+     * Sets the value of the named field.
+     *
+     * <p>Proxied types are assumed not to have fields, so this always
+     * throws a JoeError. Subclasses may override.</p>
+     * @param value A value of the proxied type
+     * @param fieldName The field name
+     * @param other The value to
+     * @return The property value
+     */
+    @SuppressWarnings("unused")
+    public Object set(Object value, String fieldName, Object other) {
+        throw new JoeError("Values of type " + name +
+            " have no field properties.");
     }
 
     //-------------------------------------------------------------------------
