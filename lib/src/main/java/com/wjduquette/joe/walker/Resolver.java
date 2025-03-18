@@ -26,7 +26,8 @@ class Resolver {
     private enum ClassType {
         NONE,                // Not in a class
         CLASS,               // In a root class
-        SUBCLASS             // In a subclass
+        SUBCLASS,            // In a subclass
+        RECORD               // In a record type
     }
 
     private final Interpreter interpreter;
@@ -166,7 +167,7 @@ class Resolver {
             }
             case Stmt.Record stmt -> {
                 ClassType enclosingClass = currentClass;
-                currentClass = ClassType.CLASS;
+                currentClass = ClassType.RECORD;
 
                 declare(stmt.name());
                 define(stmt.name());
@@ -283,6 +284,9 @@ class Resolver {
                 if (currentClass == ClassType.NONE) {
                     error(expr.keyword(),
                         "Attempted to use 'super' outside of a class.");
+                } else if (currentClass == ClassType.RECORD) {
+                    error(expr.keyword(),
+                        "Attempted to use 'super' in a record type.");
                 } else if (currentFunction == FunctionType.STATIC_INITIALIZER) {
                     error(expr.keyword(),
                         "Attempted to use 'super' in a static initializer.");
