@@ -15,7 +15,8 @@ types:
 - [Sets](#sets)
 - [Errors](#errors)
 - [Functions and Methods](#functions-and-methods)
-- [Classes and Instances](#classes-and-instances)
+- [Classes](#classes)
+- [Records](#records)
 
 ## Booleans
 
@@ -247,7 +248,7 @@ assigned to variables, passed to functions, and invoked at a later
 time.  See the sections on [Functions](functions.md) and
 [Classes](classes.md) for more information.
 
-## Classes and Instances
+## Classes
 
 Joe scripts can define classes; a class can have:
 
@@ -256,10 +257,24 @@ Joe scripts can define classes; a class can have:
 - Instance methods
 - Static variables
 - Static methods
+- A static initializer
 
 Joe classes support single inheritance.
 
 See the section on [Classes](classes.md) for more information.
+
+## Records
+
+Joe scripts can define record types.  Like Java record types,
+a Joe record has an ordered number of immutable fields, and can
+have:
+
+- Instance methods
+- Static variables
+- Static methods
+- A static initializer
+
+See the section on [Records](records.md) for more information.
 
 [^unicode]: Joe supports Unicode escapes, e.g., `\u1234`, as in Java;
 but only within string literals.

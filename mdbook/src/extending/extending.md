@@ -7,6 +7,8 @@ to existing Java types.  This section explains how the trick is done.
 - [Native Functions](native_functions.md)
 - [Registered Types](registered_types.md)
 - [Joe Packages](packages.md)
+- [Native Classes](native_classes.md)
+- [Native Records](native_records.md)
 
 These sections will refer constantly to Joe's Java API.  See the 
 Joe Javadoc for details.

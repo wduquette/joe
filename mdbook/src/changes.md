@@ -15,9 +15,16 @@
       for the `Map` `get` and `put` methods.
   - Added the `let` statement, which performs destructuring binds using
     [pattern matching](patterns.md).
+  - Added scripted [`record` types](records.md).
 - Internals/Embedding/Extending
   - Refactored the names of Joe's type-related interfaces and Java classes
     for clarity.
+  - Added infrastructure for creating Joe bindings for Java `record` types
+    See `CatchResult` for an example.
+    - The infrastructure can also be used with non-`record` types that should
+      look like records at the script level, i.e., should have an immutable
+      ordered list of immutable fields.
+    - Added `JoeType::isRecordType` to support this infrastructure.
 - Standard Library
   - Added the [`Type`](library/type.joe.Type.md) type as the root of the 
     Joe type system.
@@ -35,13 +42,6 @@
   - Added the `CatchResult` type as the result of the `catch()` method,
     replacing the `Tuple` type.
   - Deleted the `Tuple` type, as it now seems ill-conceived.
-- Extending and Embedding
-  - Added infrastructure for creating Joe bindings for Java `record` types
-    See `CatchResult` for an example.
-    - The infrastructure can also be used with non-`record` types that should
-      look like records at the script level, i.e., should have an immutable
-      ordered list of immutable fields.
-    - Added `JoeType::isRecordType` to support this infrastructure.
 
 ## Changes in 0.5.0 
 
