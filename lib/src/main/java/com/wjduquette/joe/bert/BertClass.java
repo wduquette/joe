@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * BertClass is the internal representation for a scripted Joe class.
  */
-public class BertClass implements BertCallable, JoeClass, JoeValue {
+public class BertClass implements JoeClass, JoeValue, BertType, BertCallable {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -68,6 +68,14 @@ public class BertClass implements BertCallable, JoeClass, JoeValue {
         } else {
             nativeAncestor = superclass;
         }
+    }
+
+    public void addMethod(String name, Closure closure) {
+        methods.put(name, closure);
+    }
+
+    public void addStaticMethod(String name, Closure closure) {
+        staticMethods.put(name, closure);
     }
 
     //-------------------------------------------------------------------------

@@ -576,12 +576,12 @@ class VirtualMachine {
                     // NOTE: This was defineMethod in clox
                     var name = readString();
                     var method = (Closure)peek(0);
-                    var klass = (BertClass)peek(1);
+                    var type = (BertType)peek(1);
                     switch (method.function.type()) {
                         case METHOD, INITIALIZER ->
-                            klass.methods.put(name, method);
+                            type.addMethod(name, method);
                         case STATIC_METHOD ->
-                            klass.staticMethods.put(name, method);
+                            type.addStaticMethod(name, method);
                         default -> throw new IllegalStateException(
                             "Invalid closure type in METHOD instruction: " +
                             method.function.type());
@@ -642,6 +642,8 @@ class VirtualMachine {
                     pop();       // Pop the instance
                     push(value); // Push the value; this is an assignment.
                 }
+                case RECORD ->
+                    push(new BertRecord(readString(), readStringList()));
                 case RETURN -> {
                     var result = pop();
                     closeUpvalues(frame.base);
@@ -859,6 +861,14 @@ class VirtualMachine {
     private String readString() {
         var index = frame.closure.function.code[frame.ip++];
         return (String)frame.closure.function.constants[index];
+    }
+
+    // Reads a constant index from the chunk, and returns the indexed
+    // constant as a list of strings.
+    @SuppressWarnings("unchecked")
+    private List<String> readStringList() {
+        var index = frame.closure.function.code[frame.ip++];
+        return (List<String>)frame.closure.function.constants[index];
     }
 
     // Returns the indexed constant as a string.

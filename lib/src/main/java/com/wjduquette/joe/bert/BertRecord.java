@@ -11,7 +11,9 @@ import java.util.Map;
 /**
  * BertRecord is the internal representation for a scripted record type
  */
-public class BertRecord implements JoeClass, JoeValue, NativeCallable {
+public class BertRecord
+    implements JoeClass, JoeValue, NativeCallable, BertType
+{
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -46,10 +48,18 @@ public class BertRecord implements JoeClass, JoeValue, NativeCallable {
     }
 
     //-------------------------------------------------------------------------
-    // BertClass API
+    // BertRecord API
 
     public List<String> getRecordFields() {
         return recordFields;
+    }
+
+    public void addMethod(String name, Closure closure) {
+        methods.put(name, closure);
+    }
+
+    public void addStaticMethod(String name, Closure closure) {
+        staticMethods.put(name, closure);
     }
 
     public Object call(Joe joe, Args args) {

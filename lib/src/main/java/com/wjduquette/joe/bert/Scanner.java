@@ -38,6 +38,7 @@ public class Scanner {
         reserved("method",   METHOD);
         reserved("ni",       NI);
         reserved("null",     NULL);
+        reserved("record",   RECORD);
         reserved("return",   RETURN);
         reserved("static",   STATIC);
         reserved("super",    SUPER);
