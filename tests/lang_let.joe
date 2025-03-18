@@ -189,6 +189,14 @@ function testInstance_good() {
     assertEquals(c, thing.color);
 }
 
+function testInstance_supertype_good() {
+    var gizmo = Gizmo(123, "red");
+
+    let Thing{#id: i, #color: c} = gizmo;
+    assertEquals(i, gizmo.id);
+    assertEquals(c, gizmo.color);
+}
+
 function testInstance_record() {
     var person = Person("Joe", 80);
 
@@ -204,6 +212,12 @@ class Thing {
     method init(id, color) {
         @id = id;
         @color = color;
+    }
+}
+
+class Gizmo extends Thing {
+    method init(id, color) {
+        super.init(id, color);
     }
 }
 

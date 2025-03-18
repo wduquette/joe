@@ -142,7 +142,13 @@ public class Matcher {
     // Determines whether the type name is the name of the object's
     // type or the name of one of its supertypes.
     private static boolean hasType(JoeValue obj, String typeName) {
-        // TODO: Match on supertypes.
-        return obj.typeName().equals(typeName);
+        var got = obj.type();
+
+        while (got != null) {
+            if (got.name().equals(typeName)) return true;
+
+            got = got.supertype();
+        }
+        return false;
     }
 }
