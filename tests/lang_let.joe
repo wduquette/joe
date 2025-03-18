@@ -189,6 +189,14 @@ function testInstance_good() {
     assertEquals(c, thing.color);
 }
 
+function testInstance_record() {
+    var person = Person("Joe", 80);
+
+    let Person{#name: n, #age: a} = person;
+    assertEquals(n, person.name);
+    assertEquals(a, person.age);
+}
+
 //-----------------------------------------------------------------------------
 // Helpers
 
@@ -198,4 +206,6 @@ class Thing {
         @color = color;
     }
 }
+
+record Person(name, age) {}
 
