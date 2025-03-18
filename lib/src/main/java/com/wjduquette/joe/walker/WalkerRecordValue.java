@@ -18,6 +18,9 @@ class WalkerRecordValue implements JoeValue {
     // Default "toString()" implementation.
     private final NativeCallable _toString;
 
+    //-------------------------------------------------------------------------
+    // Constructor
+
     WalkerRecordValue(WalkerRecord type, Map<String,Object> fields) {
         this.type = type;
         this.fields = fields;
