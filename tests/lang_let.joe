@@ -206,6 +206,30 @@ function testInstance_record() {
 }
 
 //-----------------------------------------------------------------------------
+// Record Patterns
+
+function testRecord_notRecord() {
+    // Thing is a normal class instance, not a record.
+    assertError(\-> { let Thing(id, color) = Thing(123, "red"); },
+        "'let' pattern failed to match target value.");
+}
+
+function testRecord_wrongType() {
+    var person = Person("Joe", 80);
+
+    assertError(\-> { let Cowboy(name, age) = person; },
+        "'let' pattern failed to match target value.");
+}
+
+function testRecord_good() {
+    var person = Person("Joe", 80);
+
+    let Person(name, age) = person;
+    assertEquals(name, person.name);
+    assertEquals(age, person.age);
+}
+
+//-----------------------------------------------------------------------------
 // Helpers
 
 class Thing {

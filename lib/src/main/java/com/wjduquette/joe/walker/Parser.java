@@ -775,6 +775,8 @@ class Parser {
                 return new Pattern.Wildcard(identifier.lexeme());
             } else if (match(LEFT_BRACE)) {
                 return instancePattern(wp, identifier);
+            } else if (match(LEFT_PAREN)) {
+                return recordPattern(wp, identifier);
             }
 
             if (patternBindings.contains(identifier.lexeme())) {
@@ -870,6 +872,25 @@ class Parser {
     private Pattern instancePattern(WalkerPattern wp, Token identifier) {
         var fieldMap = mapPattern(wp);
         return new Pattern.InstancePattern(identifier.lexeme(), fieldMap);
+    }
+
+    private Pattern recordPattern(WalkerPattern wp, Token identifier) {
+        var list = new ArrayList<Pattern>();
+
+        if (match(RIGHT_PAREN)) {
+            return new Pattern.RecordPattern(identifier.lexeme(), list);
+        }
+
+        do {
+            if (check(RIGHT_PAREN)) {
+                break;
+            }
+            list.add(parsePattern(wp, true));
+        } while (match(COMMA));
+
+        consume(RIGHT_PAREN, "Expected ')' after record pattern.");
+
+        return new Pattern.RecordPattern(identifier.lexeme(), list);
     }
 
     //-------------------------------------------------------------------------
