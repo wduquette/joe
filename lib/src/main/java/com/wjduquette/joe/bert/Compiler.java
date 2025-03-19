@@ -66,8 +66,8 @@ class Compiler {
     // The function currently being compiled.
     private FunctionCompiler current = null;
 
-    // The class currently being compiled, or null
-    private ClassCompiler currentClass = null;
+    // The type currently being compiled, or null
+    private TypeCompiler currentType = null;
 
     // The loop currently being compiled, or null
     private LoopCompiler currentLoop = null;
@@ -182,6 +182,8 @@ class Compiler {
             functionDeclaration();
         } else if (match(LET)) {
             letDeclaration();
+        } else if (match(RECORD)) {
+            recordDeclaration();
         } else if (match(VAR)) {
             varDeclaration();
         } else {
@@ -201,8 +203,8 @@ class Compiler {
         defineVariable(nameConstant);
 
         // Remember the current class.
-        var classCompiler = new ClassCompiler(currentClass);
-        currentClass = classCompiler;
+        var typeCompiler = new TypeCompiler(currentType);
+        currentType = typeCompiler;
 
         if (match(EXTENDS)) {
             consume(IDENTIFIER, "Expected superclass name after 'extends'.");
@@ -211,7 +213,7 @@ class Compiler {
                 error("A class can't inherit from itself.");
             }
 
-            classCompiler.hasSuperclass = true;
+            typeCompiler.hasSupertype = true;
             beginScope();
             addLocal(Token.synthetic(VAR_SUPER));
             defineVariable((char)0);
@@ -219,13 +221,26 @@ class Compiler {
             emit(Opcode.INHERIT);
         }
 
-        // Load the class onto the stack before processing the class
-        // body
-        getOrSetVariable(className, false);
-        consume(LEFT_BRACE, "Expected '{' before class body.");
+        parseTypeBody("class", className, nameConstant);
+
+        if (typeCompiler.hasSupertype) {
+            endScope();
+        }
+
+        currentType = currentType.enclosing;
+    }
+
+    private void parseTypeBody(
+        String kind,
+        Token typeName,
+        char nameConstant
+    ) {
+        // Load the type onto the stack before processing the type body
+        getOrSetVariable(typeName, false);
+        consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
 
         var firstInit = -1;
-        int classEnd = -1;
+        int typeEnd = -1;
         while (!check(RIGHT_BRACE) && !check(EOF)) {
             var isStatic = match(STATIC);
             var staticSpan = parser.previous.span();
@@ -242,7 +257,7 @@ class Compiler {
                 var afterInit = emitJump(Opcode.JUMP);
 
                 // Receive the previous initializer's end jump, if any.
-                if (classEnd != -1) patchJump(classEnd);
+                if (typeEnd != -1) patchJump(typeEnd);
 
                 // Only set the LOOP target for the first initializer.
                 if (firstInit == -1) firstInit = current.chunk.size;
@@ -253,10 +268,10 @@ class Compiler {
                 emit(Opcode.TRCPOP);
                 emit(Opcode.CONST, nameConstant);  // Push the class again.
 
-                // NEXT, jump to the end of the class declaration; or
+                // NEXT, jump to the end of the type declaration; or
                 // to the beginning of the next initializer if there is
                 // one.
-                classEnd = emitJump(Opcode.JUMP);
+                typeEnd = emitJump(Opcode.JUMP);
                 patchJump(afterInit);
                 current.inStaticInitializer = false;
             } else if (match(METHOD)) {
@@ -266,29 +281,27 @@ class Compiler {
                     method();
                 }
             } else {
-                errorAtCurrent("Unexpected class member.");
+                errorAtCurrent("Unexpected " + kind + " member.");
                 advance();
             }
         }
-        consume(RIGHT_BRACE, "Expected '}' after class body.");
+        consume(RIGHT_BRACE, "Expected '}' after " + kind + " body.");
+
         if (firstInit != -1) {
             var trace = new Trace(parser.previous.span(),
-                "In class " + className.lexeme());
+                "In " + kind + " " + typeName.lexeme());
             var index = current.chunk.addConstant(trace);
             emit(Opcode.TRCPUSH, index);
 
             emitLoop(firstInit);
         }
-        if (classEnd != -1) {
-            patchJump(classEnd);
+
+        if (typeEnd != -1) {
+            patchJump(typeEnd);
             emit(Opcode.TRCPOP);
         }
-        emit(Opcode.POP); // Pop the class itself
-        if (classCompiler.hasSuperclass) {
-            endScope();
-        }
 
-        currentClass = currentClass.enclosing;
+        emit(Opcode.POP); // Pop the class itself
     }
 
     private void method() {
@@ -414,6 +427,61 @@ class Compiler {
         }
 
         currentPattern = null;
+    }
+
+    private void recordDeclaration() {
+        consume(IDENTIFIER, "Expected record type name.");
+        var typeName = parser.previous;
+        char nameConstant = identifierConstant(typeName);
+        declareVariable(typeName);
+
+        consume(LEFT_PAREN, "Expected '(' after type name.");
+        var recordFields = parseRecordFields();
+        var fieldConstant = current.chunk.addConstant(recordFields);
+
+        emit(Opcode.RECORD, nameConstant);
+        emit(fieldConstant);
+        defineVariable(nameConstant);
+
+        // Remember the current type.
+        var typeCompiler = new TypeCompiler(currentType);
+        typeCompiler.kind = KindOfType.RECORD;
+        currentType = typeCompiler;
+
+        parseTypeBody("type", typeName, nameConstant);
+
+        currentType = currentType.enclosing;
+    }
+
+    private List<String> parseRecordFields() {
+        var result = new ArrayList<String>();
+
+        do {
+            if (result.size() > MAX_PARAMETERS) {
+                errorAtCurrent(
+                    "Can't have more than " + MAX_PARAMETERS + "fields.");
+            }
+
+            consume(IDENTIFIER, "Expected field name.");
+
+            var name = parser.previous.lexeme();
+
+            if (name.equals(ARGS)) {
+                error("A record type cannot have a variable argument list.");
+            }
+
+            if (result.contains(name)) {
+                error("Duplicate field name.");
+            }
+
+            result.add(name);
+
+            // Check for duplicates
+        } while (match(COMMA));
+
+        consume(RIGHT_PAREN, "Expected ')' after field names.");
+
+        return result;
     }
 
     private void varDeclaration() {
@@ -1007,8 +1075,8 @@ class Compiler {
 
     private void this_(boolean canAssign) {
         var last = parser.previous;
-        if (currentClass == null) {
-            error("Can't use '" + last.lexeme() + "' outside of a class.");
+        if (currentType == null) {
+            error("Can't use '" + last.lexeme() + "' outside of a method.");
         }
 
         if (parser.previous.type() == TokenType.THIS) {
@@ -1020,9 +1088,9 @@ class Compiler {
     }
 
     private void super_(boolean canAssign) {
-        if (currentClass == null) {
+        if (currentType == null || currentType.kind != KindOfType.CLASS) {
             error("Can't use 'super' outside of a class.");
-        } else if (!currentClass.hasSuperclass) {
+        } else if (!currentType.hasSupertype) {
             error("Can't use 'super' in a class with no superclass.");
         }
         consume(DOT, "Expected '.' after 'super'.");
@@ -1237,6 +1305,8 @@ class Compiler {
                 return new Pattern.Wildcard(identifier.lexeme());
             } else if (match(LEFT_BRACE)) {
                 return instancePattern(identifier);
+            } else if (match(LEFT_PAREN)) {
+                return recordPattern(identifier);
             }
 
             var id = addPatternVar(identifier);
@@ -1351,6 +1421,25 @@ class Compiler {
     private Pattern instancePattern(Token identifier) {
         var fieldMap = mapPattern();
         return new Pattern.InstancePattern(identifier.lexeme(), fieldMap);
+    }
+
+    private Pattern recordPattern(Token identifier) {
+        var list = new ArrayList<Pattern>();
+
+        if (match(RIGHT_PAREN)) {
+            return new Pattern.RecordPattern(identifier.lexeme(), list);
+        }
+
+        do {
+            if (check(RIGHT_PAREN)) {
+                break;
+            }
+            list.add(parsePattern(true));
+        } while (match(COMMA));
+
+        consume(RIGHT_PAREN, "Expected ')' after record pattern.");
+
+        return new Pattern.RecordPattern(identifier.lexeme(), list);
     }
 
     //-------------------------------------------------------------------------
@@ -1896,12 +1985,18 @@ class Compiler {
         }
     }
 
-    // The class currently being compiled.
-    private static class ClassCompiler {
-        final ClassCompiler enclosing;
-        boolean hasSuperclass = false;
+    private enum KindOfType {
+        CLASS,
+        RECORD
+    }
 
-        ClassCompiler(ClassCompiler enclosing) {
+    // The type currently being compiled.
+    private static class TypeCompiler {
+        final TypeCompiler enclosing;
+        KindOfType kind = KindOfType.CLASS;
+        boolean hasSupertype = false;
+
+        TypeCompiler(TypeCompiler enclosing) {
             this.enclosing = enclosing;
         }
     }
@@ -2044,6 +2139,7 @@ class Compiler {
         rule(METHOD,          null,           null,          Level.NONE);
         rule(NI,              null,           this::binary,  Level.COMPARISON);
         rule(NULL,            this::symbol,   null,          Level.NONE);
+        rule(RECORD,          null,           null,          Level.NONE);
         rule(RETURN,          null,           null,          Level.NONE);
         rule(STATIC,          null,           null,          Level.NONE);
         rule(SUPER,           this::super_,   null,          Level.NONE);

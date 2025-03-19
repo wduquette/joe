@@ -290,8 +290,7 @@ let Thing{#id: i,  #color: c}  = Thing(123, "red");
 An instance pattern consists of the name of the desired type, followed by
 a map pattern for its fields. For the pattern to match:
 
-- The named type must match value's type or one of its supertypes.
-  - Supertype matching is not yet implemented.
+- The named type must be the target value's type or one of its supertypes.
 - The value must have all of the specified fields.
 - The field patterns must match.
 
@@ -304,4 +303,23 @@ See [Unscoped Types](introspection.md#unscoped-types) for more information.
 
 ## Record Patterns
 
-Records and record patterns are not yet implemented.
+Values of [record types](records.md) can be matched by both 
+[map patterns](#map-patterns) and [instance patterns](#instance-patterns); but 
+because each record type has a fixed number of fields in a known order, record 
+types also support a special syntax that makes record types especially suited 
+to pattern matching.
+
+```joe
+record Person(name, age) {}
+
+var person = Person(Joe, 80);
+
+// These statements are identical
+let Person(n, a) = person;
+let Person{#name: n, #age: a} = person;
+```
+
+The first form can only be used with a value of a record type; it matches
+the values of the type's fields in sequence.  All fields must be
+represented.  The field subpatterns can be any arbitrary patterns, as
+usual.

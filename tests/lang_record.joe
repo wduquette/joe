@@ -1,0 +1,297 @@
+// Tests for the `record` declaration and record behavior.
+//
+// Language tests should confine themselves to the basic test API.
+
+//-----------------------------------------------------------------------------
+// Declaration and Creation
+
+// Can declare a record
+function testDeclare() {
+    record Thing(id, color) {}
+    assertEquals(Joe.typeOf(Thing), Type);
+}
+
+// Can create instances
+function testCreate() {
+    record Thing(id, color) {}
+    var thing = Thing(123, #red);
+    assertEquals(Joe.typeOf(thing), Thing);
+}
+
+// Creation arity is checked.
+function testCreate_arity() {
+    record Thing(id, color) {}
+
+    function bad() { return Thing(123); }
+    assertError(bad, "Wrong number of arguments, expected: Thing(id, color).");
+
+}
+
+//-----------------------------------------------------------------------------
+// Fields
+
+// Scripts can directly get an instance's fields.
+function testGetFields() {
+    record Thing(id, color) {}
+    var thing = Thing(123, #red);
+    assertEquals(thing.id, 123);
+    assertEquals(thing.color, #red);
+}
+
+//-----------------------------------------------------------------------------
+// Methods
+
+// Can declare and call methods.
+function testDeclareMethod() {
+    record Thing(id, color) {
+        method info() { return "I'm a Thing!"; }
+    }
+    assertEquals(Thing(123, #red).info(), "I'm a Thing!");
+}
+
+// Method arity is checked.
+function testMethod_tooFewArgs() {
+    record Thing(id) {
+        method twoArgs(name, value) { }
+    }
+
+    function bad() { Thing(123).twoArgs(#a); }
+    assertError(bad, "Wrong number of arguments, expected: twoArgs(name, value).");
+}
+
+// Method arity is checked.
+function testMethod_tooManyArgs() {
+    record Thing(id) {
+        method twoArgs(name, value) { }
+    }
+
+    function bad() { Thing(123).twoArgs(#a, #b, #c); }
+    assertError(bad, "Wrong number of arguments, expected: twoArgs(name, value).");
+}
+
+// Varargs method
+function testMethod_varargs_good() {
+    record Thing(id) {
+        method varArgs(first, args) {
+            return first + "," + args;
+        }
+    }
+    var thing = Thing(123);
+
+    assertEquals(thing.varArgs(#a), "#a,[]");
+    assertEquals(thing.varArgs(#a,#b), "#a,[#b]");
+    assertEquals(thing.varArgs(#a,#b,#c), "#a,[#b, #c]");
+
+    function bad() { thing.varArgs(); }
+    assertError(bad,
+        "Wrong number of arguments, expected: varArgs(first, args).");
+}
+
+// Methods can capture enclosing scope.
+function testMethodsCaptureScope() {
+    var greeting = #howdy;
+
+    record WithStatics(id) {
+        method howdy() {
+            return greeting;
+        }
+    }
+
+    assertEquals(WithStatics(123).howdy(), #howdy);
+}
+
+//-----------------------------------------------------------------------------
+// toString()
+
+// Default toString()
+function testToString_default() {
+    record Thing(id, color) {}
+    var thing = Thing(123, #red);
+    assertEquals(thing.toString(), "Thing(123, #red)");
+    assertEquals(Joe.stringify(thing), thing.toString());
+}
+
+// Custom toString()
+function testToString_custom() {
+    record Thing(id) {
+        method toString() { return "I'm a Thing!"; }
+    }
+    var thing = Thing(123);
+    assertEquals(thing.toString(), "I'm a Thing!");
+    assertEquals(Joe.stringify(thing), thing.toString());
+}
+
+//-----------------------------------------------------------------------------
+// Static Methods
+
+// A record can define static methods, which can then be called.
+function testDeclareStaticMethod() {
+    record WithStatics(id) {
+        static method greeting() {
+            return #howdy;
+        }
+    }
+
+    assertEquals(WithStatics.greeting(), #howdy);
+}
+
+// Static Methods can call each other.
+function testStaticMethods() {
+    record WithStatics(id) {
+        static method greeting() {
+            return #howdy;
+        }
+        static method howdy() {
+            return WithStatics.greeting();
+        }
+    }
+
+    assertEquals(WithStatics.howdy(), #howdy);
+}
+
+// Static methods can capture enclosing scope.
+function testStaticMethodsCaptureScope() {
+    var greeting = #howdy;
+
+    record WithStatics(id) {
+        static method howdy() {
+            return greeting;
+        }
+    }
+
+    assertEquals(WithStatics.howdy(), #howdy);
+}
+
+//-----------------------------------------------------------------------------
+// Static Fields
+
+// Script can set and get static record fields
+function testStaticFields() {
+    record Thing(id) {}
+    Thing.greeting = #howdy;
+
+    assertEquals(Thing.greeting, #howdy);
+}
+
+// Methods can use static record fields
+function testStaticFields_instanceMethods() {
+    record Thing(id) {
+        method howdy() { return Thing.greeting; }
+    }
+    Thing.greeting = #howdy;
+
+    assertEquals(Thing(123).howdy(), #howdy);
+}
+
+// Static methods can use static record fields
+function testStaticFields_staticMethods() {
+    record Thing(id) {
+        static method howdy() { return Thing.greeting; }
+    }
+    Thing.greeting = #howdy;
+
+    assertEquals(Thing.howdy(), #howdy);
+}
+
+//-----------------------------------------------------------------------------
+// Static Initializer
+
+// The static initializer can initialize static fields
+function testStaticInitializer_initVars() {
+    record Thing(id) {
+        static {
+            Thing.greeting = #howdy;
+        }
+    }
+
+    assertEquals(Thing.greeting, #howdy);
+}
+
+// The static initializer can call static methods
+function testStaticInitializer_initCallsStatics() {
+    record Thing(id) {
+        static {
+            Thing.greeting = Thing.defaultGreeting();
+        }
+        static method defaultGreeting() { return #howdy; }
+    }
+
+    assertEquals(Thing.greeting, #howdy);
+}
+
+// The static initializer can create instances
+function testStaticInitializer_initCreates() {
+    record Thing(id) {
+        static {
+            Thing.instance = Thing(123);
+        }
+    }
+
+    assertEquals(Joe.typeOf(Thing.instance), Thing);
+}
+
+// A record can have multiple static initializers
+function testStaticInitializer_multiple() {
+    // The methods are added just to show separation between the
+    // compiled initializer blocks.
+    record Thing(id) {
+        static { Thing.a = 1; }
+        method a() { return Thing.a; }
+        static { Thing.b = 2; }
+        method b() { return Thing.b; }
+    }
+
+    assertEquals(Thing.a, 1);
+    assertEquals(Thing.b, 2);
+
+    var thing = Thing(123);
+    assertEquals(thing.a(), 1);
+    assertEquals(thing.b(), 2);
+}
+
+//-----------------------------------------------------------------------------
+// `@` operator
+
+// `@` can be used instead of `this.`
+function testCanUseAt() {
+    record Thing(name, color) {
+        method info() {
+            return "name='" + @name + "' color='" + @color + "'";
+        }
+    }
+    var thing = Thing("Fred", "red");
+    assertEquals(thing.info(), "name='Fred' color='red'");
+}
+
+//-------------------------------------------------------------------------
+// Nested Scopes
+
+// `this.` is available in functions nested in methods
+function testThisInNestedFunction() {
+    record Nest(name) {
+        method whoAmI() {
+            function getName() {
+                return this.name;
+            }
+            return getName();
+        }
+    }
+
+    assertEquals(Nest("Howard").whoAmI(), "Howard");
+}
+
+// `@` is available in functions nested in methods
+function testAtInNestedFunction() {
+    record Nest(name) {
+        method whoAmI() {
+            function getName() {
+                return @name;
+            }
+            return getName();
+        }
+    }
+
+    assertEquals(Nest("Howard").whoAmI(), "Howard");
+}
+
+

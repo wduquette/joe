@@ -189,6 +189,46 @@ function testInstance_good() {
     assertEquals(c, thing.color);
 }
 
+function testInstance_supertype_good() {
+    var gizmo = Gizmo(123, "red");
+
+    let Thing{#id: i, #color: c} = gizmo;
+    assertEquals(i, gizmo.id);
+    assertEquals(c, gizmo.color);
+}
+
+function testInstance_record() {
+    var person = Person("Joe", 80);
+
+    let Person{#name: n, #age: a} = person;
+    assertEquals(n, person.name);
+    assertEquals(a, person.age);
+}
+
+//-----------------------------------------------------------------------------
+// Record Patterns
+
+function testRecord_notRecord() {
+    // Thing is a normal class instance, not a record.
+    assertError(\-> { let Thing(id, color) = Thing(123, "red"); },
+        "'let' pattern failed to match target value.");
+}
+
+function testRecord_wrongType() {
+    var person = Person("Joe", 80);
+
+    assertError(\-> { let Cowboy(name, age) = person; },
+        "'let' pattern failed to match target value.");
+}
+
+function testRecord_good() {
+    var person = Person("Joe", 80);
+
+    let Person(name, age) = person;
+    assertEquals(name, person.name);
+    assertEquals(age, person.age);
+}
+
 //-----------------------------------------------------------------------------
 // Helpers
 
@@ -198,4 +238,12 @@ class Thing {
         @color = color;
     }
 }
+
+class Gizmo extends Thing {
+    method init(id, color) {
+        super.init(id, color);
+    }
+}
+
+record Person(name, age) {}
 

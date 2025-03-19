@@ -22,8 +22,8 @@ represented internally as a normal Java value.
 | `Number`  | `java.lang.Double`                                   |
 | `String`  | `java.lang.String`                                   |
 
-When used in Java code, consequently, a Joe `List` is a Java list.
-A Joe string is a Java `String`.  A Joe `Number` is a Java number.
+When used in Java code, consequently, a Joe `List` is a Java `List<Object>`.
+A Joe string is a Java `String`.  A Joe `Number` is a Java `double`.
 This greatly decreases the amount of work a binding needs to do when
 working with Joe values.
 
@@ -38,7 +38,7 @@ by a Joe function, whether Joe knows anything special about the value's
 type or not.
 
 A Java type that Joe knows nothing special about is called an *opaque type*.
-But every such type is still a Java `Class`, and a subtype of 
+But every such type is still a Java class and a subtype of 
 `java.lang.Object`, and so "nothing special" is still quite a lot.  
 Given such a value, Joe can:
 
@@ -50,13 +50,13 @@ Given such a value, Joe can:
 
 For many domain-specific use cases, that may be all that's required.
 When more is wanted, the client can register a 
-[type proxy](registered_types.md) for the type, thus turning the opaque
+[proxy type](registered_types.md) for the type, thus turning the opaque
 type into a registered type.
 
 ## Registered Types
 
 A *registered type* is a Java type for which the client has registered
-a [type proxy](registered_types.md). The type proxy can give the Joe 
+a [proxy type](registered_types.md). The proxy type can give the Joe 
 interpreter the ability to:
 
 - Create instances of the type
@@ -69,7 +69,6 @@ interpreter the ability to:
 **Note**: the standard Joe types are nothing more than registered types
 that are registered with every Joe interpreter.  There's no magic; or,
 rather, the magic is fully available for use in client bindings.
-
 
 [^primitive]: Primitive types are represented as their boxed equivalents,
 e.g, `double` by `Double`.

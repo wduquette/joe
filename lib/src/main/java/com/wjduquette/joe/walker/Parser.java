@@ -53,6 +53,7 @@ class Parser {
             if (match(CLASS)) return classDeclaration();
             if (match(FUNCTION)) return functionDeclaration("function");
             if (match(LET)) return letDeclaration();
+            if (match(RECORD)) return recordDeclaration();
             if (match(VAR)) return varDeclaration();
 
             return statement();
@@ -107,6 +108,63 @@ class Parser {
             staticMethods, methods, staticInitializer);
     }
 
+    private Stmt.Function functionDeclaration(String kind) {
+        Token name = consume(IDENTIFIER, "Expected " + kind + " name.");
+
+        consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
+
+        List<Token> parameters = parameters(RIGHT_PAREN, false);
+
+        consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
+        List<Stmt> body = block();
+        return new Stmt.Function(kind, name, parameters, body);
+    }
+
+    private List<Token> parameters(
+        TokenType terminator,
+        boolean isRecordParameters
+    ) {
+        List<Token> parameters = new ArrayList<>();
+
+        var names = new HashMap<String,Token>();
+
+        if (!check(terminator)) {
+            do {
+                if (parameters.size() >= MAX_CALL_ARGUMENTS) {
+                    error(peek(), "Expected no more than " + MAX_CALL_ARGUMENTS +
+                        " parameters.");
+                }
+
+                var token = consume(IDENTIFIER, "Expected parameter name.");
+                if (names.containsKey(token.lexeme())) {
+                    throw errorSync(token, "Duplicate parameter name.");
+                }
+                names.put(token.lexeme(), token);
+                parameters.add(token);
+            } while (match(COMMA));
+        }
+
+        if (names.containsKey(ARGS)) {
+            if (isRecordParameters) {
+                throw errorSync(names.get(ARGS),
+                    "A record type cannot have a variable argument list.");
+            } else {
+                if (!parameters.getLast().lexeme().equals(ARGS)) {
+                    throw errorSync(names.get(ARGS),
+                        "'args' must be the final parameter when present.");
+                }
+            }
+        }
+
+        var terminatorString = terminator == RIGHT_PAREN
+            ? ")" : "->";
+
+        consume(terminator, "Expected '" +
+            terminatorString + "' after parameter list.");
+
+        return parameters;
+    }
+
     private Stmt letDeclaration() {
         Token keyword = previous();
         WalkerPattern pattern = pattern();
@@ -120,6 +178,53 @@ class Parser {
         consume(SEMICOLON, "Expected ';' after target expression.");
 
         return new Stmt.Let(keyword, pattern, target);
+    }
+
+    private Stmt recordDeclaration() {
+        // Type Name
+        int start = previous().span().start();
+        Token name = consume(IDENTIFIER, "Expected record type name.");
+
+        // Record Fields
+        consume(LEFT_PAREN, "Expected '(' after record type name.");
+        var recordFields = parameters(RIGHT_PAREN, true).stream()
+            .map(Token::lexeme)
+            .toList();
+
+        if (recordFields.isEmpty()) {
+            error(previous(), "Expected at least one record parameter.");
+        }
+
+        // Type body
+        consume(LEFT_BRACE, "Expected '{' before type body.");
+
+        List<Stmt.Function> staticMethods = new ArrayList<>();
+        List<Stmt.Function> methods = new ArrayList<>();
+        List<Stmt> staticInitializer = new ArrayList<>();
+
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            if (match(METHOD)) {
+                methods.add(functionDeclaration("method"));
+            } else if (match(STATIC)) {
+                if (match(METHOD)) {
+                    staticMethods.add(functionDeclaration("static method"));
+                } else {
+                    consume(LEFT_BRACE,
+                        "Expected 'method' or '{' after 'static'.");
+                    staticInitializer.addAll(block());
+                }
+            } else {
+                throw errorSync(advance(),
+                    "Expected method, static method, or static initializer.");
+            }
+        }
+
+        consume(RIGHT_BRACE, "Expected '}' after type body.");
+        int end = previous().span().end();
+        var span = source.span(start, end);
+
+        return new Stmt.Record(name, span, recordFields,
+            staticMethods, methods, staticInitializer);
     }
 
     private Stmt varDeclaration() {
@@ -240,53 +345,6 @@ class Parser {
         ));
     }
 
-    private Stmt.Function functionDeclaration(String kind) {
-        Token name = consume(IDENTIFIER, "Expected " + kind + " name.");
-
-        consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
-
-        List<Token> parameters = parameters(RIGHT_PAREN);
-
-        consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
-        List<Stmt> body = block();
-        return new Stmt.Function(kind, name, parameters, body);
-    }
-
-    private List<Token> parameters(TokenType terminator) {
-        List<Token> parameters = new ArrayList<>();
-
-        var names = new HashMap<String,Token>();
-
-        if (!check(terminator)) {
-            do {
-                if (parameters.size() >= MAX_CALL_ARGUMENTS) {
-                    error(peek(), "Expected no more than " + MAX_CALL_ARGUMENTS +
-                        " parameters.");
-                }
-
-                var token = consume(IDENTIFIER, "Expected parameter name.");
-                if (names.containsKey(token.lexeme())) {
-                    throw errorSync(token, "Duplicate parameter name.");
-                }
-                names.put(token.lexeme(), token);
-                parameters.add(token);
-            } while (match(COMMA));
-        }
-
-        if (names.containsKey(ARGS) &&
-            !parameters.getLast().lexeme().equals(ARGS)
-        ) {
-            throw errorSync(names.get(ARGS),
-                "'args' must be the final parameter when present.");
-        }
-        var terminatorString = terminator == RIGHT_PAREN
-            ? ")" : "->";
-
-        consume(terminator, "Expected '" +
-            terminatorString + "' after parameter list.");
-
-        return parameters;
-    }
 
     private Stmt ifStatement() {
         consume(LEFT_PAREN, "Expected '(' after 'if'.");
@@ -617,7 +675,7 @@ class Parser {
 
         if (match(BACK_SLASH)) {
             var token = previous();
-            var parameters = parameters(MINUS_GREATER);
+            var parameters = parameters(MINUS_GREATER, false);
 
             List<Stmt> body;
             if (match(LEFT_BRACE)) {
@@ -717,6 +775,8 @@ class Parser {
                 return new Pattern.Wildcard(identifier.lexeme());
             } else if (match(LEFT_BRACE)) {
                 return instancePattern(wp, identifier);
+            } else if (match(LEFT_PAREN)) {
+                return recordPattern(wp, identifier);
             }
 
             if (patternBindings.contains(identifier.lexeme())) {
@@ -812,6 +872,25 @@ class Parser {
     private Pattern instancePattern(WalkerPattern wp, Token identifier) {
         var fieldMap = mapPattern(wp);
         return new Pattern.InstancePattern(identifier.lexeme(), fieldMap);
+    }
+
+    private Pattern recordPattern(WalkerPattern wp, Token identifier) {
+        var list = new ArrayList<Pattern>();
+
+        if (match(RIGHT_PAREN)) {
+            return new Pattern.RecordPattern(identifier.lexeme(), list);
+        }
+
+        do {
+            if (check(RIGHT_PAREN)) {
+                break;
+            }
+            list.add(parsePattern(wp, true));
+        } while (match(COMMA));
+
+        consume(RIGHT_PAREN, "Expected ')' after record pattern.");
+
+        return new Pattern.RecordPattern(identifier.lexeme(), list);
     }
 
     //-------------------------------------------------------------------------

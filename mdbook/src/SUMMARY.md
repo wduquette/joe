@@ -13,6 +13,7 @@
 - [Statements](statements.md)
 - [Functions](functions.md)
 - [Classes](classes.md)
+- [Records](records.md)
 - [Pattern Matching](patterns.md)
 - [Introspection](introspection.md)
 
@@ -25,8 +26,8 @@
   - [Native Functions](extending/native_functions.md)
   - [Registered Types](extending/registered_types.md)
   - [Joe Packages](extending/packages.md)
-  
----
+  - [Native Classes](extending/native_classes.md)
+  - [Native Records](extending/native_records.md)
 
 # Joe Tools
 - [`joe version`](joe_version.md)

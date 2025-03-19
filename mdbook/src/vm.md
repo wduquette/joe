@@ -20,7 +20,7 @@ The byte-engine is a stack machine with a few registers:
 | 0  | ADD               | *a b* → *c*        | c = a + b                 |
 | 1  | ASSERT            | *msg* → ∅          | Throws AssertError        |
 | 2  | CALL *argc*       | *f args* → *c*     | c = f(args)               |
-| 3  | CLASS *name*      | ∅ → *cls*          | Create class              |
+| 3  | CLASS *name*      | ∅ → *type*         | Create class              |
 | 4  | CLOSURE *func*    | ∅ → *f*            | Load closure              |
 | 5  | COMMENT *name*    | ∅ → ∅              | No-op comment             |
 | 6  | CONST *constant*  | ∅ → *a*            | Load constant             |
@@ -59,7 +59,7 @@ The byte-engine is a stack machine with a few registers:
 | 39 | LT                | *a b* → *a* <= *b* | Compare: less than        |
 | 40 | MAPNEW            | ∅ → *map*          | Push empty ma p           |
 | 41 | MAPPUT            | *map k a* → *map*  | Add entry to map          |
-| 42 | METHOD *name*     | *cls f* → *cls*    | Add method to class       |
+| 42 | METHOD *name*     | *type f* → *type*  | Add method to type        |
 | 43 | MUL               | *a b* → *c*        | c = a*b                   |
 | 44 | NE                | *a b* → *c*        | c = a != b                |
 | 45 | NEGATE            | *a* → *b*          | b = -a                    |
@@ -70,6 +70,7 @@ The byte-engine is a stack machine with a few registers:
 | 50 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
 | 51 | PROPGET *name*    | *obj* → *a*        | Get property value        |
 | 52 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
+| 53 | RECORD            | ∅ → *type*         | Create record type        |
 | 53 | RETURN            | *a* → *a*          | Return                    |
 | 54 | SUB               | *a b* → *c*        | c = a - b                 |
 | 55 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
@@ -98,7 +99,6 @@ the italicized names are used as follows:
 - *a*, *b*, *c*: Arbitrary values
 - *argc*: An argument count
 - *args*: A callable's arguments; 0 or more, depending on *argc*
-- *cls*: A class
 - *coll*: An iterable collection: a Java `Collection<?>` or a value with
   a `ProxyType<T>` that supports iteration
 - *constant*: An index into the chunk's constants table for an arbitrary 
@@ -120,6 +120,7 @@ the italicized names are used as follows:
 - *sub*: A subclass
 - *sup*: A superclass
 - *trace*: A callable trace added to the current call-frame.
+- *type*: A type
 - *v*: A local variable
 
 ## Instructions
@@ -151,11 +152,11 @@ replaces the function ands its arguments on the stack.  Callable
 
 ### CLASS
 ---
-**CLASS *name*** | ∅ → *cls*
+**CLASS *name*** | ∅ → *type*
 
 The `CLASS` instruction begins the process of creating a new class from a
 `class` declaration.  Given *name*, the index of the class's name in the
-constants table, it creates a new class *cls*, assigns it to variable *name*
+constants table, it creates a new class *type*, assigns it to variable *name*
 in the current scope, and pushes it onto the stack.  Subsequent instructions
 will add methods, execute static initializers, etc.
 
@@ -448,10 +449,10 @@ Pops *k* and *a* and puts {*k*: *a*} into the *map* value.
 
 ### METHOD
 ---
-**METHOD *name*** | *cls* *f* → *cls*
+**METHOD *name*** | *type* *f* → *type*
 
-This instruction is used when compiling a class definition. Adds closure *f* 
-to class *cls* as a method.  It is illegal to add a method to a class after
+This instruction is used when compiling a type definition. Adds closure *f* 
+to *type* as a method.  It is illegal to add a method to a type after
 its definition.
 
 ### MUL
@@ -513,6 +514,17 @@ Gets the value of property *name* of object *obj*.
 **PROPSET *name*** | *obj* *a* → *a*
 
 Sets property *name* of object *obj* to *a*, leaving *a* on the stack.
+
+### RECORD
+---
+**RECORD *name fields*** | ∅ → *type*
+
+The `RECORD` instruction begins the process of creating a new type from a
+`record` declaration.  Given *name*, the index of the type's name in the
+constants table, and *fields*, the index of the type's list of field names
+in the constants table, it creates a new *type*, assigns it to variable *name*
+in the current scope, and pushes it onto the stack.  Subsequent instructions
+will add methods, execute static initializers, etc.
 
 ### RETURN
 ---

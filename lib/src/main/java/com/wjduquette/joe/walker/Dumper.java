@@ -144,6 +144,46 @@ class Dumper {
                     .append(" =\n");
                 dumpExpression(stmt.target());
             }
+            case Stmt.Record stmt -> {
+                buff.append(indent())
+                    .append("Stmt.Record ")
+                    .append(stmt.name().lexeme())
+                    .append("(")
+                    .append(String.join(", ", stmt.recordFields()))
+                    .append(")")
+                    ;
+
+                buff.append("\n");
+
+                // Class content
+                ++indent;
+
+                if (stmt.staticInitializer() !=  null &&
+                    !stmt.staticInitializer().isEmpty()
+                ) {
+                    buff.append(indent())
+                        .append("Static initializer:\n");
+                    dumpStatements(stmt.staticInitializer());
+                }
+
+                if (stmt.staticMethods() != null) {
+                    buff.append(indent())
+                        .append("Static Methods:\n");
+                    for (var func : stmt.staticMethods()) {
+                        dumpStatement(func);
+                    }
+                }
+
+                if (stmt.methods() != null) {
+                    buff.append(indent())
+                        .append("Instance Methods:\n");
+                    for (var func : stmt.methods()) {
+                        dumpStatement(func);
+                    }
+                }
+
+                --indent;
+            }
             case Stmt.Return stmt -> {
                 buff.append(indent())
                     .append("Stmt.Return\n");

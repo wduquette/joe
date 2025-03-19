@@ -86,4 +86,15 @@ public class PatternTest extends Ted {
         var p = new Pattern.InstancePattern("Thing", new Pattern.MapPattern(map));
         check(p.toString()).eq("Thing{$3: _xyz, $4: ?7}");
     }
+
+    @Test
+    public void testRecordPattern() {
+        test("testRecordPattern");
+
+        var p = new Pattern.RecordPattern("Thing", List.of(
+            new Pattern.Wildcard("_xyz"),
+            new Pattern.ValueBinding(7)
+        ));
+        check(p.toString()).eq("Thing(_xyz, ?7)");
+    }
 }

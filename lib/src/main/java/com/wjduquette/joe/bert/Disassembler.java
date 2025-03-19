@@ -209,6 +209,24 @@ public class Disassembler {
                 return ip + 2;
             }
 
+            // Two-constant Instructions
+            // Pattern: opcode constantIndex1 constantIndex2
+            case RECORD -> {
+                int i1 = chunk.code(ip + 1);
+                var c1 = joe.stringify(chunk.getConstant(i1));
+                if (c1.length() > 10) {
+                    c1 = c1.substring(0, 7) + "...";
+                }
+                int i2 = chunk.code(ip + 2);
+                var c2 = joe.stringify(chunk.getConstant(i2));
+                if (c2.length() > 10) {
+                    c2 = c2.substring(0, 7) + "...";
+                }
+                var text = String.format(" %04d '%s' '%s'", i1, c1, c2);
+                lines.add(new Line(ip, prefix + text));
+                return ip + 3;
+            }
+
             // Closure Instruction
             // Pattern: CLOSURE index [,isLocal, index]...
             case CLOSURE -> {
