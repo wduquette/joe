@@ -199,6 +199,7 @@ class Interpreter {
                 var target = evaluate(stmt.target());
                 var bindings = new ArrayList<>();
                 if (Matcher.bind(
+                    joe,
                     stmt.pattern().getPattern(),
                     target,
                     constants::get,

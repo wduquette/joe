@@ -373,6 +373,7 @@ class VirtualMachine {
                     // bindings as we go, and then add them to the global
                     // environment as a group.
                     if (!Matcher.bind(
+                        joe,
                         pattern,
                         target,
                         constants::get,
@@ -537,6 +538,7 @@ class VirtualMachine {
                     // are being processed in the order they were defined by
                     // the compiler.
                     if (!Matcher.bind(
+                        joe,
                         pattern,
                         target,
                         constants::get,

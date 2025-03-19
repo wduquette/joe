@@ -1,8 +1,7 @@
 package com.wjduquette.joe.patterns;
 
-import com.wjduquette.joe.JoeValue;
-import com.wjduquette.joe.JoeType;
-import com.wjduquette.joe.Ted;
+import com.wjduquette.joe.*;
+import com.wjduquette.joe.types.RecordType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,16 +10,18 @@ import java.util.*;
 import static com.wjduquette.joe.checker.Checker.check;
 
 public class MatcherTest extends Ted {
+    private final Joe joe = new Joe();
     private List<Object> constants;
     private final Map<Integer,Object> bindings = new LinkedHashMap<>();
 
     @Before public void setup() {
         constants = new ArrayList<>();
         bindings.clear();
+        joe.installType(new PairType());
     }
 
     private boolean bind(Pattern pattern, Object value) {
-        return Matcher.bind(pattern, value, constants::get, bindings::put);
+        return Matcher.bind(joe, pattern, value, constants::get, bindings::put);
     }
 
     @Test
@@ -295,6 +296,23 @@ public class MatcherTest extends Ted {
     }
 
     @Test
+    public void testMapPattern_proxiedType() {
+        test("testMapPattern_proxiedType");
+
+        constants = List.of("first", "v1", "second", "v2");
+        var pattern = new Pattern.MapPattern(Map.of(
+            new Pattern.Constant(0),
+            new Pattern.Constant(1),
+            new Pattern.Constant(2),
+            new Pattern.Constant(3)
+        ));
+        var value = new Pair("v1", "v2");
+
+        check(bind(pattern, value)).eq(true);
+    }
+
+
+    @Test
     public void testInstancePattern_bad_wrongType() {
         test("testInstancePattern_bad_wrongType");
 
@@ -346,6 +364,24 @@ public class MatcherTest extends Ted {
         var thing = new TestObject("Thing", "123", "red");
 
         check(bind(pattern, thing)).eq(true);
+    }
+
+    @Test
+    public void testInstancePattern_proxiedType() {
+        test("testInstancePattern_proxiedType");
+
+        constants = List.of("first", "v1", "second", "v2");
+        var fieldMap = new Pattern.MapPattern(Map.of(
+            new Pattern.Constant(0),
+            new Pattern.Constant(1),
+            new Pattern.Constant(2),
+            new Pattern.Constant(3)
+        ));
+        var pattern = new Pattern.InstancePattern("Pair", fieldMap);
+
+        var value = new Pair("v1", "v2");
+
+        check(bind(pattern, value)).eq(true);
     }
 
     @Test
@@ -422,6 +458,21 @@ public class MatcherTest extends Ted {
         check(bind(pattern, target)).eq(true);
     }
 
+    @Test
+    public void testRecordPattern_proxiedType() {
+        test("testRecordPattern_good");
+
+        constants = List.of("123", "red");
+        var pattern = new Pattern.RecordPattern("Pair", List.of(
+            new Pattern.Constant(0),
+            new Pattern.Constant(1)
+        ));
+
+        var target = new Pair("123", "red");
+
+        check(bind(pattern, target)).eq(true);
+    }
+
     //-------------------------------------------------------------------------
     // Helper
 
@@ -445,5 +496,23 @@ public class MatcherTest extends Ted {
         @Override public List<String> getFieldNames() { return List.of("id", "color"); }
         @Override public Object get(String name) { return fields.get(name); }
         @Override public void set(String name, Object value) { }
+    }
+
+    private record Pair(Object first, Object second) {}
+
+    private static class PairType extends RecordType<Pair> {
+        PairType() {
+            super("Pair");
+            proxies(Pair.class);
+            recordField("first", Pair::first);
+            recordField("second", Pair::second);
+
+            initializer(this::_init);
+        }
+
+        private Object _init(Joe joe, Args args) {
+            args.exactArity(2, "Pair(first,second)");
+            return new Pair(args.next(), args.next());
+        }
     }
 }

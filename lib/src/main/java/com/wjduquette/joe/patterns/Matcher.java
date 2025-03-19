@@ -1,5 +1,6 @@
 package com.wjduquette.joe.patterns;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeValue;
 import com.wjduquette.joe.Keyword;
 
@@ -36,6 +37,7 @@ public class Matcher {
      * <p>The binder function is called once for each such variable;
      * variables are bound in the order in which they appear in the pattern.
      * </p>
+     * @param joe The interpreter
      * @param pattern The pattern
      * @param value The target value
      * @param getter The Constant getter function
@@ -43,6 +45,7 @@ public class Matcher {
      * @return true or false.
      */
     public static boolean bind(
+        Joe joe,
         Pattern pattern,
         Object value,
         ConstantGetter getter,
@@ -59,7 +62,7 @@ public class Matcher {
             }
             case Pattern.PatternBinding p -> {
                 binder.bind(p.id(), value);
-                yield bind(p.subpattern(), value, getter, binder);
+                yield bind(joe, p.subpattern(), value, getter, binder);
             }
 
             case Pattern.ListPattern p -> {
@@ -72,7 +75,7 @@ public class Matcher {
 
                 // NEXT, match items
                 for (var i = 0; i < size; i++) {
-                    if (!bind(p.patterns().get(i), list.get(i), getter, binder)) {
+                    if (!bind(joe, p.patterns().get(i), list.get(i), getter, binder)) {
                         yield false;
                     }
                 }
@@ -87,44 +90,43 @@ public class Matcher {
                 yield true;
             }
 
-            case Pattern.MapPattern p -> switch (value) {
-                case Map<?,?> map -> {
+            case Pattern.MapPattern p -> {
+                if (value instanceof Map<?,?> map) {
                     // NEXT, match keys and values
                     for (var e : p.patterns().entrySet()) {
                         var key = getter.get(e.getKey().id());
                         if (!map.containsKey(key)) yield false;
 
                         var item = map.get(key);
-                        if (!bind(e.getValue(), item, getter, binder)) {
+                        if (!bind(joe, e.getValue(), item, getter, binder)) {
                             yield false;
                         }
                     }
 
                     // FINALLY, match succeeds
                     yield true;
-                }
-                case JoeValue obj -> {
+                } else {
+                    var obj = joe.getJoeValue(value);
+
                     for (var e : p.patterns().entrySet()) {
                         var field = key2field(getter.get(e.getKey().id()));
                         if (!obj.hasField(field)) yield false;
 
-                        if (!bind(e.getValue(), obj.get(field), getter, binder)) {
+                        if (!bind(joe, e.getValue(), obj.get(field), getter, binder)) {
                             yield false;
                         }
                     }
 
                     // FINALLY, match succeeds
                     yield true;
-
                 }
-                default -> false;
-            };
+            }
 
             case Pattern.InstancePattern p -> {
-                if (!(value instanceof JoeValue obj)) yield false;
+                var obj = joe.getJoeValue(value);
                 if (!hasType(obj, p.typeName())) yield false;
 
-                yield bind(p.fieldMap(), obj, getter, binder);
+                yield bind(joe, p.fieldMap(), obj, getter, binder);
             }
 
             case Pattern.RecordPattern p -> {
@@ -132,7 +134,7 @@ public class Matcher {
                 // a JoeValue of a record type; there must be one
                 // pattern for each field; and each pattern must match
                 // the corresponding field.
-                if (!(value instanceof JoeValue obj)) yield false;
+                var obj = joe.getJoeValue(value);
                 if (!obj.type().isRecordType()) yield false;
                 if (!obj.type().name().equals(p.typeName())) yield false;
 
@@ -144,7 +146,7 @@ public class Matcher {
 
                 // NEXT, match items
                 for (var i = 0; i < size; i++) {
-                    if (!bind(p.patterns().get(i), list.get(i), getter, binder)) {
+                    if (!bind(joe, p.patterns().get(i), list.get(i), getter, binder)) {
                         yield false;
                     }
                 }

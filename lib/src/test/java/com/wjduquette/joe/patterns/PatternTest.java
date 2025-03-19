@@ -91,10 +91,6 @@ public class PatternTest extends Ted {
     public void testRecordPattern() {
         test("testRecordPattern");
 
-        var map = new LinkedHashMap<Pattern.Constant, Pattern>();
-        map.put(new Pattern.Constant(3), new Pattern.Wildcard("_xyz"));
-        map.put(new Pattern.Constant(4), new Pattern.ValueBinding(7));
-
         var p = new Pattern.RecordPattern("Thing", List.of(
             new Pattern.Wildcard("_xyz"),
             new Pattern.ValueBinding(7)
