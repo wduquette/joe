@@ -1305,6 +1305,8 @@ class Compiler {
                 return new Pattern.Wildcard(identifier.lexeme());
             } else if (match(LEFT_BRACE)) {
                 return instancePattern(identifier);
+            } else if (match(LEFT_PAREN)) {
+                return recordPattern(identifier);
             }
 
             var id = addPatternVar(identifier);
@@ -1419,6 +1421,25 @@ class Compiler {
     private Pattern instancePattern(Token identifier) {
         var fieldMap = mapPattern();
         return new Pattern.InstancePattern(identifier.lexeme(), fieldMap);
+    }
+
+    private Pattern recordPattern(Token identifier) {
+        var list = new ArrayList<Pattern>();
+
+        if (match(RIGHT_PAREN)) {
+            return new Pattern.RecordPattern(identifier.lexeme(), list);
+        }
+
+        do {
+            if (check(RIGHT_PAREN)) {
+                break;
+            }
+            list.add(parsePattern(true));
+        } while (match(COMMA));
+
+        consume(RIGHT_PAREN, "Expected ')' after record pattern.");
+
+        return new Pattern.RecordPattern(identifier.lexeme(), list);
     }
 
     //-------------------------------------------------------------------------
