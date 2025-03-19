@@ -323,7 +323,11 @@ class Parser {
         // Body
         Stmt body = statement();
 
-        return new Stmt.For(init, condition, incr, body);
+        // Wrap in a block so that the loop clauses have their local
+        // scope.
+        return new Stmt.Block(List.of(
+            new Stmt.For(init, condition, incr, body)
+        ));
     }
 
     private Stmt forEachStatement() {
