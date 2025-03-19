@@ -16,6 +16,8 @@
   - Added the `let` statement, which performs destructuring binds using
     [pattern matching](patterns.md).
   - Added scripted [`record` types](records.md).
+  - Added the `if let` statement, which performs conditional destructuring
+    binds.
 - Internals/Embedding/Extending
   - Refactored the names of Joe's type-related interfaces and Java classes
     for clarity.
