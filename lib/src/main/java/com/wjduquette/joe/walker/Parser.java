@@ -245,7 +245,7 @@ class Parser {
         if (match(CONTINUE)) return continueStatement();
         if (match(FOR)) return forStatement();
         if (match(FOREACH)) return forEachStatement();
-        if (match(IF)) return ifStatement();
+        if (match(IF)) return match(LET) ? ifLetStatement() : ifStatement();
         if (match(RETURN)) return returnStatement();
         if (match(SWITCH)) return switchStatement();
         if (match(THROW)) return throwStatement();
@@ -362,6 +362,24 @@ class Parser {
         }
 
         return new Stmt.If(condition, thenBranch, elseBranch);
+    }
+
+    private Stmt ifLetStatement() {
+        consume(LEFT_PAREN, "Expected '(' after 'if let'.");
+        Token keyword = previous();
+        WalkerPattern pattern = pattern();
+
+        consume(EQUAL, "Expected '=' after pattern.");
+        var target = expression();
+        consume(RIGHT_PAREN, "Expected ')' after target expression.");
+
+        Stmt thenBranch = statement();
+        Stmt elseBranch = null;
+        if (match(ELSE)) {
+            elseBranch = statement();
+        }
+
+        return new Stmt.IfLet(keyword, pattern, target, thenBranch, elseBranch);
     }
 
     private Stmt returnStatement() {

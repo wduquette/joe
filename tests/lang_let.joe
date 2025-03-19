@@ -1,4 +1,6 @@
 // Tests the "let" statement and pattern syntax
+//
+// Language tests should confine themselves to the basic test API.
 
 //-----------------------------------------------------------------------------
 // Simple variable binding

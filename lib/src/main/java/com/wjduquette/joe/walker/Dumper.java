@@ -136,6 +136,22 @@ class Dumper {
                 }
                 --indent;
             }
+            case Stmt.IfLet stmt -> {
+                buff.append(indent())
+                    .append("Stmt.If ")
+                    .append(stmt.pattern())
+                    .append("\n");
+
+                dumpExpression(stmt.target());
+                ++indent;
+                buff.append(indent()).append("Then:\n");
+                dumpStatement(stmt.thenBranch());
+                if (stmt.elseBranch() != null) {
+                    buff.append(indent()).append("Else:\n");
+                    dumpStatement(stmt.elseBranch());
+                }
+                --indent;
+            }
             case Stmt.Let stmt -> {
                 // TODO: Add variables and constants
                 buff.append(indent())

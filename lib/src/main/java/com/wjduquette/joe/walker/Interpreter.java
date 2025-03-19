@@ -192,25 +192,45 @@ class Interpreter {
                     return execute(stmt.elseBranch());
                 }
             }
-            case Stmt.Let stmt -> {
+            case Stmt.IfLet stmt -> {
                 var constants = new ArrayList<>();
                 stmt.pattern().getConstants().forEach(e ->
                     constants.add(evaluate(e)));
                 var target = evaluate(stmt.target());
-                var bindings = new ArrayList<>();
+                var values = new ArrayList<>();
                 if (Matcher.bind(
                     joe,
                     stmt.pattern().getPattern(),
                     target,
                     constants::get,
-                    bindings::add
+                    values::add
                 )) {
-                    var varNames = stmt.pattern().getBindings();
-                    for (var i = 0; i < varNames.size(); i++) {
-                        environment.setVar(
-                            varNames.get(i).lexeme(),
-                            bindings.get(i));
+                    var previous = this.environment;
+                    try {
+                        this.environment = new Environment(previous);
+                        bind(stmt.pattern(), values);
+                        return execute(stmt.thenBranch());
+                    } finally {
+                        this.environment = previous;
                     }
+                } else if (stmt.elseBranch() != null) {
+                    return execute(stmt.elseBranch());
+                }
+            }
+            case Stmt.Let stmt -> {
+                var constants = new ArrayList<>();
+                stmt.pattern().getConstants().forEach(e ->
+                    constants.add(evaluate(e)));
+                var target = evaluate(stmt.target());
+                var values = new ArrayList<>();
+                if (Matcher.bind(
+                    joe,
+                    stmt.pattern().getPattern(),
+                    target,
+                    constants::get,
+                    values::add
+                )) {
+                    bind(stmt.pattern(), values);
                 } else {
                     throw new RuntimeError(stmt.keyword().span(),
                         "'let' pattern failed to match target value.");
@@ -334,6 +354,17 @@ class Interpreter {
         }
 
         return result;
+    }
+
+    // Bind the pattern's binding variables to the matching values from
+    // the target.
+    private void bind(WalkerPattern pattern, List<Object> values) {
+        var varNames = pattern.getBindings();
+        for (var i = 0; i < varNames.size(); i++) {
+            environment.setVar(
+                varNames.get(i).lexeme(),
+                values.get(i));
+        }
     }
 
     void resolve(Expr expr, int depth) {

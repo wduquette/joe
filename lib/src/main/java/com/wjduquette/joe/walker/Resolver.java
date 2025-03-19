@@ -159,6 +159,28 @@ class Resolver {
                 resolve(stmt.thenBranch());
                 if (stmt.elseBranch() != null) resolve(stmt.elseBranch());
             }
+            case Stmt.IfLet stmt -> {
+                // Begin a new scope and declare the pattern variables so that
+                // we'll get an error if they are referenced in interpolated
+                // constants or the target expression.
+                beginScope();
+                stmt.pattern().getBindings().forEach(this::declare);
+
+                // Resolve any constants and the target.
+                stmt.pattern().getConstants().forEach(this::resolve);
+                resolve(stmt.target());
+
+                // Define the bound variables and resolve the then branch.
+                // Then end the scope; the pattern variables are not in-scope
+                // in the elseBranch.
+                stmt.pattern().getBindings().forEach(this::define);
+                resolve(stmt.thenBranch());
+                endScope();
+
+                if (stmt.elseBranch() != null) {
+                    resolve(stmt.elseBranch());
+                }
+            }
             case Stmt.Let stmt -> {
                 stmt.pattern().getBindings().forEach(this::declare);
                 stmt.pattern().getConstants().forEach(this::resolve);

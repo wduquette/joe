@@ -1,0 +1,60 @@
+// Tests for the "if let" statement.
+//
+// Language tests should confine themselves to the basic test API.
+//
+// Pattern syntax and matching is tested in lang_let.joe.  The `if let` tests
+// confine themselves to the `if let` statement itself.
+
+// Verify that the then clause executes on match
+function testMatch() {
+    var list = [1, 2];
+    if let ([a, b] = list) {
+        assertEquals(a, list[0]);
+        assertEquals(b, list[1]);
+    }
+}
+
+// Verify that the then clause does not execute on failure
+function testNoMatch() {
+    if let ([a, b] = "nonesuch") {
+        fail("Should not have matched.");
+    }
+}
+
+// Verify that the else clause executes on failure.
+function testElseClause() {
+    var noMatch = false;
+
+    if let ([a, b] = "nonesuch") {
+        fail("Should not have matched.");
+    } else {
+        noMatch = true;
+    }
+    assertTrue(noMatch);
+}
+
+// Verify that pattern variables do not modify shadowed variables on match.
+function testShadowedVar_match() {
+    var a = "outer";
+
+    if let ([a, b] = [1, 2]) {
+        assertEquals(a, 1);
+    }
+    assertEquals(a, "outer");
+}
+
+// Verify that pattern variables are not visible in the else clause, and
+// do not modify shadowed variables on failure.
+function testShadowedVar_noMatch() {
+    var a = "outer";
+    var noMatch = false;
+
+    if let ([a, b] = "nonesuch") {
+        fail("Should not have matched.");
+    } else {
+        noMatch = true;
+        assertEquals(a, "outer");
+    }
+    assertEquals(a, "outer");
+    assertTrue(noMatch);
+}
