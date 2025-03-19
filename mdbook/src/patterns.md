@@ -78,7 +78,23 @@ These are only a few of the kinds of patterns that Joe supports. See
 
 ## The `if let` Statement
 
-Not yet implemented.
+The `let` statement throws an error if the pattern does match the target value.
+The `if let` statement executes its "then" branch if the pattern matches the
+target, and its optional "else" branch otherwise.
+
+```joe
+var list = [1, 2];
+
+if let ([a, b] = list) {
+    println(a); // Prints "1"
+    println(b); // Prints "2"
+} else {
+    println("no match");
+}
+```
+
+The pattern's binding variables (`a` and `b` in this example) are in-scope only
+in the "then" branch.
 
 ## The `match` Statement
 
