@@ -126,6 +126,32 @@ public class Matcher {
 
                 yield bind(p.fieldMap(), obj, getter, binder);
             }
+
+            case Pattern.RecordPattern p -> {
+                // FIRST, check type and shape.  The value must be
+                // a JoeValue of a record type; there must be one
+                // pattern for each field; and each pattern must match
+                // the corresponding field.
+                if (!(value instanceof JoeValue obj)) yield false;
+                if (!obj.type().isRecordType()) yield false;
+                if (!obj.type().name().equals(p.typeName())) yield false;
+
+                var fields = obj.getFieldNames();
+                var size = p.patterns().size();
+                if (fields.size() != size) yield false;
+
+                var list = fields.stream().map(obj::get).toList();
+
+                // NEXT, match items
+                for (var i = 0; i < size; i++) {
+                    if (!bind(p.patterns().get(i), list.get(i), getter, binder)) {
+                        yield false;
+                    }
+                }
+
+                // FINALLY, match succeeds.
+                yield true;
+            }
         };
     }
 

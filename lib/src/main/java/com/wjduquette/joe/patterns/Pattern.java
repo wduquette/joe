@@ -26,7 +26,8 @@ public sealed interface Pattern permits
     Pattern.ValueBinding,
     Pattern.ListPattern,
     Pattern.MapPattern,
-    Pattern.InstancePattern
+    Pattern.InstancePattern,
+    Pattern.RecordPattern
 {
     /**
      * A pattern that requires the target value to be exactly equal to a
@@ -154,6 +155,26 @@ public sealed interface Pattern permits
     {
         @Override public String toString() {
             return typeName + fieldMap;
+        }
+    }
+
+    /**
+     * A pattern that matches an instance of a target
+     * `record` value on its type name and fields.
+     * The given type name must match the target object's
+     * type name.  The field match is done field by field in the manner
+     * of ListPattern.
+     * @param typeName The name of the desired type.
+     * @param patterns The field value patterns
+     */
+    record RecordPattern(String typeName, List<Pattern> patterns)
+        implements Pattern
+    {
+        @Override public String toString() {
+            var list = patterns.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(", "));
+            return typeName + "(" + list + ")";
         }
     }
 }

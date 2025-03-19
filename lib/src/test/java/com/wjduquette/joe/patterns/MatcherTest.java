@@ -348,10 +348,86 @@ public class MatcherTest extends Ted {
         check(bind(pattern, thing)).eq(true);
     }
 
+    @Test
+    public void testRecordPattern_notRecord() {
+        test("testRecordPattern_notRecord");
+
+        constants = List.of("123", "red");
+        var pattern = new Pattern.RecordPattern("Thing", List.of(
+            new Pattern.Constant(0),
+            new Pattern.Constant(1)
+        ));
+
+        check(bind(pattern, "abc")).eq(false);
+    }
+
+    @Test
+    public void testRecordPattern_wrongType() {
+        test("testRecordPattern_wrongType");
+
+        constants = List.of("123", "red");
+        var pattern = new Pattern.RecordPattern("Thing", List.of(
+            new Pattern.Constant(0),
+            new Pattern.Constant(1)
+        ));
+
+        var target = new TestObject("Gizmo", "123", "red");
+
+        check(bind(pattern, target)).eq(false);
+    }
+
+    @Test
+    public void testRecordPattern_wrongSize() {
+        test("testRecordPattern_wrongSize");
+
+        constants = List.of("123", "red", 456.0);
+        var pattern = new Pattern.RecordPattern("Thing", List.of(
+            new Pattern.Constant(0),
+            new Pattern.Constant(1),
+            new Pattern.Constant(2)
+        ));
+
+        var target = new TestObject("Thing", "123", "red");
+
+        check(bind(pattern, target)).eq(false);
+    }
+
+    @Test
+    public void testRecordPattern_wrongFieldValue() {
+        test("testRecordPattern_wrongFieldValue");
+
+        constants = List.of("123", "green");
+        var pattern = new Pattern.RecordPattern("Thing", List.of(
+            new Pattern.Constant(0),
+            new Pattern.Constant(1)
+        ));
+
+        var target = new TestObject("Thing", "123", "red");
+
+        check(bind(pattern, target)).eq(false);
+    }
+
+    @Test
+    public void testRecordPattern_good() {
+        test("testRecordPattern_good");
+
+        constants = List.of("123", "red");
+        var pattern = new Pattern.RecordPattern("Thing", List.of(
+            new Pattern.Constant(0),
+            new Pattern.Constant(1)
+        ));
+
+        var target = new TestObject("Thing", "123", "red");
+
+        check(bind(pattern, target)).eq(true);
+    }
+
     //-------------------------------------------------------------------------
     // Helper
 
-    public record TestType(String name) implements JoeType { }
+    public record TestType(String name) implements JoeType {
+        public boolean isRecordType() { return true; }
+    }
 
     private static class TestObject implements JoeValue {
         final String typeName;
@@ -366,7 +442,7 @@ public class MatcherTest extends Ted {
         @Override public JoeType type() { return new TestType(typeName); }
         @Override public String typeName() { return typeName; }
         @Override public boolean hasField(String name) { return fields.containsKey(name); }
-        @Override public List<String> getFieldNames() { return new ArrayList<>(fields.keySet()); }
+        @Override public List<String> getFieldNames() { return List.of("id", "color"); }
         @Override public Object get(String name) { return fields.get(name); }
         @Override public void set(String name, Object value) { }
     }
