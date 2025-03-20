@@ -190,14 +190,16 @@ class Resolver {
             case Stmt.Match stmt -> {
                 resolve(stmt.expr());
                 for (var c : stmt.cases()) {
-                    beginScope();
                     if (c.pattern() != null) {
+                        beginScope();
                         c.pattern().getBindings().forEach(this::declare);
                         c.pattern().getConstants().forEach(this::resolve);
                         c.pattern().getBindings().forEach(this::define);
+                        resolve(c.statement());
+                        endScope();
+                    } else {
+                        resolve(c.statement());
                     }
-                    resolve(c.statement());
-                    endScope();
                 }
             }
             case Stmt.Record stmt -> {

@@ -1,0 +1,87 @@
+// Tests for the "match" statement.
+//
+// Language tests should confine themselves to the basic test API.
+//
+// Pattern syntax and matching is tested in lang_let.joe.  The `match` tests
+// confine themselves to the `match` statement itself.
+
+function testMatch_firstCase() {
+    var list = [1, 2];
+    var result = null;
+
+    match (list) {
+        case [a, 2] -> result = a;
+        default -> result = #fail;
+    }
+    assertEquals(result, list[0]);
+}
+
+function testMatch_secondCase() {
+    var list = [1, 2];
+    var result = null;
+
+    match (list) {
+        case [1, b] -> result = b;
+        default -> result = #fail;
+    }
+    assertEquals(result, list[1]);
+}
+
+function testMatch_defaultCase() {
+    var list = [1, 2];
+    var result = null;
+
+    match (list) {
+        case [2, 3] -> result = #fail;
+        default -> result = #ok;
+    }
+    assertEquals(result, #ok);
+}
+
+function testMatch_noDefault() {
+    var list = [1, 2];
+    var result = #ok;
+
+    match (list) {
+        case [2, 3] -> result = #fail;
+    }
+    assertEquals(result, #ok);
+}
+
+function testMatch_caseScope_success() {
+    var list = [1, 2];
+    var a = "A";
+    var result = null;
+
+    match (list) {
+        case [a, 2] -> result = a;
+        default -> result = #fail;
+    }
+    assertEquals(result, list[0]);
+    assertEquals(a, "A");
+}
+
+function testMatch_caseScope_default() {
+    var list = [1, 3];
+    var a = "A";
+    var result = null;
+
+    match (list) {
+        case [a, 2] -> result = a;
+        default -> result = a;
+    }
+    assertEquals(result, "A");
+    assertEquals(a, "A");
+}
+
+function testMatch_finalWildcard() {
+    var list = [1, 3];
+    var result = null;
+
+    match (list) {
+        case [a, 2] -> result = #fail;
+        case _ -> result = #ok;
+        default -> result = #fail;
+    }
+    assertEquals(result, #ok);
+}
