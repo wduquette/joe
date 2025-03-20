@@ -233,7 +233,20 @@ if not, Joe will throw a runtime error, as before.</p>
 <p>These are only a few of the kinds of patterns that Joe supports. See
 <a href="#pattern-syntax">Pattern Syntax</a> for more.</p>
 <h2 id="the-if-let-statement"><a class="header" href="#the-if-let-statement">The <code>if let</code> Statement</a></h2>
-<p>Not yet implemented.</p>
+<p>The <code>let</code> statement throws an error if the pattern does match the target value.
+The <code>if let</code> statement executes its "then" branch if the pattern matches the
+target, and its optional "else" branch otherwise.</p>
+<pre><code class="language-joe">var list = [1, 2];
+
+if let ([a, b] = list) {
+    println(a); // Prints "1"
+    println(b); // Prints "2"
+} else {
+    println("no match");
+}
+</code></pre>
+<p>The pattern's binding variables (<code>a</code> and <code>b</code> in this example) are in-scope only
+in the "then" branch.</p>
 <h2 id="the-match-statement"><a class="header" href="#the-match-statement">The <code>match</code> Statement</a></h2>
 <p>Not yet implemented.</p>
 <h2 id="pattern-syntax"><a class="header" href="#pattern-syntax">Pattern Syntax</a></h2>
@@ -391,11 +404,7 @@ let Thing{#id: i,  #color: c}  = Thing(123, "red");
 <p>An instance pattern consists of the name of the desired type, followed by
 a map pattern for its fields. For the pattern to match:</p>
 <ul>
-<li>The named type must match value's type or one of its supertypes.
-<ul>
-<li>Supertype matching is not yet implemented.</li>
-</ul>
-</li>
+<li>The named type must be the target value's type or one of its supertypes.</li>
 <li>The value must have all of the specified fields.</li>
 <li>The field patterns must match.</li>
 </ul>
@@ -406,7 +415,23 @@ the matched type is in scope; it is enough that the value being matched
 knows its type and that its type's name is the name included in the pattern.
 See <a href="introspection.html#unscoped-types">Unscoped Types</a> for more information.</p>
 <h2 id="record-patterns"><a class="header" href="#record-patterns">Record Patterns</a></h2>
-<p>Records and record patterns are not yet implemented.</p>
+<p>Values of <a href="records.html">record types</a> can be matched by both
+<a href="#map-patterns">map patterns</a> and <a href="#instance-patterns">instance patterns</a>; but
+because each record type has a fixed number of fields in a known order, record
+types also support a special syntax that makes record types especially suited
+to pattern matching.</p>
+<pre><code class="language-joe">record Person(name, age) {}
+
+var person = Person(Joe, 80);
+
+// These statements are identical
+let Person(n, a) = person;
+let Person{#name: n, #age: a} = person;
+</code></pre>
+<p>The first form can only be used with a value of a record type; it matches
+the values of the type's fields in sequence.  All fields must be
+represented.  The field subpatterns can be any arbitrary patterns, as
+usual.</p>
 
                     </main>
 

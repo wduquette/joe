@@ -314,6 +314,8 @@ for the <code>Map</code> <code>get</code> and <code>put</code> methods.</li>
 <li>Added the <code>let</code> statement, which performs destructuring binds using
 <a href="patterns.html">pattern matching</a>.</li>
 <li>Added scripted <a href="records.html"><code>record</code> types</a>.</li>
+<li>Added the <code>if let</code> statement, which performs conditional destructuring
+binds.</li>
 </ul>
 </li>
 <li>Internals/Embedding/Extending
@@ -1493,7 +1495,20 @@ if not, Joe will throw a runtime error, as before.</p>
 <p>These are only a few of the kinds of patterns that Joe supports. See
 <a href="patterns.html#pattern-syntax">Pattern Syntax</a> for more.</p>
 <h2 id="the-if-let-statement"><a class="header" href="#the-if-let-statement">The <code>if let</code> Statement</a></h2>
-<p>Not yet implemented.</p>
+<p>The <code>let</code> statement throws an error if the pattern does match the target value.
+The <code>if let</code> statement executes its "then" branch if the pattern matches the
+target, and its optional "else" branch otherwise.</p>
+<pre><code class="language-joe">var list = [1, 2];
+
+if let ([a, b] = list) {
+    println(a); // Prints "1"
+    println(b); // Prints "2"
+} else {
+    println("no match");
+}
+</code></pre>
+<p>The pattern's binding variables (<code>a</code> and <code>b</code> in this example) are in-scope only
+in the "then" branch.</p>
 <h2 id="the-match-statement"><a class="header" href="#the-match-statement">The <code>match</code> Statement</a></h2>
 <p>Not yet implemented.</p>
 <h2 id="pattern-syntax"><a class="header" href="#pattern-syntax">Pattern Syntax</a></h2>
@@ -1651,11 +1666,7 @@ let Thing{#id: i,  #color: c}  = Thing(123, "red");
 <p>An instance pattern consists of the name of the desired type, followed by
 a map pattern for its fields. For the pattern to match:</p>
 <ul>
-<li>The named type must match value's type or one of its supertypes.
-<ul>
-<li>Supertype matching is not yet implemented.</li>
-</ul>
-</li>
+<li>The named type must be the target value's type or one of its supertypes.</li>
 <li>The value must have all of the specified fields.</li>
 <li>The field patterns must match.</li>
 </ul>
@@ -1666,7 +1677,23 @@ the matched type is in scope; it is enough that the value being matched
 knows its type and that its type's name is the name included in the pattern.
 See <a href="introspection.html#unscoped-types">Unscoped Types</a> for more information.</p>
 <h2 id="record-patterns"><a class="header" href="#record-patterns">Record Patterns</a></h2>
-<p>Records and record patterns are not yet implemented.</p>
+<p>Values of <a href="records.html">record types</a> can be matched by both
+<a href="patterns.html#map-patterns">map patterns</a> and <a href="patterns.html#instance-patterns">instance patterns</a>; but
+because each record type has a fixed number of fields in a known order, record
+types also support a special syntax that makes record types especially suited
+to pattern matching.</p>
+<pre><code class="language-joe">record Person(name, age) {}
+
+var person = Person(Joe, 80);
+
+// These statements are identical
+let Person(n, a) = person;
+let Person{#name: n, #age: a} = person;
+</code></pre>
+<p>The first form can only be used with a value of a record type; it matches
+the values of the type's fields in sequence.  All fields must be
+represented.  The field subpatterns can be any arbitrary patterns, as
+usual.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="introspection"><a class="header" href="#introspection">Introspection</a></h1>
 <p><em>Introspection</em>, also known as <em>reflection</em>, is the ability for a script to
 query metadata about its types and values.  This section discusses Joe's
@@ -8718,6 +8745,7 @@ statement       → exprStmt
                 | continueStmt
                 | forStmt
                 | ifStmt
+                | ifLetStmt
                 | printStmt
                 | returnStmt
                 | switchStmt
@@ -8734,6 +8762,8 @@ forStmt         → "for" "(" ( varDecl | exprStmt | ";" )
 forEachStmt     → "foreach" "(" "var" IDENTIFIER ":" expression ")" statement;
 ifStmt          → "if" "(" expression ")" statement 
                   ( "else" statement )? ;
+ifLetStmt       → "if" "let" "(" pattern "=" expression ")" statement 
+                  ( "else" statement )? ; 
 printStmt       → "print" expression ";" ;
 returnStmt      → "return" expression? ";" ;
 switchStmt      → "switch" "(" expression ")" "{"
@@ -8973,30 +9003,31 @@ an atomic operation.</li>
 <tr><td>39</td><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
 <tr><td>40</td><td>MAPNEW</td><td>∅ → <em>map</em></td><td>Push empty ma p</td></tr>
 <tr><td>41</td><td>MAPPUT</td><td><em>map k a</em> → <em>map</em></td><td>Add entry to map</td></tr>
-<tr><td>42</td><td>METHOD <em>name</em></td><td><em>type f</em> → <em>type</em></td><td>Add method to type</td></tr>
-<tr><td>43</td><td>MUL</td><td><em>a b</em> → <em>c</em></td><td>c = a*b</td></tr>
-<tr><td>44</td><td>NE</td><td><em>a b</em> → <em>c</em></td><td>c = a != b</td></tr>
-<tr><td>45</td><td>NEGATE</td><td><em>a</em> → <em>b</em></td><td>b = -a</td></tr>
-<tr><td>46</td><td>NI</td><td><em>a coll</em> → <em>flag</em></td><td>a not in collection</td></tr>
-<tr><td>47</td><td>NOT</td><td><em>a</em> → <em>b</em></td><td>b = !a</td></tr>
-<tr><td>48</td><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
-<tr><td>49</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
-<tr><td>50</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
-<tr><td>51</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
-<tr><td>52</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
-<tr><td>53</td><td>RECORD</td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
-<tr><td>53</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
-<tr><td>54</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
-<tr><td>55</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
-<tr><td>56</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
-<tr><td>57</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
-<tr><td>58</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
-<tr><td>59</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
-<tr><td>60</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
-<tr><td>61</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
-<tr><td>62</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
-<tr><td>63</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
-<tr><td>64</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
+<tr><td>42</td><td>MATCH <em>pattern</em></td><td><em>list a</em> → <em>flag</em></td><td>Match pattern to target</td></tr>
+<tr><td>43</td><td>METHOD <em>name</em></td><td><em>type f</em> → <em>type</em></td><td>Add method to type</td></tr>
+<tr><td>44</td><td>MUL</td><td><em>a b</em> → <em>c</em></td><td>c = a*b</td></tr>
+<tr><td>45</td><td>NE</td><td><em>a b</em> → <em>c</em></td><td>c = a != b</td></tr>
+<tr><td>46</td><td>NEGATE</td><td><em>a</em> → <em>b</em></td><td>b = -a</td></tr>
+<tr><td>47</td><td>NI</td><td><em>a coll</em> → <em>flag</em></td><td>a not in collection</td></tr>
+<tr><td>48</td><td>NOT</td><td><em>a</em> → <em>b</em></td><td>b = !a</td></tr>
+<tr><td>49</td><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
+<tr><td>50</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
+<tr><td>51</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
+<tr><td>52</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
+<tr><td>53</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
+<tr><td>54</td><td>RECORD</td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
+<tr><td>55</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
+<tr><td>56</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
+<tr><td>57</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
+<tr><td>58</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
+<tr><td>59</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
+<tr><td>60</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
+<tr><td>61</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
+<tr><td>62</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
+<tr><td>63</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
+<tr><td>64</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
+<tr><td>65</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
+<tr><td>66</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
 </tbody></table>
 </div>
 <p><strong>Stack Effects:</strong> in the stack effect column, the top of the stack is on the
@@ -9285,6 +9316,12 @@ stack.</p>
 <hr />
 <p><strong>MAPPUT</strong> | <em>map</em> <em>k</em> <em>a</em> → <em>map</em></p>
 <p>Pops <em>k</em> and <em>a</em> and puts {<em>k</em>: <em>a</em>} into the <em>map</em> value.</p>
+<h3 id="match"><a class="header" href="#match">MATCH</a></h3>
+<hr />
+<p><strong>MATCH <em>pattern</em></strong> | <em>list a</em> → <em>flag</em></p>
+<p>Matches the <em>pattern</em> against the target value <em>a</em> given the <em>list</em> of
+constants to include in the pattern.  On success defines the pattern's
+binding variables and pushes <code>true</code>; on failure pushes <code>false</code>.</p>
 <h3 id="method"><a class="header" href="#method">METHOD</a></h3>
 <hr />
 <p><strong>METHOD <em>name</em></strong> | <em>type</em> <em>f</em> → <em>type</em></p>

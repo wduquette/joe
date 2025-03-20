@@ -61,30 +61,31 @@ public class Opcode {
     /** Opcode */ public static final char LT      = 39;
     /** Opcode */ public static final char MAPNEW  = 40;
     /** Opcode */ public static final char MAPPUT  = 41;
-    /** Opcode */ public static final char METHOD  = 42;
-    /** Opcode */ public static final char MUL     = 43;
-    /** Opcode */ public static final char NE      = 44;
-    /** Opcode */ public static final char NEGATE  = 45;
-    /** Opcode */ public static final char NI      = 46;
-    /** Opcode */ public static final char NOT     = 47;
-    /** Opcode */ public static final char NULL    = 48;
-    /** Opcode */ public static final char POP     = 49;
-    /** Opcode */ public static final char POPN    = 50;
-    /** Opcode */ public static final char PROPGET = 51;
-    /** Opcode */ public static final char PROPSET = 52;
-    /** Opcode */ public static final char RECORD  = 53;
-    /** Opcode */ public static final char RETURN  = 54;
-    /** Opcode */ public static final char SUB     = 55;
-    /** Opcode */ public static final char SUPGET  = 56;
-    /** Opcode */ public static final char TGET    = 57;
-    /** Opcode */ public static final char THROW   = 58;
-    /** Opcode */ public static final char TPUT    = 59;
-    /** Opcode */ public static final char TRCPOP  = 60;
-    /** Opcode */ public static final char TRCPUSH = 61;
-    /** Opcode */ public static final char TRUE    = 62;
-    /** Opcode */ public static final char UPCLOSE = 63;
-    /** Opcode */ public static final char UPGET   = 64;
-    /** Opcode */ public static final char UPSET   = 65;
+    /** Opcode */ public static final char MATCH   = 42;
+    /** Opcode */ public static final char METHOD  = 43;
+    /** Opcode */ public static final char MUL     = 44;
+    /** Opcode */ public static final char NE      = 45;
+    /** Opcode */ public static final char NEGATE  = 46;
+    /** Opcode */ public static final char NI      = 47;
+    /** Opcode */ public static final char NOT     = 48;
+    /** Opcode */ public static final char NULL    = 49;
+    /** Opcode */ public static final char POP     = 50;
+    /** Opcode */ public static final char POPN    = 51;
+    /** Opcode */ public static final char PROPGET = 52;
+    /** Opcode */ public static final char PROPSET = 53;
+    /** Opcode */ public static final char RECORD  = 54;
+    /** Opcode */ public static final char RETURN  = 55;
+    /** Opcode */ public static final char SUB     = 56;
+    /** Opcode */ public static final char SUPGET  = 57;
+    /** Opcode */ public static final char TGET    = 58;
+    /** Opcode */ public static final char THROW   = 59;
+    /** Opcode */ public static final char TPUT    = 60;
+    /** Opcode */ public static final char TRCPOP  = 61;
+    /** Opcode */ public static final char TRCPUSH = 62;
+    /** Opcode */ public static final char TRUE    = 63;
+    /** Opcode */ public static final char UPCLOSE = 64;
+    /** Opcode */ public static final char UPGET   = 65;
+    /** Opcode */ public static final char UPSET   = 66;
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -136,6 +137,7 @@ public class Opcode {
         "LT",
         "MAPNEW",
         "MAPPUT",
+        "MATCH",
         "METHOD",
         "MUL",
         "NE",

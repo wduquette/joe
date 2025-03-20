@@ -537,7 +537,11 @@ class Compiler {
         } else if (match(FOREACH)) {
             foreachStatement();
         } else if (match(IF)) {
-            ifStatement();
+            if (match(LET)) {
+                ifLetStatement();
+            } else {
+                ifStatement();
+            }
         } else if (match(RETURN)) {
             returnStatement();
         } else if (match(SWITCH)) {
@@ -740,6 +744,29 @@ class Compiler {
 
         int thenJump = emitJump(Opcode.JIF);
         statement();
+        int elseJump = emitJump(Opcode.JUMP);
+        patchJump(thenJump);
+
+        if (match(ELSE)) statement();
+        patchJump(elseJump);
+    }
+
+    private void ifLetStatement() {
+        var keyword = parser.previous;
+        consume(LEFT_PAREN, "Expected '(' after 'if let'.");
+        beginScope();
+        pattern();
+        markVarsInitialized(currentPattern.bindingVars.size());
+        consume(EQUAL, "Expected '=' after pattern.");
+        expression();
+        consume(RIGHT_PAREN, "Expected ')' after target expression.");
+
+        emit(Opcode.MATCH, currentPattern.patternIndex);
+        currentPattern = null;
+
+        int thenJump = emitJump(Opcode.JIF);
+        statement();
+        endScope();
         int elseJump = emitJump(Opcode.JUMP);
         patchJump(thenJump);
 

@@ -59,30 +59,31 @@ The byte-engine is a stack machine with a few registers:
 | 39 | LT                | *a b* → *a* <= *b* | Compare: less than        |
 | 40 | MAPNEW            | ∅ → *map*          | Push empty ma p           |
 | 41 | MAPPUT            | *map k a* → *map*  | Add entry to map          |
-| 42 | METHOD *name*     | *type f* → *type*  | Add method to type        |
-| 43 | MUL               | *a b* → *c*        | c = a*b                   |
-| 44 | NE                | *a b* → *c*        | c = a != b                |
-| 45 | NEGATE            | *a* → *b*          | b = -a                    |
-| 46 | NI                | *a coll* → *flag*  | a not in collection       |
-| 47 | NOT               | *a* → *b*          | b = !a                    |
-| 48 | NULL              | ∅ → null           | Load `null`               |
-| 49 | POP               | *a* → ∅            | Pops one value            |
-| 50 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
-| 51 | PROPGET *name*    | *obj* → *a*        | Get property value        |
-| 52 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
-| 53 | RECORD            | ∅ → *type*         | Create record type        |
-| 53 | RETURN            | *a* → *a*          | Return                    |
-| 54 | SUB               | *a b* → *c*        | c = a - b                 |
-| 55 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
-| 56 | TGET              | ∅ → *a*            | *a* = T                   |
-| 57 | THROW             | *a* → ∅            | Throw error               |
-| 58 | TPUT              | *a* → *a*          | T = *a*                   |
-| 59 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
-| 60 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
-| 61 | TRUE              | ∅ → true           | Load `true`               |
-| 62 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
-| 63 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
-| 64 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
+| 42 | MATCH *pattern*   | *list a* → *flag*  | Match pattern to target   |
+| 43 | METHOD *name*     | *type f* → *type*  | Add method to type        |
+| 44 | MUL               | *a b* → *c*        | c = a*b                   |
+| 45 | NE                | *a b* → *c*        | c = a != b                |
+| 46 | NEGATE            | *a* → *b*          | b = -a                    |
+| 47 | NI                | *a coll* → *flag*  | a not in collection       |
+| 48 | NOT               | *a* → *b*          | b = !a                    |
+| 49 | NULL              | ∅ → null           | Load `null`               |
+| 50 | POP               | *a* → ∅            | Pops one value            |
+| 51 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
+| 52 | PROPGET *name*    | *obj* → *a*        | Get property value        |
+| 53 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
+| 54 | RECORD            | ∅ → *type*         | Create record type        |
+| 55 | RETURN            | *a* → *a*          | Return                    |
+| 56 | SUB               | *a b* → *c*        | c = a - b                 |
+| 57 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
+| 58 | TGET              | ∅ → *a*            | *a* = T                   |
+| 59 | THROW             | *a* → ∅            | Throw error               |
+| 60 | TPUT              | *a* → *a*          | T = *a*                   |
+| 61 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
+| 62 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
+| 63 | TRUE              | ∅ → true           | Load `true`               |
+| 64 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
+| 65 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
+| 66 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
 
 **Stack Effects:** in the stack effect column, the top of the stack is on the 
 right.  
@@ -446,6 +447,14 @@ Pushes an empty *map* value onto the stack.
 **MAPPUT** | *map* *k* *a* → *map*
 
 Pops *k* and *a* and puts {*k*: *a*} into the *map* value.
+
+### MATCH
+---
+**MATCH *pattern*** | *list a* → *flag*
+
+Matches the *pattern* against the target value *a* given the *list* of
+constants to include in the pattern.  On success defines the pattern's
+binding variables and pushes `true`; on failure pushes `false`.
 
 ### METHOD
 ---

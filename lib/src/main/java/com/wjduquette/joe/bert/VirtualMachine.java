@@ -574,6 +574,33 @@ class VirtualMachine {
                     var map = (MapValue)peek(0);
                     map.put(key, value);
                 }
+                case MATCH -> {
+                    var pattern = readPattern();
+                    var target = pop();
+                    var constants = (ListValue)pop();
+
+                    // FIRST, save the top of the stack.
+                    int here = top;
+
+                    // NEXT, match the pattern against the target given the
+                    // constants, pushing bound values onto the stack as the
+                    // match proceeds.
+                    var flag = Matcher.bind(
+                        joe,
+                        pattern,
+                        target,
+                        constants::get,
+                        (id, value) -> push(value)
+                    );
+
+                    // NEXT, if the match failed, pop the bound values.
+                    if (!flag) {
+                        top = here;
+                    }
+
+                    // FINALLY, push the success/failure flag.
+                    push(flag);
+                }
                 case METHOD -> {
                     // NOTE: This was defineMethod in clox
                     var name = readString();
