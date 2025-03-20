@@ -49,6 +49,7 @@ statement       → exprStmt
                 | continueStmt
                 | forStmt
                 | ifStmt
+                | ifLetStmt
                 | printStmt
                 | returnStmt
                 | switchStmt
@@ -65,6 +66,8 @@ forStmt         → "for" "(" ( varDecl | exprStmt | ";" )
 forEachStmt     → "foreach" "(" "var" IDENTIFIER ":" expression ")" statement;
 ifStmt          → "if" "(" expression ")" statement 
                   ( "else" statement )? ;
+ifStmt          → "if" "let" "(" pattern "=" expression ")" statement 
+                  ( "else" statement )? ; 
 printStmt       → "print" expression ";" ;
 returnStmt      → "return" expression? ";" ;
 switchStmt      → "switch" "(" expression ")" "{"
