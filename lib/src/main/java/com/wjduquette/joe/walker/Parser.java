@@ -246,6 +246,7 @@ class Parser {
         if (match(FOR)) return forStatement();
         if (match(FOREACH)) return forEachStatement();
         if (match(IF)) return match(LET) ? ifLetStatement() : ifStatement();
+        if (match(MATCH)) return matchStatement();
         if (match(RETURN)) return returnStatement();
         if (match(SWITCH)) return switchStatement();
         if (match(THROW)) return throwStatement();
@@ -382,6 +383,43 @@ class Parser {
         return new Stmt.IfLet(keyword, pattern, target, thenBranch, elseBranch);
     }
 
+    private Stmt matchStatement() {
+        Token keyword = previous();
+        var cases = new ArrayList<Stmt.MatchCase>();
+
+        // FIRST, parse the head of the statement
+        consume(LEFT_PAREN, "Expected '(' after 'match'.");
+        Expr target = expression();
+        consume(RIGHT_PAREN, "Expected ')' after 'match' expression.");
+        consume(LEFT_BRACE, "Expected '{' before 'match' body.");
+
+        // NEXT, parse the cases.
+        while (match(CASE)) {
+            var caseKeyword = previous();
+            var pattern = pattern();
+            consume(MINUS_GREATER, "Expected '->' after pattern.");
+            var stmt = statement();
+            cases.add(new Stmt.MatchCase(caseKeyword, pattern, stmt));
+        }
+
+        if (cases.isEmpty()) {
+            error(previous(), "Expected at least one 'case' in `match`.");
+        }
+
+        // NEXT, parse the default case, if it exists
+        if (match(DEFAULT)) {
+            var caseKeyword = previous();
+            consume(MINUS_GREATER, "Expected '->' after 'default'.");
+            var stmt = statement();
+            cases.add(new Stmt.MatchCase(caseKeyword, null, stmt));
+        }
+
+        // NEXT, complete the statement
+        consume(RIGHT_BRACE, "Expected '}' after 'match' body.");
+
+        return new Stmt.Match(keyword, target, cases);
+    }
+
     private Stmt returnStatement() {
         Token keyword = previous();
         Expr value = null;
@@ -396,7 +434,7 @@ class Parser {
 
     private Stmt switchStatement() {
         Token keyword = previous();
-        var cases = new ArrayList<Stmt.Case>();
+        var cases = new ArrayList<Stmt.SwitchCase>();
 
         // FIRST, parse the head of the statement
         consume(LEFT_PAREN, "Expected '(' after 'switch'.");
@@ -416,7 +454,7 @@ class Parser {
             }
             consume(MINUS_GREATER, "Expected '->' after case values.");
             var stmt = statement();
-            cases.add(new Stmt.Case(caseKeyword, values, stmt));
+            cases.add(new Stmt.SwitchCase(caseKeyword, values, stmt));
         }
 
         if (cases.isEmpty()) {
@@ -428,7 +466,7 @@ class Parser {
             var caseKeyword = previous();
             consume(MINUS_GREATER, "Expected '->' after 'default'.");
             var stmt = statement();
-            cases.add(new Stmt.Case(caseKeyword, List.of(), stmt));
+            cases.add(new Stmt.SwitchCase(caseKeyword, List.of(), stmt));
         }
 
         // NEXT, complete the statement

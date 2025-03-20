@@ -50,6 +50,7 @@ statement       → exprStmt
                 | forStmt
                 | ifStmt
                 | ifLetStmt
+                | matchStmt
                 | printStmt
                 | returnStmt
                 | switchStmt
@@ -68,6 +69,10 @@ ifStmt          → "if" "(" expression ")" statement
                   ( "else" statement )? ;
 ifLetStmt       → "if" "let" "(" pattern "=" expression ")" statement 
                   ( "else" statement )? ; 
+matchStmt       → "match" "(" expression ")" "{" 
+                  ( "case" pattern "->" statement )+ 
+                  ( "default" "->" statement )? 
+                  "}" ;                  
 printStmt       → "print" expression ";" ;
 returnStmt      → "return" expression? ";" ;
 switchStmt      → "switch" "(" expression ")" "{"

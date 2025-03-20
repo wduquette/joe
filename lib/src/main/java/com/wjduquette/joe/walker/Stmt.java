@@ -9,7 +9,7 @@ import com.wjduquette.joe.SourceBuffer.Span;
 sealed interface Stmt
     permits Stmt.Assert, Stmt.Block, Stmt.Break, Stmt.Class,
             Stmt.Continue, Stmt.Expression, Stmt.For, Stmt.ForEach,
-            Stmt.Function, Stmt.If, Stmt.IfLet, Stmt.Let,
+            Stmt.Function, Stmt.If, Stmt.IfLet, Stmt.Let, Stmt.Match,
             Stmt.Record, Stmt.Return, Stmt.Switch,
             Stmt.Throw, Stmt.Var, Stmt.While
 {
@@ -123,6 +123,30 @@ sealed interface Stmt
         implements Stmt {}
 
     /**
+     * A "match" statement.
+     * @param keyword The "match" keyword
+     * @param expr The match expression
+     * @param cases A list of cases
+     */
+    record Match(
+        Token keyword,
+        Expr expr,
+        List<MatchCase> cases
+    ) implements Stmt {}
+
+    /**
+     * A case in a match statement.
+     * @param keyword The "case" keyword
+     * @param pattern The pattern to match
+     * @param statement The statement to execute
+     */
+    record MatchCase(
+        Token keyword,
+        WalkerPattern pattern,
+        Stmt statement
+    ) {}
+
+    /**
      * A record declaration
      * @param name The type's name
      * @param typeSpan The type's span in the source script.
@@ -156,7 +180,7 @@ sealed interface Stmt
     record Switch(
         Token keyword,
         Expr expr,
-        List<Case> cases
+        List<SwitchCase> cases
     ) implements Stmt {}
 
     /**
@@ -165,7 +189,7 @@ sealed interface Stmt
      * @param values The value expressions for this case.
      * @param statement The statement to execute
      */
-    record Case(
+    record SwitchCase(
         Token keyword,
         List<Expr> values,
         Stmt statement

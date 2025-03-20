@@ -187,6 +187,19 @@ class Resolver {
                 resolve(stmt.target());
                 stmt.pattern().getBindings().forEach(this::define);
             }
+            case Stmt.Match stmt -> {
+                resolve(stmt.expr());
+                for (var c : stmt.cases()) {
+                    beginScope();
+                    if (c.pattern() != null) {
+                        c.pattern().getBindings().forEach(this::declare);
+                        c.pattern().getConstants().forEach(this::resolve);
+                        c.pattern().getBindings().forEach(this::define);
+                    }
+                    resolve(c.statement());
+                    endScope();
+                }
+            }
             case Stmt.Record stmt -> {
                 ClassType enclosingClass = currentClass;
                 currentClass = ClassType.RECORD;

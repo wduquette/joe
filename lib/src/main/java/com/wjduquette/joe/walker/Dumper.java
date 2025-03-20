@@ -160,6 +160,21 @@ class Dumper {
                     .append(" =\n");
                 dumpExpression(stmt.target());
             }
+            case Stmt.Match stmt -> {
+                buff.append(indent())
+                    .append("Stmt.Match ")
+                    .append(stmt.expr())
+                    .append("\n");
+                ++indent;
+                for (var c : stmt.cases()) {
+                    buff.append(indent())
+                        .append("Case ")
+                        .append(c.pattern())
+                        .append("\n");
+                    dumpStatement(c.statement());
+                }
+                --indent;
+            }
             case Stmt.Record stmt -> {
                 buff.append(indent())
                     .append("Stmt.Record ")

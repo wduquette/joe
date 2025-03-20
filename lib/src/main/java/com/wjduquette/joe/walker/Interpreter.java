@@ -236,6 +236,35 @@ class Interpreter {
                         "'let' pattern failed to match target value.");
                 }
             }
+            case Stmt.Match stmt -> {
+                var target = evaluate(stmt.expr());
+                for (var c : stmt.cases()) {
+                    // default ->
+                    if (c.pattern() == null) return execute(c.statement());
+
+                    // case pattern ->
+                    var constants = new ArrayList<>();
+                    c.pattern().getConstants().forEach(e ->
+                        constants.add(evaluate(e)));
+                    var values = new ArrayList<>();
+                    if (Matcher.bind(
+                        joe,
+                        c.pattern().getPattern(),
+                        target,
+                        constants::get,
+                        values::add
+                    )) {
+                        var previous = this.environment;
+                        try {
+                            this.environment = new Environment(previous);
+                            bind(c.pattern(), values);
+                            return execute(c.statement());
+                        } finally {
+                            this.environment = previous;
+                        }
+                    }
+                }
+            }
             case Stmt.Record stmt -> {
                 // The type itself
                 environment.setVar(stmt.name().lexeme(), null);
