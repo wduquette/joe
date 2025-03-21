@@ -85,3 +85,23 @@ function testMatch_finalWildcard() {
     }
     assertEquals(result, #ok);
 }
+
+// Verify that a function can close over pattern variables.
+function testMatch_WithClosures() {
+    function getFunc(map) {
+        match (map) {
+            case {#a: a} -> { return \-> "a" + a; }
+            case {#b: b} -> { return \-> "b" + b; }
+            default -> { return \-> "no match"; }
+        }
+    }
+
+    var f1 = getFunc({#a: 1});
+    assertEquals(f1(), "a1");
+
+    var f2 = getFunc({#b: 2});
+    assertEquals(f2(), "b2");
+
+    var f3 = getFunc({#c: 3});
+    assertEquals(f3(), "no match");
+}

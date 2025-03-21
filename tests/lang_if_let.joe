@@ -58,3 +58,22 @@ function testShadowedVar_noMatch() {
     assertEquals(a, "outer");
     assertTrue(noMatch);
 }
+
+// Verify that a function can close over pattern variables.
+function testWithClosures() {
+    function getFunc(list) {
+        if let ([#a, x] = list) {
+            function getX() { return x; }
+            return getX;
+        } else {
+            function noMatch() { return "no match"; }
+            return noMatch;
+        }
+    }
+
+    var f1 = getFunc([#a, 1]);
+    assertEquals(f1(), 1);
+
+    var f2 = getFunc([#b, 2]);
+    assertEquals(f2(), "no match");
+}
