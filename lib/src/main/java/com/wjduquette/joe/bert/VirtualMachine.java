@@ -968,6 +968,7 @@ class VirtualMachine {
                     throw error(Args.arityFailureMessage(klass.name() + "()"));
                 }
             }
+            case null -> throw error("Expected callable, got: 'null'.");
             default ->
                 throw error("Expected callable, got: " + joe.typedValue(callee) + ".");
         }
