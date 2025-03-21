@@ -98,7 +98,33 @@ in the "then" branch.
 
 ## The `match` Statement
 
-Not yet implemented.
+The `match` statement is similar to a `switch` statement, but matches 
+patterns against a target value instead of checking for equality.  It
+is especially useful for processing a heterogeneous list of values.
+
+```joe
+match (value) {
+    case [a, b] -> 
+      println("Two item list of " a + " and " + b + ".");
+    case Person(name, age) -> 
+      println("Person " + name + " is " + age + " years old.");
+    default -> println("no match");
+}
+```
+
+Every `match` statement requires at least one `case`, and the `default`
+clause is optional.  Note that matching on `_` (a simple wildcard)
+is equivalent to the `default` clause:
+
+```joe
+match (value) {
+    case [a, b] -> 
+      println("Two item list of " a + " and " + b + ".");
+    case Person(name, age) -> 
+      println("Person " + name + " is " + age + " years old.");
+    case _ -> println("no match");
+}
+```
 
 ## Pattern Syntax
 

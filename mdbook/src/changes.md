@@ -18,6 +18,8 @@
   - Added scripted [`record` types](records.md).
   - Added the `if let` statement, which performs conditional destructuring
     binds.
+  - Added the `match` statement, which matches a target value against a 
+    number of case patterns and executes the selected statement.
 - Internals/Embedding/Extending
   - Refactored the names of Joe's type-related interfaces and Java classes
     for clarity.

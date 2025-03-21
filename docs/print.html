@@ -316,6 +316,8 @@ for the <code>Map</code> <code>get</code> and <code>put</code> methods.</li>
 <li>Added scripted <a href="records.html"><code>record</code> types</a>.</li>
 <li>Added the <code>if let</code> statement, which performs conditional destructuring
 binds.</li>
+<li>Added the <code>match</code> statement, which matches a target value against a
+number of case patterns and executes the selected statement.</li>
 </ul>
 </li>
 <li>Internals/Embedding/Extending
@@ -1510,7 +1512,28 @@ if let ([a, b] = list) {
 <p>The pattern's binding variables (<code>a</code> and <code>b</code> in this example) are in-scope only
 in the "then" branch.</p>
 <h2 id="the-match-statement"><a class="header" href="#the-match-statement">The <code>match</code> Statement</a></h2>
-<p>Not yet implemented.</p>
+<p>The <code>match</code> statement is similar to a <code>switch</code> statement, but matches
+patterns against a target value instead of checking for equality.  It
+is especially useful for processing a heterogeneous list of values.</p>
+<pre><code class="language-joe">match (value) {
+    case [a, b] -&gt; 
+      println("Two item list of " a + " and " + b + ".");
+    case Person(name, age) -&gt; 
+      println("Person " + name + " is " + age + " years old.");
+    default -&gt; println("no match");
+}
+</code></pre>
+<p>Every <code>match</code> statement requires at least one <code>case</code>, and the <code>default</code>
+clause is optional.  Note that matching on <code>_</code> (a simple wildcard)
+is equivalent to the <code>default</code> clause:</p>
+<pre><code class="language-joe">match (value) {
+    case [a, b] -&gt; 
+      println("Two item list of " a + " and " + b + ".");
+    case Person(name, age) -&gt; 
+      println("Person " + name + " is " + age + " years old.");
+    case _ -&gt; println("no match");
+}
+</code></pre>
 <h2 id="pattern-syntax"><a class="header" href="#pattern-syntax">Pattern Syntax</a></h2>
 <p>Here is a list of the many kinds of pattern Joe supports.  Some patterns
 can contain other patterns as subpatterns, allowing a pattern to match
@@ -8746,6 +8769,7 @@ statement       → exprStmt
                 | forStmt
                 | ifStmt
                 | ifLetStmt
+                | matchStmt
                 | printStmt
                 | returnStmt
                 | switchStmt
@@ -8764,6 +8788,10 @@ ifStmt          → "if" "(" expression ")" statement
                   ( "else" statement )? ;
 ifLetStmt       → "if" "let" "(" pattern "=" expression ")" statement 
                   ( "else" statement )? ; 
+matchStmt       → "match" "(" expression ")" "{" 
+                  ( "case" pattern "-&gt;" statement )+ 
+                  ( "default" "-&gt;" statement )? 
+                  "}" ;                  
 printStmt       → "print" expression ";" ;
 returnStmt      → "return" expression? ";" ;
 switchStmt      → "switch" "(" expression ")" "{"
