@@ -39,11 +39,15 @@ class Compiler {
     // The name of a function's varargs parameter.
     public static final String ARGS = "args";
 
+    // The hidden variable used to hold a `foreach` iterator value
+    private static final String VAR_ITERATOR = "*switch*";
+
+    // The hidden variable used to hold a `match` value
+    private static final String VAR_MATCH = "*match*";
+
     // The hidden variable used to hold a `switch` value
     private static final String VAR_SWITCH = "*switch*";
 
-    // The hidden variable used to hold a `foreach` iterator value
-    private static final String VAR_ITERATOR = "*switch*";
 
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -542,6 +546,8 @@ class Compiler {
             } else {
                 ifStatement();
             }
+        } else if (match(MATCH)) {
+            matchStatement();
         } else if (match(RETURN)) {
             returnStatement();
         } else if (match(SWITCH)) {
@@ -772,6 +778,59 @@ class Compiler {
 
         if (match(ELSE)) statement();
         patchJump(elseJump);
+    }
+
+    private void matchStatement() {
+        beginScope();
+        consume(LEFT_PAREN, "Expected '(' after 'match'.");
+        defineHiddenVariable(VAR_MATCH);
+        consume(RIGHT_PAREN, "Expected ')' after match expression.");
+        consume(LEFT_BRACE, "Expected '{' before match body.");
+
+        // Jump targets
+        var endJumps = new ArrayList<Character>();
+        int nextJump = -1;
+
+        while (match(CASE)) {
+            var caseJumps = new ArrayList<Character>();
+
+            // Allow the previous case to jump here if it doesn't match.
+            if (nextJump != -1) {
+                patchJump(nextJump);
+            }
+
+            beginScope(); // case
+            pattern();
+            markVarsInitialized(currentPattern.bindingVars.size());
+            getOrSetVariable(Token.synthetic(VAR_MATCH), false);
+
+            emit(Opcode.MATCH, currentPattern.patternIndex);
+            currentPattern = null;
+            nextJump = emitJump(Opcode.JIF);
+
+            // Parse the case body.
+            consume(MINUS_GREATER, "Expected '->' after case pattern.");
+            statement();
+            endScope(); // case
+            endJumps.add((char)emitJump(Opcode.JUMP));
+        }
+
+        // Look for the `default ->` case.
+        if (nextJump != -1) {
+            patchJump(nextJump);
+        }
+        if (match(DEFAULT)) {
+            consume(MINUS_GREATER, "Expected '->' after 'default'.");
+            statement();
+        }
+
+        consume(RIGHT_BRACE, "Expected '}' before match body.");
+
+        // Patch all the end jumps.
+        endJumps.forEach(this::patchJump);
+
+        // End the scope, removing the "*match*" variable.
+        endScope();
     }
 
     private void returnStatement() {
