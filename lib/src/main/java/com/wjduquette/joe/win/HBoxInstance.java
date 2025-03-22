@@ -20,7 +20,6 @@ public class HBoxInstance extends HBox implements JoeValue {
     }
 
     @Override public JoeType type() { return core.type(); }
-    @Override public String typeName() { return core.typeName(); }
     @Override public List<String> getFieldNames() { return core.getFieldNames(); }
     @Override public boolean hasField(String name) { return core.hasField(name); }
     @Override public Object get(String name) { return core.get(name); }

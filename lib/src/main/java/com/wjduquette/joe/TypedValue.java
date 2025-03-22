@@ -20,11 +20,6 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
     }
 
     @Override
-    public String typeName() {
-        return proxy.name();
-    }
-
-    @Override
     public boolean hasField(String name) {
         return proxy.hasField(value, name);
     }

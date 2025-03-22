@@ -13,11 +13,6 @@ class NullValue implements JoeValue {
     }
 
     @Override
-    public String typeName() {
-        return "null";
-    }
-
-    @Override
     public boolean hasField(String name) {
         return false;
     }

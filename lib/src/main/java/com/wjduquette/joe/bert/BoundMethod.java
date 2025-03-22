@@ -36,4 +36,9 @@ public record BoundMethod(Object receiver, Closure method)
     public String signature() {
         return method.signature();
     }
+
+    @Override
+    public String toString() {
+        return "<method " + signature() + ">";
+    }
 }

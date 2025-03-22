@@ -135,11 +135,6 @@ class WalkerRecord implements JoeClass, JoeValue, NativeCallable {
     }
 
     @Override
-    public String typeName() {
-        return "<record>";
-    }
-
-    @Override
     public boolean hasField(String name) {
         return fields.containsKey(name);
     }

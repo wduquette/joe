@@ -132,11 +132,6 @@ public class BertClass implements JoeClass, JoeValue, BertType, BertCallable {
     }
 
     @Override
-    public String typeName() {
-        return "<class>";
-    }
-
-    @Override
     public boolean hasField(String name) {
         return fields.containsKey(name);
     }

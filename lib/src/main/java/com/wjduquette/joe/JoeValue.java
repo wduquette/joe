@@ -8,18 +8,12 @@ import java.util.List;
  * JoeValue knows the name of its type, can have mutable or immutable
  * fields, can optionally be iterated over, and has a string representation.
  */
-public interface JoeValue extends HasTypeName {
+public interface JoeValue {
     /**
      * Gets the object's type.
      * @return The type.
      */
     JoeType type();
-
-    /**
-     * Gets the object's type name.
-     * @return The name
-     */
-    String typeName();
 
     /**
      * Returns true if the object has the named field property, and

@@ -21,6 +21,7 @@ class StandardLibrary extends JoePackage {
         type(BooleanType.TYPE);
         type(CatchResultType.TYPE);
         type(ErrorType.TYPE);
+        type(FunctionType.TYPE);
         type(JoeSingleton.TYPE);
         type(KeywordType.TYPE);
         type(ListType.TYPE);

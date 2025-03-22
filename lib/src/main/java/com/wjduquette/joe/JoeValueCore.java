@@ -51,14 +51,6 @@ public class JoeValueCore {
     }
 
     /**
-     * The type name.
-     * @return the name
-     */
-    public String typeName() {
-        return joeClass.name();
-    }
-
-    /**
      * Returns true if the object has the given field, and false otherwise.
      * Note: this checks for actual fields, not method properties.
      * @param name The field name
@@ -118,6 +110,6 @@ public class JoeValueCore {
      * @return the string.
      */
     public String defaultToString() {
-        return typeName() + "@" + host.hashCode();
+        return type().name() + "@" + host.hashCode();
     }
 }

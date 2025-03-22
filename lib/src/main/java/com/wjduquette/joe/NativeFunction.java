@@ -3,7 +3,7 @@ package com.wjduquette.joe;
 /**
  * A native function, implemented in Java, for use in a Joe interpreter.
  */
-public class NativeFunction implements NativeCallable, HasTypeName {
+public class NativeFunction implements NativeCallable {
     private final String name;
     private final String kind;
     private final JoeLambda joeLambda;
@@ -53,18 +53,10 @@ public class NativeFunction implements NativeCallable, HasTypeName {
     }
 
     //-------------------------------------------------------------------------
-    // HasTypeName API
-
-    @Override
-    public String typeName() {
-        return "<native function>";
-    }
-
-    //-------------------------------------------------------------------------
     // Object API
 
     @Override
     public String toString() {
-        return "<native fn " + name + ">";
+        return "<native " + kind + " " + name + ">";
     }
 }

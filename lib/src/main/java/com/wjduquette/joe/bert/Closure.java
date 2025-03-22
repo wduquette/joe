@@ -1,11 +1,5 @@
 package com.wjduquette.joe.bert;
 
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.JoeValue;
-import com.wjduquette.joe.JoeType;
-
-import java.util.List;
-
 /**
  * Closure is the {@link VirtualMachine}'s representation for compiled
  * functions.
@@ -21,7 +15,7 @@ import java.util.List;
  * can be used to create any number of Closures, each of which closes over
  * its own set of {@link Upvalue Upvalues}.</p>
  */
-public class Closure implements BertCallable, JoeValue {
+public class Closure implements BertCallable {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -41,43 +35,6 @@ public class Closure implements BertCallable, JoeValue {
     Closure(Function function) {
         this.function = function;
         this.upvalues = new Upvalue[function.upvalueCount];
-    }
-
-    //-------------------------------------------------------------------------
-    // JoeValue API
-
-    @Override
-    public JoeType type() {
-        // TODO: Fix this
-        throw new JoeError("Closure does not have a proper type!");
-    }
-
-    @Override
-    public String typeName() {
-        return "<function>";
-    }
-
-    @Override
-    public boolean hasField(String name) {
-        return false;
-    }
-
-    @Override
-    public List<String> getFieldNames() {
-        return List.of();
-    }
-
-
-    @Override
-    public Object get(String name) {
-        throw new UnsupportedOperationException(
-            "Values of type <function> have no properties.");
-    }
-
-    @Override
-    public void set(String name, Object value) {
-        throw new UnsupportedOperationException(
-            "Values of type <function> have no properties.");
     }
 
     //-------------------------------------------------------------------------
@@ -103,6 +60,6 @@ public class Closure implements BertCallable, JoeValue {
 
     @Override
     public String toString() {
-        return "<" + function.type().text() + " " + function.name() + ">";
+        return "<" + function.type().text() + " " + signature() + ">";
     }
 }
