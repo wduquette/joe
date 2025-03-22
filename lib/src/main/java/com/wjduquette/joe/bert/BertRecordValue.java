@@ -60,11 +60,6 @@ public class BertRecordValue implements JoeValue {
     }
 
     @Override
-    public String typeName() {
-        return type.name();
-    }
-
-    @Override
     public boolean hasField(String name) {
         return fields.containsKey(name);
     }

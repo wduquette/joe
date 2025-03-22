@@ -524,17 +524,7 @@ public class Joe {
      * @return The type string, or null.
      */
     public String typeName(Object value) {
-        return switch (value) {
-            case null -> null;
-            case HasTypeName htn -> htn.typeName();
-            default -> {
-                // If it's a native type, try to get bind to a type proxy.
-                var bound = getJoeValue(value);
-                yield bound != null
-                    ? bound.typeName()
-                    : "<java " + value.getClass().getCanonicalName() + ">";
-            }
-        };
+        return getJoeValue(value).type().name();
     }
 
     /**

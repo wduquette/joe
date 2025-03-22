@@ -491,7 +491,6 @@ public class MatcherTest extends Ted {
         }
 
         @Override public JoeType type() { return new TestType(typeName); }
-        @Override public String typeName() { return typeName; }
         @Override public boolean hasField(String name) { return fields.containsKey(name); }
         @Override public List<String> getFieldNames() { return List.of("id", "color"); }
         @Override public Object get(String name) { return fields.get(name); }

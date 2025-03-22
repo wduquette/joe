@@ -34,11 +34,6 @@ class WalkerInstance implements JoeValue {
     }
 
     @Override
-    public String typeName() {
-        return joeClass.name();
-    }
-
-    @Override
     public boolean hasField(String name) {
         return fields.containsKey(name);
     }

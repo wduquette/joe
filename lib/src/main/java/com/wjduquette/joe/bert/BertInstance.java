@@ -53,11 +53,6 @@ public class BertInstance implements JoeValue {
     }
 
     @Override
-    public String typeName() {
-        return klass.name();
-    }
-
-    @Override
     public List<String> getFieldNames() {
         return new ArrayList<>(fields.keySet());
     }

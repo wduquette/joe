@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * A function implemented in Joe.
  */
-final class WalkerFunction implements NativeCallable, HasTypeName {
+final class WalkerFunction implements NativeCallable {
     private final Interpreter interpreter;
     private final Stmt.Function declaration;
     private final Environment closure;
@@ -50,14 +50,6 @@ final class WalkerFunction implements NativeCallable, HasTypeName {
         } else {
             return declaration.name().lexeme() + "(" + params + ")";
         }
-    }
-
-    //-------------------------------------------------------------------------
-    // HasTypeName API
-
-    @Override
-    public String typeName() {
-        return "<" + kind() + ">";
     }
 
     //-------------------------------------------------------------------------
