@@ -33,6 +33,35 @@ function testElseClause() {
     assertTrue(noMatch);
 }
 
+// Verify that we can read the target from a variable.
+// (based on a real bug)
+function testVarTarget() {
+    var list = [#a, "match"];
+    var result;
+    if let ([#a, x] = list) {
+        result = x;
+        assertEquals(list, [#a, "match"]);
+    } else {
+        result = "no match";
+    }
+    assertEquals(result, "match");
+}
+
+// Verify that we can read constants from interpolated variables.
+function testInterpolated() {
+    var tag = #a;
+    var list = [tag, "match"];
+    var result;
+    if let ([$tag, x] = list) {
+        result = x;
+        assertEquals(list, [#a, "match"]);
+    } else {
+        result = "no match";
+    }
+    assertEquals(result, "match");
+}
+
+
 // Verify that pattern variables do not modify shadowed variables on match.
 function testShadowedVar_match() {
     var a = "outer";

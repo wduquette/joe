@@ -193,27 +193,29 @@ class Interpreter {
                 }
             }
             case Stmt.IfLet stmt -> {
-                var constants = new ArrayList<>();
-                stmt.pattern().getConstants().forEach(e ->
-                    constants.add(evaluate(e)));
-                var target = evaluate(stmt.target());
-                var values = new ArrayList<>();
-                if (Matcher.bind(
-                    joe,
-                    stmt.pattern().getPattern(),
-                    target,
-                    constants::get,
-                    values::add
-                )) {
-                    var previous = this.environment;
-                    try {
-                        this.environment = new Environment(previous);
+                var previous = this.environment;
+                this.environment = new Environment(previous);
+                try {
+                    var constants = new ArrayList<>();
+                    stmt.pattern().getConstants().forEach(e ->
+                        constants.add(evaluate(e)));
+                    var target = evaluate(stmt.target());
+                    var values = new ArrayList<>();
+                    if (Matcher.bind(
+                        joe,
+                        stmt.pattern().getPattern(),
+                        target,
+                        constants::get,
+                        values::add
+                    )) {
                         bind(stmt.pattern(), values);
                         return execute(stmt.thenBranch());
-                    } finally {
-                        this.environment = previous;
                     }
-                } else if (stmt.elseBranch() != null) {
+                } finally {
+                    this.environment = previous;
+                }
+
+                if (stmt.elseBranch() != null) {
                     return execute(stmt.elseBranch());
                 }
             }
@@ -243,25 +245,25 @@ class Interpreter {
                     if (c.pattern() == null) return execute(c.statement());
 
                     // case pattern ->
-                    var constants = new ArrayList<>();
-                    c.pattern().getConstants().forEach(e ->
-                        constants.add(evaluate(e)));
-                    var values = new ArrayList<>();
-                    if (Matcher.bind(
-                        joe,
-                        c.pattern().getPattern(),
-                        target,
-                        constants::get,
-                        values::add
-                    )) {
-                        var previous = this.environment;
-                        try {
-                            this.environment = new Environment(previous);
+                    var previous = this.environment;
+                    try {
+                        this.environment = new Environment(previous);
+                        var constants = new ArrayList<>();
+                        c.pattern().getConstants().forEach(e ->
+                            constants.add(evaluate(e)));
+                        var values = new ArrayList<>();
+                        if (Matcher.bind(
+                            joe,
+                            c.pattern().getPattern(),
+                            target,
+                            constants::get,
+                            values::add
+                        )) {
                             bind(c.pattern(), values);
                             return execute(c.statement());
-                        } finally {
-                            this.environment = previous;
                         }
+                    } finally {
+                        this.environment = previous;
                     }
                 }
             }

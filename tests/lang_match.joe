@@ -86,6 +86,31 @@ function testMatch_finalWildcard() {
     assertEquals(result, #ok);
 }
 
+function testVarTarget() {
+    var map = {#b: 2};
+    var result;
+
+    match (map) {
+        case {#a: a} -> { result = a; }
+        case {#b: b} -> { result = b; }
+        default -> { result = "no match"; }
+    }
+    assertEquals(result, 2);
+}
+
+function testInterpolatedConstant() {
+    var tag = #b;
+    var map = {tag: 2};
+    var result;
+
+    match (map) {
+        case {#a: a} -> { result = a; }
+        case {$tag: b} -> { result = b; }
+        default -> { result = "no match"; }
+    }
+    assertEquals(result, 2);
+}
+
 // Verify that a function can close over pattern variables.
 function testMatch_WithClosures() {
     function getFunc(map) {
