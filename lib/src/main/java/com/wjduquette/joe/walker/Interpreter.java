@@ -245,25 +245,25 @@ class Interpreter {
                     if (c.pattern() == null) return execute(c.statement());
 
                     // case pattern ->
-                    var constants = new ArrayList<>();
-                    c.pattern().getConstants().forEach(e ->
-                        constants.add(evaluate(e)));
-                    var values = new ArrayList<>();
-                    if (Matcher.bind(
-                        joe,
-                        c.pattern().getPattern(),
-                        target,
-                        constants::get,
-                        values::add
-                    )) {
-                        var previous = this.environment;
-                        try {
-                            this.environment = new Environment(previous);
+                    var previous = this.environment;
+                    try {
+                        this.environment = new Environment(previous);
+                        var constants = new ArrayList<>();
+                        c.pattern().getConstants().forEach(e ->
+                            constants.add(evaluate(e)));
+                        var values = new ArrayList<>();
+                        if (Matcher.bind(
+                            joe,
+                            c.pattern().getPattern(),
+                            target,
+                            constants::get,
+                            values::add
+                        )) {
                             bind(c.pattern(), values);
                             return execute(c.statement());
-                        } finally {
-                            this.environment = previous;
                         }
+                    } finally {
+                        this.environment = previous;
                     }
                 }
             }
