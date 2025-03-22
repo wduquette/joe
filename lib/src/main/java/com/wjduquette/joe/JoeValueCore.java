@@ -60,6 +60,11 @@ public class JoeValueCore {
         return fields.containsKey(name);
     }
 
+    /**
+     * Gets the names of the value's fields, or the empty list if
+     * none.
+     * @return The names.
+     */
     public List<String> getFieldNames() {
         return new ArrayList<>(fields.keySet());
     }

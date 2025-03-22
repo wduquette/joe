@@ -18,6 +18,11 @@ public class Matcher {
      * ID.
      */
     public interface ConstantGetter {
+        /**
+         * Gets the value of the constant with the given ID.
+         * @param id The ID
+         * @return the value
+         */
         Object get(int id);
     }
 
@@ -26,6 +31,11 @@ public class Matcher {
      * the binding ID.
      */
     public interface Binder {
+        /**
+         * Provides the binding ID/value pair to the client.
+         * @param id The binding ID
+         * @param value The bound value
+         */
         void bind(int id, Object value);
     }
 

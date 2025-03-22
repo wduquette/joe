@@ -4,13 +4,20 @@ import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 
+/**
+ * A ProxyType for the CatchResult type.
+ */
 public class CatchResultType extends RecordType<CatchResult> {
+    /** The type, ready for installation. */
     public static final CatchResultType TYPE = new CatchResultType();
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    public CatchResultType() {
+    /**
+     * Creates the proxy.
+     */
+    CatchResultType() {
         super("CatchResult");
 
         //**

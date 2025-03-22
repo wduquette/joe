@@ -112,8 +112,8 @@ public class ProxyType<V>
      * Declares that this proxy is a proxy for the given type, which
      * must be a type that is assignable to the value V.
      *
-     * The {@code type} can be a normal class or an interface
-     * implemented {@bold directly} by one or more classes of interest.
+     * <p>The {@code type} can be a normal class or an interface
+     * implemented <b>directly</b> by one or more classes of interest.</p>
      *
      * <p>A ProxyType can proxy any number of related types; call
      * {@code proxies()} for each such type.</p>
@@ -359,15 +359,6 @@ public class ProxyType<V>
 
     //-------------------------------------------------------------------------
     // Public Methods
-
-    /**
-     * As a JoeValue, the proxy needs a typeName.  It's simply a
-     * "{@code &lt;type&gt;}".
-     * @return The name.
-     */
-    public final String typeName() {
-        return "<native type>";
-    }
 
     /**
      * Gets the Java types proxied by this type.  These should be

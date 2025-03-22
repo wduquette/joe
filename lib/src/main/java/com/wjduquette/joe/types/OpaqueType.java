@@ -17,7 +17,8 @@ public class OpaqueType extends ProxyType<Object> {
     // Constructor
 
     /**
-     * Creates an instance of the proxy.
+     * Creates an instance of the proxy for the given Java class.
+     * @param javaClass The opaque type
      */
     public OpaqueType(Class<?> javaClass) {
         super(javaClass.getSimpleName());

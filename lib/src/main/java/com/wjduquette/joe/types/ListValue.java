@@ -33,12 +33,14 @@ public class ListValue
     }
 
     /**
-     * Creates a list with the given initial capacity.
-     * @param capacity The capacity
+     * Creates a list of the given size, with each element
+     * initialized to the given value.
+     * @param size The list size
+     * @param initValue The initial value to assign to each element.
      */
-    public ListValue(int capacity, Object initValue) {
-        super(capacity);
-        for (var i = 0; i < capacity; i++) {
+    public ListValue(int size, Object initValue) {
+        super(size);
+        for (var i = 0; i < size; i++) {
             add(initValue);
         }
     }

@@ -5,13 +5,20 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeType;
 import com.wjduquette.joe.ProxyType;
 
+/**
+ * Defines the `Joe.*` singleton in the Joe standard library.
+ */
 public class JoeSingleton extends ProxyType<Void> {
+    /** The singleton, ready for installation. */
     public static final JoeSingleton TYPE = new JoeSingleton();
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    public JoeSingleton() {
+    /**
+     * Creates the proxy.
+     */
+    JoeSingleton() {
         super("Joe");
 
         //**
