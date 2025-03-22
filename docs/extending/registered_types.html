@@ -261,8 +261,6 @@ the lookup is done, as it can get complicated.</p>
 <p>First, Joe maintains two lookup tables:</p>
 <ul>
 <li>The <code>proxyTable</code>, a map from <code>Class</code> objects to <code>ProxyType&lt;?&gt;</code> objects.</li>
-<li>The <code>opaqueTypes</code> table, a set if <code>Class</code> objects which are known not
-to have type proxies.</li>
 </ul>
 <p>Given these, the lookup logic is as follows:</p>
 <ul>
@@ -292,10 +290,16 @@ value's concrete class.  It will be found immediately next time.</li>
 </ul>
 </li>
 <li>
-<p>Finally, if no proxy has been found the value's <code>Class</code> is added to the
-<code>opaqueTypes</code> table, so that lookups will "fail fast" next time.</p>
+<p>Finally, if no proxy has been found an <code>OpaqueType</code> is created and
+registered for the value's <code>Class</code>.</p>
 </li>
 </ul>
+<p><strong>NOTE</strong>: when looking for registered interfaces, Joe only looks at the
+interfaces directly implemented by the value's class or its superclasses;
+it does <em>not</em> check any interfaces that those interfaces might extend.
+This is intentional, as expanding the search is too likely to lead to
+false positives and much unintentional comedy.  Registered interfaces
+should be used with great care!</p>
 <h2 id="the-supertype"><a class="header" href="#the-supertype">The Supertype</a></h2>
 <p>Sometimes it happens that both a type and its supertype are registered types;
 this is the case with Joe's <code>Error</code> and <code>AssertError</code> types.  In such a case,

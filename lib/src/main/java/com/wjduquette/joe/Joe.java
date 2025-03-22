@@ -452,9 +452,11 @@ public class Joe {
     }
 
     /**
-     * Given a value, gets it as a JoeValue.
+     * Given a value, gets it as a JoeValue.  If the value implements
+     * the JoeValue interface, it is returned immediately; otherwise
+     * Joe looks up the value's proxy in the type registry.
      * @param value The value
-     * @return The JoeValue
+     * @return The JoeValue or null if the value is null.
      */
     public JoeValue getJoeValue(Object value) {
         if (value == null) return NULL;

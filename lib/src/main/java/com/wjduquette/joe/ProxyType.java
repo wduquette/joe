@@ -109,11 +109,15 @@ public class ProxyType<V>
     }
 
     /**
-     * Declares that this proxy is a proxy for the given type, which should
-     * be a real class (not an interface) that is assignable to the value
-     * type.
+     * Declares that this proxy is a proxy for the given type, which
+     * must be a type that is assignable to the value V.
      *
-     * <p>A proxy can proxy any number of related types.</p>
+     * The {@code type} can be a normal class or an interface
+     * implemented {@bold directly} by one or more classes of interest.
+     *
+     * <p>A ProxyType can proxy any number of related types; call
+     * {@code proxies()} for each such type.</p>
+     *
      * @param type The proxied type.
      */
     protected void proxies(Class<? extends V> type) {

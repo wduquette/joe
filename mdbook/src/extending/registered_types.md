@@ -108,8 +108,6 @@ the lookup is done, as it can get complicated.
 First, Joe maintains two lookup tables:
 
 - The `proxyTable`, a map from `Class` objects to `ProxyType<?>` objects.
-- The `opaqueTypes` table, a set if `Class` objects which are known not
-  to have type proxies.
 
 Given these, the lookup logic is as follows: 
 
@@ -130,8 +128,15 @@ Given these, the lookup logic is as follows:
   - If a proxy is found, it is cached back into the `proxyTable` for the
     value's concrete class.  It will be found immediately next time.
 
-- Finally, if no proxy has been found the value's `Class` is added to the
-  `opaqueTypes` table, so that lookups will "fail fast" next time.
+- Finally, if no proxy has been found an `OpaqueType` is created and 
+  registered for the value's `Class`.
+
+**NOTE**: when looking for registered interfaces, Joe only looks at the 
+interfaces directly implemented by the value's class or its superclasses; 
+it does *not* check any interfaces that those interfaces might extend.
+This is intentional, as expanding the search is too likely to lead to
+false positives and much unintentional comedy.  Registered interfaces
+should be used with great care!
 
 ## The Supertype
 
