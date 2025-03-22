@@ -65,6 +65,6 @@ public class NativeFunction implements NativeCallable, HasTypeName {
 
     @Override
     public String toString() {
-        return "<native fn " + name + ">";
+        return "<native " + kind + " " + name + ">";
     }
 }
