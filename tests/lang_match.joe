@@ -130,3 +130,15 @@ function testMatch_WithClosures() {
     var f3 = getFunc({#c: 3});
     assertEquals(f3(), "no match");
 }
+
+function testGuard() {
+    var list = [1, 2];
+    var result;
+
+    match (list) {
+        case [a, b] if a == 10 -> { result = #first; }
+        case [a, b] if a == 1 -> { result = #second; }
+        default -> { result = "no match"; }
+    }
+    assertEquals(result, #second);
+}

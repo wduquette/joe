@@ -397,9 +397,10 @@ class Parser {
         while (match(CASE)) {
             var caseKeyword = previous();
             var pattern = pattern();
+            var guard = match(IF) ? expression() : null;
             consume(MINUS_GREATER, "Expected '->' after pattern.");
             var stmt = statement();
-            cases.add(new Stmt.MatchCase(caseKeyword, pattern, stmt));
+            cases.add(new Stmt.MatchCase(caseKeyword, pattern, guard, stmt));
         }
 
         if (cases.isEmpty()) {
@@ -411,7 +412,7 @@ class Parser {
             var caseKeyword = previous();
             consume(MINUS_GREATER, "Expected '->' after 'default'.");
             var stmt = statement();
-            cases.add(new Stmt.MatchCase(caseKeyword, null, stmt));
+            cases.add(new Stmt.MatchCase(caseKeyword, null, null, stmt));
         }
 
         // NEXT, complete the statement

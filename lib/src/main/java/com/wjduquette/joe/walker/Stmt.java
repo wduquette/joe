@@ -138,11 +138,13 @@ sealed interface Stmt
      * A case in a match statement.
      * @param keyword The "case" keyword
      * @param pattern The pattern to match
+     * @param guard The guard condition, or null.
      * @param statement The statement to execute
      */
     record MatchCase(
         Token keyword,
         WalkerPattern pattern,
+        Expr guard,
         Stmt statement
     ) {}
 

@@ -195,6 +195,7 @@ class Resolver {
                         c.pattern().getBindings().forEach(this::declare);
                         c.pattern().getConstants().forEach(this::resolve);
                         c.pattern().getBindings().forEach(this::define);
+                        if (c.guard() != null) resolve(c.guard());
                         resolve(c.statement());
                         endScope();
                     } else {

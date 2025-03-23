@@ -170,6 +170,8 @@ class Dumper {
                     buff.append(indent())
                         .append("Case ")
                         .append(c.pattern())
+                        .append(" if ")
+                        .append(c.guard())
                         .append("\n");
                     dumpStatement(c.statement());
                 }

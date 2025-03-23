@@ -260,7 +260,11 @@ class Interpreter {
                             values::add
                         )) {
                             bind(c.pattern(), values);
-                            return execute(c.statement());
+                            var guard = c.guard() != null
+                                ? evaluate(c.guard()) : true;
+                            if (Joe.isTruthy(guard)) {
+                                return execute(c.statement());
+                            }
                         }
                     } finally {
                         this.environment = previous;
