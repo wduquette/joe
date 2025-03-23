@@ -789,15 +789,15 @@ class Compiler {
 
         // Jump targets
         var endJumps = new ArrayList<Character>();
-        int nextJump = -1;
+        int nextJump1 = -1;  // Jump if match failed
+        int nextJump2 = -1;  // Jump if guard failed
 
         while (match(CASE)) {
             var caseJumps = new ArrayList<Character>();
 
             // Allow the previous case to jump here if it doesn't match.
-            if (nextJump != -1) {
-                patchJump(nextJump);
-            }
+            if (nextJump1 != -1) patchJump(nextJump1);
+            if (nextJump2 != -1) patchJump(nextJump2);
 
             beginScope(); // case
             pattern();
@@ -806,7 +806,12 @@ class Compiler {
 
             emit(Opcode.MATCH, currentPattern.patternIndex);
             currentPattern = null;
-            nextJump = emitJump(Opcode.JIF);
+            nextJump1 = emitJump(Opcode.JIF);
+
+            if (match(IF)) {
+                expression();
+                nextJump2 = emitJump(Opcode.JIF);
+            }
 
             // Parse the case body.
             consume(MINUS_GREATER, "Expected '->' after case pattern.");
@@ -816,9 +821,9 @@ class Compiler {
         }
 
         // Look for the `default ->` case.
-        if (nextJump != -1) {
-            patchJump(nextJump);
-        }
+        if (nextJump1 != -1) patchJump(nextJump1);
+        if (nextJump2 != -1) patchJump(nextJump2);
+
         if (match(DEFAULT)) {
             consume(MINUS_GREATER, "Expected '->' after 'default'.");
             statement();
