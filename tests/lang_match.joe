@@ -136,9 +136,18 @@ function testGuard() {
     var result;
 
     match (list) {
-        case [a, b] if a == 10 -> { result = #first; }
-        case [a, b] if a == 1 -> { result = #second; }
-        default -> { result = "no match"; }
+        // Fails: pattern doesn't match
+        case [0, 1]            -> { result = #a; }
+
+        // Fails: pattern matches, guard is false
+        case [a, b] if a == 10 -> { result = #b; }
+
+        // Succeeds: pattern matches, guard is true
+        case [a, b] if a == 1  -> { result = #c; }
+
+        // Skipped because of previous match
+        default                -> { result = #d; }
     }
-    assertEquals(result, #second);
+
+    assertEquals(result, #c);
 }

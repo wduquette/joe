@@ -253,9 +253,9 @@ patterns against a target value instead of checking for equality.  It
 is especially useful for processing a heterogeneous list of values.</p>
 <pre><code class="language-joe">match (value) {
     case [a, b] -&gt; 
-      println("Two item list of " a + " and " + b + ".");
+        println("Two item list of " a + " and " + b + ".");
     case Person(name, age) -&gt; 
-      println("Person " + name + " is " + age + " years old.");
+        println("Person " + name + " is " + age + " years old.");
     default -&gt; println("no match");
 }
 </code></pre>
@@ -264,10 +264,21 @@ clause is optional.  Note that matching on <code>_</code> (a simple wildcard)
 is equivalent to the <code>default</code> clause:</p>
 <pre><code class="language-joe">match (value) {
     case [a, b] -&gt; 
-      println("Two item list of " a + " and " + b + ".");
+        println("Two item list of " a + " and " + b + ".");
     case Person(name, age) -&gt; 
-      println("Person " + name + " is " + age + " years old.");
+        println("Person " + name + " is " + age + " years old.");
     case _ -&gt; println("no match");
+}
+</code></pre>
+<p>Each <code>case</code> in a <code>match</code> can include an optional  guard clause, which
+adds a boolean guard condition on top of the pattern match.  In the following
+example the case matches any <code>Person</code> record, and then requires that the
+person be at least 10 years old.</p>
+<pre><code class="language-joe">match (value) {
+    ...
+    case Person(name, age) if age &gt;= 10 -&gt; 
+        println("Person " + name + " is at least 10 years old.");
+    ...
 }
 </code></pre>
 <h2 id="pattern-syntax"><a class="header" href="#pattern-syntax">Pattern Syntax</a></h2>

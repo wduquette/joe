@@ -240,7 +240,7 @@ ifStmt          → "if" "(" expression ")" statement
 ifLetStmt       → "if" "let" "(" pattern "=" expression ")" statement 
                   ( "else" statement )? ; 
 matchStmt       → "match" "(" expression ")" "{" 
-                  ( "case" pattern "-&gt;" statement )+ 
+                  ( "case" pattern ( "if" expression )? "-&gt;" statement )+ 
                   ( "default" "-&gt;" statement )? 
                   "}" ;                  
 printStmt       → "print" expression ";" ;

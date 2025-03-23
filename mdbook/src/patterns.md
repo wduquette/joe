@@ -105,9 +105,9 @@ is especially useful for processing a heterogeneous list of values.
 ```joe
 match (value) {
     case [a, b] -> 
-      println("Two item list of " a + " and " + b + ".");
+        println("Two item list of " a + " and " + b + ".");
     case Person(name, age) -> 
-      println("Person " + name + " is " + age + " years old.");
+        println("Person " + name + " is " + age + " years old.");
     default -> println("no match");
 }
 ```
@@ -119,12 +119,27 @@ is equivalent to the `default` clause:
 ```joe
 match (value) {
     case [a, b] -> 
-      println("Two item list of " a + " and " + b + ".");
+        println("Two item list of " a + " and " + b + ".");
     case Person(name, age) -> 
-      println("Person " + name + " is " + age + " years old.");
+        println("Person " + name + " is " + age + " years old.");
     case _ -> println("no match");
 }
 ```
+
+Each `case` in a `match` can include an optional  guard clause, which 
+adds a boolean guard condition on top of the pattern match.  In the following 
+example the case matches any `Person` record, and then requires that the
+person be at least 10 years old.
+
+```joe
+match (value) {
+    ...
+    case Person(name, age) if age >= 10 -> 
+        println("Person " + name + " is at least 10 years old.");
+    ...
+}
+```
+
 
 ## Pattern Syntax
 
