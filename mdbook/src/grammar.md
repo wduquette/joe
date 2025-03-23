@@ -70,7 +70,7 @@ ifStmt          → "if" "(" expression ")" statement
 ifLetStmt       → "if" "let" "(" pattern "=" expression ")" statement 
                   ( "else" statement )? ; 
 matchStmt       → "match" "(" expression ")" "{" 
-                  ( "case" pattern "->" statement )+ 
+                  ( "case" pattern ( "if" expression )? "->" statement )+ 
                   ( "default" "->" statement )? 
                   "}" ;                  
 printStmt       → "print" expression ";" ;
