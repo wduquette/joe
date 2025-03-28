@@ -4,6 +4,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public record Literal(Token relation, List<Term> terms) {
+    public List<String> getVariableNames() {
+        return terms.stream()
+            .filter(t -> t instanceof Term.Variable)
+            .map(Term::toString)
+            .toList();
+    }
+
     @Override public String toString() {
         var termString = terms.stream().map(Term::toString)
             .collect(Collectors.joining(", "));

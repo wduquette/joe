@@ -59,20 +59,34 @@ class Parser {
     }
 
     private Clause fact(Literal head) {
-        // TODO: verify that the head is ground.
+        // Verify that there are no variable terms.
+        for (var term : head.terms()) {
+            if (term instanceof Literal.Term.Variable v) {
+                error(v.name(), "fact contains a variable term.");
+            }
+        }
         return new Clause.Fact(head);
     }
 
     private Clause rule(Literal head) {
-        // TODO: Verify that the head contains only body variables.
-
         var body = new ArrayList<Literal>();
 
+        var bodyVar = new HashSet<String>();
         do {
-            body.add(literal());
+            var literal = literal();
+            body.add(literal);
+            bodyVar.addAll(literal.getVariableNames());
         } while (match(COMMA));
 
         consume(DOT, "expected '.' after rule body.");
+
+        // Verify that the head contains only body variables.
+        head.terms().stream()
+            .filter(t -> t instanceof Literal.Term.Variable)
+            .map(t -> (Literal.Term.Variable)t)
+            .filter(t -> !bodyVar.contains(t.toString()))
+            .forEach(v -> error(v.name(),
+                "head variable not found in body."));
 
         return new Clause.Rule(head, body);
     }

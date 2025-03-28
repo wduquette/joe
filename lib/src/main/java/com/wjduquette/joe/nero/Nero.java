@@ -67,7 +67,7 @@ public class Nero {
 
     private void errorHandler(Trace trace) {
         gotError = true;
-        System.out.println("line " + trace.line() + ":" +
+        System.out.println("line " + trace.line() + ": " +
             trace.message());
     }
 }
