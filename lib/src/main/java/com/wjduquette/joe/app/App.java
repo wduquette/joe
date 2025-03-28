@@ -63,7 +63,8 @@ public class App {
             DumpTool.INFO,
             TestTool.INFO,
             DocTool.INFO,
-            WinTool.INFO
+            WinTool.INFO,
+            NeroTool.INFO // Experimental
         ));
 
         try {
