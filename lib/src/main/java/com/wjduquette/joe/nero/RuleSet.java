@@ -37,10 +37,12 @@ public class RuleSet {
     /**
      * Adds the fact into the set of known facts.  Returns true if the
      * fact was previously unknown, and false otherwise.
+     * Eventually this will be public, but we'll need to extend the
+     * data model.
      * @param fact The fact
      * @return true or false
      */
-    public boolean addFact(Fact fact) {
+    private boolean addFact(Fact fact) {
         if (!knownFacts.contains(fact)) {
             var list = factsFor(fact.relation());
             list.add(fact);
@@ -57,24 +59,48 @@ public class RuleSet {
             key -> new ArrayList<>());
     }
 
+
+    public Set<Fact> getKnownFacts() {
+        return Collections.unmodifiableSet(knownFacts);
+    }
+
+    //-------------------------------------------------------------------------
+    // Inference
+
     /**
      * Executes the inference algorithm, computing all facts knowable
      * from the rules.
      */
     public void ponder() {
-        for (var rule : rules) {
-            System.out.println("Rule: " + rule);
-            var iter = new TupleIterator(rule);
-            while (iter.hasNext()) {
-                var tuple = iter.next();
-                System.out.println("  " + Arrays.toString(tuple));
+        var gotNewFact = false;
+        knownFacts.clear();
+        knownFacts.addAll(baseFacts);
+
+        do {
+            for (var rule : rules) {
+                var iter = new TupleIterator(rule);
+                while (iter.hasNext()) {
+                    var fact = matchRule(rule, iter.next());
+
+                    if (fact != null && !knownFacts.contains(fact)) {
+                        addFact(fact);
+                        gotNewFact = true;
+                    }
+                }
             }
-        }
+        } while (gotNewFact);
     }
 
-    public Set<Fact> getKnownFacts() {
-        return Collections.unmodifiableSet(knownFacts);
+    private Fact matchRule(Rule rule, Fact[] tuple) {
+        var terms = new ArrayList<Term>();
+
+        // TODO
+        for (int i = 0; i < tuple.length; i++) {
+
+        }
+        return null;
     }
+
 
     //-------------------------------------------------------------------------
     // TupleIterator
