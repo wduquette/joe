@@ -8,15 +8,24 @@ import java.util.stream.Collectors;
  * we distinguish between facts and rules.
  */
 public sealed interface Clause
-    permits Clause.Fact, Clause.Rule
+    permits Clause.FactClause, Clause.RuleClause
 {
-    record Fact(Literal literal) implements Clause {
+    record FactClause(Literal literal) implements Clause {
+        public Fact asFact() {
+            return literal.asFact();
+        }
+
         @Override public String toString() {
             return literal + ".";
         }
     }
 
-    record Rule(Literal head, List<Literal> body) implements Clause {
+    record RuleClause(Literal head, List<Literal> body) implements Clause {
+        public Rule asRule() {
+            var realBody = body.stream().map(Literal::asFact).toList();
+            return new Rule(head.asFact(), realBody);
+        }
+
         @Override public String toString() {
             var bodyString = body.stream().map(Literal::toString)
                 .collect(Collectors.joining(", "));

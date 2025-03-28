@@ -4,6 +4,7 @@ import com.wjduquette.joe.Trace;
 import java.util.*;
 
 import static com.wjduquette.joe.nero.TokenType.*;
+import static com.wjduquette.joe.nero.Literal.LiteralTerm.*;
 
 class Parser {
     //-------------------------------------------------------------------------
@@ -61,11 +62,11 @@ class Parser {
     private Clause fact(Literal head) {
         // Verify that there are no variable terms.
         for (var term : head.terms()) {
-            if (term instanceof Literal.Term.Variable v) {
+            if (term instanceof VariableToken v) {
                 error(v.name(), "fact contains a variable term.");
             }
         }
-        return new Clause.Fact(head);
+        return new Clause.FactClause(head);
     }
 
     private Clause rule(Literal head) {
@@ -82,20 +83,20 @@ class Parser {
 
         // Verify that the head contains only body variables.
         head.terms().stream()
-            .filter(t -> t instanceof Literal.Term.Variable)
-            .map(t -> (Literal.Term.Variable)t)
+            .filter(t -> t instanceof VariableToken)
+            .map(t -> (VariableToken)t)
             .filter(t -> !bodyVar.contains(t.toString()))
             .forEach(v -> error(v.name(),
                 "head variable not found in body."));
 
-        return new Clause.Rule(head, body);
+        return new Clause.RuleClause(head, body);
     }
 
     private Literal literal() {
         var predicate = consume(IDENTIFIER, "expected predicate.");
         consume(LEFT_PAREN, "expected '(' after predicate.");
 
-        var terms = new ArrayList<Literal.Term>();
+        var terms = new ArrayList<Literal.LiteralTerm>();
 
         do {
             terms.add(term());
@@ -106,11 +107,11 @@ class Parser {
         return new Literal(predicate, terms);
     }
 
-    private Literal.Term term() {
+    private Literal.LiteralTerm term() {
         if (match(IDENTIFIER)) {
-            return new Literal.Term.Variable(previous());
+            return new VariableToken(previous());
         } else if (match(KEYWORD, NUMBER, STRING)) {
-            return new Literal.Term.Constant(previous());
+            return new ConstantToken(previous());
         } else {
             advance();
             throw errorSync(previous(), "expected term.");
