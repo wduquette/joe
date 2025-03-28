@@ -1,6 +1,7 @@
 package com.wjduquette.joe.nero;
 
 import java.util.*;
+import static com.wjduquette.joe.nero.Term.*;
 
 /**
  * A Nero rule base, including all facts and rules read from Nero input.
@@ -72,18 +73,25 @@ public class RuleSet {
      * from the rules.
      */
     public void ponder() {
-        var gotNewFact = false;
         knownFacts.clear();
-        knownFacts.addAll(baseFacts);
+        factMap.clear();
+        baseFacts.forEach(this::addFact);
 
+        int count = 0;
+        boolean gotNewFact;
         do {
+            gotNewFact = false;
+            System.out.println("Iteration " + (++count) + ":");
             for (var rule : rules) {
+                System.out.println("  Rule: " + rule);
+
                 var iter = new TupleIterator(rule);
                 while (iter.hasNext()) {
-                    var fact = matchRule(rule, iter.next());
+                    var tuple = iter.next();
+                    var fact = matchRule(rule, tuple);
 
-                    if (fact != null && !knownFacts.contains(fact)) {
-                        addFact(fact);
+                    if (fact != null && addFact(fact)) {
+                        System.out.println("    Fact: " + fact);
                         gotNewFact = true;
                     }
                 }
@@ -92,15 +100,63 @@ public class RuleSet {
     }
 
     private Fact matchRule(Rule rule, Fact[] tuple) {
+        // FIRST, match each pattern in the rule with a fact from
+        // the tuple, binding variables from left to right.
+        var bindings = new HashMap<Variable,Constant>();
+
+        for (int i = 0; i < tuple.length; i++) {
+            if (!matchFact(bindings, rule.body().get(i), tuple[i])) {
+                return null;
+            }
+        }
+
+        // NEXT, build the list of terms and return the new fact.
         var terms = new ArrayList<Term>();
 
-        // TODO
-        for (int i = 0; i < tuple.length; i++) {
-
+        for (var term : rule.head().terms()) {
+            switch (term) {
+                case Constant c -> terms.add(c);
+                case Variable v -> terms.add(bindings.get(v));
+            }
         }
-        return null;
+
+        return new Fact(rule.head().relation(), terms);
     }
 
+    // Matches the fact against the rule pattern, return any
+    // bound variables, or null on failure.
+    private boolean matchFact(
+        Map<Variable, Constant> bindings,
+        Fact pattern,
+        Fact fact
+    ) {
+//        System.out.println("      MatchFact " + bindings + " " + pattern +
+//            " " + fact);
+        var n = pattern.terms().size();
+        if (fact.terms().size() != n) return false;
+
+        for (var i = 0; i < pattern.terms().size(); i++) {
+            var p = pattern.terms().get(i);
+            var f = (Term.Constant)fact.terms().get(i);
+
+            switch (p) {
+                case Term.Variable v -> {
+                    var bound = bindings.get(v);
+
+                    if (bound == null) {
+                        bindings.put(v, f);
+                    } else if (!bound.equals(f)) {
+                        return false;
+                    }
+                }
+                case Term.Constant c -> {
+                    if (!f.equals(c)) return false;
+                }
+            }
+        }
+
+        return true;
+    }
 
     //-------------------------------------------------------------------------
     // TupleIterator
@@ -151,10 +207,12 @@ public class RuleSet {
             }
 
             var n = next++;
+            var indices = new int[tuple.length];
 
             for (var i = 0; i < inputs.size(); i++) {
                 var input = inputs.get(i);
-                tuple[i] = input.get(n % input.size());
+                indices[i] = n % input.size();
+                tuple[i] = input.get(indices[i]);
                 n /= input.size();
             }
 
