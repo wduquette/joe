@@ -13,7 +13,7 @@ To do a complete clean build:
 -->
 <project name="joe" basedir="." default="all">
     <!-- Update the following before cutting a release -->
-    <property name="version"     value="0.6.0"/>
+    <property name="version"     value="0.7.0"/>
 
     <!-- These should rarely need to be touched. -->
     <property name="srcdir"      value="${basedir}/lib/src/main/java"/>
