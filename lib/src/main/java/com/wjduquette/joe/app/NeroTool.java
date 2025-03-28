@@ -1,6 +1,7 @@
 package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.nero.Nero;
 import com.wjduquette.joe.tools.Tool;
@@ -83,6 +84,9 @@ public class NeroTool implements Tool {
             System.err.println(ex.getErrorReport());
             System.err.println("*** " + ex.getMessage());
             System.exit(65);
+        } catch (JoeError ex) {
+            System.err.println(ex.getMessage());
+            System.exit(1);
         }
     }
 

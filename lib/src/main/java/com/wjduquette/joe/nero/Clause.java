@@ -20,7 +20,7 @@ public sealed interface Clause
         @Override public String toString() {
             var bodyString = body.stream().map(Literal::toString)
                 .collect(Collectors.joining(", "));
-            return head + ":-" + bodyString + ".";
+            return head + " :- " + bodyString + ".";
         }
     }
 }

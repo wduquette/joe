@@ -42,7 +42,11 @@ public class Nero {
         var tokens = scanner.scanTokens();
         if (gotError) throw new JoeError("Error in Nero input.");
 
-        tokens.forEach(System.out::println);
+        var parser = new Parser(tokens, this::errorHandler);
+        var clauses = parser.parse();
+        if (gotError) throw new JoeError("Error in Nero input.");
+
+        clauses.forEach(System.out::println);
     }
 
     /**
