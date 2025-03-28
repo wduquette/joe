@@ -1,6 +1,10 @@
 # Change Log
 
-## Changes in 0.6.0 (forthcoming)
+## Changes in 0.7.0 (in development)
+
+- Pending
+
+## Changes in 0.6.0 (28 March 2025) 
 
 - Language
   - Lists may now be created with list literal syntax, e.g., 
