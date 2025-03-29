@@ -3,7 +3,14 @@ package com.wjduquette.joe.nero;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record Literal(Token relation, List<LiteralTerm> terms) {
+/**
+ * A literal atom, as parsed.  The `negated` flag is true if this atom was
+ * negated in the body of a rule and false otherwise.
+ * @param relation The relation name as a token
+ * @param terms The terms in the atom
+ * @param negated true or false.
+ */
+public record Literal(Token relation, List<LiteralTerm> terms, boolean negated) {
     public List<String> getVariableNames() {
         return terms.stream()
             .filter(t -> t instanceof LiteralTerm.VariableToken)
@@ -19,7 +26,8 @@ public record Literal(Token relation, List<LiteralTerm> terms) {
     @Override public String toString() {
         var termString = terms.stream().map(LiteralTerm::toString)
             .collect(Collectors.joining(", "));
-        return relation.lexeme() + "(" + termString + ")";
+        return (negated ? "not " : "") +
+            relation.lexeme() + "(" + termString + ")";
     }
 
     public sealed interface LiteralTerm

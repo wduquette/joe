@@ -8,13 +8,16 @@ Comments begin with `//`, as in Joe.
 
 ## Grammar v2:  Datalog with negation
 
+`bodyItem` now includes `"not"?`
+
 ```grammar
 nero      → clause* EOF ;
 clause    → fact | rule ;
 fact      → atom "." ;
-rule      → head ":-" body "."
+rule      → head ":-" body ; 
 head      → atom ;
-body      → "not"? atom ( "," "not"? atom )* ;
+body      → bodyItem ( "," bodyItem )* ;
+bodyItem  → "not"? atom ;
 
 atom      → IDENTIFIER "(" term+ ")"
 term      → constant | variable ;
@@ -30,9 +33,10 @@ As modified for consistency with Joe conventions.
 nero      → clause* EOF ;
 clause    → fact | rule ;
 fact      → atom "." ;
-rule      → head ":-" body "."
+rule      → head ":-" body "." ;
 head      → atom ;
-body      → atom ( "," atom )* ;
+body      → bodyItem ( "," bodyItem )* ;
+bodyItem  → atom ;
 
 atom      → IDENTIFIER "(" term+ ")"
 term      → constant | variable ;

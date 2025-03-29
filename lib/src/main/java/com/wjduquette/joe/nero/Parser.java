@@ -43,7 +43,7 @@ class Parser {
 
     private Clause clause() {
         try {
-            var head = literal();
+            var head = literal(false);
 
             if (match(DOT)) {
                 return fact(head);
@@ -74,7 +74,7 @@ class Parser {
 
         var bodyVar = new HashSet<String>();
         do {
-            var literal = literal();
+            var literal = literal(true);
             body.add(literal);
             bodyVar.addAll(literal.getVariableNames());
         } while (match(COMMA));
@@ -92,7 +92,11 @@ class Parser {
         return new Clause.RuleClause(head, body);
     }
 
-    private Literal literal() {
+    private Literal literal(boolean inBody) {
+        // FIRST, if this is a body atom, check for "not"
+        var negated = inBody && match(NOT);
+
+        // NEXT, parse the literal proper
         var predicate = consume(IDENTIFIER, "expected predicate.");
         consume(LEFT_PAREN, "expected '(' after predicate.");
 
@@ -104,7 +108,7 @@ class Parser {
 
         consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new Literal(predicate, terms);
+        return new Literal(predicate, terms, negated);
     }
 
     private Literal.LiteralTerm term() {
