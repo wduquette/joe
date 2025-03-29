@@ -29,6 +29,10 @@ public class RuleSet {
     // Facts by relation
     private final Map<String, List<Atom>> factMap = new HashMap<>();
 
+    // A map of all atoms queried as part of negated body items,
+    // the value is true if such an atom was found, and false.
+    private final Map<Atom, Boolean> found = new HashMap<>();
+
     //-------------------------------------------------------------------------
     // Constructor
 
@@ -135,8 +139,19 @@ public class RuleSet {
                     }
                 }
                 case BodyItem.Negated item -> {
-                    // TODO: Leave this for now, just so the code runs.
-                    if (!matchFact(bindings, item.atom(), tuple[i])) {
+                    // FIRST, get the atom with bindings.
+                    var bound = bindAtom(bindings, item.atom());
+
+                    // NEXT, have we already computed this?
+                    var flag = found.get(bound);
+
+                    if (flag == null) {
+                        flag = isKnown(bound);
+                        found.put(bound, flag);
+                    }
+
+                    if (flag) {
+                        // We found a fact; the rule fails.
                         return null;
                     }
                 }
@@ -156,15 +171,71 @@ public class RuleSet {
         return new Atom(rule.head().relation(), terms);
     }
 
-    // Matches the fact against the rule pattern, return any
-    // bound variables, or null on failure.
+    // Return a copy of the atom replacing variables with bound
+    // constants.  The result might still have variables.
+    private Atom bindAtom(Map<Variable, Constant> bindings, Atom atom) {
+        var terms = new ArrayList<Term>();
+
+        for (var i = 0; i < atom.terms().size(); i++) {
+            // If the term is variable and a binding is available,
+            // replace the variable with the bound constant.
+            switch (atom.terms().get(i)) {
+                case Constant c -> terms.add(c);
+                case Variable v -> {
+                    var value = bindings.get(v);
+                    if (value != null) {
+                        terms.add(value);
+                    } else {
+                        terms.add(v);
+                    }
+                }
+            }
+        }
+
+        return new Atom(atom.relation(), terms);
+    }
+
+    // Looks through the facts to see if we have a known fact that
+    // matches this atom's constant terms.  This is used to implement
+    // "not" items.
+    private boolean isKnown(Atom query) {
+        for (var fact : factsFor(query.relation())) {
+            if (matches(fact, query)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Returns true if every constant in the query matches the
+    // corresponding term in the fact.
+    private boolean matches(Atom fact, Atom query) {
+        if (!fact.relation().equals(query.relation())) {
+            return false;
+        }
+
+        for (var i = 0; i < query.terms().size(); i++) {
+            switch (query.terms().get(i)) {
+                case Constant c -> {
+                    if (!fact.terms().get(i).equals(c)) {
+                        return false;
+                    }
+                }
+                case Variable ignored -> {}
+            }
+        }
+
+        return true;
+    }
+
+    // Tries to match the fact against the rule pattern given the bindings,
+    // updating the bindings where the rule's pattern has a free variable.
+    // Returns true on success and false.
     private boolean matchFact(
         Map<Variable, Constant> bindings,
         Atom pattern,
         Atom fact
     ) {
-//        System.out.println("      MatchFact " + bindings + " " + pattern +
-//            " " + fact);
         var n = pattern.terms().size();
         if (fact.terms().size() != n) return false;
 
