@@ -1,5 +1,7 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.JoeError;
+
 import java.util.*;
 import static com.wjduquette.joe.nero.Term.*;
 
@@ -12,7 +14,11 @@ public class RuleSet {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final List<Rule> rules = new ArrayList<>();
+    // Map from head relation to rules with that head.
+    private final Map<String,List<Rule>> ruleMap = new HashMap<>();
+
+    // Stratified order of head relations.
+    private final List<String> stratified;
 
     // Facts as read from the Nero program.
     private final List<Atom> baseFacts = new ArrayList<>();
@@ -27,7 +33,22 @@ public class RuleSet {
     // Constructor
 
     public RuleSet(List<Rule> rules, List<Atom> baseFacts) {
-        this.rules.addAll(rules);
+        // FIRST, analyze the rule set
+        var graph = new Graph(rules);
+        if (!graph.isStratified()) {
+            throw new JoeError("Rule set is not stratified.");
+        }
+
+        this.stratified = graph.stratify();
+
+        // NEXT, Categorize the rules by head relation
+        for (var rule : rules) {
+            var head = rule.head().relation();
+            var list = ruleMap.computeIfAbsent(head, k -> new ArrayList<>());
+            list.add(rule);
+        }
+
+        // NEXT, save the base facts.
         this.baseFacts.addAll(baseFacts);
         baseFacts.forEach(this::addFact);
     }
@@ -82,17 +103,19 @@ public class RuleSet {
         do {
             gotNewFact = false;
             System.out.println("Iteration " + (++count) + ":");
-            for (var rule : rules) {
-                System.out.println("  Rule: " + rule);
+            for (var head : stratified) {
+                for (var rule : ruleMap.get(head)) {
+                    System.out.println("  Rule: " + rule);
 
-                var iter = new TupleIterator(rule);
-                while (iter.hasNext()) {
-                    var tuple = iter.next();
-                    var fact = matchRule(rule, tuple);
+                    var iter = new TupleIterator(rule);
+                    while (iter.hasNext()) {
+                        var tuple = iter.next();
+                        var fact = matchRule(rule, tuple);
 
-                    if (fact != null && addFact(fact)) {
-                        System.out.println("    Fact: " + fact);
-                        gotNewFact = true;
+                        if (fact != null && addFact(fact)) {
+                            System.out.println("    Fact: " + fact);
+                            gotNewFact = true;
+                        }
                     }
                 }
             }

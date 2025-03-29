@@ -16,14 +16,13 @@ public class Nero {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Joe joe;
     private boolean gotError = false;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Nero(Joe joe) {
-        this.joe = joe;
+    public Nero() {
+        // Nothing to do.
     }
 
     //-------------------------------------------------------------------------
@@ -59,7 +58,7 @@ public class Nero {
             }
         }
 
-        System.out.println("Dependencies:");
+        System.out.println("Stratification Order:");
 
         var graph = new Graph(rules);
         if (!graph.isStratified()) {

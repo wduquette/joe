@@ -52,10 +52,6 @@ public class Graph {
         }
     }
 
-    public List<String> getHeadRelations() {
-        return Collections.unmodifiableList(heads);
-    }
-
     /**
      * Returns true if the rule set is stratified, and false otherwise.
      *

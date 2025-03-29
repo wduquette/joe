@@ -1,6 +1,5 @@
 package com.wjduquette.joe.app;
 
-import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.nero.Nero;
@@ -55,22 +54,7 @@ public class NeroTool implements Tool {
             System.exit(64);
         }
 
-        var engineType = Joe.BERT;
-
-        while (!argq.isEmpty() && argq.peek().startsWith("-")) {
-            var opt = argq.poll();
-            switch (opt) {
-                case "--bert", "-b" -> engineType = Joe.BERT;
-                case "--walker", "-w" -> engineType = Joe.WALKER;
-                default -> {
-                    System.err.println("Unknown option: '" + opt + "'.");
-                    System.exit(64);
-                }
-            }
-        }
-
-        var joe = new Joe(engineType);
-        var nero = new Nero(joe);
+        var nero = new Nero();
         var path = argq.poll();
 
 
