@@ -60,13 +60,9 @@ public class Nero {
         }
 
         System.out.println("Dependencies:");
-        var graph = new DependencyGraph(rules);
-        graph.getDependencies()
-            .forEach(d -> System.out.println("  " + d));
-        var stratified = graph.isStratified();
-        System.out.println("  Stratified? " + stratified);
 
-        if (!stratified) {
+        var graph = new Graph(rules);
+        if (!graph.isStratified()) {
             throw new JoeError("Rule set is unstratified.");
         }
         System.out.println("  Order: " + graph.stratify());
