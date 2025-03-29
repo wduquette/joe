@@ -18,9 +18,9 @@ public record Literal(Token relation, List<LiteralTerm> terms, boolean negated) 
             .toList();
     }
 
-    public Fact asFact() {
+    public Atom asFact() {
         var realTerms = terms.stream().map(LiteralTerm::asTerm).toList();
-        return new Fact(relation.lexeme(), realTerms);
+        return new Atom(relation.lexeme(), realTerms);
     }
 
     @Override public String toString() {

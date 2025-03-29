@@ -3,7 +3,7 @@ package com.wjduquette.joe.nero;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record Fact(String relation, List<Term> terms) {
+public record Atom(String relation, List<Term> terms) {
     @Override public String toString() {
         var termString = terms.stream().map(Term::toString)
             .collect(Collectors.joining(", "));
@@ -14,7 +14,7 @@ public record Fact(String relation, List<Term> terms) {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        Fact fact = (Fact) o;
+        Atom fact = (Atom) o;
         return relation.equals(fact.relation) && terms.equals(fact.terms);
     }
 

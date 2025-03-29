@@ -15,18 +15,18 @@ public class RuleSet {
     private final List<Rule> rules = new ArrayList<>();
 
     // Facts as read from the Nero program.
-    private final List<Fact> baseFacts = new ArrayList<>();
+    private final List<Atom> baseFacts = new ArrayList<>();
 
     // The current set of known facts.
-    private final Set<Fact> knownFacts = new HashSet<>();
+    private final Set<Atom> knownFacts = new HashSet<>();
 
     // Facts by relation
-    private final Map<String, List<Fact>> factMap = new HashMap<>();
+    private final Map<String, List<Atom>> factMap = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    public RuleSet(List<Rule> rules, List<Fact> baseFacts) {
+    public RuleSet(List<Rule> rules, List<Atom> baseFacts) {
         this.rules.addAll(rules);
         this.baseFacts.addAll(baseFacts);
         baseFacts.forEach(this::addFact);
@@ -43,7 +43,7 @@ public class RuleSet {
      * @param fact The fact
      * @return true or false
      */
-    private boolean addFact(Fact fact) {
+    private boolean addFact(Atom fact) {
         if (!knownFacts.contains(fact)) {
             var list = factsFor(fact.relation());
             list.add(fact);
@@ -55,13 +55,13 @@ public class RuleSet {
         }
     }
 
-    public List<Fact> factsFor(String relation) {
+    public List<Atom> factsFor(String relation) {
         return factMap.computeIfAbsent(relation,
             key -> new ArrayList<>());
     }
 
 
-    public Set<Fact> getKnownFacts() {
+    public Set<Atom> getKnownFacts() {
         return Collections.unmodifiableSet(knownFacts);
     }
 
@@ -99,7 +99,7 @@ public class RuleSet {
         } while (gotNewFact);
     }
 
-    private Fact matchRule(Rule rule, Fact[] tuple) {
+    private Atom matchRule(Rule rule, Atom[] tuple) {
         // FIRST, match each pattern in the rule with a fact from
         // the tuple, binding variables from left to right.
         var bindings = new HashMap<Variable,Constant>();
@@ -120,15 +120,15 @@ public class RuleSet {
             }
         }
 
-        return new Fact(rule.head().relation(), terms);
+        return new Atom(rule.head().relation(), terms);
     }
 
     // Matches the fact against the rule pattern, return any
     // bound variables, or null on failure.
     private boolean matchFact(
         Map<Variable, Constant> bindings,
-        Fact pattern,
-        Fact fact
+        Atom pattern,
+        Atom fact
     ) {
 //        System.out.println("      MatchFact " + bindings + " " + pattern +
 //            " " + fact);
@@ -165,8 +165,8 @@ public class RuleSet {
         //---------------------------------------------------------------------
         // Instance Variables
 
-        private final List<List<Fact>> inputs = new ArrayList<>();
-        private Fact[] tuple = null;
+        private final List<List<Atom>> inputs = new ArrayList<>();
+        private Atom[] tuple = null;
         private final int total;
         private int next = 0;
 
@@ -191,7 +191,7 @@ public class RuleSet {
 
             // NEXT, save the max number of tuples
             total = sum;
-            tuple = new Fact[inputs.size()];
+            tuple = new Atom[inputs.size()];
         }
 
         //---------------------------------------------------------------------
@@ -201,7 +201,7 @@ public class RuleSet {
             return total != next;
         }
 
-        public Fact[] next() {
+        public Atom[] next() {
             if (!hasNext()) {
                 throw new IllegalStateException("Iterator is empty.");
             }

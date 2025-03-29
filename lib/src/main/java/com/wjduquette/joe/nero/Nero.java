@@ -47,7 +47,7 @@ public class Nero {
         var clauses = parser.parse();
         if (gotError) throw new JoeError("Error in Nero input.");
 
-        var baseFacts = new ArrayList<Fact>();
+        var baseFacts = new ArrayList<Atom>();
         var rules = new ArrayList<Rule>();
 
         System.out.println("Input program:");
@@ -65,7 +65,7 @@ public class Nero {
         try {
             ruleset.ponder();
             System.out.println("\nKnown facts:");
-            ruleset.getKnownFacts().stream().map(Fact::toString).sorted()
+            ruleset.getKnownFacts().stream().map(Atom::toString).sorted()
                 .forEach(f -> System.out.println("  " + f));
 
         } catch (Exception ex) {

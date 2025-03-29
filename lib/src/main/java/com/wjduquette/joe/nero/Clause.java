@@ -11,7 +11,7 @@ public sealed interface Clause
     permits Clause.FactClause, Clause.RuleClause
 {
     record FactClause(Literal literal) implements Clause {
-        public Fact asFact() {
+        public Atom asFact() {
             return literal.asFact();
         }
 
