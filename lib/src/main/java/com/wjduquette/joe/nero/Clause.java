@@ -22,7 +22,7 @@ public sealed interface Clause
 
     record RuleClause(Literal head, List<Literal> body) implements Clause {
         public Rule asRule() {
-            var realBody = body.stream().map(Literal::asFact).toList();
+            var realBody = body.stream().map(Literal::asBodyItem).toList();
             return new Rule(head.asFact(), realBody);
         }
 

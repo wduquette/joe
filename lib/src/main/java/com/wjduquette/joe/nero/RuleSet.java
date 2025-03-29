@@ -105,8 +105,18 @@ public class RuleSet {
         var bindings = new HashMap<Variable,Constant>();
 
         for (int i = 0; i < tuple.length; i++) {
-            if (!matchFact(bindings, rule.body().get(i), tuple[i])) {
-                return null;
+            switch (rule.body().get(i)) {
+                case BodyItem.Atom item -> {
+                    if (!matchFact(bindings, item.atom(), tuple[i])) {
+                        return null;
+                    }
+                }
+                case BodyItem.NotAtom item -> {
+                    // TODO: Leave this for now, just so the code runs.
+                    if (!matchFact(bindings, item.atom(), tuple[i])) {
+                        return null;
+                    }
+                }
             }
         }
 
@@ -178,7 +188,11 @@ public class RuleSet {
             // rule's body.
             int sum = 0;
             for (var item : rule.body()) {
-                var facts = factsFor(item.relation());
+                var relation = switch (item) {
+                    case BodyItem.Atom a -> a.atom().relation();
+                    case BodyItem.NotAtom na -> na.atom().relation();
+                };
+                var facts = factsFor(relation);
 
                 if (facts.isEmpty()) {
                     inputs.clear();

@@ -60,7 +60,7 @@ public class Nero {
         }
 
         var ruleset = new RuleSet(rules, baseFacts);
-        // Could add more facts.
+        // Could add more facts here, in theory.
 
         try {
             ruleset.ponder();
