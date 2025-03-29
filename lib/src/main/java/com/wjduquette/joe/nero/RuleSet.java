@@ -106,12 +106,12 @@ public class RuleSet {
 
         for (int i = 0; i < tuple.length; i++) {
             switch (rule.body().get(i)) {
-                case BodyItem.Atom item -> {
+                case BodyItem.Normal item -> {
                     if (!matchFact(bindings, item.atom(), tuple[i])) {
                         return null;
                     }
                 }
-                case BodyItem.NotAtom item -> {
+                case BodyItem.Negated item -> {
                     // TODO: Leave this for now, just so the code runs.
                     if (!matchFact(bindings, item.atom(), tuple[i])) {
                         return null;
@@ -189,8 +189,8 @@ public class RuleSet {
             int sum = 0;
             for (var item : rule.body()) {
                 var relation = switch (item) {
-                    case BodyItem.Atom a -> a.atom().relation();
-                    case BodyItem.NotAtom na -> na.atom().relation();
+                    case BodyItem.Normal a -> a.atom().relation();
+                    case BodyItem.Negated na -> na.atom().relation();
                 };
                 var facts = factsFor(relation);
 

@@ -34,8 +34,8 @@ public record Literal(Token relation, List<LiteralTerm> terms, boolean negated) 
         var atom = getAtom();
 
         return negated
-            ? new BodyItem.NotAtom(atom)
-            : new BodyItem.Atom(atom);
+            ? new BodyItem.Negated(atom)
+            : new BodyItem.Normal(atom);
     }
 
     @Override public String toString() {
