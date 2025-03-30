@@ -6,6 +6,26 @@ the JUG.
 
 Comments begin with `//`, as in Joe.
 
+## Grammar v3:  Datalog with negation and comparison items
+
+`bodyItem` now includes `term OP term`
+
+```grammar
+nero      → clause* EOF ;
+clause    → fact | rule ;
+fact      → atom "." ;
+rule      → head ":-" body ; 
+head      → atom ;
+body      → bodyItem ( "," bodyItem )* ;
+bodyItem  → "not"? atom 
+          | variable ( "==" | "!=" | ">" | ">=" | "<" | "<=" ) term ;
+
+atom      → IDENTIFIER "(" term+ ")"
+term      → constant | variable ;
+constant  → KEYWORD | STRING | NUMBER ;
+variable  → IDENTIFIER ;
+```
+
 ## Grammar v2:  Datalog with negation
 
 `bodyItem` now includes `"not"?`
