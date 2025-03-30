@@ -22,6 +22,7 @@ public sealed interface BodyItem
             return atom.toString();
         }
     }
+
     record Negated(Atom atom) implements BodyItem {
         @Override public String toString() {
             return "not " + atom.toString();
