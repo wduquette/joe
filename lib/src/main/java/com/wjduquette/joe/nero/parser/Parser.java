@@ -1,12 +1,12 @@
-package com.wjduquette.joe.nero;
+package com.wjduquette.joe.nero.parser;
 import com.wjduquette.joe.Trace;
 
 import java.util.*;
 
-import static com.wjduquette.joe.nero.TokenType.*;
-import static com.wjduquette.joe.nero.NeroAST.*;
+import static com.wjduquette.joe.nero.parser.TokenType.*;
+import static com.wjduquette.joe.nero.parser.NeroAST.*;
 
-class Parser {
+public class Parser {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -17,10 +17,7 @@ class Parser {
     //-------------------------------------------------------------------------
     // Constructor
 
-    Parser(
-        List<Token> tokens,
-        ErrorReporter reporter)
-    {
+    public Parser(List<Token> tokens, ErrorReporter reporter) {
         this.reporter = reporter;
         this.tokens = tokens;
     }

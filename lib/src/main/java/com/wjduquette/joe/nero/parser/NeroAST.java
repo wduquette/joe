@@ -1,4 +1,6 @@
-package com.wjduquette.joe.nero;
+package com.wjduquette.joe.nero.parser;
+
+import com.wjduquette.joe.nero.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * This class contains the Nero Abstract Syntax Tree types.
  */
-class NeroAST {
+public class NeroAST {
     private NeroAST() {} // not instantiable
 
     //-------------------------------------------------------------------------

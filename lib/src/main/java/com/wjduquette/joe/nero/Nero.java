@@ -1,6 +1,9 @@
 package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.parser.NeroAST;
+import com.wjduquette.joe.nero.parser.Parser;
+import com.wjduquette.joe.nero.parser.Scanner;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
