@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,7 @@ class NeroAST {
     public sealed interface Clause permits FactClause, RuleClause {}
 
     public record FactClause(AtomItem item) implements Clause {
-        public Atom asFact() {
+        public Fact asFact() {
             return item.asFact();
         }
 
@@ -26,8 +27,8 @@ class NeroAST {
 
     public record RuleClause(AtomItem head, List<AtomItem> body) implements Clause {
         public Rule asRule() {
-            var realBody = body.stream().map(AtomItem::toAtom).toList();
-            return new Rule(head.asFact(), realBody);
+            var realBody = body.stream().map(AtomItem::asAtom).toList();
+            return new Rule(head.asHead(), realBody);
         }
 
         @Override public String toString() {
@@ -57,20 +58,46 @@ class NeroAST {
         }
 
         /**
-         * Converts the item to a normal atom.  It's an error if the
-         * item's negated flag is set.
-         * TODO: Consider renaming `asAtom`. Might be the head of a rule.
-         * @return The atom.
+         * Converts the item to a Fact.  It's an error of the item contains
+         * any variables or the item's negated flag is set.
+         * @return The fact.
          */
-        public Atom asFact() {
+        public Fact asFact() {
             if (negated) {
                 throw new IllegalStateException("Atom is negated; cannot be a fact.");
             }
-            return toAtom();
+
+            var values = new ArrayList<>();
+            for (var t : terms) {
+                if (t instanceof ConstantToken c) {
+                    values.add(c.value().literal());
+                } else {
+                    throw new IllegalStateException(
+                        "Atom contains a variable term; cannot be a fact.");
+                }
+            }
+
+            return new Fact(relation.lexeme(), values);
         }
 
-        // Convert the time to an Atom, as used by the engine.
-        private Atom toAtom() {
+        /**
+         * Converts the item to an Atom, verifying that it's a valid
+         * head atom.
+         * @return The atom
+         */
+        public Atom asHead() {
+            if (negated) {
+                throw new IllegalStateException(
+                    "Atom is negated; cannot be a rule head.");
+            }
+            return asAtom();
+        }
+
+        /**
+         * Converts the item to an Atom, including negation.
+         * @return The atom
+         */
+        public Atom asAtom() {
             var realTerms = terms.stream().map(TermToken::asTerm).toList();
             return new Atom(relation.lexeme(), realTerms, negated);
         }
@@ -81,9 +108,6 @@ class NeroAST {
             return (negated ? "not " : "") +
                 relation.lexeme() + "(" + termString + ")";
         }
-    }
-
-    public record ComparisonItem() {
     }
 
     //-------------------------------------------------------------------------
@@ -127,7 +151,4 @@ class NeroAST {
             return name.lexeme();
         }
     }
-
-
-
 }
