@@ -38,7 +38,7 @@ public class Engine {
 
     public Engine(List<Rule> rules, List<Fact> baseFacts) {
         // FIRST, analyze the rule set
-        var graph = new Graph(rules);
+        var graph = new DependencyGraph(rules);
         if (!graph.isStratified()) {
             throw new JoeError("Rule set is not stratified.");
         }
