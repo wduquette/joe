@@ -11,7 +11,7 @@ public sealed interface Clause
     permits Clause.FactClause, Clause.RuleClause
 {
     record FactClause(Literal literal) implements Clause {
-        public Atom asFact() {
+        public Fact asFact() {
             return literal.asFact();
         }
 
@@ -23,7 +23,7 @@ public sealed interface Clause
     record RuleClause(Literal head, List<Literal> body) implements Clause {
         public Rule asRule() {
             var realBody = body.stream().map(Literal::asAtom).toList();
-            return new Rule(head.asFact(), realBody);
+            return new Rule(head.asHead(), realBody);
         }
 
         @Override public String toString() {

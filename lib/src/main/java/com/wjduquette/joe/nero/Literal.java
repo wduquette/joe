@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,11 +24,32 @@ public record Literal(Token relation, List<LiteralTerm> terms, boolean negated) 
         return new Atom(relation.lexeme(), realTerms, negated);
     }
 
-    public Atom asFact() {
+    public Atom asHead() {
+        if (negated) {
+            throw new IllegalStateException(
+                "Atom is negated; cannot be a rule head.");
+        }
+        var realTerms = terms.stream().map(LiteralTerm::asTerm).toList();
+        return new Atom(relation.lexeme(), realTerms, negated);
+    }
+
+    public Fact asFact() {
         if (negated) {
             throw new IllegalStateException("Atom is negated; cannot be a fact.");
         }
-        return asAtom();
+
+        var values = new ArrayList<>();
+
+        for (var term : terms) {
+            if (term instanceof LiteralTerm.ConstantToken c) {
+                values.add(c.value.literal());
+            } else {
+                throw new IllegalStateException(
+                    "Atom contains variables; cannot be a fact.");
+            }
+        }
+
+        return new Fact(relation.lexeme(), values);
     }
 
     @Override public String toString() {
