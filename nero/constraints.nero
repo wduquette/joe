@@ -1,0 +1,6 @@
+// Constraints
+
+Node(#a).
+Node(#b).
+Pair(x, y) :- Node(x), Node(y) where x != y.
+

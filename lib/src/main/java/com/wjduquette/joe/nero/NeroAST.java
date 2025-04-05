@@ -13,9 +13,9 @@ class NeroAST {
     //-------------------------------------------------------------------------
     // Clauses
 
-    public sealed interface Clause permits FactClause, RuleClause {}
+    public sealed interface HornClause permits FactClause, RuleClause {}
 
-    public record FactClause(AtomItem item) implements Clause {
+    public record FactClause(AtomItem item) implements HornClause {
         public Fact asFact() {
             return item.asFact();
         }
@@ -25,16 +25,25 @@ class NeroAST {
         }
     }
 
-    public record RuleClause(AtomItem head, List<AtomItem> body) implements Clause {
+    public record RuleClause(
+        AtomItem head,
+        List<AtomItem> body,
+        List<ConstraintItem> constraints
+    ) implements HornClause {
         public Rule asRule() {
             var realBody = body.stream().map(AtomItem::asAtom).toList();
+            // TODO: Add constraints!
             return new Rule(head.asHead(), realBody);
         }
 
         @Override public String toString() {
             var bodyString = body.stream().map(AtomItem::toString)
                 .collect(Collectors.joining(", "));
-            return head + " :- " + bodyString + ".";
+            var whereString = constraints.stream().map(ConstraintItem::toString)
+                .collect(Collectors.joining(", "));
+            return head + " :- " + bodyString +
+                (constraints.isEmpty() ? "" : " where " + whereString)
+                + ".";
         }
     }
 
@@ -107,6 +116,22 @@ class NeroAST {
                 .collect(Collectors.joining(", "));
             return (negated ? "not " : "") +
                 relation.lexeme() + "(" + termString + ")";
+        }
+    }
+
+    /**
+     * A constraint of the form "a OP b".
+     * @param a A bound variable
+     * @param op A comparison operator
+     * @param b A bound variable or constant
+     */
+    public record ConstraintItem(
+        VariableToken a,
+        Token op,
+        TermToken b)
+    {
+        @Override public String toString() {
+            return a + " " + op.lexeme() + " " + b;
         }
     }
 
