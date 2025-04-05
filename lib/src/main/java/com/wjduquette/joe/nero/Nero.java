@@ -58,13 +58,13 @@ public class Nero {
             }
         }
 
-        System.out.println("Stratification Order:");
+        System.out.println("Stratification:");
 
         var graph = new Graph(rules);
         if (!graph.isStratified()) {
             throw new JoeError("Rule set is unstratified.");
         }
-        System.out.println("  Order: " + graph.stratify());
+        System.out.println("  Strata: " + graph.strata());
 
         var ruleset = new RuleSet(rules, baseFacts);
         // Could add more facts here, in theory.

@@ -17,8 +17,8 @@ public class RuleSet {
     // Map from head relation to rules with that head.
     private final Map<String,List<Rule>> ruleMap = new HashMap<>();
 
-    // Stratified order of head relations.
-    private final List<String> stratified;
+    // Head relations by stratum.
+    private final List<List<String>> strata;
 
     // Facts as read from the Nero program.
     private final List<Atom> baseFacts = new ArrayList<>();
@@ -43,7 +43,7 @@ public class RuleSet {
             throw new JoeError("Rule set is not stratified.");
         }
 
-        this.stratified = graph.stratify();
+        this.strata = graph.strata();
 
         // NEXT, Categorize the rules by head relation
         for (var rule : rules) {
@@ -102,12 +102,18 @@ public class RuleSet {
         factMap.clear();
         baseFacts.forEach(this::addFact);
 
+        for (var i = 0; i < strata.size(); i++) {
+            ponder(i, strata.get(i));
+        }
+    }
+
+    private void ponder(int stratum, List<String> heads) {
         int count = 0;
         boolean gotNewFact;
         do {
             gotNewFact = false;
-            System.out.println("Iteration " + (++count) + ":");
-            for (var head : stratified) {
+            System.out.println("Iteration " + stratum + "." + (++count) + ":");
+            for (var head : heads) {
                 for (var rule : ruleMap.get(head)) {
                     System.out.println("  Rule: " + rule);
 
