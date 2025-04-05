@@ -99,6 +99,7 @@ public class NumberType extends ProxyType<Double> {
         staticMethod("log10",     this::_log10);
         staticMethod("max",       this::_max);
         staticMethod("min",       this::_min);
+        staticMethod("mod",       this::_mod);
         staticMethod("pow",       this::_pow);
         staticMethod("random",    this::_random);
         staticMethod("round",     this::_round);
@@ -329,6 +330,19 @@ public class NumberType extends ProxyType<Double> {
         return list.stream()
             .map(joe::toDouble)
             .min(Double::compare);
+    }
+
+    //**
+    // @static mod
+    // @args a, b
+    // @result Number
+    // Returns the integer modulus `a % b` as computed in Java.  Both
+    // terms are converted to integers.
+    private Object _mod(Joe joe, Args args) {
+        args.exactArity(2, "Number.mod(a, b)");
+        var a = joe.toInteger(args.next());
+        var b = joe.toInteger(args.next());
+        return (double)(a % b);
     }
 
     //**

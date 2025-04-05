@@ -1,0 +1,45 @@
+// The "nani" game from Adventure in Prolog (partial)
+
+// Places the player can go.
+Room(#cellar).
+Room(#diningRoom).
+Room(#hall).
+Room(#kitchen).
+Room(#office).
+
+// Things the player can interact with.
+Thing(#apple).
+Thing(#broccoli).
+Thing(#computer).
+Thing(#crackers).
+Thing(#desk).
+Thing(#flashlight).
+Thing(#nani).
+Thing(#pen).
+Thing(#washer).
+
+// Locations of things in rooms or other things
+Location(#apple, #kitchen).
+Location(#broccoli, #kitchen).
+Location(#computer, #office).
+Location(#crackers, #kitchen).
+Location(#desk, #office).
+Location(#flashlight, #desk).
+Location(#nani, #washer).
+Location(#washer, #cellar).
+
+// Bi-directional connections between rooms.
+Door(#cellar, #kitchen).
+Door(#diningRoom, #hall).
+Door(#diningRoom, #kitchen).
+Door(#hall, #office).
+Door(#kitchen, #office).
+
+// Un-directional connections between rooms
+CanGo(from, to) :- Door(from, to).
+CanGo(from, to) :- Door(to, from).
+
+// Are there any things that have no location?
+// NOTE: consider adding "_" as a wildcard term.
+Homeless(x) :- Thing(x), not Location(x, y).
+

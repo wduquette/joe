@@ -1,0 +1,18 @@
+// Transitive closure of connections in a directed graph.
+// Strata 0: CanGo
+// Strata 1: CantGo
+
+// There is a path from node x to node y.
+CanGo(x,y) :- Edge(x,y).
+CanGo(x,y) :- Edge(x,z), CanGo(z,y).
+
+// There is no path from node x to node y.
+CantGo(x,y) :- Node(x), Node(y), not CanGo(x,y).
+
+Node(#a).
+Node(#b).
+Node(#c).
+Edge(#a, #b).
+Edge(#b, #b).
+Edge(#b, #c).
+Edge(#c, #b).
