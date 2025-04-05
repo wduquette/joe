@@ -53,8 +53,8 @@ public class Nero {
         for (var clause : clauses) {
             System.out.println("  " + clause);
             switch (clause) {
-                case Clause.FactClause f -> baseFacts.add(f.asFact());
-                case Clause.RuleClause f -> rules.add(f.asRule());
+                case NeroAST.FactClause f -> baseFacts.add(f.asFact());
+                case NeroAST.RuleClause f -> rules.add(f.asRule());
             }
         }
 

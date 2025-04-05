@@ -4,7 +4,7 @@ import com.wjduquette.joe.Trace;
 import java.util.*;
 
 import static com.wjduquette.joe.nero.TokenType.*;
-import static com.wjduquette.joe.nero.Literal.LiteralTerm.*;
+import static com.wjduquette.joe.nero.NeroAST.*;
 
 class Parser {
     //-------------------------------------------------------------------------
@@ -43,7 +43,7 @@ class Parser {
 
     private Clause clause() {
         try {
-            var head = literal(false);
+            var head = atom(false);
 
             if (match(DOT)) {
                 return fact(head);
@@ -59,40 +59,43 @@ class Parser {
         }
     }
 
-    private Clause fact(Literal head) {
+    private Clause fact(AtomItem head) {
         // Verify that there are no variable terms.
         for (var term : head.terms()) {
             if (term instanceof VariableToken v) {
                 error(v.name(), "fact contains a variable term.");
             }
         }
-        return new Clause.FactClause(head);
+        return new FactClause(head);
     }
 
-    private Clause rule(Literal head) {
-        var body = new ArrayList<Literal>();
+    private Clause rule(AtomItem head) {
+        var body = new ArrayList<AtomItem>();
 
         var bodyVar = new HashSet<String>();
         do {
-            var literal = literal(true);
-            body.add(literal);
-            bodyVar.addAll(literal.getVariableNames());
+            var atom = atom(true);
+            body.add(atom);
+            if (!atom.negated()) {
+                bodyVar.addAll(atom.getVariableNames());
+            }
         } while (match(COMMA));
 
         consume(DOT, "expected '.' after rule body.");
 
-        // Verify that the head contains only body variables.
+        // Verify that the head contains only body variables
+        // from positive body items.
         head.terms().stream()
             .filter(t -> t instanceof VariableToken)
             .map(t -> (VariableToken)t)
             .filter(t -> !bodyVar.contains(t.toString()))
             .forEach(v -> error(v.name(),
-                "head variable not found in body."));
+                "head variable not found in positive body atom."));
 
-        return new Clause.RuleClause(head, body);
+        return new RuleClause(head, body);
     }
 
-    private Literal literal(boolean inBody) {
+    private AtomItem atom(boolean inBody) {
         // FIRST, if this is a body atom, check for "not"
         var negated = inBody && match(NOT);
 
@@ -100,7 +103,7 @@ class Parser {
         var predicate = consume(IDENTIFIER, "expected predicate.");
         consume(LEFT_PAREN, "expected '(' after predicate.");
 
-        var terms = new ArrayList<Literal.LiteralTerm>();
+        var terms = new ArrayList<TermToken>();
 
         do {
             terms.add(term());
@@ -108,10 +111,10 @@ class Parser {
 
         consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new Literal(predicate, terms, negated);
+        return new AtomItem(predicate, terms, negated);
     }
 
-    private Literal.LiteralTerm term() {
+    private TermToken term() {
         if (match(IDENTIFIER)) {
             return new VariableToken(previous());
         } else if (match(KEYWORD, NUMBER, STRING)) {
