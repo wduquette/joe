@@ -59,7 +59,7 @@ public class Nero {
         }
 
         // Will throw JoeError if the rules aren't stratified.
-        var ruleset = new RuleSet(rules, baseFacts);
+        var ruleset = new Engine(rules, baseFacts);
 
         // Could add more facts here, in theory.
 

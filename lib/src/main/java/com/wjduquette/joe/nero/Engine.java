@@ -10,7 +10,7 @@ import static com.wjduquette.joe.nero.Term.*;
  * For now, we only consider these; later, we'll be able to add in facts
  * from outside, and merge rule sets.
  */
-public class RuleSet {
+public class Engine {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -36,7 +36,7 @@ public class RuleSet {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public RuleSet(List<Rule> rules, List<Fact> baseFacts) {
+    public Engine(List<Rule> rules, List<Fact> baseFacts) {
         // FIRST, analyze the rule set
         var graph = new Graph(rules);
         if (!graph.isStratified()) {
