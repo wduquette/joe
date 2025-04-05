@@ -172,8 +172,8 @@ public class NeroAST {
      * @param value The value token
      */
     public record ConstantToken(Token value) implements TermToken {
-        @Override public Term.Constant asTerm() {
-            return new Term.Constant(value.literal());
+        @Override public Constant asTerm() {
+            return new Constant(value.literal());
         }
 
         @Override public String toString() {
@@ -186,8 +186,8 @@ public class NeroAST {
      * @param name The token token
      */
     public record VariableToken(Token name) implements TermToken {
-        @Override public Term.Variable asTerm() {
-            return new Term.Variable(name.lexeme());
+        @Override public Variable asTerm() {
+            return new Variable(name.lexeme());
         }
 
         @Override public String toString() {

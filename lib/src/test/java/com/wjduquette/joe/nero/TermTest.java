@@ -3,7 +3,6 @@ package com.wjduquette.joe.nero;
 import org.junit.Test;
 
 import static com.wjduquette.joe.checker.Checker.*;
-import static com.wjduquette.joe.nero.Term.*;
 
 public class TermTest extends Ted {
     private final Constant ONE = new Constant(1);

@@ -3,7 +3,6 @@ package com.wjduquette.joe.nero;
 import com.wjduquette.joe.JoeError;
 
 import java.util.*;
-import static com.wjduquette.joe.nero.Term.*;
 
 /**
  * A Nero rule base, including all facts and rules read from Nero input.
@@ -310,7 +309,7 @@ public class Engine {
             var f = fact.terms().get(i);
 
             switch (p) {
-                case Term.Variable v -> {
+                case Variable v -> {
                     var bound = bindings.get(v);
 
                     if (bound == null) {
@@ -319,7 +318,7 @@ public class Engine {
                         return false;
                     }
                 }
-                case Term.Constant c -> {
+                case Constant c -> {
                     if (!f.equals(c.value())) return false;
                 }
             }
