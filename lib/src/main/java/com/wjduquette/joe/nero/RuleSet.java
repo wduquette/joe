@@ -44,6 +44,7 @@ public class RuleSet {
         }
 
         this.strata = graph.strata();
+        System.out.println("  Strata: " + strata);
 
         // NEXT, Categorize the rules by head relation
         for (var rule : rules) {
