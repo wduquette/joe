@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
  * @param head The rule's head
  * @param body The body predicates
  */
-public record Rule(Atom head, List<BodyItem> body) {
+public record Rule(Atom head, List<Atom> body) {
     @Override
     public String toString() {
-        var bodyString = body.stream().map(BodyItem::toString)
+        var bodyString = body.stream().map(Atom::toString)
             .collect(Collectors.joining(", "));
         return head + " :- " + bodyString + ".";
     }

@@ -51,11 +51,11 @@ public class Graph {
         for (var rule : rules) {
             var i = heads.indexOf(rule.head().relation());
 
-            for (var item : rule.body()) {
-                var j = heads.indexOf(item.atom().relation());
+            for (var b : rule.body()) {
+                var j = heads.indexOf(b.relation());
                 if (j == -1) continue;  // Skip non-head predicates
 
-                if (item.isNegated()) {
+                if (b.negated()) {
                     mat[i][j] = -1;
                 } else if (mat[i][j] == 0) {
                     mat[i][j] = 1;
