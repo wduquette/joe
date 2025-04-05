@@ -28,8 +28,8 @@ class Parser {
     //-------------------------------------------------------------------------
     // Public API
 
-    public List<Clause> parse() {
-        List<Clause> clauses = new ArrayList<>();
+    public List<HornClause> parse() {
+        List<HornClause> clauses = new ArrayList<>();
 
         while (!isAtEnd()) {
             clauses.add(clause());
@@ -41,7 +41,7 @@ class Parser {
     //-------------------------------------------------------------------------
     // Productions
 
-    private Clause clause() {
+    private HornClause clause() {
         try {
             var head = atom(false);
 
@@ -59,7 +59,7 @@ class Parser {
         }
     }
 
-    private Clause fact(AtomItem head) {
+    private HornClause fact(AtomItem head) {
         // Verify that there are no variable terms.
         for (var term : head.terms()) {
             if (term instanceof VariableToken v) {
@@ -69,8 +69,9 @@ class Parser {
         return new FactClause(head);
     }
 
-    private Clause rule(AtomItem head) {
+    private HornClause rule(AtomItem head) {
         var body = new ArrayList<AtomItem>();
+        var constraints = new ArrayList<ConstraintItem>();
 
         var bodyVar = new HashSet<String>();
         do {
@@ -79,6 +80,10 @@ class Parser {
             if (!atom.negated()) {
                 bodyVar.addAll(atom.getVariableNames());
             }
+        } while (match(COMMA));
+
+        if (match(WHERE)) {
+            constraints.add(constraint(bodyVar));
         } while (match(COMMA));
 
         consume(DOT, "expected '.' after rule body.");
@@ -92,7 +97,44 @@ class Parser {
             .forEach(v -> error(v.name(),
                 "head variable not found in positive body atom."));
 
-        return new RuleClause(head, body);
+        return new RuleClause(head, body, constraints);
+    }
+
+    private ConstraintItem constraint(Set<String> bodyVar) {
+        var term = term();
+        Token op;
+        VariableToken a = null;
+
+        switch (term) {
+            case ConstantToken c ->
+                error(c.value(), "expected bound variable.");
+            case VariableToken v -> {
+                a = v;
+                if (!bodyVar.contains(v.name().lexeme())) {
+                    error(v.name(), "expected bound variable.");
+                }
+            }
+        }
+
+        if (match(
+            BANG_EQUAL, EQUAL_EQUAL,
+            GREATER, GREATER_EQUAL,
+            LESS, LESS_EQUAL)
+        ) {
+            op = previous();
+        } else {
+            throw errorSync(previous(), "expected comparison operator.");
+        }
+
+        var b = term();
+
+        if (b instanceof VariableToken v) {
+            if (!bodyVar.contains(v.name().lexeme())) {
+                error(v.name(), "expected bound variable.");
+            }
+        }
+
+        return new ConstraintItem(a, op, b);
     }
 
     private AtomItem atom(boolean inBody) {

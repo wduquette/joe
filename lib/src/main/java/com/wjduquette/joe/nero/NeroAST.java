@@ -13,9 +13,9 @@ class NeroAST {
     //-------------------------------------------------------------------------
     // Clauses
 
-    public sealed interface Clause permits FactClause, RuleClause {}
+    public sealed interface HornClause permits FactClause, RuleClause {}
 
-    public record FactClause(AtomItem item) implements Clause {
+    public record FactClause(AtomItem item) implements HornClause {
         public Fact asFact() {
             return item.asFact();
         }
@@ -25,16 +25,27 @@ class NeroAST {
         }
     }
 
-    public record RuleClause(AtomItem head, List<AtomItem> body) implements Clause {
+    public record RuleClause(
+        AtomItem head,
+        List<AtomItem> body,
+        List<ConstraintItem> constraints
+    ) implements HornClause {
         public Rule asRule() {
-            var realBody = body.stream().map(AtomItem::asAtom).toList();
-            return new Rule(head.asHead(), realBody);
+            var realBody = body.stream()
+                .map(AtomItem::asAtom).toList();
+            var realConstraints = constraints.stream()
+                .map(ConstraintItem::asConstraint).toList();
+            return new Rule(head.asHead(), realBody, realConstraints);
         }
 
         @Override public String toString() {
             var bodyString = body.stream().map(AtomItem::toString)
                 .collect(Collectors.joining(", "));
-            return head + " :- " + bodyString + ".";
+            var whereString = constraints.stream().map(ConstraintItem::toString)
+                .collect(Collectors.joining(", "));
+            return head + " :- " + bodyString +
+                (constraints.isEmpty() ? "" : " where " + whereString)
+                + ".";
         }
     }
 
@@ -110,6 +121,36 @@ class NeroAST {
         }
     }
 
+    /**
+     * A constraint of the form "a OP b".
+     * @param a A bound variable
+     * @param op A comparison operator
+     * @param b A bound variable or constant
+     */
+    public record ConstraintItem(
+        VariableToken a,
+        Token op,
+        TermToken b)
+    {
+        public Constraint asConstraint() {
+            var realOp = switch (op.type()) {
+                case BANG_EQUAL -> Op.NE;
+                case EQUAL_EQUAL -> Op.EQ;
+                case GREATER -> Op.GT;
+                case GREATER_EQUAL -> Op.GE;
+                case LESS -> Op.LT;
+                case LESS_EQUAL -> Op.LE;
+                default -> throw new IllegalStateException(
+                    "Unknown operator token: " + op);
+            };
+            return new Constraint(a.asTerm(), realOp, b.asTerm());
+        }
+
+        @Override public String toString() {
+            return a + " " + op.lexeme() + " " + b;
+        }
+    }
+
     //-------------------------------------------------------------------------
     // Terms
 
@@ -129,7 +170,7 @@ class NeroAST {
      * @param value The value token
      */
     public record ConstantToken(Token value) implements TermToken {
-        @Override public Term asTerm() {
+        @Override public Term.Constant asTerm() {
             return new Term.Constant(value.literal());
         }
 
@@ -143,7 +184,7 @@ class NeroAST {
      * @param name The token token
      */
     public record VariableToken(Token name) implements TermToken {
-        @Override public Term asTerm() {
+        @Override public Term.Variable asTerm() {
             return new Term.Variable(name.lexeme());
         }
 

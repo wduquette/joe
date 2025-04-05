@@ -17,6 +17,7 @@ class Scanner {
     static {
         reserved = new HashMap<>();
         reserved("not",   NOT);
+        reserved("where", WHERE);
     }
 
     private static void reserved(String word, TokenType token) {
@@ -77,13 +78,26 @@ class Scanner {
     private void scanToken() {
         char c = advance();
         switch (c) {
+            // One-character tokens
             case '('  -> addToken(LEFT_PAREN);
             case ')'  -> addToken(RIGHT_PAREN);
             case ','  -> addToken(COMMA);
             case '.'  -> addToken(DOT);
+
+            // One-or-two-character tokens
+            case '!' -> {
+                if (match('=')) addToken(BANG_EQUAL);
+            }
             case ':'  -> {
                 if (match('-')) addToken(COLON_MINUS);
             }
+            case '=' -> {
+                if (match('=')) addToken(EQUAL_EQUAL);
+            }
+            case '>' -> addToken(match('=') ? GREATER_EQUAL : GREATER);
+            case '<' -> addToken(match('=') ? LESS_EQUAL : LESS);
+
+            // Comments and whitespace
             case '/'  -> {
                 if (match('/')) {
                     // A comment goes until the end of the line.
@@ -93,6 +107,8 @@ class Scanner {
             case ' ', '\r', '\t', '\n' -> {
                 // Ignore whitespace.
             }
+
+            // Literals, identifiers, and reserved words
             case '"' -> string();
             case '#' -> keyword();
             default -> {

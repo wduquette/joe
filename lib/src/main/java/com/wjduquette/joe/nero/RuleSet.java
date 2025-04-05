@@ -44,6 +44,7 @@ public class RuleSet {
         }
 
         this.strata = graph.strata();
+        System.out.println("  Strata: " + strata);
 
         // NEXT, Categorize the rules by head relation
         for (var rule : rules) {
@@ -163,6 +164,13 @@ public class RuleSet {
             }
         }
 
+        // NEXT, check the bindings against the constraints.
+        for (var c : rule.constraints()) {
+            if (!constraintMet(c, bindings)) {
+                return null;
+            }
+        }
+
         // NEXT, build the list of terms and return the new fact.
         var terms = new ArrayList<>();
 
@@ -174,6 +182,59 @@ public class RuleSet {
         }
 
         return new Fact(rule.head().relation(), terms);
+    }
+
+    private boolean constraintMet(
+        Constraint constraint,
+        Map<Variable,Object> bindings
+    ) {
+        var a = bindings.get(constraint.a());
+
+        var b = switch (constraint.b()) {
+            case Variable v -> bindings.get(v);
+            case Constant c -> c.value();
+        };
+
+        return switch (constraint.op()) {
+            case EQ -> Objects.equals(a, b);
+            case NE -> !Objects.equals(a, b);
+            case GT -> {
+                if (a instanceof Double d1 && b instanceof Double d2) {
+                    yield d1 > d2;
+                } else if (a instanceof String s1 && b instanceof String s2) {
+                    yield s1.compareTo(s2) > 0;
+                } else {
+                    yield false;
+                }
+            }
+            case GE -> {
+                if (a instanceof Double d1 && b instanceof Double d2) {
+                    yield d1 >= d2;
+                } else if (a instanceof String s1 && b instanceof String s2) {
+                    yield s1.compareTo(s2) >= 0;
+                } else {
+                    yield false;
+                }
+            }
+            case LT -> {
+                if (a instanceof Double d1 && b instanceof Double d2) {
+                    yield d1 < d2;
+                } else if (a instanceof String s1 && b instanceof String s2) {
+                    yield s1.compareTo(s2) < 0;
+                } else {
+                    yield false;
+                }
+            }
+            case LE -> {
+                if (a instanceof Double d1 && b instanceof Double d2) {
+                    yield d1 <= d2;
+                } else if (a instanceof String s1 && b instanceof String s2) {
+                    yield s1.compareTo(s2) <= 0;
+                } else {
+                    yield false;
+                }
+            }
+        };
     }
 
     // Return a copy of the atom replacing variables with bound

@@ -1,0 +1,14 @@
+// Constraints
+
+Node(#a).
+Node(#b).
+Pair(x, y) :- Node(x), Node(y) where x != y.
+
+//    ID,       Size
+Thing(#pen,     1).
+Thing(#desk,    10).
+Thing(#whatsit, #unknown).
+
+// #whatsit is neither large nor small
+Small(x) :- Thing(x, size) where size < 5.
+Large(x) :- Thing(x, size) where size > 5.
