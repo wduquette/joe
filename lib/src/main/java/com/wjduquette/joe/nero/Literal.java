@@ -18,24 +18,16 @@ public record Literal(Token relation, List<LiteralTerm> terms, boolean negated) 
             .toList();
     }
 
-    public Atom getAtom() {
+    public Atom asAtom() {
         var realTerms = terms.stream().map(LiteralTerm::asTerm).toList();
-        return new Atom(relation.lexeme(), realTerms);
+        return new Atom(relation.lexeme(), realTerms, negated);
     }
 
     public Atom asFact() {
         if (negated) {
             throw new IllegalStateException("Atom is negated; cannot be a fact.");
         }
-        return getAtom();
-    }
-
-    public BodyItem asBodyItem() {
-        var atom = getAtom();
-
-        return negated
-            ? new BodyItem.Negated(atom)
-            : new BodyItem.Normal(atom);
+        return asAtom();
     }
 
     @Override public String toString() {

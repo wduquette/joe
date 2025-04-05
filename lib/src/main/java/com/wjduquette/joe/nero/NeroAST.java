@@ -24,14 +24,14 @@ class NeroAST {
         }
     }
 
-    public record RuleClause(AtomItem head, List<Item> body) implements Clause {
+    public record RuleClause(AtomItem head, List<AtomItem> body) implements Clause {
         public Rule asRule() {
-            var realBody = body.stream().map(Item::asBodyItem).toList();
+            var realBody = body.stream().map(AtomItem::toAtom).toList();
             return new Rule(head.asFact(), realBody);
         }
 
         @Override public String toString() {
-            var bodyString = body.stream().map(Item::toString)
+            var bodyString = body.stream().map(AtomItem::toString)
                 .collect(Collectors.joining(", "));
             return head + " :- " + bodyString + ".";
         }
@@ -40,15 +40,11 @@ class NeroAST {
     //-------------------------------------------------------------------------
     // Items
 
-    public sealed interface Item permits AtomItem, ComparisonItem {
-        BodyItem asBodyItem();
-    }
-
     public record AtomItem(
         Token relation,
         List<TermToken> terms,
         boolean negated
-    ) implements Item {
+    ) {
         /**
          * Gets a list of the variable names used in the item.
          * @return The list
@@ -73,21 +69,10 @@ class NeroAST {
             return toAtom();
         }
 
-        /**
-         * Converts the item to a Rule's BodyItem, according to the item's
-         * negated flag.
-         * @return The BodyItem
-         */
-        @Override
-        public BodyItem asBodyItem() {
-            return negated ? new BodyItem.Negated(toAtom())
-                           : new BodyItem.Normal(toAtom());
-        }
-
         // Convert the time to an Atom, as used by the engine.
         private Atom toAtom() {
             var realTerms = terms.stream().map(TermToken::asTerm).toList();
-            return new Atom(relation.lexeme(), realTerms);
+            return new Atom(relation.lexeme(), realTerms, negated);
         }
 
         @Override public String toString() {
@@ -98,11 +83,7 @@ class NeroAST {
         }
     }
 
-    public record ComparisonItem() implements Item {
-        @Override
-        public BodyItem asBodyItem() {
-            throw new UnsupportedOperationException("TODO");
-        }
+    public record ComparisonItem() {
     }
 
     //-------------------------------------------------------------------------

@@ -138,28 +138,27 @@ public class RuleSet {
         var bindings = new HashMap<Variable,Constant>();
 
         for (int i = 0; i < tuple.length; i++) {
-            switch (rule.body().get(i)) {
-                case BodyItem.Normal item -> {
-                    if (!matchFact(bindings, item.atom(), tuple[i])) {
-                        return null;
-                    }
+            var b = rule.body().get(i);
+            if (b.negated()) {
+                // FIRST, get the atom with bindings.
+                var bound = bindAtom(bindings, b);
+
+                // NEXT, have we already computed this?
+                var flag = found.get(bound);
+
+                if (flag == null) {
+                    flag = isKnown(bound);
+                    found.put(bound, flag);
                 }
-                case BodyItem.Negated item -> {
-                    // FIRST, get the atom with bindings.
-                    var bound = bindAtom(bindings, item.atom());
 
-                    // NEXT, have we already computed this?
-                    var flag = found.get(bound);
+                if (flag) {
+                    // We found a fact; the rule fails.
+                    return null;
+                }
 
-                    if (flag == null) {
-                        flag = isKnown(bound);
-                        found.put(bound, flag);
-                    }
-
-                    if (flag) {
-                        // We found a fact; the rule fails.
-                        return null;
-                    }
+            } else {
+                if (!matchFact(bindings, b, tuple[i])) {
+                    return null;
                 }
             }
         }
@@ -174,7 +173,7 @@ public class RuleSet {
             }
         }
 
-        return new Atom(rule.head().relation(), terms);
+        return new Atom(rule.head().relation(), terms, false);
     }
 
     // Return a copy of the atom replacing variables with bound
@@ -198,7 +197,7 @@ public class RuleSet {
             }
         }
 
-        return new Atom(atom.relation(), terms);
+        return new Atom(atom.relation(), terms, false);
     }
 
     // Looks through the facts to see if we have a known fact that
@@ -287,11 +286,8 @@ public class RuleSet {
             // FIRST, get the lists of facts in the order referenced in the
             // rule's body.
             int sum = 0;
-            for (var item : rule.body()) {
-                var relation = switch (item) {
-                    case BodyItem.Normal a -> a.atom().relation();
-                    case BodyItem.Negated na -> na.atom().relation();
-                };
+            for (var b : rule.body()) {
+                var relation = b.relation();
                 var facts = factsFor(relation);
 
                 if (facts.isEmpty()) {
