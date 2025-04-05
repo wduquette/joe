@@ -136,12 +136,12 @@ public class NeroAST {
     {
         public Constraint asConstraint() {
             var realOp = switch (op.type()) {
-                case BANG_EQUAL -> Op.NE;
-                case EQUAL_EQUAL -> Op.EQ;
-                case GREATER -> Op.GT;
-                case GREATER_EQUAL -> Op.GE;
-                case LESS -> Op.LT;
-                case LESS_EQUAL -> Op.LE;
+                case BANG_EQUAL -> Constraint.Op.NE;
+                case EQUAL_EQUAL -> Constraint.Op.EQ;
+                case GREATER -> Constraint.Op.GT;
+                case GREATER_EQUAL -> Constraint.Op.GE;
+                case LESS -> Constraint.Op.LT;
+                case LESS_EQUAL -> Constraint.Op.LE;
                 default -> throw new IllegalStateException(
                     "Unknown operator token: " + op);
             };
