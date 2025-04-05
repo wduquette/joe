@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * Nero is the public entry point for parsing and executing Nero
  * code.
  */
-public class Nero {
+public class OldNero {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -24,7 +24,7 @@ public class Nero {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Nero() {
+    public OldNero() {
         // Nothing to do.
     }
 
