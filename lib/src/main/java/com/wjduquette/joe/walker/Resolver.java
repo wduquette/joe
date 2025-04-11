@@ -2,6 +2,7 @@ package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.JoeClass;
 import com.wjduquette.joe.Trace;
+import com.wjduquette.joe.scanner.Token;
 
 import java.util.HashMap;
 import java.util.List;

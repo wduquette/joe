@@ -1,11 +1,14 @@
 package com.wjduquette.joe.walker;
+import com.wjduquette.joe.scanner.Scanner;
 import com.wjduquette.joe.scanner.SourceBuffer;
+import com.wjduquette.joe.scanner.Token;
+import com.wjduquette.joe.scanner.TokenType;
 import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.patterns.Pattern;
 
 import java.util.*;
 
-import static com.wjduquette.joe.walker.TokenType.*;
+import static com.wjduquette.joe.scanner.TokenType.*;
 
 class Parser {
     public static final String ARGS = "args";
@@ -16,8 +19,7 @@ class Parser {
 
     private final SourceBuffer source;
     private final ErrorReporter reporter;
-    private List<Token> tokens = null;
-    private int current = 0;
+    private Scanner scanner = null;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -34,12 +36,10 @@ class Parser {
     // Public API
 
     public List<Stmt> parse() {
-        Scanner scanner = new Scanner(source, reporter);
-        this.current = 0;
-        this.tokens = scanner.scanTokens();
+        this.scanner = new Scanner(source, this::errorInScanner);
         List<Stmt> statements = new ArrayList<>();
 
-        while (!isAtEnd()) {
+        while (!scanner.isAtEnd()) {
             statements.add(declaration());
         }
 
@@ -51,11 +51,11 @@ class Parser {
 
     private Stmt declaration() {
         try {
-            if (match(CLASS)) return classDeclaration();
-            if (match(FUNCTION)) return functionDeclaration("function");
-            if (match(LET)) return letDeclaration();
-            if (match(RECORD)) return recordDeclaration();
-            if (match(VAR)) return varDeclaration();
+            if (scanner.match(CLASS)) return classDeclaration();
+            if (scanner.match(FUNCTION)) return functionDeclaration("function");
+            if (scanner.match(LET)) return letDeclaration();
+            if (scanner.match(RECORD)) return recordDeclaration();
+            if (scanner.match(VAR)) return varDeclaration();
 
             return statement();
         } catch (ErrorSync error) {
@@ -66,43 +66,45 @@ class Parser {
 
     private Stmt classDeclaration() {
         // Class Name
-        int start = previous().span().start();
-        Token name = consume(IDENTIFIER, "Expected class name.");
+        int start = scanner.previous().span().start();
+        scanner.consume(IDENTIFIER, "Expected class name.");
+        var name = scanner.previous();
 
         // Superclass
         Expr.Variable superclass = null;
 
-        if (match(EXTENDS)) {
-            consume(IDENTIFIER, "Expected superclass name.");
-            superclass = new Expr.Variable(previous());
+        if (scanner.match(EXTENDS)) {
+            scanner.consume(IDENTIFIER, "Expected superclass name.");
+            superclass = new Expr.Variable(scanner.previous());
         }
 
         // Class body
-        consume(LEFT_BRACE, "Expected '{' before class body.");
+        scanner.consume(LEFT_BRACE, "Expected '{' before class body.");
 
         List<Stmt.Function> staticMethods = new ArrayList<>();
         List<Stmt.Function> methods = new ArrayList<>();
         List<Stmt> staticInitializer = new ArrayList<>();
 
-        while (!check(RIGHT_BRACE) && !isAtEnd()) {
-            if (match(METHOD)) {
+        while (!scanner.check(RIGHT_BRACE) && !scanner.isAtEnd()) {
+            if (scanner.match(METHOD)) {
                 methods.add(functionDeclaration("method"));
-            } else if (match(STATIC)) {
-                if (match(METHOD)) {
+            } else if (scanner.match(STATIC)) {
+                if (scanner.match(METHOD)) {
                     staticMethods.add(functionDeclaration("static method"));
                 } else {
-                    consume(LEFT_BRACE,
+                    scanner.consume(LEFT_BRACE,
                         "Expected 'method' or '{' after 'static'.");
                     staticInitializer.addAll(block());
                 }
             } else {
-                throw errorSync(advance(),
+                scanner.advance();
+                throw errorSync(scanner.previous(),
                     "Expected method, static method, or static initializer.");
             }
         }
 
-        consume(RIGHT_BRACE, "Expected '}' after class body.");
-        int end = previous().span().end();
+        scanner.consume(RIGHT_BRACE, "Expected '}' after class body.");
+        int end = scanner.previous().span().end();
         var classSpan = source.span(start, end);
 
         return new Stmt.Class(name, classSpan, superclass,
@@ -110,13 +112,14 @@ class Parser {
     }
 
     private Stmt.Function functionDeclaration(String kind) {
-        Token name = consume(IDENTIFIER, "Expected " + kind + " name.");
+        scanner.consume(IDENTIFIER, "Expected " + kind + " name.");
+        var name = scanner.previous();
 
-        consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
 
         List<Token> parameters = parameters(RIGHT_PAREN, false);
 
-        consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
+        scanner.consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
         List<Stmt> body = block();
         return new Stmt.Function(kind, name, parameters, body);
     }
@@ -129,20 +132,21 @@ class Parser {
 
         var names = new HashMap<String,Token>();
 
-        if (!check(terminator)) {
+        if (!scanner.check(terminator)) {
             do {
                 if (parameters.size() >= MAX_CALL_ARGUMENTS) {
-                    error(peek(), "Expected no more than " + MAX_CALL_ARGUMENTS +
+                    error(scanner.peek(), "Expected no more than " + MAX_CALL_ARGUMENTS +
                         " parameters.");
                 }
 
-                var token = consume(IDENTIFIER, "Expected parameter name.");
+                scanner.consume(IDENTIFIER, "Expected parameter name.");
+                var token = scanner.previous();
                 if (names.containsKey(token.lexeme())) {
                     throw errorSync(token, "Duplicate parameter name.");
                 }
                 names.put(token.lexeme(), token);
                 parameters.add(token);
-            } while (match(COMMA));
+            } while (scanner.match(COMMA));
         }
 
         if (names.containsKey(ARGS)) {
@@ -160,68 +164,70 @@ class Parser {
         var terminatorString = terminator == RIGHT_PAREN
             ? ")" : "->";
 
-        consume(terminator, "Expected '" +
+        scanner.consume(terminator, "Expected '" +
             terminatorString + "' after parameter list.");
 
         return parameters;
     }
 
     private Stmt letDeclaration() {
-        Token keyword = previous();
+        Token keyword = scanner.previous();
         WalkerPattern pattern = pattern();
 
         if (pattern.getBindings().isEmpty()) {
-            error(previous(), "'let' pattern must declare at least one variable.");
+            error(scanner.previous(), "'let' pattern must declare at least one variable.");
         }
 
-        consume(EQUAL, "Expected '=' after pattern.");
+        scanner.consume(EQUAL, "Expected '=' after pattern.");
         var target = expression();
-        consume(SEMICOLON, "Expected ';' after target expression.");
+        scanner.consume(SEMICOLON, "Expected ';' after target expression.");
 
         return new Stmt.Let(keyword, pattern, target);
     }
 
     private Stmt recordDeclaration() {
         // Type Name
-        int start = previous().span().start();
-        Token name = consume(IDENTIFIER, "Expected record type name.");
+        int start = scanner.previous().span().start();
+        scanner.consume(IDENTIFIER, "Expected record type name.");
+        var name = scanner.previous();
 
         // Record Fields
-        consume(LEFT_PAREN, "Expected '(' after record type name.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after record type name.");
         var recordFields = parameters(RIGHT_PAREN, true).stream()
             .map(Token::lexeme)
             .toList();
 
         if (recordFields.isEmpty()) {
-            error(previous(), "Expected at least one record parameter.");
+            error(scanner.previous(), "Expected at least one record parameter.");
         }
 
         // Type body
-        consume(LEFT_BRACE, "Expected '{' before type body.");
+        scanner.consume(LEFT_BRACE, "Expected '{' before type body.");
 
         List<Stmt.Function> staticMethods = new ArrayList<>();
         List<Stmt.Function> methods = new ArrayList<>();
         List<Stmt> staticInitializer = new ArrayList<>();
 
-        while (!check(RIGHT_BRACE) && !isAtEnd()) {
-            if (match(METHOD)) {
+        while (!scanner.check(RIGHT_BRACE) && !scanner.isAtEnd()) {
+            if (scanner.match(METHOD)) {
                 methods.add(functionDeclaration("method"));
-            } else if (match(STATIC)) {
-                if (match(METHOD)) {
+            } else if (scanner.match(STATIC)) {
+                if (scanner.match(METHOD)) {
                     staticMethods.add(functionDeclaration("static method"));
                 } else {
-                    consume(LEFT_BRACE,
+                    scanner.consume(LEFT_BRACE,
                         "Expected 'method' or '{' after 'static'.");
                     staticInitializer.addAll(block());
                 }
             } else {
-                throw errorSync(advance(),
+                scanner.advance();
+                throw errorSync(scanner.previous(),
                     "Expected method, static method, or static initializer.");
             }
         }
 
-        consume(RIGHT_BRACE, "Expected '}' after type body.");
-        int end = previous().span().end();
+        scanner.consume(RIGHT_BRACE, "Expected '}' after type body.");
+        int end = scanner.previous().span().end();
         var span = source.span(start, end);
 
         return new Stmt.Record(name, span, recordFields,
@@ -229,42 +235,43 @@ class Parser {
     }
 
     private Stmt varDeclaration() {
-        Token name = consume(IDENTIFIER, "Expected variable name.");
+        scanner.consume(IDENTIFIER, "Expected variable name.");
+        var name = scanner.previous();
 
         Expr initializer = null;
-        if (match(EQUAL)) {
+        if (scanner.match(EQUAL)) {
             initializer = expression();
         }
 
-        consume(SEMICOLON, "Expected ';' after variable declaration.");
+        scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
         return new Stmt.Var(name, initializer);
     }
 
     private Stmt statement() {
-        if (match(ASSERT)) return assertStatement();
-        if (match(BREAK)) return breakStatement();
-        if (match(CONTINUE)) return continueStatement();
-        if (match(FOR)) return forStatement();
-        if (match(FOREACH)) return forEachStatement();
-        if (match(IF)) return match(LET) ? ifLetStatement() : ifStatement();
-        if (match(MATCH)) return matchStatement();
-        if (match(RETURN)) return returnStatement();
-        if (match(SWITCH)) return switchStatement();
-        if (match(THROW)) return throwStatement();
-        if (match(WHILE)) return whileStatement();
-        if (match(LEFT_BRACE)) return new Stmt.Block(block());
+        if (scanner.match(ASSERT)) return assertStatement();
+        if (scanner.match(BREAK)) return breakStatement();
+        if (scanner.match(CONTINUE)) return continueStatement();
+        if (scanner.match(FOR)) return forStatement();
+        if (scanner.match(FOREACH)) return forEachStatement();
+        if (scanner.match(IF)) return scanner.match(LET) ? ifLetStatement() : ifStatement();
+        if (scanner.match(MATCH)) return matchStatement();
+        if (scanner.match(RETURN)) return returnStatement();
+        if (scanner.match(SWITCH)) return switchStatement();
+        if (scanner.match(THROW)) return throwStatement();
+        if (scanner.match(WHILE)) return whileStatement();
+        if (scanner.match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
     }
 
     private Stmt assertStatement() {
-        Token keyword = previous();
+        Token keyword = scanner.previous();
         var conditionStart = keyword.span().end();
         Expr condition = expression();
-        var conditionEnd = previous().span().end();
+        var conditionEnd = scanner.previous().span().end();
         Expr message;
 
-        if (match(COMMA)) {
+        if (scanner.match(COMMA)) {
             message = expression();
         } else {
             var conditionText =
@@ -272,37 +279,37 @@ class Parser {
             message = new Expr.Literal("Assertion unmet: " + conditionText + ".");
         }
 
-        consume(SEMICOLON, "Expected ';' after assertion.");
+        scanner.consume(SEMICOLON, "Expected ';' after assertion.");
 
         return new Stmt.Assert(keyword, condition, message);
     }
 
     private Stmt breakStatement() {
-        Token keyword = previous();
-        consume(SEMICOLON, "Expected ';' after 'break' value.");
+        Token keyword = scanner.previous();
+        scanner.consume(SEMICOLON, "Expected ';' after 'break' value.");
         return new Stmt.Break(keyword);
     }
 
     private Stmt continueStatement() {
-        Token keyword = previous();
-        consume(SEMICOLON, "Expected ';' after 'continue' value.");
+        Token keyword = scanner.previous();
+        scanner.consume(SEMICOLON, "Expected ';' after 'continue' value.");
         return new Stmt.Continue(keyword);
     }
 
     private Stmt expressionStatement() {
         Expr value = expression();
-        consume(SEMICOLON, "Expected ';' after expression.");
+        scanner.consume(SEMICOLON, "Expected ';' after expression.");
         return new Stmt.Expression(value);
     }
 
     private Stmt forStatement() {
-        consume(LEFT_PAREN, "Expected '(' after 'for'.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'for'.");
 
         // Initializer
         Stmt init;
-        if (match(SEMICOLON)) {
+        if (scanner.match(SEMICOLON)) {
             init = null;
-        } else if (match(VAR)) {
+        } else if (scanner.match(VAR)) {
             init = varDeclaration();
         } else {
             init = expressionStatement();
@@ -310,17 +317,17 @@ class Parser {
 
         // Condition
         Expr condition = null;
-        if (!check(SEMICOLON)) {
+        if (!scanner.check(SEMICOLON)) {
             condition = expression();
         }
-        consume(SEMICOLON, "Expected ';' after loop condition.");
+        scanner.consume(SEMICOLON, "Expected ';' after loop condition.");
 
         // Increment
         Expr incr = null;
-        if (!check(RIGHT_PAREN)) {
+        if (!scanner.check(RIGHT_PAREN)) {
             incr = expression();
         }
-        consume(RIGHT_PAREN, "Expected ')' after loop clauses.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after loop clauses.");
 
         // Body
         Stmt body = statement();
@@ -333,14 +340,15 @@ class Parser {
     }
 
     private Stmt forEachStatement() {
-        consume(LEFT_PAREN, "Expected '(' after 'foreach'.");
-        consume(VAR, "Expected 'var' before loop variable name.");
-        Token varName = consume(IDENTIFIER, "Expected loop variable name.");
-        consume(COLON, "Expected ':' after loop variable name.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'foreach'.");
+        scanner.consume(VAR, "Expected 'var' before loop variable name.");
+        scanner.consume(IDENTIFIER, "Expected loop variable name.");
+        var varName = scanner.previous();
+        scanner.consume(COLON, "Expected ':' after loop variable name.");
 
         // List Expression
         Expr listExpr = expression();
-        consume(RIGHT_PAREN, "Expected ')' after loop expression.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after loop expression.");
 
         // Body
         var body = statement();
@@ -353,13 +361,13 @@ class Parser {
 
 
     private Stmt ifStatement() {
-        consume(LEFT_PAREN, "Expected '(' after 'if'.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'if'.");
         Expr condition = expression();
-        consume(RIGHT_PAREN, "Expected ')' after if condition.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after if condition.");
 
         Stmt thenBranch = statement();
         Stmt elseBranch = null;
-        if (match(ELSE)) {
+        if (scanner.match(ELSE)) {
             elseBranch = statement();
         }
 
@@ -367,17 +375,17 @@ class Parser {
     }
 
     private Stmt ifLetStatement() {
-        consume(LEFT_PAREN, "Expected '(' after 'if let'.");
-        Token keyword = previous();
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'if let'.");
+        Token keyword = scanner.previous();
         WalkerPattern pattern = pattern();
 
-        consume(EQUAL, "Expected '=' after pattern.");
+        scanner.consume(EQUAL, "Expected '=' after pattern.");
         var target = expression();
-        consume(RIGHT_PAREN, "Expected ')' after target expression.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after target expression.");
 
         Stmt thenBranch = statement();
         Stmt elseBranch = null;
-        if (match(ELSE)) {
+        if (scanner.match(ELSE)) {
             elseBranch = statement();
         }
 
@@ -385,110 +393,110 @@ class Parser {
     }
 
     private Stmt matchStatement() {
-        Token keyword = previous();
+        Token keyword = scanner.previous();
         var cases = new ArrayList<Stmt.MatchCase>();
 
         // FIRST, parse the head of the statement
-        consume(LEFT_PAREN, "Expected '(' after 'match'.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'match'.");
         Expr target = expression();
-        consume(RIGHT_PAREN, "Expected ')' after 'match' expression.");
-        consume(LEFT_BRACE, "Expected '{' before 'match' body.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after 'match' expression.");
+        scanner.consume(LEFT_BRACE, "Expected '{' before 'match' body.");
 
         // NEXT, parse the cases.
-        while (match(CASE)) {
-            var caseKeyword = previous();
+        while (scanner.match(CASE)) {
+            var caseKeyword = scanner.previous();
             var pattern = pattern();
-            var guard = match(IF) ? expression() : null;
-            consume(MINUS_GREATER, "Expected '->' after pattern.");
+            var guard = scanner.match(IF) ? expression() : null;
+            scanner.consume(MINUS_GREATER, "Expected '->' after pattern.");
             var stmt = statement();
             cases.add(new Stmt.MatchCase(caseKeyword, pattern, guard, stmt));
         }
 
         if (cases.isEmpty()) {
-            error(previous(), "Expected at least one 'case' in `match`.");
+            error(scanner.previous(), "Expected at least one 'case' in `match`.");
         }
 
         // NEXT, parse the default case, if it exists
-        if (match(DEFAULT)) {
-            var caseKeyword = previous();
-            consume(MINUS_GREATER, "Expected '->' after 'default'.");
+        if (scanner.match(DEFAULT)) {
+            var caseKeyword = scanner.previous();
+            scanner.consume(MINUS_GREATER, "Expected '->' after 'default'.");
             var stmt = statement();
             cases.add(new Stmt.MatchCase(caseKeyword, null, null, stmt));
         }
 
         // NEXT, complete the statement
-        consume(RIGHT_BRACE, "Expected '}' after 'match' body.");
+        scanner.consume(RIGHT_BRACE, "Expected '}' after 'match' body.");
 
         return new Stmt.Match(keyword, target, cases);
     }
 
     private Stmt returnStatement() {
-        Token keyword = previous();
+        Token keyword = scanner.previous();
         Expr value = null;
 
-        if (!check(SEMICOLON)) {
+        if (!scanner.check(SEMICOLON)) {
             value = expression();
         }
 
-        consume(SEMICOLON, "Expected ';' after return value.");
+        scanner.consume(SEMICOLON, "Expected ';' after return value.");
         return new Stmt.Return(keyword, value);
     }
 
     private Stmt switchStatement() {
-        Token keyword = previous();
+        Token keyword = scanner.previous();
         var cases = new ArrayList<Stmt.SwitchCase>();
 
         // FIRST, parse the head of the statement
-        consume(LEFT_PAREN, "Expected '(' after 'switch'.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'switch'.");
         Expr switchExpr = expression();
-        consume(RIGHT_PAREN, "Expected ')' after switch expression.");
-        consume(LEFT_BRACE, "Expected '{' before switch body.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after switch expression.");
+        scanner.consume(LEFT_BRACE, "Expected '{' before switch body.");
 
         // NEXT, parse the cases.
-        while (match(CASE)) {
-            var caseKeyword = previous();
+        while (scanner.match(CASE)) {
+            var caseKeyword = scanner.previous();
             var values = new ArrayList<Expr>();
 
             // FIRST, parse the values
             values.add(expression());
-            while (match(COMMA)) {
+            while (scanner.match(COMMA)) {
                 values.add(expression());
             }
-            consume(MINUS_GREATER, "Expected '->' after case values.");
+            scanner.consume(MINUS_GREATER, "Expected '->' after case values.");
             var stmt = statement();
             cases.add(new Stmt.SwitchCase(caseKeyword, values, stmt));
         }
 
         if (cases.isEmpty()) {
-            error(previous(), "Expected at least one 'case' in switch.");
+            error(scanner.previous(), "Expected at least one 'case' in switch.");
         }
 
         // NEXT, parse the default case, if it exists
-        if (match(DEFAULT)) {
-            var caseKeyword = previous();
-            consume(MINUS_GREATER, "Expected '->' after 'default'.");
+        if (scanner.match(DEFAULT)) {
+            var caseKeyword = scanner.previous();
+            scanner.consume(MINUS_GREATER, "Expected '->' after 'default'.");
             var stmt = statement();
             cases.add(new Stmt.SwitchCase(caseKeyword, List.of(), stmt));
         }
 
         // NEXT, complete the statement
-        consume(RIGHT_BRACE, "Expected '}' after switch body.");
+        scanner.consume(RIGHT_BRACE, "Expected '}' after switch body.");
 
         return new Stmt.Switch(keyword, switchExpr, cases);
     }
 
     private Stmt throwStatement() {
-        Token keyword = previous();
+        Token keyword = scanner.previous();
         Expr value = expression();
 
-        consume(SEMICOLON, "Expected ';' after thrown error.");
+        scanner.consume(SEMICOLON, "Expected ';' after thrown error.");
         return new Stmt.Throw(keyword, value);
     }
 
     private Stmt whileStatement() {
-        consume(LEFT_PAREN, "Expected '(' after 'while'.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'while'.");
         Expr condition = expression();
-        consume(RIGHT_PAREN, "Expected ')' after condition.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after condition.");
         Stmt body = statement();
 
         return new Stmt.While(condition, body);
@@ -497,11 +505,11 @@ class Parser {
     private List<Stmt> block() {
         List<Stmt> statements = new ArrayList<>();
 
-        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+        while (!scanner.check(RIGHT_BRACE) && !scanner.isAtEnd()) {
             statements.add(declaration());
         }
 
-        consume(RIGHT_BRACE, "Expected '}' after block.");
+        scanner.consume(RIGHT_BRACE, "Expected '}' after block.");
         return statements;
     }
 
@@ -515,8 +523,8 @@ class Parser {
     private Expr assignment() {
         Expr target = ternary();
 
-        if (match(EQUAL, PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL)) {
-            Token op = previous();
+        if (scanner.match(EQUAL, PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL)) {
+            Token op = scanner.previous();
             Expr value = assignment();
 
             if (target instanceof Expr.Variable) {
@@ -538,10 +546,10 @@ class Parser {
     private Expr ternary() {
         var expr = or();
 
-        if (match(QUESTION)) {
-            var token = previous();
+        if (scanner.match(QUESTION)) {
+            var token = scanner.previous();
             var trueExpr = or();
-            consume(COLON, "Expected ':' after expression.");
+            scanner.consume(COLON, "Expected ':' after expression.");
             var falseExpr = or();
             return new Expr.Ternary(expr, token, trueExpr, falseExpr);
         }
@@ -552,8 +560,8 @@ class Parser {
     private Expr or() {
         Expr expr = and();
 
-        while (match(OR)) {
-            Token operator = previous();
+        while (scanner.match(OR)) {
+            Token operator = scanner.previous();
             Expr right = and();
             expr = new Expr.Logical(expr, operator, right);
         }
@@ -564,8 +572,8 @@ class Parser {
     private Expr and() {
         Expr expr = equality();
 
-        while (match(AND)) {
-            Token operator = previous();
+        while (scanner.match(AND)) {
+            Token operator = scanner.previous();
             Expr right = equality();
             expr = new Expr.Logical(expr, operator, right);
         }
@@ -576,8 +584,8 @@ class Parser {
     private Expr equality() {
         Expr expr = comparison();
 
-        while (match(BANG_EQUAL, EQUAL_EQUAL)) {
-            Token operator = previous();
+        while (scanner.match(BANG_EQUAL, EQUAL_EQUAL)) {
+            Token operator = scanner.previous();
             Expr right = comparison();
             expr = new Expr.Binary(expr, operator, right);
         }
@@ -588,8 +596,8 @@ class Parser {
     private Expr comparison() {
         Expr expr = term();
 
-        while (match(GREATER, GREATER_EQUAL, IN, LESS, LESS_EQUAL, NI)) {
-            Token operator = previous();
+        while (scanner.match(GREATER, GREATER_EQUAL, IN, LESS, LESS_EQUAL, NI)) {
+            Token operator = scanner.previous();
             Expr right = term();
             expr = new Expr.Binary(expr, operator, right);
         }
@@ -600,8 +608,8 @@ class Parser {
     private Expr term() {
         Expr expr = factor();
 
-        while (match(MINUS, PLUS)) {
-            Token operator = previous();
+        while (scanner.match(MINUS, PLUS)) {
+            Token operator = scanner.previous();
             Expr right = factor();
             expr = new Expr.Binary(expr, operator, right);
         }
@@ -612,8 +620,8 @@ class Parser {
     private Expr factor() {
         Expr expr = unary();
 
-        while (match(SLASH, STAR)) {
-            Token operator = previous();
+        while (scanner.match(SLASH, STAR)) {
+            Token operator = scanner.previous();
             Expr right = unary();
             expr = new Expr.Binary(expr, operator, right);
         }
@@ -622,13 +630,13 @@ class Parser {
     }
 
     private Expr unary() {
-        if (match(PLUS_PLUS, MINUS_MINUS)) {
+        if (scanner.match(PLUS_PLUS, MINUS_MINUS)) {
             // Pre-increment/decrement
-            Token op = previous();
+            Token op = scanner.previous();
             Expr target = unary();
             return prePost(op, target, true);
-        } else if (match(BANG, MINUS)) {
-            Token op = previous();
+        } else if (scanner.match(BANG, MINUS)) {
+            Token op = scanner.previous();
             Expr right = unary();
 
             return new Expr.Unary(op, right);
@@ -640,9 +648,9 @@ class Parser {
     private Expr postfix() {
         Expr target = call();
 
-        if (match(PLUS_PLUS, MINUS_MINUS)) {
+        if (scanner.match(PLUS_PLUS, MINUS_MINUS)) {
             // Post-increment/decrement
-            Token op = previous();
+            Token op = scanner.previous();
             return prePost(op, target, false);
         }
 
@@ -668,15 +676,16 @@ class Parser {
         Expr expr = primary();
 
         while (true) {
-            if (match(LEFT_PAREN)) {
+            if (scanner.match(LEFT_PAREN)) {
                 expr = finishCall(expr);
-            } else if (match(DOT)) {
-                Token name = consume(IDENTIFIER, "Expected property name after '.'.");
+            } else if (scanner.match(DOT)) {
+                scanner.consume(IDENTIFIER, "Expected property name after '.'.");
+                var name = scanner.previous();
                 expr = new Expr.Get(expr, name);
-            } else if (match(LEFT_BRACKET)) {
-                var bracket = previous();
+            } else if (scanner.match(LEFT_BRACKET)) {
+                var bracket = scanner.previous();
                 var index = expression();
-                consume(RIGHT_BRACKET, "Expected ']' after index.");
+                scanner.consume(RIGHT_BRACKET, "Expected ']' after index.");
                 expr = new Expr.IndexGet(expr, bracket, index);
             } else {
                 break;
@@ -688,59 +697,60 @@ class Parser {
 
     private Expr finishCall(Expr callee) {
         List<Expr> arguments = new ArrayList<>();
-        if (!check(RIGHT_PAREN)) {
+        if (!scanner.check(RIGHT_PAREN)) {
             do {
                 if (arguments.size() >= MAX_CALL_ARGUMENTS) {
-                    error(peek(), "Call has more than " +
+                    error(scanner.peek(), "Call has more than " +
                         MAX_CALL_ARGUMENTS + " arguments.");
                 }
                 arguments.add(expression());
-            } while (match(COMMA));
+            } while (scanner.match(COMMA));
         }
 
-        Token paren = consume(RIGHT_PAREN,
-            "Expect ')' after arguments.");
+        scanner.consume(RIGHT_PAREN, "Expect ')' after arguments.");
+        var paren = scanner.previous();
 
         return new Expr.Call(callee, paren, arguments);
     }
 
     private Expr primary() {
-        if (match(FALSE)) return new Expr.Literal(false);
-        if (match(TRUE)) return new Expr.Literal(true);
-        if (match(NULL)) return new Expr.Literal(null);
+        if (scanner.match(FALSE)) return new Expr.Literal(false);
+        if (scanner.match(TRUE)) return new Expr.Literal(true);
+        if (scanner.match(NULL)) return new Expr.Literal(null);
 
-        if (match(NUMBER, STRING, KEYWORD)) {
-            return new Expr.Literal(previous().literal());
+        if (scanner.match(NUMBER, STRING, KEYWORD)) {
+            return new Expr.Literal(scanner.previous().literal());
         }
 
-        if (match(AT)) {
-            Token keyword = previous();
-            Token name = consume(IDENTIFIER,
-                "Expected class property name.");
+        if (scanner.match(AT)) {
+            Token keyword = scanner.previous();
+            scanner.consume(IDENTIFIER, "Expected class property name.");
+            var name = scanner.previous();
             var obj = new Expr.This(keyword);
             return new Expr.Get(obj, name);
         }
 
-        if (match(SUPER)) {
-            Token keyword = previous();
-            consume(DOT, "Expected '.' after 'super'.");
-            Token method = consume(IDENTIFIER,
+        if (scanner.match(SUPER)) {
+            Token keyword = scanner.previous();
+            scanner.consume(DOT, "Expected '.' after 'super'.");
+            scanner.consume(IDENTIFIER,
                 "Expected superclass method name.");
+            var method = scanner.previous();
             return new Expr.Super(keyword, method);
         }
 
-        if (match(THIS)) return new Expr.This(previous());
+        if (scanner.match(THIS)) return new Expr.This(scanner.previous());
 
-        if (match(IDENTIFIER)) {
-            return new Expr.Variable(previous());
+        if (scanner.match(IDENTIFIER)) {
+            return new Expr.Variable(scanner.previous());
         }
 
-        if (match(BACK_SLASH)) {
-            var token = previous();
+        if (scanner.match(BACK_SLASH)) {
+            var token = scanner.previous();
             var parameters = parameters(MINUS_GREATER, false);
 
             List<Stmt> body;
-            if (match(LEFT_BRACE)) {
+            if (scanner.match(LEFT_BRACE)) {
                 body = block();
             } else {
                 var expr = expression();
@@ -750,57 +760,57 @@ class Parser {
             return new Expr.Lambda(decl);
         }
 
-        if (match(LEFT_PAREN)) {
+        if (scanner.match(LEFT_PAREN)) {
             Expr expr = expression();
-            consume(RIGHT_PAREN, "Expected ')' after expression.");
+            scanner.consume(RIGHT_PAREN, "Expected ')' after expression.");
             return new Expr.Grouping(expr);
         }
 
         // List literal
-        if (match(LEFT_BRACKET)) {
-            var bracket = previous();
+        if (scanner.match(LEFT_BRACKET)) {
+            var bracket = scanner.previous();
             var list = new ArrayList<Expr>();
 
-            if (!check(RIGHT_BRACKET)) {
+            if (!scanner.check(RIGHT_BRACKET)) {
                 list.add(expression());
 
-                while (match(COMMA)) {
+                while (scanner.match(COMMA)) {
                     // Allow trailing comma
-                    if (check(RIGHT_BRACKET)) break;
+                    if (scanner.check(RIGHT_BRACKET)) break;
                     list.add(expression());
                 }
             }
 
-            consume(RIGHT_BRACKET, "Expected ']' after list items.");
+            scanner.consume(RIGHT_BRACKET, "Expected ']' after list items.");
 
             return new Expr.ListLiteral(bracket, list);
         }
 
         // Map literal
-        if (match(LEFT_BRACE)) {
-            var brace = previous();
+        if (scanner.match(LEFT_BRACE)) {
+            var brace = scanner.previous();
             var entries = new ArrayList<Expr>();
 
-            if (!check(RIGHT_BRACE)) {
+            if (!scanner.check(RIGHT_BRACE)) {
                 entries.add(expression());
-                consume(COLON, "Expected ':' after map key.");
+                scanner.consume(COLON, "Expected ':' after map key.");
                 entries.add(expression());
 
-                while (match(COMMA)) {
+                while (scanner.match(COMMA)) {
                     // Allow trailing comma
-                    if (check(RIGHT_BRACE)) break;
+                    if (scanner.check(RIGHT_BRACE)) break;
                     entries.add(expression());
-                    consume(COLON, "Expected ':' after map key.");
+                    scanner.consume(COLON, "Expected ':' after map key.");
                     entries.add(expression());
                 }
             }
 
-            consume(RIGHT_BRACE, "Expected '}' after map entries.");
+            scanner.consume(RIGHT_BRACE, "Expected '}' after map entries.");
 
             return new Expr.MapLiteral(brace, entries);
         }
 
-        throw errorSync(peek(), "Expected expression.");
+        throw errorSync(scanner.peek(), "Expected expression.");
     }
 
     //-------------------------------------------------------------------------
@@ -826,18 +836,18 @@ class Parser {
             return constant;
         }
 
-        if (match(LEFT_BRACKET)) {
+        if (scanner.match(LEFT_BRACKET)) {
             return listPattern(wp);
-        } else if (match(LEFT_BRACE)) {
+        } else if (scanner.match(LEFT_BRACE)) {
             return mapPattern(wp);
-        } else if (match(IDENTIFIER)) {
-            var identifier = previous();
+        } else if (scanner.match(IDENTIFIER)) {
+            var identifier = scanner.previous();
 
             if (identifier.lexeme().startsWith("_")) {
                 return new Pattern.Wildcard(identifier.lexeme());
-            } else if (match(LEFT_BRACE)) {
+            } else if (scanner.match(LEFT_BRACE)) {
                 return instancePattern(wp, identifier);
-            } else if (match(LEFT_PAREN)) {
+            } else if (scanner.match(LEFT_PAREN)) {
                 return recordPattern(wp, identifier);
             }
 
@@ -849,33 +859,33 @@ class Parser {
 
             var id = wp.getBindingID(identifier);
 
-            if (isSubpattern && match(EQUAL)) {
+            if (isSubpattern && scanner.match(EQUAL)) {
                 var subpattern = parsePattern(wp, false);
                 return new Pattern.PatternBinding(id, subpattern);
             } else {
                 return new Pattern.ValueBinding(id);
             }
         } else {
-            throw errorSync(peek(), "Expected pattern.");
+            throw errorSync(scanner.peek(), "Expected pattern.");
         }
     }
 
     private Pattern.Constant constantPattern(WalkerPattern wp) {
-        if (match(TRUE)) {
+        if (scanner.match(TRUE)) {
             return wp.addLiteralConstant(true);
-        } else if (match(FALSE)) {
+        } else if (scanner.match(FALSE)) {
             return wp.addLiteralConstant(false);
-        } else if (match(NULL)) {
+        } else if (scanner.match(NULL)) {
             return wp.addLiteralConstant(null);
-        } else if (match(NUMBER) || match(STRING) || match(KEYWORD)) {
-            return wp.addLiteralConstant(previous().literal());
-        } else if (match(DOLLAR)) {
-            if (match(IDENTIFIER)) {
-                return wp.addVarConstant(previous());
+        } else if (scanner.match(NUMBER) || scanner.match(STRING) || scanner.match(KEYWORD)) {
+            return wp.addLiteralConstant(scanner.previous().literal());
+        } else if (scanner.match(DOLLAR)) {
+            if (scanner.match(IDENTIFIER)) {
+                return wp.addVarConstant(scanner.previous());
             } else {
-                consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
+                scanner.consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
                 var expr = expression();
-                consume(RIGHT_PAREN,
+                scanner.consume(RIGHT_PAREN,
                     "Expected ')' after interpolated expression.");
                 return wp.addExprConstant(expr);
             }
@@ -887,24 +897,24 @@ class Parser {
     private Pattern listPattern(WalkerPattern wp) {
         var list = new ArrayList<Pattern>();
 
-        if (match(RIGHT_BRACKET)) {
+        if (scanner.match(RIGHT_BRACKET)) {
             return new Pattern.ListPattern(list, null);
         }
 
         do {
-            if (check(RIGHT_BRACKET) || check(COLON)) {
+            if (scanner.check(RIGHT_BRACKET) || scanner.check(COLON)) {
                 break;
             }
             list.add(parsePattern(wp, true));
-        } while (match(COMMA));
+        } while (scanner.match(COMMA));
 
         Integer tailId = null;
-        if (match(COLON)) {
-            var tailVar = consume(IDENTIFIER,
-                "Expected binding variable for list tail.");
+        if (scanner.match(COLON)) {
+            scanner.consume(IDENTIFIER, "Expected binding variable for list tail.");
+            var tailVar = scanner.previous();
             tailId = wp.getBindingID(tailVar);
         }
-        consume(RIGHT_BRACKET, "Expected ']' after list pattern.");
+        scanner.consume(RIGHT_BRACKET, "Expected ']' after list pattern.");
 
         return new Pattern.ListPattern(list, tailId);
     }
@@ -912,21 +922,21 @@ class Parser {
     private Pattern.MapPattern mapPattern(WalkerPattern wp) {
         var map = new LinkedHashMap<Pattern.Constant,Pattern>();
 
-        if (match(RIGHT_BRACE)) {
+        if (scanner.match(RIGHT_BRACE)) {
             return new Pattern.MapPattern(map);
         }
 
         do {
-            if (check(RIGHT_BRACE)) {
+            if (scanner.check(RIGHT_BRACE)) {
                 break;
             }
             var key = constantPattern(wp);
-            consume(COLON, "Expected ':' after map key.");
+            scanner.consume(COLON, "Expected ':' after map key.");
             var value = parsePattern(wp, true);
             map.put(key, value);
-        } while (match(COMMA));
+        } while (scanner.match(COMMA));
 
-        consume(RIGHT_BRACE, "Expected '}' after map pattern.");
+        scanner.consume(RIGHT_BRACE, "Expected '}' after map pattern.");
 
         return new Pattern.MapPattern(map);
     }
@@ -939,63 +949,24 @@ class Parser {
     private Pattern recordPattern(WalkerPattern wp, Token identifier) {
         var list = new ArrayList<Pattern>();
 
-        if (match(RIGHT_PAREN)) {
+        if (scanner.match(RIGHT_PAREN)) {
             return new Pattern.RecordPattern(identifier.lexeme(), list);
         }
 
         do {
-            if (check(RIGHT_PAREN)) {
+            if (scanner.check(RIGHT_PAREN)) {
                 break;
             }
             list.add(parsePattern(wp, true));
-        } while (match(COMMA));
+        } while (scanner.match(COMMA));
 
-        consume(RIGHT_PAREN, "Expected ')' after record pattern.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after record pattern.");
 
         return new Pattern.RecordPattern(identifier.lexeme(), list);
     }
 
     //-------------------------------------------------------------------------
     // Primitives
-
-    private boolean match(TokenType... types) {
-        for (TokenType type : types) {
-            if (check(type)) {
-                advance();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private Token consume(TokenType type, String message) {
-        if (check(type)) return advance();
-
-        throw errorSync(peek(), message);
-    }
-
-    private boolean check(TokenType type) {
-        if (isAtEnd()) return false;
-        return peek().type() == type;
-    }
-
-    private Token advance() {
-        if (!isAtEnd()) current++;
-        return previous();
-    }
-
-    private boolean isAtEnd() {
-        return peek().type() == EOF;
-    }
-
-    private Token peek() {
-        return tokens.get(current);
-    }
-
-    private Token previous() {
-        return tokens.get(current - 1);
-    }
 
     // Saves the error detail, with no synchronization.
     void error(Token token, String message) {
@@ -1012,18 +983,24 @@ class Parser {
         return new ErrorSync(message);
     }
 
+    // Handles scan errors, triggering synchronization.
+    private void errorInScanner(SourceBuffer.Span span, String message) {
+        reporter.reportError(new Trace(span, message), span.isAtEnd());
+        throw new ErrorSync(message);
+    }
+
     // Discard tokens until we are at the beginning of the next statement.
     private void synchronize() {
         // Discard this token
-        advance();
+        scanner.advance();
 
-        while (!isAtEnd()) {
+        while (!scanner.isAtEnd()) {
             // If we see we just completed a statement, return.
-            if (previous().type() == SEMICOLON) return;
+            if (scanner.previous().type() == SEMICOLON) return;
 
             // If we see a keyword indicating the beginning of a new
             // statement, return.
-            switch (peek().type()) {
+            switch (scanner.peek().type()) {
                 case ASSERT:
                 case CLASS:
                 case FOR:
@@ -1037,7 +1014,7 @@ class Parser {
             }
 
             // Discard this token.
-            advance();
+            scanner.advance();
         }
     }
 

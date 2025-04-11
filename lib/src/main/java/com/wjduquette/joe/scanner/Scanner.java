@@ -81,16 +81,21 @@ public class Scanner {
     }
 
     /**
-     * Returns true if peek() has the given token type, and false otherwise,
-     * advancing the scanner on match().  Thus, on true, previous() will
-     * return the just matched token.
-     * @param type The type
+     * Returns true if peek() has one of the given token types, and false
+     * otherwise, advancing the scanner on match().  Thus, on true
+     * previous() will  return the just matched token.
+     * @param types The desired types
      * @return true or false.
      */
-    public boolean match(TokenType type) {
-        if (!check(type)) return false;
-        advance();
-        return true;
+    public boolean match(TokenType... types) {
+        for (var type : types) {
+            if (check(type)) {
+                advance();
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -108,7 +113,7 @@ public class Scanner {
             ? "end"
             : "'" + span.text() + "'";
 
-        var text = "At " + where + ", " + message;
+        var text = "Error at " + where + ": " + message;
 
         errorHandler.handle(span, text);
     }

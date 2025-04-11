@@ -1,6 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.RuntimeError;
+import com.wjduquette.joe.scanner.Token;
 
 import java.util.*;
 
