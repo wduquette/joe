@@ -12,8 +12,8 @@ import static com.wjduquette.joe.scanner.TokenType.*;
 import static com.wjduquette.joe.scanner.TokenType.WHILE;
 import static com.wjduquette.joe.checker.Checker.check;
 
-public class ScannerTest extends Ted {
-    private Scanner scanner;
+public class TokenizerTest extends Ted {
+    private Tokenizer tokenizer;
     private final List<String> details = new ArrayList<>();
 
     //-------------------------------------------------------------------------
@@ -319,13 +319,13 @@ public class ScannerTest extends Ted {
         details.clear();
 
         var source = new SourceBuffer("-", input);
-        scanner = new Scanner(source);
+        tokenizer = new Tokenizer(source);
     }
 
     private Token next() {
         Token token;
         do {
-            token = scanner.scanToken();
+            token = tokenizer.scanToken();
             if (token.type() == ERROR) {
                 System.out.println("detail: " +
                     token.span() + " " + token.literal());

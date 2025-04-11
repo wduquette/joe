@@ -5,7 +5,7 @@ import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.patterns.Pattern;
-import com.wjduquette.joe.scanner.Scanner;
+import com.wjduquette.joe.scanner.Tokenizer;
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.TokenType;
 
@@ -65,7 +65,7 @@ class Compiler {
     private SourceBuffer buffer;
 
     // The scanner
-    private com.wjduquette.joe.scanner.Scanner scanner;
+    private Tokenizer tokenizer;
 
     // A structure containing parser values.
     private final Parser parser = new Parser();
@@ -111,7 +111,7 @@ class Compiler {
      */
     public Function compile(String scriptName, String source) {
         buffer = new SourceBuffer(scriptName, source);
-        scanner = new Scanner(buffer);
+        tokenizer = new Tokenizer(buffer);
 
         // The FunctionCompiler contains the Chunk for the function
         // currently being compiled.  Each `function` or `method`
@@ -1860,7 +1860,7 @@ class Compiler {
         parser.previous = parser.current;
 
         for (;;) {
-            parser.current = scanner.scanToken();
+            parser.current = tokenizer.scanToken();
             if (parser.current.type() != ERROR) break;
 
             // Report the error.

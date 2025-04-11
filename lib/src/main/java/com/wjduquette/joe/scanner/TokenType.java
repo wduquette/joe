@@ -1,7 +1,7 @@
 package com.wjduquette.joe.scanner;
 
 /**
- * The {@link Token} types that can be returned by the {@link Scanner}.
+ * The {@link Token} types that can be returned by the {@link Tokenizer}.
  */
 public enum TokenType {
     // Single-character tokens.

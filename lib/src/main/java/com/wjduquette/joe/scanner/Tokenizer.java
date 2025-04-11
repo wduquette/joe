@@ -12,7 +12,7 @@ import static com.wjduquette.joe.scanner.TokenType.*;
 /**
  * Bert's scanner.
  */
-public class Scanner {
+public class Tokenizer {
     private static final Map<String, TokenType> reserved;
 
     // Define the table of reserved words.
@@ -77,7 +77,7 @@ public class Scanner {
      *
      * @param buffer The SourceBuffer
      */
-    public Scanner(SourceBuffer buffer) {
+    public Tokenizer(SourceBuffer buffer) {
         this.buffer = buffer;
         this.source = buffer.source();
     }
