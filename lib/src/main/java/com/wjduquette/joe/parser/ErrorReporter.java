@@ -1,4 +1,4 @@
-package com.wjduquette.joe.walker;
+package com.wjduquette.joe.parser;
 
 import com.wjduquette.joe.Trace;
 

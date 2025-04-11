@@ -1,4 +1,4 @@
-package com.wjduquette.joe.walker;
+package com.wjduquette.joe.parser;
 
 import com.wjduquette.joe.patterns.Pattern;
 import com.wjduquette.joe.scanner.Token;
@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A {@link com.wjduquette.joe.patterns.Pattern}, plus related data needed
- * by the {@link Resolver} and {@link Interpreter}.
+ * A {@link com.wjduquette.joe.patterns.Pattern}, as included in the parser's
+ * Abstract Syntax Tree.
  */
-class WalkerPattern {
+public class ASTPattern {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -21,7 +21,7 @@ class WalkerPattern {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public WalkerPattern() {
+    public ASTPattern() {
         // Nothing to do
     }
 

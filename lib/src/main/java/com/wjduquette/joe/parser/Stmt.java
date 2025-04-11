@@ -1,4 +1,4 @@
-package com.wjduquette.joe.walker;
+package com.wjduquette.joe.parser;
 
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.SourceBuffer.Span;
@@ -109,7 +109,7 @@ public sealed interface Stmt
      */
     record IfLet(
         Token keyword,
-        WalkerPattern pattern,
+        ASTPattern pattern,
         Expr target,
         Stmt thenBranch,
         Stmt elseBranch
@@ -121,7 +121,7 @@ public sealed interface Stmt
      * @param pattern The pattern to match
      * @param target The target expression
      */
-    record Let(Token keyword, WalkerPattern pattern, Expr target)
+    record Let(Token keyword, ASTPattern pattern, Expr target)
         implements Stmt {}
 
     /**
@@ -145,7 +145,7 @@ public sealed interface Stmt
      */
     record MatchCase(
         Token keyword,
-        WalkerPattern pattern,
+        ASTPattern pattern,
         Expr guard,
         Stmt statement
     ) {}

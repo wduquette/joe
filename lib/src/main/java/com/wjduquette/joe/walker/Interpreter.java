@@ -1,6 +1,9 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.parser.ASTPattern;
+import com.wjduquette.joe.parser.Expr;
+import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.patterns.Matcher;
 import com.wjduquette.joe.scanner.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
@@ -396,7 +399,7 @@ class Interpreter {
 
     // Bind the pattern's binding variables to the matching values from
     // the target.
-    private void bind(WalkerPattern pattern, List<Object> values) {
+    private void bind(ASTPattern pattern, List<Object> values) {
         var varNames = pattern.getBindings();
         for (var i = 0; i < varNames.size(); i++) {
             environment.setVar(
