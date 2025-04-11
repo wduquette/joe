@@ -2,6 +2,7 @@ package com.wjduquette.joe.scanner;
 
 import com.wjduquette.joe.scanner.SourceBuffer.Span;
 
+import static com.wjduquette.joe.scanner.TokenType.EOF;
 import static com.wjduquette.joe.scanner.TokenType.ERROR;
 
 public class Scanner {
@@ -48,6 +49,10 @@ public class Scanner {
 
     //-------------------------------------------------------------------------
     // Public API
+
+    public boolean isAtEnd() {
+        return current.type() == EOF;
+    }
 
     /**
      * Returns the previously scanned token.  This is initially null,
