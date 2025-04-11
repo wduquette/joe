@@ -112,7 +112,6 @@ class Compiler {
      */
     public Function compile(String scriptName, String source) {
         buffer = new SourceBuffer(scriptName, source);
-        scanner = new Scanner(buffer, this::errorInScanner);
 
         // The FunctionCompiler contains the Chunk for the function
         // currently being compiled.  Each `function` or `method`
@@ -124,6 +123,7 @@ class Compiler {
         errors.clear();
         parser.hadError = false;
         parser.panicMode = false;
+        scanner = new Scanner(buffer, this::errorInScanner);
 
         while (!scanner.match(EOF)) {
             declaration();
