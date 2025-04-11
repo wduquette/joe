@@ -6,21 +6,26 @@ import com.wjduquette.joe.SourceBuffer.Span;
 import static com.wjduquette.joe.scanner.TokenType.ERROR;
 
 public class Scanner {
+    /**
+     * The scanner's error handler interface.
+     */
     public interface ErrorHandler {
+        /**
+         * Receives each scan error
+         * @param span The span in the source code where the error occurred.
+         * @param message A descriptive message.
+         */
         void handle(Span span, String message);
     }
 
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The source being scanned
-    private final SourceBuffer buffer;
-
     // The client's error handler.
-    private final ErrorHandler handler;
+    private final ErrorHandler errorHandler;
 
     // The underlying tokenizer
-    private Tokenizer tokenizer;
+    private final Tokenizer tokenizer;
 
     // The sliding window of tokens
     private Token previous = null;
@@ -29,26 +34,84 @@ public class Scanner {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Scanner(SourceBuffer buffer, ErrorHandler handler) {
-        this.buffer = buffer;
-        this.handler = handler;
+    /**
+     * Creates a scanner on the given source buffer.
+     * On creation, previous() will return null and peek() will return the
+     * next token.  The error handler might be called on creation.
+     * @param buffer The source text
+     * @param errorHandler The handler for scan errors.
+     */
+    public Scanner(SourceBuffer buffer, ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
         this.tokenizer = new Tokenizer(buffer);
-
-        // Prime it with the first token.
         advance();
     }
 
     //-------------------------------------------------------------------------
     // Public API
 
+    /**
+     * Returns the previously scanned token.  This is initially null,
+     * and will be non-null after the first successful advance().
+     * @return The previous token.
+     */
     public Token previous() {
         return previous;
     }
 
+    /**
+     * Returns the next token to process.
+     * @return The token
+     */
     public Token peek() {
         return current;
     }
 
+    /**
+     * Returns true if peek() has the given token type, and false otherwise.
+     * @param type The type
+     * @return true or false.
+     */
+    public boolean check(TokenType type) {
+        return current.type() == type;
+    }
+
+    /**
+     * Returns true if peek() has the given token type, and false otherwise,
+     * advancing the scanner on match().  Thus, on true, previous() will
+     * return the just matched token.
+     * @param type The type
+     * @return true or false.
+     */
+    public boolean match(TokenType type) {
+        if (!check(type)) return false;
+        advance();
+        return true;
+    }
+
+    /**
+     * Requires that the next token have the given type.  If it does,
+     * the scanner is advanced; previous() will return the consumed
+     * token.  If not, an error is generated with the given message.
+     * @param type The expected type
+     * @param message The message
+     */
+    public void consume(TokenType type, String message) {
+        if (match(type)) return;
+
+        var span = current.span();
+        var where = span.isAtEnd()
+            ? "end"
+            : "'" + span.text() + "'";
+
+        var text = "At " + where + ", " + message;
+
+        errorHandler.handle(span, text);
+    }
+
+    /**
+     * Advances the scanner by one token, reporting any errors.
+     */
     public void advance() {
         // FIRST, slide the window.
         previous = current;
@@ -58,7 +121,7 @@ public class Scanner {
             current = tokenizer.scanToken();
             if (current.type() == ERROR) {
                 // Report the error.
-                handler.handle(current.span(), (String)current.literal());
+                errorHandler.handle(current.span(), (String)current.literal());
             } else {
                 break;
             }
