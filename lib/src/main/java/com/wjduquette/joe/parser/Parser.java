@@ -10,6 +10,10 @@ import java.util.*;
 
 import static com.wjduquette.joe.scanner.TokenType.*;
 
+/**
+ * The Joe parser.  Returns the parsed script as an AST consisting of a
+ * list of {@link Stmt} records.
+ */
 public class Parser {
     public static final String ARGS = "args";
     private static final int MAX_CALL_ARGUMENTS = 255;
@@ -24,6 +28,11 @@ public class Parser {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates a new parser.
+     * @param source The source to parse
+     * @param reporter The error reporter.
+     */
     public Parser(SourceBuffer source, ErrorReporter reporter) {
         this.source = source;
         this.reporter = reporter;
@@ -32,6 +41,12 @@ public class Parser {
     //-------------------------------------------------------------------------
     // Public API
 
+    /**
+     * Parses the source, attempting to detect as many meaningful errors as
+     * possible.  Errors are reported via the parser's error reporter.  If
+     * errors were reported, the result of this method should be ignored.
+     * @return The list of parsed statements.
+     */
     public List<Stmt> parse() {
         this.scanner = new Scanner(source, this::errorInScanner);
         List<Stmt> statements = new ArrayList<>();
