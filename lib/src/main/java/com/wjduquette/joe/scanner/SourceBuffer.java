@@ -1,4 +1,4 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.scanner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -277,6 +277,14 @@ public class SourceBuffer {
          */
         public Position endPosition() {
             return index2position(end());
+        }
+
+        /**
+         * Returns true if the span is at the end of the source.
+         * @return true or false.
+         */
+        public boolean isAtEnd() {
+            return end == source.length();
         }
 
         @Override public String toString() {

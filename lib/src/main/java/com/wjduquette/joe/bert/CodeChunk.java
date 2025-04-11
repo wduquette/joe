@@ -1,6 +1,6 @@
 package com.wjduquette.joe.bert;
 
-import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.scanner.SourceBuffer;
 
 /**
  * An interface for a buffer of compiled code, along with its constants table.

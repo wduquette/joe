@@ -1,19 +1,17 @@
-package com.wjduquette.joe.bert;
+package com.wjduquette.joe.scanner;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Keyword;
-import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.Trace;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.wjduquette.joe.bert.TokenType.*;
+import static com.wjduquette.joe.scanner.TokenType.*;
 
 /**
  * Bert's scanner.
  */
-public class Scanner {
+public class Tokenizer {
     private static final Map<String, TokenType> reserved;
 
     // Define the table of reserved words.
@@ -66,9 +64,6 @@ public class Scanner {
     // The SourceBuffer, used to produce Spans.
     private final SourceBuffer buffer;
 
-    // The error reporter.
-    private final ErrorReporter reporter;
-
     // The current scanning state.
     private int start = 0;
     private int current = 0;
@@ -77,19 +72,13 @@ public class Scanner {
     // Constructor
 
     /**
-     * Creates a new scanner for the given source buffer, using
-     * the given error reporter.
+     * Creates a new scanner for the given source buffer.
      *
      * @param buffer The SourceBuffer
-     * @param reporter The error handler.
      */
-    Scanner(
-        SourceBuffer buffer,
-        ErrorReporter reporter
-    ) {
+    public Tokenizer(SourceBuffer buffer) {
         this.buffer = buffer;
         this.source = buffer.source();
-        this.reporter = reporter;
     }
 
     //-------------------------------------------------------------------------
@@ -101,7 +90,7 @@ public class Scanner {
      * token.
      * @return The token.
      */
-    Token scanToken() {
+    public Token scanToken() {
         skipWhitespace();
         start = current;
 
@@ -231,8 +220,9 @@ public class Scanner {
                                     return err;
                                 }
                             }
-                            default -> errorToken(
-                                "invalid escape.");
+                            default -> {
+                                return errorToken( "invalid escape.");
+                            }
                         }
                     }
                 }
@@ -279,7 +269,10 @@ public class Scanner {
                             case 'r' -> buff.append('\r');
                             case 'f' -> buff.append('\f');
                             case '"' -> buff.append('"');
-                            case 'u' -> unicode(buff);
+                            case 'u' -> {
+                                var error = unicode(buff);
+                                if (error != null) return error;
+                            }
                             default -> {
                                 return errorToken(
                                     "invalid escape.");
@@ -511,9 +504,10 @@ public class Scanner {
         var where = isAtEnd() ? "end"
             : "'" + source.substring(start, current) + "'";
 
-        reporter.reportError(new Trace(buffer.span(start, current),
-            "At " + where + ", " + message),
-            isAtEnd());
-        return new Token(ERROR, null, null);
+
+        var span = buffer.span(start, current);
+        var text = "At " + where + ", " + message;
+
+        return new Token(ERROR, span, text);
     }
 }

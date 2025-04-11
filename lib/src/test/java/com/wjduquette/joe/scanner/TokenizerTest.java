@@ -1,19 +1,18 @@
-package com.wjduquette.joe.bert;
+package com.wjduquette.joe.scanner;
 
 import com.wjduquette.joe.Keyword;
-import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Ted;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wjduquette.joe.bert.TokenType.*;
-import static com.wjduquette.joe.bert.TokenType.WHILE;
+import static com.wjduquette.joe.scanner.TokenType.*;
+import static com.wjduquette.joe.scanner.TokenType.WHILE;
 import static com.wjduquette.joe.checker.Checker.check;
 
-public class ScannerTest extends Ted {
-    private Scanner scanner;
+public class TokenizerTest extends Ted {
+    private Tokenizer tokenizer;
     private final List<String> details = new ArrayList<>();
 
     //-------------------------------------------------------------------------
@@ -319,14 +318,21 @@ public class ScannerTest extends Ted {
         details.clear();
 
         var source = new SourceBuffer("-", input);
-        scanner = new Scanner(source, (detail, incomplete) -> {
-            System.out.println("detail: " + detail);
-            details.add(detail.message());
-        });
+        tokenizer = new Tokenizer(source);
     }
 
     private Token next() {
-        return scanner.scanToken();
+        Token token;
+        do {
+            token = tokenizer.scanToken();
+            if (token.type() == ERROR) {
+                System.out.println("detail: " +
+                    token.span() + " " + token.literal());
+                details.add((String)token.literal());
+            }
+        } while (token.type() == ERROR);
+
+        return token;
     }
 
     // Scans and returns the first error

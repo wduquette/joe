@@ -1,12 +1,16 @@
 package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.scanner.SourceBuffer;
+import com.wjduquette.joe.scanner.SourceBuffer.Span;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.patterns.Pattern;
+import com.wjduquette.joe.scanner.Scanner;
+import com.wjduquette.joe.scanner.Token;
+import com.wjduquette.joe.scanner.TokenType;
 
-import static com.wjduquette.joe.bert.TokenType.*;
+import static com.wjduquette.joe.scanner.TokenType.*;
 
 import java.util.*;
 
@@ -108,7 +112,7 @@ class Compiler {
      */
     public Function compile(String scriptName, String source) {
         buffer = new SourceBuffer(scriptName, source);
-        scanner = new Scanner(buffer, this::reportError);
+        scanner = new Scanner(buffer, this::errorInScanner);
 
         // The FunctionCompiler contains the Chunk for the function
         // currently being compiled.  Each `function` or `method`
@@ -121,8 +125,7 @@ class Compiler {
         parser.hadError = false;
         parser.panicMode = false;
 
-        advance();
-        while (!match(EOF)) {
+        while (!scanner.match(EOF)) {
             declaration();
         }
 
@@ -135,13 +138,6 @@ class Compiler {
         }
 
         return function;
-    }
-
-    private void reportError(Trace trace, boolean incomplete) {
-        errors.add(trace);
-        if (incomplete) {
-            parser.gotIncompleteScript = true;
-        }
     }
 
     /**
@@ -180,15 +176,15 @@ class Compiler {
     // Parser: Statements
 
     private void declaration() {
-        if (match(CLASS)) {
+        if (scanner.match(CLASS)) {
             classDeclaration();
-        } else if (match(FUNCTION)) {
+        } else if (scanner.match(FUNCTION)) {
             functionDeclaration();
-        } else if (match(LET)) {
+        } else if (scanner.match(LET)) {
             letDeclaration();
-        } else if (match(RECORD)) {
+        } else if (scanner.match(RECORD)) {
             recordDeclaration();
-        } else if (match(VAR)) {
+        } else if (scanner.match(VAR)) {
             varDeclaration();
         } else {
             statement();
@@ -198,8 +194,8 @@ class Compiler {
     }
 
     private void classDeclaration() {
-        consume(IDENTIFIER, "Expected class name.");
-        var className = parser.previous;
+        scanner.consume(IDENTIFIER, "Expected class name.");
+        var className = scanner.previous();
         char nameConstant = identifierConstant(className);
         declareVariable(className);
 
@@ -210,10 +206,10 @@ class Compiler {
         var typeCompiler = new TypeCompiler(currentType);
         currentType = typeCompiler;
 
-        if (match(EXTENDS)) {
-            consume(IDENTIFIER, "Expected superclass name after 'extends'.");
+        if (scanner.match(EXTENDS)) {
+            scanner.consume(IDENTIFIER, "Expected superclass name after 'extends'.");
             variable(false);
-            if (className.lexeme().equals(parser.previous.lexeme())) {
+            if (className.lexeme().equals(scanner.previous().lexeme())) {
                 error("A class can't inherit from itself.");
             }
 
@@ -241,15 +237,15 @@ class Compiler {
     ) {
         // Load the type onto the stack before processing the type body
         getOrSetVariable(typeName, false);
-        consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
+        scanner.consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
 
         var firstInit = -1;
         int typeEnd = -1;
-        while (!check(RIGHT_BRACE) && !check(EOF)) {
-            var isStatic = match(STATIC);
-            var staticSpan = parser.previous.span();
+        while (!scanner.check(RIGHT_BRACE) && !scanner.check(EOF)) {
+            var isStatic = scanner.match(STATIC);
+            var staticSpan = scanner.previous().span();
 
-            if (isStatic && match(LEFT_BRACE)) {
+            if (isStatic && scanner.match(LEFT_BRACE)) {
                 // Static initializer
                 current.inStaticInitializer = true;
 
@@ -278,7 +274,7 @@ class Compiler {
                 typeEnd = emitJump(Opcode.JUMP);
                 patchJump(afterInit);
                 current.inStaticInitializer = false;
-            } else if (match(METHOD)) {
+            } else if (scanner.match(METHOD)) {
                 if (isStatic) {
                     staticMethod();
                 } else {
@@ -286,13 +282,13 @@ class Compiler {
                 }
             } else {
                 errorAtCurrent("Unexpected " + kind + " member.");
-                advance();
+                scanner.advance();
             }
         }
-        consume(RIGHT_BRACE, "Expected '}' after " + kind + " body.");
+        scanner.consume(RIGHT_BRACE, "Expected '}' after " + kind + " body.");
 
         if (firstInit != -1) {
-            var trace = new Trace(parser.previous.span(),
+            var trace = new Trace(scanner.previous().span(),
                 "In " + kind + " " + typeName.lexeme());
             var index = current.chunk.addConstant(trace);
             emit(Opcode.TRCPUSH, index);
@@ -309,11 +305,11 @@ class Compiler {
     }
 
     private void method() {
-        int start = parser.previous.span().start();
-        consume(IDENTIFIER, "Expected method name after 'method'.");
-        char nameConstant = identifierConstant(parser.previous);
+        int start = scanner.previous().span().start();
+        scanner.consume(IDENTIFIER, "Expected method name after 'method'.");
+        char nameConstant = identifierConstant(scanner.previous());
 
-        var type = parser.previous.lexeme().equals(INIT)
+        var type = scanner.previous().lexeme().equals(INIT)
             ? FunctionType.INITIALIZER : FunctionType.METHOD;
         function(start, type);
 
@@ -321,16 +317,16 @@ class Compiler {
     }
 
     private void staticMethod() {
-        int start = parser.previous.span().start();
-        consume(IDENTIFIER, "Expected method name after 'static method'.");
-        char nameConstant = identifierConstant(parser.previous);
+        int start = scanner.previous().span().start();
+        scanner.consume(IDENTIFIER, "Expected method name after 'static method'.");
+        char nameConstant = identifierConstant(scanner.previous());
 
         function(start, FunctionType.STATIC_METHOD);
         emit(Opcode.METHOD, nameConstant);
     }
 
     private void functionDeclaration() {
-        int start = parser.previous.span().start();
+        int start = scanner.previous().span().start();
         var global = parseVariable("Expected function name.");
         markVarInitialized();
         function(start, FunctionType.FUNCTION);
@@ -338,7 +334,7 @@ class Compiler {
     }
 
     private void lambda(boolean canAssign) {
-        int start = parser.previous.span().start();
+        int start = scanner.previous().span().start();
         function(start, FunctionType.LAMBDA);
     }
 
@@ -347,20 +343,20 @@ class Compiler {
         beginScope();
 
         if (type != FunctionType.LAMBDA) {
-            consume(LEFT_PAREN, "Expected '(' after function name.");
+            scanner.consume(LEFT_PAREN, "Expected '(' after function name.");
             parseArguments(RIGHT_PAREN, ")");
-            consume(LEFT_BRACE, "Expected '{' before function body.");
+            scanner.consume(LEFT_BRACE, "Expected '{' before function body.");
             block();
         } else {
             parseArguments(MINUS_GREATER, "->");
-            if (match(LEFT_BRACE)) {
+            if (scanner.match(LEFT_BRACE)) {
                 block();
             } else {
                 expression();
                 emit(Opcode.RETURN);
             }
         }
-        var end = parser.previous.span().end();
+        var end = scanner.previous().span().end();
         current.chunk.span = buffer.span(start, end);
 
         var compiler = current;  // Save the compiler; endFunction pops it.
@@ -378,7 +374,7 @@ class Compiler {
         var parmCount = 0;
         var gotArgs = false;
 
-        if (!check(until)) {
+        if (!scanner.check(until)) {
             do {
                 if (gotArgs) {
                     errorAtCurrent(
@@ -391,7 +387,7 @@ class Compiler {
                 }
                 var constant = parseVariable("Expected parameter name.");
                 defineVariable(constant);
-                var name = parser.previous.lexeme();
+                var name = scanner.previous().lexeme();
                 if (current.parameters.contains(name)) {
                     error("Duplicate parameter name.");
                 }
@@ -399,13 +395,13 @@ class Compiler {
                 gotArgs = ARGS.equals(name);
 
                 // Check for duplicates
-            } while (match(COMMA));
+            } while (scanner.match(COMMA));
         }
-        consume(until, "Expected '" + lexeme + "' after parameters.");
+        scanner.consume(until, "Expected '" + lexeme + "' after parameters.");
     }
 
     private void letDeclaration() {
-        var keyword = parser.previous;
+        var keyword = scanner.previous();
 
         // Parse the pattern; this does all variable declarations as
         // it goes.
@@ -420,9 +416,9 @@ class Compiler {
         // global scope.
         markVarsInitialized(currentPattern.bindingVars.size());
 
-        consume(EQUAL, "Expected '=' after pattern.");
+        scanner.consume(EQUAL, "Expected '=' after pattern.");
         expression();
-        consume(SEMICOLON, "Expected ';' after target expression.");
+        scanner.consume(SEMICOLON, "Expected ';' after target expression.");
 
         if (current.scopeDepth > 0) {
             emit(Opcode.LOCLET, currentPattern.patternIndex);
@@ -434,12 +430,12 @@ class Compiler {
     }
 
     private void recordDeclaration() {
-        consume(IDENTIFIER, "Expected record type name.");
-        var typeName = parser.previous;
+        scanner.consume(IDENTIFIER, "Expected record type name.");
+        var typeName = scanner.previous();
         char nameConstant = identifierConstant(typeName);
         declareVariable(typeName);
 
-        consume(LEFT_PAREN, "Expected '(' after type name.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after type name.");
         var recordFields = parseRecordFields();
         var fieldConstant = current.chunk.addConstant(recordFields);
 
@@ -466,9 +462,9 @@ class Compiler {
                     "Can't have more than " + MAX_PARAMETERS + "fields.");
             }
 
-            consume(IDENTIFIER, "Expected field name.");
+            scanner.consume(IDENTIFIER, "Expected field name.");
 
-            var name = parser.previous.lexeme();
+            var name = scanner.previous().lexeme();
 
             if (name.equals(ARGS)) {
                 error("A record type cannot have a variable argument list.");
@@ -481,9 +477,9 @@ class Compiler {
             result.add(name);
 
             // Check for duplicates
-        } while (match(COMMA));
+        } while (scanner.match(COMMA));
 
-        consume(RIGHT_PAREN, "Expected ')' after field names.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after field names.");
 
         return result;
     }
@@ -491,21 +487,21 @@ class Compiler {
     private void varDeclaration() {
         char global = parseVariable("Expected variable name.");
 
-        if (match(EQUAL)) {
+        if (scanner.match(EQUAL)) {
             expression();
         } else {
             emit(Opcode.NULL);
         }
-        consume(SEMICOLON, "Expected ';' after variable declaration.");
+        scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
         defineVariable(global);
     }
 
     private void synchronize() {
         parser.panicMode = false;
 
-        while (parser.current.type() != EOF) {
-            if (parser.previous.type() == SEMICOLON) return;
-            switch (parser.current.type()) {
+        while (scanner.peek().type() != EOF) {
+            if (scanner.previous().type() == SEMICOLON) return;
+            switch (scanner.peek().type()) {
                 case ASSERT:
                 case BREAK:
                 case CLASS:
@@ -525,38 +521,38 @@ class Compiler {
                 default: // Do nothing.
             }
 
-            advance();
+            scanner.advance();
         }
     }
 
     private void statement() {
-        if (match(ASSERT)) {
+        if (scanner.match(ASSERT)) {
             assertStatement();
-        } else if (match(BREAK)) {
+        } else if (scanner.match(BREAK)) {
             breakStatement();
-        } else if (match(CONTINUE)) {
+        } else if (scanner.match(CONTINUE)) {
             continueStatement();
-        } else if (match(FOR)) {
+        } else if (scanner.match(FOR)) {
             forStatement();
-        } else if (match(FOREACH)) {
+        } else if (scanner.match(FOREACH)) {
             foreachStatement();
-        } else if (match(IF)) {
-            if (match(LET)) {
+        } else if (scanner.match(IF)) {
+            if (scanner.match(LET)) {
                 ifLetStatement();
             } else {
                 ifStatement();
             }
-        } else if (match(MATCH)) {
+        } else if (scanner.match(MATCH)) {
             matchStatement();
-        } else if (match(RETURN)) {
+        } else if (scanner.match(RETURN)) {
             returnStatement();
-        } else if (match(SWITCH)) {
+        } else if (scanner.match(SWITCH)) {
             switchStatement();
-        } else if (match(THROW)) {
+        } else if (scanner.match(THROW)) {
             throwStatement();
-        } else if (match(WHILE)) {
+        } else if (scanner.match(WHILE)) {
             whileStatement();
-        } else if (match(LEFT_BRACE)) {
+        } else if (scanner.match(LEFT_BRACE)) {
             beginScope();
             block();
             endScope();
@@ -566,20 +562,20 @@ class Compiler {
     }
 
     private void block() {
-        while (!check(RIGHT_BRACE) && !check(EOF)) {
+        while (!scanner.check(RIGHT_BRACE) && !scanner.check(EOF)) {
             declaration();
         }
-        consume(RIGHT_BRACE, "Expected '}' after block.");
+        scanner.consume(RIGHT_BRACE, "Expected '}' after block.");
     }
 
     private void expressionStatement() {
         expression();
-        consume(SEMICOLON, "Expected ';' after expression.");
+        scanner.consume(SEMICOLON, "Expected ';' after expression.");
 
         // Normal statements should not leave anything on the stack, so we
         // pop it.  But if this is the last statement in the script, we
         // want to return its value.
-        if (parser.current.type() == EOF) {
+        if (scanner.peek().type() == EOF) {
             emit(Opcode.RETURN);
         } else {
             emit(Opcode.POP);
@@ -588,12 +584,12 @@ class Compiler {
 
     private void assertStatement() {
         // Compile the condition expression, retaining the expression's span.
-        var start = parser.previous.span().end();
+        var start = scanner.previous().span().end();
         expression();
-        var end = parser.previous.span().end();
+        var end = scanner.previous().span().end();
         var endJump = emitJump(Opcode.JIT);
 
-        if (match(COMMA)) {
+        if (scanner.match(COMMA)) {
             // Compile the message expression
             expression();
         } else {
@@ -603,12 +599,12 @@ class Compiler {
         }
         emit(Opcode.ASSERT);
 
-        consume(SEMICOLON, "Expected ';' after assertion.");
+        scanner.consume(SEMICOLON, "Expected ';' after assertion.");
         patchJump(endJump);
     }
 
     private void breakStatement() {
-        consume(SEMICOLON, "Expected ';' after 'break'.");
+        scanner.consume(SEMICOLON, "Expected ';' after 'break'.");
 
         // FIRST, are we in a loop?
         if (currentLoop == null) {
@@ -626,7 +622,7 @@ class Compiler {
     }
 
     private void continueStatement() {
-        consume(SEMICOLON, "Expected ';' after 'continue'.");
+        scanner.consume(SEMICOLON, "Expected ';' after 'continue'.");
 
         // FIRST, are we in a loop?
         if (currentLoop == null) {
@@ -647,12 +643,12 @@ class Compiler {
         currentLoop.breakDepth = current.scopeDepth;
         beginScope();
 
-        consume(LEFT_PAREN, "Expected '(' after 'for'.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'for'.");
 
         // Initializer
-        if (match(SEMICOLON)) {
+        if (scanner.match(SEMICOLON)) {
             // No initializer
-        } else if (match(VAR)) {
+        } else if (scanner.match(VAR)) {
             varDeclaration();
         } else {
             expressionStatement();
@@ -661,20 +657,20 @@ class Compiler {
         // Condition
         int loopStart = current.chunk.codeSize();
         int exitJump = -1;
-        if (!match(SEMICOLON)) {
+        if (!scanner.match(SEMICOLON)) {
             expression();
-            consume(SEMICOLON, "Expected ';' after loop condition.");
+            scanner.consume(SEMICOLON, "Expected ';' after loop condition.");
 
             // Jump out of the loop if the condition is false.
             exitJump = emitJump(Opcode.JIF);
         }
 
-        if (!match(RIGHT_PAREN)) {
+        if (!scanner.match(RIGHT_PAREN)) {
             int bodyJump = emitJump(Opcode.JUMP);
             int incrementStart = current.chunk.codeSize();
             expression();
             emit(Opcode.POP);
-            consume(RIGHT_PAREN, "Expected ')' after 'for' clauses.");
+            scanner.consume(RIGHT_PAREN, "Expected ')' after 'for' clauses.");
             emitLoop(loopStart);
             loopStart = incrementStart;
             patchJump(bodyJump);
@@ -699,22 +695,22 @@ class Compiler {
         currentLoop.breakDepth = current.scopeDepth;
         beginScope();
 
-        consume(LEFT_PAREN, "Expected '(' after 'foreach'.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'foreach'.");
 
         // Loop variable
-        consume(VAR, "Expected 'var' before loop variable.");
+        scanner.consume(VAR, "Expected 'var' before loop variable.");
         parseVariable("Expected variable name.");
-        var itemName = parser.previous;
+        var itemName = scanner.previous();
         emit(Opcode.NULL);
         defineVariable((char)0); // Loop variable is always local
 
-        consume(COLON, "Expected ':' after loop variable.");
+        scanner.consume(COLON, "Expected ':' after loop variable.");
 
         // Collection expression
         defineHiddenVariable(VAR_ITERATOR); // Gets collection
         emit(Opcode.ITER);                  // Convert collection to iterator
 
-        consume(RIGHT_PAREN, "Expected ')' after collection expression.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after collection expression.");
 
         // Start the loop
         int loopStart = current.chunk.codeSize();
@@ -744,28 +740,28 @@ class Compiler {
     }
 
     private void ifStatement() {
-        consume(LEFT_PAREN, "Expected '(' after 'if'.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'if'.");
         expression();
-        consume(RIGHT_PAREN, "Expected ')' after condition.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after condition.");
 
         int thenJump = emitJump(Opcode.JIF);
         statement();
         int elseJump = emitJump(Opcode.JUMP);
         patchJump(thenJump);
 
-        if (match(ELSE)) statement();
+        if (scanner.match(ELSE)) statement();
         patchJump(elseJump);
     }
 
     private void ifLetStatement() {
-        var keyword = parser.previous;
-        consume(LEFT_PAREN, "Expected '(' after 'if let'.");
+        var keyword = scanner.previous();
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'if let'.");
         beginScope();
         pattern();
         markVarsInitialized(currentPattern.bindingVars.size());
-        consume(EQUAL, "Expected '=' after pattern.");
+        scanner.consume(EQUAL, "Expected '=' after pattern.");
         expression();
-        consume(RIGHT_PAREN, "Expected ')' after target expression.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after target expression.");
 
         emit(Opcode.MATCH, currentPattern.patternIndex);
         currentPattern = null;
@@ -776,23 +772,23 @@ class Compiler {
         int elseJump = emitJump(Opcode.JUMP);
         patchJump(thenJump);
 
-        if (match(ELSE)) statement();
+        if (scanner.match(ELSE)) statement();
         patchJump(elseJump);
     }
 
     private void matchStatement() {
         beginScope();
-        consume(LEFT_PAREN, "Expected '(' after 'match'.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'match'.");
         defineHiddenVariable(VAR_MATCH);
-        consume(RIGHT_PAREN, "Expected ')' after match expression.");
-        consume(LEFT_BRACE, "Expected '{' before match body.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after match expression.");
+        scanner.consume(LEFT_BRACE, "Expected '{' before match body.");
 
         // Jump targets
         var endJumps = new ArrayList<Character>();
         int nextJump1 = -1;  // Jump if match failed
         int nextJump2 = -1;  // Jump if guard failed
 
-        while (match(CASE)) {
+        while (scanner.match(CASE)) {
             var caseJumps = new ArrayList<Character>();
 
             // Allow the previous case to jump here if it doesn't match.
@@ -808,13 +804,13 @@ class Compiler {
             currentPattern = null;
             nextJump1 = emitJump(Opcode.JIF);
 
-            if (match(IF)) {
+            if (scanner.match(IF)) {
                 expression();
                 nextJump2 = emitJump(Opcode.JIF);
             }
 
             // Parse the case body.
-            consume(MINUS_GREATER, "Expected '->' after case pattern.");
+            scanner.consume(MINUS_GREATER, "Expected '->' after case pattern.");
             statement();
             endScope(); // case
             endJumps.add((char)emitJump(Opcode.JUMP));
@@ -824,12 +820,12 @@ class Compiler {
         if (nextJump1 != -1) patchJump(nextJump1);
         if (nextJump2 != -1) patchJump(nextJump2);
 
-        if (match(DEFAULT)) {
-            consume(MINUS_GREATER, "Expected '->' after 'default'.");
+        if (scanner.match(DEFAULT)) {
+            scanner.consume(MINUS_GREATER, "Expected '->' after 'default'.");
             statement();
         }
 
-        consume(RIGHT_BRACE, "Expected '}' before match body.");
+        scanner.consume(RIGHT_BRACE, "Expected '}' before match body.");
 
         // Patch all the end jumps.
         endJumps.forEach(this::patchJump);
@@ -843,30 +839,30 @@ class Compiler {
             error("Can't return from a static initializer block.");
         }
 
-        if (match(SEMICOLON)) {
+        if (scanner.match(SEMICOLON)) {
             emitReturn();
         } else {
             if (current.chunk.type == FunctionType.INITIALIZER) {
                 error("Can't return a value from an initializer.");
             }
             expression();
-            consume(SEMICOLON, "Expected ';' after return value.");
+            scanner.consume(SEMICOLON, "Expected ';' after return value.");
             emit(Opcode.RETURN);
         }
     }
 
     private void switchStatement() {
         beginScope();
-        consume(LEFT_PAREN, "Expected '(' after 'switch'.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'switch'.");
         defineHiddenVariable(VAR_SWITCH);
-        consume(RIGHT_PAREN, "Expected ')' after switch expression.");
-        consume(LEFT_BRACE, "Expected '{' before switch body.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after switch expression.");
+        scanner.consume(LEFT_BRACE, "Expected '{' before switch body.");
 
         // Jump targets
         var endJumps = new ArrayList<Character>();
         int nextJump = -1;
 
-        while (match(CASE)) {
+        while (scanner.match(CASE)) {
             var caseJumps = new ArrayList<Character>();
 
             // Allow the previous case to jump here if it doesn't match.
@@ -883,13 +879,13 @@ class Compiler {
 
                 // Jump to the next case if no match.
                 caseJumps.add((char)emitJump(Opcode.JIT));
-            } while (match(COMMA));
+            } while (scanner.match(COMMA));
 
             nextJump = emitJump(Opcode.JUMP);
             caseJumps.forEach(this::patchJump);
 
             // Parse the case body.
-            consume(MINUS_GREATER, "Expected '->' after case expression.");
+            scanner.consume(MINUS_GREATER, "Expected '->' after case expression.");
             statement();
             endJumps.add((char)emitJump(Opcode.JUMP));
         }
@@ -898,12 +894,12 @@ class Compiler {
         if (nextJump != -1) {
             patchJump(nextJump);
         }
-        if (match(DEFAULT)) {
-            consume(MINUS_GREATER, "Expected '->' after 'default'.");
+        if (scanner.match(DEFAULT)) {
+            scanner.consume(MINUS_GREATER, "Expected '->' after 'default'.");
             statement();
         }
 
-        consume(RIGHT_BRACE, "Expected '}' before switch body.");
+        scanner.consume(RIGHT_BRACE, "Expected '}' before switch body.");
 
         // Patch all the end jumps.
         endJumps.forEach(this::patchJump);
@@ -914,15 +910,15 @@ class Compiler {
 
     private void throwStatement() {
         expression();
-        consume(SEMICOLON, "Expected ';' after 'throw' value.");
+        scanner.consume(SEMICOLON, "Expected ';' after 'throw' value.");
         emit(Opcode.THROW);
     }
 
     private void whileStatement() {
         int loopStart = current.chunk.codeSize();
-        consume(LEFT_PAREN, "Expected '(' after 'while'.");
+        scanner.consume(LEFT_PAREN, "Expected '(' after 'while'.");
         expression();
-        consume(RIGHT_PAREN, "Expected ')' after condition.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after condition.");
 
         currentLoop = new LoopCompiler(currentLoop);
         currentLoop.breakDepth = current.scopeDepth;
@@ -947,7 +943,7 @@ class Compiler {
 
     void grouping(boolean canAssign) {
         expression();
-        consume(RIGHT_PAREN, "Expected ')' after expression.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after expression.");
     }
 
     void ternary(boolean canAssign) {
@@ -961,13 +957,13 @@ class Compiler {
         expression();
         var endJump = emitJump(Opcode.JUMP);
         patchJump(elseJump);
-        consume(COLON, "expected ':' after then expression.");
+        scanner.consume(COLON, "expected ':' after then expression.");
         expression();
         patchJump(endJump);
     }
 
     void binary(boolean canAssign) {
-        var op = parser.previous.type();
+        var op = scanner.previous().type();
         var rule = getRule(op);
         parsePrecedence(rule.level + 1);
 
@@ -1006,11 +1002,11 @@ class Compiler {
     }
 
     private void unary(boolean canAssign) {
-        var op = parser.previous;
+        var op = scanner.previous();
 
         // Compile the operand
         parsePrecedence(Level.UNARY);
-        var last = parser.previous;  // The last token in the expression.
+        var last = scanner.previous();  // The last token in the expression.
 
         // Emit the instruction
         switch (op.type()) {
@@ -1103,74 +1099,74 @@ class Compiler {
         // Adds interpolated variables to a list so we can check for
         // this error.
         if (current.scopeDepth > 0 && currentPattern != null) {
-            currentPattern.referencedLocals.add(parser.previous);
+            currentPattern.referencedLocals.add(scanner.previous());
         }
-        getOrSetVariable(parser.previous, canAssign);
+        getOrSetVariable(scanner.previous(), canAssign);
     }
 
     private void literal(boolean canAssign) {
-        emitConstant(parser.previous.literal());
+        emitConstant(scanner.previous().literal());
     }
 
     // List literal: [...]
     private void list(boolean canAssign) {
         emit(Opcode.LISTNEW);
 
-        if (!check(TokenType.RIGHT_BRACKET)) {
+        if (!scanner.check(TokenType.RIGHT_BRACKET)) {
             expression();
             emit(Opcode.LISTADD);
 
-            while (match(TokenType.COMMA)) {
+            while (scanner.match(TokenType.COMMA)) {
                 // Allow trailing comma
-                if (check(TokenType.RIGHT_BRACKET)) break;
+                if (scanner.check(TokenType.RIGHT_BRACKET)) break;
                 expression();
                 emit(Opcode.LISTADD);
             }
         }
 
-        consume(TokenType.RIGHT_BRACKET, "Expected ']' after list items.");
+        scanner.consume(TokenType.RIGHT_BRACKET, "Expected ']' after list items.");
     }
 
     // map literal: [...]
     private void map(boolean canAssign) {
         emit(Opcode.MAPNEW);
 
-        if (!check(TokenType.RIGHT_BRACE)) {
+        if (!scanner.check(TokenType.RIGHT_BRACE)) {
             expression();
-            consume(TokenType.COLON, "Expected ':' after map key.");
+            scanner.consume(TokenType.COLON, "Expected ':' after map key.");
             expression();
             emit(Opcode.MAPPUT);
 
-            while (match(TokenType.COMMA)) {
+            while (scanner.match(TokenType.COMMA)) {
                 // Allow trailing comma
-                if (check(TokenType.RIGHT_BRACE)) break;
+                if (scanner.check(TokenType.RIGHT_BRACE)) break;
                 expression();
-                consume(TokenType.COLON, "Expected ':' after map key.");
+                scanner.consume(TokenType.COLON, "Expected ':' after map key.");
                 expression();
                 emit(Opcode.MAPPUT);
             }
         }
 
-        consume(TokenType.RIGHT_BRACE, "Expected '}' after map entries.");
+        scanner.consume(TokenType.RIGHT_BRACE, "Expected '}' after map entries.");
     }
 
     private void symbol(boolean canAssign) {
-        switch (parser.previous.type()) {
+        switch (scanner.previous().type()) {
             case FALSE -> emit(Opcode.FALSE);
             case NULL -> emit(Opcode.NULL);
             case TRUE -> emit(Opcode.TRUE);
             default -> throw new IllegalStateException(
-                "Unexpected literal: " + parser.previous.type());
+                "Unexpected literal: " + scanner.previous().type());
         }
     }
 
     private void this_(boolean canAssign) {
-        var last = parser.previous;
+        var last = scanner.previous();
         if (currentType == null) {
             error("Can't use '" + last.lexeme() + "' outside of a method.");
         }
 
-        if (parser.previous.type() == TokenType.THIS) {
+        if (scanner.previous().type() == TokenType.THIS) {
             variable(false);
         } else {
             getOrSetVariable(Token.synthetic(VAR_THIS), canAssign);
@@ -1184,9 +1180,9 @@ class Compiler {
         } else if (!currentType.hasSupertype) {
             error("Can't use 'super' in a class with no superclass.");
         }
-        consume(DOT, "Expected '.' after 'super'.");
-        consume(IDENTIFIER, "Expected superclass method name.");
-        char nameConstant = identifierConstant(parser.previous);
+        scanner.consume(DOT, "Expected '.' after 'super'.");
+        scanner.consume(IDENTIFIER, "Expected superclass method name.");
+        char nameConstant = identifierConstant(scanner.previous());
         getOrSetVariable(Token.synthetic(VAR_THIS), false);
         getOrSetVariable(Token.synthetic(VAR_SUPER), false);
         emit(Opcode.SUPGET, nameConstant);
@@ -1200,37 +1196,37 @@ class Compiler {
     private char argumentList() {
         char count = 0;
 
-        if (!check(RIGHT_PAREN)) {
+        if (!scanner.check(RIGHT_PAREN)) {
             do {
                 expression();
                 count++;
                 if (count > MAX_PARAMETERS) {
                     error("Can't have more than 255 arguments.");
                 }
-            } while (match(COMMA));
+            } while (scanner.match(COMMA));
         }
-        consume(RIGHT_PAREN, "Expected ')' after arguments.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after arguments.");
         return count;
     }
 
     private void dot(boolean canAssign) {
-        consume(IDENTIFIER, "Expected property name after '.'.");
-        char nameConstant = identifierConstant(parser.previous);
+        scanner.consume(IDENTIFIER, "Expected property name after '.'.");
+        char nameConstant = identifierConstant(scanner.previous());
 
-        if (canAssign && match(EQUAL)) {
+        if (canAssign && scanner.match(EQUAL)) {
             expression();
             emit(Opcode.PROPSET, nameConstant);
-        } else if (canAssign && match(PLUS_EQUAL)) {
+        } else if (canAssign && scanner.match(PLUS_EQUAL)) {
             updateProperty(nameConstant, Opcode.ADD);
-        } else if (canAssign && match(MINUS_EQUAL)) {
+        } else if (canAssign && scanner.match(MINUS_EQUAL)) {
             updateProperty(nameConstant, Opcode.SUB);
-        } else if (canAssign && match(STAR_EQUAL)) {
+        } else if (canAssign && scanner.match(STAR_EQUAL)) {
             updateProperty(nameConstant, Opcode.MUL);
-        } else if (canAssign && match(SLASH_EQUAL)) {
+        } else if (canAssign && scanner.match(SLASH_EQUAL)) {
             updateProperty(nameConstant, Opcode.DIV);
-        } else if (canAssign && match(PLUS_PLUS)) {
+        } else if (canAssign && scanner.match(PLUS_PLUS)) {
             postIncrDecrProperty(nameConstant, Opcode.INCR);
-        } else if (canAssign && match(MINUS_MINUS)) {
+        } else if (canAssign && scanner.match(MINUS_MINUS)) {
             postIncrDecrProperty(nameConstant, Opcode.DECR);
         } else {
             emit(Opcode.PROPGET, nameConstant);
@@ -1276,22 +1272,22 @@ class Compiler {
     private void index(boolean canAssign) {
         // Index expression
         expression();
-        consume(RIGHT_BRACKET, "Expected ']' after indexed expression.");
+        scanner.consume(RIGHT_BRACKET, "Expected ']' after indexed expression.");
 
-        if (canAssign && match(EQUAL)) {
+        if (canAssign && scanner.match(EQUAL)) {
             expression();
             emit(Opcode.INDSET);
-        } else if (canAssign && match(PLUS_EQUAL)) {
+        } else if (canAssign && scanner.match(PLUS_EQUAL)) {
             updateIndex(Opcode.ADD);
-        } else if (canAssign && match(MINUS_EQUAL)) {
+        } else if (canAssign && scanner.match(MINUS_EQUAL)) {
             updateIndex(Opcode.SUB);
-        } else if (canAssign && match(STAR_EQUAL)) {
+        } else if (canAssign && scanner.match(STAR_EQUAL)) {
             updateIndex(Opcode.MUL);
-        } else if (canAssign && match(SLASH_EQUAL)) {
+        } else if (canAssign && scanner.match(SLASH_EQUAL)) {
             updateIndex(Opcode.DIV);
-        } else if (canAssign && match(PLUS_PLUS)) {
+        } else if (canAssign && scanner.match(PLUS_PLUS)) {
             postIncrDecrIndex(Opcode.INCR);
-        } else if (canAssign && match(MINUS_MINUS)) {
+        } else if (canAssign && scanner.match(MINUS_MINUS)) {
             postIncrDecrIndex(Opcode.DECR);
         } else {
             emit(Opcode.INDGET);
@@ -1336,8 +1332,8 @@ class Compiler {
     }
 
     private void parsePrecedence(int level) {
-        advance();
-        var prefixRule = getRule(parser.previous.type()).prefix;
+        scanner.advance();
+        var prefixRule = getRule(scanner.previous().type()).prefix;
 
         if (prefixRule == null) {
             error("Expected expression.");
@@ -1347,13 +1343,13 @@ class Compiler {
         var canAssign = level <= Level.ASSIGNMENT;
         prefixRule.parse(canAssign);
 
-        while (level <= getRule(parser.current.type()).level) {
-            advance();
-            var infixRule = getRule(parser.previous.type()).infix;
+        while (level <= getRule(scanner.peek().type()).level) {
+            scanner.advance();
+            var infixRule = getRule(scanner.previous().type()).infix;
             infixRule.parse(canAssign);
         }
 
-        if (canAssign && match(EQUAL)) {
+        if (canAssign && scanner.match(EQUAL)) {
             error("Invalid assignment target.");
         }
     }
@@ -1385,24 +1381,24 @@ class Compiler {
             return constant;
         }
 
-        if (match(LEFT_BRACKET)) {
+        if (scanner.match(LEFT_BRACKET)) {
             return listPattern();
-        } else if (match(LEFT_BRACE)) {
+        } else if (scanner.match(LEFT_BRACE)) {
             return mapPattern();
-        } else if (match(IDENTIFIER)) {
-            var identifier = parser.previous;
+        } else if (scanner.match(IDENTIFIER)) {
+            var identifier = scanner.previous();
 
             if (identifier.lexeme().startsWith("_")) {
                 return new Pattern.Wildcard(identifier.lexeme());
-            } else if (match(LEFT_BRACE)) {
+            } else if (scanner.match(LEFT_BRACE)) {
                 return instancePattern(identifier);
-            } else if (match(LEFT_PAREN)) {
+            } else if (scanner.match(LEFT_PAREN)) {
                 return recordPattern(identifier);
             }
 
             var id = addPatternVar(identifier);
 
-            if (isSubpattern && match(EQUAL)) {
+            if (isSubpattern && scanner.match(EQUAL)) {
                 var subpattern = parsePattern(false);
                 return new Pattern.PatternBinding(id, subpattern);
             } else {
@@ -1435,23 +1431,23 @@ class Compiler {
     }
 
     private Pattern.Constant constantPattern() {
-        if (match(TRUE)) {
+        if (scanner.match(TRUE)) {
             emit(Opcode.TRUE);
-        } else if (match(FALSE)) {
+        } else if (scanner.match(FALSE)) {
             emit(Opcode.FALSE);
-        } else if (match(NULL)) {
+        } else if (scanner.match(NULL)) {
             emit(Opcode.NULL);
-        } else if (match(NUMBER) || match(STRING) || match(KEYWORD)) {
-            emitConstant(parser.previous.literal());
-        } else if (match(DOLLAR)) {
-            if (match(IDENTIFIER)) {
+        } else if (scanner.match(NUMBER) || scanner.match(STRING) || scanner.match(KEYWORD)) {
+            emitConstant(scanner.previous().literal());
+        } else if (scanner.match(DOLLAR)) {
+            if (scanner.match(IDENTIFIER)) {
                 // Save the variable for shadow-checks
-                currentPattern.referencedLocals.add(parser.previous);
+                currentPattern.referencedLocals.add(scanner.previous());
                 variable(false);  // Emit the *GET instruction.
             } else {
-                consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
+                scanner.consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
                 expression();
-                consume(RIGHT_PAREN,
+                scanner.consume(RIGHT_PAREN,
                     "Expected ')' after interpolated expression.");
             }
         } else {
@@ -1465,24 +1461,24 @@ class Compiler {
     private Pattern listPattern() {
         var list = new ArrayList<Pattern>();
 
-        if (match(RIGHT_BRACKET)) {
+        if (scanner.match(RIGHT_BRACKET)) {
             return new Pattern.ListPattern(list, null);
         }
 
         do {
-            if (check(RIGHT_BRACKET) || check(COLON)) {
+            if (scanner.check(RIGHT_BRACKET) || scanner.check(COLON)) {
                 break;
             }
             list.add(parsePattern(true));
-        } while (match(COMMA));
+        } while (scanner.match(COMMA));
 
         Integer tailId = null;
-        if (match(COLON)) {
-            consume(IDENTIFIER,
+        if (scanner.match(COLON)) {
+            scanner.consume(IDENTIFIER,
                 "Expected binding variable for list tail.");
-            tailId = addPatternVar(parser.previous);
+            tailId = addPatternVar(scanner.previous());
         }
-        consume(RIGHT_BRACKET, "Expected ']' after list pattern.");
+        scanner.consume(RIGHT_BRACKET, "Expected ']' after list pattern.");
 
         return new Pattern.ListPattern(list, tailId);
     }
@@ -1490,21 +1486,21 @@ class Compiler {
     private Pattern.MapPattern mapPattern() {
         var map = new LinkedHashMap<Pattern.Constant,Pattern>();
 
-        if (match(RIGHT_BRACE)) {
+        if (scanner.match(RIGHT_BRACE)) {
             return new Pattern.MapPattern(map);
         }
 
         do {
-            if (check(RIGHT_BRACE)) {
+            if (scanner.check(RIGHT_BRACE)) {
                 break;
             }
             var key = constantPattern();
-            consume(COLON, "Expected ':' after map key.");
+            scanner.consume(COLON, "Expected ':' after map key.");
             var value = parsePattern(true);
             map.put(key, value);
-        } while (match(COMMA));
+        } while (scanner.match(COMMA));
 
-        consume(RIGHT_BRACE, "Expected '}' after map pattern.");
+        scanner.consume(RIGHT_BRACE, "Expected '}' after map pattern.");
 
         return new Pattern.MapPattern(map);
     }
@@ -1517,18 +1513,18 @@ class Compiler {
     private Pattern recordPattern(Token identifier) {
         var list = new ArrayList<Pattern>();
 
-        if (match(RIGHT_PAREN)) {
+        if (scanner.match(RIGHT_PAREN)) {
             return new Pattern.RecordPattern(identifier.lexeme(), list);
         }
 
         do {
-            if (check(RIGHT_PAREN)) {
+            if (scanner.check(RIGHT_PAREN)) {
                 break;
             }
             list.add(parsePattern(true));
-        } while (match(COMMA));
+        } while (scanner.match(COMMA));
 
-        consume(RIGHT_PAREN, "Expected ')' after record pattern.");
+        scanner.consume(RIGHT_PAREN, "Expected ')' after record pattern.");
 
         return new Pattern.RecordPattern(identifier.lexeme(), list);
     }
@@ -1545,8 +1541,8 @@ class Compiler {
     // index to the variable's name in the constants table.  Otherwise,
     // returns 0.
     private char parseVariable(String errorMessage) {
-        consume(IDENTIFIER, errorMessage);
-        return addVariable(parser.previous);
+        scanner.consume(IDENTIFIER, errorMessage);
+        return addVariable(scanner.previous());
     }
 
     private char addVariable(Token name) {
@@ -1610,20 +1606,20 @@ class Compiler {
         }
 
         // NEXT, handle assignment operators
-        if (canAssign && match(EQUAL)) {
+        if (canAssign && scanner.match(EQUAL)) {
             expression();
             emit(setOp, (char)arg);
-        } else if (canAssign && match(PLUS_EQUAL)) {
+        } else if (canAssign && scanner.match(PLUS_EQUAL)) {
             updateVar(getOp, setOp, (char)arg, Opcode.ADD);
-        } else if (canAssign && match(MINUS_EQUAL)) {
+        } else if (canAssign && scanner.match(MINUS_EQUAL)) {
             updateVar(getOp, setOp, (char)arg, Opcode.SUB);
-        } else if (canAssign && match(STAR_EQUAL)) {
+        } else if (canAssign && scanner.match(STAR_EQUAL)) {
             updateVar(getOp, setOp, (char)arg, Opcode.MUL);
-        } else if (canAssign && match(SLASH_EQUAL)) {
+        } else if (canAssign && scanner.match(SLASH_EQUAL)) {
             updateVar(getOp, setOp, (char)arg, Opcode.DIV);
-        } else if (canAssign && match(PLUS_PLUS)) {
+        } else if (canAssign && scanner.match(PLUS_PLUS)) {
             postIncrDecrVar(getOp, setOp, (char)arg, Opcode.INCR);
-        } else if (canAssign && match(MINUS_MINUS)) {
+        } else if (canAssign && scanner.match(MINUS_MINUS)) {
             postIncrDecrVar(getOp, setOp, (char)arg, Opcode.DECR);
         } else {
             emit(getOp, (char)arg);
@@ -1843,43 +1839,12 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Parsing Tools
 
-    private boolean match(TokenType type) {
-        if (!check(type)) return false;
-        advance();
-        return true;
-    }
-
-    private boolean check(TokenType type) {
-        return parser.current.type() == type;
-    }
-
-    private void advance() {
-        parser.previous = parser.current;
-
-        for (;;) {
-            parser.current = scanner.scanToken();
-            if (parser.current.type() != ERROR) break;
-
-            // The error has already been reported.
-            parser.hadError = true;
-        }
-    }
-
-    private void consume(TokenType type, String message) {
-        if (parser.current.type() == type) {
-            advance();
-            return;
-        }
-
-        errorAtCurrent(message);
-    }
-
     private void error(String message) {
-        errorAt(parser.previous, message);
+        errorAt(scanner.previous(), message);
     }
 
     private void errorAtCurrent(String message) {
-        errorAt(parser.current, message);
+        errorAt(scanner.peek(), message);
     }
 
     private void errorAt(Token token, String message) {
@@ -1891,6 +1856,18 @@ class Compiler {
             parser.gotIncompleteScript = true;
         }
     }
+
+    private void errorInScanner(Span span, String message) {
+        if (parser.panicMode) return;
+        parser.panicMode = true;
+        parser.hadError = true;
+        errors.add(new Trace(span, message));
+
+        if (span.isAtEnd()) {
+            parser.gotIncompleteScript = true;
+        }
+    }
+
 
     //-------------------------------------------------------------------------
     // Code Generation
@@ -1944,7 +1921,7 @@ class Compiler {
     }
 
     private void emit(char value) {
-        current.chunk.write(value, parser.previous.line());
+        current.chunk.write(value, scanner.previous().line());
     }
 
     private void emit(char value1, char value2) {
@@ -1957,8 +1934,6 @@ class Compiler {
 
     // The state of the parser.
     private static class Parser {
-        Token current = null;
-        Token previous = null;
         boolean hadError = false;
         boolean panicMode = false;
         boolean gotIncompleteScript = false;
@@ -2056,7 +2031,7 @@ class Compiler {
             switch (type) {
                 case SCRIPT -> chunk.name = "*script*";
                 case LAMBDA -> chunk.name = "*lambda*";
-                default -> chunk.name = parser.previous.lexeme();
+                default -> chunk.name = scanner.previous().lexeme();
             }
             chunk.type = type;
             chunk.source = source;
@@ -2101,7 +2076,7 @@ class Compiler {
         int breakDepth = -1;
 
         // The scope depth before the loop body is compiled.
-        // Allows continue to know how many scopes to end.
+        // Allows 'continue' to know how many scopes to end.
         int continueDepth = -1;
 
         // The jump instruction indices for any `break` statements in the

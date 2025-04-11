@@ -1,6 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.scanner.SourceBuffer;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,7 +26,7 @@ public class WalkerEngine implements Engine {
 
     // The buffers
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private final Map<String,SourceBuffer> buffers = new HashMap<>();
+    private final Map<String, SourceBuffer> buffers = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -87,9 +88,7 @@ public class WalkerEngine implements Engine {
         syntaxTraces = new ArrayList<>();
         gotIncompleteScript = false;
 
-        Scanner scanner = new Scanner(buffer, this::reportError);
-        List<Token> tokens = scanner.scanTokens();
-        Parser parser = new Parser(buffer, tokens, this::reportError);
+        Parser parser = new Parser(buffer, this::reportError);
         var statements = parser.parse();
 
         // Stop if there was a syntax error.

@@ -1,6 +1,8 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.scanner.SourceBuffer;
+import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.types.ListValue;
 
 import java.util.List;
