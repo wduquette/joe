@@ -2,7 +2,7 @@ package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SyntaxError;
-import com.wjduquette.joe.nero.Nero;
+import com.wjduquette.joe.nero.OldNero;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 
@@ -54,7 +54,7 @@ public class NeroTool implements Tool {
             System.exit(64);
         }
 
-        var nero = new Nero();
+        var nero = new OldNero();
         var path = argq.poll();
 
 

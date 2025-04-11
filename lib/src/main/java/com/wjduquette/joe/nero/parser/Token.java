@@ -1,8 +1,8 @@
-package com.wjduquette.joe.nero;
+package com.wjduquette.joe.nero.parser;
 
 import com.wjduquette.joe.SourceBuffer.Span;
 
-record Token(
+public record Token(
     TokenType type,
     Span span,
     Object literal

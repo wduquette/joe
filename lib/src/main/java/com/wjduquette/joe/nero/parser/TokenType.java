@@ -1,7 +1,7 @@
-package com.wjduquette.joe.nero;
+package com.wjduquette.joe.nero.parser;
 
 /** Nero Token Types */
-enum TokenType {
+public enum TokenType {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN,
     COMMA, DOT,

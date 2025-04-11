@@ -1,4 +1,6 @@
-package com.wjduquette.joe.nero;
+package com.wjduquette.joe.nero.parser;
+
+import com.wjduquette.joe.nero.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * This class contains the Nero Abstract Syntax Tree types.
  */
-class NeroAST {
+public class NeroAST {
     private NeroAST() {} // not instantiable
 
     //-------------------------------------------------------------------------
@@ -134,12 +136,12 @@ class NeroAST {
     {
         public Constraint asConstraint() {
             var realOp = switch (op.type()) {
-                case BANG_EQUAL -> Op.NE;
-                case EQUAL_EQUAL -> Op.EQ;
-                case GREATER -> Op.GT;
-                case GREATER_EQUAL -> Op.GE;
-                case LESS -> Op.LT;
-                case LESS_EQUAL -> Op.LE;
+                case BANG_EQUAL -> Constraint.Op.NE;
+                case EQUAL_EQUAL -> Constraint.Op.EQ;
+                case GREATER -> Constraint.Op.GT;
+                case GREATER_EQUAL -> Constraint.Op.GE;
+                case LESS -> Constraint.Op.LT;
+                case LESS_EQUAL -> Constraint.Op.LE;
                 default -> throw new IllegalStateException(
                     "Unknown operator token: " + op);
             };
@@ -170,8 +172,8 @@ class NeroAST {
      * @param value The value token
      */
     public record ConstantToken(Token value) implements TermToken {
-        @Override public Term.Constant asTerm() {
-            return new Term.Constant(value.literal());
+        @Override public Constant asTerm() {
+            return new Constant(value.literal());
         }
 
         @Override public String toString() {
@@ -184,8 +186,8 @@ class NeroAST {
      * @param name The token token
      */
     public record VariableToken(Token name) implements TermToken {
-        @Override public Term.Variable asTerm() {
-            return new Term.Variable(name.lexeme());
+        @Override public Variable asTerm() {
+            return new Variable(name.lexeme());
         }
 
         @Override public String toString() {

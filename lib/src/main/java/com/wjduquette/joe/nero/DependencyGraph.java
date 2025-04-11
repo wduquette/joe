@@ -2,7 +2,7 @@ package com.wjduquette.joe.nero;
 
 import java.util.*;
 
-public class Graph {
+public class DependencyGraph {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -22,7 +22,7 @@ public class Graph {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Graph(List<Rule> rules) {
+    public DependencyGraph(List<Rule> rules) {
         // FIRST, get the list of head predicates, and build the dependency
         // matrix.
         this.heads = getHeads(rules);

@@ -1,6 +1,9 @@
 package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.parser.NeroAST;
+import com.wjduquette.joe.nero.parser.Parser;
+import com.wjduquette.joe.nero.parser.Scanner;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -12,7 +15,7 @@ import java.util.ArrayList;
  * Nero is the public entry point for parsing and executing Nero
  * code.
  */
-public class Nero {
+public class OldNero {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -21,7 +24,7 @@ public class Nero {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Nero() {
+    public OldNero() {
         // Nothing to do.
     }
 
@@ -59,7 +62,7 @@ public class Nero {
         }
 
         // Will throw JoeError if the rules aren't stratified.
-        var ruleset = new RuleSet(rules, baseFacts);
+        var ruleset = new Engine(rules, baseFacts);
 
         // Could add more facts here, in theory.
 

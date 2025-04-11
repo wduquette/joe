@@ -1,4 +1,4 @@
-package com.wjduquette.joe.nero;
+package com.wjduquette.joe.nero.parser;
 
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.SourceBuffer;
@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wjduquette.joe.nero.TokenType.*;
+import static com.wjduquette.joe.nero.parser.TokenType.*;
 
-class Scanner {
+public class Scanner {
     private static final Map<String, TokenType> reserved;
 
     static {
@@ -44,7 +44,7 @@ class Scanner {
      * @param buffer The source buffer
      * @param reporter The error reporter
      */
-    Scanner(
+    public Scanner(
         SourceBuffer buffer,
         ErrorReporter reporter
     ) {
@@ -60,7 +60,7 @@ class Scanner {
      * Scans the source text and returns a list of tokens.
      * @return The list
      */
-    List<Token> scanTokens() {
+    public List<Token> scanTokens() {
         while (!isAtEnd()) {
             // We are at the beginning of the next lexeme.
             start = current;
