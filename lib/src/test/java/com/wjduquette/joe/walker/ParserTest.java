@@ -363,17 +363,7 @@ public class ParserTest extends Ted {
     private List<String> parse(String input) {
         details.clear();
         var buffer = new SourceBuffer("-", input);
-        var scanner = new Scanner(buffer, (trace, incomplete) ->
-            details.add(trace.message())
-        );
-        var tokens = scanner.scanTokens();
-
-        if (!details.isEmpty()) {
-            throw new IllegalStateException("Scanner errors:\n  " +
-                String.join("\n  ", details));
-        }
-
-        var parser = new Parser(buffer, tokens, (detail, incomplete) ->
+        var parser = new Parser(buffer, (detail, incomplete) ->
             details.add("[line " + detail.line() + "] " + detail.message())
         );
         parser.parse();

@@ -15,8 +15,8 @@ class Parser {
     // Instance Variables
 
     private final SourceBuffer source;
-    private final List<Token> tokens;
     private final ErrorReporter reporter;
+    private List<Token> tokens = null;
     private int current = 0;
 
     //-------------------------------------------------------------------------
@@ -24,18 +24,19 @@ class Parser {
 
     Parser(
         SourceBuffer source,
-        List<Token> tokens,
         ErrorReporter reporter)
     {
         this.source = source;
         this.reporter = reporter;
-        this.tokens = tokens;
     }
 
     //-------------------------------------------------------------------------
     // Public API
 
     public List<Stmt> parse() {
+        Scanner scanner = new Scanner(source, reporter);
+        this.current = 0;
+        this.tokens = scanner.scanTokens();
         List<Stmt> statements = new ArrayList<>();
 
         while (!isAtEnd()) {
