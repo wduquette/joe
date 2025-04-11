@@ -1,14 +1,15 @@
-package com.wjduquette.joe.bert;
+package com.wjduquette.joe.scanner;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Trace;
+import com.wjduquette.joe.bert.ErrorReporter;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.wjduquette.joe.bert.TokenType.*;
+import static com.wjduquette.joe.scanner.TokenType.*;
 
 /**
  * Bert's scanner.
@@ -83,7 +84,7 @@ public class Scanner {
      * @param buffer The SourceBuffer
      * @param reporter The error handler.
      */
-    Scanner(
+    public Scanner(
         SourceBuffer buffer,
         ErrorReporter reporter
     ) {
@@ -101,7 +102,7 @@ public class Scanner {
      * token.
      * @return The token.
      */
-    Token scanToken() {
+    public Token scanToken() {
         skipWhitespace();
         start = current;
 

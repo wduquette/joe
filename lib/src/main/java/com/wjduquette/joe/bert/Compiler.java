@@ -5,8 +5,11 @@ import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.patterns.Pattern;
+import com.wjduquette.joe.scanner.Scanner;
+import com.wjduquette.joe.scanner.Token;
+import com.wjduquette.joe.scanner.TokenType;
 
-import static com.wjduquette.joe.bert.TokenType.*;
+import static com.wjduquette.joe.scanner.TokenType.*;
 
 import java.util.*;
 
@@ -62,7 +65,7 @@ class Compiler {
     private SourceBuffer buffer;
 
     // The scanner
-    private Scanner scanner;
+    private com.wjduquette.joe.scanner.Scanner scanner;
 
     // A structure containing parser values.
     private final Parser parser = new Parser();

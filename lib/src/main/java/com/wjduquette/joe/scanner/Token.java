@@ -1,4 +1,4 @@
-package com.wjduquette.joe.bert;
+package com.wjduquette.joe.scanner;
 
 import com.wjduquette.joe.SourceBuffer.Span;
 
@@ -8,7 +8,7 @@ import com.wjduquette.joe.SourceBuffer.Span;
  * @param span The span in the source code
  * @param literal A literal value, e.g., for numbers, or null
  */
-record Token(
+public record Token(
     TokenType type,
     Span span,
     Object literal

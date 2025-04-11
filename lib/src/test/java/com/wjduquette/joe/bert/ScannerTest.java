@@ -3,13 +3,16 @@ package com.wjduquette.joe.bert;
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Ted;
+import com.wjduquette.joe.scanner.Scanner;
+import com.wjduquette.joe.scanner.Token;
+import com.wjduquette.joe.scanner.TokenType;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wjduquette.joe.bert.TokenType.*;
-import static com.wjduquette.joe.bert.TokenType.WHILE;
+import static com.wjduquette.joe.scanner.TokenType.*;
+import static com.wjduquette.joe.scanner.TokenType.WHILE;
 import static com.wjduquette.joe.checker.Checker.check;
 
 public class ScannerTest extends Ted {
