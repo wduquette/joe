@@ -1,6 +1,7 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.bert.BertEngine;
+import com.wjduquette.joe.clark.ClarkEngine;
 import com.wjduquette.joe.types.*;
 import com.wjduquette.joe.walker.WalkerEngine;
 
@@ -26,6 +27,9 @@ public class Joe {
 
     /** Constant for selecting the AST-walker language engine. */
     public static final String WALKER = "walker";
+
+    /** Constant for selecting the experimental byte-code language engine. */
+    public static final String CLARK = "clark";
 
     /**
      * The set of Joe's reserved words.
@@ -87,8 +91,9 @@ public class Joe {
     public Joe(String engineType) {
         this.engineName = engineType;
         switch (engineType) {
-            case WALKER -> engine = new WalkerEngine(this);
             case BERT -> engine = new BertEngine(this);
+            case WALKER -> engine = new WalkerEngine(this);
+            case CLARK -> engine = new ClarkEngine(this);
             default -> throw new IllegalArgumentException(
                 "Invalid Engine type: '" + engineType + "'.");
         }
