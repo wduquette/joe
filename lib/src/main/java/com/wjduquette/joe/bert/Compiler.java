@@ -2,10 +2,11 @@ package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.SourceBuffer.Span;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.patterns.Pattern;
-import com.wjduquette.joe.scanner.Tokenizer;
+import com.wjduquette.joe.scanner.Scanner;
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.TokenType;
 
@@ -65,7 +66,7 @@ class Compiler {
     private SourceBuffer buffer;
 
     // The scanner
-    private Tokenizer tokenizer;
+    private Scanner scanner;
 
     // A structure containing parser values.
     private final Parser parser = new Parser();
@@ -111,7 +112,7 @@ class Compiler {
      */
     public Function compile(String scriptName, String source) {
         buffer = new SourceBuffer(scriptName, source);
-        tokenizer = new Tokenizer(buffer);
+        scanner = new Scanner(buffer, this::errorInScanner);
 
         // The FunctionCompiler contains the Chunk for the function
         // currently being compiled.  Each `function` or `method`
@@ -124,7 +125,6 @@ class Compiler {
         parser.hadError = false;
         parser.panicMode = false;
 
-        advance();
         while (!match(EOF)) {
             declaration();
         }
@@ -195,7 +195,7 @@ class Compiler {
 
     private void classDeclaration() {
         consume(IDENTIFIER, "Expected class name.");
-        var className = parser.previous;
+        var className = scanner.previous();
         char nameConstant = identifierConstant(className);
         declareVariable(className);
 
@@ -209,7 +209,7 @@ class Compiler {
         if (match(EXTENDS)) {
             consume(IDENTIFIER, "Expected superclass name after 'extends'.");
             variable(false);
-            if (className.lexeme().equals(parser.previous.lexeme())) {
+            if (className.lexeme().equals(scanner.previous().lexeme())) {
                 error("A class can't inherit from itself.");
             }
 
@@ -243,7 +243,7 @@ class Compiler {
         int typeEnd = -1;
         while (!check(RIGHT_BRACE) && !check(EOF)) {
             var isStatic = match(STATIC);
-            var staticSpan = parser.previous.span();
+            var staticSpan = scanner.previous().span();
 
             if (isStatic && match(LEFT_BRACE)) {
                 // Static initializer
@@ -282,13 +282,13 @@ class Compiler {
                 }
             } else {
                 errorAtCurrent("Unexpected " + kind + " member.");
-                advance();
+                scanner.advance();
             }
         }
         consume(RIGHT_BRACE, "Expected '}' after " + kind + " body.");
 
         if (firstInit != -1) {
-            var trace = new Trace(parser.previous.span(),
+            var trace = new Trace(scanner.previous().span(),
                 "In " + kind + " " + typeName.lexeme());
             var index = current.chunk.addConstant(trace);
             emit(Opcode.TRCPUSH, index);
@@ -305,11 +305,11 @@ class Compiler {
     }
 
     private void method() {
-        int start = parser.previous.span().start();
+        int start = scanner.previous().span().start();
         consume(IDENTIFIER, "Expected method name after 'method'.");
-        char nameConstant = identifierConstant(parser.previous);
+        char nameConstant = identifierConstant(scanner.previous());
 
-        var type = parser.previous.lexeme().equals(INIT)
+        var type = scanner.previous().lexeme().equals(INIT)
             ? FunctionType.INITIALIZER : FunctionType.METHOD;
         function(start, type);
 
@@ -317,16 +317,16 @@ class Compiler {
     }
 
     private void staticMethod() {
-        int start = parser.previous.span().start();
+        int start = scanner.previous().span().start();
         consume(IDENTIFIER, "Expected method name after 'static method'.");
-        char nameConstant = identifierConstant(parser.previous);
+        char nameConstant = identifierConstant(scanner.previous());
 
         function(start, FunctionType.STATIC_METHOD);
         emit(Opcode.METHOD, nameConstant);
     }
 
     private void functionDeclaration() {
-        int start = parser.previous.span().start();
+        int start = scanner.previous().span().start();
         var global = parseVariable("Expected function name.");
         markVarInitialized();
         function(start, FunctionType.FUNCTION);
@@ -334,7 +334,7 @@ class Compiler {
     }
 
     private void lambda(boolean canAssign) {
-        int start = parser.previous.span().start();
+        int start = scanner.previous().span().start();
         function(start, FunctionType.LAMBDA);
     }
 
@@ -356,7 +356,7 @@ class Compiler {
                 emit(Opcode.RETURN);
             }
         }
-        var end = parser.previous.span().end();
+        var end = scanner.previous().span().end();
         current.chunk.span = buffer.span(start, end);
 
         var compiler = current;  // Save the compiler; endFunction pops it.
@@ -387,7 +387,7 @@ class Compiler {
                 }
                 var constant = parseVariable("Expected parameter name.");
                 defineVariable(constant);
-                var name = parser.previous.lexeme();
+                var name = scanner.previous().lexeme();
                 if (current.parameters.contains(name)) {
                     error("Duplicate parameter name.");
                 }
@@ -401,7 +401,7 @@ class Compiler {
     }
 
     private void letDeclaration() {
-        var keyword = parser.previous;
+        var keyword = scanner.previous();
 
         // Parse the pattern; this does all variable declarations as
         // it goes.
@@ -431,7 +431,7 @@ class Compiler {
 
     private void recordDeclaration() {
         consume(IDENTIFIER, "Expected record type name.");
-        var typeName = parser.previous;
+        var typeName = scanner.previous();
         char nameConstant = identifierConstant(typeName);
         declareVariable(typeName);
 
@@ -464,7 +464,7 @@ class Compiler {
 
             consume(IDENTIFIER, "Expected field name.");
 
-            var name = parser.previous.lexeme();
+            var name = scanner.previous().lexeme();
 
             if (name.equals(ARGS)) {
                 error("A record type cannot have a variable argument list.");
@@ -499,9 +499,9 @@ class Compiler {
     private void synchronize() {
         parser.panicMode = false;
 
-        while (parser.current.type() != EOF) {
-            if (parser.previous.type() == SEMICOLON) return;
-            switch (parser.current.type()) {
+        while (scanner.peek().type() != EOF) {
+            if (scanner.previous().type() == SEMICOLON) return;
+            switch (scanner.peek().type()) {
                 case ASSERT:
                 case BREAK:
                 case CLASS:
@@ -521,7 +521,7 @@ class Compiler {
                 default: // Do nothing.
             }
 
-            advance();
+            scanner.advance();
         }
     }
 
@@ -575,7 +575,7 @@ class Compiler {
         // Normal statements should not leave anything on the stack, so we
         // pop it.  But if this is the last statement in the script, we
         // want to return its value.
-        if (parser.current.type() == EOF) {
+        if (scanner.peek().type() == EOF) {
             emit(Opcode.RETURN);
         } else {
             emit(Opcode.POP);
@@ -584,9 +584,9 @@ class Compiler {
 
     private void assertStatement() {
         // Compile the condition expression, retaining the expression's span.
-        var start = parser.previous.span().end();
+        var start = scanner.previous().span().end();
         expression();
-        var end = parser.previous.span().end();
+        var end = scanner.previous().span().end();
         var endJump = emitJump(Opcode.JIT);
 
         if (match(COMMA)) {
@@ -700,7 +700,7 @@ class Compiler {
         // Loop variable
         consume(VAR, "Expected 'var' before loop variable.");
         parseVariable("Expected variable name.");
-        var itemName = parser.previous;
+        var itemName = scanner.previous();
         emit(Opcode.NULL);
         defineVariable((char)0); // Loop variable is always local
 
@@ -754,7 +754,7 @@ class Compiler {
     }
 
     private void ifLetStatement() {
-        var keyword = parser.previous;
+        var keyword = scanner.previous();
         consume(LEFT_PAREN, "Expected '(' after 'if let'.");
         beginScope();
         pattern();
@@ -963,7 +963,7 @@ class Compiler {
     }
 
     void binary(boolean canAssign) {
-        var op = parser.previous.type();
+        var op = scanner.previous().type();
         var rule = getRule(op);
         parsePrecedence(rule.level + 1);
 
@@ -1002,11 +1002,11 @@ class Compiler {
     }
 
     private void unary(boolean canAssign) {
-        var op = parser.previous;
+        var op = scanner.previous();
 
         // Compile the operand
         parsePrecedence(Level.UNARY);
-        var last = parser.previous;  // The last token in the expression.
+        var last = scanner.previous();  // The last token in the expression.
 
         // Emit the instruction
         switch (op.type()) {
@@ -1099,13 +1099,13 @@ class Compiler {
         // Adds interpolated variables to a list so we can check for
         // this error.
         if (current.scopeDepth > 0 && currentPattern != null) {
-            currentPattern.referencedLocals.add(parser.previous);
+            currentPattern.referencedLocals.add(scanner.previous());
         }
-        getOrSetVariable(parser.previous, canAssign);
+        getOrSetVariable(scanner.previous(), canAssign);
     }
 
     private void literal(boolean canAssign) {
-        emitConstant(parser.previous.literal());
+        emitConstant(scanner.previous().literal());
     }
 
     // List literal: [...]
@@ -1151,22 +1151,22 @@ class Compiler {
     }
 
     private void symbol(boolean canAssign) {
-        switch (parser.previous.type()) {
+        switch (scanner.previous().type()) {
             case FALSE -> emit(Opcode.FALSE);
             case NULL -> emit(Opcode.NULL);
             case TRUE -> emit(Opcode.TRUE);
             default -> throw new IllegalStateException(
-                "Unexpected literal: " + parser.previous.type());
+                "Unexpected literal: " + scanner.previous().type());
         }
     }
 
     private void this_(boolean canAssign) {
-        var last = parser.previous;
+        var last = scanner.previous();
         if (currentType == null) {
             error("Can't use '" + last.lexeme() + "' outside of a method.");
         }
 
-        if (parser.previous.type() == TokenType.THIS) {
+        if (scanner.previous().type() == TokenType.THIS) {
             variable(false);
         } else {
             getOrSetVariable(Token.synthetic(VAR_THIS), canAssign);
@@ -1182,7 +1182,7 @@ class Compiler {
         }
         consume(DOT, "Expected '.' after 'super'.");
         consume(IDENTIFIER, "Expected superclass method name.");
-        char nameConstant = identifierConstant(parser.previous);
+        char nameConstant = identifierConstant(scanner.previous());
         getOrSetVariable(Token.synthetic(VAR_THIS), false);
         getOrSetVariable(Token.synthetic(VAR_SUPER), false);
         emit(Opcode.SUPGET, nameConstant);
@@ -1211,7 +1211,7 @@ class Compiler {
 
     private void dot(boolean canAssign) {
         consume(IDENTIFIER, "Expected property name after '.'.");
-        char nameConstant = identifierConstant(parser.previous);
+        char nameConstant = identifierConstant(scanner.previous());
 
         if (canAssign && match(EQUAL)) {
             expression();
@@ -1332,8 +1332,8 @@ class Compiler {
     }
 
     private void parsePrecedence(int level) {
-        advance();
-        var prefixRule = getRule(parser.previous.type()).prefix;
+        scanner.advance();
+        var prefixRule = getRule(scanner.previous().type()).prefix;
 
         if (prefixRule == null) {
             error("Expected expression.");
@@ -1343,9 +1343,9 @@ class Compiler {
         var canAssign = level <= Level.ASSIGNMENT;
         prefixRule.parse(canAssign);
 
-        while (level <= getRule(parser.current.type()).level) {
-            advance();
-            var infixRule = getRule(parser.previous.type()).infix;
+        while (level <= getRule(scanner.peek().type()).level) {
+            scanner.advance();
+            var infixRule = getRule(scanner.previous().type()).infix;
             infixRule.parse(canAssign);
         }
 
@@ -1386,7 +1386,7 @@ class Compiler {
         } else if (match(LEFT_BRACE)) {
             return mapPattern();
         } else if (match(IDENTIFIER)) {
-            var identifier = parser.previous;
+            var identifier = scanner.previous();
 
             if (identifier.lexeme().startsWith("_")) {
                 return new Pattern.Wildcard(identifier.lexeme());
@@ -1438,11 +1438,11 @@ class Compiler {
         } else if (match(NULL)) {
             emit(Opcode.NULL);
         } else if (match(NUMBER) || match(STRING) || match(KEYWORD)) {
-            emitConstant(parser.previous.literal());
+            emitConstant(scanner.previous().literal());
         } else if (match(DOLLAR)) {
             if (match(IDENTIFIER)) {
                 // Save the variable for shadow-checks
-                currentPattern.referencedLocals.add(parser.previous);
+                currentPattern.referencedLocals.add(scanner.previous());
                 variable(false);  // Emit the *GET instruction.
             } else {
                 consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
@@ -1476,7 +1476,7 @@ class Compiler {
         if (match(COLON)) {
             consume(IDENTIFIER,
                 "Expected binding variable for list tail.");
-            tailId = addPatternVar(parser.previous);
+            tailId = addPatternVar(scanner.previous());
         }
         consume(RIGHT_BRACKET, "Expected ']' after list pattern.");
 
@@ -1542,7 +1542,7 @@ class Compiler {
     // returns 0.
     private char parseVariable(String errorMessage) {
         consume(IDENTIFIER, errorMessage);
-        return addVariable(parser.previous);
+        return addVariable(scanner.previous());
     }
 
     private char addVariable(Token name) {
@@ -1841,31 +1841,17 @@ class Compiler {
 
     private boolean match(TokenType type) {
         if (!check(type)) return false;
-        advance();
+        scanner.advance();
         return true;
     }
 
     private boolean check(TokenType type) {
-        return parser.current.type() == type;
-    }
-
-    private void advance() {
-        parser.previous = parser.current;
-
-        for (;;) {
-            parser.current = tokenizer.scanToken();
-
-            if (parser.current.type() == ERROR) {
-                errorInScanner(parser.current);
-            } else {
-                break;
-            }
-        }
+        return scanner.peek().type() == type;
     }
 
     private void consume(TokenType type, String message) {
-        if (parser.current.type() == type) {
-            advance();
+        if (scanner.peek().type() == type) {
+            scanner.advance();
             return;
         }
 
@@ -1873,11 +1859,11 @@ class Compiler {
     }
 
     private void error(String message) {
-        errorAt(parser.previous, message);
+        errorAt(scanner.previous(), message);
     }
 
     private void errorAtCurrent(String message) {
-        errorAt(parser.current, message);
+        errorAt(scanner.peek(), message);
     }
 
     private void errorAt(Token token, String message) {
@@ -1890,13 +1876,13 @@ class Compiler {
         }
     }
 
-    private void errorInScanner(Token error) {
+    private void errorInScanner(Span span, String message) {
         if (parser.panicMode) return;
         parser.panicMode = true;
         parser.hadError = true;
-        errors.add(new Trace(error.span(), (String)error.literal()));
+        errors.add(new Trace(span, message));
 
-        if (error.span().isAtEnd()) {
+        if (span.isAtEnd()) {
             parser.gotIncompleteScript = true;
         }
     }
@@ -1954,7 +1940,7 @@ class Compiler {
     }
 
     private void emit(char value) {
-        current.chunk.write(value, parser.previous.line());
+        current.chunk.write(value, scanner.previous().line());
     }
 
     private void emit(char value1, char value2) {
@@ -1967,8 +1953,6 @@ class Compiler {
 
     // The state of the parser.
     private static class Parser {
-        Token current = null;
-        Token previous = null;
         boolean hadError = false;
         boolean panicMode = false;
         boolean gotIncompleteScript = false;
@@ -2066,7 +2050,7 @@ class Compiler {
             switch (type) {
                 case SCRIPT -> chunk.name = "*script*";
                 case LAMBDA -> chunk.name = "*lambda*";
-                default -> chunk.name = parser.previous.lexeme();
+                default -> chunk.name = scanner.previous().lexeme();
             }
             chunk.type = type;
             chunk.source = source;
