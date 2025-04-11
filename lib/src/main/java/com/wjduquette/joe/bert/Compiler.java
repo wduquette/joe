@@ -140,13 +140,6 @@ class Compiler {
         return function;
     }
 
-    private void reportError(Trace trace, boolean incomplete) {
-        errors.add(trace);
-        if (incomplete) {
-            parser.gotIncompleteScript = true;
-        }
-    }
-
     /**
      * Gets a disassembler dump of the compiled script
      * @param scriptName The script's name, e.g., the file name
@@ -1861,15 +1854,12 @@ class Compiler {
 
         for (;;) {
             parser.current = tokenizer.scanToken();
-            if (parser.current.type() != ERROR) break;
 
-            // Report the error.
-            var trace = new Trace(
-                parser.current.span(),
-                (String)parser.current.literal());
-            reportError(trace, parser.current.span().isAtEnd());
-
-            parser.hadError = true;
+            if (parser.current.type() == ERROR) {
+                errorInScanner(parser.current);
+            } else {
+                break;
+            }
         }
     }
 
@@ -1899,6 +1889,18 @@ class Compiler {
             parser.gotIncompleteScript = true;
         }
     }
+
+    private void errorInScanner(Token error) {
+        if (parser.panicMode) return;
+        parser.panicMode = true;
+        parser.hadError = true;
+        errors.add(new Trace(error.span(), (String)error.literal()));
+
+        if (error.span().isAtEnd()) {
+            parser.gotIncompleteScript = true;
+        }
+    }
+
 
     //-------------------------------------------------------------------------
     // Code Generation
