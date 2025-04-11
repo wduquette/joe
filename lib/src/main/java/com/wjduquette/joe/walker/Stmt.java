@@ -1,7 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import java.util.List;
-import com.wjduquette.joe.SourceBuffer.Span;
+import com.wjduquette.joe.scanner.SourceBuffer.Span;
 
 /**
  * The statements that can appear in a Joe AST.

@@ -1,4 +1,4 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.scanner;
 
 import java.util.ArrayList;
 import java.util.List;

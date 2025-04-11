@@ -1,8 +1,8 @@
 package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.SourceBuffer.Span;
+import com.wjduquette.joe.scanner.SourceBuffer;
+import com.wjduquette.joe.scanner.SourceBuffer.Span;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.patterns.Pattern;

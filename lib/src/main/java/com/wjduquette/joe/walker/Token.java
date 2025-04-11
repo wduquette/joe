@@ -1,6 +1,6 @@
 package com.wjduquette.joe.walker;
 
-import com.wjduquette.joe.SourceBuffer.Span;
+import com.wjduquette.joe.scanner.SourceBuffer.Span;
 
 record Token(
     TokenType type,

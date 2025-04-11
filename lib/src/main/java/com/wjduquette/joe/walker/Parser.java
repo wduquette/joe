@@ -1,5 +1,5 @@
 package com.wjduquette.joe.walker;
-import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.scanner.SourceBuffer;
 import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.patterns.Pattern;
 

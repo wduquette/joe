@@ -1,6 +1,6 @@
 package com.wjduquette.joe.scanner;
 
-import com.wjduquette.joe.SourceBuffer.Span;
+import com.wjduquette.joe.scanner.SourceBuffer.Span;
 
 /**
  * A token produce by Bert's scanner.

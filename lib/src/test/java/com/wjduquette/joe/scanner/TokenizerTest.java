@@ -1,7 +1,6 @@
 package com.wjduquette.joe.scanner;
 
 import com.wjduquette.joe.Keyword;
-import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Ted;
 import org.junit.Test;
 

@@ -3,6 +3,7 @@ package com.wjduquette.joe.bert;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.patterns.Matcher;
 import com.wjduquette.joe.patterns.Pattern;
+import com.wjduquette.joe.scanner.SourceBuffer;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 

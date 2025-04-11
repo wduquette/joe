@@ -1,6 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.scanner.SourceBuffer;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,7 +26,7 @@ public class WalkerEngine implements Engine {
 
     // The buffers
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private final Map<String,SourceBuffer> buffers = new HashMap<>();
+    private final Map<String, SourceBuffer> buffers = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor

@@ -1,6 +1,6 @@
 package com.wjduquette.joe;
 
-import com.wjduquette.joe.SourceBuffer.Span;
+import com.wjduquette.joe.scanner.SourceBuffer.Span;
 
 /**
  * An unexpected Java exception error caught during script execution by
