@@ -1,5 +1,7 @@
 package com.wjduquette.joe.walker;
 
+import com.wjduquette.joe.parser.Expr;
+import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.scanner.Token;
 
 import java.util.List;

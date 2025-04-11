@@ -1,4 +1,4 @@
-package com.wjduquette.joe.walker;
+package com.wjduquette.joe.parser;
 import com.wjduquette.joe.scanner.Scanner;
 import com.wjduquette.joe.scanner.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
@@ -10,7 +10,11 @@ import java.util.*;
 
 import static com.wjduquette.joe.scanner.TokenType.*;
 
-class Parser {
+/**
+ * The Joe parser.  Returns the parsed script as an AST consisting of a
+ * list of {@link Stmt} records.
+ */
+public class Parser {
     public static final String ARGS = "args";
     private static final int MAX_CALL_ARGUMENTS = 255;
 
@@ -24,10 +28,12 @@ class Parser {
     //-------------------------------------------------------------------------
     // Constructor
 
-    Parser(
-        SourceBuffer source,
-        ErrorReporter reporter)
-    {
+    /**
+     * Creates a new parser.
+     * @param source The source to parse
+     * @param reporter The error reporter.
+     */
+    public Parser(SourceBuffer source, ErrorReporter reporter) {
         this.source = source;
         this.reporter = reporter;
     }
@@ -35,6 +41,12 @@ class Parser {
     //-------------------------------------------------------------------------
     // Public API
 
+    /**
+     * Parses the source, attempting to detect as many meaningful errors as
+     * possible.  Errors are reported via the parser's error reporter.  If
+     * errors were reported, the result of this method should be ignored.
+     * @return The list of parsed statements.
+     */
     public List<Stmt> parse() {
         this.scanner = new Scanner(source, this::errorInScanner);
         List<Stmt> statements = new ArrayList<>();
@@ -172,7 +184,7 @@ class Parser {
 
     private Stmt letDeclaration() {
         Token keyword = scanner.previous();
-        WalkerPattern pattern = pattern();
+        ASTPattern pattern = pattern();
 
         if (pattern.getBindings().isEmpty()) {
             error(scanner.previous(), "'let' pattern must declare at least one variable.");
@@ -377,7 +389,7 @@ class Parser {
     private Stmt ifLetStatement() {
         scanner.consume(LEFT_PAREN, "Expected '(' after 'if let'.");
         Token keyword = scanner.previous();
-        WalkerPattern pattern = pattern();
+        ASTPattern pattern = pattern();
 
         scanner.consume(EQUAL, "Expected '=' after pattern.");
         var target = expression();
@@ -820,16 +832,16 @@ class Parser {
     // pattern.
     private transient Set<String> patternBindings;
 
-    private WalkerPattern pattern() {
+    private ASTPattern pattern() {
         patternBindings = new HashSet<>();
-        var walkerPattern = new WalkerPattern();
+        var walkerPattern = new ASTPattern();
         var pattern = parsePattern(walkerPattern, false); // Not a subpattern
         walkerPattern.setPattern(pattern);
         patternBindings = null;
         return walkerPattern;
     }
 
-    private Pattern parsePattern(WalkerPattern wp, boolean isSubpattern) {
+    private Pattern parsePattern(ASTPattern wp, boolean isSubpattern) {
         var constant = constantPattern(wp);
 
         if (constant != null) {
@@ -870,7 +882,7 @@ class Parser {
         }
     }
 
-    private Pattern.Constant constantPattern(WalkerPattern wp) {
+    private Pattern.Constant constantPattern(ASTPattern wp) {
         if (scanner.match(TRUE)) {
             return wp.addLiteralConstant(true);
         } else if (scanner.match(FALSE)) {
@@ -894,7 +906,7 @@ class Parser {
         }
     }
 
-    private Pattern listPattern(WalkerPattern wp) {
+    private Pattern listPattern(ASTPattern wp) {
         var list = new ArrayList<Pattern>();
 
         if (scanner.match(RIGHT_BRACKET)) {
@@ -919,7 +931,7 @@ class Parser {
         return new Pattern.ListPattern(list, tailId);
     }
 
-    private Pattern.MapPattern mapPattern(WalkerPattern wp) {
+    private Pattern.MapPattern mapPattern(ASTPattern wp) {
         var map = new LinkedHashMap<Pattern.Constant,Pattern>();
 
         if (scanner.match(RIGHT_BRACE)) {
@@ -941,12 +953,12 @@ class Parser {
         return new Pattern.MapPattern(map);
     }
 
-    private Pattern instancePattern(WalkerPattern wp, Token identifier) {
+    private Pattern instancePattern(ASTPattern wp, Token identifier) {
         var fieldMap = mapPattern(wp);
         return new Pattern.InstancePattern(identifier.lexeme(), fieldMap);
     }
 
-    private Pattern recordPattern(WalkerPattern wp, Token identifier) {
+    private Pattern recordPattern(ASTPattern wp, Token identifier) {
         var list = new ArrayList<Pattern>();
 
         if (scanner.match(RIGHT_PAREN)) {

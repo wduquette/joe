@@ -1,12 +1,13 @@
-package com.wjduquette.joe.walker;
+package com.wjduquette.joe.parser;
 
+import com.wjduquette.joe.scanner.SourceBuffer.Span;
 import com.wjduquette.joe.scanner.Token;
 import java.util.List;
 
 /**
  * The various kinds of expression that can appear in Joe's AST.
  */
-sealed interface Expr
+public sealed interface Expr
     permits Expr.Assign, Expr.Binary, Expr.Call,
             Expr.Get, Expr.Grouping, Expr.IndexGet, Expr.IndexSet,
             Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
@@ -16,6 +17,17 @@ sealed interface Expr
             Expr.Unary, Expr.Variable
 {
     /**
+     * The location of the expression within the source.
+     *
+     * <p>Note: the span is not intended to capture the entire entity's
+     * source text.  Rather, it is a strategically chosen to associate
+     * byte-code generated for this entity with the relevant source
+     * line.</p>
+     * @return the location, or null.
+     */
+    default Span location() { return null; }
+
+    /**
      * An assignment to an existing variable.
      * See Stmt.Var for variable declaration, and Stmt.Set for assigning to
      * an object property.
@@ -23,7 +35,9 @@ sealed interface Expr
      * @param op The assignment operator
      * @param value The expression to assign to it.
      */
-    record Assign(Token name, Token op, Expr value) implements Expr {}
+    record Assign(Token name, Token op, Expr value) implements Expr {
+        public Span location() { return name.span(); }
+    }
 
     /**
      * A binary expression, e.g., "+", "&lt;", etc.
@@ -32,7 +46,9 @@ sealed interface Expr
      * @param op The operator
      * @param right The right-hand expression
      */
-    record Binary(Expr left, Token op, Expr right) implements Expr {}
+    record Binary(Expr left, Token op, Expr right) implements Expr {
+        public Span location() { return op.span(); }
+    }
 
     /**
      * A call to a function/method.  Note: arity checks are up to the
@@ -41,7 +57,9 @@ sealed interface Expr
      * @param paren A token, for line number info
      * @param arguments The argument expressions
      */
-    record Call(Expr callee, Token paren, List<Expr> arguments) implements Expr {}
+    record Call(Expr callee, Token paren, List<Expr> arguments) implements Expr {
+        public Span location() { return paren.span(); }
+    }
 
     /**
      * A get of an object property.
@@ -49,7 +67,9 @@ sealed interface Expr
      * @param object The expression that yields the object
      * @param name The name of the property
      */
-    record Get(Expr object, Token name) implements Expr {}
+    record Get(Expr object, Token name) implements Expr {
+        public Span location() { return name.span(); }
+    }
 
     /**
      * A parenthesized expression
@@ -64,7 +84,9 @@ sealed interface Expr
      * @param bracket A token, for line number info
      * @param index The index expression
      */
-    record IndexGet(Expr collection, Token bracket, Expr index) implements Expr {}
+    record IndexGet(Expr collection, Token bracket, Expr index) implements Expr {
+        public Span location() { return bracket.span(); }
+    }
 
     /**
      * An index into a collection value.
@@ -81,7 +103,9 @@ sealed interface Expr
         Expr index,
         Token op,
         Expr value
-    ) implements Expr {}
+    ) implements Expr {
+        public Span location() { return op.span(); }
+    }
 
     /**
      * A lambda function.
@@ -89,7 +113,9 @@ sealed interface Expr
      */
     record Lambda(
         Stmt.Function declaration
-    ) implements Expr {}
+    ) implements Expr {
+        // TODO: Needs span
+    }
 
     /**
      * A List literal: a list of expressions used to initialize a
@@ -97,13 +123,17 @@ sealed interface Expr
      * @param bracket The opening left bracket
      * @param list The list of expressions.
      */
-    record ListLiteral(Token bracket, List<Expr> list) implements Expr {}
+    record ListLiteral(Token bracket, List<Expr> list) implements Expr {
+        public Span location() { return bracket.span(); }
+    }
 
     /**
      * A literal value.
      * @param value The value.
      */
-    record Literal(Object value) implements Expr {}
+    record Literal(Object value) implements Expr {
+        // TODO: Needs span?
+    }
 
     /**
      * A logical binary operation.
@@ -112,7 +142,9 @@ sealed interface Expr
      * @param op The operator, "&amp;&amp;" or "||"
      * @param right The right-hand expression
      */
-    record Logical(Expr left, Token op, Expr right) implements Expr {}
+    record Logical(Expr left, Token op, Expr right) implements Expr {
+        public Span location() { return op.span(); }
+    }
 
     /**
      * A Map literal: a list of expression pairs used to initialize a
@@ -120,7 +152,9 @@ sealed interface Expr
      * @param brace The opening left brace
      * @param entries The flat list of expression pairs.
      */
-    record MapLiteral(Token brace, List<Expr> entries) implements Expr {}
+    record MapLiteral(Token brace, List<Expr> entries) implements Expr {
+        public Span location() { return brace.span(); }
+    }
 
     /**
      * A pre-or-post increment/decrement to an existing variable.
@@ -128,7 +162,9 @@ sealed interface Expr
      * @param op The operator
      * @param isPre Whether this is a pre-increment/decrement or not.
      */
-    record PrePostAssign(Token name, Token op, boolean isPre) implements Expr {}
+    record PrePostAssign(Token name, Token op, boolean isPre) implements Expr {
+        public Span location() { return op.span(); }
+    }
 
     /**
      * A pre-or-post increment/decrement to an indexed collection.
@@ -142,7 +178,11 @@ sealed interface Expr
         Expr collection,
         Token bracket,
         Expr index,
-        Token op, boolean isPre) implements Expr {}
+        Token op, boolean isPre
+    ) implements Expr {
+        public Span location() { return op.span(); }
+    }
+
     /**
      * A pre-or-post increment/decrement to an existing property.
      * @param object The expression that yields the object.
@@ -150,7 +190,14 @@ sealed interface Expr
      * @param op The operator
      * @param isPre Whether this is a pre-increment/decrement or not.
      */
-    record PrePostSet(Expr object, Token name, Token op, boolean isPre) implements Expr {}
+    record PrePostSet(
+        Expr object,
+        Token name,
+        Token op,
+        boolean isPre
+    ) implements Expr {
+        public Span location() { return op.span(); }
+    }
 
     /**
      * An assignment to an object property.
@@ -160,14 +207,18 @@ sealed interface Expr
      * @param op The assignment operator
      * @param value The expression that yields the value to assign.
      */
-    record Set(Expr object, Token name, Token op, Expr value) implements Expr {}
+    record Set(Expr object, Token name, Token op, Expr value) implements Expr {
+        public Span location() { return op.span(); }
+    }
 
     /**
      * In a class method, a reference to a superclass method
      * @param keyword The "super" keyword
      * @param method The method name
      */
-    record Super(Token keyword, Token method) implements Expr {}
+    record Super(Token keyword, Token method) implements Expr {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * A ternary operation
@@ -176,25 +227,33 @@ sealed interface Expr
      * @param trueExpr The true expression
      * @param falseExpr The false expression
      */
-    record Ternary(Expr condition, Token op, Expr trueExpr, Expr falseExpr) implements Expr {}
+    record Ternary(Expr condition, Token op, Expr trueExpr, Expr falseExpr) implements Expr {
+        public Span location() { return op.span(); }
+    }
 
     /**
      * In a class method, the magic "this" variable.
      * @param keyword The "this" keyword
      */
-    record This(Token keyword) implements Expr {}
+    record This(Token keyword) implements Expr {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * A unary operation
      * @param op "-" or "!"
      * @param right The expression yielding the value to be operated upon.
      */
-    record Unary(Token op, Expr right) implements Expr {}
+    record Unary(Token op, Expr right) implements Expr {
+        public Span location() { return op.span(); }
+    }
 
     /**
      * A get of a variable's value.
      * See Expr.Get for the get of an object's property's value.
      * @param name The variable name
      */
-    record Variable(Token name) implements Expr {}
+    record Variable(Token name) implements Expr {
+        public Span location() { return name.span(); }
+    }
 }

@@ -1,4 +1,4 @@
-package com.wjduquette.joe.walker;
+package com.wjduquette.joe.parser;
 
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.SourceBuffer.Span;
@@ -8,13 +8,24 @@ import java.util.List;
 /**
  * The statements that can appear in a Joe AST.
  */
-sealed interface Stmt
+public sealed interface Stmt
     permits Stmt.Assert, Stmt.Block, Stmt.Break, Stmt.Class,
             Stmt.Continue, Stmt.Expression, Stmt.For, Stmt.ForEach,
             Stmt.Function, Stmt.If, Stmt.IfLet, Stmt.Let, Stmt.Match,
             Stmt.Record, Stmt.Return, Stmt.Switch,
             Stmt.Throw, Stmt.Var, Stmt.While
 {
+    /**
+     * The location of the statement within the source.
+     *
+     * <p>Note: the span is not intended to capture the entire entity's
+     * source text.  Rather, it is a strategically chosen to associate
+     * byte-code generated for this entity with the relevant source
+     * line.</p>
+     * @return the location, or null.
+     */
+    default Span location() { return null; }
+
     /**
      * Asserts that the condition is truthy, throwing an AssertError
      * otherwise.  If the message is omitted, a generated message will
@@ -23,19 +34,25 @@ sealed interface Stmt
      * @param condition The condition to test
      * @param message The failure message, or null for the default
      */
-    record Assert(Token keyword, Expr condition, Expr message) implements Stmt {}
+    record Assert(Token keyword, Expr condition, Expr message) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * A block of statements, surrounded by braces.
      * @param statements The statements
      */
-    record Block(List<Stmt> statements) implements Stmt {}
+    record Block(List<Stmt> statements) implements Stmt {
+        // TODO: Need span!
+    }
 
     /**
      * A break statement in a loop.
-     * @param token The token, for line number info.
+     * @param keyword The token, for line number info.
      */
-    record Break(Token token) implements Stmt {}
+    record Break(Token keyword) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * A class declaration
@@ -53,19 +70,25 @@ sealed interface Stmt
         List<Stmt.Function> staticMethods,
         List<Stmt.Function> methods,
         List<Stmt> staticInitializer
-    ) implements Stmt {}
+    ) implements Stmt {
+        public Span location() { return classSpan; }
+    }
 
     /**
      * A continue statement in a loop.
-     * @param token The token, for line number info.
+     * @param keyword The token, for line number info.
      */
-    record Continue(Token token) implements Stmt {}
+    record Continue(Token keyword) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * An expression statement: an expression followed by a ";"
      * @param expr The expression
      */
-    record Expression(Expr expr) implements Stmt {}
+    record Expression(Expr expr) implements Stmt {
+        // TODO need span
+    }
 
     /**
      * A "for" loop
@@ -74,7 +97,9 @@ sealed interface Stmt
      * @param incr The incrementer, e.g., "i = i + 1"
      * @param body The body of the loop, a statement or block.
      */
-    record For(Stmt init, Expr condition, Expr incr, Stmt body) implements Stmt {}
+    record For(Stmt init, Expr condition, Expr incr, Stmt body) implements Stmt {
+        // TODO need keyword span?
+    }
 
     /**
      * A "foreach" loop
@@ -82,7 +107,9 @@ sealed interface Stmt
      * @param listExpr The list expression
      * @param body The body of the loop, a statement or block.
      */
-    record ForEach(Token varName, Expr listExpr, Stmt body) implements Stmt {}
+    record ForEach(Token varName, Expr listExpr, Stmt body) implements Stmt {
+        public Span location() { return varName.span(); }
+    }
 
     /**
      * A function or method.
@@ -91,14 +118,18 @@ sealed interface Stmt
      * @param params The parameter names
      * @param body The body of the function
      */
-    record Function(String kind, Token name, List<Token> params, List<Stmt> body) implements Stmt {}
+    record Function(String kind, Token name, List<Token> params, List<Stmt> body) implements Stmt {
+        public Span location() { return name.span(); }
+    }
 
     /** An "if" statement.
      * @param condition The condition being tested
      * @param thenBranch Statement or block to execute if true
      * @param elseBranch Statement or block to execute if false, or null
      */
-    record If(Expr condition, Stmt thenBranch, Stmt elseBranch) implements Stmt {}
+    record If(Expr condition, Stmt thenBranch, Stmt elseBranch) implements Stmt {
+        // TODO: need span?
+    }
 
     /** An "if let" statement.
      * @param keyword The `let` keyword
@@ -109,11 +140,13 @@ sealed interface Stmt
      */
     record IfLet(
         Token keyword,
-        WalkerPattern pattern,
+        ASTPattern pattern,
         Expr target,
         Stmt thenBranch,
         Stmt elseBranch
-    ) implements Stmt {}
+    ) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * A "let" statement
@@ -121,8 +154,9 @@ sealed interface Stmt
      * @param pattern The pattern to match
      * @param target The target expression
      */
-    record Let(Token keyword, WalkerPattern pattern, Expr target)
-        implements Stmt {}
+    record Let(Token keyword, ASTPattern pattern, Expr target) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * A "match" statement.
@@ -134,7 +168,9 @@ sealed interface Stmt
         Token keyword,
         Expr expr,
         List<MatchCase> cases
-    ) implements Stmt {}
+    ) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * A case in a match statement.
@@ -145,10 +181,12 @@ sealed interface Stmt
      */
     record MatchCase(
         Token keyword,
-        WalkerPattern pattern,
+        ASTPattern pattern,
         Expr guard,
         Stmt statement
-    ) {}
+    ) {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * A record declaration
@@ -166,7 +204,9 @@ sealed interface Stmt
         List<Stmt.Function> staticMethods,
         List<Stmt.Function> methods,
         List<Stmt> staticInitializer
-    ) implements Stmt {}
+    ) implements Stmt {
+        public Span location() { return name.span(); }
+    }
 
     /**
      * A "return" statement
@@ -185,7 +225,9 @@ sealed interface Stmt
         Token keyword,
         Expr expr,
         List<SwitchCase> cases
-    ) implements Stmt {}
+    ) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * A case in a switch statement.
@@ -197,26 +239,34 @@ sealed interface Stmt
         Token keyword,
         List<Expr> values,
         Stmt statement
-    ) {}
+    ) {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * A "throw" statement
      * @param keyword The throw keyword, for error location
      * @param value The error value
      */
-    record Throw(Token keyword, Expr value) implements Stmt {}
+    record Throw(Token keyword, Expr value) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * A "var" variable declaration.
      * @param name The variable name
      * @param initializer The initializer, or null
      */
-    record Var(Token name, Expr initializer) implements Stmt {}
+    record Var(Token name, Expr initializer) implements Stmt {
+        public Span location() { return name.span(); }
+    }
 
     /**
      * A "while" loop
      * @param condition The loop condition
      * @param body The statement or block to execute.
      */
-    record While(Expr condition, Stmt body) implements Stmt {}
+    record While(Expr condition, Stmt body) implements Stmt {
+        // TODO needs keyword span
+    }
 }

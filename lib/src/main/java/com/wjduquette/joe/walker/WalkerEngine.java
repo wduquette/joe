@@ -1,6 +1,8 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.parser.Parser;
+import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.scanner.SourceBuffer;
 
 import java.util.*;

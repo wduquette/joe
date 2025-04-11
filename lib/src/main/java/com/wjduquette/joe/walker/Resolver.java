@@ -2,6 +2,8 @@ package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.JoeClass;
 import com.wjduquette.joe.Trace;
+import com.wjduquette.joe.parser.Expr;
+import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.scanner.Token;
 
 import java.util.HashMap;
@@ -67,7 +69,7 @@ class Resolver {
             }
             case Stmt.Break stmt -> {
                 if (loopCounter == 0) {
-                    error(stmt.token(),
+                    error(stmt.keyword(),
                         "'break' used outside of loop.");
                 }
             }
@@ -130,7 +132,7 @@ class Resolver {
             }
             case Stmt.Continue stmt -> {
                 if (loopCounter == 0) {
-                    error(stmt.token(),
+                    error(stmt.keyword(),
                         "'continue' used outside of loop.");
                 }
             }
