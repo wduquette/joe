@@ -3,8 +3,6 @@ package com.wjduquette.joe.scanner;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.Trace;
-import com.wjduquette.joe.bert.ErrorReporter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,9 +65,6 @@ public class Scanner {
     // The SourceBuffer, used to produce Spans.
     private final SourceBuffer buffer;
 
-    // The error reporter.
-    private final ErrorReporter reporter;
-
     // The current scanning state.
     private int start = 0;
     private int current = 0;
@@ -78,19 +73,13 @@ public class Scanner {
     // Constructor
 
     /**
-     * Creates a new scanner for the given source buffer, using
-     * the given error reporter.
+     * Creates a new scanner for the given source buffer.
      *
      * @param buffer The SourceBuffer
-     * @param reporter The error handler.
      */
-    public Scanner(
-        SourceBuffer buffer,
-        ErrorReporter reporter
-    ) {
+    public Scanner(SourceBuffer buffer) {
         this.buffer = buffer;
         this.source = buffer.source();
-        this.reporter = reporter;
     }
 
     //-------------------------------------------------------------------------
@@ -232,8 +221,9 @@ public class Scanner {
                                     return err;
                                 }
                             }
-                            default -> errorToken(
-                                "invalid escape.");
+                            default -> {
+                                return errorToken( "invalid escape.");
+                            }
                         }
                     }
                 }
@@ -280,7 +270,10 @@ public class Scanner {
                             case 'r' -> buff.append('\r');
                             case 'f' -> buff.append('\f');
                             case '"' -> buff.append('"');
-                            case 'u' -> unicode(buff);
+                            case 'u' -> {
+                                var error = unicode(buff);
+                                if (error != null) return error;
+                            }
                             default -> {
                                 return errorToken(
                                     "invalid escape.");
@@ -512,9 +505,10 @@ public class Scanner {
         var where = isAtEnd() ? "end"
             : "'" + source.substring(start, current) + "'";
 
-        reporter.reportError(new Trace(buffer.span(start, current),
-            "At " + where + ", " + message),
-            isAtEnd());
-        return new Token(ERROR, null, null);
+
+        var span = buffer.span(start, current);
+        var text = "At " + where + ", " + message;
+
+        return new Token(ERROR, span, text);
     }
 }

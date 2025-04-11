@@ -111,7 +111,7 @@ class Compiler {
      */
     public Function compile(String scriptName, String source) {
         buffer = new SourceBuffer(scriptName, source);
-        scanner = new Scanner(buffer, this::reportError);
+        scanner = new Scanner(buffer);
 
         // The FunctionCompiler contains the Chunk for the function
         // currently being compiled.  Each `function` or `method`
@@ -1863,7 +1863,12 @@ class Compiler {
             parser.current = scanner.scanToken();
             if (parser.current.type() != ERROR) break;
 
-            // The error has already been reported.
+            // Report the error.
+            var trace = new Trace(
+                parser.current.span(),
+                (String)parser.current.literal());
+            reportError(trace, parser.current.span().isAtEnd());
+
             parser.hadError = true;
         }
     }

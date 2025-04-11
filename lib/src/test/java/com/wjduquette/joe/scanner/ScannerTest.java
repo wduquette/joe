@@ -1,11 +1,8 @@
-package com.wjduquette.joe.bert;
+package com.wjduquette.joe.scanner;
 
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Ted;
-import com.wjduquette.joe.scanner.Scanner;
-import com.wjduquette.joe.scanner.Token;
-import com.wjduquette.joe.scanner.TokenType;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -322,14 +319,21 @@ public class ScannerTest extends Ted {
         details.clear();
 
         var source = new SourceBuffer("-", input);
-        scanner = new Scanner(source, (detail, incomplete) -> {
-            System.out.println("detail: " + detail);
-            details.add(detail.message());
-        });
+        scanner = new Scanner(source);
     }
 
     private Token next() {
-        return scanner.scanToken();
+        Token token;
+        do {
+            token = scanner.scanToken();
+            if (token.type() == ERROR) {
+                System.out.println("detail: " +
+                    token.span() + " " + token.literal());
+                details.add((String)token.literal());
+            }
+        } while (token.type() == ERROR);
+
+        return token;
     }
 
     // Scans and returns the first error
