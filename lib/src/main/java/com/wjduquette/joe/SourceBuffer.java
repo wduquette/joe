@@ -279,6 +279,14 @@ public class SourceBuffer {
             return index2position(end());
         }
 
+        /**
+         * Returns true if the span is at the end of the source.
+         * @return true or false.
+         */
+        public boolean isAtEnd() {
+            return end == source.length();
+        }
+
         @Override public String toString() {
             return "Span[" + filename + ",@" + startPosition() +
                 " (" + start + ")," + text() + "]";
