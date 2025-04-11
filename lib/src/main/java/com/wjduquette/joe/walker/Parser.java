@@ -10,7 +10,7 @@ import java.util.*;
 
 import static com.wjduquette.joe.scanner.TokenType.*;
 
-class Parser {
+public class Parser {
     public static final String ARGS = "args";
     private static final int MAX_CALL_ARGUMENTS = 255;
 
@@ -24,10 +24,7 @@ class Parser {
     //-------------------------------------------------------------------------
     // Constructor
 
-    Parser(
-        SourceBuffer source,
-        ErrorReporter reporter)
-    {
+    public Parser(SourceBuffer source, ErrorReporter reporter) {
         this.source = source;
         this.reporter = reporter;
     }

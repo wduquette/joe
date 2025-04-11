@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * The statements that can appear in a Joe AST.
  */
-sealed interface Stmt
+public sealed interface Stmt
     permits Stmt.Assert, Stmt.Block, Stmt.Break, Stmt.Class,
             Stmt.Continue, Stmt.Expression, Stmt.For, Stmt.ForEach,
             Stmt.Function, Stmt.If, Stmt.IfLet, Stmt.Let, Stmt.Match,
