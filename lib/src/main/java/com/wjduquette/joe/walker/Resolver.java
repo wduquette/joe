@@ -69,7 +69,7 @@ class Resolver {
             }
             case Stmt.Break stmt -> {
                 if (loopCounter == 0) {
-                    error(stmt.token(),
+                    error(stmt.keyword(),
                         "'break' used outside of loop.");
                 }
             }
@@ -132,7 +132,7 @@ class Resolver {
             }
             case Stmt.Continue stmt -> {
                 if (loopCounter == 0) {
-                    error(stmt.token(),
+                    error(stmt.keyword(),
                         "'continue' used outside of loop.");
                 }
             }
