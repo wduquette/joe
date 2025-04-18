@@ -84,6 +84,10 @@ class Compiler {
 //    // The pattern currently being compiled, or null
 //    private PatternCompiler currentPattern = null;
 
+    // Final statement in script; used to allow the final `Stmt.Expression`
+    // to return its value.`
+    private Stmt finalStatement = null;
+
     // Used for debugging/dumping
     private transient Disassembler disassembler;
     private transient StringBuilder dump = null;
@@ -128,6 +132,7 @@ class Compiler {
         // any errors are found.
         errors.clear();
         var statements = parse(buffer);
+        finalStatement = statements.isEmpty() ? null : statements.getLast();
 
         // NEXT, generate the code.
         compile(statements);
@@ -205,8 +210,10 @@ class Compiler {
     }
 
     @SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
-    private void compile(Stmt statement) {
-        switch (statement) {
+    private void compile(Stmt stmt) {
+        setLine(stmt.location());
+
+        switch (stmt) {
             case Stmt.Assert s -> {
                 throw new UnsupportedOperationException("TODO");
             }
@@ -222,8 +229,16 @@ class Compiler {
             case Stmt.Continue aContinue -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Stmt.Expression expression -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.Expression e -> {
+                compile(e.expr());
+                if (e == finalStatement) {
+                    // Return the value of the final statement in
+                    // the script.  This allows the REPL to
+                    // display results conveniently.
+                    emit(RETURN);
+                } else {
+                    emit(POP);
+                }
             }
             case Stmt.For aFor -> {
                 throw new UnsupportedOperationException("TODO");
@@ -272,6 +287,8 @@ class Compiler {
 
     @SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
     private void compile(Expr expr) {
+        setLine(expr.location());
+
         switch (expr) {
             case Expr.Assign e -> {
                 throw new UnsupportedOperationException("TODO");
@@ -300,9 +317,7 @@ class Compiler {
             case Expr.ListLiteral listLiteral -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.Literal literal -> {
-                throw new UnsupportedOperationException("TODO");
-            }
+            case Expr.Literal literal -> emitConstant(literal.value());
             case Expr.Logical logical -> {
                 throw new UnsupportedOperationException("TODO");
             }
@@ -661,6 +676,14 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Code Generation
 
+    private void setLine(Span span) {
+        if (span != null) setLine(span.startLine());
+    }
+
+    private void setLine(int line) {
+        current.sourceLine = line;
+    }
+
     private char addConstant(Object value) {
         return current.chunk.addConstant(value);
     }
@@ -713,7 +736,7 @@ class Compiler {
     }
 
     private void emit(char value) {
-//        current.chunk.write(value, scanner.previous().line());
+        current.chunk.write(value, current.sourceLine);
     }
 
     private void emit(char value1, char value2) {
@@ -769,6 +792,9 @@ class Compiler {
 
         // Whether we are in a class static initializer block or not.
         boolean inStaticInitializer = false;
+
+        // The current source line
+        private int sourceLine = 1;
 
         FunctionCompiler(
             FunctionCompiler enclosing,
