@@ -341,9 +341,26 @@ class Compiler {
                     emit(LISTADD);
                 }
             }
-            case Expr.Literal literal -> emitConstant(literal.value());
-            case Expr.Logical logical -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.Literal e -> {
+                switch (e.value()) {
+                    case null -> emit(NULL);
+                    case Boolean b -> emit(b ? TRUE : FALSE);
+                    default -> emitConstant(e.value());
+                }
+            }
+            case Expr.Logical e -> {
+                compile(e.left());
+                if (e.op().type() == TokenType.AND) {
+                    int endJump = emitJump(JIFKEEP);
+                    emit(POP);
+                    compile(e.right());
+                    patchJump(e.op(), endJump);
+                } else { // OR
+                    int endJump = emitJump(JITKEEP);
+                    emit(POP);
+                    compile(e.right());
+                    patchJump(e.op(), endJump);
+                }
             }
             case Expr.MapLiteral e -> {
                 emit(MAPNEW);
