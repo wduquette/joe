@@ -363,7 +363,13 @@ class Compiler {
                 throw new UnsupportedOperationException("TODO");
             }
             case Expr.Unary unary -> {
-                throw new UnsupportedOperationException("TODO");
+                compile(unary.right());
+                switch(unary.op().type()) {
+                    case TokenType.BANG  -> emit(NOT);
+                    case TokenType.MINUS -> emit(NEGATE);
+                    default -> throw new IllegalStateException(
+                        "Unexpected operator: " + unary.op());
+                }
             }
             case Expr.VarGet e -> resolve(e.name()).emitGet();
             case Expr.VarIncrDecr e -> {
