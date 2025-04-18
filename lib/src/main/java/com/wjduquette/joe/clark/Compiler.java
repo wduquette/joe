@@ -356,19 +356,31 @@ class Compiler {
             case Expr.Super aSuper -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.Ternary ternary -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.Ternary e -> {
+                //                 | cond
+                // JIF else        |
+                // trueExpr        | a
+                // JUMP end        | a
+                // else: falseExpr | b
+                // end:            | a or b
+                compile(e.condition());
+                int elseJump = emitJump(JIF);
+                compile(e.trueExpr());
+                int endJump = emitJump(JUMP);
+                patchJump(e.op(), elseJump);
+                compile(e.falseExpr());
+                patchJump(e.op(), endJump);
             }
             case Expr.This aThis -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.Unary unary -> {
-                compile(unary.right());
-                switch(unary.op().type()) {
+            case Expr.Unary e -> {
+                compile(e.right());
+                switch(e.op().type()) {
                     case TokenType.BANG  -> emit(NOT);
                     case TokenType.MINUS -> emit(NEGATE);
                     default -> throw new IllegalStateException(
-                        "Unexpected operator: " + unary.op());
+                        "Unexpected operator: " + e.op());
                 }
             }
             case Expr.VarGet e -> resolve(e.name()).emitGet();
