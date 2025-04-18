@@ -122,18 +122,21 @@ public class Scanner {
      * Advances the scanner by one token, reporting any errors.
      */
     public void advance() {
+        Token error =  null;
+
         // FIRST, slide the window.
         previous = current;
 
         // NEXT, get the next non-error token.
         for (;;) {
             current = tokenizer.scanToken();
-            if (current.type() == ERROR) {
-                // Report the error.
-                errorHandler.handle(current.span(), (String)current.literal());
-            } else {
-                break;
-            }
+            if (current.type() != ERROR) break;
+            if (error == null) error = current;
+        }
+
+        if (error != null) {
+            // Report the error.
+            errorHandler.handle(error.span(), (String)error.literal());
         }
     }
 }
