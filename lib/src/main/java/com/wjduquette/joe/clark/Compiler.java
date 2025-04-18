@@ -274,7 +274,15 @@ class Compiler {
                 throw new UnsupportedOperationException("TODO");
             }
             case Stmt.Var var -> {
-                throw new UnsupportedOperationException("TODO");
+                char global = addVariable(var.name());
+
+                if (var.initializer() != null) {
+                    compile(var.initializer());
+                } else {
+                    emit(NULL);
+                }
+
+                defineVariable(global);
             }
             case Stmt.While aWhile -> {
                 throw new UnsupportedOperationException("TODO");
@@ -293,8 +301,25 @@ class Compiler {
             case Expr.Assign e -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.Binary binary -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.Binary e -> {
+                compile(e.left());
+                compile(e.right());
+                switch (e.op().type()) {
+                    case TokenType.BANG_EQUAL    -> emit(NE);
+                    case TokenType.EQUAL_EQUAL   -> emit(EQ);
+                    case TokenType.GREATER       -> emit(GT);
+                    case TokenType.GREATER_EQUAL -> emit(GE);
+                    case TokenType.IN            -> emit(IN);
+                    case TokenType.LESS          -> emit(LT);
+                    case TokenType.LESS_EQUAL    -> emit(LE);
+                    case TokenType.PLUS          ->  emit(ADD);
+                    case TokenType.MINUS         -> emit(SUB);
+                    case TokenType.NI            -> emit(NI);
+                    case TokenType.STAR          -> emit(MUL);
+                    case TokenType.SLASH         -> emit(DIV);
+                    default -> throw new IllegalStateException(
+                        "Unexpected operator: " + e.op());
+                }
             }
             case Expr.Call call -> {
                 throw new UnsupportedOperationException("TODO");
@@ -348,8 +373,8 @@ class Compiler {
             case Expr.Unary unary -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.Variable variable -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.Variable e -> {
+                emitVarGet(e.name());
             }
         }
     }
@@ -358,23 +383,10 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Variable Management
 
-    // Parses a variable name as part of a declaration.  The name can be:
-    //
-    // - A variable name in a `var` declaration
-    // - A function or parameter name in a `function` or `method` declaration.
-    //
-    // Declares the variable.  If the variable is a global, returns an
-    // index to the variable's name in the constants table.  Otherwise,
-    // returns 0.
-//    private char parseVariable(String errorMessage) {
-//        scanner.consume(IDENTIFIER, errorMessage);
-//        return addVariable(scanner.previous());
-//    }
-
     private char addVariable(Token name) {
         declareVariable(name);
         if (current.scopeDepth > 0) return 0;    // Local
-        return identifierConstant(name);         // Global
+        return addConstant(name.lexeme());       // Global
     }
 
     // Creates a hidden variable in the current scope, giving it the
@@ -391,13 +403,6 @@ class Compiler {
 //        markVarInitialized();
 //    }
 
-    // Adds a string constant to the current chunk's
-    // constants table for the given identifier and returns
-    // the constant's index.
-    private char identifierConstant(Token name) {
-        return current.chunk.addConstant(name.lexeme());
-    }
-
     // Emits the instruction to define the variable.
     private void defineVariable(char global) {
         if (current.scopeDepth > 0) {
@@ -413,23 +418,23 @@ class Compiler {
     // be preceded by the compiled expression to assign to the
     // variable.
     private void getOrSetVariable(Token name, boolean canAssign) {
-        // FIRST, get the relevant *SET/*GET opcodes.
-        char getOp;
-        char setOp;
-
-        int arg = resolveLocal(current, name);
-
-        if (arg != -1) {
-            getOp = Opcode.LOCGET;
-            setOp = Opcode.LOCSET;
-        } else if ((arg = resolveUpvalue(current, name)) != -1) {
-            getOp = Opcode.UPGET;
-            setOp = Opcode.UPSET;
-        } else {
-            arg = identifierConstant(name);
-            getOp = Opcode.GLOGET;
-            setOp = Opcode.GLOSET;
-        }
+//        // FIRST, get the relevant *SET/*GET opcodes.
+//        char getOp;
+//        char setOp;
+//
+//        int arg = resolveLocal(current, name);
+//
+//        if (arg != -1) {
+//            getOp = Opcode.LOCGET;
+//            setOp = Opcode.LOCSET;
+//        } else if ((arg = resolveUpvalue(current, name)) != -1) {
+//            getOp = Opcode.UPGET;
+//            setOp = Opcode.UPSET;
+//        } else {
+//            arg = identifierConstant(name);
+//            getOp = Opcode.GLOGET;
+//            setOp = Opcode.GLOSET;
+//        }
 //
 //        // NEXT, handle assignment operators
 //        if (canAssign && scanner.match(EQUAL)) {
@@ -684,13 +689,37 @@ class Compiler {
         current.sourceLine = line;
     }
 
+    // Adds a constant to the constants table and returns its
+    // index.
     private char addConstant(Object value) {
         return current.chunk.addConstant(value);
     }
 
+    // Adds the value to the constants table and emits CONST.
     private void emitConstant(Object value) {
         emit(Opcode.CONST, current.chunk.addConstant(value));
     }
+
+    // Given the variable name, emits the relevant *GET
+    // instruction based on the context.
+    private void emitVarGet(Token name) {
+        // FIRST, get the relevant *GET opcode.
+        char getOp;
+
+        int arg = resolveLocal(current, name);
+
+        if (arg != -1) {
+            getOp = Opcode.LOCGET;
+        } else if ((arg = resolveUpvalue(current, name)) != -1) {
+            getOp = Opcode.UPGET;
+        } else {
+            arg = addConstant(name.lexeme());
+            getOp = Opcode.GLOGET;
+        }
+
+        emit(getOp, (char)arg);
+    }
+
 
     private int emitJump(char opcode) {
         emit(opcode);
