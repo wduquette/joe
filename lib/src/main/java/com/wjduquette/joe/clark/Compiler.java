@@ -327,9 +327,7 @@ class Compiler {
             case Expr.Get get -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.Grouping grouping -> {
-                throw new UnsupportedOperationException("TODO");
-            }
+            case Expr.Grouping e -> compile(e.expr());
             case Expr.IndexGet indexGet -> {
                 throw new UnsupportedOperationException("TODO");
             }
