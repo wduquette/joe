@@ -298,9 +298,6 @@ class Compiler {
         setLine(expr.location());
 
         switch (expr) {
-            case Expr.Assign e -> {
-                throw new UnsupportedOperationException("TODO");
-            }
             case Expr.Binary e -> {
                 compile(e.left());
                 compile(e.right());
@@ -371,8 +368,32 @@ class Compiler {
             case Expr.Unary unary -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.Variable e -> {
+            case Expr.VarGet e -> emitVarGet(e.name());
+            case Expr.VarSet e -> {
+                if (e.op().type() == TokenType.EQUAL) {
+                    compile(e.value());
+                    emitVarSet(e.name());
+                    return;
+                }
+
+                var mathOp = switch(e.op().type()) {
+                    case TokenType.PLUS_EQUAL  -> Opcode.ADD;
+                    case TokenType.MINUS_EQUAL -> Opcode.SUB;
+                    case TokenType.STAR_EQUAL  -> Opcode.MUL;
+                    case TokenType.SLASH_EQUAL -> Opcode.DIV;
+                    default -> throw new IllegalStateException(
+                            "Unexpected operator: " + e.op());
+                };
+
+                //                | ∅         ; Initial stack
+                // *GET    var    | a         ; a = var
+                // expr           | a b       ; b = expr
+                // mathOp         | c         ; E.g., c = a + b
+                // *SET    var    | c         ; var = c, retaining c
                 emitVarGet(e.name());
+                compile(e.value());
+                emit(mathOp);
+                emitVarSet(e.name());
             }
         }
     }
@@ -702,22 +723,41 @@ class Compiler {
     // instruction based on the context.
     private void emitVarGet(Token name) {
         // FIRST, get the relevant *GET opcode.
-        char getOp;
+        char op;
 
         int arg = resolveLocal(current, name);
 
         if (arg != -1) {
-            getOp = Opcode.LOCGET;
+            op = Opcode.LOCGET;
         } else if ((arg = resolveUpvalue(current, name)) != -1) {
-            getOp = Opcode.UPGET;
+            op = Opcode.UPGET;
         } else {
             arg = addConstant(name.lexeme());
-            getOp = Opcode.GLOGET;
+            op = Opcode.GLOGET;
         }
 
-        emit(getOp, (char)arg);
+        emit(op, (char)arg);
     }
 
+    // Given the variable name, emits the relevant *SET
+    // instruction based on the context.
+    private void emitVarSet(Token name) {
+        // FIRST, get the relevant *SET opcode.
+        char op;
+
+        int arg = resolveLocal(current, name);
+
+        if (arg != -1) {
+            op = Opcode.LOCSET;
+        } else if ((arg = resolveUpvalue(current, name)) != -1) {
+            op = Opcode.UPSET;
+        } else {
+            arg = addConstant(name.lexeme());
+            op = Opcode.GLOSET;
+        }
+
+        emit(op, (char)arg);
+    }
 
     private int emitJump(char opcode) {
         emit(opcode);

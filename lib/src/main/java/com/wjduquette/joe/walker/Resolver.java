@@ -276,7 +276,7 @@ class Resolver {
 
     private void resolve(Expr expression) {
         switch (expression) {
-            case Expr.Assign expr -> {
+            case Expr.VarSet expr -> {
                 resolve(expr.value());
                 resolveLocal(expr, expr.name());
             }
@@ -363,7 +363,7 @@ class Resolver {
                 resolve(expr.trueExpr());
                 resolve(expr.falseExpr());
             }
-            case Expr.Variable expr -> {
+            case Expr.VarGet expr -> {
                 if (!scopes.isEmpty() &&
                     scopes.peek().get(expr.name().lexeme()) == Boolean.FALSE) {
                     error(expr.name(),

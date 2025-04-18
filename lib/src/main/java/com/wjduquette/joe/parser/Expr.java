@@ -8,13 +8,13 @@ import java.util.List;
  * The various kinds of expression that can appear in Joe's AST.
  */
 public sealed interface Expr
-    permits Expr.Assign, Expr.Binary, Expr.Call,
+    permits Expr.Binary, Expr.Call,
             Expr.Get, Expr.Grouping, Expr.IndexGet, Expr.IndexSet,
             Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
             Expr.MapLiteral,
             Expr.PrePostAssign, Expr.PrePostIndex, Expr.PrePostSet,
             Expr.Set, Expr.Super, Expr.This, Expr.Ternary,
-            Expr.Unary, Expr.Variable
+            Expr.Unary, Expr.VarGet, Expr.VarSet
 {
     /**
      * The location of the expression within the source.
@@ -26,18 +26,6 @@ public sealed interface Expr
      * @return the location, or null.
      */
     default Span location() { return null; }
-
-    /**
-     * An assignment to an existing variable.
-     * See Stmt.Var for variable declaration, and Stmt.Set for assigning to
-     * an object property.
-     * @param name The variable's name token
-     * @param op The assignment operator
-     * @param value The expression to assign to it.
-     */
-    record Assign(Token name, Token op, Expr value) implements Expr {
-        public Span location() { return name.span(); }
-    }
 
     /**
      * A binary expression, e.g., "+", "&lt;", etc.
@@ -253,7 +241,17 @@ public sealed interface Expr
      * See Expr.Get for the get of an object's property's value.
      * @param name The variable name
      */
-    record Variable(Token name) implements Expr {
+    record VarGet(Token name) implements Expr {
+        public Span location() { return name.span(); }
+    }
+
+    /**
+     * An assignment to an existing variable.
+     * @param name The variable's name token
+     * @param op The assignment operator, `=`, `+=`, etc.
+     * @param value The expression to assign to it.
+     */
+    record VarSet(Token name, Token op, Expr value) implements Expr {
         public Span location() { return name.span(); }
     }
 }

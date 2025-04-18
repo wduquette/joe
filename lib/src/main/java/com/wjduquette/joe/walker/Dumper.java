@@ -276,7 +276,7 @@ class Dumper {
             .append(expr.getClass().getSimpleName())
             .append(" ");
         switch (expr) {
-            case Expr.Assign e -> {
+            case Expr.VarSet e -> {
                 buff.append(e.name().lexeme())
                     .append(" ")
                     .append(e.op().lexeme())
@@ -384,7 +384,7 @@ class Dumper {
                     .append("\n");
                 dumpExpression(e.right());
             }
-            case Expr.Variable e ->
+            case Expr.VarGet e ->
                 buff.append(e.name().lexeme())
                     .append("\n");
         }

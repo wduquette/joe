@@ -419,7 +419,7 @@ class Interpreter {
         return switch (expression) {
             // Assign a value to a variable or an object property, using
             // =, +=, -=, *=, /=
-            case Expr.Assign expr -> {
+            case Expr.VarSet expr -> {
                 Object right = evaluate(expr.value());
                 var distance = locals.get(expr);
 
@@ -771,7 +771,7 @@ class Interpreter {
                 };
             }
             // Get a variable's value
-            case Expr.Variable expr -> lookupVariable(expr.name(), expr);
+            case Expr.VarGet expr -> lookupVariable(expr.name(), expr);
         };
     }
 

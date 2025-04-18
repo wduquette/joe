@@ -66,7 +66,7 @@ public sealed interface Stmt
     record Class(
         Token name,
         Span classSpan,
-        Expr.Variable superclass,
+        Expr.VarGet superclass,
         List<Stmt.Function> staticMethods,
         List<Stmt.Function> methods,
         List<Stmt> staticInitializer

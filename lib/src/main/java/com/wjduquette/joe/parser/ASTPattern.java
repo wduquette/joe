@@ -55,7 +55,7 @@ public class ASTPattern {
      * @return The pattern
      */
     public Pattern.Constant addVarConstant(Token varName) {
-        return addExprConstant(new Expr.Variable(varName));
+        return addExprConstant(new Expr.VarGet(varName));
     }
 
     /**

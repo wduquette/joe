@@ -96,11 +96,11 @@ public class Parser {
         var name = scanner.previous();
 
         // Superclass
-        Expr.Variable superclass = null;
+        Expr.VarGet superclass = null;
 
         if (scanner.match(EXTENDS)) {
             scanner.consume(IDENTIFIER, "Expected superclass name.");
-            superclass = new Expr.Variable(scanner.previous());
+            superclass = new Expr.VarGet(scanner.previous());
         }
 
         // Class body
@@ -552,9 +552,9 @@ public class Parser {
             Token op = scanner.previous();
             Expr value = assignment();
 
-            if (target instanceof Expr.Variable) {
-                Token name = ((Expr.Variable) target).name();
-                return new Expr.Assign(name, op, value);
+            if (target instanceof Expr.VarGet) {
+                Token name = ((Expr.VarGet) target).name();
+                return new Expr.VarSet(name, op, value);
             } else if (target instanceof Expr.Get get) {
                 return new Expr.Set(get.object(), get.name(), op, value);
             } else if (target instanceof Expr.IndexGet get) {
@@ -683,8 +683,8 @@ public class Parser {
     }
 
     private Expr prePost(Token op, Expr target, boolean isPre) {
-        if (target instanceof Expr.Variable) {
-            Token name = ((Expr.Variable) target).name();
+        if (target instanceof Expr.VarGet) {
+            Token name = ((Expr.VarGet) target).name();
             return new Expr.PrePostAssign(name, op, isPre);
         } else if (target instanceof Expr.Get get) {
             return new Expr.PrePostSet(get.object(), get.name(), op, isPre);
@@ -767,7 +767,7 @@ public class Parser {
         if (scanner.match(THIS)) return new Expr.This(scanner.previous());
 
         if (scanner.match(IDENTIFIER)) {
-            return new Expr.Variable(scanner.previous());
+            return new Expr.VarGet(scanner.previous());
         }
 
         if (scanner.match(BACK_SLASH)) {
