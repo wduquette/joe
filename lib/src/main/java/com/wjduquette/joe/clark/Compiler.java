@@ -365,8 +365,9 @@ class Compiler {
             case Expr.Unary unary -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.VarGet e -> emitVarGet(e.name());
+            case Expr.VarGet e -> resolve(e.name()).emitGet();
             case Expr.VarIncrDecr e -> {
+                var rv = resolve(e.name());
                 var incrDecr = token2incrDecr(e.op());
 
                 if (e.isPre()) {
@@ -376,9 +377,9 @@ class Compiler {
                     // *GET        var    | a         ; a = var
                     // mathOp             | a'        ; e.g., a' = a + 1
                     // *SET        var    | a'        ; var = a'
-                    emitVarGet(e.name());
+                    rv.emitGet();
                     emit(incrDecr);
-                    emitVarSet(e.name());
+                    rv.emitSet();
                 } else {
                     // Post-increment/decrement
                     //                    | ∅         ; Initial state
@@ -388,21 +389,25 @@ class Compiler {
                     // *SET        var    | a'        ; var = a'
                     // POP                | ∅         ;
                     // TGET               | a         ; push T
-                    emitVarGet(e.name());
+                    rv.emitGet();
                     emit(TPUT);
                     emit(incrDecr);
-                    emitVarSet(e.name());
+                    rv.emitSet();
                     emit(POP);
                     emit(TGET);
                 }
             }
             case Expr.VarSet e -> {
+                var rv = resolve(e.name());
+
+                // Simple Assignment
                 if (e.op().type() == TokenType.EQUAL) {
                     compile(e.value());
-                    emitVarSet(e.name());
+                    rv.emitSet();
                     return;
                 }
 
+                // Assignment with update
                 var mathOp = token2updater(e.op());
 
                 //                | ∅         ; Initial stack
@@ -410,10 +415,10 @@ class Compiler {
                 // expr           | a b       ; b = expr
                 // mathOp         | c         ; E.g., c = a + b
                 // *SET    var    | c         ; var = c, retaining c
-                emitVarGet(e.name());
+                rv.emitGet();
                 compile(e.value());
                 emit(mathOp);
-                emitVarSet(e.name());
+                rv.emitSet();
             }
         }
     }
@@ -592,6 +597,25 @@ class Compiler {
             current.locals[current.localCount - 1 - i].depth
                 = current.scopeDepth;
         }
+    }
+
+    private ResolvedVariable resolve(Token name) {
+        char getOp;
+        char setOp;
+        int arg = resolveLocal(current, name);
+
+        if (arg != -1) {
+            getOp = Opcode.LOCGET;
+            setOp = Opcode.LOCSET;
+        } else if ((arg = resolveUpvalue(current, name)) != -1) {
+            getOp = Opcode.UPGET;
+            setOp = Opcode.UPSET;
+        } else {
+            arg = addConstant(name.lexeme());
+            getOp = Opcode.GLOGET;
+            setOp = Opcode.GLOSET;
+        }
+        return new ResolvedVariable(getOp, setOp, (char)arg);
     }
 
     // Resolves the name as the name of the local variable in the current
@@ -1005,5 +1029,20 @@ class Compiler {
         public String toString() {
             return "UpvalueInfo[index=" + (int)index + ", isLocal=" + isLocal + "]";
         }
+    }
+
+    private class ResolvedVariable {
+        private final char getOp;
+        private final char setOp;
+        private final char arg;
+
+        ResolvedVariable(char getOp, char setOp, char arg) {
+            this.getOp = getOp;
+            this.setOp = setOp;
+            this.arg = arg;
+        }
+
+        void emitGet() { emit(getOp, arg); }
+        void emitSet() { emit(setOp, arg); }
     }
 }
