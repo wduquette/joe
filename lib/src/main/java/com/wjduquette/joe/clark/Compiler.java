@@ -334,15 +334,24 @@ class Compiler {
             case Expr.Lambda lambda -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.ListLiteral listLiteral -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.ListLiteral e -> {
+                emit(LISTNEW);
+                for (var item : e.list()) {
+                    compile(item);
+                    emit(LISTADD);
+                }
             }
             case Expr.Literal literal -> emitConstant(literal.value());
             case Expr.Logical logical -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.MapLiteral mapLiteral -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.MapLiteral e -> {
+                emit(MAPNEW);
+                for (var i = 0; i < e.entries().size(); i += 2) {
+                    compile(e.entries().get(i));      // Key
+                    compile(e.entries().get(i + 1));  // Value
+                    emit(MAPPUT);
+                }
             }
             case Expr.PrePostIndex prePostIndex -> {
                 throw new UnsupportedOperationException("TODO");
