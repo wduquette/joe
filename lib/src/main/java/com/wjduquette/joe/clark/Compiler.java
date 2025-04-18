@@ -10,9 +10,9 @@ import com.wjduquette.joe.scanner.SourceBuffer.Span;
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.TokenType;
 
-import java.util.*;
-
 import static com.wjduquette.joe.scanner.TokenType.*;
+
+import java.util.*;
 
 /**
  * The Bert byte-compiler.  This is a single-pass compiler, parsing the
