@@ -36,15 +36,16 @@ public class Scanner {
 
     /**
      * Creates a scanner on the given source buffer.
-     * On creation, previous() will return null and peek() will return the
-     * next token.  The error handler might be called on creation.
+     *
+     * <p>The scanner must be primed before use by calling advance() a
+     * single time.  This will scan the first token...and possibly
+     * call the error handler.</p>
      * @param buffer The source text
      * @param errorHandler The handler for scan errors.
      */
     public Scanner(SourceBuffer buffer, ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
         this.tokenizer = new Tokenizer(buffer);
-        advance();
     }
 
     //-------------------------------------------------------------------------

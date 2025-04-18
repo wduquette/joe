@@ -24,6 +24,7 @@ public class Parser {
     private final SourceBuffer source;
     private final ErrorReporter reporter;
     private Scanner scanner = null;
+    private boolean scannerIsPrimed = false;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -51,11 +52,23 @@ public class Parser {
         this.scanner = new Scanner(source, this::errorInScanner);
         List<Stmt> statements = new ArrayList<>();
 
+        // FIRST, prime the scanner.  Any error detected while priming the
+        // scanner will be reported but will not result in an `ErrorSync`.
+        scannerIsPrimed = false;
+        scanner.advance();
+        scannerIsPrimed = true;
+
         while (!scanner.isAtEnd()) {
             statements.add(declaration());
         }
 
         return statements;
+    }
+
+    // Handles scan errors, triggering synchronization.
+    private void errorInScanner(SourceBuffer.Span span, String message) {
+        reporter.reportError(new Trace(span, message), span.isAtEnd());
+        if (scannerIsPrimed) throw new ErrorSync(message);
     }
 
     //-------------------------------------------------------------------------
@@ -993,12 +1006,6 @@ public class Parser {
     private ErrorSync errorSync(Token token, String message) {
         error(token, message);
         return new ErrorSync(message);
-    }
-
-    // Handles scan errors, triggering synchronization.
-    private void errorInScanner(SourceBuffer.Span span, String message) {
-        reporter.reportError(new Trace(span, message), span.isAtEnd());
-        throw new ErrorSync(message);
     }
 
     // Discard tokens until we are at the beginning of the next statement.

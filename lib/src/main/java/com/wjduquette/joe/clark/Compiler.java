@@ -124,6 +124,7 @@ class Compiler {
         parser.hadError = false;
         parser.panicMode = false;
         scanner = new Scanner(buffer, this::errorInScanner);
+        scanner.advance();  // Prime the scanner
 
         while (!scanner.match(EOF)) {
             declaration();
