@@ -311,7 +311,7 @@ class Resolver {
                 resolve(expr.right());
             }
             case Expr.MapLiteral expr -> expr.entries().forEach(this::resolve);
-            case Expr.PrePostAssign expr -> resolveLocal(expr, expr.name());
+            case Expr.VarIncrDecr expr -> resolveLocal(expr, expr.name());
             case Expr.PrePostIndex expr -> {
                 resolve(expr.collection());
                 resolve(expr.index());

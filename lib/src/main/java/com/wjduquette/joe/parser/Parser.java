@@ -685,7 +685,7 @@ public class Parser {
     private Expr prePost(Token op, Expr target, boolean isPre) {
         if (target instanceof Expr.VarGet) {
             Token name = ((Expr.VarGet) target).name();
-            return new Expr.PrePostAssign(name, op, isPre);
+            return new Expr.VarIncrDecr(name, op, isPre);
         } else if (target instanceof Expr.Get get) {
             return new Expr.PrePostSet(get.object(), get.name(), op, isPre);
         } else if (target instanceof Expr.IndexGet get) {

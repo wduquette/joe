@@ -335,7 +335,7 @@ class Dumper {
                 dumpExpression(e.right());
             }
             case Expr.MapLiteral e -> e.entries().forEach(this::dumpExpression);
-            case Expr.PrePostAssign e -> {
+            case Expr.VarIncrDecr e -> {
                 if (e.isPre()) {
                     buff.append(e.op().lexeme())
                         .append(e.name().lexeme())

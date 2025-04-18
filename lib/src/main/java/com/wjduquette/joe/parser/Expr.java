@@ -12,9 +12,9 @@ public sealed interface Expr
             Expr.Get, Expr.Grouping, Expr.IndexGet, Expr.IndexSet,
             Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
             Expr.MapLiteral,
-            Expr.PrePostAssign, Expr.PrePostIndex, Expr.PrePostSet,
+            Expr.PrePostIndex, Expr.PrePostSet,
             Expr.Set, Expr.Super, Expr.This, Expr.Ternary,
-            Expr.Unary, Expr.VarGet, Expr.VarSet
+            Expr.Unary, Expr.VarGet, Expr.VarIncrDecr, Expr.VarSet
 {
     /**
      * The location of the expression within the source.
@@ -145,16 +145,6 @@ public sealed interface Expr
     }
 
     /**
-     * A pre-or-post increment/decrement to an existing variable.
-     * @param name The variable's name token
-     * @param op The operator
-     * @param isPre Whether this is a pre-increment/decrement or not.
-     */
-    record PrePostAssign(Token name, Token op, boolean isPre) implements Expr {
-        public Span location() { return op.span(); }
-    }
-
-    /**
      * A pre-or-post increment/decrement to an indexed collection.
      * @param collection The expression that yields the collection.
      * @param bracket The bracket
@@ -243,6 +233,16 @@ public sealed interface Expr
      */
     record VarGet(Token name) implements Expr {
         public Span location() { return name.span(); }
+    }
+
+    /**
+     * A pre-or-post increment/decrement to an existing variable.
+     * @param name The variable's name token
+     * @param op The operator
+     * @param isPre Whether this is a pre-increment/decrement or not.
+     */
+    record VarIncrDecr(Token name, Token op, boolean isPre) implements Expr {
+        public Span location() { return op.span(); }
     }
 
     /**

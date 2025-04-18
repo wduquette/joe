@@ -344,9 +344,6 @@ class Compiler {
             case Expr.MapLiteral mapLiteral -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.PrePostAssign prePostAssign -> {
-                throw new UnsupportedOperationException("TODO");
-            }
             case Expr.PrePostIndex prePostIndex -> {
                 throw new UnsupportedOperationException("TODO");
             }
@@ -369,6 +366,36 @@ class Compiler {
                 throw new UnsupportedOperationException("TODO");
             }
             case Expr.VarGet e -> emitVarGet(e.name());
+            case Expr.VarIncrDecr e -> {
+                var incrDecr = token2incrDecr(e.op());
+
+                if (e.isPre()) {
+                    // Pre-increment/decrement
+                    //
+                    //                    | ∅         ; Initial state
+                    // *GET        var    | a         ; a = var
+                    // mathOp             | a'        ; e.g., a' = a + 1
+                    // *SET        var    | a'        ; var = a'
+                    emitVarGet(e.name());
+                    emit(incrDecr);
+                    emitVarSet(e.name());
+                } else {
+                    // Post-increment/decrement
+                    //                    | ∅         ; Initial state
+                    // *GET        var    | a         ; a = var
+                    // TPUT               | a         ; T = a
+                    // INCR               | a'        ; a' = a + 1
+                    // *SET        var    | a'        ; var = a'
+                    // POP                | ∅         ;
+                    // TGET               | a         ; push T
+                    emitVarGet(e.name());
+                    emit(TPUT);
+                    emit(incrDecr);
+                    emitVarSet(e.name());
+                    emit(POP);
+                    emit(TGET);
+                }
+            }
             case Expr.VarSet e -> {
                 if (e.op().type() == TokenType.EQUAL) {
                     compile(e.value());
@@ -376,14 +403,7 @@ class Compiler {
                     return;
                 }
 
-                var mathOp = switch(e.op().type()) {
-                    case TokenType.PLUS_EQUAL  -> Opcode.ADD;
-                    case TokenType.MINUS_EQUAL -> Opcode.SUB;
-                    case TokenType.STAR_EQUAL  -> Opcode.MUL;
-                    case TokenType.SLASH_EQUAL -> Opcode.DIV;
-                    default -> throw new IllegalStateException(
-                            "Unexpected operator: " + e.op());
-                };
+                var mathOp = token2updater(e.op());
 
                 //                | ∅         ; Initial stack
                 // *GET    var    | a         ; a = var
@@ -398,6 +418,25 @@ class Compiler {
         }
     }
 
+    private char token2updater(Token op) {
+        return switch(op.type()) {
+            case TokenType.PLUS_EQUAL  -> ADD;
+            case TokenType.MINUS_EQUAL -> SUB;
+            case TokenType.STAR_EQUAL  -> MUL;
+            case TokenType.SLASH_EQUAL -> DIV;
+            default -> throw new IllegalStateException(
+                "Unexpected operator: " + op);
+        };
+    }
+
+    private char token2incrDecr(Token op) {
+        return switch (op.type()) {
+            case TokenType.PLUS_PLUS   -> INCR;
+            case TokenType.MINUS_MINUS -> DECR;
+            default -> throw new IllegalStateException(
+                "Unexpected operator: " + op);
+        };
+    }
 
     //-------------------------------------------------------------------------
     // Variable Management

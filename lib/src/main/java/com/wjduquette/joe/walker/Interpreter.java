@@ -643,7 +643,7 @@ class Interpreter {
                 yield map;
             }
             // ++ and -- with a variable name
-            case Expr.PrePostAssign expr -> {
+            case Expr.VarIncrDecr expr -> {
                 var distance = locals.get(expr);
                 Object prior = lookupVariable(expr.name(), expr);
                 checkNumericTarget(expr.op(), prior);
