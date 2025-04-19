@@ -271,8 +271,47 @@ class Compiler {
             case Stmt.For aFor -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Stmt.ForEach forEach -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.ForEach s -> {
+                // NOTE: the Parser wraps Stmt.ForEach as follows:
+                // Stmt.Block
+                //     Stmt.Var loopVar
+                //     Stmt.ForEach
+
+                currentLoop = new LoopCompiler(currentLoop);
+                currentLoop.breakDepth = current.scopeDepth;
+
+                // Collection expression
+                compile(s.listExpr());
+                emit(ITER);  // Convert collection to iterator
+                defineHiddenVariable(VAR_ITERATOR); // Gets collection
+
+                // Start the loop
+                int loopStart = here();
+                currentLoop.continueDepth = current.scopeDepth;
+                currentLoop.loopStart = loopStart;
+
+                // Check to see if we have any more items
+                emit(HASNEXT);
+                var exitJump = emitJump(JIF);
+
+                // Get the next item and update the loop variable
+                emit(GETNEXT);
+                var arg = resolveLocal(current, s.varName());
+                emit(LOCSET, (char)arg);
+                emit(POP); // Pop the item value
+
+                // Compile the body
+                compile(s.body());
+                emitLoop(s.keyword(), loopStart);
+
+                // Patch any breaks
+                patchJump(s.keyword(), exitJump);
+
+                for (var jump : currentLoop.breakJumps) {
+                    patchJump(s.keyword(), jump);
+                }
+
+                currentLoop = currentLoop.enclosing;
             }
             case Stmt.Function s -> {
                 // NOTE: The parser returns this for both functions
@@ -628,26 +667,24 @@ class Compiler {
             }
 
             if (name.lexeme().equals(local.name.lexeme())) {
-                error(name, "Duplicate variable declaration in this scope.");
+                error(name, "duplicate variable declaration in this scope.");
             }
         }
 
         addLocal(name);
     }
 
-    // Creates a hidden variable in the current scope, giving it the
-    // value of the next `expression()`.  Hidden variable names should look
-    // like "*identifier*", so as not to conflict with real variables.
-    @SuppressWarnings("SameParameterValue")
-//    private void defineHiddenVariable(String name) {
-//        if (current.scopeDepth == 0) {
-//            throw new IllegalStateException("Hidden variables must be local.");
-//        }
-//        var nameToken = Token.synthetic(name);
-//        addLocal(nameToken);
-//        expression();
-//        markVarInitialized();
-//    }
+    // Creates a hidden variable in the current scope; its value is
+    // presumed to be on top of the stack already. Hidden variable names should
+    // look like "*identifier*", so as not to conflict with real variables.
+    private void defineHiddenVariable(String name) {
+        if (current.scopeDepth == 0) {
+            throw new IllegalStateException("Hidden variables must be local.");
+        }
+        var nameToken = Token.synthetic(name);
+        addLocal(nameToken);
+        markVarInitialized();
+    }
 
     // Emits the instruction to define the variable.
     private void defineVariable(char global) {
@@ -658,81 +695,6 @@ class Compiler {
         }
         emit(Opcode.GLODEF, global);            // Global
     }
-
-    // Given the variable name, emits the relevant *GET or *SET
-    // instruction based on the context.  A *SET instruction will
-    // be preceded by the compiled expression to assign to the
-    // variable.
-    private void getOrSetVariable(Token name, boolean canAssign) {
-//        // FIRST, get the relevant *SET/*GET opcodes.
-//        char getOp;
-//        char setOp;
-//
-//        int arg = resolveLocal(current, name);
-//
-//        if (arg != -1) {
-//            getOp = Opcode.LOCGET;
-//            setOp = Opcode.LOCSET;
-//        } else if ((arg = resolveUpvalue(current, name)) != -1) {
-//            getOp = Opcode.UPGET;
-//            setOp = Opcode.UPSET;
-//        } else {
-//            arg = identifierConstant(name);
-//            getOp = Opcode.GLOGET;
-//            setOp = Opcode.GLOSET;
-//        }
-//
-//        // NEXT, handle assignment operators
-//        if (canAssign && scanner.match(EQUAL)) {
-//            expression();
-//            emit(setOp, (char)arg);
-//        } else if (canAssign && scanner.match(PLUS_EQUAL)) {
-//            updateVar(getOp, setOp, (char)arg, Opcode.ADD);
-//        } else if (canAssign && scanner.match(MINUS_EQUAL)) {
-//            updateVar(getOp, setOp, (char)arg, Opcode.SUB);
-//        } else if (canAssign && scanner.match(STAR_EQUAL)) {
-//            updateVar(getOp, setOp, (char)arg, Opcode.MUL);
-//        } else if (canAssign && scanner.match(SLASH_EQUAL)) {
-//            updateVar(getOp, setOp, (char)arg, Opcode.DIV);
-//        } else if (canAssign && scanner.match(PLUS_PLUS)) {
-//            postIncrDecrVar(getOp, setOp, (char)arg, Opcode.INCR);
-//        } else if (canAssign && scanner.match(MINUS_MINUS)) {
-//            postIncrDecrVar(getOp, setOp, (char)arg, Opcode.DECR);
-//        } else {
-//            emit(getOp, (char)arg);
-//        }
-    }
-
-    // Emits the code to update a variable
-    private void updateVar(char getOp, char setOp, char arg, char mathOp) {
-        //                | ∅         ; Initial stack
-        // *GET    var    | a         ; a = var
-        // expr           | a b       ; b = expr
-        // mathOp         | c         ; E.g., c = a + b
-        // *SET    var    | c         ; var = c, retaining c
-        emit(getOp, arg);
-//        expression();
-        emit(mathOp);
-        emit(setOp, arg);
-    }
-
-    // Emits the code to post-increment/decrement a variable
-    private void postIncrDecrVar(char getOp, char setOp, char arg, char mathOp) {
-        //                    | ∅         ; Initial state
-        // *GET        var    | a         ; a = var
-        // TPUT               | a         ; T = a
-        // INCR               | a'        ; a' = a + 1
-        // *SET        var    | a'        ; var = a'
-        // POP                | ∅         ;
-        // TGET               | a         ; push T
-        emit(getOp, arg);
-        emit(Opcode.TPUT);
-        emit(mathOp);
-        emit(setOp, arg);
-        emit(Opcode.POP);
-        emit(Opcode.TGET);
-    }
-
 
     // Adds a local variable with the given name to the current scope.
     private void addLocal(Token name) {
@@ -919,7 +881,10 @@ class Compiler {
     // Parsing Tools
 
     private void error(Token token, String message) {
-        errors.add(new Trace(token.span(), message));
+        var msg = token.span().isAtEnd()
+            ? "Error at end: " + message
+            : "Error at '" + token.lexeme() + "': " + message;
+        errors.add(new Trace(token.span(), msg));
     }
 
     //-------------------------------------------------------------------------
