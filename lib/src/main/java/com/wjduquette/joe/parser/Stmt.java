@@ -124,12 +124,18 @@ public sealed interface Stmt
     }
 
     /** An "if" statement.
+     * @param keyword The "if" keyword
      * @param condition The condition being tested
      * @param thenBranch Statement or block to execute if true
      * @param elseBranch Statement or block to execute if false, or null
      */
-    record If(Expr condition, Stmt thenBranch, Stmt elseBranch) implements Stmt {
-        // TODO: need span?
+    record If(
+        Token keyword,
+        Expr condition,
+        Stmt thenBranch,
+        Stmt elseBranch
+    ) implements Stmt {
+        public Span location() { return keyword.span(); }
     }
 
     /** An "if let" statement.

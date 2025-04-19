@@ -392,6 +392,7 @@ public class Parser {
 
 
     private Stmt ifStatement() {
+        var keyword = scanner.previous();
         scanner.consume(LEFT_PAREN, "Expected '(' after 'if'.");
         Expr condition = expression();
         scanner.consume(RIGHT_PAREN, "Expected ')' after if condition.");
@@ -402,7 +403,7 @@ public class Parser {
             elseBranch = statement();
         }
 
-        return new Stmt.If(condition, thenBranch, elseBranch);
+        return new Stmt.If(keyword, condition, thenBranch, elseBranch);
     }
 
     private Stmt ifLetStatement() {

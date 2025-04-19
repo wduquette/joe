@@ -256,8 +256,21 @@ class Compiler {
             case Stmt.Function function -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Stmt.If anIf -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.If s -> {
+                //                    | ∅      ; Initial state
+                //       condition    | flag   ; Compute condition
+                //       JIF else     | ∅      ; Jump to else branch
+                //       thenBranch   | ∅      ; Execute then branch
+                //       JUMP end     | ∅      ; Jump to end
+                // else: elseBranch   | ∅      ; Execute else branch
+                // end:  ...          | ∅      ; end of statement
+                compile(s.condition());
+                var elseJump = emitJump(JIF);
+                compile(s.thenBranch());
+                var endJump = emitJump(JUMP);
+                patchJump(null, elseJump);
+                if (s.elseBranch() != null) compile(s.elseBranch());
+                patchJump(null, endJump);
             }
             case Stmt.IfLet ifLet -> {
                 throw new UnsupportedOperationException("TODO");
