@@ -215,10 +215,17 @@ class Compiler {
 
         switch (stmt) {
             case Stmt.Assert s -> {
-                throw new UnsupportedOperationException("TODO");
+                compile(s.condition());
+                var endJump = emitJump(JIT);
+                compile(s.message());
+                emit(ASSERT);
+                patchJump(s.keyword(), endJump);
             }
-            case Stmt.Block block -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.Block s -> {
+                beginScope();
+                compile(s.statements());
+                setLine(s.span().endLine());
+                endScope();
             }
             case Stmt.Break aBreak -> {
                 throw new UnsupportedOperationException("TODO");
@@ -270,8 +277,9 @@ class Compiler {
             case Stmt.Switch aSwitch -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Stmt.Throw aThrow -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.Throw s -> {
+                compile(s.value());
+                emit(THROW);
             }
             case Stmt.Var var -> {
                 char global = addVariable(var.name());

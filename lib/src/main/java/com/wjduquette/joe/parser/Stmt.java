@@ -40,10 +40,11 @@ public sealed interface Stmt
 
     /**
      * A block of statements, surrounded by braces.
+     * @param span The block's complete span
      * @param statements The statements
      */
-    record Block(List<Stmt> statements) implements Stmt {
-        // TODO: Need span!
+    record Block(Span span, List<Stmt> statements) implements Stmt {
+        public Span location() { return span; }
     }
 
     /**

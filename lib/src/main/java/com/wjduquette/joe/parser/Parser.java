@@ -284,7 +284,7 @@ public class Parser {
         if (scanner.match(SWITCH)) return switchStatement();
         if (scanner.match(THROW)) return throwStatement();
         if (scanner.match(WHILE)) return whileStatement();
-        if (scanner.match(LEFT_BRACE)) return new Stmt.Block(block());
+        if (scanner.match(LEFT_BRACE)) return blockStatement();
 
         return expressionStatement();
     }
@@ -328,6 +328,7 @@ public class Parser {
     }
 
     private Stmt forStatement() {
+        var start = scanner.previous().span().start();
         scanner.consume(LEFT_PAREN, "Expected '(' after 'for'.");
 
         // Initializer
@@ -359,12 +360,14 @@ public class Parser {
 
         // Wrap in a block so that the loop clauses have their local
         // scope.
-        return new Stmt.Block(List.of(
-            new Stmt.For(init, condition, incr, body)
+        var end = scanner.previous().span().end();
+        return new Stmt.Block(source.span(start, end),
+            List.of(new Stmt.For(init, condition, incr, body)
         ));
     }
 
     private Stmt forEachStatement() {
+        var start = scanner.previous().span().start();
         scanner.consume(LEFT_PAREN, "Expected '(' after 'foreach'.");
         scanner.consume(VAR, "Expected 'var' before loop variable name.");
         scanner.consume(IDENTIFIER, "Expected loop variable name.");
@@ -377,10 +380,13 @@ public class Parser {
 
         // Body
         var body = statement();
+        var end = scanner.previous().span().end();
 
-        return new Stmt.Block(List.of(
-            new Stmt.Var(varName, null),
-            new Stmt.ForEach(varName, listExpr, body)
+        return new Stmt.Block(
+            source.span(start, end),
+            List.of(
+                new Stmt.Var(varName, null),
+                new Stmt.ForEach(varName, listExpr, body)
         ));
     }
 
@@ -525,6 +531,13 @@ public class Parser {
         Stmt body = statement();
 
         return new Stmt.While(condition, body);
+    }
+
+    private Stmt.Block blockStatement() {
+        var start = scanner.previous().span().end();
+        List<Stmt> statements = block();
+        var end = scanner.previous().span().start();
+        return new Stmt.Block(source.span(start, end), statements);
     }
 
     private List<Stmt> block() {
