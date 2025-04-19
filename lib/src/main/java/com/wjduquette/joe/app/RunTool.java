@@ -31,6 +31,7 @@ public class RunTool implements Tool {
         --walker, -w   Use the "Walker" AST-walker engine.
         --debug,  -d   Enable debugging output.  This is mostly of use to
                        the Joe maintainer.
+        --clark,  -c   Use the "Clark" experimental byte-engine
         """,
         RunTool::main
     );
@@ -71,6 +72,7 @@ public class RunTool implements Tool {
             switch (opt) {
                 case "--bert", "-b" -> engineType = Joe.BERT;
                 case "--walker", "-w" -> engineType = Joe.WALKER;
+                case "--clark", "-c" -> engineType = Joe.CLARK;
                 case "--time", "-t" -> measureRuntime = true;
                 case "--debug", "-d" -> debug = true;
                 default -> {

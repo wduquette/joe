@@ -40,6 +40,7 @@ public class ReplTool implements Tool {
         
         --bert,   -b   Use the "Bert" byte-engine (default).
         --walker, -w   Use the "Walker" AST-walker engine.
+        --clark,  -c   Use the "Clark" experimental byte-engine
         --debug,  -d   Enable debugging output.  This is mostly of use to
                        the Joe maintainer.
         """,
@@ -79,9 +80,10 @@ public class ReplTool implements Tool {
         while (!argq.isEmpty() && argq.peek().startsWith("-")) {
             var opt = argq.poll();
             switch (opt) {
-                case "--bert", "-b" -> engineType = Joe.BERT;
+                case "--bert",   "-b" -> engineType = Joe.BERT;
                 case "--walker", "-w" -> engineType = Joe.WALKER;
-                case "--debug", "-d" -> debug = true;
+                case "--clark",  "-c" -> engineType = Joe.CLARK;
+                case "--debug",  "-d" -> debug = true;
                 default -> {
                     System.err.println("Unknown option: '" + opt + "'.");
                     System.exit(64);

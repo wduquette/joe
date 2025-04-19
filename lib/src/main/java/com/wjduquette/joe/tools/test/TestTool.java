@@ -29,16 +29,10 @@ public class TestTool implements Tool {
         
         Options:
         
-        --bert, -b
-            Use the "Bert" byte-engine (the default).
-        
-        --walker, -w
-            Use the "Walker" AST-walker engine.
-        
-        --verbose, -v
-            Enable verbose output.  Normally only failures and the final
-            summary are included in the output.  If this is given, all test
-            output is included.
+        --bert,   -b   Use the "Bert" byte-engine (default)
+        --walker, -w   Use the "Walker" AST-walker engine.
+        --clark,  -c   Use the "Clark" experimental byte-engine
+        --verbose, -v  Enable verbose output.
         
         Test Scripts
         
@@ -95,6 +89,7 @@ public class TestTool implements Tool {
             switch (arg) {
                 case "--bert", "-b" -> engineType = Joe.BERT;
                 case "--walker", "-w" -> engineType = Joe.WALKER;
+                case "--clark", "-c" -> engineType = Joe.CLARK;
                 case "-v", "--verbose" -> verbose = true;
                 default -> testScripts.add(arg);
             }
