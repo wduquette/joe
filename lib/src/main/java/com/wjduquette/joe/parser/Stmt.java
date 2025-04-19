@@ -277,10 +277,11 @@ public sealed interface Stmt
 
     /**
      * A "while" loop
+     * @param keyword The "while" keyword
      * @param condition The loop condition
      * @param body The statement or block to execute.
      */
-    record While(Expr condition, Stmt body) implements Stmt {
-        // TODO needs keyword span
+    record While(Token keyword, Expr condition, Stmt body) implements Stmt {
+        public Span location() { return keyword.span(); }
     }
 }

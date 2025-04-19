@@ -78,11 +78,11 @@ class Compiler {
     // The function currently being compiled.
     private FunctionCompiler current = null;
 
+    // The loop currently being compiled, or null
+    private LoopCompiler currentLoop = null;
+
 //    // The type currently being compiled, or null
 //    private TypeCompiler currentType = null;
-//
-//    // The loop currently being compiled, or null
-//    private LoopCompiler currentLoop = null;
 //
 //    // The pattern currently being compiled, or null
 //    private PatternCompiler currentPattern = null;
@@ -230,14 +230,32 @@ class Compiler {
                 setLine(s.span().endLine());
                 endScope();
             }
-            case Stmt.Break aBreak -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.Break s -> {
+                if (currentLoop == null) {
+                    error(s.keyword(), "found 'break' outside of any loop.");
+                }
+
+                // NEXT, end any open scopes.
+                popLocals(currentLoop.breakDepth);
+
+                // NEXT, emit the jump, saving it to be patched at
+                // the end of the loop.
+                var jump = emitJump(JUMP);
+                currentLoop.breakJumps.add((char)jump);
             }
             case Stmt.Class aClass -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Stmt.Continue aContinue -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.Continue s -> {
+                if (currentLoop == null) {
+                    error(s.keyword(), "found 'continue' outside of any loop.");
+                }
+
+                // NEXT, end any open scopes.
+                popLocals(currentLoop.continueDepth);
+
+                // NEXT, loop back to the beginning.
+                emitLoop(s.keyword(), currentLoop.loopStart);
             }
             case Stmt.Expression e -> {
                 compile(e.expr());
@@ -330,8 +348,24 @@ class Compiler {
 
                 defineVariable(global);
             }
-            case Stmt.While aWhile -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.While s -> {
+                var loopStart = here();
+                compile(s.condition());
+
+                currentLoop = new LoopCompiler(currentLoop);
+                currentLoop.breakDepth = current.scopeDepth;
+                currentLoop.continueDepth = current.scopeDepth;
+                currentLoop.loopStart = loopStart;
+
+                int exitJump = emitJump(JIF);
+                compile(s.body());
+                emitLoop(s.keyword(), loopStart);
+
+                for (var jump : currentLoop.breakJumps) {
+                    patchJump(s.keyword(), jump);
+                }
+                patchJump(s.keyword(), exitJump);
+                currentLoop = currentLoop.enclosing;
             }
         }
     }
@@ -897,6 +931,12 @@ class Compiler {
 
     private void setLine(int line) {
         current.sourceLine = line;
+    }
+
+    // Returns the current location in the chunk, e.g., for determining
+    // the start of a loop.
+    private int here() {
+        return current.chunk.codeSize();
     }
 
     // Adds a constant to the constants table and returns its

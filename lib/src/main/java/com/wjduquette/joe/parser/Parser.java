@@ -529,12 +529,13 @@ public class Parser {
     }
 
     private Stmt whileStatement() {
+        var keyword = scanner.previous();
         scanner.consume(LEFT_PAREN, "Expected '(' after 'while'.");
         Expr condition = expression();
         scanner.consume(RIGHT_PAREN, "Expected ')' after condition.");
         Stmt body = statement();
 
-        return new Stmt.While(condition, body);
+        return new Stmt.While(keyword, condition, body);
     }
 
     private Stmt.Block blockStatement() {
