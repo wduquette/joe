@@ -118,9 +118,16 @@ public sealed interface Stmt
      * @param name The name
      * @param params The parameter names
      * @param body The body of the function
+     * @param span The function's full span.
      */
-    record Function(String kind, Token name, List<Token> params, List<Stmt> body) implements Stmt {
-        public Span location() { return name.span(); }
+    record Function(
+        String kind,
+        Token name,
+        List<Token> params,
+        List<Stmt> body,
+        Span span
+    ) implements Stmt {
+        public Span location() { return span; }
     }
 
     /** An "if" statement.

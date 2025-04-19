@@ -137,6 +137,7 @@ public class Parser {
     }
 
     private Stmt.Function functionDeclaration(String kind) {
+        var start = scanner.previous().span().start();
         scanner.consume(IDENTIFIER, "Expected " + kind + " name.");
         var name = scanner.previous();
 
@@ -146,7 +147,9 @@ public class Parser {
 
         scanner.consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
         List<Stmt> body = block();
-        return new Stmt.Function(kind, name, parameters, body);
+        var end = scanner.previous().span().end();
+        var span = source.span(start, end);
+        return new Stmt.Function(kind, name, parameters, body, span);
     }
 
     private List<Token> parameters(
@@ -795,7 +798,10 @@ public class Parser {
                 var expr = expression();
                 body = List.of(new Stmt.Return(token, expr));
             }
-            var decl = new Stmt.Function("lambda", token, parameters, body);
+            var end = scanner.previous().span().end();
+            var span = source.span(token.span().start(), end);
+            var decl =
+                new Stmt.Function("lambda", token, parameters, body, span);
             return new Expr.Lambda(decl);
         }
 

@@ -38,6 +38,9 @@ class Compiler {
     // The name of the script function
     public static final String SCRIPT_NAME = "*script*";
 
+    // The name of all lambda functions
+    public static final String LAMBDA_NAME = "*lambda*";
+
     // The name of a class's "init" method
     public static final String INIT = "init";
 
@@ -125,8 +128,7 @@ class Compiler {
             null,
             FunctionType.SCRIPT,
             SCRIPT_NAME,
-            buffer.all(),
-            buffer);
+            buffer.all());
 
         // NEXT, parse the script.  This will throw a `SyntaxError` if
         // any errors are found.
@@ -188,6 +190,7 @@ class Compiler {
 
     // Completes compilation of the current function and returns it.
     private Function endFunction() {
+        setLine(current.chunk.span.endLine());
         emitReturn();
         var function = new Function(
             current.parameters,
@@ -253,8 +256,14 @@ class Compiler {
             case Stmt.ForEach forEach -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Stmt.Function function -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.Function s -> {
+                // NOTE: The parser returns this for both functions
+                // and methods.  Methods aren't yet implemented.
+                var global = addVariable(s.name());
+                markVarInitialized();
+                compileFunction(FunctionType.FUNCTION, s.name().lexeme(),
+                    s.params(), s.body(), s.location());
+                defineVariable(global);
             }
             case Stmt.If s -> {
                 //                    | ∅      ; Initial state
@@ -284,8 +293,24 @@ class Compiler {
             case Stmt.Record record -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Stmt.Return aReturn -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.Return s -> {
+                if (current.inStaticInitializer) {
+                    // TODO: Move this to parser?
+                    error(s.keyword(),
+                        "Can't return from a static initializer block.");
+                }
+
+                if (s.value() != null) {
+                    if (current.chunk.type == FunctionType.INITIALIZER) {
+                        // Move to parser?
+                        error(s.keyword(),
+                            "Can't return a value from an initializer.");
+                    }
+                    compile(s.value());
+                    emit(RETURN);
+                } else {
+                    emitReturn(); // Includes initializer magic
+                }
             }
             case Stmt.Switch aSwitch -> {
                 throw new UnsupportedOperationException("TODO");
@@ -308,6 +333,38 @@ class Compiler {
             case Stmt.While aWhile -> {
                 throw new UnsupportedOperationException("TODO");
             }
+        }
+    }
+
+    private void compileFunction(
+        FunctionType type,
+        String name,
+        List<Token> params,
+        List<Stmt> body,
+        Span span
+    ) {
+        this.current = new FunctionCompiler(current, type, name, span);
+
+        // Begin the function's scope; no endScope() because `RETURN`
+        // does the cleanup.
+        beginScope();
+
+        for (var param : params) {
+            var constant = addVariable(param);
+            defineVariable(constant);
+        }
+
+        compile(body);
+
+        var compiler = current;  // Save the compiler; endFunction pops it.
+        var function = endFunction();
+        setLine(current.chunk.span.endLine());
+        emit(CLOSURE, addConstant(function));
+
+        // Emit data about the upvalues
+        for (int i = 0; i < function.upvalueCount; i++) {
+            emit((char)(compiler.upvalues[i].isLocal ? 1 : 0));
+            emit(compiler.upvalues[i].index);
         }
     }
 
@@ -352,8 +409,10 @@ class Compiler {
             case Expr.IndexSet indexSet -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.Lambda lambda -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.Lambda e -> {
+                compileFunction(FunctionType.LAMBDA, LAMBDA_NAME,
+                    e.declaration().params(), e.declaration().body(),
+                    e.declaration().span());
             }
             case Expr.ListLiteral e -> {
                 emit(LISTNEW);
@@ -517,6 +576,28 @@ class Compiler {
         return addConstant(name.lexeme());       // Global
     }
 
+    // Declares the variable.  Checking for duplicate declarations in the
+    // current local scope.
+    private void declareVariable(Token name) {
+        if (current.scopeDepth == 0) return; // Global
+
+        // Check for duplicate declarations in current scope.
+        for (var i = current.localCount - 1; i >= 0; i--) {
+            var local = current.locals[i];
+
+            // Stop checking once we get to a lower scope depth.
+            if (local.depth != -1 && local.depth < current.scopeDepth) {
+                break;
+            }
+
+            if (name.lexeme().equals(local.name.lexeme())) {
+                error(name, "Duplicate variable declaration in this scope.");
+            }
+        }
+
+        addLocal(name);
+    }
+
     // Creates a hidden variable in the current scope, giving it the
     // value of the next `expression()`.  Hidden variable names should look
     // like "*identifier*", so as not to conflict with real variables.
@@ -615,27 +696,6 @@ class Compiler {
         emit(Opcode.TGET);
     }
 
-    // Declares the variable.  Checking for duplicate declarations in the
-    // current local scope.
-    private void declareVariable(Token name) {
-        if (current.scopeDepth == 0) return; // Global
-
-        // Check for duplicate declarations in current scope.
-        for (var i = current.localCount - 1; i >= 0; i--) {
-            var local = current.locals[i];
-
-            // Stop checking once we get to a lower scope depth.
-            if (local.depth != -1 && local.depth < current.scopeDepth) {
-                break;
-            }
-
-            if (name.lexeme().equals(local.name.lexeme())) {
-                error(name, "Duplicate variable declaration in this scope.");
-            }
-        }
-
-        addLocal(name);
-    }
 
     // Adds a local variable with the given name to the current scope.
     private void addLocal(Token name) {
@@ -995,16 +1055,13 @@ class Compiler {
             FunctionCompiler enclosing,
             FunctionType type,
             String name,
-            Span span,
-            SourceBuffer source
+            Span span
         ) {
             this.enclosing = enclosing;
             this.chunk = new Chunk();
             this.chunk.type = type;
             this.chunk.name = name;
             this.chunk.span = span;
-            this.chunk.source = source;
-
 
             // Every function has an implicit stack slot for the VM's own use.
             // For methods, this slot will be filled by the instance.
