@@ -429,8 +429,60 @@ class Compiler {
                     emitReturn(); // Includes initializer magic
                 }
             }
-            case Stmt.Switch aSwitch -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.Switch s -> {
+                beginScope();
+                compile(s.expr());
+                defineHiddenVariable(VAR_SWITCH);
+
+                // Jump targets
+                var endJumps = new ArrayList<Character>();
+                int nextJump = -1;
+
+                for (var c : s.cases()) {
+                    setLine(c.location());
+                    var caseJumps = new ArrayList<Character>();
+
+                    // Allow the previous case to jump here if it doesn't match.
+                    if (nextJump != -1) {
+                        patchJump(c.keyword(), nextJump);
+                    }
+
+                    for (var target : c.values()) {
+                        // Compute the case target and compare it with the
+                        // *switch* value.
+                        emit(DUP); // Duplicate the switch value
+                        compile(target);
+                        emit(EQ);
+
+                        // Jump to the next case if no match.
+                        caseJumps.add((char) emitJump(JIT));
+                    }
+
+                    // No next jump if this is the default case.
+                    if (!c.values().isEmpty()) {
+                        nextJump = emitJump(JUMP);
+                    }
+
+                    for (var jump : caseJumps) {
+                        patchJump(c.keyword(), jump);
+                    }
+
+                    // Parse the case body.
+                    compile(c.statement());
+
+                    // No end jump if this the default case
+                    if (!c.values().isEmpty()) {
+                        endJumps.add((char) emitJump(JUMP));
+                    }
+                }
+
+                // Patch all the end jumps.
+                for (var jump : endJumps) {
+                    patchJump(s.keyword(), jump);
+                }
+
+                // End the scope, removing the "*switch*" variable.
+                endScope();
             }
             case Stmt.Throw s -> {
                 compile(s.value());
