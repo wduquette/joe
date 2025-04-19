@@ -352,6 +352,7 @@ class Compiler {
         for (var param : params) {
             var constant = addVariable(param);
             defineVariable(constant);
+            current.parameters.add(param.lexeme());
         }
 
         compile(body);
