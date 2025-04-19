@@ -93,23 +93,36 @@ public sealed interface Stmt
 
     /**
      * A "for" loop
+     * @param keyword The "for" keyword
      * @param init The initializer, e.g., "var i = 0"
      * @param condition The condition, e.g., "i &lt; 10"
      * @param incr The incrementer, e.g., "i = i + 1"
      * @param body The body of the loop, a statement or block.
      */
-    record For(Stmt init, Expr condition, Expr incr, Stmt body) implements Stmt {
-        // TODO need keyword span?
+    record For(
+        Token keyword,
+        Stmt init,
+        Expr condition,
+        Expr incr,
+        Stmt body
+    ) implements Stmt {
+        public Span location() { return keyword.span(); }
     }
 
     /**
      * A "foreach" loop
+     * @param keyword The "foreach" keyword
      * @param varName The loop variable
      * @param listExpr The list expression
      * @param body The body of the loop, a statement or block.
      */
-    record ForEach(Token varName, Expr listExpr, Stmt body) implements Stmt {
-        public Span location() { return varName.span(); }
+    record ForEach(
+        Token keyword,
+        Token varName,
+        Expr listExpr,
+        Stmt body
+    ) implements Stmt {
+        public Span location() { return keyword.span(); }
     }
 
     /**

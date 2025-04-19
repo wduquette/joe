@@ -331,7 +331,8 @@ public class Parser {
     }
 
     private Stmt forStatement() {
-        var start = scanner.previous().span().start();
+        var keyword = scanner.previous();
+        var start = keyword.span().start();
         scanner.consume(LEFT_PAREN, "Expected '(' after 'for'.");
 
         // Initializer
@@ -365,12 +366,13 @@ public class Parser {
         // scope.
         var end = scanner.previous().span().end();
         return new Stmt.Block(source.span(start, end),
-            List.of(new Stmt.For(init, condition, incr, body)
+            List.of(new Stmt.For(keyword, init, condition, incr, body)
         ));
     }
 
     private Stmt forEachStatement() {
-        var start = scanner.previous().span().start();
+        var keyword = scanner.previous();
+        var start = keyword.span().start();
         scanner.consume(LEFT_PAREN, "Expected '(' after 'foreach'.");
         scanner.consume(VAR, "Expected 'var' before loop variable name.");
         scanner.consume(IDENTIFIER, "Expected loop variable name.");
@@ -389,7 +391,7 @@ public class Parser {
             source.span(start, end),
             List.of(
                 new Stmt.Var(varName, null),
-                new Stmt.ForEach(varName, listExpr, body)
+                new Stmt.ForEach(keyword, varName, listExpr, body)
         ));
     }
 
