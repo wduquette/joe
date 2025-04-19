@@ -358,7 +358,7 @@ class Compiler {
 
         var compiler = current;  // Save the compiler; endFunction pops it.
         var function = endFunction();
-        setLine(current.chunk.span.endLine());
+        setLine(span.endLine());
         emit(CLOSURE, addConstant(function));
 
         // Emit data about the upvalues
@@ -396,8 +396,10 @@ class Compiler {
                         "Unexpected operator: " + e.op());
                 }
             }
-            case Expr.Call call -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.Call e -> {
+                compile(e.callee());
+                e.arguments().forEach(this::compile);
+                emit(CALL, (char)e.arguments().size());
             }
             case Expr.Get get -> {
                 throw new UnsupportedOperationException("TODO");
