@@ -576,11 +576,17 @@ class Compiler {
         // Normal statements should not leave anything on the stack, so we
         // pop it.  But if this is the last statement in the script, we
         // want to return its value.
-        if (scanner.peek().type() == EOF) {
-            emit(Opcode.RETURN);
-        } else {
-            emit(Opcode.POP);
-        }
+
+        // WARNING: This is the wrong implementation; it does not
+        // get the final top-level statement.
+//        if (scanner.peek().type() == EOF) {
+//            emit(Opcode.RETURN);
+//        } else {
+//            emit(Opcode.POP);
+//        }
+
+        // For now, just POP it normally.
+        emit(Opcode.POP);
     }
 
     private void assertStatement() {
@@ -751,13 +757,19 @@ class Compiler {
         expression();
         scanner.consume(RIGHT_PAREN, "Expected ')' after condition.");
 
-        int thenJump = emitJump(Opcode.JIF);
-        statement();
-        int elseJump = emitJump(Opcode.JUMP);
-        patchJump(thenJump);
+        int elseJump = emitJump(Opcode.JIF);
+        statement(); // Then branch
 
-        if (scanner.match(ELSE)) statement();
-        patchJump(elseJump);
+        int endJump = -1;
+        if (scanner.match(ELSE)) {
+            endJump = emitJump(Opcode.JUMP);
+            patchJump(elseJump);
+            statement(); // Else branch
+        } else {
+            patchJump(elseJump);
+        }
+
+        if (endJump != -1) patchJump(endJump);
     }
 
     private void ifLetStatement() {

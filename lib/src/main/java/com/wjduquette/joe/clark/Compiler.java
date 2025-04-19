@@ -382,13 +382,21 @@ class Compiler {
                 //       JUMP end     | ∅      ; Jump to end
                 // else: elseBranch   | ∅      ; Execute else branch
                 // end:  ...          | ∅      ; end of statement
+
                 compile(s.condition());
                 var elseJump = emitJump(JIF);
                 compile(s.thenBranch());
-                var endJump = emitJump(JUMP);
-                patchJump(null, elseJump);
-                if (s.elseBranch() != null) compile(s.elseBranch());
-                patchJump(null, endJump);
+
+                int endJump = -1;
+                if (s.elseBranch() != null) {
+                    endJump = emitJump(JUMP);
+                    patchJump(null, elseJump);
+                    compile(s.elseBranch());
+                } else {
+                    patchJump(null, elseJump);
+                }
+
+                if (endJump != -1) patchJump(null, endJump);
             }
             case Stmt.IfLet ifLet -> {
                 throw new UnsupportedOperationException("TODO");
