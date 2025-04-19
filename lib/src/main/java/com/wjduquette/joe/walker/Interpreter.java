@@ -167,8 +167,8 @@ class Interpreter {
                     } catch (Continue ex) {
                         // Nothing else to do
                     }
-                    if (stmt.incr() != null) {
-                        evaluate(stmt.incr());
+                    if (stmt.updater() != null) {
+                        evaluate(stmt.updater());
                     }
                 }
             }

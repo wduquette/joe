@@ -268,14 +268,66 @@ class Compiler {
                     emit(POP);
                 }
             }
-            case Stmt.For aFor -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.For s -> {
+                // NOTE: the Parser wraps Stmt.For as follows:
+                // Stmt.Block[Stmt.For].
+                //
+                // Thus, this code needn't create a scope.
+
+                currentLoop = new LoopCompiler(currentLoop);
+                currentLoop.breakDepth = current.scopeDepth;
+
+                // Initializer
+                if (s.init() != null) {
+                    emitComment("init");
+                    compile(s.init());
+                }
+
+                // Condition
+                int loopStart = here();
+                int exitJump = -1;
+                if (s.condition() != null) {
+                    emitComment("cond");
+                    compile(s.condition());
+
+                    // Jump out of the loop if the condition is false.
+                    exitJump = emitJump(JIF);
+                }
+
+                if (s.updater() != null) {
+                    int bodyJump = emitJump(JUMP);
+                    emitComment("incr");
+                    int updaterStart = here();
+                    compile(s.updater());
+                    emit(POP);
+                    emitLoop(s.keyword(), loopStart);
+                    loopStart = updaterStart;
+                    patchJump(s.keyword(), bodyJump);
+                }
+
+                currentLoop.continueDepth = current.scopeDepth;
+                currentLoop.loopStart = loopStart;
+                emitComment("body");
+                compile(s.body());
+                emitLoop(s.keyword(), loopStart);
+
+                emitComment("exit");
+                if (exitJump != -1) {
+                    patchJump(s.keyword(), exitJump);
+                }
+
+                for (var jump : currentLoop.breakJumps) {
+                    patchJump(s.keyword(), jump);
+                }
+
+                currentLoop = currentLoop.enclosing;
             }
             case Stmt.ForEach s -> {
                 // NOTE: the Parser wraps Stmt.ForEach as follows:
-                // Stmt.Block
-                //     Stmt.Var loopVar
-                //     Stmt.ForEach
+                // Stmt.Block[Stmt.Var loopVar, Stmt.ForEach]
+                //
+                // Thus, this code needn't create a scope or
+                // define the loop variable.
 
                 currentLoop = new LoopCompiler(currentLoop);
                 currentLoop.breakDepth = current.scopeDepth;

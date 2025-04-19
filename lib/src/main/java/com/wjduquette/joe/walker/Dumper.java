@@ -103,7 +103,7 @@ class Dumper {
                     .append("Stmt.For\n");
                 dumpStatement(stmt.init());
                 dumpExpression(stmt.condition());
-                dumpExpression(stmt.incr());
+                dumpExpression(stmt.updater());
                 dumpStatement(stmt.body());
             }
             case Stmt.ForEach stmt -> {

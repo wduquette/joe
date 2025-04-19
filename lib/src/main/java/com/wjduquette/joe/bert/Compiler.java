@@ -650,8 +650,10 @@ class Compiler {
         if (scanner.match(SEMICOLON)) {
             // No initializer
         } else if (scanner.match(VAR)) {
+            emitComment("init");
             varDeclaration();
         } else {
+            emitComment("init");
             expressionStatement();
         }
 
@@ -659,6 +661,7 @@ class Compiler {
         int loopStart = current.chunk.codeSize();
         int exitJump = -1;
         if (!scanner.match(SEMICOLON)) {
+            emitComment("cond");
             expression();
             scanner.consume(SEMICOLON, "Expected ';' after loop condition.");
 
@@ -668,6 +671,7 @@ class Compiler {
 
         if (!scanner.match(RIGHT_PAREN)) {
             int bodyJump = emitJump(Opcode.JUMP);
+            emitComment("incr");
             int incrementStart = current.chunk.codeSize();
             expression();
             emit(Opcode.POP);
@@ -679,9 +683,11 @@ class Compiler {
 
         currentLoop.continueDepth = current.scopeDepth;
         currentLoop.loopStart = loopStart;
+        emitComment("body");
         statement();
         emitLoop(loopStart);
 
+        emitComment("exit");
         if (exitJump != -1) {
             patchJump(exitJump);
         }

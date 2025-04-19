@@ -141,7 +141,7 @@ class Resolver {
                 ++loopCounter;
                 if (stmt.init() != null)      resolve(stmt.init());
                 if (stmt.condition() != null) resolve(stmt.condition());
-                if (stmt.incr() != null)      resolve(stmt.incr());
+                if (stmt.updater() != null)      resolve(stmt.updater());
                 resolve(stmt.body());
                 --loopCounter;
             }
