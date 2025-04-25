@@ -39,6 +39,19 @@ public class SyntaxError extends JoeError {
         getTraces().addAll(traces);
     }
 
+    /**
+     * Used by engines to indicate that a script could not be compiled due
+     * to an unexpected exception.
+     * @param message The main error message
+     * @param traces The specific errors, with location
+     * @param cause The unexpected exception.
+     */
+    public SyntaxError(String message, List<Trace> traces, Throwable cause) {
+        super(message, cause);
+        this.complete = true;
+        getTraces().addAll(traces);
+    }
+
     //-------------------------------------------------------------------------
     // Reporting
 

@@ -120,6 +120,27 @@ class Compiler {
     public Function compile(String scriptName, String source) {
         var buffer = new SourceBuffer(scriptName, source);
 
+        // Take the current chunk and package it as a Function.
+        Function function;
+        try {
+            function = compileScript(buffer);
+        } catch (Exception ex) {
+            var context = ex.getStackTrace()[0].toString();
+            throw new SyntaxError(
+                "Unexpected exception while compiling script: " + ex +
+                " at: " + context,
+                errors, ex);
+        }
+
+        if (!errors.isEmpty()) {
+            throw new SyntaxError("Error while compiling script", errors,
+                true);
+        }
+
+        return function;
+    }
+
+    public Function compileScript(SourceBuffer buffer) {
         // The FunctionCompiler contains the Chunk for the function
         // currently being compiled.  Each `function` or `method`
         // declaration adds a new FunctionCompiler to the stack, so that
@@ -140,14 +161,7 @@ class Compiler {
         emit(statements);
 
         // Take the current chunk and package it as a Function.
-        var function = endFunction();
-
-        if (!errors.isEmpty()) {
-            throw new SyntaxError("Error while compiling script", errors,
-                true);
-        }
-
-        return function;
+        return endFunction();
     }
 
     private List<Stmt> parse(SourceBuffer buffer) throws SyntaxError {
