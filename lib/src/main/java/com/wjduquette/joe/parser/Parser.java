@@ -509,17 +509,18 @@ public class Parser {
         }
 
         // NEXT, parse the default case, if it exists
+        Stmt.SwitchDefault switchDefault = null;
         if (scanner.match(DEFAULT)) {
-            var caseKeyword = scanner.previous();
+            var defaultKeyword = scanner.previous();
             scanner.consume(MINUS_GREATER, "Expected '->' after 'default'.");
             var stmt = statement();
-            cases.add(new Stmt.SwitchCase(caseKeyword, List.of(), stmt));
+            switchDefault = new Stmt.SwitchDefault(defaultKeyword, stmt);
         }
 
         // NEXT, complete the statement
         scanner.consume(RIGHT_BRACE, "Expected '}' after switch body.");
 
-        return new Stmt.Switch(keyword, switchExpr, cases);
+        return new Stmt.Switch(keyword, switchExpr, cases, switchDefault);
     }
 
     private Stmt throwStatement() {

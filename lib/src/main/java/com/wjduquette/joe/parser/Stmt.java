@@ -247,11 +247,13 @@ public sealed interface Stmt
      * @param keyword The "switch" keyword
      * @param expr The switch expression
      * @param cases A list of cases
+     * @param switchDefault The default case, or null
      */
     record Switch(
         Token keyword,
         Expr expr,
-        List<SwitchCase> cases
+        List<SwitchCase> cases,
+        SwitchDefault switchDefault
     ) implements Stmt {
         public Span location() { return keyword.span(); }
     }
@@ -265,6 +267,18 @@ public sealed interface Stmt
     record SwitchCase(
         Token keyword,
         List<Expr> values,
+        Stmt statement
+    ) {
+        public Span location() { return keyword.span(); }
+    }
+
+    /**
+     * The default case in a switch statement.
+     * @param keyword The "default" keyword
+     * @param statement The statement to execute
+     */
+    record SwitchDefault(
+        Token keyword,
         Stmt statement
     ) {
         public Span location() { return keyword.span(); }

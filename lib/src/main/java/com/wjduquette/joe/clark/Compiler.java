@@ -459,9 +459,7 @@ class Compiler {
                     }
 
                     // No next jump if this is the default case.
-                    if (!c.values().isEmpty()) {
-                        nextJump = emitJump(JUMP);
-                    }
+                    nextJump = emitJump(JUMP);
 
                     for (var jump : caseJumps) {
                         patchJump(c.keyword(), jump);
@@ -471,9 +469,15 @@ class Compiler {
                     compile(c.statement());
 
                     // No end jump if this the default case
-                    if (!c.values().isEmpty()) {
-                        endJumps.add((char) emitJump(JUMP));
-                    }
+                    endJumps.add((char) emitJump(JUMP));
+                }
+
+                if (nextJump != -1) {
+                    patchJump(s.keyword(), nextJump);
+                }
+
+                if (s.switchDefault() != null) {
+                    compile(s.switchDefault().statement());
                 }
 
                 // Patch all the end jumps.

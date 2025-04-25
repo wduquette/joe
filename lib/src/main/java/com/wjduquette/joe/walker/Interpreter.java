@@ -337,11 +337,11 @@ class Interpreter {
                             return execute(c.statement());
                         }
                     }
+                }
 
-                    // Default case; always the last
-                    if (c.values().isEmpty()) {
-                        return execute(c.statement());
-                    }
+                // Default case; always the last
+                if (stmt.switchDefault() != null) {
+                    return execute(stmt.switchDefault().statement());
                 }
 
                 // No case matched

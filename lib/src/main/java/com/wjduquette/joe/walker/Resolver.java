@@ -256,6 +256,9 @@ class Resolver {
                     c.values().forEach(this::resolve);
                     resolve(c.statement());
                 }
+                if (stmt.switchDefault() != null) {
+                    resolve(stmt.switchDefault().statement());
+                }
             }
             case Stmt.Throw stmt -> resolve(stmt.value());
             case Stmt.While stmt -> {
