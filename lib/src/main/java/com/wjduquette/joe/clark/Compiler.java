@@ -243,7 +243,7 @@ class Compiler {
                 // NEXT, emit the jump, saving it to be patched at
                 // the end of the loop.
                 var jump = emitJump(JUMP);
-                currentLoop.breakJumps.add((char)jump);
+                currentLoop.breakJumps.add(jump);
             }
             case Stmt.Class aClass -> {
                 throw new UnsupportedOperationException("TODO");
@@ -281,7 +281,6 @@ class Compiler {
 
                 // Initializer
                 if (s.init() != null) {
-                    emitComment("init");
                     emit(s.init());
                 }
 
@@ -289,7 +288,6 @@ class Compiler {
                 int loopStart = here();
                 int exitJump = -1;
                 if (s.condition() != null) {
-                    emitComment("cond");
                     emit(s.condition());
 
                     // Jump out of the loop if the condition is false.
@@ -298,7 +296,6 @@ class Compiler {
 
                 if (s.updater() != null) {
                     int bodyJump = emitJump(JUMP);
-                    emitComment("incr");
                     int updaterStart = here();
                     emit(s.updater());
                     emit(POP);
@@ -309,18 +306,12 @@ class Compiler {
 
                 currentLoop.continueDepth = current.scopeDepth;
                 currentLoop.loopStart = loopStart;
-                emitComment("body");
                 emit(s.body());
                 emitLoop(s.keyword(), loopStart);
 
-                emitComment("exit");
-                if (exitJump != -1) {
-                    patchJump(s.keyword(), exitJump);
-                }
-
-                for (var jump : currentLoop.breakJumps) {
-                    patchJump(s.keyword(), jump);
-                }
+                // exit:
+                if (exitJump != -1) patchJump(s.keyword(), exitJump);
+                patchJumps(s.keyword(), currentLoop.breakJumps);
 
                 currentLoop = currentLoop.enclosing;
             }
@@ -358,12 +349,9 @@ class Compiler {
                 emit(s.body());
                 emitLoop(s.keyword(), loopStart);
 
-                // Patch any breaks
+                // exit:
                 patchJump(s.keyword(), exitJump);
-
-                for (var jump : currentLoop.breakJumps) {
-                    patchJump(s.keyword(), jump);
-                }
+                patchJumps(s.keyword(), currentLoop.breakJumps);
 
                 currentLoop = currentLoop.enclosing;
             }
@@ -437,17 +425,16 @@ class Compiler {
                 defineHiddenVariable(VAR_SWITCH);
 
                 // Jump targets
-                var endJumps = new ArrayList<Character>();
+                var endJumps = jumpList();
                 int nextJump = -1;
 
                 for (var c : s.cases()) {
                     setSourceLine(c.location());
-                    var caseJumps = new ArrayList<Character>();
+                    var caseJumps = jumpList();
 
                     // Allow the previous case to jump here if it doesn't match.
-                    if (nextJump != -1) {
-                        patchJump(c.keyword(), nextJump);
-                    }
+                    // next:
+                    if (nextJump != -1) patchJump(c.keyword(), nextJump);
 
                     for (var target : c.values()) {
                         // Compute the case target and compare it with the
@@ -457,35 +444,28 @@ class Compiler {
                         emit(EQ);
 
                         // Jump to the next case if no match.
-                        caseJumps.add((char) emitJump(JIT));
+                        caseJumps.add(emitJump(JIT));
                     }
 
-                    // No next jump if this is the default case.
                     nextJump = emitJump(JUMP);
-
-                    for (var jump : caseJumps) {
-                        patchJump(c.keyword(), jump);
-                    }
+                    patchJumps(c.keyword(), caseJumps);
 
                     // Parse the case body.
                     emit(c.statement());
 
                     // No end jump if this the default case
-                    endJumps.add((char) emitJump(JUMP));
+                    endJumps.add(emitJump(JUMP));
                 }
 
-                if (nextJump != -1) {
-                    patchJump(s.keyword(), nextJump);
-                }
+                // next:
+                if (nextJump != -1) patchJump(s.keyword(), nextJump);
 
                 if (s.switchDefault() != null) {
                     emit(s.switchDefault().statement());
                 }
 
                 // Patch all the end jumps.
-                for (var jump : endJumps) {
-                    patchJump(s.keyword(), jump);
-                }
+                patchJumps(s.keyword(), endJumps);
 
                 // End the scope, removing the "*switch*" variable.
                 endScope();
@@ -518,9 +498,7 @@ class Compiler {
                 emit(s.body());
                 emitLoop(s.keyword(), loopStart);
 
-                for (var jump : currentLoop.breakJumps) {
-                    patchJump(s.keyword(), jump);
-                }
+                patchJumps(s.keyword(), currentLoop.breakJumps);
                 patchJump(s.keyword(), exitJump);
                 currentLoop = currentLoop.enclosing;
             }
@@ -616,13 +594,7 @@ class Compiler {
                     e.declaration().params(), e.declaration().body(),
                     e.declaration().span());
             }
-            case Expr.ListLiteral e -> {
-                emit(LISTNEW);
-                for (var item : e.list()) {
-                    emit(item);
-                    emit(LISTADD);
-                }
-            }
+            case Expr.ListLiteral e -> emitList(e.list());
             case Expr.Literal e -> {
                 switch (e.value()) {
                     case null -> emit(NULL);
@@ -1041,6 +1013,15 @@ class Compiler {
         emit(Opcode.CONST, current.chunk.addConstant(value));
     }
 
+    // Builds a new ListValue from multiple expressions.
+    private void emitList(List<Expr> items) {
+        emit(LISTNEW);
+        for (var item : items) {
+            emit(item);
+            emit(LISTADD);
+        }
+    }
+
     private int emitJump(char opcode) {
         emit(opcode);
         emit(Character.MAX_VALUE);
@@ -1057,6 +1038,10 @@ class Compiler {
         }
     }
 
+    private List<Integer> jumpList() {
+        return new ArrayList<>();
+    }
+
     private void patchJump(Token token, int offset) {
         // -1 to adjust for the bytecode for the jump offset itself.
         int jump = current.chunk.codeSize() - offset - 1;
@@ -1066,6 +1051,12 @@ class Compiler {
         }
 
         current.chunk.setCode(offset, (char)jump);
+    }
+
+    private void patchJumps(Token token, List<Integer> offsets) {
+        for (var offset : offsets) {
+            patchJump(token, offset);
+        }
     }
 
     private void emitReturn() {
@@ -1202,7 +1193,7 @@ class Compiler {
 
         // The jump instruction indices for any `break` statements in the
         // body of the loop.
-        List<Character> breakJumps = new ArrayList<>();
+        List<Integer> breakJumps = new ArrayList<>();
 
         // The chunk index to loop back to on continue
         int loopStart = -1;
