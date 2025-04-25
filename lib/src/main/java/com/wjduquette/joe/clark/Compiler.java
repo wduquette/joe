@@ -190,7 +190,7 @@ class Compiler {
 
     // Completes compilation of the current function and returns it.
     private Function endFunction() {
-        setLine(current.chunk.span.endLine());
+        setSourceLine(current.chunk.span.endLine());
         emitReturn();
         var function = new Function(
             current.parameters,
@@ -216,7 +216,7 @@ class Compiler {
     // Emits the code for a single statement.
     @SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
     private void emit(Stmt stmt) {
-        setLine(stmt.location());
+        setSourceLine(stmt.location());
 
         switch (stmt) {
             case Stmt.Assert s -> {
@@ -229,7 +229,7 @@ class Compiler {
             case Stmt.Block s -> {
                 beginScope();
                 emit(s.statements());
-                setLine(s.span().endLine());
+                setSourceLine(s.span().endLine());
                 endScope();
             }
             case Stmt.Break s -> {
@@ -441,7 +441,7 @@ class Compiler {
                 int nextJump = -1;
 
                 for (var c : s.cases()) {
-                    setLine(c.location());
+                    setSourceLine(c.location());
                     var caseJumps = new ArrayList<Character>();
 
                     // Allow the previous case to jump here if it doesn't match.
@@ -550,7 +550,7 @@ class Compiler {
 
         var compiler = current;  // Save the compiler; endFunction pops it.
         var function = endFunction();
-        setLine(span.endLine());
+        setSourceLine(span.endLine());
         emit(CLOSURE, addConstant(function));
 
         // Emit data about the upvalues
@@ -573,7 +573,7 @@ class Compiler {
     // Emits the code for a single expression.
     @SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
     private void emit(Expr expr) {
-        setLine(expr.location());
+        setSourceLine(expr.location());
 
         switch (expr) {
             case Expr.Binary e -> {
@@ -1016,11 +1016,11 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Code Generation
 
-    private void setLine(Span span) {
-        if (span != null) setLine(span.startLine());
+    private void setSourceLine(Span span) {
+        if (span != null) setSourceLine(span.startLine());
     }
 
-    private void setLine(int line) {
+    private void setSourceLine(int line) {
         current.sourceLine = line;
     }
 
