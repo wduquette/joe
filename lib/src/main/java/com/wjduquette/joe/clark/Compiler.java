@@ -1041,46 +1041,6 @@ class Compiler {
         emit(Opcode.CONST, current.chunk.addConstant(value));
     }
 
-    // Given the variable name, emits the relevant *GET
-    // instruction based on the context.
-    private void emitVarGet(Token name) {
-        // FIRST, get the relevant *GET opcode.
-        char op;
-
-        int arg = resolveLocal(current, name);
-
-        if (arg != -1) {
-            op = Opcode.LOCGET;
-        } else if ((arg = resolveUpvalue(current, name)) != -1) {
-            op = Opcode.UPGET;
-        } else {
-            arg = addConstant(name.lexeme());
-            op = Opcode.GLOGET;
-        }
-
-        emit(op, (char)arg);
-    }
-
-    // Given the variable name, emits the relevant *SET
-    // instruction based on the context.
-    private void emitVarSet(Token name) {
-        // FIRST, get the relevant *SET opcode.
-        char op;
-
-        int arg = resolveLocal(current, name);
-
-        if (arg != -1) {
-            op = Opcode.LOCSET;
-        } else if ((arg = resolveUpvalue(current, name)) != -1) {
-            op = Opcode.UPSET;
-        } else {
-            arg = addConstant(name.lexeme());
-            op = Opcode.GLOSET;
-        }
-
-        emit(op, (char)arg);
-    }
-
     private int emitJump(char opcode) {
         emit(opcode);
         emit(Character.MAX_VALUE);
