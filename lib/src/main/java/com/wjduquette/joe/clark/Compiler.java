@@ -137,7 +137,7 @@ class Compiler {
         finalStatement = statements.isEmpty() ? null : statements.getLast();
 
         // NEXT, generate the code.
-        compile(statements);
+        emit(statements);
 
         // Take the current chunk and package it as a Function.
         var function = endFunction();
@@ -206,27 +206,29 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Code Generation: Statements
 
-    private void compile(List<Stmt> statements) {
+    // Emits the code for a list of statements.
+    private void emit(List<Stmt> statements) {
         for (var stmt : statements) {
-            compile(stmt);
+            emit(stmt);
         }
     }
 
+    // Emits the code for a single statement.
     @SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
-    private void compile(Stmt stmt) {
+    private void emit(Stmt stmt) {
         setLine(stmt.location());
 
         switch (stmt) {
             case Stmt.Assert s -> {
-                compile(s.condition());
+                emit(s.condition());
                 var endJump = emitJump(JIT);
-                compile(s.message());
+                emit(s.message());
                 emit(ASSERT);
                 patchJump(s.keyword(), endJump);
             }
             case Stmt.Block s -> {
                 beginScope();
-                compile(s.statements());
+                emit(s.statements());
                 setLine(s.span().endLine());
                 endScope();
             }
@@ -258,7 +260,7 @@ class Compiler {
                 emitLoop(s.keyword(), currentLoop.loopStart);
             }
             case Stmt.Expression e -> {
-                compile(e.expr());
+                emit(e.expr());
                 if (e == finalStatement) {
                     // Return the value of the final statement in
                     // the script.  This allows the REPL to
@@ -280,7 +282,7 @@ class Compiler {
                 // Initializer
                 if (s.init() != null) {
                     emitComment("init");
-                    compile(s.init());
+                    emit(s.init());
                 }
 
                 // Condition
@@ -288,7 +290,7 @@ class Compiler {
                 int exitJump = -1;
                 if (s.condition() != null) {
                     emitComment("cond");
-                    compile(s.condition());
+                    emit(s.condition());
 
                     // Jump out of the loop if the condition is false.
                     exitJump = emitJump(JIF);
@@ -298,7 +300,7 @@ class Compiler {
                     int bodyJump = emitJump(JUMP);
                     emitComment("incr");
                     int updaterStart = here();
-                    compile(s.updater());
+                    emit(s.updater());
                     emit(POP);
                     emitLoop(s.keyword(), loopStart);
                     loopStart = updaterStart;
@@ -308,7 +310,7 @@ class Compiler {
                 currentLoop.continueDepth = current.scopeDepth;
                 currentLoop.loopStart = loopStart;
                 emitComment("body");
-                compile(s.body());
+                emit(s.body());
                 emitLoop(s.keyword(), loopStart);
 
                 emitComment("exit");
@@ -333,7 +335,7 @@ class Compiler {
                 currentLoop.breakDepth = current.scopeDepth;
 
                 // Collection expression
-                compile(s.listExpr());
+                emit(s.listExpr());
                 emit(ITER);  // Convert collection to iterator
                 defineHiddenVariable(VAR_ITERATOR); // Gets collection
 
@@ -353,7 +355,7 @@ class Compiler {
                 emit(POP); // Pop the item value
 
                 // Compile the body
-                compile(s.body());
+                emit(s.body());
                 emitLoop(s.keyword(), loopStart);
 
                 // Patch any breaks
@@ -383,15 +385,15 @@ class Compiler {
                 // else: elseBranch   | ∅      ; Execute else branch
                 // end:  ...          | ∅      ; end of statement
 
-                compile(s.condition());
+                emit(s.condition());
                 var elseJump = emitJump(JIF);
-                compile(s.thenBranch());
+                emit(s.thenBranch());
 
                 int endJump = -1;
                 if (s.elseBranch() != null) {
                     endJump = emitJump(JUMP);
                     patchJump(s.keyword(), elseJump);
-                    compile(s.elseBranch());
+                    emit(s.elseBranch());
                 } else {
                     patchJump(s.keyword(), elseJump);
                 }
@@ -423,7 +425,7 @@ class Compiler {
                         error(s.keyword(),
                             "Can't return a value from an initializer.");
                     }
-                    compile(s.value());
+                    emit(s.value());
                     emit(RETURN);
                 } else {
                     emitReturn(); // Includes initializer magic
@@ -431,7 +433,7 @@ class Compiler {
             }
             case Stmt.Switch s -> {
                 beginScope();
-                compile(s.expr());
+                emit(s.expr());
                 defineHiddenVariable(VAR_SWITCH);
 
                 // Jump targets
@@ -451,7 +453,7 @@ class Compiler {
                         // Compute the case target and compare it with the
                         // *switch* value.
                         emit(DUP); // Duplicate the switch value
-                        compile(target);
+                        emit(target);
                         emit(EQ);
 
                         // Jump to the next case if no match.
@@ -466,7 +468,7 @@ class Compiler {
                     }
 
                     // Parse the case body.
-                    compile(c.statement());
+                    emit(c.statement());
 
                     // No end jump if this the default case
                     endJumps.add((char) emitJump(JUMP));
@@ -477,7 +479,7 @@ class Compiler {
                 }
 
                 if (s.switchDefault() != null) {
-                    compile(s.switchDefault().statement());
+                    emit(s.switchDefault().statement());
                 }
 
                 // Patch all the end jumps.
@@ -489,14 +491,14 @@ class Compiler {
                 endScope();
             }
             case Stmt.Throw s -> {
-                compile(s.value());
+                emit(s.value());
                 emit(THROW);
             }
             case Stmt.Var var -> {
                 char global = addVariable(var.name());
 
                 if (var.initializer() != null) {
-                    compile(var.initializer());
+                    emit(var.initializer());
                 } else {
                     emit(NULL);
                 }
@@ -505,7 +507,7 @@ class Compiler {
             }
             case Stmt.While s -> {
                 var loopStart = here();
-                compile(s.condition());
+                emit(s.condition());
 
                 currentLoop = new LoopCompiler(currentLoop);
                 currentLoop.breakDepth = current.scopeDepth;
@@ -513,7 +515,7 @@ class Compiler {
                 currentLoop.loopStart = loopStart;
 
                 int exitJump = emitJump(JIF);
-                compile(s.body());
+                emit(s.body());
                 emitLoop(s.keyword(), loopStart);
 
                 for (var jump : currentLoop.breakJumps) {
@@ -544,7 +546,7 @@ class Compiler {
             current.parameters.add(param.lexeme());
         }
 
-        compile(body);
+        emit(body);
 
         var compiler = current;  // Save the compiler; endFunction pops it.
         var function = endFunction();
@@ -561,14 +563,22 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Code Generation: Expressions
 
+    // Emits a function's argument list.
+    private void emitArgs(List<Expr> args) {
+        for (var arg : args) {
+            emit(arg);
+        }
+    }
+
+    // Emits the code for a single expression.
     @SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
-    private void compile(Expr expr) {
+    private void emit(Expr expr) {
         setLine(expr.location());
 
         switch (expr) {
             case Expr.Binary e -> {
-                compile(e.left());
-                compile(e.right());
+                emit(e.left());
+                emit(e.right());
                 switch (e.op().type()) {
                     case TokenType.BANG_EQUAL    -> emit(NE);
                     case TokenType.EQUAL_EQUAL   -> emit(EQ);
@@ -577,7 +587,7 @@ class Compiler {
                     case TokenType.IN            -> emit(IN);
                     case TokenType.LESS          -> emit(LT);
                     case TokenType.LESS_EQUAL    -> emit(LE);
-                    case TokenType.PLUS          ->  emit(ADD);
+                    case TokenType.PLUS          -> emit(ADD);
                     case TokenType.MINUS         -> emit(SUB);
                     case TokenType.NI            -> emit(NI);
                     case TokenType.STAR          -> emit(MUL);
@@ -587,14 +597,14 @@ class Compiler {
                 }
             }
             case Expr.Call e -> {
-                compile(e.callee());
-                e.arguments().forEach(this::compile);
+                emit(e.callee());
+                emitArgs(e.arguments());
                 emit(CALL, (char)e.arguments().size());
             }
             case Expr.Get get -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.Grouping e -> compile(e.expr());
+            case Expr.Grouping e -> emit(e.expr());
             case Expr.IndexGet indexGet -> {
                 throw new UnsupportedOperationException("TODO");
             }
@@ -609,7 +619,7 @@ class Compiler {
             case Expr.ListLiteral e -> {
                 emit(LISTNEW);
                 for (var item : e.list()) {
-                    compile(item);
+                    emit(item);
                     emit(LISTADD);
                 }
             }
@@ -621,24 +631,24 @@ class Compiler {
                 }
             }
             case Expr.Logical e -> {
-                compile(e.left());
+                emit(e.left());
                 if (e.op().type() == TokenType.AND) {
                     int endJump = emitJump(JIFKEEP);
                     emit(POP);
-                    compile(e.right());
+                    emit(e.right());
                     patchJump(e.op(), endJump);
                 } else { // OR
                     int endJump = emitJump(JITKEEP);
                     emit(POP);
-                    compile(e.right());
+                    emit(e.right());
                     patchJump(e.op(), endJump);
                 }
             }
             case Expr.MapLiteral e -> {
                 emit(MAPNEW);
                 for (var i = 0; i < e.entries().size(); i += 2) {
-                    compile(e.entries().get(i));      // Key
-                    compile(e.entries().get(i + 1));  // Value
+                    emit(e.entries().get(i));      // Key
+                    emit(e.entries().get(i + 1));  // Value
                     emit(MAPPUT);
                 }
             }
@@ -661,19 +671,19 @@ class Compiler {
                 // JUMP end        | a
                 // else: falseExpr | b
                 // end:            | a or b
-                compile(e.condition());
+                emit(e.condition());
                 int elseJump = emitJump(JIF);
-                compile(e.trueExpr());
+                emit(e.trueExpr());
                 int endJump = emitJump(JUMP);
                 patchJump(e.op(), elseJump);
-                compile(e.falseExpr());
+                emit(e.falseExpr());
                 patchJump(e.op(), endJump);
             }
             case Expr.This aThis -> {
                 throw new UnsupportedOperationException("TODO");
             }
             case Expr.Unary e -> {
-                compile(e.right());
+                emit(e.right());
                 switch(e.op().type()) {
                     case TokenType.BANG  -> emit(NOT);
                     case TokenType.MINUS -> emit(NEGATE);
@@ -718,7 +728,7 @@ class Compiler {
 
                 // Simple Assignment
                 if (e.op().type() == TokenType.EQUAL) {
-                    compile(e.value());
+                    emit(e.value());
                     rv.emitSet();
                     return;
                 }
@@ -732,7 +742,7 @@ class Compiler {
                 // mathOp         | c         ; E.g., c = a + b
                 // *SET    var    | c         ; var = c, retaining c
                 rv.emitGet();
-                compile(e.value());
+                emit(e.value());
                 emit(mathOp);
                 rv.emitSet();
             }
