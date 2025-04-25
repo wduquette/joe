@@ -390,10 +390,10 @@ class Compiler {
                 int endJump = -1;
                 if (s.elseBranch() != null) {
                     endJump = emitJump(JUMP);
-                    patchJump(null, elseJump);
+                    patchJump(s.keyword(), elseJump);
                     compile(s.elseBranch());
                 } else {
-                    patchJump(null, elseJump);
+                    patchJump(s.keyword(), elseJump);
                 }
 
                 if (endJump != -1) patchJump(null, endJump);
