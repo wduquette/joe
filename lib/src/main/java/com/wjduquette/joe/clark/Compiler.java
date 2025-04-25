@@ -489,15 +489,32 @@ class Compiler {
                 emit(THROW);
             }
             case Stmt.Var var -> {
-                char global = addVariable(var.name());
+                if (inGlobalScope()) {
+                    // Compile the initial value
+                    if (var.initializer() != null) {
+                        emit(var.initializer());
+                    } else {
+                        emit(NULL);
+                    }
 
-                if (var.initializer() != null) {
-                    emit(var.initializer());
+                    // Define the variable.  We don't worry about whether it
+                    // already existed or not
+                    defineGlobal(var.name());
                 } else {
-                    emit(NULL);
-                }
+                    // Declare the local before we compute the initializer;
+                    // this guarantees that the variable isn't initialized
+                    // in terms of itself.
+                    declareLocal(var.name());
 
-                defineVariable(global);
+                    if (var.initializer() != null) {
+                        emit(var.initializer());
+                    } else {
+                        emit(NULL);
+                    }
+
+                    // The value is on the stack; define the variable.
+                    defineLocal();
+                }
             }
             case Stmt.While s -> {
                 var loopStart = here();
@@ -757,6 +774,70 @@ class Compiler {
 
     //-------------------------------------------------------------------------
     // Variable Management
+
+    // Returns true if we are at global scope, and false otherwise.
+    private boolean inGlobalScope() {
+        return current.scopeDepth == 0;
+    }
+
+    // Defines a global variable with the given name.  The variable's
+    // initial value is taken from the top of the stack:
+    //
+    // emit: initializer      | ∅ → value
+    // GLODEF nameIndex       | value → ∅
+    private void defineGlobal(Token name) {
+        assert inGlobalScope();
+        emit(GLODEF, addConstant(name.lexeme()));
+    }
+
+    // Declares a local variable.  Checks for too many locals, and for
+    // duplicate declarations in the current scope.
+    private void declareLocal(Token name) {
+        assert !inGlobalScope();
+
+        // Check for too many locals
+        if (current.localCount == MAX_LOCALS) {
+            error(name, "Too many local variables in function.");
+        }
+
+        // Check for duplicate declarations in current scope.
+        for (var i = current.localCount - 1; i >= 0; i--) {
+            var local = current.locals[i];
+
+            // Stop checking once we get to a lower scope depth.
+            if (local.depth != -1 && local.depth < current.scopeDepth) {
+                break;
+            }
+
+            if (name.lexeme().equals(local.name.lexeme())) {
+                error(name, "duplicate variable declaration in this scope.");
+            }
+        }
+
+        current.locals[current.localCount++] = new Local(name);
+    }
+
+    // Marks the newest local variable "initialized", so that it can be
+    // referred to in expressions.  The local's initial value must be
+    // on the stack; this call effectively increments the boundary between the
+    // function's local variables and its working stack.
+    private void defineLocal() {
+        assert !inGlobalScope();
+        current.locals[current.localCount - 1].depth = current.scopeDepth;
+    }
+
+    // Declares and defines the local in one step. The local's initial value
+    // must be on the stack; this call effectively increments the boundary
+    // between the function's local variables and its working stack.
+    private void defineLocal(Token name) {
+        assert !inGlobalScope();
+        declareLocal(name);
+        defineLocal();
+    }
+
+
+    //-------------------------------------------------------------------------
+    // Variable Management: old
 
     private char addVariable(Token name) {
         declareVariable(name);
