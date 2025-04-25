@@ -1,5 +1,5 @@
-# Experimental Byte-Code Engine
+# Clark Byte-Code Engine
 
-`BertEngine` is a byte-code engine based on loosely on Nystrom's
+`ClarkEngine` is a byte-code engine that based loosely on Nystrom's 
 `clox` implementation.
 
