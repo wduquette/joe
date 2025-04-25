@@ -372,11 +372,15 @@ class Compiler {
             case Stmt.Function s -> {
                 // NOTE: The parser returns this for both functions
                 // and methods.  Methods aren't yet implemented.
-                var global = addVariable(s.name());
-                markVarInitialized();
-                compileFunction(FunctionType.FUNCTION, s.name().lexeme(),
-                    s.params(), s.body(), s.location());
-                defineVariable(global);
+                if (inGlobalScope()) {
+                    compileFunction(FunctionType.FUNCTION, s.name().lexeme(),
+                        s.params(), s.body(), s.location());
+                    defineGlobal(s.name());
+                } else {
+                    defineLocal(s.name());
+                    compileFunction(FunctionType.FUNCTION, s.name().lexeme(),
+                        s.params(), s.body(), s.location());
+                }
             }
             case Stmt.If s -> {
                 //                    | ∅      ; Initial state
@@ -818,8 +822,9 @@ class Compiler {
     }
 
     // Marks the newest local variable "initialized", so that it can be
-    // referred to in expressions.  The local's initial value must be
-    // on the stack; this call effectively increments the boundary between the
+    // referred to in expressions.  The local's initial value should be
+    // placed on the stack either directly before or directly after this call,
+    // which effectively increments the boundary between the
     // function's local variables and its working stack.
     private void defineLocal() {
         assert !inGlobalScope();
@@ -827,8 +832,9 @@ class Compiler {
     }
 
     // Declares and defines the local in one step. The local's initial value
-    // must be on the stack; this call effectively increments the boundary
-    // between the function's local variables and its working stack.
+    // placed on the stack either directly before or directly after this call,
+    // which effectively increments the boundary between the
+    // function's local variables and its working stack.
     private void defineLocal(Token name) {
         assert !inGlobalScope();
         declareLocal(name);
