@@ -99,6 +99,9 @@ public class TestTool implements Tool {
         var startTime = Instant.now();
         System.out.println("Joe " + App.getVersion() + " (" +
             engineType + " engine)");
+        if (engineType.equals(Joe.CLARK)) {
+            System.out.println("Skipping advanced test API.");
+        }
         for (var path : testScripts) {
             runTest(path);
         }
