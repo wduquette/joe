@@ -554,8 +554,7 @@ class Compiler {
         beginScope();
 
         for (var param : params) {
-            var constant = addVariable(param);
-            defineVariable(constant);
+            defineLocal(param);
             current.parameters.add(param.lexeme());
         }
 
