@@ -1073,6 +1073,11 @@ class Compiler {
         }
     }
 
+    // This function emits the `RETURN` for implicitly returning from
+    // a function.  For normal functions it returns `NULL`; for
+    // class initializers, it returns the instance that's been
+    // initialized.
+    // TODO: After classes are implemented, see if we can avoid this logic
     private void emitReturn() {
         if (current.chunk.type == FunctionType.INITIALIZER) {
             emit(Opcode.LOCGET, (char)0);
