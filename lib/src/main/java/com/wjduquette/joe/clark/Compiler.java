@@ -54,13 +54,13 @@ class Compiler {
     public static final String ARGS = "args";
 
     // The hidden variable used to hold a `foreach` iterator value
-    private static final String VAR_ITERATOR = "*switch*";
-
-    // The hidden variable used to hold a `match` value
-    private static final String VAR_MATCH = "*match*";
+    private static final Token VAR_ITERATOR = Token.synthetic("*iter*");
 
     // The hidden variable used to hold a `switch` value
-    private static final String VAR_SWITCH = "*switch*";
+    private static final Token VAR_SWITCH = Token.synthetic("*switch*");
+
+    // The hidden variable used to hold a `match` value
+    private static final Token VAR_MATCH = Token.synthetic("*match*");
 
 
     //-------------------------------------------------------------------------
@@ -342,7 +342,7 @@ class Compiler {
                 // Collection expression
                 emit(s.listExpr());
                 emit(ITER);  // Convert collection to iterator
-                defineHiddenVariable(VAR_ITERATOR); // Gets collection
+                defineLocal(VAR_ITERATOR); // Saves iterator
 
                 // Start the loop
                 int loopStart = here();
@@ -350,6 +350,7 @@ class Compiler {
                 currentLoop.loopStart = loopStart;
 
                 // Check to see if we have any more items
+                // Note: the iterator is on the top of the stack.
                 emit(HASNEXT);
                 var exitJump = emitJump(JIF);
 
@@ -440,7 +441,7 @@ class Compiler {
             case Stmt.Switch s -> {
                 beginScope();
                 emit(s.expr());
-                defineHiddenVariable(VAR_SWITCH);
+                defineLocal(VAR_SWITCH);
 
                 // Jump targets
                 var endJumps = jumpList();
@@ -840,76 +841,6 @@ class Compiler {
         defineLocal();
     }
 
-
-    //-------------------------------------------------------------------------
-    // Variable Management: old
-
-    private char addVariable(Token name) {
-        declareVariable(name);
-        if (current.scopeDepth > 0) return 0;    // Local
-        return addConstant(name.lexeme());       // Global
-    }
-
-    // Declares the variable.  Checking for duplicate declarations in the
-    // current local scope.
-    private void declareVariable(Token name) {
-        if (current.scopeDepth == 0) return; // Global
-
-        // Check for duplicate declarations in current scope.
-        for (var i = current.localCount - 1; i >= 0; i--) {
-            var local = current.locals[i];
-
-            // Stop checking once we get to a lower scope depth.
-            if (local.depth != -1 && local.depth < current.scopeDepth) {
-                break;
-            }
-
-            if (name.lexeme().equals(local.name.lexeme())) {
-                error(name, "duplicate variable declaration in this scope.");
-            }
-        }
-
-        addLocal(name);
-    }
-
-    // Creates a hidden variable in the current scope; its value is
-    // presumed to be on top of the stack already. Hidden variable names should
-    // look like "*identifier*", so as not to conflict with real variables.
-    private void defineHiddenVariable(String name) {
-        if (current.scopeDepth == 0) {
-            throw new IllegalStateException("Hidden variables must be local.");
-        }
-        var nameToken = Token.synthetic(name);
-        addLocal(nameToken);
-        markVarInitialized();
-    }
-
-    // Emits the instruction to define the variable.
-    private void defineVariable(char global) {
-        if (current.scopeDepth > 0) {
-            // Local
-            markVarInitialized();
-            return;
-        }
-        emit(Opcode.GLODEF, global);            // Global
-    }
-
-    // Adds a local variable with the given name to the current scope.
-    private void addLocal(Token name) {
-        if (current.localCount == MAX_LOCALS) {
-            error(name, "Too many local variables in function.");
-        }
-        current.locals[current.localCount++] =
-            new Local(name);
-    }
-
-    // Marks the newest local variable "initialized", so that they can be
-    // referred to in expressions.  This is a no-op for global variables.
-    private void markVarInitialized() {
-        if (current.scopeDepth == 0) return;
-        current.locals[current.localCount - 1].depth
-            = current.scopeDepth;
-    }
 
     // Marks the N newest local variables "initialized", so that they can be
     // referred to in expressions.  This is a no-op for global variables.
