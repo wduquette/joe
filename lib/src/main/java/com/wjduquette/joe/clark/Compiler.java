@@ -373,15 +373,9 @@ class Compiler {
             case Stmt.Function s -> {
                 // NOTE: The parser returns this for both functions
                 // and methods.  Methods aren't yet implemented.
-                if (inGlobalScope()) {
-                    compileFunction(FunctionType.FUNCTION, s.name().lexeme(),
-                        s.params(), s.body(), s.location());
-                    defineGlobal(s.name());
-                } else {
-                    defineLocal(s.name());
-                    compileFunction(FunctionType.FUNCTION, s.name().lexeme(),
-                        s.params(), s.body(), s.location());
-                }
+                compileFunction(FunctionType.FUNCTION, s.name().lexeme(),
+                    s.params(), s.body(), s.location());
+                defineVariable(s.name());
             }
             case Stmt.If s -> {
                 //                    | ∅      ; Initial state
@@ -494,29 +488,25 @@ class Compiler {
                 emit(THROW);
             }
             case Stmt.Var var -> {
-                if (inGlobalScope()) {
-                    // Compile the initial value
-                    if (var.initializer() != null) {
-                        emit(var.initializer());
-                    } else {
-                        emit(NULL);
-                    }
-
-                    // Define the variable.  We don't worry about whether it
-                    // already existed or not
-                    defineGlobal(var.name());
-                } else {
+                if (!inGlobalScope()) {
                     // Declare the local before we compute the initializer;
                     // this guarantees that the variable isn't initialized
                     // in terms of itself.
                     declareLocal(var.name());
+                }
 
-                    if (var.initializer() != null) {
-                        emit(var.initializer());
-                    } else {
-                        emit(NULL);
-                    }
+                // Compile the initial value
+                if (var.initializer() != null) {
+                    emit(var.initializer());
+                } else {
+                    emit(NULL);
+                }
 
+                if (inGlobalScope()) {
+                    // Define the variable.  We don't worry about whether it
+                    // already existed or not
+                    defineGlobal(var.name());
+                } else {
                     // The value is on the stack; define the variable.
                     defineLocal();
                 }
@@ -784,8 +774,21 @@ class Compiler {
         return current.scopeDepth == 0;
     }
 
+    // Declares and defines the variable with the given name, taking the
+    // appropriate action whether we are in the global or a local scope.
+    // The variable's value *must* be on the top of the stack before this
+    // is called.
+    private void defineVariable(Token name) {
+        if (inGlobalScope()) {
+            defineGlobal(name);
+        } else {
+            defineLocal(name);
+        }
+    }
+
     // Defines a global variable with the given name.  The variable's
-    // initial value is taken from the top of the stack:
+    // initial value is taken from the top of the stack, and immediately assigned
+    // to the named variable in the global environment.
     //
     // emit: initializer      | ∅ → value
     // GLODEF nameIndex       | value → ∅
@@ -795,7 +798,9 @@ class Compiler {
     }
 
     // Declares a local variable.  Checks for too many locals, and for
-    // duplicate declarations in the current scope.
+    // duplicate declarations in the current scope.  Once this is executed,
+    // the variable may no longer be declared, but can not yet be retrieved as
+    // it has no value.
     private void declareLocal(Token name) {
         assert !inGlobalScope();
 
@@ -822,19 +827,19 @@ class Compiler {
     }
 
     // Marks the newest local variable "initialized", so that it can be
-    // referred to in expressions.  The local's initial value should be
-    // placed on the stack either directly before or directly after this call,
-    // which effectively increments the boundary between the
-    // function's local variables and its working stack.
+    // referred to in expressions.  This constitutes a promise that the value
+    // the variable will be placed on the stack before any other instruction
+    // executes.  Or, to put it another way, that the code to produce that
+    // value will be generated before any other code is generated.
+    //
+    // Usually this is called either immediately before or immediately after the
+    // code that generates the value is generated.
     private void defineLocal() {
         assert !inGlobalScope();
         current.locals[current.localCount - 1].depth = current.scopeDepth;
     }
 
-    // Declares and defines the local in one step. The local's initial value
-    // placed on the stack either directly before or directly after this call,
-    // which effectively increments the boundary between the
-    // function's local variables and its working stack.
+    // Calls declareLocal() and defineLocal() in one step.
     private void defineLocal(Token name) {
         assert !inGlobalScope();
         declareLocal(name);
