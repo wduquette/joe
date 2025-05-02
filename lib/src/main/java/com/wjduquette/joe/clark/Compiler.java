@@ -620,7 +620,6 @@ class Compiler {
     }
 
     // Emits the code for a single expression.
-    @SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
     private void emit(Expr expr) {
         setSourceLine(expr.location());
 
@@ -703,11 +702,10 @@ class Compiler {
                 emit(mathOp);             // c i z     ; z = x + y
                 emit(INDSET);             // z         ; c[i] = z
             }
-            case Expr.Lambda e -> {
+            case Expr.Lambda e ->
                 emitFunction(FunctionType.LAMBDA, LAMBDA_NAME,
                     e.declaration().params(), e.declaration().body(),
                     e.declaration().span());
-            }
             case Expr.ListLiteral e -> emitList(e.list());
             case Expr.Literal e -> {
                 switch (e.value()) {
