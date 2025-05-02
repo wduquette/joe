@@ -260,31 +260,37 @@ class Compiler {
                 currentLoop.breakJumps.add(jump);
             }
             case Stmt.Class s -> {
-                beginType(Kind.CLASS);
-                emit(CLASS, constant(s.name().lexeme()));
-                defineVariable(s.name());
+                // NOTE: The stack effects are written presuming that the
+                // class is defined at local scope, as that's harder to
+                // track mentally.
+
+                                               // Stack: locals | working
+                beginType(Kind.CLASS);         // ∅         ; begin type def
+                emit(CLASS, name(s.name()));   // ∅ | c     ; create class
+                defineVariable(s.name());      // c | ∅     ; define class var
 
                 if (s.superclass() != null) {
                     currentType.hasSupertype = true;
-                    beginScope(); // super
-                    defineLocal(VAR_SUPER);
-                    emitGET(s.name());
-                    emit(INHERIT);
+                    beginScope(); // super    // c | ∅      ; begin scope: super
+                    emit(s.superclass());     // c | s      ; compute super
+                    defineLocal(VAR_SUPER);   // c s | ∅    ; define super var
+                    emitGET(s.name());        // c s | c    ; get class
+                    emit(INHERIT);            // c s | ∅    ; inherit super
                 }
 
-                emitGET(s.name());
+                emitGET(s.name());            // c s | c    ; get class
 
                 // Static Methods
                 for (var m : s.staticMethods()) {
                     setSourceLine(m.span().startLine());
-                    emitFunction(
+                    emitFunction(             // c s | c m  ; compile method
                         FunctionType.STATIC_METHOD,
                         m.name().lexeme(),
                         m.params(),
                         m.body(),
                         m.span()
                     );
-                    emitMETHOD(m.name());
+                    emitMETHOD(m.name());     // c s | c    ; save method
                 }
 
                 // Instance Methods
@@ -292,27 +298,29 @@ class Compiler {
                     setSourceLine(m.span().startLine());
                     var type = m.name().lexeme().equals(INIT)
                         ? FunctionType.INITIALIZER : FunctionType.METHOD;
-                    emitFunction(
+                    emitFunction(             // c s | c m  ; compile method
                         type,
                         m.name().lexeme(),
                         m.params(),
                         m.body(),
                         m.span()
                     );
-                    emitMETHOD(m.name());
+                    emitMETHOD(m.name());     // c s | c    ; save method
                 }
 
-                emit(POP); // Pop the class itself
+                emit(POP);                    // c s | ∅    ; pop class
+
+                // End super scope
+                if (currentType.hasSupertype) {
+                    endScope();               // c | ∅      ; end scope super
+                }
 
                 // Static Initializer
                 if (!s.staticInit().isEmpty()) {
-                    emit(s.staticInit());
+                    emit(s.staticInit());     // c | ∅      ; execute static init
                 }
 
-                if (currentType.hasSupertype) {
-                    endScope(); // super
-                }
-                endType();
+                endType();                    // c | ∅      ; end type def
             }
             case Stmt.Continue s -> {
                 if (currentLoop == null) {
