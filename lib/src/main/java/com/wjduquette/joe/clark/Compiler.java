@@ -688,9 +688,8 @@ class Compiler {
                         "Unexpected operator: " + e.op());
                 }
             }
-            case Expr.VarGet e -> resolve(e.name()).emitGet();
+            case Expr.VarGet e -> emitGET(e.name());
             case Expr.VarIncrDecr e -> {
-                var rv = resolve(e.name());
                 var incrDecr = token2incrDecr(e.op());
 
                 if (e.isPre()) {
@@ -700,9 +699,9 @@ class Compiler {
                     // *GET        var    | a         ; a = var
                     // mathOp             | a'        ; e.g., a' = a + 1
                     // *SET        var    | a'        ; var = a'
-                    rv.emitGet();
+                    emitGET(e.name());
                     emit(incrDecr);
-                    rv.emitSet();
+                    emitSET(e.name());
                 } else {
                     // Post-increment/decrement
                     //                    | ∅         ; Initial state
@@ -712,21 +711,19 @@ class Compiler {
                     // *SET        var    | a'        ; var = a'
                     // POP                | ∅         ;
                     // TGET               | a         ; push T
-                    rv.emitGet();
+                    emitGET(e.name());
                     emit(TPUT);
                     emit(incrDecr);
-                    rv.emitSet();
+                    emitSET(e.name());
                     emit(POP);
                     emit(TGET);
                 }
             }
             case Expr.VarSet e -> {
-                var rv = resolve(e.name());
-
                 // Simple Assignment
                 if (e.op().type() == TokenType.EQUAL) {
                     emit(e.value());
-                    rv.emitSet();
+                    emitSET(e.name());
                     return;
                 }
 
@@ -738,10 +735,10 @@ class Compiler {
                 // expr           | a b       ; b = expr
                 // mathOp         | c         ; E.g., c = a + b
                 // *SET    var    | c         ; var = c, retaining c
-                rv.emitGet();
+                emitGET(e.name());
                 emit(e.value());
                 emit(mathOp);
-                rv.emitSet();
+                emitSET(e.name());
             }
         }
     }
@@ -857,23 +854,38 @@ class Compiler {
         }
     }
 
-    private ResolvedVariable resolve(Token name) {
+    // Resolves the named variable and emits a GET instruction.
+    private void emitGET(Token name) {
         char getOp;
-        char setOp;
         int arg = resolveLocal(current, name);
 
         if (arg != -1) {
             getOp = Opcode.LOCGET;
-            setOp = Opcode.LOCSET;
         } else if ((arg = resolveUpvalue(current, name)) != -1) {
             getOp = Opcode.UPGET;
-            setOp = Opcode.UPSET;
         } else {
             arg = addConstant(name.lexeme());
             getOp = Opcode.GLOGET;
+        }
+
+        emit(getOp, (char)arg);
+    }
+
+    // Resolves the named variable and emits a SET instruction.
+    private void emitSET(Token name) {
+        char setOp;
+        int arg = resolveLocal(current, name);
+
+        if (arg != -1) {
+            setOp = Opcode.LOCSET;
+        } else if ((arg = resolveUpvalue(current, name)) != -1) {
+            setOp = Opcode.UPSET;
+        } else {
+            arg = addConstant(name.lexeme());
             setOp = Opcode.GLOSET;
         }
-        return new ResolvedVariable(getOp, setOp, (char)arg);
+
+        emit(setOp, (char)arg);
     }
 
     // Resolves the name as the name of the local variable in the current
@@ -1277,20 +1289,5 @@ class Compiler {
         public String toString() {
             return "UpvalueInfo[index=" + (int)index + ", isLocal=" + isLocal + "]";
         }
-    }
-
-    private class ResolvedVariable {
-        private final char getOp;
-        private final char setOp;
-        private final char arg;
-
-        ResolvedVariable(char getOp, char setOp, char arg) {
-            this.getOp = getOp;
-            this.setOp = setOp;
-            this.arg = arg;
-        }
-
-        void emitGet() { emit(getOp, arg); }
-        void emitSet() { emit(setOp, arg); }
     }
 }
