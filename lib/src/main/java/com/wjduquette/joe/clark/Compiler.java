@@ -657,8 +657,29 @@ class Compiler {
                 emit(e.index());          // c i        ; compute index
                 emit(INDGET);             // v          ; get v = c[i]
             }
-            case Expr.IndexIncrDecr prePostIndex -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.IndexIncrDecr e -> {
+                var op = token2incrDecr(e.op());
+
+                if (e.isPre()) { // Pre-increment/decrement
+                                              // Stack effects:
+                    emit(e.collection());     // c       ; compute collection
+                    emit(e.index());          // c i     ; compute index
+                    emit(DUP2);               // c i c i ; need it twice
+                    emit(INDGET);             // c i x   ; x = c[i]
+                    emit(op);                 // c i y   ; y = x +/- 1
+                    emit(INDSET);             // y       ; c[i] = y
+                } else { // Post-increment/decrement
+                                              // Stack effects:
+                    emit(e.collection());     // c       ; compute collection
+                    emit(e.index());          // c i     ; compute index
+                    emit(DUP2);               // c i c i ; need it twice
+                    emit(INDGET);             // c i x   ; x = c[i]
+                    emit(TPUT);               // c i x   ; T = x
+                    emit(op);                 // c i y   ; y = x +/- 1
+                    emit(INDSET);             // y       ; c[i] = y
+                    emit(POP);                // ∅       ;
+                    emit(TGET);               // x       ; x = T
+                }
             }
             case Expr.IndexSet e -> {
                 // Simple Assignment
