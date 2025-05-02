@@ -576,7 +576,7 @@ public class Parser {
             if (target instanceof Expr.VarGet) {
                 Token name = ((Expr.VarGet) target).name();
                 return new Expr.VarSet(name, op, value);
-            } else if (target instanceof Expr.Get get) {
+            } else if (target instanceof Expr.PropGet get) {
                 return new Expr.Set(get.object(), get.name(), op, value);
             } else if (target instanceof Expr.IndexGet get) {
                 return new Expr.IndexSet(
@@ -707,7 +707,7 @@ public class Parser {
         if (target instanceof Expr.VarGet) {
             Token name = ((Expr.VarGet) target).name();
             return new Expr.VarIncrDecr(name, op, isPre);
-        } else if (target instanceof Expr.Get get) {
+        } else if (target instanceof Expr.PropGet get) {
             return new Expr.PrePostSet(get.object(), get.name(), op, isPre);
         } else if (target instanceof Expr.IndexGet get) {
             return new Expr.PrePostIndex(
@@ -727,7 +727,7 @@ public class Parser {
             } else if (scanner.match(DOT)) {
                 scanner.consume(IDENTIFIER, "Expected property name after '.'.");
                 var name = scanner.previous();
-                expr = new Expr.Get(expr, name);
+                expr = new Expr.PropGet(expr, name);
             } else if (scanner.match(LEFT_BRACKET)) {
                 var bracket = scanner.previous();
                 var index = expression();
@@ -773,7 +773,7 @@ public class Parser {
             scanner.consume(IDENTIFIER, "Expected class property name.");
             var name = scanner.previous();
             var obj = new Expr.This(keyword);
-            return new Expr.Get(obj, name);
+            return new Expr.PropGet(obj, name);
         }
 
         if (scanner.match(SUPER)) {

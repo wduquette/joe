@@ -641,9 +641,6 @@ class Compiler {
                 emitArgs(e.arguments());
                 emit(CALL, (char)e.arguments().size());
             }
-            case Expr.Get get -> {
-                throw new UnsupportedOperationException("TODO");
-            }
             case Expr.Grouping e -> emit(e.expr());
             case Expr.IndexGet indexGet -> {
                 throw new UnsupportedOperationException("TODO");
@@ -691,6 +688,10 @@ class Compiler {
             }
             case Expr.PrePostSet prePostSet -> {
                 throw new UnsupportedOperationException("TODO");
+            }
+            case Expr.PropGet e -> {
+                emit(e.object());
+                emit(PROPGET, constant(e.name().lexeme()));
             }
             case Expr.Set set -> {
                 throw new UnsupportedOperationException("TODO");

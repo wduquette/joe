@@ -544,18 +544,6 @@ class Interpreter {
                     throw expected(expr.paren().span(), "callable", callee);
                 }
             }
-            // Get an object property.  The expression must evaluate to
-            // a JoeValue, i.e., a JoeInstance or a ProxiedValue.
-            case Expr.Get expr -> {
-                Object object = evaluate(expr.object());
-                if (object == null) {
-                    throw new RuntimeError(expr.name().span(),
-                        "Tried to retrieve '" + expr.name().lexeme() +
-                        "' property from null value.");
-                }
-                JoeValue instance = joe.getJoeValue(object);
-                yield instance.get(expr.name().lexeme());
-            }
             // (expr...)
             case Expr.Grouping expr -> evaluate(expr.expr());
             // expr[index]
@@ -708,6 +696,18 @@ class Interpreter {
 
                 instance.set(name, assigned);
                 yield result;
+            }
+            // Get an object property.  The expression must evaluate to
+            // a JoeValue, i.e., a JoeInstance or a ProxiedValue.
+            case Expr.PropGet expr -> {
+                Object object = evaluate(expr.object());
+                if (object == null) {
+                    throw new RuntimeError(expr.name().span(),
+                        "Tried to retrieve '" + expr.name().lexeme() +
+                            "' property from null value.");
+                }
+                JoeValue instance = joe.getJoeValue(object);
+                yield instance.get(expr.name().lexeme());
             }
             // Assign a value to an object property using =, +=, -=, *=, /=
             case Expr.Set expr -> {

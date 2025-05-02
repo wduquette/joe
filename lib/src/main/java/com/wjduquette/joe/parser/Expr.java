@@ -7,14 +7,18 @@ import java.util.List;
 /**
  * The various kinds of expression that can appear in Joe's AST.
  */
-public sealed interface Expr
-    permits Expr.Binary, Expr.Call,
-            Expr.Get, Expr.Grouping, Expr.IndexGet, Expr.IndexSet,
-            Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
-            Expr.MapLiteral,
-            Expr.PrePostIndex, Expr.PrePostSet,
-            Expr.Set, Expr.Super, Expr.This, Expr.Ternary,
-            Expr.Unary, Expr.VarGet, Expr.VarIncrDecr, Expr.VarSet
+public sealed interface Expr permits
+    Expr.Binary,
+    Expr.Call,
+    Expr.Grouping,
+    Expr.IndexGet, Expr.IndexSet,
+    Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
+    Expr.MapLiteral,
+    Expr.PrePostIndex, Expr.PrePostSet, Expr.PropGet,
+    Expr.Set, Expr.Super,
+    Expr.This, Expr.Ternary,
+    Expr.Unary,
+    Expr.VarGet, Expr.VarIncrDecr, Expr.VarSet
 {
     /**
      * The location of the expression within the source.
@@ -47,16 +51,6 @@ public sealed interface Expr
      */
     record Call(Expr callee, Token paren, List<Expr> arguments) implements Expr {
         public Span location() { return paren.span(); }
-    }
-
-    /**
-     * A get of an object property.
-     * See Expr.Variable for a get of a normal variable.
-     * @param object The expression that yields the object
-     * @param name The name of the property
-     */
-    record Get(Expr object, Token name) implements Expr {
-        public Span location() { return name.span(); }
     }
 
     /**
@@ -175,6 +169,16 @@ public sealed interface Expr
         boolean isPre
     ) implements Expr {
         public Span location() { return op.span(); }
+    }
+
+    /**
+     * A get of an object property.
+     * See Expr.Variable for a get of a normal variable.
+     * @param object The expression that yields the object
+     * @param name The name of the property
+     */
+    record PropGet(Expr object, Token name) implements Expr {
+        public Span location() { return name.span(); }
     }
 
     /**

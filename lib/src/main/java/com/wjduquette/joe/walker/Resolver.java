@@ -294,7 +294,6 @@ class Resolver {
                     resolve(arg);
                 }
             }
-            case Expr.Get expr -> resolve(expr.object());
             case Expr.Grouping expr -> resolve(expr.expr());
             case Expr.IndexGet expr -> {
                 resolve(expr.collection());
@@ -320,6 +319,7 @@ class Resolver {
                 resolve(expr.index());
             }
             case Expr.PrePostSet expr -> resolve(expr.object());
+            case Expr.PropGet expr -> resolve(expr.object());
             case Expr.Set expr -> {
                 resolve(expr.value());
                 resolve(expr.object());

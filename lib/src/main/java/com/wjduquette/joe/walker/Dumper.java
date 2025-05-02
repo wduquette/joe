@@ -296,11 +296,6 @@ class Dumper {
                     dumpExpression(arg);
                 }
             }
-            case Expr.Get e -> {
-                buff.append(e.name().lexeme())
-                    .append(" of:\n");
-                dumpExpression(e.object());
-            }
             case Expr.Grouping e -> {
                 buff.append(" (\n");
                 dumpExpression(e.expr());
@@ -360,6 +355,11 @@ class Dumper {
                         .append(e.op().lexeme())
                         .append(" of\n");
                 }
+                dumpExpression(e.object());
+            }
+            case Expr.PropGet e -> {
+                buff.append(e.name().lexeme())
+                    .append(" of:\n");
                 dumpExpression(e.object());
             }
             case Expr.Set e -> {
