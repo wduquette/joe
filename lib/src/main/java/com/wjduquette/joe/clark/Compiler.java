@@ -294,6 +294,7 @@ class Compiler {
                 }
 
                 // Instance Methods
+                currentType.inInstanceMethod = true;
                 for (var m : s.methods()) {
                     setSourceLine(m.span().startLine());
                     var type = m.name().lexeme().equals(INIT)
@@ -307,6 +308,7 @@ class Compiler {
                     );
                     emitMETHOD(m.name());     // c s | c    ; save method
                 }
+                currentType.inInstanceMethod = false;
 
                 emit(POP);                    // c s | ∅    ; pop class
 
@@ -721,8 +723,13 @@ class Compiler {
                 emit(e.falseExpr());
                 patchJump(e.op(), endJump);
             }
-            case Expr.This aThis -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.This e -> {
+                if (!currentType.inInstanceMethod) {
+                    error(e.keyword(),
+                        "Can't use '" + e.keyword().lexeme() +
+                        "' outside of a method.");
+                }
+                emitGET(VAR_THIS);
             }
             case Expr.Unary e -> {
                 emit(e.right());
@@ -921,6 +928,11 @@ class Compiler {
         emit(getOp, (char)arg);
     }
 
+    // emitGET for hidden locals.
+    private void emitGET(String name) {
+        emitGET(Token.synthetic(name));
+    }
+
     // Resolves the named variable and emits a SET instruction.
     private void emitSET(Token name) {
         char setOp;
@@ -936,6 +948,11 @@ class Compiler {
         }
 
         emit(setOp, (char)arg);
+    }
+
+    // emitSET for hidden locals.
+    private void emitSET(String name) {
+        emitSET(Token.synthetic(name));
     }
 
     // Resolves the name as the name of the local variable in the current
@@ -1322,7 +1339,12 @@ class Compiler {
 
         // The kind of type.
         Kind kind = Kind.CLASS;
+
+        // Whether this type has a supertype.
         boolean hasSupertype = false;
+
+        // Whether we are in an instance method or not.
+        boolean inInstanceMethod = false;
 
         // Constructor
         TypeInfo(TypeInfo enclosing) {
