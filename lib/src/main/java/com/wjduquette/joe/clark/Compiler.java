@@ -651,8 +651,10 @@ class Compiler {
                 emit(CALL, (char)e.arguments().size());
             }
             case Expr.Grouping e -> emit(e.expr());
-            case Expr.IndexGet indexGet -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.IndexGet e -> {
+                emit(e.collection());     // c          ; compute collection
+                emit(e.index());          // c i        ; compute index
+                emit(INDGET);             // v          ; get v = c[i]
             }
             case Expr.IndexIncrDecr prePostIndex -> {
                 throw new UnsupportedOperationException("TODO");
