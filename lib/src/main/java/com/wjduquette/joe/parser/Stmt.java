@@ -240,7 +240,9 @@ public sealed interface Stmt
      * @param keyword The return keyword, for error location
      * @param value The value, or null
      */
-    record Return(Token keyword, Expr value) implements Stmt {}
+    record Return(Token keyword, Expr value) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
 
     /**
      * A "switch" statement.

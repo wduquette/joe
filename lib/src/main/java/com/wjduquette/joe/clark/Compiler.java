@@ -76,13 +76,13 @@ class Compiler {
     private boolean gotCompleteScript = false;
 
     // The function currently being compiled.
-    private FunctionCompiler current = null;
+    private FunctionInfo current = null;
 
     // The loop currently being compiled, or null
     private LoopInfo currentLoop = null;
 
     // The type currently being compiled, or null
-    private TypeCompiler currentType = null;
+    private TypeInfo currentType = null;
 
 //    // The pattern currently being compiled, or null
 //    private PatternCompiler currentPattern = null;
@@ -145,7 +145,7 @@ class Compiler {
         // currently being compiled.  Each `function` or `method`
         // declaration adds a new FunctionCompiler to the stack, so that
         // each has its own Chunk.
-        current = new FunctionCompiler(
+        current = new FunctionInfo(
             null,
             FunctionType.SCRIPT,
             SCRIPT_NAME,
@@ -260,9 +260,60 @@ class Compiler {
                 currentLoop.breakJumps.add(jump);
             }
             case Stmt.Class s -> {
+                beginType(Kind.CLASS);
                 emit(CLASS, constant(s.name().lexeme()));
                 defineVariable(s.name());
 
+                if (s.superclass() != null) {
+                    currentType.hasSupertype = true;
+                    beginScope(); // super
+                    defineLocal(VAR_SUPER);
+                    emitGET(s.name());
+                    emit(INHERIT);
+                }
+
+                emitGET(s.name());
+
+                // Static Methods
+                for (var m : s.staticMethods()) {
+                    setSourceLine(m.span().startLine());
+                    emitFunction(
+                        FunctionType.STATIC_METHOD,
+                        m.name().lexeme(),
+                        m.params(),
+                        m.body(),
+                        m.span()
+                    );
+                    emitMETHOD(m.name());
+                }
+
+                // Instance Methods
+                for (var m : s.methods()) {
+                    setSourceLine(m.span().startLine());
+                    var type = m.name().lexeme().equals(INIT)
+                        ? FunctionType.INITIALIZER : FunctionType.METHOD;
+                    emitFunction(
+                        FunctionType.METHOD,
+                        m.name().lexeme(),
+                        m.params(),
+                        m.body(),
+                        m.span()
+                    );
+                    emitMETHOD(m.name());
+                }
+
+                // Static Initializer
+                if (!s.staticInitializer().isEmpty()) {
+                    // See bert.Compiler::parseTypeBody
+                    throw new UnsupportedOperationException("TODO: Static init");
+                }
+
+                emit(POP); // Pop the class itself
+
+                if (currentType.hasSupertype) {
+                    endScope(); // super
+                }
+                endType();
             }
             case Stmt.Continue s -> {
                 if (currentLoop == null) {
@@ -363,7 +414,7 @@ class Compiler {
             case Stmt.Function s -> {
                 // NOTE: The parser returns this for both functions
                 // and methods.  Methods aren't yet implemented.
-                compileFunction(FunctionType.FUNCTION, s.name().lexeme(),
+                emitFunction(FunctionType.FUNCTION, s.name().lexeme(),
                     s.params(), s.body(), s.location());
                 defineVariable(s.name());
             }
@@ -517,14 +568,14 @@ class Compiler {
         }
     }
 
-    private void compileFunction(
+    private void emitFunction(
         FunctionType type,
         String name,
         List<Token> params,
         List<Stmt> body,
         Span span
     ) {
-        this.current = new FunctionCompiler(current, type, name, span);
+        this.current = new FunctionInfo(current, type, name, span);
 
         // Begin the function's scope; no endScope() because `RETURN`
         // does the cleanup.
@@ -601,7 +652,7 @@ class Compiler {
                 throw new UnsupportedOperationException("TODO");
             }
             case Expr.Lambda e -> {
-                compileFunction(FunctionType.LAMBDA, LAMBDA_NAME,
+                emitFunction(FunctionType.LAMBDA, LAMBDA_NAME,
                     e.declaration().params(), e.declaration().body(),
                     e.declaration().span());
             }
@@ -829,6 +880,11 @@ class Compiler {
         defineLocal();
     }
 
+    // defineLocal for hidden variables
+    private void defineLocal(String name) {
+        defineLocal(Token.synthetic(name));
+    }
+
 
     // Marks the N newest local variables "initialized", so that they can be
     // referred to in expressions.  This is a no-op for global variables.
@@ -877,7 +933,7 @@ class Compiler {
     // Resolves the name as the name of the local variable in the current
     // scope.  Returns the local's index in the current scope, or -1 if
     // no variable was found.
-    private int resolveLocal(FunctionCompiler compiler, Token name) {
+    private int resolveLocal(FunctionInfo compiler, Token name) {
         for (var i = compiler.localCount - 1; i >= 0; i--) {
             var local = compiler.locals[i];
             if (name.lexeme().equals(local.name.lexeme())) {
@@ -893,7 +949,7 @@ class Compiler {
     // Resolves the name as the name of an upvalue.  Returns -1 if the
     // variable is global, and the upvalue index otherwise.  Captures
     // locals as upvalues.
-    private int resolveUpvalue(FunctionCompiler compiler, Token name) {
+    private int resolveUpvalue(FunctionInfo compiler, Token name) {
         // FIRST, if there's no enclosing FunctionCompiler, then this is
         // necessarily a global.
         if (compiler.enclosing == null) return -1;
@@ -922,7 +978,7 @@ class Compiler {
     // upvalue in this function; `isLocal` is true if the upvalue is defined
     // for this scope, and false if it's for an enclosing scope.
     private int addUpvalue(
-        FunctionCompiler compiler,
+        FunctionInfo compiler,
         Token name,
         char index,
         boolean isLocal) {
@@ -1031,12 +1087,15 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Type Management
 
-    private void beginType() {
-
+    // Begins a new type definition
+    private void beginType(Kind kind) {
+        currentType = new TypeInfo(currentType);
+        currentType.kind = kind;
     }
 
+    // Ends the type definition
     private void endType() {
-
+        currentType = currentType.enclosing;
     }
 
     //-------------------------------------------------------------------------
@@ -1074,7 +1133,13 @@ class Compiler {
 
     // Adds the value to the constants table and emits CONST.
     private void emitConstant(Object value) {
-        emit(Opcode.CONST, current.chunk.addConstant(value));
+        emit(Opcode.CONST, constant(value));
+    }
+
+    // Emits METHOD with the name of the method.  The method's
+    // closure must already be on the stack.
+    private void emitMETHOD(Token name) {
+        emit(METHOD, constant(name.lexeme()));
     }
 
     // Builds a new ListValue from multiple expressions.
@@ -1127,7 +1192,6 @@ class Compiler {
     // a function.  For normal functions it returns `NULL`; for
     // class initializers, it returns the instance that's been
     // initialized.
-    // TODO: After classes are implemented, see if we can avoid this logic
     private void emitReturn() {
         if (current.chunk.type == FunctionType.INITIALIZER) {
             emit(Opcode.LOCGET, (char)0);
@@ -1174,9 +1238,9 @@ class Compiler {
     }
 
     // State for the function currently being compiled.
-    private class FunctionCompiler {
+    private class FunctionInfo {
         // The enclosing function, or null.
-        final FunctionCompiler enclosing;
+        final FunctionInfo enclosing;
 
         // The names of the function's parameters.
         final List<String> parameters = new ArrayList<>();
@@ -1205,8 +1269,8 @@ class Compiler {
         // The current source line
         private int sourceLine = 1;
 
-        FunctionCompiler(
-            FunctionCompiler enclosing,
+        FunctionInfo(
+            FunctionInfo enclosing,
             FunctionType type,
             String name,
             Span span
@@ -1232,18 +1296,22 @@ class Compiler {
         }
     }
 
-    private enum KindOfType {
+    private enum Kind {
         CLASS,
         RECORD
     }
 
-    // The type currently being compiled.
-    private static class TypeCompiler {
-        final TypeCompiler enclosing;
-        KindOfType kind = KindOfType.CLASS;
+    // Data about the type currently being compiled.
+    private static class TypeInfo {
+        // The type below this one on the type stack.
+        final TypeInfo enclosing;
+
+        // The kind of type.
+        Kind kind = Kind.CLASS;
         boolean hasSupertype = false;
 
-        TypeCompiler(TypeCompiler enclosing) {
+        // Constructor
+        TypeInfo(TypeInfo enclosing) {
             this.enclosing = enclosing;
         }
     }
