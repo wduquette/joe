@@ -62,7 +62,7 @@ public sealed interface Stmt
      * @param superclass The superclass variable, or null for none
      * @param staticMethods The class object's static methods
      * @param methods The class's instance methods
-     * @param staticInitializer The static initializer statements
+     * @param staticInit The static initializer statements
      */
     record Class(
         Token name,
@@ -70,7 +70,7 @@ public sealed interface Stmt
         Expr.VarGet superclass,
         List<Stmt.Function> staticMethods,
         List<Stmt.Function> methods,
-        List<Stmt> staticInitializer
+        List<Stmt> staticInit
     ) implements Stmt {
         public Span location() { return classSpan; }
     }

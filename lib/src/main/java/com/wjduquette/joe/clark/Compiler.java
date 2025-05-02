@@ -293,7 +293,7 @@ class Compiler {
                     var type = m.name().lexeme().equals(INIT)
                         ? FunctionType.INITIALIZER : FunctionType.METHOD;
                     emitFunction(
-                        FunctionType.METHOD,
+                        type,
                         m.name().lexeme(),
                         m.params(),
                         m.body(),
@@ -302,13 +302,12 @@ class Compiler {
                     emitMETHOD(m.name());
                 }
 
-                // Static Initializer
-                if (!s.staticInitializer().isEmpty()) {
-                    // See bert.Compiler::parseTypeBody
-                    throw new UnsupportedOperationException("TODO: Static init");
-                }
-
                 emit(POP); // Pop the class itself
+
+                // Static Initializer
+                if (!s.staticInit().isEmpty()) {
+                    emit(s.staticInit());
+                }
 
                 if (currentType.hasSupertype) {
                     endScope(); // super
@@ -1130,6 +1129,12 @@ class Compiler {
     // index.
     private char constant(Object value) {
         return current.chunk.addConstant(value);
+    }
+
+    // Adds a constant to the constant table for the token's lexeme,
+    // and returns its index.
+    private char name(Token name) {
+        return constant(name.lexeme());
     }
 
     // Adds the value to the constants table and emits CONST.

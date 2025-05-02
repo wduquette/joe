@@ -134,9 +134,9 @@ class Interpreter {
                 environment.assign(stmt.name(), klass);
 
                 // Static Initialization
-                if (!stmt.staticInitializer().isEmpty()) {
+                if (!stmt.staticInit().isEmpty()) {
                     try {
-                        executeBlock(stmt.staticInitializer(), environment);
+                        executeBlock(stmt.staticInit(), environment);
                     } catch (JoeError ex) {
                         var buff = stmt.classSpan().buffer();
                         var context = buff.lineSpan(stmt.classSpan().endLine());
