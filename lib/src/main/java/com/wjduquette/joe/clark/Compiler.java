@@ -793,8 +793,20 @@ class Compiler {
                 emit(mathOp);             // o c    ; c = a op b
                 emit(PROPSET, name);      // c      ; o.name = c
             }
-            case Expr.Super aSuper -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.Super e -> {
+                if (currentType == null || !currentType.inInstanceMethod) {
+                    error(e.keyword(), "Can't use '" + e.keyword().lexeme() +
+                        "' outside of a method.");
+                } else if (!currentType.hasSupertype) {
+                    error(e.keyword(), "Can't use '" + e.keyword().lexeme() +
+                        "' in a class with no superclass.");
+                }
+
+                var name = name(e.method());
+
+                emitGET(VAR_THIS);     // t        ; get this
+                emitGET(VAR_SUPER);    // t s      ; get super
+                emit(SUPGET, name);    // m        ; super.name
             }
             case Expr.Ternary e -> {
                 //                 | cond
@@ -812,7 +824,7 @@ class Compiler {
                 patchJump(e.op(), endJump);
             }
             case Expr.This e -> {
-                if (!currentType.inInstanceMethod) {
+                if (currentType == null || !currentType.inInstanceMethod) {
                     error(e.keyword(),
                         "Can't use '" + e.keyword().lexeme() +
                         "' outside of a method.");
