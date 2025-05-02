@@ -256,8 +256,7 @@ class Compiler {
 
                 // NEXT, emit the jump, saving it to be patched at
                 // the end of the loop.
-                var jump = emitJump(JUMP);
-                currentLoop.breakJumps.add(jump);
+                currentLoop.breakJumps.emit(JUMP);
             }
             case Stmt.Class s -> {
                 // NOTE: The stack effects are written presuming that the
@@ -540,12 +539,12 @@ class Compiler {
                 defineLocal(VAR_SWITCH);
 
                 // Jump targets
-                var endJumps = jumpList();
+                var endJumps = jumpList(s.keyword());
                 int nextJump = -1;
 
                 for (var c : s.cases()) {
                     setSourceLine(c.location());
-                    var caseJumps = jumpList();
+                    var caseJumps = jumpList(c.keyword());
 
                     // Allow the previous case to jump here if it doesn't match.
                     // next:
@@ -559,17 +558,17 @@ class Compiler {
                         emit(EQ);
 
                         // Jump to the next case if no match.
-                        caseJumps.add(emitJump(JIT));
+                        caseJumps.emit(JIT);
                     }
 
                     nextJump = emitJump(JUMP);
-                    patchJumps(c.keyword(), caseJumps);
+                    patchJumps(caseJumps);
 
                     // Parse the case body.
                     emit(c.statement());
 
                     // No end jump if this the default case
-                    endJumps.add(emitJump(JUMP));
+                    endJumps.emit(JUMP);
                 }
 
                 // next:
@@ -580,7 +579,7 @@ class Compiler {
                 }
 
                 // Patch all the end jumps.
-                patchJumps(s.keyword(), endJumps);
+                patchJumps(endJumps);
 
                 // End the scope, removing the "*switch*" variable.
                 endScope();
@@ -1243,8 +1242,7 @@ class Compiler {
 
     // Begins the loop's break/continue control region.
     private void beginLoop(Token keyword, int loopStart) {
-        currentLoop = new LoopInfo(currentLoop);
-        currentLoop.keyword = keyword;
+        currentLoop = new LoopInfo(currentLoop, keyword);
         currentLoop.breakDepth = current.scopeDepth;
         currentLoop.continueDepth = current.scopeDepth;
         currentLoop.loopStart = loopStart;
@@ -1253,7 +1251,7 @@ class Compiler {
     // Ends the loop's break/continue control region, and patches all
     // break jumps
     private void endLoop() {
-        patchJumps(currentLoop.keyword, currentLoop.breakJumps);
+        patchJumps(currentLoop.breakJumps);
         currentLoop = currentLoop.enclosing;
     }
 
@@ -1346,8 +1344,8 @@ class Compiler {
         }
     }
 
-    private List<Integer> jumpList() {
-        return new ArrayList<>();
+    private JumpList jumpList(Token keyword) {
+        return new JumpList(keyword);
     }
 
     private void patchJump(Token token, int offset) {
@@ -1361,9 +1359,9 @@ class Compiler {
         current.chunk.setCode(offset, (char)jump);
     }
 
-    private void patchJumps(Token token, List<Integer> offsets) {
-        for (var offset : offsets) {
-            patchJump(token, offset);
+    private void patchJumps(JumpList jumpList) {
+        for (var offset : jumpList) {
+            patchJump(jumpList.keyword(), offset);
         }
     }
 
@@ -1497,12 +1495,9 @@ class Compiler {
         }
     }
 
-    private static class LoopInfo {
+    private class LoopInfo {
         // The enclosing loop, or null if none.
         final LoopInfo enclosing;
-
-        // The loop's keyword, for use when patching jumps
-        Token keyword = null;
 
         // The scope depth before the entire loop is compiled.
         // Allows break to know how many scopes to end.
@@ -1514,13 +1509,14 @@ class Compiler {
 
         // The jump instruction indices for any `break` statements in the
         // body of the loop.
-        List<Integer> breakJumps = new ArrayList<>();
+        final JumpList breakJumps;
 
         // The chunk index to loop back to on continue
         int loopStart = -1;
 
-        LoopInfo(LoopInfo enclosing) {
+        LoopInfo(LoopInfo enclosing, Token keyword) {
             this.enclosing = enclosing;
+            this.breakJumps = new JumpList(keyword);
         }
     }
 
@@ -1556,6 +1552,22 @@ class Compiler {
         @Override
         public String toString() {
             return "UpvalueInfo[index=" + (int)index + ", isLocal=" + isLocal + "]";
+        }
+    }
+
+    private class JumpList extends ArrayList<Integer> {
+        private final Token keyword;
+
+        public JumpList(Token keyword) {
+            this.keyword = keyword;
+        }
+
+        public Token keyword() {
+            return keyword;
+        }
+
+        public void emit(char jumpCode) {
+            add(emitJump(jumpCode));
         }
     }
 }
