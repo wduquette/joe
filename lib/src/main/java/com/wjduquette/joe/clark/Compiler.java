@@ -654,6 +654,9 @@ class Compiler {
             case Expr.IndexGet indexGet -> {
                 throw new UnsupportedOperationException("TODO");
             }
+            case Expr.IndexIncrDecr prePostIndex -> {
+                throw new UnsupportedOperationException("TODO");
+            }
             case Expr.IndexSet indexSet -> {
                 throw new UnsupportedOperationException("TODO");
             }
@@ -692,18 +695,34 @@ class Compiler {
                     emit(MAPPUT);
                 }
             }
-            case Expr.IndexIncrDecr prePostIndex -> {
-                throw new UnsupportedOperationException("TODO");
-            }
-            case Expr.PropIncrDecr prePostSet -> {
-                throw new UnsupportedOperationException("TODO");
-            }
             case Expr.PropGet e -> {
                 emit(e.object());
                 emit(PROPGET, constant(e.name().lexeme()));
             }
-            case Expr.PropSet set -> {
+            case Expr.PropIncrDecr prePostSet -> {
                 throw new UnsupportedOperationException("TODO");
+            }
+            case Expr.PropSet e -> {
+                var name = name(e.name());
+
+                // Simple Assignment
+                if (e.op().type() == TokenType.EQUAL) {
+                                          // Stack effects:
+                    emit(e.object());     // o     ; compute object
+                    emit(e.value());      // o v   ; compute value
+                    emit(PROPSET, name);  // v     ; o.name = v
+                    return;
+                }
+
+                // Assignment with update
+                var mathOp = token2updater(e.op());
+
+                emit(e.object());         // o     ; compute object
+                emit(DUP);                // o o   ; object needed twice
+                emit(PROPGET, name);      // o a   ; get prop value
+                emit(e.value());          // o a b ; compute update value
+                emit(mathOp);             // o c   ; c = a op b
+                emit(PROPSET, name);      // c     ; o.name = c
             }
             case Expr.Super aSuper -> {
                 throw new UnsupportedOperationException("TODO");
