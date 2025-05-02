@@ -24,7 +24,7 @@ import java.util.*;
  * {@link TokenType} must be represented in the parser table.  See
  * {@code populateRulesTable} at the bottom of the file.</p>
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "RedundantLabeledSwitchRuleCodeBlock"})
 class Compiler {
     //------------------------------------------------------------------------
     // Static Constants
@@ -625,29 +625,34 @@ class Compiler {
 
         switch (expr) {
             case Expr.Binary e -> {
-                emit(e.left());
-                emit(e.right());
-                switch (e.op().type()) {
-                    case TokenType.BANG_EQUAL    -> emit(NE);
-                    case TokenType.EQUAL_EQUAL   -> emit(EQ);
-                    case TokenType.GREATER       -> emit(GT);
-                    case TokenType.GREATER_EQUAL -> emit(GE);
-                    case TokenType.IN            -> emit(IN);
-                    case TokenType.LESS          -> emit(LT);
-                    case TokenType.LESS_EQUAL    -> emit(LE);
-                    case TokenType.PLUS          -> emit(ADD);
-                    case TokenType.MINUS         -> emit(SUB);
-                    case TokenType.NI            -> emit(NI);
-                    case TokenType.STAR          -> emit(MUL);
-                    case TokenType.SLASH         -> emit(DIV);
+                var op = switch (e.op().type()) {
+                    case TokenType.BANG_EQUAL    -> NE;
+                    case TokenType.EQUAL_EQUAL   -> EQ;
+                    case TokenType.GREATER       -> GT;
+                    case TokenType.GREATER_EQUAL -> GE;
+                    case TokenType.IN            -> IN;
+                    case TokenType.LESS          -> LT;
+                    case TokenType.LESS_EQUAL    -> LE;
+                    case TokenType.PLUS          -> ADD;
+                    case TokenType.MINUS         -> SUB;
+                    case TokenType.NI            -> NI;
+                    case TokenType.STAR          -> MUL;
+                    case TokenType.SLASH         -> DIV;
                     default -> throw new IllegalStateException(
                         "Unexpected operator: " + e.op());
-                }
+                };
+
+                                     // Stack effects:
+                emit(e.left());      // a        ; compute left
+                emit(e.right());     // a b      ; compute right
+                emit(op);            // c        ; c = a op b
             }
             case Expr.Call e -> {
-                emit(e.callee());
-                emitArgs(e.arguments());
-                emit(CALL, (char)e.arguments().size());
+                var argc = e.arguments().size();
+
+                emit(e.callee());         // f          ; compute callable
+                emitArgs(e.arguments());  // f args...  ; compute arguments
+                emit(CALL, (char)argc);   // result     ; result = f(args);
             }
             case Expr.Grouping e -> emit(e.expr());
             case Expr.IndexGet e -> {
@@ -660,34 +665,34 @@ class Compiler {
                 var op = token2incrDecr(e.op());
 
                 if (e.isPre()) { // Pre-increment/decrement
-                                              // Stack effects:
-                    emit(e.collection());     // c       ; compute collection
-                    emit(e.index());          // c i     ; compute index
-                    emit(DUP2);               // c i c i ; need it twice
-                    emit(INDGET);             // c i x   ; x = c[i]
-                    emit(op);                 // c i y   ; y = x +/- 1
-                    emit(INDSET);             // y       ; c[i] = y
+                                          // Stack effects:
+                    emit(e.collection()); // c       ; compute collection
+                    emit(e.index());      // c i     ; compute index
+                    emit(DUP2);           // c i c i ; need it twice
+                    emit(INDGET);         // c i x   ; x = c[i]
+                    emit(op);             // c i y   ; y = x +/- 1
+                    emit(INDSET);         // y       ; c[i] = y
                 } else { // Post-increment/decrement
-                                              // Stack effects:
-                    emit(e.collection());     // c       ; compute collection
-                    emit(e.index());          // c i     ; compute index
-                    emit(DUP2);               // c i c i ; need it twice
-                    emit(INDGET);             // c i x   ; x = c[i]
-                    emit(TPUT);               // c i x   ; T = x
-                    emit(op);                 // c i y   ; y = x +/- 1
-                    emit(INDSET);             // y       ; c[i] = y
-                    emit(POP);                // ∅       ;
-                    emit(TGET);               // x       ; x = T
+                                          // Stack effects:
+                    emit(e.collection()); // c       ; compute collection
+                    emit(e.index());      // c i     ; compute index
+                    emit(DUP2);           // c i c i ; need it twice
+                    emit(INDGET);         // c i x   ; x = c[i]
+                    emit(TPUT);           // c i x   ; T = x
+                    emit(op);             // c i y   ; y = x +/- 1
+                    emit(INDSET);         // y       ; c[i] = y
+                    emit(POP);            // ∅       ;
+                    emit(TGET);           // x       ; x = T
                 }
             }
             case Expr.IndexSet e -> {
                 // Simple Assignment
                 if (e.op().type() == TokenType.EQUAL) {
                     // Stack effects:
-                    emit(e.collection());     // c       ; compute collection
-                    emit(e.index());          // c i     ; compute index
-                    emit(e.value());          // c i x   ; compute value
-                    emit(INDSET);             // x       ; c[i] = x
+                    emit(e.collection()); // c       ; compute collection
+                    emit(e.index());      // c i     ; compute index
+                    emit(e.value());      // c i x   ; compute value
+                    emit(INDSET);         // x       ; c[i] = x
                     return;
                 }
 
@@ -706,7 +711,10 @@ class Compiler {
                 emitFunction(FunctionType.LAMBDA, LAMBDA_NAME,
                     e.declaration().params(), e.declaration().body(),
                     e.declaration().span());
-            case Expr.ListLiteral e -> emitList(e.list());
+            case Expr.ListLiteral e -> {
+                                          // Stack effects
+                emitList(e.list());       // list      ; compute list
+            }
             case Expr.Literal e -> {
                 switch (e.value()) {
                     case null -> emit(NULL);
@@ -715,25 +723,28 @@ class Compiler {
                 }
             }
             case Expr.Logical e -> {
-                emit(e.left());
                 if (e.op().type() == TokenType.AND) {
-                    int endJump = emitJump(JIFKEEP);
-                    emit(POP);
-                    emit(e.right());
-                    patchJump(e.op(), endJump);
+                                                     // Stack effects:
+                    emit(e.left());                  // v      ; compute left
+                    int endJump = emitJump(JIFKEEP); // v      ; JIFKEEP end
+                    emit(POP);                       // ∅
+                    emit(e.right());                 // v      ; compute right
+                    patchJump(e.op(), endJump);      // v      ; end:
                 } else { // OR
-                    int endJump = emitJump(JITKEEP);
-                    emit(POP);
-                    emit(e.right());
-                    patchJump(e.op(), endJump);
+                    emit(e.left());                  // v      ; compute left
+                    int endJump = emitJump(JITKEEP); // v      ; JITKEEP end
+                    emit(POP);                       // ∅
+                    emit(e.right());                 // v      ; compute right
+                    patchJump(e.op(), endJump);      // v      ; end:
                 }
             }
             case Expr.MapLiteral e -> {
-                emit(MAPNEW);
+                                                   // Stack effects:
+                emit(MAPNEW);                      // m        ; create map
                 for (var i = 0; i < e.entries().size(); i += 2) {
-                    emit(e.entries().get(i));      // Key
-                    emit(e.entries().get(i + 1));  // Value
-                    emit(MAPPUT);
+                    emit(e.entries().get(i));      // m k      ; compute key
+                    emit(e.entries().get(i + 1));  // m k v    ; compute value
+                    emit(MAPPUT);                  // m        ; m[k] = v
                 }
             }
             case Expr.PropGet e -> {
@@ -807,19 +818,14 @@ class Compiler {
                 emit(SUPGET, name);    // m        ; super.name
             }
             case Expr.Ternary e -> {
-                //                 | cond
-                // JIF else        |
-                // trueExpr        | a
-                // JUMP end        | a
-                // else: falseExpr | b
-                // end:            | a or b
-                emit(e.condition());
-                int elseJump = emitJump(JIF);
-                emit(e.trueExpr());
-                int endJump = emitJump(JUMP);
-                patchJump(e.op(), elseJump);
-                emit(e.falseExpr());
-                patchJump(e.op(), endJump);
+                                               // Stack effects
+                emit(e.condition());           // c     ; compute condition
+                int elseJump = emitJump(JIF);  //       ; JIF else
+                emit(e.trueExpr());            // v     ; compute true value
+                int endJump = emitJump(JUMP);  // v     ; JUMP end
+                patchJump(e.op(), elseJump);   // ∅     ; else:
+                emit(e.falseExpr());           // v     ; compute false value
+                patchJump(e.op(), endJump);    // v     ; end:
             }
             case Expr.This e -> {
                 if (currentType == null || !currentType.inInstanceMethod) {
@@ -827,68 +833,60 @@ class Compiler {
                         "Can't use '" + e.keyword().lexeme() +
                         "' outside of a method.");
                 }
-                emitGET(VAR_THIS);
+                                     // Stack effects:
+                emitGET(VAR_THIS);   // this
             }
             case Expr.Unary e -> {
-                emit(e.right());
-                switch(e.op().type()) {
-                    case TokenType.BANG  -> emit(NOT);
-                    case TokenType.MINUS -> emit(NEGATE);
+                var op = switch(e.op().type()) {
+                    case TokenType.BANG  -> NOT;
+                    case TokenType.MINUS -> NEGATE;
                     default -> throw new IllegalStateException(
                         "Unexpected operator: " + e.op());
-                }
+                };
+
+                                     // Stack effects:
+                emit(e.right());     // a       ; compute right
+                emit(op);            // b       ; b = op a
             }
-            case Expr.VarGet e -> emitGET(e.name());
+            case Expr.VarGet e -> {
+                                     // Stack effects:
+                emitGET(e.name());   // value     ; get name
+            }
             case Expr.VarIncrDecr e -> {
                 var incrDecr = token2incrDecr(e.op());
 
-                if (e.isPre()) {
-                    // Pre-increment/decrement
-                    //
-                    //                    | ∅         ; Initial state
-                    // *GET        var    | a         ; a = var
-                    // mathOp             | a'        ; e.g., a' = a + 1
-                    // *SET        var    | a'        ; var = a'
-                    emitGET(e.name());
-                    emit(incrDecr);
-                    emitSET(e.name());
-                } else {
-                    // Post-increment/decrement
-                    //                    | ∅         ; Initial state
-                    // *GET        var    | a         ; a = var
-                    // TPUT               | a         ; T = a
-                    // INCR               | a'        ; a' = a + 1
-                    // *SET        var    | a'        ; var = a'
-                    // POP                | ∅         ;
-                    // TGET               | a         ; push T
-                    emitGET(e.name());
-                    emit(TPUT);
-                    emit(incrDecr);
-                    emitSET(e.name());
-                    emit(POP);
-                    emit(TGET);
+                if (e.isPre()) { // Pre-increment/decrement
+                                          // Stack effects:
+                    emitGET(e.name());    // a        ; a = name
+                    emit(incrDecr);       // b        ; b = a +/- 1
+                    emitSET(e.name());    // b        ; name = b
+                } else { // Post-increment/decrement
+                                          // Stack effects:
+                    emitGET(e.name());    // a        ; a = name
+                    emit(TPUT);           // a        ; T = a
+                    emit(incrDecr);       // b        ; b = a +/- 1
+                    emitSET(e.name());    // b        ; name = b
+                    emit(POP);            // ∅
+                    emit(TGET);           // a        ; a = T
                 }
             }
             case Expr.VarSet e -> {
                 // Simple Assignment
                 if (e.op().type() == TokenType.EQUAL) {
-                    emit(e.value());
-                    emitSET(e.name());
+                                          // Stack effects:
+                    emit(e.value());      // a        ; compute value
+                    emitSET(e.name());    // a        ; name = a
                     return;
                 }
 
                 // Assignment with update
                 var mathOp = token2updater(e.op());
 
-                //                | ∅         ; Initial stack
-                // *GET    var    | a         ; a = var
-                // expr           | a b       ; b = expr
-                // mathOp         | c         ; E.g., c = a + b
-                // *SET    var    | c         ; var = c, retaining c
-                emitGET(e.name());
-                emit(e.value());
-                emit(mathOp);
-                emitSET(e.name());
+                                          // Stack effects:
+                emitGET(e.name());        // a      ; a = name
+                emit(e.value());          // a b    ; compute update value
+                emit(mathOp);             // c      ; c = a op b
+                emitSET(e.name());        // c      ; name = c
             }
         }
     }
