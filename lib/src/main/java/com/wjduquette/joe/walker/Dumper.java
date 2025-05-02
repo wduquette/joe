@@ -276,13 +276,6 @@ class Dumper {
             .append(expr.getClass().getSimpleName())
             .append(" ");
         switch (expr) {
-            case Expr.VarSet e -> {
-                buff.append(e.name().lexeme())
-                    .append(" ")
-                    .append(e.op().lexeme())
-                    .append("\n");
-                dumpExpression(e.value());
-            }
             case Expr.Binary e -> {
                 buff.append(e.op().lexeme())
                     .append("\n");
@@ -303,6 +296,10 @@ class Dumper {
                     .append(")\n");
             }
             case Expr.IndexGet e -> {
+                dumpExpression(e.collection());
+                dumpExpression(e.index());
+            }
+            case Expr.IndexIncrDecr e -> {
                 dumpExpression(e.collection());
                 dumpExpression(e.index());
             }
@@ -330,39 +327,24 @@ class Dumper {
                 dumpExpression(e.right());
             }
             case Expr.MapLiteral e -> e.entries().forEach(this::dumpExpression);
-            case Expr.VarIncrDecr e -> {
-                if (e.isPre()) {
-                    buff.append(e.op().lexeme())
-                        .append(e.name().lexeme())
-                        .append("\n");
-                } else {
-                    buff.append(e.name().lexeme())
-                        .append(e.op().lexeme())
-                        .append("\n");
-                }
-            }
-            case Expr.PrePostIndex e -> {
-                dumpExpression(e.collection());
-                dumpExpression(e.index());
-            }
-            case Expr.PrePostSet e -> {
-                if (e.isPre()) {
-                    buff.append(e.op().lexeme())
-                        .append(e.name().lexeme())
-                        .append(" of\n");
-                } else {
-                    buff.append(e.name().lexeme())
-                        .append(e.op().lexeme())
-                        .append(" of\n");
-                }
-                dumpExpression(e.object());
-            }
             case Expr.PropGet e -> {
                 buff.append(e.name().lexeme())
                     .append(" of:\n");
                 dumpExpression(e.object());
             }
-            case Expr.Set e -> {
+            case Expr.PropIncrDecr e -> {
+                if (e.isPre()) {
+                    buff.append(e.op().lexeme())
+                        .append(e.name().lexeme())
+                        .append(" of\n");
+                } else {
+                    buff.append(e.name().lexeme())
+                        .append(e.op().lexeme())
+                        .append(" of\n");
+                }
+                dumpExpression(e.object());
+            }
+            case Expr.PropSet e -> {
                 buff.append(e.name().lexeme())
                     .append(" of\n");
                 dumpExpression(e.object());
@@ -387,6 +369,24 @@ class Dumper {
             case Expr.VarGet e ->
                 buff.append(e.name().lexeme())
                     .append("\n");
+            case Expr.VarIncrDecr e -> {
+                if (e.isPre()) {
+                    buff.append(e.op().lexeme())
+                        .append(e.name().lexeme())
+                        .append("\n");
+                } else {
+                    buff.append(e.name().lexeme())
+                        .append(e.op().lexeme())
+                        .append("\n");
+                }
+            }
+            case Expr.VarSet e -> {
+                buff.append(e.name().lexeme())
+                    .append(" ")
+                    .append(e.op().lexeme())
+                    .append("\n");
+                dumpExpression(e.value());
+            }
         }
 
         --indent;

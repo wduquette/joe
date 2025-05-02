@@ -279,10 +279,6 @@ class Resolver {
 
     private void resolve(Expr expression) {
         switch (expression) {
-            case Expr.VarSet expr -> {
-                resolve(expr.value());
-                resolveLocal(expr, expr.name());
-            }
             case Expr.Binary expr -> {
                 resolve(expr.left());
                 resolve(expr.right());
@@ -296,6 +292,10 @@ class Resolver {
             }
             case Expr.Grouping expr -> resolve(expr.expr());
             case Expr.IndexGet expr -> {
+                resolve(expr.collection());
+                resolve(expr.index());
+            }
+            case Expr.IndexIncrDecr expr -> {
                 resolve(expr.collection());
                 resolve(expr.index());
             }
@@ -313,14 +313,9 @@ class Resolver {
                 resolve(expr.right());
             }
             case Expr.MapLiteral expr -> expr.entries().forEach(this::resolve);
-            case Expr.VarIncrDecr expr -> resolveLocal(expr, expr.name());
-            case Expr.PrePostIndex expr -> {
-                resolve(expr.collection());
-                resolve(expr.index());
-            }
-            case Expr.PrePostSet expr -> resolve(expr.object());
             case Expr.PropGet expr -> resolve(expr.object());
-            case Expr.Set expr -> {
+            case Expr.PropIncrDecr expr -> resolve(expr.object());
+            case Expr.PropSet expr -> {
                 resolve(expr.value());
                 resolve(expr.object());
             }
@@ -373,6 +368,11 @@ class Resolver {
                         "Can't read local variable in its own initializer.");
                 }
 
+                resolveLocal(expr, expr.name());
+            }
+            case Expr.VarIncrDecr expr -> resolveLocal(expr, expr.name());
+            case Expr.VarSet expr -> {
+                resolve(expr.value());
                 resolveLocal(expr, expr.name());
             }
         }

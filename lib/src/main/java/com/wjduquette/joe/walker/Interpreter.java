@@ -417,24 +417,6 @@ class Interpreter {
 
     Object evaluate(Expr expression) {
         return switch (expression) {
-            // Assign a value to a variable or an object property, using
-            // =, +=, -=, *=, /=
-            case Expr.VarSet expr -> {
-                Object right = evaluate(expr.value());
-                var distance = locals.get(expr);
-
-                if (expr.op().type() != TokenType.EQUAL) {
-                    Object left = lookupVariable(expr.name(), expr);
-                    right = computeExtendedAssignment(left, expr.op(), right);
-                }
-
-                if (distance != null) {
-                    environment.assignAt(distance, expr.name(), right);
-                } else {
-                    globals.assign(expr.name(), right);
-                }
-                yield right;
-            }
             // Compute any binary operation except for && and ||
             case Expr.Binary expr -> {
                 Object left = evaluate(expr.left());
@@ -561,6 +543,39 @@ class Interpreter {
                         joe.typedValue(target) + ".");
                 }
             }
+            // ++ and -- with an indexed collection
+            case Expr.IndexIncrDecr expr -> {
+                var target = evaluate(expr.collection());
+                var index = evaluate(expr.index());
+                Object prior;
+
+                if (target instanceof JoeList list) {
+                    int i = checkListIndex(expr.bracket(), list, index);
+                    prior = list.get(i);
+                } else if (target instanceof JoeMap map) {
+                    prior = map.get(index);
+                } else {
+                    throw new RuntimeError(expr.bracket().span(),
+                        "Expected indexed collection, got: " +
+                            joe.typedValue(target));
+                }
+
+                checkNumericTarget(expr.op(), prior);
+
+                double assigned = expr.op().type() == TokenType.PLUS_PLUS
+                    ? (double)prior + 1
+                    : (double)prior - 1;
+                var result = expr.isPre() ? assigned : prior;
+
+                if (target instanceof JoeList list) {
+                    int i = checkListIndex(expr.bracket(), list, index);
+                    list.set(i, assigned);
+                } else {
+                    ((JoeMap)target).put(index, assigned);
+                }
+
+                yield result;
+            }
             // expr[index] = value, etc.
             case Expr.IndexSet expr -> {
                 var target = evaluate(expr.collection());
@@ -630,59 +645,20 @@ class Interpreter {
                 }
                 yield map;
             }
-            // ++ and -- with a variable name
-            case Expr.VarIncrDecr expr -> {
-                var distance = locals.get(expr);
-                Object prior = lookupVariable(expr.name(), expr);
-                checkNumericTarget(expr.op(), prior);
-
-                double assigned = expr.op().type() == TokenType.PLUS_PLUS
-                    ? (double)prior + 1
-                    : (double)prior - 1;
-                var result = expr.isPre() ? assigned : prior;
-
-                if (distance != null) {
-                    environment.assignAt(distance, expr.name(), assigned);
-                } else {
-                    globals.assign(expr.name(), assigned);
+            // Get an object property.  The expression must evaluate to
+            // a JoeValue, i.e., a JoeInstance or a ProxiedValue.
+            case Expr.PropGet expr -> {
+                Object object = evaluate(expr.object());
+                if (object == null) {
+                    throw new RuntimeError(expr.name().span(),
+                        "Tried to retrieve '" + expr.name().lexeme() +
+                            "' property from null value.");
                 }
-                yield result;
-            }
-            // ++ and -- with an indexed collection
-            case Expr.PrePostIndex expr -> {
-                var target = evaluate(expr.collection());
-                var index = evaluate(expr.index());
-                Object prior;
-
-                if (target instanceof JoeList list) {
-                    int i = checkListIndex(expr.bracket(), list, index);
-                    prior = list.get(i);
-                } else if (target instanceof JoeMap map) {
-                    prior = map.get(index);
-                } else {
-                    throw new RuntimeError(expr.bracket().span(),
-                        "Expected indexed collection, got: " +
-                            joe.typedValue(target));
-                }
-
-                checkNumericTarget(expr.op(), prior);
-
-                double assigned = expr.op().type() == TokenType.PLUS_PLUS
-                    ? (double)prior + 1
-                    : (double)prior - 1;
-                var result = expr.isPre() ? assigned : prior;
-
-                if (target instanceof JoeList list) {
-                    int i = checkListIndex(expr.bracket(), list, index);
-                    list.set(i, assigned);
-                } else {
-                    ((JoeMap)target).put(index, assigned);
-                }
-
-                yield result;
+                JoeValue instance = joe.getJoeValue(object);
+                yield instance.get(expr.name().lexeme());
             }
             // ++ and -- with an object property
-            case Expr.PrePostSet expr -> {
+            case Expr.PropIncrDecr expr -> {
                 Object object = evaluate(expr.object());
                 JoeValue instance = joe.getJoeValue(object);
                 var name = expr.name().lexeme();
@@ -697,20 +673,8 @@ class Interpreter {
                 instance.set(name, assigned);
                 yield result;
             }
-            // Get an object property.  The expression must evaluate to
-            // a JoeValue, i.e., a JoeInstance or a ProxiedValue.
-            case Expr.PropGet expr -> {
-                Object object = evaluate(expr.object());
-                if (object == null) {
-                    throw new RuntimeError(expr.name().span(),
-                        "Tried to retrieve '" + expr.name().lexeme() +
-                            "' property from null value.");
-                }
-                JoeValue instance = joe.getJoeValue(object);
-                yield instance.get(expr.name().lexeme());
-            }
             // Assign a value to an object property using =, +=, -=, *=, /=
-            case Expr.Set expr -> {
+            case Expr.PropSet expr -> {
                 Object object = evaluate(expr.object());
                 JoeValue instance = joe.getJoeValue(object);
 
@@ -772,6 +736,42 @@ class Interpreter {
             }
             // Get a variable's value
             case Expr.VarGet expr -> lookupVariable(expr.name(), expr);
+            // ++ and -- with a variable name
+            case Expr.VarIncrDecr expr -> {
+                var distance = locals.get(expr);
+                Object prior = lookupVariable(expr.name(), expr);
+                checkNumericTarget(expr.op(), prior);
+
+                double assigned = expr.op().type() == TokenType.PLUS_PLUS
+                    ? (double)prior + 1
+                    : (double)prior - 1;
+                var result = expr.isPre() ? assigned : prior;
+
+                if (distance != null) {
+                    environment.assignAt(distance, expr.name(), assigned);
+                } else {
+                    globals.assign(expr.name(), assigned);
+                }
+                yield result;
+            }
+            // Assign a value to a variable or an object property, using
+            // =, +=, -=, *=, /=
+            case Expr.VarSet expr -> {
+                Object right = evaluate(expr.value());
+                var distance = locals.get(expr);
+
+                if (expr.op().type() != TokenType.EQUAL) {
+                    Object left = lookupVariable(expr.name(), expr);
+                    right = computeExtendedAssignment(left, expr.op(), right);
+                }
+
+                if (distance != null) {
+                    environment.assignAt(distance, expr.name(), right);
+                } else {
+                    globals.assign(expr.name(), right);
+                }
+                yield right;
+            }
         };
     }
 

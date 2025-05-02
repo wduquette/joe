@@ -577,7 +577,7 @@ public class Parser {
                 Token name = ((Expr.VarGet) target).name();
                 return new Expr.VarSet(name, op, value);
             } else if (target instanceof Expr.PropGet get) {
-                return new Expr.Set(get.object(), get.name(), op, value);
+                return new Expr.PropSet(get.object(), get.name(), op, value);
             } else if (target instanceof Expr.IndexGet get) {
                 return new Expr.IndexSet(
                     get.collection(), get.bracket(), get.index(), op, value);
@@ -708,9 +708,9 @@ public class Parser {
             Token name = ((Expr.VarGet) target).name();
             return new Expr.VarIncrDecr(name, op, isPre);
         } else if (target instanceof Expr.PropGet get) {
-            return new Expr.PrePostSet(get.object(), get.name(), op, isPre);
+            return new Expr.PropIncrDecr(get.object(), get.name(), op, isPre);
         } else if (target instanceof Expr.IndexGet get) {
-            return new Expr.PrePostIndex(
+            return new Expr.IndexIncrDecr(
                 get.collection(), get.bracket(), get.index(), op, isPre);
         }
 

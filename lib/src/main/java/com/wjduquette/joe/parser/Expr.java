@@ -11,11 +11,11 @@ public sealed interface Expr permits
     Expr.Binary,
     Expr.Call,
     Expr.Grouping,
-    Expr.IndexGet, Expr.IndexSet,
+    Expr.IndexGet, Expr.IndexIncrDecr, Expr.IndexSet,
     Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
     Expr.MapLiteral,
-    Expr.PrePostIndex, Expr.PrePostSet, Expr.PropGet,
-    Expr.Set, Expr.Super,
+    Expr.PropGet, Expr.PropIncrDecr, Expr.PropSet,
+    Expr.Super,
     Expr.This, Expr.Ternary,
     Expr.Unary,
     Expr.VarGet, Expr.VarIncrDecr, Expr.VarSet
@@ -68,6 +68,23 @@ public sealed interface Expr permits
      */
     record IndexGet(Expr collection, Token bracket, Expr index) implements Expr {
         public Span location() { return bracket.span(); }
+    }
+
+    /**
+     * A pre-or-post increment/decrement to an indexed collection.
+     * @param collection The expression that yields the collection.
+     * @param bracket The bracket
+     * @param index The expression that yields the index.
+     * @param op The operator
+     * @param isPre Whether this is a pre-increment/decrement or not.
+     */
+    record IndexIncrDecr(
+        Expr collection,
+        Token bracket,
+        Expr index,
+        Token op, boolean isPre
+    ) implements Expr {
+        public Span location() { return op.span(); }
     }
 
     /**
@@ -139,39 +156,6 @@ public sealed interface Expr permits
     }
 
     /**
-     * A pre-or-post increment/decrement to an indexed collection.
-     * @param collection The expression that yields the collection.
-     * @param bracket The bracket
-     * @param index The expression that yields the index.
-     * @param op The operator
-     * @param isPre Whether this is a pre-increment/decrement or not.
-     */
-    record PrePostIndex(
-        Expr collection,
-        Token bracket,
-        Expr index,
-        Token op, boolean isPre
-    ) implements Expr {
-        public Span location() { return op.span(); }
-    }
-
-    /**
-     * A pre-or-post increment/decrement to an existing property.
-     * @param object The expression that yields the object.
-     * @param name The name of the property
-     * @param op The operator
-     * @param isPre Whether this is a pre-increment/decrement or not.
-     */
-    record PrePostSet(
-        Expr object,
-        Token name,
-        Token op,
-        boolean isPre
-    ) implements Expr {
-        public Span location() { return op.span(); }
-    }
-
-    /**
      * A get of an object property.
      * See Expr.Variable for a get of a normal variable.
      * @param object The expression that yields the object
@@ -182,6 +166,22 @@ public sealed interface Expr permits
     }
 
     /**
+     * A pre-or-post increment/decrement to an existing property.
+     * @param object The expression that yields the object.
+     * @param name The name of the property
+     * @param op The operator
+     * @param isPre Whether this is a pre-increment/decrement or not.
+     */
+    record PropIncrDecr(
+        Expr object,
+        Token name,
+        Token op,
+        boolean isPre
+    ) implements Expr {
+        public Span location() { return op.span(); }
+    }
+
+    /**
      * An assignment to an object property.
      * See Expr.Assign for assignments to normal variables.
      * @param object The expression that yields the object.
@@ -189,7 +189,7 @@ public sealed interface Expr permits
      * @param op The assignment operator
      * @param value The expression that yields the value to assign.
      */
-    record Set(Expr object, Token name, Token op, Expr value) implements Expr {
+    record PropSet(Expr object, Token name, Token op, Expr value) implements Expr {
         public Span location() { return op.span(); }
     }
 

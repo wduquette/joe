@@ -683,17 +683,17 @@ class Compiler {
                     emit(MAPPUT);
                 }
             }
-            case Expr.PrePostIndex prePostIndex -> {
+            case Expr.IndexIncrDecr prePostIndex -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.PrePostSet prePostSet -> {
+            case Expr.PropIncrDecr prePostSet -> {
                 throw new UnsupportedOperationException("TODO");
             }
             case Expr.PropGet e -> {
                 emit(e.object());
                 emit(PROPGET, constant(e.name().lexeme()));
             }
-            case Expr.Set set -> {
+            case Expr.PropSet set -> {
                 throw new UnsupportedOperationException("TODO");
             }
             case Expr.Super aSuper -> {
