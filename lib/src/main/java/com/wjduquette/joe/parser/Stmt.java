@@ -219,18 +219,18 @@ public sealed interface Stmt
      * A record declaration
      * @param name The type's name
      * @param typeSpan The type's span in the source script.
-     * @param recordFields The type's field names.
+     * @param fields The type's field names.
      * @param staticMethods The class object's static methods
      * @param methods The class's instance methods
-     * @param staticInitializer The static initializer statements
+     * @param staticInit The static initializer statements
      */
     record Record(
         Token name,
         Span typeSpan,
-        List<String> recordFields,
+        List<String> fields,
         List<Stmt.Function> staticMethods,
         List<Stmt.Function> methods,
-        List<Stmt> staticInitializer
+        List<Stmt> staticInit
     ) implements Stmt {
         public Span location() { return name.span(); }
     }

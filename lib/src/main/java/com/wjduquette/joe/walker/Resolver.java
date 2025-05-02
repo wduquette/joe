@@ -219,10 +219,10 @@ class Resolver {
                     resolveFunction(method, declaration);
                 }
 
-                if (!stmt.staticInitializer().isEmpty()) {
+                if (!stmt.staticInit().isEmpty()) {
                     var oldFunction = currentFunction;
                     currentFunction = FunctionType.STATIC_INITIALIZER;
-                    resolve(stmt.staticInitializer());
+                    resolve(stmt.staticInit());
                     currentFunction = oldFunction;
                 }
 

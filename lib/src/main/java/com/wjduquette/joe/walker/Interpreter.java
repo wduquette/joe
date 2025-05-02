@@ -299,7 +299,7 @@ class Interpreter {
                 WalkerRecord type = new WalkerRecord(
                     stmt.name().lexeme(),
                     stmt.typeSpan(),
-                    stmt.recordFields(),
+                    stmt.fields(),
                     staticMethods,
                     methods);
 
@@ -307,9 +307,9 @@ class Interpreter {
                 environment.assign(stmt.name(), type);
 
                 // Static Initialization
-                if (!stmt.staticInitializer().isEmpty()) {
+                if (!stmt.staticInit().isEmpty()) {
                     try {
-                        executeBlock(stmt.staticInitializer(), environment);
+                        executeBlock(stmt.staticInit(), environment);
                     } catch (JoeError ex) {
                         var buff = stmt.typeSpan().buffer();
                         var context = buff.lineSpan(stmt.typeSpan().endLine());

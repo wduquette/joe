@@ -460,8 +460,60 @@ class Compiler {
             case Stmt.Match match -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Stmt.Record record -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.Record s -> {
+                // NOTE: The stack effects are written presuming that the
+                // class is defined at local scope, as that's harder to
+                // track mentally.
+
+                // Create Record              // Stack: locals | working
+                beginType(Kind.RECORD);       // ∅        ; begin type def
+                emit(RECORD,                  // ∅ | t    ; create type
+                    name(s.name()),
+                    constant(s.fields()));
+                defineVariable(s.name());     // t | ∅    ; define type var
+                emitGET(s.name());            // t | t    ; get type
+
+                // Static Methods
+                for (var m : s.staticMethods()) {
+                    setSourceLine(m.span().startLine());
+                    emitFunction(             // t | t m  ; compile method
+                        FunctionType.STATIC_METHOD,
+                        m.name().lexeme(),
+                        m.params(),
+                        m.body(),
+                        m.span()
+                    );
+                    emitMETHOD(m.name());     // t | t    ; save method
+                }
+
+                // Instance Methods
+                currentType.inInstanceMethod = true;
+                for (var m : s.methods()) {
+                    setSourceLine(m.span().startLine());
+                    emitFunction(             // t | t m  ; compile method
+                        FunctionType.METHOD,
+                        m.name().lexeme(),
+                        m.params(),
+                        m.body(),
+                        m.span()
+                    );
+                    emitMETHOD(m.name());     // t | t    ; save method
+                }
+                currentType.inInstanceMethod = false;
+
+                emit(POP);                    // t | ∅    ; pop tye
+
+                // End super scope
+                if (currentType.hasSupertype) {
+                    endScope();               // t | ∅    ; end scope super
+                }
+
+                // Static Initializer
+                if (!s.staticInit().isEmpty()) {
+                    emit(s.staticInit());     // t | ∅    ; execute static init
+                }
+
+                endType();                    // t | ∅    ; end type def
             }
             case Stmt.Return s -> {
                 if (current.inStaticInitializer) {
@@ -1335,13 +1387,10 @@ class Compiler {
         emit(Opcode.COMMENT, index);
     }
 
-    private void emit(char value) {
-        current.chunk.write(value, current.sourceLine);
-    }
-
-    private void emit(char value1, char value2) {
-        emit(value1);
-        emit(value2);
+    private void emit(char... codes) {
+        for (var code : codes) {
+            current.chunk.write(code, current.sourceLine);
+        }
     }
 
     //-------------------------------------------------------------------------

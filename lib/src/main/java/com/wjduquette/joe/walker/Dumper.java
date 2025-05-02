@@ -186,7 +186,7 @@ class Dumper {
                     .append("Stmt.Record ")
                     .append(stmt.name().lexeme())
                     .append("(")
-                    .append(String.join(", ", stmt.recordFields()))
+                    .append(String.join(", ", stmt.fields()))
                     .append(")")
                     ;
 
@@ -195,12 +195,12 @@ class Dumper {
                 // Class content
                 ++indent;
 
-                if (stmt.staticInitializer() !=  null &&
-                    !stmt.staticInitializer().isEmpty()
+                if (stmt.staticInit() !=  null &&
+                    !stmt.staticInit().isEmpty()
                 ) {
                     buff.append(indent())
                         .append("Static initializer:\n");
-                    dumpStatements(stmt.staticInitializer());
+                    dumpStatements(stmt.staticInit());
                 }
 
                 if (stmt.staticMethods() != null) {
