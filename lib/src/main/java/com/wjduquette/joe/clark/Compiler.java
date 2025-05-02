@@ -652,6 +652,7 @@ class Compiler {
             }
             case Expr.Grouping e -> emit(e.expr());
             case Expr.IndexGet e -> {
+                                          // Stack effects:
                 emit(e.collection());     // c          ; compute collection
                 emit(e.index());          // c i        ; compute index
                 emit(INDGET);             // v          ; get v = c[i]
@@ -659,8 +660,27 @@ class Compiler {
             case Expr.IndexIncrDecr prePostIndex -> {
                 throw new UnsupportedOperationException("TODO");
             }
-            case Expr.IndexSet indexSet -> {
-                throw new UnsupportedOperationException("TODO");
+            case Expr.IndexSet e -> {
+                // Simple Assignment
+                if (e.op().type() == TokenType.EQUAL) {
+                    // Stack effects:
+                    emit(e.collection());     // c       ; compute collection
+                    emit(e.index());          // c i     ; compute index
+                    emit(e.value());          // c i x   ; compute value
+                    emit(INDSET);             // x       ; c[i] = x
+                    return;
+                }
+
+                // Assignment with update
+                var mathOp = token2updater(e.op());
+
+                emit(e.collection());     // c         ; compute collection
+                emit(e.index());          // c i       ; compute index
+                emit(DUP2);               // c i c i   ; need it twice
+                emit(INDGET);             // c i x     ; x = c[i]
+                emit(e.value());          // c i x y   ; compute update value
+                emit(mathOp);             // c i z     ; z = x + y
+                emit(INDSET);             // z         ; c[i] = z
             }
             case Expr.Lambda e -> {
                 emitFunction(FunctionType.LAMBDA, LAMBDA_NAME,
