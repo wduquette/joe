@@ -79,11 +79,11 @@ class Compiler {
     private FunctionCompiler current = null;
 
     // The loop currently being compiled, or null
-    private LoopCompiler currentLoop = null;
+    private LoopInfo currentLoop = null;
 
-//    // The type currently being compiled, or null
-//    private TypeCompiler currentType = null;
-//
+    // The type currently being compiled, or null
+    private TypeCompiler currentType = null;
+
 //    // The pattern currently being compiled, or null
 //    private PatternCompiler currentPattern = null;
 
@@ -259,8 +259,10 @@ class Compiler {
                 var jump = emitJump(JUMP);
                 currentLoop.breakJumps.add(jump);
             }
-            case Stmt.Class aClass -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.Class s -> {
+                emit(CLASS, constant(s.name().lexeme()));
+                defineVariable(s.name());
+
             }
             case Stmt.Continue s -> {
                 if (currentLoop == null) {
@@ -290,9 +292,6 @@ class Compiler {
                 //
                 // Thus, this code needn't create a scope.
 
-                currentLoop = new LoopCompiler(currentLoop);
-                currentLoop.breakDepth = current.scopeDepth;
-
                 // Initializer
                 if (s.init() != null) {
                     emit(s.init());
@@ -318,16 +317,13 @@ class Compiler {
                     patchJump(s.keyword(), bodyJump);
                 }
 
-                currentLoop.continueDepth = current.scopeDepth;
-                currentLoop.loopStart = loopStart;
+                beginLoop(s.keyword(), loopStart);
                 emit(s.body());
                 emitLoop(s.keyword(), loopStart);
 
                 // exit:
                 if (exitJump != -1) patchJump(s.keyword(), exitJump);
-                patchJumps(s.keyword(), currentLoop.breakJumps);
-
-                currentLoop = currentLoop.enclosing;
+                endLoop();
             }
             case Stmt.ForEach s -> {
                 // NOTE: the Parser wraps Stmt.ForEach as follows:
@@ -336,9 +332,6 @@ class Compiler {
                 // Thus, this code needn't create a scope or
                 // define the loop variable.
 
-                currentLoop = new LoopCompiler(currentLoop);
-                currentLoop.breakDepth = current.scopeDepth;
-
                 // Collection expression
                 emit(s.listExpr());
                 emit(ITER);  // Convert collection to iterator
@@ -346,8 +339,7 @@ class Compiler {
 
                 // Start the loop
                 int loopStart = here();
-                currentLoop.continueDepth = current.scopeDepth;
-                currentLoop.loopStart = loopStart;
+                beginLoop(s.keyword(), loopStart);
 
                 // Check to see if we have any more items
                 // Note: the iterator is on the top of the stack.
@@ -366,9 +358,7 @@ class Compiler {
 
                 // exit:
                 patchJump(s.keyword(), exitJump);
-                patchJumps(s.keyword(), currentLoop.breakJumps);
-
-                currentLoop = currentLoop.enclosing;
+                endLoop();
             }
             case Stmt.Function s -> {
                 // NOTE: The parser returns this for both functions
@@ -515,18 +505,14 @@ class Compiler {
                 var loopStart = here();
                 emit(s.condition());
 
-                currentLoop = new LoopCompiler(currentLoop);
-                currentLoop.breakDepth = current.scopeDepth;
-                currentLoop.continueDepth = current.scopeDepth;
-                currentLoop.loopStart = loopStart;
+                beginLoop(s.keyword(), loopStart);
 
                 int exitJump = emitJump(JIF);
                 emit(s.body());
                 emitLoop(s.keyword(), loopStart);
 
-                patchJumps(s.keyword(), currentLoop.breakJumps);
                 patchJump(s.keyword(), exitJump);
-                currentLoop = currentLoop.enclosing;
+                endLoop();
             }
         }
     }
@@ -554,7 +540,7 @@ class Compiler {
         var compiler = current;  // Save the compiler; endFunction pops it.
         var function = endFunction();
         setSourceLine(span.endLine());
-        emit(CLOSURE, addConstant(function));
+        emit(CLOSURE, constant(function));
 
         // Emit data about the upvalues
         for (int i = 0; i < function.upvalueCount; i++) {
@@ -791,7 +777,7 @@ class Compiler {
     // GLODEF nameIndex       | value → ∅
     private void defineGlobal(Token name) {
         assert inGlobalScope();
-        emit(GLODEF, addConstant(name.lexeme()));
+        emit(GLODEF, constant(name.lexeme()));
     }
 
     // Declares a local variable.  Checks for too many locals, and for
@@ -864,7 +850,7 @@ class Compiler {
         } else if ((arg = resolveUpvalue(current, name)) != -1) {
             getOp = Opcode.UPGET;
         } else {
-            arg = addConstant(name.lexeme());
+            arg = constant(name.lexeme());
             getOp = Opcode.GLOGET;
         }
 
@@ -881,7 +867,7 @@ class Compiler {
         } else if ((arg = resolveUpvalue(current, name)) != -1) {
             setOp = Opcode.UPSET;
         } else {
-            arg = addConstant(name.lexeme());
+            arg = constant(name.lexeme());
             setOp = Opcode.GLOSET;
         }
 
@@ -1024,6 +1010,36 @@ class Compiler {
     }
 
     //-------------------------------------------------------------------------
+    // Loop management
+
+    // Begins the loop's break/continue control region.
+    private void beginLoop(Token keyword, int loopStart) {
+        currentLoop = new LoopInfo(currentLoop);
+        currentLoop.keyword = keyword;
+        currentLoop.breakDepth = current.scopeDepth;
+        currentLoop.continueDepth = current.scopeDepth;
+        currentLoop.loopStart = loopStart;
+    }
+
+    // Ends the loop's break/continue control region, and patches all
+    // break jumps
+    private void endLoop() {
+        patchJumps(currentLoop.keyword, currentLoop.breakJumps);
+        currentLoop = currentLoop.enclosing;
+    }
+
+    //-------------------------------------------------------------------------
+    // Type Management
+
+    private void beginType() {
+
+    }
+
+    private void endType() {
+
+    }
+
+    //-------------------------------------------------------------------------
     // Parsing Tools
 
     private void error(Token token, String message) {
@@ -1052,7 +1068,7 @@ class Compiler {
 
     // Adds a constant to the constants table and returns its
     // index.
-    private char addConstant(Object value) {
+    private char constant(Object value) {
         return current.chunk.addConstant(value);
     }
 
@@ -1232,9 +1248,12 @@ class Compiler {
         }
     }
 
-    private static class LoopCompiler {
+    private static class LoopInfo {
         // The enclosing loop, or null if none.
-        final LoopCompiler enclosing;
+        final LoopInfo enclosing;
+
+        // The loop's keyword, for use when patching jumps
+        Token keyword = null;
 
         // The scope depth before the entire loop is compiled.
         // Allows break to know how many scopes to end.
@@ -1251,7 +1270,7 @@ class Compiler {
         // The chunk index to loop back to on continue
         int loopStart = -1;
 
-        LoopCompiler(LoopCompiler enclosing) {
+        LoopInfo(LoopInfo enclosing) {
             this.enclosing = enclosing;
         }
     }
