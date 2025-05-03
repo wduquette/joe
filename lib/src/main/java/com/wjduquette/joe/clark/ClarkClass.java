@@ -62,9 +62,9 @@ public class ClarkClass implements JoeClass, JoeValue, ClarkType, ClarkCallable 
 
         this.superclass = superclass;
 
-        if (superclass instanceof ClarkClass bertClass) {
-            methods.putAll(bertClass.methods);
-            nativeAncestor = bertClass.nativeAncestor;
+        if (superclass instanceof ClarkClass clarkClass) {
+            methods.putAll(clarkClass.methods);
+            nativeAncestor = clarkClass.nativeAncestor;
         } else {
             nativeAncestor = superclass;
         }

@@ -9,7 +9,7 @@ import com.wjduquette.joe.types.MapValue;
 
 import java.util.*;
 
-import static com.wjduquette.joe.bert.Opcode.*;
+import static com.wjduquette.joe.clark.Opcode.*;
 
 /**
  * The {@link ClarkEngine}'s virtual machine.  This is where the magic
