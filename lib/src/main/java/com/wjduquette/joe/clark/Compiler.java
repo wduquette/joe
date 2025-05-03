@@ -54,7 +54,7 @@ class Compiler {
     public static final String ARGS = "args";
 
     // The hidden variable used to hold a `foreach` iterator value
-    private static final Token VAR_ITERATOR = Token.synthetic("*iter*");
+    private static final Token VAR_ITER = Token.synthetic("*iter*");
 
     // The hidden variable used to hold a `switch` value
     private static final Token VAR_SWITCH = Token.synthetic("*switch*");
@@ -249,10 +249,10 @@ class Compiler {
         switch (stmt) {
             case Stmt.Assert s -> {          // Stack effects:
                 emit(s.condition());         // cond    ; compute condition
-                var endJump = emitJump(JIT); // ∅       ; JIT end
+                var end_ = emitJump(JIT);    // ∅       ; JIT end
                 emit(s.message());           // msg     ; compute message
                 emit(ASSERT);                // ∅       ; throw AssertError
-                patchJump(endJump);          // ∅       ; end:
+                patchJump(end_);             // ∅       ; end:
             }
             case Stmt.Block s -> {           // Stack effects:
                 beginScope();                // ∅           ; begin block scope
@@ -375,31 +375,31 @@ class Compiler {
                 }
 
                 // Condition
-                int loopStart = here();
-                int exitJump = -1;
+                int start_ = here();
+                int end_ = -1;
                 if (s.condition() != null) {
                     emit(s.condition());
 
                     // Jump out of the loop if the condition is false.
-                    exitJump = emitJump(JIF);
+                    end_ = emitJump(JIF);
                 }
 
                 if (s.updater() != null) {
-                    int bodyJump = emitJump(JUMP);
-                    int updaterStart = here();
+                    int body_ = emitJump(JUMP);
+                    int updater_ = here();
                     emit(s.updater());
                     emit(POP);
-                    emitLoop(loopStart);
-                    loopStart = updaterStart;
-                    patchJump(bodyJump);
+                    emitLoop(start_);
+                    start_ = updater_;
+                    patchJump(body_);
                 }
 
-                beginLoop(loopStart);
+                beginLoop(start_);
                 emit(s.body());
-                emitLoop(loopStart);
+                emitLoop(start_);
 
                 // exit:
-                if (exitJump != -1) patchJump(exitJump);
+                if (end_ != -1) patchJump(end_);
                 endLoop();
             }
             case Stmt.ForEach s -> {
@@ -412,16 +412,16 @@ class Compiler {
                 // Collection expression
                 emit(s.listExpr());
                 emit(ITER);  // Convert collection to iterator
-                defineLocal(VAR_ITERATOR); // Saves iterator
+                defineLocal(VAR_ITER); // Saves iterator
 
                 // Start the loop
-                int loopStart = here();
-                beginLoop(loopStart);
+                int start_ = here();
+                beginLoop(start_);
 
                 // Check to see if we have any more items
                 // Note: the iterator is on the top of the stack.
                 emit(HASNEXT);
-                var exitJump = emitJump(JIF);
+                var end_ = emitJump(JIF);
 
                 // Get the next item and update the loop variable
                 emit(GETNEXT);
@@ -431,10 +431,10 @@ class Compiler {
 
                 // Compile the body
                 emit(s.body());
-                emitLoop(loopStart);
+                emitLoop(start_);
 
                 // exit:
-                patchJump(exitJump);
+                patchJump(end_);
                 endLoop();
             }
             case Stmt.Function s -> {
@@ -454,19 +454,19 @@ class Compiler {
                 // end:  ...          | ∅      ; end of statement
 
                 emit(s.condition());
-                var elseJump = emitJump(JIF);
+                var else_ = emitJump(JIF);
                 emit(s.thenBranch());
 
-                int endJump = -1;
+                int end_ = -1;
                 if (s.elseBranch() != null) {
-                    endJump = emitJump(JUMP);
-                    patchJump(elseJump);
+                    end_ = emitJump(JUMP);
+                    patchJump(else_);
                     emit(s.elseBranch());
                 } else {
-                    patchJump(elseJump);
+                    patchJump(else_);
                 }
 
-                if (endJump != -1) patchJump(endJump);
+                if (end_ != -1) patchJump(end_);
             }
             case Stmt.IfLet ifLet -> {
                 throw new UnsupportedOperationException("TODO");
@@ -557,16 +557,16 @@ class Compiler {
                 defineLocal(VAR_SWITCH);
 
                 // Jump targets
-                var endJumps = jumpList();
-                int nextJump = -1;
+                var ends_ = jumpList();
+                int next_ = -1;
 
                 for (var c : s.cases()) {
                     setSourceLine(c.location());
-                    var caseJumps = jumpList();
+                    var cases_ = jumpList();
 
                     // Allow the previous case to jump here if it doesn't match.
                     // next:
-                    if (nextJump != -1) patchJump(nextJump);
+                    if (next_ != -1) patchJump(next_);
 
                     for (var target : c.values()) {
                         // Compute the case target and compare it with the
@@ -576,28 +576,28 @@ class Compiler {
                         emit(EQ);
 
                         // Jump to the next case if no match.
-                        caseJumps.emit(JIT);
+                        cases_.emit(JIT);
                     }
 
-                    nextJump = emitJump(JUMP);
-                    patchJumps(caseJumps);
+                    next_ = emitJump(JUMP);
+                    patchJumps(cases_);
 
                     // Parse the case body.
                     emit(c.statement());
 
                     // No end jump if this the default case
-                    endJumps.emit(JUMP);
+                    ends_.emit(JUMP);
                 }
 
                 // next:
-                if (nextJump != -1) patchJump(nextJump);
+                if (next_ != -1) patchJump(next_);
 
                 if (s.switchDefault() != null) {
                     emit(s.switchDefault().statement());
                 }
 
                 // Patch all the end jumps.
-                patchJumps(endJumps);
+                patchJumps(ends_);
 
                 // End the scope, removing the "*switch*" variable.
                 endScope();
@@ -631,17 +631,17 @@ class Compiler {
                 }
             }
             case Stmt.While s -> {
-                var loopStart = here();
-                emit(s.condition());
+                // Setup                   // Stack effects:
+                var start_ = here();       // ∅     ; start:
+                emit(s.condition());       // cond  ; compute condition
 
-                beginLoop(loopStart);
-
-                int exitJump = emitJump(JIF);
-                emit(s.body());
-                emitLoop(loopStart);
-
-                patchJump(exitJump);
-                endLoop();
+                // Loop
+                beginLoop(start_);         // cond  ; begin b/c zone
+                int end_ = emitJump(JIF);  // ∅     ; JIF end:
+                emit(s.body());            // ∅     ; compile loop body
+                emitLoop(start_);          // ∅     ; LOOP start:
+                patchJump(end_);           // ∅     ; end:
+                endLoop();                 // ∅     ; end b/c zone
             }
         }
     }
