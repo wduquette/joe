@@ -282,7 +282,7 @@ class Compiler {
                                                // Stack: locals | working
                 beginType(Kind.CLASS);         // ∅         ; begin type def
                 emit(CLASS, name(s.name()));   // ∅ | c     ; create class
-                defineVariable(s.name());      // c | ∅     ; define class var
+                defineVar(s.name());      // c | ∅     ; define class var
 
                 if (s.superclass() != null) {
                     currentType.hasSupertype = true;
@@ -442,7 +442,7 @@ class Compiler {
                 // and methods.  Methods aren't yet implemented.
                 emitFunction(FunctionType.FUNCTION, s.name().lexeme(),
                     s.params(), s.body(), s.location());
-                defineVariable(s.name());
+                defineVar(s.name());
             }
             case Stmt.If s -> {
                 //                    | ∅      ; Initial state
@@ -487,7 +487,7 @@ class Compiler {
                 emit(RECORD,                  // ∅ | t    ; create type
                     name(s.name()),
                     constant(s.fields()));
-                defineVariable(s.name());     // t | ∅    ; define type var
+                defineVar(s.name());     // t | ∅    ; define type var
                 emitGET(s.name());            // t | t    ; get type
 
                 // Static Methods
@@ -992,7 +992,7 @@ class Compiler {
     // appropriate action whether we are in the global or a local scope.
     // The variable's value *must* be on the top of the stack before this
     // is called.
-    private void defineVariable(Token name) {
+    private void defineVar(Token name) {
         if (inGlobalScope()) {
             defineGlobal(name);
         } else {
