@@ -269,7 +269,7 @@ class Resolver {
             }
             case Stmt.Var stmt -> {
                 declare(stmt.name());
-                resolve(stmt.initializer());
+                resolve(stmt.value());
                 define(stmt.name());
             }
         }

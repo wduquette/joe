@@ -615,7 +615,7 @@ class Compiler {
                 }
 
                 // Compile the initial value
-                emit(var.initializer());
+                emit(var.value());
 
                 if (inGlobalScope()) {
                     // Define the variable.  We don't worry about whether it

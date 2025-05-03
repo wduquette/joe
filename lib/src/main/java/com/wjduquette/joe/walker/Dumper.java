@@ -252,7 +252,7 @@ class Dumper {
                     .append("Stmt.Var ")
                     .append(stmt.name().lexeme())
                     .append(" =\n");
-                dumpExpression(stmt.initializer());
+                dumpExpression(stmt.value());
             }
             case Stmt.While stmt -> {
                 buff.append(indent())

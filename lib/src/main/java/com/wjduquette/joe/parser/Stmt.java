@@ -299,9 +299,9 @@ public sealed interface Stmt
      * A "var" variable declaration.  The initializer should always be
      * a valid Expr, possibly Expr.Literal(null).
      * @param name The variable name
-     * @param initializer The initializer, NOT null
+     * @param value The initializer, NOT null
      */
-    record Var(Token name, Expr initializer) implements Stmt {
+    record Var(Token name, Expr value) implements Stmt {
         public Span location() { return name.span(); }
     }
 
