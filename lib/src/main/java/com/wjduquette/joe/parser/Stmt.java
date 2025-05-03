@@ -112,14 +112,14 @@ public sealed interface Stmt
     /**
      * A "foreach" loop
      * @param keyword The "foreach" keyword
-     * @param varName The loop variable
-     * @param listExpr The list expression
+     * @param name The loop variable
+     * @param items The collection expression
      * @param body The body of the loop, a statement or block.
      */
     record ForEach(
         Token keyword,
-        Token varName,
-        Expr listExpr,
+        Token name,
+        Expr items,
         Stmt body
     ) implements Stmt {
         public Span location() { return keyword.span(); }

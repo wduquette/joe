@@ -147,7 +147,7 @@ class Resolver {
             }
             case Stmt.ForEach stmt -> {
                 ++loopCounter;
-                resolve(stmt.listExpr());
+                resolve(stmt.items());
                 resolve(stmt.body());
                 --loopCounter;
             }

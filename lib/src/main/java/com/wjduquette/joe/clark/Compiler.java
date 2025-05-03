@@ -279,10 +279,10 @@ class Compiler {
                 // class is defined at local scope, as that's harder to
                 // track mentally.
 
-                                               // Stack: locals | working
-                beginType(Kind.CLASS);         // ∅         ; begin type def
-                emit(CLASS, name(s.name()));   // ∅ | c     ; create class
-                defineVar(s.name());      // c | ∅     ; define class var
+                                              // Stack: locals | working
+                beginType(Kind.CLASS);        // ∅         ; begin type def
+                emit(CLASS, name(s.name()));  // ∅ | c     ; create class
+                defineVar(s.name());          // c | ∅     ; define class var
 
                 if (s.superclass() != null) {
                     currentType.hasSupertype = true;
@@ -370,37 +370,38 @@ class Compiler {
                 // we should manage the scope here.
 
                 // Initializer
-                if (s.init() != null) {
-                    emit(s.init());
+                if (s.init() != null) {      // Stack effects:
+                    emit(s.init());          // ∅     ; compile initializer
                 }
 
                 // Condition
-                int start_ = here();
+                int start_ = here();         // ∅     ; start:
                 int end_ = -1;
                 if (s.condition() != null) {
-                    emit(s.condition());
-
-                    // Jump out of the loop if the condition is false.
-                    end_ = emitJump(JIF);
+                    emit(s.condition());     // cond  ; compute the condition
+                    end_ = emitJump(JIF);    // ∅     ; JIF end
                 }
 
+                // Updater
                 if (s.updater() != null) {
-                    int body_ = emitJump(JUMP);
-                    int updater_ = here();
-                    emit(s.updater());
-                    emit(POP);
-                    emitLoop(start_);
-                    start_ = updater_;
-                    patchJump(body_);
+                    int body_ =              // ∅     ; JUMP body
+                        emitJump(JUMP);
+                    int updater_ = here();   //       ; updater:
+                    emit(s.updater());       // a     ; compute updater
+                    emit(POP);               // ∅     ; pop unneeded value
+                    emitLoop(start_);        // ∅     ; LOOP start:
+                    start_ = updater_;       // ∅     ; Loop back to updater:
+                    patchJump(body_);        // ∅     ; body:
                 }
 
-                beginLoop(start_);
-                emit(s.body());
-                emitLoop(start_);
+                beginLoop(start_);           // ∅     ; begin b/c zone
+                emit(s.body());              // ∅     ; compile body
+                emitLoop(start_);            // ∅     ; LOOP to updater or start
 
-                // exit:
-                if (end_ != -1) patchJump(end_);
-                endLoop();
+                if (end_ != -1) {
+                    patchJump(end_);         // ∅     ; end:
+                }
+                endLoop();                   // ∅     ; end b/c zone
             }
             case Stmt.ForEach s -> {
                 // NOTE: the Parser wraps Stmt.ForEach as follows:
@@ -409,33 +410,28 @@ class Compiler {
                 // Thus, this code needn't create a scope or
                 // define the loop variable.
 
-                // Collection expression
-                emit(s.listExpr());
-                emit(ITER);  // Convert collection to iterator
-                defineLocal(VAR_ITER); // Saves iterator
+                // Collection expression     // Stack: locals | working
+                emit(s.items());             // ∅ | items  ; compute collection
+                emit(ITER);                  // ∅ | it     ; compute iterator
+                defineLocal(VAR_ITER);       // it | ∅     ; define *iter*
 
-                // Start the loop
-                int start_ = here();
-                beginLoop(start_);
+                // Iteration
+                int start_ = here();         // it | ∅     ; start:
+                beginLoop(start_);           // it | ∅     ; begin b/c zone
+                emit(HASNEXT);               // it | flag  ; got item?
+                var end_ = emitJump(JIF);    // it | ∅     ; JIF end
+                emit(GETNEXT);               // it | i     ; get next item
+                emitSET(s.name());           // it | i     ; set loop var
+                emit(POP);                   // it | ∅     ; clear stack
 
-                // Check to see if we have any more items
-                // Note: the iterator is on the top of the stack.
-                emit(HASNEXT);
-                var end_ = emitJump(JIF);
+                // Loop Body
+                emit(s.body());              // it | ∅     ; compile body
+                emitLoop(start_);            // it | ∅     ; LOOP start:
 
-                // Get the next item and update the loop variable
-                emit(GETNEXT);
-                var arg = resolveLocal(current, s.varName());
-                emit(LOCSET, (char)arg);
-                emit(POP); // Pop the item value
+                patchJump(end_);             // it | ∅     ; end:
+                endLoop();                   // it | ∅     ; end b/c zone
 
-                // Compile the body
-                emit(s.body());
-                emitLoop(start_);
-
-                // exit:
-                patchJump(end_);
-                endLoop();
+                // Local *iter* is popped when the enclosing block end.
             }
             case Stmt.Function s -> {
                 // NOTE: The parser returns this for both functions
@@ -602,9 +598,9 @@ class Compiler {
                 // End the scope, removing the "*switch*" variable.
                 endScope();
             }
-            case Stmt.Throw s -> {
-                emit(s.value());
-                emit(THROW);
+            case Stmt.Throw s -> { // Stack effects:
+                emit(s.value());   // value     ; compute error
+                emit(THROW);       // ∅         ; Throw it
             }
             case Stmt.Var var -> {
                 if (!inGlobalScope()) {

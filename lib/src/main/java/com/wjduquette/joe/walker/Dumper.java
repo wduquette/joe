@@ -110,7 +110,7 @@ class Dumper {
                 buff.append(indent())
                     .append("Stmt.ForEach\n");
 
-                dumpExpression(stmt.listExpr());
+                dumpExpression(stmt.items());
                 dumpStatement(stmt.body());
             }
             case Stmt.Function stmt -> {

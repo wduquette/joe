@@ -173,12 +173,12 @@ class Interpreter {
                 }
             }
             case Stmt.ForEach stmt -> {
-                var list = evaluate(stmt.listExpr());
-                Collection<?> collection = toCollection(stmt.varName(), list);
+                var list = evaluate(stmt.items());
+                Collection<?> collection = toCollection(stmt.name(), list);
 
                 for (var item : collection) {
                     try {
-                        environment.setVar(stmt.varName().lexeme(), item);
+                        environment.setVar(stmt.name().lexeme(), item);
                         execute(stmt.body());
                     } catch (Break ex) {
                         break;
