@@ -615,11 +615,7 @@ class Compiler {
                 }
 
                 // Compile the initial value
-                if (var.initializer() != null) {
-                    emit(var.initializer());
-                } else {
-                    emit(NULL);
-                }
+                emit(var.initializer());
 
                 if (inGlobalScope()) {
                     // Define the variable.  We don't worry about whether it

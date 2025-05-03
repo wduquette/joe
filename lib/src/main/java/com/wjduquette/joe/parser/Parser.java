@@ -266,10 +266,9 @@ public class Parser {
         scanner.consume(IDENTIFIER, "Expected variable name.");
         var name = scanner.previous();
 
-        Expr initializer = null;
-        if (scanner.match(EQUAL)) {
-            initializer = expression();
-        }
+        var initializer = scanner.match(EQUAL)
+            ? expression()
+            : new Expr.Literal(null);
 
         scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
         return new Stmt.Var(name, initializer);
@@ -390,7 +389,7 @@ public class Parser {
         return new Stmt.Block(
             source.span(start, end),
             List.of(
-                new Stmt.Var(varName, null),
+                new Stmt.Var(varName, new Expr.Literal(null)),
                 new Stmt.ForEach(keyword, varName, listExpr, body)
         ));
     }

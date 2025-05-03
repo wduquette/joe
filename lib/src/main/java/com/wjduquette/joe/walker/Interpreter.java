@@ -358,10 +358,7 @@ class Interpreter {
                 }
             }
             case Stmt.Var stmt -> {
-                Object value = null;
-                if (stmt.initializer() != null) {
-                    value = evaluate(stmt.initializer());
-                }
+                Object value = evaluate(stmt.initializer());
                 environment.setVar(stmt.name().lexeme(), value);
             }
             case Stmt.While stmt -> {

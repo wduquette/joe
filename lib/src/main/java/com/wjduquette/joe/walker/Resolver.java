@@ -269,9 +269,7 @@ class Resolver {
             }
             case Stmt.Var stmt -> {
                 declare(stmt.name());
-                if (stmt.initializer() != null) {
-                    resolve(stmt.initializer());
-                }
+                resolve(stmt.initializer());
                 define(stmt.name());
             }
         }
