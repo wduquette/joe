@@ -208,7 +208,7 @@ class Compiler {
 
     // Completes compilation of the current function and returns it.
     private Function endFunction() {
-        setSourceLine(current.chunk.span.endLine());
+        lineAtEnd(current.chunk.span);
         emitReturn();
         var function = new Function(
             current.parameters,
@@ -244,7 +244,7 @@ class Compiler {
     //   - I'm planning on removing this pattern in the long run, as it's
     //     less clear.
     private void emit(Stmt stmt) {
-        setSourceLine(stmt.location());
+        line(stmt.location());
 
         switch (stmt) {
             case Stmt.Assert s -> {          // Stack effects:
@@ -257,7 +257,7 @@ class Compiler {
             case Stmt.Block s -> {           // Stack effects:
                 beginScope();                // ∅           ; begin block scope
                 emit(s.statements());        // locals? | ∅ ; compile body
-                setSourceLine(s.span().endLine());
+                lineAtEnd(s.span());
                 endScope();                  // ∅           ; end block scope
             }
             case Stmt.Break s -> {
@@ -297,7 +297,7 @@ class Compiler {
 
                 // Static Methods
                 for (var m : s.staticMethods()) {
-                    setSourceLine(m.span().startLine());
+                    line(m.span());
                     emitFunction(             // c s | c m  ; compile method
                         FunctionType.STATIC_METHOD,
                         m.name().lexeme(),
@@ -311,7 +311,7 @@ class Compiler {
                 // Instance Methods
                 currentType.inInstanceMethod = true;
                 for (var m : s.methods()) {
-                    setSourceLine(m.span().startLine());
+                    line(m.span());
                     var type = m.name().lexeme().equals(INIT)
                         ? FunctionType.INITIALIZER : FunctionType.METHOD;
                     emitFunction(             // c s | c m  ; compile method
@@ -492,7 +492,7 @@ class Compiler {
 
                 // Static Methods
                 for (var m : s.staticMethods()) {
-                    setSourceLine(m.span().startLine());
+                    line(m.span());
                     emitFunction(             // t | t m  ; compile method
                         FunctionType.STATIC_METHOD,
                         m.name().lexeme(),
@@ -506,7 +506,7 @@ class Compiler {
                 // Instance Methods
                 currentType.inInstanceMethod = true;
                 for (var m : s.methods()) {
-                    setSourceLine(m.span().startLine());
+                    line(m.span());
                     emitFunction(             // t | t m  ; compile method
                         FunctionType.METHOD,
                         m.name().lexeme(),
@@ -561,7 +561,7 @@ class Compiler {
                 int next_ = -1;
 
                 for (var c : s.cases()) {
-                    setSourceLine(c.location());
+                    line(c.location());
                     var cases_ = jumpList();
 
                     // Allow the previous case to jump here if it doesn't match.
@@ -668,7 +668,7 @@ class Compiler {
 
         var compiler = current;  // Save the compiler; endFunction pops it.
         var function = endFunction();
-        setSourceLine(span.endLine());
+        lineAtEnd(span);
         emit(CLOSURE, constant(function));
 
         // Emit data about the upvalues
@@ -690,7 +690,7 @@ class Compiler {
 
     // Emits the code for a single expression.
     private void emit(Expr expr) {
-        setSourceLine(expr.location());
+        line(expr.location());
 
         switch (expr) {
             case Expr.Binary e -> {
@@ -1309,12 +1309,24 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Code Generation
 
-    private void setSourceLine(Span span) {
-        if (span != null) setSourceLine(span.startLine());
+    // Sets the current source line
+    private void line(int line) {
+        current.sourceLine = line;
     }
 
-    private void setSourceLine(int line) {
-        current.sourceLine = line;
+    // Sets the current source line to that of the given token.
+    private void line(Token token) {
+        line(token.span());
+    }
+
+    // Sets the current source line to the start line of the span.
+    private void line(Span span) {
+        if (span != null) line(span.startLine());
+    }
+
+    // Sets the current source line to the end line of the span.
+    private void lineAtEnd(Span span) {
+        if (span != null) line(span.endLine());
     }
 
     // Returns the current location in the chunk, e.g., for determining
