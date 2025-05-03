@@ -24,7 +24,7 @@ import java.util.*;
  * {@link TokenType} must be represented in the parser table.  See
  * {@code populateRulesTable} at the bottom of the file.</p>
  */
-@SuppressWarnings({"unused", "RedundantLabeledSwitchRuleCodeBlock"})
+@SuppressWarnings({"unused", "RedundantLabeledSwitchRuleCodeBlock", "SameParameterValue"})
 class Compiler {
     //------------------------------------------------------------------------
     // Static Constants
@@ -69,10 +69,12 @@ class Compiler {
     // The Joe runtime
     private final Joe joe;
 
+
     // The errors found during compilation
     private final List<Trace> errors = new ArrayList<>();
 
     // The source being compiled
+    private SourceBuffer buffer = null;
     private boolean gotCompleteScript = false;
 
     // The function currently being compiled.
@@ -118,12 +120,12 @@ class Compiler {
      * @return The script as a `Function`.
      */
     public Function compile(String scriptName, String source) {
-        var buffer = new SourceBuffer(scriptName, source);
 
         // Take the current chunk and package it as a Function.
         Function function;
         try {
-            function = compileScript(buffer);
+            var buff = new SourceBuffer(scriptName, source);
+            function = compileScript(buff);
         } catch (Exception ex) {
             var context = ex.getStackTrace()[0].toString();
             throw new SyntaxError(
@@ -140,7 +142,8 @@ class Compiler {
         return function;
     }
 
-    public Function compileScript(SourceBuffer buffer) {
+    public Function compileScript(SourceBuffer source) {
+        this.buffer = source;
         // The FunctionCompiler contains the Chunk for the function
         // currently being compiled.  Each `function` or `method`
         // declaration adds a new FunctionCompiler to the stack, so that
@@ -161,6 +164,7 @@ class Compiler {
         emit(statements);
 
         // Take the current chunk and package it as a Function.
+        this.buffer = null;
         return endFunction();
     }
 
@@ -227,35 +231,47 @@ class Compiler {
         }
     }
 
-    // Emits the code for a single statement.
-    @SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
+    // Emits the code for a single statement.  Some typical invariants:
+    //
+    // - Most statements should leave the stack as they found it; this is
+    //   indicated by a "∅" at the end of their stack effects.
+    // - Declarations will leave at least one local variable
+    //   on the stack (in local scope), but nothing on the "working" part of
+    //   the stack.
+    // - Some non-declarations are wrapped in a `Stmt.Block` by the Parser.
+    //   - These might leave local variables on the stack; they will be
+    //     cleared when the block ends.
+    //   - I'm planning on removing this pattern in the long run, as it's
+    //     less clear.
     private void emit(Stmt stmt) {
         setSourceLine(stmt.location());
 
         switch (stmt) {
-            case Stmt.Assert s -> {
-                emit(s.condition());
-                var endJump = emitJump(JIT);
-                emit(s.message());
-                emit(ASSERT);
-                patchJump(s.keyword(), endJump);
+            case Stmt.Assert s -> {          // Stack effects:
+                emit(s.condition());         // cond    ; compute condition
+                var endJump = emitJump(JIT); // ∅       ; JIT end
+                emit(s.message());           // msg     ; compute message
+                emit(ASSERT);                // ∅       ; throw AssertError
+                patchJump(endJump);          // ∅       ; end:
             }
-            case Stmt.Block s -> {
-                beginScope();
-                emit(s.statements());
+            case Stmt.Block s -> {           // Stack effects:
+                beginScope();                // ∅           ; begin block scope
+                emit(s.statements());        // locals? | ∅ ; compile body
                 setSourceLine(s.span().endLine());
-                endScope();
+                endScope();                  // ∅           ; end block scope
             }
             case Stmt.Break s -> {
                 if (currentLoop == null) {
                     error(s.keyword(), "found 'break' outside of any loop.");
                 }
 
-                // NEXT, end any open scopes.
+                // NEXT, we are jumping out of some number of open scopes, any
+                // or all of which might have declared local variables.  Clean
+                // them up explicitly.
                 popLocals(currentLoop.breakDepth);
 
-                // NEXT, emit the jump, saving it to be patched at
-                // the end of the loop.
+                // NEXT, emit the jump to the end of the loop.  It will be
+                // patched at the correct time by endLoop().
                 currentLoop.breakJumps.emit(JUMP);
             }
             case Stmt.Class s -> {
@@ -328,11 +344,13 @@ class Compiler {
                     error(s.keyword(), "found 'continue' outside of any loop.");
                 }
 
-                // NEXT, end any open scopes.
+                // NEXT, we are jumping out of some number of open scopes, any
+                // or all of which might have declared local variables.  Clean
+                // them up explicitly.
                 popLocals(currentLoop.continueDepth);
 
-                // NEXT, loop back to the beginning.
-                emitLoop(s.keyword(), currentLoop.loopStart);
+                // NEXT, jump back to the beginning of the loop.
+                emitLoop(currentLoop.loopStart);
             }
             case Stmt.Expression e -> {
                 emit(e.expr());
@@ -347,9 +365,9 @@ class Compiler {
             }
             case Stmt.For s -> {
                 // NOTE: the Parser wraps Stmt.For as follows:
-                // Stmt.Block[Stmt.For].
-                //
-                // Thus, this code needn't create a scope.
+                // Stmt.Block[Stmt.For]. Thus, this code needn't
+                // create a scope.  This is a confusing pattern;
+                // we should manage the scope here.
 
                 // Initializer
                 if (s.init() != null) {
@@ -371,17 +389,17 @@ class Compiler {
                     int updaterStart = here();
                     emit(s.updater());
                     emit(POP);
-                    emitLoop(s.keyword(), loopStart);
+                    emitLoop(loopStart);
                     loopStart = updaterStart;
-                    patchJump(s.keyword(), bodyJump);
+                    patchJump(bodyJump);
                 }
 
-                beginLoop(s.keyword(), loopStart);
+                beginLoop(loopStart);
                 emit(s.body());
-                emitLoop(s.keyword(), loopStart);
+                emitLoop(loopStart);
 
                 // exit:
-                if (exitJump != -1) patchJump(s.keyword(), exitJump);
+                if (exitJump != -1) patchJump(exitJump);
                 endLoop();
             }
             case Stmt.ForEach s -> {
@@ -398,7 +416,7 @@ class Compiler {
 
                 // Start the loop
                 int loopStart = here();
-                beginLoop(s.keyword(), loopStart);
+                beginLoop(loopStart);
 
                 // Check to see if we have any more items
                 // Note: the iterator is on the top of the stack.
@@ -413,10 +431,10 @@ class Compiler {
 
                 // Compile the body
                 emit(s.body());
-                emitLoop(s.keyword(), loopStart);
+                emitLoop(loopStart);
 
                 // exit:
-                patchJump(s.keyword(), exitJump);
+                patchJump(exitJump);
                 endLoop();
             }
             case Stmt.Function s -> {
@@ -442,13 +460,13 @@ class Compiler {
                 int endJump = -1;
                 if (s.elseBranch() != null) {
                     endJump = emitJump(JUMP);
-                    patchJump(s.keyword(), elseJump);
+                    patchJump(elseJump);
                     emit(s.elseBranch());
                 } else {
-                    patchJump(s.keyword(), elseJump);
+                    patchJump(elseJump);
                 }
 
-                if (endJump != -1) patchJump(null, endJump);
+                if (endJump != -1) patchJump(endJump);
             }
             case Stmt.IfLet ifLet -> {
                 throw new UnsupportedOperationException("TODO");
@@ -539,16 +557,16 @@ class Compiler {
                 defineLocal(VAR_SWITCH);
 
                 // Jump targets
-                var endJumps = jumpList(s.keyword());
+                var endJumps = jumpList();
                 int nextJump = -1;
 
                 for (var c : s.cases()) {
                     setSourceLine(c.location());
-                    var caseJumps = jumpList(c.keyword());
+                    var caseJumps = jumpList();
 
                     // Allow the previous case to jump here if it doesn't match.
                     // next:
-                    if (nextJump != -1) patchJump(c.keyword(), nextJump);
+                    if (nextJump != -1) patchJump(nextJump);
 
                     for (var target : c.values()) {
                         // Compute the case target and compare it with the
@@ -572,7 +590,7 @@ class Compiler {
                 }
 
                 // next:
-                if (nextJump != -1) patchJump(s.keyword(), nextJump);
+                if (nextJump != -1) patchJump(nextJump);
 
                 if (s.switchDefault() != null) {
                     emit(s.switchDefault().statement());
@@ -616,13 +634,13 @@ class Compiler {
                 var loopStart = here();
                 emit(s.condition());
 
-                beginLoop(s.keyword(), loopStart);
+                beginLoop(loopStart);
 
                 int exitJump = emitJump(JIF);
                 emit(s.body());
-                emitLoop(s.keyword(), loopStart);
+                emitLoop(loopStart);
 
-                patchJump(s.keyword(), exitJump);
+                patchJump(exitJump);
                 endLoop();
             }
         }
@@ -780,13 +798,13 @@ class Compiler {
                     int endJump = emitJump(JIFKEEP); // v      ; JIFKEEP end
                     emit(POP);                       // ∅
                     emit(e.right());                 // v      ; compute right
-                    patchJump(e.op(), endJump);      // v      ; end:
+                    patchJump(endJump);              // v      ; end:
                 } else { // OR
                     emit(e.left());                  // v      ; compute left
                     int endJump = emitJump(JITKEEP); // v      ; JITKEEP end
                     emit(POP);                       // ∅
                     emit(e.right());                 // v      ; compute right
-                    patchJump(e.op(), endJump);      // v      ; end:
+                    patchJump(endJump);              // v      ; end:
                 }
             }
             case Expr.MapLiteral e -> {
@@ -874,9 +892,9 @@ class Compiler {
                 int elseJump = emitJump(JIF);  //       ; JIF else
                 emit(e.trueExpr());            // v     ; compute true value
                 int endJump = emitJump(JUMP);  // v     ; JUMP end
-                patchJump(e.op(), elseJump);   // ∅     ; else:
+                patchJump(elseJump);           // ∅     ; else:
                 emit(e.falseExpr());           // v     ; compute false value
-                patchJump(e.op(), endJump);    // v     ; end:
+                patchJump(endJump);            // v     ; end:
             }
             case Expr.This e -> {
                 if (currentType == null || !currentType.inInstanceMethod) {
@@ -1241,8 +1259,8 @@ class Compiler {
     // Loop management
 
     // Begins the loop's break/continue control region.
-    private void beginLoop(Token keyword, int loopStart) {
-        currentLoop = new LoopInfo(currentLoop, keyword);
+    private void beginLoop(int loopStart) {
+        currentLoop = new LoopInfo(currentLoop);
         currentLoop.breakDepth = current.scopeDepth;
         currentLoop.continueDepth = current.scopeDepth;
         currentLoop.loopStart = loopStart;
@@ -1272,11 +1290,20 @@ class Compiler {
     //-------------------------------------------------------------------------
     // Parsing Tools
 
+    // This method should be used for most compilation errors.
     private void error(Token token, String message) {
         var msg = token.span().isAtEnd()
             ? "Error at end: " + message
             : "Error at '" + token.lexeme() + "': " + message;
         errors.add(new Trace(token.span(), msg));
+    }
+
+    // Generates an ad hoc error at a given line.
+    @SuppressWarnings("SameParameterValue")
+    private void error(String at, String message) {
+        var msg = "Error at " + at + ": " + message;
+        var span = buffer.lineSpan(current.sourceLine);
+        errors.add(new Trace(span, msg));
     }
 
     //-------------------------------------------------------------------------
@@ -1334,26 +1361,28 @@ class Compiler {
         return current.chunk.codeSize() - 1;
     }
 
-    private void emitLoop(Token token, int loopStart) {
+    private void emitLoop(int loopStart) {
         emit(Opcode.LOOP);
         int offset = current.chunk.codeSize() - loopStart + 1;
         if (offset < Character.MAX_VALUE) {
             emit((char) offset);
         } else {
-            error(token, "Loop body too large.");
+            error("loop target", "loop size larger than " +
+                Character.MAX_VALUE + ".");
         }
     }
 
-    private JumpList jumpList(Token keyword) {
-        return new JumpList(keyword);
+    private JumpList jumpList() {
+        return new JumpList();
     }
 
-    private void patchJump(Token token, int offset) {
+    private void patchJump(int offset) {
         // -1 to adjust for the bytecode for the jump offset itself.
         int jump = current.chunk.codeSize() - offset - 1;
 
         if (jump > Character.MAX_VALUE) {
-            error(token, "Too much code to jump over.");
+            error("jump target", "jump size larger than " +
+                Character.MAX_VALUE + ".");
         }
 
         current.chunk.setCode(offset, (char)jump);
@@ -1361,7 +1390,7 @@ class Compiler {
 
     private void patchJumps(JumpList jumpList) {
         for (var offset : jumpList) {
-            patchJump(jumpList.keyword(), offset);
+            patchJump(offset);
         }
     }
 
@@ -1514,9 +1543,9 @@ class Compiler {
         // The chunk index to loop back to on continue
         int loopStart = -1;
 
-        LoopInfo(LoopInfo enclosing, Token keyword) {
+        LoopInfo(LoopInfo enclosing) {
             this.enclosing = enclosing;
-            this.breakJumps = new JumpList(keyword);
+            this.breakJumps = new JumpList();
         }
     }
 
@@ -1556,14 +1585,8 @@ class Compiler {
     }
 
     private class JumpList extends ArrayList<Integer> {
-        private final Token keyword;
-
-        public JumpList(Token keyword) {
-            this.keyword = keyword;
-        }
-
-        public Token keyword() {
-            return keyword;
+        public JumpList() {
+            // Nothing to do
         }
 
         public void emit(char jumpCode) {
