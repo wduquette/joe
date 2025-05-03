@@ -795,16 +795,16 @@ class Compiler {
                 if (e.op().type() == TokenType.AND) {
                                                      // Stack effects:
                     emit(e.left());                  // v      ; compute left
-                    int endJump = emitJump(JIFKEEP); // v      ; JIFKEEP end
+                    int end_ = emitJump(JIFKEEP);    // v      ; JIFKEEP end
                     emit(POP);                       // ∅
                     emit(e.right());                 // v      ; compute right
-                    patchJump(endJump);              // v      ; end:
+                    patchJump(end_);                 // v      ; end:
                 } else { // OR
                     emit(e.left());                  // v      ; compute left
-                    int endJump = emitJump(JITKEEP); // v      ; JITKEEP end
+                    int end_ = emitJump(JITKEEP);    // v      ; JITKEEP end
                     emit(POP);                       // ∅
                     emit(e.right());                 // v      ; compute right
-                    patchJump(endJump);              // v      ; end:
+                    patchJump(end_);                 // v      ; end:
                 }
             }
             case Expr.MapLiteral e -> {
@@ -887,14 +887,14 @@ class Compiler {
                 emit(SUPGET, name);    // m        ; super.name
             }
             case Expr.Ternary e -> {
-                                               // Stack effects
-                emit(e.condition());           // c     ; compute condition
-                int elseJump = emitJump(JIF);  //       ; JIF else
-                emit(e.trueExpr());            // v     ; compute true value
-                int endJump = emitJump(JUMP);  // v     ; JUMP end
-                patchJump(elseJump);           // ∅     ; else:
-                emit(e.falseExpr());           // v     ; compute false value
-                patchJump(endJump);            // v     ; end:
+                                            // Stack effects
+                emit(e.condition());        // c     ; compute condition
+                int else_ = emitJump(JIF);  //       ; JIF else
+                emit(e.trueExpr());         // v     ; compute true value
+                int end_ = emitJump(JUMP);  // v     ; JUMP end
+                patchJump(else_);           // ∅     ; else:
+                emit(e.falseExpr());        // v     ; compute false value
+                patchJump(end_);            // v     ; end:
             }
             case Expr.This e -> {
                 if (currentType == null || !currentType.inInstanceMethod) {
