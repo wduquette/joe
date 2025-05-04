@@ -1031,7 +1031,6 @@ class Compiler {
         }
 
         current.notYetDefined.add(name.lexeme());
-//        current.locals[current.localCount++] = new Local(name);
     }
 
     // Defines the variable so that it can be referred to in expressions.
