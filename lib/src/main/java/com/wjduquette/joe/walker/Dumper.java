@@ -5,6 +5,7 @@ import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.scanner.Token;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 class Dumper {
@@ -314,12 +315,24 @@ class Dumper {
                 dumpStatement(e.declaration());
                 --indent;
             }
-            case Expr.ListLiteral e -> e.list().forEach(this::dumpExpression);
-            case Expr.Literal e ->
-                buff.append(e.value().getClass().getSimpleName())
-                    .append(" '")
-                    .append(e.value())
-                    .append("'\n");
+            case Expr.ListLiteral e -> {
+                if (e.list().isEmpty()) {
+                    buff.append("[]\n");
+                } else {
+                    buff.append("\n");
+                    e.list().forEach(this::dumpExpression);
+                }
+            }
+            case Expr.Literal e -> {
+                if (e.value() == null) {
+                    buff.append("null\n");
+                } else {
+                    buff.append(e.value().getClass().getSimpleName())
+                        .append(" '")
+                        .append(e.value())
+                        .append("'\n");
+                }
+            }
             case Expr.Logical e -> {
                 buff.append(e.op().lexeme())
                     .append("\n");

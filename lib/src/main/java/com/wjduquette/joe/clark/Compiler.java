@@ -619,7 +619,7 @@ class Compiler {
                     defineGlobal(var.name());
                 } else {
                     // The value is on the stack; define the variable.
-                    defineLocal();
+                    defineLocal(var.name());
                 }
             }
             case Stmt.While s -> {
@@ -1009,6 +1009,7 @@ class Compiler {
     // it has no value.
     private void declareLocal(Token name) {
         assert !inGlobalScope();
+        assert !current.notYetDefined.contains(name.lexeme());
 
         // Check for too many locals
         if (current.localCount == MAX_LOCALS) {
@@ -1029,43 +1030,29 @@ class Compiler {
             }
         }
 
-        current.locals[current.localCount++] = new Local(name);
+        current.notYetDefined.add(name.lexeme());
+//        current.locals[current.localCount++] = new Local(name);
     }
 
-    // Marks the newest local variable "initialized", so that it can be
-    // referred to in expressions.  This constitutes a promise that the value
-    // the variable will be placed on the stack before any other instruction
-    // executes.  Or, to put it another way, that the code to produce that
-    // value will be generated before any other code is generated.
+    // Defines the variable so that it can be referred to in expressions.
+    // This constitutes a promise that the value the variable will be placed
+    // on the stack before any other instruction executes.  Or, to put it
+    // another way, that the code to produce that value will be generated
+    // before any other code is generated.
     //
     // Usually this is called either immediately before or immediately after the
     // code that generates the value is generated.
-    private void defineLocal() {
-        assert !inGlobalScope();
-        current.locals[current.localCount - 1].depth = current.scopeDepth;
-    }
-
-    // Calls declareLocal() and defineLocal() in one step.
     private void defineLocal(Token name) {
         assert !inGlobalScope();
-        declareLocal(name);
-        defineLocal();
+
+        current.notYetDefined.remove(name.lexeme());
+        current.locals[current.localCount++] =
+            new Local(name, current.scopeDepth);
     }
 
     // defineLocal for hidden variables
     private void defineLocal(String name) {
         defineLocal(Token.synthetic(name));
-    }
-
-
-    // Marks the N newest local variables "initialized", so that they can be
-    // referred to in expressions.  This is a no-op for global variables.
-    private void markVarsInitialized(int count) {
-        if (current.scopeDepth == 0) return;
-        for (var i = 0; i < count; i++) {
-            current.locals[current.localCount - 1 - i].depth
-                = current.scopeDepth;
-        }
     }
 
     // Resolves the named variable and emits a GET instruction.
@@ -1116,12 +1103,16 @@ class Compiler {
     // scope.  Returns the local's index in the current scope, or -1 if
     // no variable was found.
     private int resolveLocal(FunctionInfo compiler, Token name) {
+        if (current.notYetDefined.contains(name.lexeme())) {
+            error(name, "Can't read local variable in its own initializer.");
+            // Return localCount so that the compiler doesn't look for
+            // it as a global.
+            return compiler.localCount;
+        }
+
         for (var i = compiler.localCount - 1; i >= 0; i--) {
             var local = compiler.locals[i];
             if (name.lexeme().equals(local.name.lexeme())) {
-                if (local.depth == -1) {
-                    error(name, "Can't read local variable in its own initializer.");
-                }
                 return i;
             }
         }
@@ -1434,13 +1425,14 @@ class Compiler {
         final Token name;
 
         // Its scope depth
-        int depth = - 1;
+        final int depth;
 
         // Whether it has been captured as an Upvalue
         boolean isCaptured = false;
 
-        Local(Token name) {
+        Local(Token name, int depth) {
             this.name = name;
+            this.depth = depth;
         }
     }
 
@@ -1455,7 +1447,11 @@ class Compiler {
         // The chunk into which byte-code is compiled.
         final Chunk chunk;
 
-        // Information about the function's local variables
+        // Information about the function's local variables.
+        // Locals that have been declared but not yet defined are
+        // added to notYetDefined to ensure that they aren't used
+        // in their own initializers.
+        final Set<String> notYetDefined = new HashSet<>();
         final Local[] locals = new Local[MAX_LOCALS];
 
         // The actual number of local variables
@@ -1494,11 +1490,10 @@ class Compiler {
             if (type == FunctionType.METHOD ||
                 type == FunctionType.INITIALIZER
             ) {
-                local = new Local(Token.synthetic(VAR_THIS));
+                local = new Local(Token.synthetic(VAR_THIS), 0);
             } else {
-                local = new Local(Token.synthetic(""));
+                local = new Local(Token.synthetic(""), 0);
             }
-            local.depth = 0;
             locals[localCount++] = local;
         }
     }
