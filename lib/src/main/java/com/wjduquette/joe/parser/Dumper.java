@@ -1,17 +1,18 @@
-package com.wjduquette.joe.walker;
+package com.wjduquette.joe.parser;
 
-import com.wjduquette.joe.parser.Expr;
-import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.scanner.Token;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-class Dumper {
+/**
+ * Produces a text dump of a Joe AST.
+ */
+public class Dumper {
     private transient StringBuilder buff;
     private transient int indent;
 
-    Dumper() {
+    public Dumper() {
         // Nothing to do
     }
 
