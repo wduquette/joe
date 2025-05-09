@@ -29,9 +29,9 @@ public class TestTool implements Tool {
         
         Options:
         
-        --bert,   -b   Use the "Bert" byte-engine (default)
+        --clark,  -c   Use the "Clark" byte-engine (default)
         --walker, -w   Use the "Walker" AST-walker engine.
-        --clark,  -c   Use the "Clark" experimental byte-engine
+        --bert,   -b   Use the "Bert" byte-engine (legacy)
         --verbose, -v  Enable verbose output.
         
         Test Scripts
@@ -48,7 +48,7 @@ public class TestTool implements Tool {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    String engineType = Joe.BERT;
+    String engineType = Joe.CLARK;
     boolean verbose = false;
     private final List<String> testScripts = new ArrayList<>();
     private int loadErrorCount = 0;
@@ -88,8 +88,8 @@ public class TestTool implements Tool {
 
             switch (arg) {
                 case "--bert", "-b" -> engineType = Joe.BERT;
-                case "--walker", "-w" -> engineType = Joe.WALKER;
                 case "--clark", "-c" -> engineType = Joe.CLARK;
+                case "--walker", "-w" -> engineType = Joe.WALKER;
                 case "-v", "--verbose" -> verbose = true;
                 default -> testScripts.add(arg);
             }

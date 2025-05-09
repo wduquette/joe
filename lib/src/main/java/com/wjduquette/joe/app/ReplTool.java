@@ -38,9 +38,9 @@ public class ReplTool implements Tool {
         
         The options are as follows:
         
-        --bert,   -b   Use the "Bert" byte-engine (default).
+        --clark,  -c   Use the "Clark" byte-engine (default).
         --walker, -w   Use the "Walker" AST-walker engine.
-        --clark,  -c   Use the "Clark" experimental byte-engine
+        --bert,   -b   Use the "Bert" byte-engine (legacy).
         --debug,  -d   Enable debugging output.  This is mostly of use to
                        the Joe maintainer.
         """,
@@ -74,7 +74,7 @@ public class ReplTool implements Tool {
 
     private void run(String[] args) {
         var argq = new ArrayDeque<>(List.of(args));
-        var engineType = Joe.BERT;
+        var engineType = Joe.CLARK;
         var debug = false;
 
         while (!argq.isEmpty() && argq.peek().startsWith("-")) {
@@ -94,12 +94,10 @@ public class ReplTool implements Tool {
         this.joe = new Joe(engineType);
         joe.setDebug(debug);
 
-        if (engineType.equals(Joe.WALKER)) {
-            var consolePackage = new ConsolePackage();
-            consolePackage.setScript("<repl>");
-            consolePackage.getArgs().addAll(List.of(args));
-            joe.installPackage(consolePackage);
-        }
+        var consolePackage = new ConsolePackage();
+        consolePackage.setScript("<repl>");
+        consolePackage.getArgs().addAll(List.of(args));
+        joe.installPackage(consolePackage);
 
         try {
             System.out.println("Joe " + App.getVersion() + " (" +

@@ -31,8 +31,9 @@ public class WinTool extends FXTool {
         
         Executes the script.  The options are as follows:
         
-        --bert,   -b   Use the "Bert" byte-engine (default).
+        --clark,  -c   Use the "Clark" byte-engine (default)
         --walker, -w   Use the "Walker" AST-walker engine.
+        --bert,   -b   Use the "Bert" byte-engine (legacy).
         --debug,  -d   Enable debugging output.  This is mostly of use to
                        the Joe maintainer.
         """,
@@ -43,7 +44,6 @@ public class WinTool extends FXTool {
     // Instance Variables
 
     // Keeps joe from being collected.
-    private Joe joe;
     private final VBox root = new VBox();
 
     //------------------------------------------------------------------------
@@ -68,13 +68,14 @@ public class WinTool extends FXTool {
         }
 
         // NEXT, parse the options.
-        var engineType = Joe.BERT;
+        var engineType = Joe.CLARK;
         var debug = false;
 
         while (!args.isEmpty() && args.peek().startsWith("-")) {
             var opt = args.poll();
             switch (opt) {
                 case "--bert", "-b" -> engineType = Joe.BERT;
+                case "--clark", "-c" -> engineType = Joe.CLARK;
                 case "--walker", "-w" -> engineType = Joe.WALKER;
                 case "--debug", "-d" -> debug = true;
                 default -> {
