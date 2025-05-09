@@ -465,13 +465,31 @@ class Compiler {
                 if (end_ != -1) patchJump(end_);
             }
             case Stmt.IfLet ifLet -> {
-                throw new UnsupportedOperationException("TODO");
+                emitTHROW("Not yet supported: 'if let'.");
             }
-            case Stmt.Let let -> {
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.Let s -> {
+                var pat = constant(s.pattern().getPattern());
+                var consts = s.pattern().getConstants();
+                var vars = s.pattern().getBindings();
+
+                if (!inGlobalScope()) {        // Stack: locals | working
+                    vars.forEach(              // ∅         ; declare vars
+                        this::declareLocal);
+                }
+
+                emitList(consts);              // ∅ | cs    ; compute constants
+                emit(s.target());              // ∅ | cs t  ; compute target.
+
+                if (!inGlobalScope()) {
+                    emit(Opcode.LOCLET, pat);  // ∅ | vs    ; match pattern
+                    vars.forEach(              // vs | ∅    ; define vars
+                        this::defineLocal);
+                } else {
+                    emit(Opcode.GLOLET, pat);  // ∅         ; define vars
+                }
             }
             case Stmt.Match match -> {
-                throw new UnsupportedOperationException("TODO");
+                emitTHROW("Not yet supported: 'match'.");
             }
             case Stmt.Record s -> {
                 // NOTE: The stack effects are written presuming that the
@@ -780,7 +798,7 @@ class Compiler {
                 switch (e.value()) {
                     case null -> emit(NULL);
                     case Boolean b -> emit(b ? TRUE : FALSE);
-                    default -> emitConstant(e.value());
+                    default -> emitCONST(e.value());
                 }
             }
             case Expr.Logical e -> {
@@ -1330,7 +1348,7 @@ class Compiler {
     }
 
     // Adds the value to the constants table and emits CONST.
-    private void emitConstant(Object value) {
+    private void emitCONST(Object value) {
         emit(Opcode.CONST, constant(value));
     }
 
@@ -1406,6 +1424,13 @@ class Compiler {
     private void emitComment(String comment) {
         var index = current.chunk.addConstant(comment);
         emit(Opcode.COMMENT, index);
+    }
+
+    // Emits a THROW instruction; used to mark unfinished code.
+    @SuppressWarnings("unused")
+    private void emitTHROW(String message) {
+        emitCONST(message);
+        emit(THROW);
     }
 
     private void emit(char... codes) {
