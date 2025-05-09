@@ -197,7 +197,7 @@ public class Disassembler {
             // Constant Instructions
             // Pattern: opcode constantIndex
             case CLASS, COMMENT, CONST, GLODEF, GLOGET, GLOLET, GLOSET, LOCLET,
-                 MATCH, METHOD, PROPGET, PROPSET, SUPGET, TRCPUSH
+                 MATCH0, METHOD, PROPGET, PROPSET, SUPGET, TRCPUSH
             -> {
                 int index = chunk.code(ip + 1);
                 var constant = joe.stringify(chunk.getConstant(index));

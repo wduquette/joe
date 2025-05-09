@@ -61,7 +61,7 @@ public class Opcode {
     /** Opcode */ public static final char LT      = 39;
     /** Opcode */ public static final char MAPNEW  = 40;
     /** Opcode */ public static final char MAPPUT  = 41;
-    /** Opcode */ public static final char MATCH   = 42;
+    /** Opcode */ public static final char MATCH0  = 42;
     /** Opcode */ public static final char METHOD  = 43;
     /** Opcode */ public static final char MUL     = 44;
     /** Opcode */ public static final char NE      = 45;
@@ -137,7 +137,7 @@ public class Opcode {
         "LT",
         "MAPNEW",
         "MAPPUT",
-        "MATCH",
+        "MATCH0",
         "METHOD",
         "MUL",
         "NE",

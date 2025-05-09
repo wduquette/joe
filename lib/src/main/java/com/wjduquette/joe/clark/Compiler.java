@@ -481,7 +481,7 @@ class Compiler {
                 beginScope();                  // ∅            ; begin scope: then
                 emitList(consts);              // ∅ | cs       ; pattern constants
                 emit(s.target());              // ∅ | cs t     ; match target
-                emit(MATCH, pat);              // ∅ | vs? flag ; match pattern
+                emit(MATCH0, pat);              // ∅ | vs? flag ; match pattern
                 int else_ = emitJump(JIF);     // ∅ | vs?      ; JIF else
                 defineLocals(vars);            // vs | ∅       ; define bindings
                 emit(s.thenBranch());          // vs | ∅       ; compile "then"
@@ -534,7 +534,7 @@ class Compiler {
                     beginScope();             // m | ∅        ; begin scope: case
                     emitList(consts);         // m | cs       ; pattern constants
                     emitGET(VAR_MATCH);       // m | cs m     ; get *match*
-                    emit(MATCH, pat);         // m | vs? flag ; match pattern
+                    emit(MATCH0, pat);         // m | vs? flag ; match pattern
                     next1_ = emitJump(JIF);   // m | vs?      ; JIF next1
                     defineLocals(vars);       // m vs | ∅     ; define bindings
                     if (c.guard() != null) {  // m vs | flag  ; compute guard

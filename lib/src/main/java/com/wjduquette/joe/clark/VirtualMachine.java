@@ -577,7 +577,7 @@ class VirtualMachine {
                     var map = (MapValue)peek(0);
                     map.put(key, value);
                 }
-                case MATCH -> {
+                case MATCH0 -> {
                     var pattern = readPattern();
                     var target = pop();
                     var constants = (ListValue)pop();
