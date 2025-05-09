@@ -92,10 +92,10 @@ class Resolver {
                     resolveFunction(method, declaration);
                 }
 
-                if (!stmt.staticInitializer().isEmpty()) {
+                if (!stmt.staticInit().isEmpty()) {
                     var oldFunction = currentFunction;
                     currentFunction = FunctionType.STATIC_INITIALIZER;
-                    resolve(stmt.staticInitializer());
+                    resolve(stmt.staticInit());
                     currentFunction = oldFunction;
                 }
 
@@ -141,13 +141,13 @@ class Resolver {
                 ++loopCounter;
                 if (stmt.init() != null)      resolve(stmt.init());
                 if (stmt.condition() != null) resolve(stmt.condition());
-                if (stmt.incr() != null)      resolve(stmt.incr());
+                if (stmt.updater() != null)      resolve(stmt.updater());
                 resolve(stmt.body());
                 --loopCounter;
             }
             case Stmt.ForEach stmt -> {
                 ++loopCounter;
-                resolve(stmt.listExpr());
+                resolve(stmt.items());
                 resolve(stmt.body());
                 --loopCounter;
             }
@@ -193,17 +193,16 @@ class Resolver {
             case Stmt.Match stmt -> {
                 resolve(stmt.expr());
                 for (var c : stmt.cases()) {
-                    if (c.pattern() != null) {
-                        beginScope();
-                        c.pattern().getBindings().forEach(this::declare);
-                        c.pattern().getConstants().forEach(this::resolve);
-                        c.pattern().getBindings().forEach(this::define);
-                        if (c.guard() != null) resolve(c.guard());
-                        resolve(c.statement());
-                        endScope();
-                    } else {
-                        resolve(c.statement());
-                    }
+                    beginScope();
+                    c.pattern().getBindings().forEach(this::declare);
+                    c.pattern().getConstants().forEach(this::resolve);
+                    c.pattern().getBindings().forEach(this::define);
+                    if (c.guard() != null) resolve(c.guard());
+                    resolve(c.statement());
+                    endScope();
+                }
+                if (stmt.matchDefault() != null) {
+                    resolve(stmt.matchDefault().statement());
                 }
             }
             case Stmt.Record stmt -> {
@@ -219,10 +218,10 @@ class Resolver {
                     resolveFunction(method, declaration);
                 }
 
-                if (!stmt.staticInitializer().isEmpty()) {
+                if (!stmt.staticInit().isEmpty()) {
                     var oldFunction = currentFunction;
                     currentFunction = FunctionType.STATIC_INITIALIZER;
-                    resolve(stmt.staticInitializer());
+                    resolve(stmt.staticInit());
                     currentFunction = oldFunction;
                 }
 
@@ -256,6 +255,9 @@ class Resolver {
                     c.values().forEach(this::resolve);
                     resolve(c.statement());
                 }
+                if (stmt.switchDefault() != null) {
+                    resolve(stmt.switchDefault().statement());
+                }
             }
             case Stmt.Throw stmt -> resolve(stmt.value());
             case Stmt.While stmt -> {
@@ -266,9 +268,7 @@ class Resolver {
             }
             case Stmt.Var stmt -> {
                 declare(stmt.name());
-                if (stmt.initializer() != null) {
-                    resolve(stmt.initializer());
-                }
+                resolve(stmt.value());
                 define(stmt.name());
             }
         }
@@ -276,10 +276,6 @@ class Resolver {
 
     private void resolve(Expr expression) {
         switch (expression) {
-            case Expr.Assign expr -> {
-                resolve(expr.value());
-                resolveLocal(expr, expr.name());
-            }
             case Expr.Binary expr -> {
                 resolve(expr.left());
                 resolve(expr.right());
@@ -291,9 +287,12 @@ class Resolver {
                     resolve(arg);
                 }
             }
-            case Expr.Get expr -> resolve(expr.object());
             case Expr.Grouping expr -> resolve(expr.expr());
             case Expr.IndexGet expr -> {
+                resolve(expr.collection());
+                resolve(expr.index());
+            }
+            case Expr.IndexIncrDecr expr -> {
                 resolve(expr.collection());
                 resolve(expr.index());
             }
@@ -311,13 +310,9 @@ class Resolver {
                 resolve(expr.right());
             }
             case Expr.MapLiteral expr -> expr.entries().forEach(this::resolve);
-            case Expr.PrePostAssign expr -> resolveLocal(expr, expr.name());
-            case Expr.PrePostIndex expr -> {
-                resolve(expr.collection());
-                resolve(expr.index());
-            }
-            case Expr.PrePostSet expr -> resolve(expr.object());
-            case Expr.Set expr -> {
+            case Expr.PropGet expr -> resolve(expr.object());
+            case Expr.PropIncrDecr expr -> resolve(expr.object());
+            case Expr.PropSet expr -> {
                 resolve(expr.value());
                 resolve(expr.object());
             }
@@ -363,13 +358,18 @@ class Resolver {
                 resolve(expr.trueExpr());
                 resolve(expr.falseExpr());
             }
-            case Expr.Variable expr -> {
+            case Expr.VarGet expr -> {
                 if (!scopes.isEmpty() &&
                     scopes.peek().get(expr.name().lexeme()) == Boolean.FALSE) {
                     error(expr.name(),
                         "Can't read local variable in its own initializer.");
                 }
 
+                resolveLocal(expr, expr.name());
+            }
+            case Expr.VarIncrDecr expr -> resolveLocal(expr, expr.name());
+            case Expr.VarSet expr -> {
+                resolve(expr.value());
                 resolveLocal(expr, expr.name());
             }
         }

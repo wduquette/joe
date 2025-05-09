@@ -3,14 +3,15 @@ package com.wjduquette.joe.clark;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
-import com.wjduquette.joe.patterns.Pattern;
-import com.wjduquette.joe.scanner.Scanner;
+import com.wjduquette.joe.parser.Expr;
+import com.wjduquette.joe.parser.Parser;
+import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.scanner.SourceBuffer;
 import com.wjduquette.joe.scanner.SourceBuffer.Span;
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.TokenType;
 
-import static com.wjduquette.joe.scanner.TokenType.*;
+import static com.wjduquette.joe.clark.Opcode.*;
 
 import java.util.*;
 
@@ -23,13 +24,22 @@ import java.util.*;
  * {@link TokenType} must be represented in the parser table.  See
  * {@code populateRulesTable} at the bottom of the file.</p>
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "RedundantLabeledSwitchRuleCodeBlock", "SameParameterValue"})
 class Compiler {
+    //------------------------------------------------------------------------
+    // Static Constants
+
     // The maximum number of local variables in a function.
     public static final int MAX_LOCALS = 256;
 
     // The maximum number of parameters in a function
     public static final int MAX_PARAMETERS = 255;
+
+    // The name of the script function
+    public static final String SCRIPT_NAME = "*script*";
+
+    // The name of all lambda functions
+    public static final String LAMBDA_NAME = "*lambda*";
 
     // The name of a class's "init" method
     public static final String INIT = "init";
@@ -44,13 +54,13 @@ class Compiler {
     public static final String ARGS = "args";
 
     // The hidden variable used to hold a `foreach` iterator value
-    private static final String VAR_ITERATOR = "*switch*";
-
-    // The hidden variable used to hold a `match` value
-    private static final String VAR_MATCH = "*match*";
+    private static final Token VAR_ITER = Token.synthetic("*iter*");
 
     // The hidden variable used to hold a `switch` value
-    private static final String VAR_SWITCH = "*switch*";
+    private static final Token VAR_SWITCH = Token.synthetic("*switch*");
+
+    // The hidden variable used to hold a `match` value
+    private static final Token VAR_MATCH = Token.synthetic("*match*");
 
 
     //-------------------------------------------------------------------------
@@ -59,29 +69,29 @@ class Compiler {
     // The Joe runtime
     private final Joe joe;
 
+
     // The errors found during compilation
     private final List<Trace> errors = new ArrayList<>();
 
     // The source being compiled
-    private SourceBuffer buffer;
-
-    // The scanner
-    private Scanner scanner;
-
-    // A structure containing parser values.
-    private final Parser parser = new Parser();
+    private SourceBuffer buffer = null;
+    private boolean gotCompleteScript = false;
 
     // The function currently being compiled.
-    private FunctionCompiler current = null;
-
-    // The type currently being compiled, or null
-    private TypeCompiler currentType = null;
+    private FunctionInfo current = null;
 
     // The loop currently being compiled, or null
-    private LoopCompiler currentLoop = null;
+    private LoopInfo currentLoop = null;
 
-    // The pattern currently being compiled, or null
-    private PatternCompiler currentPattern = null;
+    // The type currently being compiled, or null
+    private TypeInfo currentType = null;
+
+//    // The pattern currently being compiled, or null
+//    private PatternCompiler currentPattern = null;
+
+    // Final statement in script; used to allow the final `Stmt.Expression`
+    // to return its value.`
+    private Stmt finalStatement = null;
 
     // Used for debugging/dumping
     private transient Disassembler disassembler;
@@ -97,7 +107,6 @@ class Compiler {
      */
     Compiler(Joe joe) {
         this.joe = joe;
-        populateRulesTable();
     }
 
     //-------------------------------------------------------------------------
@@ -111,34 +120,72 @@ class Compiler {
      * @return The script as a `Function`.
      */
     public Function compile(String scriptName, String source) {
-        buffer = new SourceBuffer(scriptName, source);
 
+        // Take the current chunk and package it as a Function.
+        Function function;
+        try {
+            var buff = new SourceBuffer(scriptName, source);
+            function = compileScript(buff);
+        } catch (Exception ex) {
+            var context = ex.getStackTrace()[0].toString();
+            throw new SyntaxError(
+                "Unexpected exception while compiling script: " + ex +
+                " at: " + context,
+                errors, ex);
+        }
+
+        if (!errors.isEmpty()) {
+            throw new SyntaxError("Error while compiling script", errors,
+                true);
+        }
+
+        return function;
+    }
+
+    public Function compileScript(SourceBuffer source) {
+        this.buffer = source;
         // The FunctionCompiler contains the Chunk for the function
         // currently being compiled.  Each `function` or `method`
         // declaration adds a new FunctionCompiler to the stack, so that
         // each has its own Chunk.
-        current = new FunctionCompiler(null, FunctionType.SCRIPT, buffer);
-        current.chunk.span = buffer.all();
+        current = new FunctionInfo(
+            null,
+            FunctionType.SCRIPT,
+            SCRIPT_NAME,
+            buffer.all());
 
+        // NEXT, parse the script.  This will throw a `SyntaxError` if
+        // any errors are found.
         errors.clear();
-        parser.hadError = false;
-        parser.panicMode = false;
-        scanner = new Scanner(buffer, this::errorInScanner);
-        scanner.advance();  // Prime the scanner
+        var statements = parse(buffer);
+        finalStatement = statements.isEmpty() ? null : statements.getLast();
 
-        while (!scanner.match(EOF)) {
-            declaration();
-        }
+        // NEXT, generate the code.
+        emit(statements);
 
         // Take the current chunk and package it as a Function.
-        var function = endFunction();
+        this.buffer = null;
+        return endFunction();
+    }
 
+    private List<Stmt> parse(SourceBuffer buffer) throws SyntaxError {
+        gotCompleteScript = true;
+
+        Parser parser = new Parser(buffer, this::parseError);
+        var statements = parser.parse();
+
+        // Stop if there was a syntax error.
         if (!errors.isEmpty()) {
-            throw new SyntaxError("Error while compiling script", errors,
-                !parser.gotIncompleteScript);
+            throw new SyntaxError("Syntax error in input, halting.",
+                errors, gotCompleteScript);
         }
 
-        return function;
+        return statements;
+    }
+
+    private void parseError(Trace trace, boolean incomplete) {
+        if (incomplete) gotCompleteScript = false;
+        errors.add(trace);
     }
 
     /**
@@ -161,6 +208,7 @@ class Compiler {
 
     // Completes compilation of the current function and returns it.
     private Function endFunction() {
+        lineAtEnd(current.chunk.span);
         emitReturn();
         var function = new Function(
             current.parameters,
@@ -174,1493 +222,896 @@ class Compiler {
     }
 
     //-------------------------------------------------------------------------
-    // Parser: Statements
+    // Code Generation: Statements
 
-    private void declaration() {
-        if (scanner.match(CLASS)) {
-            classDeclaration();
-        } else if (scanner.match(FUNCTION)) {
-            functionDeclaration();
-        } else if (scanner.match(LET)) {
-            letDeclaration();
-        } else if (scanner.match(RECORD)) {
-            recordDeclaration();
-        } else if (scanner.match(VAR)) {
-            varDeclaration();
-        } else {
-            statement();
+    // Emits the code for a list of statements.
+    private void emit(List<Stmt> statements) {
+        for (var stmt : statements) {
+            emit(stmt);
         }
-
-        if (parser.panicMode) synchronize();
     }
 
-    private void classDeclaration() {
-        scanner.consume(IDENTIFIER, "Expected class name.");
-        var className = scanner.previous();
-        char nameConstant = identifierConstant(className);
-        declareVariable(className);
+    // Emits the code for a single statement.  Some typical invariants:
+    //
+    // - Most statements should leave the stack as they found it; this is
+    //   indicated by a "∅" at the end of their stack effects.
+    // - Declarations will leave at least one local variable
+    //   on the stack (in local scope), but nothing on the "working" part of
+    //   the stack.
+    // - Some non-declarations are wrapped in a `Stmt.Block` by the Parser.
+    //   - These might leave local variables on the stack; they will be
+    //     cleared when the block ends.
+    //   - I'm planning on removing this pattern in the long run, as it's
+    //     less clear.
+    private void emit(Stmt stmt) {
+        line(stmt.location());
 
-        emit(Opcode.CLASS, nameConstant);
-        defineVariable(nameConstant);
-
-        // Remember the current class.
-        var typeCompiler = new TypeCompiler(currentType);
-        currentType = typeCompiler;
-
-        if (scanner.match(EXTENDS)) {
-            scanner.consume(IDENTIFIER, "Expected superclass name after 'extends'.");
-            variable(false);
-            if (className.lexeme().equals(scanner.previous().lexeme())) {
-                error("A class can't inherit from itself.");
+        switch (stmt) {
+            case Stmt.Assert s -> {          // Stack effects:
+                emit(s.condition());         // cond    ; compute condition
+                var end_ = emitJump(JIT);    // ∅       ; JIT end
+                emit(s.message());           // msg     ; compute message
+                emit(ASSERT);                // ∅       ; throw AssertError
+                patchJump(end_);             // ∅       ; end:
             }
-
-            typeCompiler.hasSupertype = true;
-            beginScope();
-            addLocal(Token.synthetic(VAR_SUPER));
-            defineVariable((char)0);
-            getOrSetVariable(className, false);
-            emit(Opcode.INHERIT);
-        }
-
-        parseTypeBody("class", className, nameConstant);
-
-        if (typeCompiler.hasSupertype) {
-            endScope();
-        }
-
-        currentType = currentType.enclosing;
-    }
-
-    private void parseTypeBody(
-        String kind,
-        Token typeName,
-        char nameConstant
-    ) {
-        // Load the type onto the stack before processing the type body
-        getOrSetVariable(typeName, false);
-        scanner.consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
-
-        var firstInit = -1;
-        int typeEnd = -1;
-        while (!scanner.check(RIGHT_BRACE) && !scanner.check(EOF)) {
-            var isStatic = scanner.match(STATIC);
-            var staticSpan = scanner.previous().span();
-
-            if (isStatic && scanner.match(LEFT_BRACE)) {
-                // Static initializer
-                current.inStaticInitializer = true;
-
-                // Compute the trace for the initializer block
-                var trace = new Trace(staticSpan, "In static initializer");
-                var index = current.chunk.addConstant(trace);
-
-                // Jump after the initializer
-                var afterInit = emitJump(Opcode.JUMP);
-
-                // Receive the previous initializer's end jump, if any.
-                if (typeEnd != -1) patchJump(typeEnd);
-
-                // Only set the LOOP target for the first initializer.
-                if (firstInit == -1) firstInit = current.chunk.size;
-
-                emit(Opcode.POP);                  // Pop the class
-                emit(Opcode.TRCPUSH, index);
-                block();                           // The initializer
-                emit(Opcode.TRCPOP);
-                emit(Opcode.CONST, nameConstant);  // Push the class again.
-
-                // NEXT, jump to the end of the type declaration; or
-                // to the beginning of the next initializer if there is
-                // one.
-                typeEnd = emitJump(Opcode.JUMP);
-                patchJump(afterInit);
-                current.inStaticInitializer = false;
-            } else if (scanner.match(METHOD)) {
-                if (isStatic) {
-                    staticMethod();
-                } else {
-                    method();
+            case Stmt.Block s -> {           // Stack effects:
+                beginScope();                // ∅           ; begin block scope
+                emit(s.statements());        // locals? | ∅ ; compile body
+                lineAtEnd(s.span());
+                endScope();                  // ∅           ; end block scope
+            }
+            case Stmt.Break s -> {
+                if (currentLoop == null) {
+                    error(s.keyword(), "found 'break' outside of any loop.");
                 }
-            } else {
-                errorAtCurrent("Unexpected " + kind + " member.");
-                scanner.advance();
+
+                // NEXT, we are jumping out of some number of open scopes, any
+                // or all of which might have declared local variables.  Clean
+                // them up explicitly.
+                popLocals(currentLoop.breakDepth);
+
+                // NEXT, emit the jump to the end of the loop.  It will be
+                // patched at the correct time by endLoop().
+                currentLoop.breakJumps.emit(JUMP);
+            }
+            case Stmt.Class s -> {
+                // NOTE: The stack effects are written presuming that the
+                // class is defined at local scope, as that's harder to
+                // track mentally.
+
+                                              // Stack: locals | working
+                beginType(Kind.CLASS);        // ∅         ; begin type def
+                emit(CLASS, name(s.name()));  // ∅ | c     ; create class
+                defineVar(s.name());          // c | ∅     ; define class var
+
+                if (s.superclass() != null) {
+                    currentType.hasSupertype = true;
+                    beginScope(); // super    // c | ∅      ; begin scope: super
+                    emit(s.superclass());     // c | s      ; compute super
+                    defineLocal(VAR_SUPER);   // c s | ∅    ; define super var
+                    emitGET(s.name());        // c s | c    ; get class
+                    emit(INHERIT);            // c s | ∅    ; inherit super
+                }
+
+                emitGET(s.name());            // c s | c    ; get class
+
+                // Static Methods
+                for (var m : s.staticMethods()) {
+                    line(m.span());
+                    emitFunction(             // c s | c m  ; compile method
+                        FunctionType.STATIC_METHOD,
+                        m.name().lexeme(),
+                        m.params(),
+                        m.body(),
+                        m.span()
+                    );
+                    emitMETHOD(m.name());     // c s | c    ; save method
+                }
+
+                // Instance Methods
+                currentType.inInstanceMethod = true;
+                for (var m : s.methods()) {
+                    line(m.span());
+                    var type = m.name().lexeme().equals(INIT)
+                        ? FunctionType.INITIALIZER : FunctionType.METHOD;
+                    emitFunction(             // c s | c m  ; compile method
+                        type,
+                        m.name().lexeme(),
+                        m.params(),
+                        m.body(),
+                        m.span()
+                    );
+                    emitMETHOD(m.name());     // c s | c    ; save method
+                }
+                currentType.inInstanceMethod = false;
+
+                emit(POP);                    // c s | ∅    ; pop class
+
+                // End super scope
+                if (currentType.hasSupertype) {
+                    endScope();               // c | ∅      ; end scope super
+                }
+
+                // Static Initializer
+                if (!s.staticInit().isEmpty()) {
+                    var span = buffer.lineSpan(s.classSpan().endLine());
+                    var classTrace = constant(new Trace(span,
+                        "In class " + s.name().lexeme()));
+                    var staticTrace = constant(new Trace(span,
+                        "In static initializer"));
+                    emit(TRCPUSH, classTrace);
+                    emit(TRCPUSH, staticTrace);
+                    emit(s.staticInit());     // c | ∅      ; execute static init
+                    emit(TRCPOP);
+                    emit(TRCPOP);
+                }
+
+                endType();                    // c | ∅      ; end type def
+            }
+            case Stmt.Continue s -> {
+                if (currentLoop == null) {
+                    error(s.keyword(), "found 'continue' outside of any loop.");
+                }
+
+                // NEXT, we are jumping out of some number of open scopes, any
+                // or all of which might have declared local variables.  Clean
+                // them up explicitly.
+                popLocals(currentLoop.continueDepth);
+
+                // NEXT, jump back to the beginning of the loop.
+                emitLoop(currentLoop.loopStart);
+            }
+            case Stmt.Expression e -> {
+                emit(e.expr());
+                if (e == finalStatement) {
+                    // Return the value of the final statement in
+                    // the script.  This allows the REPL to
+                    // display results conveniently.
+                    emit(RETURN);
+                } else {
+                    emit(POP);
+                }
+            }
+            case Stmt.For s -> {
+                // NOTE: the Parser wraps Stmt.For as follows:
+                // Stmt.Block[Stmt.For]. Thus, this code needn't
+                // create a scope.  This is a confusing pattern;
+                // we should manage the scope here.
+
+                // Initializer
+                if (s.init() != null) {      // Stack effects:
+                    emit(s.init());          // ∅     ; compile initializer
+                }
+
+                // Condition
+                int start_ = here();         // ∅     ; start:
+                int end_ = -1;
+                if (s.condition() != null) {
+                    emit(s.condition());     // cond  ; compute the condition
+                    end_ = emitJump(JIF);    // ∅     ; JIF end
+                }
+
+                // Updater
+                if (s.updater() != null) {
+                    int body_ =              // ∅     ; JUMP body
+                        emitJump(JUMP);
+                    int updater_ = here();   //       ; updater:
+                    emit(s.updater());       // a     ; compute updater
+                    emit(POP);               // ∅     ; pop unneeded value
+                    emitLoop(start_);        // ∅     ; LOOP start:
+                    start_ = updater_;       // ∅     ; Loop back to updater:
+                    patchJump(body_);        // ∅     ; body:
+                }
+
+                beginLoop(start_);           // ∅     ; begin b/c zone
+                emit(s.body());              // ∅     ; compile body
+                emitLoop(start_);            // ∅     ; LOOP to updater or start
+
+                if (end_ != -1) {
+                    patchJump(end_);         // ∅     ; end:
+                }
+                endLoop();                   // ∅     ; end b/c zone
+            }
+            case Stmt.ForEach s -> {
+                // NOTE: the Parser wraps Stmt.ForEach as follows:
+                // Stmt.Block[Stmt.Var loopVar, Stmt.ForEach]
+                //
+                // Thus, this code needn't create a scope or
+                // define the loop variable.
+
+                // Collection expression     // Stack: locals | working
+                emit(s.items());             // ∅ | items  ; compute collection
+                emit(ITER);                  // ∅ | it     ; compute iterator
+                defineLocal(VAR_ITER);       // it | ∅     ; define *iter*
+
+                // Iteration
+                int start_ = here();         // it | ∅     ; start:
+                beginLoop(start_);           // it | ∅     ; begin b/c zone
+                emit(HASNEXT);               // it | flag  ; got item?
+                var end_ = emitJump(JIF);    // it | ∅     ; JIF end
+                emit(GETNEXT);               // it | i     ; get next item
+                emitSET(s.name());           // it | i     ; set loop var
+                emit(POP);                   // it | ∅     ; clear stack
+
+                // Loop Body
+                emit(s.body());              // it | ∅     ; compile body
+                emitLoop(start_);            // it | ∅     ; LOOP start:
+
+                patchJump(end_);             // it | ∅     ; end:
+                endLoop();                   // it | ∅     ; end b/c zone
+
+                // Local *iter* is popped when the enclosing block end.
+            }
+            case Stmt.Function s -> {
+                // NOTE: The parser returns this for both functions
+                // and methods.  Methods aren't yet implemented.
+                emitFunction(FunctionType.FUNCTION, s.name().lexeme(),
+                    s.params(), s.body(), s.location());
+                defineVar(s.name());
+            }
+            case Stmt.If s -> {
+                //                    | ∅      ; Initial state
+                //       condition    | flag   ; Compute condition
+                //       JIF else     | ∅      ; Jump to else branch
+                //       thenBranch   | ∅      ; Execute then branch
+                //       JUMP end     | ∅      ; Jump to end
+                // else: elseBranch   | ∅      ; Execute else branch
+                // end:  ...          | ∅      ; end of statement
+
+                emit(s.condition());
+                var else_ = emitJump(JIF);
+                emit(s.thenBranch());
+
+                int end_ = -1;
+                if (s.elseBranch() != null) {
+                    end_ = emitJump(JUMP);
+                    patchJump(else_);
+                    emit(s.elseBranch());
+                } else {
+                    patchJump(else_);
+                }
+
+                if (end_ != -1) patchJump(end_);
+            }
+            case Stmt.IfLet s -> {
+                var pat = constant(s.pattern().getPattern());
+                var consts = s.pattern().getConstants();
+                var vars = s.pattern().getBindings();
+
+                beginScope();                  // ∅            ; begin scope: then
+                emitList(consts);              // ∅ | cs       ; pattern constants
+                emit(s.target());              // ∅ | cs t     ; match target
+                emit(MATCH, pat);              // ∅ | vs? flag ; match pattern
+                int else_ = emitJump(JIF);     // ∅ | vs?      ; JIF else
+                defineLocals(vars);            // vs | ∅       ; define bindings
+                emit(s.thenBranch());          // vs | ∅       ; compile "then"
+                endScope();                    // ∅            ; end scope: then
+                if (s.elseBranch() != null) {
+                    int end_ = emitJump(JUMP); // ∅            ; JUMP end
+                    patchJump(else_);          // ∅            ; else:
+                    emit(s.elseBranch());      // ∅            ; compile "else"
+                    patchJump(end_);           // ∅            ; end:
+                } else {
+                    patchJump(else_);          // ∅            ; else:
+                }
+            }
+            case Stmt.Let s -> {
+                var pat = constant(s.pattern().getPattern());
+                var consts = s.pattern().getConstants();
+                var vars = s.pattern().getBindings();
+
+                if (!inGlobalScope()) {        // Stack: locals | working
+                    declareLocals(vars);       // ∅         ; declare vars
+                }
+
+                emitList(consts);              // ∅ | cs    ; compute constants
+                emit(s.target());              // ∅ | cs t  ; compute target.
+
+                if (!inGlobalScope()) {
+                    emit(Opcode.LOCLET, pat);  // ∅ | vs    ; match pattern
+                    defineLocals(vars);        // vs | ∅    ; define vars
+                } else {
+                    emit(Opcode.GLOLET, pat);  // ∅         ; define vars
+                }
+            }
+            case Stmt.Match s -> {
+                // Setup                      // Stack: locals | working
+                beginScope();                 // ∅            ; begin scope: match
+                emit(s.expr());               // ∅ | m        ; compile match target
+                defineLocal(VAR_MATCH);       // m | ∅        ; define *match*
+
+                // Match Cases
+                var ends_ = jumpList();
+                var next1_ = -1;
+                var next2_ = -1;
+                for (var c : s.cases()) {
+                    var pat = constant(c.pattern().getPattern());
+                    var consts = c.pattern().getConstants();
+                    var vars = c.pattern().getBindings();
+
+                    patchJump(next1_);        // m | ∅        ; next1:
+                    patchJump(next2_);        // m | ∅        ; next2:
+                    beginScope();             // m | ∅        ; begin scope: case
+                    emitList(consts);         // m | cs       ; pattern constants
+                    emitGET(VAR_MATCH);       // m | cs m     ; get *match*
+                    emit(MATCH, pat);         // m | vs? flag ; match pattern
+                    next1_ = emitJump(JIF);   // m | vs?      ; JIF next1
+                    defineLocals(vars);       // m vs | ∅     ; define bindings
+                    if (c.guard() != null) {  // m vs | flag  ; compute guard
+                        // Just parse as TRUE
+                        emit(c.guard());
+                    } else {
+                        emit(TRUE);
+                    }
+                    next2_ = emitJump(JIF);   // m vs | ∅     ; JIF next2
+                    emit(c.statement());      // m vs | ∅     ; compile body
+                    endScope();               // m | ∅        ; end scope: case
+                    ends_.emit(JUMP);         // m | ∅        ; JUMP end
+                }
+
+                // Default Case
+                patchJump(next1_);            // m | ∅        ; next1:
+                patchJump(next2_);            // m | ∅        ; next2:
+                if (s.matchDefault() != null) {
+                    emit(s.matchDefault()     // m | ∅        ; compile default
+                        .statement());
+                }
+
+                // End Of Statement
+                patchJumps(ends_);            // m | ∅        ; end:
+                endScope();                   // ∅            ; end scope: match
+            }
+            case Stmt.Record s -> {
+                // NOTE: The stack effects are written presuming that the
+                // class is defined at local scope, as that's harder to
+                // track mentally.
+
+                // Create Record              // Stack: locals | working
+                beginType(Kind.RECORD);       // ∅        ; begin type def
+                emit(RECORD,                  // ∅ | t    ; create type
+                    name(s.name()),
+                    constant(s.fields()));
+                defineVar(s.name());     // t | ∅    ; define type var
+                emitGET(s.name());            // t | t    ; get type
+
+                // Static Methods
+                for (var m : s.staticMethods()) {
+                    line(m.span());
+                    emitFunction(             // t | t m  ; compile method
+                        FunctionType.STATIC_METHOD,
+                        m.name().lexeme(),
+                        m.params(),
+                        m.body(),
+                        m.span()
+                    );
+                    emitMETHOD(m.name());     // t | t    ; save method
+                }
+
+                // Instance Methods
+                currentType.inInstanceMethod = true;
+                for (var m : s.methods()) {
+                    line(m.span());
+                    emitFunction(             // t | t m  ; compile method
+                        FunctionType.METHOD,
+                        m.name().lexeme(),
+                        m.params(),
+                        m.body(),
+                        m.span()
+                    );
+                    emitMETHOD(m.name());     // t | t    ; save method
+                }
+                currentType.inInstanceMethod = false;
+
+                emit(POP);                    // t | ∅    ; pop tye
+
+                // End super scope
+                if (currentType.hasSupertype) {
+                    endScope();               // t | ∅    ; end scope super
+                }
+
+                // Static Initializer
+                if (!s.staticInit().isEmpty()) {
+                    var span = buffer.lineSpan(s.typeSpan().endLine());
+                    var typeTrace = constant(new Trace(span,
+                        "In type " + s.name().lexeme()));
+                    var staticTrace = constant(new Trace(span,
+                        "In static initializer"));
+                    emit(TRCPUSH, typeTrace);
+                    emit(TRCPUSH, staticTrace);
+                    emit(s.staticInit());     // t | ∅      ; execute static init
+                    emit(TRCPOP);
+                    emit(TRCPOP);
+                }
+
+                endType();                    // t | ∅    ; end type def
+            }
+            case Stmt.Return s -> {
+                if (current.inStaticInitializer) {
+                    // TODO: Move this to parser?
+                    error(s.keyword(),
+                        "Can't return from a static initializer block.");
+                }
+
+                if (s.value() != null) {
+                    if (current.chunk.type == FunctionType.INITIALIZER) {
+                        // Move to parser?
+                        error(s.keyword(),
+                            "Can't return a value from an initializer.");
+                    }
+                    emit(s.value());
+                    emit(RETURN);
+                } else {
+                    emitReturn(); // Includes initializer magic
+                }
+            }
+            case Stmt.Switch s -> {
+                beginScope();
+                emit(s.expr());
+                defineLocal(VAR_SWITCH);
+
+                // Jump targets
+                var ends_ = jumpList();
+                int next_ = -1;
+
+                for (var c : s.cases()) {
+                    line(c.location());
+                    var cases_ = jumpList();
+
+                    // Allow the previous case to jump here if it doesn't match.
+                    // next:
+                    if (next_ != -1) patchJump(next_);
+
+                    for (var target : c.values()) {
+                        // Compute the case target and compare it with the
+                        // *switch* value.
+                        emit(DUP); // Duplicate the switch value
+                        emit(target);
+                        emit(EQ);
+
+                        // Jump to the next case if no match.
+                        cases_.emit(JIT);
+                    }
+
+                    next_ = emitJump(JUMP);
+                    patchJumps(cases_);
+
+                    // Parse the case body.
+                    emit(c.statement());
+
+                    // No end jump if this the default case
+                    ends_.emit(JUMP);
+                }
+
+                // next:
+                if (next_ != -1) patchJump(next_);
+
+                if (s.switchDefault() != null) {
+                    emit(s.switchDefault().statement());
+                }
+
+                // Patch all the end jumps.
+                patchJumps(ends_);
+
+                // End the scope, removing the "*switch*" variable.
+                endScope();
+            }
+            case Stmt.Throw s -> { // Stack effects:
+                emit(s.value());   // value     ; compute error
+                emit(THROW);       // ∅         ; Throw it
+            }
+            case Stmt.Var var -> {
+                if (!inGlobalScope()) {
+                    // Declare the local before we compute the initializer;
+                    // this guarantees that the variable isn't initialized
+                    // in terms of itself.
+                    declareLocal(var.name());
+                }
+
+                // Compile the initial value
+                emit(var.value());
+
+                if (inGlobalScope()) {
+                    // Define the variable.  We don't worry about whether it
+                    // already existed or not
+                    defineGlobal(var.name());
+                } else {
+                    // The value is on the stack; define the variable.
+                    defineLocal(var.name());
+                }
+            }
+            case Stmt.While s -> {
+                // Setup                   // Stack effects:
+                var start_ = here();       // ∅     ; start:
+                emit(s.condition());       // cond  ; compute condition
+
+                // Loop
+                beginLoop(start_);         // cond  ; begin b/c zone
+                int end_ = emitJump(JIF);  // ∅     ; JIF end:
+                emit(s.body());            // ∅     ; compile loop body
+                emitLoop(start_);          // ∅     ; LOOP start:
+                patchJump(end_);           // ∅     ; end:
+                endLoop();                 // ∅     ; end b/c zone
             }
         }
-        scanner.consume(RIGHT_BRACE, "Expected '}' after " + kind + " body.");
-
-        if (firstInit != -1) {
-            var trace = new Trace(scanner.previous().span(),
-                "In " + kind + " " + typeName.lexeme());
-            var index = current.chunk.addConstant(trace);
-            emit(Opcode.TRCPUSH, index);
-
-            emitLoop(firstInit);
-        }
-
-        if (typeEnd != -1) {
-            patchJump(typeEnd);
-            emit(Opcode.TRCPOP);
-        }
-
-        emit(Opcode.POP); // Pop the class itself
     }
 
-    private void method() {
-        int start = scanner.previous().span().start();
-        scanner.consume(IDENTIFIER, "Expected method name after 'method'.");
-        char nameConstant = identifierConstant(scanner.previous());
+    private void emitFunction(
+        FunctionType type,
+        String name,
+        List<Token> params,
+        List<Stmt> body,
+        Span span
+    ) {
+        this.current = new FunctionInfo(current, type, name, span);
 
-        var type = scanner.previous().lexeme().equals(INIT)
-            ? FunctionType.INITIALIZER : FunctionType.METHOD;
-        function(start, type);
-
-        emit(Opcode.METHOD, nameConstant);
-    }
-
-    private void staticMethod() {
-        int start = scanner.previous().span().start();
-        scanner.consume(IDENTIFIER, "Expected method name after 'static method'.");
-        char nameConstant = identifierConstant(scanner.previous());
-
-        function(start, FunctionType.STATIC_METHOD);
-        emit(Opcode.METHOD, nameConstant);
-    }
-
-    private void functionDeclaration() {
-        int start = scanner.previous().span().start();
-        var global = parseVariable("Expected function name.");
-        markVarInitialized();
-        function(start, FunctionType.FUNCTION);
-        defineVariable(global);
-    }
-
-    private void lambda(boolean canAssign) {
-        int start = scanner.previous().span().start();
-        function(start, FunctionType.LAMBDA);
-    }
-
-    private void function(int start, FunctionType type) {
-        this.current = new FunctionCompiler(current, type, buffer);
+        // Begin the function's scope; no endScope() because `RETURN`
+        // does the cleanup.
         beginScope();
 
-        if (type != FunctionType.LAMBDA) {
-            scanner.consume(LEFT_PAREN, "Expected '(' after function name.");
-            parseArguments(RIGHT_PAREN, ")");
-            scanner.consume(LEFT_BRACE, "Expected '{' before function body.");
-            block();
-        } else {
-            parseArguments(MINUS_GREATER, "->");
-            if (scanner.match(LEFT_BRACE)) {
-                block();
-            } else {
-                expression();
-                emit(Opcode.RETURN);
-            }
+        for (var param : params) {
+            defineLocal(param);
+            current.parameters.add(param.lexeme());
         }
-        var end = scanner.previous().span().end();
-        current.chunk.span = buffer.span(start, end);
+
+        emit(body);
 
         var compiler = current;  // Save the compiler; endFunction pops it.
         var function = endFunction();
-        emit(Opcode.CLOSURE, current.chunk.addConstant(function));
+        lineAtEnd(span);
+        emit(CLOSURE, constant(function));
 
-        // Emit data about the upvalues.
+        // Emit data about the upvalues
         for (int i = 0; i < function.upvalueCount; i++) {
             emit((char)(compiler.upvalues[i].isLocal ? 1 : 0));
             emit(compiler.upvalues[i].index);
         }
     }
 
-    private void parseArguments(TokenType until, String lexeme) {
-        var parmCount = 0;
-        var gotArgs = false;
+    //-------------------------------------------------------------------------
+    // Code Generation: Expressions
 
-        if (!scanner.check(until)) {
-            do {
-                if (gotArgs) {
-                    errorAtCurrent(
-                        "If present, 'args' must be the final parameter.");
-                }
-                ++parmCount;
-                if (parmCount > MAX_PARAMETERS) {
-                    errorAtCurrent(
-                        "Can't have more than " + MAX_PARAMETERS + "parameters.");
-                }
-                var constant = parseVariable("Expected parameter name.");
-                defineVariable(constant);
-                var name = scanner.previous().lexeme();
-                if (current.parameters.contains(name)) {
-                    error("Duplicate parameter name.");
-                }
-                current.parameters.add(name);
-                gotArgs = ARGS.equals(name);
-
-                // Check for duplicates
-            } while (scanner.match(COMMA));
+    // Emits a function's argument list.
+    private void emitArgs(List<Expr> args) {
+        for (var arg : args) {
+            emit(arg);
         }
-        scanner.consume(until, "Expected '" + lexeme + "' after parameters.");
     }
 
-    private void letDeclaration() {
-        var keyword = scanner.previous();
+    // Emits the code for a single expression.
+    private void emit(Expr expr) {
+        line(expr.location());
 
-        // Parse the pattern; this does all variable declarations as
-        // it goes.
-        pattern();
+        switch (expr) {
+            case Expr.Binary e -> {
+                var op = switch (e.op().type()) {
+                    case TokenType.BANG_EQUAL    -> NE;
+                    case TokenType.EQUAL_EQUAL   -> EQ;
+                    case TokenType.GREATER       -> GT;
+                    case TokenType.GREATER_EQUAL -> GE;
+                    case TokenType.IN            -> IN;
+                    case TokenType.LESS          -> LT;
+                    case TokenType.LESS_EQUAL    -> LE;
+                    case TokenType.PLUS          -> ADD;
+                    case TokenType.MINUS         -> SUB;
+                    case TokenType.NI            -> NI;
+                    case TokenType.STAR          -> MUL;
+                    case TokenType.SLASH         -> DIV;
+                    default -> throw new IllegalStateException(
+                        "Unexpected operator: " + e.op());
+                };
 
-        if (currentPattern.bindingVars.isEmpty()) {
-            errorAt(keyword,
-                "'let' pattern must declare at least one variable.");
-        }
-
-        // Mark bound variables initialized.  This is a no-op at
-        // global scope.
-        markVarsInitialized(currentPattern.bindingVars.size());
-
-        scanner.consume(EQUAL, "Expected '=' after pattern.");
-        expression();
-        scanner.consume(SEMICOLON, "Expected ';' after target expression.");
-
-        if (current.scopeDepth > 0) {
-            emit(Opcode.LOCLET, currentPattern.patternIndex);
-        } else {
-            emit(Opcode.GLOLET, currentPattern.patternIndex);
-        }
-
-        currentPattern = null;
-    }
-
-    private void recordDeclaration() {
-        scanner.consume(IDENTIFIER, "Expected record type name.");
-        var typeName = scanner.previous();
-        char nameConstant = identifierConstant(typeName);
-        declareVariable(typeName);
-
-        scanner.consume(LEFT_PAREN, "Expected '(' after type name.");
-        var recordFields = parseRecordFields();
-        var fieldConstant = current.chunk.addConstant(recordFields);
-
-        emit(Opcode.RECORD, nameConstant);
-        emit(fieldConstant);
-        defineVariable(nameConstant);
-
-        // Remember the current type.
-        var typeCompiler = new TypeCompiler(currentType);
-        typeCompiler.kind = KindOfType.RECORD;
-        currentType = typeCompiler;
-
-        parseTypeBody("type", typeName, nameConstant);
-
-        currentType = currentType.enclosing;
-    }
-
-    private List<String> parseRecordFields() {
-        var result = new ArrayList<String>();
-
-        do {
-            if (result.size() > MAX_PARAMETERS) {
-                errorAtCurrent(
-                    "Can't have more than " + MAX_PARAMETERS + "fields.");
+                                     // Stack effects:
+                emit(e.left());      // a        ; compute left
+                emit(e.right());     // a b      ; compute right
+                emit(op);            // c        ; c = a op b
             }
+            case Expr.Call e -> {
+                var argc = e.arguments().size();
 
-            scanner.consume(IDENTIFIER, "Expected field name.");
-
-            var name = scanner.previous().lexeme();
-
-            if (name.equals(ARGS)) {
-                error("A record type cannot have a variable argument list.");
+                emit(e.callee());         // f          ; compute callable
+                emitArgs(e.arguments());  // f args...  ; compute arguments
+                emit(CALL, (char)argc);   // result     ; result = f(args);
             }
-
-            if (result.contains(name)) {
-                error("Duplicate field name.");
+            case Expr.Grouping e -> emit(e.expr());
+            case Expr.IndexGet e -> {
+                                          // Stack effects:
+                emit(e.collection());     // c          ; compute collection
+                emit(e.index());          // c i        ; compute index
+                emit(INDGET);             // v          ; get v = c[i]
             }
+            case Expr.IndexIncrDecr e -> {
+                var op = token2incrDecr(e.op());
 
-            result.add(name);
-
-            // Check for duplicates
-        } while (scanner.match(COMMA));
-
-        scanner.consume(RIGHT_PAREN, "Expected ')' after field names.");
-
-        return result;
-    }
-
-    private void varDeclaration() {
-        char global = parseVariable("Expected variable name.");
-
-        if (scanner.match(EQUAL)) {
-            expression();
-        } else {
-            emit(Opcode.NULL);
-        }
-        scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
-        defineVariable(global);
-    }
-
-    private void synchronize() {
-        parser.panicMode = false;
-
-        while (scanner.peek().type() != EOF) {
-            if (scanner.previous().type() == SEMICOLON) return;
-            switch (scanner.peek().type()) {
-                case ASSERT:
-                case BREAK:
-                case CLASS:
-                case CONTINUE:
-                case FOR:
-                case FOREACH:
-                case FUNCTION:
-                case IF:
-                case METHOD:
-                case RETURN:
-                case SWITCH:
-                case THROW:
-                case VAR:
-                case WHILE:
+                if (e.isPre()) { // Pre-increment/decrement
+                                          // Stack effects:
+                    emit(e.collection()); // c       ; compute collection
+                    emit(e.index());      // c i     ; compute index
+                    emit(DUP2);           // c i c i ; need it twice
+                    emit(INDGET);         // c i x   ; x = c[i]
+                    emit(op);             // c i y   ; y = x +/- 1
+                    emit(INDSET);         // y       ; c[i] = y
+                } else { // Post-increment/decrement
+                                          // Stack effects:
+                    emit(e.collection()); // c       ; compute collection
+                    emit(e.index());      // c i     ; compute index
+                    emit(DUP2);           // c i c i ; need it twice
+                    emit(INDGET);         // c i x   ; x = c[i]
+                    emit(TPUT);           // c i x   ; T = x
+                    emit(op);             // c i y   ; y = x +/- 1
+                    emit(INDSET);         // y       ; c[i] = y
+                    emit(POP);            // ∅       ;
+                    emit(TGET);           // x       ; x = T
+                }
+            }
+            case Expr.IndexSet e -> {
+                // Simple Assignment
+                if (e.op().type() == TokenType.EQUAL) {
+                    // Stack effects:
+                    emit(e.collection()); // c       ; compute collection
+                    emit(e.index());      // c i     ; compute index
+                    emit(e.value());      // c i x   ; compute value
+                    emit(INDSET);         // x       ; c[i] = x
                     return;
-
-                default: // Do nothing.
-            }
-
-            scanner.advance();
-        }
-    }
-
-    private void statement() {
-        if (scanner.match(ASSERT)) {
-            assertStatement();
-        } else if (scanner.match(BREAK)) {
-            breakStatement();
-        } else if (scanner.match(CONTINUE)) {
-            continueStatement();
-        } else if (scanner.match(FOR)) {
-            forStatement();
-        } else if (scanner.match(FOREACH)) {
-            foreachStatement();
-        } else if (scanner.match(IF)) {
-            if (scanner.match(LET)) {
-                ifLetStatement();
-            } else {
-                ifStatement();
-            }
-        } else if (scanner.match(MATCH)) {
-            matchStatement();
-        } else if (scanner.match(RETURN)) {
-            returnStatement();
-        } else if (scanner.match(SWITCH)) {
-            switchStatement();
-        } else if (scanner.match(THROW)) {
-            throwStatement();
-        } else if (scanner.match(WHILE)) {
-            whileStatement();
-        } else if (scanner.match(LEFT_BRACE)) {
-            beginScope();
-            block();
-            endScope();
-        } else {
-            expressionStatement();
-        }
-    }
-
-    private void block() {
-        while (!scanner.check(RIGHT_BRACE) && !scanner.check(EOF)) {
-            declaration();
-        }
-        scanner.consume(RIGHT_BRACE, "Expected '}' after block.");
-    }
-
-    private void expressionStatement() {
-        expression();
-        scanner.consume(SEMICOLON, "Expected ';' after expression.");
-
-        // Normal statements should not leave anything on the stack, so we
-        // pop it.  But if this is the last statement in the script, we
-        // want to return its value.
-        if (scanner.peek().type() == EOF) {
-            emit(Opcode.RETURN);
-        } else {
-            emit(Opcode.POP);
-        }
-    }
-
-    private void assertStatement() {
-        // Compile the condition expression, retaining the expression's span.
-        var start = scanner.previous().span().end();
-        expression();
-        var end = scanner.previous().span().end();
-        var endJump = emitJump(Opcode.JIT);
-
-        if (scanner.match(COMMA)) {
-            // Compile the message expression
-            expression();
-        } else {
-            var message = "Assertion unmet: " +
-                buffer.span(start, end).text().strip() + ".";
-            emitConstant(message);
-        }
-        emit(Opcode.ASSERT);
-
-        scanner.consume(SEMICOLON, "Expected ';' after assertion.");
-        patchJump(endJump);
-    }
-
-    private void breakStatement() {
-        scanner.consume(SEMICOLON, "Expected ';' after 'break'.");
-
-        // FIRST, are we in a loop?
-        if (currentLoop == null) {
-            error("Found 'break' outside of any loop.");
-            return;
-        }
-
-        // NEXT, end any open scopes. The  count might be 0; endScope()
-        // accounts for that.
-        popLocals(currentLoop.breakDepth);
-
-        // NEXT, emit the jump
-        var jump = emitJump(Opcode.JUMP);
-        currentLoop.breakJumps.add((char)jump);
-    }
-
-    private void continueStatement() {
-        scanner.consume(SEMICOLON, "Expected ';' after 'continue'.");
-
-        // FIRST, are we in a loop?
-        if (currentLoop == null) {
-            error("Found 'continue' outside of any loop.");
-            return;
-        }
-
-        // NEXT, end any open scopes. The  count might be 0; endScope()
-        // accounts for that.
-        popLocals(currentLoop.continueDepth);
-
-        // NEXT, emit the jump
-        emitLoop(currentLoop.loopStart);
-    }
-
-    private void forStatement() {
-        currentLoop = new LoopCompiler(currentLoop);
-        currentLoop.breakDepth = current.scopeDepth;
-        beginScope();
-
-        scanner.consume(LEFT_PAREN, "Expected '(' after 'for'.");
-
-        // Initializer
-        if (scanner.match(SEMICOLON)) {
-            // No initializer
-        } else if (scanner.match(VAR)) {
-            varDeclaration();
-        } else {
-            expressionStatement();
-        }
-
-        // Condition
-        int loopStart = current.chunk.codeSize();
-        int exitJump = -1;
-        if (!scanner.match(SEMICOLON)) {
-            expression();
-            scanner.consume(SEMICOLON, "Expected ';' after loop condition.");
-
-            // Jump out of the loop if the condition is false.
-            exitJump = emitJump(Opcode.JIF);
-        }
-
-        if (!scanner.match(RIGHT_PAREN)) {
-            int bodyJump = emitJump(Opcode.JUMP);
-            int incrementStart = current.chunk.codeSize();
-            expression();
-            emit(Opcode.POP);
-            scanner.consume(RIGHT_PAREN, "Expected ')' after 'for' clauses.");
-            emitLoop(loopStart);
-            loopStart = incrementStart;
-            patchJump(bodyJump);
-        }
-
-        currentLoop.continueDepth = current.scopeDepth;
-        currentLoop.loopStart = loopStart;
-        statement();
-        emitLoop(loopStart);
-
-        if (exitJump != -1) {
-            patchJump(exitJump);
-        }
-        endScope();
-
-        currentLoop.breakJumps.forEach(this::patchJump);
-        currentLoop = currentLoop.enclosing;
-    }
-
-    private void foreachStatement() {
-        currentLoop = new LoopCompiler(currentLoop);
-        currentLoop.breakDepth = current.scopeDepth;
-        beginScope();
-
-        scanner.consume(LEFT_PAREN, "Expected '(' after 'foreach'.");
-
-        // Loop variable
-        scanner.consume(VAR, "Expected 'var' before loop variable.");
-        parseVariable("Expected variable name.");
-        var itemName = scanner.previous();
-        emit(Opcode.NULL);
-        defineVariable((char)0); // Loop variable is always local
-
-        scanner.consume(COLON, "Expected ':' after loop variable.");
-
-        // Collection expression
-        defineHiddenVariable(VAR_ITERATOR); // Gets collection
-        emit(Opcode.ITER);                  // Convert collection to iterator
-
-        scanner.consume(RIGHT_PAREN, "Expected ')' after collection expression.");
-
-        // Start the loop
-        int loopStart = current.chunk.codeSize();
-        currentLoop.continueDepth = current.scopeDepth;
-        currentLoop.loopStart = loopStart;
-
-        // Check to see if we have any more items
-        emit(Opcode.HASNEXT);
-        var exitJump = emitJump(Opcode.JIF);
-
-        // Get the next item and update the loop variable
-        emit(Opcode.GETNEXT);
-        var arg = resolveLocal(current, itemName);
-        emit(Opcode.LOCSET, (char)arg);
-        emit(Opcode.POP); // Pop the item value
-
-        // Execute the body
-        statement();
-        emitLoop(loopStart);
-
-        // Patch any breaks
-        patchJump(exitJump);
-        endScope();
-
-        currentLoop.breakJumps.forEach(this::patchJump);
-        currentLoop = currentLoop.enclosing;
-    }
-
-    private void ifStatement() {
-        scanner.consume(LEFT_PAREN, "Expected '(' after 'if'.");
-        expression();
-        scanner.consume(RIGHT_PAREN, "Expected ')' after condition.");
-
-        int thenJump = emitJump(Opcode.JIF);
-        statement();
-        int elseJump = emitJump(Opcode.JUMP);
-        patchJump(thenJump);
-
-        if (scanner.match(ELSE)) statement();
-        patchJump(elseJump);
-    }
-
-    private void ifLetStatement() {
-        var keyword = scanner.previous();
-        scanner.consume(LEFT_PAREN, "Expected '(' after 'if let'.");
-        beginScope();
-        pattern();
-        markVarsInitialized(currentPattern.bindingVars.size());
-        scanner.consume(EQUAL, "Expected '=' after pattern.");
-        expression();
-        scanner.consume(RIGHT_PAREN, "Expected ')' after target expression.");
-
-        emit(Opcode.MATCH, currentPattern.patternIndex);
-        currentPattern = null;
-
-        int thenJump = emitJump(Opcode.JIF);
-        statement();
-        endScope();
-        int elseJump = emitJump(Opcode.JUMP);
-        patchJump(thenJump);
-
-        if (scanner.match(ELSE)) statement();
-        patchJump(elseJump);
-    }
-
-    private void matchStatement() {
-        beginScope();
-        scanner.consume(LEFT_PAREN, "Expected '(' after 'match'.");
-        defineHiddenVariable(VAR_MATCH);
-        scanner.consume(RIGHT_PAREN, "Expected ')' after match expression.");
-        scanner.consume(LEFT_BRACE, "Expected '{' before match body.");
-
-        // Jump targets
-        var endJumps = new ArrayList<Character>();
-        int nextJump1 = -1;  // Jump if match failed
-        int nextJump2 = -1;  // Jump if guard failed
-
-        while (scanner.match(CASE)) {
-            var caseJumps = new ArrayList<Character>();
-
-            // Allow the previous case to jump here if it doesn't match.
-            if (nextJump1 != -1) patchJump(nextJump1);
-            if (nextJump2 != -1) patchJump(nextJump2);
-
-            beginScope(); // case
-            pattern();
-            markVarsInitialized(currentPattern.bindingVars.size());
-            getOrSetVariable(Token.synthetic(VAR_MATCH), false);
-
-            emit(Opcode.MATCH, currentPattern.patternIndex);
-            currentPattern = null;
-            nextJump1 = emitJump(Opcode.JIF);
-
-            if (scanner.match(IF)) {
-                expression();
-                nextJump2 = emitJump(Opcode.JIF);
-            }
-
-            // Parse the case body.
-            scanner.consume(MINUS_GREATER, "Expected '->' after case pattern.");
-            statement();
-            endScope(); // case
-            endJumps.add((char)emitJump(Opcode.JUMP));
-        }
-
-        // Look for the `default ->` case.
-        if (nextJump1 != -1) patchJump(nextJump1);
-        if (nextJump2 != -1) patchJump(nextJump2);
-
-        if (scanner.match(DEFAULT)) {
-            scanner.consume(MINUS_GREATER, "Expected '->' after 'default'.");
-            statement();
-        }
-
-        scanner.consume(RIGHT_BRACE, "Expected '}' before match body.");
-
-        // Patch all the end jumps.
-        endJumps.forEach(this::patchJump);
-
-        // End the scope, removing the "*match*" variable.
-        endScope();
-    }
-
-    private void returnStatement() {
-        if (current.inStaticInitializer) {
-            error("Can't return from a static initializer block.");
-        }
-
-        if (scanner.match(SEMICOLON)) {
-            emitReturn();
-        } else {
-            if (current.chunk.type == FunctionType.INITIALIZER) {
-                error("Can't return a value from an initializer.");
-            }
-            expression();
-            scanner.consume(SEMICOLON, "Expected ';' after return value.");
-            emit(Opcode.RETURN);
-        }
-    }
-
-    private void switchStatement() {
-        beginScope();
-        scanner.consume(LEFT_PAREN, "Expected '(' after 'switch'.");
-        defineHiddenVariable(VAR_SWITCH);
-        scanner.consume(RIGHT_PAREN, "Expected ')' after switch expression.");
-        scanner.consume(LEFT_BRACE, "Expected '{' before switch body.");
-
-        // Jump targets
-        var endJumps = new ArrayList<Character>();
-        int nextJump = -1;
-
-        while (scanner.match(CASE)) {
-            var caseJumps = new ArrayList<Character>();
-
-            // Allow the previous case to jump here if it doesn't match.
-            if (nextJump != -1) {
-                patchJump(nextJump);
-            }
-
-            do {
-                // Parse the case expression and compare it with the
-                // switch value.
-                emit(Opcode.DUP); // Duplicate the switch value
-                expression();
-                emit(Opcode.EQ);
-
-                // Jump to the next case if no match.
-                caseJumps.add((char)emitJump(Opcode.JIT));
-            } while (scanner.match(COMMA));
-
-            nextJump = emitJump(Opcode.JUMP);
-            caseJumps.forEach(this::patchJump);
-
-            // Parse the case body.
-            scanner.consume(MINUS_GREATER, "Expected '->' after case expression.");
-            statement();
-            endJumps.add((char)emitJump(Opcode.JUMP));
-        }
-
-        // Look for the `default ->` case.
-        if (nextJump != -1) {
-            patchJump(nextJump);
-        }
-        if (scanner.match(DEFAULT)) {
-            scanner.consume(MINUS_GREATER, "Expected '->' after 'default'.");
-            statement();
-        }
-
-        scanner.consume(RIGHT_BRACE, "Expected '}' before switch body.");
-
-        // Patch all the end jumps.
-        endJumps.forEach(this::patchJump);
-
-        // End the scope, removing the "*switch*" variable.
-        endScope();
-    }
-
-    private void throwStatement() {
-        expression();
-        scanner.consume(SEMICOLON, "Expected ';' after 'throw' value.");
-        emit(Opcode.THROW);
-    }
-
-    private void whileStatement() {
-        int loopStart = current.chunk.codeSize();
-        scanner.consume(LEFT_PAREN, "Expected '(' after 'while'.");
-        expression();
-        scanner.consume(RIGHT_PAREN, "Expected ')' after condition.");
-
-        currentLoop = new LoopCompiler(currentLoop);
-        currentLoop.breakDepth = current.scopeDepth;
-        currentLoop.continueDepth = current.scopeDepth;
-        currentLoop.loopStart = loopStart;
-
-        int exitJump = emitJump(Opcode.JIF);
-        statement();
-        emitLoop(loopStart);
-
-        currentLoop.breakJumps.forEach(this::patchJump);
-        patchJump(exitJump);
-        currentLoop = currentLoop.enclosing;
-    }
-
-    //-------------------------------------------------------------------------
-    // Parser: Expressions
-
-    private void expression() {
-        parsePrecedence(Level.ASSIGNMENT);
-    }
-
-    void grouping(boolean canAssign) {
-        expression();
-        scanner.consume(RIGHT_PAREN, "Expected ')' after expression.");
-    }
-
-    void ternary(boolean canAssign) {
-        //                 | cond
-        // JIF else        |
-        // thenExpr        | a
-        // JUMP end        | a
-        // else: elseExpr  | b
-        // end:            | a or b
-        var elseJump = emitJump(Opcode.JIF);
-        expression();
-        var endJump = emitJump(Opcode.JUMP);
-        patchJump(elseJump);
-        scanner.consume(COLON, "expected ':' after then expression.");
-        expression();
-        patchJump(endJump);
-    }
-
-    void binary(boolean canAssign) {
-        var op = scanner.previous().type();
-        var rule = getRule(op);
-        parsePrecedence(rule.level + 1);
-
-        switch (op) {
-            case BANG_EQUAL -> emit(Opcode.NE);
-            case EQUAL_EQUAL -> emit(Opcode.EQ);
-            case GREATER -> emit(Opcode.GT);
-            case GREATER_EQUAL -> emit(Opcode.GE);
-            case IN -> emit(Opcode.IN);
-            case LESS -> emit(Opcode.LT);
-            case LESS_EQUAL -> emit(Opcode.LE);
-            case PLUS ->  emit(Opcode.ADD);
-            case MINUS -> emit(Opcode.SUB);
-            case NI -> emit(Opcode.NI);
-            case STAR  -> emit(Opcode.MUL);
-            case SLASH -> emit(Opcode.DIV);
-            default -> throw new IllegalStateException(
-                "Unexpected operator: " + op);
-        }
-    }
-
-    void and(boolean canAssign) {
-        // On false, the tested value becomes the value of the expression.
-        int endJump = emitJump(Opcode.JIFKEEP);
-        emit(Opcode.POP);
-        parsePrecedence(Level.AND);
-        patchJump(endJump);
-    }
-
-    void or(boolean canAssign) {
-        // On true, the tested value becomes the value of the expression.
-        int endJump = emitJump(Opcode.JITKEEP);
-        emit(Opcode.POP);
-        parsePrecedence(Level.OR);
-        patchJump(endJump);
-    }
-
-    private void unary(boolean canAssign) {
-        var op = scanner.previous();
-
-        // Compile the operand
-        parsePrecedence(Level.UNARY);
-        var last = scanner.previous();  // The last token in the expression.
-
-        // Emit the instruction
-        switch (op.type()) {
-            case BANG -> emit(Opcode.NOT);
-            case MINUS -> emit(Opcode.NEGATE);
-            case PLUS_PLUS, MINUS_MINUS -> preIncrDecr(op, last);
-            default -> throw new IllegalStateException(
-                "Unexpected operator: " + op);
-        }
-    }
-
-    private void preIncrDecr(Token op, Token last) {
-        var mathOp = op.type() == TokenType.PLUS_PLUS
-            ? Opcode.INCR : Opcode.DECR;
-
-        if (last.type() == TokenType.IDENTIFIER) {
-            preIncrDecrIdentifier(mathOp);
-        } else if (last.type() == TokenType.RIGHT_BRACKET) {
-            preIncrDecrIndex(mathOp);
-        } else {
-            error("Invalid '" + op.lexeme() + "' target.");
-        }
-    }
-
-    private void preIncrDecrIdentifier(char mathOp) {
-        // FIRST, get the last instruction and its argument, and back
-        // them out.
-        char getOp = current.chunk.code[current.chunk.size - 2];
-        char arg = current.chunk.code[current.chunk.size - 1];
-        current.chunk.size -= 2;
-
-        // NEXT, get the relevant set operation.
-        char setOp = switch (getOp) {
-            case Opcode.GLOGET -> Opcode.GLOSET;
-            case Opcode.LOCGET -> Opcode.LOCSET;
-            case Opcode.UPGET -> Opcode.UPSET;
-            case Opcode.PROPGET -> Opcode.PROPSET;
-            default -> throw new IllegalStateException(
-                "Unexpected opcode: " + getOp);
-        };
-
-        if (getOp == Opcode.PROPGET) {
-            // Increment/decrement a property
-            //
-            //                | o         ; Initial state
-            // DUP            | o o       ; Copy the object
-            // PROPGET name   | o a       ; a = o.name
-            // mathOp         | o a'      ; E.g., a' = a + 1
-            // PROPSET name   | a'        ; o.name = a'
-
-            emit(Opcode.DUP);
-            emit(Opcode.PROPGET, arg);
-            emit(mathOp);
-            emit(Opcode.PROPSET, arg);
-        } else {
-            // Increment/decrement a variable
-            //
-            //                    | ∅         ; Initial state
-            // *GET        var    | a         ; a = var
-            // mathOp             | a'        ; e.g., a' = a + 1
-            // *SET        var    | a'        ; var = a'
-            emit(getOp, arg);
-            emit(mathOp);
-            emit(setOp, arg);
-        }
-    }
-
-    private void preIncrDecrIndex(char mathOp) {
-        // FIRST, back out the last instruction, which will be INDGET.
-        current.chunk.size--;
-
-        // Increment/decrement an indexed reference
-        // ; ++x[i] or --x[i]
-        //           | x i              ; Indexed ref on stack
-        // DUP2      | x i → x i x i    ; Duplicate ref
-        // INDGET    | x i x i → x i a  ; a = x[i]
-        // op        | x i a → x i b    ; b = ++a or b = --a
-        // INDSET    | x i b → b        ; x[i] = b, retaining b
-
-        emit(Opcode.DUP2);
-        emit(Opcode.INDGET);
-        emit(mathOp);
-        emit(Opcode.INDSET);
-    }
-
-    private void variable(boolean canAssign) {
-        // When parsing a pattern, interpolated variables and expressions
-        // can reference a variable with the same name as a binding
-        // variable before the binding variable is declared.  This
-        // Adds interpolated variables to a list so we can check for
-        // this error.
-        if (current.scopeDepth > 0 && currentPattern != null) {
-            currentPattern.referencedLocals.add(scanner.previous());
-        }
-        getOrSetVariable(scanner.previous(), canAssign);
-    }
-
-    private void literal(boolean canAssign) {
-        emitConstant(scanner.previous().literal());
-    }
-
-    // List literal: [...]
-    private void list(boolean canAssign) {
-        emit(Opcode.LISTNEW);
-
-        if (!scanner.check(TokenType.RIGHT_BRACKET)) {
-            expression();
-            emit(Opcode.LISTADD);
-
-            while (scanner.match(TokenType.COMMA)) {
-                // Allow trailing comma
-                if (scanner.check(TokenType.RIGHT_BRACKET)) break;
-                expression();
-                emit(Opcode.LISTADD);
-            }
-        }
-
-        scanner.consume(TokenType.RIGHT_BRACKET, "Expected ']' after list items.");
-    }
-
-    // map literal: [...]
-    private void map(boolean canAssign) {
-        emit(Opcode.MAPNEW);
-
-        if (!scanner.check(TokenType.RIGHT_BRACE)) {
-            expression();
-            scanner.consume(TokenType.COLON, "Expected ':' after map key.");
-            expression();
-            emit(Opcode.MAPPUT);
-
-            while (scanner.match(TokenType.COMMA)) {
-                // Allow trailing comma
-                if (scanner.check(TokenType.RIGHT_BRACE)) break;
-                expression();
-                scanner.consume(TokenType.COLON, "Expected ':' after map key.");
-                expression();
-                emit(Opcode.MAPPUT);
-            }
-        }
-
-        scanner.consume(TokenType.RIGHT_BRACE, "Expected '}' after map entries.");
-    }
-
-    private void symbol(boolean canAssign) {
-        switch (scanner.previous().type()) {
-            case FALSE -> emit(Opcode.FALSE);
-            case NULL -> emit(Opcode.NULL);
-            case TRUE -> emit(Opcode.TRUE);
-            default -> throw new IllegalStateException(
-                "Unexpected literal: " + scanner.previous().type());
-        }
-    }
-
-    private void this_(boolean canAssign) {
-        var last = scanner.previous();
-        if (currentType == null) {
-            error("Can't use '" + last.lexeme() + "' outside of a method.");
-        }
-
-        if (scanner.previous().type() == TokenType.THIS) {
-            variable(false);
-        } else {
-            getOrSetVariable(Token.synthetic(VAR_THIS), canAssign);
-            dot(canAssign);
-        }
-    }
-
-    private void super_(boolean canAssign) {
-        if (currentType == null || currentType.kind != KindOfType.CLASS) {
-            error("Can't use 'super' outside of a class.");
-        } else if (!currentType.hasSupertype) {
-            error("Can't use 'super' in a class with no superclass.");
-        }
-        scanner.consume(DOT, "Expected '.' after 'super'.");
-        scanner.consume(IDENTIFIER, "Expected superclass method name.");
-        char nameConstant = identifierConstant(scanner.previous());
-        getOrSetVariable(Token.synthetic(VAR_THIS), false);
-        getOrSetVariable(Token.synthetic(VAR_SUPER), false);
-        emit(Opcode.SUPGET, nameConstant);
-    }
-
-    private void call(boolean canAssign) {
-        var argCount = argumentList();
-        emit(Opcode.CALL, argCount);
-    }
-
-    private char argumentList() {
-        char count = 0;
-
-        if (!scanner.check(RIGHT_PAREN)) {
-            do {
-                expression();
-                count++;
-                if (count > MAX_PARAMETERS) {
-                    error("Can't have more than 255 arguments.");
                 }
-            } while (scanner.match(COMMA));
-        }
-        scanner.consume(RIGHT_PAREN, "Expected ')' after arguments.");
-        return count;
-    }
 
-    private void dot(boolean canAssign) {
-        scanner.consume(IDENTIFIER, "Expected property name after '.'.");
-        char nameConstant = identifierConstant(scanner.previous());
+                // Assignment with update
+                var mathOp = token2updater(e.op());
 
-        if (canAssign && scanner.match(EQUAL)) {
-            expression();
-            emit(Opcode.PROPSET, nameConstant);
-        } else if (canAssign && scanner.match(PLUS_EQUAL)) {
-            updateProperty(nameConstant, Opcode.ADD);
-        } else if (canAssign && scanner.match(MINUS_EQUAL)) {
-            updateProperty(nameConstant, Opcode.SUB);
-        } else if (canAssign && scanner.match(STAR_EQUAL)) {
-            updateProperty(nameConstant, Opcode.MUL);
-        } else if (canAssign && scanner.match(SLASH_EQUAL)) {
-            updateProperty(nameConstant, Opcode.DIV);
-        } else if (canAssign && scanner.match(PLUS_PLUS)) {
-            postIncrDecrProperty(nameConstant, Opcode.INCR);
-        } else if (canAssign && scanner.match(MINUS_MINUS)) {
-            postIncrDecrProperty(nameConstant, Opcode.DECR);
-        } else {
-            emit(Opcode.PROPGET, nameConstant);
-        }
-    }
+                emit(e.collection());     // c         ; compute collection
+                emit(e.index());          // c i       ; compute index
+                emit(DUP2);               // c i c i   ; need it twice
+                emit(INDGET);             // c i x     ; x = c[i]
+                emit(e.value());          // c i x y   ; compute update value
+                emit(mathOp);             // c i z     ; z = x + y
+                emit(INDSET);             // z         ; c[i] = z
+            }
+            case Expr.Lambda e ->
+                emitFunction(FunctionType.LAMBDA, LAMBDA_NAME,
+                    e.declaration().params(), e.declaration().body(),
+                    e.declaration().span());
+            case Expr.ListLiteral e -> {
+                                          // Stack effects
+                emitList(e.list());       // list      ; compute list
+            }
+            case Expr.Literal e -> {
+                switch (e.value()) {
+                    case null -> emit(NULL);
+                    case Boolean b -> emit(b ? TRUE : FALSE);
+                    default -> emitCONST(e.value());
+                }
+            }
+            case Expr.Logical e -> {
+                if (e.op().type() == TokenType.AND) {
+                                                     // Stack effects:
+                    emit(e.left());                  // v      ; compute left
+                    int end_ = emitJump(JIFKEEP);    // v      ; JIFKEEP end
+                    emit(POP);                       // ∅
+                    emit(e.right());                 // v      ; compute right
+                    patchJump(end_);                 // v      ; end:
+                } else { // OR
+                    emit(e.left());                  // v      ; compute left
+                    int end_ = emitJump(JITKEEP);    // v      ; JITKEEP end
+                    emit(POP);                       // ∅
+                    emit(e.right());                 // v      ; compute right
+                    patchJump(end_);                 // v      ; end:
+                }
+            }
+            case Expr.MapLiteral e -> {
+                                                   // Stack effects:
+                emit(MAPNEW);                      // m        ; create map
+                for (var i = 0; i < e.entries().size(); i += 2) {
+                    emit(e.entries().get(i));      // m k      ; compute key
+                    emit(e.entries().get(i + 1));  // m k v    ; compute value
+                    emit(MAPPUT);                  // m        ; m[k] = v
+                }
+            }
+            case Expr.PropGet e -> {
+                var name = name(e.name());
+                                          // Stack effects:
+                emit(e.object());         // o      ; compute object
+                emit(PROPGET, name);      // a      ; get property name
+            }
+            case Expr.PropIncrDecr e -> {
+                var name = name(e.name());
+                var op = token2incrDecr(e.op());
 
-    // Emits the code to update a property
-    private void updateProperty(char name, char mathOp) {
-        //                | o         ; Object on stack
-        // DUP            | o o       ; Duplicate object
-        // PROPGET name   | o a       ; a = o.name
-        // expr           | o a b     ; b = expr
-        // mathOp         | o c       ; E.g., c = a + b
-        // PROPSET name   | c         ; o.name = c, retaining c
-        emit(Opcode.DUP);
-        emit(Opcode.PROPGET, name);
-        expression();
-        emit(mathOp);
-        emit(Opcode.PROPSET, name);
-    }
+                if (e.isPre()) {
+                    // Pre-increment/decrement
 
-    // Emits the code to post-increment/decrement a property
-    private void postIncrDecrProperty(char name, char mathOp) {
-        //                | o         ; Initial state
-        // DUP            | o o       ; Copy the object
-        // PROPGET name   | o a       ; a = o.name
-        // TPUT           | o a       ; T = a
-        // mathOp         | o a'      ; E.g., a' = a + 1
-        // PROPSET name   | a'        ; o.name = a'
-        // POP            | ∅         ;
-        // TGET           | a         ; push T
+                                          // Stack effects:
+                    emit(e.object());     // o      ; compute object
+                    emit(DUP);            // o o    ; need it twice
+                    emit(PROPGET, name);  // o a    ; a = o.name
+                    emit(op);             // o b    ; b = a +/- 1
+                    emit(PROPSET, name);  // b      ; o.name = b
+                } else {
+                    // Post-increment/decrement
 
-        emit(Opcode.DUP);
-        emit(Opcode.PROPGET, name);
-        emit(Opcode.TPUT);
-        emit(mathOp);
-        emit(Opcode.PROPSET, name);
-        emit(Opcode.POP);
-        emit(Opcode.TGET);
-    }
+                                          // Stack effects:
+                    emit(e.object());     // o      ; compute object
+                    emit(DUP);            // o o    ; need it twice
+                    emit(PROPGET, name);  // o a    ; a = o.name
+                    emit(TPUT);           // o a    ; T = a
+                    emit(op);             // o b    ; b = a +/- 1
+                    emit(PROPSET, name);  // b      ; o.name = b
+                    emit(POP);            // ∅      ;
+                    emit(TGET);           // a      ; a = T
+                }
+            }
+            case Expr.PropSet e -> {
+                var name = name(e.name());
 
-    // Handles `[i]`
-    private void index(boolean canAssign) {
-        // Index expression
-        expression();
-        scanner.consume(RIGHT_BRACKET, "Expected ']' after indexed expression.");
+                // Simple Assignment
+                if (e.op().type() == TokenType.EQUAL) {
+                                          // Stack effects:
+                    emit(e.object());     // o      ; compute object
+                    emit(e.value());      // o v    ; compute value
+                    emit(PROPSET, name);  // v      ; o.name = v
+                    return;
+                }
 
-        if (canAssign && scanner.match(EQUAL)) {
-            expression();
-            emit(Opcode.INDSET);
-        } else if (canAssign && scanner.match(PLUS_EQUAL)) {
-            updateIndex(Opcode.ADD);
-        } else if (canAssign && scanner.match(MINUS_EQUAL)) {
-            updateIndex(Opcode.SUB);
-        } else if (canAssign && scanner.match(STAR_EQUAL)) {
-            updateIndex(Opcode.MUL);
-        } else if (canAssign && scanner.match(SLASH_EQUAL)) {
-            updateIndex(Opcode.DIV);
-        } else if (canAssign && scanner.match(PLUS_PLUS)) {
-            postIncrDecrIndex(Opcode.INCR);
-        } else if (canAssign && scanner.match(MINUS_MINUS)) {
-            postIncrDecrIndex(Opcode.DECR);
-        } else {
-            emit(Opcode.INDGET);
-        }
-    }
+                // Assignment with update
+                var mathOp = token2updater(e.op());
 
-    // Emits the code to update an indexed reference
-    private void updateIndex(char mathOp) {
-        // ; x[i] op= expr
-        //          | x i              ; Index ref on stack
-        // DUP2     | x i → x i x i    ; Duplicate index ref
-        // INDGET   | x i x i → x i a  ; a = x[i]
-        // expr     | x i a → x i a b  ; b = expr
-        // op       | x i a b → x i c  ; E.g., c = a op b
-        // INDSET   | x i c → c        ; x[i] = c, retaining c
-        emit(Opcode.DUP2);
-        emit(Opcode.INDGET);
-        expression();
-        emit(mathOp);
-        emit(Opcode.INDSET);
-    }
+                emit(e.object());         // o      ; compute object
+                emit(DUP);                // o o    ; object needed twice
+                emit(PROPGET, name);      // o a    ; get prop value
+                emit(e.value());          // o a b  ; compute update value
+                emit(mathOp);             // o c    ; c = a op b
+                emit(PROPSET, name);      // c      ; o.name = c
+            }
+            case Expr.Super e -> {
+                if (currentType == null || !currentType.inInstanceMethod) {
+                    error(e.keyword(), "Can't use '" + e.keyword().lexeme() +
+                        "' outside of a method.");
+                } else if (!currentType.hasSupertype) {
+                    error(e.keyword(), "Can't use '" + e.keyword().lexeme() +
+                        "' in a class with no superclass.");
+                }
 
-    // Emits the code to post-increment/decrement an indexed reference
-    private void postIncrDecrIndex(char mathOp) {
-        // ; x[i]++, x[i]--
-        //           | x i               ; Index ref on stack
-        // DUP2      | x i → x i x i     ; Duplicate index ref
-        // INDGET    | x i x i → x i a   ; a = x[i]
-        // TPUT      | x i a → x i a     ; T = a
-        // op        | x i a → x i b     ; b = a++ or b = a--
-        // INDSET    | x i b → b         ; x[i] = b
-        // POP       | b → ∅             ;
-        // TGET      | ∅ → a             ; push T
+                var name = name(e.method());
 
-        emit(Opcode.DUP2);
-        emit(Opcode.INDGET);
-        emit(Opcode.TPUT);
-        emit(mathOp);
-        emit(Opcode.INDSET);
-        emit(Opcode.POP);
-        emit(Opcode.TGET);
-    }
+                emitGET(VAR_THIS);     // t        ; get this
+                emitGET(VAR_SUPER);    // t s      ; get super
+                emit(SUPGET, name);    // m        ; super.name
+            }
+            case Expr.Ternary e -> {
+                                            // Stack effects
+                emit(e.condition());        // c     ; compute condition
+                int else_ = emitJump(JIF);  //       ; JIF else
+                emit(e.trueExpr());         // v     ; compute true value
+                int end_ = emitJump(JUMP);  // v     ; JUMP end
+                patchJump(else_);           // ∅     ; else:
+                emit(e.falseExpr());        // v     ; compute false value
+                patchJump(end_);            // v     ; end:
+            }
+            case Expr.This e -> {
+                if (currentType == null || !currentType.inInstanceMethod) {
+                    error(e.keyword(),
+                        "Can't use '" + e.keyword().lexeme() +
+                        "' outside of a method.");
+                }
+                                     // Stack effects:
+                emitGET(VAR_THIS);   // this
+            }
+            case Expr.Unary e -> {
+                var op = switch(e.op().type()) {
+                    case TokenType.BANG  -> NOT;
+                    case TokenType.MINUS -> NEGATE;
+                    default -> throw new IllegalStateException(
+                        "Unexpected operator: " + e.op());
+                };
 
-    private void parsePrecedence(int level) {
-        scanner.advance();
-        var prefixRule = getRule(scanner.previous().type()).prefix;
+                                     // Stack effects:
+                emit(e.right());     // a       ; compute right
+                emit(op);            // b       ; b = op a
+            }
+            case Expr.VarGet e -> {
+                                     // Stack effects:
+                emitGET(e.name());   // value     ; get name
+            }
+            case Expr.VarIncrDecr e -> {
+                var incrDecr = token2incrDecr(e.op());
 
-        if (prefixRule == null) {
-            error("Expected expression.");
-            return;
-        }
+                if (e.isPre()) { // Pre-increment/decrement
+                                          // Stack effects:
+                    emitGET(e.name());    // a        ; a = name
+                    emit(incrDecr);       // b        ; b = a +/- 1
+                    emitSET(e.name());    // b        ; name = b
+                } else { // Post-increment/decrement
+                                          // Stack effects:
+                    emitGET(e.name());    // a        ; a = name
+                    emit(TPUT);           // a        ; T = a
+                    emit(incrDecr);       // b        ; b = a +/- 1
+                    emitSET(e.name());    // b        ; name = b
+                    emit(POP);            // ∅
+                    emit(TGET);           // a        ; a = T
+                }
+            }
+            case Expr.VarSet e -> {
+                // Simple Assignment
+                if (e.op().type() == TokenType.EQUAL) {
+                                          // Stack effects:
+                    emit(e.value());      // a        ; compute value
+                    emitSET(e.name());    // a        ; name = a
+                    return;
+                }
 
-        var canAssign = level <= Level.ASSIGNMENT;
-        prefixRule.parse(canAssign);
+                // Assignment with update
+                var mathOp = token2updater(e.op());
 
-        while (level <= getRule(scanner.peek().type()).level) {
-            scanner.advance();
-            var infixRule = getRule(scanner.previous().type()).infix;
-            infixRule.parse(canAssign);
-        }
-
-        if (canAssign && scanner.match(EQUAL)) {
-            error("Invalid assignment target.");
-        }
-    }
-
-    //-------------------------------------------------------------------------
-    // Patterns
-
-    private void pattern() {
-        currentPattern = new PatternCompiler();
-
-        // Prepare for constants
-        emit(Opcode.LISTNEW);
-
-        var pattern = parsePattern(false);
-        currentPattern.patternIndex = addConstant(pattern);
-
-        for (var name : currentPattern.referencedLocals) {
-            if (currentPattern.bindingVars.contains(name.lexeme())) {
-                errorAt(name,
-                    "Can't read local variable in its own initializer.");
+                                          // Stack effects:
+                emitGET(e.name());        // a      ; a = name
+                emit(e.value());          // a b    ; compute update value
+                emit(mathOp);             // c      ; c = a op b
+                emitSET(e.name());        // c      ; name = c
             }
         }
     }
 
-    private Pattern parsePattern(boolean isSubpattern) {
-        var constant = constantPattern();
-
-        if (constant != null) {
-            return constant;
-        }
-
-        if (scanner.match(LEFT_BRACKET)) {
-            return listPattern();
-        } else if (scanner.match(LEFT_BRACE)) {
-            return mapPattern();
-        } else if (scanner.match(IDENTIFIER)) {
-            var identifier = scanner.previous();
-
-            if (identifier.lexeme().startsWith("_")) {
-                return new Pattern.Wildcard(identifier.lexeme());
-            } else if (scanner.match(LEFT_BRACE)) {
-                return instancePattern(identifier);
-            } else if (scanner.match(LEFT_PAREN)) {
-                return recordPattern(identifier);
-            }
-
-            var id = addPatternVar(identifier);
-
-            if (isSubpattern && scanner.match(EQUAL)) {
-                var subpattern = parsePattern(false);
-                return new Pattern.PatternBinding(id, subpattern);
-            } else {
-                return new Pattern.ValueBinding(id);
-            }
-        } else {
-            errorAtCurrent("Expected pattern.");
-            return new Pattern.Wildcard("_");
-        }
+    private char token2updater(Token op) {
+        return switch(op.type()) {
+            case TokenType.PLUS_EQUAL  -> ADD;
+            case TokenType.MINUS_EQUAL -> SUB;
+            case TokenType.STAR_EQUAL  -> MUL;
+            case TokenType.SLASH_EQUAL -> DIV;
+            default -> throw new IllegalStateException(
+                "Unexpected operator: " + op);
+        };
     }
 
-    private int addPatternVar(Token varName) {
-        if (currentPattern.bindingVars.contains(varName.lexeme())) {
-            errorAt(varName, "Duplicate binding variable in pattern.");
-        } else {
-            currentPattern.bindingVars.add(varName.lexeme());
-        }
-
-        var id = addVariable(varName);
-
-        // If this is a global, the VM uses the returned ID as the index
-        // of the global variable's name in the constants table.  If it
-        // is a local, the ID is ignored; so give them nice consecutive
-        // IDs to make the pattern's string-rep easier to read.
-        if (current.scopeDepth == 0) {
-            return id;
-        } else {
-            return currentPattern.bindingVars.size() - 1;
-        }
-    }
-
-    private Pattern.Constant constantPattern() {
-        if (scanner.match(TRUE)) {
-            emit(Opcode.TRUE);
-        } else if (scanner.match(FALSE)) {
-            emit(Opcode.FALSE);
-        } else if (scanner.match(NULL)) {
-            emit(Opcode.NULL);
-        } else if (scanner.match(NUMBER) || scanner.match(STRING) || scanner.match(KEYWORD)) {
-            emitConstant(scanner.previous().literal());
-        } else if (scanner.match(DOLLAR)) {
-            if (scanner.match(IDENTIFIER)) {
-                // Save the variable for shadow-checks
-                currentPattern.referencedLocals.add(scanner.previous());
-                variable(false);  // Emit the *GET instruction.
-            } else {
-                scanner.consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
-                expression();
-                scanner.consume(RIGHT_PAREN,
-                    "Expected ')' after interpolated expression.");
-            }
-        } else {
-            return null;
-        }
-
-        emit(Opcode.LISTADD);
-        return new Pattern.Constant(currentPattern.constantCount++);
-    }
-
-    private Pattern listPattern() {
-        var list = new ArrayList<Pattern>();
-
-        if (scanner.match(RIGHT_BRACKET)) {
-            return new Pattern.ListPattern(list, null);
-        }
-
-        do {
-            if (scanner.check(RIGHT_BRACKET) || scanner.check(COLON)) {
-                break;
-            }
-            list.add(parsePattern(true));
-        } while (scanner.match(COMMA));
-
-        Integer tailId = null;
-        if (scanner.match(COLON)) {
-            scanner.consume(IDENTIFIER,
-                "Expected binding variable for list tail.");
-            tailId = addPatternVar(scanner.previous());
-        }
-        scanner.consume(RIGHT_BRACKET, "Expected ']' after list pattern.");
-
-        return new Pattern.ListPattern(list, tailId);
-    }
-
-    private Pattern.MapPattern mapPattern() {
-        var map = new LinkedHashMap<Pattern.Constant,Pattern>();
-
-        if (scanner.match(RIGHT_BRACE)) {
-            return new Pattern.MapPattern(map);
-        }
-
-        do {
-            if (scanner.check(RIGHT_BRACE)) {
-                break;
-            }
-            var key = constantPattern();
-            scanner.consume(COLON, "Expected ':' after map key.");
-            var value = parsePattern(true);
-            map.put(key, value);
-        } while (scanner.match(COMMA));
-
-        scanner.consume(RIGHT_BRACE, "Expected '}' after map pattern.");
-
-        return new Pattern.MapPattern(map);
-    }
-
-    private Pattern instancePattern(Token identifier) {
-        var fieldMap = mapPattern();
-        return new Pattern.InstancePattern(identifier.lexeme(), fieldMap);
-    }
-
-    private Pattern recordPattern(Token identifier) {
-        var list = new ArrayList<Pattern>();
-
-        if (scanner.match(RIGHT_PAREN)) {
-            return new Pattern.RecordPattern(identifier.lexeme(), list);
-        }
-
-        do {
-            if (scanner.check(RIGHT_PAREN)) {
-                break;
-            }
-            list.add(parsePattern(true));
-        } while (scanner.match(COMMA));
-
-        scanner.consume(RIGHT_PAREN, "Expected ')' after record pattern.");
-
-        return new Pattern.RecordPattern(identifier.lexeme(), list);
+    private char token2incrDecr(Token op) {
+        return switch (op.type()) {
+            case TokenType.PLUS_PLUS   -> INCR;
+            case TokenType.MINUS_MINUS -> DECR;
+            default -> throw new IllegalStateException(
+                "Unexpected operator: " + op);
+        };
     }
 
     //-------------------------------------------------------------------------
     // Variable Management
 
-    // Parses a variable name as part of a declaration.  The name can be:
-    //
-    // - A variable name in a `var` declaration
-    // - A function or parameter name in a `function` or `method` declaration.
-    //
-    // Declares the variable.  If the variable is a global, returns an
-    // index to the variable's name in the constants table.  Otherwise,
-    // returns 0.
-    private char parseVariable(String errorMessage) {
-        scanner.consume(IDENTIFIER, errorMessage);
-        return addVariable(scanner.previous());
+    // Returns true if we are at global scope, and false otherwise.
+    private boolean inGlobalScope() {
+        return current.scopeDepth == 0;
     }
 
-    private char addVariable(Token name) {
-        declareVariable(name);
-        if (current.scopeDepth > 0) return 0;    // Local
-        return identifierConstant(name);         // Global
-    }
-
-    // Creates a hidden variable in the current scope, giving it the
-    // value of the next `expression()`.  Hidden variable names should look
-    // like "*identifier*", so as not to conflict with real variables.
-    @SuppressWarnings("SameParameterValue")
-    private void defineHiddenVariable(String name) {
-        if (current.scopeDepth == 0) {
-            throw new IllegalStateException("Hidden variables must be local.");
-        }
-        var nameToken = Token.synthetic(name);
-        addLocal(nameToken);
-        expression();
-        markVarInitialized();
-    }
-
-    // Adds a string constant to the current chunk's
-    // constants table for the given identifier and returns
-    // the constant's index.
-    private char identifierConstant(Token name) {
-        return current.chunk.addConstant(name.lexeme());
-    }
-
-    // Emits the instruction to define the variable.
-    private void defineVariable(char global) {
-        if (current.scopeDepth > 0) {
-            // Local
-            markVarInitialized();
-            return;
-        }
-        emit(Opcode.GLODEF, global);            // Global
-    }
-
-    // Given the variable name, emits the relevant *GET or *SET
-    // instruction based on the context.  A *SET instruction will
-    // be preceded by the compiled expression to assign to the
-    // variable.
-    private void getOrSetVariable(Token name, boolean canAssign) {
-        // FIRST, get the relevant *SET/*GET opcodes.
-        char getOp;
-        char setOp;
-
-        int arg = resolveLocal(current, name);
-
-        if (arg != -1) {
-            getOp = Opcode.LOCGET;
-            setOp = Opcode.LOCSET;
-        } else if ((arg = resolveUpvalue(current, name)) != -1) {
-            getOp = Opcode.UPGET;
-            setOp = Opcode.UPSET;
+    // Declares and defines the variable with the given name, taking the
+    // appropriate action whether we are in the global or a local scope.
+    // The variable's value *must* be on the top of the stack before this
+    // is called.
+    private void defineVar(Token name) {
+        if (inGlobalScope()) {
+            defineGlobal(name);
         } else {
-            arg = identifierConstant(name);
-            getOp = Opcode.GLOGET;
-            setOp = Opcode.GLOSET;
-        }
-
-        // NEXT, handle assignment operators
-        if (canAssign && scanner.match(EQUAL)) {
-            expression();
-            emit(setOp, (char)arg);
-        } else if (canAssign && scanner.match(PLUS_EQUAL)) {
-            updateVar(getOp, setOp, (char)arg, Opcode.ADD);
-        } else if (canAssign && scanner.match(MINUS_EQUAL)) {
-            updateVar(getOp, setOp, (char)arg, Opcode.SUB);
-        } else if (canAssign && scanner.match(STAR_EQUAL)) {
-            updateVar(getOp, setOp, (char)arg, Opcode.MUL);
-        } else if (canAssign && scanner.match(SLASH_EQUAL)) {
-            updateVar(getOp, setOp, (char)arg, Opcode.DIV);
-        } else if (canAssign && scanner.match(PLUS_PLUS)) {
-            postIncrDecrVar(getOp, setOp, (char)arg, Opcode.INCR);
-        } else if (canAssign && scanner.match(MINUS_MINUS)) {
-            postIncrDecrVar(getOp, setOp, (char)arg, Opcode.DECR);
-        } else {
-            emit(getOp, (char)arg);
+            defineLocal(name);
         }
     }
 
-    // Emits the code to update a variable
-    private void updateVar(char getOp, char setOp, char arg, char mathOp) {
-        //                | ∅         ; Initial stack
-        // *GET    var    | a         ; a = var
-        // expr           | a b       ; b = expr
-        // mathOp         | c         ; E.g., c = a + b
-        // *SET    var    | c         ; var = c, retaining c
-        emit(getOp, arg);
-        expression();
-        emit(mathOp);
-        emit(setOp, arg);
+    // Defines a global variable with the given name.  The variable's
+    // initial value is taken from the top of the stack, and immediately assigned
+    // to the named variable in the global environment.
+    //
+    // emit: initializer      | ∅ → value
+    // GLODEF nameIndex       | value → ∅
+    private void defineGlobal(Token name) {
+        assert inGlobalScope();
+        emit(GLODEF, constant(name.lexeme()));
     }
 
-    // Emits the code to post-increment/decrement a variable
-    private void postIncrDecrVar(char getOp, char setOp, char arg, char mathOp) {
-        //                    | ∅         ; Initial state
-        // *GET        var    | a         ; a = var
-        // TPUT               | a         ; T = a
-        // INCR               | a'        ; a' = a + 1
-        // *SET        var    | a'        ; var = a'
-        // POP                | ∅         ;
-        // TGET               | a         ; push T
-        emit(getOp, arg);
-        emit(Opcode.TPUT);
-        emit(mathOp);
-        emit(setOp, arg);
-        emit(Opcode.POP);
-        emit(Opcode.TGET);
-    }
+    // Declares a local variable.  Checks for too many locals, and for
+    // duplicate declarations in the current scope.  Once this is executed,
+    // the variable may no longer be declared, but can not yet be retrieved as
+    // it has no value.
+    private void declareLocal(Token name) {
+        assert !inGlobalScope();
+        assert !current.notYetDefined.contains(name.lexeme());
 
-    // Declares the variable.  Checking for duplicate declarations in the
-    // current local scope.
-    private void declareVariable(Token name) {
-        if (current.scopeDepth == 0) return; // Global
+        // Check for too many locals
+        if (current.localCount == MAX_LOCALS) {
+            error(name, "Too many local variables in function.");
+        }
 
         // Check for duplicate declarations in current scope.
         for (var i = current.localCount - 1; i >= 0; i--) {
@@ -1672,50 +1123,102 @@ class Compiler {
             }
 
             if (name.lexeme().equals(local.name.lexeme())) {
-                error("Duplicate variable declaration in this scope.");
+                error(name, "duplicate variable declaration in this scope.");
             }
         }
 
-        addLocal(name);
+        current.notYetDefined.add(name.lexeme());
     }
 
-    // Adds a local variable with the given name to the current scope.
-    private void addLocal(Token name) {
-        if (current.localCount == MAX_LOCALS) {
-            error("Too many local variables in function.");
-        }
+    // Declares a number of locals at once, e.g., for pattern bindings.
+    private void declareLocals(List<Token> names) {
+        names.forEach(this::declareLocal);
+    }
+
+    // Defines the variable so that it can be referred to in expressions.
+    // This constitutes a promise that the value the variable will be placed
+    // on the stack before any other instruction executes.  Or, to put it
+    // another way, that the code to produce that value will be generated
+    // before any other code is generated.
+    //
+    // Usually this is called either immediately before or immediately after the
+    // code that generates the value is generated.
+    private void defineLocal(Token name) {
+        assert !inGlobalScope();
+
+        current.notYetDefined.remove(name.lexeme());
         current.locals[current.localCount++] =
-            new Local(name);
+            new Local(name, current.scopeDepth);
     }
 
-    // Marks the newest local variable "initialized", so that they can be
-    // referred to in expressions.  This is a no-op for global variables.
-    private void markVarInitialized() {
-        if (current.scopeDepth == 0) return;
-        current.locals[current.localCount - 1].depth
-            = current.scopeDepth;
+    // Defines a number of locals at once, e.g., for pattern bindings.
+    private void defineLocals(List<Token> names) {
+        names.forEach(this::defineLocal);
     }
 
-    // Marks the N newest local variables "initialized", so that they can be
-    // referred to in expressions.  This is a no-op for global variables.
-    private void markVarsInitialized(int count) {
-        if (current.scopeDepth == 0) return;
-        for (var i = 0; i < count; i++) {
-            current.locals[current.localCount - 1 - i].depth
-                = current.scopeDepth;
+    // defineLocal for hidden variables
+    private void defineLocal(String name) {
+        defineLocal(Token.synthetic(name));
+    }
+
+    // Resolves the named variable and emits a GET instruction.
+    private void emitGET(Token name) {
+        char getOp;
+        int arg = resolveLocal(current, name);
+
+        if (arg != -1) {
+            getOp = Opcode.LOCGET;
+        } else if ((arg = resolveUpvalue(current, name)) != -1) {
+            getOp = Opcode.UPGET;
+        } else {
+            arg = constant(name.lexeme());
+            getOp = Opcode.GLOGET;
         }
+
+        emit(getOp, (char)arg);
+    }
+
+    // emitGET for hidden locals.
+    private void emitGET(String name) {
+        emitGET(Token.synthetic(name));
+    }
+
+    // Resolves the named variable and emits a SET instruction.
+    private void emitSET(Token name) {
+        char setOp;
+        int arg = resolveLocal(current, name);
+
+        if (arg != -1) {
+            setOp = Opcode.LOCSET;
+        } else if ((arg = resolveUpvalue(current, name)) != -1) {
+            setOp = Opcode.UPSET;
+        } else {
+            arg = constant(name.lexeme());
+            setOp = Opcode.GLOSET;
+        }
+
+        emit(setOp, (char)arg);
+    }
+
+    // emitSET for hidden locals.
+    private void emitSET(String name) {
+        emitSET(Token.synthetic(name));
     }
 
     // Resolves the name as the name of the local variable in the current
     // scope.  Returns the local's index in the current scope, or -1 if
     // no variable was found.
-    private int resolveLocal(FunctionCompiler compiler, Token name) {
+    private int resolveLocal(FunctionInfo compiler, Token name) {
+        if (current.notYetDefined.contains(name.lexeme())) {
+            error(name, "Can't read local variable in its own initializer.");
+            // Return localCount so that the compiler doesn't look for
+            // it as a global.
+            return compiler.localCount;
+        }
+
         for (var i = compiler.localCount - 1; i >= 0; i--) {
             var local = compiler.locals[i];
             if (name.lexeme().equals(local.name.lexeme())) {
-                if (local.depth == -1) {
-                    error("Can't read local variable in its own initializer.");
-                }
                 return i;
             }
         }
@@ -1725,7 +1228,7 @@ class Compiler {
     // Resolves the name as the name of an upvalue.  Returns -1 if the
     // variable is global, and the upvalue index otherwise.  Captures
     // locals as upvalues.
-    private int resolveUpvalue(FunctionCompiler compiler, Token name) {
+    private int resolveUpvalue(FunctionInfo compiler, Token name) {
         // FIRST, if there's no enclosing FunctionCompiler, then this is
         // necessarily a global.
         if (compiler.enclosing == null) return -1;
@@ -1736,7 +1239,7 @@ class Compiler {
 
         if (local != -1) {
             compiler.enclosing.locals[local].isCaptured = true;
-            return addUpvalue(compiler, (char)local, true);
+            return addUpvalue(compiler, name, (char)local, true);
         }
 
         // NEXT, it might be defined in a scope that encloses the enclosing
@@ -1744,7 +1247,7 @@ class Compiler {
         // as an upvalue, not as a local.
         int upvalue = resolveUpvalue(compiler.enclosing, name);
         if (upvalue != -1) {
-            return addUpvalue(compiler, (char)upvalue, false);
+            return addUpvalue(compiler, name, (char)upvalue, false);
         }
 
         return -1;
@@ -1753,7 +1256,11 @@ class Compiler {
     // Adds an upvalue to the current function.  `index` is the index of the
     // upvalue in this function; `isLocal` is true if the upvalue is defined
     // for this scope, and false if it's for an enclosing scope.
-    private int addUpvalue(FunctionCompiler compiler, char index, boolean isLocal) {
+    private int addUpvalue(
+        FunctionInfo compiler,
+        Token name,
+        char index,
+        boolean isLocal) {
         int upvalueCount = compiler.upvalueCount;
 
         // See if we already know about this upvalue.
@@ -1765,7 +1272,7 @@ class Compiler {
         }
 
         if (upvalueCount == MAX_LOCALS) {
-            error("Too many closure variables in function.");
+            error(name, "Too many closure variables in function.");
             return 0;
         }
 
@@ -1838,47 +1345,115 @@ class Compiler {
     }
 
     //-------------------------------------------------------------------------
+    // Loop management
+
+    // Begins the loop's break/continue control region.
+    private void beginLoop(int loopStart) {
+        currentLoop = new LoopInfo(currentLoop);
+        currentLoop.breakDepth = current.scopeDepth;
+        currentLoop.continueDepth = current.scopeDepth;
+        currentLoop.loopStart = loopStart;
+    }
+
+    // Ends the loop's break/continue control region, and patches all
+    // break jumps
+    private void endLoop() {
+        patchJumps(currentLoop.breakJumps);
+        currentLoop = currentLoop.enclosing;
+    }
+
+    //-------------------------------------------------------------------------
+    // Type Management
+
+    // Begins a new type definition
+    private void beginType(Kind kind) {
+        currentType = new TypeInfo(currentType);
+        currentType.kind = kind;
+    }
+
+    // Ends the type definition
+    private void endType() {
+        currentType = currentType.enclosing;
+    }
+
+    //-------------------------------------------------------------------------
     // Parsing Tools
 
-    private void error(String message) {
-        errorAt(scanner.previous(), message);
+    // This method should be used for most compilation errors.
+    private void error(Token token, String message) {
+        var msg = token.span().isAtEnd()
+            ? "Error at end: " + message
+            : "Error at '" + token.lexeme() + "': " + message;
+        errors.add(new Trace(token.span(), msg));
     }
 
-    private void errorAtCurrent(String message) {
-        errorAt(scanner.peek(), message);
+    // Generates an ad hoc error at a given line.
+    @SuppressWarnings("SameParameterValue")
+    private void error(String at, String message) {
+        var msg = "Error at " + at + ": " + message;
+        var span = buffer.lineSpan(current.sourceLine);
+        errors.add(new Trace(span, msg));
     }
-
-    private void errorAt(Token token, String message) {
-        if (parser.panicMode) return;
-        parser.panicMode = true;
-        errors.add(new Trace(token.span(), message));
-        parser.hadError = true;
-        if (token.type() == TokenType.EOF) {
-            parser.gotIncompleteScript = true;
-        }
-    }
-
-    private void errorInScanner(Span span, String message) {
-        if (parser.panicMode) return;
-        parser.panicMode = true;
-        parser.hadError = true;
-        errors.add(new Trace(span, message));
-
-        if (span.isAtEnd()) {
-            parser.gotIncompleteScript = true;
-        }
-    }
-
 
     //-------------------------------------------------------------------------
     // Code Generation
 
-    private char addConstant(Object value) {
+    // Sets the current source line
+    private void line(int line) {
+        current.sourceLine = line;
+    }
+
+    // Sets the current source line to that of the given token.
+    private void line(Token token) {
+        line(token.span());
+    }
+
+    // Sets the current source line to the start line of the span.
+    private void line(Span span) {
+        if (span != null) line(span.startLine());
+    }
+
+    // Sets the current source line to the end line of the span.
+    private void lineAtEnd(Span span) {
+        if (span != null) line(span.endLine());
+    }
+
+    // Returns the current location in the chunk, e.g., for determining
+    // the start of a loop.
+    private int here() {
+        return current.chunk.codeSize();
+    }
+
+    // Adds a constant to the constants table and returns its
+    // index.
+    private char constant(Object value) {
         return current.chunk.addConstant(value);
     }
 
-    private void emitConstant(Object value) {
-        emit(Opcode.CONST, current.chunk.addConstant(value));
+    // Adds a constant to the constant table for the token's lexeme,
+    // and returns its index.
+    private char name(Token name) {
+        return constant(name.lexeme());
+    }
+
+    // Adds the value to the constants table and emits CONST.
+    private void emitCONST(Object value) {
+        emit(Opcode.CONST, constant(value));
+    }
+
+    // Emits METHOD with the name of the method.  The method's
+    // closure must already be on the stack.
+    private void emitMETHOD(Token name) {
+        emit(METHOD, constant(name.lexeme()));
+    }
+
+    // Builds a new ListValue from multiple expressions.
+    private void emitList(List<Expr> items) {
+        emit(LISTNEW);
+        for (var item : items) {
+            emit(item);
+            emit(LISTADD);
+        }
     }
 
     private int emitJump(char opcode) {
@@ -1890,21 +1465,44 @@ class Compiler {
     private void emitLoop(int loopStart) {
         emit(Opcode.LOOP);
         int offset = current.chunk.codeSize() - loopStart + 1;
-        if (offset > Character.MAX_VALUE) error("Loop body too large.");
-        emit((char)offset);
+        if (offset < Character.MAX_VALUE) {
+            emit((char) offset);
+        } else {
+            error("loop target", "loop size larger than " +
+                Character.MAX_VALUE + ".");
+        }
     }
 
+    private JumpList jumpList() {
+        return new JumpList();
+    }
+
+    // This is a no-op if the offset is -1.
     private void patchJump(int offset) {
+        if (offset == -1) {
+            return;
+        }
         // -1 to adjust for the bytecode for the jump offset itself.
         int jump = current.chunk.codeSize() - offset - 1;
 
         if (jump > Character.MAX_VALUE) {
-            error("Too much code to jump over.");
+            error("jump target", "jump size larger than " +
+                Character.MAX_VALUE + ".");
         }
 
         current.chunk.setCode(offset, (char)jump);
     }
 
+    private void patchJumps(JumpList jumpList) {
+        for (var offset : jumpList) {
+            patchJump(offset);
+        }
+    }
+
+    // This function emits the `RETURN` for implicitly returning from
+    // a function.  For normal functions it returns `NULL`; for
+    // class initializers, it returns the instance that's been
+    // initialized.
     private void emitReturn() {
         if (current.chunk.type == FunctionType.INITIALIZER) {
             emit(Opcode.LOCGET, (char)0);
@@ -1921,61 +1519,22 @@ class Compiler {
         emit(Opcode.COMMENT, index);
     }
 
-    private void emit(char value) {
-        current.chunk.write(value, scanner.previous().line());
+    // Emits a THROW instruction; used to mark unfinished code.
+    @SuppressWarnings("unused")
+    private void emitTHROW(String message) {
+        emitCONST(message);
+        emit(THROW);
     }
 
-    private void emit(char value1, char value2) {
-        emit(value1);
-        emit(value2);
+    private void emit(char... codes) {
+        for (var code : codes) {
+            current.chunk.write(code, current.sourceLine);
+        }
     }
 
     //-------------------------------------------------------------------------
     // Helper Classes
 
-    // The state of the parser.
-    private static class Parser {
-        boolean hadError = false;
-        boolean panicMode = false;
-        boolean gotIncompleteScript = false;
-    }
-
-    // Precedence levels
-    @SuppressWarnings("unused")
-    private static class Level {
-        private Level() {} // Not Instantiable
-        private final static int NONE         = 0;
-        private final static int ASSIGNMENT   = 1;  // =
-        private final static int TERNARY      = 2;  // ? :
-        private final static int OR           = 3;  // ||
-        private final static int AND          = 4;  // &&
-        private final static int EQUALITY     = 5;  // == !=
-        private final static int COMPARISON   = 6;  // < > <= >=
-        private final static int TERM         = 7;  // + -
-        private final static int FACTOR       = 8;  // * /
-        private final static int UNARY        = 9;  // ! -
-        private final static int CALL         = 10; // . ()
-        private final static int PRIMARY      = 11;
-    }
-
-    // A parsing function for the Pratt parser.
-    private interface ParseFunction {
-        void parse(boolean canAssign);
-    }
-
-    // A record in the Pratt parser table.
-    private record ParseRule(
-        // Function to parse a token found in the prefix position,
-        // or null.
-        ParseFunction prefix,
-
-        // Function to parse a token found in the infix position,
-        // or null.
-        ParseFunction infix,
-
-        // The precedence level for infix tokens.
-        int level
-    ) {}
 
     // A local variable.
     private static class Local {
@@ -1983,20 +1542,21 @@ class Compiler {
         final Token name;
 
         // Its scope depth
-        int depth = - 1;
+        final int depth;
 
         // Whether it has been captured as an Upvalue
         boolean isCaptured = false;
 
-        Local(Token name) {
+        Local(Token name, int depth) {
             this.name = name;
+            this.depth = depth;
         }
     }
 
     // State for the function currently being compiled.
-    private class FunctionCompiler {
+    private class FunctionInfo {
         // The enclosing function, or null.
-        final FunctionCompiler enclosing;
+        final FunctionInfo enclosing;
 
         // The names of the function's parameters.
         final List<String> parameters = new ArrayList<>();
@@ -2004,7 +1564,11 @@ class Compiler {
         // The chunk into which byte-code is compiled.
         final Chunk chunk;
 
-        // Information about the function's local variables
+        // Information about the function's local variables.
+        // Locals that have been declared but not yet defined are
+        // added to notYetDefined to ensure that they aren't used
+        // in their own initializers.
+        final Set<String> notYetDefined = new HashSet<>();
         final Local[] locals = new Local[MAX_LOCALS];
 
         // The actual number of local variables
@@ -2022,20 +1586,20 @@ class Compiler {
         // Whether we are in a class static initializer block or not.
         boolean inStaticInitializer = false;
 
-        FunctionCompiler(
-            FunctionCompiler enclosing,
+        // The current source line
+        private int sourceLine = 1;
+
+        FunctionInfo(
+            FunctionInfo enclosing,
             FunctionType type,
-            SourceBuffer source
+            String name,
+            Span span
         ) {
             this.enclosing = enclosing;
             this.chunk = new Chunk();
-            switch (type) {
-                case SCRIPT -> chunk.name = "*script*";
-                case LAMBDA -> chunk.name = "*lambda*";
-                default -> chunk.name = scanner.previous().lexeme();
-            }
-            chunk.type = type;
-            chunk.source = source;
+            this.chunk.type = type;
+            this.chunk.name = name;
+            this.chunk.span = span;
 
             // Every function has an implicit stack slot for the VM's own use.
             // For methods, this slot will be filled by the instance.
@@ -2043,34 +1607,42 @@ class Compiler {
             if (type == FunctionType.METHOD ||
                 type == FunctionType.INITIALIZER
             ) {
-                local = new Local(Token.synthetic(VAR_THIS));
+                local = new Local(Token.synthetic(VAR_THIS), 0);
             } else {
-                local = new Local(Token.synthetic(""));
+                local = new Local(Token.synthetic(""), 0);
             }
-            local.depth = 0;
             locals[localCount++] = local;
         }
     }
 
-    private enum KindOfType {
+    private enum Kind {
         CLASS,
         RECORD
     }
 
-    // The type currently being compiled.
-    private static class TypeCompiler {
-        final TypeCompiler enclosing;
-        KindOfType kind = KindOfType.CLASS;
+    // Data about the type currently being compiled.
+    private static class TypeInfo {
+        // The type below this one on the type stack.
+        final TypeInfo enclosing;
+
+        // The kind of type.
+        Kind kind = Kind.CLASS;
+
+        // Whether this type has a supertype.
         boolean hasSupertype = false;
 
-        TypeCompiler(TypeCompiler enclosing) {
+        // Whether we are in an instance method or not.
+        boolean inInstanceMethod = false;
+
+        // Constructor
+        TypeInfo(TypeInfo enclosing) {
             this.enclosing = enclosing;
         }
     }
 
-    private static class LoopCompiler {
+    private class LoopInfo {
         // The enclosing loop, or null if none.
-        final LoopCompiler enclosing;
+        final LoopInfo enclosing;
 
         // The scope depth before the entire loop is compiled.
         // Allows break to know how many scopes to end.
@@ -2082,13 +1654,14 @@ class Compiler {
 
         // The jump instruction indices for any `break` statements in the
         // body of the loop.
-        List<Character> breakJumps = new ArrayList<>();
+        final JumpList breakJumps;
 
         // The chunk index to loop back to on continue
         int loopStart = -1;
 
-        LoopCompiler(LoopCompiler enclosing) {
+        LoopInfo(LoopInfo enclosing) {
             this.enclosing = enclosing;
+            this.breakJumps = new JumpList();
         }
     }
 
@@ -2127,117 +1700,13 @@ class Compiler {
         }
     }
 
+    private class JumpList extends ArrayList<Integer> {
+        public JumpList() {
+            // Nothing to do
+        }
 
-    //-------------------------------------------------------------------------
-    // Parser Rules
-
-    private final ParseRule[] rules = new ParseRule[TokenType.values().length];
-
-    // Tokens are in the same order as in TokenType.  All tokens must appear
-    // in this table.
-    //
-    // - The prefix function will be non-null only if the token can appear
-    //   at the start of an expression.
-    // - The infix function will be non-null only if the token can appear
-    //   as an operator within an expression.
-    private void populateRulesTable() {
-        //                                                  Infix
-        //   Token            Prefix          Infix         precedence
-        //   ---------------- --------------- ------------- ----------------
-        //   Single Character
-        rule(LEFT_PAREN,      this::grouping, this::call,    Level.CALL);
-        rule(RIGHT_PAREN,     null,           null,          Level.NONE);
-        rule(LEFT_BRACE,      this::map,      null,          Level.NONE);
-        rule(RIGHT_BRACE,     null,           null,          Level.NONE);
-        rule(LEFT_BRACKET,    this::list,     this::index,   Level.CALL);
-        rule(RIGHT_BRACKET,   null,           null,          Level.NONE);
-        rule(AT,              this::this_,    null,          Level.NONE);
-        rule(BACK_SLASH,      this::lambda,   null,          Level.NONE);
-        rule(COLON,           null,           null,          Level.NONE);
-        rule(COMMA,           null,           null,          Level.NONE);
-        rule(DOLLAR,          null,           null,          Level.NONE);
-        rule(DOT,             null,           this::dot,     Level.CALL);
-        rule(QUESTION,        null,           this::ternary, Level.TERNARY);
-        rule(SEMICOLON,       null,           null,          Level.NONE);
-        //   One or two character
-        rule(AND,             null,           this::and,     Level.AND);
-        rule(BANG,            this::unary,    null,          Level.NONE);
-        rule(BANG_EQUAL,      null,           this::binary,  Level.EQUALITY);
-        rule(EQUAL,           null,           null,          Level.NONE);
-        rule(EQUAL_EQUAL,     null,           this::binary,  Level.EQUALITY);
-        rule(GREATER,         null,           this::binary,  Level.COMPARISON);
-        rule(GREATER_EQUAL,   null,           this::binary,  Level.COMPARISON);
-        rule(LESS,            null,           this::binary,  Level.COMPARISON);
-        rule(LESS_EQUAL,      null,           this::binary,  Level.COMPARISON);
-        rule(MINUS,           this::unary,    this::binary,  Level.TERM);
-        rule(MINUS_EQUAL,     null,           null,          Level.NONE);
-        rule(MINUS_GREATER,   null,           null,          Level.NONE);
-        rule(MINUS_MINUS,     this::unary,    null,          Level.NONE);
-        rule(OR,              null,           this::or,      Level.OR);
-        rule(PLUS,            null,           this::binary,  Level.TERM);
-        rule(PLUS_EQUAL,      null,           null,          Level.NONE);
-        rule(PLUS_PLUS,       this::unary,    null,          Level.NONE);
-        rule(SLASH,           null,           this::binary,  Level.FACTOR);
-        rule(SLASH_EQUAL,     null,           null,          Level.NONE);
-        rule(STAR,            null,           this::binary,  Level.FACTOR);
-        rule(STAR_EQUAL,      null,           null,          Level.NONE);
-        //   Literals
-        rule(IDENTIFIER,      this::variable, null,          Level.NONE);
-        rule(STRING,          this::literal,  null,          Level.NONE);
-        rule(NUMBER,          this::literal,  null,          Level.NONE);
-        rule(KEYWORD,         this::literal,  null,          Level.NONE);
-        //   Reserved words
-        rule(ASSERT,          null,           null,          Level.NONE);
-        rule(BREAK,           null,           null,          Level.NONE);
-        rule(CASE,            null,           null,          Level.NONE);
-        rule(CLASS,           null,           null,          Level.NONE);
-        rule(CONTINUE,        null,           null,          Level.NONE);
-        rule(DEFAULT,         null,           null,          Level.NONE);
-        rule(ELSE,            null,           null,          Level.NONE);
-        rule(EXTENDS,         null,           null,          Level.NONE);
-        rule(FALSE,           this::symbol,   null,          Level.NONE);
-        rule(FOR,             null,           null,          Level.NONE);
-        rule(FOREACH,         null,           null,          Level.NONE);
-        rule(FUNCTION,        null,           null,          Level.NONE);
-        rule(IF,              null,           null,          Level.NONE);
-        rule(IN,              null,           this::binary,  Level.COMPARISON);
-        rule(LET,             null,           null,          Level.NONE);
-        rule(MATCH,           null,           null,          Level.NONE);
-        rule(METHOD,          null,           null,          Level.NONE);
-        rule(NI,              null,           this::binary,  Level.COMPARISON);
-        rule(NULL,            this::symbol,   null,          Level.NONE);
-        rule(RECORD,          null,           null,          Level.NONE);
-        rule(RETURN,          null,           null,          Level.NONE);
-        rule(STATIC,          null,           null,          Level.NONE);
-        rule(SUPER,           this::super_,   null,          Level.NONE);
-        rule(SWITCH,          null,           null,          Level.NONE);
-        rule(THIS,            this::this_,    null,          Level.NONE);
-        rule(THROW,           null,           null,          Level.NONE);
-        rule(TRUE,            this::symbol,   null,          Level.NONE);
-        rule(VAR,             null,           null,          Level.NONE);
-        rule(WHILE,           null,           null,          Level.NONE);
-        rule(ERROR,           null,           null,          Level.NONE);
-        rule(EOF,             null,           null,          Level.NONE);
-
-        for (var type : TokenType.values()) {
-            if (rules[type.ordinal()] == null) {
-                throw new IllegalStateException(
-                    "Missing ParseRule for TokenType." + type);
-            }
+        public void emit(char jumpCode) {
+            add(emitJump(jumpCode));
         }
     }
-
-    private void rule(
-        TokenType type,
-        ParseFunction prefix,
-        ParseFunction infix,
-        int level
-    ) {
-        rules[type.ordinal()] = new ParseRule(prefix, infix, level);
-    }
-
-    private ParseRule getRule(TokenType type) {
-        return rules[type.ordinal()];
-    }
-
 }

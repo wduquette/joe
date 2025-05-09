@@ -55,16 +55,6 @@ public interface Engine {
     String dump(String filename, String source) throws SyntaxError;
 
     /**
-     * Checks whether the source "is complete", i.e, whether it can
-     * be compiled.  The result is not executed.  This is useful
-     * in REPLs, so that the user can enter a newline in a string or
-     * function call or block and keep editing if it is not complete.
-     * @param source The source text
-     * @return true or false
-     */
-    boolean isComplete(String source);
-
-    /**
      * Calls a JoeCallable value with the given arguments.
      * @param callee A Joe value which must be callable.
      * @param args The arguments to pass to the callable

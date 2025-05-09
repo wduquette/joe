@@ -51,9 +51,6 @@ class Chunk implements CodeChunk {
     // The function's type
     FunctionType type = FunctionType.SCRIPT;
 
-    // The function's source buffer
-    SourceBuffer source = null;
-
     // The function's span in the source.
     SourceBuffer.Span span = null;
 
@@ -139,7 +136,7 @@ class Chunk implements CodeChunk {
     //-------------------------------------------------------------------------
     // CodeChunk API
 
-    @Override public SourceBuffer source() { return source; }
+    @Override public SourceBuffer source() { return span.buffer(); }
     @Override public SourceBuffer.Span span() { return span; }
     @Override public FunctionType type() { return type; }
     @Override public String name() { return name; }

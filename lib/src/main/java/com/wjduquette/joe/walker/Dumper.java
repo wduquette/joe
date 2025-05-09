@@ -65,12 +65,12 @@ class Dumper {
                 // Class content
                 ++indent;
 
-                if (stmt.staticInitializer() !=  null &&
-                    !stmt.staticInitializer().isEmpty()
+                if (stmt.staticInit() !=  null &&
+                    !stmt.staticInit().isEmpty()
                 ) {
                     buff.append(indent())
                         .append("Static initializer:\n");
-                    dumpStatements(stmt.staticInitializer());
+                    dumpStatements(stmt.staticInit());
                 }
 
                 if (stmt.staticMethods() != null) {
@@ -103,14 +103,14 @@ class Dumper {
                     .append("Stmt.For\n");
                 dumpStatement(stmt.init());
                 dumpExpression(stmt.condition());
-                dumpExpression(stmt.incr());
+                dumpExpression(stmt.updater());
                 dumpStatement(stmt.body());
             }
             case Stmt.ForEach stmt -> {
                 buff.append(indent())
                     .append("Stmt.ForEach\n");
 
-                dumpExpression(stmt.listExpr());
+                dumpExpression(stmt.items());
                 dumpStatement(stmt.body());
             }
             case Stmt.Function stmt -> {
@@ -179,6 +179,11 @@ class Dumper {
                         .append("\n");
                     dumpStatement(c.statement());
                 }
+                if (stmt.matchDefault() != null) {
+                    buff.append(indent())
+                        .append("Default\n");
+                    dumpStatement(stmt.matchDefault().statement());
+                }
                 --indent;
             }
             case Stmt.Record stmt -> {
@@ -186,7 +191,7 @@ class Dumper {
                     .append("Stmt.Record ")
                     .append(stmt.name().lexeme())
                     .append("(")
-                    .append(String.join(", ", stmt.recordFields()))
+                    .append(String.join(", ", stmt.fields()))
                     .append(")")
                     ;
 
@@ -195,12 +200,12 @@ class Dumper {
                 // Class content
                 ++indent;
 
-                if (stmt.staticInitializer() !=  null &&
-                    !stmt.staticInitializer().isEmpty()
+                if (stmt.staticInit() !=  null &&
+                    !stmt.staticInit().isEmpty()
                 ) {
                     buff.append(indent())
                         .append("Static initializer:\n");
-                    dumpStatements(stmt.staticInitializer());
+                    dumpStatements(stmt.staticInit());
                 }
 
                 if (stmt.staticMethods() != null) {
@@ -240,6 +245,11 @@ class Dumper {
                     }
                     dumpStatement(c.statement());
                 }
+                if (stmt.switchDefault() != null) {
+                    buff.append(indent())
+                        .append("Default\n");
+                    dumpStatement(stmt.switchDefault().statement());
+                }
                 --indent;
             }
             case Stmt.Throw stmt -> {
@@ -252,7 +262,7 @@ class Dumper {
                     .append("Stmt.Var ")
                     .append(stmt.name().lexeme())
                     .append(" =\n");
-                dumpExpression(stmt.initializer());
+                dumpExpression(stmt.value());
             }
             case Stmt.While stmt -> {
                 buff.append(indent())
@@ -276,13 +286,6 @@ class Dumper {
             .append(expr.getClass().getSimpleName())
             .append(" ");
         switch (expr) {
-            case Expr.Assign e -> {
-                buff.append(e.name().lexeme())
-                    .append(" ")
-                    .append(e.op().lexeme())
-                    .append("\n");
-                dumpExpression(e.value());
-            }
             case Expr.Binary e -> {
                 buff.append(e.op().lexeme())
                     .append("\n");
@@ -296,11 +299,6 @@ class Dumper {
                     dumpExpression(arg);
                 }
             }
-            case Expr.Get e -> {
-                buff.append(e.name().lexeme())
-                    .append(" of:\n");
-                dumpExpression(e.object());
-            }
             case Expr.Grouping e -> {
                 buff.append(" (\n");
                 dumpExpression(e.expr());
@@ -308,6 +306,10 @@ class Dumper {
                     .append(")\n");
             }
             case Expr.IndexGet e -> {
+                dumpExpression(e.collection());
+                dumpExpression(e.index());
+            }
+            case Expr.IndexIncrDecr e -> {
                 dumpExpression(e.collection());
                 dumpExpression(e.index());
             }
@@ -322,12 +324,24 @@ class Dumper {
                 dumpStatement(e.declaration());
                 --indent;
             }
-            case Expr.ListLiteral e -> e.list().forEach(this::dumpExpression);
-            case Expr.Literal e ->
-                buff.append(e.value().getClass().getSimpleName())
-                    .append(" '")
-                    .append(e.value())
-                    .append("'\n");
+            case Expr.ListLiteral e -> {
+                if (e.list().isEmpty()) {
+                    buff.append("[]\n");
+                } else {
+                    buff.append("\n");
+                    e.list().forEach(this::dumpExpression);
+                }
+            }
+            case Expr.Literal e -> {
+                if (e.value() == null) {
+                    buff.append("null\n");
+                } else {
+                    buff.append(e.value().getClass().getSimpleName())
+                        .append(" '")
+                        .append(e.value())
+                        .append("'\n");
+                }
+            }
             case Expr.Logical e -> {
                 buff.append(e.op().lexeme())
                     .append("\n");
@@ -335,22 +349,12 @@ class Dumper {
                 dumpExpression(e.right());
             }
             case Expr.MapLiteral e -> e.entries().forEach(this::dumpExpression);
-            case Expr.PrePostAssign e -> {
-                if (e.isPre()) {
-                    buff.append(e.op().lexeme())
-                        .append(e.name().lexeme())
-                        .append("\n");
-                } else {
-                    buff.append(e.name().lexeme())
-                        .append(e.op().lexeme())
-                        .append("\n");
-                }
+            case Expr.PropGet e -> {
+                buff.append(e.name().lexeme())
+                    .append(" of:\n");
+                dumpExpression(e.object());
             }
-            case Expr.PrePostIndex e -> {
-                dumpExpression(e.collection());
-                dumpExpression(e.index());
-            }
-            case Expr.PrePostSet e -> {
+            case Expr.PropIncrDecr e -> {
                 if (e.isPre()) {
                     buff.append(e.op().lexeme())
                         .append(e.name().lexeme())
@@ -362,7 +366,7 @@ class Dumper {
                 }
                 dumpExpression(e.object());
             }
-            case Expr.Set e -> {
+            case Expr.PropSet e -> {
                 buff.append(e.name().lexeme())
                     .append(" of\n");
                 dumpExpression(e.object());
@@ -384,9 +388,27 @@ class Dumper {
                     .append("\n");
                 dumpExpression(e.right());
             }
-            case Expr.Variable e ->
+            case Expr.VarGet e ->
                 buff.append(e.name().lexeme())
                     .append("\n");
+            case Expr.VarIncrDecr e -> {
+                if (e.isPre()) {
+                    buff.append(e.op().lexeme())
+                        .append(e.name().lexeme())
+                        .append("\n");
+                } else {
+                    buff.append(e.name().lexeme())
+                        .append(e.op().lexeme())
+                        .append("\n");
+                }
+            }
+            case Expr.VarSet e -> {
+                buff.append(e.name().lexeme())
+                    .append(" ")
+                    .append(e.op().lexeme())
+                    .append("\n");
+                dumpExpression(e.value());
+            }
         }
 
         --indent;

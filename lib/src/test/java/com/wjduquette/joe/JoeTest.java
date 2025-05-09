@@ -3,18 +3,16 @@ package com.wjduquette.joe;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.function.Supplier;
-
 import static com.wjduquette.joe.checker.Checker.*;
 
 @SuppressWarnings("ConstantValue")
 public class JoeTest extends Ted {
-    private Joe walker;
-    private Joe bert;
+    private Joe engine;
 
     @Before public void setup() {
-        walker = new Joe(Joe.WALKER);
-        bert = new Joe(Joe.BERT);
+        // We need an engine to test these things; either Walker or Clark
+        // will do.
+        engine = new Joe(Joe.CLARK);
     }
 
     @Test
@@ -43,10 +41,10 @@ public class JoeTest extends Ted {
     @Test
     public void testStringify() {
         test("testStringify");
-        check(walker.stringify(null)).eq("null");
-        check(walker.stringify(2.0)).eq("2");
-        check(walker.stringify(2.5)).eq("2.5");
-        check(walker.stringify("abc")).eq("abc");
+        check(engine.stringify(null)).eq("null");
+        check(engine.stringify(2.0)).eq("2");
+        check(engine.stringify(2.5)).eq("2.5");
+        check(engine.stringify("abc")).eq("abc");
     }
 
     @Test
@@ -66,7 +64,7 @@ public class JoeTest extends Ted {
     public void testTypeName() {
         test("testTypeName");
 
-        check(walker.typeName(5.0)).eq("Number");
+        check(engine.typeName(5.0)).eq("Number");
     }
 
     @Test
@@ -91,25 +89,14 @@ public class JoeTest extends Ted {
             """;
         var errorPlusIncomplete = "a = \"abc;";
 
-        check(walker.isComplete(completeString)).eq(true);
-        check(walker.isComplete(incompleteString)).eq(false);
+        // Walker
+        check(engine.isComplete(completeString)).eq(true);
+        check(engine.isComplete(incompleteString)).eq(false);
 
-        check(walker.isComplete(completeBlock)).eq(true);
-        check(walker.isComplete(incompleteBlock)).eq(false);
+        check(engine.isComplete(completeBlock)).eq(true);
+        check(engine.isComplete(incompleteBlock)).eq(false);
 
-        check(walker.isComplete(normalError)).eq(true);
-        check(walker.isComplete(errorPlusIncomplete)).eq(false);
-
-        check(bert.isComplete(completeString)).eq(true);
-        check(bert.isComplete(incompleteString)).eq(false);
-
-        check(bert.isComplete(completeBlock)).eq(true);
-        check(bert.isComplete(incompleteBlock)).eq(false);
-
-        check(bert.isComplete(normalError)).eq(true);
-        check(bert.isComplete(errorPlusIncomplete)).eq(false);
+        check(engine.isComplete(normalError)).eq(true);
+        check(engine.isComplete(errorPlusIncomplete)).eq(false);
     }
-
-    private class Foo {}
-    private static class Bar {}
 }

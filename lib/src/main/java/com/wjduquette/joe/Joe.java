@@ -2,6 +2,7 @@ package com.wjduquette.joe;
 
 import com.wjduquette.joe.bert.BertEngine;
 import com.wjduquette.joe.clark.ClarkEngine;
+import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.types.*;
 import com.wjduquette.joe.walker.WalkerEngine;
 
@@ -383,7 +384,7 @@ public class Joe {
      */
     @SuppressWarnings("unused")
     public boolean isComplete(String source) {
-        return engine.isComplete(source);
+        return Parser.isComplete(source);
     }
 
     //-------------------------------------------------------------------------

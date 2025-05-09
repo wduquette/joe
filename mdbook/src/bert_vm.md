@@ -1,12 +1,12 @@
-# Appendix: Clark Virtual Machine
+# Appendix: Bert Virtual Machine
 
-This appendix describes the Clark byte-engine's virtual machine.  
+This appendix describes the legacy Bert byte-engine's virtual machine.  
 
-**NOTE:** this information is for the benefit of the language maintainer.
-The VM's architecture and instruction set details are not part of the
-language specification, and can change without notice.
+**NOTE:** Bert has been superseded by the Clark byte-engine, and will 
+eventually be removed from the code base.  This appendix will be retained
+for reference until that time.
 
-The byte-engine is a stack machine with a few registers:
+The Bert byte-engine is a stack machine with a few registers:
 
 - `ip` is the instruction pointer within the current function.
 - `T` is the temporary register, used to stash a value momentarily during

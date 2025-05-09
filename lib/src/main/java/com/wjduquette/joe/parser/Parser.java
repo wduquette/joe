@@ -19,6 +19,33 @@ public class Parser {
     private static final int MAX_CALL_ARGUMENTS = 255;
 
     //-------------------------------------------------------------------------
+    // Static Methods
+
+    // Used by Parser.isComplete()
+    private static boolean isComplete;
+
+    /**
+     * Returns true if this a complete Joe script (though possibly containing
+     * errors), and false if it clearly stops partway through a construct.
+     * @param source The source
+     * @return true or false
+     */
+    public static boolean isComplete(String source) {
+        var buff = new SourceBuffer("*isComplete*", source);
+        var parser = new Parser(buff, Parser::completionReporter);
+
+        // If it parsed without error then it is complete.  It might
+        // also have resolution errors, but that's irrelevant.
+        isComplete = true;
+        parser.parse();
+        return isComplete;
+    }
+
+    private static void completionReporter(Trace ignored, boolean incomplete) {
+        if (incomplete) isComplete = false;
+    }
+
+    //-------------------------------------------------------------------------
     // Instance Variables
 
     private final SourceBuffer source;
@@ -96,11 +123,11 @@ public class Parser {
         var name = scanner.previous();
 
         // Superclass
-        Expr.Variable superclass = null;
+        Expr.VarGet superclass = null;
 
         if (scanner.match(EXTENDS)) {
             scanner.consume(IDENTIFIER, "Expected superclass name.");
-            superclass = new Expr.Variable(scanner.previous());
+            superclass = new Expr.VarGet(scanner.previous());
         }
 
         // Class body
@@ -137,6 +164,7 @@ public class Parser {
     }
 
     private Stmt.Function functionDeclaration(String kind) {
+        var start = scanner.previous().span().start();
         scanner.consume(IDENTIFIER, "Expected " + kind + " name.");
         var name = scanner.previous();
 
@@ -146,7 +174,9 @@ public class Parser {
 
         scanner.consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
         List<Stmt> body = block();
-        return new Stmt.Function(kind, name, parameters, body);
+        var end = scanner.previous().span().end();
+        var span = source.span(start, end);
+        return new Stmt.Function(kind, name, parameters, body, span);
     }
 
     private List<Token> parameters(
@@ -263,10 +293,9 @@ public class Parser {
         scanner.consume(IDENTIFIER, "Expected variable name.");
         var name = scanner.previous();
 
-        Expr initializer = null;
-        if (scanner.match(EQUAL)) {
-            initializer = expression();
-        }
+        var initializer = scanner.match(EQUAL)
+            ? expression()
+            : new Expr.Literal(null);
 
         scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
         return new Stmt.Var(name, initializer);
@@ -284,7 +313,7 @@ public class Parser {
         if (scanner.match(SWITCH)) return switchStatement();
         if (scanner.match(THROW)) return throwStatement();
         if (scanner.match(WHILE)) return whileStatement();
-        if (scanner.match(LEFT_BRACE)) return new Stmt.Block(block());
+        if (scanner.match(LEFT_BRACE)) return blockStatement();
 
         return expressionStatement();
     }
@@ -328,6 +357,8 @@ public class Parser {
     }
 
     private Stmt forStatement() {
+        var keyword = scanner.previous();
+        var start = keyword.span().start();
         scanner.consume(LEFT_PAREN, "Expected '(' after 'for'.");
 
         // Initializer
@@ -359,12 +390,15 @@ public class Parser {
 
         // Wrap in a block so that the loop clauses have their local
         // scope.
-        return new Stmt.Block(List.of(
-            new Stmt.For(init, condition, incr, body)
+        var end = scanner.previous().span().end();
+        return new Stmt.Block(source.span(start, end),
+            List.of(new Stmt.For(keyword, init, condition, incr, body)
         ));
     }
 
     private Stmt forEachStatement() {
+        var keyword = scanner.previous();
+        var start = keyword.span().start();
         scanner.consume(LEFT_PAREN, "Expected '(' after 'foreach'.");
         scanner.consume(VAR, "Expected 'var' before loop variable name.");
         scanner.consume(IDENTIFIER, "Expected loop variable name.");
@@ -377,15 +411,19 @@ public class Parser {
 
         // Body
         var body = statement();
+        var end = scanner.previous().span().end();
 
-        return new Stmt.Block(List.of(
-            new Stmt.Var(varName, null),
-            new Stmt.ForEach(varName, listExpr, body)
+        return new Stmt.Block(
+            source.span(start, end),
+            List.of(
+                new Stmt.Var(varName, new Expr.Literal(null)),
+                new Stmt.ForEach(keyword, varName, listExpr, body)
         ));
     }
 
 
     private Stmt ifStatement() {
+        var keyword = scanner.previous();
         scanner.consume(LEFT_PAREN, "Expected '(' after 'if'.");
         Expr condition = expression();
         scanner.consume(RIGHT_PAREN, "Expected ')' after if condition.");
@@ -396,7 +434,7 @@ public class Parser {
             elseBranch = statement();
         }
 
-        return new Stmt.If(condition, thenBranch, elseBranch);
+        return new Stmt.If(keyword, condition, thenBranch, elseBranch);
     }
 
     private Stmt ifLetStatement() {
@@ -442,17 +480,18 @@ public class Parser {
         }
 
         // NEXT, parse the default case, if it exists
+        Stmt.MatchCase defCase = null;
         if (scanner.match(DEFAULT)) {
             var caseKeyword = scanner.previous();
             scanner.consume(MINUS_GREATER, "Expected '->' after 'default'.");
             var stmt = statement();
-            cases.add(new Stmt.MatchCase(caseKeyword, null, null, stmt));
+            defCase = new Stmt.MatchCase(caseKeyword, null, null, stmt);
         }
 
         // NEXT, complete the statement
         scanner.consume(RIGHT_BRACE, "Expected '}' after 'match' body.");
 
-        return new Stmt.Match(keyword, target, cases);
+        return new Stmt.Match(keyword, target, cases, defCase);
     }
 
     private Stmt returnStatement() {
@@ -497,17 +536,18 @@ public class Parser {
         }
 
         // NEXT, parse the default case, if it exists
+        Stmt.SwitchDefault switchDefault = null;
         if (scanner.match(DEFAULT)) {
-            var caseKeyword = scanner.previous();
+            var defaultKeyword = scanner.previous();
             scanner.consume(MINUS_GREATER, "Expected '->' after 'default'.");
             var stmt = statement();
-            cases.add(new Stmt.SwitchCase(caseKeyword, List.of(), stmt));
+            switchDefault = new Stmt.SwitchDefault(defaultKeyword, stmt);
         }
 
         // NEXT, complete the statement
         scanner.consume(RIGHT_BRACE, "Expected '}' after switch body.");
 
-        return new Stmt.Switch(keyword, switchExpr, cases);
+        return new Stmt.Switch(keyword, switchExpr, cases, switchDefault);
     }
 
     private Stmt throwStatement() {
@@ -519,12 +559,20 @@ public class Parser {
     }
 
     private Stmt whileStatement() {
+        var keyword = scanner.previous();
         scanner.consume(LEFT_PAREN, "Expected '(' after 'while'.");
         Expr condition = expression();
         scanner.consume(RIGHT_PAREN, "Expected ')' after condition.");
         Stmt body = statement();
 
-        return new Stmt.While(condition, body);
+        return new Stmt.While(keyword, condition, body);
+    }
+
+    private Stmt.Block blockStatement() {
+        var start = scanner.previous().span().end();
+        List<Stmt> statements = block();
+        var end = scanner.previous().span().start();
+        return new Stmt.Block(source.span(start, end), statements);
     }
 
     private List<Stmt> block() {
@@ -552,11 +600,11 @@ public class Parser {
             Token op = scanner.previous();
             Expr value = assignment();
 
-            if (target instanceof Expr.Variable) {
-                Token name = ((Expr.Variable) target).name();
-                return new Expr.Assign(name, op, value);
-            } else if (target instanceof Expr.Get get) {
-                return new Expr.Set(get.object(), get.name(), op, value);
+            if (target instanceof Expr.VarGet) {
+                Token name = ((Expr.VarGet) target).name();
+                return new Expr.VarSet(name, op, value);
+            } else if (target instanceof Expr.PropGet get) {
+                return new Expr.PropSet(get.object(), get.name(), op, value);
             } else if (target instanceof Expr.IndexGet get) {
                 return new Expr.IndexSet(
                     get.collection(), get.bracket(), get.index(), op, value);
@@ -683,13 +731,13 @@ public class Parser {
     }
 
     private Expr prePost(Token op, Expr target, boolean isPre) {
-        if (target instanceof Expr.Variable) {
-            Token name = ((Expr.Variable) target).name();
-            return new Expr.PrePostAssign(name, op, isPre);
-        } else if (target instanceof Expr.Get get) {
-            return new Expr.PrePostSet(get.object(), get.name(), op, isPre);
+        if (target instanceof Expr.VarGet) {
+            Token name = ((Expr.VarGet) target).name();
+            return new Expr.VarIncrDecr(name, op, isPre);
+        } else if (target instanceof Expr.PropGet get) {
+            return new Expr.PropIncrDecr(get.object(), get.name(), op, isPre);
         } else if (target instanceof Expr.IndexGet get) {
-            return new Expr.PrePostIndex(
+            return new Expr.IndexIncrDecr(
                 get.collection(), get.bracket(), get.index(), op, isPre);
         }
 
@@ -706,7 +754,7 @@ public class Parser {
             } else if (scanner.match(DOT)) {
                 scanner.consume(IDENTIFIER, "Expected property name after '.'.");
                 var name = scanner.previous();
-                expr = new Expr.Get(expr, name);
+                expr = new Expr.PropGet(expr, name);
             } else if (scanner.match(LEFT_BRACKET)) {
                 var bracket = scanner.previous();
                 var index = expression();
@@ -752,7 +800,7 @@ public class Parser {
             scanner.consume(IDENTIFIER, "Expected class property name.");
             var name = scanner.previous();
             var obj = new Expr.This(keyword);
-            return new Expr.Get(obj, name);
+            return new Expr.PropGet(obj, name);
         }
 
         if (scanner.match(SUPER)) {
@@ -767,7 +815,7 @@ public class Parser {
         if (scanner.match(THIS)) return new Expr.This(scanner.previous());
 
         if (scanner.match(IDENTIFIER)) {
-            return new Expr.Variable(scanner.previous());
+            return new Expr.VarGet(scanner.previous());
         }
 
         if (scanner.match(BACK_SLASH)) {
@@ -781,7 +829,10 @@ public class Parser {
                 var expr = expression();
                 body = List.of(new Stmt.Return(token, expr));
             }
-            var decl = new Stmt.Function("lambda", token, parameters, body);
+            var end = scanner.previous().span().end();
+            var span = source.span(token.span().start(), end);
+            var decl =
+                new Stmt.Function("lambda", token, parameters, body, span);
             return new Expr.Lambda(decl);
         }
 

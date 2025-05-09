@@ -67,15 +67,4 @@ public class BertEngine implements Engine {
         var compiler = new Compiler(joe);
         return compiler.dump(filename, source);
     }
-
-    @Override
-    public boolean isComplete(String source) {
-        var compiler = new Compiler(joe);
-        try {
-            compiler.compile("*isComplete*", source);
-            return true;
-        } catch (SyntaxError ex) {
-            return ex.isComplete();
-        }
-    }
 }

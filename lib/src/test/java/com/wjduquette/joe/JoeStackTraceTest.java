@@ -10,12 +10,15 @@ import static com.wjduquette.joe.checker.Checker.fail;
 public class JoeStackTraceTest extends Ted {
     private Joe walker;
     private Joe bert;
+    private Joe clark;
 
     @Before public void setup() {
         this.walker = new Joe(Joe.WALKER);
         this.bert = new Joe(Joe.BERT);
+        this.clark = new Joe(Joe.CLARK);
         walker.installGlobalFunction("passThrough", this::_passThrough);
         bert.installGlobalFunction("passThrough", this::_passThrough);
+        clark.installGlobalFunction("passThrough", this::_passThrough);
     }
 
 
@@ -59,6 +62,7 @@ public class JoeStackTraceTest extends Ted {
         dumpScript(script);
         checkRun(walker, script, trace);
         checkRun(bert, script, trace);
+        checkRun(clark, script, trace);
     }
 
     @Test
@@ -90,6 +94,7 @@ public class JoeStackTraceTest extends Ted {
         dumpScript(script);
         checkRun(walker, script, trace);
         checkRun(bert, script, trace);
+        checkRun(clark, script, trace);
     }
 
     @Test
@@ -122,6 +127,7 @@ public class JoeStackTraceTest extends Ted {
         dumpScript(script);
         checkRun(walker, script, trace);
         checkRun(bert, script, trace);
+        checkRun(clark, script, trace);
     }
 
     @Test
@@ -151,6 +157,7 @@ public class JoeStackTraceTest extends Ted {
         dumpScript(script);
         checkRun(walker, script, trace);
         checkRun(bert, script, trace);
+        checkRun(clark, script, trace);
     }
 
     @Test
@@ -183,11 +190,12 @@ public class JoeStackTraceTest extends Ted {
         dumpScript(script);
         checkRun(walker, script, trace);
         checkRun(bert, script, trace);
+        checkRun(clark, script, trace);
     }
 
     @Test
-    public void testStackTrace_staticInitializer() {
-        test("testStackTrace_staticInitializer");
+    public void testStackTrace_classStaticInitializer() {
+        test("testStackTrace_classStaticInitializer");
         var script = """
             class Thing {
                 static {
@@ -202,7 +210,7 @@ public class JoeStackTraceTest extends Ted {
         // judged that the work required to modify Walker to get the specific
         // line number wasn't worth it, as Walker will soon be used only
         // for experimentation.
-        var traceWalker = """
+        var trace = """
             Simulated error!
               In static initializer (*test*:3)
                 002     static {
@@ -222,8 +230,51 @@ public class JoeStackTraceTest extends Ted {
             """;
         dumpScript(script);
 
-        checkRun(walker, script, traceWalker);
+        checkRun(walker, script, trace);
         checkRun(bert, script, traceBert);
+        checkRun(clark, script, trace);
+    }
+
+    @Test
+    public void testStackTrace_recordStaticInitializer() {
+        test("testStackTrace_recordStaticInitializer");
+        var script = """
+            record Thing(id) {
+                static {
+                    throw "Simulated error!";
+                }
+            }
+            """;
+
+        // In this case, Walker sees a different line number "In class Thing"
+        // because it accumulates the class's static blocks into a single
+        // list of statements and doesn't preserve block span info.  I
+        // judged that the work required to modify Walker to get the specific
+        // line number wasn't worth it, as Walker will soon be used only
+        // for experimentation.
+        var trace = """
+            Simulated error!
+              In static initializer (*test*:3)
+                002     static {
+                003         throw "Simulated error!";
+                004     }
+              In type Thing (*test*:5)
+              In <script> (*test*:5)
+            """;
+        var traceBert = """
+            Simulated error!
+              In static initializer (*test*:3)
+                002     static {
+                003         throw "Simulated error!";
+                004     }
+              In type Thing (*test*:2)
+              In <script> (*test*:5)
+            """;
+        dumpScript(script);
+
+        checkRun(walker, script, trace);
+        checkRun(bert, script, traceBert);
+        checkRun(clark, script, trace);
     }
 
     @Test
@@ -247,6 +298,7 @@ public class JoeStackTraceTest extends Ted {
         dumpScript(script);
         checkRun(walker, script, trace);
         checkRun(bert, script, trace);
+        checkRun(clark, script, trace);
     }
 
     @Test
@@ -270,6 +322,7 @@ public class JoeStackTraceTest extends Ted {
         dumpScript(script);
         checkRun(walker, script, trace);
         checkRun(bert, script, trace);
+        checkRun(clark, script, trace);
     }
 
     @Test
@@ -293,6 +346,7 @@ public class JoeStackTraceTest extends Ted {
         dumpScript(script);
         checkRun(walker, script, trace);
         checkRun(bert, script, trace);
+        checkRun(clark, script, trace);
     }
 
     @Test
@@ -322,6 +376,7 @@ public class JoeStackTraceTest extends Ted {
         dumpScript(script);
         checkRun(walker, script, trace);
         checkRun(bert, script, trace);
+        checkRun(clark, script, trace);
     }
 
     @Test
@@ -348,6 +403,7 @@ public class JoeStackTraceTest extends Ted {
         dumpScript(script);
         checkRun(walker, script, trace);
         checkRun(bert, script, trace);
+        checkRun(clark, script, trace);
     }
 
     private Object _passThrough(Joe joe, Args args) {
@@ -360,7 +416,6 @@ public class JoeStackTraceTest extends Ted {
     }
 
     private void checkRun(Joe joe, String script, String expected) {
-        var engine = (joe == bert) ? "Bert" : "Walker";
         var got = "";
         try {
             joe.run("*test*", script);
@@ -376,7 +431,7 @@ public class JoeStackTraceTest extends Ted {
 
         System.out.println(toColumns(
             "Expected Trace:\n" + expected,
-            "From " + engine + " engine:\n" + got));
+            "From " + joe.engineName() + " engine:\n" + got));
         fail("Stack traces do not match!");
     }
 

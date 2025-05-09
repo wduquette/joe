@@ -46,7 +46,9 @@ public class TestPackage extends JoePackage {
         globalFunction("engine",       this::_engine);
         globalFunction("fail",         this::_fail);
         globalFunction("skip",         this::_skip);
+
         scriptResource(getClass(), "pkg.joe.test.joe");
+
         type(new JoeTestType());
         type(PathProxy.TYPE);
     }
