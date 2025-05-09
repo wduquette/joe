@@ -1,4 +1,5 @@
 package com.wjduquette.joe.parser;
+import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.scanner.Scanner;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
@@ -23,6 +24,30 @@ public class Parser {
 
     // Used by Parser.isComplete()
     private static boolean isComplete;
+
+    /**
+     * Given the source, produces a dump of the Abstract Syntax Tree.
+     * @param source The source
+     * @return The dump
+     * @throws SyntaxError on syntax errors
+     */
+    public static String dumpAST(String source) throws SyntaxError {
+        // FIRST, parse the source.
+        var buff = new SourceBuffer("*dumpAST*", source);
+        var traces = new ArrayList<Trace>();
+        var parser = new Parser(buff, (t, flag) -> traces.add(t));
+
+        var statements = parser.parse();
+
+        if (!traces.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.",
+                traces, true);
+        }
+
+        // NEXT, produce the dump
+        var dumper = new Dumper();
+        return dumper.dump(statements);
+    }
 
     /**
      * Returns true if this a complete Joe script (though possibly containing

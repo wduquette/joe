@@ -8,6 +8,10 @@
   - Clark is now the default engine.
   - Bert will be retained for the time being, but will receive only minimal
     updates.
+- Revised `joe dump` to output one or all of the following:
+  - The script's byte-code (the default)
+  - The script's Abstract Syntax Tree (AST)
+  - The script's legacy Bert byte-code
 
 ## Changes in 0.6.0 (28 March 2025) 
 
