@@ -11,10 +11,16 @@ import static com.wjduquette.joe.checker.Checker.*;
 public class JoeTest extends Ted {
     private Joe walker;
     private Joe bert;
+    private Joe clark;
+
+    // NOTE: tests of code in the Joe class itself can be done with any
+    // engine.  Tests that involve the engine need to be done for all
+    // engines.
 
     @Before public void setup() {
         walker = new Joe(Joe.WALKER);
         bert = new Joe(Joe.BERT);
+        clark = new Joe(Joe.CLARK);
     }
 
     @Test
@@ -91,6 +97,7 @@ public class JoeTest extends Ted {
             """;
         var errorPlusIncomplete = "a = \"abc;";
 
+        // Walker
         check(walker.isComplete(completeString)).eq(true);
         check(walker.isComplete(incompleteString)).eq(false);
 
@@ -100,6 +107,7 @@ public class JoeTest extends Ted {
         check(walker.isComplete(normalError)).eq(true);
         check(walker.isComplete(errorPlusIncomplete)).eq(false);
 
+        // Bert
         check(bert.isComplete(completeString)).eq(true);
         check(bert.isComplete(incompleteString)).eq(false);
 
@@ -108,6 +116,16 @@ public class JoeTest extends Ted {
 
         check(bert.isComplete(normalError)).eq(true);
         check(bert.isComplete(errorPlusIncomplete)).eq(false);
+
+        // Clark
+        check(clark.isComplete(completeString)).eq(true);
+        check(clark.isComplete(incompleteString)).eq(false);
+
+        check(clark.isComplete(completeBlock)).eq(true);
+        check(clark.isComplete(incompleteBlock)).eq(false);
+
+        check(clark.isComplete(normalError)).eq(true);
+        check(clark.isComplete(errorPlusIncomplete)).eq(false);
     }
 
     private class Foo {}

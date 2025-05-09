@@ -18,8 +18,7 @@ public class ClarkEngineTest extends Ted {
         joe.installGlobalFunction("unexpected", this::_unexpected);
     }
 
-    // TODO: re-enable these tests when Clark is advanced enough.
-//    @Test
+    @Test
     public void testUnexpectedException_run() {
         test("testUnexpectedException_run");
         try {
@@ -36,7 +35,7 @@ public class ClarkEngineTest extends Ted {
         }
     }
 
-//    @Test
+    @Test
     public void testUnexpectedException_call() {
         test("testUnexpectedException_run");
         try {
@@ -52,7 +51,7 @@ public class ClarkEngineTest extends Ted {
         }
     }
 
-//    @Test
+    @Test
     public void testCallClass() {
         test("testCallClass");
 

@@ -1,7 +1,12 @@
 package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.parser.Parser;
+import com.wjduquette.joe.parser.Stmt;
+import com.wjduquette.joe.scanner.SourceBuffer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,6 +18,10 @@ public class ClarkEngine implements Engine {
 
     private final Joe joe;
     private final VirtualMachine vm;
+
+    // Error traces accumulated during parse()
+    private List<Trace> syntaxTraces = null;
+    private boolean gotIncompleteScript = false;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -70,12 +79,38 @@ public class ClarkEngine implements Engine {
 
     @Override
     public boolean isComplete(String source) {
-        var compiler = new Compiler(joe);
         try {
-            compiler.compile("*isComplete*", source);
+            // If it parsed without error, it's complete.  It might
+            // also have resolution errors, but that's irrelevant.
+            parse(new SourceBuffer("*isComplete*", source));
             return true;
         } catch (SyntaxError ex) {
             return ex.isComplete();
+        }
+    }
+
+    private List<Stmt> parse(SourceBuffer buffer) throws SyntaxError {
+        syntaxTraces = new ArrayList<>();
+        gotIncompleteScript = false;
+
+        Parser parser = new Parser(buffer, this::reportError);
+        var statements = parser.parse();
+
+        // Stop if there was a syntax error.
+        if (!syntaxTraces.isEmpty()) {
+            var err = new SyntaxError("Syntax error in input, halting.",
+                syntaxTraces, !gotIncompleteScript);
+            syntaxTraces = null;
+            throw err;
+        }
+
+        return statements;
+    }
+
+    private void reportError(Trace trace, boolean incomplete) {
+        syntaxTraces.add(trace);
+        if (incomplete) {
+            gotIncompleteScript = true;
         }
     }
 }
