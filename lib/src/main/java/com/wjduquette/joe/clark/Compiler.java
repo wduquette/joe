@@ -334,7 +334,16 @@ class Compiler {
 
                 // Static Initializer
                 if (!s.staticInit().isEmpty()) {
+                    var span = buffer.lineSpan(s.classSpan().endLine());
+                    var classTrace = constant(new Trace(span,
+                        "In class " + s.name().lexeme()));
+                    var staticTrace = constant(new Trace(span,
+                        "In static initializer"));
+                    emit(TRCPUSH, classTrace);
+                    emit(TRCPUSH, staticTrace);
                     emit(s.staticInit());     // c | ∅      ; execute static init
+                    emit(TRCPOP);
+                    emit(TRCPOP);
                 }
 
                 endType();                    // c | ∅      ; end type def
@@ -602,7 +611,16 @@ class Compiler {
 
                 // Static Initializer
                 if (!s.staticInit().isEmpty()) {
-                    emit(s.staticInit());     // t | ∅    ; execute static init
+                    var span = buffer.lineSpan(s.typeSpan().endLine());
+                    var typeTrace = constant(new Trace(span,
+                        "In type " + s.name().lexeme()));
+                    var staticTrace = constant(new Trace(span,
+                        "In static initializer"));
+                    emit(TRCPUSH, typeTrace);
+                    emit(TRCPUSH, staticTrace);
+                    emit(s.staticInit());     // t | ∅      ; execute static init
+                    emit(TRCPOP);
+                    emit(TRCPOP);
                 }
 
                 endType();                    // t | ∅    ; end type def
