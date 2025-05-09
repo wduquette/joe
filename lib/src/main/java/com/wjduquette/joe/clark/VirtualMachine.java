@@ -18,6 +18,8 @@ import static com.wjduquette.joe.clark.Opcode.*;
 class VirtualMachine {
     public static final int DEFAULT_STACK_SIZE = 256;
     public static final int MAX_FRAMES = 64;
+    private static final String STACK_SEPARATOR = "►";
+
     private enum Origin {
         /** Called from Java code. */ JAVA,
         /** Called from Joe code. */  JOE
@@ -259,7 +261,7 @@ class VirtualMachine {
             // redirected to a file. OR, redirect output and save it until
             // the end of the instruction.
             joe.printf("%-40s ", " ");
-            joe.println("| " + stackText());
+            joe.println(stackText());
         }
         for (;;) {
             if (joe.isDebug()) {
@@ -687,7 +689,7 @@ class VirtualMachine {
                         top = frame.base;
 
                         if (joe.isDebug()) {
-                            joe.println("| " + stackText());
+                            joe.println(stackText());
                         }
                         return result;
                     }
@@ -701,7 +703,7 @@ class VirtualMachine {
                     frame = frames[frameCount - 1];
 
                     if (joe.isDebug()) {
-                        joe.println("| " + stackText());
+                        joe.println(stackText());
                     }
                 }
                 case SUB -> {
@@ -760,7 +762,7 @@ class VirtualMachine {
                     "Unknown opcode: " + opcode + ".");
             }
             if (joe.isDebug()) {
-                joe.println("| " + stackText());
+                joe.println(stackText());
             }
         }
     }
@@ -852,9 +854,10 @@ class VirtualMachine {
         }
         var buff = new StringBuilder();
         for (var slot = 0; slot < top; slot++) {
-            buff.append("[ ")
+            buff.append(STACK_SEPARATOR)
+                .append(" ")
                 .append(joe.stringify(stack[slot]))
-                .append(" ]");
+                .append(" ");
         }
         return buff.toString();
     }
