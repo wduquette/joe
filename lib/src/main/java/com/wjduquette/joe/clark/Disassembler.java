@@ -153,11 +153,11 @@ public class Disassembler {
             // Simple Instructions
             // Pattern: opcode
             case ADD, ASSERT, DECR, DIV, DUP, DUP2, EQ, FALSE,
-                GE, GT, GETNEXT, HASNEXT,
-                IN, INCR, INDGET, INDSET, INHERIT, ITER,
-                LISTADD, LISTNEW, LE, LT,
-                MAPNEW, MAPPUT, MUL, NE, NEGATE, NI, NOT, NULL,
-                POP, RETURN, SUB, TGET, THROW, TPUT, TRUE, TRCPOP
+                 GE, GT, GETNEXT, HASNEXT,
+                 IN, INCR, INDGET, INDSET, INHERIT, ITER,
+                 LISTADD, LISTNEW, LE, LT,
+                 MAPNEW, MAPPUT, MUL, NE, NEGATE, NI, NOT, NULL,
+                 POP, RETURN, SUB, TGET, THROW, TSET, TRUE, TRCPOP
                 -> {
                 lines.add(new Line(ip, prefix));
                 return ip + 1;

@@ -1,17 +1,18 @@
-package com.wjduquette.joe.walker;
+package com.wjduquette.joe.parser;
 
-import com.wjduquette.joe.parser.Expr;
-import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.scanner.Token;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-class Dumper {
+/**
+ * Produces a text dump of a Joe AST.
+ */
+public class Dumper {
     private transient StringBuilder buff;
     private transient int indent;
 
-    Dumper() {
+    public Dumper() {
         // Nothing to do
     }
 
@@ -299,6 +300,7 @@ class Dumper {
                     dumpExpression(arg);
                 }
             }
+            case Expr.False ignored -> buff.append("\n");
             case Expr.Grouping e -> {
                 buff.append(" (\n");
                 dumpExpression(e.expr());
@@ -349,6 +351,7 @@ class Dumper {
                 dumpExpression(e.right());
             }
             case Expr.MapLiteral e -> e.entries().forEach(this::dumpExpression);
+            case Expr.Null ignored -> buff.append("\n");
             case Expr.PropGet e -> {
                 buff.append(e.name().lexeme())
                     .append(" of:\n");
@@ -383,6 +386,7 @@ class Dumper {
                 buff.append("'")
                     .append(e.keyword().lexeme())
                     .append("'\n");
+            case Expr.True ignored -> buff.append("\n");
             case Expr.Unary e -> {
                 buff.append(e.op().lexeme())
                     .append("\n");

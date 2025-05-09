@@ -287,6 +287,7 @@ class Resolver {
                     resolve(arg);
                 }
             }
+            case Expr.False ignored -> {}
             case Expr.Grouping expr -> resolve(expr.expr());
             case Expr.IndexGet expr -> {
                 resolve(expr.collection());
@@ -310,6 +311,7 @@ class Resolver {
                 resolve(expr.right());
             }
             case Expr.MapLiteral expr -> expr.entries().forEach(this::resolve);
+            case Expr.Null ignored -> {}
             case Expr.PropGet expr -> resolve(expr.object());
             case Expr.PropIncrDecr expr -> resolve(expr.object());
             case Expr.PropSet expr -> {
@@ -358,6 +360,7 @@ class Resolver {
                 resolve(expr.trueExpr());
                 resolve(expr.falseExpr());
             }
+            case Expr.True ignored -> {}
             case Expr.VarGet expr -> {
                 if (!scopes.isEmpty() &&
                     scopes.peek().get(expr.name().lexeme()) == Boolean.FALSE) {

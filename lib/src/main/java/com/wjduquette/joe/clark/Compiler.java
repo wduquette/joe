@@ -812,6 +812,7 @@ class Compiler {
                 emitArgs(e.arguments());  // f args...  ; compute arguments
                 emit(CALL, (char)argc);   // result     ; result = f(args);
             }
+            case Expr.False ignored -> emit(FALSE);
             case Expr.Grouping e -> emit(e.expr());
             case Expr.IndexGet e -> {
                                           // Stack effects:
@@ -836,7 +837,7 @@ class Compiler {
                     emit(e.index());      // c i     ; compute index
                     emit(DUP2);           // c i c i ; need it twice
                     emit(INDGET);         // c i x   ; x = c[i]
-                    emit(TPUT);           // c i x   ; T = x
+                    emit(TSET);           // c i x   ; T = x
                     emit(op);             // c i y   ; y = x +/- 1
                     emit(INDSET);         // y       ; c[i] = y
                     emit(POP);            // ∅       ;
@@ -873,13 +874,7 @@ class Compiler {
                                           // Stack effects
                 emitList(e.list());       // list      ; compute list
             }
-            case Expr.Literal e -> {
-                switch (e.value()) {
-                    case null -> emit(NULL);
-                    case Boolean b -> emit(b ? TRUE : FALSE);
-                    default -> emitCONST(e.value());
-                }
-            }
+            case Expr.Literal e -> emitCONST(e.value());
             case Expr.Logical e -> {
                 if (e.op().type() == TokenType.AND) {
                                                      // Stack effects:
@@ -905,6 +900,7 @@ class Compiler {
                     emit(MAPPUT);                  // m        ; m[k] = v
                 }
             }
+            case Expr.Null ignored -> emit(NULL);
             case Expr.PropGet e -> {
                 var name = name(e.name());
                                           // Stack effects:
@@ -931,7 +927,7 @@ class Compiler {
                     emit(e.object());     // o      ; compute object
                     emit(DUP);            // o o    ; need it twice
                     emit(PROPGET, name);  // o a    ; a = o.name
-                    emit(TPUT);           // o a    ; T = a
+                    emit(TSET);           // o a    ; T = a
                     emit(op);             // o b    ; b = a +/- 1
                     emit(PROPSET, name);  // b      ; o.name = b
                     emit(POP);            // ∅      ;
@@ -994,6 +990,7 @@ class Compiler {
                                      // Stack effects:
                 emitGET(VAR_THIS);   // this
             }
+            case Expr.True ignored -> emit(TRUE);
             case Expr.Unary e -> {
                 var op = switch(e.op().type()) {
                     case TokenType.BANG  -> NOT;
@@ -1021,7 +1018,7 @@ class Compiler {
                 } else { // Post-increment/decrement
                                           // Stack effects:
                     emitGET(e.name());    // a        ; a = name
-                    emit(TPUT);           // a        ; T = a
+                    emit(TSET);           // a        ; T = a
                     emit(incrDecr);       // b        ; b = a +/- 1
                     emitSET(e.name());    // b        ; name = b
                     emit(POP);            // ∅

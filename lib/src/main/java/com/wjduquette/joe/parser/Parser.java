@@ -1,4 +1,5 @@
 package com.wjduquette.joe.parser;
+import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.scanner.Scanner;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
@@ -23,6 +24,30 @@ public class Parser {
 
     // Used by Parser.isComplete()
     private static boolean isComplete;
+
+    /**
+     * Given the source, produces a dump of the Abstract Syntax Tree.
+     * @param source The source
+     * @return The dump
+     * @throws SyntaxError on syntax errors
+     */
+    public static String dumpAST(String source) throws SyntaxError {
+        // FIRST, parse the source.
+        var buff = new SourceBuffer("*dumpAST*", source);
+        var traces = new ArrayList<Trace>();
+        var parser = new Parser(buff, (t, flag) -> traces.add(t));
+
+        var statements = parser.parse();
+
+        if (!traces.isEmpty()) {
+            throw new SyntaxError("Syntax error in input, halting.",
+                traces, true);
+        }
+
+        // NEXT, produce the dump
+        var dumper = new Dumper();
+        return dumper.dump(statements);
+    }
 
     /**
      * Returns true if this a complete Joe script (though possibly containing
@@ -295,7 +320,7 @@ public class Parser {
 
         var initializer = scanner.match(EQUAL)
             ? expression()
-            : new Expr.Literal(null);
+            : new Expr.Null();
 
         scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
         return new Stmt.Var(name, initializer);
@@ -416,7 +441,7 @@ public class Parser {
         return new Stmt.Block(
             source.span(start, end),
             List.of(
-                new Stmt.Var(varName, new Expr.Literal(null)),
+                new Stmt.Var(varName, new Expr.Null()),
                 new Stmt.ForEach(keyword, varName, listExpr, body)
         ));
     }
@@ -787,9 +812,9 @@ public class Parser {
     }
 
     private Expr primary() {
-        if (scanner.match(FALSE)) return new Expr.Literal(false);
-        if (scanner.match(TRUE)) return new Expr.Literal(true);
-        if (scanner.match(NULL)) return new Expr.Literal(null);
+        if (scanner.match(FALSE)) return new Expr.False();
+        if (scanner.match(TRUE)) return new Expr.True();
+        if (scanner.match(NULL)) return new Expr.Null();
 
         if (scanner.match(NUMBER, STRING, KEYWORD)) {
             return new Expr.Literal(scanner.previous().literal());

@@ -299,6 +299,13 @@ engine.  This will make Joe easier to evolve.
 updates.</li>
 </ul>
 </li>
+<li>Revised <code>joe dump</code> to output one or all of the following:
+<ul>
+<li>The script's byte-code (the default)</li>
+<li>The script's Abstract Syntax Tree (AST)</li>
+<li>The script's legacy Bert byte-code</li>
+</ul>
+</li>
 </ul>
 <h2 id="changes-in-060-28-march-2025"><a class="header" href="#changes-in-060-28-march-2025">Changes in 0.6.0 (28 March 2025)</a></h2>
 <ul>
@@ -9024,7 +9031,9 @@ language specification, and can change without notice.</p>
 <ul>
 <li><code>ip</code> is the instruction pointer within the current function.</li>
 <li><code>T</code> is the temporary register, used to stash a value momentarily during
-an atomic operation.</li>
+an atomic operation.  The <code>Compiler</code> must <em>not</em> compile an arbitrary
+expression between <code>TSET</code> and <code>TGET</code>, as it might step on the stashed
+value.</li>
 </ul>
 <h2 id="instruction-set"><a class="header" href="#instruction-set">Instruction Set</a></h2>
 <div class="table-wrapper"><table><thead><tr><th></th><th>Mnemonic/argument</th><th>Stack effect</th><th>Description</th></tr></thead><tbody>
@@ -9088,9 +9097,9 @@ an atomic operation.</li>
 <tr><td>57</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
 <tr><td>58</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
 <tr><td>59</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
-<tr><td>60</td><td>TPUT</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
-<tr><td>61</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
-<tr><td>62</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
+<tr><td>60</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
+<tr><td>61</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
+<tr><td>62</td><td>TSET</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
 <tr><td>63</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
 <tr><td>64</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
 <tr><td>65</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
@@ -9469,10 +9478,6 @@ This is used to compile the <code>super.&lt;method&gt;</code> syntax.</p>
 <p><strong>THROW</strong> | <em>a</em> -&gt; ∅</p>
 <p>Throws a <code>MonicaError</code> given <em>a</em>, which may be a <code>MonicaError</code> or a
 string, creating a new <code>MonicaError</code> in the latter case.</p>
-<h3 id="tput"><a class="header" href="#tput">TPUT</a></h3>
-<hr />
-<p><strong>TPUT</strong> | <em>a</em> → <em>a</em></p>
-<p>Loads <em>a</em> into the T register, leaving it on the stack.</p>
 <h3 id="trcpop"><a class="header" href="#trcpop">TRCPOP</a></h3>
 <hr />
 <p><strong>TRCPOP</strong> | ∅ → ∅</p>
@@ -9486,6 +9491,10 @@ If an error is thrown while the post-trace is present in the <code>CallFrame</co
 the trace will be included in the error stack trace.</p>
 <p>This is used to add the <code>class</code> as a stack level when errors are found
 in a class static initializer block.</p>
+<h3 id="tset"><a class="header" href="#tset">TSET</a></h3>
+<hr />
+<p><strong>TSET</strong> | <em>a</em> → <em>a</em></p>
+<p>Loads <em>a</em> into the T register, leaving it on the stack.</p>
 <h3 id="true"><a class="header" href="#true">TRUE</a></h3>
 <hr />
 <p><strong>TRUE</strong> | ∅ → <code>true</code></p>
@@ -9963,7 +9972,7 @@ This is used to compile the <code>super.&lt;method&gt;</code> syntax.</p>
 <p><strong>THROW</strong> | <em>a</em> -&gt; ∅</p>
 <p>Throws a <code>MonicaError</code> given <em>a</em>, which may be a <code>MonicaError</code> or a
 string, creating a new <code>MonicaError</code> in the latter case.</p>
-<h3 id="tput-1"><a class="header" href="#tput-1">TPUT</a></h3>
+<h3 id="tput"><a class="header" href="#tput">TPUT</a></h3>
 <hr />
 <p><strong>TPUT</strong> | <em>a</em> → <em>a</em></p>
 <p>Loads <em>a</em> into the T register, leaving it on the stack.</p>

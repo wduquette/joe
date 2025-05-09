@@ -79,9 +79,9 @@ public class Opcode {
     /** Opcode */ public static final char SUPGET  = 57;
     /** Opcode */ public static final char TGET    = 58;
     /** Opcode */ public static final char THROW   = 59;
-    /** Opcode */ public static final char TPUT    = 60;
-    /** Opcode */ public static final char TRCPOP  = 61;
-    /** Opcode */ public static final char TRCPUSH = 62;
+    /** Opcode */ public static final char TRCPOP  = 60;
+    /** Opcode */ public static final char TRCPUSH = 61;
+    /** Opcode */ public static final char TSET    = 62;
     /** Opcode */ public static final char TRUE    = 63;
     /** Opcode */ public static final char UPCLOSE = 64;
     /** Opcode */ public static final char UPGET   = 65;
@@ -155,9 +155,9 @@ public class Opcode {
         "SUPGET",
         "TGET",
         "THROW",
-        "TPUT",
         "TRCPOP",
         "TRCPUSH",
+        "TSET",
         "TRUE",
         "UPCLOSE",
         "UPGET",
