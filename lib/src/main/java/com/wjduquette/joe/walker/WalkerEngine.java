@@ -3,7 +3,7 @@ package com.wjduquette.joe.walker;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.parser.Stmt;
-import com.wjduquette.joe.scanner.SourceBuffer;
+import com.wjduquette.joe.SourceBuffer;
 
 import java.util.*;
 import java.util.stream.Collectors;

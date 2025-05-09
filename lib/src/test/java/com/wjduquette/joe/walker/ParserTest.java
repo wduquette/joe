@@ -1,7 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.parser.Parser;
-import com.wjduquette.joe.scanner.SourceBuffer;
+import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Ted;
 import org.junit.Test;
 

@@ -5,7 +5,7 @@ import com.wjduquette.joe.parser.ASTPattern;
 import com.wjduquette.joe.parser.Expr;
 import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.patterns.Matcher;
-import com.wjduquette.joe.scanner.SourceBuffer;
+import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.TokenType;
 import com.wjduquette.joe.types.ListValue;

@@ -1,6 +1,6 @@
 package com.wjduquette.joe.bert;
 
-import com.wjduquette.joe.scanner.SourceBuffer;
+import com.wjduquette.joe.SourceBuffer;
 
 import java.util.Arrays;
 import java.util.List;

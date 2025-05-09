@@ -2,6 +2,7 @@ package com.wjduquette.joe.scanner;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Keyword;
+import com.wjduquette.joe.SourceBuffer;
 
 import java.util.HashMap;
 import java.util.Map;

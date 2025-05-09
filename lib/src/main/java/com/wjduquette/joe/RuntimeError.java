@@ -1,6 +1,6 @@
 package com.wjduquette.joe;
 
-import com.wjduquette.joe.scanner.SourceBuffer.Span;
+import com.wjduquette.joe.SourceBuffer.Span;
 
 /**
  * A runtime error found during script execution by Joe's core

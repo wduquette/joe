@@ -1,6 +1,6 @@
 package com.wjduquette.joe.parser;
 import com.wjduquette.joe.scanner.Scanner;
-import com.wjduquette.joe.scanner.SourceBuffer;
+import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.TokenType;
 import com.wjduquette.joe.Trace;
