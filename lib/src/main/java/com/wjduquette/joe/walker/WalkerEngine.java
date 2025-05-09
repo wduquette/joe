@@ -118,19 +118,6 @@ public class WalkerEngine implements Engine {
     }
 
     @Override
-    public boolean isComplete(String source) {
-        try {
-            // If it parsed without error, it's complete.  It might
-            // also have resolution errors, but that's irrelevant.
-            parse(new SourceBuffer("*isComplete*", source));
-            return true;
-        } catch (SyntaxError ex) {
-            // If there's an error, return the error's complete flag.
-            return ex.isComplete();
-        }
-    }
-
-    @Override
     public boolean isCallable(Object callee) {
         return callee instanceof NativeCallable;
     }

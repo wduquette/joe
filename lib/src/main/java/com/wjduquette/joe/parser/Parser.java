@@ -19,6 +19,33 @@ public class Parser {
     private static final int MAX_CALL_ARGUMENTS = 255;
 
     //-------------------------------------------------------------------------
+    // Static Methods
+
+    // Used by Parser.isComplete()
+    private static boolean isComplete;
+
+    /**
+     * Returns true if this a complete Joe script (though possibly containing
+     * errors), and false if it clearly stops partway through a construct.
+     * @param source The source
+     * @return true or false
+     */
+    public static boolean isComplete(String source) {
+        var buff = new SourceBuffer("*isComplete*", source);
+        var parser = new Parser(buff, Parser::completionReporter);
+
+        // If it parsed without error then it is complete.  It might
+        // also have resolution errors, but that's irrelevant.
+        isComplete = true;
+        parser.parse();
+        return isComplete;
+    }
+
+    private static void completionReporter(Trace ignored, boolean incomplete) {
+        if (incomplete) isComplete = false;
+    }
+
+    //-------------------------------------------------------------------------
     // Instance Variables
 
     private final SourceBuffer source;
