@@ -1,6 +1,7 @@
 package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.tools.Tool;
