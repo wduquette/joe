@@ -10,7 +10,9 @@ The byte-engine is a stack machine with a few registers:
 
 - `ip` is the instruction pointer within the current function.
 - `T` is the temporary register, used to stash a value momentarily during
-  an atomic operation.
+  an atomic operation.  The `Compiler` must *not* compile an arbitrary
+  expression between `TSET` and `TGET`, as it might step on the stashed
+  value.
 
 ## Instruction Set
 
@@ -77,9 +79,9 @@ The byte-engine is a stack machine with a few registers:
 | 57 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
 | 58 | TGET              | ∅ → *a*            | *a* = T                   |
 | 59 | THROW             | *a* → ∅            | Throw error               |
-| 60 | TPUT              | *a* → *a*          | T = *a*                   |
-| 61 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
-| 62 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
+| 60 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
+| 61 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
+| 62 | TSET              | *a* → *a*          | T = *a*                   |
 | 63 | TRUE              | ∅ → true           | Load `true`               |
 | 64 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
 | 65 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
@@ -569,12 +571,6 @@ Pushes the value of the T register onto the stack.
 Throws a `MonicaError` given *a*, which may be a `MonicaError` or a
 string, creating a new `MonicaError` in the latter case.
 
-### TPUT
----
-**TPUT** | *a* → *a*
-
-Loads *a* into the T register, leaving it on the stack.
-
 ### TRCPOP
 ---
 **TRCPOP** | ∅ → ∅
@@ -592,6 +588,13 @@ the trace will be included in the error stack trace.
 
 This is used to add the `class` as a stack level when errors are found
 in a class static initializer block.
+
+### TSET
+---
+**TSET** | *a* → *a*
+
+Loads *a* into the T register, leaving it on the stack.
+
 
 ### TRUE
 ---

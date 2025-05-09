@@ -837,7 +837,7 @@ class Compiler {
                     emit(e.index());      // c i     ; compute index
                     emit(DUP2);           // c i c i ; need it twice
                     emit(INDGET);         // c i x   ; x = c[i]
-                    emit(TPUT);           // c i x   ; T = x
+                    emit(TSET);           // c i x   ; T = x
                     emit(op);             // c i y   ; y = x +/- 1
                     emit(INDSET);         // y       ; c[i] = y
                     emit(POP);            // ∅       ;
@@ -927,7 +927,7 @@ class Compiler {
                     emit(e.object());     // o      ; compute object
                     emit(DUP);            // o o    ; need it twice
                     emit(PROPGET, name);  // o a    ; a = o.name
-                    emit(TPUT);           // o a    ; T = a
+                    emit(TSET);           // o a    ; T = a
                     emit(op);             // o b    ; b = a +/- 1
                     emit(PROPSET, name);  // b      ; o.name = b
                     emit(POP);            // ∅      ;
@@ -1018,7 +1018,7 @@ class Compiler {
                 } else { // Post-increment/decrement
                                           // Stack effects:
                     emitGET(e.name());    // a        ; a = name
-                    emit(TPUT);           // a        ; T = a
+                    emit(TSET);           // a        ; T = a
                     emit(incrDecr);       // b        ; b = a +/- 1
                     emitSET(e.name());    // b        ; name = b
                     emit(POP);            // ∅

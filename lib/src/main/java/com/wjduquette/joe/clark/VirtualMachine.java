@@ -734,7 +734,7 @@ class VirtualMachine {
                         throw error(joe.stringify(value));
                     }
                 }
-                case TPUT -> registerT = peek(0);
+                case TSET -> registerT = peek(0);
                 case TRUE -> push(true);
                 case TRCPOP -> frame.postTraces.pop();
                 case TRCPUSH -> {
