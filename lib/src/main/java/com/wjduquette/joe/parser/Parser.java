@@ -295,7 +295,7 @@ public class Parser {
 
         var initializer = scanner.match(EQUAL)
             ? expression()
-            : new Expr.Literal(null);
+            : new Expr.Null();
 
         scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
         return new Stmt.Var(name, initializer);
@@ -416,7 +416,7 @@ public class Parser {
         return new Stmt.Block(
             source.span(start, end),
             List.of(
-                new Stmt.Var(varName, new Expr.Literal(null)),
+                new Stmt.Var(varName, new Expr.Null()),
                 new Stmt.ForEach(keyword, varName, listExpr, body)
         ));
     }
@@ -787,9 +787,9 @@ public class Parser {
     }
 
     private Expr primary() {
-        if (scanner.match(FALSE)) return new Expr.Literal(false);
-        if (scanner.match(TRUE)) return new Expr.Literal(true);
-        if (scanner.match(NULL)) return new Expr.Literal(null);
+        if (scanner.match(FALSE)) return new Expr.False();
+        if (scanner.match(TRUE)) return new Expr.True();
+        if (scanner.match(NULL)) return new Expr.Null();
 
         if (scanner.match(NUMBER, STRING, KEYWORD)) {
             return new Expr.Literal(scanner.previous().literal());

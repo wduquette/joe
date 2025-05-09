@@ -299,6 +299,7 @@ class Dumper {
                     dumpExpression(arg);
                 }
             }
+            case Expr.False ignored -> buff.append("\n");
             case Expr.Grouping e -> {
                 buff.append(" (\n");
                 dumpExpression(e.expr());
@@ -349,6 +350,7 @@ class Dumper {
                 dumpExpression(e.right());
             }
             case Expr.MapLiteral e -> e.entries().forEach(this::dumpExpression);
+            case Expr.Null ignored -> buff.append("\n");
             case Expr.PropGet e -> {
                 buff.append(e.name().lexeme())
                     .append(" of:\n");
@@ -383,6 +385,7 @@ class Dumper {
                 buff.append("'")
                     .append(e.keyword().lexeme())
                     .append("'\n");
+            case Expr.True ignored -> buff.append("\n");
             case Expr.Unary e -> {
                 buff.append(e.op().lexeme())
                     .append("\n");

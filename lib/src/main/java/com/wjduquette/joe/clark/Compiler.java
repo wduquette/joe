@@ -812,6 +812,7 @@ class Compiler {
                 emitArgs(e.arguments());  // f args...  ; compute arguments
                 emit(CALL, (char)argc);   // result     ; result = f(args);
             }
+            case Expr.False ignored -> emit(FALSE);
             case Expr.Grouping e -> emit(e.expr());
             case Expr.IndexGet e -> {
                                           // Stack effects:
@@ -873,13 +874,7 @@ class Compiler {
                                           // Stack effects
                 emitList(e.list());       // list      ; compute list
             }
-            case Expr.Literal e -> {
-                switch (e.value()) {
-                    case null -> emit(NULL);
-                    case Boolean b -> emit(b ? TRUE : FALSE);
-                    default -> emitCONST(e.value());
-                }
-            }
+            case Expr.Literal e -> emitCONST(e.value());
             case Expr.Logical e -> {
                 if (e.op().type() == TokenType.AND) {
                                                      // Stack effects:
@@ -905,6 +900,7 @@ class Compiler {
                     emit(MAPPUT);                  // m        ; m[k] = v
                 }
             }
+            case Expr.Null ignored -> emit(NULL);
             case Expr.PropGet e -> {
                 var name = name(e.name());
                                           // Stack effects:
@@ -994,6 +990,7 @@ class Compiler {
                                      // Stack effects:
                 emitGET(VAR_THIS);   // this
             }
+            case Expr.True ignored -> emit(TRUE);
             case Expr.Unary e -> {
                 var op = switch(e.op().type()) {
                     case TokenType.BANG  -> NOT;

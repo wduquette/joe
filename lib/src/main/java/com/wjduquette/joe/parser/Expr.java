@@ -10,13 +10,15 @@ import java.util.List;
 public sealed interface Expr permits
     Expr.Binary,
     Expr.Call,
+    Expr.False,
     Expr.Grouping,
     Expr.IndexGet, Expr.IndexIncrDecr, Expr.IndexSet,
     Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
     Expr.MapLiteral,
+    Expr.Null,
     Expr.PropGet, Expr.PropIncrDecr, Expr.PropSet,
     Expr.Super,
-    Expr.This, Expr.Ternary,
+    Expr.This, Expr.Ternary, Expr.True,
     Expr.Unary,
     Expr.VarGet, Expr.VarIncrDecr, Expr.VarSet
 {
@@ -52,6 +54,11 @@ public sealed interface Expr permits
     record Call(Expr callee, Token paren, List<Expr> arguments) implements Expr {
         public Span location() { return paren.span(); }
     }
+
+    /**
+     * A literal false
+     */
+    record False() implements Expr {}
 
     /**
      * A parenthesized expression
@@ -156,6 +163,11 @@ public sealed interface Expr permits
     }
 
     /**
+     * A literal null
+     */
+    record Null() implements Expr {}
+
+    /**
      * A get of an object property.
      * See Expr.Variable for a get of a normal variable.
      * @param object The expression that yields the object
@@ -220,6 +232,11 @@ public sealed interface Expr permits
     record This(Token keyword) implements Expr {
         public Span location() { return keyword.span(); }
     }
+
+    /**
+     * A literal true
+     */
+    record True() implements Expr {}
 
     /**
      * A unary operation

@@ -528,6 +528,8 @@ class Interpreter {
                     throw expected(expr.paren().span(), "callable", callee);
                 }
             }
+            // false
+            case Expr.False ignored -> false;
             // (expr...)
             case Expr.Grouping expr -> evaluate(expr.expr());
             // expr[index]
@@ -647,6 +649,8 @@ class Interpreter {
                 }
                 yield map;
             }
+            // null
+            case Expr.Null ignored -> null;
             // Get an object property.  The expression must evaluate to
             // a JoeValue, i.e., a JoeInstance or a ProxiedValue.
             case Expr.PropGet expr -> {
@@ -722,6 +726,8 @@ class Interpreter {
                     yield evaluate(expr.falseExpr());
                 }
             }
+            // true
+            case Expr.True ignored -> true;
             // The unary operators
             case Expr.Unary expr -> {
                 Object right = evaluate(expr.right());
