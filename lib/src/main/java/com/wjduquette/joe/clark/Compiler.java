@@ -464,8 +464,27 @@ class Compiler {
 
                 if (end_ != -1) patchJump(end_);
             }
-            case Stmt.IfLet ifLet -> {
-                emitTHROW("Not yet supported: 'if let'.");
+            case Stmt.IfLet s -> {
+                var pat = constant(s.pattern().getPattern());
+                var consts = s.pattern().getConstants();
+                var vars = s.pattern().getBindings();
+
+                beginScope();                  // ∅            ; begin scope: then
+                emitList(consts);              // ∅ | cs       ; pattern constants
+                emit(s.target());              // ∅ | cs t     ; match target
+                emit(MATCH, pat);              // ∅ | vs? flag ; match pattern
+                int else_ = emitJump(JIF);     // ∅ | vs?      ; JIF else
+                defineLocals(vars);            // vs | ∅       ; define bindings
+                emit(s.thenBranch());          // vs | ∅       ; compile "then"
+                endScope();                    // ∅            ; end scope: then
+                if (s.elseBranch() != null) {
+                    int end_ = emitJump(JUMP); // ∅            ; JUMP end
+                    patchJump(else_);          // ∅            ; else:
+                    emit(s.elseBranch());      // ∅            ; compile "else"
+                    patchJump(end_);           // ∅            ; end:
+                } else {
+                    patchJump(else_);          // ∅            ; else:
+                }
             }
             case Stmt.Let s -> {
                 var pat = constant(s.pattern().getPattern());
@@ -473,8 +492,7 @@ class Compiler {
                 var vars = s.pattern().getBindings();
 
                 if (!inGlobalScope()) {        // Stack: locals | working
-                    vars.forEach(              // ∅         ; declare vars
-                        this::declareLocal);
+                    declareLocals(vars);       // ∅         ; declare vars
                 }
 
                 emitList(consts);              // ∅ | cs    ; compute constants
@@ -482,8 +500,7 @@ class Compiler {
 
                 if (!inGlobalScope()) {
                     emit(Opcode.LOCLET, pat);  // ∅ | vs    ; match pattern
-                    vars.forEach(              // vs | ∅    ; define vars
-                        this::defineLocal);
+                    defineLocals(vars);        // vs | ∅    ; define vars
                 } else {
                     emit(Opcode.GLOLET, pat);  // ∅         ; define vars
                 }
@@ -1051,6 +1068,11 @@ class Compiler {
         current.notYetDefined.add(name.lexeme());
     }
 
+    // Declares a number of locals at once, e.g., for pattern bindings.
+    private void declareLocals(List<Token> names) {
+        names.forEach(this::declareLocal);
+    }
+
     // Defines the variable so that it can be referred to in expressions.
     // This constitutes a promise that the value the variable will be placed
     // on the stack before any other instruction executes.  Or, to put it
@@ -1065,6 +1087,11 @@ class Compiler {
         current.notYetDefined.remove(name.lexeme());
         current.locals[current.localCount++] =
             new Local(name, current.scopeDepth);
+    }
+
+    // Defines a number of locals at once, e.g., for pattern bindings.
+    private void defineLocals(List<Token> names) {
+        names.forEach(this::defineLocal);
     }
 
     // defineLocal for hidden variables
