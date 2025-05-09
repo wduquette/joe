@@ -47,10 +47,8 @@ public class TestPackage extends JoePackage {
         globalFunction("fail",         this::_fail);
         globalFunction("skip",         this::_skip);
 
-        if (!engine.equals(Joe.CLARK)) {
-            // CLARK doesn't yet understand classes.
-            scriptResource(getClass(), "pkg.joe.test.joe");
-        }
+        scriptResource(getClass(), "pkg.joe.test.joe");
+
         type(new JoeTestType());
         type(PathProxy.TYPE);
     }
