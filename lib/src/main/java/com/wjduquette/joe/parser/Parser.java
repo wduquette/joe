@@ -453,17 +453,18 @@ public class Parser {
         }
 
         // NEXT, parse the default case, if it exists
+        Stmt.MatchCase defCase = null;
         if (scanner.match(DEFAULT)) {
             var caseKeyword = scanner.previous();
             scanner.consume(MINUS_GREATER, "Expected '->' after 'default'.");
             var stmt = statement();
-            cases.add(new Stmt.MatchCase(caseKeyword, null, null, stmt));
+            defCase = new Stmt.MatchCase(caseKeyword, null, null, stmt);
         }
 
         // NEXT, complete the statement
         scanner.consume(RIGHT_BRACE, "Expected '}' after 'match' body.");
 
-        return new Stmt.Match(keyword, target, cases);
+        return new Stmt.Match(keyword, target, cases, defCase);
     }
 
     private Stmt returnStatement() {

@@ -193,17 +193,16 @@ class Resolver {
             case Stmt.Match stmt -> {
                 resolve(stmt.expr());
                 for (var c : stmt.cases()) {
-                    if (c.pattern() != null) {
-                        beginScope();
-                        c.pattern().getBindings().forEach(this::declare);
-                        c.pattern().getConstants().forEach(this::resolve);
-                        c.pattern().getBindings().forEach(this::define);
-                        if (c.guard() != null) resolve(c.guard());
-                        resolve(c.statement());
-                        endScope();
-                    } else {
-                        resolve(c.statement());
-                    }
+                    beginScope();
+                    c.pattern().getBindings().forEach(this::declare);
+                    c.pattern().getConstants().forEach(this::resolve);
+                    c.pattern().getBindings().forEach(this::define);
+                    if (c.guard() != null) resolve(c.guard());
+                    resolve(c.statement());
+                    endScope();
+                }
+                if (stmt.matchDefault() != null) {
+                    resolve(stmt.matchDefault().statement());
                 }
             }
             case Stmt.Record stmt -> {

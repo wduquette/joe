@@ -247,9 +247,6 @@ class Interpreter {
             case Stmt.Match stmt -> {
                 var target = evaluate(stmt.expr());
                 for (var c : stmt.cases()) {
-                    // default ->
-                    if (c.pattern() == null) return execute(c.statement());
-
                     // case pattern ->
                     var previous = this.environment;
                     try {
@@ -276,6 +273,14 @@ class Interpreter {
                         this.environment = previous;
                     }
                 }
+
+                // Default case; always the last
+                if (stmt.matchDefault() != null) {
+                    return execute(stmt.matchDefault().statement());
+                }
+
+                // No case matched
+                return null;
             }
             case Stmt.Record stmt -> {
                 // The type itself

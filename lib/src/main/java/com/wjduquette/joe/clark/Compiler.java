@@ -505,8 +505,52 @@ class Compiler {
                     emit(Opcode.GLOLET, pat);  // ∅         ; define vars
                 }
             }
-            case Stmt.Match match -> {
-                emitTHROW("Not yet supported: 'match'.");
+            case Stmt.Match s -> {
+                // Setup                      // Stack: locals | working
+                beginScope();                 // ∅            ; begin scope: match
+                emit(s.expr());               // ∅ | m        ; compile match target
+                defineLocal(VAR_MATCH);       // m | ∅        ; define *match*
+
+                // Match Cases
+                var ends_ = jumpList();
+                var next1_ = -1;
+                var next2_ = -1;
+                for (var c : s.cases()) {
+                    var pat = constant(c.pattern().getPattern());
+                    var consts = c.pattern().getConstants();
+                    var vars = c.pattern().getBindings();
+
+                    patchJump(next1_);        // m | ∅        ; next1:
+                    patchJump(next2_);        // m | ∅        ; next2:
+                    beginScope();             // m | ∅        ; begin scope: case
+                    emitList(consts);         // m | cs       ; pattern constants
+                    emitGET(VAR_MATCH);       // m | cs m     ; get *match*
+                    emit(MATCH, pat);         // m | vs? flag ; match pattern
+                    next1_ = emitJump(JIF);   // m | vs?      ; JIF next1
+                    defineLocals(vars);       // m vs | ∅     ; define bindings
+                    if (c.guard() != null) {  // m vs | flag  ; compute guard
+                        // Just parse as TRUE
+                        emit(c.guard());
+                    } else {
+                        emit(TRUE);
+                    }
+                    next2_ = emitJump(JIF);   // m vs | ∅     ; JIF next2
+                    emit(c.statement());      // m vs | ∅     ; compile body
+                    endScope();               // m | ∅        ; end scope: case
+                    ends_.emit(JUMP);         // m | ∅        ; JUMP end
+                }
+
+                // Default Case
+                patchJump(next1_);            // m | ∅        ; next1:
+                patchJump(next2_);            // m | ∅        ; next2:
+                if (s.matchDefault() != null) {
+                    emit(s.matchDefault()     // m | ∅        ; compile default
+                        .statement());
+                }
+
+                // End Of Statement
+                patchJumps(ends_);            // m | ∅        ; end:
+                endScope();                   // ∅            ; end scope: match
             }
             case Stmt.Record s -> {
                 // NOTE: The stack effects are written presuming that the
@@ -1415,7 +1459,11 @@ class Compiler {
         return new JumpList();
     }
 
+    // This is a no-op if the offset is -1.
     private void patchJump(int offset) {
+        if (offset == -1) {
+            return;
+        }
         // -1 to adjust for the bytecode for the jump offset itself.
         int jump = current.chunk.codeSize() - offset - 1;
 

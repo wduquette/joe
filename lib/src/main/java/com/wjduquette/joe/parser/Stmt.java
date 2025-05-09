@@ -190,11 +190,13 @@ public sealed interface Stmt
      * @param keyword The "match" keyword
      * @param expr The match expression
      * @param cases A list of cases
+     * @param matchDefault The default case, or null
      */
     record Match(
         Token keyword,
         Expr expr,
-        List<MatchCase> cases
+        List<MatchCase> cases,
+        MatchCase matchDefault
     ) implements Stmt {
         public Span location() { return keyword.span(); }
     }

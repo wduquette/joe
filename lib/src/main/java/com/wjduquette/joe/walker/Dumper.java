@@ -180,6 +180,11 @@ class Dumper {
                         .append("\n");
                     dumpStatement(c.statement());
                 }
+                if (stmt.matchDefault() != null) {
+                    buff.append(indent())
+                        .append("Default\n");
+                    dumpStatement(stmt.matchDefault().statement());
+                }
                 --indent;
             }
             case Stmt.Record stmt -> {
@@ -240,6 +245,11 @@ class Dumper {
                         dumpExpression(value);
                     }
                     dumpStatement(c.statement());
+                }
+                if (stmt.switchDefault() != null) {
+                    buff.append(indent())
+                        .append("Default\n");
+                    dumpStatement(stmt.switchDefault().statement());
                 }
                 --indent;
             }
