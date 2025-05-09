@@ -97,4 +97,5 @@
 ---
 
 [Appendix: Joe Grammar](grammar.md)
-[Appendix: Virtual Machine](vm.md)
+[Appendix: Clark Virtual Machine](vm.md)
+[Appendix: Bert Virtual Machine](bert_vm.md)

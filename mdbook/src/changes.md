@@ -2,7 +2,12 @@
 
 ## Changes in 0.7.0 (in development)
 
-- Pending
+- Replaced the Bert byte-code engine and its single-pass compiler with the
+  Clark byte-code engine, which shares a parser and scanner with the Walker 
+  engine.  This will make Joe easier to evolve.
+  - Clark is now the default engine.
+  - Bert will be retained for the time being, but will receive only minimal
+    updates.
 
 ## Changes in 0.6.0 (28 March 2025) 
 
