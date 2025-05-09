@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.wjduquette.joe.scanner.SourceBuffer.Span;
+import com.wjduquette.joe.SourceBuffer.Span;
 import com.wjduquette.joe.types.TypeType;
 
 /**

@@ -4,13 +4,10 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.patterns.Pattern;
-import com.wjduquette.joe.scanner.Scanner;
-import com.wjduquette.joe.scanner.SourceBuffer;
-import com.wjduquette.joe.scanner.SourceBuffer.Span;
-import com.wjduquette.joe.scanner.Token;
-import com.wjduquette.joe.scanner.TokenType;
+import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.SourceBuffer.Span;
 
-import static com.wjduquette.joe.scanner.TokenType.*;
+import static com.wjduquette.joe.bert.TokenType.*;
 
 import java.util.*;
 

@@ -5,8 +5,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wjduquette.joe.scanner.SourceBuffer;
-import com.wjduquette.joe.scanner.SourceBuffer.Span;
+import com.wjduquette.joe.SourceBuffer.Span;
 
 /**
  * This is the base class for all error exceptions thrown by Joe at

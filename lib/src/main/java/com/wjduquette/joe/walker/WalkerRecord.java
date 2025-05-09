@@ -1,7 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.scanner.SourceBuffer.Span;
+import com.wjduquette.joe.SourceBuffer.Span;
 import com.wjduquette.joe.types.TypeType;
 
 import java.util.ArrayList;

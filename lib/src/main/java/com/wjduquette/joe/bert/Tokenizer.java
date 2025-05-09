@@ -1,13 +1,12 @@
-package com.wjduquette.joe.scanner;
+package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.SourceBuffer;
+import static com.wjduquette.joe.bert.TokenType.*;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.wjduquette.joe.scanner.TokenType.*;
 
 /**
  * Bert's scanner.

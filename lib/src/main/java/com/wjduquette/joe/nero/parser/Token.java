@@ -1,6 +1,6 @@
 package com.wjduquette.joe.nero.parser;
 
-import com.wjduquette.joe.scanner.SourceBuffer.Span;
+import com.wjduquette.joe.SourceBuffer.Span;
 
 public record Token(
     TokenType type,

@@ -1,4 +1,4 @@
-package com.wjduquette.joe.scanner;
+package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.SourceBuffer.Span;
 

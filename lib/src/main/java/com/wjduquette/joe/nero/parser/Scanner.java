@@ -1,7 +1,7 @@
 package com.wjduquette.joe.nero.parser;
 
 import com.wjduquette.joe.Keyword;
-import com.wjduquette.joe.scanner.SourceBuffer;
+import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Trace;
 
 import java.util.ArrayList;

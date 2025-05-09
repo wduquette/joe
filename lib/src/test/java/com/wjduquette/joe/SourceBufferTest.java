@@ -1,10 +1,9 @@
 package com.wjduquette.joe;
 
-import com.wjduquette.joe.scanner.SourceBuffer;
 import org.junit.Test;
 
 import static com.wjduquette.joe.checker.Checker.*;
-import static com.wjduquette.joe.scanner.SourceBuffer.Position;
+import static com.wjduquette.joe.SourceBuffer.Position;
 
 public class SourceBufferTest extends Ted {
     SourceBuffer buff;

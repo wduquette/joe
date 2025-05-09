@@ -1,10 +1,8 @@
-package com.wjduquette.joe.scanner;
+package com.wjduquette.joe.bert;
 
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SourceBuffer.Span;
-
-import static com.wjduquette.joe.scanner.TokenType.EOF;
-import static com.wjduquette.joe.scanner.TokenType.ERROR;
+import static com.wjduquette.joe.bert.TokenType.*;
 
 public class Scanner {
     /**

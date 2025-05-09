@@ -1,6 +1,6 @@
 package com.wjduquette.joe.parser;
 
-import com.wjduquette.joe.scanner.SourceBuffer.Span;
+import com.wjduquette.joe.SourceBuffer.Span;
 import com.wjduquette.joe.scanner.Token;
 import java.util.List;
 

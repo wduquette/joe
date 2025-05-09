@@ -4,7 +4,7 @@ import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.parser.NeroAST;
 import com.wjduquette.joe.nero.parser.Parser;
 import com.wjduquette.joe.nero.parser.Scanner;
-import com.wjduquette.joe.scanner.SourceBuffer;
+import com.wjduquette.joe.SourceBuffer;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
