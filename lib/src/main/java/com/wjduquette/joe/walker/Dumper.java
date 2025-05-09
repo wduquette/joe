@@ -5,7 +5,6 @@ import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.scanner.Token;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 class Dumper {
