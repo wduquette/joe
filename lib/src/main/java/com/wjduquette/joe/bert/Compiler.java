@@ -1412,13 +1412,14 @@ class Compiler {
                 return recordPattern(identifier);
             }
 
-            var id = addPatternVar(identifier);
+            addPatternVar(identifier);
+            var name = identifier.lexeme();
 
             if (isSubpattern && scanner.match(EQUAL)) {
                 var subpattern = parsePattern(false);
-                return new Pattern.PatternBinding(id, subpattern);
+                return new Pattern.PatternBinding(name, subpattern);
             } else {
-                return new Pattern.ValueBinding(id);
+                return new Pattern.ValueBinding(name);
             }
         } else {
             errorAtCurrent("Expected pattern.");
@@ -1426,24 +1427,14 @@ class Compiler {
         }
     }
 
-    private int addPatternVar(Token varName) {
+    private void addPatternVar(Token varName) {
         if (currentPattern.bindingVars.contains(varName.lexeme())) {
             errorAt(varName, "Duplicate binding variable in pattern.");
         } else {
             currentPattern.bindingVars.add(varName.lexeme());
         }
 
-        var id = addVariable(varName);
-
-        // If this is a global, the VM uses the returned ID as the index
-        // of the global variable's name in the constants table.  If it
-        // is a local, the ID is ignored; so give them nice consecutive
-        // IDs to make the pattern's string-rep easier to read.
-        if (current.scopeDepth == 0) {
-            return id;
-        } else {
-            return currentPattern.bindingVars.size() - 1;
-        }
+        addVariable(varName);
     }
 
     private Pattern.Constant constantPattern() {
@@ -1488,15 +1479,16 @@ class Compiler {
             list.add(parsePattern(true));
         } while (scanner.match(COMMA));
 
-        Integer tailId = null;
+        String tailVar = null;
         if (scanner.match(COLON)) {
             scanner.consume(IDENTIFIER,
                 "Expected binding variable for list tail.");
-            tailId = addPatternVar(scanner.previous());
+            addPatternVar(scanner.previous());
+            tailVar = scanner.previous().lexeme();
         }
         scanner.consume(RIGHT_BRACKET, "Expected ']' after list pattern.");
 
-        return new Pattern.ListPattern(list, tailId);
+        return new Pattern.ListPattern(list, tailVar);
     }
 
     private Pattern.MapPattern mapPattern() {

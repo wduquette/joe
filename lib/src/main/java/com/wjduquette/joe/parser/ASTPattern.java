@@ -72,16 +72,11 @@ public class ASTPattern {
     }
 
     /**
-     * Given a binding variable name, adds it to the bindings list and
-     * returns the binding ID.  Use this for binding IDs included in
-     * other patterns.
+     * Adds the binding name to the bindings list.
      * @param varName The variable name
-     * @return The ID
      */
-    public int getBindingID(Token varName) {
-        int index = bindings.size();
+    public void saveBinding(Token varName) {
         bindings.add(varName);
-        return index;
     }
 
     //-------------------------------------------------------------------------

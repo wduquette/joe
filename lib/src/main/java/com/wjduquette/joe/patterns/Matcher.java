@@ -32,11 +32,11 @@ public class Matcher {
      */
     public interface Binder {
         /**
-         * Provides the binding ID/value pair to the client.
-         * @param id The binding ID
+         * Provides the binding name/value pair to the client.
+         * @param name The binding name
          * @param value The bound value
          */
-        void bind(int id, Object value);
+        void bind(String name, Object value);
     }
 
     /**
@@ -67,11 +67,11 @@ public class Matcher {
             case Pattern.Wildcard ignored
                 -> true;
             case Pattern.ValueBinding p -> {
-                binder.bind(p.id(), value);
+                binder.bind(p.name(), value);
                 yield true;
             }
             case Pattern.PatternBinding p -> {
-                binder.bind(p.id(), value);
+                binder.bind(p.name(), value);
                 yield bind(joe, p.subpattern(), value, getter, binder);
             }
 
@@ -81,7 +81,7 @@ public class Matcher {
 
                 if (!(value instanceof List<?> list)) yield false;
                 if (size > list.size()) yield false;
-                if (p.tailId() == null && size < list.size()) yield false;
+                if (p.tailVar() == null && size < list.size()) yield false;
 
                 // NEXT, match items
                 for (var i = 0; i < size; i++) {
@@ -91,9 +91,9 @@ public class Matcher {
                 }
 
                 // NEXT, bind the tail to the tailId
-                if (p.tailId() != null) {
+                if (p.tailVar() != null) {
                     var tail = list.subList(size, list.size());
-                    binder.bind(p.tailId(), tail);
+                    binder.bind(p.tailVar(), tail);
                 }
 
                 // FINALLY, match succeeds.

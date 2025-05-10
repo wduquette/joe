@@ -378,10 +378,7 @@ class VirtualMachine {
                         pattern,
                         target,
                         constants::get,
-                        (id, value) -> {
-                            var name = readString(id);
-                            bound.put(name, value);
-                        }
+                        bound::put
                     )) {
                         throw error(
                             "'let' pattern failed to match target value.");
@@ -899,11 +896,6 @@ class VirtualMachine {
     private List<String> readStringList() {
         var index = frame.closure.function.code[frame.ip++];
         return (List<String>)frame.closure.function.constants[index];
-    }
-
-    // Returns the indexed constant as a string.
-    private String readString(int index) {
-        return (String)frame.closure.function.constants[index];
     }
 
     // Reads a constant index from the chunk, and returns the indexed

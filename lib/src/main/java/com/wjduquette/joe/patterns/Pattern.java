@@ -65,33 +65,32 @@ public sealed interface Pattern permits
 
     /**
      * A pattern that binds the matching target value to the binding variable
-     * with the given ID.  Binding variables are identified using integer
-     * IDs because the details depend on the language engine.
-     * @param id A binding variable ID
+     * with the given name.
+     * @param name A binding variable name
      */
-    record ValueBinding(int id) implements Pattern {
+    record ValueBinding(String name) implements Pattern {
         /**
-         * Returns "?id" as the string representation.
+         * Returns "?name" as the string representation.
          * @return The string
          */
         @Override public String toString() {
-            return "?" + id;
+            return "?" + name;
         }
     }
 
     /**
      * A pattern that matches a subpattern and binds its value to a binding
      * variable.
-     * @param id A binding variable Id
+     * @param name A binding variable name
      * @param subpattern The subpattern to match.
      */
-    record PatternBinding(int id, Pattern subpattern) implements Pattern {
+    record PatternBinding(String name, Pattern subpattern) implements Pattern {
         /**
          * Returns "?id" as the string representation.
          * @return The string
          */
         @Override public String toString() {
-            return "?" + id + " = " + subpattern;
+            return "?" + name + " = " + subpattern;
         }
     }
 
@@ -102,14 +101,14 @@ public sealed interface Pattern permits
      * target list.  The overall match fails if they do not, or if there are
      * too few items in the target list.
      *
-     * <p>If the {@code tailId} is null then the match will also fail if
+     * <p>If the {@code tailVar} is null then the match will also fail if
      * there are excess items in the target list.  Otherwise,
-     * {@code tailId} will is a binding ID, and a list containing
-     * the excess items will be bound to that ID.
+     * {@code tailVar} will be bound to a list containing
+     * the excess items.
      * @param patterns The item patterns
-     * @param tailId The ID for the tail binding, or null.
+     * @param tailVar The name for the tail binding, or null.
      */
-    record ListPattern(List<Pattern> patterns, Integer tailId)
+    record ListPattern(List<Pattern> patterns, String tailVar)
         implements Pattern
     {
         @Override public String toString() {
@@ -117,7 +116,7 @@ public sealed interface Pattern permits
                 .map(Object::toString)
                 .collect(Collectors.joining(", "));
             return "[" + list +
-                (tailId != null ? " | ?" + tailId : "") +
+                (tailVar != null ? " | ?" + tailVar : "") +
                 "]";
         }
     }

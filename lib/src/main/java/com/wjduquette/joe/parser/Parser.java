@@ -958,13 +958,14 @@ public class Parser {
                 patternBindings.add(identifier.lexeme());
             }
 
-            var id = wp.getBindingID(identifier);
+            wp.saveBinding(identifier);
+            var name = identifier.lexeme();
 
             if (isSubpattern && scanner.match(EQUAL)) {
                 var subpattern = parsePattern(wp, false);
-                return new Pattern.PatternBinding(id, subpattern);
+                return new Pattern.PatternBinding(name, subpattern);
             } else {
-                return new Pattern.ValueBinding(id);
+                return new Pattern.ValueBinding(name);
             }
         } else {
             throw errorSync(scanner.peek(), "Expected pattern.");
@@ -1009,15 +1010,16 @@ public class Parser {
             list.add(parsePattern(wp, true));
         } while (scanner.match(COMMA));
 
-        Integer tailId = null;
+        String tailName = null;
         if (scanner.match(COLON)) {
             scanner.consume(IDENTIFIER, "Expected binding variable for list tail.");
             var tailVar = scanner.previous();
-            tailId = wp.getBindingID(tailVar);
+            wp.saveBinding(tailVar);
+            tailName = tailVar.lexeme();
         }
         scanner.consume(RIGHT_BRACKET, "Expected ']' after list pattern.");
 
-        return new Pattern.ListPattern(list, tailId);
+        return new Pattern.ListPattern(list, tailName);
     }
 
     private Pattern.MapPattern mapPattern(ASTPattern wp) {

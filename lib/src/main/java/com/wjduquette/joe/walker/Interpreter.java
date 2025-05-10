@@ -1,7 +1,6 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.parser.ASTPattern;
 import com.wjduquette.joe.parser.Expr;
 import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.patterns.Matcher;
@@ -206,15 +205,15 @@ class Interpreter {
                     stmt.pattern().getConstants().forEach(e ->
                         constants.add(evaluate(e)));
                     var target = evaluate(stmt.target());
-                    var values = new ArrayList<>();
+                    var bound = new HashMap<String,Object>();
                     if (Matcher.bind(
                         joe,
                         stmt.pattern().getPattern(),
                         target,
                         constants::get,
-                        values::add
+                        bound::put
                     )) {
-                        bind(stmt.pattern(), values);
+                        bind(bound);
                         return execute(stmt.thenBranch());
                     }
                 } finally {
@@ -230,15 +229,15 @@ class Interpreter {
                 stmt.pattern().getConstants().forEach(e ->
                     constants.add(evaluate(e)));
                 var target = evaluate(stmt.target());
-                var values = new ArrayList<>();
+                var bound = new HashMap<String,Object>();
                 if (Matcher.bind(
                     joe,
                     stmt.pattern().getPattern(),
                     target,
                     constants::get,
-                    values::add
+                    bound::put
                 )) {
-                    bind(stmt.pattern(), values);
+                    bind(bound);
                 } else {
                     throw new RuntimeError(stmt.keyword().span(),
                         "'let' pattern failed to match target value.");
@@ -254,15 +253,15 @@ class Interpreter {
                         var constants = new ArrayList<>();
                         c.pattern().getConstants().forEach(e ->
                             constants.add(evaluate(e)));
-                        var values = new ArrayList<>();
+                        var bound = new HashMap<String,Object>();
                         if (Matcher.bind(
                             joe,
                             c.pattern().getPattern(),
                             target,
                             constants::get,
-                            values::add
+                            bound::put
                         )) {
-                            bind(c.pattern(), values);
+                            bind(bound);
                             var guard = c.guard() != null
                                 ? evaluate(c.guard()) : true;
                             if (Joe.isTruthy(guard)) {
@@ -401,12 +400,9 @@ class Interpreter {
 
     // Bind the pattern's binding variables to the matching values from
     // the target.
-    private void bind(ASTPattern pattern, List<Object> values) {
-        var varNames = pattern.getBindings();
-        for (var i = 0; i < varNames.size(); i++) {
-            environment.setVar(
-                varNames.get(i).lexeme(),
-                values.get(i));
+    private void bind(Map<String,Object> bound) {
+        for (var e : bound.entrySet()) {
+            environment.setVar(e.getKey(), e.getValue());
         }
     }
 

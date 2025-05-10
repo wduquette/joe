@@ -12,7 +12,7 @@ import static com.wjduquette.joe.checker.Checker.check;
 public class MatcherTest extends Ted {
     private final Joe joe = new Joe();
     private List<Object> constants;
-    private final Map<Integer,Object> bindings = new LinkedHashMap<>();
+    private final Map<String,Object> bindings = new LinkedHashMap<>();
 
     @Before public void setup() {
         constants = new ArrayList<>();
@@ -62,11 +62,11 @@ public class MatcherTest extends Ted {
     public void testValueBinding() {
         test("testValueBinding");
 
-        var pattern = new Pattern.ValueBinding(0);
+        var pattern = new Pattern.ValueBinding("x");
         var value = "abc";
 
         check(bind(pattern, value)).eq(true);
-        check(bindings.get(0)).eq("abc");
+        check(bindings.get("x")).eq("abc");
     }
 
     @Test
@@ -74,7 +74,7 @@ public class MatcherTest extends Ted {
         test("testPatternBinding_bad");
 
         constants = List.of("abc");
-        var pattern = new Pattern.PatternBinding(0,
+        var pattern = new Pattern.PatternBinding("x",
             new Pattern.Constant(0));
         var value = "xyz";
 
@@ -86,12 +86,12 @@ public class MatcherTest extends Ted {
         test("testPatternBinding_good");
 
         constants = List.of("abc");
-        var pattern = new Pattern.PatternBinding(0,
+        var pattern = new Pattern.PatternBinding("x",
             new Pattern.Constant(0));
         var value = "abc";
 
         check(bind(pattern, value)).eq(true);
-        check(bindings.get(0)).eq("abc");
+        check(bindings.get("x")).eq("abc");
     }
 
     @Test
@@ -182,11 +182,11 @@ public class MatcherTest extends Ted {
         var pattern = new Pattern.ListPattern(List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1)
-        ), 0);
+        ), "tail");
         var value = List.of("abc", "def");
 
         check(bind(pattern, value)).eq(true);
-        check(bindings.get(0)).eq(List.of());
+        check(bindings.get("tail")).eq(List.of());
     }
 
     @Test
@@ -197,11 +197,11 @@ public class MatcherTest extends Ted {
         var pattern = new Pattern.ListPattern(List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1)
-        ), 0);
+        ), "tail");
         var value = List.of("abc", "def", "ghi", "jkl");
 
         check(bind(pattern, value)).eq(true);
-        check(bindings.get(0)).eq(List.of("ghi", "jkl"));
+        check(bindings.get("tail")).eq(List.of("ghi", "jkl"));
     }
 
     @Test
