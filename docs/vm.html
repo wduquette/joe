@@ -192,7 +192,7 @@ value.</li>
 <tr><td>1</td><td>ASSERT</td><td><em>msg</em> → ∅</td><td>Throws AssertError</td></tr>
 <tr><td>2</td><td>CALL <em>argc</em></td><td><em>f args</em> → <em>c</em></td><td>c = f(args)</td></tr>
 <tr><td>3</td><td>CLASS <em>name</em></td><td>∅ → <em>type</em></td><td>Create class</td></tr>
-<tr><td>4</td><td>CLOSURE <em>func</em></td><td>∅ → <em>f</em></td><td>Load closure</td></tr>
+<tr><td>4</td><td>CLOSURE <em>func...</em></td><td>∅ → <em>f</em></td><td>Load closure</td></tr>
 <tr><td>5</td><td>COMMENT <em>name</em></td><td>∅ → ∅</td><td>No-op comment</td></tr>
 <tr><td>6</td><td>CONST <em>constant</em></td><td>∅ → <em>a</em></td><td>Load constant</td></tr>
 <tr><td>7</td><td>DECR</td><td><em>a</em> → <em>b</em></td><td>b = a - 1</td></tr>
@@ -242,7 +242,7 @@ value.</li>
 <tr><td>51</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
 <tr><td>52</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
 <tr><td>53</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
-<tr><td>54</td><td>RECORD</td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
+<tr><td>54</td><td>RECORD <em>name fields</em></td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
 <tr><td>55</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
 <tr><td>56</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
 <tr><td>57</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
@@ -311,14 +311,14 @@ yields the concatenated string.</li>
 test is compiled using multiple instructions.</p>
 <h3 id="call"><a class="header" href="#call">CALL</a></h3>
 <hr />
-<p><strong>CALL <em>argc</em></strong> | <em>f args</em> → <em>c</em></p>
+<p><strong>CALL</strong> <em>argc</em> | <em>f args</em> → <em>c</em></p>
 <p>Calls callable <em>f</em> with <em>argc</em> arguments; the arguments are
 found in consecutive stack slots just above <em>f</em>.  The result <em>c</em>
 replaces the function ands its arguments on the stack.  Callable
 <em>f</em> may be any valid native or Bert callable.</p>
 <h3 id="class"><a class="header" href="#class">CLASS</a></h3>
 <hr />
-<p><strong>CLASS <em>name</em></strong> | ∅ → <em>type</em></p>
+<p><strong>CLASS</strong> <em>name</em> | ∅ → <em>type</em></p>
 <p>The <code>CLASS</code> instruction begins the process of creating a new class from a
 <code>class</code> declaration.  Given <em>name</em>, the index of the class's name in the
 constants table, it creates a new class <em>type</em>, assigns it to variable <em>name</em>
@@ -326,8 +326,8 @@ in the current scope, and pushes it onto the stack.  Subsequent instructions
 will add methods, execute static initializers, etc.</p>
 <h3 id="closure"><a class="header" href="#closure">CLOSURE</a></h3>
 <hr />
-<p><strong>CLOSURE <em>func</em></strong> | ∅ → <em>f</em></p>
-<p>Converts a <em>func</em> function definition into <code>Closure</code> <em>f</em> in the current scope.
+<p><strong>CLOSURE</strong> <em>func...</em> | ∅ → <em>f</em></p>
+<p>Converts a <em>func...</em> function definition into <code>Closure</code> <em>f</em> in the current scope.
 The <em>func</em> argument is a complex set of codes, consisting of:</p>
 <ul>
 <li>The index of the <code>Function</code> definition in the constants table.
@@ -352,7 +352,7 @@ and execution traces.  The <em>name</em> is an index of a string in the constant
 table; the string serves as the text of the comment.</p>
 <h3 id="const"><a class="header" href="#const">CONST</a></h3>
 <hr />
-<p><strong>CONST <em>constant</em></strong> | ∅ → <em>a</em></p>
+<p><strong>CONST</strong> <em>constant</em> | ∅ → <em>a</em></p>
 <p>Retrieves the constant with index <em>constant</em> from the constants table, and
 pushes it onto the stack.</p>
 <h3 id="decr"><a class="header" href="#decr">DECR</a></h3>
@@ -393,15 +393,15 @@ otherwise.</p>
 <code>ITER</code> instruction.  This instruction should always be paired with <code>HASNEXT</code>.</p>
 <h3 id="glodef"><a class="header" href="#glodef">GLODEF</a></h3>
 <hr />
-<p><strong>GLODEF <em>name</em></strong> | <em>a</em> → ∅</p>
+<p><strong>GLODEF</strong> <em>name</em> | <em>a</em> → ∅</p>
 <p>Defines a global variable called <em>name</em>, assigning it the value <em>a</em>.</p>
 <h3 id="gloget"><a class="header" href="#gloget">GLOGET</a></h3>
 <hr />
-<p><strong>GLOGET <em>name</em></strong> | ∅ → <em>a</em></p>
+<p><strong>GLOGET</strong> <em>name</em> | ∅ → <em>a</em></p>
 <p>Retrieves the value of global variable <em>name</em> and pushes it on the stack.</p>
 <h3 id="glolet"><a class="header" href="#glolet">GLOLET</a></h3>
 <hr />
-<p><strong>GLOLET <em>pattern</em></strong> | <em>list</em> <em>a</em> → ∅</p>
+<p><strong>GLOLET</strong> <em>pattern</em> | <em>list</em> <em>a</em> → ∅</p>
 <p>The <code>GLOLET</code> instruction implements the <code>let</code> statement where the binding
 variables are bound in the global scope.  It receives the
 <code>let</code> pattern as a constant index.  The <em>list</em> is a list of the constants,
@@ -411,7 +411,7 @@ variables will be added to the global environment. If the match fails then the
 instruction throws a <code>RuntimeError</code>.</p>
 <h3 id="gloset"><a class="header" href="#gloset">GLOSET</a></h3>
 <hr />
-<p><strong>GLOSET <em>name</em></strong> | <em>a</em> → <em>a</em></p>
+<p><strong>GLOSET</strong> <em>name</em> | <em>a</em> → <em>a</em></p>
 <p>Assigns value <em>a</em> to global variable <em>name</em>, leaving <em>a</em> on the stack.</p>
 <h3 id="gt"><a class="header" href="#gt">GT</a></h3>
 <hr />
@@ -475,25 +475,25 @@ would need to change.</p>
 provides iterability.  This is used to implement the <code>foreach</code> statement.</p>
 <h3 id="jif"><a class="header" href="#jif">JIF</a></h3>
 <hr />
-<p><strong>JIF <em>offset</em></strong> | <em>flag</em> → ∅</p>
+<p><strong>JIF</strong> <em>offset</em> | <em>flag</em> → ∅</p>
 <p>Jumps forward by <em>offset</em> if <em>flag</em> is false.</p>
 <h3 id="jifkeep"><a class="header" href="#jifkeep">JIFKEEP</a></h3>
 <hr />
-<p><strong>JIFKEEP <em>offset</em></strong> | <em>flag</em> → <em>flag</em></p>
+<p><strong>JIFKEEP</strong> <em>offset</em> | <em>flag</em> → <em>flag</em></p>
 <p>Jumps forward by <em>offset</em> if <em>flag</em> is false, retaining the flag on the
 stack.</p>
 <h3 id="jit"><a class="header" href="#jit">JIT</a></h3>
 <hr />
-<p><strong>JIT <em>offset</em></strong> | <em>flag</em> → ∅</p>
+<p><strong>JIT</strong> <em>offset</em> | <em>flag</em> → ∅</p>
 <p>Jumps forward by <em>offset</em> if <em>flag</em> is true.</p>
 <h3 id="jitkeep"><a class="header" href="#jitkeep">JITKEEP</a></h3>
 <hr />
-<p><strong>JITKEEP <em>offset</em></strong> | <em>flag</em> → <em>flag</em></p>
+<p><strong>JITKEEP</strong> <em>offset</em> | <em>flag</em> → <em>flag</em></p>
 <p>Jumps forward by <em>offset</em> if <em>flag</em> is true, retaining the flag on the
 stack.</p>
 <h3 id="jump"><a class="header" href="#jump">JUMP</a></h3>
 <hr />
-<p><strong>JUMP <em>offset</em></strong> | ∅ → ∅</p>
+<p><strong>JUMP</strong> <em>offset</em> | ∅ → ∅</p>
 <p>Jumps forward by <em>offset</em>.</p>
 <h3 id="le"><a class="header" href="#le">LE</a></h3>
 <hr />
@@ -508,12 +508,12 @@ stack.</p>
 <p>Pushes an empty <em>list</em> value onto the stack.</p>
 <h3 id="locget"><a class="header" href="#locget">LOCGET</a></h3>
 <hr />
-<p><strong>LOCGET <em>slot</em></strong> | ∅ → <em>a</em></p>
+<p><strong>LOCGET</strong> <em>slot</em> | ∅ → <em>a</em></p>
 <p>Gets the value of the local variable in the given stack <em>slot</em>,
 relative to the current call frame.</p>
 <h3 id="loclet"><a class="header" href="#loclet">LOCLET</a></h3>
 <hr />
-<p><strong>LOCLET <em>pattern</em></strong> | <em>list</em> <em>a</em> → ∅</p>
+<p><strong>LOCLET</strong> <em>pattern</em> | <em>list</em> <em>a</em> → ∅</p>
 <p>The <code>LOCLET</code> instruction implements the <code>let</code> statement where the binding
 variables are bound in a local scope.  It receives the
 <code>let</code> pattern as a constant index.  The <em>list</em> is a list of the constants,
@@ -524,13 +524,13 @@ onto the stack, initializing them as locals. If the match fails then the
 instruction throws a <code>RuntimeError</code>.</p>
 <h3 id="locset"><a class="header" href="#locset">LOCSET</a></h3>
 <hr />
-<p><strong>LOCSET <em>slot</em></strong> | <em>a</em> → <em>a</em></p>
+<p><strong>LOCSET</strong> <em>slot</em> | <em>a</em> → <em>a</em></p>
 <p>Sets the value of the local variable in the given stack <em>slot</em>,
 relative to the current call frame, to <em>a</em>, leaving the value on the
 stack.</p>
 <h3 id="loop"><a class="header" href="#loop">LOOP</a></h3>
 <hr />
-<p><strong>LOOP <em>offset</em></strong> | ∅ → ∅</p>
+<p><strong>LOOP</strong> <em>offset</em> | ∅ → ∅</p>
 <p>Jumps backward by <em>offset</em>.</p>
 <h3 id="lt"><a class="header" href="#lt">LT</a></h3>
 <hr />
@@ -545,13 +545,13 @@ stack.</p>
 <p>Pops <em>k</em> and <em>a</em> and puts {<em>k</em>: <em>a</em>} into the <em>map</em> value.</p>
 <h3 id="match"><a class="header" href="#match">MATCH</a></h3>
 <hr />
-<p><strong>MATCH <em>pattern</em></strong> | <em>list a</em> → <em>flag</em></p>
+<p><strong>MATCH</strong> <em>pattern</em> | <em>list a</em> → <em>flag</em></p>
 <p>Matches the <em>pattern</em> against the target value <em>a</em> given the <em>list</em> of
 constants to include in the pattern.  On success defines the pattern's
 binding variables and pushes <code>true</code>; on failure pushes <code>false</code>.</p>
 <h3 id="method"><a class="header" href="#method">METHOD</a></h3>
 <hr />
-<p><strong>METHOD <em>name</em></strong> | <em>type</em> <em>f</em> → <em>type</em></p>
+<p><strong>METHOD</strong> <em>name</em> | <em>type</em> <em>f</em> → <em>type</em></p>
 <p>This instruction is used when compiling a type definition. Adds closure <em>f</em>
 to <em>type</em> as a method.  It is illegal to add a method to a type after
 its definition.</p>
@@ -590,15 +590,15 @@ iterable.</p>
 <p>Pops <em>n</em> values from the stack.</p>
 <h3 id="propget"><a class="header" href="#propget">PROPGET</a></h3>
 <hr />
-<p><strong>PROPGET <em>name</em></strong> | <em>obj</em> → <em>a</em></p>
+<p><strong>PROPGET</strong> <em>name</em> | <em>obj</em> → <em>a</em></p>
 <p>Gets the value of property <em>name</em> of object <em>obj</em>.</p>
 <h3 id="propset"><a class="header" href="#propset">PROPSET</a></h3>
 <hr />
-<p><strong>PROPSET <em>name</em></strong> | <em>obj</em> <em>a</em> → <em>a</em></p>
+<p><strong>PROPSET</strong> <em>name</em> | <em>obj</em> <em>a</em> → <em>a</em></p>
 <p>Sets property <em>name</em> of object <em>obj</em> to <em>a</em>, leaving <em>a</em> on the stack.</p>
 <h3 id="record"><a class="header" href="#record">RECORD</a></h3>
 <hr />
-<p><strong>RECORD <em>name fields</em></strong> | ∅ → <em>type</em></p>
+<p><strong>RECORD</strong> <em>name fields</em> | ∅ → <em>type</em></p>
 <p>The <code>RECORD</code> instruction begins the process of creating a new type from a
 <code>record</code> declaration.  Given <em>name</em>, the index of the type's name in the
 constants table, and <em>fields</em>, the index of the type's list of field names
@@ -617,7 +617,7 @@ result is popped and returned to the Java caller.</p>
 <p>Computes the difference of <em>a</em> and <em>b</em>.</p>
 <h3 id="supget"><a class="header" href="#supget">SUPGET</a></h3>
 <hr />
-<p><strong>SUPGET <em>name</em></strong> | <em>obj</em> <em>sup</em> → <em>f</em></p>
+<p><strong>SUPGET</strong> <em>name</em> | <em>obj</em> <em>sup</em> → <em>f</em></p>
 <p>Retrieves method <em>name</em> for superclass <em>sup</em> of object <em>obj</em>.
 This is used to compile the <code>super.&lt;method&gt;</code> syntax.</p>
 <h3 id="tget"><a class="header" href="#tget">TGET</a></h3>
@@ -658,13 +658,13 @@ open upvalues. This is used when ending a scope, and by <code>break</code> and <
 when ending a scope prematurely.</p>
 <h3 id="upget"><a class="header" href="#upget">UPGET</a></h3>
 <hr />
-<p><strong>UPGET <em>slot</em></strong> | ∅ → <em>a</em></p>
+<p><strong>UPGET</strong> <em>slot</em> | ∅ → <em>a</em></p>
 <p>Gets the value of the local variable in the given stack <em>slot</em>,
 relative to the current call frame.  This is used when the local
 variable has been captured by a closure.</p>
 <h3 id="upset"><a class="header" href="#upset">UPSET</a></h3>
 <hr />
-<p><strong>UPSET <em>slot</em></strong> | <em>a</em> → <em>a</em></p>
+<p><strong>UPSET</strong> <em>slot</em> | <em>a</em> → <em>a</em></p>
 <p>Sets the value of the local variable in the given stack <em>slot</em>,
 relative to the current call frame, to <em>a</em>, leaving the value on the
 stack.  This is used when the local

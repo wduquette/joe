@@ -17,75 +17,75 @@ The byte-engine is a stack machine with a few registers:
 ## Instruction Set
 
 
-|    | Mnemonic/argument | Stack effect       | Description               |
-|----|-------------------|--------------------|---------------------------|
-| 0  | ADD               | *a b* → *c*        | c = a + b                 |
-| 1  | ASSERT            | *msg* → ∅          | Throws AssertError        |
-| 2  | CALL *argc*       | *f args* → *c*     | c = f(args)               |
-| 3  | CLASS *name*      | ∅ → *type*         | Create class              |
-| 4  | CLOSURE *func*    | ∅ → *f*            | Load closure              |
-| 5  | COMMENT *name*    | ∅ → ∅              | No-op comment             |
-| 6  | CONST *constant*  | ∅ → *a*            | Load constant             |
-| 7  | DECR              | *a* → *b*          | b = a - 1                 |
-| 8  | DIV               | *a b* → *c*        | c = a/b                   |
-| 9  | DUP               | *a* → *a* *a*      | Duplicate top             |
-| 10 | DUP2              | *a b* → *a b a b*  | Duplicate top 2           |
-| 11 | EQ                | *a b* → *c*        | c = a == b                |
-| 12 | FALSE             | ∅ → false          | Load `false`              |
-| 13 | GE                | *a b* → *c*        | c = a >= b                |
-| 14 | GETNEXT           | *iter* → *a*       | a = iter.next()           |
-| 15 | GLODEF *name*     | *a* → ∅            | Define global             |
-| 16 | GLOGET *name*     | ∅ → *a*            | Get global                |
-| 17 | GLOLET *pattern*  | *list a* → ∅       | Bind target to pattern    |
-| 18 | GLOSET *name*     | *a* → *a*          | Set global                |
-| 19 | GT                | *a b* → *a* > *b*  | Compare: greater          |
-| 20 | HASNEXT           | *iter* → *flag*    | flag = iter.hasNext()     |
-| 21 | IN                | *a coll* → *flag*  | a in collection           |
-| 22 | INCR              | *a* → *b*          | b = a + 1                 |
-| 23 | INDGET            | *coll i* → *a*     | `a = coll[i]`             |
-| 24 | INDSET            | *coll i a* → *a*   | `coll[i] = a`             |
-| 25 | INHERIT           | *sup sub* → *sup*  | Inheritance               |
-| 26 | ITER              | *coll* → *iter*    | iter = coll.iterator()    |
-| 27 | JIF *offset*      | *flag* → ∅         | Jump if false             |
-| 28 | JIFKEEP *offset*  | *flag* → *flag*    | Jump if false, keep value |
-| 29 | JIT *offset*      | *flag* → ∅         | Jump if true              |
-| 30 | JITKEEP *offset*  | *flag* → *flag*    | Jump if true, keep value  |
-| 31 | JUMP *offset*     | ∅ → ∅              | Jump forwards             |
-| 32 | LE                | *a b* → *a* <= *b* | Compare: less or equal    |
-| 33 | LISTADD           | *list a* → *list*  | Add item to list          |
-| 34 | LISTNEW           | ∅ → *list*         | Push empty list           |
-| 35 | LOCGET *slot*     | ∅ → *a*            | Get local                 |
-| 36 | LOCLET *pattern*  | *list a* → ∅       | Bind target to pattern    |
-| 37 | LOCSET *slot*     | *a* → *a*          | Set local                 |
-| 38 | LOOP *offset*     | ∅ → ∅              | Jump backwards            |
-| 39 | LT                | *a b* → *a* <= *b* | Compare: less than        |
-| 40 | MAPNEW            | ∅ → *map*          | Push empty ma p           |
-| 41 | MAPPUT            | *map k a* → *map*  | Add entry to map          |
-| 42 | MATCH *pattern*   | *list a* → *flag*  | Match pattern to target   |
-| 43 | METHOD *name*     | *type f* → *type*  | Add method to type        |
-| 44 | MUL               | *a b* → *c*        | c = a*b                   |
-| 45 | NE                | *a b* → *c*        | c = a != b                |
-| 46 | NEGATE            | *a* → *b*          | b = -a                    |
-| 47 | NI                | *a coll* → *flag*  | a not in collection       |
-| 48 | NOT               | *a* → *b*          | b = !a                    |
-| 49 | NULL              | ∅ → null           | Load `null`               |
-| 50 | POP               | *a* → ∅            | Pops one value            |
-| 51 | POPN *n*          | *a...* → ∅         | Pops *n* values           |
-| 52 | PROPGET *name*    | *obj* → *a*        | Get property value        |
-| 53 | PROPSET *name*    | *obj a* → *a*      | Set property value        |
-| 54 | RECORD            | ∅ → *type*         | Create record type        |
-| 55 | RETURN            | *a* → *a*          | Return                    |
-| 56 | SUB               | *a b* → *c*        | c = a - b                 |
-| 57 | SUPGET *name*     | *obj sup* → *f*    | Get superclass method     |
-| 58 | TGET              | ∅ → *a*            | *a* = T                   |
-| 59 | THROW             | *a* → ∅            | Throw error               |
-| 60 | TRCPOP            | ∅ → ∅              | Pops a post-trace         |
-| 61 | TRCPUSH *trace*   | ∅ → ∅              | Pushes a post-trace       |
-| 62 | TSET              | *a* → *a*          | T = *a*                   |
-| 63 | TRUE              | ∅ → true           | Load `true`               |
-| 64 | UPCLOSE *n*       | *v...* → ∅         | Closes *n* upvalue(s)     |
-| 65 | UPGET *slot*      | ∅ → *a*            | Get upvalue               |
-| 66 | UPSET *slot*      | *a* → *a*          | Set upvalue               |
+|    | Mnemonic/argument    | Stack effect       | Description               |
+|----|----------------------|--------------------|---------------------------|
+| 0  | ADD                  | *a b* → *c*        | c = a + b                 |
+| 1  | ASSERT               | *msg* → ∅          | Throws AssertError        |
+| 2  | CALL *argc*          | *f args* → *c*     | c = f(args)               |
+| 3  | CLASS *name*         | ∅ → *type*         | Create class              |
+| 4  | CLOSURE *func...*    | ∅ → *f*            | Load closure              |
+| 5  | COMMENT *name*       | ∅ → ∅              | No-op comment             |
+| 6  | CONST *constant*     | ∅ → *a*            | Load constant             |
+| 7  | DECR                 | *a* → *b*          | b = a - 1                 |
+| 8  | DIV                  | *a b* → *c*        | c = a/b                   |
+| 9  | DUP                  | *a* → *a* *a*      | Duplicate top             |
+| 10 | DUP2                 | *a b* → *a b a b*  | Duplicate top 2           |
+| 11 | EQ                   | *a b* → *c*        | c = a == b                |
+| 12 | FALSE                | ∅ → false          | Load `false`              |
+| 13 | GE                   | *a b* → *c*        | c = a >= b                |
+| 14 | GETNEXT              | *iter* → *a*       | a = iter.next()           |
+| 15 | GLODEF *name*        | *a* → ∅            | Define global             |
+| 16 | GLOGET *name*        | ∅ → *a*            | Get global                |
+| 17 | GLOLET *pattern*     | *list a* → ∅       | Bind target to pattern    |
+| 18 | GLOSET *name*        | *a* → *a*          | Set global                |
+| 19 | GT                   | *a b* → *a* > *b*  | Compare: greater          |
+| 20 | HASNEXT              | *iter* → *flag*    | flag = iter.hasNext()     |
+| 21 | IN                   | *a coll* → *flag*  | a in collection           |
+| 22 | INCR                 | *a* → *b*          | b = a + 1                 |
+| 23 | INDGET               | *coll i* → *a*     | `a = coll[i]`             |
+| 24 | INDSET               | *coll i a* → *a*   | `coll[i] = a`             |
+| 25 | INHERIT              | *sup sub* → *sup*  | Inheritance               |
+| 26 | ITER                 | *coll* → *iter*    | iter = coll.iterator()    |
+| 27 | JIF *offset*         | *flag* → ∅         | Jump if false             |
+| 28 | JIFKEEP *offset*     | *flag* → *flag*    | Jump if false, keep value |
+| 29 | JIT *offset*         | *flag* → ∅         | Jump if true              |
+| 30 | JITKEEP *offset*     | *flag* → *flag*    | Jump if true, keep value  |
+| 31 | JUMP *offset*        | ∅ → ∅              | Jump forwards             |
+| 32 | LE                   | *a b* → *a* <= *b* | Compare: less or equal    |
+| 33 | LISTADD              | *list a* → *list*  | Add item to list          |
+| 34 | LISTNEW              | ∅ → *list*         | Push empty list           |
+| 35 | LOCGET *slot*        | ∅ → *a*            | Get local                 |
+| 36 | LOCLET *pattern*     | *list a* → ∅       | Bind target to pattern    |
+| 37 | LOCSET *slot*        | *a* → *a*          | Set local                 |
+| 38 | LOOP *offset*        | ∅ → ∅              | Jump backwards            |
+| 39 | LT                   | *a b* → *a* <= *b* | Compare: less than        |
+| 40 | MAPNEW               | ∅ → *map*          | Push empty ma p           |
+| 41 | MAPPUT               | *map k a* → *map*  | Add entry to map          |
+| 42 | MATCH *pattern*      | *list a* → *flag*  | Match pattern to target   |
+| 43 | METHOD *name*        | *type f* → *type*  | Add method to type        |
+| 44 | MUL                  | *a b* → *c*        | c = a*b                   |
+| 45 | NE                   | *a b* → *c*        | c = a != b                |
+| 46 | NEGATE               | *a* → *b*          | b = -a                    |
+| 47 | NI                   | *a coll* → *flag*  | a not in collection       |
+| 48 | NOT                  | *a* → *b*          | b = !a                    |
+| 49 | NULL                 | ∅ → null           | Load `null`               |
+| 50 | POP                  | *a* → ∅            | Pops one value            |
+| 51 | POPN *n*             | *a...* → ∅         | Pops *n* values           |
+| 52 | PROPGET *name*       | *obj* → *a*        | Get property value        |
+| 53 | PROPSET *name*       | *obj a* → *a*      | Set property value        |
+| 54 | RECORD *name fields* | ∅ → *type*         | Create record type        |
+| 55 | RETURN               | *a* → *a*          | Return                    |
+| 56 | SUB                  | *a b* → *c*        | c = a - b                 |
+| 57 | SUPGET *name*        | *obj sup* → *f*    | Get superclass method     |
+| 58 | TGET                 | ∅ → *a*            | *a* = T                   |
+| 59 | THROW                | *a* → ∅            | Throw error               |
+| 60 | TRCPOP               | ∅ → ∅              | Pops a post-trace         |
+| 61 | TRCPUSH *trace*      | ∅ → ∅              | Pushes a post-trace       |
+| 62 | TSET                 | *a* → *a*          | T = *a*                   |
+| 63 | TRUE                 | ∅ → true           | Load `true`               |
+| 64 | UPCLOSE *n*          | *v...* → ∅         | Closes *n* upvalue(s)     |
+| 65 | UPGET *slot*         | ∅ → *a*            | Get upvalue               |
+| 66 | UPSET *slot*         | *a* → *a*          | Set upvalue               |
 
 **Stack Effects:** in the stack effect column, the top of the stack is on the 
 right.  
@@ -146,7 +146,7 @@ test is compiled using multiple instructions.
 
 ### CALL
 ---
-**CALL *argc*** | *f args* → *c*
+**CALL** *argc* | *f args* → *c*
 
 Calls callable *f* with *argc* arguments; the arguments are 
 found in consecutive stack slots just above *f*.  The result *c* 
@@ -155,7 +155,7 @@ replaces the function ands its arguments on the stack.  Callable
 
 ### CLASS
 ---
-**CLASS *name*** | ∅ → *type*
+**CLASS** *name* | ∅ → *type*
 
 The `CLASS` instruction begins the process of creating a new class from a
 `class` declaration.  Given *name*, the index of the class's name in the
@@ -165,9 +165,9 @@ will add methods, execute static initializers, etc.
 
 ### CLOSURE
 ---
-**CLOSURE *func*** | ∅ → *f*
+**CLOSURE** *func...* | ∅ → *f*
 
-Converts a *func* function definition into `Closure` *f* in the current scope.
+Converts a *func...* function definition into `Closure` *f* in the current scope.
 The *func* argument is a complex set of codes, consisting of:
 
 - The index of the `Function` definition in the constants table.
@@ -189,7 +189,7 @@ table; the string serves as the text of the comment.
 
 ### CONST
 ---
-**CONST *constant*** | ∅ → *a*
+**CONST** *constant* | ∅ → *a*
 
 Retrieves the constant with index *constant* from the constants table, and
 pushes it onto the stack.
@@ -249,19 +249,19 @@ Gets the next value from *iter*, which must be an iterator created by the
 
 ### GLODEF
 ---
-**GLODEF *name*** | *a* → ∅
+**GLODEF** *name* | *a* → ∅
 
 Defines a global variable called *name*, assigning it the value *a*.
 
 ### GLOGET
 ---
-**GLOGET *name*** | ∅ → *a*
+**GLOGET** *name* | ∅ → *a*
 
 Retrieves the value of global variable *name* and pushes it on the stack.
 
 ### GLOLET
 ---
-**GLOLET *pattern*** | *list* *a* → ∅
+**GLOLET** *pattern* | *list* *a* → ∅
 
 The `GLOLET` instruction implements the `let` statement where the binding
 variables are bound in the global scope.  It receives the
@@ -273,7 +273,7 @@ instruction throws a `RuntimeError`.
 
 ### GLOSET
 ---
-**GLOSET *name*** | *a* → *a*
+**GLOSET** *name* | *a* → *a*
 
 Assigns value *a* to global variable *name*, leaving *a* on the stack.
 
@@ -353,33 +353,33 @@ provides iterability.  This is used to implement the `foreach` statement.
 
 ### JIF
 ---
-**JIF *offset*** | *flag* → ∅
+**JIF** *offset* | *flag* → ∅
 
 Jumps forward by *offset* if *flag* is false.
 
 ### JIFKEEP
 ---
-**JIFKEEP *offset*** | *flag* → *flag*
+**JIFKEEP** *offset* | *flag* → *flag*
 
 Jumps forward by *offset* if *flag* is false, retaining the flag on the
 stack.
 
 ### JIT
 ---
-**JIT *offset*** | *flag* → ∅
+**JIT** *offset* | *flag* → ∅
 
 Jumps forward by *offset* if *flag* is true.
 
 ### JITKEEP
 ---
-**JITKEEP *offset*** | *flag* → *flag*
+**JITKEEP** *offset* | *flag* → *flag*
 
 Jumps forward by *offset* if *flag* is true, retaining the flag on the
 stack.
 
 ### JUMP
 ---
-**JUMP *offset*** | ∅ → ∅
+**JUMP** *offset* | ∅ → ∅
 
 Jumps forward by *offset*.
 
@@ -401,14 +401,14 @@ Pushes an empty *list* value onto the stack.
 
 ### LOCGET
 ---
-**LOCGET *slot*** | ∅ → *a*
+**LOCGET** *slot* | ∅ → *a*
 
 Gets the value of the local variable in the given stack *slot*, 
 relative to the current call frame.
 
 ### LOCLET
 ---
-**LOCLET *pattern*** | *list* *a* → ∅
+**LOCLET** *pattern* | *list* *a* → ∅
 
 The `LOCLET` instruction implements the `let` statement where the binding
 variables are bound in a local scope.  It receives the
@@ -422,7 +422,7 @@ instruction throws a `RuntimeError`.
 
 ### LOCSET
 ---
-**LOCSET *slot*** | *a* → *a*
+**LOCSET** *slot* | *a* → *a*
 
 Sets the value of the local variable in the given stack *slot*, 
 relative to the current call frame, to *a*, leaving the value on the
@@ -430,7 +430,7 @@ stack.
 
 ### LOOP
 ---
-**LOOP *offset*** | ∅ → ∅
+**LOOP** *offset* | ∅ → ∅
 
 Jumps backward by *offset*.
 
@@ -452,7 +452,7 @@ Pops *k* and *a* and puts {*k*: *a*} into the *map* value.
 
 ### MATCH
 ---
-**MATCH *pattern*** | *list a* → *flag*
+**MATCH** *pattern* | *list a* → *flag*
 
 Matches the *pattern* against the target value *a* given the *list* of
 constants to include in the pattern.  On success defines the pattern's
@@ -460,7 +460,7 @@ binding variables and pushes `true`; on failure pushes `false`.
 
 ### METHOD
 ---
-**METHOD *name*** | *type* *f* → *type*
+**METHOD** *name* | *type* *f* → *type*
 
 This instruction is used when compiling a type definition. Adds closure *f* 
 to *type* as a method.  It is illegal to add a method to a type after
@@ -516,19 +516,19 @@ Pops *n* values from the stack.
 
 ### PROPGET
 ---
-**PROPGET *name*** | *obj* → *a*
+**PROPGET** *name* | *obj* → *a*
 
 Gets the value of property *name* of object *obj*.
 
 ### PROPSET
 ---
-**PROPSET *name*** | *obj* *a* → *a*
+**PROPSET** *name* | *obj* *a* → *a*
 
 Sets property *name* of object *obj* to *a*, leaving *a* on the stack.
 
 ### RECORD
 ---
-**RECORD *name fields*** | ∅ → *type*
+**RECORD** *name fields* | ∅ → *type*
 
 The `RECORD` instruction begins the process of creating a new type from a
 `record` declaration.  Given *name*, the index of the type's name in the
@@ -553,7 +553,7 @@ Computes the difference of *a* and *b*.
 
 ### SUPGET
 ---
-**SUPGET *name*** | *obj* *sup* → *f*
+**SUPGET** *name* | *obj* *sup* → *f*
 
 Retrieves method *name* for superclass *sup* of object *obj*.
 This is used to compile the `super.<method>` syntax.  
@@ -612,7 +612,7 @@ when ending a scope prematurely.
 
 ### UPGET
 ---
-**UPGET *slot*** | ∅ → *a*
+**UPGET** *slot* | ∅ → *a*
 
 Gets the value of the local variable in the given stack *slot*,
 relative to the current call frame.  This is used when the local
@@ -620,11 +620,9 @@ variable has been captured by a closure.
 
 ### UPSET
 ---
-**UPSET *slot*** | *a* → *a*
+**UPSET** *slot* | *a* → *a*
 
 Sets the value of the local variable in the given stack *slot*,
 relative to the current call frame, to *a*, leaving the value on the
 stack.  This is used when the local
 variable has been captured by a closure.
-
-
