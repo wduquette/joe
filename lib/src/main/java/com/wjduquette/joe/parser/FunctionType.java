@@ -1,9 +1,9 @@
-package com.wjduquette.joe.clark;
+package com.wjduquette.joe.parser;
 
 /**
- * The different kinds of {@link Function} compiled by Bert's
- * {@link Compiler}.  This is used for semantic error checking
- * during compilation, and as introspection data at runtime.
+ * The different kinds of function parsed by the Joe {@link Parser}.
+ * This is used for semantic error checking during compilation, and as
+ * introspection data at runtime.
  */
 public enum FunctionType {
     /** An entire script. */        SCRIPT("script"),

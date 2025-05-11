@@ -3,6 +3,7 @@ package com.wjduquette.joe.walker;
 import com.wjduquette.joe.JoeClass;
 import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.parser.Expr;
+import com.wjduquette.joe.parser.FunctionType;
 import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.scanner.Token;
 
@@ -17,15 +18,6 @@ import java.util.function.Consumer;
  * to scopes, and for doing other scope-related checks.
  */
 class Resolver {
-    private enum FunctionType {
-        NONE,                // Not in a function
-        FUNCTION,            // In a normal function
-        METHOD,              // In an instance method
-        INITIALIZER,         // In `method init()`
-        STATIC_METHOD,       // In a static method
-        STATIC_INITIALIZER,  // In a static initializer
-        LAMBDA
-    }
     private enum ClassType {
         NONE,                // Not in a class
         CLASS,               // In a root class
@@ -36,7 +28,7 @@ class Resolver {
     private final Interpreter interpreter;
     private final Consumer<Trace> reporter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
-    private FunctionType currentFunction = FunctionType.NONE;
+    private FunctionType currentFunction = FunctionType.SCRIPT;
     private ClassType currentClass = ClassType.NONE;
 
     // Tracks whether we are in a loop or not.
