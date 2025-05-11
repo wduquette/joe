@@ -3,6 +3,7 @@ package com.wjduquette.joe.clark;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
+import com.wjduquette.joe.parser.ASTPattern;
 import com.wjduquette.joe.parser.Expr;
 import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.parser.Stmt;
@@ -474,14 +475,12 @@ class Compiler {
                 if (end_ != -1) patchJump(end_);
             }
             case Stmt.IfLet s -> {
-                var pat = constant(s.pattern().getPattern());
-                var consts = s.pattern().getConstants();
                 var vars = s.pattern().getBindings();
 
+                emitPATTERN(s.pattern());      // ∅ | p        ; compile pattern
+                emit(s.target());              // ∅ | p t      ; compute target
                 beginScope();                  // ∅            ; begin scope: then
-                emitList(consts);              // ∅ | cs       ; pattern constants
-                emit(s.target());              // ∅ | cs t     ; match target
-                emit(MATCH0, pat);              // ∅ | vs? flag ; match pattern
+                emit(MATCH);                   // ∅ | vs? flag ; match pattern
                 int else_ = emitJump(JIF);     // ∅ | vs?      ; JIF else
                 defineLocals(vars);            // vs | ∅       ; define bindings
                 emit(s.thenBranch());          // vs | ∅       ; compile "then"
@@ -496,22 +495,20 @@ class Compiler {
                 }
             }
             case Stmt.Let s -> {
-                var pat = constant(s.pattern().getPattern());
-                var consts = s.pattern().getConstants();
                 var vars = s.pattern().getBindings();
 
                 if (!inGlobalScope()) {        // Stack: locals | working
                     declareLocals(vars);       // ∅         ; declare vars
                 }
 
-                emitList(consts);              // ∅ | cs    ; compute constants
-                emit(s.target());              // ∅ | cs t  ; compute target.
+                emitPATTERN(s.pattern());      // ∅ | p     ; compute pattern
+                emit(s.target());              // ∅ | p t   ; compute target.
 
                 if (!inGlobalScope()) {
-                    emit(Opcode.LOCLET, pat);  // ∅ | vs    ; match pattern
+                    emit(Opcode.LOCLET);       // ∅ | vs    ; match pattern
                     defineLocals(vars);        // vs | ∅    ; define vars
                 } else {
-                    emit(Opcode.GLOLET, pat);  // ∅         ; define vars
+                    emit(Opcode.GLOLET);       // ∅         ; define vars
                 }
             }
             case Stmt.Match s -> {
@@ -525,16 +522,14 @@ class Compiler {
                 var next1_ = -1;
                 var next2_ = -1;
                 for (var c : s.cases()) {
-                    var pat = constant(c.pattern().getPattern());
-                    var consts = c.pattern().getConstants();
                     var vars = c.pattern().getBindings();
 
                     patchJump(next1_);        // m | ∅        ; next1:
                     patchJump(next2_);        // m | ∅        ; next2:
-                    beginScope();             // m | ∅        ; begin scope: case
-                    emitList(consts);         // m | cs       ; pattern constants
-                    emitGET(VAR_MATCH);       // m | cs m     ; get *match*
-                    emit(MATCH0, pat);         // m | vs? flag ; match pattern
+                    emitPATTERN(c.pattern()); // m | p        ; compute pattern
+                    beginScope();             // m | p        ; begin scope: case
+                    emitGET(VAR_MATCH);       // m | p m      ; get *match*
+                    emit(MATCH);              // m | vs? flag ; match pattern
                     next1_ = emitJump(JIF);   // m | vs?      ; JIF next1
                     defineLocals(vars);       // m vs | ∅     ; define bindings
                     if (c.guard() != null) {  // m vs | flag  ; compute guard
@@ -765,6 +760,12 @@ class Compiler {
             emit((char)(compiler.upvalues[i].isLocal ? 1 : 0));
             emit(compiler.upvalues[i].index);
         }
+    }
+
+    private void emitPATTERN(ASTPattern astPattern) {
+        var index = constant(astPattern.getPattern());
+        emitList(astPattern.getConstants());
+        emit(PATTERN, index);
     }
 
     //-------------------------------------------------------------------------

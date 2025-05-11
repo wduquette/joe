@@ -36,7 +36,7 @@ The byte-engine is a stack machine with a few registers:
 | 14 | GETNEXT              | *iter* → *a*       | a = iter.next()           |
 | 15 | GLODEF *name*        | *a* → ∅            | Define global             |
 | 16 | GLOGET *name*        | ∅ → *a*            | Get global                |
-| 17 | GLOLET *pattern*     | *list a* → ∅       | Bind target to pattern    |
+| 17 | GLOLET               | *p t* → ∅          | Bind target to pattern    |
 | 18 | GLOSET *name*        | *a* → *a*          | Set global                |
 | 19 | GT                   | *a b* → *a* > *b*  | Compare: greater          |
 | 20 | HASNEXT              | *iter* → *flag*    | flag = iter.hasNext()     |
@@ -55,13 +55,13 @@ The byte-engine is a stack machine with a few registers:
 | 33 | LISTADD              | *list a* → *list*  | Add item to list          |
 | 34 | LISTNEW              | ∅ → *list*         | Push empty list           |
 | 35 | LOCGET *slot*        | ∅ → *a*            | Get local                 |
-| 36 | LOCLET *pattern*     | *list a* → ∅       | Bind target to pattern    |
+| 36 | LOCLET               | *p t* → *vs*       | Bind target to pattern    |
 | 37 | LOCSET *slot*        | *a* → *a*          | Set local                 |
 | 38 | LOOP *offset*        | ∅ → ∅              | Jump backwards            |
 | 39 | LT                   | *a b* → *a* <= *b* | Compare: less than        |
 | 40 | MAPNEW               | ∅ → *map*          | Push empty ma p           |
 | 41 | MAPPUT               | *map k a* → *map*  | Add entry to map          |
-| 42 | MATCH *pattern*      | *list a* → *flag*  | Match pattern to target   |
+| 42 | MATCH                | *p t* → *vs? flag* | Match pattern to target   |
 | 43 | METHOD *name*        | *type f* → *type*  | Add method to type        |
 | 44 | MUL                  | *a b* → *c*        | c = a*b                   |
 | 45 | NE                   | *a b* → *c*        | c = a != b                |
@@ -69,23 +69,24 @@ The byte-engine is a stack machine with a few registers:
 | 47 | NI                   | *a coll* → *flag*  | a not in collection       |
 | 48 | NOT                  | *a* → *b*          | b = !a                    |
 | 49 | NULL                 | ∅ → null           | Load `null`               |
-| 50 | POP                  | *a* → ∅            | Pops one value            |
-| 51 | POPN *n*             | *a...* → ∅         | Pops *n* values           |
-| 52 | PROPGET *name*       | *obj* → *a*        | Get property value        |
-| 53 | PROPSET *name*       | *obj a* → *a*      | Set property value        |
-| 54 | RECORD *name fields* | ∅ → *type*         | Create record type        |
-| 55 | RETURN               | *a* → *a*          | Return                    |
-| 56 | SUB                  | *a b* → *c*        | c = a - b                 |
-| 57 | SUPGET *name*        | *obj sup* → *f*    | Get superclass method     |
-| 58 | TGET                 | ∅ → *a*            | *a* = T                   |
-| 59 | THROW                | *a* → ∅            | Throw error               |
-| 60 | TRCPOP               | ∅ → ∅              | Pops a post-trace         |
-| 61 | TRCPUSH *trace*      | ∅ → ∅              | Pushes a post-trace       |
-| 62 | TSET                 | *a* → *a*          | T = *a*                   |
-| 63 | TRUE                 | ∅ → true           | Load `true`               |
-| 64 | UPCLOSE *n*          | *v...* → ∅         | Closes *n* upvalue(s)     |
-| 65 | UPGET *slot*         | ∅ → *a*            | Get upvalue               |
-| 66 | UPSET *slot*         | *a* → *a*          | Set upvalue               |
+| 50 | PATTERN *pattern*    | *constants* → *p*  | Evaluate the pattern      |
+| 51 | POP                  | *a* → ∅            | Pops one value            |
+| 52 | POPN *n*             | *a...* → ∅         | Pops *n* values           |
+| 53 | PROPGET *name*       | *obj* → *a*        | Get property value        |
+| 54 | PROPSET *name*       | *obj a* → *a*      | Set property value        |
+| 55 | RECORD *name fields* | ∅ → *type*         | Create record type        |
+| 56 | RETURN               | *a* → *a*          | Return                    |
+| 57 | SUB                  | *a b* → *c*        | c = a - b                 |
+| 58 | SUPGET *name*        | *obj sup* → *f*    | Get superclass method     |
+| 59 | TGET                 | ∅ → *a*            | *a* = T                   |
+| 60 | THROW                | *a* → ∅            | Throw error               |
+| 61 | TRCPOP               | ∅ → ∅              | Pops a post-trace         |
+| 62 | TRCPUSH *trace*      | ∅ → ∅              | Pushes a post-trace       |
+| 63 | TSET                 | *a* → *a*          | T = *a*                   |
+| 64 | TRUE                 | ∅ → true           | Load `true`               |
+| 65 | UPCLOSE *n*          | *v...* → ∅         | Closes *n* upvalue(s)     |
+| 66 | UPGET *slot*         | ∅ → *a*            | Get upvalue               |
+| 67 | UPSET *slot*         | *a* → *a*          | Set upvalue               |
 
 **Stack Effects:** in the stack effect column, the top of the stack is on the 
 right.  
@@ -261,15 +262,13 @@ Retrieves the value of global variable *name* and pushes it on the stack.
 
 ### GLOLET
 ---
-**GLOLET** *pattern* | *list* *a* → ∅
+**GLOLET** | *p* *t* → ∅
 
-The `GLOLET` instruction implements the `let` statement where the binding
-variables are bound in the global scope.  It receives the
-`let` pattern as a constant index.  The *list* is a list of the constants,
-computed or literal, used in the pattern.  The value *a* is the target value
-to be matched.  If the match succeeds then the values of the binding 
-variables will be added to the global environment. If the match fails then the
-instruction throws a `RuntimeError`.
+The `GLOLET` instruction implements the `let` statement at the global scope,
+binding pattern value *p* to target *t*, where *p* is a pattern evaluated
+by the `PATTERN` instruction. If the match succeeds then the binding 
+variables and their values will be added to the global environment. If the 
+match fails then the instruction throws a `RuntimeError`.
 
 ### GLOSET
 ---
@@ -408,15 +407,12 @@ relative to the current call frame.
 
 ### LOCLET
 ---
-**LOCLET** *pattern* | *list* *a* → ∅
+**LOCLET** | *p* *t* → *vs*
 
-The `LOCLET` instruction implements the `let` statement where the binding
-variables are bound in a local scope.  It receives the
-`let` pattern as a constant index.  The *list* is a list of the constants,
-computed or literal, used in the pattern.  The value *a* is the target value
-to be matched.
-
-If the match succeeds then the values of the binding variables will be pushed
+The `LOCLET` instruction implements the `let` statement in local scopes,
+binding pattern value *p* to target value *t*, where *p* is a pattern
+value produced by the `PATTERN` instruction. If the match succeeds 
+then the values of the binding variables will be pushed
 onto the stack, initializing them as locals. If the match fails then the 
 instruction throws a `RuntimeError`.
 
@@ -452,11 +448,11 @@ Pops *k* and *a* and puts {*k*: *a*} into the *map* value.
 
 ### MATCH
 ---
-**MATCH** *pattern* | *list a* → *flag*
+**MATCH** | *p t* → *vs? flag*
 
-Matches the *pattern* against the target value *a* given the *list* of
-constants to include in the pattern.  On success defines the pattern's
-binding variables and pushes `true`; on failure pushes `false`.
+Matches pattern *p* against the target value *a* 
+constants to include in the pattern.  On success pushes the values of
+the pattern's bound variables followed by `true`; on failure pushes `false`.
 
 ### METHOD
 ---
@@ -501,6 +497,15 @@ iterable.
 **NULL** | ∅ → `null`
 
 Pushes `null` on the stack.
+
+### PATTERN
+---
+**PATTERN** *pattern* | *constants* → *p*
+
+Combines a list of evaluated *constants* with a `Pattern` to produce
+`PatternValue` *p*, which can then be matched against using `GLOLET`, 
+`LOCLET`, and `MATCH`. The `PatternValue` is used internally only; it 
+is never exposed to the Joe client.
 
 ### POP
 ---

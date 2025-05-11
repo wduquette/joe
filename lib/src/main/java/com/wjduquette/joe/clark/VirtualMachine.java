@@ -365,9 +365,8 @@ class VirtualMachine {
                     }
                 }
                 case GLOLET -> {
-                    var pattern = readPattern();
                     var target = pop();
-                    var constants = (ListValue)pop();
+                    var pv = (PatternValue)pop();
                     var bound = new HashMap<String,Object>();
 
                     // FIRST, see if there's a match.  This is defining globals;
@@ -377,9 +376,9 @@ class VirtualMachine {
                     // environment as a group.
                     if (!Matcher.bind(
                         joe,
-                        pattern,
+                        pv.pattern,
                         target,
-                        constants::get,
+                        pv.constants::get,
                         bound::put
                     )) {
                         throw error(
@@ -529,9 +528,8 @@ class VirtualMachine {
                     push(stack[frame.base + slot]);
                 }
                 case LOCLET -> {
-                    var pattern = readPattern();
                     var target = pop();
-                    var constants = (ListValue)pop();
+                    var pv = (PatternValue)pop();
 
                     // FIRST, see if there's a match.  This is defining locals,
                     // so just push the bound values onto the stack.  They
@@ -539,9 +537,9 @@ class VirtualMachine {
                     // the compiler.
                     if (!Matcher.bind(
                         joe,
-                        pattern,
+                        pv.pattern,
                         target,
-                        constants::get,
+                        pv.constants::get,
                         (id, value) -> push(value)
                     )) {
                         throw error(
@@ -574,10 +572,9 @@ class VirtualMachine {
                     var map = (MapValue)peek(0);
                     map.put(key, value);
                 }
-                case MATCH0 -> {
-                    var pattern = readPattern();
+                case MATCH -> {
                     var target = pop();
-                    var constants = (ListValue)pop();
+                    var pv = (PatternValue)pop();
 
                     // FIRST, save the top of the stack.
                     int here = top;
@@ -587,9 +584,9 @@ class VirtualMachine {
                     // match proceeds.
                     var flag = Matcher.bind(
                         joe,
-                        pattern,
+                        pv.pattern,
                         target,
-                        constants::get,
+                        pv.constants::get,
                         (id, value) -> push(value)
                     );
 
@@ -640,6 +637,11 @@ class VirtualMachine {
                 }
                 case NOT -> push(Joe.isFalsey(pop()));
                 case NULL -> push(null);
+                case PATTERN -> {
+                    var pattern = readPattern();
+                    var constants = (ListValue)pop();
+                    push(new PatternValue(pattern, constants));
+                }
                 case POP -> pop();
                 case POPN -> top -= readArg();
                 case PROPGET -> {
@@ -1127,4 +1129,8 @@ class VirtualMachine {
             return "Upvalue[slot=" + slot + ", closed=" + closed + "]";
         }
     }
+
+    // A pattern, as evaluated by the PATTERN instruction and used by
+    // the MATCH instruction.
+    private record PatternValue(Pattern pattern, List<Object> constants) {}
 }
