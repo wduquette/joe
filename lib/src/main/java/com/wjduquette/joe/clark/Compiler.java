@@ -495,22 +495,20 @@ class Compiler {
                 }
             }
             case Stmt.Let s -> {
-                var pat = constant(s.pattern().getPattern());
-                var consts = s.pattern().getConstants();
                 var vars = s.pattern().getBindings();
 
                 if (!inGlobalScope()) {        // Stack: locals | working
                     declareLocals(vars);       // ∅         ; declare vars
                 }
 
-                emitList(consts);              // ∅ | cs    ; compute constants
-                emit(s.target());              // ∅ | cs t  ; compute target.
+                emitPATTERN(s.pattern());      // ∅ | p     ; compute pattern
+                emit(s.target());              // ∅ | p t   ; compute target.
 
                 if (!inGlobalScope()) {
-                    emit(Opcode.LOCLET, pat);  // ∅ | vs    ; match pattern
+                    emit(Opcode.LOCLET);       // ∅ | vs    ; match pattern
                     defineLocals(vars);        // vs | ∅    ; define vars
                 } else {
-                    emit(Opcode.GLOLET, pat);  // ∅         ; define vars
+                    emit(Opcode.GLOLET);       // ∅         ; define vars
                 }
             }
             case Stmt.Match s -> {

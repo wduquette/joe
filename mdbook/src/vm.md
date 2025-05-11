@@ -36,7 +36,7 @@ The byte-engine is a stack machine with a few registers:
 | 14 | GETNEXT              | *iter* → *a*       | a = iter.next()           |
 | 15 | GLODEF *name*        | *a* → ∅            | Define global             |
 | 16 | GLOGET *name*        | ∅ → *a*            | Get global                |
-| 17 | GLOLET *pattern*     | *list a* → ∅       | Bind target to pattern    |
+| 17 | GLOLET               | *p t* → ∅          | Bind target to pattern    |
 | 18 | GLOSET *name*        | *a* → *a*          | Set global                |
 | 19 | GT                   | *a b* → *a* > *b*  | Compare: greater          |
 | 20 | HASNEXT              | *iter* → *flag*    | flag = iter.hasNext()     |
@@ -55,7 +55,7 @@ The byte-engine is a stack machine with a few registers:
 | 33 | LISTADD              | *list a* → *list*  | Add item to list          |
 | 34 | LISTNEW              | ∅ → *list*         | Push empty list           |
 | 35 | LOCGET *slot*        | ∅ → *a*            | Get local                 |
-| 36 | LOCLET *pattern*     | *list a* → ∅       | Bind target to pattern    |
+| 36 | LOCLET               | *p t* → *vs*       | Bind target to pattern    |
 | 37 | LOCSET *slot*        | *a* → *a*          | Set local                 |
 | 38 | LOOP *offset*        | ∅ → ∅              | Jump backwards            |
 | 39 | LT                   | *a b* → *a* <= *b* | Compare: less than        |
@@ -262,15 +262,13 @@ Retrieves the value of global variable *name* and pushes it on the stack.
 
 ### GLOLET
 ---
-**GLOLET** *pattern* | *list* *a* → ∅
+**GLOLET** | *p* *t* → ∅
 
-The `GLOLET` instruction implements the `let` statement where the binding
-variables are bound in the global scope.  It receives the
-`let` pattern as a constant index.  The *list* is a list of the constants,
-computed or literal, used in the pattern.  The value *a* is the target value
-to be matched.  If the match succeeds then the values of the binding 
-variables will be added to the global environment. If the match fails then the
-instruction throws a `RuntimeError`.
+The `GLOLET` instruction implements the `let` statement at the global scope,
+binding pattern value *p* to target *t*, where *p* is a pattern evaluated
+by the `PATTERN` instruction. If the match succeeds then the binding 
+variables and their values will be added to the global environment. If the 
+match fails then the instruction throws a `RuntimeError`.
 
 ### GLOSET
 ---
@@ -409,15 +407,12 @@ relative to the current call frame.
 
 ### LOCLET
 ---
-**LOCLET** *pattern* | *list* *a* → ∅
+**LOCLET** | *p* *t* → *vs*
 
-The `LOCLET` instruction implements the `let` statement where the binding
-variables are bound in a local scope.  It receives the
-`let` pattern as a constant index.  The *list* is a list of the constants,
-computed or literal, used in the pattern.  The value *a* is the target value
-to be matched.
-
-If the match succeeds then the values of the binding variables will be pushed
+The `LOCLET` instruction implements the `let` statement in local scopes,
+binding pattern value *p* to target value *t*, where *p* is a pattern
+value produced by the `PATTERN` instruction. If the match succeeds 
+then the values of the binding variables will be pushed
 onto the stack, initializing them as locals. If the match fails then the 
 instruction throws a `RuntimeError`.
 
@@ -508,9 +503,9 @@ Pushes `null` on the stack.
 **PATTERN** *pattern* | *constants* → *p*
 
 Combines a list of evaluated *constants* with a `Pattern` to produce
-`PatternValue` *p*, which can then be matched against using `MATCH`.
-The `PatternValue` is used internally only; it is not exposed to the Joe 
-client.
+`PatternValue` *p*, which can then be matched against using `GLOLET`, 
+`LOCLET`, and `MATCH`. The `PatternValue` is used internally only; it 
+is never exposed to the Joe client.
 
 ### POP
 ---

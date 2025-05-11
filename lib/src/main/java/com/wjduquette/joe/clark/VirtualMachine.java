@@ -365,9 +365,8 @@ class VirtualMachine {
                     }
                 }
                 case GLOLET -> {
-                    var pattern = readPattern();
                     var target = pop();
-                    var constants = (ListValue)pop();
+                    var pv = (PatternValue)pop();
                     var bound = new HashMap<String,Object>();
 
                     // FIRST, see if there's a match.  This is defining globals;
@@ -377,9 +376,9 @@ class VirtualMachine {
                     // environment as a group.
                     if (!Matcher.bind(
                         joe,
-                        pattern,
+                        pv.pattern,
                         target,
-                        constants::get,
+                        pv.constants::get,
                         bound::put
                     )) {
                         throw error(
@@ -529,9 +528,8 @@ class VirtualMachine {
                     push(stack[frame.base + slot]);
                 }
                 case LOCLET -> {
-                    var pattern = readPattern();
                     var target = pop();
-                    var constants = (ListValue)pop();
+                    var pv = (PatternValue)pop();
 
                     // FIRST, see if there's a match.  This is defining locals,
                     // so just push the bound values onto the stack.  They
@@ -539,9 +537,9 @@ class VirtualMachine {
                     // the compiler.
                     if (!Matcher.bind(
                         joe,
-                        pattern,
+                        pv.pattern,
                         target,
-                        constants::get,
+                        pv.constants::get,
                         (id, value) -> push(value)
                     )) {
                         throw error(

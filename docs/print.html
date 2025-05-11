@@ -9054,7 +9054,7 @@ value.</li>
 <tr><td>14</td><td>GETNEXT</td><td><em>iter</em> → <em>a</em></td><td>a = iter.next()</td></tr>
 <tr><td>15</td><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
 <tr><td>16</td><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
-<tr><td>17</td><td>GLOLET <em>pattern</em></td><td><em>list a</em> → ∅</td><td>Bind target to pattern</td></tr>
+<tr><td>17</td><td>GLOLET</td><td><em>p t</em> → ∅</td><td>Bind target to pattern</td></tr>
 <tr><td>18</td><td>GLOSET <em>name</em></td><td><em>a</em> → <em>a</em></td><td>Set global</td></tr>
 <tr><td>19</td><td>GT</td><td><em>a b</em> → <em>a</em> &gt; <em>b</em></td><td>Compare: greater</td></tr>
 <tr><td>20</td><td>HASNEXT</td><td><em>iter</em> → <em>flag</em></td><td>flag = iter.hasNext()</td></tr>
@@ -9073,13 +9073,13 @@ value.</li>
 <tr><td>33</td><td>LISTADD</td><td><em>list a</em> → <em>list</em></td><td>Add item to list</td></tr>
 <tr><td>34</td><td>LISTNEW</td><td>∅ → <em>list</em></td><td>Push empty list</td></tr>
 <tr><td>35</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
-<tr><td>36</td><td>LOCLET <em>pattern</em></td><td><em>list a</em> → ∅</td><td>Bind target to pattern</td></tr>
+<tr><td>36</td><td>LOCLET</td><td><em>p t</em> → <em>vs</em></td><td>Bind target to pattern</td></tr>
 <tr><td>37</td><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
 <tr><td>38</td><td>LOOP <em>offset</em></td><td>∅ → ∅</td><td>Jump backwards</td></tr>
 <tr><td>39</td><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
 <tr><td>40</td><td>MAPNEW</td><td>∅ → <em>map</em></td><td>Push empty ma p</td></tr>
 <tr><td>41</td><td>MAPPUT</td><td><em>map k a</em> → <em>map</em></td><td>Add entry to map</td></tr>
-<tr><td>42</td><td>MATCH <em>pattern</em></td><td><em>list a</em> → <em>flag</em></td><td>Match pattern to target</td></tr>
+<tr><td>42</td><td>MATCH</td><td><em>p t</em> → <em>vs? flag</em></td><td>Match pattern to target</td></tr>
 <tr><td>43</td><td>METHOD <em>name</em></td><td><em>type f</em> → <em>type</em></td><td>Add method to type</td></tr>
 <tr><td>44</td><td>MUL</td><td><em>a b</em> → <em>c</em></td><td>c = a*b</td></tr>
 <tr><td>45</td><td>NE</td><td><em>a b</em> → <em>c</em></td><td>c = a != b</td></tr>
@@ -9087,23 +9087,24 @@ value.</li>
 <tr><td>47</td><td>NI</td><td><em>a coll</em> → <em>flag</em></td><td>a not in collection</td></tr>
 <tr><td>48</td><td>NOT</td><td><em>a</em> → <em>b</em></td><td>b = !a</td></tr>
 <tr><td>49</td><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
-<tr><td>50</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
-<tr><td>51</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
-<tr><td>52</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
-<tr><td>53</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
-<tr><td>54</td><td>RECORD <em>name fields</em></td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
-<tr><td>55</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
-<tr><td>56</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
-<tr><td>57</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
-<tr><td>58</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
-<tr><td>59</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
-<tr><td>60</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
-<tr><td>61</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
-<tr><td>62</td><td>TSET</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
-<tr><td>63</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
-<tr><td>64</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
-<tr><td>65</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
-<tr><td>66</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
+<tr><td>50</td><td>PATTERN <em>pattern</em></td><td><em>constants</em> → <em>p</em></td><td>Evaluate the pattern</td></tr>
+<tr><td>51</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
+<tr><td>52</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
+<tr><td>53</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
+<tr><td>54</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
+<tr><td>55</td><td>RECORD <em>name fields</em></td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
+<tr><td>56</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
+<tr><td>57</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
+<tr><td>58</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
+<tr><td>59</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
+<tr><td>60</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
+<tr><td>61</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
+<tr><td>62</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
+<tr><td>63</td><td>TSET</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
+<tr><td>64</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
+<tr><td>65</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
+<tr><td>66</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
+<tr><td>67</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
 </tbody></table>
 </div>
 <p><strong>Stack Effects:</strong> in the stack effect column, the top of the stack is on the
@@ -9250,14 +9251,12 @@ otherwise.</p>
 <p>Retrieves the value of global variable <em>name</em> and pushes it on the stack.</p>
 <h3 id="glolet"><a class="header" href="#glolet">GLOLET</a></h3>
 <hr />
-<p><strong>GLOLET</strong> <em>pattern</em> | <em>list</em> <em>a</em> → ∅</p>
-<p>The <code>GLOLET</code> instruction implements the <code>let</code> statement where the binding
-variables are bound in the global scope.  It receives the
-<code>let</code> pattern as a constant index.  The <em>list</em> is a list of the constants,
-computed or literal, used in the pattern.  The value <em>a</em> is the target value
-to be matched.  If the match succeeds then the values of the binding
-variables will be added to the global environment. If the match fails then the
-instruction throws a <code>RuntimeError</code>.</p>
+<p><strong>GLOLET</strong> | <em>p</em> <em>t</em> → ∅</p>
+<p>The <code>GLOLET</code> instruction implements the <code>let</code> statement at the global scope,
+binding pattern value <em>p</em> to target <em>t</em>, where <em>p</em> is a pattern evaluated
+by the <code>PATTERN</code> instruction. If the match succeeds then the binding
+variables and their values will be added to the global environment. If the
+match fails then the instruction throws a <code>RuntimeError</code>.</p>
 <h3 id="gloset"><a class="header" href="#gloset">GLOSET</a></h3>
 <hr />
 <p><strong>GLOSET</strong> <em>name</em> | <em>a</em> → <em>a</em></p>
@@ -9362,13 +9361,11 @@ stack.</p>
 relative to the current call frame.</p>
 <h3 id="loclet"><a class="header" href="#loclet">LOCLET</a></h3>
 <hr />
-<p><strong>LOCLET</strong> <em>pattern</em> | <em>list</em> <em>a</em> → ∅</p>
-<p>The <code>LOCLET</code> instruction implements the <code>let</code> statement where the binding
-variables are bound in a local scope.  It receives the
-<code>let</code> pattern as a constant index.  The <em>list</em> is a list of the constants,
-computed or literal, used in the pattern.  The value <em>a</em> is the target value
-to be matched.</p>
-<p>If the match succeeds then the values of the binding variables will be pushed
+<p><strong>LOCLET</strong> | <em>p</em> <em>t</em> → <em>vs</em></p>
+<p>The <code>LOCLET</code> instruction implements the <code>let</code> statement in local scopes,
+binding pattern value <em>p</em> to target value <em>t</em>, where <em>p</em> is a pattern
+value produced by the <code>PATTERN</code> instruction. If the match succeeds
+then the values of the binding variables will be pushed
 onto the stack, initializing them as locals. If the match fails then the
 instruction throws a <code>RuntimeError</code>.</p>
 <h3 id="locset"><a class="header" href="#locset">LOCSET</a></h3>
@@ -9394,10 +9391,10 @@ stack.</p>
 <p>Pops <em>k</em> and <em>a</em> and puts {<em>k</em>: <em>a</em>} into the <em>map</em> value.</p>
 <h3 id="match"><a class="header" href="#match">MATCH</a></h3>
 <hr />
-<p><strong>MATCH</strong> <em>pattern</em> | <em>list a</em> → <em>flag</em></p>
-<p>Matches the <em>pattern</em> against the target value <em>a</em> given the <em>list</em> of
-constants to include in the pattern.  On success defines the pattern's
-binding variables and pushes <code>true</code>; on failure pushes <code>false</code>.</p>
+<p><strong>MATCH</strong> | <em>p t</em> → <em>vs? flag</em></p>
+<p>Matches pattern <em>p</em> against the target value <em>a</em>
+constants to include in the pattern.  On success pushes the values of
+the pattern's bound variables followed by <code>true</code>; on failure pushes <code>false</code>.</p>
 <h3 id="method"><a class="header" href="#method">METHOD</a></h3>
 <hr />
 <p><strong>METHOD</strong> <em>name</em> | <em>type</em> <em>f</em> → <em>type</em></p>
@@ -9429,6 +9426,13 @@ iterable.</p>
 <hr />
 <p><strong>NULL</strong> | ∅ → <code>null</code></p>
 <p>Pushes <code>null</code> on the stack.</p>
+<h3 id="pattern"><a class="header" href="#pattern">PATTERN</a></h3>
+<hr />
+<p><strong>PATTERN</strong> <em>pattern</em> | <em>constants</em> → <em>p</em></p>
+<p>Combines a list of evaluated <em>constants</em> with a <code>Pattern</code> to produce
+<code>PatternValue</code> <em>p</em>, which can then be matched against using <code>GLOLET</code>,
+<code>LOCLET</code>, and <code>MATCH</code>. The <code>PatternValue</code> is used internally only; it
+is never exposed to the Joe client.</p>
 <h3 id="pop"><a class="header" href="#pop">POP</a></h3>
 <hr />
 <p><strong>POP</strong> | <em>a</em> -&gt; ∅</p>
