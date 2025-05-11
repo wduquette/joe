@@ -129,7 +129,8 @@ public class Parser {
     private Stmt declaration() {
         try {
             if (scanner.match(CLASS)) return classDeclaration();
-            if (scanner.match(FUNCTION)) return functionDeclaration("function");
+            if (scanner.match(FUNCTION)) return functionDeclaration(
+                FunctionType.FUNCTION, "function");
             if (scanner.match(LET)) return letDeclaration();
             if (scanner.match(RECORD)) return recordDeclaration();
             if (scanner.match(VAR)) return varDeclaration();
@@ -164,10 +165,11 @@ public class Parser {
 
         while (!scanner.check(RIGHT_BRACE) && !scanner.isAtEnd()) {
             if (scanner.match(METHOD)) {
-                methods.add(functionDeclaration("method"));
+                methods.add(functionDeclaration(FunctionType.METHOD, "method"));
             } else if (scanner.match(STATIC)) {
                 if (scanner.match(METHOD)) {
-                    staticMethods.add(functionDeclaration("static method"));
+                    staticMethods.add(functionDeclaration(
+                        FunctionType.STATIC_METHOD, "static method"));
                 } else {
                     scanner.consume(LEFT_BRACE,
                         "Expected 'method' or '{' after 'static'.");
@@ -188,10 +190,13 @@ public class Parser {
             staticMethods, methods, staticInitializer);
     }
 
-    private Stmt.Function functionDeclaration(String kind) {
+    private Stmt.Function functionDeclaration(FunctionType type, String kind) {
         var start = scanner.previous().span().start();
         scanner.consume(IDENTIFIER, "Expected " + kind + " name.");
         var name = scanner.previous();
+        if (type == FunctionType.METHOD && name.lexeme().equals("init")) {
+            type = FunctionType.INITIALIZER;
+        }
 
         scanner.consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
 
@@ -201,7 +206,7 @@ public class Parser {
         List<Stmt> body = block();
         var end = scanner.previous().span().end();
         var span = source.span(start, end);
-        return new Stmt.Function(kind, name, parameters, body, span);
+        return new Stmt.Function(type, kind, name, parameters, body, span);
     }
 
     private List<Token> parameters(
@@ -290,10 +295,11 @@ public class Parser {
 
         while (!scanner.check(RIGHT_BRACE) && !scanner.isAtEnd()) {
             if (scanner.match(METHOD)) {
-                methods.add(functionDeclaration("method"));
+                methods.add(functionDeclaration(FunctionType.METHOD, "method"));
             } else if (scanner.match(STATIC)) {
                 if (scanner.match(METHOD)) {
-                    staticMethods.add(functionDeclaration("static method"));
+                    staticMethods.add(functionDeclaration(
+                        FunctionType.STATIC_METHOD, "static method"));
                 } else {
                     scanner.consume(LEFT_BRACE,
                         "Expected 'method' or '{' after 'static'.");
@@ -857,7 +863,8 @@ public class Parser {
             var end = scanner.previous().span().end();
             var span = source.span(token.span().start(), end);
             var decl =
-                new Stmt.Function("lambda", token, parameters, body, span);
+                new Stmt.Function(FunctionType.LAMBDA,
+                    "lambda", token, parameters, body, span);
             return new Expr.Lambda(decl);
         }
 

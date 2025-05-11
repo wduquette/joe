@@ -134,6 +134,7 @@ public sealed interface Stmt
      * @param span The function's full span.
      */
     record Function(
+        FunctionType type,
         String kind,
         Token name,
         List<Token> params,
