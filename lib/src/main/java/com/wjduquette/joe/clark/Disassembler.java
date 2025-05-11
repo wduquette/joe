@@ -156,8 +156,8 @@ public class Disassembler {
                  GE, GT, GETNEXT, HASNEXT,
                  IN, INCR, INDGET, INDSET, INHERIT, ITER,
                  LISTADD, LISTNEW, LE, LT,
-                 MAPNEW, MAPPUT, MUL, NE, NEGATE, NI, NOT, NULL,
-                 POP, RETURN, SUB, TGET, THROW, TSET, TRUE, TRCPOP
+                 MAPNEW, MAPPUT, MATCH, MUL, NE, NEGATE, NI, NOT, NULL,
+                 PATTERN, POP, RETURN, SUB, TGET, THROW, TSET, TRUE, TRCPOP
                 -> {
                 lines.add(new Line(ip, prefix));
                 return ip + 1;

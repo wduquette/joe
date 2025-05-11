@@ -601,6 +601,32 @@ class VirtualMachine {
                     // FINALLY, push the success/failure flag.
                     push(flag);
                 }
+                case MATCH -> {
+                    var target = pop();
+                    var pv = (PatternValue)pop();
+
+                    // FIRST, save the top of the stack.
+                    int here = top;
+
+                    // NEXT, match the pattern against the target given the
+                    // constants, pushing bound values onto the stack as the
+                    // match proceeds.
+                    var flag = Matcher.bind(
+                        joe,
+                        pv.pattern,
+                        target,
+                        pv.constants::get,
+                        (id, value) -> push(value)
+                    );
+
+                    // NEXT, if the match failed, pop the bound values.
+                    if (!flag) {
+                        top = here;
+                    }
+
+                    // FINALLY, push the success/failure flag.
+                    push(flag);
+                }
                 case METHOD -> {
                     // NOTE: This was defineMethod in clox
                     var name = readString();
@@ -640,6 +666,11 @@ class VirtualMachine {
                 }
                 case NOT -> push(Joe.isFalsey(pop()));
                 case NULL -> push(null);
+                case PATTERN -> {
+                    var pattern = readPattern();
+                    var constants = (ListValue)pop();
+                    push(new PatternValue(pattern, constants));
+                }
                 case POP -> pop();
                 case POPN -> top -= readArg();
                 case PROPGET -> {
@@ -1127,4 +1158,8 @@ class VirtualMachine {
             return "Upvalue[slot=" + slot + ", closed=" + closed + "]";
         }
     }
+
+    // A pattern, as evaluated by the PATTERN instruction and used by
+    // the MATCH instruction.
+    private record PatternValue(Pattern pattern, List<Object> constants) {}
 }

@@ -3,6 +3,7 @@ package com.wjduquette.joe.clark;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
+import com.wjduquette.joe.parser.ASTPattern;
 import com.wjduquette.joe.parser.Expr;
 import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.parser.Stmt;
@@ -474,14 +475,12 @@ class Compiler {
                 if (end_ != -1) patchJump(end_);
             }
             case Stmt.IfLet s -> {
-                var pat = constant(s.pattern().getPattern());
-                var consts = s.pattern().getConstants();
                 var vars = s.pattern().getBindings();
 
                 beginScope();                  // ∅            ; begin scope: then
-                emitList(consts);              // ∅ | cs       ; pattern constants
-                emit(s.target());              // ∅ | cs t     ; match target
-                emit(MATCH0, pat);              // ∅ | vs? flag ; match pattern
+                emitPATTERN(s.pattern());      // ∅ | p        ; compile pattern
+                emit(s.target());              // ∅ | p t      ; compute target
+                emit(MATCH);                   // ∅ | vs? flag ; match pattern
                 int else_ = emitJump(JIF);     // ∅ | vs?      ; JIF else
                 defineLocals(vars);            // vs | ∅       ; define bindings
                 emit(s.thenBranch());          // vs | ∅       ; compile "then"
@@ -765,6 +764,12 @@ class Compiler {
             emit((char)(compiler.upvalues[i].isLocal ? 1 : 0));
             emit(compiler.upvalues[i].index);
         }
+    }
+
+    private void emitPATTERN(ASTPattern astPattern) {
+        var index = constant(astPattern.getPattern());
+        emitList(astPattern.getConstants());
+        emit(PATTERN, index);
     }
 
     //-------------------------------------------------------------------------
