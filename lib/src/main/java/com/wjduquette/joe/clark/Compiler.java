@@ -477,9 +477,9 @@ class Compiler {
             case Stmt.IfLet s -> {
                 var vars = s.pattern().getBindings();
 
-                beginScope();                  // ∅            ; begin scope: then
                 emitPATTERN(s.pattern());      // ∅ | p        ; compile pattern
                 emit(s.target());              // ∅ | p t      ; compute target
+                beginScope();                  // ∅            ; begin scope: then
                 emit(MATCH);                   // ∅ | vs? flag ; match pattern
                 int else_ = emitJump(JIF);     // ∅ | vs?      ; JIF else
                 defineLocals(vars);            // vs | ∅       ; define bindings
@@ -524,16 +524,14 @@ class Compiler {
                 var next1_ = -1;
                 var next2_ = -1;
                 for (var c : s.cases()) {
-                    var pat = constant(c.pattern().getPattern());
-                    var consts = c.pattern().getConstants();
                     var vars = c.pattern().getBindings();
 
                     patchJump(next1_);        // m | ∅        ; next1:
                     patchJump(next2_);        // m | ∅        ; next2:
-                    beginScope();             // m | ∅        ; begin scope: case
-                    emitList(consts);         // m | cs       ; pattern constants
-                    emitGET(VAR_MATCH);       // m | cs m     ; get *match*
-                    emit(MATCH0, pat);         // m | vs? flag ; match pattern
+                    emitPATTERN(c.pattern()); // m | p        ; compute pattern
+                    beginScope();             // m | p        ; begin scope: case
+                    emitGET(VAR_MATCH);       // m | p m      ; get *match*
+                    emit(MATCH);              // m | vs? flag ; match pattern
                     next1_ = emitJump(JIF);   // m | vs?      ; JIF next1
                     defineLocals(vars);       // m vs | ∅     ; define bindings
                     if (c.guard() != null) {  // m vs | flag  ; compute guard
