@@ -2,16 +2,22 @@
 
 ## Changes in 0.7.0 (in development)
 
-- Replaced the Bert byte-code engine and its single-pass compiler with the
-  Clark byte-code engine, which shares a parser and scanner with the Walker 
-  engine.  This will make Joe easier to evolve.
-  - Clark is now the default engine.
-  - Bert will be retained for the time being, but will receive only minimal
-    updates.
-- Revised `joe dump` to output one or all of the following:
-  - The script's byte-code (the default)
-  - The script's Abstract Syntax Tree (AST)
-  - The script's legacy Bert byte-code
+- Internals
+  - Replaced the Bert byte-code engine and its single-pass compiler with the
+    Clark byte-code engine, which shares a parser and scanner with the Walker
+    engine.  This will make Joe easier to evolve.
+    - Clark is now the default engine.
+    - Bert will be retained for the time being, but will receive only minimal
+      updates.
+- Language
+  - Merged `let`'s capability into `var`, and removed `let`.
+    - `var` can now do destructuring binds while still handling simple variable
+      declarations efficiently.
+- Tools
+  - Revised `joe dump` to output one or all of the following:
+    - The script's byte-code (the default)
+    - The script's Abstract Syntax Tree (AST)
+    - The script's legacy Bert byte-code
 
 ## Changes in 0.6.0 (28 March 2025) 
 

@@ -174,119 +174,17 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="pattern-matching"><a class="header" href="#pattern-matching">Pattern Matching</a></h1>
-<p>Joe supports a rich pattern-matching capability inspired the Rust language's
-<code>let</code>, <code>if let</code>, and <code>match</code> statements.</p>
+<p>Joe supports a rich pattern-matching capability inspired by the Rust language's
+similar capability. Joe's
+<a href="statements.html#variable-declarations"><code>var</code></a>,
+<a href="statements.html#if-let-statements"><code>if let</code></a>, and
+<a href="statements.html#match-statements"><code>match</code></a> statements all make
+use of pattern matching to do destructuring binds.</p>
+<p>Joe supports a rich variety of patterns.  Some of them can contain
+other patterns as subpatterns, allowing a pattern to match
+quite complicated data structures.</p>
 <ul>
-<li><a href="#the-let-statement">The <code>let</code> Statement</a></li>
-<li><a href="#the-if-let-statement">The <code>if let</code> Statement</a></li>
-<li><a href="#the-match-statement">The <code>match</code> Statement</a></li>
-<li><a href="#pattern-syntax">Pattern Syntax</a></li>
-</ul>
-<h2 id="the-let-statement"><a class="header" href="#the-let-statement">The <code>let</code> Statement</a></h2>
-<p>The <code>let</code> statement performs a destructuring bind, that is, it binds
-variables to values within a data structure.  For example, suppose that the
-function <code>f()</code> returns a two-item list, and the caller wants to assign the
-list items to variables <code>x</code> and <code>y</code>.</p>
-<p>One could do this:</p>
-<pre><code class="language-joe">var result = f();
-var x = result[0];
-var y = result[1];
-</code></pre>
-<p>Or, one could do a destructing bind using <code>let</code>:</p>
-<pre><code class="language-joe">let [x, y] = f();
-</code></pre>
-<p>Here, <code>let</code> matches the list returned by <code>f()</code> against the pattern
-<code>[x, y]</code> and binds variables <code>x</code> and <code>y</code> to the matched values.</p>
-<p><strong><code>let</code> vs. <code>var</code></strong>: The <code>let</code> statement is quite similar to the
-<code>var</code> statement; both declare new variables, and these two statements
-are semantically equivalent:</p>
-<pre><code class="language-joe">var x = 5;
-let x = 5;
-</code></pre>
-<p>There are two differences:</p>
-<ul>
-<li><code>let</code> can match more complex patterns, while <code>var</code> cannot.</li>
-<li><code>var</code> is faster, as it doesn't incur any pattern-matching overhead.</li>
-</ul>
-<p><strong>When the pattern doesn't match:</strong> If <code>let</code>'s pattern doesn't match
-the target value, e.g., if <code>f()</code> didn't return a two-item list in the
-example shown above, then the pattern match will fail and Joe will
-throw a runtime error.  Therefore, <code>let</code> should only be used when the
-shape of the target value is known ahead of time.  Use
-<a href="#the-if-let-statement"><code>if let</code></a> or
-<a href="#the-match-statement"><code>match</code></a> to test whether a value matches a
-particular pattern.</p>
-<p><strong>Matching Maps:</strong> Similarly, one can match the values of map fields.  Suppose
-<code>g()</code> returns a map, and the call wants the values of the map's
-<code>#name</code> and <code>#age</code> keys:</p>
-<pre><code class="language-joe">// The hard way
-var map = g();
-var n = map[#name];
-var a = map[#age];
-
-// The easy way
-let {#name: n, #age: a} = g();
-</code></pre>
-<p>If the <code>map</code> returned by <code>g()</code> has keys <code>#name</code> and <code>#age</code>, this statement
-will bind the variables <code>n</code> and <code>a</code> to <code>map[#name]</code> and <code>map[#age]</code>.  And
-if not, Joe will throw a runtime error, as before.</p>
-<p>These are only a few of the kinds of patterns that Joe supports. See
-<a href="#pattern-syntax">Pattern Syntax</a> for more.</p>
-<h2 id="the-if-let-statement"><a class="header" href="#the-if-let-statement">The <code>if let</code> Statement</a></h2>
-<p>The <code>let</code> statement throws an error if the pattern does match the target value.
-The <code>if let</code> statement executes its "then" branch if the pattern matches the
-target, and its optional "else" branch otherwise.</p>
-<pre><code class="language-joe">var list = [1, 2];
-
-if let ([a, b] = list) {
-    println(a); // Prints "1"
-    println(b); // Prints "2"
-} else {
-    println("no match");
-}
-</code></pre>
-<p>The pattern's binding variables (<code>a</code> and <code>b</code> in this example) are in-scope only
-in the "then" branch.</p>
-<h2 id="the-match-statement"><a class="header" href="#the-match-statement">The <code>match</code> Statement</a></h2>
-<p>The <code>match</code> statement is similar to a <code>switch</code> statement, but matches
-patterns against a target value instead of checking for equality.  It
-is especially useful for processing a heterogeneous list of values.</p>
-<pre><code class="language-joe">match (value) {
-    case [a, b] -&gt; 
-        println("Two item list of " a + " and " + b + ".");
-    case Person(name, age) -&gt; 
-        println("Person " + name + " is " + age + " years old.");
-    default -&gt; println("no match");
-}
-</code></pre>
-<p>Every <code>match</code> statement requires at least one <code>case</code>, and the <code>default</code>
-clause is optional.  Note that matching on <code>_</code> (a simple wildcard)
-is equivalent to the <code>default</code> clause:</p>
-<pre><code class="language-joe">match (value) {
-    case [a, b] -&gt; 
-        println("Two item list of " a + " and " + b + ".");
-    case Person(name, age) -&gt; 
-        println("Person " + name + " is " + age + " years old.");
-    case _ -&gt; println("no match");
-}
-</code></pre>
-<p>Each <code>case</code> in a <code>match</code> can include an optional  guard clause, which
-adds a boolean guard condition on top of the pattern match.  In the following
-example the case matches any <code>Person</code> record, and then requires that the
-person be at least 10 years old.</p>
-<pre><code class="language-joe">match (value) {
-    ...
-    case Person(name, age) if age &gt;= 10 -&gt; 
-        println("Person " + name + " is at least 10 years old.");
-    ...
-}
-</code></pre>
-<h2 id="pattern-syntax"><a class="header" href="#pattern-syntax">Pattern Syntax</a></h2>
-<p>Here is a list of the many kinds of pattern Joe supports.  Some patterns
-can contain other patterns as subpatterns, allowing a pattern to match
-quite complicated data structures.  Here is a list of the different
-kinds of patterns:</p>
-<ul>
+<li><a href="#patterns-and-destructuring-binds">Patterns and Destructuring Binds</a></li>
 <li><a href="#binding-variables">Binding Variables</a></li>
 <li><a href="#wildcards">Wildcards</a></li>
 <li><a href="#constants">Constants</a></li>
@@ -297,35 +195,51 @@ kinds of patterns:</p>
 <li><a href="#instance-patterns">Instance Patterns</a></li>
 <li><a href="#record-patterns">Record Patterns</a></li>
 </ul>
-<h3 id="binding-variables"><a class="header" href="#binding-variables">Binding Variables</a></h3>
+<h2 id="patterns-and-destructuring-binds"><a class="header" href="#patterns-and-destructuring-binds">Patterns and Destructuring Binds</a></h2>
+<p>A destructuring bind is a way to bind one more variables to values within
+a complex data structure.  The bind makes use of a pattern that duplicates
+the structure of the target value to match variable names to specific elements.</p>
+<p>For example, suppose that the function <code>f()</code> returns a two-item list, and the
+caller wants to assign the list items to the variables <code>x</code> and <code>y</code>.</p>
+<p>One could do this:</p>
+<pre><code class="language-joe">var result = f();
+var x = result[0];
+var y = result[1];
+</code></pre>
+<p>Or, one could do a destructing bind using <code>var</code>:</p>
+<pre><code class="language-joe">var [x, y] = f();
+</code></pre>
+<p>Here, <code>var</code> matches the list returned by <code>f()</code> against the pattern
+<code>[x, y]</code> and binds variables <code>x</code> and <code>y</code> to the matched values.</p>
+<h2 id="binding-variables"><a class="header" href="#binding-variables">Binding Variables</a></h2>
 <p>We've seen binding variables in most of the examples shown above.
 A binding variable is a variable name that appears within the pattern and
 is assigned the corresponding value in the match target.</p>
-<pre><code class="language-joe">let [a, b] = [1, 2];    // a = 1, b = 2.
+<pre><code class="language-joe">var [a, b] = [1, 2];    // a = 1, b = 2.
 </code></pre>
 <p>A binding variable can also be used to capture a subpattern.  In the
 following example, the variable <code>b</code> is assigned list <code>[2, 3]</code> while
 <code>c</code> and <code>d</code> are assigned the values of the list's items.</p>
 <pre><code class="language-joe">var list = [1, [2, 3], 4];
 
-let [a, b = [c, d], e];
+var [a, b = [c, d], e];
 </code></pre>
-<h3 id="wildcards"><a class="header" href="#wildcards">Wildcards</a></h3>
+<h2 id="wildcards"><a class="header" href="#wildcards">Wildcards</a></h2>
 <p>A <em>wildcard</em> is a pattern that matches (and ignores) any value.  A
 wildcard is written as an identifier with leading underscore, e.g.,
 <code>_</code>, <code>_ignore</code>, <code>_x</code>.  For example:</p>
-<pre><code class="language-joe">let [x, _] = ["abc", "def"];
+<pre><code class="language-joe">var [x, _] = ["abc", "def"];
 </code></pre>
 <p><code>x</code> will be assigned the value <code>"abc"</code>, while the second item of
 the target <code>list</code> will be ignored.</p>
 <p>It's most common to use the wildcard <code>_</code>; but using a longer name can
 be useful to document what the ignored value is:</p>
-<pre><code class="language-joe">let [first, _last] = ["Joe", "Pro"];
+<pre><code class="language-joe">var [first, _last] = ["Joe", "Pro"];
 </code></pre>
 <p>Using <code>_last</code> indicates that we don't care about the last name
 at the moment, but also shows that it is the last name that we are
 ignoring.</p>
-<h3 id="constants"><a class="header" href="#constants">Constants</a></h3>
+<h2 id="constants"><a class="header" href="#constants">Constants</a></h2>
 <p>A constant pattern is a constant value included in the pattern; the
 corresponding value in the target must have that exact value.</p>
 <pre><code class="language-joe">function isPro(list) {
@@ -345,13 +259,13 @@ var y = isPro(["Joe", "Amateur"]);   // Returns false
 <a href="types.html#booleans">boolean</a>,
 <a href="types.html#keywords">keyword</a>,
 or <code>null</code>.</p>
-<h3 id="interpolated-expressions"><a class="header" href="#interpolated-expressions">Interpolated Expressions</a></h3>
+<h2 id="interpolated-expressions"><a class="header" href="#interpolated-expressions">Interpolated Expressions</a></h2>
 <p>To use a computed value as a constant, interpolate
 it using <code>$(...)</code>.</p>
 <pre><code class="language-joe">var a = 5;
 var b = 15;
 
-let [x, $(a + b)] = [10, 20];  // Matches; x == 10.
+var [x, $(a + b)] = [10, 20];  // Matches; x == 10.
 </code></pre>
 <p>Here, <code>$(a + b)</code> evaluates to <code>20</code>, which matches the second
 item in the target list.</p>
@@ -359,9 +273,9 @@ item in the target list.</p>
 a variable name:</p>
 <pre><code class="language-joe">var wanted = "Pro";
 
-let [first, $wanted] = ["Joe", "Pro"];   
+var [first, $wanted] = ["Joe", "Pro"];   
 </code></pre>
-<h3 id="list-patterns"><a class="header" href="#list-patterns">List Patterns</a></h3>
+<h2 id="list-patterns"><a class="header" href="#list-patterns">List Patterns</a></h2>
 <p>We've seen many list patterns in the above examples.  Syntactically,
 a list pattern is simply a list of patterns that matches a <code>List</code> of
 values.  The matched list must have exactly the same number of items
@@ -381,7 +295,7 @@ pattern can provide a pattern variable to bind to the list's tail:</p>
 <p>The variables <code>a</code> and <code>b</code> will get <code>list[0]</code> and <code>list[1]</code>, and <code>tail</code>
 will get any remaining items, or the empty list if <code>list.size() == 2</code>.
 (The match will naturally fail if <code>list.size() &lt; 2</code>.)</p>
-<h3 id="map-patterns"><a class="header" href="#map-patterns">Map Patterns</a></h3>
+<h2 id="map-patterns"><a class="header" href="#map-patterns">Map Patterns</a></h2>
 <p>A map pattern matches objects with keys and values, e.g.,
 <a href="library/type.joe.Map.html"><code>Map</code></a> values.</p>
 <ul>
@@ -393,11 +307,11 @@ pattern, and their values must match the corresponding value patterns.</li>
 the pattern.</li>
 </ul>
 <p>Some examples:</p>
-<pre><code class="language-joe">let {#a: a, #b: b} = {#a: 1, #b: 2, #c: 3};  // a = 1, b = 2
-let ($x: value} = someMap;                   // value = someMap.get(x)
-let {#a: [a, b, c], #b: x} = someMap;
+<pre><code class="language-joe">var {#a: a, #b: b} = {#a: 1, #b: 2, #c: 3};  // a = 1, b = 2
+var ($x: value} = someMap;                   // value = someMap.get(x)
+var {#a: [a, b, c], #b: x} = someMap;
 </code></pre>
-<h3 id="matching-instances-with-map-patterns"><a class="header" href="#matching-instances-with-map-patterns">Matching Instances with Map Patterns</a></h3>
+<h2 id="matching-instances-with-map-patterns"><a class="header" href="#matching-instances-with-map-patterns">Matching Instances with Map Patterns</a></h2>
 <p>A map pattern can also match any Joe value with field properties, e.g.,
 an instance of a Joe <code>class</code>.  The pattern's keys match the field names
 and the pattern's values match the field values.</p>
@@ -414,8 +328,8 @@ to such strings or keywords.</li>
 }
 
 // These two statements are equivalent
-let {"id": i, "color": c} = Thing(123, "red");
-let {#id: i,  #color: c}  = Thing(123, "red");
+var {"id": i, "color": c} = Thing(123, "red");
+var {#id: i,  #color: c}  = Thing(123, "red");
 </code></pre>
 <p>As when matching <code>Map</code> values, the pattern can reference a subset of
 the object's fields.</p>
@@ -430,8 +344,8 @@ match on the value's type as well as on its fields.  For example,</p>
 }
 
 // These two statements are equivalent
-let Thing{"id": i, "color": c} = Thing(123, "red");
-let Thing{#id: i,  #color: c}  = Thing(123, "red");
+var Thing{"id": i, "color": c} = Thing(123, "red");
+var Thing{#id: i,  #color: c}  = Thing(123, "red");
 </code></pre>
 <p>An instance pattern consists of the name of the desired type, followed by
 a map pattern for its fields. For the pattern to match:</p>
@@ -440,7 +354,7 @@ a map pattern for its fields. For the pattern to match:</p>
 <li>The value must have all of the specified fields.</li>
 <li>The field patterns must match.</li>
 </ul>
-<p>Types are matched based on their names, i.e., in <code>let Thing{...} = thing;</code> the
+<p>Types are matched based on their names, i.e., in <code>var Thing{...} = thing;</code> the
 type will match if <code>Joe.typeOf(thing).name() == "Thing"</code>, <em><strong>not</strong></em> if
 <code>Joe.typeOf(thing) == Thing</code>.  In other words, there is no requirement that
 the matched type is in scope; it is enough that the value being matched
@@ -457,8 +371,8 @@ to pattern matching.</p>
 var person = Person(Joe, 80);
 
 // These statements are identical
-let Person(n, a) = person;
-let Person{#name: n, #age: a} = person;
+var Person(n, a) = person;
+var Person{#name: n, #age: a} = person;
 </code></pre>
 <p>The first form can only be used with a value of a record type; it matches
 the values of the type's fields in sequence.  All fields must be

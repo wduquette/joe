@@ -474,7 +474,7 @@ class Compiler {
                     patchJump(else_);          // ∅            ; else:
                 }
             }
-            case Stmt.Let s -> {
+            case Stmt.VarPattern s -> {
                 var vars = s.pattern().getBindings();
 
                 if (!inGlobalScope()) {        // Stack: locals | working
@@ -485,10 +485,10 @@ class Compiler {
                 emit(s.target());              // ∅ | p t   ; compute target.
 
                 if (!inGlobalScope()) {
-                    emit(Opcode.LOCLET);       // ∅ | vs    ; match pattern
+                    emit(Opcode.LOCBIND);       // ∅ | vs    ; match pattern
                     defineLocals(vars);        // vs | ∅    ; define vars
                 } else {
-                    emit(Opcode.GLOLET);       // ∅         ; define vars
+                    emit(Opcode.GLOBIND);       // ∅         ; define vars
                 }
             }
             case Stmt.Match s -> {

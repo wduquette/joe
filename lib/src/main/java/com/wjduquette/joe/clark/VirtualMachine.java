@@ -365,7 +365,7 @@ class VirtualMachine {
                         throw error("Undefined variable: '" + name + "'.");
                     }
                 }
-                case GLOLET -> {
+                case GLOBIND -> {
                     var target = pop();
                     var pv = (PatternValue)pop();
                     var bound = new HashMap<String,Object>();
@@ -383,7 +383,7 @@ class VirtualMachine {
                         bound::put
                     )) {
                         throw error(
-                            "'let' pattern failed to match target value.");
+                            "'var' pattern failed to match target value.");
                     }
 
                     // NEXT, add the bindings to the global scope.
@@ -528,7 +528,7 @@ class VirtualMachine {
                     var slot = readSlot();
                     push(stack[frame.base + slot]);
                 }
-                case LOCLET -> {
+                case LOCBIND -> {
                     var target = pop();
                     var pv = (PatternValue)pop();
 
@@ -544,7 +544,7 @@ class VirtualMachine {
                         (id, value) -> push(value)
                     )) {
                         throw error(
-                            "'let' pattern failed to match target value.");
+                            "'var' pattern failed to match target value.");
                     }
                 }
                 case LOCSET -> {

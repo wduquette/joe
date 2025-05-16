@@ -290,6 +290,8 @@ buy him lunch.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="change-log"><a class="header" href="#change-log">Change Log</a></h1>
 <h2 id="changes-in-070-in-development"><a class="header" href="#changes-in-070-in-development">Changes in 0.7.0 (in development)</a></h2>
 <ul>
+<li>Internals
+<ul>
 <li>Replaced the Bert byte-code engine and its single-pass compiler with the
 Clark byte-code engine, which shares a parser and scanner with the Walker
 engine.  This will make Joe easier to evolve.
@@ -299,11 +301,27 @@ engine.  This will make Joe easier to evolve.
 updates.</li>
 </ul>
 </li>
+</ul>
+</li>
+<li>Language
+<ul>
+<li>Merged <code>let</code>'s capability into <code>var</code>, and removed <code>let</code>.
+<ul>
+<li><code>var</code> can now do destructuring binds while still handling simple variable
+declarations efficiently.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Tools
+<ul>
 <li>Revised <code>joe dump</code> to output one or all of the following:
 <ul>
 <li>The script's byte-code (the default)</li>
 <li>The script's Abstract Syntax Tree (AST)</li>
 <li>The script's legacy Bert byte-code</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1099,11 +1117,13 @@ by a semicolon or (sometimes) a block, as in Java.</p>
 <li><a href="statements.html#blocks">Blocks</a></li>
 <li><a href="statements.html#return">Return</a></li>
 <li><a href="statements.html#if-statements">If Statements</a></li>
+<li><a href="statements.html#if-let-statements">If Let Statements</a></li>
 <li><a href="statements.html#while-loops">While Loops</a></li>
 <li><a href="statements.html#for-loops">For Loops</a></li>
 <li><a href="statements.html#foreach-loops">Foreach Loops</a></li>
 <li><a href="statements.html#break-and-continue">Break and Continue</a></li>
 <li><a href="statements.html#switch-statements">Switch Statements</a></li>
+<li><a href="statements.html#match-statements">Match Statements</a></li>
 <li><a href="statements.html#throw">Throw</a></li>
 <li><a href="statements.html#assert">Assert</a></li>
 </ul>
@@ -1117,6 +1137,32 @@ var y;      // y == null
 <p>Joe is lexically scoped; undeclared variables in function or method bodies
 are presumed to be declared in an enclosing scope.  It is an error if
 they are not.</p>
+<p>In addition to declaring and initializing individual variables, the
+<code>var</code> statement can use a <a href="patterns.html">pattern</a> to perform a destructuring
+bind: that is,
+to bind one or more variables to values within a data structure.  For example,
+suppose that the function <code>f()</code> returns a two-item list, and the caller wants
+to assign the list items to the variables <code>x</code> and <code>y</code>.</p>
+<p>One could do this:</p>
+<pre><code class="language-joe">var result = f();
+var x = result[0];
+var y = result[1];
+</code></pre>
+<p>Or, one could do a destructing bind:</p>
+<pre><code class="language-joe">var [x, y] = f();
+</code></pre>
+<p>Here, <code>var</code> matches the list returned by <code>f()</code> against the pattern
+<code>[x, y]</code> and binds variables <code>x</code> and <code>y</code> to the matched values.</p>
+<p><strong>When the pattern doesn't match:</strong> If <code>var</code>'s pattern doesn't match
+the target value, e.g., if <code>f()</code> didn't return a two-item list in the
+example shown above, then the pattern match will fail and Joe will
+throw a runtime error.  Therefore, <code>var</code> should only be used when the
+shape of the target value is known ahead of time.  Use
+<a href="statements.html#the-if-let-statement"><code>if let</code></a> or
+<a href="statements.html#the-match-statement"><code>match</code></a> to test whether a value matches a
+particular pattern.</p>
+<p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
+destructuring binds, including Joe's full pattern syntax.</p>
 <h2 id="function-declarations"><a class="header" href="#function-declarations">Function Declarations</a></h2>
 <p>Functions are declared with the <code>function</code> statement.  See
 <a href="functions.html">Functions</a> for more details.</p>
@@ -1157,6 +1203,24 @@ not displayed by <code>joe run</code>.</p>
     ...
 }
 </code></pre>
+<h2 id="if-let-statements"><a class="header" href="#if-let-statements">If Let Statements</a></h2>
+<p>The <code>if let</code> uses a <a href="patterns.html">pattern</a> to do a conditional
+destructuring bind on a data structure.  If the pattern matches, <code>if let</code>
+executes its "then" branch with the bound variables in scope;
+otherwise it executes its "else" branch:</p>
+<pre><code class="language-joe">var list = [1, 2];
+
+if let ([a, b] = list) {
+    println(a); // Prints "1"
+    println(b); // Prints "2"
+} else {
+    println("no match");
+}
+</code></pre>
+<p>The pattern's binding variables (<code>a</code> and <code>b</code> in this example) are in-scope only
+in the "then" branch.</p>
+<p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
+destructuring binds, including Joe's full pattern syntax.</p>
 <h2 id="while-loops"><a class="header" href="#while-loops">While Loops</a></h2>
 <p><code>while</code> loops are defined as in Java.</p>
 <pre><code class="language-joe">var x = 0;
@@ -1208,6 +1272,42 @@ expression</em>.</li>
 <p>The implementation is quite simple: each case value is checked in
 turn, from the top to the bottom, until a match is found; then the
 case's body is executed.</p>
+<h2 id="match-statements"><a class="header" href="#match-statements">Match Statements</a></h2>
+<p>The <code>match</code> statement is similar to a <code>switch</code> statement, but matches
+patterns against a target value instead of checking for equality.  It
+is especially useful for processing a heterogeneous list of values.</p>
+<pre><code class="language-joe">match (value) {
+    case [a, b] -&gt; 
+        println("Two item list of " a + " and " + b + ".");
+    case Person(name, age) -&gt; 
+        println("Person " + name + " is " + age + " years old.");
+    default -&gt; println("no match");
+}
+</code></pre>
+<p>Every <code>match</code> statement requires at least one <code>case</code>; the <code>default</code>
+case is optional.  (Note that matching on <code>_</code>, a simple wildcard pattern,
+is equivalent to the <code>default</code> case:</p>
+<pre><code class="language-joe">match (value) {
+    case [a, b] -&gt; 
+        println("Two item list of " a + " and " + b + ".");
+    case Person(name, age) -&gt; 
+        println("Person " + name + " is " + age + " years old.");
+    case _ -&gt; println("no match");
+}
+</code></pre>
+<p>Each <code>case</code> in a <code>match</code> can include an optional guard clause that
+adds a boolean guard condition on top of the pattern match.  In the following
+example the case matches any <code>Person</code> record, and then requires that the
+person be at least 10 years old.</p>
+<pre><code class="language-joe">match (value) {
+    ...
+    case Person(name, age) if age &gt;= 10 -&gt; 
+        println("Person " + name + " is at least 10 years old.");
+    ...
+}
+</code></pre>
+<p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
+destructuring binds, including Joe's full pattern syntax.</p>
 <h2 id="throw"><a class="header" href="#throw">Throw</a></h2>
 <p>The <code>throw</code> statement is used to explicitly throw
 <a href="library/type.joe.Error.html">error exceptions</a> in a Joe script.</p>
@@ -1457,119 +1557,17 @@ etc.</p>
 <p>Record types are especially useful when <a href="patterns.html">pattern matching</a>
 is used.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="pattern-matching"><a class="header" href="#pattern-matching">Pattern Matching</a></h1>
-<p>Joe supports a rich pattern-matching capability inspired the Rust language's
-<code>let</code>, <code>if let</code>, and <code>match</code> statements.</p>
+<p>Joe supports a rich pattern-matching capability inspired by the Rust language's
+similar capability. Joe's
+<a href="statements.html#variable-declarations"><code>var</code></a>,
+<a href="statements.html#if-let-statements"><code>if let</code></a>, and
+<a href="statements.html#match-statements"><code>match</code></a> statements all make
+use of pattern matching to do destructuring binds.</p>
+<p>Joe supports a rich variety of patterns.  Some of them can contain
+other patterns as subpatterns, allowing a pattern to match
+quite complicated data structures.</p>
 <ul>
-<li><a href="patterns.html#the-let-statement">The <code>let</code> Statement</a></li>
-<li><a href="patterns.html#the-if-let-statement">The <code>if let</code> Statement</a></li>
-<li><a href="patterns.html#the-match-statement">The <code>match</code> Statement</a></li>
-<li><a href="patterns.html#pattern-syntax">Pattern Syntax</a></li>
-</ul>
-<h2 id="the-let-statement"><a class="header" href="#the-let-statement">The <code>let</code> Statement</a></h2>
-<p>The <code>let</code> statement performs a destructuring bind, that is, it binds
-variables to values within a data structure.  For example, suppose that the
-function <code>f()</code> returns a two-item list, and the caller wants to assign the
-list items to variables <code>x</code> and <code>y</code>.</p>
-<p>One could do this:</p>
-<pre><code class="language-joe">var result = f();
-var x = result[0];
-var y = result[1];
-</code></pre>
-<p>Or, one could do a destructing bind using <code>let</code>:</p>
-<pre><code class="language-joe">let [x, y] = f();
-</code></pre>
-<p>Here, <code>let</code> matches the list returned by <code>f()</code> against the pattern
-<code>[x, y]</code> and binds variables <code>x</code> and <code>y</code> to the matched values.</p>
-<p><strong><code>let</code> vs. <code>var</code></strong>: The <code>let</code> statement is quite similar to the
-<code>var</code> statement; both declare new variables, and these two statements
-are semantically equivalent:</p>
-<pre><code class="language-joe">var x = 5;
-let x = 5;
-</code></pre>
-<p>There are two differences:</p>
-<ul>
-<li><code>let</code> can match more complex patterns, while <code>var</code> cannot.</li>
-<li><code>var</code> is faster, as it doesn't incur any pattern-matching overhead.</li>
-</ul>
-<p><strong>When the pattern doesn't match:</strong> If <code>let</code>'s pattern doesn't match
-the target value, e.g., if <code>f()</code> didn't return a two-item list in the
-example shown above, then the pattern match will fail and Joe will
-throw a runtime error.  Therefore, <code>let</code> should only be used when the
-shape of the target value is known ahead of time.  Use
-<a href="patterns.html#the-if-let-statement"><code>if let</code></a> or
-<a href="patterns.html#the-match-statement"><code>match</code></a> to test whether a value matches a
-particular pattern.</p>
-<p><strong>Matching Maps:</strong> Similarly, one can match the values of map fields.  Suppose
-<code>g()</code> returns a map, and the call wants the values of the map's
-<code>#name</code> and <code>#age</code> keys:</p>
-<pre><code class="language-joe">// The hard way
-var map = g();
-var n = map[#name];
-var a = map[#age];
-
-// The easy way
-let {#name: n, #age: a} = g();
-</code></pre>
-<p>If the <code>map</code> returned by <code>g()</code> has keys <code>#name</code> and <code>#age</code>, this statement
-will bind the variables <code>n</code> and <code>a</code> to <code>map[#name]</code> and <code>map[#age]</code>.  And
-if not, Joe will throw a runtime error, as before.</p>
-<p>These are only a few of the kinds of patterns that Joe supports. See
-<a href="patterns.html#pattern-syntax">Pattern Syntax</a> for more.</p>
-<h2 id="the-if-let-statement"><a class="header" href="#the-if-let-statement">The <code>if let</code> Statement</a></h2>
-<p>The <code>let</code> statement throws an error if the pattern does match the target value.
-The <code>if let</code> statement executes its "then" branch if the pattern matches the
-target, and its optional "else" branch otherwise.</p>
-<pre><code class="language-joe">var list = [1, 2];
-
-if let ([a, b] = list) {
-    println(a); // Prints "1"
-    println(b); // Prints "2"
-} else {
-    println("no match");
-}
-</code></pre>
-<p>The pattern's binding variables (<code>a</code> and <code>b</code> in this example) are in-scope only
-in the "then" branch.</p>
-<h2 id="the-match-statement"><a class="header" href="#the-match-statement">The <code>match</code> Statement</a></h2>
-<p>The <code>match</code> statement is similar to a <code>switch</code> statement, but matches
-patterns against a target value instead of checking for equality.  It
-is especially useful for processing a heterogeneous list of values.</p>
-<pre><code class="language-joe">match (value) {
-    case [a, b] -&gt; 
-        println("Two item list of " a + " and " + b + ".");
-    case Person(name, age) -&gt; 
-        println("Person " + name + " is " + age + " years old.");
-    default -&gt; println("no match");
-}
-</code></pre>
-<p>Every <code>match</code> statement requires at least one <code>case</code>, and the <code>default</code>
-clause is optional.  Note that matching on <code>_</code> (a simple wildcard)
-is equivalent to the <code>default</code> clause:</p>
-<pre><code class="language-joe">match (value) {
-    case [a, b] -&gt; 
-        println("Two item list of " a + " and " + b + ".");
-    case Person(name, age) -&gt; 
-        println("Person " + name + " is " + age + " years old.");
-    case _ -&gt; println("no match");
-}
-</code></pre>
-<p>Each <code>case</code> in a <code>match</code> can include an optional  guard clause, which
-adds a boolean guard condition on top of the pattern match.  In the following
-example the case matches any <code>Person</code> record, and then requires that the
-person be at least 10 years old.</p>
-<pre><code class="language-joe">match (value) {
-    ...
-    case Person(name, age) if age &gt;= 10 -&gt; 
-        println("Person " + name + " is at least 10 years old.");
-    ...
-}
-</code></pre>
-<h2 id="pattern-syntax"><a class="header" href="#pattern-syntax">Pattern Syntax</a></h2>
-<p>Here is a list of the many kinds of pattern Joe supports.  Some patterns
-can contain other patterns as subpatterns, allowing a pattern to match
-quite complicated data structures.  Here is a list of the different
-kinds of patterns:</p>
-<ul>
+<li><a href="patterns.html#patterns-and-destructuring-binds">Patterns and Destructuring Binds</a></li>
 <li><a href="patterns.html#binding-variables">Binding Variables</a></li>
 <li><a href="patterns.html#wildcards">Wildcards</a></li>
 <li><a href="patterns.html#constants">Constants</a></li>
@@ -1580,35 +1578,51 @@ kinds of patterns:</p>
 <li><a href="patterns.html#instance-patterns">Instance Patterns</a></li>
 <li><a href="patterns.html#record-patterns">Record Patterns</a></li>
 </ul>
-<h3 id="binding-variables"><a class="header" href="#binding-variables">Binding Variables</a></h3>
+<h2 id="patterns-and-destructuring-binds"><a class="header" href="#patterns-and-destructuring-binds">Patterns and Destructuring Binds</a></h2>
+<p>A destructuring bind is a way to bind one more variables to values within
+a complex data structure.  The bind makes use of a pattern that duplicates
+the structure of the target value to match variable names to specific elements.</p>
+<p>For example, suppose that the function <code>f()</code> returns a two-item list, and the
+caller wants to assign the list items to the variables <code>x</code> and <code>y</code>.</p>
+<p>One could do this:</p>
+<pre><code class="language-joe">var result = f();
+var x = result[0];
+var y = result[1];
+</code></pre>
+<p>Or, one could do a destructing bind using <code>var</code>:</p>
+<pre><code class="language-joe">var [x, y] = f();
+</code></pre>
+<p>Here, <code>var</code> matches the list returned by <code>f()</code> against the pattern
+<code>[x, y]</code> and binds variables <code>x</code> and <code>y</code> to the matched values.</p>
+<h2 id="binding-variables"><a class="header" href="#binding-variables">Binding Variables</a></h2>
 <p>We've seen binding variables in most of the examples shown above.
 A binding variable is a variable name that appears within the pattern and
 is assigned the corresponding value in the match target.</p>
-<pre><code class="language-joe">let [a, b] = [1, 2];    // a = 1, b = 2.
+<pre><code class="language-joe">var [a, b] = [1, 2];    // a = 1, b = 2.
 </code></pre>
 <p>A binding variable can also be used to capture a subpattern.  In the
 following example, the variable <code>b</code> is assigned list <code>[2, 3]</code> while
 <code>c</code> and <code>d</code> are assigned the values of the list's items.</p>
 <pre><code class="language-joe">var list = [1, [2, 3], 4];
 
-let [a, b = [c, d], e];
+var [a, b = [c, d], e];
 </code></pre>
-<h3 id="wildcards"><a class="header" href="#wildcards">Wildcards</a></h3>
+<h2 id="wildcards"><a class="header" href="#wildcards">Wildcards</a></h2>
 <p>A <em>wildcard</em> is a pattern that matches (and ignores) any value.  A
 wildcard is written as an identifier with leading underscore, e.g.,
 <code>_</code>, <code>_ignore</code>, <code>_x</code>.  For example:</p>
-<pre><code class="language-joe">let [x, _] = ["abc", "def"];
+<pre><code class="language-joe">var [x, _] = ["abc", "def"];
 </code></pre>
 <p><code>x</code> will be assigned the value <code>"abc"</code>, while the second item of
 the target <code>list</code> will be ignored.</p>
 <p>It's most common to use the wildcard <code>_</code>; but using a longer name can
 be useful to document what the ignored value is:</p>
-<pre><code class="language-joe">let [first, _last] = ["Joe", "Pro"];
+<pre><code class="language-joe">var [first, _last] = ["Joe", "Pro"];
 </code></pre>
 <p>Using <code>_last</code> indicates that we don't care about the last name
 at the moment, but also shows that it is the last name that we are
 ignoring.</p>
-<h3 id="constants"><a class="header" href="#constants">Constants</a></h3>
+<h2 id="constants"><a class="header" href="#constants">Constants</a></h2>
 <p>A constant pattern is a constant value included in the pattern; the
 corresponding value in the target must have that exact value.</p>
 <pre><code class="language-joe">function isPro(list) {
@@ -1628,13 +1642,13 @@ var y = isPro(["Joe", "Amateur"]);   // Returns false
 <a href="types.html#booleans">boolean</a>,
 <a href="types.html#keywords">keyword</a>,
 or <code>null</code>.</p>
-<h3 id="interpolated-expressions"><a class="header" href="#interpolated-expressions">Interpolated Expressions</a></h3>
+<h2 id="interpolated-expressions"><a class="header" href="#interpolated-expressions">Interpolated Expressions</a></h2>
 <p>To use a computed value as a constant, interpolate
 it using <code>$(...)</code>.</p>
 <pre><code class="language-joe">var a = 5;
 var b = 15;
 
-let [x, $(a + b)] = [10, 20];  // Matches; x == 10.
+var [x, $(a + b)] = [10, 20];  // Matches; x == 10.
 </code></pre>
 <p>Here, <code>$(a + b)</code> evaluates to <code>20</code>, which matches the second
 item in the target list.</p>
@@ -1642,9 +1656,9 @@ item in the target list.</p>
 a variable name:</p>
 <pre><code class="language-joe">var wanted = "Pro";
 
-let [first, $wanted] = ["Joe", "Pro"];   
+var [first, $wanted] = ["Joe", "Pro"];   
 </code></pre>
-<h3 id="list-patterns"><a class="header" href="#list-patterns">List Patterns</a></h3>
+<h2 id="list-patterns"><a class="header" href="#list-patterns">List Patterns</a></h2>
 <p>We've seen many list patterns in the above examples.  Syntactically,
 a list pattern is simply a list of patterns that matches a <code>List</code> of
 values.  The matched list must have exactly the same number of items
@@ -1664,7 +1678,7 @@ pattern can provide a pattern variable to bind to the list's tail:</p>
 <p>The variables <code>a</code> and <code>b</code> will get <code>list[0]</code> and <code>list[1]</code>, and <code>tail</code>
 will get any remaining items, or the empty list if <code>list.size() == 2</code>.
 (The match will naturally fail if <code>list.size() &lt; 2</code>.)</p>
-<h3 id="map-patterns"><a class="header" href="#map-patterns">Map Patterns</a></h3>
+<h2 id="map-patterns"><a class="header" href="#map-patterns">Map Patterns</a></h2>
 <p>A map pattern matches objects with keys and values, e.g.,
 <a href="library/type.joe.Map.html"><code>Map</code></a> values.</p>
 <ul>
@@ -1676,11 +1690,11 @@ pattern, and their values must match the corresponding value patterns.</li>
 the pattern.</li>
 </ul>
 <p>Some examples:</p>
-<pre><code class="language-joe">let {#a: a, #b: b} = {#a: 1, #b: 2, #c: 3};  // a = 1, b = 2
-let ($x: value} = someMap;                   // value = someMap.get(x)
-let {#a: [a, b, c], #b: x} = someMap;
+<pre><code class="language-joe">var {#a: a, #b: b} = {#a: 1, #b: 2, #c: 3};  // a = 1, b = 2
+var ($x: value} = someMap;                   // value = someMap.get(x)
+var {#a: [a, b, c], #b: x} = someMap;
 </code></pre>
-<h3 id="matching-instances-with-map-patterns"><a class="header" href="#matching-instances-with-map-patterns">Matching Instances with Map Patterns</a></h3>
+<h2 id="matching-instances-with-map-patterns"><a class="header" href="#matching-instances-with-map-patterns">Matching Instances with Map Patterns</a></h2>
 <p>A map pattern can also match any Joe value with field properties, e.g.,
 an instance of a Joe <code>class</code>.  The pattern's keys match the field names
 and the pattern's values match the field values.</p>
@@ -1697,8 +1711,8 @@ to such strings or keywords.</li>
 }
 
 // These two statements are equivalent
-let {"id": i, "color": c} = Thing(123, "red");
-let {#id: i,  #color: c}  = Thing(123, "red");
+var {"id": i, "color": c} = Thing(123, "red");
+var {#id: i,  #color: c}  = Thing(123, "red");
 </code></pre>
 <p>As when matching <code>Map</code> values, the pattern can reference a subset of
 the object's fields.</p>
@@ -1713,8 +1727,8 @@ match on the value's type as well as on its fields.  For example,</p>
 }
 
 // These two statements are equivalent
-let Thing{"id": i, "color": c} = Thing(123, "red");
-let Thing{#id: i,  #color: c}  = Thing(123, "red");
+var Thing{"id": i, "color": c} = Thing(123, "red");
+var Thing{#id: i,  #color: c}  = Thing(123, "red");
 </code></pre>
 <p>An instance pattern consists of the name of the desired type, followed by
 a map pattern for its fields. For the pattern to match:</p>
@@ -1723,7 +1737,7 @@ a map pattern for its fields. For the pattern to match:</p>
 <li>The value must have all of the specified fields.</li>
 <li>The field patterns must match.</li>
 </ul>
-<p>Types are matched based on their names, i.e., in <code>let Thing{...} = thing;</code> the
+<p>Types are matched based on their names, i.e., in <code>var Thing{...} = thing;</code> the
 type will match if <code>Joe.typeOf(thing).name() == "Thing"</code>, <em><strong>not</strong></em> if
 <code>Joe.typeOf(thing) == Thing</code>.  In other words, there is no requirement that
 the matched type is in scope; it is enough that the value being matched
@@ -1740,8 +1754,8 @@ to pattern matching.</p>
 var person = Person(Joe, 80);
 
 // These statements are identical
-let Person(n, a) = person;
-let Person{#name: n, #age: a} = person;
+var Person(n, a) = person;
+var Person{#name: n, #age: a} = person;
 </code></pre>
 <p>The first form can only be used with a value of a record type; it matches
 the values of the type's fields in sequence.  All fields must be
@@ -9052,9 +9066,9 @@ value.</li>
 <tr><td>12</td><td>FALSE</td><td>∅ → false</td><td>Load <code>false</code></td></tr>
 <tr><td>13</td><td>GE</td><td><em>a b</em> → <em>c</em></td><td>c = a &gt;= b</td></tr>
 <tr><td>14</td><td>GETNEXT</td><td><em>iter</em> → <em>a</em></td><td>a = iter.next()</td></tr>
-<tr><td>15</td><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
-<tr><td>16</td><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
-<tr><td>17</td><td>GLOLET</td><td><em>p t</em> → ∅</td><td>Bind target to pattern</td></tr>
+<tr><td>15</td><td>GLOBIND</td><td><em>p t</em> → ∅</td><td>Bind target to pattern</td></tr>
+<tr><td>16</td><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
+<tr><td>17</td><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
 <tr><td>18</td><td>GLOSET <em>name</em></td><td><em>a</em> → <em>a</em></td><td>Set global</td></tr>
 <tr><td>19</td><td>GT</td><td><em>a b</em> → <em>a</em> &gt; <em>b</em></td><td>Compare: greater</td></tr>
 <tr><td>20</td><td>HASNEXT</td><td><em>iter</em> → <em>flag</em></td><td>flag = iter.hasNext()</td></tr>
@@ -9072,8 +9086,8 @@ value.</li>
 <tr><td>32</td><td>LE</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less or equal</td></tr>
 <tr><td>33</td><td>LISTADD</td><td><em>list a</em> → <em>list</em></td><td>Add item to list</td></tr>
 <tr><td>34</td><td>LISTNEW</td><td>∅ → <em>list</em></td><td>Push empty list</td></tr>
-<tr><td>35</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
-<tr><td>36</td><td>LOCLET</td><td><em>p t</em> → <em>vs</em></td><td>Bind target to pattern</td></tr>
+<tr><td>35</td><td>LOCBIND</td><td><em>p t</em> → <em>vs</em></td><td>Bind target to pattern</td></tr>
+<tr><td>36</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
 <tr><td>37</td><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
 <tr><td>38</td><td>LOOP <em>offset</em></td><td>∅ → ∅</td><td>Jump backwards</td></tr>
 <tr><td>39</td><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
@@ -9241,6 +9255,15 @@ otherwise.</p>
 <p><strong>GETNEXT</strong> | <em>iter</em> → <em>a</em></p>
 <p>Gets the next value from <em>iter</em>, which must be an iterator created by the
 <code>ITER</code> instruction.  This instruction should always be paired with <code>HASNEXT</code>.</p>
+<h3 id="globind"><a class="header" href="#globind">GLOBIND</a></h3>
+<hr />
+<p><strong>GLOBIND</strong> | <em>p</em> <em>t</em> → ∅</p>
+<p>The <code>GLOBIND</code> instruction implements the <code>var</code> statement at the global scope
+when <code>var</code> includes a destructuring pattern,
+binding pattern value <em>p</em> to target <em>t</em>, where <em>p</em> is a pattern evaluated
+by the <code>PATTERN</code> instruction. If the match succeeds then the binding
+variables and their values will be added to the global environment. If the
+match fails then the instruction throws a <code>RuntimeError</code>.</p>
 <h3 id="glodef"><a class="header" href="#glodef">GLODEF</a></h3>
 <hr />
 <p><strong>GLODEF</strong> <em>name</em> | <em>a</em> → ∅</p>
@@ -9249,14 +9272,6 @@ otherwise.</p>
 <hr />
 <p><strong>GLOGET</strong> <em>name</em> | ∅ → <em>a</em></p>
 <p>Retrieves the value of global variable <em>name</em> and pushes it on the stack.</p>
-<h3 id="glolet"><a class="header" href="#glolet">GLOLET</a></h3>
-<hr />
-<p><strong>GLOLET</strong> | <em>p</em> <em>t</em> → ∅</p>
-<p>The <code>GLOLET</code> instruction implements the <code>let</code> statement at the global scope,
-binding pattern value <em>p</em> to target <em>t</em>, where <em>p</em> is a pattern evaluated
-by the <code>PATTERN</code> instruction. If the match succeeds then the binding
-variables and their values will be added to the global environment. If the
-match fails then the instruction throws a <code>RuntimeError</code>.</p>
 <h3 id="gloset"><a class="header" href="#gloset">GLOSET</a></h3>
 <hr />
 <p><strong>GLOSET</strong> <em>name</em> | <em>a</em> → <em>a</em></p>
@@ -9354,20 +9369,21 @@ stack.</p>
 <hr />
 <p><strong>LISTNEW</strong> | ∅ → <em>list</em></p>
 <p>Pushes an empty <em>list</em> value onto the stack.</p>
-<h3 id="locget"><a class="header" href="#locget">LOCGET</a></h3>
+<h3 id="locbind"><a class="header" href="#locbind">LOCBIND</a></h3>
 <hr />
-<p><strong>LOCGET</strong> <em>slot</em> | ∅ → <em>a</em></p>
-<p>Gets the value of the local variable in the given stack <em>slot</em>,
-relative to the current call frame.</p>
-<h3 id="loclet"><a class="header" href="#loclet">LOCLET</a></h3>
-<hr />
-<p><strong>LOCLET</strong> | <em>p</em> <em>t</em> → <em>vs</em></p>
-<p>The <code>LOCLET</code> instruction implements the <code>let</code> statement in local scopes,
+<p><strong>LOCBIND</strong> | <em>p</em> <em>t</em> → <em>vs</em></p>
+<p>The <code>LOCBIND</code> instruction implements the <code>var</code> statement in local scopes
+when <code>var</code> includes a destructuring pattern,
 binding pattern value <em>p</em> to target value <em>t</em>, where <em>p</em> is a pattern
 value produced by the <code>PATTERN</code> instruction. If the match succeeds
 then the values of the binding variables will be pushed
 onto the stack, initializing them as locals. If the match fails then the
 instruction throws a <code>RuntimeError</code>.</p>
+<h3 id="locget"><a class="header" href="#locget">LOCGET</a></h3>
+<hr />
+<p><strong>LOCGET</strong> <em>slot</em> | ∅ → <em>a</em></p>
+<p>Gets the value of the local variable in the given stack <em>slot</em>,
+relative to the current call frame.</p>
 <h3 id="locset"><a class="header" href="#locset">LOCSET</a></h3>
 <hr />
 <p><strong>LOCSET</strong> <em>slot</em> | <em>a</em> → <em>a</em></p>
@@ -9746,7 +9762,7 @@ otherwise.</p>
 <hr />
 <p><strong>GLOGET <em>name</em></strong> | ∅ → <em>a</em></p>
 <p>Retrieves the value of global variable <em>name</em> and pushes it on the stack.</p>
-<h3 id="glolet-1"><a class="header" href="#glolet-1">GLOLET</a></h3>
+<h3 id="glolet"><a class="header" href="#glolet">GLOLET</a></h3>
 <hr />
 <p><strong>GLOLET <em>pattern</em></strong> | <em>list</em> <em>a</em> → ∅</p>
 <p>The <code>GLOLET</code> instruction implements the <code>let</code> statement where the binding
@@ -9858,7 +9874,7 @@ stack.</p>
 <p><strong>LOCGET <em>slot</em></strong> | ∅ → <em>a</em></p>
 <p>Gets the value of the local variable in the given stack <em>slot</em>,
 relative to the current call frame.</p>
-<h3 id="loclet-1"><a class="header" href="#loclet-1">LOCLET</a></h3>
+<h3 id="loclet"><a class="header" href="#loclet">LOCLET</a></h3>
 <hr />
 <p><strong>LOCLET <em>pattern</em></strong> | <em>list</em> <em>a</em> → ∅</p>
 <p>The <code>LOCLET</code> instruction implements the <code>let</code> statement where the binding

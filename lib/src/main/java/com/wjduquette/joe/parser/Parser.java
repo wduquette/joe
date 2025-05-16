@@ -131,7 +131,6 @@ public class Parser {
             if (scanner.match(CLASS)) return classDeclaration();
             if (scanner.match(FUNCTION)) return functionDeclaration(
                 FunctionType.FUNCTION, "function");
-            if (scanner.match(LET)) return letDeclaration();
             if (scanner.match(RECORD)) return recordDeclaration();
             if (scanner.match(VAR)) return varDeclaration();
 
@@ -255,21 +254,6 @@ public class Parser {
         return parameters;
     }
 
-    private Stmt letDeclaration() {
-        Token keyword = scanner.previous();
-        ASTPattern pattern = pattern();
-
-        if (pattern.getBindings().isEmpty()) {
-            error(scanner.previous(), "'let' pattern must declare at least one variable.");
-        }
-
-        scanner.consume(EQUAL, "Expected '=' after pattern.");
-        var target = expression();
-        scanner.consume(SEMICOLON, "Expected ';' after target expression.");
-
-        return new Stmt.Let(keyword, pattern, target);
-    }
-
     private Stmt recordDeclaration() {
         // Type Name
         int start = scanner.previous().span().start();
@@ -321,15 +305,37 @@ public class Parser {
     }
 
     private Stmt varDeclaration() {
-        scanner.consume(IDENTIFIER, "Expected variable name.");
-        var name = scanner.previous();
+        Token keyword = scanner.previous();
+        ASTPattern pattern = pattern();
 
-        var initializer = scanner.match(EQUAL)
-            ? expression()
-            : new Expr.Null();
+        return switch (pattern.getPattern()) {
+            case Pattern.ValueBinding ignored -> {
+                var name = scanner.previous();
 
-        scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
-        return new Stmt.Var(name, initializer);
+                var initializer = scanner.match(EQUAL)
+                    ? expression()
+                    : new Expr.Null();
+
+                scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
+                yield new Stmt.Var(name, initializer);
+            }
+            case Pattern.Constant ignored ->
+                throw errorSync(scanner.previous(), "Expected variable name.");
+            case Pattern.Wildcard ignored ->
+                throw errorSync(scanner.previous(), "Expected variable name.");
+            default -> {
+                if (pattern.getBindings().isEmpty()) {
+                    error(scanner.previous(),
+                        "'var' pattern must declare at least one variable.");
+                }
+
+                scanner.consume(EQUAL, "Expected '=' after pattern.");
+                var target = expression();
+                scanner.consume(SEMICOLON, "Expected ';' after target expression.");
+
+                yield new Stmt.VarPattern(keyword, pattern, target);
+            }
+        };
     }
 
     private Stmt statement() {

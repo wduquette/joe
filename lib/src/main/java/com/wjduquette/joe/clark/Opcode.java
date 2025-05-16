@@ -34,9 +34,9 @@ public class Opcode {
     /** Opcode */ public static final char FALSE   = 12;
     /** Opcode */ public static final char GE      = 13;
     /** Opcode */ public static final char GETNEXT = 14;
-    /** Opcode */ public static final char GLODEF  = 15;
-    /** Opcode */ public static final char GLOGET  = 16;
-    /** Opcode */ public static final char GLOLET  = 17;
+    /** Opcode */ public static final char GLOBIND = 15;
+    /** Opcode */ public static final char GLODEF  = 16;
+    /** Opcode */ public static final char GLOGET  = 17;
     /** Opcode */ public static final char GLOSET  = 18;
     /** Opcode */ public static final char GT      = 19;
     /** Opcode */ public static final char HASNEXT = 20;
@@ -54,8 +54,8 @@ public class Opcode {
     /** Opcode */ public static final char LE      = 32;
     /** Opcode */ public static final char LISTADD = 33;
     /** Opcode */ public static final char LISTNEW = 34;
-    /** Opcode */ public static final char LOCGET  = 35;
-    /** Opcode */ public static final char LOCLET  = 36;
+    /** Opcode */ public static final char LOCBIND = 35;
+    /** Opcode */ public static final char LOCGET  = 36;
     /** Opcode */ public static final char LOCSET  = 37;
     /** Opcode */ public static final char LOOP    = 38;
     /** Opcode */ public static final char LT      = 39;
@@ -111,9 +111,9 @@ public class Opcode {
         "FALSE",
         "GE",
         "GETNEXT",
+        "GLOBIND",
         "GLODEF",
         "GLOGET",
-        "GLOLET",
         "GLOSET",
         "GT",
         "HASNEXT",
@@ -131,8 +131,8 @@ public class Opcode {
         "LE",
         "LISTADD",
         "LISTNEW",
+        "LOCBIND",
         "LOCGET",
-        "LOCLET",
         "LOCSET",
         "LOOP",
         "LT",
