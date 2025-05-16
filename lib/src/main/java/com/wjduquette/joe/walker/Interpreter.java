@@ -228,13 +228,16 @@ class Interpreter {
                 }
             }
             case Stmt.IfLet stmt -> {
+                // Evaluate the pattern constants and the target value.
+                var constants = new ArrayList<>();
+                stmt.pattern().getConstants().forEach(e ->
+                    constants.add(evaluate(e)));
+                var target = evaluate(stmt.target());
+
+                // Do the binding in the pattern scope.
                 var previous = this.environment;
                 this.environment = new Environment(previous);
                 try {
-                    var constants = new ArrayList<>();
-                    stmt.pattern().getConstants().forEach(e ->
-                        constants.add(evaluate(e)));
-                    var target = evaluate(stmt.target());
                     var bound = new HashMap<String,Object>();
                     if (Matcher.bind(
                         joe,
@@ -258,12 +261,13 @@ class Interpreter {
                 var target = evaluate(stmt.expr());
                 for (var c : stmt.cases()) {
                     // case pattern ->
+                    var constants = new ArrayList<>();
+                    c.pattern().getConstants().forEach(e ->
+                        constants.add(evaluate(e)));
+
                     var previous = this.environment;
                     try {
                         this.environment = new Environment(previous);
-                        var constants = new ArrayList<>();
-                        c.pattern().getConstants().forEach(e ->
-                            constants.add(evaluate(e)));
                         var bound = new HashMap<String,Object>();
                         if (Matcher.bind(
                             joe,
