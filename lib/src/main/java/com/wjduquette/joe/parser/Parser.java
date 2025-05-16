@@ -472,8 +472,13 @@ public class Parser {
 
                 // Body
                 var body = statement();
+                var end = scanner.previous().span().end();
 
-                return new Stmt.ForEachBind(keyword, pattern, listExpr, body);
+                return new Stmt.Block(
+                    source.span(start, end),
+                    List.of(
+                        new Stmt.ForEachBind(keyword, pattern, listExpr, body)
+                    ));
             }
         }
     }
