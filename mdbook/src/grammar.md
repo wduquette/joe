@@ -20,7 +20,6 @@ program         → declaration* EOF ;
 
 declaration     → classDecl
                 | funDecl
-                | letDecl
                 | varDecl
                 | statement ;
 
@@ -34,20 +33,20 @@ funDecl         → "function" function ;
 function        → IDENTIFIER "(" parameters? ")" block ;
 parameters      → IDENTIFIER ( "," IDENTIFIER )* ;
 
-letDecl         → "let" pattern "=" expression ";" ; 
-
 recordDecl      → "record" IDENTIFIER "(" parameters ")" 
                   "{" recordItem* "}" ;
 recordItem      → "method" function
                 | "static" "method" function
                 | "static" block ; 
                   
-varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
+varDecl         → "var" IDENTIFIER ( "=" expression )? ";" 
+                | "var" pattern "=" expression ";" ;
                
 statement       → exprStmt
                 | breakStmt
                 | continueStmt
                 | forStmt
+                | foreachStmt
                 | ifStmt
                 | ifLetStmt
                 | matchStmt
@@ -64,7 +63,7 @@ continueStmt    → "continue" ";" ;
 forStmt         → "for" "(" ( varDecl | exprStmt | ";" )
                   expression? ";"
                   expression? ")" statement ;
-forEachStmt     → "foreach" "(" "var" IDENTIFIER ":" expression ")" statement;
+forEachStmt     → "foreach" "(" pattern ":" expression ")" statement;
 ifStmt          → "if" "(" expression ")" statement 
                   ( "else" statement )? ;
 ifLetStmt       → "if" "let" "(" pattern "=" expression ")" statement 

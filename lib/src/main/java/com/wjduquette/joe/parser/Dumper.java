@@ -109,8 +109,16 @@ public class Dumper {
             }
             case Stmt.ForEach stmt -> {
                 buff.append(indent())
-                    .append("Stmt.ForEach\n");
+                    .append("Stmt.ForEach ")
+                    .append(stmt.name().lexeme());
 
+                dumpExpression(stmt.items());
+                dumpStatement(stmt.body());
+            }
+            case Stmt.ForEachBind stmt -> {
+                buff.append(indent())
+                    .append("Stmt.ForEach")
+                    .append(stmt.pattern());
                 dumpExpression(stmt.items());
                 dumpStatement(stmt.body());
             }

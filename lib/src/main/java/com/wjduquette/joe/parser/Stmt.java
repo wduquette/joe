@@ -9,11 +9,19 @@ import java.util.List;
  * The statements that can appear in a Joe AST.
  */
 public sealed interface Stmt
-    permits Stmt.Assert, Stmt.Block, Stmt.Break, Stmt.Class,
-            Stmt.Continue, Stmt.Expression, Stmt.For, Stmt.ForEach,
-            Stmt.Function, Stmt.If, Stmt.IfLet, Stmt.VarPattern, Stmt.Match,
-            Stmt.Record, Stmt.Return, Stmt.Switch,
-            Stmt.Throw, Stmt.Var, Stmt.While
+    permits Stmt.Assert,
+            Stmt.Block, Stmt.Break,
+            Stmt.Class,
+            Stmt.Continue,
+            Stmt.Expression,
+            Stmt.For, Stmt.ForEach, Stmt.ForEachBind, Stmt.Function,
+            Stmt.If, Stmt.IfLet,
+            Stmt.Match,
+            Stmt.Record, Stmt.Return,
+            Stmt.Switch,
+            Stmt.Throw,
+            Stmt.Var, Stmt.VarPattern,
+            Stmt.While
 {
     /**
      * The location of the statement within the source.
@@ -119,6 +127,23 @@ public sealed interface Stmt
     record ForEach(
         Token keyword,
         Token name,
+        Expr items,
+        Stmt body
+    ) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
+
+    /**
+     * A "foreach" loop that performs a destructuring bind on the
+     * collection items.
+     * @param keyword The "foreach" keyword
+     * @param pattern The binding pattern
+     * @param items The collection expression
+     * @param body The body of the loop, a statement or block.
+     */
+    record ForEachBind(
+        Token keyword,
+        ASTPattern pattern,
         Expr items,
         Stmt body
     ) implements Stmt {

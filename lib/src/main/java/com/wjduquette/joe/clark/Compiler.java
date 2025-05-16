@@ -426,6 +426,10 @@ class Compiler {
 
                 // Local *iter* is popped when the enclosing block end.
             }
+            case Stmt.ForEachBind s -> {
+                emitCONST("Clark does not yet support patterns with 'foreach'.");
+                emit(THROW);
+            }
             case Stmt.Function s -> {
                 emitFunction(s);
                 defineVar(s.name());

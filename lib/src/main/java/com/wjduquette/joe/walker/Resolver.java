@@ -143,6 +143,15 @@ class Resolver {
                 resolve(stmt.body());
                 --loopCounter;
             }
+            case Stmt.ForEachBind stmt -> {
+                ++loopCounter;
+                stmt.pattern().getConstants().forEach(this::resolve);
+                stmt.pattern().getBindings().forEach(this::declare);
+                stmt.pattern().getBindings().forEach(this::define);
+                resolve(stmt.items());
+                resolve(stmt.body());
+                --loopCounter;
+            }
             case Stmt.Function stmt -> {
                 declare(stmt.name());
                 define(stmt.name());
