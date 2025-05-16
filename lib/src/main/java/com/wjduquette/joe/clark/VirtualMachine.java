@@ -1,6 +1,7 @@
 package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.parser.FunctionType;
 import com.wjduquette.joe.patterns.Matcher;
 import com.wjduquette.joe.patterns.Pattern;
 import com.wjduquette.joe.SourceBuffer;

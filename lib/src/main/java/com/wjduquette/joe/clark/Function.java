@@ -1,6 +1,7 @@
 package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.parser.FunctionType;
 
 import java.util.Arrays;
 import java.util.List;

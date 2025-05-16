@@ -120,7 +120,7 @@ public class Dumper {
                     .collect(Collectors.joining(", "));
                 buff.append(indent())
                     .append("Stmt.Function ")
-                    .append(stmt.kind())
+                    .append(stmt.type())
                     .append(" ")
                     .append(stmt.name().lexeme())
                     .append("(")

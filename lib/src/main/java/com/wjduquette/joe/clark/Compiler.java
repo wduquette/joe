@@ -3,10 +3,7 @@ package com.wjduquette.joe.clark;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
-import com.wjduquette.joe.parser.ASTPattern;
-import com.wjduquette.joe.parser.Expr;
-import com.wjduquette.joe.parser.Parser;
-import com.wjduquette.joe.parser.Stmt;
+import com.wjduquette.joe.parser.*;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SourceBuffer.Span;
 import com.wjduquette.joe.scanner.Token;
@@ -299,13 +296,7 @@ class Compiler {
                 // Static Methods
                 for (var m : s.staticMethods()) {
                     line(m.span());
-                    emitFunction(             // c s | c m  ; compile method
-                        FunctionType.STATIC_METHOD,
-                        m.name().lexeme(),
-                        m.params(),
-                        m.body(),
-                        m.span()
-                    );
+                    emitFunction(m);          // c s | c m  ; compile method
                     emitMETHOD(m.name());     // c s | c    ; save method
                 }
 
@@ -313,15 +304,7 @@ class Compiler {
                 currentType.inInstanceMethod = true;
                 for (var m : s.methods()) {
                     line(m.span());
-                    var type = m.name().lexeme().equals(INIT)
-                        ? FunctionType.INITIALIZER : FunctionType.METHOD;
-                    emitFunction(             // c s | c m  ; compile method
-                        type,
-                        m.name().lexeme(),
-                        m.params(),
-                        m.body(),
-                        m.span()
-                    );
+                    emitFunction(m);          // c s | c m  ; compile method
                     emitMETHOD(m.name());     // c s | c    ; save method
                 }
                 currentType.inInstanceMethod = false;
@@ -444,10 +427,7 @@ class Compiler {
                 // Local *iter* is popped when the enclosing block end.
             }
             case Stmt.Function s -> {
-                // NOTE: The parser returns this for both functions
-                // and methods.  Methods aren't yet implemented.
-                emitFunction(FunctionType.FUNCTION, s.name().lexeme(),
-                    s.params(), s.body(), s.location());
+                emitFunction(s);
                 defineVar(s.name());
             }
             case Stmt.If s -> {
@@ -572,13 +552,7 @@ class Compiler {
                 // Static Methods
                 for (var m : s.staticMethods()) {
                     line(m.span());
-                    emitFunction(             // t | t m  ; compile method
-                        FunctionType.STATIC_METHOD,
-                        m.name().lexeme(),
-                        m.params(),
-                        m.body(),
-                        m.span()
-                    );
+                    emitFunction(m);          // t | t m  ; compile method
                     emitMETHOD(m.name());     // t | t    ; save method
                 }
 
@@ -586,13 +560,7 @@ class Compiler {
                 currentType.inInstanceMethod = true;
                 for (var m : s.methods()) {
                     line(m.span());
-                    emitFunction(             // t | t m  ; compile method
-                        FunctionType.METHOD,
-                        m.name().lexeme(),
-                        m.params(),
-                        m.body(),
-                        m.span()
-                    );
+                    emitFunction(m);          // t | t m  ; compile method
                     emitMETHOD(m.name());     // t | t    ; save method
                 }
                 currentType.inInstanceMethod = false;
@@ -730,29 +698,24 @@ class Compiler {
         }
     }
 
-    private void emitFunction(
-        FunctionType type,
-        String name,
-        List<Token> params,
-        List<Stmt> body,
-        Span span
-    ) {
-        this.current = new FunctionInfo(current, type, name, span);
+    private void emitFunction(Stmt.Function func) {
+        this.current = new FunctionInfo(current,
+            func.type(), func.name().lexeme(), func.span());
 
         // Begin the function's scope; no endScope() because `RETURN`
         // does the cleanup.
         beginScope();
 
-        for (var param : params) {
+        for (var param : func.params()) {
             defineLocal(param);
             current.parameters.add(param.lexeme());
         }
 
-        emit(body);
+        emit(func.body());
 
         var compiler = current;  // Save the compiler; endFunction pops it.
         var function = endFunction();
-        lineAtEnd(span);
+        lineAtEnd(func.span());
         emit(CLOSURE, constant(function));
 
         // Emit data about the upvalues
@@ -867,10 +830,7 @@ class Compiler {
                 emit(mathOp);             // c i z     ; z = x + y
                 emit(INDSET);             // z         ; c[i] = z
             }
-            case Expr.Lambda e ->
-                emitFunction(FunctionType.LAMBDA, LAMBDA_NAME,
-                    e.declaration().params(), e.declaration().body(),
-                    e.declaration().span());
+            case Expr.Lambda e -> emitFunction(e.declaration());
             case Expr.ListLiteral e -> {
                                           // Stack effects
                 emitList(e.list());       // list      ; compute list

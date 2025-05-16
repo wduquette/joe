@@ -1,6 +1,7 @@
 package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.parser.FunctionType;
 
 /**
  * An interface for a buffer of compiled code, along with its constants table.
