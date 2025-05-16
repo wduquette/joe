@@ -131,7 +131,6 @@ public class Parser {
             if (scanner.match(CLASS)) return classDeclaration();
             if (scanner.match(FUNCTION)) return functionDeclaration(
                 FunctionType.FUNCTION, "function");
-            if (scanner.match(LET)) return letDeclaration();
             if (scanner.match(RECORD)) return recordDeclaration();
             if (scanner.match(VAR)) return varDeclaration();
 
@@ -253,21 +252,6 @@ public class Parser {
             terminatorString + "' after parameter list.");
 
         return parameters;
-    }
-
-    private Stmt letDeclaration() {
-        Token keyword = scanner.previous();
-        ASTPattern pattern = pattern();
-
-        if (pattern.getBindings().isEmpty()) {
-            error(scanner.previous(), "'let' pattern must declare at least one variable.");
-        }
-
-        scanner.consume(EQUAL, "Expected '=' after pattern.");
-        var target = expression();
-        scanner.consume(SEMICOLON, "Expected ';' after target expression.");
-
-        return new Stmt.VarPattern(keyword, pattern, target);
     }
 
     private Stmt recordDeclaration() {
