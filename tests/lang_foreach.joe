@@ -81,3 +81,49 @@ function testBind_basic() {
     assertEquals(y, "outer y");
 }
 
+function testBind_break() {
+    var list = [[#a, 1], [#b, 2], #nonesuch,  [#c, 3]];
+    var result = [];
+
+    foreach ([x, _] : list) {
+        if (x == #b) break;
+        result.add(x);
+    }
+
+    assertEquals(result, [#a]);
+}
+
+function testBind_continue() {
+    var list = [[#a, 1], [#b, 2], #nonesuch,  [#c, 3]];
+    var result = [];
+
+    foreach ([x, _] : list) {
+        if (x == #b) continue;
+        result.add(x);
+    }
+
+    assertEquals(result, [#a, #c]);
+}
+
+function testBind_hasOwnScope() {
+    var list = [[#a, 1], [#b, 2]];
+    foreach ([x, _] : list) {
+        // Do nothing
+    }
+
+    assertError(\-> x, "Undefined variable: 'x'.");
+}
+
+function testBind_canInterpolate() {
+    var list = [[#a, 2], [#b, 2]];
+    var x = 2;
+    var result;
+
+    // Interpolations are done *once* prior to loop start.
+    // This should match both items, but if the $x is interpolated
+    // again we'll miss [#b, 2].
+    foreach ([x, $x] : list) {
+        result = x;
+    }
+    assertEquals(result, #b);
+}
