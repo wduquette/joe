@@ -383,7 +383,7 @@ class VirtualMachine {
                         bound::put
                     )) {
                         throw error(
-                            "'let' pattern failed to match target value.");
+                            "'var' pattern failed to match target value.");
                     }
 
                     // NEXT, add the bindings to the global scope.
@@ -544,7 +544,7 @@ class VirtualMachine {
                         (id, value) -> push(value)
                     )) {
                         throw error(
-                            "'let' pattern failed to match target value.");
+                            "'var' pattern failed to match target value.");
                     }
                 }
                 case LOCSET -> {

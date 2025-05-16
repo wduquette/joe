@@ -224,25 +224,6 @@ class Interpreter {
                     return execute(stmt.elseBranch());
                 }
             }
-            case Stmt.VarPattern stmt -> {
-                var constants = new ArrayList<>();
-                stmt.pattern().getConstants().forEach(e ->
-                    constants.add(evaluate(e)));
-                var target = evaluate(stmt.target());
-                var bound = new HashMap<String,Object>();
-                if (Matcher.bind(
-                    joe,
-                    stmt.pattern().getPattern(),
-                    target,
-                    constants::get,
-                    bound::put
-                )) {
-                    bind(bound);
-                } else {
-                    throw new RuntimeError(stmt.keyword().span(),
-                        "'let' pattern failed to match target value.");
-                }
-            }
             case Stmt.Match stmt -> {
                 var target = evaluate(stmt.expr());
                 for (var c : stmt.cases()) {
@@ -364,6 +345,25 @@ class Interpreter {
             case Stmt.Var stmt -> {
                 Object value = evaluate(stmt.value());
                 environment.setVar(stmt.name().lexeme(), value);
+            }
+            case Stmt.VarPattern stmt -> {
+                var constants = new ArrayList<>();
+                stmt.pattern().getConstants().forEach(e ->
+                    constants.add(evaluate(e)));
+                var target = evaluate(stmt.target());
+                var bound = new HashMap<String,Object>();
+                if (Matcher.bind(
+                    joe,
+                    stmt.pattern().getPattern(),
+                    target,
+                    constants::get,
+                    bound::put
+                )) {
+                    bind(bound);
+                } else {
+                    throw new RuntimeError(stmt.keyword().span(),
+                        "'var' pattern failed to match target value.");
+                }
             }
             case Stmt.While stmt -> {
                 while (Joe.isTruthy(evaluate(stmt.condition()))) {

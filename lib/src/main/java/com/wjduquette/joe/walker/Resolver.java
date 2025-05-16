@@ -176,12 +176,6 @@ class Resolver {
                     resolve(stmt.elseBranch());
                 }
             }
-            case Stmt.VarPattern stmt -> {
-                stmt.pattern().getBindings().forEach(this::declare);
-                stmt.pattern().getConstants().forEach(this::resolve);
-                resolve(stmt.target());
-                stmt.pattern().getBindings().forEach(this::define);
-            }
             case Stmt.Match stmt -> {
                 resolve(stmt.expr());
                 for (var c : stmt.cases()) {
@@ -252,16 +246,22 @@ class Resolver {
                 }
             }
             case Stmt.Throw stmt -> resolve(stmt.value());
+            case Stmt.Var stmt -> {
+                declare(stmt.name());
+                resolve(stmt.value());
+                define(stmt.name());
+            }
+            case Stmt.VarPattern stmt -> {
+                stmt.pattern().getBindings().forEach(this::declare);
+                stmt.pattern().getConstants().forEach(this::resolve);
+                resolve(stmt.target());
+                stmt.pattern().getBindings().forEach(this::define);
+            }
             case Stmt.While stmt -> {
                 ++loopCounter;
                 resolve(stmt.condition());
                 resolve(stmt.body());
                 --loopCounter;
-            }
-            case Stmt.Var stmt -> {
-                declare(stmt.name());
-                resolve(stmt.value());
-                define(stmt.name());
             }
         }
     }

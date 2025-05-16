@@ -157,14 +157,6 @@ public class Dumper {
                 }
                 --indent;
             }
-            case Stmt.VarPattern stmt -> {
-                // TODO: Add variables and constants
-                buff.append(indent())
-                    .append("Stmt.Let ")
-                    .append(stmt.pattern().getPattern())
-                    .append(" =\n");
-                dumpExpression(stmt.target());
-            }
             case Stmt.Match stmt -> {
                 buff.append(indent())
                     .append("Stmt.Match ")
@@ -264,6 +256,14 @@ public class Dumper {
                     .append(stmt.name().lexeme())
                     .append(" =\n");
                 dumpExpression(stmt.value());
+            }
+            case Stmt.VarPattern stmt -> {
+                // TODO: Add variables and constants
+                buff.append(indent())
+                    .append("Stmt.Let ")
+                    .append(stmt.pattern().getPattern())
+                    .append(" =\n");
+                dumpExpression(stmt.target());
             }
             case Stmt.While stmt -> {
                 buff.append(indent())
