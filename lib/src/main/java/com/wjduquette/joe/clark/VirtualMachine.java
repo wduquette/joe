@@ -725,6 +725,12 @@ class VirtualMachine {
                         throw error("Undefined property: '" + name + "'.");
                     }
                 }
+                case SWAP -> {
+                    var a = pop();
+                    var b = pop();
+                    push(a);
+                    push(b);
+                }
                 case TGET -> push(registerT);
                 case THROW -> {
                     var value = pop();

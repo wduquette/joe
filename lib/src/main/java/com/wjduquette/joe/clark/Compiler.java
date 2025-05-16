@@ -60,6 +60,11 @@ class Compiler {
     // The hidden variable used to hold a `match` value
     private static final Token VAR_MATCH = Token.synthetic("*match*");
 
+    // The hidden variable used to hold a `foreach` pattern value
+    private static final Token VAR_PATTERN = Token.synthetic("*pattern*");
+
+    // The hidden variable used to hold a `foreach` item value
+    private static final Token VAR_ITEM = Token.synthetic("*item*");
 
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -427,8 +432,43 @@ class Compiler {
                 // Local *iter* is popped when the enclosing block end.
             }
             case Stmt.ForEachBind s -> {
-                emitCONST("Clark does not yet support patterns with 'foreach'.");
-                emit(THROW);
+                // NOTE: the Parser wraps Stmt.ForEachBind as
+                // Stmt.Block[Stmt.ForEachBind]. Thus, this code needn't
+                // create a scope.
+                var vars = s.pattern().getBindings();
+
+                // Setup                     // Stack: locals | working
+                emitPATTERN(s.pattern());    // ∅ | p           ; compile pattern
+                defineLocal(VAR_PATTERN);    // p | ∅           ; define *pattern*
+                emit(s.items());             // p | items       ; compute collection
+                emit(ITER);                  // p | it          ; compute iterator
+                defineLocal(VAR_ITER);       // p it | ∅        ; define *iter*
+
+                // Iteration
+                int start_ = here();         // p it | ∅        ; start:
+                beginLoop(start_);           // p it | ∅        ; begin b/c zone
+                emit(HASNEXT);               // p it | flag     ; got item?
+                var end_ = emitJump(JIF);    // p it | ∅        ; JIF end
+                emit(GETNEXT);               // p it | i        ; get next item
+                emitGET(VAR_PATTERN);        // p it | i p      ; get *pattern*
+                emit(SWAP);                  // p it | p i      ;
+                emit(MATCH);                 // p it | vs? flag ; match pattern
+                var body_ = emitJump(JIT);   // p it | vs?      ; JIT body
+                emitLoop(start_);            // p it | ∅        ; LOOP start
+
+                // Loop Body
+                patchJump(body_);            // p it | vs       ; body:
+                beginScope();
+                defineLocals(vars);          // p it vs | ∅     ; define vars
+                emit(s.body());              // p it vs | ∅     ; compile body
+                endScope();
+                emitLoop(start_);            // p it | ∅        ; loop start
+
+                // End
+                patchJump(end_);             // p it | ∅        ; end:
+                endLoop();
+
+                // Hidden locals are popped when the enclosing block ends.
             }
             case Stmt.Function s -> {
                 emitFunction(s);
