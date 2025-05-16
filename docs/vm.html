@@ -203,9 +203,9 @@ value.</li>
 <tr><td>12</td><td>FALSE</td><td>∅ → false</td><td>Load <code>false</code></td></tr>
 <tr><td>13</td><td>GE</td><td><em>a b</em> → <em>c</em></td><td>c = a &gt;= b</td></tr>
 <tr><td>14</td><td>GETNEXT</td><td><em>iter</em> → <em>a</em></td><td>a = iter.next()</td></tr>
-<tr><td>15</td><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
-<tr><td>16</td><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
-<tr><td>17</td><td>GLOLET</td><td><em>p t</em> → ∅</td><td>Bind target to pattern</td></tr>
+<tr><td>15</td><td>GLOBIND</td><td><em>p t</em> → ∅</td><td>Bind target to pattern</td></tr>
+<tr><td>16</td><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
+<tr><td>17</td><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
 <tr><td>18</td><td>GLOSET <em>name</em></td><td><em>a</em> → <em>a</em></td><td>Set global</td></tr>
 <tr><td>19</td><td>GT</td><td><em>a b</em> → <em>a</em> &gt; <em>b</em></td><td>Compare: greater</td></tr>
 <tr><td>20</td><td>HASNEXT</td><td><em>iter</em> → <em>flag</em></td><td>flag = iter.hasNext()</td></tr>
@@ -223,8 +223,8 @@ value.</li>
 <tr><td>32</td><td>LE</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less or equal</td></tr>
 <tr><td>33</td><td>LISTADD</td><td><em>list a</em> → <em>list</em></td><td>Add item to list</td></tr>
 <tr><td>34</td><td>LISTNEW</td><td>∅ → <em>list</em></td><td>Push empty list</td></tr>
-<tr><td>35</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
-<tr><td>36</td><td>LOCLET</td><td><em>p t</em> → <em>vs</em></td><td>Bind target to pattern</td></tr>
+<tr><td>35</td><td>LOCBIND</td><td><em>p t</em> → <em>vs</em></td><td>Bind target to pattern</td></tr>
+<tr><td>36</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
 <tr><td>37</td><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
 <tr><td>38</td><td>LOOP <em>offset</em></td><td>∅ → ∅</td><td>Jump backwards</td></tr>
 <tr><td>39</td><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
@@ -392,6 +392,15 @@ otherwise.</p>
 <p><strong>GETNEXT</strong> | <em>iter</em> → <em>a</em></p>
 <p>Gets the next value from <em>iter</em>, which must be an iterator created by the
 <code>ITER</code> instruction.  This instruction should always be paired with <code>HASNEXT</code>.</p>
+<h3 id="globind"><a class="header" href="#globind">GLOBIND</a></h3>
+<hr />
+<p><strong>GLOBIND</strong> | <em>p</em> <em>t</em> → ∅</p>
+<p>The <code>GLOBIND</code> instruction implements the <code>var</code> statement at the global scope
+when <code>var</code> includes a destructuring pattern,
+binding pattern value <em>p</em> to target <em>t</em>, where <em>p</em> is a pattern evaluated
+by the <code>PATTERN</code> instruction. If the match succeeds then the binding
+variables and their values will be added to the global environment. If the
+match fails then the instruction throws a <code>RuntimeError</code>.</p>
 <h3 id="glodef"><a class="header" href="#glodef">GLODEF</a></h3>
 <hr />
 <p><strong>GLODEF</strong> <em>name</em> | <em>a</em> → ∅</p>
@@ -400,14 +409,6 @@ otherwise.</p>
 <hr />
 <p><strong>GLOGET</strong> <em>name</em> | ∅ → <em>a</em></p>
 <p>Retrieves the value of global variable <em>name</em> and pushes it on the stack.</p>
-<h3 id="glolet"><a class="header" href="#glolet">GLOLET</a></h3>
-<hr />
-<p><strong>GLOLET</strong> | <em>p</em> <em>t</em> → ∅</p>
-<p>The <code>GLOLET</code> instruction implements the <code>let</code> statement at the global scope,
-binding pattern value <em>p</em> to target <em>t</em>, where <em>p</em> is a pattern evaluated
-by the <code>PATTERN</code> instruction. If the match succeeds then the binding
-variables and their values will be added to the global environment. If the
-match fails then the instruction throws a <code>RuntimeError</code>.</p>
 <h3 id="gloset"><a class="header" href="#gloset">GLOSET</a></h3>
 <hr />
 <p><strong>GLOSET</strong> <em>name</em> | <em>a</em> → <em>a</em></p>
@@ -505,20 +506,21 @@ stack.</p>
 <hr />
 <p><strong>LISTNEW</strong> | ∅ → <em>list</em></p>
 <p>Pushes an empty <em>list</em> value onto the stack.</p>
-<h3 id="locget"><a class="header" href="#locget">LOCGET</a></h3>
+<h3 id="locbind"><a class="header" href="#locbind">LOCBIND</a></h3>
 <hr />
-<p><strong>LOCGET</strong> <em>slot</em> | ∅ → <em>a</em></p>
-<p>Gets the value of the local variable in the given stack <em>slot</em>,
-relative to the current call frame.</p>
-<h3 id="loclet"><a class="header" href="#loclet">LOCLET</a></h3>
-<hr />
-<p><strong>LOCLET</strong> | <em>p</em> <em>t</em> → <em>vs</em></p>
-<p>The <code>LOCLET</code> instruction implements the <code>let</code> statement in local scopes,
+<p><strong>LOCBIND</strong> | <em>p</em> <em>t</em> → <em>vs</em></p>
+<p>The <code>LOCBIND</code> instruction implements the <code>var</code> statement in local scopes
+when <code>var</code> includes a destructuring pattern,
 binding pattern value <em>p</em> to target value <em>t</em>, where <em>p</em> is a pattern
 value produced by the <code>PATTERN</code> instruction. If the match succeeds
 then the values of the binding variables will be pushed
 onto the stack, initializing them as locals. If the match fails then the
 instruction throws a <code>RuntimeError</code>.</p>
+<h3 id="locget"><a class="header" href="#locget">LOCGET</a></h3>
+<hr />
+<p><strong>LOCGET</strong> <em>slot</em> | ∅ → <em>a</em></p>
+<p>Gets the value of the local variable in the given stack <em>slot</em>,
+relative to the current call frame.</p>
 <h3 id="locset"><a class="header" href="#locset">LOCSET</a></h3>
 <hr />
 <p><strong>LOCSET</strong> <em>slot</em> | <em>a</em> → <em>a</em></p>

@@ -1,153 +1,17 @@
 # Pattern Matching
 
-Joe supports a rich pattern-matching capability inspired the Rust language's
-`let`, `if let`, and `match` statements.
+Joe supports a rich pattern-matching capability inspired by the Rust language's
+similar capability. Joe's 
+[`var`](statements.md#variable-declarations), 
+[`if let`](statements.md#if-let-statements), and 
+[`match`](statements.md#match-statements) statements all make
+use of pattern matching to do destructuring binds.
 
-- [The `let` Statement](#the-let-statement)
-- [The `if let` Statement](#the-if-let-statement)
-- [The `match` Statement](#the-match-statement)
-- [Pattern Syntax](#pattern-syntax)
+Joe supports a rich variety of patterns.  Some of them can contain
+other patterns as subpatterns, allowing a pattern to match
+quite complicated data structures.
 
-## The `let` Statement
-
-The `let` statement performs a destructuring bind, that is, it binds
-variables to values within a data structure.  For example, suppose that the
-function `f()` returns a two-item list, and the caller wants to assign the
-list items to variables `x` and `y`.
-
-One could do this:
-
-```joe
-var result = f();
-var x = result[0];
-var y = result[1];
-```
-
-Or, one could do a destructing bind using `let`:
-
-```joe
-let [x, y] = f();
-```
-
-Here, `let` matches the list returned by `f()` against the pattern 
-`[x, y]` and binds variables `x` and `y` to the matched values.
-
-**`let` vs. `var`**: The `let` statement is quite similar to the
-`var` statement; both declare new variables, and these two statements
-are semantically equivalent:
-
-```joe
-var x = 5;
-let x = 5;
-```
-
-There are two differences:
-
-- `let` can match more complex patterns, while `var` cannot.
-- `var` is faster, as it doesn't incur any pattern-matching overhead.
-
-**When the pattern doesn't match:** If `let`'s pattern doesn't match
-the target value, e.g., if `f()` didn't return a two-item list in the
-example shown above, then the pattern match will fail and Joe will 
-throw a runtime error.  Therefore, `let` should only be used when the 
-shape of the target value is known ahead of time.  Use 
-[`if let`](#the-if-let-statement) or 
-[`match`](#the-match-statement) to test whether a value matches a 
-particular pattern.
-
-**Matching Maps:** Similarly, one can match the values of map fields.  Suppose 
-`g()` returns a map, and the call wants the values of the map's 
-`#name` and `#age` keys:
-
-```joe
-// The hard way
-var map = g();
-var n = map[#name];
-var a = map[#age];
-
-// The easy way
-let {#name: n, #age: a} = g();
-```
-
-If the `map` returned by `g()` has keys `#name` and `#age`, this statement
-will bind the variables `n` and `a` to `map[#name]` and `map[#age]`.  And
-if not, Joe will throw a runtime error, as before.
-
-These are only a few of the kinds of patterns that Joe supports. See
-[Pattern Syntax](#pattern-syntax) for more.
-
-## The `if let` Statement
-
-The `let` statement throws an error if the pattern does match the target value.
-The `if let` statement executes its "then" branch if the pattern matches the
-target, and its optional "else" branch otherwise.
-
-```joe
-var list = [1, 2];
-
-if let ([a, b] = list) {
-    println(a); // Prints "1"
-    println(b); // Prints "2"
-} else {
-    println("no match");
-}
-```
-
-The pattern's binding variables (`a` and `b` in this example) are in-scope only
-in the "then" branch.
-
-## The `match` Statement
-
-The `match` statement is similar to a `switch` statement, but matches 
-patterns against a target value instead of checking for equality.  It
-is especially useful for processing a heterogeneous list of values.
-
-```joe
-match (value) {
-    case [a, b] -> 
-        println("Two item list of " a + " and " + b + ".");
-    case Person(name, age) -> 
-        println("Person " + name + " is " + age + " years old.");
-    default -> println("no match");
-}
-```
-
-Every `match` statement requires at least one `case`, and the `default`
-clause is optional.  Note that matching on `_` (a simple wildcard)
-is equivalent to the `default` clause:
-
-```joe
-match (value) {
-    case [a, b] -> 
-        println("Two item list of " a + " and " + b + ".");
-    case Person(name, age) -> 
-        println("Person " + name + " is " + age + " years old.");
-    case _ -> println("no match");
-}
-```
-
-Each `case` in a `match` can include an optional  guard clause, which 
-adds a boolean guard condition on top of the pattern match.  In the following 
-example the case matches any `Person` record, and then requires that the
-person be at least 10 years old.
-
-```joe
-match (value) {
-    ...
-    case Person(name, age) if age >= 10 -> 
-        println("Person " + name + " is at least 10 years old.");
-    ...
-}
-```
-
-
-## Pattern Syntax
-
-Here is a list of the many kinds of pattern Joe supports.  Some patterns
-can contain other patterns as subpatterns, allowing a pattern to match
-quite complicated data structures.  Here is a list of the different 
-kinds of patterns:
-
+- [Patterns and Destructuring Binds](#patterns-and-destructuring-binds)
 - [Binding Variables](#binding-variables)
 - [Wildcards](#wildcards)
 - [Constants](#constants)
@@ -158,14 +22,40 @@ kinds of patterns:
 - [Instance Patterns](#instance-patterns)
 - [Record Patterns](#record-patterns)
 
-### Binding Variables
+## Patterns and Destructuring Binds
+
+A destructuring bind is a way to bind one more variables to values within
+a complex data structure.  The bind makes use of a pattern that duplicates 
+the structure of the target value to match variable names to specific elements.
+
+For example, suppose that the function `f()` returns a two-item list, and the 
+caller wants to assign the list items to the variables `x` and `y`.
+
+One could do this:
+
+```joe
+var result = f();
+var x = result[0];
+var y = result[1];
+```
+
+Or, one could do a destructing bind using `var`:
+
+```joe
+var [x, y] = f();
+```
+
+Here, `var` matches the list returned by `f()` against the pattern 
+`[x, y]` and binds variables `x` and `y` to the matched values.
+
+## Binding Variables
 
 We've seen binding variables in most of the examples shown above.
 A binding variable is a variable name that appears within the pattern and
 is assigned the corresponding value in the match target.
 
 ```joe
-let [a, b] = [1, 2];    // a = 1, b = 2.
+var [a, b] = [1, 2];    // a = 1, b = 2.
 ```
 
 A binding variable can also be used to capture a subpattern.  In the
@@ -175,17 +65,17 @@ following example, the variable `b` is assigned list `[2, 3]` while
 ```joe
 var list = [1, [2, 3], 4];
 
-let [a, b = [c, d], e];
+var [a, b = [c, d], e];
 ```
 
-### Wildcards
+## Wildcards
 
 A *wildcard* is a pattern that matches (and ignores) any value.  A 
 wildcard is written as an identifier with leading underscore, e.g., 
 `_`, `_ignore`, `_x`.  For example:
 
 ```joe
-let [x, _] = ["abc", "def"];
+var [x, _] = ["abc", "def"];
 ```
 
 `x` will be assigned the value `"abc"`, while the second item of 
@@ -195,14 +85,14 @@ It's most common to use the wildcard `_`; but using a longer name can
 be useful to document what the ignored value is:
 
 ```joe
-let [first, _last] = ["Joe", "Pro"];
+var [first, _last] = ["Joe", "Pro"];
 ```
 
 Using `_last` indicates that we don't care about the last name
 at the moment, but also shows that it is the last name that we are
 ignoring.
 
-### Constants
+## Constants
 
 A constant pattern is a constant value included in the pattern; the 
 corresponding value in the target must have that exact value.
@@ -227,7 +117,7 @@ The constant must be a literal
 [keyword](types.md#keywords),
 or `null`.
 
-### Interpolated Expressions
+## Interpolated Expressions
 
 To use a computed value as a constant, interpolate
 it using `$(...)`.  
@@ -236,7 +126,7 @@ it using `$(...)`.
 var a = 5;
 var b = 15;
 
-let [x, $(a + b)] = [10, 20];  // Matches; x == 10.
+var [x, $(a + b)] = [10, 20];  // Matches; x == 10.
 ```
 
 Here, `$(a + b)` evaluates to `20`, which matches the second
@@ -248,10 +138,10 @@ a variable name:
 ```joe
 var wanted = "Pro";
 
-let [first, $wanted] = ["Joe", "Pro"];   
+var [first, $wanted] = ["Joe", "Pro"];   
 ```
 
-### List Patterns
+## List Patterns
 
 We've seen many list patterns in the above examples.  Syntactically,
 a list pattern is simply a list of patterns that matches a `List` of
@@ -280,7 +170,7 @@ The variables `a` and `b` will get `list[0]` and `list[1]`, and `tail`
 will get any remaining items, or the empty list if `list.size() == 2`.
 (The match will naturally fail if `list.size() < 2`.)
 
-### Map Patterns
+## Map Patterns
 
 A map pattern matches objects with keys and values, e.g., 
 [`Map`](library/type.joe.Map.md) values. 
@@ -295,12 +185,12 @@ A map pattern matches objects with keys and values, e.g.,
 Some examples:
 
 ```joe
-let {#a: a, #b: b} = {#a: 1, #b: 2, #c: 3};  // a = 1, b = 2
-let ($x: value} = someMap;                   // value = someMap.get(x)
-let {#a: [a, b, c], #b: x} = someMap;
+var {#a: a, #b: b} = {#a: 1, #b: 2, #c: 3};  // a = 1, b = 2
+var ($x: value} = someMap;                   // value = someMap.get(x)
+var {#a: [a, b, c], #b: x} = someMap;
 ```
 
-### Matching Instances with Map Patterns
+## Matching Instances with Map Patterns
 
 A map pattern can also match any Joe value with field properties, e.g.,
 an instance of a Joe `class`.  The pattern's keys match the field names
@@ -319,8 +209,8 @@ class Thing {
 }
 
 // These two statements are equivalent
-let {"id": i, "color": c} = Thing(123, "red");
-let {#id: i,  #color: c}  = Thing(123, "red");
+var {"id": i, "color": c} = Thing(123, "red");
+var {#id: i,  #color: c}  = Thing(123, "red");
 ```
 
 As when matching `Map` values, the pattern can reference a subset of
@@ -340,8 +230,8 @@ class Thing {
 }
 
 // These two statements are equivalent
-let Thing{"id": i, "color": c} = Thing(123, "red");
-let Thing{#id: i,  #color: c}  = Thing(123, "red");
+var Thing{"id": i, "color": c} = Thing(123, "red");
+var Thing{#id: i,  #color: c}  = Thing(123, "red");
 ```
 
 An instance pattern consists of the name of the desired type, followed by
@@ -351,7 +241,7 @@ a map pattern for its fields. For the pattern to match:
 - The value must have all of the specified fields.
 - The field patterns must match.
 
-Types are matched based on their names, i.e., in `let Thing{...} = thing;` the
+Types are matched based on their names, i.e., in `var Thing{...} = thing;` the
 type will match if `Joe.typeOf(thing).name() == "Thing"`, ***not*** if 
 `Joe.typeOf(thing) == Thing`.  In other words, there is no requirement that
 the matched type is in scope; it is enough that the value being matched 
@@ -372,8 +262,8 @@ record Person(name, age) {}
 var person = Person(Joe, 80);
 
 // These statements are identical
-let Person(n, a) = person;
-let Person{#name: n, #age: a} = person;
+var Person(n, a) = person;
+var Person{#name: n, #age: a} = person;
 ```
 
 The first form can only be used with a value of a record type; it matches

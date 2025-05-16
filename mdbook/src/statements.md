@@ -10,11 +10,13 @@ by a semicolon or (sometimes) a block, as in Java.
 - [Blocks](#blocks)
 - [Return](#return)
 - [If Statements](#if-statements)
+- [If Let Statements](#if-let-statements)
 - [While Loops](#while-loops)
 - [For Loops](#for-loops)
 - [Foreach Loops](#foreach-loops)
 - [Break and Continue](#break-and-continue)
 - [Switch Statements](#switch-statements)
+- [Match Statements](#match-statements)
 - [Throw](#throw)
 - [Assert](#assert)
 
@@ -32,6 +34,42 @@ var y;      // y == null
 Joe is lexically scoped; undeclared variables in function or method bodies
 are presumed to be declared in an enclosing scope.  It is an error if
 they are not.
+
+In addition to declaring and initializing individual variables, the
+`var` statement can use a [pattern](patterns.md) to perform a destructuring 
+bind: that is,
+to bind one or more variables to values within a data structure.  For example,
+suppose that the function `f()` returns a two-item list, and the caller wants
+to assign the list items to the variables `x` and `y`.
+
+One could do this:
+
+```joe
+var result = f();
+var x = result[0];
+var y = result[1];
+```
+
+Or, one could do a destructing bind:
+
+```joe
+var [x, y] = f();
+```
+
+Here, `var` matches the list returned by `f()` against the pattern
+`[x, y]` and binds variables `x` and `y` to the matched values.
+
+**When the pattern doesn't match:** If `var`'s pattern doesn't match
+the target value, e.g., if `f()` didn't return a two-item list in the
+example shown above, then the pattern match will fail and Joe will
+throw a runtime error.  Therefore, `var` should only be used when the
+shape of the target value is known ahead of time.  Use
+[`if let`](#the-if-let-statement) or
+[`match`](#the-match-statement) to test whether a value matches a
+particular pattern.
+
+See [Pattern Matching](patterns.md) for more on pattern matching and
+destructuring binds, including Joe's full pattern syntax.
 
 ## Function Declarations
 
@@ -92,6 +130,30 @@ if (x == 5) {
     ...
 }
 ```
+
+## If Let Statements
+
+The `if let` uses a [pattern](patterns.md) to do a conditional 
+destructuring bind on a data structure.  If the pattern matches, `if let`
+executes its "then" branch with the bound variables in scope;
+otherwise it executes its "else" branch:
+
+```joe
+var list = [1, 2];
+
+if let ([a, b] = list) {
+    println(a); // Prints "1"
+    println(b); // Prints "2"
+} else {
+    println("no match");
+}
+```
+
+The pattern's binding variables (`a` and `b` in this example) are in-scope only
+in the "then" branch.
+
+See [Pattern Matching](patterns.md) for more on pattern matching and
+destructuring binds, including Joe's full pattern syntax.
 
 ## While Loops
 
@@ -162,6 +224,53 @@ switch (x) {
 The implementation is quite simple: each case value is checked in 
 turn, from the top to the bottom, until a match is found; then the
 case's body is executed.
+
+## Match Statements
+
+The `match` statement is similar to a `switch` statement, but matches
+patterns against a target value instead of checking for equality.  It
+is especially useful for processing a heterogeneous list of values.
+
+```joe
+match (value) {
+    case [a, b] -> 
+        println("Two item list of " a + " and " + b + ".");
+    case Person(name, age) -> 
+        println("Person " + name + " is " + age + " years old.");
+    default -> println("no match");
+}
+```
+
+Every `match` statement requires at least one `case`; the `default`
+case is optional.  (Note that matching on `_`, a simple wildcard pattern, 
+is equivalent to the `default` case:
+
+```joe
+match (value) {
+    case [a, b] -> 
+        println("Two item list of " a + " and " + b + ".");
+    case Person(name, age) -> 
+        println("Person " + name + " is " + age + " years old.");
+    case _ -> println("no match");
+}
+```
+
+Each `case` in a `match` can include an optional guard clause that
+adds a boolean guard condition on top of the pattern match.  In the following
+example the case matches any `Person` record, and then requires that the
+person be at least 10 years old.
+
+```joe
+match (value) {
+    ...
+    case Person(name, age) if age >= 10 -> 
+        println("Person " + name + " is at least 10 years old.");
+    ...
+}
+```
+
+See [Pattern Matching](patterns.md) for more on pattern matching and
+destructuring binds, including Joe's full pattern syntax.
 
 ## Throw
 

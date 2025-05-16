@@ -34,9 +34,9 @@ The byte-engine is a stack machine with a few registers:
 | 12 | FALSE                | ∅ → false          | Load `false`              |
 | 13 | GE                   | *a b* → *c*        | c = a >= b                |
 | 14 | GETNEXT              | *iter* → *a*       | a = iter.next()           |
-| 15 | GLODEF *name*        | *a* → ∅            | Define global             |
-| 16 | GLOGET *name*        | ∅ → *a*            | Get global                |
-| 17 | GLOLET               | *p t* → ∅          | Bind target to pattern    |
+| 15 | GLOBIND              | *p t* → ∅          | Bind target to pattern    |
+| 16 | GLODEF *name*        | *a* → ∅            | Define global             |
+| 17 | GLOGET *name*        | ∅ → *a*            | Get global                |
 | 18 | GLOSET *name*        | *a* → *a*          | Set global                |
 | 19 | GT                   | *a b* → *a* > *b*  | Compare: greater          |
 | 20 | HASNEXT              | *iter* → *flag*    | flag = iter.hasNext()     |
@@ -54,8 +54,8 @@ The byte-engine is a stack machine with a few registers:
 | 32 | LE                   | *a b* → *a* <= *b* | Compare: less or equal    |
 | 33 | LISTADD              | *list a* → *list*  | Add item to list          |
 | 34 | LISTNEW              | ∅ → *list*         | Push empty list           |
-| 35 | LOCGET *slot*        | ∅ → *a*            | Get local                 |
-| 36 | LOCLET               | *p t* → *vs*       | Bind target to pattern    |
+| 35 | LOCBIND              | *p t* → *vs*       | Bind target to pattern    |
+| 36 | LOCGET *slot*        | ∅ → *a*            | Get local                 |
 | 37 | LOCSET *slot*        | *a* → *a*          | Set local                 |
 | 38 | LOOP *offset*        | ∅ → ∅              | Jump backwards            |
 | 39 | LT                   | *a b* → *a* <= *b* | Compare: less than        |
@@ -248,6 +248,17 @@ Yields `true` if *a* is greater than or equal to *b*, and `false` otherwise.
 Gets the next value from *iter*, which must be an iterator created by the 
 `ITER` instruction.  This instruction should always be paired with `HASNEXT`.
 
+### GLOBIND
+---
+**GLOBIND** | *p* *t* → ∅
+
+The `GLOBIND` instruction implements the `var` statement at the global scope
+when `var` includes a destructuring pattern, 
+binding pattern value *p* to target *t*, where *p* is a pattern evaluated
+by the `PATTERN` instruction. If the match succeeds then the binding
+variables and their values will be added to the global environment. If the
+match fails then the instruction throws a `RuntimeError`.
+
 ### GLODEF
 ---
 **GLODEF** *name* | *a* → ∅
@@ -259,16 +270,6 @@ Defines a global variable called *name*, assigning it the value *a*.
 **GLOGET** *name* | ∅ → *a*
 
 Retrieves the value of global variable *name* and pushes it on the stack.
-
-### GLOLET
----
-**GLOLET** | *p* *t* → ∅
-
-The `GLOLET` instruction implements the `let` statement at the global scope,
-binding pattern value *p* to target *t*, where *p* is a pattern evaluated
-by the `PATTERN` instruction. If the match succeeds then the binding 
-variables and their values will be added to the global environment. If the 
-match fails then the instruction throws a `RuntimeError`.
 
 ### GLOSET
 ---
@@ -398,23 +399,24 @@ Pops *a* and adds it to the *list* value.
 
 Pushes an empty *list* value onto the stack.
 
+### LOCBIND
+---
+**LOCBIND** | *p* *t* → *vs*
+
+The `LOCBIND` instruction implements the `var` statement in local scopes
+when `var` includes a destructuring pattern,
+binding pattern value *p* to target value *t*, where *p* is a pattern
+value produced by the `PATTERN` instruction. If the match succeeds
+then the values of the binding variables will be pushed
+onto the stack, initializing them as locals. If the match fails then the
+instruction throws a `RuntimeError`.
+
 ### LOCGET
 ---
 **LOCGET** *slot* | ∅ → *a*
 
 Gets the value of the local variable in the given stack *slot*, 
 relative to the current call frame.
-
-### LOCLET
----
-**LOCLET** | *p* *t* → *vs*
-
-The `LOCLET` instruction implements the `let` statement in local scopes,
-binding pattern value *p* to target value *t*, where *p* is a pattern
-value produced by the `PATTERN` instruction. If the match succeeds 
-then the values of the binding variables will be pushed
-onto the stack, initializing them as locals. If the match fails then the 
-instruction throws a `RuntimeError`.
 
 ### LOCSET
 ---

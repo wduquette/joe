@@ -184,11 +184,13 @@ by a semicolon or (sometimes) a block, as in Java.</p>
 <li><a href="#blocks">Blocks</a></li>
 <li><a href="#return">Return</a></li>
 <li><a href="#if-statements">If Statements</a></li>
+<li><a href="#if-let-statements">If Let Statements</a></li>
 <li><a href="#while-loops">While Loops</a></li>
 <li><a href="#for-loops">For Loops</a></li>
 <li><a href="#foreach-loops">Foreach Loops</a></li>
 <li><a href="#break-and-continue">Break and Continue</a></li>
 <li><a href="#switch-statements">Switch Statements</a></li>
+<li><a href="#match-statements">Match Statements</a></li>
 <li><a href="#throw">Throw</a></li>
 <li><a href="#assert">Assert</a></li>
 </ul>
@@ -202,6 +204,32 @@ var y;      // y == null
 <p>Joe is lexically scoped; undeclared variables in function or method bodies
 are presumed to be declared in an enclosing scope.  It is an error if
 they are not.</p>
+<p>In addition to declaring and initializing individual variables, the
+<code>var</code> statement can use a <a href="patterns.html">pattern</a> to perform a destructuring
+bind: that is,
+to bind one or more variables to values within a data structure.  For example,
+suppose that the function <code>f()</code> returns a two-item list, and the caller wants
+to assign the list items to the variables <code>x</code> and <code>y</code>.</p>
+<p>One could do this:</p>
+<pre><code class="language-joe">var result = f();
+var x = result[0];
+var y = result[1];
+</code></pre>
+<p>Or, one could do a destructing bind:</p>
+<pre><code class="language-joe">var [x, y] = f();
+</code></pre>
+<p>Here, <code>var</code> matches the list returned by <code>f()</code> against the pattern
+<code>[x, y]</code> and binds variables <code>x</code> and <code>y</code> to the matched values.</p>
+<p><strong>When the pattern doesn't match:</strong> If <code>var</code>'s pattern doesn't match
+the target value, e.g., if <code>f()</code> didn't return a two-item list in the
+example shown above, then the pattern match will fail and Joe will
+throw a runtime error.  Therefore, <code>var</code> should only be used when the
+shape of the target value is known ahead of time.  Use
+<a href="#the-if-let-statement"><code>if let</code></a> or
+<a href="#the-match-statement"><code>match</code></a> to test whether a value matches a
+particular pattern.</p>
+<p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
+destructuring binds, including Joe's full pattern syntax.</p>
 <h2 id="function-declarations"><a class="header" href="#function-declarations">Function Declarations</a></h2>
 <p>Functions are declared with the <code>function</code> statement.  See
 <a href="functions.html">Functions</a> for more details.</p>
@@ -242,6 +270,24 @@ not displayed by <code>joe run</code>.</p>
     ...
 }
 </code></pre>
+<h2 id="if-let-statements"><a class="header" href="#if-let-statements">If Let Statements</a></h2>
+<p>The <code>if let</code> uses a <a href="patterns.html">pattern</a> to do a conditional
+destructuring bind on a data structure.  If the pattern matches, <code>if let</code>
+executes its "then" branch with the bound variables in scope;
+otherwise it executes its "else" branch:</p>
+<pre><code class="language-joe">var list = [1, 2];
+
+if let ([a, b] = list) {
+    println(a); // Prints "1"
+    println(b); // Prints "2"
+} else {
+    println("no match");
+}
+</code></pre>
+<p>The pattern's binding variables (<code>a</code> and <code>b</code> in this example) are in-scope only
+in the "then" branch.</p>
+<p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
+destructuring binds, including Joe's full pattern syntax.</p>
 <h2 id="while-loops"><a class="header" href="#while-loops">While Loops</a></h2>
 <p><code>while</code> loops are defined as in Java.</p>
 <pre><code class="language-joe">var x = 0;
@@ -293,6 +339,42 @@ expression</em>.</li>
 <p>The implementation is quite simple: each case value is checked in
 turn, from the top to the bottom, until a match is found; then the
 case's body is executed.</p>
+<h2 id="match-statements"><a class="header" href="#match-statements">Match Statements</a></h2>
+<p>The <code>match</code> statement is similar to a <code>switch</code> statement, but matches
+patterns against a target value instead of checking for equality.  It
+is especially useful for processing a heterogeneous list of values.</p>
+<pre><code class="language-joe">match (value) {
+    case [a, b] -&gt; 
+        println("Two item list of " a + " and " + b + ".");
+    case Person(name, age) -&gt; 
+        println("Person " + name + " is " + age + " years old.");
+    default -&gt; println("no match");
+}
+</code></pre>
+<p>Every <code>match</code> statement requires at least one <code>case</code>; the <code>default</code>
+case is optional.  (Note that matching on <code>_</code>, a simple wildcard pattern,
+is equivalent to the <code>default</code> case:</p>
+<pre><code class="language-joe">match (value) {
+    case [a, b] -&gt; 
+        println("Two item list of " a + " and " + b + ".");
+    case Person(name, age) -&gt; 
+        println("Person " + name + " is " + age + " years old.");
+    case _ -&gt; println("no match");
+}
+</code></pre>
+<p>Each <code>case</code> in a <code>match</code> can include an optional guard clause that
+adds a boolean guard condition on top of the pattern match.  In the following
+example the case matches any <code>Person</code> record, and then requires that the
+person be at least 10 years old.</p>
+<pre><code class="language-joe">match (value) {
+    ...
+    case Person(name, age) if age &gt;= 10 -&gt; 
+        println("Person " + name + " is at least 10 years old.");
+    ...
+}
+</code></pre>
+<p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
+destructuring binds, including Joe's full pattern syntax.</p>
 <h2 id="throw"><a class="header" href="#throw">Throw</a></h2>
 <p>The <code>throw</code> statement is used to explicitly throw
 <a href="library/type.joe.Error.html">error exceptions</a> in a Joe script.</p>
