@@ -186,9 +186,36 @@ class Interpreter {
                     }
                 }
             }
-            case Stmt.ForEachBind stmt ->
-                throw new RuntimeError(stmt.keyword().span(),
-                    "Walker does not yet support patterns in 'foreach'.");
+            case Stmt.ForEachBind stmt -> {
+                // Evaluate the pattern's constants
+                var constants = new ArrayList<>();
+                stmt.pattern().getConstants().forEach(e ->
+                    constants.add(evaluate(e)));
+
+                // Evaluate the collection
+                var list = evaluate(stmt.items());
+                Collection<?> collection = toCollection(stmt.keyword(), list);
+
+                for (var item : collection) {
+                    try {
+                        var bound = new HashMap<String,Object>();
+                        if (Matcher.bind(
+                            joe,
+                            stmt.pattern().getPattern(),
+                            item,
+                            constants::get,
+                            bound::put
+                        )) {
+                            bind(bound);
+                            execute(stmt.body());
+                        }
+                    } catch (Break ex) {
+                        break;
+                    } catch (Continue ex) {
+                        // Nothing else to do
+                    }
+                }
+            }
             case Stmt.Function stmt -> {
                 var function = new WalkerFunction(this, stmt, environment, false);
                 environment.setVar(stmt.name().lexeme(), function);

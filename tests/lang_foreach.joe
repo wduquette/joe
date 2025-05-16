@@ -2,6 +2,9 @@
 //
 // Language tests should confine themselves to the basic test API.
 
+//-----------------------------------------------------------------------------
+// Simple `foreach`
+
 // Basic foreach loop
 function testForeach_simple() {
     var list = ["a", "b", "c"];
@@ -59,3 +62,22 @@ function testForeach_hasOwnScope() {
 
     assertError(\-> i, "Undefined variable: 'i'.");
 }
+
+//-----------------------------------------------------------------------------
+// `foreach` with pattern-binding
+
+function testBind_basic() {
+    var x = "outer x";
+    var y = "outer y";
+    var list = [[#a, 1], [#b, 2], #nonesuch,  [#c, 3]];
+    var result = [];
+
+    foreach ([x, y] : list) {
+        result.add(x.toString() + y);
+    }
+
+    assertEquals(result, ["#a1", "#b2", "#c3"]);
+    assertEquals(x, "outer x");
+    assertEquals(y, "outer y");
+}
+
