@@ -1,6 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.parser.FunctionType;
 import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.SourceBuffer;
@@ -36,7 +37,7 @@ final class WalkerFunction implements NativeCallable {
         this.closure = closure;
         this.isInitializer = isInitializer;
         this.isVarArgs = isVarArgs(declaration.params());
-        this.isLambda = declaration.kind().equals("lambda");
+        this.isLambda = declaration.type() == FunctionType.LAMBDA;
         this.signature = makeSignature();
     }
 
@@ -70,14 +71,6 @@ final class WalkerFunction implements NativeCallable {
 
     public SourceBuffer.Span span() {
         return declaration.name().span();
-    }
-
-    /**
-     * Returns the "kind" of the function, e.g., "function", "method"
-     * @return The kind
-     */
-    public String kind() {
-        return declaration.kind();
     }
 
     WalkerFunction bind(JoeValue instance) {
@@ -127,7 +120,7 @@ final class WalkerFunction implements NativeCallable {
 
     @Override
     public String callableType() {
-        return kind();
+        return declaration.type().text();
     }
 
     @Override
@@ -145,6 +138,6 @@ final class WalkerFunction implements NativeCallable {
 
     @Override
     public String toString() {
-        return "<" + declaration.kind() + " " + signature + ">";
+        return "<" + declaration.type().text() + " " + signature + ">";
     }
 }

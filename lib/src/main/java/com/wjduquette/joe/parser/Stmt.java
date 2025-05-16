@@ -126,8 +126,8 @@ public sealed interface Stmt
     }
 
     /**
-     * A function or method.
-     * @param kind The kind, currently "function" or "method"
+     * A function, method, etc.
+     * @param type The function type
      * @param name The name
      * @param params The parameter names
      * @param body The body of the function
@@ -135,7 +135,6 @@ public sealed interface Stmt
      */
     record Function(
         FunctionType type,
-        String kind,
         Token name,
         List<Token> params,
         List<Stmt> body,

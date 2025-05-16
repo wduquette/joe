@@ -206,7 +206,7 @@ public class Parser {
         List<Stmt> body = block();
         var end = scanner.previous().span().end();
         var span = source.span(start, end);
-        return new Stmt.Function(type, kind, name, parameters, body, span);
+        return new Stmt.Function(type, name, parameters, body, span);
     }
 
     private List<Token> parameters(
@@ -864,7 +864,7 @@ public class Parser {
             var span = source.span(token.span().start(), end);
             var decl =
                 new Stmt.Function(FunctionType.LAMBDA,
-                    "lambda", token, parameters, body, span);
+                    token, parameters, body, span);
             return new Expr.Lambda(decl);
         }
 
