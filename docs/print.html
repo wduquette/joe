@@ -1239,13 +1239,27 @@ is not supported.  See <a href="statements.html#foreach-loops">Foreach Loops</a>
 <h2 id="foreach-loops"><a class="header" href="#foreach-loops">Foreach Loops</a></h2>
 <p><code>foreach</code> loops allow iteration over the members of a collection, e.g.,
 a Joe <code>List</code>.</p>
-<pre><code class="language-joe">var list = List("a", "b", "c");
+<pre><code class="language-joe">var list = ["a", "b", "c"];
 
 // Prints "a", "b", and "c" on successive lines.
-foreach (var item : list) {
+foreach (item : list) {
     println(item);
 } 
 </code></pre>
+<p>In addition, <code>foreach</code> can use a <a href="patterns.html">pattern</a> to do a
+destructuring bind on each list item:</p>
+<pre><code class="language-joe">var list = [[#a, 1], [#b, 2], #whoops, [#c, 3]];
+
+// Prints #a, #b, and #c on successive lines
+foreach ([x, _] : list) {
+    println(x);
+}
+</code></pre>
+<p><code>foreach</code> will silently ignore any list items that
+don't match the pattern, making it a useful tool for extracting data
+from homogeneous lists.</p>
+<p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
+destructuring binds, including Joe's full pattern syntax.</p>
 <h2 id="break-and-continue"><a class="header" href="#break-and-continue">Break and Continue</a></h2>
 <p>The <code>break</code> and <code>continue</code> statements break out of the enclosing loop or
 continue with the next iteration of the enclosing loop, just as in Java.</p>
@@ -1560,6 +1574,7 @@ is used.</p>
 <p>Joe supports a rich pattern-matching capability inspired by the Rust language's
 similar capability. Joe's
 <a href="statements.html#variable-declarations"><code>var</code></a>,
+<a href="statements.html#foreach-statements"><code>foreach</code></a>,
 <a href="statements.html#if-let-statements"><code>if let</code></a>, and
 <a href="statements.html#match-statements"><code>match</code></a> statements all make
 use of pattern matching to do destructuring binds.</p>
@@ -8799,7 +8814,6 @@ for some conditions enforced by the compiler.</p>
 
 declaration     → classDecl
                 | funDecl
-                | letDecl
                 | varDecl
                 | statement ;
 
@@ -8813,20 +8827,20 @@ funDecl         → "function" function ;
 function        → IDENTIFIER "(" parameters? ")" block ;
 parameters      → IDENTIFIER ( "," IDENTIFIER )* ;
 
-letDecl         → "let" pattern "=" expression ";" ; 
-
 recordDecl      → "record" IDENTIFIER "(" parameters ")" 
                   "{" recordItem* "}" ;
 recordItem      → "method" function
                 | "static" "method" function
                 | "static" block ; 
                   
-varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
+varDecl         → "var" IDENTIFIER ( "=" expression )? ";" 
+                | "var" pattern "=" expression ";" ;
                
 statement       → exprStmt
                 | breakStmt
                 | continueStmt
                 | forStmt
+                | foreachStmt
                 | ifStmt
                 | ifLetStmt
                 | matchStmt
@@ -8843,7 +8857,7 @@ continueStmt    → "continue" ";" ;
 forStmt         → "for" "(" ( varDecl | exprStmt | ";" )
                   expression? ";"
                   expression? ")" statement ;
-forEachStmt     → "foreach" "(" "var" IDENTIFIER ":" expression ")" statement;
+forEachStmt     → "foreach" "(" pattern ":" expression ")" statement;
 ifStmt          → "if" "(" expression ")" statement 
                   ( "else" statement )? ;
 ifLetStmt       → "if" "let" "(" pattern "=" expression ")" statement 
@@ -9110,15 +9124,16 @@ value.</li>
 <tr><td>56</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
 <tr><td>57</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
 <tr><td>58</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
-<tr><td>59</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
-<tr><td>60</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
-<tr><td>61</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
-<tr><td>62</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
-<tr><td>63</td><td>TSET</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
-<tr><td>64</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
-<tr><td>65</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
-<tr><td>66</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
-<tr><td>67</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
+<tr><td>59</td><td>SWAP</td><td><em>a b</em> → <em>b a</em></td><td>Swap top stack items</td></tr>
+<tr><td>60</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
+<tr><td>61</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
+<tr><td>62</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
+<tr><td>63</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
+<tr><td>64</td><td>TSET</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
+<tr><td>65</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
+<tr><td>66</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
+<tr><td>67</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
+<tr><td>68</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
 </tbody></table>
 </div>
 <p><strong>Stack Effects:</strong> in the stack effect column, the top of the stack is on the
@@ -9489,6 +9504,10 @@ result is popped and returned to the Java caller.</p>
 <p><strong>SUPGET</strong> <em>name</em> | <em>obj</em> <em>sup</em> → <em>f</em></p>
 <p>Retrieves method <em>name</em> for superclass <em>sup</em> of object <em>obj</em>.
 This is used to compile the <code>super.&lt;method&gt;</code> syntax.</p>
+<h3 id="swap"><a class="header" href="#swap">SWAP</a></h3>
+<hr />
+<p><strong>SWAP</strong> | <em>a b</em> → <em>b a</em></p>
+<p>Swaps the top two items on the stack.</p>
 <h3 id="tget"><a class="header" href="#tget">TGET</a></h3>
 <hr />
 <p><strong>TGET</strong> | ∅ → <em>a</em></p>

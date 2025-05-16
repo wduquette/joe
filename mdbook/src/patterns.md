@@ -2,7 +2,8 @@
 
 Joe supports a rich pattern-matching capability inspired by the Rust language's
 similar capability. Joe's 
-[`var`](statements.md#variable-declarations), 
+[`var`](statements.md#variable-declarations),
+[`foreach`](statements.md#foreach-statements), 
 [`if let`](statements.md#if-let-statements), and 
 [`match`](statements.md#match-statements) statements all make
 use of pattern matching to do destructuring binds.

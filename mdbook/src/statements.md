@@ -184,13 +184,32 @@ for (var i = 0; i < 10; i = i + 1) {
 a Joe `List`.
 
 ```joe
-var list = List("a", "b", "c");
+var list = ["a", "b", "c"];
 
 // Prints "a", "b", and "c" on successive lines.
-foreach (var item : list) {
+foreach (item : list) {
     println(item);
 } 
 ```
+
+In addition, `foreach` can use a [pattern](patterns.md) to do a 
+destructuring bind on each list item:
+
+```joe
+var list = [[#a, 1], [#b, 2], #whoops, [#c, 3]];
+
+// Prints #a, #b, and #c on successive lines
+foreach ([x, _] : list) {
+    println(x);
+}
+```
+
+`foreach` will silently ignore any list items that 
+don't match the pattern, making it a useful tool for extracting data
+from homogeneous lists.
+
+See [Pattern Matching](patterns.md) for more on pattern matching and
+destructuring binds, including Joe's full pattern syntax.
 
 ## Break and Continue
 

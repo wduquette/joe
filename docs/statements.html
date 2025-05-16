@@ -306,13 +306,27 @@ is not supported.  See <a href="#foreach-loops">Foreach Loops</a>, below.</p>
 <h2 id="foreach-loops"><a class="header" href="#foreach-loops">Foreach Loops</a></h2>
 <p><code>foreach</code> loops allow iteration over the members of a collection, e.g.,
 a Joe <code>List</code>.</p>
-<pre><code class="language-joe">var list = List("a", "b", "c");
+<pre><code class="language-joe">var list = ["a", "b", "c"];
 
 // Prints "a", "b", and "c" on successive lines.
-foreach (var item : list) {
+foreach (item : list) {
     println(item);
 } 
 </code></pre>
+<p>In addition, <code>foreach</code> can use a <a href="patterns.html">pattern</a> to do a
+destructuring bind on each list item:</p>
+<pre><code class="language-joe">var list = [[#a, 1], [#b, 2], #whoops, [#c, 3]];
+
+// Prints #a, #b, and #c on successive lines
+foreach ([x, _] : list) {
+    println(x);
+}
+</code></pre>
+<p><code>foreach</code> will silently ignore any list items that
+don't match the pattern, making it a useful tool for extracting data
+from homogeneous lists.</p>
+<p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
+destructuring binds, including Joe's full pattern syntax.</p>
 <h2 id="break-and-continue"><a class="header" href="#break-and-continue">Break and Continue</a></h2>
 <p>The <code>break</code> and <code>continue</code> statements break out of the enclosing loop or
 continue with the next iteration of the enclosing loop, just as in Java.</p>

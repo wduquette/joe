@@ -78,15 +78,16 @@ The byte-engine is a stack machine with a few registers:
 | 56 | RETURN               | *a* → *a*          | Return                    |
 | 57 | SUB                  | *a b* → *c*        | c = a - b                 |
 | 58 | SUPGET *name*        | *obj sup* → *f*    | Get superclass method     |
-| 59 | TGET                 | ∅ → *a*            | *a* = T                   |
-| 60 | THROW                | *a* → ∅            | Throw error               |
-| 61 | TRCPOP               | ∅ → ∅              | Pops a post-trace         |
-| 62 | TRCPUSH *trace*      | ∅ → ∅              | Pushes a post-trace       |
-| 63 | TSET                 | *a* → *a*          | T = *a*                   |
-| 64 | TRUE                 | ∅ → true           | Load `true`               |
-| 65 | UPCLOSE *n*          | *v...* → ∅         | Closes *n* upvalue(s)     |
-| 66 | UPGET *slot*         | ∅ → *a*            | Get upvalue               |
-| 67 | UPSET *slot*         | *a* → *a*          | Set upvalue               |
+| 59 | SWAP                 | *a b* → *b a*      | Swap top stack items      |
+| 60 | TGET                 | ∅ → *a*            | *a* = T                   |
+| 61 | THROW                | *a* → ∅            | Throw error               |
+| 62 | TRCPOP               | ∅ → ∅              | Pops a post-trace         |
+| 63 | TRCPUSH *trace*      | ∅ → ∅              | Pushes a post-trace       |
+| 64 | TSET                 | *a* → *a*          | T = *a*                   |
+| 65 | TRUE                 | ∅ → true           | Load `true`               |
+| 66 | UPCLOSE *n*          | *v...* → ∅         | Closes *n* upvalue(s)     |
+| 67 | UPGET *slot*         | ∅ → *a*            | Get upvalue               |
+| 68 | UPSET *slot*         | *a* → *a*          | Set upvalue               |
 
 **Stack Effects:** in the stack effect column, the top of the stack is on the 
 right.  
@@ -564,6 +565,12 @@ Computes the difference of *a* and *b*.
 
 Retrieves method *name* for superclass *sup* of object *obj*.
 This is used to compile the `super.<method>` syntax.  
+
+### SWAP
+---
+**SWAP** | *a b* → *b a*
+
+Swaps the top two items on the stack.
 
 ### TGET
 ---
