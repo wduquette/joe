@@ -365,7 +365,7 @@ class VirtualMachine {
                         throw error("Undefined variable: '" + name + "'.");
                     }
                 }
-                case GLOLET -> {
+                case GLOBIND -> {
                     var target = pop();
                     var pv = (PatternValue)pop();
                     var bound = new HashMap<String,Object>();
@@ -528,7 +528,7 @@ class VirtualMachine {
                     var slot = readSlot();
                     push(stack[frame.base + slot]);
                 }
-                case LOCLET -> {
+                case LOCBIND -> {
                     var target = pop();
                     var pv = (PatternValue)pop();
 

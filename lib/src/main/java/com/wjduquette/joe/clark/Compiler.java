@@ -485,10 +485,10 @@ class Compiler {
                 emit(s.target());              // ∅ | p t   ; compute target.
 
                 if (!inGlobalScope()) {
-                    emit(Opcode.LOCLET);       // ∅ | vs    ; match pattern
+                    emit(Opcode.LOCBIND);       // ∅ | vs    ; match pattern
                     defineLocals(vars);        // vs | ∅    ; define vars
                 } else {
-                    emit(Opcode.GLOLET);       // ∅         ; define vars
+                    emit(Opcode.GLOBIND);       // ∅         ; define vars
                 }
             }
             case Stmt.Match s -> {
