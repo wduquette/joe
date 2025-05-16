@@ -224,7 +224,7 @@ class Interpreter {
                     return execute(stmt.elseBranch());
                 }
             }
-            case Stmt.Let stmt -> {
+            case Stmt.VarPattern stmt -> {
                 var constants = new ArrayList<>();
                 stmt.pattern().getConstants().forEach(e ->
                     constants.add(evaluate(e)));

@@ -267,7 +267,7 @@ public class Parser {
         var target = expression();
         scanner.consume(SEMICOLON, "Expected ';' after target expression.");
 
-        return new Stmt.Let(keyword, pattern, target);
+        return new Stmt.VarPattern(keyword, pattern, target);
     }
 
     private Stmt recordDeclaration() {

@@ -474,7 +474,7 @@ class Compiler {
                     patchJump(else_);          // ∅            ; else:
                 }
             }
-            case Stmt.Let s -> {
+            case Stmt.VarPattern s -> {
                 var vars = s.pattern().getBindings();
 
                 if (!inGlobalScope()) {        // Stack: locals | working

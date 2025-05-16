@@ -11,7 +11,7 @@ import java.util.List;
 public sealed interface Stmt
     permits Stmt.Assert, Stmt.Block, Stmt.Break, Stmt.Class,
             Stmt.Continue, Stmt.Expression, Stmt.For, Stmt.ForEach,
-            Stmt.Function, Stmt.If, Stmt.IfLet, Stmt.Let, Stmt.Match,
+            Stmt.Function, Stmt.If, Stmt.IfLet, Stmt.VarPattern, Stmt.Match,
             Stmt.Record, Stmt.Return, Stmt.Switch,
             Stmt.Throw, Stmt.Var, Stmt.While
 {
@@ -176,16 +176,6 @@ public sealed interface Stmt
     }
 
     /**
-     * A "let" statement
-     * @param keyword The keyword, for error location
-     * @param pattern The pattern to match
-     * @param target The target expression
-     */
-    record Let(Token keyword, ASTPattern pattern, Expr target) implements Stmt {
-        public Span location() { return keyword.span(); }
-    }
-
-    /**
      * A "match" statement.
      * @param keyword The "match" keyword
      * @param expr The match expression
@@ -306,6 +296,17 @@ public sealed interface Stmt
     record Var(Token name, Expr value) implements Stmt {
         public Span location() { return name.span(); }
     }
+
+    /**
+     * A "var" statement doing a destructuring bind using a pattern.
+     * @param keyword The keyword, for error location
+     * @param pattern The pattern to match
+     * @param target The target expression
+     */
+    record VarPattern(Token keyword, ASTPattern pattern, Expr target) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
+
 
     /**
      * A "while" loop

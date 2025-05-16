@@ -157,7 +157,7 @@ public class Dumper {
                 }
                 --indent;
             }
-            case Stmt.Let stmt -> {
+            case Stmt.VarPattern stmt -> {
                 // TODO: Add variables and constants
                 buff.append(indent())
                     .append("Stmt.Let ")

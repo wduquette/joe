@@ -176,7 +176,7 @@ class Resolver {
                     resolve(stmt.elseBranch());
                 }
             }
-            case Stmt.Let stmt -> {
+            case Stmt.VarPattern stmt -> {
                 stmt.pattern().getBindings().forEach(this::declare);
                 stmt.pattern().getConstants().forEach(this::resolve);
                 resolve(stmt.target());
