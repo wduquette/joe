@@ -188,7 +188,7 @@ class Interpreter {
             }
             case Stmt.ForEachBind stmt ->
                 throw new RuntimeError(stmt.keyword().span(),
-                    "Walker does not support patterns in 'foreach'.");
+                    "Walker does not yet support patterns in 'foreach'.");
             case Stmt.Function stmt -> {
                 var function = new WalkerFunction(this, stmt, environment, false);
                 environment.setVar(stmt.name().lexeme(), function);

@@ -110,15 +110,17 @@ public class Dumper {
             case Stmt.ForEach stmt -> {
                 buff.append(indent())
                     .append("Stmt.ForEach ")
-                    .append(stmt.name().lexeme());
+                    .append(stmt.name().lexeme())
+                    .append("\n");
 
                 dumpExpression(stmt.items());
                 dumpStatement(stmt.body());
             }
             case Stmt.ForEachBind stmt -> {
                 buff.append(indent())
-                    .append("Stmt.ForEach")
-                    .append(stmt.pattern());
+                    .append("Stmt.ForEach ")
+                    .append(stmt.pattern().getPattern())
+                    .append("\n");
                 dumpExpression(stmt.items());
                 dumpStatement(stmt.body());
             }
@@ -152,7 +154,7 @@ public class Dumper {
             case Stmt.IfLet stmt -> {
                 buff.append(indent())
                     .append("Stmt.If ")
-                    .append(stmt.pattern())
+                    .append(stmt.pattern().getPattern())
                     .append("\n");
 
                 dumpExpression(stmt.target());
@@ -174,7 +176,7 @@ public class Dumper {
                 for (var c : stmt.cases()) {
                     buff.append(indent())
                         .append("Case ")
-                        .append(c.pattern())
+                        .append(c.pattern().getPattern())
                         .append(" if ")
                         .append(c.guard())
                         .append("\n");

@@ -98,7 +98,7 @@ class ValueChecker {
     // contains all of the expected arguments.
     method containsAll(args) {
         // TODO: Need predicate to check for a collection
-        foreach (var arg : args) {
+        foreach (arg : args) {
             if (!@value.contains(arg)) {
                 fail("Expected collection to contain " +
                     _typedValue(arg) + ", got: " + _typedValue(args) + ".");

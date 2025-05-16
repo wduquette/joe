@@ -437,25 +437,45 @@ public class Parser {
         var keyword = scanner.previous();
         var start = keyword.span().start();
         scanner.consume(LEFT_PAREN, "Expected '(' after 'foreach'.");
-        scanner.consume(VAR, "Expected 'var' before loop variable name.");
-        scanner.consume(IDENTIFIER, "Expected loop variable name.");
-        var varName = scanner.previous();
-        scanner.consume(COLON, "Expected ':' after loop variable name.");
+        var pattern = pattern();
 
-        // List Expression
-        Expr listExpr = expression();
-        scanner.consume(RIGHT_PAREN, "Expected ')' after loop expression.");
+        switch (pattern.getPattern()) {
+            case Pattern.Constant ignored ->
+                throw errorSync(scanner.previous(), "Expected loop variable name.");
+            case Pattern.Wildcard ignored ->
+                throw errorSync(scanner.previous(), "Expected loop variable name.");
+            case Pattern.ValueBinding ignored -> {
+                var varName = scanner.previous();
+                scanner.consume(COLON, "Expected ':' after loop variable name.");
 
-        // Body
-        var body = statement();
-        var end = scanner.previous().span().end();
+                // List Expression
+                Expr listExpr = expression();
+                scanner.consume(RIGHT_PAREN, "Expected ')' after loop expression.");
 
-        return new Stmt.Block(
-            source.span(start, end),
-            List.of(
-                new Stmt.Var(varName, new Expr.Null()),
-                new Stmt.ForEach(keyword, varName, listExpr, body)
-        ));
+                // Body
+                var body = statement();
+                var end = scanner.previous().span().end();
+
+                return new Stmt.Block(
+                    source.span(start, end),
+                    List.of(
+                        new Stmt.Var(varName, new Expr.Null()),
+                        new Stmt.ForEach(keyword, varName, listExpr, body)
+                    ));
+            }
+            default -> {
+                scanner.consume(COLON, "Expected ':' after loop pattern.");
+
+                // List Expression
+                Expr listExpr = expression();
+                scanner.consume(RIGHT_PAREN, "Expected ')' after loop expression.");
+
+                // Body
+                var body = statement();
+
+                return new Stmt.ForEachBind(keyword, pattern, listExpr, body);
+            }
+        }
     }
 
 
