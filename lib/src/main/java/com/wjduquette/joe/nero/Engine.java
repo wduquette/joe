@@ -170,6 +170,12 @@ public class Engine {
             }
         }
 
+        // NEXT, check the bindings against the negations.
+        for (var atom : rule.negations()) {
+            var query = bindAtom(bindings, atom);
+            if (isKnown(query)) return null;
+        }
+
         // NEXT, build the list of terms and return the new fact.
         var terms = new ArrayList<>();
 
