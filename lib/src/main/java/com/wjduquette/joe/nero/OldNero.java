@@ -1,7 +1,6 @@
 package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.nero.parser.NeroAST;
 import com.wjduquette.joe.nero.parser.Parser;
 import com.wjduquette.joe.nero.parser.Scanner;
 import com.wjduquette.joe.SourceBuffer;
@@ -47,19 +46,20 @@ public class OldNero {
         if (gotError) throw new JoeError("Error in Nero input.");
 
         var parser = new Parser(tokens, this::errorHandler);
-        var clauses = parser.parse();
+        var ast = parser.parse();
         if (gotError) throw new JoeError("Error in Nero input.");
 
         var baseFacts = new ArrayList<Fact>();
         var rules = new ArrayList<Rule>();
 
         System.out.println("Input program:");
-        for (var clause : clauses) {
-            System.out.println("  " + clause);
-            switch (clause) {
-                case NeroAST.Axiom f -> baseFacts.add(f.asFact());
-                case NeroAST.RuleClause f -> rules.add(f.asRule());
-            }
+        for (var fact : ast.facts()) {
+            System.out.println(fact);
+            baseFacts.add(fact.asFact());
+        }
+        for (var rule : ast.rules()) {
+            System.out.println("  " + rule);
+            rules.add(rule.asRule());
         }
 
         // Will throw JoeError if the rules aren't stratified.

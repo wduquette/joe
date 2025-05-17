@@ -25,50 +25,46 @@ public class Parser {
     //-------------------------------------------------------------------------
     // Public API
 
-    public List<HornClause> parse() {
-        List<HornClause> clauses = new ArrayList<>();
+    public NeroAST parse() {
+        List<ASTFact> facts = new ArrayList<>();
+        List<ASTRule> rules = new ArrayList<>();
 
         while (!isAtEnd()) {
-            clauses.add(clause());
+            try {
+                var head = atom();
+
+                if (match(SEMICOLON)) {
+                    facts.add(fact(head));
+                } else if (match(COLON_MINUS)) {
+                    rules.add(rule(head));
+                } else {
+                    advance();
+                    throw errorSync(previous(), "expected fact or rule.");
+                }
+            } catch (ErrorSync error) {
+                synchronize();
+            }
         }
 
-        return clauses;
+        return new NeroAST(facts, rules);
     }
 
     //-------------------------------------------------------------------------
     // Productions
 
-    private HornClause clause() {
-        try {
-            var head = atom();
-
-            if (match(SEMICOLON)) {
-                return axiom(head);
-            } else if (match(COLON_MINUS)) {
-                return rule(head);
-            } else {
-                advance();
-                throw errorSync(previous(), "expected rule or fact.");
-            }
-        } catch (ErrorSync error) {
-            synchronize();
-            return null;
-        }
-    }
-
-    private HornClause axiom(AtomItem head) {
+    private ASTFact fact(ASTAtom head) {
         // Verify that there are no variable terms.
         for (var term : head.terms()) {
-            if (!(term instanceof ConstantToken)) {
+            if (!(term instanceof ASTConstant)) {
                 error(term.token(), "axiom contains a non-constant term.");
             }
         }
-        return new Axiom(head);
+        return new ASTFact(head);
     }
 
-    private HornClause rule(AtomItem head) {
-        var body = new ArrayList<AtomItem>();
-        var negations = new ArrayList<AtomItem>();
+    private ASTRule rule(ASTAtom head) {
+        var body = new ArrayList<ASTAtom>();
+        var negations = new ArrayList<ASTAtom>();
         var constraints = new ArrayList<ConstraintItem>();
 
         var bodyVar = new HashSet<String>();
@@ -78,7 +74,7 @@ public class Parser {
             var atom = atom();
             if (negated) {
                 for (var term : atom.terms()) {
-                    if (term instanceof VariableToken v) {
+                    if (term instanceof ASTVariable) {
                         if (!bodyVar.contains(term.token().lexeme())) {
                             error(term.token(),
                                 "negated atom contains an unbound variable.");
@@ -101,36 +97,36 @@ public class Parser {
         // Verify that the head contains only valid terms.
         for (var term : head.terms()) {
             switch (term) {
-                case ConstantToken c -> {}
-                case VariableToken v -> {
+                case ASTConstant ignored -> {}
+                case ASTVariable v -> {
                     if (!bodyVar.contains(v.token().lexeme())) {
                         error(v.token(),
                             "head variable not found in positive body atom.");
                     }
                 }
-                case WildcardToken w -> error(w.token(),
+                case ASTWildcard w -> error(w.token(),
                     "wildcard found in rule head.");
             }
         }
 
-        return new RuleClause(head, body, negations, constraints);
+        return new ASTRule(head, body, negations, constraints);
     }
 
     private ConstraintItem constraint(Set<String> bodyVar) {
         var term = term();
         Token op;
-        VariableToken a = null;
+        ASTVariable a = null;
 
         switch (term) {
-            case ConstantToken c ->
+            case ASTConstant c ->
                 error(c.token(), "expected bound variable.");
-            case VariableToken v -> {
+            case ASTVariable v -> {
                 a = v;
                 if (!bodyVar.contains(v.token().lexeme())) {
                     error(v.token(), "expected bound variable.");
                 }
             }
-            case WildcardToken c ->
+            case ASTWildcard c ->
                 error(c.token(), "expected bound variable.");
         }
 
@@ -146,23 +142,23 @@ public class Parser {
 
         var b = term();
 
-        if (b instanceof VariableToken v) {
+        if (b instanceof ASTVariable v) {
             if (!bodyVar.contains(v.token().lexeme())) {
                 error(v.token(), "expected bound variable.");
             }
-        } else if (b instanceof WildcardToken w) {
+        } else if (b instanceof ASTWildcard w) {
             error(w.token(), "expected bound variable or constant.");
         }
 
         return new ConstraintItem(a, op, b);
     }
 
-    private AtomItem atom() {
+    private ASTAtom atom() {
         // NEXT, parse the literal proper
         var predicate = consume(IDENTIFIER, "expected predicate.");
         consume(LEFT_PAREN, "expected '(' after predicate.");
 
-        var terms = new ArrayList<TermToken>();
+        var terms = new ArrayList<ASTTerm>();
 
         do {
             terms.add(term());
@@ -170,19 +166,19 @@ public class Parser {
 
         consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new AtomItem(predicate, terms);
+        return new ASTAtom(predicate, terms);
     }
 
-    private TermToken term() {
+    private ASTTerm term() {
         if (match(IDENTIFIER)) {
             var name = previous();
             if (name.lexeme().startsWith("_")) {
-                return new WildcardToken(name);
+                return new ASTWildcard(name);
             } else {
-                return new VariableToken(name);
+                return new ASTVariable(name);
             }
         } else if (match(KEYWORD, NUMBER, STRING)) {
-            return new ConstantToken(previous());
+            return new ASTConstant(previous());
         } else {
             advance();
             throw errorSync(previous(), "expected term.");

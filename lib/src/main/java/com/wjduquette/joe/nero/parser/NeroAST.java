@@ -9,15 +9,12 @@ import java.util.stream.Collectors;
 /**
  * This class contains the Nero Abstract Syntax Tree types.
  */
-public class NeroAST {
-    private NeroAST() {} // not instantiable
+public record NeroAST(List<ASTFact> facts, List<ASTRule> rules) {
 
     //-------------------------------------------------------------------------
     // Clauses
 
-    public sealed interface HornClause permits Axiom, RuleClause {}
-
-    public record Axiom(AtomItem item) implements HornClause {
+    public record ASTFact(ASTAtom item) {
         public Fact asFact() {
             return item.asFact();
         }
@@ -27,24 +24,24 @@ public class NeroAST {
         }
     }
 
-    public record RuleClause(
-        AtomItem head,
-        List<AtomItem> body,
-        List<AtomItem> negations,
+    public record ASTRule(
+        ASTAtom head,
+        List<ASTAtom> body,
+        List<ASTAtom> negations,
         List<ConstraintItem> constraints
-    ) implements HornClause {
+    ) {
         public Rule asRule() {
             return new Rule(
                 head.asHead(),
-                body.stream().map(AtomItem::asAtom).toList(),
-                negations.stream().map(AtomItem::asAtom).toList(),
+                body.stream().map(ASTAtom::asAtom).toList(),
+                negations.stream().map(ASTAtom::asAtom).toList(),
                 constraints.stream().map(ConstraintItem::asConstraint).toList());
         }
 
         @Override public String toString() {
-            var bodyString = body.stream().map(AtomItem::toString)
+            var bodyString = body.stream().map(ASTAtom::toString)
                 .collect(Collectors.joining(", "));
-            var negString = "not " + negations.stream().map(AtomItem::toString)
+            var negString = "not " + negations.stream().map(ASTAtom::toString)
                 .collect(Collectors.joining(", not "));
             var whereString = constraints.stream().map(ConstraintItem::toString)
                 .collect(Collectors.joining(", "));
@@ -58,9 +55,9 @@ public class NeroAST {
     //-------------------------------------------------------------------------
     // Items
 
-    public record AtomItem(
+    public record ASTAtom(
         Token relation,
-        List<TermToken> terms
+        List<ASTTerm> terms
     ) {
         /**
          * Gets a list of the variable names used in the item.
@@ -68,8 +65,8 @@ public class NeroAST {
          */
         public List<String> getVariableNames() {
             return terms.stream()
-                .filter(t -> t instanceof VariableToken)
-                .map(TermToken::toString)
+                .filter(t -> t instanceof ASTVariable)
+                .map(ASTTerm::toString)
                 .toList();
         }
 
@@ -81,7 +78,7 @@ public class NeroAST {
         public Fact asFact() {
             var values = new ArrayList<>();
             for (var t : terms) {
-                if (t instanceof ConstantToken c) {
+                if (t instanceof ASTConstant c) {
                     values.add(c.token().literal());
                 } else {
                     throw new IllegalStateException(
@@ -106,12 +103,12 @@ public class NeroAST {
          * @return The atom
          */
         public Atom asAtom() {
-            var realTerms = terms.stream().map(TermToken::asTerm).toList();
+            var realTerms = terms.stream().map(ASTTerm::asTerm).toList();
             return new Atom(relation.lexeme(), realTerms);
         }
 
         @Override public String toString() {
-            var termString = terms.stream().map(TermToken::toString)
+            var termString = terms.stream().map(ASTTerm::toString)
                 .collect(Collectors.joining(", "));
             return relation.lexeme() + "(" + termString + ")";
         }
@@ -124,9 +121,9 @@ public class NeroAST {
      * @param b A bound variable or constant
      */
     public record ConstraintItem(
-        VariableToken a,
+        ASTVariable a,
         Token op,
-        TermToken b)
+        ASTTerm b)
     {
         public Constraint asConstraint() {
             var realOp = switch (op.type()) {
@@ -153,8 +150,8 @@ public class NeroAST {
     /**
      * A term in an atom, either a constant or a variable.
      */
-    public sealed interface TermToken
-        permits ConstantToken, VariableToken, WildcardToken
+    public sealed interface ASTTerm
+        permits ASTConstant, ASTVariable, ASTWildcard
     {
         Token token();
         /** Converts the token to a `Term` as used in the engine. */
@@ -166,7 +163,7 @@ public class NeroAST {
      * integer.
      * @param token The value token
      */
-    public record ConstantToken(Token token) implements TermToken {
+    public record ASTConstant(Token token) implements ASTTerm {
         @Override public Constant asTerm() {
             return new Constant(token.literal());
         }
@@ -180,7 +177,7 @@ public class NeroAST {
      * A token representing a variable term: an identifier.
      * @param token The token token
      */
-    public record VariableToken(Token token) implements TermToken {
+    public record ASTVariable(Token token) implements ASTTerm {
         @Override public Variable asTerm() {
             return new Variable(token.lexeme());
         }
@@ -195,7 +192,7 @@ public class NeroAST {
      * with an underscore
      * @param token The token token
      */
-    public record WildcardToken(Token token) implements TermToken {
+    public record ASTWildcard(Token token) implements ASTTerm {
         @Override public Wildcard asTerm() {
             return new Wildcard(token.lexeme());
         }
