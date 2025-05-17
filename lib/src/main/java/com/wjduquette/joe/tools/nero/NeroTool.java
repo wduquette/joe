@@ -1,7 +1,8 @@
-package com.wjduquette.joe.app;
+package com.wjduquette.joe.tools.nero;
 
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SyntaxError;
+import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.nero.OldNero;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
