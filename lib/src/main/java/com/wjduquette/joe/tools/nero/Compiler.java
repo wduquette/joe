@@ -37,6 +37,17 @@ public class Compiler {
      * @throws JoeError on compilation failure.
      */
     public RuleSet compile() {
+        var ast = parse();
+
+        var ruleset = new RuleSet();
+
+        for (var f : ast.facts()) ruleset.add(ast2fact(f));
+        for (var r : ast.rules()) ruleset.add(ast2rule(r));
+
+        return ruleset;
+    }
+
+    public ASTRuleSet parse() {
         gotError = false;
 
         var scanner = new Scanner(source, this::errorHandler);
@@ -47,15 +58,7 @@ public class Compiler {
         var ast = parser.parse();
         if (gotError) throw new JoeError("Error in Nero input.");
 
-        System.out.println("Program:");
-        System.out.println(ast.toString().indent(2));
-
-        var ruleset = new RuleSet();
-
-        for (var f : ast.facts()) ruleset.add(ast2fact(f));
-        for (var r : ast.rules()) ruleset.add(ast2rule(r));
-
-        return ruleset;
+        return ast;
     }
 
     private void errorHandler(Trace trace) {

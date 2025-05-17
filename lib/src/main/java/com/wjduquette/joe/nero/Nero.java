@@ -33,7 +33,7 @@ public class Nero {
     private final List<List<String>> strata;
 
     // Facts as read from the Nero program.
-    private final List<Fact> baseFacts = new ArrayList<>();
+    private final Set<Fact> baseFacts = new HashSet<>();
 
     // The current set of known facts.
     private final Set<Fact> knownFacts = new HashSet<>();
@@ -43,6 +43,9 @@ public class Nero {
 
     // Fact Creator
     private FactFactory factFactory = DEFAULT_FACT_FACTORY;
+
+    // Debug Flag
+    private boolean debug = false;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -55,7 +58,8 @@ public class Nero {
         }
 
         this.strata = graph.strata();
-        System.out.println("  Strata: " + strata);
+
+        if (debug) System.out.println("Rule Strata: " + strata);
 
         // NEXT, Categorize the rules by head relation
         for (var rule : ruleset.getRules()) {
@@ -74,6 +78,15 @@ public class Nero {
 
 
     @SuppressWarnings("unused")
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    @SuppressWarnings("unused")
     public FactFactory getFactFactory() {
         return factFactory;
     }
@@ -83,14 +96,22 @@ public class Nero {
         this.factFactory = factFactory;
     }
 
-    public List<Fact> factsFor(String relation) {
+    public List<Fact> getFacts(String relation) {
         return factMap.computeIfAbsent(relation,
             key -> new ArrayList<>());
     }
 
-
-    public Set<Fact> getKnownFacts() {
+    public Set<Fact> getAllFacts() {
         return Collections.unmodifiableSet(knownFacts);
+    }
+
+    public Set<Fact> getNewFacts() {
+        var result = new HashSet<Fact>();
+        for (var fact : knownFacts) {
+            if (!baseFacts.contains(fact)) result.add(fact);
+        }
+
+        return result;
     }
 
     /**
@@ -103,7 +124,7 @@ public class Nero {
      */
     private boolean addFact(Fact fact) {
         if (!knownFacts.contains(fact)) {
-            var list = factsFor(fact.relation());
+            var list = getFacts(fact.relation());
             list.add(fact);
 
             knownFacts.add(fact);
@@ -136,10 +157,10 @@ public class Nero {
         boolean gotNewFact;
         do {
             gotNewFact = false;
-            System.out.println("Iteration " + stratum + "." + (++count) + ":");
+            if (debug) System.out.println("Iteration " + stratum + "." + (++count) + ":");
             for (var head : heads) {
                 for (var rule : ruleMap.get(head)) {
-                    System.out.println("  Rule: " + rule);
+                    if (debug) System.out.println("  Rule: " + rule);
 
                     var iter = new TupleIterator(rule);
                     while (iter.hasNext()) {
@@ -147,7 +168,7 @@ public class Nero {
                         var fact = matchRule(rule, tuple);
 
                         if (fact != null && addFact(fact)) {
-                            System.out.println("    Fact: " + fact);
+                            if (debug) System.out.println("    Fact: " + fact);
                             gotNewFact = true;
                         }
                     }
@@ -281,7 +302,7 @@ public class Nero {
     // matches this atom's constant terms.  This is used to implement
     // "not" items.
     private boolean isKnown(Atom query) {
-        for (var fact : factsFor(query.relation())) {
+        for (var fact : getFacts(query.relation())) {
             if (matches(fact, query)) {
                 return true;
             }
@@ -367,7 +388,7 @@ public class Nero {
             int sum = 0;
             for (var b : rule.body()) {
                 var relation = b.relation();
-                var facts = factsFor(relation);
+                var facts = getFacts(relation);
 
                 if (facts.isEmpty()) {
                     inputs.clear();

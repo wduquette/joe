@@ -14,6 +14,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -26,12 +28,31 @@ public class NeroTool implements Tool {
     public static final ToolInfo INFO = new ToolInfo(
         "nero",
         "[options...] file.nero",
-        "Experimental tool for working with Nero scripts.",
+        "Executes Nero scripts.",
         """
-        Exercises the Nero script in some way.
+        Nero is Joe's implementation of Datalog.  This tool executes Nero
+        scripts and supports Nero debugging.
+        
+        By default, the tool executes the rule set and outputs all computed
+        facts.
+        
+        Option:
+        
+        --ast, -a                 Dumps the abstract syntax tree (AST)
+        --debug, -d               Enable debugging
+        --all                     Dumps all known facts.
+        --relation, -r relation   Dumps facts with the given relation.
         """,
         NeroTool::main
     );
+
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
+    private boolean dumpAST = false;
+    private boolean debug = false;
+    private boolean dumpAll = false;
+    private final List<String> relations = new ArrayList<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -53,22 +74,63 @@ public class NeroTool implements Tool {
     }
 
     private void run(String[] args) {
+        // FIRST, parse the arguments
         var argq = new ArrayDeque<>(List.of(args));
+
+        while (!argq.isEmpty() && argq.peek().startsWith("-")) {
+            var opt = argq.poll();
+            switch (opt) {
+                case "--ast", "-a"      -> dumpAST = true;
+                case "--all"            -> dumpAll = true;
+                case "--debug", "-d"    -> debug = true;
+                case "--relation", "-r" ->
+                    relations.add(toOptArg(opt, argq));
+                default -> {
+                    System.err.println("Unknown option: '" + opt + "'.");
+                    System.exit(64);
+                }
+            }
+        }
 
         if (argq.isEmpty()) {
             printUsage(App.NAME);
             System.exit(64);
         }
 
+        // NEXT, get the source.
         var path = argq.poll();
-
+        SourceBuffer source = null;
 
         try {
-            executeFile(path);
+            source = readSource(path);
         } catch (IOException ex) {
             System.err.println("Could not read script: " + path +
                 "\n*** " + ex.getMessage());
             System.exit(1);
+        }
+        assert source != null;
+
+        // NEXT, figure out what to do.
+        var dumpNew = !dumpAST && !dumpAll && relations.isEmpty();
+
+        try {
+            // FIRST, dump the AST if they asked for that.
+            if (dumpAST) dumpAST(source);
+
+            // NEXT, compile and execute it.
+            var nero = compile(source);
+
+            if (dumpNew) {
+                dumpFacts("New Facts:", nero.getNewFacts());
+            } else if (dumpAll) {
+                // If we dump everything, no need to do specific queries.
+                dumpFacts("All Facts:", nero.getAllFacts());
+            } else {
+                for (var relation : relations) {
+                    dumpFacts("Relation: " + relation,
+                        nero.getFacts(relation));
+                }
+            }
         } catch (SyntaxError ex) {
             System.err.println(ex.getErrorReport());
             System.err.println("*** " + ex.getMessage());
@@ -79,20 +141,25 @@ public class NeroTool implements Tool {
         }
     }
 
+    private void dumpAST(SourceBuffer source) {
+        var compiler = new Compiler(source);
+        var ast = compiler.parse();
+        println(ast);
+    }
+
     /**
-     * Processes the given file in some way.
+     * Gets the source from disk.
      * @param scriptPath The file's path
      * @throws IOException if the file cannot be read.
-     * @throws JoeError if the script could not be compiled.
      */
-    public void executeFile(String scriptPath)
-        throws IOException, SyntaxError
+    private SourceBuffer readSource(String scriptPath)
+        throws IOException
     {
         var path = Paths.get(scriptPath);
         byte[] bytes = Files.readAllBytes(path);
         var script = new String(bytes, Charset.defaultCharset());
 
-        execute(new SourceBuffer(path.getFileName().toString(), script));
+        return new SourceBuffer(path.getFileName().toString(), script);
     }
 
     /**
@@ -102,25 +169,23 @@ public class NeroTool implements Tool {
      * @param buff The Nero source.
      * @throws JoeError if the script could not be compiled.
      */
-    public void execute(SourceBuffer buff) {
+    public Nero compile(SourceBuffer buff) {
         // FIRST, compile the source.
         var compiler = new Compiler(buff);
         var ruleset = compiler.compile();
 
         // Will throw JoeError if the rules aren't stratified.
-        var engine = new Nero(ruleset);
-
-        try {
-            engine.infer();
-            System.out.println("\nKnown facts:");
-            engine.getKnownFacts().stream().map(Fact::toString).sorted()
-                .forEach(f -> System.out.println("  " + f));
-
-        } catch (Exception ex) {
-            System.out.println("Error in ruleset: " + ex);
-        }
+        var nero = new Nero(ruleset);
+        nero.setDebug(debug);
+        nero.infer();
+        return nero;
     }
 
+    void dumpFacts(String title, Collection<Fact> facts) {
+        println(title);
+        facts.stream().map(Fact::toString).sorted()
+            .forEach(this::println);
+    }
 
     //-------------------------------------------------------------------------
     // Main

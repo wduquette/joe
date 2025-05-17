@@ -1,4 +1,4 @@
-// Simple nero example
+// Simple Nero example
 
 Parent(#walker, #bert);
 Parent(#bert, #clark);
