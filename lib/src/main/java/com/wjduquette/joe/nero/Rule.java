@@ -24,12 +24,12 @@ public record Rule(
     public String toString() {
         var bodyString = body.stream().map(Atom::toString)
             .collect(Collectors.joining(", "));
-        var negString = negations.stream().map(Atom::toString)
-            .collect(Collectors.joining(", "));
+        var negString = "not " + negations.stream().map(Atom::toString)
+            .collect(Collectors.joining(", not "));
         var constraintString = constraints.stream().map(Constraint::toString)
             .collect(Collectors.joining(", "));
         return head + " :- " + bodyString
-            + (negString.isEmpty() ? "" : ", " + negString)
+            + (negations.isEmpty() ? "" : ", " + negString)
             + (constraints.isEmpty() ? "" : " where " + constraintString)
             + ";";
     }

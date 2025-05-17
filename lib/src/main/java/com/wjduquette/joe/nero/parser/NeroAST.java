@@ -44,12 +44,12 @@ public class NeroAST {
         @Override public String toString() {
             var bodyString = body.stream().map(AtomItem::toString)
                 .collect(Collectors.joining(", "));
-            var negString = negations.stream().map(AtomItem::toString)
-                .collect(Collectors.joining(", "));
+            var negString = "not " + negations.stream().map(AtomItem::toString)
+                .collect(Collectors.joining(", not "));
             var whereString = constraints.stream().map(ConstraintItem::toString)
                 .collect(Collectors.joining(", "));
             return head + " :- " + bodyString +
-                (negString.isEmpty() ? "" : ", " + negString) +
+                (negations.isEmpty() ? "" : ", " + negString) +
                 (constraints.isEmpty() ? "" : " where " + whereString)
                 + ";";
         }
@@ -60,8 +60,7 @@ public class NeroAST {
 
     public record AtomItem(
         Token relation,
-        List<TermToken> terms,
-        boolean negated
+        List<TermToken> terms
     ) {
         /**
          * Gets a list of the variable names used in the item.
@@ -80,10 +79,6 @@ public class NeroAST {
          * @return The fact.
          */
         public Fact asFact() {
-            if (negated) {
-                throw new IllegalStateException("Atom is negated; cannot be a fact.");
-            }
-
             var values = new ArrayList<>();
             for (var t : terms) {
                 if (t instanceof ConstantToken c) {
@@ -103,10 +98,6 @@ public class NeroAST {
          * @return The atom
          */
         public Atom asHead() {
-            if (negated) {
-                throw new IllegalStateException(
-                    "Atom is negated; cannot be a rule head.");
-            }
             return asAtom();
         }
 
@@ -116,14 +107,13 @@ public class NeroAST {
          */
         public Atom asAtom() {
             var realTerms = terms.stream().map(TermToken::asTerm).toList();
-            return new Atom(relation.lexeme(), realTerms, negated);
+            return new Atom(relation.lexeme(), realTerms);
         }
 
         @Override public String toString() {
             var termString = terms.stream().map(TermToken::toString)
                 .collect(Collectors.joining(", "));
-            return (negated ? "not " : "") +
-                relation.lexeme() + "(" + termString + ")";
+            return relation.lexeme() + "(" + termString + ")";
         }
     }
 

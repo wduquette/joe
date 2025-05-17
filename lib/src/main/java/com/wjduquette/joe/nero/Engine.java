@@ -241,7 +241,7 @@ public class Engine {
             }
         }
 
-        return new Atom(atom.relation(), terms, false);
+        return new Atom(atom.relation(), terms);
     }
 
     // Looks through the facts to see if we have a known fact that

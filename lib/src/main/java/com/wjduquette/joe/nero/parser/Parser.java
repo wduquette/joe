@@ -40,7 +40,7 @@ public class Parser {
 
     private HornClause clause() {
         try {
-            var head = atom(false);
+            var head = atom();
 
             if (match(SEMICOLON)) {
                 return fact(head);
@@ -73,13 +73,15 @@ public class Parser {
 
         var bodyVar = new HashSet<String>();
         do {
-            var atom = atom(true);
-            if (atom.negated()) {
+            var negated = match(NOT);
+
+            var atom = atom();
+            if (negated) {
+                // Ensure the atom only uses bound variables once we
+                // have wildcards.
                 negations.add(atom);
             } else {
                 body.add(atom);
-            }
-            if (!atom.negated()) {
                 bodyVar.addAll(atom.getVariableNames());
             }
         } while (match(COMMA));
@@ -139,10 +141,7 @@ public class Parser {
         return new ConstraintItem(a, op, b);
     }
 
-    private AtomItem atom(boolean inBody) {
-        // FIRST, if this is a body atom, check for "not"
-        var negated = inBody && match(NOT);
-
+    private AtomItem atom() {
         // NEXT, parse the literal proper
         var predicate = consume(IDENTIFIER, "expected predicate.");
         consume(LEFT_PAREN, "expected '(' after predicate.");
@@ -155,7 +154,7 @@ public class Parser {
 
         consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new AtomItem(predicate, terms, negated);
+        return new AtomItem(predicate, terms);
     }
 
     private TermToken term() {
