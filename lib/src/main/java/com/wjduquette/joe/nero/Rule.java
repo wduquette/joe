@@ -4,27 +4,34 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * A rule.  At present, both the head and body components are simply
- * "Facts"; in time, the body components will be simple patterns and
- * comparisons, with "not" as a possibility, and the head will be a
- * fact constructor.
+ * A rule, consisting of a head (a template for creating new facts),
+ * a body, consisting of patterns that match known facts and bind
+ * variables, a list of negations, consisting of patterns that must
+ * not match known facts given the bindings, and constraints that
+ * the bindings must meet.
  * @param head The rule's head
- * @param body The body predicates
+ * @param body The binding predicates
+ * @param negations The negated predicates
+ * @param constraints The constraint expressions
  */
 public record Rule(
     Atom head,
     List<Atom> body,
+    List<Atom> negations,
     List<Constraint> constraints
 ) {
     @Override
     public String toString() {
         var bodyString = body.stream().map(Atom::toString)
             .collect(Collectors.joining(", "));
+        var negString = negations.stream().map(Atom::toString)
+            .collect(Collectors.joining(", "));
         var constraintString = constraints.stream().map(Constraint::toString)
             .collect(Collectors.joining(", "));
         return head + " :- " + bodyString
+            + (negString.isEmpty() ? "" : ", " + negString)
             + (constraints.isEmpty() ? "" : " where " + constraintString)
-            + ".";
+            + ";";
     }
 
     @Override
@@ -34,6 +41,7 @@ public record Rule(
         Rule rule = (Rule) o;
         return head.equals(rule.head)
             && body.equals(rule.body)
+            && negations.equals(rule.negations)
             && constraints.equals(rule.constraints);
     }
 
@@ -41,6 +49,7 @@ public record Rule(
     public int hashCode() {
         int result = head.hashCode();
         result = 31 * result + body.hashCode();
+        result = 31 * result + negations.hashCode();
         result = 31 * result + constraints.hashCode();
         return result;
     }

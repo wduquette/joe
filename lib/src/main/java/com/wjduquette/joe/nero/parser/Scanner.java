@@ -82,7 +82,7 @@ public class Scanner {
             case '('  -> addToken(LEFT_PAREN);
             case ')'  -> addToken(RIGHT_PAREN);
             case ','  -> addToken(COMMA);
-            case '.'  -> addToken(DOT);
+            case ';'  -> addToken(SEMICOLON);
 
             // One-or-two-character tokens
             case '!' -> {
@@ -277,11 +277,6 @@ public class Scanner {
     private char peekNext() {
         if (current + 1 >= source.length()) return '\0';
         return source.charAt(current + 1);
-    }
-
-    private char peekNext(int delta) {
-        if (current + delta >= source.length()) return '\0';
-        return source.charAt(current + delta);
     }
 
     private boolean isAlpha(char c) {

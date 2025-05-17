@@ -42,7 +42,7 @@ public class Parser {
         try {
             var head = atom(false);
 
-            if (match(DOT)) {
+            if (match(SEMICOLON)) {
                 return fact(head);
             } else if (match(COLON_MINUS)) {
                 return rule(head);
@@ -68,12 +68,17 @@ public class Parser {
 
     private HornClause rule(AtomItem head) {
         var body = new ArrayList<AtomItem>();
+        var negations = new ArrayList<AtomItem>();
         var constraints = new ArrayList<ConstraintItem>();
 
         var bodyVar = new HashSet<String>();
         do {
             var atom = atom(true);
-            body.add(atom);
+            if (atom.negated()) {
+                negations.add(atom);
+            } else {
+                body.add(atom);
+            }
             if (!atom.negated()) {
                 bodyVar.addAll(atom.getVariableNames());
             }
@@ -83,7 +88,7 @@ public class Parser {
             constraints.add(constraint(bodyVar));
         } while (match(COMMA));
 
-        consume(DOT, "expected '.' after rule body.");
+        consume(SEMICOLON, "expected ';' after rule body.");
 
         // Verify that the head contains only body variables
         // from positive body items.
@@ -94,7 +99,7 @@ public class Parser {
             .forEach(v -> error(v.name(),
                 "head variable not found in positive body atom."));
 
-        return new RuleClause(head, body, constraints);
+        return new RuleClause(head, body, negations, constraints);
     }
 
     private ConstraintItem constraint(Set<String> bodyVar) {
@@ -229,7 +234,7 @@ public class Parser {
         // Complete the clause.
         while (!isAtEnd()) {
             // If we see we just completed a clause, return.
-            if (previous().type() == DOT) return;
+            if (previous().type() == SEMICOLON) return;
 
             // Discard this token.
             advance();
