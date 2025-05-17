@@ -59,7 +59,7 @@ public class NeroTool implements Tool {
 
 
         try {
-            nero.parseFile(path);
+            nero.executeFile(path);
         } catch (IOException ex) {
             System.err.println("Could not read script: " + path +
                 "\n*** " + ex.getMessage());

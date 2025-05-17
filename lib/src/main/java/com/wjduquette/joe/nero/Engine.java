@@ -31,9 +31,9 @@ public class Engine {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Engine(List<Rule> rules, List<Fact> baseFacts) {
+    public Engine(RuleSet ruleset) {
         // FIRST, analyze the rule set
-        var graph = new DependencyGraph(rules);
+        var graph = new DependencyGraph(ruleset.getRules());
         if (!graph.isStratified()) {
             throw new JoeError("Rule set is not stratified.");
         }
@@ -42,14 +42,14 @@ public class Engine {
         System.out.println("  Strata: " + strata);
 
         // NEXT, Categorize the rules by head relation
-        for (var rule : rules) {
+        for (var rule : ruleset.getRules()) {
             var head = rule.head().relation();
             var list = ruleMap.computeIfAbsent(head, k -> new ArrayList<>());
             list.add(rule);
         }
 
         // NEXT, save the base facts.
-        this.baseFacts.addAll(baseFacts);
+        this.baseFacts.addAll(ruleset.getFacts());
         baseFacts.forEach(this::addFact);
     }
 
@@ -93,17 +93,17 @@ public class Engine {
      * Executes the inference algorithm, computing all facts knowable
      * from the rules.
      */
-    public void ponder() {
+    public void infer() {
         knownFacts.clear();
         factMap.clear();
         baseFacts.forEach(this::addFact);
 
         for (var i = 0; i < strata.size(); i++) {
-            ponder(i, strata.get(i));
+            infer(i, strata.get(i));
         }
     }
 
-    private void ponder(int stratum, List<String> heads) {
+    private void infer(int stratum, List<String> heads) {
         int count = 0;
         boolean gotNewFact;
         do {
