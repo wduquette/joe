@@ -28,10 +28,6 @@ public class Engine {
     // Facts by relation
     private final Map<String, List<Fact>> factMap = new HashMap<>();
 
-    // A map of all atoms queried as part of negated body items,
-    // the value is true if such an atom was found, and false.
-    private final Map<Atom, Boolean> found = new HashMap<>();
-
     //-------------------------------------------------------------------------
     // Constructor
 
@@ -139,27 +135,9 @@ public class Engine {
 
         for (int i = 0; i < tuple.length; i++) {
             var b = rule.body().get(i);
-            if (b.negated()) {
-                // FIRST, get the atom with bindings.
-                var bound = bindAtom(bindings, b);
 
-                // NEXT, have we already computed this?
-                var flag = found.get(bound);
-
-                if (flag == null) {
-                    flag = isKnown(bound);
-                    found.put(bound, flag);
-                }
-
-                if (flag) {
-                    // We found a fact; the rule fails.
-                    return null;
-                }
-
-            } else {
-                if (!matchFact(bindings, b, tuple[i])) {
-                    return null;
-                }
+            if (!matchFact(bindings, b, tuple[i])) {
+                return null;
             }
         }
 
@@ -168,6 +146,12 @@ public class Engine {
             if (!constraintMet(c, bindings)) {
                 return null;
             }
+        }
+
+        // NEXT, check the bindings against the negations.
+        for (var atom : rule.negations()) {
+            var query = bindAtom(bindings, atom);
+            if (isKnown(query)) return null;
         }
 
         // NEXT, build the list of terms and return the new fact.
@@ -257,7 +241,7 @@ public class Engine {
             }
         }
 
-        return new Atom(atom.relation(), terms, false);
+        return new Atom(atom.relation(), terms);
     }
 
     // Looks through the facts to see if we have a known fact that

@@ -23,31 +23,35 @@ public class NeroAST {
         }
 
         @Override public String toString() {
-            return item + ".";
+            return item + ";";
         }
     }
 
     public record RuleClause(
         AtomItem head,
         List<AtomItem> body,
+        List<AtomItem> negations,
         List<ConstraintItem> constraints
     ) implements HornClause {
         public Rule asRule() {
-            var realBody = body.stream()
-                .map(AtomItem::asAtom).toList();
-            var realConstraints = constraints.stream()
-                .map(ConstraintItem::asConstraint).toList();
-            return new Rule(head.asHead(), realBody, realConstraints);
+            return new Rule(
+                head.asHead(),
+                body.stream().map(AtomItem::asAtom).toList(),
+                negations.stream().map(AtomItem::asAtom).toList(),
+                constraints.stream().map(ConstraintItem::asConstraint).toList());
         }
 
         @Override public String toString() {
             var bodyString = body.stream().map(AtomItem::toString)
                 .collect(Collectors.joining(", "));
+            var negString = "not " + negations.stream().map(AtomItem::toString)
+                .collect(Collectors.joining(", not "));
             var whereString = constraints.stream().map(ConstraintItem::toString)
                 .collect(Collectors.joining(", "));
             return head + " :- " + bodyString +
+                (negations.isEmpty() ? "" : ", " + negString) +
                 (constraints.isEmpty() ? "" : " where " + whereString)
-                + ".";
+                + ";";
         }
     }
 
@@ -56,8 +60,7 @@ public class NeroAST {
 
     public record AtomItem(
         Token relation,
-        List<TermToken> terms,
-        boolean negated
+        List<TermToken> terms
     ) {
         /**
          * Gets a list of the variable names used in the item.
@@ -76,10 +79,6 @@ public class NeroAST {
          * @return The fact.
          */
         public Fact asFact() {
-            if (negated) {
-                throw new IllegalStateException("Atom is negated; cannot be a fact.");
-            }
-
             var values = new ArrayList<>();
             for (var t : terms) {
                 if (t instanceof ConstantToken c) {
@@ -99,10 +98,6 @@ public class NeroAST {
          * @return The atom
          */
         public Atom asHead() {
-            if (negated) {
-                throw new IllegalStateException(
-                    "Atom is negated; cannot be a rule head.");
-            }
             return asAtom();
         }
 
@@ -112,14 +107,13 @@ public class NeroAST {
          */
         public Atom asAtom() {
             var realTerms = terms.stream().map(TermToken::asTerm).toList();
-            return new Atom(relation.lexeme(), realTerms, negated);
+            return new Atom(relation.lexeme(), realTerms);
         }
 
         @Override public String toString() {
             var termString = terms.stream().map(TermToken::toString)
                 .collect(Collectors.joining(", "));
-            return (negated ? "not " : "") +
-                relation.lexeme() + "(" + termString + ")";
+            return relation.lexeme() + "(" + termString + ")";
         }
     }
 

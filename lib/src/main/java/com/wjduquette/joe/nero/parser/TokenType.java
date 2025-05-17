@@ -4,7 +4,7 @@ package com.wjduquette.joe.nero.parser;
 public enum TokenType {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN,
-    COMMA, DOT,
+    COMMA, SEMICOLON,
 
     // One or two character tokens.
     BANG_EQUAL,

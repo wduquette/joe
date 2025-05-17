@@ -51,15 +51,19 @@ public class DependencyGraph {
         for (var rule : rules) {
             var i = heads.indexOf(rule.head().relation());
 
+            // Set +1 for each positive dependency
             for (var b : rule.body()) {
                 var j = heads.indexOf(b.relation());
                 if (j == -1) continue;  // Skip non-head predicates
+                mat[i][j] = 1;
+            }
 
-                if (b.negated()) {
-                    mat[i][j] = -1;
-                } else if (mat[i][j] == 0) {
-                    mat[i][j] = 1;
-                }
+            // Set -1 for each negative dependency; this may override a
+            // positive dependency.
+            for (var b : rule.negations()) {
+                var j = heads.indexOf(b.relation());
+                if (j == -1) continue;  // Skip non-head predicates
+                mat[i][j] = -1;
             }
         }
 

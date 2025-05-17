@@ -1,6 +1,6 @@
 // Simple nero example
 
-Parent(#xerces, #brooke).
-Parent(#brooke, #damocles).
-Ancestor(x, y) :- Parent(x, y).
-Ancestor(x, y) :- Parent(x, z), Ancestor(z, y).
+Parent(#walker, #bert);
+Parent(#bert, #clark);
+Ancestor(x, y) :- Parent(x, y);
+Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
