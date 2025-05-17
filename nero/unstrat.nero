@@ -1,2 +1,2 @@
-P(x) :- not Q(x).
-Q(x) :- P(x).
+P(x) :- R(x), not Q(x);
+Q(x) :- P(x);

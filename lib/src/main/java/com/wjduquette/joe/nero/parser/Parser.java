@@ -43,7 +43,7 @@ public class Parser {
             var head = atom();
 
             if (match(SEMICOLON)) {
-                return fact(head);
+                return axiom(head);
             } else if (match(COLON_MINUS)) {
                 return rule(head);
             } else {
@@ -56,14 +56,14 @@ public class Parser {
         }
     }
 
-    private HornClause fact(AtomItem head) {
+    private HornClause axiom(AtomItem head) {
         // Verify that there are no variable terms.
         for (var term : head.terms()) {
-            if (term instanceof VariableToken v) {
-                error(v.name(), "fact contains a variable term.");
+            if (!(term instanceof ConstantToken)) {
+                error(term.token(), "axiom contains a non-constant term.");
             }
         }
-        return new FactClause(head);
+        return new Axiom(head);
     }
 
     private HornClause rule(AtomItem head) {
@@ -77,8 +77,14 @@ public class Parser {
 
             var atom = atom();
             if (negated) {
-                // Ensure the atom only uses bound variables once we
-                // have wildcards.
+                for (var term : atom.terms()) {
+                    if (term instanceof VariableToken v) {
+                        if (!bodyVar.contains(term.token().lexeme())) {
+                            error(term.token(),
+                                "negated atom contains an unbound variable.");
+                        }
+                    }
+                }
                 negations.add(atom);
             } else {
                 body.add(atom);
@@ -92,14 +98,20 @@ public class Parser {
 
         consume(SEMICOLON, "expected ';' after rule body.");
 
-        // Verify that the head contains only body variables
-        // from positive body items.
-        head.terms().stream()
-            .filter(t -> t instanceof VariableToken)
-            .map(t -> (VariableToken)t)
-            .filter(t -> !bodyVar.contains(t.toString()))
-            .forEach(v -> error(v.name(),
-                "head variable not found in positive body atom."));
+        // Verify that the head contains only valid terms.
+        for (var term : head.terms()) {
+            switch (term) {
+                case ConstantToken c -> {}
+                case VariableToken v -> {
+                    if (!bodyVar.contains(v.token().lexeme())) {
+                        error(v.token(),
+                            "head variable not found in positive body atom.");
+                    }
+                }
+                case WildcardToken w -> error(w.token(),
+                    "wildcard found in rule head.");
+            }
+        }
 
         return new RuleClause(head, body, negations, constraints);
     }
@@ -111,13 +123,15 @@ public class Parser {
 
         switch (term) {
             case ConstantToken c ->
-                error(c.value(), "expected bound variable.");
+                error(c.token(), "expected bound variable.");
             case VariableToken v -> {
                 a = v;
-                if (!bodyVar.contains(v.name().lexeme())) {
-                    error(v.name(), "expected bound variable.");
+                if (!bodyVar.contains(v.token().lexeme())) {
+                    error(v.token(), "expected bound variable.");
                 }
             }
+            case WildcardToken c ->
+                error(c.token(), "expected bound variable.");
         }
 
         if (match(
@@ -133,9 +147,11 @@ public class Parser {
         var b = term();
 
         if (b instanceof VariableToken v) {
-            if (!bodyVar.contains(v.name().lexeme())) {
-                error(v.name(), "expected bound variable.");
+            if (!bodyVar.contains(v.token().lexeme())) {
+                error(v.token(), "expected bound variable.");
             }
+        } else if (b instanceof WildcardToken w) {
+            error(w.token(), "expected bound variable or constant.");
         }
 
         return new ConstraintItem(a, op, b);
@@ -159,7 +175,12 @@ public class Parser {
 
     private TermToken term() {
         if (match(IDENTIFIER)) {
-            return new VariableToken(previous());
+            var name = previous();
+            if (name.lexeme().startsWith("_")) {
+                return new WildcardToken(name);
+            } else {
+                return new VariableToken(name);
+            }
         } else if (match(KEYWORD, NUMBER, STRING)) {
             return new ConstantToken(previous());
         } else {

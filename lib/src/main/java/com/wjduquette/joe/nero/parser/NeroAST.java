@@ -15,9 +15,9 @@ public class NeroAST {
     //-------------------------------------------------------------------------
     // Clauses
 
-    public sealed interface HornClause permits FactClause, RuleClause {}
+    public sealed interface HornClause permits Axiom, RuleClause {}
 
-    public record FactClause(AtomItem item) implements HornClause {
+    public record Axiom(AtomItem item) implements HornClause {
         public Fact asFact() {
             return item.asFact();
         }
@@ -82,7 +82,7 @@ public class NeroAST {
             var values = new ArrayList<>();
             for (var t : terms) {
                 if (t instanceof ConstantToken c) {
-                    values.add(c.value().literal());
+                    values.add(c.token().literal());
                 } else {
                     throw new IllegalStateException(
                         "Atom contains a variable term; cannot be a fact.");
@@ -154,8 +154,9 @@ public class NeroAST {
      * A term in an atom, either a constant or a variable.
      */
     public sealed interface TermToken
-        permits ConstantToken, VariableToken
+        permits ConstantToken, VariableToken, WildcardToken
     {
+        Token token();
         /** Converts the token to a `Term` as used in the engine. */
         Term asTerm();
     }
@@ -163,29 +164,44 @@ public class NeroAST {
     /**
      * A token representing a constant term: a keyword, string, or
      * integer.
-     * @param value The value token
+     * @param token The value token
      */
-    public record ConstantToken(Token value) implements TermToken {
+    public record ConstantToken(Token token) implements TermToken {
         @Override public Constant asTerm() {
-            return new Constant(value.literal());
+            return new Constant(token.literal());
         }
 
         @Override public String toString() {
-            return value.lexeme();
+            return token.lexeme();
         }
     }
 
     /**
      * A token representing a variable term: an identifier.
-     * @param name The token token
+     * @param token The token token
      */
-    public record VariableToken(Token name) implements TermToken {
+    public record VariableToken(Token token) implements TermToken {
         @Override public Variable asTerm() {
-            return new Variable(name.lexeme());
+            return new Variable(token.lexeme());
         }
 
         @Override public String toString() {
-            return name.lexeme();
+            return token.lexeme();
+        }
+    }
+
+    /**
+     * A token representing a wildcard term: an identifier beginning
+     * with an underscore
+     * @param token The token token
+     */
+    public record WildcardToken(Token token) implements TermToken {
+        @Override public Wildcard asTerm() {
+            return new Wildcard(token.lexeme());
+        }
+
+        @Override public String toString() {
+            return token.lexeme();
         }
     }
 }

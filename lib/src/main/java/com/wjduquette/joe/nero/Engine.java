@@ -161,6 +161,8 @@ public class Engine {
             switch (term) {
                 case Constant c -> terms.add(c.value());
                 case Variable v -> terms.add(bindings.get(v));
+                case Wildcard ignored -> throw new IllegalStateException(
+                    "Rule head contains a Wildcard term.");
             }
         }
 
@@ -176,6 +178,8 @@ public class Engine {
         var b = switch (constraint.b()) {
             case Variable v -> bindings.get(v);
             case Constant c -> c.value();
+            case Wildcard ignored -> throw new IllegalStateException(
+                "Constraint contains a Wildcard term.");
         };
 
         return switch (constraint.op()) {
@@ -221,7 +225,7 @@ public class Engine {
     }
 
     // Return a copy of the atom replacing variables with bound
-    // constants.  The result might still have variables.
+    // constants.  The result might still have variables and wildcards.
     private Atom bindAtom(Map<Variable, Object> bindings, Atom atom) {
         var terms = new ArrayList<Term>();
 
@@ -238,6 +242,7 @@ public class Engine {
                         terms.add(v);
                     }
                 }
+                case Wildcard ignored -> {}
             }
         }
 
@@ -271,6 +276,7 @@ public class Engine {
                     }
                 }
                 case Variable ignored -> {}
+                case Wildcard ignored -> {}
             }
         }
 
@@ -305,6 +311,7 @@ public class Engine {
                 case Constant c -> {
                     if (!f.equals(c.value())) return false;
                 }
+                case Wildcard ignored -> {}
             }
         }
 

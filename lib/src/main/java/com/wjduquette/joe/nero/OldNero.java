@@ -57,7 +57,7 @@ public class OldNero {
         for (var clause : clauses) {
             System.out.println("  " + clause);
             switch (clause) {
-                case NeroAST.FactClause f -> baseFacts.add(f.asFact());
+                case NeroAST.Axiom f -> baseFacts.add(f.asFact());
                 case NeroAST.RuleClause f -> rules.add(f.asRule());
             }
         }
