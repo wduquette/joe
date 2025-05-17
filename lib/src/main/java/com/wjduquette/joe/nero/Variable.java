@@ -1,7 +1,8 @@
 package com.wjduquette.joe.nero;
 
 /**
- * A variable in an Atom.  The Variable has a name.
+ * A Variable in a {@link Atom}.  The Variable's name must be
+ * a valid identifier, and must not begin with an underscore.
  * @param name The name
  */
 public record Variable(String name) implements Term {
@@ -14,7 +15,7 @@ public record Variable(String name) implements Term {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        com.wjduquette.joe.nero.Variable variable = (com.wjduquette.joe.nero.Variable) o;
+        Variable variable = (Variable) o;
         return name.equals(variable.name);
     }
 

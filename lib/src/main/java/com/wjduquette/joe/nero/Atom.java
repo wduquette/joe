@@ -3,6 +3,13 @@ package com.wjduquette.joe.nero;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * An Atom is a predicate consisting of a relation name and a list of
+ * {@link Term Terms}, which may be variables, wildcards, or constants.
+ * Atoms are used to express {@link Rule} head and body atoms.
+ * @param relation The relation name
+ * @param terms The terms
+ */
 public record Atom(String relation, List<Term> terms) {
     @Override public String toString() {
         var termString = terms.stream().map(Term::toString)

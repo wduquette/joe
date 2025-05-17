@@ -4,14 +4,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * A rule, consisting of a head (a template for creating new facts),
- * a body, consisting of patterns that match known facts and bind
+ * A rule, consisting of a head {@link Atom} (a template for creating new
+ * facts), a body, consisting of normal body atoms that match known facts and bind
  * variables, a list of negations, consisting of patterns that must
  * not match known facts given the bindings, and constraints that
  * the bindings must meet.
+ *
+ * <h2>Requirements</h2>
+ *
+ * <ul>
+ * <li>Normal body atoms may contain any kind of {@link Term}.</li>
+ * <li>The head atom may not contain {@link Wildcard} terms.</li>
+ * <li>Every {@link Variable} in the head atom, the negated body atoms, and
+ *     the constraints must be bound in a normal body atom.</li>
+ * </ul>
  * @param head The rule's head
- * @param body The binding predicates
- * @param negations The negated predicates
+ * @param body The normal body atoms
+ * @param negations The negated body atoms
  * @param constraints The constraint expressions
  */
 public record Rule(

@@ -3,7 +3,7 @@ package com.wjduquette.joe.nero;
 import java.util.Objects;
 
 /**
- * A constant in an Atom.  The Constant's value is an arbitrary Java
+ * A Constant in a {@link Atom}.  The Constant's value is an arbitrary Java
  * object.
  * @param value The value
  */
