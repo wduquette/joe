@@ -54,7 +54,7 @@ public class OldNero {
 
         System.out.println("Input program:");
         for (var fact : ast.facts()) {
-            System.out.println(fact);
+            System.out.println("  " + fact);
             baseFacts.add(fact.asFact());
         }
         for (var rule : ast.rules()) {

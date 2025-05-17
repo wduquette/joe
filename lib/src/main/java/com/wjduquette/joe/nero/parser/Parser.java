@@ -65,7 +65,7 @@ public class Parser {
     private ASTRule rule(ASTAtom head) {
         var body = new ArrayList<ASTAtom>();
         var negations = new ArrayList<ASTAtom>();
-        var constraints = new ArrayList<ConstraintItem>();
+        var constraints = new ArrayList<ASTConstraint>();
 
         var bodyVar = new HashSet<String>();
         do {
@@ -112,7 +112,39 @@ public class Parser {
         return new ASTRule(head, body, negations, constraints);
     }
 
-    private ConstraintItem constraint(Set<String> bodyVar) {
+    private ASTAtom atom() {
+        // NEXT, parse the literal proper
+        var predicate = consume(IDENTIFIER, "expected predicate.");
+        consume(LEFT_PAREN, "expected '(' after predicate.");
+
+        var terms = new ArrayList<ASTTerm>();
+
+        do {
+            terms.add(term());
+        } while (match(COMMA));
+
+        consume(RIGHT_PAREN, "expected ')' after terms.");
+
+        return new ASTAtom(predicate, terms);
+    }
+
+    private ASTTerm term() {
+        if (match(IDENTIFIER)) {
+            var name = previous();
+            if (name.lexeme().startsWith("_")) {
+                return new ASTWildcard(name);
+            } else {
+                return new ASTVariable(name);
+            }
+        } else if (match(KEYWORD, NUMBER, STRING)) {
+            return new ASTConstant(previous());
+        } else {
+            advance();
+            throw errorSync(previous(), "expected term.");
+        }
+    }
+
+    private ASTConstraint constraint(Set<String> bodyVar) {
         var term = term();
         Token op;
         ASTVariable a = null;
@@ -150,39 +182,7 @@ public class Parser {
             error(w.token(), "expected bound variable or constant.");
         }
 
-        return new ConstraintItem(a, op, b);
-    }
-
-    private ASTAtom atom() {
-        // NEXT, parse the literal proper
-        var predicate = consume(IDENTIFIER, "expected predicate.");
-        consume(LEFT_PAREN, "expected '(' after predicate.");
-
-        var terms = new ArrayList<ASTTerm>();
-
-        do {
-            terms.add(term());
-        } while (match(COMMA));
-
-        consume(RIGHT_PAREN, "expected ')' after terms.");
-
-        return new ASTAtom(predicate, terms);
-    }
-
-    private ASTTerm term() {
-        if (match(IDENTIFIER)) {
-            var name = previous();
-            if (name.lexeme().startsWith("_")) {
-                return new ASTWildcard(name);
-            } else {
-                return new ASTVariable(name);
-            }
-        } else if (match(KEYWORD, NUMBER, STRING)) {
-            return new ASTConstant(previous());
-        } else {
-            advance();
-            throw errorSync(previous(), "expected term.");
-        }
+        return new ASTConstraint(a, op, b);
     }
 
 

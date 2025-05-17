@@ -4,7 +4,6 @@ import com.wjduquette.joe.nero.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class contains the Nero Abstract Syntax Tree types.
@@ -28,27 +27,19 @@ public record NeroAST(List<ASTFact> facts, List<ASTRule> rules) {
         ASTAtom head,
         List<ASTAtom> body,
         List<ASTAtom> negations,
-        List<ConstraintItem> constraints
+        List<ASTConstraint> constraints
     ) {
         public Rule asRule() {
             return new Rule(
                 head.asHead(),
                 body.stream().map(ASTAtom::asAtom).toList(),
                 negations.stream().map(ASTAtom::asAtom).toList(),
-                constraints.stream().map(ConstraintItem::asConstraint).toList());
+                constraints.stream().map(ASTConstraint::asConstraint).toList());
         }
 
         @Override public String toString() {
-            var bodyString = body.stream().map(ASTAtom::toString)
-                .collect(Collectors.joining(", "));
-            var negString = "not " + negations.stream().map(ASTAtom::toString)
-                .collect(Collectors.joining(", not "));
-            var whereString = constraints.stream().map(ConstraintItem::toString)
-                .collect(Collectors.joining(", "));
-            return head + " :- " + bodyString +
-                (negations.isEmpty() ? "" : ", " + negString) +
-                (constraints.isEmpty() ? "" : " where " + whereString)
-                + ";";
+            return "ASTRule(head=" + head + ",body=" + body +
+                ",neg=" + negations + ",where=" + constraints + ")";
         }
     }
 
@@ -66,7 +57,7 @@ public record NeroAST(List<ASTFact> facts, List<ASTRule> rules) {
         public List<String> getVariableNames() {
             return terms.stream()
                 .filter(t -> t instanceof ASTVariable)
-                .map(ASTTerm::toString)
+                .map(t -> t.token().lexeme())
                 .toList();
         }
 
@@ -108,9 +99,7 @@ public record NeroAST(List<ASTFact> facts, List<ASTRule> rules) {
         }
 
         @Override public String toString() {
-            var termString = terms.stream().map(ASTTerm::toString)
-                .collect(Collectors.joining(", "));
-            return relation.lexeme() + "(" + termString + ")";
+            return "ASTAtom(" + relation.lexeme() + "," + terms + ")";
         }
     }
 
@@ -120,7 +109,7 @@ public record NeroAST(List<ASTFact> facts, List<ASTRule> rules) {
      * @param op A comparison operator
      * @param b A bound variable or constant
      */
-    public record ConstraintItem(
+    public record ASTConstraint(
         ASTVariable a,
         Token op,
         ASTTerm b)
@@ -140,7 +129,7 @@ public record NeroAST(List<ASTFact> facts, List<ASTRule> rules) {
         }
 
         @Override public String toString() {
-            return a + " " + op.lexeme() + " " + b;
+            return "ASTConstraint(" + a + "," + op.lexeme() + "," + b + ")";
         }
     }
 
@@ -154,6 +143,7 @@ public record NeroAST(List<ASTFact> facts, List<ASTRule> rules) {
         permits ASTConstant, ASTVariable, ASTWildcard
     {
         Token token();
+
         /** Converts the token to a `Term` as used in the engine. */
         Term asTerm();
     }
