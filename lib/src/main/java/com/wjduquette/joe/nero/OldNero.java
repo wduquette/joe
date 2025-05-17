@@ -48,22 +48,21 @@ public class OldNero {
         var parser = new Parser(tokens, this::errorHandler);
         var ast = parser.parse();
         if (gotError) throw new JoeError("Error in Nero input.");
+        System.out.println("Program:");
+        System.out.println(ast.toString().indent(2));
 
-        var baseFacts = new ArrayList<Fact>();
+        var facts = new ArrayList<Fact>();
         var rules = new ArrayList<Rule>();
 
-        System.out.println("Input program:");
-        for (var fact : ast.facts()) {
-            System.out.println("  " + fact);
-            baseFacts.add(fact.asFact());
+        for (var astFact : ast.facts()) {
+            facts.add(astFact.asFact());
         }
-        for (var rule : ast.rules()) {
-            System.out.println("  " + rule);
-            rules.add(rule.asRule());
+        for (var astRule : ast.rules()) {
+            rules.add(astRule.asRule());
         }
 
         // Will throw JoeError if the rules aren't stratified.
-        var ruleset = new Engine(rules, baseFacts);
+        var ruleset = new Engine(rules, facts);
 
         // Could add more facts here, in theory.
 

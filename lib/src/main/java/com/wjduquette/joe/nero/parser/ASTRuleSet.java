@@ -8,20 +8,27 @@ import java.util.List;
 /**
  * This class contains the Nero Abstract Syntax Tree types.
  */
-public record NeroAST(List<ASTFact> facts, List<ASTRule> rules) {
+public record ASTRuleSet(List<ASTAtom> facts, List<ASTRule> rules) {
+    @Override
+    public String toString() {
+        var buff = new StringBuilder();
+        buff.append("ASTRuleSet[\n");
+
+        for (var fact : facts) {
+            buff.append("  Fact: ").append(fact).append("\n");
+        }
+
+        for (var rule : rules) {
+            buff.append("  Rule: ").append(rule).append("\n");
+        }
+
+        buff.append("]");
+
+        return buff.toString();
+    }
 
     //-------------------------------------------------------------------------
     // Clauses
-
-    public record ASTFact(ASTAtom item) {
-        public Fact asFact() {
-            return item.asFact();
-        }
-
-        @Override public String toString() {
-            return item + ";";
-        }
-    }
 
     public record ASTRule(
         ASTAtom head,

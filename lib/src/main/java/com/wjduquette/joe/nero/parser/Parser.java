@@ -4,7 +4,7 @@ import com.wjduquette.joe.Trace;
 import java.util.*;
 
 import static com.wjduquette.joe.nero.parser.TokenType.*;
-import static com.wjduquette.joe.nero.parser.NeroAST.*;
+import static com.wjduquette.joe.nero.parser.ASTRuleSet.*;
 
 public class Parser {
     //-------------------------------------------------------------------------
@@ -25,8 +25,8 @@ public class Parser {
     //-------------------------------------------------------------------------
     // Public API
 
-    public NeroAST parse() {
-        List<ASTFact> facts = new ArrayList<>();
+    public ASTRuleSet parse() {
+        List<ASTAtom> facts = new ArrayList<>();
         List<ASTRule> rules = new ArrayList<>();
 
         while (!isAtEnd()) {
@@ -46,20 +46,20 @@ public class Parser {
             }
         }
 
-        return new NeroAST(facts, rules);
+        return new ASTRuleSet(facts, rules);
     }
 
     //-------------------------------------------------------------------------
     // Productions
 
-    private ASTFact fact(ASTAtom head) {
+    private ASTAtom fact(ASTAtom head) {
         // Verify that there are no variable terms.
         for (var term : head.terms()) {
             if (!(term instanceof ASTConstant)) {
-                error(term.token(), "axiom contains a non-constant term.");
+                error(term.token(), "fact contains a non-constant term.");
             }
         }
-        return new ASTFact(head);
+        return head;
     }
 
     private ASTRule rule(ASTAtom head) {
