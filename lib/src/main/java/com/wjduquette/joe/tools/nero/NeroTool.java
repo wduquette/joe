@@ -4,7 +4,7 @@ import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.app.App;
-import com.wjduquette.joe.nero.Engine;
+import com.wjduquette.joe.nero.Nero;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
@@ -108,7 +108,7 @@ public class NeroTool implements Tool {
         var ruleset = compiler.compile();
 
         // Will throw JoeError if the rules aren't stratified.
-        var engine = new Engine(ruleset);
+        var engine = new Nero(ruleset);
 
         try {
             engine.infer();

@@ -67,7 +67,7 @@ public class Compiler {
     //-------------------------------------------------------------------------
     // Compilation
 
-    private Fact ast2fact(ASTRuleSet.ASTAtom atom) {
+    private ConcreteFact ast2fact(ASTRuleSet.ASTAtom atom) {
         var terms = new ArrayList<>();
         for (var t : atom.terms()) {
             if (t instanceof ASTRuleSet.ASTConstant c) {
@@ -78,7 +78,7 @@ public class Compiler {
             }
         }
 
-        return new Fact(atom.relation().lexeme(), terms);
+        return new ConcreteFact(atom.relation().lexeme(), terms);
     }
 
     private Rule ast2rule(ASTRuleSet.ASTRule rule) {

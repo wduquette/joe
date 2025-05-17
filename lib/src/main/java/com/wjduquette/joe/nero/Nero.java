@@ -9,7 +9,20 @@ import java.util.*;
  * For now, we only consider these; later, we'll be able to add in facts
  * from outside, and merge rule sets.
  */
-public class Engine {
+public class Nero {
+    //-------------------------------------------------------------------------
+    // Static
+
+    /**
+     * Nero's default fact factory; it creates {@link ConcreteFact} objects.
+     */
+    public static final FactFactory DEFAULT_FACT_FACTORY =
+        Nero::defaultFactFactory;
+
+    private static Fact defaultFactFactory(String relation, List<Object> terms) {
+        return new ConcreteFact(relation, terms);
+    }
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -28,10 +41,13 @@ public class Engine {
     // Facts by relation
     private final Map<String, List<Fact>> factMap = new HashMap<>();
 
+    // Fact Creator
+    private FactFactory factFactory = DEFAULT_FACT_FACTORY;
+
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Engine(RuleSet ruleset) {
+    public Nero(RuleSet ruleset) {
         // FIRST, analyze the rule set
         var graph = new DependencyGraph(ruleset.getRules());
         if (!graph.isStratified()) {
@@ -54,7 +70,28 @@ public class Engine {
     }
 
     //-------------------------------------------------------------------------
-    // API
+    // Configuration
+
+
+    @SuppressWarnings("unused")
+    public FactFactory getFactFactory() {
+        return factFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFactFactory(FactFactory factFactory) {
+        this.factFactory = factFactory;
+    }
+
+    public List<Fact> factsFor(String relation) {
+        return factMap.computeIfAbsent(relation,
+            key -> new ArrayList<>());
+    }
+
+
+    public Set<Fact> getKnownFacts() {
+        return Collections.unmodifiableSet(knownFacts);
+    }
 
     /**
      * Adds the fact into the set of known facts.  Returns true if the
@@ -76,15 +113,6 @@ public class Engine {
         }
     }
 
-    public List<Fact> factsFor(String relation) {
-        return factMap.computeIfAbsent(relation,
-            key -> new ArrayList<>());
-    }
-
-
-    public Set<Fact> getKnownFacts() {
-        return Collections.unmodifiableSet(knownFacts);
-    }
 
     //-------------------------------------------------------------------------
     // Inference
@@ -166,7 +194,7 @@ public class Engine {
             }
         }
 
-        return new Fact(rule.head().relation(), terms);
+        return factFactory.create(rule.head().relation(), terms);
     }
 
     private boolean constraintMet(
