@@ -1,42 +1,45 @@
-package com.wjduquette.joe.nero;
+package com.wjduquette.joe.tools.nero;
 
-import com.wjduquette.joe.*;
+import com.wjduquette.joe.JoeError;
+import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.Trace;
+import com.wjduquette.joe.nero.*;
 import com.wjduquette.joe.nero.parser.ASTRuleSet;
 import com.wjduquette.joe.nero.parser.Parser;
 import com.wjduquette.joe.nero.parser.Scanner;
-import com.wjduquette.joe.SourceBuffer;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
- * Nero is the public entry point for parsing and executing Nero
- * code.
+ * Compiles a Nero {@link com.wjduquette.joe.nero.RuleSet} from source.
  */
-public class OldNero {
+public class Compiler {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The input source
+    private final SourceBuffer source;
     private boolean gotError = false;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    public OldNero() {
-        // Nothing to do.
+    public Compiler(SourceBuffer source) {
+        this.source = source;
     }
 
     //-------------------------------------------------------------------------
     // Public API
 
-    // TODO: Move to Compiler
-    public RuleSet compile(SourceBuffer buff) {
+    /**
+     * Compiles the Nero source, producing a rule set.
+     * @return The RuleSet
+     * @throws JoeError on compilation failure.
+     */
+    public RuleSet compile() {
         gotError = false;
 
-        var scanner = new Scanner(buff, this::errorHandler);
+        var scanner = new Scanner(source, this::errorHandler);
         var tokens = scanner.scanTokens();
         if (gotError) throw new JoeError("Error in Nero input.");
 
@@ -54,6 +57,15 @@ public class OldNero {
 
         return ruleset;
     }
+
+    private void errorHandler(Trace trace) {
+        gotError = true;
+        System.out.println("line " + trace.line() + ": " +
+            trace.message());
+    }
+
+    //-------------------------------------------------------------------------
+    // Compilation
 
     private Fact ast2fact(ASTRuleSet.ASTAtom atom) {
         var terms = new ArrayList<>();
@@ -109,52 +121,5 @@ public class OldNero {
             case ASTRuleSet.ASTVariable v -> new Variable(v.token().lexeme());
             case ASTRuleSet.ASTWildcard w -> new Wildcard(w.token().lexeme());
         };
-    }
-
-    /**
-     * Just a convenient entry point for getting some source code into
-     * the module.  This will undoubtedly change a lot over time.
-     *
-     * @param buff The Nero source.
-     * @throws JoeError if the script could not be compiled.
-     */
-    public void execute(SourceBuffer buff) {
-        // FIRST, compile the source.
-        var ruleset = compile(buff);
-
-        // Will throw JoeError if the rules aren't stratified.
-        var engine = new Engine(ruleset);
-
-        try {
-            engine.infer();
-            System.out.println("\nKnown facts:");
-            engine.getKnownFacts().stream().map(Fact::toString).sorted()
-                .forEach(f -> System.out.println("  " + f));
-
-        } catch (Exception ex) {
-            System.out.println("Error in ruleset: " + ex);
-        }
-    }
-
-    /**
-     * Processes the given file in some way.
-     * @param scriptPath The file's path
-     * @throws IOException if the file cannot be read.
-     * @throws JoeError if the script could not be compiled.
-     */
-    public void executeFile(String scriptPath)
-        throws IOException, SyntaxError
-    {
-        var path = Paths.get(scriptPath);
-        byte[] bytes = Files.readAllBytes(path);
-        var script = new String(bytes, Charset.defaultCharset());
-
-        execute(new SourceBuffer(path.getFileName().toString(), script));
-    }
-
-    private void errorHandler(Trace trace) {
-        gotError = true;
-        System.out.println("line " + trace.line() + ": " +
-            trace.message());
     }
 }

@@ -1,13 +1,18 @@
 package com.wjduquette.joe.tools.nero;
 
 import com.wjduquette.joe.JoeError;
+import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.app.App;
-import com.wjduquette.joe.nero.OldNero;
+import com.wjduquette.joe.nero.Engine;
+import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.List;
 
@@ -55,12 +60,11 @@ public class NeroTool implements Tool {
             System.exit(64);
         }
 
-        var nero = new OldNero();
         var path = argq.poll();
 
 
         try {
-            nero.executeFile(path);
+            executeFile(path);
         } catch (IOException ex) {
             System.err.println("Could not read script: " + path +
                 "\n*** " + ex.getMessage());
@@ -72,6 +76,48 @@ public class NeroTool implements Tool {
         } catch (JoeError ex) {
             System.err.println(ex.getMessage());
             System.exit(1);
+        }
+    }
+
+    /**
+     * Processes the given file in some way.
+     * @param scriptPath The file's path
+     * @throws IOException if the file cannot be read.
+     * @throws JoeError if the script could not be compiled.
+     */
+    public void executeFile(String scriptPath)
+        throws IOException, SyntaxError
+    {
+        var path = Paths.get(scriptPath);
+        byte[] bytes = Files.readAllBytes(path);
+        var script = new String(bytes, Charset.defaultCharset());
+
+        execute(new SourceBuffer(path.getFileName().toString(), script));
+    }
+
+    /**
+     * Just a convenient entry point for getting some source code into
+     * the module.  This will undoubtedly change a lot over time.
+     *
+     * @param buff The Nero source.
+     * @throws JoeError if the script could not be compiled.
+     */
+    public void execute(SourceBuffer buff) {
+        // FIRST, compile the source.
+        var compiler = new Compiler(buff);
+        var ruleset = compiler.compile();
+
+        // Will throw JoeError if the rules aren't stratified.
+        var engine = new Engine(ruleset);
+
+        try {
+            engine.infer();
+            System.out.println("\nKnown facts:");
+            engine.getKnownFacts().stream().map(Fact::toString).sorted()
+                .forEach(f -> System.out.println("  " + f));
+
+        } catch (Exception ex) {
+            System.out.println("Error in ruleset: " + ex);
         }
     }
 
