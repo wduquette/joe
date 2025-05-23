@@ -16,6 +16,10 @@ public record IndexedAtom(String relation, List<Term> terms)
     @Override public Bindings matches(Fact fact, Bindings given) {
         var bindings = new Bindings(given);
 
+        if (!fact.relation().equals(relation)) {
+            return null;
+        }
+
         var n = terms().size();
         if (fact.fields().size() != n) return null;
 

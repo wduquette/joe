@@ -1,5 +1,7 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.Joe;
+
 import java.util.Objects;
 
 /**
@@ -10,8 +12,11 @@ import java.util.Objects;
 public record Constant(Object value) implements Term {
     @Override
     public String toString() {
-        // Handles null.
-        return Objects.toString(value);
+        return switch (value) {
+            case null -> "null";
+            case String s -> "\"" + Joe.escape(s) + "\"";
+            default -> value.toString();
+        };
     }
 
     @Override
