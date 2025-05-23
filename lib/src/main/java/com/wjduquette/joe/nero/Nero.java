@@ -30,6 +30,7 @@ public class Nero {
     private final Map<String,List<Rule>> ruleMap = new HashMap<>();
 
     // Head relations by stratum.
+    private final boolean isStratified;
     private final List<List<String>> strata;
 
     // Facts as read from the Nero program.
@@ -57,11 +58,9 @@ public class Nero {
     public Nero(RuleSet ruleset) {
         // FIRST, analyze the rule set
         var graph = new Stratifier(ruleset.getRules());
-        if (!graph.isStratified()) {
-            throw new JoeError("Rule set is not stratified.");
-        }
+        this.isStratified = graph.isStratified();
 
-        this.strata = graph.strata();
+        this.strata = isStratified ? graph.strata() : null;
 
         if (debug) System.out.println("Rule Strata: " + strata);
 
@@ -118,6 +117,14 @@ public class Nero {
     @SuppressWarnings("unused")
     public void setFactFactory(FactFactory factFactory) {
         this.factFactory = factFactory;
+    }
+
+    /**
+     * Gets whether the rule set can be stratified or not.
+     * @return true or false.
+     */
+    public boolean isStratified() {
+        return isStratified;
     }
 
     /**
@@ -178,8 +185,13 @@ public class Nero {
     /**
      * Executes the inference algorithm, computing all facts knowable
      * from the rules.
+     * @throws JoeError if the rule set is not stratified.
      */
     public void infer() {
+        if (!isStratified) {
+            throw new JoeError("Rule set is not stratified.");
+        }
+
         knownFacts.clear();
         factMap.clear();
         baseFacts.forEach(this::addFact);
