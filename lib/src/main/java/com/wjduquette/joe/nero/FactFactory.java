@@ -6,5 +6,5 @@ import java.util.List;
  * A functional interface for creating new facts.
  */
 public interface FactFactory {
-    Fact create(String relation, List<Object> terms);
+    Fact create(String relation, List<Object> fields);
 }

@@ -17,11 +17,11 @@ public record IndexedAtom(String relation, List<Term> terms)
         var bindings = new Bindings(given);
 
         var n = terms().size();
-        if (fact.terms().size() != n) return null;
+        if (fact.fields().size() != n) return null;
 
         for (var i = 0; i < terms().size(); i++) {
             var t = terms().get(i);
-            var f = fact.terms().get(i);
+            var f = fact.fields().get(i);
 
             switch (t) {
                 case Variable v -> {
