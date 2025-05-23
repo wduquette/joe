@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The Fact interface defines what {@link Nero} needs to know about
- * Fact objects in order to match {@link Rule rules} against them.
- * A Fact might or might not have indexed fields that can be matched
- * positionally; all Facts must have fields that can be accessed by name.
+ * {@link Nero} analyzes input Facts and infers output facts based on
+ * {@link Rule Rules} in the Nero rule set.  Any object that implements the
+ * Fact interface can be used as an input fact.
  *
- * <p>Facts created by a Nero rule set will often not have
- * explicit field names.  In this case, the standard is to use field
+ * <p>A Fact might or might not have indexed fields that can be matched
+ * positionally; all Facts must have fields that can be accessed by name.
+ * Facts created by a Nero rule set will usually not have
+ * explicit field names; in this case, the standard is to use field
  * names "f0", "f1", etc.</p>
  */
 public interface Fact {

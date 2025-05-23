@@ -4,9 +4,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * An Atom is a predicate consisting of a relation name and a list of
- * {@link Term Terms}, which may be variables, wildcards, or constants.
- * Atoms are used to express {@link Rule} head and body atoms.
+ * An NameAtom is a {@link BodyAtom} consisting of a relation name and a
+ * map of field names and {@link Term Terms}, which may be variables,
+ * wildcards, or constants. A NamedAtom can match any {@link Fact},
+ * identifying fields by name.
  * @param relation The relation name
  * @param terms The terms
  */

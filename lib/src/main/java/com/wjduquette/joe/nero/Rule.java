@@ -5,10 +5,11 @@ import java.util.stream.Collectors;
 
 /**
  * A rule, consisting of a head {@link HeadAtom} (a template for creating new
- * facts), a body, consisting of normal body atoms that match known facts and bind
- * variables, a list of negations, consisting of patterns that must
- * not match known facts given the bindings, and constraints that
- * the bindings must meet.
+ * facts), and a body, which consists of normal and negated
+ * {@link BodyAtom BodyAtoms} and a list of constraints.  The normal BodyAtoms
+ * match facts and bind body variables.  For the rule to fire, the bound
+ * variables must meet the constraints, and there can be no facts that match
+ * the negated BodyAtoms given the bound variables.
  *
  * <h2>Requirements</h2>
  *

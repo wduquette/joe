@@ -5,9 +5,9 @@ import com.wjduquette.joe.JoeError;
 import java.util.*;
 
 /**
- * A Nero rule base, including all facts and rules read from Nero input.
- * For now, we only consider these; later, we'll be able to add in facts
- * from outside, and merge rule sets.
+ * The Nero inference engine.  Given a {@link RuleSet}, and optionally
+ * an additional set of input {@link Fact Facts}, Nero will infer the
+ * new Facts implied by the input and the RuleSet's {@link Rule Rules}.
  */
 public class Nero {
     //-------------------------------------------------------------------------
@@ -50,9 +50,13 @@ public class Nero {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an instance of Nero for the given {@link RuleSet}.
+     * @param ruleset The rule set.
+     */
     public Nero(RuleSet ruleset) {
         // FIRST, analyze the rule set
-        var graph = new DependencyGraph(ruleset.getRules());
+        var graph = new Stratifier(ruleset.getRules());
         if (!graph.isStratified()) {
             throw new JoeError("Rule set is not stratified.");
         }
@@ -77,34 +81,67 @@ public class Nero {
     // Configuration
 
 
+    /**
+     * Gets whether debugging is enabled or not.
+     * @return true or false
+     */
     @SuppressWarnings("unused")
     public boolean isDebug() {
         return debug;
     }
 
+    /**
+     * Enables/disables debugging.  When debugging is enabled, Nero will
+     * dump a great deal of debugging information that can be used to
+     * debug the rule set, and also Nero itself.
+     * @param debug true or false
+     */
     public void setDebug(boolean debug) {
         this.debug = debug;
     }
 
+    /**
+     * Gets the factory used to create new {@link Fact Facts} given a
+     * relation and list of terms.
+     * @return The factory
+     */
     @SuppressWarnings("unused")
     public FactFactory getFactFactory() {
         return factFactory;
     }
 
+    /**
+     * Sets the factory used to create new {@link Fact Facts} given a
+     * relation and list of terms.
+     * @param factFactory The factory
+     */
     @SuppressWarnings("unused")
     public void setFactFactory(FactFactory factFactory) {
         this.factFactory = factFactory;
     }
 
+    /**
+     * Gets the known facts that have the given relation.
+     * @param relation The relation
+     * @return The facts.
+     */
     public List<Fact> getFacts(String relation) {
         return factMap.computeIfAbsent(relation,
             key -> new ArrayList<>());
     }
 
+    /**
+     * Gets all known facts.
+     * @return The facts.
+     */
     public Set<Fact> getAllFacts() {
         return Collections.unmodifiableSet(knownFacts);
     }
 
+    /**
+     * Gets any new facts inferred by Nero.
+     * @return The new facts.
+     */
     public Set<Fact> getNewFacts() {
         var result = new HashSet<Fact>();
         for (var fact : knownFacts) {

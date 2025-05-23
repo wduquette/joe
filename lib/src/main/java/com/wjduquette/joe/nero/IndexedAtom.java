@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * An Atom is a predicate consisting of a relation name and a list of
- * {@link Term Terms}, which may be variables, wildcards, or constants.
- * Atoms are used to express {@link Rule} head and body atoms.
+ * An IndexedAtom is a {@link BodyAtom} consisting of a relation name and a
+ * list of {@link Term Terms}, which may be variables, wildcards, or constants.
+ * An IndexedAtom can match indexed {@link Fact Facts}.
  * @param relation The relation name
  * @param terms The terms
  */
@@ -17,6 +17,10 @@ public record IndexedAtom(String relation, List<Term> terms)
         var bindings = new Bindings(given);
 
         if (!fact.relation().equals(relation)) {
+            return null;
+        }
+
+        if (!fact.isIndexed()) {
             return null;
         }
 

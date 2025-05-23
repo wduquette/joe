@@ -1,5 +1,8 @@
 package com.wjduquette.joe.nero;
 
+/**
+ * An atom in the body of a rule.
+ */
 public interface BodyAtom {
     /**
      * Gets the atom's relation string.

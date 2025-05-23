@@ -2,7 +2,11 @@ package com.wjduquette.joe.nero;
 
 import java.util.*;
 
-public class DependencyGraph {
+/**
+ * Stratifier is used to stratify Nero rule sets or determine that they
+ * cannot be stratified.
+ */
+public class Stratifier {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -22,7 +26,7 @@ public class DependencyGraph {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public DependencyGraph(Collection<Rule> rules) {
+    public Stratifier(Collection<Rule> rules) {
         // FIRST, get the list of head predicates, and build the dependency
         // matrix.
         this.heads = getHeads(rules);
