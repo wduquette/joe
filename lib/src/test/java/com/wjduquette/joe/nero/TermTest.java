@@ -19,7 +19,7 @@ public class TermTest extends Ted {
         check(ONE.toString()).eq("1");
 
         check(ABC.value()).eq("abc");
-        check(ABC.toString()).eq("abc");
+        check(ABC.toString()).eq("\"abc\"");
     }
 
     @Test

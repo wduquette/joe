@@ -29,8 +29,10 @@ public class Scanner {
     private final Tokenizer tokenizer;
 
     // The sliding window of tokens
+    private boolean isPrimed = false;
     private Token previous = null;
     private Token current = null;
+    private Token next = null;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -38,8 +40,8 @@ public class Scanner {
     /**
      * Creates a scanner on the given source buffer.
      *
-     * <p>The scanner must be primed before use by calling advance() a
-     * single time.  This will scan the first token...and possibly
+     * <p>The scanner must be primed before use by calling prime() a
+     * single time.  This will scan the first tokens, and possibly
      * call the error handler.</p>
      * @param buffer The source text
      * @param errorHandler The handler for scan errors.
@@ -51,6 +53,46 @@ public class Scanner {
 
     //-------------------------------------------------------------------------
     // Public API
+
+    public void prime() {
+        // FIRST, scan the very first token.
+        next = tokenizer.scanToken();
+
+        // NEXT, initialize current.
+        advance();
+        isPrimed = true;
+    }
+
+    /**
+     * Gets whether prime() has been called or not.
+     * @return true or false
+     */
+    public boolean isPrimed() {
+        return isPrimed;
+    }
+
+    /**
+     * Advances the scanner by one token, reporting any errors.
+     */
+    public void advance() {
+        Token error =  null;
+
+        // FIRST, slide the window.
+        previous = current;
+
+        // NEXT, get the next non-error token.
+        for (;;) {
+            current = next;
+            next = tokenizer.scanToken();
+            if (current.type() != ERROR) break;
+            if (error == null) error = current;
+        }
+
+        if (error != null) {
+            // Report the error.
+            errorHandler.handle(error.span(), (String)error.literal());
+        }
+    }
 
     public boolean isAtEnd() {
         return current.type() == EOF;
@@ -66,11 +108,19 @@ public class Scanner {
     }
 
     /**
-     * Returns the next token to process.
+     * Returns the current token to process.
      * @return The token
      */
     public Token peek() {
         return current;
+    }
+
+    /**
+     * Returns the token to process after the current token.
+     * @return The token
+     */
+    public Token peekNext() {
+        return next;
     }
 
     /**
@@ -80,6 +130,17 @@ public class Scanner {
      */
     public boolean check(TokenType type) {
         return current.type() == type;
+    }
+
+    /**
+     * Returns true if peek() has the given token type, and false otherwise.
+     * @param currentType The expected type of peek()
+     * @param nextType The expected type of peekNext()
+     * @return true or false.
+     */
+    public boolean checkTwo(TokenType currentType, TokenType nextType) {
+        return current.type() == currentType
+            && next.type() == nextType;
     }
 
     /**
@@ -120,25 +181,4 @@ public class Scanner {
         errorHandler.handle(span, text);
     }
 
-    /**
-     * Advances the scanner by one token, reporting any errors.
-     */
-    public void advance() {
-        Token error =  null;
-
-        // FIRST, slide the window.
-        previous = current;
-
-        // NEXT, get the next non-error token.
-        for (;;) {
-            current = tokenizer.scanToken();
-            if (current.type() != ERROR) break;
-            if (error == null) error = current;
-        }
-
-        if (error != null) {
-            // Report the error.
-            errorHandler.handle(error.span(), (String)error.literal());
-        }
-    }
 }
