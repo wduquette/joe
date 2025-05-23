@@ -13,9 +13,39 @@ import java.util.stream.Collectors;
 public record NamedAtom(String relation, Map<String,Term> terms)
     implements BodyAtom
 {
-    @Override
-    public Bindings matches(Fact fact, Bindings given) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+    @Override public Bindings matches(Fact fact, Bindings given) {
+        var bindings = new Bindings(given);
+
+        if (!fact.relation().equals(relation)) {
+            return null;
+        }
+
+        for (var e : terms.entrySet()) {
+            var name = e.getKey();
+
+            if (!fact.fieldMap().containsKey(name)) {
+                return null;
+            }
+            var f = fact.fieldMap().get(name);
+
+            switch (e.getValue()) {
+                case Variable v -> {
+                    var bound = bindings.get(v);
+
+                    if (bound == null) {
+                        bindings.put(v, f);
+                    } else if (!bound.equals(f)) {
+                        return null;
+                    }
+                }
+                case Constant c -> {
+                    if (!f.equals(c.value())) return null;
+                }
+                case Wildcard ignored -> {}
+            }
+        }
+
+        return bindings;
     }
 
     @Override public String toString() {
