@@ -42,10 +42,10 @@ public class Joe {
         Collections.addAll(set,
             "assert", "break", "case", "class", "continue", "default",
             "else", "extends", "false", "for", "foreach", "function",
-            "if", "in", "let", "match", "method", "ni", "null",
+            "if", "in", "let", "match", "method", "ni", "not", "null",
             "record", "return", "static", "super", "switch",
             "this", "throw", "true",
-            "var", "while"
+            "var", "where", "while"
         );
         RESERVED_WORDS = Collections.unmodifiableSet(set);
     }

@@ -36,6 +36,7 @@ public class Tokenizer {
         reserved("match",    MATCH);
         reserved("method",   METHOD);
         reserved("ni",       NI);
+        reserved("not",      NOT);
         reserved("null",     NULL);
         reserved("record",   RECORD);
         reserved("return",   RETURN);
@@ -46,6 +47,7 @@ public class Tokenizer {
         reserved("throw",    THROW);
         reserved("true",     TRUE);
         reserved("var",      VAR);
+        reserved("where",    WHERE);
         reserved("while",    WHILE);
     }
 
@@ -123,11 +125,11 @@ public class Tokenizer {
             case '@' -> makeToken(AT);
             case '\\' -> makeToken(BACK_SLASH);
             case ';' -> makeToken(SEMICOLON);
+            case ':' -> makeToken(match('-') ? COLON_MINUS : COLON);
             case ',' -> makeToken(COMMA);
             case '$' -> makeToken(DOLLAR);
             case '.' -> makeToken(DOT);
             case '?' -> makeToken(QUESTION);
-            case ':' -> makeToken(COLON);
             case '-' -> {
                 if (match('=')) {
                     yield makeToken(MINUS_EQUAL);
