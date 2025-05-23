@@ -3,7 +3,14 @@ package com.wjduquette.joe.nero;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record Atom(String relation, List<Term> terms) {
+/**
+ * An Atom is a predicate consisting of a relation name and a list of
+ * {@link Term Terms}, which may be variables, wildcards, or constants.
+ * Atoms are used to express {@link Rule} head and body atoms.
+ * @param relation The relation name
+ * @param terms The terms
+ */
+public record HeadAtom(String relation, List<Term> terms) {
     @Override public String toString() {
         var termString = terms.stream().map(Term::toString)
             .collect(Collectors.joining(", "));
@@ -14,7 +21,7 @@ public record Atom(String relation, List<Term> terms) {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        Atom atom = (Atom) o;
+        HeadAtom atom = (HeadAtom) o;
         return relation.equals(atom.relation) && terms.equals(atom.terms);
     }
 

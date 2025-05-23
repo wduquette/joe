@@ -1,11 +1,11 @@
 package com.wjduquette.joe.nero;
 
 /**
- * A Variable in a {@link HeadAtom}.  The Variable's name must be
- * a valid identifier, and must not begin with an underscore.
+ * A Wildcard {@link Term} in an {@link HeadAtom}.  The Wildcard's name
+ * must be a valid identifier that begins with an underscore.
  * @param name The name
  */
-public record Variable(String name) implements Term {
+public record Wildcard(String name) implements Term {
     @Override
     public String toString() {
         return name;
@@ -15,8 +15,8 @@ public record Variable(String name) implements Term {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        Variable variable = (Variable) o;
-        return name.equals(variable.name);
+        Wildcard other = (Wildcard) o;
+        return name.equals(other.name);
     }
 
     @Override

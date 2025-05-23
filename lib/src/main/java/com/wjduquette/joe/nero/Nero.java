@@ -9,7 +9,20 @@ import java.util.*;
  * For now, we only consider these; later, we'll be able to add in facts
  * from outside, and merge rule sets.
  */
-public class Engine {
+public class Nero {
+    //-------------------------------------------------------------------------
+    // Static
+
+    /**
+     * Nero's default fact factory; it creates {@link ConcreteFact} objects.
+     */
+    public static final FactFactory DEFAULT_FACT_FACTORY =
+        Nero::defaultFactFactory;
+
+    private static Fact defaultFactFactory(String relation, List<Object> terms) {
+        return new ConcreteFact(relation, terms);
+    }
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -20,7 +33,7 @@ public class Engine {
     private final List<List<String>> strata;
 
     // Facts as read from the Nero program.
-    private final List<Fact> baseFacts = new ArrayList<>();
+    private final Set<Fact> baseFacts = new HashSet<>();
 
     // The current set of known facts.
     private final Set<Fact> knownFacts = new HashSet<>();
@@ -28,33 +41,78 @@ public class Engine {
     // Facts by relation
     private final Map<String, List<Fact>> factMap = new HashMap<>();
 
+    // Fact Creator
+    private FactFactory factFactory = DEFAULT_FACT_FACTORY;
+
+    // Debug Flag
+    private boolean debug = false;
+
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Engine(List<Rule> rules, List<Fact> baseFacts) {
+    public Nero(RuleSet ruleset) {
         // FIRST, analyze the rule set
-        var graph = new DependencyGraph(rules);
+        var graph = new DependencyGraph(ruleset.getRules());
         if (!graph.isStratified()) {
             throw new JoeError("Rule set is not stratified.");
         }
 
         this.strata = graph.strata();
-        System.out.println("  Strata: " + strata);
+
+        if (debug) System.out.println("Rule Strata: " + strata);
 
         // NEXT, Categorize the rules by head relation
-        for (var rule : rules) {
+        for (var rule : ruleset.getRules()) {
             var head = rule.head().relation();
             var list = ruleMap.computeIfAbsent(head, k -> new ArrayList<>());
             list.add(rule);
         }
 
         // NEXT, save the base facts.
-        this.baseFacts.addAll(baseFacts);
+        this.baseFacts.addAll(ruleset.getFacts());
         baseFacts.forEach(this::addFact);
     }
 
     //-------------------------------------------------------------------------
-    // API
+    // Configuration
+
+
+    @SuppressWarnings("unused")
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    @SuppressWarnings("unused")
+    public FactFactory getFactFactory() {
+        return factFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFactFactory(FactFactory factFactory) {
+        this.factFactory = factFactory;
+    }
+
+    public List<Fact> getFacts(String relation) {
+        return factMap.computeIfAbsent(relation,
+            key -> new ArrayList<>());
+    }
+
+    public Set<Fact> getAllFacts() {
+        return Collections.unmodifiableSet(knownFacts);
+    }
+
+    public Set<Fact> getNewFacts() {
+        var result = new HashSet<Fact>();
+        for (var fact : knownFacts) {
+            if (!baseFacts.contains(fact)) result.add(fact);
+        }
+
+        return result;
+    }
 
     /**
      * Adds the fact into the set of known facts.  Returns true if the
@@ -66,7 +124,7 @@ public class Engine {
      */
     private boolean addFact(Fact fact) {
         if (!knownFacts.contains(fact)) {
-            var list = factsFor(fact.relation());
+            var list = getFacts(fact.relation());
             list.add(fact);
 
             knownFacts.add(fact);
@@ -76,15 +134,6 @@ public class Engine {
         }
     }
 
-    public List<Fact> factsFor(String relation) {
-        return factMap.computeIfAbsent(relation,
-            key -> new ArrayList<>());
-    }
-
-
-    public Set<Fact> getKnownFacts() {
-        return Collections.unmodifiableSet(knownFacts);
-    }
 
     //-------------------------------------------------------------------------
     // Inference
@@ -93,25 +142,25 @@ public class Engine {
      * Executes the inference algorithm, computing all facts knowable
      * from the rules.
      */
-    public void ponder() {
+    public void infer() {
         knownFacts.clear();
         factMap.clear();
         baseFacts.forEach(this::addFact);
 
         for (var i = 0; i < strata.size(); i++) {
-            ponder(i, strata.get(i));
+            infer(i, strata.get(i));
         }
     }
 
-    private void ponder(int stratum, List<String> heads) {
+    private void infer(int stratum, List<String> heads) {
         int count = 0;
         boolean gotNewFact;
         do {
             gotNewFact = false;
-            System.out.println("Iteration " + stratum + "." + (++count) + ":");
+            if (debug) System.out.println("Iteration " + stratum + "." + (++count) + ":");
             for (var head : heads) {
                 for (var rule : ruleMap.get(head)) {
-                    System.out.println("  Rule: " + rule);
+                    if (debug) System.out.println("  Rule: " + rule);
 
                     var iter = new TupleIterator(rule);
                     while (iter.hasNext()) {
@@ -119,7 +168,7 @@ public class Engine {
                         var fact = matchRule(rule, tuple);
 
                         if (fact != null && addFact(fact)) {
-                            System.out.println("    Fact: " + fact);
+                            if (debug) System.out.println("    Fact: " + fact);
                             gotNewFact = true;
                         }
                     }
@@ -131,14 +180,13 @@ public class Engine {
     private Fact matchRule(Rule rule, Fact[] tuple) {
         // FIRST, match each pattern in the rule with a fact from
         // the tuple, binding variables from left to right.
-        var bindings = new HashMap<Variable,Object>();
+        var bindings = new Bindings();
 
         for (int i = 0; i < tuple.length; i++) {
             var b = rule.body().get(i);
 
-            if (!matchFact(bindings, b, tuple[i])) {
-                return null;
-            }
+            bindings = b.matches(tuple[i], bindings);
+            if (bindings == null) return null;
         }
 
         // NEXT, check the bindings against the constraints.
@@ -150,8 +198,11 @@ public class Engine {
 
         // NEXT, check the bindings against the negations.
         for (var atom : rule.negations()) {
-            var query = bindAtom(bindings, atom);
-            if (isKnown(query)) return null;
+            for (var fact : getFacts(atom.relation())) {
+                if (atom.matches(fact, bindings) != null) {
+                    return null;
+                }
+            }
         }
 
         // NEXT, build the list of terms and return the new fact.
@@ -161,10 +212,12 @@ public class Engine {
             switch (term) {
                 case Constant c -> terms.add(c.value());
                 case Variable v -> terms.add(bindings.get(v));
+                case Wildcard ignored -> throw new IllegalStateException(
+                    "Rule head contains a Wildcard term.");
             }
         }
 
-        return new Fact(rule.head().relation(), terms);
+        return factFactory.create(rule.head().relation(), terms);
     }
 
     private boolean constraintMet(
@@ -176,6 +229,8 @@ public class Engine {
         var b = switch (constraint.b()) {
             case Variable v -> bindings.get(v);
             case Constant c -> c.value();
+            case Wildcard ignored -> throw new IllegalStateException(
+                "Constraint contains a Wildcard term.");
         };
 
         return switch (constraint.op()) {
@@ -220,97 +275,6 @@ public class Engine {
         };
     }
 
-    // Return a copy of the atom replacing variables with bound
-    // constants.  The result might still have variables.
-    private Atom bindAtom(Map<Variable, Object> bindings, Atom atom) {
-        var terms = new ArrayList<Term>();
-
-        for (var i = 0; i < atom.terms().size(); i++) {
-            // If the term is variable and a binding is available,
-            // replace the variable with the bound constant.
-            switch (atom.terms().get(i)) {
-                case Constant c -> terms.add(c);
-                case Variable v -> {
-                    var value = bindings.get(v);
-                    if (value != null) {
-                        terms.add(new Constant(value));
-                    } else {
-                        terms.add(v);
-                    }
-                }
-            }
-        }
-
-        return new Atom(atom.relation(), terms);
-    }
-
-    // Looks through the facts to see if we have a known fact that
-    // matches this atom's constant terms.  This is used to implement
-    // "not" items.
-    private boolean isKnown(Atom query) {
-        for (var fact : factsFor(query.relation())) {
-            if (matches(fact, query)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Returns true if every constant in the query matches the
-    // corresponding term in the fact.
-    private boolean matches(Fact fact, Atom query) {
-        if (!fact.relation().equals(query.relation())) {
-            return false;
-        }
-
-        for (var i = 0; i < query.terms().size(); i++) {
-            switch (query.terms().get(i)) {
-                case Constant c -> {
-                    if (!fact.terms().get(i).equals(c.value())) {
-                        return false;
-                    }
-                }
-                case Variable ignored -> {}
-            }
-        }
-
-        return true;
-    }
-
-    // Tries to match the fact against the rule pattern given the bindings,
-    // updating the bindings where the rule's pattern has a free variable.
-    // Returns true on success and false.
-    private boolean matchFact(
-        Map<Variable, Object> bindings,
-        Atom pattern,
-        Fact fact
-    ) {
-        var n = pattern.terms().size();
-        if (fact.terms().size() != n) return false;
-
-        for (var i = 0; i < pattern.terms().size(); i++) {
-            var p = pattern.terms().get(i);
-            var f = fact.terms().get(i);
-
-            switch (p) {
-                case Variable v -> {
-                    var bound = bindings.get(v);
-
-                    if (bound == null) {
-                        bindings.put(v, f);
-                    } else if (!bound.equals(f)) {
-                        return false;
-                    }
-                }
-                case Constant c -> {
-                    if (!f.equals(c.value())) return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
     //-------------------------------------------------------------------------
     // TupleIterator
 
@@ -332,7 +296,7 @@ public class Engine {
             int sum = 0;
             for (var b : rule.body()) {
                 var relation = b.relation();
-                var facts = factsFor(relation);
+                var facts = getFacts(relation);
 
                 if (facts.isEmpty()) {
                     inputs.clear();

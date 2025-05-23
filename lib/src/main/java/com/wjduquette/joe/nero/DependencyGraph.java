@@ -22,7 +22,7 @@ public class DependencyGraph {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public DependencyGraph(List<Rule> rules) {
+    public DependencyGraph(Collection<Rule> rules) {
         // FIRST, get the list of head predicates, and build the dependency
         // matrix.
         this.heads = getHeads(rules);
@@ -33,7 +33,7 @@ public class DependencyGraph {
         this.strata = stratify();
     }
 
-    private List<String> getHeads(List<Rule> rules) {
+    private List<String> getHeads(Collection<Rule> rules) {
         var result = new ArrayList<String>();
         for (var rule : rules) {
             var head = rule.head().relation();
@@ -45,7 +45,7 @@ public class DependencyGraph {
         return result;
     }
 
-    private int[][] getDep(List<Rule> rules) {
+    private int[][] getDep(Collection<Rule> rules) {
         int[][] mat = newMatrix(heads.size());
 
         for (var rule : rules) {

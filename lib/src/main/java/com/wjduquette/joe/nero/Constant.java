@@ -1,17 +1,22 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.Joe;
+
 import java.util.Objects;
 
 /**
- * A constant in an Atom.  The Constant's value is an arbitrary Java
+ * A Constant in a {@link HeadAtom}.  The Constant's value is an arbitrary Java
  * object.
  * @param value The value
  */
 public record Constant(Object value) implements Term {
     @Override
     public String toString() {
-        // Handles null.
-        return Objects.toString(value);
+        return switch (value) {
+            case null -> "null";
+            case String s -> "\"" + Joe.escape(s) + "\"";
+            default -> value.toString();
+        };
     }
 
     @Override
