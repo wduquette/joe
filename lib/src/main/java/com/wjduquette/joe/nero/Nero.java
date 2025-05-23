@@ -180,14 +180,13 @@ public class Nero {
     private Fact matchRule(Rule rule, Fact[] tuple) {
         // FIRST, match each pattern in the rule with a fact from
         // the tuple, binding variables from left to right.
-        var bindings = new HashMap<Variable,Object>();
+        var bindings = new Bindings();
 
         for (int i = 0; i < tuple.length; i++) {
             var b = rule.body().get(i);
 
-            if (!matchFact(bindings, b, tuple[i])) {
-                return null;
-            }
+            bindings = b.matches(tuple[i], bindings);
+            if (bindings == null) return null;
         }
 
         // NEXT, check the bindings against the constraints.
@@ -199,8 +198,11 @@ public class Nero {
 
         // NEXT, check the bindings against the negations.
         for (var atom : rule.negations()) {
-            var query = bindAtom(bindings, atom);
-            if (isKnown(query)) return null;
+            for (var fact : getFacts(atom.relation())) {
+                if (atom.matches(fact, bindings) != null) {
+                    return null;
+                }
+            }
         }
 
         // NEXT, build the list of terms and return the new fact.
@@ -271,100 +273,6 @@ public class Nero {
                 }
             }
         };
-    }
-
-    // Return a copy of the atom replacing variables with bound
-    // constants.  The result might still have variables and wildcards.
-    private Atom bindAtom(Map<Variable, Object> bindings, Atom atom) {
-        var terms = new ArrayList<Term>();
-
-        for (var i = 0; i < atom.terms().size(); i++) {
-            // If the term is variable and a binding is available,
-            // replace the variable with the bound constant.
-            switch (atom.terms().get(i)) {
-                case Constant c -> terms.add(c);
-                case Variable v -> {
-                    var value = bindings.get(v);
-                    if (value != null) {
-                        terms.add(new Constant(value));
-                    } else {
-                        terms.add(v);
-                    }
-                }
-                case Wildcard ignored -> {}
-            }
-        }
-
-        return new Atom(atom.relation(), terms);
-    }
-
-    // Looks through the facts to see if we have a known fact that
-    // matches this atom's constant terms.  This is used to implement
-    // "not" items.
-    private boolean isKnown(Atom query) {
-        for (var fact : getFacts(query.relation())) {
-            if (matches(fact, query)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Returns true if every constant in the query matches the
-    // corresponding term in the fact.
-    private boolean matches(Fact fact, Atom query) {
-        if (!fact.relation().equals(query.relation())) {
-            return false;
-        }
-
-        for (var i = 0; i < query.terms().size(); i++) {
-            switch (query.terms().get(i)) {
-                case Constant c -> {
-                    if (!fact.terms().get(i).equals(c.value())) {
-                        return false;
-                    }
-                }
-                case Variable ignored -> {}
-                case Wildcard ignored -> {}
-            }
-        }
-
-        return true;
-    }
-
-    // Tries to match the fact against the rule pattern given the bindings,
-    // updating the bindings where the rule's pattern has a free variable.
-    // Returns true on success and false.
-    private boolean matchFact(
-        Map<Variable, Object> bindings,
-        Atom pattern,
-        Fact fact
-    ) {
-        var n = pattern.terms().size();
-        if (fact.terms().size() != n) return false;
-
-        for (var i = 0; i < pattern.terms().size(); i++) {
-            var p = pattern.terms().get(i);
-            var f = fact.terms().get(i);
-
-            switch (p) {
-                case Variable v -> {
-                    var bound = bindings.get(v);
-
-                    if (bound == null) {
-                        bindings.put(v, f);
-                    } else if (!bound.equals(f)) {
-                        return false;
-                    }
-                }
-                case Constant c -> {
-                    if (!f.equals(c.value())) return false;
-                }
-                case Wildcard ignored -> {}
-            }
-        }
-
-        return true;
     }
 
     //-------------------------------------------------------------------------

@@ -1,11 +1,13 @@
 package com.wjduquette.joe.nero.parser;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class contains the Nero Abstract Syntax Tree types.
  */
-public record ASTRuleSet(List<ASTAtom> facts, List<ASTRule> rules) {
+public record ASTRuleSet(List<ASTIndexedAtom> facts, List<ASTRule> rules) {
     @Override
     public String toString() {
         var buff = new StringBuilder();
@@ -28,7 +30,7 @@ public record ASTRuleSet(List<ASTAtom> facts, List<ASTRule> rules) {
     // Clauses
 
     public record ASTRule(
-        ASTAtom head,
+        ASTIndexedAtom head,
         List<ASTAtom> body,
         List<ASTAtom> negations,
         List<ASTConstraint> constraints
@@ -42,12 +44,17 @@ public record ASTRuleSet(List<ASTAtom> facts, List<ASTRule> rules) {
     //-------------------------------------------------------------------------
     // Items
 
-    public record ASTAtom(
+    public sealed interface ASTAtom permits ASTIndexedAtom, ASTNamedAtom {
+        Token relation();
+        List<String> getVariableNames();
+    }
+
+    public record ASTIndexedAtom(
         Token relation,
         List<ASTTerm> terms
-    ) {
+    ) implements ASTAtom {
         @Override public String toString() {
-            return "ASTAtom(" + relation.lexeme() + "," + terms + ")";
+            return "ASTIndexedAtom(" + relation.lexeme() + "," + terms + ")";
         }
 
         /**
@@ -56,6 +63,29 @@ public record ASTRuleSet(List<ASTAtom> facts, List<ASTRule> rules) {
          */
         public List<String> getVariableNames() {
             return terms.stream()
+                .filter(t -> t instanceof ASTVariable)
+                .map(t -> t.token().lexeme())
+                .toList();
+        }
+    }
+
+    public record ASTNamedAtom(
+        Token relation,
+        Map<Token,ASTTerm> terms
+    ) implements ASTAtom {
+        @Override public String toString() {
+            var termString = terms.entrySet().stream()
+                .map(e -> e.getKey() + ": " + e.getValue())
+                .collect(Collectors.joining(", "));
+            return "ASTNamedAtom(" + relation.lexeme() + ", [" + termString + "])";
+        }
+
+        /**
+         * Gets a list of the variable names used in the item.
+         * @return The list
+         */
+        public List<String> getVariableNames() {
+            return terms.values().stream()
                 .filter(t -> t instanceof ASTVariable)
                 .map(t -> t.token().lexeme())
                 .toList();

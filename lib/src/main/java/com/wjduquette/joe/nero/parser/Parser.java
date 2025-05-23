@@ -26,7 +26,7 @@ public class Parser {
     // Public API
 
     public ASTRuleSet parse() {
-        List<ASTAtom> facts = new ArrayList<>();
+        List<ASTIndexedAtom> facts = new ArrayList<>();
         List<ASTRule> rules = new ArrayList<>();
 
         while (!isAtEnd()) {
@@ -52,7 +52,7 @@ public class Parser {
     //-------------------------------------------------------------------------
     // Productions
 
-    private ASTAtom fact(ASTAtom head) {
+    private ASTIndexedAtom fact(ASTIndexedAtom head) {
         // Verify that there are no variable terms.
         for (var term : head.terms()) {
             if (!(term instanceof ASTConstant)) {
@@ -62,7 +62,7 @@ public class Parser {
         return head;
     }
 
-    private ASTRule rule(ASTAtom head) {
+    private ASTRule rule(ASTIndexedAtom head) {
         var body = new ArrayList<ASTAtom>();
         var negations = new ArrayList<ASTAtom>();
         var constraints = new ArrayList<ASTConstraint>();
@@ -112,7 +112,7 @@ public class Parser {
         return new ASTRule(head, body, negations, constraints);
     }
 
-    private ASTAtom atom() {
+    private ASTIndexedAtom atom() {
         // NEXT, parse the literal proper
         var predicate = consume(IDENTIFIER, "expected predicate.");
         consume(LEFT_PAREN, "expected '(' after predicate.");
@@ -125,7 +125,7 @@ public class Parser {
 
         consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new ASTAtom(predicate, terms);
+        return new ASTIndexedAtom(predicate, terms);
     }
 
     private ASTTerm term() {

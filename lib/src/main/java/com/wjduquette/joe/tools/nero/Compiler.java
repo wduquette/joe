@@ -9,6 +9,7 @@ import com.wjduquette.joe.nero.parser.Parser;
 import com.wjduquette.joe.nero.parser.Scanner;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 /**
  * Compiles a Nero {@link com.wjduquette.joe.nero.RuleSet} from source.
@@ -70,7 +71,7 @@ public class Compiler {
     //-------------------------------------------------------------------------
     // Compilation
 
-    private ConcreteFact ast2fact(ASTRuleSet.ASTAtom atom) {
+    private ConcreteFact ast2fact(ASTRuleSet.ASTIndexedAtom atom) {
         var terms = new ArrayList<>();
         for (var t : atom.terms()) {
             if (t instanceof ASTRuleSet.ASTConstant c) {
@@ -86,18 +87,34 @@ public class Compiler {
 
     private Rule ast2rule(ASTRuleSet.ASTRule rule) {
         return new Rule(
-            ast2atom(rule.head()),
-            rule.body().stream().map(this::ast2atom).toList(),
-            rule.negations().stream().map(this::ast2atom).toList(),
+            ast2head(rule.head()),
+            rule.body().stream().map(this::ast2body).toList(),
+            rule.negations().stream().map(this::ast2body).toList(),
             rule.constraints().stream().map(this::ast2constraint).toList()
         );
     }
 
-    private Atom ast2atom(ASTRuleSet.ASTAtom atom) {
-        return new Atom(
+    private HeadAtom ast2head(ASTRuleSet.ASTIndexedAtom atom) {
+        return new HeadAtom(
             atom.relation().lexeme(),
             atom.terms().stream().map(this::ast2term).toList()
         );
+    }
+
+    private BodyAtom ast2body(ASTRuleSet.ASTAtom atom) {
+        return switch (atom) {
+            case ASTRuleSet.ASTIndexedAtom a -> new IndexedAtom(
+                a.relation().lexeme(),
+                a.terms().stream().map(this::ast2term).toList()
+            );
+            case ASTRuleSet.ASTNamedAtom a -> {
+                var terms = new LinkedHashMap<String,Term>();
+                for (var e : a.terms().entrySet()) {
+                    terms.put(e.getKey().lexeme(), ast2term(e.getValue()));
+                }
+                yield new NamedAtom(a.relation().lexeme(), terms);
+            }
+        };
     }
 
     private Constraint ast2constraint(ASTRuleSet.ASTConstraint constraint) {

@@ -1,7 +1,7 @@
 package com.wjduquette.joe.nero;
 
 /**
- * A Wildcard {@link Term} in an {@link Atom}.  The Wildcard's name
+ * A Wildcard {@link Term} in an {@link HeadAtom}.  The Wildcard's name
  * must be a valid identifier that begins with an underscore.
  * @param name The name
  */

@@ -1,7 +1,7 @@
 package com.wjduquette.joe.nero;
 
 /**
- * A Variable in a {@link Atom}.  The Variable's name must be
+ * A Variable in a {@link HeadAtom}.  The Variable's name must be
  * a valid identifier, and must not begin with an underscore.
  * @param name The name
  */

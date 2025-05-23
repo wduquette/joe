@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
  * @param relation The relation name
  * @param terms The terms
  */
-public record Atom(String relation, List<Term> terms) {
+public record HeadAtom(String relation, List<Term> terms) {
     @Override public String toString() {
         var termString = terms.stream().map(Term::toString)
             .collect(Collectors.joining(", "));
@@ -21,7 +21,7 @@ public record Atom(String relation, List<Term> terms) {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        Atom atom = (Atom) o;
+        HeadAtom atom = (HeadAtom) o;
         return relation.equals(atom.relation) && terms.equals(atom.terms);
     }
 
