@@ -176,7 +176,7 @@ public class Scanner {
             ? "end"
             : "'" + span.text() + "'";
 
-        var text = "Error at " + where + ": " + message;
+        var text = "error at " + where + ", " + message;
 
         errorHandler.handle(span, text);
     }
