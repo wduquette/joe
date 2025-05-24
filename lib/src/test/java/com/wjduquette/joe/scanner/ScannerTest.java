@@ -105,7 +105,7 @@ public class ScannerTest extends Ted {
         check(scanner.isPrimed()).eq(true);
         scanner.consume(TRUE, "expected true.");
         checkList(errors)
-            .items("Error at '+': expected true.");
+            .items("error at '+', expected true.");
     }
 
     //-------------------------------------------------------------------------

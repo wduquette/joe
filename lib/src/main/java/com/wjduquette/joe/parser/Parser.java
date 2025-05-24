@@ -1173,7 +1173,7 @@ public class Parser {
             if (negated) {
                 for (var name : atom.getVariableTokens()) {
                     if (!bodyVar.contains(name.lexeme())) {
-                        error(name, "negated atom contains an unbound variable.");
+                        error(name, "negated body atom contains unbound variable.");
                     }
                 }
                 negations.add(atom);
@@ -1196,11 +1196,11 @@ public class Parser {
                 case ASTRuleSet.ASTVariable v -> {
                     if (!bodyVar.contains(v.token().lexeme())) {
                         error(v.token(),
-                            "head variable not found in positive body atom.");
+                            "head atom contains unbound variable.");
                     }
                 }
                 case ASTRuleSet.ASTWildcard w -> error(w.token(),
-                    "wildcard found in rule head.");
+                    "head atom contains wildcard.");
             }
         }
 
@@ -1232,6 +1232,7 @@ public class Parser {
         ) {
             op = scanner.previous();
         } else {
+            scanner.advance();
             throw errorSync(scanner.previous(), "expected comparison operator.");
         }
 
@@ -1239,7 +1240,7 @@ public class Parser {
 
         if (b instanceof ASTRuleSet.ASTVariable v) {
             if (!bodyVar.contains(v.token().lexeme())) {
-                error(v.token(), "expected bound variable.");
+                error(v.token(), "expected bound variable or constant.");
             }
         } else if (b instanceof ASTRuleSet.ASTWildcard w) {
             error(w.token(), "expected bound variable or constant.");
@@ -1310,8 +1311,8 @@ public class Parser {
     // Saves the error detail, with no synchronization.
     void error(Token token, String message) {
         var msg = token.type() == TokenType.EOF
-            ? "Error at end: " + message
-            : "Error at '" + token.lexeme() + "': " + message;
+            ? "error at end, " + message
+            : "error at '" + token.lexeme() + "', " + message;
         reporter.reportError(new Trace(token.span(), msg),
             token.type() == TokenType.EOF);
     }
