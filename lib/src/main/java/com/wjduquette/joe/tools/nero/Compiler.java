@@ -101,7 +101,7 @@ public class Compiler {
             );
             case ASTRuleSet.ASTNamedAtom a -> {
                 var terms = new LinkedHashMap<String,Term>();
-                for (var e : a.terms().entrySet()) {
+                for (var e : a.termMap().entrySet()) {
                     terms.put(e.getKey().lexeme(), ast2term(e.getValue()));
                 }
                 yield new NamedAtom(a.relation().lexeme(), terms);

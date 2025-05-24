@@ -30,6 +30,24 @@ public class NeroTest extends Ted {
     }
 
     @Test
+    public void testSimple_named() {
+        test("testSimple_named");
+        var source = """
+            Parent(#walker, #bert);
+            Parent(#bert, #clark);
+            Ancestor(x, y) :- Parent(f0: x, f1: y);
+            Ancestor(x, y) :- Parent(f0: x, f1: z), Ancestor(f0: z, f1: y);
+            """;
+        check(infer(source)).eq("""
+            Ancestor(#bert, #clark)
+            Ancestor(#walker, #bert)
+            Ancestor(#walker, #clark)
+            Parent(#bert, #clark)
+            Parent(#walker, #bert)
+            """);
+    }
+
+    @Test
     public void testConstraint() {
         test("testConstraint");
         var source = """
