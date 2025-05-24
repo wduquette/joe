@@ -23,7 +23,7 @@ public class ParserTest extends Ted {
     public void testStmtAssert_noSemiColon() {
         test("testStmtAssert_noSemiColon");
 
-        var details = parse("""
+        var details = parseJoe("""
             assert 1 == 1
             println();
             """);
@@ -39,7 +39,7 @@ public class ParserTest extends Ted {
     public void testStmtBlock_noRightBrace() {
         test("testStmtBlock_noRightBrace");
 
-        var details = parse("{");
+        var details = parseJoe("{");
         checkList(details).items(
             "[line 1] Error at end: Expected '}' after block."
         );
@@ -52,7 +52,7 @@ public class ParserTest extends Ted {
     public void testStmtClass_badName() {
         test("testStmtClass_badName");
 
-        var details = parse("""
+        var details = parseJoe("""
             class 123 {}
             """);
         checkList(details).items(
@@ -64,7 +64,7 @@ public class ParserTest extends Ted {
     public void testStmtClass_badExtends() {
         test("testStmtClass_badExtends");
 
-        var details = parse("""
+        var details = parseJoe("""
             class Thing extends 123 {}
             """);
         checkList(details).items(
@@ -76,7 +76,7 @@ public class ParserTest extends Ted {
     public void testStmtClass_noLeftBrace() {
         test("testStmtClass_noLeftBrace");
 
-        var details = parse("""
+        var details = parseJoe("""
             class Thing
                 method init() {}
             }
@@ -90,7 +90,7 @@ public class ParserTest extends Ted {
     public void testStmtClass_badMethod() {
         test("testStmtClass_badMethod");
 
-        var details = parse("""
+        var details = parseJoe("""
             class Thing {
                 function init() {}
             }
@@ -105,7 +105,7 @@ public class ParserTest extends Ted {
     public void testStmtClass_noRightBrace() {
         test("testStmtClass_noRightBrace");
 
-        var details = parse("""
+        var details = parseJoe("""
             class Thing {
                 method init() {}
             """);
@@ -121,7 +121,7 @@ public class ParserTest extends Ted {
     public void testStmtExpression_noSemiColon() {
         test("testStmtExpression_noSemiColon");
 
-        var details = parse("""
+        var details = parseJoe("""
             1 + 2
             println();
             """);
@@ -137,7 +137,7 @@ public class ParserTest extends Ted {
     public void testStmtFor_noLeftParen() {
         test("testStmtFor_noLeftParen");
 
-        var details = parse("""
+        var details = parseJoe("""
             for var i = 1; i < 5; i = i + 1) { }
             """);
         checkList(details).items(
@@ -151,7 +151,7 @@ public class ParserTest extends Ted {
     public void testStmtFor_noSemiAfterCondition() {
         test("testStmtFor_noSemiAfterCondition");
 
-        var details = parse("""
+        var details = parseJoe("""
             for (var i = 1; i < 5 i = i + 1) { }
             """);
         checkList(details).items(
@@ -163,7 +163,7 @@ public class ParserTest extends Ted {
     public void testStmtFor_noRightParen() {
         test("testStmtFor_noRightParen");
 
-        var details = parse("""
+        var details = parseJoe("""
             for (var i = 1; i < 5; i = i + 1 { }
             """);
         checkList(details).items(
@@ -178,7 +178,7 @@ public class ParserTest extends Ted {
     public void testStmtFunction_badName() {
         test("testStmtFunction_badName");
 
-        var details = parse("""
+        var details = parseJoe("""
             function 123() {}
             """);
         checkList(details).items(
@@ -190,7 +190,7 @@ public class ParserTest extends Ted {
     public void testStmtFunction_noLeftParen() {
         test("testStmtFunction_noLeftParen");
 
-        var details = parse("""
+        var details = parseJoe("""
             function square x) {}
             """);
         checkList(details).items(
@@ -202,7 +202,7 @@ public class ParserTest extends Ted {
     public void testStmtFunction_badParam() {
         test("testStmtFunction_badParam");
 
-        var details = parse("""
+        var details = parseJoe("""
             function compute(x,123) {}
             """);
         checkList(details).items(
@@ -214,7 +214,7 @@ public class ParserTest extends Ted {
     public void testStmtFunction_duplicateParam() {
         test("testStmtFunction_duplicateParam");
 
-        var details = parse("""
+        var details = parseJoe("""
             function bad(x,y,x) {}
             """);
         checkList(details).items(
@@ -226,7 +226,7 @@ public class ParserTest extends Ted {
     public void testStmtFunction_argsPosition() {
         test("testStmtFunction_argsPosition");
 
-        var details = parse("""
+        var details = parseJoe("""
             function bad(x,args,y) {}
             """);
         checkList(details).items(
@@ -238,7 +238,7 @@ public class ParserTest extends Ted {
     public void testStmtFunction_noRightParen() {
         test("testStmtFunction_noRightParen");
 
-        var details = parse("""
+        var details = parseJoe("""
             function compute(x,y {}
             """);
         checkList(details).items(
@@ -250,7 +250,7 @@ public class ParserTest extends Ted {
     public void testStmtFunction_noLeftBrace() {
         test("testStmtFunction_noLeftBrace");
 
-        var details = parse("""
+        var details = parseJoe("""
             function compute(x,y) }
             """);
         checkList(details).items(
@@ -265,7 +265,7 @@ public class ParserTest extends Ted {
     public void testStmtIf_noLeftParen() {
         test("testStmtIf_noLeftParen");
 
-        var details = parse("""
+        var details = parseJoe("""
             if x > 0) {}
             """);
         checkList(details).items(
@@ -277,7 +277,7 @@ public class ParserTest extends Ted {
     public void testStmtIf_noRightParen() {
         test("testStmtIf_noRightParen");
 
-        var details = parse("""
+        var details = parseJoe("""
             if (x > 0 {}
             """);
         checkList(details).items(
@@ -292,7 +292,7 @@ public class ParserTest extends Ted {
     public void testStmtReturn_noSemiColon() {
         test("testStmtReturn_noSemiColon");
 
-        var details = parse("""
+        var details = parseJoe("""
             return 1
             var x;
             """);
@@ -308,7 +308,7 @@ public class ParserTest extends Ted {
     public void testStmtVar_badName() {
         test("testStmtVar_badName");
 
-        var details = parse("""
+        var details = parseJoe("""
             var 123 = 5;
             """);
         checkList(details).items(
@@ -320,7 +320,7 @@ public class ParserTest extends Ted {
     public void testStmtVar_noSemiColon() {
         test("testStmtVar_noSemiColon");
 
-        var details = parse("""
+        var details = parseJoe("""
             var x = 5
             println(x);
             """);
@@ -336,7 +336,7 @@ public class ParserTest extends Ted {
     public void testStmtWhile_noLeftParen() {
         test("testStmtWhile_noLeftParen");
 
-        var details = parse("""
+        var details = parseJoe("""
             while x > 0) {}
             """);
         checkList(details).items(
@@ -348,7 +348,7 @@ public class ParserTest extends Ted {
     public void testStmtWhile_noRightParen() {
         test("testStmtWhile_noRightParen");
 
-        var details = parse("""
+        var details = parseJoe("""
             while (x > 0 {}
             """);
         checkList(details).items(
@@ -361,13 +361,13 @@ public class ParserTest extends Ted {
     // Helpers
 
     // Scans and returns the parse errors
-    private List<String> parse(String input) {
+    private List<String> parseJoe(String input) {
         details.clear();
         var buffer = new SourceBuffer("-", input);
         var parser = new Parser(buffer, (detail, incomplete) ->
             details.add("[line " + detail.line() + "] " + detail.message())
         );
-        parser.parse();
+        parser.parseJoe();
 
         return details;
     }

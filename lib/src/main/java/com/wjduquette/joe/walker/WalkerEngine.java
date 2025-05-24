@@ -92,7 +92,7 @@ public class WalkerEngine implements Engine {
         gotIncompleteScript = false;
 
         Parser parser = new Parser(buffer, this::reportError);
-        var statements = parser.parse();
+        var statements = parser.parseJoe();
 
         // Stop if there was a syntax error.
         if (!syntaxTraces.isEmpty()) {

@@ -175,7 +175,7 @@ class Compiler {
         gotCompleteScript = true;
 
         Parser parser = new Parser(buffer, this::parseError);
-        var statements = parser.parse();
+        var statements = parser.parseJoe();
 
         // Stop if there was a syntax error.
         if (!errors.isEmpty()) {
