@@ -12,6 +12,7 @@ for some conditions enforced by the compiler.
 - [Statements](#statements)
 - [Expressions](#expressions)
 - [Patterns](#patterns)
+- [Nero](#nero)
 
 ## Statements
 
@@ -207,28 +208,50 @@ fashion.
 recordPattern   → IDENTIFIER listPattern ;
 ```
 
+## Nero
 
-## Semantic Constraints
+This is the grammar for Nero, Joe's dialect of Datalog.  Nero rule sets can
+be parsed standalone, or as part of a Joe script via the `ruleset` expression.
 
-The Joe grammar has no clear distinction between lvalues and rvalues; as
-a result, it allows a number of expressions that are forbidden by the
-language engines.  At time of writing, I've not determined how to clean
-up the grammar to match.  
+Differences from classic Datalog with negation:
 
-The following expressions are valid lvalues:
+- Comments begin with `//` rather than `%`
+- Horn clauses end with `;` rather than '.'.
+- Relations usually have initial caps, to match Monica type names.
+- Constant terms can be Monica keywords, strings, or numbers, or, if read
+  from a scripted input fact, any Monica value.
+- Variables are normal identifiers, usually lowercase.
+- Wildcards are identifiers with a leading `_`.
+- Constraints follow a `where` token.
+- Body atoms can reference fact fields either by name or by position.
 
-- Variable reference: `IDENTIFIER`
-- Property reference: `call "." IDENTIFIER`
-- Collection index: `call "[" primary "]"`
+```grammar
+nero        → clause* EOF ;
+clause      → fact
+            | rule ;
+fact        → head ";"
+rule        → head ":-" body ( "where" constraints )? ";"
+head        → indexedAtom ;
+body        → "not"? bodyAtom ( "," "not"? bodyAtom )* ;
+bodyAtom    → indexedAtom | namedAtom ;
+indexedAtom → IDENTIFIER "(" term ( "," term )* ")" ;
+orderedAtom → IDENTIFIER "(" namedTerm ( "," namedTerm )* ")" ;
+namedTerm   → IDENTIFIER ":" term ;
+constrants  → constraint ( "," constraint )* ;
+constraint  → variable ( "==" | "!=" | ">" | ">=" | "<" | "<=" ) term ;
+term        → constant | variable | wildcard ;
+constant    → KEYWORD | STRING | NUMBER ;
+variable    → IDENTIFIER ;     // No leading "_"
+wildcard    → IDENTIFIER ;     // With leading "_"
+```
 
-Other valid `call` and `unary` expressions are not.  This primarily
-affects the increment/decrement operators: `++` and `--`.  For example,
-the following expressions are syntactically valid but will be rejected
-by the language engines:
+Semantic restrictions:
 
-- `myFunc(a, b, c)++`
-- `--myFunc(a, b, c)`
-- `++!x`
+- Normal body atoms can contain free variables to bind against facts.  All 
+  variables in a rule's head, negated body atoms, or constraints must be
+  bound in normal body atoms.
+- Only body atoms (negated or otherwise) may contain wildcard terms.
+
 
 ## JLox Grammar
 

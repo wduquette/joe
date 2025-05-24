@@ -37,7 +37,7 @@ public class Parser {
         var traces = new ArrayList<Trace>();
         var parser = new Parser(buff, (t, flag) -> traces.add(t));
 
-        var statements = parser.parse();
+        var statements = parser.parseJoe();
 
         if (!traces.isEmpty()) {
             throw new SyntaxError("Syntax error in input, halting.",
@@ -62,7 +62,7 @@ public class Parser {
         // If it parsed without error then it is complete.  It might
         // also have resolution errors, but that's irrelevant.
         isComplete = true;
-        parser.parse();
+        parser.parseJoe();
         return isComplete;
     }
 
@@ -94,12 +94,13 @@ public class Parser {
     // Public API
 
     /**
-     * Parses the source, attempting to detect as many meaningful errors as
-     * possible.  Errors are reported via the parser's error reporter.  If
-     * errors were reported, the result of this method should be ignored.
+     * Parses the source as Joe source code, attempting to detect as many
+     * meaningful errors as possible.  Errors are reported via the parser's
+     * error reporter.  If errors are reported then the result of this method
+     * should be ignored.
      * @return The list of parsed statements.
      */
-    public List<Stmt> parse() {
+    public List<Stmt> parseJoe() {
         this.scanner = new Scanner(source, this::errorInScanner);
         List<Stmt> statements = new ArrayList<>();
 
@@ -1101,6 +1102,178 @@ public class Parser {
         scanner.consume(RIGHT_PAREN, "Expected ')' after record pattern.");
 
         return new Pattern.RecordPattern(identifier.lexeme(), list);
+    }
+
+    //-------------------------------------------------------------------------
+    // Nero Rule Sets
+
+    /**
+     * Parses the source as a standalone Nero program, attempting to detect
+     * as many meaningful errors as possible.  Errors are reported via the
+     * parser's error reporter.  If errors were reported, the result of
+     * this method should be ignored.
+     * @return The parsed rule set.
+     */
+    public ASTRuleSet parseNero() {
+        this.scanner = new Scanner(source, this::errorInScanner);
+        scanner.prime();
+
+        List<ASTRuleSet.ASTIndexedAtom> facts = new ArrayList<>();
+        List<ASTRuleSet.ASTRule> rules = new ArrayList<>();
+
+        while (!scanner.isAtEnd()) {
+            try {
+                var head = indexedAtom();
+
+                if (scanner.match(SEMICOLON)) {
+                    facts.add(fact(head));
+                } else if (scanner.match(COLON_MINUS)) {
+                    rules.add(rule(head));
+                } else {
+                    scanner.advance();
+                    throw errorSync(scanner.previous(),
+                        "expected fact or rule.");
+                }
+            } catch (ErrorSync error) {
+                synchronize();
+            }
+        }
+
+        return new ASTRuleSet(facts, rules);
+    }
+
+    private ASTRuleSet.ASTIndexedAtom fact(ASTRuleSet.ASTIndexedAtom head) {
+        // Verify that there are no non-constant terms.
+        for (var term : head.terms()) {
+            if (!(term instanceof ASTRuleSet.ASTConstant)) {
+                error(term.token(), "fact contains a non-constant term.");
+            }
+        }
+        return head;
+    }
+
+    private ASTRuleSet.ASTRule rule(ASTRuleSet.ASTIndexedAtom head) {
+        var body = new ArrayList<ASTRuleSet.ASTAtom>();
+        var negations = new ArrayList<ASTRuleSet.ASTAtom>();
+        var constraints = new ArrayList<ASTRuleSet.ASTConstraint>();
+
+        var bodyVar = new HashSet<String>();
+        do {
+            var negated = scanner.match(NOT);
+
+            var atom = indexedAtom();
+            if (negated) {
+                for (var term : atom.terms()) {
+                    if (term instanceof ASTRuleSet.ASTVariable) {
+                        if (!bodyVar.contains(term.token().lexeme())) {
+                            error(term.token(),
+                                "negated atom contains an unbound variable.");
+                        }
+                    }
+                }
+                negations.add(atom);
+            } else {
+                body.add(atom);
+                bodyVar.addAll(atom.getVariableNames());
+            }
+        } while (scanner.match(COMMA));
+
+        if (scanner.match(WHERE)) {
+            constraints.add(constraint(bodyVar));
+        } while (scanner.match(COMMA));
+
+        scanner.consume(SEMICOLON, "expected ';' after rule body.");
+
+        // Verify that the head contains only valid terms.
+        for (var term : head.terms()) {
+            switch (term) {
+                case ASTRuleSet.ASTConstant ignored -> {}
+                case ASTRuleSet.ASTVariable v -> {
+                    if (!bodyVar.contains(v.token().lexeme())) {
+                        error(v.token(),
+                            "head variable not found in positive body atom.");
+                    }
+                }
+                case ASTRuleSet.ASTWildcard w -> error(w.token(),
+                    "wildcard found in rule head.");
+            }
+        }
+
+        return new ASTRuleSet.ASTRule(head, body, negations, constraints);
+    }
+
+    private ASTRuleSet.ASTConstraint constraint(Set<String> bodyVar) {
+        var term = astTerm();
+        Token op;
+        ASTRuleSet.ASTVariable a = null;
+
+        switch (term) {
+            case ASTRuleSet.ASTConstant c ->
+                error(c.token(), "expected bound variable.");
+            case ASTRuleSet.ASTVariable v -> {
+                a = v;
+                if (!bodyVar.contains(v.token().lexeme())) {
+                    error(v.token(), "expected bound variable.");
+                }
+            }
+            case ASTRuleSet.ASTWildcard c ->
+                error(c.token(), "expected bound variable.");
+        }
+
+        if (scanner.match(
+            BANG_EQUAL, EQUAL_EQUAL,
+            GREATER, GREATER_EQUAL,
+            LESS, LESS_EQUAL)
+        ) {
+            op = scanner.previous();
+        } else {
+            throw errorSync(scanner.previous(), "expected comparison operator.");
+        }
+
+        var b = astTerm();
+
+        if (b instanceof ASTRuleSet.ASTVariable v) {
+            if (!bodyVar.contains(v.token().lexeme())) {
+                error(v.token(), "expected bound variable.");
+            }
+        } else if (b instanceof ASTRuleSet.ASTWildcard w) {
+            error(w.token(), "expected bound variable or constant.");
+        }
+
+        return new ASTRuleSet.ASTConstraint(a, op, b);
+    }
+
+    private ASTRuleSet.ASTIndexedAtom indexedAtom() {
+        // NEXT, parse the atom.
+        scanner.consume(IDENTIFIER, "expected relation.");
+        var relation = scanner.previous();
+        scanner.consume(LEFT_PAREN, "expected '(' after relation.");
+
+        var terms = new ArrayList<ASTRuleSet.ASTTerm>();
+
+        do {
+            terms.add(astTerm());
+        } while (scanner.match(COMMA));
+
+        scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
+
+        return new ASTRuleSet.ASTIndexedAtom(relation, terms);
+    }
+
+    private ASTRuleSet.ASTTerm astTerm() {
+        if (scanner.match(IDENTIFIER)) {
+            var name = scanner.previous();
+            if (name.lexeme().startsWith("_")) {
+                return new ASTRuleSet.ASTWildcard(name);
+            } else {
+                return new ASTRuleSet.ASTVariable(name);
+            }
+        } else if (scanner.match(KEYWORD, NUMBER, STRING)) {
+            return new ASTRuleSet.ASTConstant(scanner.previous());
+        } else {
+            scanner.advance();
+            throw errorSync(scanner.previous(), "expected term.");
+        }
     }
 
     //-------------------------------------------------------------------------

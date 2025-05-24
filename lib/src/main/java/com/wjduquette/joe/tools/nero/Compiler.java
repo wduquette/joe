@@ -4,9 +4,8 @@ import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.nero.*;
-import com.wjduquette.joe.nero.parser.ASTRuleSet;
-import com.wjduquette.joe.nero.parser.Parser;
-import com.wjduquette.joe.nero.parser.Scanner;
+import com.wjduquette.joe.parser.ASTRuleSet;
+import com.wjduquette.joe.parser.Parser;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -49,20 +48,13 @@ public class Compiler {
     }
 
     public ASTRuleSet parse() {
-        gotError = false;
-
-        var scanner = new Scanner(source, this::errorHandler);
-        var tokens = scanner.scanTokens();
+        var parser = new Parser(source, this::errorHandler);
+        var ast = parser.parseNero();
         if (gotError) throw new JoeError("Error in Nero input.");
-
-        var parser = new Parser(tokens, this::errorHandler);
-        var ast = parser.parse();
-        if (gotError) throw new JoeError("Error in Nero input.");
-
         return ast;
     }
 
-    private void errorHandler(Trace trace) {
+    private void errorHandler(Trace trace, boolean incomplete) {
         gotError = true;
         System.out.println("line " + trace.line() + ": " +
             trace.message());

@@ -1,11 +1,14 @@
-package com.wjduquette.joe.nero.parser;
+package com.wjduquette.joe.parser;
+
+import com.wjduquette.joe.scanner.Token;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * This class contains the Nero Abstract Syntax Tree types.
+ * This class contains the Abstract Syntax Tree (AST) types for Nero
+ * rule sets.
  */
 public record ASTRuleSet(List<ASTIndexedAtom> facts, List<ASTRule> rules) {
     @Override
