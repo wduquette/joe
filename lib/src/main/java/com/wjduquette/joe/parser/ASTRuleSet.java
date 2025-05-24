@@ -2,6 +2,7 @@ package com.wjduquette.joe.parser;
 
 import com.wjduquette.joe.scanner.Token;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -48,50 +49,65 @@ public record ASTRuleSet(List<ASTIndexedAtom> facts, List<ASTRule> rules) {
     // Items
 
     public sealed interface ASTAtom permits ASTIndexedAtom, ASTNamedAtom {
+        /**
+         * The Atom's relation
+         * @return The relation name
+         */
         Token relation();
-        List<String> getVariableNames();
+
+        /**
+         * The atom's terms.  This is to be used for retrieving data about
+         * the terms, i.e., variable names.
+         * @return The terms
+         */
+        Collection<ASTTerm> getTerms();
+
+        /**
+         * Gets a list of the variable tokens used in the atom.
+         * @return The list
+         */
+        default List<Token> getVariableTokens() {
+            return getTerms().stream()
+                .filter(t -> t instanceof ASTVariable)
+                .map(ASTTerm::token)
+                .toList();
+        }
+
+        /**
+         * Gets a list of the variable names used in the item.
+         * @return The list
+         */
+        default List<String> getVariableNames() {
+            return getTerms().stream()
+                .filter(t -> t instanceof ASTVariable)
+                .map(t -> t.token().lexeme())
+                .toList();
+        }
     }
 
     public record ASTIndexedAtom(
         Token relation,
         List<ASTTerm> terms
     ) implements ASTAtom {
+        @Override public Collection<ASTTerm> getTerms() { return terms(); }
         @Override public String toString() {
             return "ASTIndexedAtom(" + relation.lexeme() + "," + terms + ")";
-        }
-
-        /**
-         * Gets a list of the variable names used in the item.
-         * @return The list
-         */
-        public List<String> getVariableNames() {
-            return terms.stream()
-                .filter(t -> t instanceof ASTVariable)
-                .map(t -> t.token().lexeme())
-                .toList();
         }
     }
 
     public record ASTNamedAtom(
         Token relation,
-        Map<Token,ASTTerm> terms
+        Map<Token,ASTTerm> termMap
     ) implements ASTAtom {
+        @Override public Collection<ASTTerm> getTerms() {
+            return termMap.values();
+        }
+
         @Override public String toString() {
-            var termString = terms.entrySet().stream()
+            var termString = termMap.entrySet().stream()
                 .map(e -> e.getKey() + ": " + e.getValue())
                 .collect(Collectors.joining(", "));
             return "ASTNamedAtom(" + relation.lexeme() + ", [" + termString + "])";
-        }
-
-        /**
-         * Gets a list of the variable names used in the item.
-         * @return The list
-         */
-        public List<String> getVariableNames() {
-            return terms.values().stream()
-                .filter(t -> t instanceof ASTVariable)
-                .map(t -> t.token().lexeme())
-                .toList();
         }
     }
 

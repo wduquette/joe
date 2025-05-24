@@ -1123,7 +1123,7 @@ public class Parser {
 
         while (!scanner.isAtEnd()) {
             try {
-                var head = indexedAtom();
+                var head = head();
 
                 if (scanner.match(SEMICOLON)) {
                     facts.add(fact(head));
@@ -1140,6 +1140,14 @@ public class Parser {
         }
 
         return new ASTRuleSet(facts, rules);
+    }
+
+    private ASTRuleSet.ASTIndexedAtom head() {
+        // NEXT, parse the atom.
+        scanner.consume(IDENTIFIER, "expected relation.");
+        var relation = scanner.previous();
+        scanner.consume(LEFT_PAREN, "expected '(' after relation.");
+        return indexedAtom(relation);
     }
 
     private ASTRuleSet.ASTIndexedAtom fact(ASTRuleSet.ASTIndexedAtom head) {
@@ -1161,14 +1169,11 @@ public class Parser {
         do {
             var negated = scanner.match(NOT);
 
-            var atom = indexedAtom();
+            var atom = bodyAtom();
             if (negated) {
-                for (var term : atom.terms()) {
-                    if (term instanceof ASTRuleSet.ASTVariable) {
-                        if (!bodyVar.contains(term.token().lexeme())) {
-                            error(term.token(),
-                                "negated atom contains an unbound variable.");
-                        }
+                for (var name : atom.getVariableTokens()) {
+                    if (!bodyVar.contains(name.lexeme())) {
+                        error(name, "negated atom contains an unbound variable.");
                     }
                 }
                 negations.add(atom);
@@ -1243,12 +1248,20 @@ public class Parser {
         return new ASTRuleSet.ASTConstraint(a, op, b);
     }
 
-    private ASTRuleSet.ASTIndexedAtom indexedAtom() {
+    private ASTRuleSet.ASTAtom bodyAtom() {
         // NEXT, parse the atom.
         scanner.consume(IDENTIFIER, "expected relation.");
         var relation = scanner.previous();
         scanner.consume(LEFT_PAREN, "expected '(' after relation.");
 
+        if (scanner.checkTwo(IDENTIFIER, COLON)) {
+            return namedAtom(relation);
+        } else {
+            return indexedAtom(relation);
+        }
+    }
+
+    private ASTRuleSet.ASTIndexedAtom indexedAtom(Token relation) {
         var terms = new ArrayList<ASTRuleSet.ASTTerm>();
 
         do {
@@ -1258,6 +1271,21 @@ public class Parser {
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
         return new ASTRuleSet.ASTIndexedAtom(relation, terms);
+    }
+
+    private ASTRuleSet.ASTNamedAtom namedAtom(Token relation) {
+        var terms = new LinkedHashMap<Token,ASTRuleSet.ASTTerm>();
+
+        do {
+            scanner.consume(IDENTIFIER, "expected field name.");
+            var name = scanner.previous();
+            scanner.consume(COLON, "expected ':' after field name.");
+            terms.put(name, astTerm());
+        } while (scanner.match(COMMA));
+
+        scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
+
+        return new ASTRuleSet.ASTNamedAtom(relation, terms);
     }
 
     private ASTRuleSet.ASTTerm astTerm() {
