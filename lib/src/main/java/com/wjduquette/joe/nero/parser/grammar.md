@@ -4,6 +4,9 @@ The Nero grammar: Datalog as modified for consistency with Joe
 conventions and enhancements. Eventually this should go in an appendix of 
 the JUG.
 
+**NOTE:** This grammar is no longer accurate with the change to `IndexedAtoms`
+and `NamedAtoms`.  See the overall Joe grammar for the current Nero grammar.
+
 Comments begin with `//`, as in Joe.
 
 ## Grammar v3:  Datalog with negation and constraints
