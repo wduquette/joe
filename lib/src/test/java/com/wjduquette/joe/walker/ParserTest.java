@@ -28,7 +28,7 @@ public class ParserTest extends Ted {
             println();
             """);
         checkList(details).items(
-            "[line 2] Error at 'println': Expected ';' after assertion."
+            "[line 2] error at 'println', Expected ';' after assertion."
         );
     }
 
@@ -41,7 +41,7 @@ public class ParserTest extends Ted {
 
         var details = parseJoe("{");
         checkList(details).items(
-            "[line 1] Error at end: Expected '}' after block."
+            "[line 1] error at end, Expected '}' after block."
         );
     }
 
@@ -56,7 +56,7 @@ public class ParserTest extends Ted {
             class 123 {}
             """);
         checkList(details).items(
-            "[line 1] Error at '123': Expected class name."
+            "[line 1] error at '123', Expected class name."
         );
     }
 
@@ -68,7 +68,7 @@ public class ParserTest extends Ted {
             class Thing extends 123 {}
             """);
         checkList(details).items(
-            "[line 1] Error at '123': Expected superclass name."
+            "[line 1] error at '123', Expected superclass name."
         );
     }
 
@@ -82,7 +82,7 @@ public class ParserTest extends Ted {
             }
             """);
         checkList(details).items(
-            "[line 2] Error at 'method': Expected '{' before class body."
+            "[line 2] error at 'method', Expected '{' before class body."
         );
     }
 
@@ -96,7 +96,7 @@ public class ParserTest extends Ted {
             }
             """);
         checkList(details).items(
-            "[line 2] Error at 'function': Expected method, static method," +
+            "[line 2] error at 'function', Expected method, static method," +
             " or static initializer."
         );
     }
@@ -110,7 +110,7 @@ public class ParserTest extends Ted {
                 method init() {}
             """);
         checkList(details).items(
-            "[line 2] Error at end: Expected '}' after class body."
+            "[line 2] error at end, Expected '}' after class body."
         );
     }
 
@@ -126,7 +126,7 @@ public class ParserTest extends Ted {
             println();
             """);
         checkList(details).items(
-            "[line 2] Error at 'println': Expected ';' after expression."
+            "[line 2] error at 'println', Expected ';' after expression."
         );
     }
 
@@ -141,9 +141,9 @@ public class ParserTest extends Ted {
             for var i = 1; i < 5; i = i + 1) { }
             """);
         checkList(details).items(
-            "[line 1] Error at 'var': Expected '(' after 'for'.",
+            "[line 1] error at 'var', Expected '(' after 'for'.",
             // Bogus; should skip if possible
-            "[line 1] Error at ')': Expected ';' after expression."
+            "[line 1] error at ')', Expected ';' after expression."
         );
     }
 
@@ -155,7 +155,7 @@ public class ParserTest extends Ted {
             for (var i = 1; i < 5 i = i + 1) { }
             """);
         checkList(details).items(
-            "[line 1] Error at 'i': Expected ';' after loop condition."
+            "[line 1] error at 'i', Expected ';' after loop condition."
         );
     }
 
@@ -167,7 +167,7 @@ public class ParserTest extends Ted {
             for (var i = 1; i < 5; i = i + 1 { }
             """);
         checkList(details).items(
-            "[line 1] Error at '{': Expected ')' after loop clauses."
+            "[line 1] error at '{', Expected ')' after loop clauses."
         );
     }
 
@@ -182,7 +182,7 @@ public class ParserTest extends Ted {
             function 123() {}
             """);
         checkList(details).items(
-            "[line 1] Error at '123': Expected function name."
+            "[line 1] error at '123', Expected function name."
         );
     }
 
@@ -194,7 +194,7 @@ public class ParserTest extends Ted {
             function square x) {}
             """);
         checkList(details).items(
-            "[line 1] Error at 'x': Expected '(' after function name."
+            "[line 1] error at 'x', Expected '(' after function name."
         );
     }
 
@@ -206,7 +206,7 @@ public class ParserTest extends Ted {
             function compute(x,123) {}
             """);
         checkList(details).items(
-            "[line 1] Error at '123': Expected parameter name."
+            "[line 1] error at '123', Expected parameter name."
         );
     }
 
@@ -218,7 +218,7 @@ public class ParserTest extends Ted {
             function bad(x,y,x) {}
             """);
         checkList(details).items(
-            "[line 1] Error at 'x': Duplicate parameter name."
+            "[line 1] error at 'x', Duplicate parameter name."
         );
     }
 
@@ -230,7 +230,7 @@ public class ParserTest extends Ted {
             function bad(x,args,y) {}
             """);
         checkList(details).items(
-            "[line 1] Error at 'args': 'args' must be the final parameter when present."
+            "[line 1] error at 'args', 'args' must be the final parameter when present."
         );
     }
 
@@ -242,7 +242,7 @@ public class ParserTest extends Ted {
             function compute(x,y {}
             """);
         checkList(details).items(
-            "[line 1] Error at '{': Expected ')' after parameter list."
+            "[line 1] error at '{', Expected ')' after parameter list."
         );
     }
 
@@ -254,7 +254,7 @@ public class ParserTest extends Ted {
             function compute(x,y) }
             """);
         checkList(details).items(
-            "[line 1] Error at '}': Expected '{' before function body."
+            "[line 1] error at '}', Expected '{' before function body."
         );
     }
 
@@ -269,7 +269,7 @@ public class ParserTest extends Ted {
             if x > 0) {}
             """);
         checkList(details).items(
-            "[line 1] Error at 'x': Expected '(' after 'if'."
+            "[line 1] error at 'x', Expected '(' after 'if'."
         );
     }
 
@@ -281,7 +281,7 @@ public class ParserTest extends Ted {
             if (x > 0 {}
             """);
         checkList(details).items(
-            "[line 1] Error at '{': Expected ')' after if condition."
+            "[line 1] error at '{', Expected ')' after if condition."
         );
     }
 
@@ -297,7 +297,7 @@ public class ParserTest extends Ted {
             var x;
             """);
         checkList(details).items(
-            "[line 2] Error at 'var': Expected ';' after return value."
+            "[line 2] error at 'var', Expected ';' after return value."
         );
     }
 
@@ -312,7 +312,7 @@ public class ParserTest extends Ted {
             var 123 = 5;
             """);
         checkList(details).items(
-            "[line 1] Error at '123': Expected variable name."
+            "[line 1] error at '123', Expected variable name."
         );
     }
 
@@ -325,7 +325,7 @@ public class ParserTest extends Ted {
             println(x);
             """);
         checkList(details).items(
-            "[line 2] Error at 'println': Expected ';' after variable declaration."
+            "[line 2] error at 'println', Expected ';' after variable declaration."
         );
     }
 
@@ -340,7 +340,7 @@ public class ParserTest extends Ted {
             while x > 0) {}
             """);
         checkList(details).items(
-            "[line 1] Error at 'x': Expected '(' after 'while'."
+            "[line 1] error at 'x', Expected '(' after 'while'."
         );
     }
 
@@ -352,7 +352,7 @@ public class ParserTest extends Ted {
             while (x > 0 {}
             """);
         checkList(details).items(
-            "[line 1] Error at '{': Expected ')' after condition."
+            "[line 1] error at '{', Expected ')' after condition."
         );
     }
 
