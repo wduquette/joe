@@ -19,12 +19,11 @@ public interface JoeType {
     default JoeType supertype() { return null; }
 
     /**
-     * Gets whether this type has an immutable set of ordered fields,
-     * and thus can be matched as a record rather than as a map.
-     * The field values are typically also immutable, but the essential
-     * thing is that no new fields can be added at runtime.
+     * Gets whether this type has ordered fields, i.e., an immutable,
+     * documented list of named fields.  This affects pattern matching.
+     * Ideally, the field names should match the construction arguments.
      * @return true or false
      */
     @SuppressWarnings("unused")
-    default boolean isRecordType() { return false; }
+    default boolean hasOrderedFields() { return false; }
 }

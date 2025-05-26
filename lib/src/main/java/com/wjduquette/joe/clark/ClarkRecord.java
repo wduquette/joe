@@ -91,7 +91,7 @@ class ClarkRecord
     }
 
     @Override
-    public boolean isRecordType() {
+    public boolean hasOrderedFields() {
         return true;
     }
 

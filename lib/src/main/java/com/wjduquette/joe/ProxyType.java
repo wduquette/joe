@@ -16,21 +16,29 @@ public class ProxyType<V>
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    //
+    // Attributes of the type itself
+    //
+
     // Type V's script-level name.  May differ from the Java-level
     // name.
     private final String name;
 
-    // Static methods and constants
+    // Whether the type is static (has no instances) or not.
     private boolean isStatic = false;
+
+    // The proxy of the type's supertype, or null.
     private ProxyType<? super V> superProxy = null;
+
+    // The type's static methods
     private final Map<String, NativeFunction> staticMethods =
         new HashMap<>();
+
+    // The type's constants (i.e., static variables.
     private final Map<String, Object> constants = new HashMap<>();
-    private Function<V, Collection<?>> iterableSupplier = null;
 
     //
-    // Value methods and functions.  These will be null or empty if this is
-    // a static type.
+    // Attributes of instances
     //
 
     // The set of Java value types that are proxied by this proxy.
@@ -43,6 +51,17 @@ public class ProxyType<V>
 
     // The instance methods
     private final Map<String, JoeValueLambda<V>> methods = new HashMap<>();
+
+    // The type's instance field names.  Values of proxied native types
+    // can have read-only fields.
+    private final List<String> fieldNames = new ArrayList<>();
+
+    // The getters used to retrieve field values, by field name.
+    private final Map<String, Function<V,Object>> getters = new HashMap<>();
+
+    // The supplier for iteration, if this type is iterable.
+    private Function<V, Collection<?>> iterableSupplier = null;
+
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -134,13 +153,13 @@ public class ProxyType<V>
     }
 
     /**
-     * Defines a way for the proxy to get a list of iterables from
-     * the value.
-     * @param supplier The iterable supplier.
+     * Adds a field and its getter to the type.
+     * @param fieldName The field's name
+     * @param getter The getter
      */
-    @SuppressWarnings("unused")
-    protected void iterables(Function<V,Collection<?>> supplier) {
-        this.iterableSupplier = supplier;
+    protected void field(String fieldName, Function<V, Object> getter) {
+        fieldNames.add(fieldName);
+        getters.put(fieldName, getter);
     }
 
     /**
@@ -150,6 +169,16 @@ public class ProxyType<V>
      */
     protected void method(String name, JoeValueLambda<V> callable) {
         methods.put(name, callable);
+    }
+
+    /**
+     * Defines a way for the proxy to get a list of iterables from
+     * the value.
+     * @param supplier The iterable supplier.
+     */
+    @SuppressWarnings("unused")
+    protected void iterables(Function<V,Collection<?>> supplier) {
+        this.iterableSupplier = supplier;
     }
 
     //-------------------------------------------------------------------------
@@ -210,62 +239,71 @@ public class ProxyType<V>
         return value.toString();
     }
 
+
+    //-------------------------------------------------------------------------
+    // Instance Fields
+    //
+    // Instance fields are presumed to be read-only.
+
+    /**
+     * If the instance has any fields, they are assumed to be ordered.
+     * Subclasses can override.
+     * @return true or false
+     */
+    public boolean hasOrderedFields() {
+        return !fieldNames.isEmpty();
+    }
+
     /**
      * Returns true if the value has a field with the given name, and
      * false otherwise.
      *
-     * <p>Proxied types are assumed not to have fields, so this always
-     * returns false. Subclasses may override.</p>
      * @param value A value of the proxied type
      * @param fieldName The field name
      * @return true or false
      */
     @SuppressWarnings("unused")
     public boolean hasField(Object value, String fieldName) {
-        return false;
+        return getters.containsKey(fieldName);
     }
 
     /**
      * Returns a list of the names of the value's fields.  The
      * list will be empty if the value has no fields.
-     *
-     * <p>Proxied types are assumed not to have fields, so this always
-     * returns the empty list. Subclasses may override.</p>
      * @param value A value of the proxied type
      * @return The list
      */
     @SuppressWarnings("unused")
     public List<String> getFieldNames(Object value) {
-        return List.of();
+        return Collections.unmodifiableList(fieldNames);
     }
 
     /**
      * Gets the value of the named property.  Throws an
      * "Undefined property" error if there is no such property.
-     *
-     * <p>Proxied types are assumed not to have fields, so this only
-     * looks for method properties. Subclasses may override.</p>
      * @param value A value of the proxied type
      * @param propertyName The property name
      * @return The property value
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "unchecked"})
     public Object get(Object value, String propertyName) {
         var method = bind(value, propertyName);
 
         if (method != null) {
             return method;
-        } else {
-            throw new JoeError("Undefined property '" +
-                propertyName + "'.");
         }
+
+        var getter = getters.get(propertyName);
+        if (getter != null) {
+            return getter.apply((V)value);
+        }
+
+        throw new JoeError("Undefined property '" +
+            propertyName + "'.");
     }
 
     /**
      * Sets the value of the named field.
-     *
-     * <p>Proxied types are assumed not to have fields, so this always
-     * throws a JoeError. Subclasses may override.</p>
      * @param value A value of the proxied type
      * @param fieldName The field name
      * @param other The value to
@@ -273,8 +311,13 @@ public class ProxyType<V>
      */
     @SuppressWarnings("unused")
     public Object set(Object value, String fieldName, Object other) {
-        throw new JoeError("Values of type " + name +
-            " have no field properties.");
+        if (fieldNames.isEmpty()) {
+            throw new JoeError("Values of type " + name +
+                " have no field properties.");
+        } else {
+            throw new JoeError("Values of type " + name() +
+                " have no mutable properties.");
+        }
     }
 
     //-------------------------------------------------------------------------

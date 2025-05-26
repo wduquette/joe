@@ -1,7 +1,6 @@
 package com.wjduquette.joe.patterns;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.types.RecordType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -477,7 +476,7 @@ public class MatcherTest extends Ted {
     // Helper
 
     public record TestType(String name) implements JoeType {
-        public boolean isRecordType() { return true; }
+        public boolean hasOrderedFields() { return true; }
     }
 
     private static class TestObject implements JoeValue {
@@ -499,12 +498,12 @@ public class MatcherTest extends Ted {
 
     private record Pair(Object first, Object second) {}
 
-    private static class PairType extends RecordType<Pair> {
+    private static class PairType extends ProxyType<Pair> {
         PairType() {
             super("Pair");
             proxies(Pair.class);
-            recordField("first", Pair::first);
-            recordField("second", Pair::second);
+            field("first", Pair::first);
+            field("second", Pair::second);
 
             initializer(this::_init);
         }

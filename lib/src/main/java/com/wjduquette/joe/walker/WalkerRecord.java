@@ -90,7 +90,7 @@ class WalkerRecord implements JoeClass, JoeValue, NativeCallable {
     }
 
     @Override
-    public boolean isRecordType() {
+    public boolean hasOrderedFields() {
         return true;
     }
 

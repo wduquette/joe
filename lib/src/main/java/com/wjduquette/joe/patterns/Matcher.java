@@ -145,7 +145,7 @@ public class Matcher {
                 // pattern for each field; and each pattern must match
                 // the corresponding field.
                 var obj = joe.getJoeValue(value);
-                if (!obj.type().isRecordType()) yield false;
+                if (!obj.type().hasOrderedFields()) yield false;
                 if (!obj.type().name().equals(p.typeName())) yield false;
 
                 var fields = obj.getFieldNames();

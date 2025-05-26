@@ -3,11 +3,12 @@ package com.wjduquette.joe.types;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
+import com.wjduquette.joe.ProxyType;
 
 /**
  * A ProxyType for the CatchResult type.
  */
-public class CatchResultType extends RecordType<CatchResult> {
+public class CatchResultType extends ProxyType<CatchResult> {
     /** The type, ready for installation. */
     public static final CatchResultType TYPE = new CatchResultType();
 
@@ -27,8 +28,8 @@ public class CatchResultType extends RecordType<CatchResult> {
         // The record has two fields, `result` and `error`.
         proxies(CatchResult.class);
 
-        recordField("result", CatchResult::result);
-        recordField("error",  CatchResult::error);
+        field("result", CatchResult::result);
+        field("error",  CatchResult::error);
 
         staticMethod("ok",    this::_ok);
         staticMethod("error", this::_error);
