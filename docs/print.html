@@ -2609,17 +2609,15 @@ for importing its own packages....</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="native-classes"><a class="header" href="#native-classes">Native Classes</a></h1>
 <p>TODO: Document how to create an extensible type in Java.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="native-records"><a class="header" href="#native-records">Native Records</a></h1>
-<p>Joe makes it easy to define bindings for native Java record types via the
-<code>RecordType&lt;R&gt;</code> class, a <code>ProxyType&lt;T&gt;</code> created for the
-purpose.  <code>RecordType&lt;R&gt;</code> also supports bindings that makes other Java
-types <em>look</em> like record types.</p>
+<p>Joe makes it easy to define bindings for native Java record types, and
+also to define bindings that make other Java types <em>look</em> like record types.</p>
 <p>Consider the following Java record type:</p>
 <pre><code class="language-java">record Thing(String id, Keyword color) {}
 </code></pre>
 <p>To create a binding, define <code>ThingType</code> as follows and install
 <code>ThingType.TYPE</code> into an instance of <code>Joe</code> in the usual way.  The user
 can now create and use instances of <code>Thing</code> in their scripts.</p>
-<pre><code class="language-java">public class ThingType extends RecordType&lt;Thing&gt; {
+<pre><code class="language-java">public class ThingType extends ProxyType&lt;Thing&gt; {
     public static final ThingType TYPE = new ThingType();
 
     public ThingType() {
@@ -2629,8 +2627,8 @@ can now create and use instances of <code>Thing</code> in their scripts.</p>
         
         initializer(this::_init);
 
-        recordField("id",    Thing::id);
-        recordField("color", Thing::color);
+        field("id",    Thing::id);
+        field("color", Thing::color);
     }
     
     private Object _init(Joe joe, Args args) {
@@ -2641,6 +2639,11 @@ can now create and use instances of <code>Thing</code> in their scripts.</p>
     }
 }
 </code></pre>
+<p>The <code>field()</code> method declares that the type has a field with the given name,
+and specifies a lambda to retrieve it given an instance of the native type.
+As shown here the lambda is just a simple reference to the record's field,
+but more complex lambdas can be used freely.</p>
+<p>Fields declared by <code>field</code> are read-only.</p>
 <p>Constants, static methods, and instance methods can be added in the usual
 way.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="joe-version"><a class="header" href="#joe-version">joe version</a></h1>
