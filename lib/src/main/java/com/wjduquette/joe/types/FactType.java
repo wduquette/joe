@@ -2,8 +2,11 @@ package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.ProxyType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +31,8 @@ public class FactType extends ProxyType<FactValue> {
         // An ad hoc type for Nero facts, consisting of a relation name
         // and a list of field values.  A Nero `ruleset` will accept
         // Facts as input and produces Facts as output by default.
+        //
+        // A Fact's fields have names `f0`, `f1`, ....
         proxies(FactValue.class);
 
         staticMethod("of",  this::_of);
@@ -54,6 +59,84 @@ public class FactType extends ProxyType<FactValue> {
     }
 
     //-------------------------------------------------------------------------
+    // Support for instance fields
+
+    /**
+     * If the instance has any fields, they are assumed to be ordered.
+     * Subclasses can override.
+     * @return true or false
+     */
+    public boolean hasOrderedFields() {
+        return true;
+    }
+
+    /**
+     * Returns true if the value has a field with the given name, and
+     * false otherwise.
+     *
+     * @param value A value of the proxied type
+     * @param fieldName The field name
+     * @return true or false
+     */
+    @SuppressWarnings("unused")
+    public boolean hasField(Object value, String fieldName) {
+        assert value instanceof FactValue;
+        return ((FactValue)value).fieldMap().containsKey(fieldName);
+    }
+
+    /**
+     * Returns a list of the names of the value's fields.  The
+     * list will be empty if the value has no fields.
+     * @param value A value of the proxied type
+     * @return The list
+     */
+    @SuppressWarnings("unused")
+    public List<String> getFieldNames(Object value) {
+        assert value instanceof FactValue;
+        return new ArrayList<>(((FactValue)value).fieldMap().keySet());
+    }
+
+    /**
+     * Gets the value of the named property.  Throws an
+     * "Undefined property" error if there is no such property.
+     * @param value A value of the proxied type
+     * @param propertyName The property name
+     * @return The property value
+     */
+    @SuppressWarnings({"unused"})
+    public Object get(Object value, String propertyName) {
+        var method = bind(value, propertyName);
+
+        if (method != null) {
+            return method;
+        }
+
+        assert value instanceof FactValue;
+        var map = ((FactValue)value).fieldMap();
+
+        if (map.containsKey(propertyName)) {
+            return map.get(propertyName);
+        }
+
+        throw new JoeError("Undefined property '" +
+            propertyName + "'.");
+    }
+
+    /**
+     * Sets the value of the named field.
+     * @param value A value of the proxied type
+     * @param fieldName The field name
+     * @param other The value to
+     * @return The property value
+     */
+    @SuppressWarnings("unused")
+    public Object set(Object value, String fieldName, Object other) {
+        throw new JoeError("Values of type " + name() +
+            " have no mutable properties.");
+    }
+
+
+    //-------------------------------------------------------------------------
     // Static Methods
 
     //**
@@ -75,7 +158,7 @@ public class FactType extends ProxyType<FactValue> {
     // @args relation, fields
     // Creates a new `Fact` given the relation and a list of field values.
     private Object _init(Joe joe, Args args) {
-        args.exactArity(1, "init(relation, fields)");
+        args.exactArity(2, "Fact(relation, fields)");
         var relation = joe.toString(args.next());
         var fields = joe.toList(args.next());
         return new FactValue(relation, fields);
