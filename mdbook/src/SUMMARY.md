@@ -46,6 +46,8 @@
     - [Boolean Type](./library/type.joe.Boolean.md)
     - [CatchResult Type](./library/type.joe.CatchResult.md)
     - [Error Type](./library/type.joe.Error.md)
+    - [Fact Type](./library/type.joe.Fact.md)
+    - [Function Type](./library/type.joe.Function.md)
     - [Joe Type](./library/type.joe.Type.md)
     - [Keyword Type](./library/type.joe.Keyword.md)
     - [List Type](./library/type.joe.List.md)
