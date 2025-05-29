@@ -855,6 +855,8 @@ public class Parser {
             return new Expr.Literal(scanner.previous().literal());
         }
 
+        if (scanner.match(RULESET)) return ruleset();
+
         if (scanner.match(AT)) {
             Token keyword = scanner.previous();
             scanner.consume(IDENTIFIER, "Expected class property name.");
@@ -862,6 +864,7 @@ public class Parser {
             var obj = new Expr.This(keyword);
             return new Expr.PropGet(obj, name);
         }
+
 
         if (scanner.match(SUPER)) {
             Token keyword = scanner.previous();
@@ -1106,6 +1109,41 @@ public class Parser {
 
     //-------------------------------------------------------------------------
     // Nero Rule Sets
+
+    /**
+     * Parses the source as a standalone Nero program, attempting to detect
+     * as many meaningful errors as possible.  Errors are reported via the
+     * parser's error reporter.  If errors were reported, the result of
+     * this method should be ignored.
+     * @return The parsed rule set.
+     */
+    public Expr.RuleSet ruleset() {
+        var keyword = scanner.previous();
+        var facts = new ArrayList<ASTRuleSet.ASTIndexedAtom>();
+        var rules = new ArrayList<ASTRuleSet.ASTRule>();
+
+        scanner.consume(LEFT_BRACE, "expected '{' after 'ruleset'.");
+
+        while (!scanner.match(RIGHT_BRACE)) {
+            try {
+                var head = head();
+
+                if (scanner.match(SEMICOLON)) {
+                    facts.add(fact(head));
+                } else if (scanner.match(COLON_MINUS)) {
+                    rules.add(rule(head));
+                } else {
+                    scanner.advance();
+                    throw errorSync(scanner.previous(),
+                        "expected fact or rule.");
+                }
+            } catch (ErrorSync error) {
+                synchronize();
+            }
+        }
+
+        return new Expr.RuleSet(keyword, new ASTRuleSet(facts, rules));
+    }
 
     /**
      * Parses the source as a standalone Nero program, attempting to detect

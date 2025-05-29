@@ -961,6 +961,10 @@ class Compiler {
                 emit(mathOp);             // o c    ; c = a op b
                 emit(PROPSET, name);      // c      ; o.name = c
             }
+            case Expr.RuleSet ignored -> {
+                emitCONST("ruleset is not yet supported.");
+                emit(THROW);
+            }
             case Expr.Super e -> {
                 if (currentType == null || !currentType.inInstanceMethod) {
                     error(e.keyword(), "Can't use '" + e.keyword().lexeme() +

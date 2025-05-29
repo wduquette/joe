@@ -17,6 +17,7 @@ public sealed interface Expr permits
     Expr.MapLiteral,
     Expr.Null,
     Expr.PropGet, Expr.PropIncrDecr, Expr.PropSet,
+    Expr.RuleSet,
     Expr.Super,
     Expr.This, Expr.Ternary, Expr.True,
     Expr.Unary,
@@ -203,6 +204,15 @@ public sealed interface Expr permits
      */
     record PropSet(Expr object, Token name, Token op, Expr value) implements Expr {
         public Span location() { return op.span(); }
+    }
+
+    /**
+     * A `ruleset` expression, containing a Nero rule set's AST.
+     * @param keyword The `ruleset` keyword
+     * @param ruleSet The rule set as parsed
+     */
+    record RuleSet(Token keyword, ASTRuleSet ruleSet) implements Expr {
+        public Span location() { return keyword.span(); }
     }
 
     /**

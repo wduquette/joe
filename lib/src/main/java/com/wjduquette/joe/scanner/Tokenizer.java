@@ -40,6 +40,7 @@ public class Tokenizer {
         reserved("null",     NULL);
         reserved("record",   RECORD);
         reserved("return",   RETURN);
+        reserved("ruleset",  RULESET);
         reserved("static",   STATIC);
         reserved("super",    SUPER);
         reserved("switch",   SWITCH);

@@ -384,6 +384,8 @@ public class Dumper {
                     .append(" of\n");
                 dumpExpression(e.object());
             }
+            case Expr.RuleSet e ->
+                buff.append(e.ruleSet()).append("\n");
             case Expr.Super e ->
                 buff.append(e.method().lexeme()).append("\n");
             case Expr.Ternary e -> {

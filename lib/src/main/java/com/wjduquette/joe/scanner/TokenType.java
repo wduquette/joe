@@ -37,7 +37,7 @@ public enum TokenType {
     LET,
     MATCH, METHOD,
     NI, NOT, NULL,
-    RECORD, RETURN,
+    RECORD, RETURN, RULESET,
     STATIC, SUPER, SWITCH,
     THIS, THROW, TRUE,
     VAR,

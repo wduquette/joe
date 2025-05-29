@@ -43,7 +43,7 @@ public class Joe {
             "assert", "break", "case", "class", "continue", "default",
             "else", "extends", "false", "for", "foreach", "function",
             "if", "in", "let", "match", "method", "ni", "not", "null",
-            "record", "return", "static", "super", "switch",
+            "record", "return", "ruleset", "static", "super", "switch",
             "this", "throw", "true",
             "var", "where", "while"
         );

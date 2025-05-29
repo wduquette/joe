@@ -725,6 +725,10 @@ class Interpreter {
                 instance.set(name, right);
                 yield right;
             }
+            // Evaluate the rule set.
+            case Expr.RuleSet ignored ->
+                throw new JoeError("ruleset is not yet supported.");
+
             // Handle `super.<methodName>` in methods
             case Expr.Super expr -> {
                 int distance = locals.get(expr);
