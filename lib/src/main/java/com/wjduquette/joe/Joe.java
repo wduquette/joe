@@ -340,24 +340,6 @@ public class Joe {
     }
 
     /**
-     * Compiles the given file and returns a compilation dump.
-     * @param scriptPath The file's path
-     * @return The dump's result
-     * @throws IOException if the file cannot be read.
-     * @throws SyntaxError if the script could not be compiled.
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    public Object dumpFile(String scriptPath)
-        throws IOException, SyntaxError
-    {
-        var path = Paths.get(scriptPath);
-        byte[] bytes = Files.readAllBytes(path);
-        var script = new String(bytes, Charset.defaultCharset());
-
-        return dump(path.getFileName().toString(), script);
-    }
-
-    /**
      * Compiles the script, throwing an appropriate error on failure, and
      * returns a compilation dump.
      * The filename is usually the bare file name of the script file,
