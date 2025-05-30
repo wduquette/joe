@@ -1,5 +1,6 @@
 package com.wjduquette.joe.parser;
 
+import com.wjduquette.joe.patterns.Pattern;
 import com.wjduquette.joe.scanner.Token;
 
 import java.util.List;
@@ -65,7 +66,7 @@ public class ASTDumper {
                 .dump("body", s.body());
             case Stmt.ForEachBind s -> buffer().nl()
                 // TODO break down
-                .indent("pattern: " + s.pattern())
+                .dump("pattern",s.pattern())
                 .dump("items", s.items())
                 .dump("body", s.body());
             case Stmt.Function s -> buffer()
@@ -84,7 +85,7 @@ public class ASTDumper {
             }
             case Stmt.IfLet s -> {
                 var buff = buffer().nl()
-                    .indent("pattern: " + s.pattern())
+                    .dump("pattern", s.pattern())
                     .dump("target", s.target())
                     .dump("then", s.thenBranch());
                 if (s.elseBranch() != null) {
@@ -131,7 +132,7 @@ public class ASTDumper {
                 .println(" '" + s.name().lexeme() + "'")
                 .dump(s.value());
             case Stmt.VarPattern s -> buffer().nl()
-                .indent("pattern: " + s.pattern())
+                .dump("pattern",s.pattern())
                 .dump("target", s.target());
             case Stmt.While s -> buffer.nl()
                 .dump("cond", s.condition())
@@ -145,7 +146,7 @@ public class ASTDumper {
     public static String dump(Stmt.MatchCase stmt) {
         var buff = new Buffer();
         buff.print("Stmt." + stmt.getClass().getSimpleName()).nl()
-            .indent("pattern: " + stmt.pattern());
+            .dump("pattern", stmt.pattern());
         if (stmt.guard() != null) buff.dump("guard", stmt.guard());
         buff.dump("body", stmt.statement());
         return buff.toString();
@@ -262,6 +263,68 @@ public class ASTDumper {
         return buffer.toString();
     }
 
+    private static String dump(ASTPattern pattern) {
+        var buffer = new Buffer();
+        buffer.println(pattern.getClass().getSimpleName());
+
+        buffer.indent("bindings: " + tokenList(pattern.getBindings()));
+        int i = 0;
+        for (var c : pattern.getConstants()) {
+            buffer.indent("constant[" + i++ + "]: " + dump(c));
+        }
+        buffer.dump("pattern", pattern.getPattern());
+        return buffer.toString();
+    }
+
+    private static String dump(Pattern pattern) {
+        var buffer = new Buffer();
+        buffer.print("Pattern." + pattern.getClass().getSimpleName());
+
+        var content = switch (pattern) {
+            case Pattern.Constant p -> buffer()
+                .println(" '" + p.id() + "'");
+            case Pattern.InstancePattern p -> {
+                var buff = buffer()
+                    .println(" '" + p.typeName() + "'")
+                    .dump(p.fieldMap());
+                yield buff.toString();
+            }
+            case Pattern.ListPattern p -> {
+                var buff = buffer().nl();
+                p.patterns().forEach(buff::dump);
+                yield buff.toString();
+            }
+            case Pattern.MapPattern p -> {
+                var buff = buffer().nl();
+                for (var e : p.patterns().entrySet()) {
+                    buff.dump("key", e.getKey());
+                    buff.dump("val", e.getValue());
+                }
+                yield buff.toString();
+            }
+            case Pattern.PatternBinding p -> buffer()
+                .println(" '" + p.name() + "'")
+                .dump(p.subpattern());
+            case Pattern.RecordPattern p -> {
+                var buff = buffer()
+                    .println(" '" + p.typeName() + "'");
+                for (var sub : p.patterns()) {
+                    buff.dump(sub);
+                }
+                yield buff.toString();
+            }
+            case Pattern.ValueBinding p -> buffer()
+                .println(" '" + p.name() + "'");
+            case Pattern.Wildcard p -> buffer()
+                .println(" '" + p.name() + "'");
+        };
+
+
+        buffer.print(content.toString());
+
+        return buffer.toString();
+    }
+
     private static String tokenList(List<Token> list) {
         return list.stream()
             .map(t -> "'" + t.lexeme() + "'")
@@ -351,6 +414,18 @@ public class ASTDumper {
 
         Buffer dump(Expr value) {
             return indent(ASTDumper.dump(value));
+        }
+
+        Buffer dump(String name, ASTPattern pattern) {
+            return indent(name + ": " + ASTDumper.dump(pattern));
+        }
+
+        Buffer dump(String name, Pattern pattern) {
+            return indent(name + ": " + ASTDumper.dump(pattern));
+        }
+
+        Buffer dump(Pattern pattern) {
+            return indent(ASTDumper.dump(pattern));
         }
 
         /**
