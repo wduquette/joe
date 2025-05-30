@@ -45,8 +45,7 @@ public class Parser {
         }
 
         // NEXT, produce the dump
-        var dumper = new Dumper();
-        return dumper.dump(statements);
+        return ASTDumper.dump(statements);
     }
 
     /**
