@@ -65,7 +65,6 @@ public class ASTDumper {
                 .dump("items", s.items())
                 .dump("body", s.body());
             case Stmt.ForEachBind s -> buffer().nl()
-                // TODO break down
                 .dump("pattern",s.pattern())
                 .dump("items", s.items())
                 .dump("body", s.body());
@@ -233,8 +232,7 @@ public class ASTDumper {
                 .dump("object", e.object())
                 .dump("value", e.value());
             case Expr.RuleSet e -> buffer().nl()
-                // TODO: Breakdown
-                .indent(e.ruleSet().toString());
+                .dump(e.ruleSet());
             case Expr.Super e -> buffer()
                 .println(" '" + e.method().lexeme() + "'");
             case Expr.Ternary e -> buffer().nl()
@@ -323,6 +321,46 @@ public class ASTDumper {
         buffer.print(content.toString());
 
         return buffer.toString();
+    }
+
+    private static String dump(ASTRuleSet ruleset) {
+        var buff = new Buffer();
+        buff.println(ruleset.getClass().getSimpleName());
+
+        for (var fact : ruleset.facts()) {
+            buff.indent("fact: " + dump(fact));
+        }
+
+        for (var rule : ruleset.rules()) {
+            buff.indent("rule: " + dump(rule));
+        }
+
+        return buff.toString();
+    }
+
+    private static String dump(ASTRuleSet.ASTIndexedAtom atom) {
+        return atom.toString();
+    }
+
+    private static String dump(ASTRuleSet.ASTRule rule) {
+        var buff = new Buffer();
+        buff.print(rule.getClass().getSimpleName())
+            .print(" ")
+            .println(rule.head().toString());
+
+        for (var atom : rule.body()) {
+            buff.indent("body: " + atom.toString());
+        }
+
+        for (var atom : rule.negations()) {
+            buff.indent("not: " + atom.toString());
+        }
+
+        for (var constraint : rule.constraints()) {
+            buff.indent("where: " + constraint.toString());
+        }
+
+        return buff.toString();
     }
 
     private static String tokenList(List<Token> list) {
@@ -426,6 +464,10 @@ public class ASTDumper {
 
         Buffer dump(Pattern pattern) {
             return indent(ASTDumper.dump(pattern));
+        }
+
+        Buffer dump(ASTRuleSet ruleset) {
+            return indent(ASTDumper.dump(ruleset));
         }
 
         /**
