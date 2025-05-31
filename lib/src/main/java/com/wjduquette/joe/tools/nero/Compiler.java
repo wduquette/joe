@@ -9,6 +9,8 @@ import com.wjduquette.joe.parser.Parser;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Compiles a Nero {@link com.wjduquette.joe.nero.RuleSet} from source.
@@ -39,12 +41,12 @@ public class Compiler {
     public RuleSet compile() {
         var ast = parse();
 
-        var ruleset = new RuleSet();
+        Set<Fact> facts = ast.facts().stream().map(this::ast2fact)
+            .collect(Collectors.toSet());
+        Set<Rule> rules = ast.rules().stream().map(this::ast2rule)
+            .collect(Collectors.toSet());
 
-        for (var f : ast.facts()) ruleset.add(ast2fact(f));
-        for (var r : ast.rules()) ruleset.add(ast2rule(r));
-
-        return ruleset;
+        return new RuleSet(facts, rules);
     }
 
     public ASTRuleSet parse() {

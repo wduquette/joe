@@ -43,10 +43,10 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
 
         var buff = new StringBuilder();
         buff.append("ruleset {\n");
-        for (var fact : rsv.ruleset().getFacts()) {
+        for (var fact : rsv.ruleset().facts()) {
             buff.append("    ").append(fact).append(";\n");
         }
-        for (var rule : rsv.ruleset().getRules()) {
+        for (var rule : rsv.ruleset().rules()) {
             buff.append("    ").append(rule).append("\n");
         }
         buff.append("}");

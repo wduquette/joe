@@ -26,12 +26,10 @@ public class Nero {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    private final RuleSet ruleset;
+
     // Map from head relation to rules with that head.
     private final Map<String,List<Rule>> ruleMap = new HashMap<>();
-
-    // Head relations by stratum.
-    private final boolean isStratified;
-    private final List<List<String>> strata;
 
     // Facts as read from the Nero program.
     private final Set<Fact> baseFacts = new HashSet<>();
@@ -56,29 +54,30 @@ public class Nero {
      * @param ruleset The rule set.
      */
     public Nero(RuleSet ruleset) {
-        // FIRST, analyze the rule set
-        var graph = new Stratifier(ruleset.getRules());
-        this.isStratified = graph.isStratified();
-
-        this.strata = isStratified ? graph.strata() : null;
-
-        if (debug) System.out.println("Rule Strata: " + strata);
+        this.ruleset = ruleset;
 
         // NEXT, Categorize the rules by head relation
-        for (var rule : ruleset.getRules()) {
+        for (var rule : ruleset.rules()) {
             var head = rule.head().relation();
             var list = ruleMap.computeIfAbsent(head, k -> new ArrayList<>());
             list.add(rule);
         }
 
         // NEXT, save the base facts.
-        this.baseFacts.addAll(ruleset.getFacts());
+        this.baseFacts.addAll(ruleset.facts());
         baseFacts.forEach(this::addFact);
     }
 
     //-------------------------------------------------------------------------
-    // Configuration
+    // Public API
 
+    /**
+     * Gets whether the provided rule set is stratified or not.
+     * @return true or false
+     */
+    public boolean isStratified() {
+        return ruleset.isStratified();
+    }
 
     /**
      * Gets whether debugging is enabled or not.
@@ -117,14 +116,6 @@ public class Nero {
     @SuppressWarnings("unused")
     public void setFactFactory(FactFactory factFactory) {
         this.factFactory = factFactory;
-    }
-
-    /**
-     * Gets whether the rule set can be stratified or not.
-     * @return true or false.
-     */
-    public boolean isStratified() {
-        return isStratified;
     }
 
     /**
@@ -188,16 +179,21 @@ public class Nero {
      * @throws JoeError if the rule set is not stratified.
      */
     public void infer() {
-        if (!isStratified) {
+        if (!ruleset.isStratified()) {
             throw new JoeError("Rule set is not stratified.");
+        }
+
+        if (debug) {
+            System.out.println("Rule Strata: " +
+                ruleset.getStrata());
         }
 
         knownFacts.clear();
         factMap.clear();
         baseFacts.forEach(this::addFact);
 
-        for (var i = 0; i < strata.size(); i++) {
-            infer(i, strata.get(i));
+        for (var i = 0; i < ruleset.getStrata().size(); i++) {
+            infer(i, ruleset.getStrata().get(i));
         }
     }
 
