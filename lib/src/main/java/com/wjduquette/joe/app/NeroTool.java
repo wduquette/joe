@@ -1,10 +1,9 @@
-package com.wjduquette.joe.tools.nero;
+package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
-import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.nero.Nero;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.RuleSetCompiler;
