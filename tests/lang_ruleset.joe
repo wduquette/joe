@@ -1,0 +1,14 @@
+// lang_ruleset.joe
+//
+// The purpose of this test suite is to look for semantic errors, found on
+// rule set creation, e.g., undefined fact types.  The `type.joe.RuleSet.joe`
+// test suite tests the behavior of the `RuleSet` object once created.
+
+function testValid() {
+    var rules = ruleset {
+        Parent(#walker, #bert);
+        Parent(#bert, #clark);
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+}
