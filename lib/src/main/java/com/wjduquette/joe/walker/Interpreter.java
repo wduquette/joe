@@ -823,6 +823,9 @@ class Interpreter {
 
     //-------------------------------------------------------------------------
     // RuleSet evaluation
+    //
+    // TODO: Much of this code is shared identically with clark.Compiler.
+    // Consider how to remove the duplication.
 
     private RuleSetValue evaluateRuleSet(Expr.RuleSet expr) {
         var ast = expr.ruleSet();
