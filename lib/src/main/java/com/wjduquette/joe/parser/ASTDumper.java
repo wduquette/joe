@@ -338,7 +338,7 @@ public class ASTDumper {
         return buff.toString();
     }
 
-    private static String dump(ASTRuleSet.ASTIndexedAtom atom) {
+    private static String dump(ASTRuleSet.ASTOrderedAtom atom) {
         return atom.toString();
     }
 

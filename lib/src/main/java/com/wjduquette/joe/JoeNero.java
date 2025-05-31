@@ -2,6 +2,7 @@ package com.wjduquette.joe;
 
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.Nero;
+import com.wjduquette.joe.types.FactValue;
 import com.wjduquette.joe.types.RuleSetValue;
 
 import java.util.Set;
@@ -38,6 +39,7 @@ public class JoeNero {
      */
     public Set<Fact> infer() {
         var nero = new Nero(rsv.ruleset());
+        nero.setFactFactory(FactValue::new);
         nero.infer();
         return nero.getAllFacts();
     }

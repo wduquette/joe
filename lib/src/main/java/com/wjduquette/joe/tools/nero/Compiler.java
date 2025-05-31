@@ -65,7 +65,7 @@ public class Compiler {
     //-------------------------------------------------------------------------
     // Compilation
 
-    private ConcreteFact ast2fact(ASTRuleSet.ASTIndexedAtom atom) {
+    private Fact ast2fact(ASTRuleSet.ASTOrderedAtom atom) {
         var terms = new ArrayList<>();
         for (var t : atom.terms()) {
             if (t instanceof ASTRuleSet.ASTConstant c) {
@@ -88,7 +88,7 @@ public class Compiler {
         );
     }
 
-    private HeadAtom ast2head(ASTRuleSet.ASTIndexedAtom atom) {
+    private HeadAtom ast2head(ASTRuleSet.ASTOrderedAtom atom) {
         return new HeadAtom(
             atom.relation().lexeme(),
             atom.terms().stream().map(this::ast2term).toList()
@@ -97,7 +97,7 @@ public class Compiler {
 
     private BodyAtom ast2body(ASTRuleSet.ASTAtom atom) {
         return switch (atom) {
-            case ASTRuleSet.ASTIndexedAtom a -> new OrderedAtom(
+            case ASTRuleSet.ASTOrderedAtom a -> new OrderedAtom(
                 a.relation().lexeme(),
                 a.terms().stream().map(this::ast2term).toList()
             );

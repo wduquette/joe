@@ -561,6 +561,16 @@ public class Joe {
     }
 
     /**
+     * Quotes a Java string, escaping any special characters it contains.
+     * @param string The string
+     * @return The quoted string.
+     */
+    @SuppressWarnings("unused")
+    public static String quote(String string) {
+        return "\"" + escape(string) + "\"";
+    }
+
+    /**
      * Returns true if the object is "truthy", i.e., boolean {@code true} or
      * non-null, and false otherwise.
      * @param value The value

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * A ProxyType for the FactValue type.
  */
-public class FactType extends ProxyType<Fact> {
+public class FactType extends ProxyType<FactValue> {
     /** The type, ready for installation. */
     public static final FactType TYPE = new FactType();
 
@@ -34,7 +34,7 @@ public class FactType extends ProxyType<Fact> {
         // Facts as input and produces Facts as output by default.
         //
         // A Fact's fields have names `f0`, `f1`, ....
-        proxies(Fact.class);
+        proxies(FactValue.class);
 
         staticMethod("of",  this::_of);
 

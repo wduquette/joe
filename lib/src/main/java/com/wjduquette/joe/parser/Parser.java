@@ -1116,7 +1116,7 @@ public class Parser {
      */
     public Expr.RuleSet ruleset() {
         var keyword = scanner.previous();
-        var facts = new ArrayList<ASTRuleSet.ASTIndexedAtom>();
+        var facts = new ArrayList<ASTRuleSet.ASTOrderedAtom>();
         var rules = new ArrayList<ASTRuleSet.ASTRule>();
 
         scanner.consume(LEFT_BRACE, "expected '{' after 'ruleset'.");
@@ -1153,7 +1153,7 @@ public class Parser {
         this.scanner = new Scanner(source, this::errorInScanner);
         scanner.prime();
 
-        List<ASTRuleSet.ASTIndexedAtom> facts = new ArrayList<>();
+        List<ASTRuleSet.ASTOrderedAtom> facts = new ArrayList<>();
         List<ASTRuleSet.ASTRule> rules = new ArrayList<>();
 
         while (!scanner.isAtEnd()) {
@@ -1177,7 +1177,7 @@ public class Parser {
         return new ASTRuleSet(facts, rules);
     }
 
-    private ASTRuleSet.ASTIndexedAtom head() {
+    private ASTRuleSet.ASTOrderedAtom head() {
         // NEXT, parse the atom.
         scanner.consume(IDENTIFIER, "expected relation.");
         var relation = scanner.previous();
@@ -1185,7 +1185,7 @@ public class Parser {
         return indexedAtom(relation);
     }
 
-    private ASTRuleSet.ASTIndexedAtom fact(ASTRuleSet.ASTIndexedAtom head) {
+    private ASTRuleSet.ASTOrderedAtom fact(ASTRuleSet.ASTOrderedAtom head) {
         // Verify that there are no non-constant terms.
         for (var term : head.terms()) {
             if (!(term instanceof ASTRuleSet.ASTConstant)) {
@@ -1195,7 +1195,7 @@ public class Parser {
         return head;
     }
 
-    private ASTRuleSet.ASTRule rule(ASTRuleSet.ASTIndexedAtom head) {
+    private ASTRuleSet.ASTRule rule(ASTRuleSet.ASTOrderedAtom head) {
         var body = new ArrayList<ASTRuleSet.ASTAtom>();
         var negations = new ArrayList<ASTRuleSet.ASTAtom>();
         var constraints = new ArrayList<ASTRuleSet.ASTConstraint>();
@@ -1297,7 +1297,7 @@ public class Parser {
         }
     }
 
-    private ASTRuleSet.ASTIndexedAtom indexedAtom(Token relation) {
+    private ASTRuleSet.ASTOrderedAtom indexedAtom(Token relation) {
         var terms = new ArrayList<ASTRuleSet.ASTTerm>();
 
         do {
@@ -1306,7 +1306,7 @@ public class Parser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new ASTRuleSet.ASTIndexedAtom(relation, terms);
+        return new ASTRuleSet.ASTOrderedAtom(relation, terms);
     }
 
     private ASTRuleSet.ASTNamedAtom namedAtom(Token relation) {
