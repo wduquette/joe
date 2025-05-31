@@ -63,7 +63,7 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
     // Returns a set of the known facts, both base and inferred.
     private Object _infer(RuleSetValue value, Joe joe, Args args) {
         args.exactArity(0, "infer()");
-        throw new UnsupportedOperationException("infer is not yet supported.");
+        return value.infer();
     }
 
     //**

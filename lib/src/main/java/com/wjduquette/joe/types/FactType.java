@@ -4,6 +4,7 @@ import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.ProxyType;
+import com.wjduquette.joe.nero.Fact;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * A ProxyType for the FactValue type.
  */
-public class FactType extends ProxyType<FactValue> {
+public class FactType extends ProxyType<Fact> {
     /** The type, ready for installation. */
     public static final FactType TYPE = new FactType();
 
@@ -33,7 +34,7 @@ public class FactType extends ProxyType<FactValue> {
         // Facts as input and produces Facts as output by default.
         //
         // A Fact's fields have names `f0`, `f1`, ....
-        proxies(FactValue.class);
+        proxies(Fact.class);
 
         staticMethod("of",  this::_of);
 
@@ -143,6 +144,7 @@ public class FactType extends ProxyType<FactValue> {
     // @static of
     // @args relation, fields...
     // Creates a new `Fact` given the relation and one or more field values.
+    // The `Fact` will be an instance of the Java `FactValue` class.
     private Object _of(Joe joe, Args args) {
         args.minArity(2, "Fact.of(relation, field, ...)");
         var relation = joe.toString(args.next());
@@ -157,6 +159,7 @@ public class FactType extends ProxyType<FactValue> {
     // @init
     // @args relation, fields
     // Creates a new `Fact` given the relation and a list of field values.
+    // The `Fact` will be an instance of the Java `FactValue` class.
     private Object _init(Joe joe, Args args) {
         args.exactArity(2, "Fact(relation, fields)");
         var relation = joe.toString(args.next());
@@ -171,7 +174,7 @@ public class FactType extends ProxyType<FactValue> {
     // @method fields
     // @result List
     // Returns a list of the field values.
-    private Object _fields(FactValue value, Joe joe, Args args) {
+    private Object _fields(Fact value, Joe joe, Args args) {
         args.exactArity(0, "fields()");
         return new ListValue(value.fields());
     }
@@ -180,7 +183,7 @@ public class FactType extends ProxyType<FactValue> {
     // @method relation
     // @result String
     // Returns the Fact's relation name.
-    private Object _relation(FactValue value, Joe joe, Args args) {
+    private Object _relation(Fact value, Joe joe, Args args) {
         args.exactArity(0, "relation()");
         return value.relation();
     }
@@ -189,7 +192,7 @@ public class FactType extends ProxyType<FactValue> {
     // @method toString
     // @result String
     // Returns the value's string representation.
-    private Object _toString(FactValue value, Joe joe, Args args) {
+    private Object _toString(Fact value, Joe joe, Args args) {
         args.exactArity(0, "toString()");
         return stringify(joe, value);
     }
