@@ -28,6 +28,7 @@ class StandardLibrary extends JoePackage {
         type(ListType.TYPE);
         type(MapType.TYPE);
         type(NumberType.TYPE);
+        type(RuleSetType.TYPE);
         type(SetType.TYPE);
         type(StringType.TYPE);
         type(TextBuilderClass.TYPE);
