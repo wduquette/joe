@@ -98,7 +98,7 @@ public class ASTDumper {
                 for (var c : s.cases()) {
                     buff.indent(dump(c));
                 }
-                buff.dump("default", s.matchDefault().statement());
+                buff.dump("default", s.matchDefault());
                 yield buff.toString();
             }
             case Stmt.Record s -> {

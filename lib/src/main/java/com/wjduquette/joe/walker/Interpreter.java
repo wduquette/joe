@@ -290,7 +290,7 @@ class Interpreter {
 
                 // Default case; always the last
                 if (stmt.matchDefault() != null) {
-                    return execute(stmt.matchDefault().statement());
+                    return execute(stmt.matchDefault());
                 }
 
                 // No case matched

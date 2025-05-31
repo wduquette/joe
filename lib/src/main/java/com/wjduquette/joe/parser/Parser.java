@@ -539,12 +539,10 @@ public class Parser {
         }
 
         // NEXT, parse the default case, if it exists
-        Stmt.MatchCase defCase = null;
+        Stmt defCase = null;
         if (scanner.match(DEFAULT)) {
-            var caseKeyword = scanner.previous();
             scanner.consume(MINUS_GREATER, "Expected '->' after 'default'.");
-            var stmt = statement();
-            defCase = new Stmt.MatchCase(caseKeyword, null, null, stmt);
+            defCase = statement();
         }
 
         // NEXT, complete the statement

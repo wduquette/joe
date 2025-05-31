@@ -572,8 +572,7 @@ class Compiler {
                 patchJump(next1_);            // m | ∅        ; next1:
                 patchJump(next2_);            // m | ∅        ; next2:
                 if (s.matchDefault() != null) {
-                    emit(s.matchDefault()     // m | ∅        ; compile default
-                        .statement());
+                    emit(s.matchDefault());   // m | ∅        ; compile default
                 }
 
                 // End Of Statement

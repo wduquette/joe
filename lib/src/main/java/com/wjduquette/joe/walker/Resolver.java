@@ -192,7 +192,7 @@ class Resolver {
                     endScope();
                 }
                 if (stmt.matchDefault() != null) {
-                    resolve(stmt.matchDefault().statement());
+                    resolve(stmt.matchDefault());
                 }
             }
             case Stmt.Record stmt -> {
