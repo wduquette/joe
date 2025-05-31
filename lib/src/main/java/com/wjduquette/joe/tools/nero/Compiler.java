@@ -95,7 +95,7 @@ public class Compiler {
 
     private BodyAtom ast2body(ASTRuleSet.ASTAtom atom) {
         return switch (atom) {
-            case ASTRuleSet.ASTIndexedAtom a -> new IndexedAtom(
+            case ASTRuleSet.ASTIndexedAtom a -> new OrderedAtom(
                 a.relation().lexeme(),
                 a.terms().stream().map(this::ast2term).toList()
             );

@@ -16,7 +16,7 @@ public record FactValue(String relation, List<Object> fields)
     implements Fact
 {
     @Override
-    public boolean isIndexed() {
+    public boolean hasOrderedFields() {
         return true;
     }
 
