@@ -13,11 +13,17 @@
   - Merged `let`'s capability into `var`, and removed `let`.
     - `var` can now do destructuring binds while still handling simple variable
       declarations efficiently.
+  - `foreach` can now do a destructuring bind on each item in the collection.
+- Extensibility
+  - Simplified implementation of proxy types for native record types.
+    - Any `ProxyType` can now easily define read-only fields for its proxied
+      values.
 - Tools
   - Revised `joe dump` to output one or all of the following:
     - The script's byte-code (the default)
     - The script's Abstract Syntax Tree (AST)
     - The script's legacy Bert byte-code
+  - Revised the AST dump format for readability and easy maintenance.
 
 ## Changes in 0.6.0 (28 March 2025) 
 
