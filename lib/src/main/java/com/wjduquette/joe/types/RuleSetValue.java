@@ -22,4 +22,12 @@ public record RuleSetValue(RuleSet ruleset) {
         var nero = new JoeNero(this);
         return nero.infer();
     }
+
+    /**
+     * Gets whether the rule set is stratified or not.
+     * @return true or false.
+     */
+    public boolean isStratified() {
+        return ruleset.isStratified();
+    }
 }

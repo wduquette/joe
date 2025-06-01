@@ -29,8 +29,9 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
         // base facts, and any input facts provided by the script.
         proxies(RuleSetValue.class);
 
-        method("infer",     this::_infer);
-        method("toString",  this::_toString);
+        method("infer",        this::_infer);
+        method("isStratified", this::_isStratified);
+        method("toString",     this::_toString);
     }
 
     //-------------------------------------------------------------------------
@@ -63,7 +64,16 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
     // Returns a set of the known facts, both base and inferred.
     private Object _infer(RuleSetValue value, Joe joe, Args args) {
         args.exactArity(0, "infer()");
-        return value.infer();
+        return new SetValue(value.infer());
+    }
+
+    //**
+    // @method isStratified
+    // @result Boolean
+    // Returns the value's string representation.
+    private Object _isStratified(RuleSetValue value, Joe joe, Args args) {
+        args.exactArity(0, "isStratified()");
+        return value.isStratified();
     }
 
     //**

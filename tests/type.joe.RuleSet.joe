@@ -1,0 +1,46 @@
+// type.joe.RuleSet.joe
+//
+// This script tests the behavior of RuleSet objects once created.
+// Errors found during creation are tested by lang_ruleset.joe.
+
+function testIsStratified_true() {
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+    check(rules.isStratified()).eq(true);
+}
+
+function testIsStratified_false() {
+    var rules = ruleset {
+        A(x) :- B(x), not C(x);
+        C(x) :- A(x);
+    };
+    check(rules.isStratified()).eq(false);
+}
+
+function testInfer_good_noScriptedFacts() {
+    var rules = ruleset {
+        Parent(#anne, #bert);
+        Parent(#bert, #clark);
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+    var results = rules.infer().map(Joe.stringify).sorted();
+    check(results).eq([
+        "Fact(Ancestor, #anne, #bert)",
+        "Fact(Ancestor, #anne, #clark)",
+        "Fact(Ancestor, #bert, #clark)",
+        "Fact(Parent, #anne, #bert)",
+        "Fact(Parent, #bert, #clark)"
+    ]);
+}
+
+function testInfer_bad_notStratified() {
+    var rules = ruleset {
+        A(x) :- B(x), not C(x);
+        C(x) :- A(x);
+    };
+    assertError(\-> rules.infer(),
+        "Rule set is not stratified.");
+}
