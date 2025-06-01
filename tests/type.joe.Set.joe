@@ -44,11 +44,22 @@ function testCopy() {
     check(set2 == set).isFalse();
 }
 
+function testFilter() {
+    var set = Set(1, 2, 3, 4, 5);
+    var filtered = set.filter(\x -> x > 3);
+    check(filtered).eq(Set(4, 5));
+}
+
 function testIsEmpty() {
     check(Set().isEmpty()).isTrue();
     check(Set(#a).isEmpty()).isFalse();
 }
 
+function testMap() {
+    var set = Set(1, 2, 3);
+    var filtered = set.map(Joe.stringify);
+    check(filtered).eq(Set("1", "2", "3"));
+}
 
 function testRemove() {
     var set = Set(#a, #b, #c);
@@ -67,6 +78,25 @@ function testRemoveAll() {
 function testSize() {
     check(Set().size()).eq(0);
     check(Set(#a, #b).size()).eq(2);
+}
+
+function testSorted_string() {
+    var list = Set("b", "c", "a", "d").sorted();
+    check(list).eq(["a", "b", "c", "d"]);
+}
+
+function testSorted_nonString_noComparator() {
+    assertError(\ -> Set(#a, #b).sorted(),
+        "Expected two strings or two numbers.");
+}
+
+function testSorted_nonString_comparator() {
+    function comp(a, b) {
+        return Joe.compare(Joe.stringify(a), Joe.stringify(b));
+    }
+
+    var list = Set(#a, #b, #c, #d).sorted(comp);
+    check(list).eq([#a, #b, #c, #d]);
 }
 
 function testToString() {

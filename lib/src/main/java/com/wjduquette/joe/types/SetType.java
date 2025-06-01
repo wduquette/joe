@@ -132,35 +132,18 @@ public class SetType extends ProxyType<JoeSet> {
     //**
     // @method filter
     // @args predicate
-    // @result List
+    // @result Set
     // Returns a list containing the elements for which the filter
     // *predicate* is true.
     private Object _filter(JoeSet set, Joe joe, Args args) {
         args.exactArity(1, "filter(predicate)");
         var callable = args.next();
 
-        var result = new ListValue();
+        var result = new SetValue();
         for (var item : set) {
             if (Joe.isTruthy(joe.call(callable, item))) {
                 result.add(item);
             }
-        }
-        return result;
-    }
-
-    //**
-    // @method map
-    // @args func
-    // @result List
-    // Returns a list containing the items that result from applying
-    // function *func* to each item in this set.
-    private Object _map(JoeSet set, Joe joe, Args args) {
-        args.exactArity(1, "map(func)");
-        var callable = args.next();
-
-        var result = new ListValue();
-        for (var item : set) {
-            result.add(joe.call(callable, item));
         }
         return result;
     }
@@ -174,6 +157,24 @@ public class SetType extends ProxyType<JoeSet> {
 
         return set.isEmpty();
     }
+
+    //**
+    // @method map
+    // @args func
+    // @result Set
+    // Returns a set containing the items that result from applying
+    // function *func* to each item in this set.
+    private Object _map(JoeSet set, Joe joe, Args args) {
+        args.exactArity(1, "map(func)");
+        var callable = args.next();
+
+        var result = new SetValue();
+        for (var item : set) {
+            result.add(joe.call(callable, item));
+        }
+        return result;
+    }
+
 
     //**
     // @method remove
