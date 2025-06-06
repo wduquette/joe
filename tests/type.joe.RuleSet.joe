@@ -53,6 +53,26 @@ function testInfer_noScriptedFacts() {
     ]);
 }
 
+
+// RuleSet::infer(inputs) should throw an error if an input fact's type
+// name matches that of a head relation.
+function testInfer_headCollision() {
+    record Ancestor(a, d) {}
+
+    var inputs = [
+        Ancestor(#jacob, #moses)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+
+    assertError(\-> rules.infer(inputs),
+        "Input fact type collides with rule set's head relation: 'Ancestor'.");
+}
+
+
 // RuleSet::infer(inputs) should throw an error if a provided
 // input fact has no fields.
 function testInfer_noFields() {

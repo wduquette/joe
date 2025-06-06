@@ -1,6 +1,7 @@
 package com.wjduquette.joe.nero;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -56,5 +57,16 @@ public class RuleSet {
 
     public Set<Rule> rules() {
         return Collections.unmodifiableSet(rules);
+    }
+
+    /**
+     * Gets the set of relation names inferred by the rule set.
+     * @return The set
+     */
+    public Set<String> getHeadRelations() {
+        var set = new HashSet<String>();
+        facts.stream().map(Fact::relation).forEach(set::add);
+        rules.stream().map(r -> r.head().relation()).forEach(set::add);
+        return set;
     }
 }

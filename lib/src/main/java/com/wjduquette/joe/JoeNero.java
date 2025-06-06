@@ -56,10 +56,18 @@ public class JoeNero {
         // FIRST, Build the list of input facts, wrapping values of proxied
         // types as TypedValues so that they can be used as Facts
         // by Nero.
+        var heads = rsv.ruleset().getHeadRelations();
         var inputFacts = new HashSet<Fact>();
 
         for (var input : inputs) {
             // Throws JoeError if the input is not a valid NeroFact.
+            var fact = asNeroFact(input);
+
+            if (heads.contains(fact.relation())) {
+                throw new JoeError(
+                    "Input fact type collides with rule set's head relation: '" +
+                    fact.relation() + "'.");
+            }
             inputFacts.add(asNeroFact(input));
         }
 
