@@ -180,11 +180,11 @@ and a list of field values.  A Nero <code>ruleset</code> will accept
 Facts as input and produces Facts as output by default.</p>
 <p><strong><a href="#statics">Static Methods</a></strong></p>
 <ul>
-<li><a href="type.joe.Fact.html#static.of">Fact.of(<em>relation</em>, <em>fields</em>...)</a></li>
+<li><a href="type.joe.Fact.html#static.of">Fact.of(<em>relation</em>, <em>fields</em>)</a></li>
 </ul>
 <p><strong><a href="#init">Initializer</a></strong></p>
 <ul>
-<li><a href="type.joe.Fact.html#init">Fact(<em>relation</em>, <em>fields</em>)</a> → <a href="type.joe.Fact.html">Fact</a></li>
+<li><a href="type.joe.Fact.html#init">Fact(<em>relation</em>, <em>field</em>, ...)</a> → <a href="type.joe.Fact.html">Fact</a></li>
 </ul>
 <p><strong><a href="#methods">Methods</a></strong></p>
 <ul>
@@ -198,14 +198,16 @@ Facts as input and produces Facts as output by default.</p>
 <p><span id="static.of"> </span></p>
 <h3 id="factof"><a class="header" href="#factof">Fact.of()</a></h3>
 <hr />
-<p><strong>Fact.of(<em>relation</em>, <em>fields</em>...)</strong></p>
-<p>Creates a new <code>Fact</code> given the relation and one or more field values.
-The <code>Fact</code> will be an instance of the Java <code>FactValue</code> class.</p>
+<p><strong>Fact.of(<em>relation</em>, <em>fields</em>)</strong></p>
+<p>Creates a new <code>Fact</code> given the relation and a list of
+field values. The <code>Fact</code> will be an instance of the Java
+<code>FactValue</code> class.</p>
 <h2 id="init"><a class="header" href="#init">Fact Initializer</a></h2>
 <hr />
-<p><strong>Fact(<em>relation</em>, <em>fields</em>) → <a href="type.joe.Fact.html">Fact</a></strong></p>
-<p>Creates a new <code>Fact</code> given the relation and a list of field values.
-The <code>Fact</code> will be an instance of the Java <code>FactValue</code> class.</p>
+<p><strong>Fact(<em>relation</em>, <em>field</em>, ...) → <a href="type.joe.Fact.html">Fact</a></strong></p>
+<p>Creates a new <code>Fact</code> given the relation and one or more the
+field values. The <code>Fact</code> will be an instance of the Java
+<code>FactValue</code> class.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
 <p><span id="method.fields"> </span></p>

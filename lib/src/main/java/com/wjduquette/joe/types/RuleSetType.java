@@ -64,6 +64,15 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
     // @result Set
     // Returns a set of known facts, both input and inferred, given
     // the rule set and any provided *inputs*.
+    //
+    // **NOTE:** By default, a rule set cannot infer facts of the same
+    // types as the given *inputs*: `infer(inputs)` throws an error
+    // if any input fact's type name is the same as a relation used in
+    // one of the rule set's rule heads or axioms.
+    //
+    // However, an `export` declaration can achieve the same effect.
+    // See the Nero tutorial for details.
+
     private Object _infer(RuleSetValue value, Joe joe, Args args) {
         args.arityRange(0, 1, "infer([inputs])");
         if (args.isEmpty()) {

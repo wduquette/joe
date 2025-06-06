@@ -3364,8 +3364,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.Fact.html">Fact</a>
 <ul>
-<li><a href="library/type.joe.Fact.html#static.of">Fact.of(<em>relation</em>, <em>fields</em>...)</a></li>
-<li><a href="library/type.joe.Fact.html#init">Fact(<em>relation</em>, <em>fields</em>)</a> → <a href="library/type.joe.Fact.html">Fact</a></li>
+<li><a href="library/type.joe.Fact.html#static.of">Fact.of(<em>relation</em>, <em>fields</em>)</a></li>
+<li><a href="library/type.joe.Fact.html#init">Fact(<em>relation</em>, <em>field</em>, ...)</a> → <a href="library/type.joe.Fact.html">Fact</a></li>
 <li><a href="library/type.joe.Fact.html#method.fields"><em>fact</em>.fields()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.Fact.html#method.relation"><em>fact</em>.relation()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Fact.html#method.toString"><em>fact</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -3494,7 +3494,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.RuleSet.html">RuleSet</a>
 <ul>
-<li><a href="library/type.joe.RuleSet.html#method.infer"><em>ruleSet</em>.infer()</a> → <a href="library/type.joe.Set.html">Set</a></li>
+<li><a href="library/type.joe.RuleSet.html#method.infer"><em>ruleSet</em>.infer([<em>inputs</em>])</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.isStratified"><em>ruleSet</em>.isStratified()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.toString"><em>ruleSet</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -4185,11 +4185,11 @@ and a list of field values.  A Nero <code>ruleset</code> will accept
 Facts as input and produces Facts as output by default.</p>
 <p><strong><a href="library/type.joe.Fact.html#statics">Static Methods</a></strong></p>
 <ul>
-<li><a href="library/type.joe.Fact.html#static.of">Fact.of(<em>relation</em>, <em>fields</em>...)</a></li>
+<li><a href="library/type.joe.Fact.html#static.of">Fact.of(<em>relation</em>, <em>fields</em>)</a></li>
 </ul>
 <p><strong><a href="library/type.joe.Fact.html#init">Initializer</a></strong></p>
 <ul>
-<li><a href="library/type.joe.Fact.html#init">Fact(<em>relation</em>, <em>fields</em>)</a> → <a href="library/type.joe.Fact.html">Fact</a></li>
+<li><a href="library/type.joe.Fact.html#init">Fact(<em>relation</em>, <em>field</em>, ...)</a> → <a href="library/type.joe.Fact.html">Fact</a></li>
 </ul>
 <p><strong><a href="library/type.joe.Fact.html#methods">Methods</a></strong></p>
 <ul>
@@ -4203,14 +4203,16 @@ Facts as input and produces Facts as output by default.</p>
 <p><span id="static.of"> </span></p>
 <h3 id="factof"><a class="header" href="#factof">Fact.of()</a></h3>
 <hr />
-<p><strong>Fact.of(<em>relation</em>, <em>fields</em>...)</strong></p>
-<p>Creates a new <code>Fact</code> given the relation and one or more field values.
-The <code>Fact</code> will be an instance of the Java <code>FactValue</code> class.</p>
+<p><strong>Fact.of(<em>relation</em>, <em>fields</em>)</strong></p>
+<p>Creates a new <code>Fact</code> given the relation and a list of
+field values. The <code>Fact</code> will be an instance of the Java
+<code>FactValue</code> class.</p>
 <h2 id="init"><a class="header" href="#init">Fact Initializer</a></h2>
 <hr />
-<p><strong>Fact(<em>relation</em>, <em>fields</em>) → <a href="library/type.joe.Fact.html">Fact</a></strong></p>
-<p>Creates a new <code>Fact</code> given the relation and a list of field values.
-The <code>Fact</code> will be an instance of the Java <code>FactValue</code> class.</p>
+<p><strong>Fact(<em>relation</em>, <em>field</em>, ...) → <a href="library/type.joe.Fact.html">Fact</a></strong></p>
+<p>Creates a new <code>Fact</code> given the relation and one or more the
+field values. The <code>Fact</code> will be an instance of the Java
+<code>FactValue</code> class.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
 <p><span id="method.fields"> </span></p>
@@ -4964,7 +4966,7 @@ base facts.  A rule set can infer new facts given its rules,
 base facts, and any input facts provided by the script.</p>
 <p><strong><a href="library/type.joe.RuleSet.html#methods">Methods</a></strong></p>
 <ul>
-<li><a href="library/type.joe.RuleSet.html#method.infer"><em>ruleSet</em>.infer()</a> → <a href="library/type.joe.Set.html">Set</a></li>
+<li><a href="library/type.joe.RuleSet.html#method.infer"><em>ruleSet</em>.infer([<em>inputs</em>])</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.isStratified"><em>ruleSet</em>.isStratified()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.toString"><em>ruleSet</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -4973,8 +4975,15 @@ base facts, and any input facts provided by the script.</p>
 <p><span id="method.infer"> </span></p>
 <h3 id="rulesetinfer"><a class="header" href="#rulesetinfer"><em>ruleSet</em>.infer()</a></h3>
 <hr />
-<p><strong><em>ruleSet</em>.infer() → <a href="library/type.joe.Set.html">Set</a></strong></p>
-<p>Returns a set of the known facts, both base and inferred.</p>
+<p><strong><em>ruleSet</em>.infer([<em>inputs</em>]) → <a href="library/type.joe.Set.html">Set</a></strong></p>
+<p>Returns a set of known facts, both input and inferred, given
+the rule set and any provided <em>inputs</em>.</p>
+<p><strong>NOTE:</strong> By default, a rule set cannot infer facts of the same
+types as the given <em>inputs</em>: <code>infer(inputs)</code> throws an error
+if any input fact's type name is the same as a relation used in
+one of the rule set's rule heads or axioms.</p>
+<p>However, an <code>export</code> declaration can achieve the same effect.
+See the Nero tutorial for details.</p>
 <p><span id="method.isStratified"> </span></p>
 <h3 id="rulesetisstratified"><a class="header" href="#rulesetisstratified"><em>ruleSet</em>.isStratified()</a></h3>
 <hr />
@@ -8429,8 +8438,8 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.Fact.html">Fact</a>
 <ul>
-<li><a href="library/type.joe.Fact.html#static.of">Fact.of(<em>relation</em>, <em>fields</em>...)</a></li>
-<li><a href="library/type.joe.Fact.html#init">Fact(<em>relation</em>, <em>fields</em>)</a> → <a href="library/type.joe.Fact.html">Fact</a></li>
+<li><a href="library/type.joe.Fact.html#static.of">Fact.of(<em>relation</em>, <em>fields</em>)</a></li>
+<li><a href="library/type.joe.Fact.html#init">Fact(<em>relation</em>, <em>field</em>, ...)</a> → <a href="library/type.joe.Fact.html">Fact</a></li>
 <li><a href="library/type.joe.Fact.html#method.fields"><em>fact</em>.fields()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.Fact.html#method.relation"><em>fact</em>.relation()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Fact.html#method.toString"><em>fact</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
@@ -8559,7 +8568,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/type.joe.RuleSet.html">RuleSet</a>
 <ul>
-<li><a href="library/type.joe.RuleSet.html#method.infer"><em>ruleSet</em>.infer()</a> → <a href="library/type.joe.Set.html">Set</a></li>
+<li><a href="library/type.joe.RuleSet.html#method.infer"><em>ruleSet</em>.infer([<em>inputs</em>])</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.isStratified"><em>ruleSet</em>.isStratified()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.toString"><em>ruleSet</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
