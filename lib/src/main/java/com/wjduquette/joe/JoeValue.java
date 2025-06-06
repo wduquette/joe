@@ -124,6 +124,6 @@ public interface JoeValue extends Fact {
      */
     default Map<String, Object> getFieldMap() {
         throw new IllegalStateException(
-            "Fact does not have fields fields!");
+            "Fact does not have fields!");
     }
 }

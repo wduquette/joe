@@ -2,10 +2,7 @@ package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class WalkerInstance implements JoeValue {
     private final static String TO_STRING = "toString";
@@ -74,5 +71,13 @@ class WalkerInstance implements JoeValue {
     @Override
     public String toString() {
         return "<" + joeClass.name() + "@" + String.format("%x",hashCode()) + ">";
+    }
+
+    //-------------------------------------------------------------------------
+    // Fact API
+
+    @Override
+    public Map<String,Object> getFieldMap() {
+        return Collections.unmodifiableMap(fields);
     }
 }

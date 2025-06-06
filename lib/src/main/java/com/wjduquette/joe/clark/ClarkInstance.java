@@ -2,10 +2,7 @@ package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * BertInstance is the internal representation for instances of scripted
@@ -92,6 +89,13 @@ public class ClarkInstance implements JoeValue {
         return (String)joe.call(callable);
     }
 
+    //-------------------------------------------------------------------------
+    // Fact API
+
+    @Override
+    public Map<String,Object> getFieldMap() {
+        return Collections.unmodifiableMap(fields);
+    }
 
     //-------------------------------------------------------------------------
     // Object API
