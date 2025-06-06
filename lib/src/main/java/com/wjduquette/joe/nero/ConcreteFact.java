@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 /**
  * The default concrete Fact type for use with {@link Nero}.
  * @param relation The relation
- * @param fields The values.
+ * @param getFields The values.
  */
-public record ConcreteFact(String relation, List<Object> fields)
+public record ConcreteFact(String relation, List<Object> getFields)
     implements Fact
 {
     @Override
@@ -19,17 +19,17 @@ public record ConcreteFact(String relation, List<Object> fields)
     }
 
     @Override
-    public Map<String, Object> fieldMap() {
+    public Map<String, Object> getFieldMap() {
         // Create a field map when needed.
         var map = new LinkedHashMap<String, Object>();
-        for (var i = 0; i < fields.size(); i++) {
-            map.put("f" + i, fields.get(i));
+        for (var i = 0; i < getFields.size(); i++) {
+            map.put("f" + i, getFields.get(i));
         }
         return map;
     }
 
     @Override public String toString() {
-        var termString = fields.stream().map(Object::toString)
+        var termString = getFields.stream().map(Object::toString)
             .collect(Collectors.joining(", "));
         return relation + "(" + termString + ")";
     }
@@ -39,13 +39,13 @@ public record ConcreteFact(String relation, List<Object> fields)
         if (o == null || getClass() != o.getClass()) return false;
 
         ConcreteFact fact = (ConcreteFact) o;
-        return relation.equals(fact.relation) && fields.equals(fact.fields);
+        return relation.equals(fact.relation) && getFields.equals(fact.getFields);
     }
 
     @Override
     public int hashCode() {
         int result = relation.hashCode();
-        result = 31 * result + fields.hashCode();
+        result = 31 * result + getFields.hashCode();
         return result;
     }
 }

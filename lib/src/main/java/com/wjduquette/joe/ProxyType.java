@@ -191,6 +191,9 @@ public class ProxyType<V>
 
     //-------------------------------------------------------------------------
     // JoeValue API
+    //
+    // This is the API for this ProxyType instance as it appears as a
+    // value in Joe scripts.
 
     @Override
     public JoeType type() {
@@ -241,18 +244,13 @@ public class ProxyType<V>
 
 
     //-------------------------------------------------------------------------
-    // Instance Fields
+    // Instance API
     //
-    // Instance fields are presumed to be read-only.
-
-    /**
-     * If the instance has any fields, they are assumed to be ordered.
-     * Subclasses can override.
-     * @return true or false
-     */
-    public boolean hasOrderedFields() {
-        return !fieldNames.isEmpty();
-    }
+    // This API returns information about a specific instance.  Concrete
+    // proxy types can override these methods as needed.
+    //
+    // In particular, this API defines the interface to the type's defined
+    // field properties.  Fields are presumed to be ordered and read-only.
 
     /**
      * Returns true if the value has a field with the given name, and
@@ -262,7 +260,6 @@ public class ProxyType<V>
      * @param fieldName The field name
      * @return true or false
      */
-    @SuppressWarnings("unused")
     public boolean hasField(Object value, String fieldName) {
         return getters.containsKey(fieldName);
     }
@@ -273,7 +270,6 @@ public class ProxyType<V>
      * @param value A value of the proxied type
      * @return The list
      */
-    @SuppressWarnings("unused")
     public List<String> getFieldNames(Object value) {
         return Collections.unmodifiableList(fieldNames);
     }
@@ -285,7 +281,7 @@ public class ProxyType<V>
      * @param propertyName The property name
      * @return The property value
      */
-    @SuppressWarnings({"unused", "unchecked"})
+    @SuppressWarnings("unchecked")
     public Object get(Object value, String propertyName) {
         var method = bind(value, propertyName);
 
@@ -309,7 +305,6 @@ public class ProxyType<V>
      * @param other The value to
      * @return The property value
      */
-    @SuppressWarnings("unused")
     public Object set(Object value, String fieldName, Object other) {
         if (fieldNames.isEmpty()) {
             throw new JoeError("Values of type " + name +
@@ -318,6 +313,61 @@ public class ProxyType<V>
             throw new JoeError("Values of type " + name() +
                 " have no mutable properties.");
         }
+    }
+
+    /**
+     * If the instance has any fields, they are assumed to be ordered.
+     * Subclasses may override to base the predicate on the instance's
+     * own state.
+     * @param ignored The instance
+     * @return true or false
+     */
+    public boolean hasOrderedFields(Object ignored) {
+        return !fieldNames.isEmpty();
+    }
+
+    /**
+     * Gets a list of the value's field values, provided that the
+     * value has ordered fields.
+     * @param value The instance
+     * @return The list of values
+     */
+    @SuppressWarnings("unchecked")
+    public List<Object> getFields(Object value) {
+        if (!hasOrderedFields(value)) {
+            throw new IllegalStateException(
+                "This value does not have ordered fields.");
+        }
+
+        var list = new ArrayList<>();
+
+        for (var name : fieldNames) {
+            var getter = getters.get(name);
+            if (getter != null) {
+                list.add(getter.apply((V)value));
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     * Gets a map of the value's field names, by name.
+     * @param value The instance
+     * @return The map
+     */
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getFieldMap(Object value) {
+        var map = new HashMap<String,Object>();
+
+        for (var name : fieldNames) {
+            var getter = getters.get(name);
+            if (getter != null) {
+                map.put(name, getter.apply((V)value));
+            }
+        }
+
+        return map;
     }
 
     //-------------------------------------------------------------------------

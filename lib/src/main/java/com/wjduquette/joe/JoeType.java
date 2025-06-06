@@ -17,13 +17,4 @@ public interface JoeType {
      * @return the supertype.
      */
     default JoeType supertype() { return null; }
-
-    /**
-     * Gets whether this type has ordered fields, i.e., an immutable,
-     * documented list of named fields.  This affects pattern matching.
-     * Ideally, the field names should match the construction arguments.
-     * @return true or false
-     */
-    @SuppressWarnings("unused")
-    default boolean hasOrderedFields() { return false; }
 }

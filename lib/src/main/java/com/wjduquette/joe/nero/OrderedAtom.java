@@ -25,11 +25,11 @@ public record OrderedAtom(String relation, List<Term> terms)
         }
 
         var n = terms().size();
-        if (fact.fields().size() != n) return null;
+        if (fact.getFields().size() != n) return null;
 
         for (var i = 0; i < terms().size(); i++) {
             var t = terms().get(i);
-            var f = fact.fields().get(i);
+            var f = fact.getFields().get(i);
 
             switch (t) {
                 case Variable v -> {

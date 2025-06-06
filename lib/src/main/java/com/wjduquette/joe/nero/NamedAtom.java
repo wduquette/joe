@@ -24,10 +24,10 @@ public record NamedAtom(String relation, Map<String,Term> terms)
         for (var e : terms.entrySet()) {
             var name = e.getKey();
 
-            if (!fact.fieldMap().containsKey(name)) {
+            if (!fact.getFieldMap().containsKey(name)) {
                 return null;
             }
-            var f = fact.fieldMap().get(name);
+            var f = fact.getFieldMap().get(name);
 
             switch (e.getValue()) {
                 case Variable v -> {

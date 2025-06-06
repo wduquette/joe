@@ -33,13 +33,14 @@ public interface Fact {
      * @return the list
      * @throws IllegalStateException if !isIndexed.
      */
-    default List<Object> fields() {
-        throw new IllegalStateException("Fact does not have indexed fields!");
+    default List<Object> getFields() {
+        throw new IllegalStateException(
+            "Fact does not have ordered fields!");
     }
 
     /**
      * Gets a map of the fact's field values by name.
      * @return The map
      */
-    Map<String, Object> fieldMap();
+    Map<String, Object> getFieldMap();
 }

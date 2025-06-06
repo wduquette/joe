@@ -52,7 +52,7 @@ public class FactType extends ProxyType<FactValue> {
     public String stringify(Joe joe, Object value) {
         assert value instanceof FactValue;
         var fact = (FactValue)value;
-        var fields = fact.fields().stream()
+        var fields = fact.getFields().stream()
             .map(joe::stringify)
             .collect(Collectors.joining(", "));
 
@@ -82,7 +82,7 @@ public class FactType extends ProxyType<FactValue> {
     @SuppressWarnings("unused")
     public boolean hasField(Object value, String fieldName) {
         assert value instanceof FactValue;
-        return ((FactValue)value).fieldMap().containsKey(fieldName);
+        return ((FactValue)value).getFieldMap().containsKey(fieldName);
     }
 
     /**
@@ -94,7 +94,7 @@ public class FactType extends ProxyType<FactValue> {
     @SuppressWarnings("unused")
     public List<String> getFieldNames(Object value) {
         assert value instanceof FactValue;
-        return new ArrayList<>(((FactValue)value).fieldMap().keySet());
+        return new ArrayList<>(((FactValue)value).getFieldMap().keySet());
     }
 
     /**
@@ -113,7 +113,7 @@ public class FactType extends ProxyType<FactValue> {
         }
 
         assert value instanceof FactValue;
-        var map = ((FactValue)value).fieldMap();
+        var map = ((FactValue)value).getFieldMap();
 
         if (map.containsKey(propertyName)) {
             return map.get(propertyName);
@@ -176,7 +176,7 @@ public class FactType extends ProxyType<FactValue> {
     // Returns a list of the field values.
     private Object _fields(Fact value, Joe joe, Args args) {
         args.exactArity(0, "fields()");
-        return new ListValue(value.fields());
+        return new ListValue(value.getFields());
     }
 
     //**
