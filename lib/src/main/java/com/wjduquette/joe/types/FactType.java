@@ -142,13 +142,14 @@ public class FactType extends ProxyType<FactValue> {
 
     //**
     // @static of
-    // @args relation, fields...
-    // Creates a new `Fact` given the relation and one or more field values.
-    // The `Fact` will be an instance of the Java `FactValue` class.
+    // @args relation, fields
+    // Creates a new `Fact` given the relation and a list of
+    // field values. The `Fact` will be an instance of the Java
+    // `FactValue` class.
     private Object _of(Joe joe, Args args) {
-        args.minArity(2, "Fact.of(relation, field, ...)");
+        args.exactArity(2, "Fact.of(relation, fields)");
         var relation = joe.toString(args.next());
-        var fields = args.remainderAsList();
+        var fields = joe.toList(args.next());
         return new FactValue(relation, fields);
     }
 
@@ -157,13 +158,14 @@ public class FactType extends ProxyType<FactValue> {
 
     //**
     // @init
-    // @args relation, fields
-    // Creates a new `Fact` given the relation and a list of field values.
-    // The `Fact` will be an instance of the Java `FactValue` class.
+    // @args relation, field, ...
+    // Creates a new `Fact` given the relation and one or more the
+    // field values. The `Fact` will be an instance of the Java
+    // `FactValue` class.
     private Object _init(Joe joe, Args args) {
-        args.exactArity(2, "Fact(relation, fields)");
+        args.minArity(2, "Fact(relation, field, ...)");
         var relation = joe.toString(args.next());
-        var fields = joe.toList(args.next());
+        var fields = args.remainderAsList();
         return new FactValue(relation, fields);
     }
 

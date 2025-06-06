@@ -3,7 +3,7 @@
 // Tests for the `Fact` type
 
 function testInitializer() {
-    var fact = Fact("Thing", [#car, #red]);
+    var fact = Fact("Thing", #car, #red);
     check(fact.relation()).eq("Thing");
     check(fact.fields()).eq([#car, #red]);
     check(fact.f0).eq(#car);
@@ -12,7 +12,7 @@ function testInitializer() {
 }
 
 function testOf() {
-    var fact = Fact.of("Thing", #car, #red);
+    var fact = Fact.of("Thing", [#car, #red]);
     check(fact.relation()).eq("Thing");
     check(fact.fields()).eq([#car, #red]);
     check(fact.f0).eq(#car);

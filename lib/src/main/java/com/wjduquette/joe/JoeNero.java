@@ -59,12 +59,8 @@ public class JoeNero {
         var inputFacts = new HashSet<Fact>();
 
         for (var input : inputs) {
-            var fact = joe.getJoeValue(input);
-            if (fact.hasFields()) {
-                inputFacts.add(fact);
-            } else {
-                throw joe.expected("fact", input);
-            }
+            // Throws JoeError if the input is not a valid NeroFact.
+            inputFacts.add(asNeroFact(input));
         }
 
         // NEXT, Execute the rule set.
@@ -79,5 +75,19 @@ public class JoeNero {
         result.addAll(inputs);
         result.addAll(nero.getInferredFacts());
         return result;
+    }
+
+    private Fact asNeroFact(Object value) {
+        if (value instanceof FactValue fv) {
+            return fv;
+        }
+
+        var fact = joe.getJoeValue(value);
+
+        if (fact.hasFields()) {
+            return fact;
+        } else {
+            throw joe.expected("fact", value);
+        }
     }
 }

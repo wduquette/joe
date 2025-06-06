@@ -255,6 +255,15 @@ public class Nero {
         for (int i = 0; i < tuple.length; i++) {
             var b = rule.body().get(i);
 
+            if (b.requiresOrderedFields() &&
+                !tuple[i].hasOrderedFields()
+            ) {
+                throw new JoeError(
+                    "'" + b.relation() +
+                    "' in rule '" + rule +
+                    "' requires ordered fields, but a provided " +
+                    "fact is not ordered.");
+            }
             bindings = b.matches(tuple[i], bindings);
             if (bindings == null) return null;
         }

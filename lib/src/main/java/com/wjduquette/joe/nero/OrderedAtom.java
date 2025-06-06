@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 public record OrderedAtom(String relation, List<Term> terms)
     implements BodyAtom
 {
+    @Override public boolean requiresOrderedFields() { return true; }
+
     @Override public Bindings matches(Fact fact, Bindings given) {
         var bindings = new Bindings(given);
 
