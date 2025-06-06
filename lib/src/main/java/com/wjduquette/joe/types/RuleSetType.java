@@ -60,11 +60,17 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
 
     //**
     // @method infer
+    // @args [inputs]
     // @result Set
-    // Returns a set of the known facts, both base and inferred.
+    // Returns a set of known facts, both input and inferred, given
+    // the rule set and any provided *inputs*.
     private Object _infer(RuleSetValue value, Joe joe, Args args) {
-        args.exactArity(0, "infer()");
-        return new SetValue(value.infer());
+        args.arityRange(0, 1, "infer([inputs])");
+        if (args.isEmpty()) {
+            return value.infer(joe);
+        } else {
+            return value.infer(joe, joe.toCollection(args.next()));
+        }
     }
 
     //**

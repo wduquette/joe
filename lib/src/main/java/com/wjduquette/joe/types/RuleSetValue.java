@@ -1,10 +1,10 @@
 package com.wjduquette.joe.types;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeNero;
-import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.RuleSet;
 
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * A RuleSetValue wraps up a Nero
@@ -15,12 +15,22 @@ import java.util.Set;
  */
 public record RuleSetValue(RuleSet ruleset) {
     /**
-     * Preliminary implementation of infer().
+     * Infer facts from the rule set.
      * @return The set of all known facts.
      */
-    public Set<Fact> infer() {
-        var nero = new JoeNero(this);
+    public SetValue infer(Joe joe) {
+        var nero = new JoeNero(joe, this);
         return nero.infer();
+    }
+
+    /**
+     * Infer facts from the rule set and the set of scripted input facts.
+     * @param inputs The input facts
+     * @return The set of all known facts.
+     */
+    public SetValue infer(Joe joe, Collection<?> inputs) {
+        var nero = new JoeNero(joe, this);
+        return nero.infer(inputs);
     }
 
     /**

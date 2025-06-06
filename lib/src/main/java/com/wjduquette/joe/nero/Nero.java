@@ -181,10 +181,21 @@ public class Nero {
 
     /**
      * Executes the inference algorithm, computing all facts knowable
-     * from the rules.
+     * from the axioms and rules.
      * @throws JoeError if the rule set is not stratified.
      */
     public void infer() {
+        infer(List.of());
+    }
+
+    /**
+     * Executes the inference algorithm, computing all facts knowable
+     * from the axioms and rules given the set of scripted input facts
+     * (the "extensional database").
+     * @param inputFacts The scripted input facts
+     * @throws JoeError if the rule set is not stratified.
+     */
+    public void infer(Collection<Fact> inputFacts) {
         // FIRST, check validity
         if (!ruleset.isStratified()) {
             throw new JoeError("Rule set is not stratified.");
@@ -202,6 +213,7 @@ public class Nero {
 
         inferredFacts.addAll(ruleset.facts());
         ruleset.facts().forEach(this::addFact);
+        inputFacts.forEach(this::addFact);
 
         // NEXT, execute the rules.
         for (var i = 0; i < ruleset.getStrata().size(); i++) {

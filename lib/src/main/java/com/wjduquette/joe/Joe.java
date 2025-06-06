@@ -714,6 +714,21 @@ public class Joe {
         }
     }
 
+
+    /**
+     * Converts an argument into a collection.
+     * @param arg The argument
+     * @return The comparator
+     * @throws JoeError if the argument isn't a collection.
+     */
+    public Collection<?> toCollection(Object arg) {
+        if (arg instanceof Collection<?> c) {
+            return c;
+        } else {
+            throw expected("collection", arg);
+        }
+    }
+
     /**
      * Converts a Monica comparator callable to a Java comparator.
      * @param arg The callable
