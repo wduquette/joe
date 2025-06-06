@@ -16,10 +16,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * The implementation for the {@code joe nero} tool.
@@ -126,7 +123,9 @@ public class NeroTool implements Tool {
             var nero = compile(source);
 
             if (dumpNew) {
-                dumpFacts("New Facts:", nero.getNewFacts());
+                var newFacts = new HashSet<>(nero.getInferredFacts());
+                newFacts.removeAll(nero.getAxioms());
+                dumpFacts("New Facts:", newFacts);
             } else if (dumpAll) {
                 // If we dump everything, no need to do specific queries.
                 dumpFacts("All Facts:", nero.getAllFacts());
