@@ -53,21 +53,31 @@ public class JoeNero {
      * @throws JoeError if the rule set is not stratified.
      */
     public SetValue infer(Collection<?> inputs) {
+        // FIRST, Build the list of input facts, wrapping values of proxied
+        // types as TypedValues so that they can be used as Facts
+        // by Nero.
         var inputFacts = new HashSet<Fact>();
 
         for (var input : inputs) {
-            if (input instanceof JoeValue fact) {
-                if (fact.hasFields()) {
-                    inputFacts.add(fact);
-                    continue;
-                }
+            var fact = joe.getJoeValue(input);
+            if (fact.hasFields()) {
+                inputFacts.add(fact);
+            } else {
+                throw joe.expected("fact", input);
             }
-            throw joe.expected("fact", input);
         }
 
+        // NEXT, Execute the rule set.
         var nero = new Nero(rsv.ruleset());
         nero.setFactFactory(FactValue::new);
         nero.infer(inputFacts);
-        return new SetValue(nero.getAllFacts());
+
+        // NEXT, build the list of known facts.  We want the input
+        // facts as they were given to us, plus the newly inferred
+        // facts.
+        var result = new SetValue();
+        result.addAll(inputs);
+        result.addAll(nero.getInferredFacts());
+        return result;
     }
 }
