@@ -26,15 +26,14 @@ public class Nero {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    private final RuleSet ruleset;
+
     // Map from head relation to rules with that head.
     private final Map<String,List<Rule>> ruleMap = new HashMap<>();
 
-    // Head relations by stratum.
-    private final boolean isStratified;
-    private final List<List<String>> strata;
-
-    // Facts as read from the Nero program.
-    private final Set<Fact> baseFacts = new HashSet<>();
+    // Facts inferred from the rule set's axioms and rules
+    // (the "intensional database")
+    private final Set<Fact> inferredFacts = new HashSet<>();
 
     // The current set of known facts.
     private final Set<Fact> knownFacts = new HashSet<>();
@@ -56,29 +55,31 @@ public class Nero {
      * @param ruleset The rule set.
      */
     public Nero(RuleSet ruleset) {
-        // FIRST, analyze the rule set
-        var graph = new Stratifier(ruleset.getRules());
-        this.isStratified = graph.isStratified();
-
-        this.strata = isStratified ? graph.strata() : null;
-
-        if (debug) System.out.println("Rule Strata: " + strata);
+        this.ruleset = ruleset;
 
         // NEXT, Categorize the rules by head relation
-        for (var rule : ruleset.getRules()) {
+        for (var rule : ruleset.rules()) {
             var head = rule.head().relation();
             var list = ruleMap.computeIfAbsent(head, k -> new ArrayList<>());
             list.add(rule);
         }
 
-        // NEXT, save the base facts.
-        this.baseFacts.addAll(ruleset.getFacts());
-        baseFacts.forEach(this::addFact);
+        // NEXT, save the axiomatic facts as inferred facts, and add
+        // them to the known facts list.
+        this.inferredFacts.addAll(ruleset.facts());
+        inferredFacts.forEach(this::addFact);
     }
 
     //-------------------------------------------------------------------------
-    // Configuration
+    // Public API
 
+    /**
+     * Gets whether the provided rule set is stratified or not.
+     * @return true or false
+     */
+    public boolean isStratified() {
+        return ruleset.isStratified();
+    }
 
     /**
      * Gets whether debugging is enabled or not.
@@ -120,14 +121,6 @@ public class Nero {
     }
 
     /**
-     * Gets whether the rule set can be stratified or not.
-     * @return true or false.
-     */
-    public boolean isStratified() {
-        return isStratified;
-    }
-
-    /**
      * Gets the known facts that have the given relation.
      * @param relation The relation
      * @return The facts.
@@ -146,16 +139,20 @@ public class Nero {
     }
 
     /**
-     * Gets any new facts inferred by Nero.
-     * @return The new facts.
+     * Gets axiomatic facts from the rule set.
+     * @return The axioms
      */
-    public Set<Fact> getNewFacts() {
-        var result = new HashSet<Fact>();
-        for (var fact : knownFacts) {
-            if (!baseFacts.contains(fact)) result.add(fact);
-        }
+    public Set<Fact> getAxioms() {
+        return ruleset.facts();
+    }
 
-        return result;
+    /**
+     * Gets any facts inferred by Nero from the rule set's axioms and
+     * rules.
+     * @return The inferred facts.
+     */
+    public Set<Fact> getInferredFacts() {
+        return inferredFacts;
     }
 
     /**
@@ -184,20 +181,43 @@ public class Nero {
 
     /**
      * Executes the inference algorithm, computing all facts knowable
-     * from the rules.
+     * from the axioms and rules.
      * @throws JoeError if the rule set is not stratified.
      */
     public void infer() {
-        if (!isStratified) {
+        infer(List.of());
+    }
+
+    /**
+     * Executes the inference algorithm, computing all facts knowable
+     * from the axioms and rules given the set of scripted input facts
+     * (the "extensional database").
+     * @param inputFacts The scripted input facts
+     * @throws JoeError if the rule set is not stratified.
+     */
+    public void infer(Collection<Fact> inputFacts) {
+        // FIRST, check validity
+        if (!ruleset.isStratified()) {
             throw new JoeError("Rule set is not stratified.");
         }
 
+        if (debug) {
+            System.out.println("Rule Strata: " +
+                ruleset.getStrata());
+        }
+
+        // NEXT, initialize the data structures
+        inferredFacts.clear();
         knownFacts.clear();
         factMap.clear();
-        baseFacts.forEach(this::addFact);
 
-        for (var i = 0; i < strata.size(); i++) {
-            infer(i, strata.get(i));
+        inferredFacts.addAll(ruleset.facts());
+        ruleset.facts().forEach(this::addFact);
+        inputFacts.forEach(this::addFact);
+
+        // NEXT, execute the rules.
+        for (var i = 0; i < ruleset.getStrata().size(); i++) {
+            infer(i, ruleset.getStrata().get(i));
         }
     }
 
@@ -219,6 +239,7 @@ public class Nero {
                         if (fact != null && addFact(fact)) {
                             if (debug) System.out.println("    Fact: " + fact);
                             gotNewFact = true;
+                            inferredFacts.add(fact);
                         }
                     }
                 }
@@ -234,6 +255,15 @@ public class Nero {
         for (int i = 0; i < tuple.length; i++) {
             var b = rule.body().get(i);
 
+            if (b.requiresOrderedFields() &&
+                !tuple[i].hasOrderedFields()
+            ) {
+                throw new JoeError(
+                    "'" + b.relation() +
+                    "' in rule '" + rule +
+                    "' requires ordered fields, but a provided " +
+                    "fact is not ordered.");
+            }
             bindings = b.matches(tuple[i], bindings);
             if (bindings == null) return null;
         }

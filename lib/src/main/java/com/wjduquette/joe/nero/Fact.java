@@ -8,7 +8,7 @@ import java.util.Map;
  * {@link Rule Rules} in the Nero rule set.  Any object that implements the
  * Fact interface can be used as an input fact.
  *
- * <p>A Fact might or might not have indexed fields that can be matched
+ * <p>A Fact might or might not have ordered fields that can be matched
  * positionally; all Facts must have fields that can be accessed by name.
  * Facts created by a Nero rule set will usually not have
  * explicit field names; in this case, the standard is to use field
@@ -26,20 +26,21 @@ public interface Fact {
      * fields() method or whether they must be accessed by name.
      * @return true or false
      */
-    boolean isIndexed();
+    boolean hasOrderedFields();
 
     /**
-     * If isIndexed(), the list of field values.
+     * If hasOrderedFields(), the list of field values.
      * @return the list
      * @throws IllegalStateException if !isIndexed.
      */
-    default List<Object> fields() {
-        throw new IllegalStateException("Fact does not have indexed fields!");
+    default List<Object> getFields() {
+        throw new IllegalStateException(
+            "Fact does not have ordered fields!");
     }
 
     /**
      * Gets a map of the fact's field values by name.
      * @return The map
      */
-    Map<String, Object> fieldMap();
+    Map<String, Object> getFieldMap();
 }

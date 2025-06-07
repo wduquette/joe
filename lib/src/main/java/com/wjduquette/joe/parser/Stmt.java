@@ -211,7 +211,7 @@ public sealed interface Stmt
         Token keyword,
         Expr expr,
         List<MatchCase> cases,
-        MatchCase matchDefault
+        Stmt matchDefault
     ) implements Stmt {
         public Span location() { return keyword.span(); }
     }

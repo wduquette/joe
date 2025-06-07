@@ -192,7 +192,7 @@ class Resolver {
                     endScope();
                 }
                 if (stmt.matchDefault() != null) {
-                    resolve(stmt.matchDefault().statement());
+                    resolve(stmt.matchDefault());
                 }
             }
             case Stmt.Record stmt -> {
@@ -314,6 +314,7 @@ class Resolver {
                 resolve(expr.value());
                 resolve(expr.object());
             }
+            case Expr.RuleSet ignored -> {}
             case Expr.Super expr -> {
                 if (currentClass == ClassType.NONE) {
                     error(expr.keyword(),

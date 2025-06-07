@@ -10,27 +10,27 @@ import java.util.Map;
 /**
  * The concrete Fact type for use with {@link Nero} in Joe scripts.
  * @param relation The relation
- * @param fields The values.
+ * @param getFields The values.
  */
-public record FactValue(String relation, List<Object> fields)
+public record FactValue(String relation, List<Object> getFields)
     implements Fact
 {
     @Override
-    public boolean isIndexed() {
+    public boolean hasOrderedFields() {
         return true;
     }
 
     @Override
-    public Map<String, Object> fieldMap() {
+    public Map<String, Object> getFieldMap() {
         // Create a field map when needed.
         var map = new LinkedHashMap<String, Object>();
-        for (var i = 0; i < fields.size(); i++) {
-            map.put("f" + i, fields.get(i));
+        for (var i = 0; i < getFields.size(); i++) {
+            map.put("f" + i, getFields.get(i));
         }
         return map;
     }
 
     @Override public String toString() {
-        return "Fact(" + relation + ", " + fields + ")";
+        return "Fact(" + relation + ", " + getFields + ")";
     }
 }

@@ -1,7 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.parser.Dumper;
+import com.wjduquette.joe.parser.ASTDumper;
 import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.SourceBuffer;
@@ -157,7 +157,7 @@ public class WalkerEngine implements Engine {
     public String dump(String scriptName, String source) {
         var buffer = new SourceBuffer(scriptName, source);
         var statements = parseAndResolve(buffer);
-        return new Dumper().dump(statements);
+        return ASTDumper.dump(statements);
     }
 
     private void reportError(Trace trace, boolean incomplete) {

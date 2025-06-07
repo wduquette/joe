@@ -1,0 +1,246 @@
+// type.joe.RuleSet.joe
+//
+// This script tests the behavior of RuleSet objects once created.
+// Errors found during creation are tested by lang_ruleset.joe.
+
+// RuleSet::isStratified() should return true for stratified
+// rule sets.
+function testIsStratified_true() {
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+    check(rules.isStratified()).eq(true);
+}
+
+// RuleSet::isStratified() should return false for unstratified
+// rule sets.
+function testIsStratified_false() {
+    var rules = ruleset {
+        A(x) :- B(x), not C(x);
+        C(x) :- A(x);
+    };
+    check(rules.isStratified()).eq(false);
+}
+
+// RuleSet::infer should always throw an error for unstratified
+// rule sets.
+function testInfer_notStratified() {
+    var rules = ruleset {
+        A(x) :- B(x), not C(x);
+        C(x) :- A(x);
+    };
+    assertError(\-> rules.infer(),
+        "Rule set is not stratified.");
+}
+
+// RuleSet::infer should always run successfully when no
+// input facts are provided.
+function testInfer_noScriptedFacts() {
+    var rules = ruleset {
+        Parent(#anne, #bert);
+        Parent(#bert, #clark);
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+    var results = rules.infer().map(Joe.stringify).sorted();
+    check(results).eq([
+        "Fact(Ancestor, #anne, #bert)",
+        "Fact(Ancestor, #anne, #clark)",
+        "Fact(Ancestor, #bert, #clark)",
+        "Fact(Parent, #anne, #bert)",
+        "Fact(Parent, #bert, #clark)"
+    ]);
+}
+
+
+// RuleSet::infer(inputs) should throw an error if an input fact's type
+// name matches that of a head relation.
+function testInfer_headCollision() {
+    record Ancestor(a, d) {}
+
+    var inputs = [
+        Ancestor(#jacob, #moses)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+
+    assertError(\-> rules.infer(inputs),
+        "Input fact type collides with rule set's head relation: 'Ancestor'.");
+}
+
+
+// RuleSet::infer(inputs) should throw an error if a provided
+// input fact has no fields.
+function testInfer_noFields() {
+    class Parent {
+        method toString() { return "Parent()"; }
+    }
+
+    var inputs = [
+        Parent()
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+
+    assertError(\-> rules.infer(inputs),
+        "Expected fact, got: Parent 'Parent()'.");
+}
+
+// RuleSet::infer(inputs) should accept proxied values with
+// fields, including the Fact type itself.
+function testInfer_proxiedValue_ordered() {
+    var inputs = [
+        Fact("Parent", #anne, #bert),
+        Fact("Parent", #bert, #clark)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+    var results = rules.infer(inputs).map(Joe.stringify).sorted();
+
+    check(results).eq([
+        "Fact(Ancestor, #anne, #bert)",
+        "Fact(Ancestor, #anne, #clark)",
+        "Fact(Ancestor, #bert, #clark)",
+        "Fact(Parent, #anne, #bert)",
+        "Fact(Parent, #bert, #clark)"
+    ]);
+}
+
+// RuleSet::infer(inputs) should accept proxied values with
+// fields, including the Fact type itself, using named atoms
+function testInfer_proxiedValue_named() {
+    var inputs = [
+        Fact("Parent", #anne, #bert),
+        Fact("Parent", #bert, #clark)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(f0:x, f1:y);
+        Ancestor(x, y) :- Parent(f0:x, f1:z), Ancestor(z, y);
+    };
+    var results = rules.infer(inputs).map(Joe.stringify).sorted();
+
+    check(results).eq([
+        "Fact(Ancestor, #anne, #bert)",
+        "Fact(Ancestor, #anne, #clark)",
+        "Fact(Ancestor, #bert, #clark)",
+        "Fact(Parent, #anne, #bert)",
+        "Fact(Parent, #bert, #clark)"
+    ]);
+}
+
+// RuleSet::infer(inputs) should accept record instances using
+// ordered-field atoms.
+function testInfer_record_ordered() {
+    record Parent(p, c) {}
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+    var results = rules.infer(inputs).map(Joe.stringify).sorted();
+    check(results).eq([
+        "Fact(Ancestor, #anne, #bert)",
+        "Fact(Ancestor, #anne, #clark)",
+        "Fact(Ancestor, #bert, #clark)",
+        "Parent(#anne, #bert)",
+        "Parent(#bert, #clark)"
+    ]);
+}
+
+// RuleSet::infer(inputs) should accept record instances using
+// named-field atoms
+function testInfer_record_named() {
+    record Parent(p, c) {}
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(p:x, c:y);
+        Ancestor(x, y) :- Parent(p:x, c:z), Ancestor(z, y);
+    };
+    var results = rules.infer(inputs).map(Joe.stringify).sorted();
+    check(results).eq([
+        "Fact(Ancestor, #anne, #bert)",
+        "Fact(Ancestor, #anne, #clark)",
+        "Fact(Ancestor, #bert, #clark)",
+        "Parent(#anne, #bert)",
+        "Parent(#bert, #clark)"
+    ]);
+}
+
+// RuleSet::infer(inputs) should accept class instances
+// with fields, provided that named-field atoms are used to match them.
+function testInfer_class_named() {
+    class Parent {
+        method init(p, c) {
+            @p = p;
+            @c = c;
+        }
+        method toString() {
+            return "Parent(" + @p + ", " + @c + ")";
+        }
+    }
+
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(p:x, c:y);
+        Ancestor(x, y) :- Parent(p:x, c:z), Ancestor(z, y);
+    };
+    var results = rules.infer(inputs).map(Joe.stringify).sorted();
+    check(results).eq([
+        "Fact(Ancestor, #anne, #bert)",
+        "Fact(Ancestor, #anne, #clark)",
+        "Fact(Ancestor, #bert, #clark)",
+        "Parent(#anne, #bert)",
+        "Parent(#bert, #clark)"
+    ]);
+}
+
+// RuleSet::infer(inputs) should throw an error if an
+// ordered-field atom is used with a fact that does not have ordered
+// fields.
+function testInfer_class_ordered() {
+    class Parent {
+        method init(p, c) {
+            @p = p;
+            @c = c;
+        }
+        method toString() {
+            return "Parent(" + @p + ", " + @c + ")";
+        }
+    }
+
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+
+    assertError(\-> rules.infer(inputs),
+        "'Parent' in rule 'Ancestor(x, y) :- Parent(x, y);' requires ordered fields, but a provided fact is not ordered.");
+}

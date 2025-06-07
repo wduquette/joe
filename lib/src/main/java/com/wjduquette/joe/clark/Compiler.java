@@ -3,11 +3,14 @@ package com.wjduquette.joe.clark;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
+import com.wjduquette.joe.nero.*;
 import com.wjduquette.joe.parser.*;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SourceBuffer.Span;
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.TokenType;
+import com.wjduquette.joe.types.FactValue;
+import com.wjduquette.joe.types.RuleSetValue;
 
 import static com.wjduquette.joe.clark.Opcode.*;
 
@@ -572,8 +575,7 @@ class Compiler {
                 patchJump(next1_);            // m | ∅        ; next1:
                 patchJump(next2_);            // m | ∅        ; next2:
                 if (s.matchDefault() != null) {
-                    emit(s.matchDefault()     // m | ∅        ; compile default
-                        .statement());
+                    emit(s.matchDefault());   // m | ∅        ; compile default
                 }
 
                 // End Of Statement
@@ -960,6 +962,11 @@ class Compiler {
                 emit(e.value());          // o a b  ; compute update value
                 emit(mathOp);             // o c    ; c = a op b
                 emit(PROPSET, name);      // c      ; o.name = c
+            }
+            case Expr.RuleSet e -> {
+                var rsc = new RuleSetCompiler(e.ruleSet());
+                rsc.setFactFactory(FactValue::new);
+                emitCONST(new RuleSetValue(rsc.compile()));
             }
             case Expr.Super e -> {
                 if (currentType == null || !currentType.inInstanceMethod) {
@@ -1379,7 +1386,7 @@ class Compiler {
     }
 
     //-------------------------------------------------------------------------
-    // Parsing Tools
+    // Error Handling
 
     // This method should be used for most compilation errors.
     private void error(Token token, String message) {

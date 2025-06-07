@@ -1,0 +1,27 @@
+// type.joe.Fact.joe
+//
+// Tests for the `Fact` type
+
+function testInitializer() {
+    var fact = Fact("Thing", #car, #red);
+    check(fact.relation()).eq("Thing");
+    check(fact.fields()).eq([#car, #red]);
+    check(fact.f0).eq(#car);
+    check(fact.f1).eq(#red);
+    check(fact.toString()).eq("Fact(Thing, #car, #red)");
+}
+
+function testOf() {
+    var fact = Fact.of("Thing", [#car, #red]);
+    check(fact.relation()).eq("Thing");
+    check(fact.fields()).eq([#car, #red]);
+    check(fact.f0).eq(#car);
+    check(fact.f1).eq(#red);
+    check(fact.toString()).eq("Fact(Thing, #car, #red)");
+}
+
+function testBadField() {
+    var fact = Fact("Thing", [#car, #red]);
+    assertError(\-> fact.f2,
+        "Undefined property 'f2'.");
+}

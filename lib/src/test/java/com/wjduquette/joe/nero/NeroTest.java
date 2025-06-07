@@ -1,7 +1,10 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.tools.nero.Compiler;
+import com.wjduquette.joe.Trace;
+import com.wjduquette.joe.parser.ASTRuleSet;
+import com.wjduquette.joe.parser.Parser;
 import org.junit.Test;
 
 import java.util.stream.Collectors;
@@ -155,10 +158,27 @@ public class NeroTest extends Ted {
     //-------------------------------------------------------------------------
     // Helpers
 
+    private boolean gotParseError = false;
+
     private Nero compile(String source) {
+        gotParseError = false;
         var buff = new SourceBuffer("-", source);
-        var ruleset = new Compiler(buff).compile();
+        var ast = parse(buff);
+        var ruleset = new RuleSetCompiler(ast).compile();
         return new Nero(ruleset);
+    }
+
+    public ASTRuleSet parse(SourceBuffer source) {
+        var parser = new Parser(source, this::errorHandler);
+        var ast = parser.parseNero();
+        if (gotParseError) throw new JoeError("Error in Nero input.");
+        return ast;
+    }
+
+    private void errorHandler(Trace trace, boolean incomplete) {
+        gotParseError = true;
+        System.out.println("line " + trace.line() + ": " +
+            trace.message());
     }
 
     private String infer(String source) {

@@ -1,11 +1,14 @@
-package com.wjduquette.joe.tools.nero;
+package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
-import com.wjduquette.joe.app.App;
+import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.nero.Nero;
 import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.RuleSetCompiler;
+import com.wjduquette.joe.parser.ASTRuleSet;
+import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 
@@ -13,10 +16,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * The implementation for the {@code joe nero} tool.
@@ -53,6 +53,8 @@ public class NeroTool implements Tool {
     private boolean debug = false;
     private boolean dumpAll = false;
     private final List<String> relations = new ArrayList<>();
+
+    private boolean gotParseError = false;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -121,7 +123,9 @@ public class NeroTool implements Tool {
             var nero = compile(source);
 
             if (dumpNew) {
-                dumpFacts("New Facts:", nero.getNewFacts());
+                var newFacts = new HashSet<>(nero.getInferredFacts());
+                newFacts.removeAll(nero.getAxioms());
+                dumpFacts("New Facts:", newFacts);
             } else if (dumpAll) {
                 // If we dump everything, no need to do specific queries.
                 dumpFacts("All Facts:", nero.getAllFacts());
@@ -142,8 +146,7 @@ public class NeroTool implements Tool {
     }
 
     private void dumpAST(SourceBuffer source) {
-        var compiler = new Compiler(source);
-        var ast = compiler.parse();
+        var ast = parse(source);
         println(ast);
     }
 
@@ -171,7 +174,8 @@ public class NeroTool implements Tool {
      */
     public Nero compile(SourceBuffer buff) {
         // FIRST, compile the source.
-        var compiler = new Compiler(buff);
+        var ast = parse(buff);
+        var compiler = new RuleSetCompiler(ast);
         var ruleset = compiler.compile();
 
         // Will throw JoeError if the rules aren't stratified.
@@ -179,6 +183,19 @@ public class NeroTool implements Tool {
         nero.setDebug(debug);
         nero.infer();
         return nero;
+    }
+
+    public ASTRuleSet parse(SourceBuffer source) {
+        var parser = new Parser(source, this::errorHandler);
+        var ast = parser.parseNero();
+        if (gotParseError) throw new JoeError("Error in Nero input.");
+        return ast;
+    }
+
+    private void errorHandler(Trace trace, boolean incomplete) {
+        gotParseError = true;
+        System.out.println("line " + trace.line() + ": " +
+            trace.message());
     }
 
     void dumpFacts(String title, Collection<Fact> facts) {

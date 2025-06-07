@@ -5,6 +5,12 @@ package com.wjduquette.joe.nero;
  */
 public interface BodyAtom {
     /**
+     * Gets whether this atom requires ordered fields or not.
+     * @return true or false.
+     */
+    boolean requiresOrderedFields();
+
+    /**
      * Gets the atom's relation string.
      * @return The relation
      */

@@ -10,8 +10,15 @@ import java.util.stream.Collectors;
 /**
  * This class contains the Abstract Syntax Tree (AST) types for Nero
  * rule sets.
+ * @param facts The axioms read from the rule set
+ * @param rules The rules read from the rule set
+ * @param exports export declarations
  */
-public record ASTRuleSet(List<ASTIndexedAtom> facts, List<ASTRule> rules) {
+public record ASTRuleSet(
+    List<ASTOrderedAtom> facts,
+    List<ASTRule> rules,
+    Map<String,Expr> exports
+) {
     @Override
     public String toString() {
         var buff = new StringBuilder();
@@ -34,7 +41,7 @@ public record ASTRuleSet(List<ASTIndexedAtom> facts, List<ASTRule> rules) {
     // Clauses
 
     public record ASTRule(
-        ASTIndexedAtom head,
+        ASTOrderedAtom head,
         List<ASTAtom> body,
         List<ASTAtom> negations,
         List<ASTConstraint> constraints
@@ -48,7 +55,7 @@ public record ASTRuleSet(List<ASTIndexedAtom> facts, List<ASTRule> rules) {
     //-------------------------------------------------------------------------
     // Items
 
-    public sealed interface ASTAtom permits ASTIndexedAtom, ASTNamedAtom {
+    public sealed interface ASTAtom permits ASTOrderedAtom, ASTNamedAtom {
         /**
          * The Atom's relation
          * @return The relation name
@@ -85,7 +92,7 @@ public record ASTRuleSet(List<ASTIndexedAtom> facts, List<ASTRule> rules) {
         }
     }
 
-    public record ASTIndexedAtom(
+    public record ASTOrderedAtom(
         Token relation,
         List<ASTTerm> terms
     ) implements ASTAtom {

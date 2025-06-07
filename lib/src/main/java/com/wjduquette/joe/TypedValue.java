@@ -2,6 +2,7 @@ package com.wjduquette.joe;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A value bound to its ProxyType.  It is the responsibility
@@ -14,6 +15,9 @@ import java.util.List;
 record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
     implements JoeValue
 {
+    //-------------------------------------------------------------------------
+    // JoeValue API
+
     @Override
     public JoeType type() {
         return proxy;
@@ -55,5 +59,23 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
 
     @Override public String toString() {
         return stringify(joe);
+    }
+
+    //-------------------------------------------------------------------------
+    // Fact API (every JoeValue is a Fact)
+
+    @Override
+    public boolean hasOrderedFields() {
+        return proxy.hasOrderedFields(value);
+    }
+
+    @Override
+    public List<Object> getFields() {
+        return proxy.getFields(value);
+    }
+
+    @Override
+    public Map<String, Object> getFieldMap() {
+        return proxy.getFieldMap(value);
     }
 }

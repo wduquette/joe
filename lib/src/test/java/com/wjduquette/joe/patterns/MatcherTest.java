@@ -476,7 +476,6 @@ public class MatcherTest extends Ted {
     // Helper
 
     public record TestType(String name) implements JoeType {
-        public boolean hasOrderedFields() { return true; }
     }
 
     private static class TestObject implements JoeValue {
@@ -494,6 +493,7 @@ public class MatcherTest extends Ted {
         @Override public List<String> getFieldNames() { return List.of("id", "color"); }
         @Override public Object get(String name) { return fields.get(name); }
         @Override public void set(String name, Object value) { }
+        @Override public boolean hasOrderedFields() { return true; }
     }
 
     private record Pair(Object first, Object second) {}

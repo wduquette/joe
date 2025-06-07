@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
  * @param relation The relation name
  * @param terms The terms
  */
-public record IndexedAtom(String relation, List<Term> terms)
+public record OrderedAtom(String relation, List<Term> terms)
     implements BodyAtom
 {
+    @Override public boolean requiresOrderedFields() { return true; }
+
     @Override public Bindings matches(Fact fact, Bindings given) {
         var bindings = new Bindings(given);
 
@@ -20,16 +22,16 @@ public record IndexedAtom(String relation, List<Term> terms)
             return null;
         }
 
-        if (!fact.isIndexed()) {
+        if (!fact.hasOrderedFields()) {
             return null;
         }
 
         var n = terms().size();
-        if (fact.fields().size() != n) return null;
+        if (fact.getFields().size() != n) return null;
 
         for (var i = 0; i < terms().size(); i++) {
             var t = terms().get(i);
-            var f = fact.fields().get(i);
+            var f = fact.getFields().get(i);
 
             switch (t) {
                 case Variable v -> {
@@ -61,7 +63,7 @@ public record IndexedAtom(String relation, List<Term> terms)
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        IndexedAtom atom = (IndexedAtom) o;
+        OrderedAtom atom = (OrderedAtom) o;
         return relation.equals(atom.relation) && terms.equals(atom.terms);
     }
 

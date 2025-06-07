@@ -43,7 +43,7 @@ public class Joe {
             "assert", "break", "case", "class", "continue", "default",
             "else", "extends", "false", "for", "foreach", "function",
             "if", "in", "let", "match", "method", "ni", "not", "null",
-            "record", "return", "static", "super", "switch",
+            "record", "return", "ruleset", "static", "super", "switch",
             "this", "throw", "true",
             "var", "where", "while"
         );
@@ -340,24 +340,6 @@ public class Joe {
     }
 
     /**
-     * Compiles the given file and returns a compilation dump.
-     * @param scriptPath The file's path
-     * @return The dump's result
-     * @throws IOException if the file cannot be read.
-     * @throws SyntaxError if the script could not be compiled.
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    public Object dumpFile(String scriptPath)
-        throws IOException, SyntaxError
-    {
-        var path = Paths.get(scriptPath);
-        byte[] bytes = Files.readAllBytes(path);
-        var script = new String(bytes, Charset.defaultCharset());
-
-        return dump(path.getFileName().toString(), script);
-    }
-
-    /**
      * Compiles the script, throwing an appropriate error on failure, and
      * returns a compilation dump.
      * The filename is usually the bare file name of the script file,
@@ -579,6 +561,16 @@ public class Joe {
     }
 
     /**
+     * Quotes a Java string, escaping any special characters it contains.
+     * @param string The string
+     * @return The quoted string.
+     */
+    @SuppressWarnings("unused")
+    public static String quote(String string) {
+        return "\"" + escape(string) + "\"";
+    }
+
+    /**
      * Returns true if the object is "truthy", i.e., boolean {@code true} or
      * non-null, and false otherwise.
      * @param value The value
@@ -719,6 +711,21 @@ public class Joe {
             return (T)arg;
         } else {
             throw expected(classTypeName(cls), arg);
+        }
+    }
+
+
+    /**
+     * Converts an argument into a collection.
+     * @param arg The argument
+     * @return The comparator
+     * @throws JoeError if the argument isn't a collection.
+     */
+    public Collection<?> toCollection(Object arg) {
+        if (arg instanceof Collection<?> c) {
+            return c;
+        } else {
+            throw expected("collection", arg);
         }
     }
 

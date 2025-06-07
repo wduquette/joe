@@ -34,10 +34,13 @@ public class SetType extends ProxyType<JoeSet> {
         method("clear",         this::_clear);
         method("contains",      this::_contains);
         method("copy",          this::_copy);
+        method("filter",        this::_filter);
         method("isEmpty",       this::_isEmpty);
+        method("map",           this::_map);
         method("remove",        this::_remove);
         method("removeAll",     this::_removeAll);
         method("size",          this::_size);
+        method("sorted",        this::_sorted);
         method("toString",      this::_toString);
     }
 
@@ -126,6 +129,24 @@ public class SetType extends ProxyType<JoeSet> {
         return new SetValue(set);
     }
 
+    //**
+    // @method filter
+    // @args predicate
+    // @result Set
+    // Returns a list containing the elements for which the filter
+    // *predicate* is true.
+    private Object _filter(JoeSet set, Joe joe, Args args) {
+        args.exactArity(1, "filter(predicate)");
+        var callable = args.next();
+
+        var result = new SetValue();
+        for (var item : set) {
+            if (Joe.isTruthy(joe.call(callable, item))) {
+                result.add(item);
+            }
+        }
+        return result;
+    }
 
     //**
     // @method isEmpty
@@ -136,6 +157,24 @@ public class SetType extends ProxyType<JoeSet> {
 
         return set.isEmpty();
     }
+
+    //**
+    // @method map
+    // @args func
+    // @result Set
+    // Returns a set containing the items that result from applying
+    // function *func* to each item in this set.
+    private Object _map(JoeSet set, Joe joe, Args args) {
+        args.exactArity(1, "map(func)");
+        var callable = args.next();
+
+        var result = new SetValue();
+        for (var item : set) {
+            result.add(joe.call(callable, item));
+        }
+        return result;
+    }
+
 
     //**
     // @method remove
@@ -174,6 +213,34 @@ public class SetType extends ProxyType<JoeSet> {
         args.exactArity(0, "size()");
 
         return (double)set.size();
+    }
+
+    //**
+    // @method sorted
+    // @args [comparator]
+    // @result List
+    // Returns a list of the set's items, sorted in ascending order.  If
+    // no *comparator* is provided, then this set must be a set of
+    // strings or numbers.  If a *comparator* is given, it must be a function
+    // that takes two arguments and returns -1, 0, 1, like
+    // the standard [[Joe#static.compare]] function.
+    //
+    // To sort in descending order, provide a *comparator* that reverses
+    // the comparison.
+    private Object _sorted(JoeSet set, Joe joe, Args args) {
+        args.arityRange(0, 1, "sorted([comparator])");
+        if (!args.hasNext()) {
+            var result = set.stream()
+                .sorted(Joe::compare)
+                .toList();
+            return new ListValue(result);
+        } else {
+            var comparator = joe.toComparator(args.next());
+            var result = set.stream()
+                .sorted(comparator)
+                .toList();
+            return new ListValue(result);
+        }
     }
 
     //**

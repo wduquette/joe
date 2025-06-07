@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 public record NamedAtom(String relation, Map<String,Term> terms)
     implements BodyAtom
 {
+    @Override public boolean requiresOrderedFields() { return false; }
+
     @Override public Bindings matches(Fact fact, Bindings given) {
         var bindings = new Bindings(given);
 
@@ -24,10 +26,10 @@ public record NamedAtom(String relation, Map<String,Term> terms)
         for (var e : terms.entrySet()) {
             var name = e.getKey();
 
-            if (!fact.fieldMap().containsKey(name)) {
+            if (!fact.getFieldMap().containsKey(name)) {
                 return null;
             }
-            var f = fact.fieldMap().get(name);
+            var f = fact.getFieldMap().get(name);
 
             switch (e.getValue()) {
                 case Variable v -> {

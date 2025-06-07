@@ -1,6 +1,8 @@
 package com.wjduquette.joe.nero;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -10,29 +12,61 @@ public class RuleSet {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Set<Fact> facts = new HashSet<>();
-    private final Set<Rule> rules = new HashSet<>();
+    // The facts and rules
+    private final Set<Fact> facts;
+    private final Set<Rule> rules;
+
+    // Rule Head relations by stratum.
+    private final boolean isStratified;
+    private final List<List<String>> strata;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    public RuleSet() {
-        // nothing to do
+    /**
+     * Creates a new rule set given the facts and rules.  Transfers ownership
+     * of the two sets to the new instance, and computes the stratification
+     * of the rules.
+     * @param facts The facts
+     * @param rules The rules
+     */
+    public RuleSet(Set<Fact> facts, Set<Rule> rules) {
+        this.facts = facts;
+        this.rules = rules;
+
+        var stratifier = new Stratifier(rules);
+        this.isStratified = stratifier.isStratified();
+
+        this.strata = isStratified ? stratifier.strata() : null;
     }
 
-    public boolean add(Fact fact) {
-        return facts.add(fact);
+    //-------------------------------------------------------------------------
+    // Public API
+
+    public boolean isStratified() {
+        return isStratified;
     }
 
-    public boolean add(Rule rule) {
-        return rules.add(rule);
+    public List<List<String>> getStrata() {
+        return strata;
     }
 
-    public Set<Fact> getFacts() {
-        return facts;
+    public Set<Fact> facts() {
+        return Collections.unmodifiableSet(facts);
     }
 
-    public Set<Rule> getRules() {
-        return rules;
+    public Set<Rule> rules() {
+        return Collections.unmodifiableSet(rules);
+    }
+
+    /**
+     * Gets the set of relation names inferred by the rule set.
+     * @return The set
+     */
+    public Set<String> getHeadRelations() {
+        var set = new HashSet<String>();
+        facts.stream().map(Fact::relation).forEach(set::add);
+        rules.stream().map(r -> r.head().relation()).forEach(set::add);
+        return set;
     }
 }

@@ -1,14 +1,17 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.*;
 import com.wjduquette.joe.parser.Expr;
 import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.patterns.Matcher;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.TokenType;
+import com.wjduquette.joe.types.FactValue;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
+import com.wjduquette.joe.types.RuleSetValue;
 
 import java.util.*;
 
@@ -290,7 +293,7 @@ class Interpreter {
 
                 // Default case; always the last
                 if (stmt.matchDefault() != null) {
-                    return execute(stmt.matchDefault().statement());
+                    return execute(stmt.matchDefault());
                 }
 
                 // No case matched
@@ -725,6 +728,13 @@ class Interpreter {
                 instance.set(name, right);
                 yield right;
             }
+            // Evaluate the rule set.
+            case Expr.RuleSet e -> {
+                var rsc = new RuleSetCompiler(e.ruleSet());
+                rsc.setFactFactory(FactValue::new);
+                yield new RuleSetValue(rsc.compile());
+            }
+
             // Handle `super.<methodName>` in methods
             case Expr.Super expr -> {
                 int distance = locals.get(expr);
@@ -812,6 +822,9 @@ class Interpreter {
             }
         };
     }
+
+    //-------------------------------------------------------------------------
+    // Evaluation Helpers
 
     private Object lookupVariable(Token name, Expr expr) {
         Integer distance = locals.get(expr);

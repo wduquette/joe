@@ -1,35 +1,52 @@
-package com.wjduquette.joe.tools.nero;
+package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.Trace;
-import com.wjduquette.joe.nero.*;
 import com.wjduquette.joe.parser.ASTRuleSet;
-import com.wjduquette.joe.parser.Parser;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
- * Compiles a Nero {@link com.wjduquette.joe.nero.RuleSet} from source.
+ * Compiles a Nero {@link RuleSet} from an
+ * {@link com.wjduquette.joe.parser.ASTRuleSet} given its configuration.
  */
-public class Compiler {
+public class RuleSetCompiler {
+    /**
+     * The default fact factory used by the compiler; it creates
+     * {@link ConcreteFact} objects.
+     */
+    public static final FactFactory DEFAULT_FACT_FACTORY = ConcreteFact::new;
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The input source
-    private final SourceBuffer source;
-    private boolean gotError = false;
+    // The AST
+    private final ASTRuleSet ast;
+
+    // The factory to use to create fact values
+    private FactFactory factFactory = DEFAULT_FACT_FACTORY;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Compiler(SourceBuffer source) {
-        this.source = source;
+    public RuleSetCompiler(ASTRuleSet ast) {
+        this.ast = ast;
     }
 
     //-------------------------------------------------------------------------
     // Public API
+
+
+    @SuppressWarnings("unused")
+    public FactFactory getFactFactory() {
+        return factFactory;
+    }
+
+    public void setFactFactory(FactFactory factFactory) {
+        this.factFactory = factFactory;
+    }
 
     /**
      * Compiles the Nero source, producing a rule set.
@@ -37,33 +54,18 @@ public class Compiler {
      * @throws JoeError on compilation failure.
      */
     public RuleSet compile() {
-        var ast = parse();
+        Set<Fact> facts = ast.facts().stream().map(this::ast2fact)
+            .collect(Collectors.toSet());
+        Set<Rule> rules = ast.rules().stream().map(this::ast2rule)
+            .collect(Collectors.toSet());
 
-        var ruleset = new RuleSet();
-
-        for (var f : ast.facts()) ruleset.add(ast2fact(f));
-        for (var r : ast.rules()) ruleset.add(ast2rule(r));
-
-        return ruleset;
-    }
-
-    public ASTRuleSet parse() {
-        var parser = new Parser(source, this::errorHandler);
-        var ast = parser.parseNero();
-        if (gotError) throw new JoeError("Error in Nero input.");
-        return ast;
-    }
-
-    private void errorHandler(Trace trace, boolean incomplete) {
-        gotError = true;
-        System.out.println("line " + trace.line() + ": " +
-            trace.message());
+        return new RuleSet(facts, rules);
     }
 
     //-------------------------------------------------------------------------
     // Compilation
 
-    private ConcreteFact ast2fact(ASTRuleSet.ASTIndexedAtom atom) {
+    private Fact ast2fact(ASTRuleSet.ASTOrderedAtom atom) {
         var terms = new ArrayList<>();
         for (var t : atom.terms()) {
             if (t instanceof ASTRuleSet.ASTConstant c) {
@@ -74,7 +76,7 @@ public class Compiler {
             }
         }
 
-        return new ConcreteFact(atom.relation().lexeme(), terms);
+        return factFactory.create(atom.relation().lexeme(), terms);
     }
 
     private Rule ast2rule(ASTRuleSet.ASTRule rule) {
@@ -86,7 +88,7 @@ public class Compiler {
         );
     }
 
-    private HeadAtom ast2head(ASTRuleSet.ASTIndexedAtom atom) {
+    private HeadAtom ast2head(ASTRuleSet.ASTOrderedAtom atom) {
         return new HeadAtom(
             atom.relation().lexeme(),
             atom.terms().stream().map(this::ast2term).toList()
@@ -95,7 +97,7 @@ public class Compiler {
 
     private BodyAtom ast2body(ASTRuleSet.ASTAtom atom) {
         return switch (atom) {
-            case ASTRuleSet.ASTIndexedAtom a -> new IndexedAtom(
+            case ASTRuleSet.ASTOrderedAtom a -> new OrderedAtom(
                 a.relation().lexeme(),
                 a.terms().stream().map(this::ast2term).toList()
             );

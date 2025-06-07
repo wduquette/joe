@@ -45,8 +45,7 @@ public class Parser {
         }
 
         // NEXT, produce the dump
-        var dumper = new Dumper();
-        return dumper.dump(statements);
+        return ASTDumper.dump(statements);
     }
 
     /**
@@ -540,12 +539,10 @@ public class Parser {
         }
 
         // NEXT, parse the default case, if it exists
-        Stmt.MatchCase defCase = null;
+        Stmt defCase = null;
         if (scanner.match(DEFAULT)) {
-            var caseKeyword = scanner.previous();
             scanner.consume(MINUS_GREATER, "Expected '->' after 'default'.");
-            var stmt = statement();
-            defCase = new Stmt.MatchCase(caseKeyword, null, null, stmt);
+            defCase = statement();
         }
 
         // NEXT, complete the statement
@@ -855,6 +852,8 @@ public class Parser {
             return new Expr.Literal(scanner.previous().literal());
         }
 
+        if (scanner.match(RULESET)) return ruleset();
+
         if (scanner.match(AT)) {
             Token keyword = scanner.previous();
             scanner.consume(IDENTIFIER, "Expected class property name.");
@@ -862,6 +861,7 @@ public class Parser {
             var obj = new Expr.This(keyword);
             return new Expr.PropGet(obj, name);
         }
+
 
         if (scanner.match(SUPER)) {
             Token keyword = scanner.previous();
@@ -1108,6 +1108,42 @@ public class Parser {
     // Nero Rule Sets
 
     /**
+     * Parses the source as embedded in a script, program, attempting to detect
+     * as many meaningful errors as possible.  Errors are reported via the
+     * parser's error reporter.  If errors were reported, the result of
+     * this method should be ignored.
+     * @return The parsed rule set.
+     */
+    public Expr.RuleSet ruleset() {
+        var keyword = scanner.previous();
+        var facts = new ArrayList<ASTRuleSet.ASTOrderedAtom>();
+        var rules = new ArrayList<ASTRuleSet.ASTRule>();
+
+        scanner.consume(LEFT_BRACE, "expected '{' after 'ruleset'.");
+
+        while (!scanner.match(RIGHT_BRACE)) {
+            try {
+                var head = head();
+
+                if (scanner.match(SEMICOLON)) {
+                    facts.add(fact(head));
+                } else if (scanner.match(COLON_MINUS)) {
+                    rules.add(rule(head));
+                } else {
+                    scanner.advance();
+                    throw errorSync(scanner.previous(),
+                        "expected fact or rule.");
+                }
+            } catch (ErrorSync error) {
+                synchronize();
+            }
+        }
+
+        var ast = new ASTRuleSet(facts, rules, Map.of());
+        return new Expr.RuleSet(keyword, ast);
+    }
+
+    /**
      * Parses the source as a standalone Nero program, attempting to detect
      * as many meaningful errors as possible.  Errors are reported via the
      * parser's error reporter.  If errors were reported, the result of
@@ -1118,7 +1154,7 @@ public class Parser {
         this.scanner = new Scanner(source, this::errorInScanner);
         scanner.prime();
 
-        List<ASTRuleSet.ASTIndexedAtom> facts = new ArrayList<>();
+        List<ASTRuleSet.ASTOrderedAtom> facts = new ArrayList<>();
         List<ASTRuleSet.ASTRule> rules = new ArrayList<>();
 
         while (!scanner.isAtEnd()) {
@@ -1139,10 +1175,11 @@ public class Parser {
             }
         }
 
-        return new ASTRuleSet(facts, rules);
+        // No exports; return an empty map.
+        return new ASTRuleSet(facts, rules, Map.of());
     }
 
-    private ASTRuleSet.ASTIndexedAtom head() {
+    private ASTRuleSet.ASTOrderedAtom head() {
         // NEXT, parse the atom.
         scanner.consume(IDENTIFIER, "expected relation.");
         var relation = scanner.previous();
@@ -1150,7 +1187,7 @@ public class Parser {
         return indexedAtom(relation);
     }
 
-    private ASTRuleSet.ASTIndexedAtom fact(ASTRuleSet.ASTIndexedAtom head) {
+    private ASTRuleSet.ASTOrderedAtom fact(ASTRuleSet.ASTOrderedAtom head) {
         // Verify that there are no non-constant terms.
         for (var term : head.terms()) {
             if (!(term instanceof ASTRuleSet.ASTConstant)) {
@@ -1160,7 +1197,7 @@ public class Parser {
         return head;
     }
 
-    private ASTRuleSet.ASTRule rule(ASTRuleSet.ASTIndexedAtom head) {
+    private ASTRuleSet.ASTRule rule(ASTRuleSet.ASTOrderedAtom head) {
         var body = new ArrayList<ASTRuleSet.ASTAtom>();
         var negations = new ArrayList<ASTRuleSet.ASTAtom>();
         var constraints = new ArrayList<ASTRuleSet.ASTConstraint>();
@@ -1262,7 +1299,7 @@ public class Parser {
         }
     }
 
-    private ASTRuleSet.ASTIndexedAtom indexedAtom(Token relation) {
+    private ASTRuleSet.ASTOrderedAtom indexedAtom(Token relation) {
         var terms = new ArrayList<ASTRuleSet.ASTTerm>();
 
         do {
@@ -1271,7 +1308,7 @@ public class Parser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new ASTRuleSet.ASTIndexedAtom(relation, terms);
+        return new ASTRuleSet.ASTOrderedAtom(relation, terms);
     }
 
     private ASTRuleSet.ASTNamedAtom namedAtom(Token relation) {
