@@ -966,7 +966,7 @@ class Compiler {
             case Expr.RuleSet e -> {
                 var rsc = new RuleSetCompiler(e.ruleSet());
                 rsc.setFactFactory(FactValue::new);
-                emitCONST(new RuleSetValue(rsc.compile()));
+                emitCONST(new RuleSetValue(rsc.compile(), Map.of()));
             }
             case Expr.Super e -> {
                 if (currentType == null || !currentType.inInstanceMethod) {

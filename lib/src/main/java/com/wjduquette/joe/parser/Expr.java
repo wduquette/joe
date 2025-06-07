@@ -216,7 +216,7 @@ public sealed interface Expr permits
     record RuleSet(
         Token keyword,
         ASTRuleSet ruleSet,
-        Map<String,Expr> exports
+        Map<Token,Expr> exports
     ) implements Expr {
         public Span location() { return keyword.span(); }
     }

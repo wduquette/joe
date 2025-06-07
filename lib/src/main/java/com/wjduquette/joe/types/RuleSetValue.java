@@ -1,10 +1,12 @@
 package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeCallable;
 import com.wjduquette.joe.JoeNero;
 import com.wjduquette.joe.nero.RuleSet;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * A RuleSetValue wraps up a Nero
@@ -12,8 +14,9 @@ import java.util.Collection;
  * required to make use of it in Joe scripts.  It is the type returned
  * by Joe's `ruleset` expression.
  * @param ruleset The Nero rule set.
+ * @param exports map from relation to export callable
  */
-public record RuleSetValue(RuleSet ruleset) {
+public record RuleSetValue(RuleSet ruleset, Map<String, JoeCallable> exports) {
     /**
      * Infer facts from the rule set.
      * @return The set of all known facts.

@@ -1120,7 +1120,7 @@ public class Parser {
         var keyword = scanner.previous();
         var facts = new ArrayList<ASTRuleSet.ASTOrderedAtom>();
         var rules = new ArrayList<ASTRuleSet.ASTRule>();
-        var exports = new HashMap<String, Expr>();
+        var exports = new HashMap<Token, Expr>();
 
         scanner.consume(LEFT_BRACE, "expected '{' after 'ruleset'.");
 
@@ -1133,9 +1133,9 @@ public class Parser {
 
                     if (scanner.matchIdentifier(AS)) {
                         var expr = expression();
-                        exports.put(name.lexeme(), expr);
+                        exports.put(name, expr);
                     } else {
-                        exports.put(name.lexeme(), new Expr.VarGet(name));
+                        exports.put(name, new Expr.VarGet(name));
                     }
                     scanner.consume(SEMICOLON,
                         "expected ';' after export declaration.");

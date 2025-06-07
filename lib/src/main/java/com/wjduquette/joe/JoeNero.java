@@ -78,10 +78,19 @@ public class JoeNero {
 
         // NEXT, build the list of known facts.  We want the input
         // facts as they were given to us, plus the newly inferred
-        // facts.
+        // facts, converted according to any export declarations.
         var result = new SetValue();
         result.addAll(inputs);
-        result.addAll(nero.getInferredFacts());
+
+        for (var fact : nero.getInferredFacts()) {
+            var creator = rsv.exports().get(fact.relation());
+
+            if (creator != null) {
+                result.add(joe.call(creator, fact.getFields().toArray()));
+            } else {
+                result.add(fact);
+            }
+        }
         return result;
     }
 

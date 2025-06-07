@@ -236,7 +236,8 @@ public class ASTDumper {
                     .dump("ruleset", e.ruleSet());
 
                 for (var export : e.exports().entrySet()) {
-                    buff.dump("export " + export.getKey(), export.getValue());
+                    buff.dump("export " + export.getKey().lexeme(),
+                        export.getValue());
                 }
 
                 yield buff.toString();
