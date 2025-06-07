@@ -77,6 +77,7 @@ public class Parser {
     private final SourceBuffer source;
     private final ErrorReporter reporter;
     private Scanner scanner = null;
+    private boolean synchronizing = false;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -118,8 +119,10 @@ public class Parser {
 
     // Handles scan errors, triggering synchronization.
     private void errorInScanner(SourceBuffer.Span span, String message) {
-        reporter.reportError(new Trace(span, message), span.isAtEnd());
-        if (scanner.isPrimed()) throw new ErrorSync(message);
+        if (!synchronizing) {
+            reporter.reportError(new Trace(span, message), span.isAtEnd());
+            if (scanner.isPrimed()) throw new ErrorSync(message);
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -1380,30 +1383,36 @@ public class Parser {
 
     // Discard tokens until we are at the beginning of the next statement.
     private void synchronize() {
-        // Discard this token
-        scanner.advance();
+        try {
+            synchronizing = true;
 
-        while (!scanner.isAtEnd()) {
-            // If we see we just completed a statement, return.
-            if (scanner.previous().type() == SEMICOLON) return;
-
-            // If we see a keyword indicating the beginning of a new
-            // statement, return.
-            switch (scanner.peek().type()) {
-                case ASSERT:
-                case CLASS:
-                case FOR:
-                case FUNCTION:
-                case IF:
-                case METHOD:
-                case RETURN:
-                case VAR:
-                case WHILE:
-                    return;
-            }
-
-            // Discard this token.
+            // Discard this token
             scanner.advance();
+
+            while (!scanner.isAtEnd()) {
+                // If we see we just completed a statement, return.
+                if (scanner.previous().type() == SEMICOLON) return;
+
+                // If we see a keyword indicating the beginning of a new
+                // statement, return.
+                switch (scanner.peek().type()) {
+                    case ASSERT:
+                    case CLASS:
+                    case FOR:
+                    case FUNCTION:
+                    case IF:
+                    case METHOD:
+                    case RETURN:
+                    case VAR:
+                    case WHILE:
+                        return;
+                }
+
+                // Discard this token.
+                scanner.advance();
+            }
+        } finally {
+            synchronizing = false;
         }
     }
 

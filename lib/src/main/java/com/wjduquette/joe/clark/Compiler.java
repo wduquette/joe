@@ -128,6 +128,8 @@ class Compiler {
         try {
             var buff = new SourceBuffer(scriptName, source);
             function = compileScript(buff);
+        } catch (SyntaxError ex) {
+            throw ex;
         } catch (Exception ex) {
             var context = ex.getStackTrace()[0].toString();
             throw new SyntaxError(
