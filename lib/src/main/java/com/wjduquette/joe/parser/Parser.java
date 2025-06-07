@@ -1352,7 +1352,7 @@ public class Parser {
             } else {
                 return new ASTRuleSet.ASTVariable(name);
             }
-        } else if (scanner.match(KEYWORD, NUMBER, STRING)) {
+        } else if (scanner.match(KEYWORD, NUMBER, STRING, TRUE, FALSE, NULL)) {
             return new ASTRuleSet.ASTConstant(scanner.previous());
         } else {
             scanner.advance();
