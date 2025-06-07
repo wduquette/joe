@@ -733,7 +733,7 @@ class Interpreter {
                 var rsc = new RuleSetCompiler(e.ruleSet());
                 rsc.setFactFactory(FactValue::new);
                 var ruleset = rsc.compile();
-                var exports = new HashMap<String, JoeCallable>();
+                var exports = new HashMap<String, Object>();
 
                 for (var export : e.exports().entrySet()) {
                     var name = export.getKey();
@@ -957,7 +957,7 @@ class Interpreter {
             return jc;
         } else {
             throw new RuntimeError(token.span(),
-                "Expected callable, got: " + joe.typedValue(value));
+                "Expected callable, got: " + joe.typedValue(value) + ".");
         }
     }
 }
