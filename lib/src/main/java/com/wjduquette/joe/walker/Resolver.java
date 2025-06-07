@@ -314,7 +314,7 @@ class Resolver {
                 resolve(expr.value());
                 resolve(expr.object());
             }
-            case Expr.RuleSet ignored -> {}
+            case Expr.RuleSet ignored -> { }
             case Expr.Super expr -> {
                 if (currentClass == ClassType.NONE) {
                     error(expr.keyword(),

@@ -17,6 +17,8 @@ import static com.wjduquette.joe.scanner.TokenType.*;
  */
 public class Parser {
     public static final String ARGS = "args";
+    public static final String AS = "as";
+    public static final String EXPORT = "export";
     private static final int MAX_CALL_ARGUMENTS = 255;
 
     //-------------------------------------------------------------------------
@@ -1118,29 +1120,45 @@ public class Parser {
         var keyword = scanner.previous();
         var facts = new ArrayList<ASTRuleSet.ASTOrderedAtom>();
         var rules = new ArrayList<ASTRuleSet.ASTRule>();
+        var exports = new HashMap<String, Expr>();
 
         scanner.consume(LEFT_BRACE, "expected '{' after 'ruleset'.");
 
         while (!scanner.match(RIGHT_BRACE)) {
             try {
-                var head = head();
+                if (scanner.matchIdentifier(EXPORT)) {
+                    scanner.consume(IDENTIFIER,
+                        "expected relation name after 'export'.");
+                    var name = scanner.previous();
 
-                if (scanner.match(SEMICOLON)) {
-                    facts.add(fact(head));
-                } else if (scanner.match(COLON_MINUS)) {
-                    rules.add(rule(head));
+                    if (scanner.matchIdentifier(AS)) {
+                        var expr = expression();
+                        exports.put(name.lexeme(), expr);
+                    } else {
+                        exports.put(name.lexeme(), new Expr.VarGet(name));
+                    }
+                    scanner.consume(SEMICOLON,
+                        "expected ';' after export declaration.");
                 } else {
-                    scanner.advance();
-                    throw errorSync(scanner.previous(),
-                        "expected fact or rule.");
+                    var head = head();
+
+                    if (scanner.match(SEMICOLON)) {
+                        facts.add(fact(head));
+                    } else if (scanner.match(COLON_MINUS)) {
+                        rules.add(rule(head));
+                    } else {
+                        scanner.advance();
+                        throw errorSync(scanner.previous(),
+                            "expected fact or rule.");
+                    }
                 }
             } catch (ErrorSync error) {
                 synchronize();
             }
         }
 
-        var ast = new ASTRuleSet(facts, rules, Map.of());
-        return new Expr.RuleSet(keyword, ast);
+        var ast = new ASTRuleSet(facts, rules);
+        return new Expr.RuleSet(keyword, ast, exports);
     }
 
     /**
@@ -1176,7 +1194,7 @@ public class Parser {
         }
 
         // No exports; return an empty map.
-        return new ASTRuleSet(facts, rules, Map.of());
+        return new ASTRuleSet(facts, rules);
     }
 
     private ASTRuleSet.ASTOrderedAtom head() {
