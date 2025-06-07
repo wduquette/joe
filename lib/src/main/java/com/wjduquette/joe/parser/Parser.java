@@ -1108,7 +1108,7 @@ public class Parser {
     // Nero Rule Sets
 
     /**
-     * Parses the source as a standalone Nero program, attempting to detect
+     * Parses the source as embedded in a script, program, attempting to detect
      * as many meaningful errors as possible.  Errors are reported via the
      * parser's error reporter.  If errors were reported, the result of
      * this method should be ignored.
@@ -1139,7 +1139,8 @@ public class Parser {
             }
         }
 
-        return new Expr.RuleSet(keyword, new ASTRuleSet(facts, rules));
+        var ast = new ASTRuleSet(facts, rules, Map.of());
+        return new Expr.RuleSet(keyword, ast);
     }
 
     /**
@@ -1174,7 +1175,8 @@ public class Parser {
             }
         }
 
-        return new ASTRuleSet(facts, rules);
+        // No exports; return an empty map.
+        return new ASTRuleSet(facts, rules, Map.of());
     }
 
     private ASTRuleSet.ASTOrderedAtom head() {

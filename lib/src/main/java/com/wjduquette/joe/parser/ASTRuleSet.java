@@ -10,8 +10,15 @@ import java.util.stream.Collectors;
 /**
  * This class contains the Abstract Syntax Tree (AST) types for Nero
  * rule sets.
+ * @param facts The axioms read from the rule set
+ * @param rules The rules read from the rule set
+ * @param exports export declarations
  */
-public record ASTRuleSet(List<ASTOrderedAtom> facts, List<ASTRule> rules) {
+public record ASTRuleSet(
+    List<ASTOrderedAtom> facts,
+    List<ASTRule> rules,
+    Map<String,Expr> exports
+) {
     @Override
     public String toString() {
         var buff = new StringBuilder();
