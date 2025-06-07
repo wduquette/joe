@@ -245,18 +245,19 @@ value.</li>
 <tr><td>54</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
 <tr><td>55</td><td>RECORD <em>name fields</em></td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
 <tr><td>56</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
-<tr><td>57</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
-<tr><td>58</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
-<tr><td>59</td><td>SWAP</td><td><em>a b</em> → <em>b a</em></td><td>Swap top stack items</td></tr>
-<tr><td>60</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
-<tr><td>61</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
-<tr><td>62</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
-<tr><td>63</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
-<tr><td>64</td><td>TSET</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
-<tr><td>65</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
-<tr><td>66</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
-<tr><td>67</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
-<tr><td>68</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
+<tr><td>57</td><td>RULESET <em>ruleset</em></td><td><em>exports</em> → <em>rsv</em></td><td>Evaluate rule set</td></tr>
+<tr><td>58</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
+<tr><td>59</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
+<tr><td>60</td><td>SWAP</td><td><em>a b</em> → <em>b a</em></td><td>Swap top stack items</td></tr>
+<tr><td>61</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
+<tr><td>62</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
+<tr><td>63</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
+<tr><td>64</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
+<tr><td>65</td><td>TSET</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
+<tr><td>66</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
+<tr><td>67</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
+<tr><td>68</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
+<tr><td>69</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
 </tbody></table>
 </div>
 <p><strong>Stack Effects:</strong> in the stack effect column, the top of the stack is on the
@@ -618,6 +619,11 @@ will add methods, execute static initializers, etc.</p>
 <p>Returns <em>a</em> from the current function/call frame.  If the function was invoked
 from Java via <code>VirtualMachine::execute</code> or <code>VirtualMachine::callFromJava</code>, the
 result is popped and returned to the Java caller.</p>
+<h3 id="ruleset"><a class="header" href="#ruleset">RULESET</a></h3>
+<hr />
+<p><strong>RULESET</strong> <em>ruleset</em> | <em>exports</em> → <em>rsv</em></p>
+<p>Given a <code>RuleSet</code> as a constant, and x map of callable expressions by relation
+name on the stack, creates a <code>RuleSetValue</code>.</p>
 <h3 id="sub"><a class="header" href="#sub">SUB</a></h3>
 <hr />
 <p><strong>SUB</strong> | <em>a</em> <em>b</em> → *c, where <em>c</em> = (<em>a</em> - <em>b</em>)</p>

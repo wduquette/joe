@@ -10,20 +10,16 @@ import com.wjduquette.joe.SourceBuffer.Span;
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.TokenType;
 import com.wjduquette.joe.types.FactValue;
-import com.wjduquette.joe.types.RuleSetValue;
 
 import static com.wjduquette.joe.clark.Opcode.*;
 
 import java.util.*;
 
 /**
- * The Bert byte-compiler.  This is a single-pass compiler, parsing the
- * source and producing compiled code simultaneously; there is no
- * intermediate form.
- *
- * <p>The compiler uses a Pratt parser for parsing expressions; every
- * {@link TokenType} must be represented in the parser table.  See
- * {@code populateRulesTable} at the bottom of the file.</p>
+ * The Clark byte-compiler.  The code is loosely based on the legacy
+ * Bert compiler, a single-pass compiler based on Nystrom's `clox`
+ * compiler, but Clark works from the standard `Parser`'s AST, and
+ * the code-generation API is vastly clearer than Bert's.
  */
 @SuppressWarnings({"unused", "RedundantLabeledSwitchRuleCodeBlock", "SameParameterValue"})
 class Compiler {
@@ -964,9 +960,20 @@ class Compiler {
                 emit(PROPSET, name);      // c      ; o.name = c
             }
             case Expr.RuleSet e -> {
+                // FIRST, compile the rule set.
                 var rsc = new RuleSetCompiler(e.ruleSet());
                 rsc.setFactFactory(FactValue::new);
-                emitCONST(new RuleSetValue(rsc.compile()));
+                var ruleset = rsc.compile();
+
+                // Get the exports                // Stack effects
+                emit(MAPNEW);                     // map       ; Map of exports
+                for (var export : e.exports().entrySet()) {
+                    var name = export.getKey().lexeme();
+                    emitCONST(name);              // map k     ; export name
+                    emit(export.getValue());      // map k v   ; export value
+                    emit(MAPPUT);                 // map       ; put k v
+                }
+                emit(RULESET, constant(ruleset)); // rsv       ; RuleSetValue
             }
             case Expr.Super e -> {
                 if (currentType == null || !currentType.inInstanceMethod) {

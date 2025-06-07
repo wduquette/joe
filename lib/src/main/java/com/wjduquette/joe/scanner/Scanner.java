@@ -162,6 +162,29 @@ public class Scanner {
     }
 
     /**
+     * Returns true if peek() returns an IDENTIFIER token with one of the given
+     * lexemes, and false otherwise, advancing the scanner on match().
+     * On true, previous() will  return the just matched token.
+     *
+     * <p>This is for use when a bit of syntax needs a literal word but
+     * the word need not be reserved to avoid confusion.</p>
+     * @param lexemes The desired lexemes
+     * @return true or false.
+     */
+    public boolean matchIdentifier(String... lexemes) {
+        if (peek().type() == TokenType.IDENTIFIER) {
+            for (var lexeme : lexemes) {
+                if (lexeme.equals(peek().lexeme())) {
+                    advance();
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Requires that the next token have the given type.  If it does,
      * the scanner is advanced; previous() will return the consumed
      * token.  If not, an error is generated with the given message.

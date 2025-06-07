@@ -76,18 +76,19 @@ The byte-engine is a stack machine with a few registers:
 | 54 | PROPSET *name*       | *obj a* → *a*      | Set property value        |
 | 55 | RECORD *name fields* | ∅ → *type*         | Create record type        |
 | 56 | RETURN               | *a* → *a*          | Return                    |
-| 57 | SUB                  | *a b* → *c*        | c = a - b                 |
-| 58 | SUPGET *name*        | *obj sup* → *f*    | Get superclass method     |
-| 59 | SWAP                 | *a b* → *b a*      | Swap top stack items      |
-| 60 | TGET                 | ∅ → *a*            | *a* = T                   |
-| 61 | THROW                | *a* → ∅            | Throw error               |
-| 62 | TRCPOP               | ∅ → ∅              | Pops a post-trace         |
-| 63 | TRCPUSH *trace*      | ∅ → ∅              | Pushes a post-trace       |
-| 64 | TSET                 | *a* → *a*          | T = *a*                   |
-| 65 | TRUE                 | ∅ → true           | Load `true`               |
-| 66 | UPCLOSE *n*          | *v...* → ∅         | Closes *n* upvalue(s)     |
-| 67 | UPGET *slot*         | ∅ → *a*            | Get upvalue               |
-| 68 | UPSET *slot*         | *a* → *a*          | Set upvalue               |
+| 57 | RULESET *ruleset*    | *exports* → *rsv*  | Evaluate rule set         |
+| 58 | SUB                  | *a b* → *c*        | c = a - b                 |
+| 59 | SUPGET *name*        | *obj sup* → *f*    | Get superclass method     |
+| 60 | SWAP                 | *a b* → *b a*      | Swap top stack items      |
+| 61 | TGET                 | ∅ → *a*            | *a* = T                   |
+| 62 | THROW                | *a* → ∅            | Throw error               |
+| 63 | TRCPOP               | ∅ → ∅              | Pops a post-trace         |
+| 64 | TRCPUSH *trace*      | ∅ → ∅              | Pushes a post-trace       |
+| 65 | TSET                 | *a* → *a*          | T = *a*                   |
+| 66 | TRUE                 | ∅ → true           | Load `true`               |
+| 67 | UPCLOSE *n*          | *v...* → ∅         | Closes *n* upvalue(s)     |
+| 68 | UPGET *slot*         | ∅ → *a*            | Get upvalue               |
+| 69 | UPSET *slot*         | *a* → *a*          | Set upvalue               |
 
 **Stack Effects:** in the stack effect column, the top of the stack is on the 
 right.  
@@ -552,6 +553,13 @@ will add methods, execute static initializers, etc.
 Returns *a* from the current function/call frame.  If the function was invoked
 from Java via `VirtualMachine::execute` or `VirtualMachine::callFromJava`, the
 result is popped and returned to the Java caller.
+
+### RULESET
+---
+**RULESET** *ruleset* | *exports* → *rsv*
+
+Given a `RuleSet` as a constant, and x map of callable expressions by relation 
+name on the stack, creates a `RuleSetValue`.
 
 ### SUB
 ---

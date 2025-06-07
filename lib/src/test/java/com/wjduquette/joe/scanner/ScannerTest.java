@@ -108,6 +108,19 @@ public class ScannerTest extends Ted {
             .items("error at '+', expected true.");
     }
 
+    @Test public void testMatchIdentifier() {
+        test("testMatchIdentifier");
+
+        scan("hello");
+        check(scanner.isPrimed()).eq(true);
+
+        check(scanner.matchIdentifier("a", "b", "c")).eq(false);
+        check(scanner.peek().lexeme()).eq("hello");
+        check(scanner.matchIdentifier("a", "hello")).eq(true);
+        check(scanner.previous().lexeme()).eq("hello");
+        check(scanner.peek().type()).eq(TokenType.EOF);
+    }
+
     //-------------------------------------------------------------------------
     // Helpers
 

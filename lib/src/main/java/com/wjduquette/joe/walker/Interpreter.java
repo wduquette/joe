@@ -732,7 +732,16 @@ class Interpreter {
             case Expr.RuleSet e -> {
                 var rsc = new RuleSetCompiler(e.ruleSet());
                 rsc.setFactFactory(FactValue::new);
-                yield new RuleSetValue(rsc.compile());
+                var ruleset = rsc.compile();
+                var exports = new HashMap<String, Object>();
+
+                for (var export : e.exports().entrySet()) {
+                    var name = export.getKey();
+                    var callable = evaluate(export.getValue());
+                    exports.put(name.lexeme(), checkCallable(name, callable));
+                }
+
+                yield new RuleSetValue(ruleset, exports);
             }
 
             // Handle `super.<methodName>` in methods
@@ -943,4 +952,12 @@ class Interpreter {
         }
     }
 
+    private JoeCallable checkCallable(Token token, Object value) {
+        if (value instanceof JoeCallable jc) {
+            return jc;
+        } else {
+            throw new RuntimeError(token.span(),
+                "Expected callable, got: " + joe.typedValue(value) + ".");
+        }
+    }
 }

@@ -1,12 +1,14 @@
 package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.RuleSet;
 import com.wjduquette.joe.parser.FunctionType;
 import com.wjduquette.joe.patterns.Matcher;
 import com.wjduquette.joe.patterns.Pattern;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
+import com.wjduquette.joe.types.RuleSetValue;
 
 import java.util.*;
 
@@ -706,6 +708,17 @@ class VirtualMachine {
                         joe.println(stackText());
                     }
                 }
+                case RULESET -> {
+                    var ruleset = readRuleSet();
+                    @SuppressWarnings("unchecked")
+                    var exports = (Map<String,Object>)pop();
+
+                    for (var callable : exports.values()) {
+                        checkCallable(callable);
+                    }
+
+                    push(new RuleSetValue(ruleset, exports));
+                }
                 case SUB -> {
                     var b = pop();
                     var a = pop();
@@ -850,6 +863,13 @@ class VirtualMachine {
         };
     }
 
+    private void checkCallable(Object arg) {
+        if (!(arg instanceof JoeCallable)) {
+            throw error("Expected callable, got: " +
+                joe.typedValue(arg) + ".");
+        }
+    }
+
     private RuntimeError error(String message) {
         return new RuntimeError(ipSpan(), message);
     }
@@ -915,6 +935,13 @@ class VirtualMachine {
     private Pattern readPattern() {
         var index = frame.closure.function.code[frame.ip++];
         return (Pattern)frame.closure.function.constants[index];
+    }
+
+    // Reads a constant index from the chunk, and returns the indexed
+    // constant as a RuleSet.
+    private RuleSet readRuleSet() {
+        var index = frame.closure.function.code[frame.ip++];
+        return (RuleSet)frame.closure.function.constants[index];
     }
 
     //-------------------------------------------------------------------------

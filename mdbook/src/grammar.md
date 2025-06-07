@@ -117,6 +117,7 @@ primary         → "true" | "false" | "nil"
                 | lambda 
                 | grouping
                 | list 
+                | "ruleset" "{" ruleset "}" ;
                 | "super" "." IDENTIFIER ;
 grouping        → "(" expression ")"
 lambda          → "\" parameters? "->" ( expression | block ) ; 
@@ -218,7 +219,7 @@ Differences from classic Datalog with negation:
 - Comments begin with `//` rather than `%`
 - Horn clauses end with `;` rather than '.'.
 - Relations usually have initial caps, to match Monica type names.
-- Constant terms can be Monica keywords, strings, or numbers, or, if read
+- Constant terms can be Monica scalar values, or, if read
   from a scripted input fact, any Monica value.
 - Variables are normal identifiers, usually lowercase.
 - Wildcards are identifiers with a leading `_`.
@@ -227,9 +228,11 @@ Differences from classic Datalog with negation:
 
 ```grammar
 nero        → clause* EOF ;
-clause      → fact
+ruleset     → ( clause | export )* EOF ;
+export      → "export" IDENTIFIER ( "as" expression )? ";" ;
+clause      → axiom
             | rule ;
-fact        → head ";"
+axiom       → head ";"
 rule        → head ":-" body ( "where" constraints )? ";"
 head        → indexedAtom ;
 body        → "not"? bodyAtom ( "," "not"? bodyAtom )* ;
@@ -240,7 +243,7 @@ namedTerm   → IDENTIFIER ":" term ;
 constrants  → constraint ( "," constraint )* ;
 constraint  → variable ( "==" | "!=" | ">" | ">=" | "<" | "<=" ) term ;
 term        → constant | variable | wildcard ;
-constant    → KEYWORD | STRING | NUMBER ;
+constant    → KEYWORD | STRING | NUMBER | TRUE | FALSE | NULL ;
 variable    → IDENTIFIER ;     // No leading "_"
 wildcard    → IDENTIFIER ;     // With leading "_"
 ```

@@ -244,3 +244,26 @@ function testInfer_class_ordered() {
     assertError(\-> rules.infer(inputs),
         "'Parent' in rule 'Ancestor(x, y) :- Parent(x, y);' requires ordered fields, but a provided fact is not ordered.");
 }
+
+// Verify that facts can be exported by name and by an expression
+function testExport() {
+    record Parent(p, c) {}
+
+    var rules = ruleset {
+        export Parent;
+        Parent(#anne, #bert);
+        Parent(#bert, #clark);
+
+        export Ancestor as \x,y -> [x, y];
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+    var results = rules.infer().map(Joe.stringify).sorted();
+    check(results).eq([
+        "Parent(#anne, #bert)",
+        "Parent(#bert, #clark)",
+        "[#anne, #bert]",
+        "[#anne, #clark]",
+        "[#bert, #clark]"
+    ]);
+}

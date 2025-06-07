@@ -76,18 +76,19 @@ public class Opcode {
     /** Opcode */ public static final char PROPSET = 54;
     /** Opcode */ public static final char RECORD  = 55;
     /** Opcode */ public static final char RETURN  = 56;
-    /** Opcode */ public static final char SUB     = 57;
-    /** Opcode */ public static final char SUPGET  = 58;
-    /** Opcode */ public static final char SWAP    = 59;
-    /** Opcode */ public static final char TGET    = 60;
-    /** Opcode */ public static final char THROW   = 61;
-    /** Opcode */ public static final char TRCPOP  = 62;
-    /** Opcode */ public static final char TRCPUSH = 63;
-    /** Opcode */ public static final char TSET    = 64;
-    /** Opcode */ public static final char TRUE    = 65;
-    /** Opcode */ public static final char UPCLOSE = 66;
-    /** Opcode */ public static final char UPGET   = 67;
-    /** Opcode */ public static final char UPSET   = 68;
+    /** Opcode */ public static final char RULESET = 57;
+    /** Opcode */ public static final char SUB     = 58;
+    /** Opcode */ public static final char SUPGET  = 59;
+    /** Opcode */ public static final char SWAP    = 60;
+    /** Opcode */ public static final char TGET    = 61;
+    /** Opcode */ public static final char THROW   = 62;
+    /** Opcode */ public static final char TRCPOP  = 63;
+    /** Opcode */ public static final char TRCPUSH = 64;
+    /** Opcode */ public static final char TSET    = 65;
+    /** Opcode */ public static final char TRUE    = 66;
+    /** Opcode */ public static final char UPCLOSE = 67;
+    /** Opcode */ public static final char UPGET   = 68;
+    /** Opcode */ public static final char UPSET   = 69;
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -154,6 +155,7 @@ public class Opcode {
         "PROPSET",
         "RECORD",
         "RETURN",
+        "RULESET",
         "SUB",
         "SUPGET",
         "SWAP",
