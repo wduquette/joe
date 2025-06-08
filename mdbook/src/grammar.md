@@ -96,7 +96,7 @@ assignment      → ( ( call "." )? IDENTIFIER
                 | ternary ;
 ternary         → logic_or "?" logic_or ":" logic_or ;
 logic_or        → logic_and ( "||" logic_and )* ;
-logic_or        → equality ( "&&" equality )* ;
+logic_and       → equality ( "&&" equality )* ;
 equality        → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison      → term ( ( ">" | ">=" | "<" | "<=" | "in" | "ni" ) term )* ;
 term            → factor ( ( "-" | "+" ) factor )* ;

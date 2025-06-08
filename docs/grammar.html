@@ -263,7 +263,7 @@ assignment      → ( ( call "." )? IDENTIFIER
                 | ternary ;
 ternary         → logic_or "?" logic_or ":" logic_or ;
 logic_or        → logic_and ( "||" logic_and )* ;
-logic_or        → equality ( "&amp;&amp;" equality )* ;
+logic_and       → equality ( "&amp;&amp;" equality )* ;
 equality        → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison      → term ( ( "&gt;" | "&gt;=" | "&lt;" | "&lt;=" | "in" | "ni" ) term )* ;
 term            → factor ( ( "-" | "+" ) factor )* ;
