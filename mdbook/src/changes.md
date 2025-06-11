@@ -14,6 +14,9 @@
     - `var` can now do destructuring binds while still handling simple variable
       declarations efficiently.
   - `foreach` can now do a destructuring bind on each item in the collection.
+  - The new `~` operator is a comparison operator that checks whether a Joe
+    value matches a Joe pattern, binding any variables in the local scope.
+    It replaces the existing `if let` statement, which has been removed.
 - Extensibility
   - Simplified implementation of proxy types for native record types.
     - Any `ProxyType` can now easily define read-only fields for its proxied
