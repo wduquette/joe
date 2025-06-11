@@ -49,7 +49,6 @@ statement       → exprStmt
                 | forStmt
                 | foreachStmt
                 | ifStmt
-                | ifLetStmt
                 | matchStmt
                 | printStmt
                 | returnStmt
@@ -67,8 +66,6 @@ forStmt         → "for" "(" ( varDecl | exprStmt | ";" )
 forEachStmt     → "foreach" "(" pattern ":" expression ")" statement;
 ifStmt          → "if" "(" expression ")" statement 
                   ( "else" statement )? ;
-ifLetStmt       → "if" "let" "(" pattern "=" expression ")" statement 
-                  ( "else" statement )? ; 
 matchStmt       → "match" "(" expression ")" "{" 
                   ( "case" pattern ( "if" expression )? "->" statement )+ 
                   ( "default" "->" statement )? 
@@ -98,7 +95,7 @@ ternary         → logic_or "?" logic_or ":" logic_or ;
 logic_or        → logic_and ( "||" logic_and )* ;
 logic_and       → equality ( "&&" equality )* ;
 equality        → comparison ( ( "!=" | "==" ) comparison )* ;
-comparison      → term ( ( ">" | ">=" | "<" | "<=" | "in" | "ni" ) term )* ;
+comparison      → term ( ( ">" | ">=" | "<" | "<=" | "~" | "in" | "ni" ) term )* ;
 term            → factor ( ( "-" | "+" ) factor )* ;
 factor          → unary ( ( "/" | "*" ) unary )* ;
 unary           → ( "++" | "==" | "-" | "!" ) unary 
@@ -128,8 +125,8 @@ map_entry       → expression ":" expression ;
 
 ## Patterns
 
-A `pattern` is a destructuring pattern that can appear in a `let` statement,
-an `if let` statement, or as a `case` of a `match` statement.
+A `pattern` is a destructuring pattern that can be used with the `~` 
+operator, and with a number of Joe statements.
 
 ```
 pattern         → constantPattern

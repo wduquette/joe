@@ -10,7 +10,6 @@ by a semicolon or (sometimes) a block, as in Java.
 - [Blocks](#blocks)
 - [Return](#return)
 - [If Statements](#if-statements)
-- [If Let Statements](#if-let-statements)
 - [While Loops](#while-loops)
 - [For Loops](#for-loops)
 - [Foreach Loops](#foreach-loops)
@@ -64,8 +63,8 @@ the target value, e.g., if `f()` didn't return a two-item list in the
 example shown above, then the pattern match will fail and Joe will
 throw a runtime error.  Therefore, `var` should only be used when the
 shape of the target value is known ahead of time.  Use
-[`if let`](#the-if-let-statement) or
-[`match`](#the-match-statement) to test whether a value matches a
+the [`~` operator](operators.md#matching-operator) or the
+[`match` statement](#the-match-statement) to test whether a value matches a
 particular pattern.
 
 See [Pattern Matching](patterns.md) for more on pattern matching and
@@ -130,30 +129,6 @@ if (x == 5) {
     ...
 }
 ```
-
-## If Let Statements
-
-The `if let` uses a [pattern](patterns.md) to do a conditional 
-destructuring bind on a data structure.  If the pattern matches, `if let`
-executes its "then" branch with the bound variables in scope;
-otherwise it executes its "else" branch:
-
-```joe
-var list = [1, 2];
-
-if let ([a, b] = list) {
-    println(a); // Prints "1"
-    println(b); // Prints "2"
-} else {
-    println("no match");
-}
-```
-
-The pattern's binding variables (`a` and `b` in this example) are in-scope only
-in the "then" branch.
-
-See [Pattern Matching](patterns.md) for more on pattern matching and
-destructuring binds, including Joe's full pattern syntax.
 
 ## While Loops
 

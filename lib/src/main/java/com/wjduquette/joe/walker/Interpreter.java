@@ -230,36 +230,6 @@ class Interpreter {
                     return execute(stmt.elseBranch());
                 }
             }
-            case Stmt.IfLet stmt -> {
-                // Evaluate the pattern constants and the target value.
-                var constants = new ArrayList<>();
-                stmt.pattern().getConstants().forEach(e ->
-                    constants.add(evaluate(e)));
-                var target = evaluate(stmt.target());
-
-                // Do the binding in the pattern scope.
-                var previous = this.environment;
-                this.environment = new Environment(previous);
-                try {
-                    var bound = new HashMap<String,Object>();
-                    if (Matcher.bind(
-                        joe,
-                        stmt.pattern().getPattern(),
-                        target,
-                        constants::get,
-                        bound::put
-                    )) {
-                        bind(bound);
-                        return execute(stmt.thenBranch());
-                    }
-                } finally {
-                    this.environment = previous;
-                }
-
-                if (stmt.elseBranch() != null) {
-                    return execute(stmt.elseBranch());
-                }
-            }
             case Stmt.Match stmt -> {
                 var target = evaluate(stmt.expr());
                 for (var c : stmt.cases()) {
@@ -681,6 +651,36 @@ class Interpreter {
                     map.put(key, value);
                 }
                 yield map;
+            }
+            // A pattern match
+            case Expr.Match expr -> {
+                // FIRST, Evaluate the target and any pattern constants
+                var target = evaluate(expr.target());
+                var constants = new ArrayList<>();
+                expr.pattern().getConstants().forEach(e ->
+                    constants.add(evaluate(e)));
+
+                // NEXT, do the pattern match
+                var bound = new HashMap<String,Object>();
+                for (var name : expr.pattern().getBindings()) {
+                    bound.put(name.lexeme(), null);
+                }
+                if (Matcher.bind(
+                    joe,
+                    expr.pattern().getPattern(),
+                    target,
+                    constants::get,
+                    bound::put
+                )) {
+                    bind(bound);
+                    yield true;
+                } else {
+                    for (var name : expr.pattern().getBindings()) {
+                        bound.put(name.lexeme(), null);
+                    }
+                    bind(bound);
+                    yield false;
+                }
             }
             // null
             case Expr.Null ignored -> null;

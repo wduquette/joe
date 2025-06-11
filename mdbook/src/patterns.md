@@ -2,9 +2,10 @@
 
 Joe supports a rich pattern-matching capability inspired by the Rust language's
 similar capability. Joe's 
+[`~` matching operator](operators.md#matching-operator)
+and the 
 [`var`](statements.md#variable-declarations),
-[`foreach`](statements.md#foreach-statements), 
-[`if let`](statements.md#if-let-statements), and 
+[`foreach`](statements.md#foreach-statements), and
 [`match`](statements.md#match-statements) statements all make
 use of pattern matching to do destructuring binds.
 
@@ -100,7 +101,7 @@ corresponding value in the target must have that exact value.
 
 ```joe
 function isPro(list) {
-    if let ([_, "Pro"] = list1) {
+    if (list ~ [_, "Pro"]) {
         return true;
     } else {
         return false;
@@ -151,7 +152,7 @@ as the list pattern, and each subpattern must match the corresponding
 item.
 
 ```joe
-if let ([a, [b, _], "howdy"] = list) {
+if (list ~ [a, [b, _], "howdy"]) {
     // ...
 }
 ```
@@ -162,7 +163,7 @@ Sometimes the length of the list is unknown; in this case, the list
 pattern can provide a pattern variable to bind to the list's tail:
 
 ```joe
-if let ([a, b : tail] = list) {
+if (list ~ [a, b : tail]) {
     // tail gets the rest of the list.
 }
 ```

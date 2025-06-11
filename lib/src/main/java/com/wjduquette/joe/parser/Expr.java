@@ -16,6 +16,7 @@ public sealed interface Expr permits
     Expr.IndexGet, Expr.IndexIncrDecr, Expr.IndexSet,
     Expr.Lambda, Expr.ListLiteral, Expr.Literal, Expr.Logical,
     Expr.MapLiteral,
+    Expr.Match,
     Expr.Null,
     Expr.PropGet, Expr.PropIncrDecr, Expr.PropSet,
     Expr.RuleSet,
@@ -162,6 +163,16 @@ public sealed interface Expr permits
      */
     record MapLiteral(Token brace, List<Expr> entries) implements Expr {
         public Span location() { return brace.span(); }
+    }
+
+    /**
+     * A matching expression, `value ~ pattern`.
+     * @param target The left-hand expression
+     * @param op The operator
+     * @param pattern The right-hand pattern
+     */
+    record Match(Expr target, Token op, ASTPattern pattern) implements Expr {
+        public Span location() { return op.span(); }
     }
 
     /**

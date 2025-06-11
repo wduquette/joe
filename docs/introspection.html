@@ -226,7 +226,7 @@ by strict equality of type objects, precisely because the value's type
 might be unscoped: the type's name is known to the value and to the script
 author, but isn't assigned to any convenient variable.</p>
 <p>In other words,</p>
-<pre><code class="language-joe">if let (Thing{#id: id} = thing) {
+<pre><code class="language-joe">if (thing ~ Thing{#id: id}) {
     ...
 }
 </code></pre>

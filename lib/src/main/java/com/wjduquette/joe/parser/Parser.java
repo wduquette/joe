@@ -346,7 +346,7 @@ public class Parser {
         if (scanner.match(CONTINUE)) return continueStatement();
         if (scanner.match(FOR)) return forStatement();
         if (scanner.match(FOREACH)) return forEachStatement();
-        if (scanner.match(IF)) return scanner.match(LET) ? ifLetStatement() : ifStatement();
+        if (scanner.match(IF)) return ifStatement();
         if (scanner.match(MATCH)) return matchStatement();
         if (scanner.match(RETURN)) return returnStatement();
         if (scanner.match(SWITCH)) return switchStatement();
@@ -499,24 +499,6 @@ public class Parser {
         }
 
         return new Stmt.If(keyword, condition, thenBranch, elseBranch);
-    }
-
-    private Stmt ifLetStatement() {
-        scanner.consume(LEFT_PAREN, "Expected '(' after 'if let'.");
-        Token keyword = scanner.previous();
-        ASTPattern pattern = pattern();
-
-        scanner.consume(EQUAL, "Expected '=' after pattern.");
-        var target = expression();
-        scanner.consume(RIGHT_PAREN, "Expected ')' after target expression.");
-
-        Stmt thenBranch = statement();
-        Stmt elseBranch = null;
-        if (scanner.match(ELSE)) {
-            elseBranch = statement();
-        }
-
-        return new Stmt.IfLet(keyword, pattern, target, thenBranch, elseBranch);
     }
 
     private Stmt matchStatement() {
@@ -731,10 +713,17 @@ public class Parser {
     private Expr comparison() {
         Expr expr = term();
 
-        while (scanner.match(GREATER, GREATER_EQUAL, IN, LESS, LESS_EQUAL, NI)) {
+        while (scanner.match(
+            GREATER, GREATER_EQUAL, IN, LESS, LESS_EQUAL, NI, TILDE
+        )) {
             Token operator = scanner.previous();
-            Expr right = term();
-            expr = new Expr.Binary(expr, operator, right);
+            if (operator.type() == TILDE) {
+                ASTPattern right = pattern();
+                expr = new Expr.Match(expr, operator, right);
+            } else {
+                Expr right = term();
+                expr = new Expr.Binary(expr, operator, right);
+            }
         }
 
         return expr;

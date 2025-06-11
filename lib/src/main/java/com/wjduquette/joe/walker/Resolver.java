@@ -163,23 +163,6 @@ class Resolver {
                 resolve(stmt.thenBranch());
                 if (stmt.elseBranch() != null) resolve(stmt.elseBranch());
             }
-            case Stmt.IfLet stmt -> {
-                // Resolve any constants and the target.
-                stmt.pattern().getConstants().forEach(this::resolve);
-                resolve(stmt.target());
-
-                // Resolve the variable bindings and "then" branch
-                // in the pattern scope
-                beginScope();
-                stmt.pattern().getBindings().forEach(this::declare);
-                stmt.pattern().getBindings().forEach(this::define);
-                resolve(stmt.thenBranch());
-                endScope();
-
-                if (stmt.elseBranch() != null) {
-                    resolve(stmt.elseBranch());
-                }
-            }
             case Stmt.Match stmt -> {
                 resolve(stmt.expr());
                 for (var c : stmt.cases()) {
@@ -307,6 +290,12 @@ class Resolver {
                 resolve(expr.right());
             }
             case Expr.MapLiteral expr -> expr.entries().forEach(this::resolve);
+            case Expr.Match expr -> {
+                resolve(expr.target());
+                expr.pattern().getConstants().forEach(this::resolve);
+                expr.pattern().getBindings().forEach(this::declare);
+                expr.pattern().getBindings().forEach(this::define);
+            }
             case Expr.Null ignored -> {}
             case Expr.PropGet expr -> resolve(expr.object());
             case Expr.PropIncrDecr expr -> resolve(expr.object());

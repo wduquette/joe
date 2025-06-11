@@ -499,43 +499,6 @@ class Compiler {
 
                 if (end_ != -1) patchJump(end_);
             }
-            case Stmt.IfLet s -> {
-                var vars = s.pattern().getBindings();
-
-                emitPATTERN(s.pattern());      // ∅ | p        ; compile pattern
-                emit(s.target());              // ∅ | p t      ; compute target
-                beginScope();                  // ∅            ; begin scope: then
-                emit(MATCH);                   // ∅ | vs? flag ; match pattern
-                int else_ = emitJump(JIF);     // ∅ | vs?      ; JIF else
-                defineLocals(vars);            // vs | ∅       ; define bindings
-                emit(s.thenBranch());          // vs | ∅       ; compile "then"
-                endScope();                    // ∅            ; end scope: then
-                if (s.elseBranch() != null) {
-                    int end_ = emitJump(JUMP); // ∅            ; JUMP end
-                    patchJump(else_);          // ∅            ; else:
-                    emit(s.elseBranch());      // ∅            ; compile "else"
-                    patchJump(end_);           // ∅            ; end:
-                } else {
-                    patchJump(else_);          // ∅            ; else:
-                }
-            }
-            case Stmt.VarPattern s -> {
-                var vars = s.pattern().getBindings();
-
-                if (!inGlobalScope()) {        // Stack: locals | working
-                    declareLocals(vars);       // ∅         ; declare vars
-                }
-
-                emitPATTERN(s.pattern());      // ∅ | p     ; compute pattern
-                emit(s.target());              // ∅ | p t   ; compute target.
-
-                if (!inGlobalScope()) {
-                    emit(Opcode.LOCBIND);       // ∅ | vs    ; match pattern
-                    defineLocals(vars);        // vs | ∅    ; define vars
-                } else {
-                    emit(Opcode.GLOBIND);       // ∅         ; define vars
-                }
-            }
             case Stmt.Match s -> {
                 // Setup                      // Stack: locals | working
                 beginScope();                 // ∅            ; begin scope: match
@@ -726,6 +689,23 @@ class Compiler {
                     defineLocal(var.name());
                 }
             }
+            case Stmt.VarPattern s -> {
+                var vars = s.pattern().getBindings();
+
+                if (!inGlobalScope()) {        // Stack: locals | working
+                    declareLocals(vars);       // ∅         ; declare vars
+                }
+
+                emitPATTERN(s.pattern());      // ∅ | p     ; compute pattern
+                emit(s.target());              // ∅ | p t   ; compute target.
+
+                if (!inGlobalScope()) {
+                    emit(Opcode.LOCBIND);       // ∅ | vs    ; match pattern
+                    defineLocals(vars);        // vs | ∅    ; define vars
+                } else {
+                    emit(Opcode.GLOBIND);       // ∅         ; define vars
+                }
+            }
             case Stmt.While s -> {
                 // Setup                   // Stack effects:
                 var start_ = here();       // ∅     ; start:
@@ -771,8 +751,11 @@ class Compiler {
 
     private void emitPATTERN(ASTPattern astPattern) {
         var index = constant(astPattern.getPattern());
+        var bindings = constant(astPattern.getBindings().stream()
+            .map(Token::lexeme)
+            .toList());
         emitList(astPattern.getConstants());
-        emit(PATTERN, index);
+        emit(PATTERN, index, bindings);
     }
 
     //-------------------------------------------------------------------------
@@ -903,6 +886,29 @@ class Compiler {
                     emit(e.entries().get(i));      // m k      ; compute key
                     emit(e.entries().get(i + 1));  // m k v    ; compute value
                     emit(MAPPUT);                  // m        ; m[k] = v
+                }
+            }
+            case Expr.Match e -> {
+                // Stack effects are written for locals.
+                int nVars = e.pattern().getBindings().size();
+
+                // Set up                  // Stack: locals | working
+                emit(e.target());          // ∅ | t        ; Compute target
+                emitPATTERN(e.pattern());  // ∅ | t p      ; Compute pattern
+                emit(SWAP);                // ∅ | p t      ; setup for match
+
+                if (inGlobalScope()) {
+                    emit(MATCHG);          // ∅ | flag     ; Do match
+                } else {
+                    var slot = current.localCount;
+                    emit(MATCHL);          // ∅ | vs flag  ; Do match
+                    emit(TPUT);            // ∅ | vs       ; T = pop
+                    defineLocals(          // ∅ | vs       ; define locals
+                        e.pattern().getBindings());
+                    emit(LOCMOVE,         // vs | ∅       ; fixup local values
+                        (char)slot,
+                        (char)nVars);
+                    emit(TGET);            // vs | flag    ; push T
                 }
             }
             case Expr.Null ignored -> emit(NULL);

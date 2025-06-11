@@ -364,6 +364,45 @@ function testNI() {
     assertError(bad, "Expected iterable, got: Keyword '#a'.");
 }
 
+//-----------------------------------------------------------------------------
+// ~ Operator
+
+function testMatchOp_simple() {
+   var list = [1, 2];
+   assertTrue(list ~ [_, _]);
+   assertFalse(list ~ [_, _, _]);
+}
+
+function testMatchOp_bindOnSuccess() {
+   var list = [1, 2];
+   assertTrue(list ~ [a, b]);
+   assertEquals(a, 1);
+   assertEquals(b, 2);
+}
+
+function testMatchOp_bindWithAnd() {
+   var list = [1, 2];
+   assertFalse(list ~ [a, b] && a > b);
+   assertEquals(a, 1);
+   assertEquals(b, 2);
+}
+
+function testMatchOp_declareOnFailure() {
+   var list = [1, 2, 3];
+   assertFalse(list ~ [a, b]);
+   assertEquals(a, null);
+   assertEquals(b, null);
+}
+
+// Verify that having working values on the stack
+// doesn't break ~'s binding variables
+function testMatchOp_withWorkingStack() {
+   var list = [1, 2];
+   var value = "(" + (list ~ [a, b]) + ")";
+   assertEquals(value, "(true)");
+   assertEquals(a, 1);
+   assertEquals(b, 2);
+}
 
 //-----------------------------------------------------------------------------
 // Helpers

@@ -82,16 +82,6 @@ public class ASTDumper {
                 }
                 yield buff.toString();
             }
-            case Stmt.IfLet s -> {
-                var buff = buffer().nl()
-                    .dump("pattern", s.pattern())
-                    .dump("target", s.target())
-                    .dump("then", s.thenBranch());
-                if (s.elseBranch() != null) {
-                    buff.dump("else", s.elseBranch());
-                }
-                yield buff.toString();
-            }
             case Stmt.Match s -> {
                 var buff = buffer().nl();
                 buff.dump("value", s.expr());
@@ -217,6 +207,10 @@ public class ASTDumper {
                 }
                 yield buff.toString();
             }
+            case Expr.Match e -> buffer()
+                .println(" '" + e.op().lexeme() + "'")
+                .dump("target", e.target())
+                .dump("pattern", e.pattern());
             case Expr.Null ignored -> "";
             case Expr.PropGet e -> buffer()
                 .println(" '" + e.name().lexeme() + "'")

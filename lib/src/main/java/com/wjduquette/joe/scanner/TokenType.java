@@ -8,7 +8,7 @@ public enum TokenType {
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
     LEFT_BRACKET, RIGHT_BRACKET,
     AT, BACK_SLASH, COLON, COMMA, DOLLAR, DOT, QUESTION,
-    SEMICOLON,
+    SEMICOLON, TILDE,
 
     // One or two character tokens.
     AND,

@@ -312,6 +312,9 @@ declarations efficiently.</li>
 </ul>
 </li>
 <li><code>foreach</code> can now do a destructuring bind on each item in the collection.</li>
+<li>The new <code>~</code> operator is a comparison operator that checks whether a Joe
+value matches a Joe pattern, binding any variables in the local scope.
+It replaces the existing <code>if let</code> statement, which has been removed.</li>
 </ul>
 </li>
 <li>Extensibility
@@ -1087,6 +1090,26 @@ if ("D" ni list) println("Nope, not there!");
 </code></pre>
 <p>These operators work with the same set of collection values as the
 <a href="statements.html#foreach-loops"><code>foreach</code> statement</a>.</p>
+<h2 id="matching-operator"><a class="header" href="#matching-operator">Matching Operator</a></h2>
+<p>The <code>~</code> operator matches a value against a
+<a href="patterns.html">destructuring pattern</a>, returning true or false.  For example,
+here it used to determine whether <code>myValue</code> contains a three-item list whose
+first item is <code>#fred</code>:</p>
+<pre><code class="language-joe">if (myValue ~ [#fred, _, _]) {
+    println("Match!");
+}
+</code></pre>
+<p>If the pattern contains binding variables, the variables are implicitly
+declared within the current scope.  On a successful match they are set
+to the matching values within the target; on failure they are set to
+<code>null</code>:</p>
+<pre><code class="language-joe">if (myValue ~ [#fred, height, weight]) {
+    println("Fred is " + height + " inches tall,");
+    println("and weighs " + weight + " pounds.");
+}
+</code></pre>
+<p>See the <a href="patterns.html">Pattern Matching</a> section for more about pattern
+matching and Joe's pattern syntax.</p>
 <h2 id="logical-operators"><a class="header" href="#logical-operators">Logical Operators</a></h2>
 <p>The <code>&amp;&amp;</code> and <code>||</code> operators provide short-circuit execution of Boolean
 expressions in the usual way.  However, in Joe the values <code>false</code> and <code>null</code>
@@ -1129,7 +1152,6 @@ by a semicolon or (sometimes) a block, as in Java.</p>
 <li><a href="statements.html#blocks">Blocks</a></li>
 <li><a href="statements.html#return">Return</a></li>
 <li><a href="statements.html#if-statements">If Statements</a></li>
-<li><a href="statements.html#if-let-statements">If Let Statements</a></li>
 <li><a href="statements.html#while-loops">While Loops</a></li>
 <li><a href="statements.html#for-loops">For Loops</a></li>
 <li><a href="statements.html#foreach-loops">Foreach Loops</a></li>
@@ -1170,8 +1192,8 @@ the target value, e.g., if <code>f()</code> didn't return a two-item list in the
 example shown above, then the pattern match will fail and Joe will
 throw a runtime error.  Therefore, <code>var</code> should only be used when the
 shape of the target value is known ahead of time.  Use
-<a href="statements.html#the-if-let-statement"><code>if let</code></a> or
-<a href="statements.html#the-match-statement"><code>match</code></a> to test whether a value matches a
+the <a href="operators.html#matching-operator"><code>~</code> operator</a> or the
+<a href="statements.html#the-match-statement"><code>match</code> statement</a> to test whether a value matches a
 particular pattern.</p>
 <p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
 destructuring binds, including Joe's full pattern syntax.</p>
@@ -1215,24 +1237,6 @@ not displayed by <code>joe run</code>.</p>
     ...
 }
 </code></pre>
-<h2 id="if-let-statements"><a class="header" href="#if-let-statements">If Let Statements</a></h2>
-<p>The <code>if let</code> uses a <a href="patterns.html">pattern</a> to do a conditional
-destructuring bind on a data structure.  If the pattern matches, <code>if let</code>
-executes its "then" branch with the bound variables in scope;
-otherwise it executes its "else" branch:</p>
-<pre><code class="language-joe">var list = [1, 2];
-
-if let ([a, b] = list) {
-    println(a); // Prints "1"
-    println(b); // Prints "2"
-} else {
-    println("no match");
-}
-</code></pre>
-<p>The pattern's binding variables (<code>a</code> and <code>b</code> in this example) are in-scope only
-in the "then" branch.</p>
-<p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
-destructuring binds, including Joe's full pattern syntax.</p>
 <h2 id="while-loops"><a class="header" href="#while-loops">While Loops</a></h2>
 <p><code>while</code> loops are defined as in Java.</p>
 <pre><code class="language-joe">var x = 0;
@@ -1585,9 +1589,10 @@ is used.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="pattern-matching"><a class="header" href="#pattern-matching">Pattern Matching</a></h1>
 <p>Joe supports a rich pattern-matching capability inspired by the Rust language's
 similar capability. Joe's
+<a href="operators.html#matching-operator"><code>~</code> matching operator</a>
+and the
 <a href="statements.html#variable-declarations"><code>var</code></a>,
-<a href="statements.html#foreach-statements"><code>foreach</code></a>,
-<a href="statements.html#if-let-statements"><code>if let</code></a>, and
+<a href="statements.html#foreach-statements"><code>foreach</code></a>, and
 <a href="statements.html#match-statements"><code>match</code></a> statements all make
 use of pattern matching to do destructuring binds.</p>
 <p>Joe supports a rich variety of patterns.  Some of them can contain
@@ -1653,7 +1658,7 @@ ignoring.</p>
 <p>A constant pattern is a constant value included in the pattern; the
 corresponding value in the target must have that exact value.</p>
 <pre><code class="language-joe">function isPro(list) {
-    if let ([_, "Pro"] = list1) {
+    if (list ~ [_, "Pro"]) {
         return true;
     } else {
         return false;
@@ -1691,14 +1696,14 @@ a list pattern is simply a list of patterns that matches a <code>List</code> of
 values.  The matched list must have exactly the same number of items
 as the list pattern, and each subpattern must match the corresponding
 item.</p>
-<pre><code class="language-joe">if let ([a, [b, _], "howdy"] = list) {
+<pre><code class="language-joe">if (list ~ [a, [b, _], "howdy"]) {
     // ...
 }
 </code></pre>
 <p>The pattern <code>[]</code> matches the empty list.</p>
 <p>Sometimes the length of the list is unknown; in this case, the list
 pattern can provide a pattern variable to bind to the list's tail:</p>
-<pre><code class="language-joe">if let ([a, b : tail] = list) {
+<pre><code class="language-joe">if (list ~ [a, b : tail]) {
     // tail gets the rest of the list.
 }
 </code></pre>
@@ -1841,7 +1846,7 @@ by strict equality of type objects, precisely because the value's type
 might be unscoped: the type's name is known to the value and to the script
 author, but isn't assigned to any convenient variable.</p>
 <p>In other words,</p>
-<pre><code class="language-joe">if let (Thing{#id: id} = thing) {
+<pre><code class="language-joe">if (thing ~ Thing{#id: id}) {
     ...
 }
 </code></pre>
@@ -9085,7 +9090,6 @@ statement       → exprStmt
                 | forStmt
                 | foreachStmt
                 | ifStmt
-                | ifLetStmt
                 | matchStmt
                 | printStmt
                 | returnStmt
@@ -9103,8 +9107,6 @@ forStmt         → "for" "(" ( varDecl | exprStmt | ";" )
 forEachStmt     → "foreach" "(" pattern ":" expression ")" statement;
 ifStmt          → "if" "(" expression ")" statement 
                   ( "else" statement )? ;
-ifLetStmt       → "if" "let" "(" pattern "=" expression ")" statement 
-                  ( "else" statement )? ; 
 matchStmt       → "match" "(" expression ")" "{" 
                   ( "case" pattern ( "if" expression )? "-&gt;" statement )+ 
                   ( "default" "-&gt;" statement )? 
@@ -9131,7 +9133,7 @@ ternary         → logic_or "?" logic_or ":" logic_or ;
 logic_or        → logic_and ( "||" logic_and )* ;
 logic_and       → equality ( "&amp;&amp;" equality )* ;
 equality        → comparison ( ( "!=" | "==" ) comparison )* ;
-comparison      → term ( ( "&gt;" | "&gt;=" | "&lt;" | "&lt;=" | "in" | "ni" ) term )* ;
+comparison      → term ( ( "&gt;" | "&gt;=" | "&lt;" | "&lt;=" | "~" | "in" | "ni" ) term )* ;
 term            → factor ( ( "-" | "+" ) factor )* ;
 factor          → unary ( ( "/" | "*" ) unary )* ;
 unary           → ( "++" | "==" | "-" | "!" ) unary 
@@ -9159,8 +9161,8 @@ map             → "{" (map_entry ( "," map_entry )* ","? )? "]" ;
 map_entry       → expression ":" expression ;
 </code></pre>
 <h2 id="patterns"><a class="header" href="#patterns">Patterns</a></h2>
-<p>A <code>pattern</code> is a destructuring pattern that can appear in a <code>let</code> statement,
-an <code>if let</code> statement, or as a <code>case</code> of a <code>match</code> statement.</p>
+<p>A <code>pattern</code> is a destructuring pattern that can be used with the <code>~</code>
+operator, and with a number of Joe statements.</p>
 <pre><code>pattern         → constantPattern
                 | wildcardPattern
                 | valueBinding
@@ -9330,77 +9332,80 @@ expression between <code>TSET</code> and <code>TGET</code>, as it might step on 
 value.</li>
 </ul>
 <h2 id="instruction-set"><a class="header" href="#instruction-set">Instruction Set</a></h2>
-<div class="table-wrapper"><table><thead><tr><th></th><th>Mnemonic/argument</th><th>Stack effect</th><th>Description</th></tr></thead><tbody>
-<tr><td>0</td><td>ADD</td><td><em>a b</em> → <em>c</em></td><td>c = a + b</td></tr>
-<tr><td>1</td><td>ASSERT</td><td><em>msg</em> → ∅</td><td>Throws AssertError</td></tr>
-<tr><td>2</td><td>CALL <em>argc</em></td><td><em>f args</em> → <em>c</em></td><td>c = f(args)</td></tr>
-<tr><td>3</td><td>CLASS <em>name</em></td><td>∅ → <em>type</em></td><td>Create class</td></tr>
-<tr><td>4</td><td>CLOSURE <em>func...</em></td><td>∅ → <em>f</em></td><td>Load closure</td></tr>
-<tr><td>5</td><td>COMMENT <em>name</em></td><td>∅ → ∅</td><td>No-op comment</td></tr>
-<tr><td>6</td><td>CONST <em>constant</em></td><td>∅ → <em>a</em></td><td>Load constant</td></tr>
-<tr><td>7</td><td>DECR</td><td><em>a</em> → <em>b</em></td><td>b = a - 1</td></tr>
-<tr><td>8</td><td>DIV</td><td><em>a b</em> → <em>c</em></td><td>c = a/b</td></tr>
-<tr><td>9</td><td>DUP</td><td><em>a</em> → <em>a</em> <em>a</em></td><td>Duplicate top</td></tr>
-<tr><td>10</td><td>DUP2</td><td><em>a b</em> → <em>a b a b</em></td><td>Duplicate top 2</td></tr>
-<tr><td>11</td><td>EQ</td><td><em>a b</em> → <em>c</em></td><td>c = a == b</td></tr>
-<tr><td>12</td><td>FALSE</td><td>∅ → false</td><td>Load <code>false</code></td></tr>
-<tr><td>13</td><td>GE</td><td><em>a b</em> → <em>c</em></td><td>c = a &gt;= b</td></tr>
-<tr><td>14</td><td>GETNEXT</td><td><em>iter</em> → <em>a</em></td><td>a = iter.next()</td></tr>
-<tr><td>15</td><td>GLOBIND</td><td><em>p t</em> → ∅</td><td>Bind target to pattern</td></tr>
-<tr><td>16</td><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
-<tr><td>17</td><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
-<tr><td>18</td><td>GLOSET <em>name</em></td><td><em>a</em> → <em>a</em></td><td>Set global</td></tr>
-<tr><td>19</td><td>GT</td><td><em>a b</em> → <em>a</em> &gt; <em>b</em></td><td>Compare: greater</td></tr>
-<tr><td>20</td><td>HASNEXT</td><td><em>iter</em> → <em>flag</em></td><td>flag = iter.hasNext()</td></tr>
-<tr><td>21</td><td>IN</td><td><em>a coll</em> → <em>flag</em></td><td>a in collection</td></tr>
-<tr><td>22</td><td>INCR</td><td><em>a</em> → <em>b</em></td><td>b = a + 1</td></tr>
-<tr><td>23</td><td>INDGET</td><td><em>coll i</em> → <em>a</em></td><td><code>a = coll[i]</code></td></tr>
-<tr><td>24</td><td>INDSET</td><td><em>coll i a</em> → <em>a</em></td><td><code>coll[i] = a</code></td></tr>
-<tr><td>25</td><td>INHERIT</td><td><em>sup sub</em> → <em>sup</em></td><td>Inheritance</td></tr>
-<tr><td>26</td><td>ITER</td><td><em>coll</em> → <em>iter</em></td><td>iter = coll.iterator()</td></tr>
-<tr><td>27</td><td>JIF <em>offset</em></td><td><em>flag</em> → ∅</td><td>Jump if false</td></tr>
-<tr><td>28</td><td>JIFKEEP <em>offset</em></td><td><em>flag</em> → <em>flag</em></td><td>Jump if false, keep value</td></tr>
-<tr><td>29</td><td>JIT <em>offset</em></td><td><em>flag</em> → ∅</td><td>Jump if true</td></tr>
-<tr><td>30</td><td>JITKEEP <em>offset</em></td><td><em>flag</em> → <em>flag</em></td><td>Jump if true, keep value</td></tr>
-<tr><td>31</td><td>JUMP <em>offset</em></td><td>∅ → ∅</td><td>Jump forwards</td></tr>
-<tr><td>32</td><td>LE</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less or equal</td></tr>
-<tr><td>33</td><td>LISTADD</td><td><em>list a</em> → <em>list</em></td><td>Add item to list</td></tr>
-<tr><td>34</td><td>LISTNEW</td><td>∅ → <em>list</em></td><td>Push empty list</td></tr>
-<tr><td>35</td><td>LOCBIND</td><td><em>p t</em> → <em>vs</em></td><td>Bind target to pattern</td></tr>
-<tr><td>36</td><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
-<tr><td>37</td><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
-<tr><td>38</td><td>LOOP <em>offset</em></td><td>∅ → ∅</td><td>Jump backwards</td></tr>
-<tr><td>39</td><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
-<tr><td>40</td><td>MAPNEW</td><td>∅ → <em>map</em></td><td>Push empty ma p</td></tr>
-<tr><td>41</td><td>MAPPUT</td><td><em>map k a</em> → <em>map</em></td><td>Add entry to map</td></tr>
-<tr><td>42</td><td>MATCH</td><td><em>p t</em> → <em>vs? flag</em></td><td>Match pattern to target</td></tr>
-<tr><td>43</td><td>METHOD <em>name</em></td><td><em>type f</em> → <em>type</em></td><td>Add method to type</td></tr>
-<tr><td>44</td><td>MUL</td><td><em>a b</em> → <em>c</em></td><td>c = a*b</td></tr>
-<tr><td>45</td><td>NE</td><td><em>a b</em> → <em>c</em></td><td>c = a != b</td></tr>
-<tr><td>46</td><td>NEGATE</td><td><em>a</em> → <em>b</em></td><td>b = -a</td></tr>
-<tr><td>47</td><td>NI</td><td><em>a coll</em> → <em>flag</em></td><td>a not in collection</td></tr>
-<tr><td>48</td><td>NOT</td><td><em>a</em> → <em>b</em></td><td>b = !a</td></tr>
-<tr><td>49</td><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
-<tr><td>50</td><td>PATTERN <em>pattern</em></td><td><em>constants</em> → <em>p</em></td><td>Evaluate the pattern</td></tr>
-<tr><td>51</td><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
-<tr><td>52</td><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
-<tr><td>53</td><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
-<tr><td>54</td><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
-<tr><td>55</td><td>RECORD <em>name fields</em></td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
-<tr><td>56</td><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
-<tr><td>57</td><td>RULESET <em>ruleset</em></td><td><em>exports</em> → <em>rsv</em></td><td>Evaluate rule set</td></tr>
-<tr><td>58</td><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
-<tr><td>59</td><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
-<tr><td>60</td><td>SWAP</td><td><em>a b</em> → <em>b a</em></td><td>Swap top stack items</td></tr>
-<tr><td>61</td><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
-<tr><td>62</td><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
-<tr><td>63</td><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
-<tr><td>64</td><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
-<tr><td>65</td><td>TSET</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
-<tr><td>66</td><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
-<tr><td>67</td><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
-<tr><td>68</td><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
-<tr><td>69</td><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
+<div class="table-wrapper"><table><thead><tr><th>Mnemonic/argument</th><th>Stack effect</th><th>Description</th></tr></thead><tbody>
+<tr><td>ADD</td><td><em>a b</em> → <em>c</em></td><td>c = a + b</td></tr>
+<tr><td>ASSERT</td><td><em>msg</em> → ∅</td><td>Throws AssertError</td></tr>
+<tr><td>CALL <em>argc</em></td><td><em>f args</em> → <em>c</em></td><td>c = f(args)</td></tr>
+<tr><td>CLASS <em>name</em></td><td>∅ → <em>type</em></td><td>Create class</td></tr>
+<tr><td>CLOSURE <em>func...</em></td><td>∅ → <em>f</em></td><td>Load closure</td></tr>
+<tr><td>COMMENT <em>name</em></td><td>∅ → ∅</td><td>No-op comment</td></tr>
+<tr><td>CONST <em>constant</em></td><td>∅ → <em>a</em></td><td>Load constant</td></tr>
+<tr><td>DECR</td><td><em>a</em> → <em>b</em></td><td>b = a - 1</td></tr>
+<tr><td>DIV</td><td><em>a b</em> → <em>c</em></td><td>c = a/b</td></tr>
+<tr><td>DUP</td><td><em>a</em> → <em>a</em> <em>a</em></td><td>Duplicate top</td></tr>
+<tr><td>DUP2</td><td><em>a b</em> → <em>a b a b</em></td><td>Duplicate top 2</td></tr>
+<tr><td>EQ</td><td><em>a b</em> → <em>c</em></td><td>c = a == b</td></tr>
+<tr><td>FALSE</td><td>∅ → false</td><td>Load <code>false</code></td></tr>
+<tr><td>GE</td><td><em>a b</em> → <em>c</em></td><td>c = a &gt;= b</td></tr>
+<tr><td>GETNEXT</td><td><em>iter</em> → <em>a</em></td><td>a = iter.next()</td></tr>
+<tr><td>GLOBIND</td><td><em>p t</em> → <em>flag</em></td><td>Bind target to pattern</td></tr>
+<tr><td>GLOBINO</td><td><em>p t</em> → ∅</td><td>Bind target to pattern</td></tr>
+<tr><td>GLODEF <em>name</em></td><td><em>a</em> → ∅</td><td>Define global</td></tr>
+<tr><td>GLOGET <em>name</em></td><td>∅ → <em>a</em></td><td>Get global</td></tr>
+<tr><td>GLOSET <em>name</em></td><td><em>a</em> → <em>a</em></td><td>Set global</td></tr>
+<tr><td>GT</td><td><em>a b</em> → <em>a</em> &gt; <em>b</em></td><td>Compare: greater</td></tr>
+<tr><td>HASNEXT</td><td><em>iter</em> → <em>flag</em></td><td>flag = iter.hasNext()</td></tr>
+<tr><td>IN</td><td><em>a coll</em> → <em>flag</em></td><td>a in collection</td></tr>
+<tr><td>INCR</td><td><em>a</em> → <em>b</em></td><td>b = a + 1</td></tr>
+<tr><td>INDGET</td><td><em>coll i</em> → <em>a</em></td><td><code>a = coll[i]</code></td></tr>
+<tr><td>INDSET</td><td><em>coll i a</em> → <em>a</em></td><td><code>coll[i] = a</code></td></tr>
+<tr><td>INHERIT</td><td><em>sup sub</em> → <em>sup</em></td><td>Inheritance</td></tr>
+<tr><td>ITER</td><td><em>coll</em> → <em>iter</em></td><td>iter = coll.iterator()</td></tr>
+<tr><td>JIF <em>offset</em></td><td><em>flag</em> → ∅</td><td>Jump if false</td></tr>
+<tr><td>JIFKEEP <em>offset</em></td><td><em>flag</em> → <em>flag</em></td><td>Jump if false, keep value</td></tr>
+<tr><td>JIT <em>offset</em></td><td><em>flag</em> → ∅</td><td>Jump if true</td></tr>
+<tr><td>JITKEEP <em>offset</em></td><td><em>flag</em> → <em>flag</em></td><td>Jump if true, keep value</td></tr>
+<tr><td>JUMP <em>offset</em></td><td>∅ → ∅</td><td>Jump forwards</td></tr>
+<tr><td>LE</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less or equal</td></tr>
+<tr><td>LISTADD</td><td><em>list a</em> → <em>list</em></td><td>Add item to list</td></tr>
+<tr><td>LISTNEW</td><td>∅ → <em>list</em></td><td>Push empty list</td></tr>
+<tr><td>LOCBIND</td><td><em>p t</em> → <em>vs</em></td><td>Bind target to pattern</td></tr>
+<tr><td>LOCGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get local</td></tr>
+<tr><td>LOCMOVE <em>slot n</em></td><td>... <em>vars</em> → <em>vars</em> ...</td><td>Get local</td></tr>
+<tr><td>LOCSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set local</td></tr>
+<tr><td>LOOP <em>offset</em></td><td>∅ → ∅</td><td>Jump backwards</td></tr>
+<tr><td>LT</td><td><em>a b</em> → <em>a</em> &lt;= <em>b</em></td><td>Compare: less than</td></tr>
+<tr><td>MAPNEW</td><td>∅ → <em>map</em></td><td>Push empty ma p</td></tr>
+<tr><td>MAPPUT</td><td><em>map k a</em> → <em>map</em></td><td>Add entry to map</td></tr>
+<tr><td>MATCH</td><td><em>p t</em> → <em>vs? flag</em></td><td>Match pattern to target</td></tr>
+<tr><td>METHOD <em>name</em></td><td><em>type f</em> → <em>type</em></td><td>Add method to type</td></tr>
+<tr><td>MUL</td><td><em>a b</em> → <em>c</em></td><td>c = a*b</td></tr>
+<tr><td>NE</td><td><em>a b</em> → <em>c</em></td><td>c = a != b</td></tr>
+<tr><td>NEGATE</td><td><em>a</em> → <em>b</em></td><td>b = -a</td></tr>
+<tr><td>NI</td><td><em>a coll</em> → <em>flag</em></td><td>a not in collection</td></tr>
+<tr><td>NOT</td><td><em>a</em> → <em>b</em></td><td>b = !a</td></tr>
+<tr><td>NULL</td><td>∅ → null</td><td>Load <code>null</code></td></tr>
+<tr><td>PATTERN <em>p</em> <em>bs</em></td><td><em>constants</em> → <em>pv</em></td><td>Evaluate the pattern</td></tr>
+<tr><td>POP</td><td><em>a</em> → ∅</td><td>Pops one value</td></tr>
+<tr><td>POPN <em>n</em></td><td><em>a...</em> → ∅</td><td>Pops <em>n</em> values</td></tr>
+<tr><td>PROPGET <em>name</em></td><td><em>obj</em> → <em>a</em></td><td>Get property value</td></tr>
+<tr><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
+<tr><td>RECORD <em>name fields</em></td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
+<tr><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
+<tr><td>RULESET <em>ruleset</em></td><td><em>exports</em> → <em>rsv</em></td><td>Evaluate rule set</td></tr>
+<tr><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
+<tr><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
+<tr><td>SWAP</td><td><em>a b</em> → <em>b a</em></td><td>Swap top stack items</td></tr>
+<tr><td>TGET</td><td>∅ → <em>a</em></td><td><em>a</em> = T</td></tr>
+<tr><td>THROW</td><td><em>a</em> → ∅</td><td>Throw error</td></tr>
+<tr><td>TPUT</td><td><em>a</em> → ∅</td><td>T = <em>a</em>, pop <em>a</em></td></tr>
+<tr><td>TRCPOP</td><td>∅ → ∅</td><td>Pops a post-trace</td></tr>
+<tr><td>TRCPUSH <em>trace</em></td><td>∅ → ∅</td><td>Pushes a post-trace</td></tr>
+<tr><td>TRUE</td><td>∅ → true</td><td>Load <code>true</code></td></tr>
+<tr><td>TSET</td><td><em>a</em> → <em>a</em></td><td>T = <em>a</em></td></tr>
+<tr><td>UPCLOSE <em>n</em></td><td><em>v...</em> → ∅</td><td>Closes <em>n</em> upvalue(s)</td></tr>
+<tr><td>UPGET <em>slot</em></td><td>∅ → <em>a</em></td><td>Get upvalue</td></tr>
+<tr><td>UPSET <em>slot</em></td><td><em>a</em> → <em>a</em></td><td>Set upvalue</td></tr>
 </tbody></table>
 </div>
 <p><strong>Stack Effects:</strong> in the stack effect column, the top of the stack is on the
@@ -9539,8 +9544,16 @@ otherwise.</p>
 <code>ITER</code> instruction.  This instruction should always be paired with <code>HASNEXT</code>.</p>
 <h3 id="globind"><a class="header" href="#globind">GLOBIND</a></h3>
 <hr />
-<p><strong>GLOBIND</strong> | <em>p</em> <em>t</em> → ∅</p>
-<p>The <code>GLOBIND</code> instruction implements the <code>var</code> statement at the global scope
+<p><strong>GLOBIND</strong> | <em>p</em> <em>t</em> → <em>flag</em></p>
+<p>The <code>GLOBIND</code> instruction matches pattern <em>p</em> against target <em>t</em>, binding
+pattern variables to matched values and pushing true on success and
+binding pattern variables to null and pushing false on failure, where
+<em>p</em> is a pattern evaluated by the <code>PATTERN</code> instruction and <em>t</em> is any
+Joe value.</p>
+<h3 id="globino"><a class="header" href="#globino">GLOBINO</a></h3>
+<hr />
+<p><strong>GLOBINO</strong> | <em>p</em> <em>t</em> → ∅</p>
+<p><strong>Legacy:</strong> The <code>GLOBINO</code> instruction implements the <code>var</code> statement at the global scope
 when <code>var</code> includes a destructuring pattern,
 binding pattern value <em>p</em> to target <em>t</em>, where <em>p</em> is a pattern evaluated
 by the <code>PATTERN</code> instruction. If the match succeeds then the binding
@@ -9666,6 +9679,14 @@ instruction throws a <code>RuntimeError</code>.</p>
 <p><strong>LOCGET</strong> <em>slot</em> | ∅ → <em>a</em></p>
 <p>Gets the value of the local variable in the given stack <em>slot</em>,
 relative to the current call frame.</p>
+<h3 id="locmove"><a class="header" href="#locmove">LOCMOVE</a></h3>
+<hr />
+<p><strong>LOCMOVE</strong> <em>slot n</em> | ... <em>vars</em> → <em>vars</em> ...</p>
+<p>Shifts the top <em>n</em> items on the stack down to the given local variable
+*slot, moving the displaced items up.</p>
+<p>This instruction is used by expressions that declare local variables
+(e.g., the <code>~</code> operator) to move them below any transient values
+below them on stack.</p>
 <h3 id="locset"><a class="header" href="#locset">LOCSET</a></h3>
 <hr />
 <p><strong>LOCSET</strong> <em>slot</em> | <em>a</em> → <em>a</em></p>
@@ -9690,9 +9711,28 @@ stack.</p>
 <h3 id="match"><a class="header" href="#match">MATCH</a></h3>
 <hr />
 <p><strong>MATCH</strong> | <em>p t</em> → <em>vs? flag</em></p>
-<p>Matches pattern <em>p</em> against the target value <em>a</em>
-constants to include in the pattern.  On success pushes the values of
-the pattern's bound variables followed by <code>true</code>; on failure pushes <code>false</code>.</p>
+<p>Matches pattern <em>p</em> against the target value <em>t</em>. On success pushes
+the values of the pattern's bound variables followed by <code>true</code>; on failure
+pushes <code>false</code>.</p>
+<p>This is used for <code>foreach</code> and <code>match</code>, where we don't want
+to bind the variables on failure.  These statements define local scopes,
+so <code>MATCH</code> is never used at global scope.</p>
+<h3 id="matchg"><a class="header" href="#matchg">MATCHG</a></h3>
+<hr />
+<p><strong>MATCHG</strong> | <em>p t</em> → <em>flag</em></p>
+<p>Matches pattern <em>p</em> against the target value <em>t</em>. On
+success saves the pattern's bound variables to the global environment
+and pushes <code>true</code>; on failure pushes saves nulls and pushes <code>false</code>.</p>
+<p>This is used for the <code>~</code> operator at global scope, where the variables
+must be declared in the enclosing scope whether the match succeeds or not.</p>
+<h3 id="matchl"><a class="header" href="#matchl">MATCHL</a></h3>
+<hr />
+<p><strong>MATCHL</strong> | <em>p t</em> → <em>vs? flag</em></p>
+<p>Matches pattern <em>p</em> against the target value <em>t</em>. On
+success pushes the values of the pattern's bound variables followed by <code>true</code>;
+on failure pushes nulls followed by <code>false</code>.</p>
+<p>This is used for the <code>~</code> at local scope, where the variables
+must be declared in the enclosing scope whether the match succeeds or not.</p>
 <h3 id="method"><a class="header" href="#method">METHOD</a></h3>
 <hr />
 <p><strong>METHOD</strong> <em>name</em> | <em>type</em> <em>f</em> → <em>type</em></p>
@@ -9726,11 +9766,12 @@ iterable.</p>
 <p>Pushes <code>null</code> on the stack.</p>
 <h3 id="pattern"><a class="header" href="#pattern">PATTERN</a></h3>
 <hr />
-<p><strong>PATTERN</strong> <em>pattern</em> | <em>constants</em> → <em>p</em></p>
-<p>Combines a list of evaluated <em>constants</em> with a <code>Pattern</code> to produce
-<code>PatternValue</code> <em>p</em>, which can then be matched against using <code>GLOLET</code>,
-<code>LOCLET</code>, and <code>MATCH</code>. The <code>PatternValue</code> is used internally only; it
-is never exposed to the Joe client.</p>
+<p><strong>PATTERN</strong> <em>p bs</em> | <em>constants</em> → <em>pv</em></p>
+<p>Given <em>p</em>, a <code>Pattern</code>, and <em>bs</em>, a <code>List&lt;String&gt;</code> of binding variable names,
+and a list of evaluated pattern constants, produces a <code>PatternValue</code>
+for use with <code>GLOBIND</code>, <code>LOCBIND</code>, and <code>MATCH</code>.</p>
+<p>The <code>PatternValue</code> is used internally only; it is never exposed to the Joe
+client.</p>
 <h3 id="pop"><a class="header" href="#pop">POP</a></h3>
 <hr />
 <p><strong>POP</strong> | <em>a</em> -&gt; ∅</p>
@@ -9789,6 +9830,10 @@ This is used to compile the <code>super.&lt;method&gt;</code> syntax.</p>
 <p><strong>THROW</strong> | <em>a</em> -&gt; ∅</p>
 <p>Throws a <code>MonicaError</code> given <em>a</em>, which may be a <code>MonicaError</code> or a
 string, creating a new <code>MonicaError</code> in the latter case.</p>
+<h3 id="tput"><a class="header" href="#tput">TPUT</a></h3>
+<hr />
+<p><strong>TPUT</strong> | <em>a</em> → ∅</p>
+<p>Pops and loads <em>a</em> into the T register.</p>
 <h3 id="trcpop"><a class="header" href="#trcpop">TRCPOP</a></h3>
 <hr />
 <p><strong>TRCPOP</strong> | ∅ → ∅</p>
@@ -10283,7 +10328,7 @@ This is used to compile the <code>super.&lt;method&gt;</code> syntax.</p>
 <p><strong>THROW</strong> | <em>a</em> -&gt; ∅</p>
 <p>Throws a <code>MonicaError</code> given <em>a</em>, which may be a <code>MonicaError</code> or a
 string, creating a new <code>MonicaError</code> in the latter case.</p>
-<h3 id="tput"><a class="header" href="#tput">TPUT</a></h3>
+<h3 id="tput-1"><a class="header" href="#tput-1">TPUT</a></h3>
 <hr />
 <p><strong>TPUT</strong> | <em>a</em> → <em>a</em></p>
 <p>Loads <em>a</em> into the T register, leaving it on the stack.</p>

@@ -526,10 +526,6 @@ class VirtualMachine {
                     list.add(item);
                 }
                 case LISTNEW -> push(new ListValue());
-                case LOCGET -> {
-                    var slot = readSlot();
-                    push(stack[frame.base + slot]);
-                }
                 case LOCBIND -> {
                     var target = pop();
                     var pv = (PatternValue)pop();
@@ -549,8 +545,18 @@ class VirtualMachine {
                             "'var' pattern failed to match target value.");
                     }
                 }
+                case LOCGET -> {
+                    var slot = readInt();
+                    push(stack[frame.base + slot]);
+                }
+                case LOCMOVE -> {
+                    var slot = readInt();
+                    var n = readInt();
+                    var range = top - (frame.base + slot);
+                    shift(n, range);
+                }
                 case LOCSET -> {
-                    var slot = readSlot();
+                    var slot = readInt();
                     stack[frame.base + slot] = peek(0);
                 }
                 case LOOP -> {
@@ -601,6 +607,58 @@ class VirtualMachine {
                     // FINALLY, push the success/failure flag.
                     push(flag);
                 }
+                case MATCHG -> {
+                    var target = pop();
+                    var pv = (PatternValue)pop();
+
+                    // FIRST, see if there's a match.  Saves bound values
+                    // to the global environment as it goes.
+                    var flag = Matcher.bind(
+                        joe,
+                        pv.pattern,
+                        target,
+                        pv.constants::get,
+                        globals::put
+                    );
+
+                    if (!flag) {
+                        // Match failed; set all relevant globals to null.
+                        for (var name : pv.bindings()) {
+                            globals.put(name, null);
+                        }
+                    }
+
+                    push(flag);
+                }
+                case MATCHL -> {
+                    var target = pop();
+                    var pv = (PatternValue)pop();
+
+                    // FIRST, save the top of the stack.
+                    int here = top;
+
+                    // NEXT, match the pattern against the target given the
+                    // constants, pushing bound values onto the stack as the
+                    // match proceeds.
+                    var flag = Matcher.bind(
+                        joe,
+                        pv.pattern,
+                        target,
+                        pv.constants::get,
+                        (id, value) -> push(value)
+                    );
+
+                    // NEXT, if the match failed, pop the bound values.
+                    if (!flag) {
+                        top = here;
+                        for (var ignored : pv.bindings) {
+                            push(null);
+                        }
+                    }
+
+                    // FINALLY, push the success/failure flag.
+                    push(flag);
+                }
                 case METHOD -> {
                     // NOTE: This was defineMethod in clox
                     var name = readString();
@@ -642,8 +700,9 @@ class VirtualMachine {
                 case NULL -> push(null);
                 case PATTERN -> {
                     var pattern = readPattern();
+                    var bindings = readStringList();
                     var constants = (ListValue)pop();
-                    push(new PatternValue(pattern, constants));
+                    push(new PatternValue(pattern, bindings, constants));
                 }
                 case POP -> pop();
                 case POPN -> top -= readArg();
@@ -753,7 +812,7 @@ class VirtualMachine {
                         throw error(joe.stringify(value));
                     }
                 }
-                case TSET -> registerT = peek(0);
+                case TPUT -> registerT = pop();
                 case TRUE -> push(true);
                 case TRCPOP -> frame.postTraces.pop();
                 case TRCPUSH -> {
@@ -762,6 +821,7 @@ class VirtualMachine {
                     }
                     frame.postTraces.push((Trace)readConstant());
                 }
+                case TSET -> registerT = peek(0);
                 case UPCLOSE -> {
                     // Close and then pop the *n* upvalues on the
                     // top of the stack.
@@ -903,8 +963,8 @@ class VirtualMachine {
         return (Function)frame.closure.function.constants[index];
     }
 
-    // Reads a stack slot argument from the chunk.
-    private char readSlot() {
+    // Reads a `char` argument from the chunk as an integer.
+    private int readInt() {
         return frame.closure.function.code[frame.ip++];
     }
 
@@ -960,6 +1020,30 @@ class VirtualMachine {
 
     private Object peek(int depth) {
         return stack[top - depth - 1];
+    }
+
+    // Slides the n items at the top of the stack down to the beginning
+    // of the range, e.g., given
+    //
+    //    5 4 3 2 1 top
+    //
+    // shift(2, 5) will move items like this:
+    //
+    //    2 1 5 4 3 top
+    @SuppressWarnings("ManualArrayCopy")
+    private void shift(int n, int range) {
+        var base = top - range;
+        var copy = Arrays.copyOfRange(stack, base, top);
+        var m = range - n;
+
+        // Move vars down
+        for (var i = 0; i < n; i++) {
+            stack[base + i] = copy[m + i];
+        }
+
+        for (var i = 0; i < m; i++) {
+            stack[base + n + i] = copy[i];
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -1166,5 +1250,9 @@ class VirtualMachine {
 
     // A pattern, as evaluated by the PATTERN instruction and used by
     // the MATCH instruction.
-    private record PatternValue(Pattern pattern, List<Object> constants) {}
+    private record PatternValue(
+        Pattern pattern,         // The pattern proper
+        List<String> bindings,   // The names of the pattern variables
+        List<Object> constants   // The evaluated pattern constants
+    ) {}
 }
