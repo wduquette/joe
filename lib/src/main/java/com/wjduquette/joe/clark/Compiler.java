@@ -909,16 +909,26 @@ class Compiler {
                 }
             }
             case Expr.Match e -> {
-                emit(e.target());
-                emitPATTERN(e.pattern());
-                emit(SWAP);
+                // Stack effects are written for locals.
+                int nVars = e.pattern().getBindings().size();
+
+                // Set up                  // Stack: locals | working
+                emit(e.target());          // ∅ | t        ; Compute target
+                emitPATTERN(e.pattern());  // ∅ | t p      ; Compute pattern
+                emit(SWAP);                // ∅ | p t      ; setup for match
 
                 if (inGlobalScope()) {
-                    emit(MATCHG);
+                    emit(MATCHG);          // ∅ | flag     ; Do match
                 } else {
-                    defineLocals(e.pattern().getBindings());
-                    // TODO: Need LOCMOVE!
-                    emit(MATCHL);
+                    var slot = current.localCount;
+                    emit(MATCHL);          // ∅ | vs flag  ; Do match
+                    emit(TPUT);            // ∅ | vs       ; T = pop
+                    defineLocals(          // ∅ | vs       ; define locals
+                        e.pattern().getBindings());
+                    emit(LOCMOVE,         // vs | ∅       ; fixup local values
+                        (char)slot,
+                        (char)nVars);
+                    emit(TGET);            // vs | flag    ; push T
                 }
             }
             case Expr.Null ignored -> emit(NULL);

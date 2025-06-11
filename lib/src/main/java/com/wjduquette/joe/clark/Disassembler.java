@@ -159,7 +159,7 @@ public class Disassembler {
                  MAPNEW, MAPPUT, MATCH, MATCHG, MATCHL, MUL,
                  NE, NEGATE, NI, NOT, NULL,
                  POP, RETURN, SUB, SWAP,
-                 TGET, THROW, TSET, TRUE, TRCPOP
+                 TGET, THROW, TPUT, TRUE, TRCPOP, TSET
                 -> {
                 lines.add(new Line(ip, prefix));
                 return ip + 1;
@@ -172,6 +172,16 @@ public class Disassembler {
                 var text = String.format(" %04d", (int)arg);
                 lines.add(new Line(ip, prefix + text));
                 return ip + 2;
+            }
+
+            // Two-Char Instructions (instructions with two arbitrary char args)
+            // Pattern: opcode charValue charValue
+            case LOCMOVE -> {
+                char arg = chunk.code(ip + 1);
+                char arg2 = chunk.code(ip + 2);
+                var text = String.format(" %04d %04d", (int)arg, (int)arg2);
+                lines.add(new Line(ip, prefix + text));
+                return ip + 3;
             }
 
             // Forward Jump Instructions
