@@ -519,23 +519,6 @@ class Compiler {
                     patchJump(else_);          // ∅            ; else:
                 }
             }
-            case Stmt.VarPattern s -> {
-                var vars = s.pattern().getBindings();
-
-                if (!inGlobalScope()) {        // Stack: locals | working
-                    declareLocals(vars);       // ∅         ; declare vars
-                }
-
-                emitPATTERN(s.pattern());      // ∅ | p     ; compute pattern
-                emit(s.target());              // ∅ | p t   ; compute target.
-
-                if (!inGlobalScope()) {
-                    emit(Opcode.LOCBIND);       // ∅ | vs    ; match pattern
-                    defineLocals(vars);        // vs | ∅    ; define vars
-                } else {
-                    emit(Opcode.GLOBIND);       // ∅         ; define vars
-                }
-            }
             case Stmt.Match s -> {
                 // Setup                      // Stack: locals | working
                 beginScope();                 // ∅            ; begin scope: match
@@ -726,6 +709,23 @@ class Compiler {
                     defineLocal(var.name());
                 }
             }
+            case Stmt.VarPattern s -> {
+                var vars = s.pattern().getBindings();
+
+                if (!inGlobalScope()) {        // Stack: locals | working
+                    declareLocals(vars);       // ∅         ; declare vars
+                }
+
+                emitPATTERN(s.pattern());      // ∅ | p     ; compute pattern
+                emit(s.target());              // ∅ | p t   ; compute target.
+
+                if (!inGlobalScope()) {
+                    emit(Opcode.LOCBIND);       // ∅ | vs    ; match pattern
+                    defineLocals(vars);        // vs | ∅    ; define vars
+                } else {
+                    emit(Opcode.GLOBIND);       // ∅         ; define vars
+                }
+            }
             case Stmt.While s -> {
                 // Setup                   // Stack effects:
                 var start_ = here();       // ∅     ; start:
@@ -771,8 +771,11 @@ class Compiler {
 
     private void emitPATTERN(ASTPattern astPattern) {
         var index = constant(astPattern.getPattern());
+        var bindings = constant(astPattern.getBindings().stream()
+            .map(Token::lexeme)
+            .toList());
         emitList(astPattern.getConstants());
-        emit(PATTERN, index);
+        emit(PATTERN, index, bindings);
     }
 
     //-------------------------------------------------------------------------
@@ -905,9 +908,18 @@ class Compiler {
                     emit(MAPPUT);                  // m        ; m[k] = v
                 }
             }
-            case Expr.Match ignored -> {
-                emitCONST("'~' is not yet implemented.");
-                emit(THROW);
+            case Expr.Match e -> {
+                emit(e.target());
+                emitPATTERN(e.pattern());
+                emit(SWAP);
+
+                if (inGlobalScope()) {
+                    emit(MATCHG);
+                } else {
+                    defineLocals(e.pattern().getBindings());
+                    // TODO: Need LOCMOVE!
+                    emit(MATCHL);
+                }
             }
             case Expr.Null ignored -> emit(NULL);
             case Expr.PropGet e -> {

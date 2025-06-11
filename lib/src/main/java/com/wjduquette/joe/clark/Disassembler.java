@@ -156,7 +156,8 @@ public class Disassembler {
                  GE, GT, GETNEXT, HASNEXT,
                  IN, INCR, INDGET, INDSET, INHERIT, ITER,
                  LISTADD, LISTNEW, LE, LT,
-                 MAPNEW, MAPPUT, MATCH, MUL, NE, NEGATE, NI, NOT, NULL,
+                 MAPNEW, MAPPUT, MATCH, MATCHG, MATCHL, MUL,
+                 NE, NEGATE, NI, NOT, NULL,
                  POP, RETURN, SUB, SWAP,
                  TGET, THROW, TSET, TRUE, TRCPOP
                 -> {
@@ -197,8 +198,8 @@ public class Disassembler {
 
             // Constant Instructions
             // Pattern: opcode constantIndex
-            case CLASS, COMMENT, CONST, GLODEF, GLOGET, GLOBIND, GLOSET, LOCBIND,
-                 METHOD, PATTERN, PROPGET, PROPSET, SUPGET, TRCPUSH
+            case CLASS, COMMENT, CONST, GLODEF, GLOGET, GLOBIND, GLOSET,
+                 LOCBIND, METHOD, PATTERN, PROPGET, PROPSET, SUPGET, TRCPUSH
             -> {
                 int index = chunk.code(ip + 1);
                 var constant = joe.stringify(chunk.getConstant(index));

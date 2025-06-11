@@ -601,6 +601,58 @@ class VirtualMachine {
                     // FINALLY, push the success/failure flag.
                     push(flag);
                 }
+                case MATCHG -> {
+                    var target = pop();
+                    var pv = (PatternValue)pop();
+
+                    // FIRST, see if there's a match.  Saves bound values
+                    // to the global environment as it goes.
+                    var flag = Matcher.bind(
+                        joe,
+                        pv.pattern,
+                        target,
+                        pv.constants::get,
+                        globals::put
+                    );
+
+                    if (!flag) {
+                        // Match failed; set all relevant globals to null.
+                        for (var name : pv.bindings()) {
+                            globals.put(name, null);
+                        }
+                    }
+
+                    push(flag);
+                }
+                case MATCHL -> {
+                    var target = pop();
+                    var pv = (PatternValue)pop();
+
+                    // FIRST, save the top of the stack.
+                    int here = top;
+
+                    // NEXT, match the pattern against the target given the
+                    // constants, pushing bound values onto the stack as the
+                    // match proceeds.
+                    var flag = Matcher.bind(
+                        joe,
+                        pv.pattern,
+                        target,
+                        pv.constants::get,
+                        (id, value) -> push(value)
+                    );
+
+                    // NEXT, if the match failed, pop the bound values.
+                    if (!flag) {
+                        top = here;
+                        for (var ignored : pv.bindings) {
+                            push(null);
+                        }
+                    }
+
+                    // FINALLY, push the success/failure flag.
+                    push(flag);
+                }
                 case METHOD -> {
                     // NOTE: This was defineMethod in clox
                     var name = readString();
@@ -642,8 +694,9 @@ class VirtualMachine {
                 case NULL -> push(null);
                 case PATTERN -> {
                     var pattern = readPattern();
+                    var bindings = readStringList();
                     var constants = (ListValue)pop();
-                    push(new PatternValue(pattern, constants));
+                    push(new PatternValue(pattern, bindings, constants));
                 }
                 case POP -> pop();
                 case POPN -> top -= readArg();
@@ -1166,5 +1219,9 @@ class VirtualMachine {
 
     // A pattern, as evaluated by the PATTERN instruction and used by
     // the MATCH instruction.
-    private record PatternValue(Pattern pattern, List<Object> constants) {}
+    private record PatternValue(
+        Pattern pattern,         // The pattern proper
+        List<String> bindings,   // The names of the pattern variables
+        List<Object> constants   // The evaluated pattern constants
+    ) {}
 }
