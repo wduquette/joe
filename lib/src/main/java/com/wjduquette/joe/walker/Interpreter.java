@@ -683,9 +683,35 @@ class Interpreter {
                 yield map;
             }
             // A pattern match
-            case Expr.Match expr ->
-                throw new RuntimeError(expr.op().span(),
-                    "'~' is not yet implemented.");
+            case Expr.Match expr -> {
+                // FIRST, Evaluate the target and any pattern constants
+                var target = evaluate(expr.target());
+                var constants = new ArrayList<>();
+                expr.pattern().getConstants().forEach(e ->
+                    constants.add(evaluate(e)));
+
+                // NEXT, do the pattern match
+                var bound = new HashMap<String,Object>();
+                for (var name : expr.pattern().getBindings()) {
+                    bound.put(name.lexeme(), null);
+                }
+                if (Matcher.bind(
+                    joe,
+                    expr.pattern().getPattern(),
+                    target,
+                    constants::get,
+                    bound::put
+                )) {
+                    bind(bound);
+                    yield true;
+                } else {
+                    for (var name : expr.pattern().getBindings()) {
+                        bound.put(name.lexeme(), null);
+                    }
+                    bind(bound);
+                    yield false;
+                }
+            }
             // null
             case Expr.Null ignored -> null;
             // Get an object property.  The expression must evaluate to
