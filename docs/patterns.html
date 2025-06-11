@@ -176,9 +176,10 @@
                         <h1 id="pattern-matching"><a class="header" href="#pattern-matching">Pattern Matching</a></h1>
 <p>Joe supports a rich pattern-matching capability inspired by the Rust language's
 similar capability. Joe's
+<a href="operators.html#matching-operator"><code>~</code> matching operator</a>
+and the
 <a href="statements.html#variable-declarations"><code>var</code></a>,
-<a href="statements.html#foreach-statements"><code>foreach</code></a>,
-<a href="statements.html#if-let-statements"><code>if let</code></a>, and
+<a href="statements.html#foreach-statements"><code>foreach</code></a>, and
 <a href="statements.html#match-statements"><code>match</code></a> statements all make
 use of pattern matching to do destructuring binds.</p>
 <p>Joe supports a rich variety of patterns.  Some of them can contain
@@ -244,7 +245,7 @@ ignoring.</p>
 <p>A constant pattern is a constant value included in the pattern; the
 corresponding value in the target must have that exact value.</p>
 <pre><code class="language-joe">function isPro(list) {
-    if let ([_, "Pro"] = list1) {
+    if (list ~ [_, "Pro"]) {
         return true;
     } else {
         return false;
@@ -282,14 +283,14 @@ a list pattern is simply a list of patterns that matches a <code>List</code> of
 values.  The matched list must have exactly the same number of items
 as the list pattern, and each subpattern must match the corresponding
 item.</p>
-<pre><code class="language-joe">if let ([a, [b, _], "howdy"] = list) {
+<pre><code class="language-joe">if (list ~ [a, [b, _], "howdy"]) {
     // ...
 }
 </code></pre>
 <p>The pattern <code>[]</code> matches the empty list.</p>
 <p>Sometimes the length of the list is unknown; in this case, the list
 pattern can provide a pattern variable to bind to the list's tail:</p>
-<pre><code class="language-joe">if let ([a, b : tail] = list) {
+<pre><code class="language-joe">if (list ~ [a, b : tail]) {
     // tail gets the rest of the list.
 }
 </code></pre>

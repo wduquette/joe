@@ -34,6 +34,34 @@ if ("D" ni list) println("Nope, not there!");
 These operators work with the same set of collection values as the 
 [`foreach` statement](statements.md#foreach-loops).
 
+## Matching Operator
+
+The `~` operator matches a value against a 
+[destructuring pattern](patterns.md), returning true or false.  For example,
+here it used to determine whether `myValue` contains a three-item list whose
+first item is `#fred`:
+
+```joe
+if (myValue ~ [#fred, _, _]) {
+    println("Match!");
+}
+```
+
+If the pattern contains binding variables, the variables are implicitly
+declared within the current scope.  On a successful match they are set
+to the matching values within the target; on failure they are set to
+`null`:
+
+```joe
+if (myValue ~ [#fred, height, weight]) {
+    println("Fred is " + height + " inches tall,");
+    println("and weighs " + weight + " pounds.");
+}
+```
+
+See the [Pattern Matching](patterns.md) section for more about pattern
+matching and Joe's pattern syntax.
+
 ## Logical Operators
 
 The `&&` and `||` operators provide short-circuit execution of Boolean

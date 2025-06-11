@@ -1087,6 +1087,26 @@ if ("D" ni list) println("Nope, not there!");
 </code></pre>
 <p>These operators work with the same set of collection values as the
 <a href="statements.html#foreach-loops"><code>foreach</code> statement</a>.</p>
+<h2 id="matching-operator"><a class="header" href="#matching-operator">Matching Operator</a></h2>
+<p>The <code>~</code> operator matches a value against a
+<a href="patterns.html">destructuring pattern</a>, returning true or false.  For example,
+here it used to determine whether <code>myValue</code> contains a three-item list whose
+first item is <code>#fred</code>:</p>
+<pre><code class="language-joe">if (myValue ~ [#fred, _, _]) {
+    println("Match!");
+}
+</code></pre>
+<p>If the pattern contains binding variables, the variables are implicitly
+declared within the current scope.  On a successful match they are set
+to the matching values within the target; on failure they are set to
+<code>null</code>:</p>
+<pre><code class="language-joe">if (myValue ~ [#fred, height, weight]) {
+    println("Fred is " + height + " inches tall,");
+    println("and weighs " + weight + " pounds.");
+}
+</code></pre>
+<p>See the <a href="patterns.html">Pattern Matching</a> section for more about pattern
+matching and Joe's pattern syntax.</p>
 <h2 id="logical-operators"><a class="header" href="#logical-operators">Logical Operators</a></h2>
 <p>The <code>&amp;&amp;</code> and <code>||</code> operators provide short-circuit execution of Boolean
 expressions in the usual way.  However, in Joe the values <code>false</code> and <code>null</code>
@@ -1585,9 +1605,10 @@ is used.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="pattern-matching"><a class="header" href="#pattern-matching">Pattern Matching</a></h1>
 <p>Joe supports a rich pattern-matching capability inspired by the Rust language's
 similar capability. Joe's
+<a href="operators.html#matching-operator"><code>~</code> matching operator</a>
+and the
 <a href="statements.html#variable-declarations"><code>var</code></a>,
-<a href="statements.html#foreach-statements"><code>foreach</code></a>,
-<a href="statements.html#if-let-statements"><code>if let</code></a>, and
+<a href="statements.html#foreach-statements"><code>foreach</code></a>, and
 <a href="statements.html#match-statements"><code>match</code></a> statements all make
 use of pattern matching to do destructuring binds.</p>
 <p>Joe supports a rich variety of patterns.  Some of them can contain
@@ -1653,7 +1674,7 @@ ignoring.</p>
 <p>A constant pattern is a constant value included in the pattern; the
 corresponding value in the target must have that exact value.</p>
 <pre><code class="language-joe">function isPro(list) {
-    if let ([_, "Pro"] = list1) {
+    if (list ~ [_, "Pro"]) {
         return true;
     } else {
         return false;
@@ -1691,14 +1712,14 @@ a list pattern is simply a list of patterns that matches a <code>List</code> of
 values.  The matched list must have exactly the same number of items
 as the list pattern, and each subpattern must match the corresponding
 item.</p>
-<pre><code class="language-joe">if let ([a, [b, _], "howdy"] = list) {
+<pre><code class="language-joe">if (list ~ [a, [b, _], "howdy"]) {
     // ...
 }
 </code></pre>
 <p>The pattern <code>[]</code> matches the empty list.</p>
 <p>Sometimes the length of the list is unknown; in this case, the list
 pattern can provide a pattern variable to bind to the list's tail:</p>
-<pre><code class="language-joe">if let ([a, b : tail] = list) {
+<pre><code class="language-joe">if (list ~ [a, b : tail]) {
     // tail gets the rest of the list.
 }
 </code></pre>
