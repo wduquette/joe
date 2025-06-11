@@ -569,7 +569,7 @@ stack.</p>
 <p>Matches pattern <em>p</em> against the target value <em>t</em>. On success pushes
 the values of the pattern's bound variables followed by <code>true</code>; on failure
 pushes <code>false</code>.</p>
-<p>This is used for <code>foreach</code>, <code>if let</code>, and <code>match</code>, where we don't want
+<p>This is used for <code>foreach</code> and <code>match</code>, where we don't want
 to bind the variables on failure.  These statements define local scopes,
 so <code>MATCH</code> is never used at global scope.</p>
 <h3 id="matchg"><a class="header" href="#matchg">MATCHG</a></h3>

@@ -184,7 +184,6 @@ by a semicolon or (sometimes) a block, as in Java.</p>
 <li><a href="#blocks">Blocks</a></li>
 <li><a href="#return">Return</a></li>
 <li><a href="#if-statements">If Statements</a></li>
-<li><a href="#if-let-statements">If Let Statements</a></li>
 <li><a href="#while-loops">While Loops</a></li>
 <li><a href="#for-loops">For Loops</a></li>
 <li><a href="#foreach-loops">Foreach Loops</a></li>
@@ -225,8 +224,8 @@ the target value, e.g., if <code>f()</code> didn't return a two-item list in the
 example shown above, then the pattern match will fail and Joe will
 throw a runtime error.  Therefore, <code>var</code> should only be used when the
 shape of the target value is known ahead of time.  Use
-<a href="#the-if-let-statement"><code>if let</code></a> or
-<a href="#the-match-statement"><code>match</code></a> to test whether a value matches a
+the <a href="operators.html#matching-operator"><code>~</code> operator</a> or the
+<a href="#the-match-statement"><code>match</code> statement</a> to test whether a value matches a
 particular pattern.</p>
 <p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
 destructuring binds, including Joe's full pattern syntax.</p>
@@ -270,24 +269,6 @@ not displayed by <code>joe run</code>.</p>
     ...
 }
 </code></pre>
-<h2 id="if-let-statements"><a class="header" href="#if-let-statements">If Let Statements</a></h2>
-<p>The <code>if let</code> uses a <a href="patterns.html">pattern</a> to do a conditional
-destructuring bind on a data structure.  If the pattern matches, <code>if let</code>
-executes its "then" branch with the bound variables in scope;
-otherwise it executes its "else" branch:</p>
-<pre><code class="language-joe">var list = [1, 2];
-
-if let ([a, b] = list) {
-    println(a); // Prints "1"
-    println(b); // Prints "2"
-} else {
-    println("no match");
-}
-</code></pre>
-<p>The pattern's binding variables (<code>a</code> and <code>b</code> in this example) are in-scope only
-in the "then" branch.</p>
-<p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
-destructuring binds, including Joe's full pattern syntax.</p>
 <h2 id="while-loops"><a class="header" href="#while-loops">While Loops</a></h2>
 <p><code>while</code> loops are defined as in Java.</p>
 <pre><code class="language-joe">var x = 0;

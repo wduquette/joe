@@ -70,7 +70,7 @@ author, but isn't assigned to any convenient variable.
 In other words,
 
 ```joe
-if let (Thing{#id: id} = thing) {
+if (thing ~ Thing{#id: id}) {
     ...
 }
 ```

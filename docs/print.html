@@ -1152,7 +1152,6 @@ by a semicolon or (sometimes) a block, as in Java.</p>
 <li><a href="statements.html#blocks">Blocks</a></li>
 <li><a href="statements.html#return">Return</a></li>
 <li><a href="statements.html#if-statements">If Statements</a></li>
-<li><a href="statements.html#if-let-statements">If Let Statements</a></li>
 <li><a href="statements.html#while-loops">While Loops</a></li>
 <li><a href="statements.html#for-loops">For Loops</a></li>
 <li><a href="statements.html#foreach-loops">Foreach Loops</a></li>
@@ -1193,8 +1192,8 @@ the target value, e.g., if <code>f()</code> didn't return a two-item list in the
 example shown above, then the pattern match will fail and Joe will
 throw a runtime error.  Therefore, <code>var</code> should only be used when the
 shape of the target value is known ahead of time.  Use
-<a href="statements.html#the-if-let-statement"><code>if let</code></a> or
-<a href="statements.html#the-match-statement"><code>match</code></a> to test whether a value matches a
+the <a href="operators.html#matching-operator"><code>~</code> operator</a> or the
+<a href="statements.html#the-match-statement"><code>match</code> statement</a> to test whether a value matches a
 particular pattern.</p>
 <p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
 destructuring binds, including Joe's full pattern syntax.</p>
@@ -1238,24 +1237,6 @@ not displayed by <code>joe run</code>.</p>
     ...
 }
 </code></pre>
-<h2 id="if-let-statements"><a class="header" href="#if-let-statements">If Let Statements</a></h2>
-<p>The <code>if let</code> uses a <a href="patterns.html">pattern</a> to do a conditional
-destructuring bind on a data structure.  If the pattern matches, <code>if let</code>
-executes its "then" branch with the bound variables in scope;
-otherwise it executes its "else" branch:</p>
-<pre><code class="language-joe">var list = [1, 2];
-
-if let ([a, b] = list) {
-    println(a); // Prints "1"
-    println(b); // Prints "2"
-} else {
-    println("no match");
-}
-</code></pre>
-<p>The pattern's binding variables (<code>a</code> and <code>b</code> in this example) are in-scope only
-in the "then" branch.</p>
-<p>See <a href="patterns.html">Pattern Matching</a> for more on pattern matching and
-destructuring binds, including Joe's full pattern syntax.</p>
 <h2 id="while-loops"><a class="header" href="#while-loops">While Loops</a></h2>
 <p><code>while</code> loops are defined as in Java.</p>
 <pre><code class="language-joe">var x = 0;
@@ -1865,7 +1846,7 @@ by strict equality of type objects, precisely because the value's type
 might be unscoped: the type's name is known to the value and to the script
 author, but isn't assigned to any convenient variable.</p>
 <p>In other words,</p>
-<pre><code class="language-joe">if let (Thing{#id: id} = thing) {
+<pre><code class="language-joe">if (thing ~ Thing{#id: id}) {
     ...
 }
 </code></pre>
@@ -9109,7 +9090,6 @@ statement       → exprStmt
                 | forStmt
                 | foreachStmt
                 | ifStmt
-                | ifLetStmt
                 | matchStmt
                 | printStmt
                 | returnStmt
@@ -9127,8 +9107,6 @@ forStmt         → "for" "(" ( varDecl | exprStmt | ";" )
 forEachStmt     → "foreach" "(" pattern ":" expression ")" statement;
 ifStmt          → "if" "(" expression ")" statement 
                   ( "else" statement )? ;
-ifLetStmt       → "if" "let" "(" pattern "=" expression ")" statement 
-                  ( "else" statement )? ; 
 matchStmt       → "match" "(" expression ")" "{" 
                   ( "case" pattern ( "if" expression )? "-&gt;" statement )+ 
                   ( "default" "-&gt;" statement )? 
@@ -9183,8 +9161,8 @@ map             → "{" (map_entry ( "," map_entry )* ","? )? "]" ;
 map_entry       → expression ":" expression ;
 </code></pre>
 <h2 id="patterns"><a class="header" href="#patterns">Patterns</a></h2>
-<p>A <code>pattern</code> is a destructuring pattern that can appear in a <code>let</code> statement,
-an <code>if let</code> statement, or as a <code>case</code> of a <code>match</code> statement.</p>
+<p>A <code>pattern</code> is a destructuring pattern that can be used with the <code>~</code>
+operator, and with a number of Joe statements.</p>
 <pre><code>pattern         → constantPattern
                 | wildcardPattern
                 | valueBinding
@@ -9736,7 +9714,7 @@ stack.</p>
 <p>Matches pattern <em>p</em> against the target value <em>t</em>. On success pushes
 the values of the pattern's bound variables followed by <code>true</code>; on failure
 pushes <code>false</code>.</p>
-<p>This is used for <code>foreach</code>, <code>if let</code>, and <code>match</code>, where we don't want
+<p>This is used for <code>foreach</code> and <code>match</code>, where we don't want
 to bind the variables on failure.  These statements define local scopes,
 so <code>MATCH</code> is never used at global scope.</p>
 <h3 id="matchg"><a class="header" href="#matchg">MATCHG</a></h3>

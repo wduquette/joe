@@ -482,7 +482,7 @@ Matches pattern *p* against the target value *t*. On success pushes
 the values of the pattern's bound variables followed by `true`; on failure 
 pushes `false`. 
 
-This is used for `foreach`, `if let`, and `match`, where we don't want
+This is used for `foreach` and `match`, where we don't want
 to bind the variables on failure.  These statements define local scopes,
 so `MATCH` is never used at global scope.
 
