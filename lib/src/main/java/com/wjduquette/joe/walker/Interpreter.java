@@ -682,6 +682,10 @@ class Interpreter {
                 }
                 yield map;
             }
+            // A pattern match
+            case Expr.Match expr ->
+                throw new RuntimeError(expr.op().span(),
+                    "'~' is not yet implemented.");
             // null
             case Expr.Null ignored -> null;
             // Get an object property.  The expression must evaluate to

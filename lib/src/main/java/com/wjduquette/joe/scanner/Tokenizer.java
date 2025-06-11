@@ -131,6 +131,7 @@ public class Tokenizer {
             case '$' -> makeToken(DOLLAR);
             case '.' -> makeToken(DOT);
             case '?' -> makeToken(QUESTION);
+            case '~' -> makeToken(TILDE);
             case '-' -> {
                 if (match('=')) {
                     yield makeToken(MINUS_EQUAL);

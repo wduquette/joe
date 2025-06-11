@@ -905,6 +905,10 @@ class Compiler {
                     emit(MAPPUT);                  // m        ; m[k] = v
                 }
             }
+            case Expr.Match ignored -> {
+                emitCONST("'~' is not yet implemented.");
+                emit(THROW);
+            }
             case Expr.Null ignored -> emit(NULL);
             case Expr.PropGet e -> {
                 var name = name(e.name());

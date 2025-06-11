@@ -1,6 +1,7 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.JoeClass;
+import com.wjduquette.joe.RuntimeError;
 import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.parser.Expr;
 import com.wjduquette.joe.parser.FunctionType;
@@ -307,6 +308,9 @@ class Resolver {
                 resolve(expr.right());
             }
             case Expr.MapLiteral expr -> expr.entries().forEach(this::resolve);
+            case Expr.Match expr ->
+                throw new RuntimeError(expr.op().span(),
+                    "'~' is not yet implemented.");
             case Expr.Null ignored -> {}
             case Expr.PropGet expr -> resolve(expr.object());
             case Expr.PropIncrDecr expr -> resolve(expr.object());

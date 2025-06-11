@@ -731,10 +731,17 @@ public class Parser {
     private Expr comparison() {
         Expr expr = term();
 
-        while (scanner.match(GREATER, GREATER_EQUAL, IN, LESS, LESS_EQUAL, NI)) {
+        while (scanner.match(
+            GREATER, GREATER_EQUAL, IN, LESS, LESS_EQUAL, NI, TILDE
+        )) {
             Token operator = scanner.previous();
-            Expr right = term();
-            expr = new Expr.Binary(expr, operator, right);
+            if (operator.type() == TILDE) {
+                ASTPattern right = pattern();
+                expr = new Expr.Match(expr, operator, right);
+            } else {
+                Expr right = term();
+                expr = new Expr.Binary(expr, operator, right);
+            }
         }
 
         return expr;

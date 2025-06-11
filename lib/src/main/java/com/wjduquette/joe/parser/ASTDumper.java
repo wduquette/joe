@@ -217,6 +217,10 @@ public class ASTDumper {
                 }
                 yield buff.toString();
             }
+            case Expr.Match e -> buffer()
+                .println(" '" + e.op().lexeme() + "'")
+                .dump("target", e.target())
+                .dump("pattern", e.pattern());
             case Expr.Null ignored -> "";
             case Expr.PropGet e -> buffer()
                 .println(" '" + e.name().lexeme() + "'")
