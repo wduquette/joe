@@ -15,7 +15,7 @@ public sealed interface Stmt
             Stmt.Continue,
             Stmt.Expression,
             Stmt.For, Stmt.ForEach, Stmt.ForEachBind, Stmt.Function,
-            Stmt.If, Stmt.IfLet,
+            Stmt.If,
             Stmt.Match,
             Stmt.Record, Stmt.Return,
             Stmt.Switch,
@@ -177,23 +177,6 @@ public sealed interface Stmt
     record If(
         Token keyword,
         Expr condition,
-        Stmt thenBranch,
-        Stmt elseBranch
-    ) implements Stmt {
-        public Span location() { return keyword.span(); }
-    }
-
-    /** An "if let" statement.
-     * @param keyword The `let` keyword
-     * @param pattern The pattern being matched
-     * @param target The target expression
-     * @param thenBranch Statement or block to execute if true
-     * @param elseBranch Statement or block to execute if false, or null
-     */
-    record IfLet(
-        Token keyword,
-        ASTPattern pattern,
-        Expr target,
         Stmt thenBranch,
         Stmt elseBranch
     ) implements Stmt {

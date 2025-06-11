@@ -499,26 +499,6 @@ class Compiler {
 
                 if (end_ != -1) patchJump(end_);
             }
-            case Stmt.IfLet s -> {
-                var vars = s.pattern().getBindings();
-
-                emitPATTERN(s.pattern());      // ∅ | p        ; compile pattern
-                emit(s.target());              // ∅ | p t      ; compute target
-                beginScope();                  // ∅            ; begin scope: then
-                emit(MATCH);                   // ∅ | vs? flag ; match pattern
-                int else_ = emitJump(JIF);     // ∅ | vs?      ; JIF else
-                defineLocals(vars);            // vs | ∅       ; define bindings
-                emit(s.thenBranch());          // vs | ∅       ; compile "then"
-                endScope();                    // ∅            ; end scope: then
-                if (s.elseBranch() != null) {
-                    int end_ = emitJump(JUMP); // ∅            ; JUMP end
-                    patchJump(else_);          // ∅            ; else:
-                    emit(s.elseBranch());      // ∅            ; compile "else"
-                    patchJump(end_);           // ∅            ; end:
-                } else {
-                    patchJump(else_);          // ∅            ; else:
-                }
-            }
             case Stmt.Match s -> {
                 // Setup                      // Stack: locals | working
                 beginScope();                 // ∅            ; begin scope: match
