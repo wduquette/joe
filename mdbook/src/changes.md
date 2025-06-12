@@ -16,6 +16,11 @@
   - The new `~` operator is a comparison operator that checks whether a Joe
     value matches a Joe pattern, binding any variables in the local scope.
     It replaces the existing `if let` statement, which has been removed.
+  - Replaced the "instance" pattern syntax with the friendly "named-field"
+    pattern syntax.
+  - "record" pattern syntax is now called "ordered-field" pattern syntax, as
+    we now have non-record-types with ordered fields.
+    
 - Extensibility
   - Simplified implementation of proxy types for native record types.
     - Any `ProxyType` can now easily define read-only fields for its proxied
