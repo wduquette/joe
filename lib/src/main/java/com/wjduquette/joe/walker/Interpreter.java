@@ -319,6 +319,23 @@ class Interpreter {
 
                 throw new Return(value);
             }
+            // Evaluate the rule set.
+            case Stmt.RuleSet stmt -> {
+                var rsc = new RuleSetCompiler(stmt.ruleSet());
+                rsc.setFactFactory(FactValue::new);
+                var ruleset = rsc.compile();
+                var exports = new HashMap<String, Object>();
+
+                for (var export : stmt.exports().entrySet()) {
+                    var name = export.getKey();
+                    var callable = evaluate(export.getValue());
+                    exports.put(name.lexeme(), checkCallable(name, callable));
+                }
+
+                // TODO: RSV needs the name
+                environment.setVar(stmt.name().lexeme(),
+                    new RuleSetValue(ruleset, exports));
+            }
             case Stmt.Switch stmt -> {
                 var value = evaluate(stmt.expr());
                 for (var c : stmt.cases()) {
@@ -728,22 +745,6 @@ class Interpreter {
                 instance.set(name, right);
                 yield right;
             }
-            // Evaluate the rule set.
-            case Expr.RuleSet e -> {
-                var rsc = new RuleSetCompiler(e.ruleSet());
-                rsc.setFactFactory(FactValue::new);
-                var ruleset = rsc.compile();
-                var exports = new HashMap<String, Object>();
-
-                for (var export : e.exports().entrySet()) {
-                    var name = export.getKey();
-                    var callable = evaluate(export.getValue());
-                    exports.put(name.lexeme(), checkCallable(name, callable));
-                }
-
-                yield new RuleSetValue(ruleset, exports);
-            }
-
             // Handle `super.<methodName>` in methods
             case Expr.Super expr -> {
                 int distance = locals.get(expr);

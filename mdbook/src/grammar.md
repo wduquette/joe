@@ -72,6 +72,7 @@ matchStmt       → "match" "(" expression ")" "{"
                   "}" ;                  
 printStmt       → "print" expression ";" ;
 returnStmt      → "return" expression? ";" ;
+rulesetStmt     → "ruleset" "{" ruleset "}" ;
 switchStmt      → "switch" "(" expression ")" "{"
                   ( "case" expression ( "," expression )* "->" statement )+
                   ( "default" "->" statement )?
@@ -114,7 +115,6 @@ primary         → "true" | "false" | "nil"
                 | lambda 
                 | grouping
                 | list 
-                | "ruleset" "{" ruleset "}" ;
                 | "super" "." IDENTIFIER ;
 grouping        → "(" expression ")"
 lambda          → "\" parameters? "->" ( expression | block ) ; 
