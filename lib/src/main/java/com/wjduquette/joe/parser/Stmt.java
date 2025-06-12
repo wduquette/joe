@@ -4,6 +4,7 @@ import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.SourceBuffer.Span;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * The statements that can appear in a Joe AST.
@@ -17,7 +18,7 @@ public sealed interface Stmt
             Stmt.For, Stmt.ForEach, Stmt.ForEachBind, Stmt.Function,
             Stmt.If,
             Stmt.Match,
-            Stmt.Record, Stmt.Return,
+            Stmt.Record, Stmt.Return, Stmt.RuleSet,
             Stmt.Switch,
             Stmt.Throw,
             Stmt.Var, Stmt.VarPattern,
@@ -243,6 +244,23 @@ public sealed interface Stmt
     record Return(Token keyword, Expr value) implements Stmt {
         public Span location() { return keyword.span(); }
     }
+
+    /**
+     * A `ruleset` statement, containing a Nero rule set's AST.
+     * @param keyword The `ruleset` keyword
+     * @param name The rule set's name.
+     * @param ruleSet The rule set as parsed
+     * @param exports The exported relations
+     */
+    record RuleSet(
+        Token keyword,
+        Token name,
+        ASTRuleSet ruleSet,
+        Map<Token,Expr> exports
+    ) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
+
 
     /**
      * A "switch" statement.

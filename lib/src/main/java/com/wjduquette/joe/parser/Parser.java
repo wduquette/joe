@@ -134,6 +134,7 @@ public class Parser {
             if (scanner.match(FUNCTION)) return functionDeclaration(
                 FunctionType.FUNCTION, "function");
             if (scanner.match(RECORD)) return recordDeclaration();
+            if (scanner.match(RULESET)) return rulesetDeclaration();
             if (scanner.match(VAR)) return varDeclaration();
 
             return statement();
@@ -846,8 +847,6 @@ public class Parser {
             return new Expr.Literal(scanner.previous().literal());
         }
 
-        if (scanner.match(RULESET)) return ruleset();
-
         if (scanner.match(AT)) {
             Token keyword = scanner.previous();
             scanner.consume(IDENTIFIER, "Expected class property name.");
@@ -1129,12 +1128,14 @@ public class Parser {
      * this method should be ignored.
      * @return The parsed rule set.
      */
-    public Expr.RuleSet ruleset() {
+    public Stmt.RuleSet rulesetDeclaration() {
         var keyword = scanner.previous();
         var facts = new ArrayList<ASTRuleSet.ASTOrderedAtom>();
         var rules = new ArrayList<ASTRuleSet.ASTRule>();
         var exports = new HashMap<Token, Expr>();
 
+        scanner.consume(IDENTIFIER, "expected rule set name after 'ruleset'.");
+        var ruleSetName = scanner.previous();
         scanner.consume(LEFT_BRACE, "expected '{' after 'ruleset'.");
 
         while (!scanner.match(RIGHT_BRACE)) {
@@ -1171,7 +1172,7 @@ public class Parser {
         }
 
         var ast = new ASTRuleSet(facts, rules);
-        return new Expr.RuleSet(keyword, ast, exports);
+        return new Stmt.RuleSet(keyword, ruleSetName, ast, exports);
     }
 
     /**

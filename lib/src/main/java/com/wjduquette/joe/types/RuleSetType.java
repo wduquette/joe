@@ -31,6 +31,7 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
 
         method("infer",        this::_infer);
         method("isStratified", this::_isStratified);
+        method("name",         this::_name);
         method("toString",     this::_toString);
     }
 
@@ -43,7 +44,7 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
         var rsv = (RuleSetValue)value;
 
         var buff = new StringBuilder();
-        buff.append("ruleset {\n");
+        buff.append("ruleset ").append(rsv.name()).append(" {\n");
         for (var fact : rsv.ruleset().facts()) {
             buff.append("    ").append(fact).append(";\n");
         }
@@ -89,6 +90,15 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
     private Object _isStratified(RuleSetValue value, Joe joe, Args args) {
         args.exactArity(0, "isStratified()");
         return value.isStratified();
+    }
+
+    //**
+    // @method name
+    // @result String
+    // Returns the rule set's name.
+    private Object _name(RuleSetValue value, Joe joe, Args args) {
+        args.exactArity(0, "name()");
+        return value.name();
     }
 
     //**
