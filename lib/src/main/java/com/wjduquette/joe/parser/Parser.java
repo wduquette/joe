@@ -976,8 +976,6 @@ public class Parser {
 
             if (identifier.lexeme().startsWith("_")) {
                 return new Pattern.Wildcard(identifier.lexeme());
-            } else if (scanner.match(LEFT_BRACE)) {
-                return instancePattern(wp, identifier);
             } else if (scanner.match(LEFT_PAREN)) {
                 if (scanner.peekNext().type() == COLON) {
                     return namedFieldPattern(wp, identifier);
@@ -1076,11 +1074,6 @@ public class Parser {
         scanner.consume(RIGHT_BRACE, "Expected '}' after map pattern.");
 
         return new Pattern.MapPattern(map);
-    }
-
-    private Pattern instancePattern(ASTPattern wp, Token identifier) {
-        var fieldMap = mapPattern(wp);
-        return new Pattern.InstancePattern(identifier.lexeme(), fieldMap);
     }
 
     private Pattern namedFieldPattern(ASTPattern wp, Token identifier) {
