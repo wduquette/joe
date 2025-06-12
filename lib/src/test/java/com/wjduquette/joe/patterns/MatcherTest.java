@@ -379,7 +379,7 @@ public class MatcherTest extends Ted {
         test("testRecordPattern_notRecord");
 
         constants = List.of("123", "red");
-        var pattern = new Pattern.RecordPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1)
         ));
@@ -392,7 +392,7 @@ public class MatcherTest extends Ted {
         test("testRecordPattern_wrongType");
 
         constants = List.of("123", "red");
-        var pattern = new Pattern.RecordPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1)
         ));
@@ -407,7 +407,7 @@ public class MatcherTest extends Ted {
         test("testRecordPattern_wrongSize");
 
         constants = List.of("123", "red", 456.0);
-        var pattern = new Pattern.RecordPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1),
             new Pattern.Constant(2)
@@ -423,7 +423,7 @@ public class MatcherTest extends Ted {
         test("testRecordPattern_wrongFieldValue");
 
         constants = List.of("123", "green");
-        var pattern = new Pattern.RecordPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1)
         ));
@@ -438,7 +438,7 @@ public class MatcherTest extends Ted {
         test("testRecordPattern_good");
 
         constants = List.of("123", "red");
-        var pattern = new Pattern.RecordPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1)
         ));
@@ -453,7 +453,7 @@ public class MatcherTest extends Ted {
         test("testRecordPattern_good");
 
         constants = List.of("123", "red");
-        var pattern = new Pattern.RecordPattern("Pair", List.of(
+        var pattern = new Pattern.OrderedFieldPattern("Pair", List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1)
         ));

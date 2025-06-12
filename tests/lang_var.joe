@@ -209,22 +209,22 @@ function testNamedField_record() {
 }
 
 //-----------------------------------------------------------------------------
-// Record Patterns
+// Ordered-Field Patterns
 
-function testRecord_notRecord() {
+function testOrderedField_notRecord() {
     // Thing is a normal class instance, not a record.
     assertError(\-> { var Thing(id, color) = Thing(123, "red"); },
         "'var' pattern failed to match target value.");
 }
 
-function testRecord_wrongType() {
+function testOrderedField_wrongType() {
     var person = Person("Joe", 80);
 
     assertError(\-> { var Cowboy(name, age) = person; },
         "'var' pattern failed to match target value.");
 }
 
-function testRecord_good() {
+function testOrderedField_good() {
     var person = Person("Joe", 80);
 
     var Person(name, age) = person;

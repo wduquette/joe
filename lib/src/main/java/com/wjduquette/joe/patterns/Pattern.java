@@ -27,7 +27,7 @@ public sealed interface Pattern permits
     Pattern.ListPattern,
     Pattern.MapPattern,
     Pattern.NamedFieldPattern,
-    Pattern.RecordPattern
+    Pattern.OrderedFieldPattern
 
 {
     /**
@@ -163,14 +163,13 @@ public sealed interface Pattern permits
 
     /**
      * A pattern that matches an instance of a target
-     * `record` value on its type name and fields.
-     * The given type name must match the target object's
-     * type name.  The field match is done field by field in the manner
-     * of ListPattern.
+     * Joe value that has ordered fields. The given type name must
+     * match the target object's type name.  The field match is done
+     * field by field in the manner of ListPattern.
      * @param typeName The name of the desired type.
      * @param patterns The field value patterns
      */
-    record RecordPattern(String typeName, List<Pattern> patterns)
+    record OrderedFieldPattern(String typeName, List<Pattern> patterns)
         implements Pattern
     {
         @Override public String toString() {

@@ -308,7 +308,7 @@ public class ASTDumper {
             case Pattern.PatternBinding p -> buffer()
                 .println(" '" + p.name() + "'")
                 .dump(p.subpattern());
-            case Pattern.RecordPattern p -> {
+            case Pattern.OrderedFieldPattern p -> {
                 var buff = buffer()
                     .println(" '" + p.typeName() + "'");
                 for (var sub : p.patterns()) {

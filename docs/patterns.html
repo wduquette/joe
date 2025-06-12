@@ -195,7 +195,7 @@ quite complicated data structures.</p>
 <li><a href="#map-patterns">Map Patterns</a></li>
 <li><a href="#matching-instances-with-map-patterns">Matching Instances with Map Patterns</a></li>
 <li><a href="#named-field-patterns">Named-Field Patterns</a></li>
-<li><a href="#record-patterns">Record Patterns</a></li>
+<li><a href="#ordered-field-patterns">Ordered-Field Patterns</a></li>
 </ul>
 <h2 id="patterns-and-destructuring-binds"><a class="header" href="#patterns-and-destructuring-binds">Patterns and Destructuring Binds</a></h2>
 <p>A destructuring bind is a way to bind one more variables to values within
@@ -360,24 +360,26 @@ type will match if <code>Joe.typeOf(thing).name() == "Thing"</code>, <em><strong
 the matched type is in scope; it is enough that the value being matched
 knows its type and that its type's name is the name included in the pattern.
 See <a href="introspection.html#unscoped-types">Unscoped Types</a> for more information.</p>
-<h2 id="record-patterns"><a class="header" href="#record-patterns">Record Patterns</a></h2>
-<p>Values of <a href="records.html">record types</a> can be matched by both
-<a href="#map-patterns">map patterns</a> and <a href="#named-field-patterns">named-field patterns</a>; but
-because each record type has a fixed number of fields in a known order, record
-types also support a special syntax that makes record types especially suited
-to pattern matching.</p>
+<h2 id="ordered-field-patterns"><a class="header" href="#ordered-field-patterns">Ordered-Field Patterns</a></h2>
+<p>Ordered-field patterns match Joe values with ordered fields, i.e., fields that
+can be accessed by index as well as by name.  Joe <a href="records.html">records</a>
+and <a href="library/type.joe.Fact.html"><code>Fact</code> values</a> have ordered fields, and
+proxied types can have ordered fields as well.  This allows a stream-lined
+pattern syntax.</p>
 <pre><code class="language-joe">record Person(name, age) {}
 
 var person = Person(Joe, 80);
 
 // These statements are identical
-var Person(n, a) = person;
-var Person{#name: n, #age: a} = person;
+var Person(n, a) = person;               // Ordered-field
+var Person(name: n, age: a) = person;    // Named-field
 </code></pre>
-<p>The first form can only be used with a value of a record type; it matches
-the values of the type's fields in sequence.  All fields must be
-represented.  The field subpatterns can be any arbitrary patterns, as
-usual.</p>
+<p>The first form matches the values of the type's fields in sequence.  All
+fields must be represented.  The field subpatterns can be any arbitrary
+patterns, as usual.</p>
+<p>Values with ordered fields can also be matched by
+<a href="#map-patterns">map patterns</a> and
+<a href="#named-field-patterns">named-field patterns</a>.</p>
 
                     </main>
 

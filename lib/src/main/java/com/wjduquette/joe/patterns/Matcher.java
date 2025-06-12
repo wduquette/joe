@@ -149,7 +149,7 @@ public class Matcher {
                 yield true;
             }
 
-            case Pattern.RecordPattern p -> {
+            case Pattern.OrderedFieldPattern p -> {
                 // FIRST, check type and shape.  The value must be
                 // a JoeValue of a record type; there must be one
                 // pattern for each field; and each pattern must match

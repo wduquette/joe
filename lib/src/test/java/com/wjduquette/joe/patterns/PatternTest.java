@@ -91,7 +91,7 @@ public class PatternTest extends Ted {
     public void testRecordPattern() {
         test("testRecordPattern");
 
-        var p = new Pattern.RecordPattern("Thing", List.of(
+        var p = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Wildcard("_xyz"),
             new Pattern.ValueBinding("a")
         ));
