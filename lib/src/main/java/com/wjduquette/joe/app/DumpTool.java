@@ -1,7 +1,6 @@
 package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.tools.Tool;
@@ -31,7 +30,6 @@ public class DumpTool implements Tool {
         
         --code, -c   Dump the compiled byte-code (default)
         --ast,  -a   Dump the Abstract Syntax Tree (AST)
-        --bert, -b   Dump the legacy "Bert" byte-code
         """,
         DumpTool::main
     );
@@ -73,7 +71,6 @@ public class DumpTool implements Tool {
             switch (opt) {
                 case "--code", "-c" -> dumps.add(this::dumpCode);
                 case "--ast",  "-a" -> dumps.add(this::dumpAST);
-                case "--bert", "-b" -> dumps.add(this::dumpBert);
                 default -> {
                     System.err.println("Unknown option: '" + opt + "'.");
                     System.exit(64);
@@ -110,12 +107,6 @@ public class DumpTool implements Tool {
     private void dumpAST() {
         println("AST: " + path + "\n");
         println(Parser.dumpAST(source));
-    }
-
-    private void dumpBert() {
-        println("Bert byte-code: " + path + "\n");
-        var joe = new Joe(Joe.BERT);
-        println(joe.dump(path, source));
     }
 
     private String readFile(String path) {

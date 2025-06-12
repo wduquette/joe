@@ -33,7 +33,6 @@ public class WinTool extends FXTool {
         
         --clark,  -c   Use the "Clark" byte-engine (default)
         --walker, -w   Use the "Walker" AST-walker engine.
-        --bert,   -b   Use the "Bert" byte-engine (legacy).
         --debug,  -d   Enable debugging output.  This is mostly of use to
                        the Joe maintainer.
         """,
@@ -74,7 +73,6 @@ public class WinTool extends FXTool {
         while (!args.isEmpty() && args.peek().startsWith("-")) {
             var opt = args.poll();
             switch (opt) {
-                case "--bert", "-b" -> engineType = Joe.BERT;
                 case "--clark", "-c" -> engineType = Joe.CLARK;
                 case "--walker", "-w" -> engineType = Joe.WALKER;
                 case "--debug", "-d" -> debug = true;

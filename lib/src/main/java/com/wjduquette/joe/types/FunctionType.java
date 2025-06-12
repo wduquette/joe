@@ -1,7 +1,7 @@
 package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.bert.BertCallable;
+import com.wjduquette.joe.clark.ClarkCallable;
 
 /**
  * The type proxy for Joe's `JoeCallable` type.
@@ -27,7 +27,7 @@ public class FunctionType extends ProxyType<JoeCallable> {
         super("Function");
         staticType();
         proxies(NativeCallable.class);
-        proxies(BertCallable.class);
+        proxies(ClarkCallable.class);
 
         method("toString", this::_toString);
     }
@@ -39,5 +39,4 @@ public class FunctionType extends ProxyType<JoeCallable> {
         args.exactArity(0, "toString()");
         return func.toString();
     }
-
 }

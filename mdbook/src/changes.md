@@ -7,8 +7,7 @@
     Clark byte-code engine, which shares a parser and scanner with the Walker
     engine.  This will make Joe easier to evolve.
     - Clark is now the default engine.
-    - Bert will be retained for the time being, but will receive only minimal
-      updates.
+    - Bert has been removed.
 - Language
   - Merged `let`'s capability into `var`, and removed `let`.
     - `var` can now do destructuring binds while still handling simple variable

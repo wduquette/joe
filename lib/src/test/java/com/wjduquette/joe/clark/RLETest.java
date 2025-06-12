@@ -15,7 +15,7 @@ public class RLETest extends Ted {
     public void testEncodeDecode() {
         test("testEncodeDecode()");
 
-        var encoded = com.wjduquette.joe.bert.RLE.encode(INPUT);
+        var encoded = RLE.encode(INPUT);
         println("INPUT.length   = " + INPUT.length);
         println("encoded.length = " + encoded.length);
 
@@ -24,7 +24,7 @@ public class RLETest extends Ted {
             println("   " + encoded[i] + ", " + encoded[i+1]);
         }
 
-        var decoded = com.wjduquette.joe.bert.RLE.decode(encoded);
+        var decoded = RLE.decode(encoded);
         check(Arrays.equals(INPUT, decoded)).eq(true);
     }
 
@@ -32,12 +32,12 @@ public class RLETest extends Ted {
     public void testGet() {
         test("testGet()");
 
-        var encoded = com.wjduquette.joe.bert.RLE.encode(INPUT);
+        var encoded = RLE.encode(INPUT);
         println("INPUT.length   = " + INPUT.length);
         println("encoded.length = " + encoded.length);
 
         for (var i = 0; i < INPUT.length; i++) {
-            var value = com.wjduquette.joe.bert.RLE.get(encoded, i);
+            var value = RLE.get(encoded, i);
             System.out.printf("[%02d] in %d out %d\n",
                 i, INPUT[i], value);
 
@@ -49,15 +49,15 @@ public class RLETest extends Ted {
     public void testEncodedLength() {
         test("testEncodedLength()");
 
-        var encoded = com.wjduquette.joe.bert.RLE.encode(INPUT);
-        check(com.wjduquette.joe.bert.RLE.encodedLength(INPUT)).eq(encoded.length);
+        var encoded = RLE.encode(INPUT);
+        check(RLE.encodedLength(INPUT)).eq(encoded.length);
     }
 
     @Test
     public void testDecodedLength() {
         test("testDecodedLength()");
 
-        var encoded = com.wjduquette.joe.bert.RLE.encode(INPUT);
+        var encoded = RLE.encode(INPUT);
         check(RLE.decodedLength(encoded)).eq(INPUT.length);
     }
 }

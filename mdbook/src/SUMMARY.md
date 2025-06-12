@@ -101,4 +101,3 @@
 
 [Appendix: Joe Grammar](grammar.md)
 [Appendix: Clark Virtual Machine](vm.md)
-[Appendix: Bert Virtual Machine](bert_vm.md)

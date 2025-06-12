@@ -31,7 +31,6 @@ public class TestTool implements Tool {
         
         --clark,  -c   Use the "Clark" byte-engine (default)
         --walker, -w   Use the "Walker" AST-walker engine.
-        --bert,   -b   Use the "Bert" byte-engine (legacy)
         --verbose, -v  Enable verbose output.
         
         Test Scripts
@@ -87,7 +86,6 @@ public class TestTool implements Tool {
             var arg = argq.poll();
 
             switch (arg) {
-                case "--bert", "-b" -> engineType = Joe.BERT;
                 case "--clark", "-c" -> engineType = Joe.CLARK;
                 case "--walker", "-w" -> engineType = Joe.WALKER;
                 case "-v", "--verbose" -> verbose = true;

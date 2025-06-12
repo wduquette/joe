@@ -9,15 +9,12 @@ import static com.wjduquette.joe.checker.Checker.fail;
 
 public class JoeStackTraceTest extends Ted {
     private Joe walker;
-    private Joe bert;
     private Joe clark;
 
     @Before public void setup() {
         this.walker = new Joe(Joe.WALKER);
-        this.bert = new Joe(Joe.BERT);
         this.clark = new Joe(Joe.CLARK);
         walker.installGlobalFunction("passThrough", this::_passThrough);
-        bert.installGlobalFunction("passThrough", this::_passThrough);
         clark.installGlobalFunction("passThrough", this::_passThrough);
     }
 
@@ -61,7 +58,6 @@ public class JoeStackTraceTest extends Ted {
 
         dumpScript(script);
         checkRun(walker, script, trace);
-        checkRun(bert, script, trace);
         checkRun(clark, script, trace);
     }
 
@@ -93,7 +89,6 @@ public class JoeStackTraceTest extends Ted {
             """;
         dumpScript(script);
         checkRun(walker, script, trace);
-        checkRun(bert, script, trace);
         checkRun(clark, script, trace);
     }
 
@@ -126,7 +121,6 @@ public class JoeStackTraceTest extends Ted {
             """;
         dumpScript(script);
         checkRun(walker, script, trace);
-        checkRun(bert, script, trace);
         checkRun(clark, script, trace);
     }
 
@@ -156,7 +150,6 @@ public class JoeStackTraceTest extends Ted {
             """;
         dumpScript(script);
         checkRun(walker, script, trace);
-        checkRun(bert, script, trace);
         checkRun(clark, script, trace);
     }
 
@@ -189,7 +182,6 @@ public class JoeStackTraceTest extends Ted {
             """;
         dumpScript(script);
         checkRun(walker, script, trace);
-        checkRun(bert, script, trace);
         checkRun(clark, script, trace);
     }
 
@@ -219,19 +211,9 @@ public class JoeStackTraceTest extends Ted {
               In class Thing (*test*:5)
               In <script> (*test*:5)
             """;
-        var traceBert = """
-            Simulated error!
-              In static initializer (*test*:3)
-                002     static {
-                003         throw "Simulated error!";
-                004     }
-              In class Thing (*test*:2)
-              In <script> (*test*:5)
-            """;
         dumpScript(script);
 
         checkRun(walker, script, trace);
-        checkRun(bert, script, traceBert);
         checkRun(clark, script, trace);
     }
 
@@ -261,19 +243,9 @@ public class JoeStackTraceTest extends Ted {
               In type Thing (*test*:5)
               In <script> (*test*:5)
             """;
-        var traceBert = """
-            Simulated error!
-              In static initializer (*test*:3)
-                002     static {
-                003         throw "Simulated error!";
-                004     }
-              In type Thing (*test*:2)
-              In <script> (*test*:5)
-            """;
         dumpScript(script);
 
         checkRun(walker, script, trace);
-        checkRun(bert, script, traceBert);
         checkRun(clark, script, trace);
     }
 
@@ -297,7 +269,6 @@ public class JoeStackTraceTest extends Ted {
             """;
         dumpScript(script);
         checkRun(walker, script, trace);
-        checkRun(bert, script, trace);
         checkRun(clark, script, trace);
     }
 
@@ -321,7 +292,6 @@ public class JoeStackTraceTest extends Ted {
             """;
         dumpScript(script);
         checkRun(walker, script, trace);
-        checkRun(bert, script, trace);
         checkRun(clark, script, trace);
     }
 
@@ -345,7 +315,6 @@ public class JoeStackTraceTest extends Ted {
             """;
         dumpScript(script);
         checkRun(walker, script, trace);
-        checkRun(bert, script, trace);
         checkRun(clark, script, trace);
     }
 
@@ -375,7 +344,6 @@ public class JoeStackTraceTest extends Ted {
             """;
         dumpScript(script);
         checkRun(walker, script, trace);
-        checkRun(bert, script, trace);
         checkRun(clark, script, trace);
     }
 
@@ -402,7 +370,6 @@ public class JoeStackTraceTest extends Ted {
             """;
         dumpScript(script);
         checkRun(walker, script, trace);
-        checkRun(bert, script, trace);
         checkRun(clark, script, trace);
     }
 
