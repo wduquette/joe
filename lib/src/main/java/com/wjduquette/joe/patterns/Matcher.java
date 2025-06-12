@@ -132,13 +132,6 @@ public class Matcher {
                 }
             }
 
-            case Pattern.InstancePattern p -> {
-                var obj = joe.getJoeValue(value);
-                if (!hasType(obj, p.typeName())) yield false;
-
-                yield bind(joe, p.fieldMap(), obj, getter, binder);
-            }
-
             case Pattern.NamedFieldPattern p -> {
                 var obj = joe.getJoeValue(value);
                 if (!hasType(obj, p.typeName())) yield false;
