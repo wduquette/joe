@@ -88,6 +88,18 @@ public class PatternTest extends Ted {
     }
 
     @Test
+    public void testNamedFieldPattern() {
+        test("testNamedFieldPattern");
+
+        var map = new LinkedHashMap<String, Pattern>();
+        map.put("id", new Pattern.Wildcard("_xyz"));
+        map.put("color", new Pattern.ValueBinding("a"));
+
+        var p = new Pattern.NamedFieldPattern("Thing", map);
+        check(p.toString()).eq("Thing(id: _xyz, color: ?a)");
+    }
+
+    @Test
     public void testRecordPattern() {
         test("testRecordPattern");
 

@@ -384,6 +384,70 @@ public class MatcherTest extends Ted {
     }
 
     @Test
+    public void testNamedFieldPattern_bad_wrongType() {
+        test("testNamedFieldPattern_bad_wrongType");
+
+        constants = List.of("123", "red");
+        Map<String,Pattern> fieldMap = Map.of(
+            "id", new Pattern.Constant(0),
+            "red", new Pattern.Constant(1)
+        );
+        var pattern = new Pattern.NamedFieldPattern("Thing", fieldMap);
+
+        var gizmo = new TestObject("Gizmo", "123", "red");
+
+        check(bind(pattern, gizmo)).eq(false);
+    }
+
+    @Test
+    public void testNamedFieldPattern_bad_wrongField() {
+        test("testNamedFieldPattern_bad_wrongField");
+
+        constants = List.of("123", "fancy");
+        Map<String,Pattern> fieldMap = Map.of(
+            "id", new Pattern.Constant(0),
+            "style", new Pattern.Constant(1)
+        );
+        var pattern = new Pattern.NamedFieldPattern("Thing", fieldMap);
+
+        var thing = new TestObject("Thing", "123", "red");
+
+        check(bind(pattern, thing)).eq(false);
+    }
+
+    @Test
+    public void testNamedFieldPattern_good() {
+        test("testNamedFieldPattern_good");
+
+        constants = List.of("123", "red");
+        Map<String,Pattern> fieldMap = Map.of(
+            "id", new Pattern.Constant(0),
+            "color", new Pattern.Constant(1)
+        );
+        var pattern = new Pattern.NamedFieldPattern("Thing", fieldMap);
+
+        var thing = new TestObject("Thing", "123", "red");
+
+        check(bind(pattern, thing)).eq(true);
+    }
+
+    @Test
+    public void testNamedFieldPattern_proxiedType() {
+        test("testNamedFieldPattern_proxiedType");
+
+        constants = List.of("v1", "v2");
+        Map<String,Pattern> fieldMap = Map.of(
+            "first", new Pattern.Constant(0),
+            "second", new Pattern.Constant(1)
+        );
+        var pattern = new Pattern.NamedFieldPattern("Pair", fieldMap);
+
+        var pair = new Pair("v1", "v2");
+
+        check(bind(pattern, pair)).eq(true);
+    }
+
+    @Test
     public void testRecordPattern_notRecord() {
         test("testRecordPattern_notRecord");
 

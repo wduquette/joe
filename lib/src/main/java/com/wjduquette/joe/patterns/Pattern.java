@@ -27,7 +27,9 @@ public sealed interface Pattern permits
     Pattern.ListPattern,
     Pattern.MapPattern,
     Pattern.InstancePattern,
+    Pattern.NamedFieldPattern,
     Pattern.RecordPattern
+
 {
     /**
      * A pattern that requires the target value to be exactly equal to a
@@ -154,6 +156,26 @@ public sealed interface Pattern permits
     {
         @Override public String toString() {
             return typeName + fieldMap;
+        }
+    }
+
+    /**
+     * A pattern that matches a target {@link JoeValue} on its type
+     * name and fields. The given type name must match the name of the
+     * target value's Joe type or one of its supertypes.  The field
+     * The keys in the field map must be existing field names, and
+     * the patterns in the field map must match the relevant values.
+     * @param typeName The name of the desired type.
+     * @param fieldMap The field names and value patterns
+     */
+    record NamedFieldPattern(String typeName, Map<String,Pattern> fieldMap)
+        implements Pattern
+    {
+        @Override public String toString() {
+            var map = fieldMap.entrySet().stream()
+                .map(e -> e.getKey() + ": " + e.getValue())
+                .collect(Collectors.joining(", "));
+            return typeName + "(" + map + ")";
         }
     }
 
