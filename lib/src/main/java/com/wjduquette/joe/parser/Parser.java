@@ -1104,7 +1104,7 @@ public class Parser {
         var list = new ArrayList<Pattern>();
 
         if (scanner.match(RIGHT_PAREN)) {
-            return new Pattern.RecordPattern(identifier.lexeme(), list);
+            return new Pattern.OrderedFieldPattern(identifier.lexeme(), list);
         }
 
         do {
@@ -1116,7 +1116,7 @@ public class Parser {
 
         scanner.consume(RIGHT_PAREN, "Expected ')' after record pattern.");
 
-        return new Pattern.RecordPattern(identifier.lexeme(), list);
+        return new Pattern.OrderedFieldPattern(identifier.lexeme(), list);
     }
 
     //-------------------------------------------------------------------------

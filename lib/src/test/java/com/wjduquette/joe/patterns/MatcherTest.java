@@ -310,79 +310,6 @@ public class MatcherTest extends Ted {
         check(bind(pattern, value)).eq(true);
     }
 
-
-    @Test
-    public void testInstancePattern_bad_wrongType() {
-        test("testInstancePattern_bad_wrongType");
-
-        constants = List.of("id", "123", "color", "red");
-        var fieldMap = new Pattern.MapPattern(Map.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1),
-            new Pattern.Constant(2),
-            new Pattern.Constant(3)
-        ));
-        var pattern = new Pattern.InstancePattern("Thing", fieldMap);
-
-        var gizmo = new TestObject("Gizmo", "123", "red");
-
-        check(bind(pattern, gizmo)).eq(false);
-    }
-
-    @Test
-    public void testInstancePattern_bad_wrongField() {
-        test("testInstancePattern_wrongField");
-
-        constants = List.of("id", "123", "style", "fancy");
-        var fieldMap = new Pattern.MapPattern(Map.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1),
-            new Pattern.Constant(2),
-            new Pattern.Constant(3)
-        ));
-        var pattern = new Pattern.InstancePattern("Thing", fieldMap);
-
-        var thing = new TestObject("Thing", "123", "red");
-
-        check(bind(pattern, thing)).eq(false);
-    }
-
-    @Test
-    public void testInstancePattern_good() {
-        test("testInstancePattern_good");
-
-        constants = List.of("id", "123", "color", "red");
-        var fieldMap = new Pattern.MapPattern(Map.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1),
-            new Pattern.Constant(2),
-            new Pattern.Constant(3)
-        ));
-        var pattern = new Pattern.InstancePattern("Thing", fieldMap);
-
-        var thing = new TestObject("Thing", "123", "red");
-
-        check(bind(pattern, thing)).eq(true);
-    }
-
-    @Test
-    public void testInstancePattern_proxiedType() {
-        test("testInstancePattern_proxiedType");
-
-        constants = List.of("first", "v1", "second", "v2");
-        var fieldMap = new Pattern.MapPattern(Map.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1),
-            new Pattern.Constant(2),
-            new Pattern.Constant(3)
-        ));
-        var pattern = new Pattern.InstancePattern("Pair", fieldMap);
-
-        var value = new Pair("v1", "v2");
-
-        check(bind(pattern, value)).eq(true);
-    }
-
     @Test
     public void testNamedFieldPattern_bad_wrongType() {
         test("testNamedFieldPattern_bad_wrongType");
@@ -452,7 +379,7 @@ public class MatcherTest extends Ted {
         test("testRecordPattern_notRecord");
 
         constants = List.of("123", "red");
-        var pattern = new Pattern.RecordPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1)
         ));
@@ -465,7 +392,7 @@ public class MatcherTest extends Ted {
         test("testRecordPattern_wrongType");
 
         constants = List.of("123", "red");
-        var pattern = new Pattern.RecordPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1)
         ));
@@ -480,7 +407,7 @@ public class MatcherTest extends Ted {
         test("testRecordPattern_wrongSize");
 
         constants = List.of("123", "red", 456.0);
-        var pattern = new Pattern.RecordPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1),
             new Pattern.Constant(2)
@@ -496,7 +423,7 @@ public class MatcherTest extends Ted {
         test("testRecordPattern_wrongFieldValue");
 
         constants = List.of("123", "green");
-        var pattern = new Pattern.RecordPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1)
         ));
@@ -511,7 +438,7 @@ public class MatcherTest extends Ted {
         test("testRecordPattern_good");
 
         constants = List.of("123", "red");
-        var pattern = new Pattern.RecordPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1)
         ));
@@ -526,7 +453,7 @@ public class MatcherTest extends Ted {
         test("testRecordPattern_good");
 
         constants = List.of("123", "red");
-        var pattern = new Pattern.RecordPattern("Pair", List.of(
+        var pattern = new Pattern.OrderedFieldPattern("Pair", List.of(
             new Pattern.Constant(0),
             new Pattern.Constant(1)
         ));

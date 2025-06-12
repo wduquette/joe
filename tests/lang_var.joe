@@ -163,52 +163,6 @@ function testMap_fancyKey() {
 }
 
 //-----------------------------------------------------------------------------
-// Instance Patterns
-
-function testInstance_notInstance() {
-    assertError(\-> { var Thing{#id: id} = "abc"; },
-        "'var' pattern failed to match target value.");
-}
-
-function testInstance_wrongType() {
-    var thing = Thing(123, "red");
-
-    assertError(\-> { var Gizmo{#id: id} = thing; },
-        "'var' pattern failed to match target value.");
-}
-
-function testInstance_badField() {
-    var thing = Thing(123, "red");
-
-    assertError(\-> { var Thing{#id: id, #style: s} = thing; },
-        "'var' pattern failed to match target value.");
-}
-
-function testInstance_good() {
-    var thing = Thing(123, "red");
-
-    var Thing{#id: i, #color: c} = thing;
-    assertEquals(i, thing.id);
-    assertEquals(c, thing.color);
-}
-
-function testInstance_supertype_good() {
-    var gizmo = Gizmo(123, "red");
-
-    var Thing{#id: i, #color: c} = gizmo;
-    assertEquals(i, gizmo.id);
-    assertEquals(c, gizmo.color);
-}
-
-function testInstance_record() {
-    var person = Person("Joe", 80);
-
-    var Person{#name: n, #age: a} = person;
-    assertEquals(n, person.name);
-    assertEquals(a, person.age);
-}
-
-//-----------------------------------------------------------------------------
 // Named-Field Patterns
 
 function testNamedField_notInstance() {
@@ -255,22 +209,22 @@ function testNamedField_record() {
 }
 
 //-----------------------------------------------------------------------------
-// Record Patterns
+// Ordered-Field Patterns
 
-function testRecord_notRecord() {
+function testOrderedField_notRecord() {
     // Thing is a normal class instance, not a record.
     assertError(\-> { var Thing(id, color) = Thing(123, "red"); },
         "'var' pattern failed to match target value.");
 }
 
-function testRecord_wrongType() {
+function testOrderedField_wrongType() {
     var person = Person("Joe", 80);
 
     assertError(\-> { var Cowboy(name, age) = person; },
         "'var' pattern failed to match target value.");
 }
 
-function testRecord_good() {
+function testOrderedField_good() {
     var person = Person("Joe", 80);
 
     var Person(name, age) = person;

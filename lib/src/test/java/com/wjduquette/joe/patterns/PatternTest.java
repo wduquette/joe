@@ -76,18 +76,6 @@ public class PatternTest extends Ted {
     }
 
     @Test
-    public void testInstancePattern() {
-        test("testInstancePattern");
-
-        var map = new LinkedHashMap<Pattern.Constant, Pattern>();
-        map.put(new Pattern.Constant(3), new Pattern.Wildcard("_xyz"));
-        map.put(new Pattern.Constant(4), new Pattern.ValueBinding("a"));
-
-        var p = new Pattern.InstancePattern("Thing", new Pattern.MapPattern(map));
-        check(p.toString()).eq("Thing{$3: _xyz, $4: ?a}");
-    }
-
-    @Test
     public void testNamedFieldPattern() {
         test("testNamedFieldPattern");
 
@@ -103,7 +91,7 @@ public class PatternTest extends Ted {
     public void testRecordPattern() {
         test("testRecordPattern");
 
-        var p = new Pattern.RecordPattern("Thing", List.of(
+        var p = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Wildcard("_xyz"),
             new Pattern.ValueBinding("a")
         ));

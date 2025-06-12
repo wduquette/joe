@@ -284,12 +284,6 @@ public class ASTDumper {
         var content = switch (pattern) {
             case Pattern.Constant p -> buffer()
                 .println(" '" + p.id() + "'");
-            case Pattern.InstancePattern p -> {
-                var buff = buffer()
-                    .println(" '" + p.typeName() + "'")
-                    .dump(p.fieldMap());
-                yield buff.toString();
-            }
             case Pattern.ListPattern p -> {
                 var buff = buffer().nl();
                 p.patterns().forEach(buff::dump);
@@ -314,7 +308,7 @@ public class ASTDumper {
             case Pattern.PatternBinding p -> buffer()
                 .println(" '" + p.name() + "'")
                 .dump(p.subpattern());
-            case Pattern.RecordPattern p -> {
+            case Pattern.OrderedFieldPattern p -> {
                 var buff = buffer()
                     .println(" '" + p.typeName() + "'");
                 for (var sub : p.patterns()) {

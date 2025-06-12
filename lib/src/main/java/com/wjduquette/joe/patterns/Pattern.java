@@ -26,9 +26,8 @@ public sealed interface Pattern permits
     Pattern.ValueBinding,
     Pattern.ListPattern,
     Pattern.MapPattern,
-    Pattern.InstancePattern,
     Pattern.NamedFieldPattern,
-    Pattern.RecordPattern
+    Pattern.OrderedFieldPattern
 
 {
     /**
@@ -143,23 +142,6 @@ public sealed interface Pattern permits
     }
 
     /**
-     * A pattern that matches a target
-     * {@link JoeValue} on its type name and fields.
-     * The given type name must match the name of the target object's
-     * Joe type or one of its supertypes.  The field match is done
-     * by MapPattern.
-     * @param typeName The name of the desired type.
-     * @param fieldMap The key constants and value patterns
-     */
-    record InstancePattern(String typeName, MapPattern fieldMap)
-        implements Pattern
-    {
-        @Override public String toString() {
-            return typeName + fieldMap;
-        }
-    }
-
-    /**
      * A pattern that matches a target {@link JoeValue} on its type
      * name and fields. The given type name must match the name of the
      * target value's Joe type or one of its supertypes.  The field
@@ -181,14 +163,13 @@ public sealed interface Pattern permits
 
     /**
      * A pattern that matches an instance of a target
-     * `record` value on its type name and fields.
-     * The given type name must match the target object's
-     * type name.  The field match is done field by field in the manner
-     * of ListPattern.
+     * Joe value that has ordered fields. The given type name must
+     * match the target object's type name.  The field match is done
+     * field by field in the manner of ListPattern.
      * @param typeName The name of the desired type.
      * @param patterns The field value patterns
      */
-    record RecordPattern(String typeName, List<Pattern> patterns)
+    record OrderedFieldPattern(String typeName, List<Pattern> patterns)
         implements Pattern
     {
         @Override public String toString() {

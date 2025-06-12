@@ -176,7 +176,8 @@
                         <h1 id="change-log"><a class="header" href="#change-log">Change Log</a></h1>
 <h2 id="changes-in-070-in-development"><a class="header" href="#changes-in-070-in-development">Changes in 0.7.0 (in development)</a></h2>
 <ul>
-<li>Internals
+<li>
+<p>Internals</p>
 <ul>
 <li>Replaced the Bert byte-code engine and its single-pass compiler with the
 Clark byte-code engine, which shares a parser and scanner with the Walker
@@ -188,7 +189,8 @@ engine.  This will make Joe easier to evolve.
 </li>
 </ul>
 </li>
-<li>Language
+<li>
+<p>Language</p>
 <ul>
 <li>Merged <code>let</code>'s capability into <code>var</code>, and removed <code>let</code>.
 <ul>
@@ -200,9 +202,14 @@ declarations efficiently.</li>
 <li>The new <code>~</code> operator is a comparison operator that checks whether a Joe
 value matches a Joe pattern, binding any variables in the local scope.
 It replaces the existing <code>if let</code> statement, which has been removed.</li>
+<li>Replaced the "instance" pattern syntax with the friendly "named-field"
+pattern syntax.</li>
+<li>"record" pattern syntax is now called "ordered-field" pattern syntax, as
+we now have non-record-types with ordered fields.</li>
 </ul>
 </li>
-<li>Extensibility
+<li>
+<p>Extensibility</p>
 <ul>
 <li>Simplified implementation of proxy types for native record types.
 <ul>
@@ -212,7 +219,8 @@ values.</li>
 </li>
 </ul>
 </li>
-<li>Tools
+<li>
+<p>Tools</p>
 <ul>
 <li>Revised <code>joe dump</code> to output one or all of the following:
 <ul>

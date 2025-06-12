@@ -22,7 +22,7 @@ quite complicated data structures.
 - [Map Patterns](#map-patterns)
 - [Matching Instances with Map Patterns](#matching-instances-with-map-patterns)
 - [Named-Field Patterns](#named-field-patterns)
-- [Record Patterns](#record-patterns)
+- [Ordered-Field Patterns](#ordered-field-patterns)
 
 ## Patterns and Destructuring Binds
 
@@ -248,13 +248,13 @@ the matched type is in scope; it is enough that the value being matched
 knows its type and that its type's name is the name included in the pattern.
 See [Unscoped Types](introspection.md#unscoped-types) for more information.
 
-## Record Patterns
+## Ordered-Field Patterns
 
-Values of [record types](records.md) can be matched by both 
-[map patterns](#map-patterns) and [named-field patterns](#named-field-patterns); but 
-because each record type has a fixed number of fields in a known order, record 
-types also support a special syntax that makes record types especially suited 
-to pattern matching.
+Ordered-field patterns match Joe values with ordered fields, i.e., fields that 
+can be accessed by index as well as by name.  Joe [records](records.md) 
+and [`Fact` values](library/type.joe.Fact.md) have ordered fields, and 
+proxied types can have ordered fields as well.  This allows a stream-lined
+pattern syntax.
 
 ```joe
 record Person(name, age) {}
@@ -262,11 +262,15 @@ record Person(name, age) {}
 var person = Person(Joe, 80);
 
 // These statements are identical
-var Person(n, a) = person;
-var Person{#name: n, #age: a} = person;
+var Person(n, a) = person;               // Ordered-field
+var Person(name: n, age: a) = person;    // Named-field
 ```
 
-The first form can only be used with a value of a record type; it matches
-the values of the type's fields in sequence.  All fields must be
-represented.  The field subpatterns can be any arbitrary patterns, as
-usual.
+The first form matches the values of the type's fields in sequence.  All 
+fields must be represented.  The field subpatterns can be any arbitrary 
+patterns, as usual.
+
+Values with ordered fields can also be matched by 
+[map patterns](#map-patterns) and
+[named-field patterns](#named-field-patterns).
+

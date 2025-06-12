@@ -290,7 +290,8 @@ buy him lunch.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="change-log"><a class="header" href="#change-log">Change Log</a></h1>
 <h2 id="changes-in-070-in-development"><a class="header" href="#changes-in-070-in-development">Changes in 0.7.0 (in development)</a></h2>
 <ul>
-<li>Internals
+<li>
+<p>Internals</p>
 <ul>
 <li>Replaced the Bert byte-code engine and its single-pass compiler with the
 Clark byte-code engine, which shares a parser and scanner with the Walker
@@ -302,7 +303,8 @@ engine.  This will make Joe easier to evolve.
 </li>
 </ul>
 </li>
-<li>Language
+<li>
+<p>Language</p>
 <ul>
 <li>Merged <code>let</code>'s capability into <code>var</code>, and removed <code>let</code>.
 <ul>
@@ -314,9 +316,14 @@ declarations efficiently.</li>
 <li>The new <code>~</code> operator is a comparison operator that checks whether a Joe
 value matches a Joe pattern, binding any variables in the local scope.
 It replaces the existing <code>if let</code> statement, which has been removed.</li>
+<li>Replaced the "instance" pattern syntax with the friendly "named-field"
+pattern syntax.</li>
+<li>"record" pattern syntax is now called "ordered-field" pattern syntax, as
+we now have non-record-types with ordered fields.</li>
 </ul>
 </li>
-<li>Extensibility
+<li>
+<p>Extensibility</p>
 <ul>
 <li>Simplified implementation of proxy types for native record types.
 <ul>
@@ -326,7 +333,8 @@ values.</li>
 </li>
 </ul>
 </li>
-<li>Tools
+<li>
+<p>Tools</p>
 <ul>
 <li>Revised <code>joe dump</code> to output one or all of the following:
 <ul>
@@ -1607,7 +1615,7 @@ quite complicated data structures.</p>
 <li><a href="patterns.html#map-patterns">Map Patterns</a></li>
 <li><a href="patterns.html#matching-instances-with-map-patterns">Matching Instances with Map Patterns</a></li>
 <li><a href="patterns.html#named-field-patterns">Named-Field Patterns</a></li>
-<li><a href="patterns.html#record-patterns">Record Patterns</a></li>
+<li><a href="patterns.html#ordered-field-patterns">Ordered-Field Patterns</a></li>
 </ul>
 <h2 id="patterns-and-destructuring-binds"><a class="header" href="#patterns-and-destructuring-binds">Patterns and Destructuring Binds</a></h2>
 <p>A destructuring bind is a way to bind one more variables to values within
@@ -1772,24 +1780,26 @@ type will match if <code>Joe.typeOf(thing).name() == "Thing"</code>, <em><strong
 the matched type is in scope; it is enough that the value being matched
 knows its type and that its type's name is the name included in the pattern.
 See <a href="introspection.html#unscoped-types">Unscoped Types</a> for more information.</p>
-<h2 id="record-patterns"><a class="header" href="#record-patterns">Record Patterns</a></h2>
-<p>Values of <a href="records.html">record types</a> can be matched by both
-<a href="patterns.html#map-patterns">map patterns</a> and <a href="patterns.html#named-field-patterns">named-field patterns</a>; but
-because each record type has a fixed number of fields in a known order, record
-types also support a special syntax that makes record types especially suited
-to pattern matching.</p>
+<h2 id="ordered-field-patterns"><a class="header" href="#ordered-field-patterns">Ordered-Field Patterns</a></h2>
+<p>Ordered-field patterns match Joe values with ordered fields, i.e., fields that
+can be accessed by index as well as by name.  Joe <a href="records.html">records</a>
+and <a href="library/type.joe.Fact.html"><code>Fact</code> values</a> have ordered fields, and
+proxied types can have ordered fields as well.  This allows a stream-lined
+pattern syntax.</p>
 <pre><code class="language-joe">record Person(name, age) {}
 
 var person = Person(Joe, 80);
 
 // These statements are identical
-var Person(n, a) = person;
-var Person{#name: n, #age: a} = person;
+var Person(n, a) = person;               // Ordered-field
+var Person(name: n, age: a) = person;    // Named-field
 </code></pre>
-<p>The first form can only be used with a value of a record type; it matches
-the values of the type's fields in sequence.  All fields must be
-represented.  The field subpatterns can be any arbitrary patterns, as
-usual.</p>
+<p>The first form matches the values of the type's fields in sequence.  All
+fields must be represented.  The field subpatterns can be any arbitrary
+patterns, as usual.</p>
+<p>Values with ordered fields can also be matched by
+<a href="patterns.html#map-patterns">map patterns</a> and
+<a href="patterns.html#named-field-patterns">named-field patterns</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="introspection"><a class="header" href="#introspection">Introspection</a></h1>
 <p><em>Introspection</em>, also known as <em>reflection</em>, is the ability for a script to
 query metadata about its types and values.  This section discusses Joe's

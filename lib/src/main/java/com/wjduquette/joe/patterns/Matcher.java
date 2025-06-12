@@ -132,13 +132,6 @@ public class Matcher {
                 }
             }
 
-            case Pattern.InstancePattern p -> {
-                var obj = joe.getJoeValue(value);
-                if (!hasType(obj, p.typeName())) yield false;
-
-                yield bind(joe, p.fieldMap(), obj, getter, binder);
-            }
-
             case Pattern.NamedFieldPattern p -> {
                 var obj = joe.getJoeValue(value);
                 if (!hasType(obj, p.typeName())) yield false;
@@ -156,7 +149,7 @@ public class Matcher {
                 yield true;
             }
 
-            case Pattern.RecordPattern p -> {
+            case Pattern.OrderedFieldPattern p -> {
                 // FIRST, check type and shape.  The value must be
                 // a JoeValue of a record type; there must be one
                 // pattern for each field; and each pattern must match
