@@ -21,7 +21,7 @@ quite complicated data structures.
 - [List Patterns](#list-patterns)
 - [Map Patterns](#map-patterns)
 - [Matching Instances with Map Patterns](#matching-instances-with-map-patterns)
-- [Instance Patterns](#instance-patterns)
+- [Named-Field Patterns](#named-field-patterns)
 - [Record Patterns](#record-patterns)
 
 ## Patterns and Destructuring Binds
@@ -218,10 +218,10 @@ var {#id: i,  #color: c}  = Thing(123, "red");
 As when matching `Map` values, the pattern can reference a subset of
 the object's fields.
 
-## Instance Patterns
+## Named-Field Patterns
 
-An instance pattern is like a [map pattern](#map-patterns), but it can
-match on the value's type as well as on its fields.  For example,
+A named-field pattern matches the type and field values for any 
+Joe value with named fields. 
 
 ```joe
 class Thing {
@@ -231,19 +231,17 @@ class Thing {
     }
 }
 
-// These two statements are equivalent
-var Thing{"id": i, "color": c} = Thing(123, "red");
-var Thing{#id: i,  #color: c}  = Thing(123, "red");
+var Thing(id: i, color: c) = Thing(123, "red");
 ```
 
-An instance pattern consists of the name of the desired type, followed by
-a map pattern for its fields. For the pattern to match:
+A named-field pattern consists of the name of the desired type, followed by
+field-name/pattern pairs in parentheses.
 
 - The named type must be the target value's type or one of its supertypes.
 - The value must have all of the specified fields.
-- The field patterns must match.
+- The field patterns must match the field values.
 
-Types are matched based on their names, i.e., in `var Thing{...} = thing;` the
+Types are matched based on their names, i.e., in `var Thing(...) = thing;` the
 type will match if `Joe.typeOf(thing).name() == "Thing"`, ***not*** if 
 `Joe.typeOf(thing) == Thing`.  In other words, there is no requirement that
 the matched type is in scope; it is enough that the value being matched 
@@ -253,7 +251,7 @@ See [Unscoped Types](introspection.md#unscoped-types) for more information.
 ## Record Patterns
 
 Values of [record types](records.md) can be matched by both 
-[map patterns](#map-patterns) and [instance patterns](#instance-patterns); but 
+[map patterns](#map-patterns) and [named-field patterns](#named-field-patterns); but 
 because each record type has a fixed number of fields in a known order, record 
 types also support a special syntax that makes record types especially suited 
 to pattern matching.

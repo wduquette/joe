@@ -303,6 +303,14 @@ public class ASTDumper {
                 }
                 yield buff.toString();
             }
+            case Pattern.NamedFieldPattern p -> {
+                var buff = buffer()
+                    .println(" '" + p.typeName() + "'");
+                for (var key : p.fieldMap().keySet()) {
+                    buff.dump("'" + key + "'", p.fieldMap().get(key));
+                }
+                yield buff.toString();
+            }
             case Pattern.PatternBinding p -> buffer()
                 .println(" '" + p.name() + "'")
                 .dump(p.subpattern());

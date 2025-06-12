@@ -976,10 +976,12 @@ public class Parser {
 
             if (identifier.lexeme().startsWith("_")) {
                 return new Pattern.Wildcard(identifier.lexeme());
-            } else if (scanner.match(LEFT_BRACE)) {
-                return instancePattern(wp, identifier);
             } else if (scanner.match(LEFT_PAREN)) {
-                return recordPattern(wp, identifier);
+                if (scanner.peekNext().type() == COLON) {
+                    return namedFieldPattern(wp, identifier);
+                } else {
+                    return recordPattern(wp, identifier);
+                }
             }
 
             if (patternBindings.contains(identifier.lexeme())) {
@@ -1074,9 +1076,28 @@ public class Parser {
         return new Pattern.MapPattern(map);
     }
 
-    private Pattern instancePattern(ASTPattern wp, Token identifier) {
-        var fieldMap = mapPattern(wp);
-        return new Pattern.InstancePattern(identifier.lexeme(), fieldMap);
+    private Pattern namedFieldPattern(ASTPattern wp, Token identifier) {
+        var fieldMap = new LinkedHashMap<String, Pattern>();
+
+        if (scanner.match(RIGHT_PAREN)) {
+            return new Pattern.NamedFieldPattern(identifier.lexeme(), fieldMap);
+        }
+
+        do {
+            if (scanner.check(RIGHT_PAREN)) {
+                break;
+            }
+
+            scanner.consume(IDENTIFIER, "Expected field name.");
+            var key = scanner.previous().lexeme();
+            scanner.consume(COLON, "Expected ':' after field name.");
+            var value = parsePattern(wp, true);
+            fieldMap.put(key, value);
+        } while (scanner.match(COMMA));
+
+        scanner.consume(RIGHT_PAREN, "Expected ')' after field pattern.");
+
+        return new Pattern.NamedFieldPattern(identifier.lexeme(), fieldMap);
     }
 
     private Pattern recordPattern(ASTPattern wp, Token identifier) {

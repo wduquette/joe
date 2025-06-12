@@ -139,6 +139,23 @@ public class Matcher {
                 yield bind(joe, p.fieldMap(), obj, getter, binder);
             }
 
+            case Pattern.NamedFieldPattern p -> {
+                var obj = joe.getJoeValue(value);
+                if (!hasType(obj, p.typeName())) yield false;
+
+                for (var e : p.fieldMap().entrySet()) {
+                    var field = e.getKey();
+                    if (!obj.hasField(field)) yield false;
+
+                    if (!bind(joe, e.getValue(), obj.get(field), getter, binder)) {
+                        yield false;
+                    }
+                }
+
+                // FINALLY, match succeeds
+                yield true;
+            }
+
             case Pattern.RecordPattern p -> {
                 // FIRST, check type and shape.  The value must be
                 // a JoeValue of a record type; there must be one
