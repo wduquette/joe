@@ -332,9 +332,8 @@ class Interpreter {
                     exports.put(name.lexeme(), checkCallable(name, callable));
                 }
 
-                // TODO: RSV needs the name
                 environment.setVar(stmt.name().lexeme(),
-                    new RuleSetValue(ruleset, exports));
+                    new RuleSetValue(stmt.name().lexeme(), ruleset, exports));
             }
             case Stmt.Switch stmt -> {
                 var value = evaluate(stmt.expr());

@@ -768,6 +768,7 @@ class VirtualMachine {
                     }
                 }
                 case RULESET -> {
+                    var name = readString();
                     var ruleset = readRuleSet();
                     @SuppressWarnings("unchecked")
                     var exports = (Map<String,Object>)pop();
@@ -776,7 +777,7 @@ class VirtualMachine {
                         checkCallable(callable);
                     }
 
-                    push(new RuleSetValue(ruleset, exports));
+                    push(new RuleSetValue(name, ruleset, exports));
                 }
                 case SUB -> {
                     var b = pop();

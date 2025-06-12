@@ -628,7 +628,9 @@ class Compiler {
                     emit(export.getValue());      // map k v   ; export value
                     emit(MAPPUT);                 // map       ; put k v
                 }
-                emit(RULESET, constant(ruleset)); // rsv       ; RuleSetValue
+                emit(RULESET,                     // rsv       ; RuleSetValue
+                    constant(s.name().lexeme()),
+                    constant(ruleset));
                 defineVar(s.name());
             }
 

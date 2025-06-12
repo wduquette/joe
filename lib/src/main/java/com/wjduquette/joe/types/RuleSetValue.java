@@ -10,12 +10,17 @@ import java.util.Map;
 /**
  * A RuleSetValue wraps up a Nero
  * {@link com.wjduquette.joe.nero.RuleSet} with the additional data
- * required to make use of it in Joe scripts.  It is the type returned
- * by Joe's `ruleset` expression.
+ * required to make use of it in Joe scripts.  RuleSetValues are created
+ * by Joe's `ruleset` declaration.
+ * @param name The rule set's name.
  * @param ruleset The Nero rule set.
  * @param exports map from relation to export callable
  */
-public record RuleSetValue(RuleSet ruleset, Map<String, Object> exports) {
+public record RuleSetValue(
+    String name,
+    RuleSet ruleset,
+    Map<String, Object> exports
+) {
     /**
      * Infer facts from the rule set.
      * @return The set of all known facts.
