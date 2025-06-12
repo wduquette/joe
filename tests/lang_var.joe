@@ -209,6 +209,52 @@ function testInstance_record() {
 }
 
 //-----------------------------------------------------------------------------
+// Named-Field Patterns
+
+function testNamedField_notInstance() {
+    assertError(\-> { var Thing(id: id) = "abc"; },
+        "'var' pattern failed to match target value.");
+}
+
+function testNamedField_wrongType() {
+    var thing = Thing(123, "red");
+
+    assertError(\-> { var Gizmo(id: id) = thing; },
+        "'var' pattern failed to match target value.");
+}
+
+function testNamedField_badField() {
+    var thing = Thing(123, "red");
+
+    assertError(\-> { var Thing(id: id, style: s) = thing; },
+        "'var' pattern failed to match target value.");
+}
+
+function testNamedField_good() {
+    var thing = Thing(123, "red");
+
+    var Thing(id: i, color: c) = thing;
+    assertEquals(i, thing.id);
+    assertEquals(c, thing.color);
+}
+
+function testNamedField_supertype_good() {
+    var gizmo = Gizmo(123, "red");
+
+    var Thing(id: i, color: c) = gizmo;
+    assertEquals(i, gizmo.id);
+    assertEquals(c, gizmo.color);
+}
+
+function testNamedField_record() {
+    var person = Person("Joe", 80);
+
+    var Person(name: n, age: a) = person;
+    assertEquals(n, person.name);
+    assertEquals(a, person.age);
+}
+
+//-----------------------------------------------------------------------------
 // Record Patterns
 
 function testRecord_notRecord() {
