@@ -194,7 +194,7 @@ quite complicated data structures.</p>
 <li><a href="#list-patterns">List Patterns</a></li>
 <li><a href="#map-patterns">Map Patterns</a></li>
 <li><a href="#matching-instances-with-map-patterns">Matching Instances with Map Patterns</a></li>
-<li><a href="#instance-patterns">Instance Patterns</a></li>
+<li><a href="#named-field-patterns">Named-Field Patterns</a></li>
 <li><a href="#record-patterns">Record Patterns</a></li>
 </ul>
 <h2 id="patterns-and-destructuring-binds"><a class="header" href="#patterns-and-destructuring-binds">Patterns and Destructuring Binds</a></h2>
@@ -335,9 +335,9 @@ var {#id: i,  #color: c}  = Thing(123, "red");
 </code></pre>
 <p>As when matching <code>Map</code> values, the pattern can reference a subset of
 the object's fields.</p>
-<h2 id="instance-patterns"><a class="header" href="#instance-patterns">Instance Patterns</a></h2>
-<p>An instance pattern is like a <a href="#map-patterns">map pattern</a>, but it can
-match on the value's type as well as on its fields.  For example,</p>
+<h2 id="named-field-patterns"><a class="header" href="#named-field-patterns">Named-Field Patterns</a></h2>
+<p>A named-field pattern matches the type and field values for any
+Joe value with named fields.</p>
 <pre><code class="language-joe">class Thing {
     method init(id, color) {
         this.id = id;
@@ -345,18 +345,16 @@ match on the value's type as well as on its fields.  For example,</p>
     }
 }
 
-// These two statements are equivalent
-var Thing{"id": i, "color": c} = Thing(123, "red");
-var Thing{#id: i,  #color: c}  = Thing(123, "red");
+var Thing(id: i, color: c) = Thing(123, "red");
 </code></pre>
-<p>An instance pattern consists of the name of the desired type, followed by
-a map pattern for its fields. For the pattern to match:</p>
+<p>A named-field pattern consists of the name of the desired type, followed by
+field-name/pattern pairs in parentheses.</p>
 <ul>
 <li>The named type must be the target value's type or one of its supertypes.</li>
 <li>The value must have all of the specified fields.</li>
-<li>The field patterns must match.</li>
+<li>The field patterns must match the field values.</li>
 </ul>
-<p>Types are matched based on their names, i.e., in <code>var Thing{...} = thing;</code> the
+<p>Types are matched based on their names, i.e., in <code>var Thing(...) = thing;</code> the
 type will match if <code>Joe.typeOf(thing).name() == "Thing"</code>, <em><strong>not</strong></em> if
 <code>Joe.typeOf(thing) == Thing</code>.  In other words, there is no requirement that
 the matched type is in scope; it is enough that the value being matched
@@ -364,7 +362,7 @@ knows its type and that its type's name is the name included in the pattern.
 See <a href="introspection.html#unscoped-types">Unscoped Types</a> for more information.</p>
 <h2 id="record-patterns"><a class="header" href="#record-patterns">Record Patterns</a></h2>
 <p>Values of <a href="records.html">record types</a> can be matched by both
-<a href="#map-patterns">map patterns</a> and <a href="#instance-patterns">instance patterns</a>; but
+<a href="#map-patterns">map patterns</a> and <a href="#named-field-patterns">named-field patterns</a>; but
 because each record type has a fixed number of fields in a known order, record
 types also support a special syntax that makes record types especially suited
 to pattern matching.</p>
