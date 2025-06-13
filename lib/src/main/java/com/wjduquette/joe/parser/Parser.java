@@ -946,16 +946,10 @@ public class Parser {
     //-------------------------------------------------------------------------
     // Patterns
 
-    // Used to ensure that there are no duplicate binding variables in a
-    // pattern.
-    private transient Set<String> patternBindings;
-
     private ASTPattern pattern() {
-        patternBindings = new HashSet<>();
         var walkerPattern = new ASTPattern();
         var pattern = parsePattern(walkerPattern, false); // Not a subpattern
         walkerPattern.setPattern(pattern);
-        patternBindings = null;
         return walkerPattern;
     }
 
@@ -981,12 +975,6 @@ public class Parser {
                 } else {
                     return recordPattern(wp, identifier);
                 }
-            }
-
-            if (patternBindings.contains(identifier.lexeme())) {
-                error(identifier, "Duplicate binding variable in pattern.");
-            } else {
-                patternBindings.add(identifier.lexeme());
             }
 
             wp.saveBinding(identifier);
