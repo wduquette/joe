@@ -201,14 +201,12 @@ class Interpreter {
 
                 for (var item : collection) {
                     try {
-                        var bound = new HashMap<String,Object>();
-                        if (Matcher.bind(
+                        var bound = Matcher.bind(
                             joe,
                             stmt.pattern().getPattern(),
                             item,
-                            constants::get,
-                            bound::put
-                        )) {
+                            constants::get);
+                        if (bound != null) {
                             bind(bound);
                             execute(stmt.body());
                         }
@@ -241,14 +239,12 @@ class Interpreter {
                     var previous = this.environment;
                     try {
                         this.environment = new Environment(previous);
-                        var bound = new HashMap<String,Object>();
-                        if (Matcher.bind(
+                        var bound = Matcher.bind(
                             joe,
                             c.pattern().getPattern(),
                             target,
-                            constants::get,
-                            bound::put
-                        )) {
+                            constants::get);
+                        if (bound != null) {
                             bind(bound);
                             var guard = c.guard() != null
                                 ? evaluate(c.guard()) : true;
@@ -381,14 +377,14 @@ class Interpreter {
                 stmt.pattern().getConstants().forEach(e ->
                     constants.add(evaluate(e)));
                 var target = evaluate(stmt.target());
-                var bound = new HashMap<String,Object>();
-                if (Matcher.bind(
+                var bound = Matcher.bind(
                     joe,
                     stmt.pattern().getPattern(),
                     target,
-                    constants::get,
-                    bound::put
-                )) {
+                    constants::get
+                );
+
+                if (bound != null) {
                     bind(bound);
                 } else {
                     throw new RuntimeError(stmt.keyword().span(),
@@ -684,20 +680,18 @@ class Interpreter {
                     constants.add(evaluate(e)));
 
                 // NEXT, do the pattern match
-                var bound = new HashMap<String,Object>();
-                for (var name : expr.pattern().getBindings()) {
-                    bound.put(name.lexeme(), null);
-                }
-                if (Matcher.bind(
+                var bound = Matcher.bind(
                     joe,
                     expr.pattern().getPattern(),
                     target,
-                    constants::get,
-                    bound::put
-                )) {
+                    constants::get
+                );
+
+                if (bound != null) {
                     bind(bound);
                     yield true;
                 } else {
+                    bound = new LinkedHashMap<>();
                     for (var name : expr.pattern().getBindings()) {
                         bound.put(name.lexeme(), null);
                     }

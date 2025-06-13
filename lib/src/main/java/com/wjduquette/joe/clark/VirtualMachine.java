@@ -370,20 +370,18 @@ class VirtualMachine {
                 case GLOBIND -> {
                     var target = pop();
                     var pv = (PatternValue)pop();
-                    var bound = new HashMap<String,Object>();
 
                     // FIRST, see if there's a match.  This is defining globals;
                     // the global environment persists, so we don't want to
                     // touch it unless the match is successful.  Save the
                     // bindings as we go, and then add them to the global
                     // environment as a group.
-                    if (!Matcher.bind(
+                    var bound = Matcher.bind(
                         joe,
                         pv.pattern,
                         target,
-                        pv.constants::get,
-                        bound::put
-                    )) {
+                        pv.constants::get);
+                    if (bound == null) {
                         throw error(
                             "'var' pattern failed to match target value.");
                     }
@@ -534,16 +532,34 @@ class VirtualMachine {
                     // so just push the bound values onto the stack.  They
                     // are being processed in the order they were defined by
                     // the compiler.
-                    if (!Matcher.bind(
+                    var bound = Matcher.bind(
                         joe,
                         pv.pattern,
                         target,
-                        pv.constants::get,
-                        (id, value) -> push(value)
-                    )) {
+                        pv.constants::get
+                    );
+
+                    if (bound != null) {
+                        // Note: bound is a LinkedHashMap, values are in order
+                        // of binding.
+                        for (var value : bound.values()) {
+                            push(value);
+                        }
+                    } else {
                         throw error(
                             "'var' pattern failed to match target value.");
                     }
+//
+//                    if (!Matcher.bind(
+//                        joe,
+//                        pv.pattern,
+//                        target,
+//                        pv.constants::get,
+//                        (id, value) -> push(value)
+//                    )) {
+//                        throw error(
+//                            "'var' pattern failed to match target value.");
+//                    }
                 }
                 case LOCGET -> {
                     var slot = readInt();
@@ -585,27 +601,23 @@ class VirtualMachine {
                     var target = pop();
                     var pv = (PatternValue)pop();
 
-                    // FIRST, save the top of the stack.
-                    int here = top;
-
-                    // NEXT, match the pattern against the target given the
+                    // FIRST, match the pattern against the target given the
                     // constants, pushing bound values onto the stack as the
                     // match proceeds.
-                    var flag = Matcher.bind(
+                    var bound = Matcher.bind(
                         joe,
                         pv.pattern,
                         target,
-                        pv.constants::get,
-                        (id, value) -> push(value)
+                        pv.constants::get
                     );
 
-                    // NEXT, if the match failed, pop the bound values.
-                    if (!flag) {
-                        top = here;
+                    // NEXT, if the match succeeded push the bound values.
+                    if (bound != null) {
+                        bound.values().forEach(this::push);
                     }
 
                     // FINALLY, push the success/failure flag.
-                    push(flag);
+                    push(bound != null);
                 }
                 case MATCHG -> {
                     var target = pop();
@@ -613,51 +625,49 @@ class VirtualMachine {
 
                     // FIRST, see if there's a match.  Saves bound values
                     // to the global environment as it goes.
-                    var flag = Matcher.bind(
+                    var bound = Matcher.bind(
                         joe,
                         pv.pattern,
                         target,
-                        pv.constants::get,
-                        globals::put
+                        pv.constants::get
                     );
 
-                    if (!flag) {
+                    if (bound != null) {
+                        globals.putAll(bound);
+                    } else {
                         // Match failed; set all relevant globals to null.
                         for (var name : pv.bindings()) {
                             globals.put(name, null);
                         }
                     }
 
-                    push(flag);
+                    push(bound != null);
                 }
                 case MATCHL -> {
                     var target = pop();
                     var pv = (PatternValue)pop();
 
-                    // FIRST, save the top of the stack.
-                    int here = top;
-
-                    // NEXT, match the pattern against the target given the
+                    // FIRST, match the pattern against the target given the
                     // constants, pushing bound values onto the stack as the
                     // match proceeds.
-                    var flag = Matcher.bind(
+                    var bound = Matcher.bind(
                         joe,
                         pv.pattern,
                         target,
-                        pv.constants::get,
-                        (id, value) -> push(value)
+                        pv.constants::get
                     );
 
-                    // NEXT, if the match failed, pop the bound values.
-                    if (!flag) {
-                        top = here;
+                    // NEXT, push the bound values or nulls.
+                    if (bound != null) {
+                        bound.values().forEach(this::push);
+                    } else {
                         for (var ignored : pv.bindings) {
                             push(null);
                         }
                     }
 
                     // FINALLY, push the success/failure flag.
-                    push(flag);
+                    push(bound != null);
                 }
                 case METHOD -> {
                     // NOTE: This was defineMethod in clox
