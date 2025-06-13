@@ -1132,6 +1132,7 @@ public class Parser {
         var keyword = scanner.previous();
         var facts = new ArrayList<ASTRuleSet.ASTOrderedAtom>();
         var rules = new ArrayList<ASTRuleSet.ASTRule>();
+        var heads = new HashSet<String>();
         var exports = new HashMap<Token, Expr>();
 
         scanner.consume(IDENTIFIER, "expected rule set name after 'ruleset'.");
@@ -1155,6 +1156,7 @@ public class Parser {
                         "expected ';' after export declaration.");
                 } else {
                     var head = head();
+                    heads.add(head.relation().lexeme());
 
                     if (scanner.match(SEMICOLON)) {
                         facts.add(fact(head));
@@ -1170,6 +1172,15 @@ public class Parser {
                 synchronize();
             }
         }
+
+        for (var token : exports.keySet()) {
+            if (!heads.contains(token.lexeme())) {
+                error(token,
+                    "exported relation is not used in any axiom or rule head: '"
+                    + token.lexeme() + "'.");
+            }
+        }
+
 
         var ast = new ASTRuleSet(facts, rules);
         return new Stmt.RuleSet(keyword, ruleSetName, ast, exports);
