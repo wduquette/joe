@@ -226,6 +226,14 @@ following example, the variable <code>b</code> is assigned list <code>[2, 3]</co
 
 var [a, b = [c, d], e];
 </code></pre>
+<p>If a variable appears in the pattern more than once, it is bound on
+first appearance and the bound value must match on subsequent appearances.</p>
+<pre><code>// flag is true, a == 1
+var flag = [a, a] ~ [1, 1];
+
+// flag is false, a == null
+var flag = [a, a] ~ [1, 2];
+</code></pre>
 <h2 id="wildcards"><a class="header" href="#wildcards">Wildcards</a></h2>
 <p>A <em>wildcard</em> is a pattern that matches (and ignores) any value.  A
 wildcard is written as an identifier with leading underscore, e.g.,

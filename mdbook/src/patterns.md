@@ -70,6 +70,17 @@ var list = [1, [2, 3], 4];
 var [a, b = [c, d], e];
 ```
 
+If a variable appears in the pattern more than once, it is bound on 
+first appearance and the bound value must match on subsequent appearances.
+
+```
+// flag is true, a == 1
+var flag = [a, a] ~ [1, 1];
+
+// flag is false, a == null
+var flag = [a, a] ~ [1, 2];
+```
+
 ## Wildcards
 
 A *wildcard* is a pattern that matches (and ignores) any value.  A 
