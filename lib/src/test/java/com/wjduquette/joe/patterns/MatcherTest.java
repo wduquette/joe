@@ -11,16 +11,14 @@ import static com.wjduquette.joe.checker.Checker.check;
 public class MatcherTest extends Ted {
     private final Joe joe = new Joe();
     private List<Object> constants;
-    private final Map<String,Object> bindings = new LinkedHashMap<>();
 
     @Before public void setup() {
         constants = new ArrayList<>();
-        bindings.clear();
         joe.installType(new PairType());
     }
 
-    private boolean bind(Pattern pattern, Object value) {
-        return Matcher.bind(joe, pattern, value, constants::get, bindings::put);
+    private Map<String,Object> bind(Pattern pattern, Object value) {
+        return Matcher.bind(joe, pattern, value, constants::get);
     }
 
     @Test
@@ -31,7 +29,7 @@ public class MatcherTest extends Ted {
         var pattern = new Pattern.Constant(0);
         var value = "xyz";
 
-        check(bind(pattern, value)).eq(false);
+        check(bind(pattern, value)).eq(null);
     }
 
     @Test
@@ -42,7 +40,8 @@ public class MatcherTest extends Ted {
         var pattern = new Pattern.Constant(0);
         var value = "abc";
 
-        check(bind(pattern, value)).eq(true);
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
         check(bindings.isEmpty()).eq(true);
     }
 
@@ -53,18 +52,49 @@ public class MatcherTest extends Ted {
         var pattern = new Pattern.Wildcard("_");
         var value = "abc";
 
-        check(bind(pattern, value)).eq(true);
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
         check(bindings.isEmpty()).eq(true);
     }
 
     @Test
-    public void testValueBinding() {
-        test("testValueBinding");
+    public void testValueBinding_newVar() {
+        test("testValueBinding_newVar");
 
         var pattern = new Pattern.ValueBinding("x");
         var value = "abc";
 
-        check(bind(pattern, value)).eq(true);
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.get("x")).eq("abc");
+    }
+
+    @Test
+    public void testValueBinding_boundVar_bad() {
+        test("testValueBinding_boundVar_bad");
+
+        var pattern = new Pattern.ListPattern(List.of(
+            new Pattern.ValueBinding("x"),
+            new Pattern.ValueBinding("x")
+        ), null);
+        var value = List.of("abc", "def");
+
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
+    }
+
+    @Test
+    public void testValueBinding_boundVar_good() {
+        test("testValueBinding_boundVar_good");
+
+        var pattern = new Pattern.ListPattern(List.of(
+            new Pattern.ValueBinding("x"),
+            new Pattern.ValueBinding("x")
+        ), null);
+        var value = List.of("abc", "abc");
+
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
         check(bindings.get("x")).eq("abc");
     }
 
@@ -77,7 +107,7 @@ public class MatcherTest extends Ted {
             new Pattern.Constant(0));
         var value = "xyz";
 
-        check(bind(pattern, value)).eq(false);
+        check(bind(pattern, value)).eq(null);
     }
 
     @Test
@@ -89,7 +119,41 @@ public class MatcherTest extends Ted {
             new Pattern.Constant(0));
         var value = "abc";
 
-        check(bind(pattern, value)).eq(true);
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.get("x")).eq("abc");
+    }
+
+    @Test
+    public void testPatternBinding_boundVar_bad() {
+        test("testPatternBinding_boundVar_bad");
+
+        constants = List.of("abc");
+        var pattern = new Pattern.ListPattern(List.of(
+            new Pattern.ValueBinding("x"),
+            new Pattern.PatternBinding("x",
+                new Pattern.Constant(0))
+        ), null);
+        var value = List.of("abc", "def");
+
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
+    }
+
+    @Test
+    public void testPatternBinding_boundVar_good() {
+        test("testPatternBinding_boundVar_good");
+
+        constants = List.of("abc");
+        var pattern = new Pattern.ListPattern(List.of(
+            new Pattern.ValueBinding("x"),
+            new Pattern.PatternBinding("x",
+                new Pattern.Constant(0))
+        ), null);
+        var value = List.of("abc", "abc");
+
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
         check(bindings.get("x")).eq("abc");
     }
 
@@ -103,7 +167,8 @@ public class MatcherTest extends Ted {
         ), null);
         var value = "abc";
 
-        check(bind(pattern, value)).eq(false);
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
     }
 
     @Test
@@ -118,7 +183,8 @@ public class MatcherTest extends Ted {
         ), null);
         var value = List.of("abc", "def");
 
-        check(bind(pattern, value)).eq(false);
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
     }
 
     @Test
@@ -131,7 +197,8 @@ public class MatcherTest extends Ted {
         ), null);
         var value = List.of("abc", "def");
 
-        check(bind(pattern, value)).eq(false);
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
     }
 
     @Test
@@ -145,7 +212,8 @@ public class MatcherTest extends Ted {
         ), null);
         var value = List.of("abc", "xyz");
 
-        check(bind(pattern, value)).eq(false);
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
     }
 
     @Test
@@ -156,7 +224,9 @@ public class MatcherTest extends Ted {
         ), null);
         var value = List.of();
 
-        check(bind(pattern, value)).eq(true);
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
     }
 
     @Test
@@ -170,7 +240,9 @@ public class MatcherTest extends Ted {
         ), null);
         var value = List.of("abc", "def");
 
-        check(bind(pattern, value)).eq(true);
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
     }
 
     @Test
@@ -184,7 +256,8 @@ public class MatcherTest extends Ted {
         ), "tail");
         var value = List.of("abc", "def");
 
-        check(bind(pattern, value)).eq(true);
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
         check(bindings.get("tail")).eq(List.of());
     }
 
@@ -199,8 +272,36 @@ public class MatcherTest extends Ted {
         ), "tail");
         var value = List.of("abc", "def", "ghi", "jkl");
 
-        check(bind(pattern, value)).eq(true);
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
         check(bindings.get("tail")).eq(List.of("ghi", "jkl"));
+    }
+
+    @Test
+    public void testListPattern_bad_boundTail() {
+        test("testListPattern_bad_boundTail");
+
+        var pattern = new Pattern.ListPattern(List.of(
+            new Pattern.ValueBinding("x")
+        ), "x");
+        var value = List.of(List.of("abc"), "def");
+
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
+    }
+
+    @Test
+    public void testListPattern_good_boundTail() {
+        test("testListPattern_good_boundTail");
+
+        var pattern = new Pattern.ListPattern(List.of(
+            new Pattern.ValueBinding("x")
+        ), "x");
+        var value = List.of(List.of("abc"), "abc");
+
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.get("x")).eq(List.of("abc"));
     }
 
     @Test
@@ -216,7 +317,8 @@ public class MatcherTest extends Ted {
         ));
         var value = "abc";
 
-        check(bind(pattern, value)).eq(false);
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
     }
 
     @Test
@@ -232,7 +334,8 @@ public class MatcherTest extends Ted {
         ));
         var value = Map.of("k1", "v1");
 
-        check(bind(pattern, value)).eq(false);
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
     }
 
     @Test
@@ -248,7 +351,8 @@ public class MatcherTest extends Ted {
         ));
         var value = Map.of("k1", "v1", "k2", "nonesuch");
 
-        check(bind(pattern, value)).eq(false);
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
     }
 
     @Test
@@ -259,7 +363,9 @@ public class MatcherTest extends Ted {
         ));
         var value = Map.of();
 
-        check(bind(pattern, value)).eq(true);
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
     }
 
     @Test
@@ -275,7 +381,9 @@ public class MatcherTest extends Ted {
         ));
         var value = Map.of("k1", "v1", "k2", "v2");
 
-        check(bind(pattern, value)).eq(true);
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
     }
 
     @Test
@@ -291,7 +399,9 @@ public class MatcherTest extends Ted {
         ));
         var value = Map.of("k1", "v1", "k2", "v2", "k3", "v3");
 
-        check(bind(pattern, value)).eq(true);
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
     }
 
     @Test
@@ -307,7 +417,9 @@ public class MatcherTest extends Ted {
         ));
         var value = new Pair("v1", "v2");
 
-        check(bind(pattern, value)).eq(true);
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
     }
 
     @Test
@@ -323,7 +435,8 @@ public class MatcherTest extends Ted {
 
         var gizmo = new TestObject("Gizmo", "123", "red");
 
-        check(bind(pattern, gizmo)).eq(false);
+        var bindings = bind(pattern, gizmo);
+        check(bindings).eq(null);
     }
 
     @Test
@@ -339,7 +452,8 @@ public class MatcherTest extends Ted {
 
         var thing = new TestObject("Thing", "123", "red");
 
-        check(bind(pattern, thing)).eq(false);
+        var bindings = bind(pattern, thing);
+        check(bindings).eq(null);
     }
 
     @Test
@@ -355,7 +469,9 @@ public class MatcherTest extends Ted {
 
         var thing = new TestObject("Thing", "123", "red");
 
-        check(bind(pattern, thing)).eq(true);
+        var bindings = bind(pattern, thing);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
     }
 
     @Test
@@ -371,7 +487,9 @@ public class MatcherTest extends Ted {
 
         var pair = new Pair("v1", "v2");
 
-        check(bind(pattern, pair)).eq(true);
+        var bindings = bind(pattern, pair);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
     }
 
     @Test
@@ -384,7 +502,8 @@ public class MatcherTest extends Ted {
             new Pattern.Constant(1)
         ));
 
-        check(bind(pattern, "abc")).eq(false);
+        var bindings = bind(pattern, "abc");
+        check(bindings).eq(null);
     }
 
     @Test
@@ -399,7 +518,8 @@ public class MatcherTest extends Ted {
 
         var target = new TestObject("Gizmo", "123", "red");
 
-        check(bind(pattern, target)).eq(false);
+        var bindings = bind(pattern, target);
+        check(bindings).eq(null);
     }
 
     @Test
@@ -415,7 +535,8 @@ public class MatcherTest extends Ted {
 
         var target = new TestObject("Thing", "123", "red");
 
-        check(bind(pattern, target)).eq(false);
+        var bindings = bind(pattern, target);
+        check(bindings).eq(null);
     }
 
     @Test
@@ -430,7 +551,8 @@ public class MatcherTest extends Ted {
 
         var target = new TestObject("Thing", "123", "red");
 
-        check(bind(pattern, target)).eq(false);
+        var bindings = bind(pattern, target);
+        check(bindings).eq(null);
     }
 
     @Test
@@ -445,7 +567,9 @@ public class MatcherTest extends Ted {
 
         var target = new TestObject("Thing", "123", "red");
 
-        check(bind(pattern, target)).eq(true);
+        var bindings = bind(pattern, target);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
     }
 
     @Test
@@ -460,7 +584,9 @@ public class MatcherTest extends Ted {
 
         var target = new Pair("123", "red");
 
-        check(bind(pattern, target)).eq(true);
+        var bindings = bind(pattern, target);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
     }
 
     //-------------------------------------------------------------------------
