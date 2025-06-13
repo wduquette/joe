@@ -16,6 +16,11 @@
 - [Records](records.md)
 - [Pattern Matching](patterns.md)
 - [Introspection](introspection.md)
+- [Nero Datalog](nero/nero.md)
+  - [Nero Tutorial](nero/nero_tutorial.md)
+  - [Embedded Nero](nero/embedded_nero.md)
+  - ['ruleset' Reference](nero/ruleset_reference.md)
+  - [Technical Details](nero/technical_details.md)
 
 ---
 
@@ -35,6 +40,7 @@
 - [`joe repl`](joe_repl.md)
 - [`joe test`](joe_test.md)
 - [`joe doc`](joe_doc.md)
+- [`joe nero`](joe_nero.md)
  
 ---
  
