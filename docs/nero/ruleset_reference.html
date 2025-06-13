@@ -174,6 +174,73 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="ruleset-reference"><a class="header" href="#ruleset-reference">'ruleset' Reference</a></h1>
+<p>A Nero rule set is defined within a Joe script using the <code>ruleset</code>
+declaration.</p>
+<h2 id="the-ruleset-declaration"><a class="header" href="#the-ruleset-declaration">The <code>ruleset</code> declaration</a></h2>
+<p>A <code>ruleset</code> declaration has this form:</p>
+<p><strong>ruleset <em>name</em> { <em>body</em> }</strong></p>
+<p>where</p>
+<ul>
+<li><em>name</em> is a simple identifier, like a function name.</li>
+<li><em>body</em> consists of Nero axioms and rules, just like a standalone Nero
+program, but may also contain any number of <code>export</code> declarations.</li>
+</ul>
+<h2 id="axioms"><a class="header" href="#axioms">Axioms</a></h2>
+<p>An axiom has this form:</p>
+<p><strong><em>relation</em> (<em>term</em>, [<em>term</em>...]);</strong></p>
+<p>where</p>
+<ul>
+<li><em>relation</em> is an identifier, conventionally beginning with an uppercase
+letter.</li>
+<li>The <em>terms</em> are constant terms: Joe keywords, strings, numbers, <code>true</code>,
+<code>false</code>, or <code>null</code>.</li>
+</ul>
+<h2 id="rules"><a class="header" href="#rules">Rules</a></h2>
+<p>A rule has this form:</p>
+<p><strong><em>head</em> :- <em>bodyAtom</em> [, <em>bodyAtom</em>...] [where <em>constraints</em>] ;</strong></p>
+<p>The rule head is an atom whose terms are constant or variable terms:</p>
+<p><strong><em>relation</em> (<em>term</em>, [<em>term</em>...])</strong></p>
+<ul>
+<li>All variable terms in the head must be bound in the rule's body.</li>
+</ul>
+<p>A body atom is an atom, possibly negated, whose terms may be
+constants, variables, or wildcards:</p>
+<p><strong>[not] <em>relation</em> (<em>term</em>, [<em>term</em>...])</strong></p>
+<ul>
+<li>The first body atom must not be negated.</li>
+<li>Variables used in negated atoms and constraints must be bound by
+non-negated atoms to their left in the rule's body.</li>
+</ul>
+<p>A rule may have zero or more optional constraints using
+the <code>where</code> clause:</p>
+<p><strong>where <em>constraint</em> [, <em>constraint</em>...]</strong></p>
+<p>A constraint has this form:</p>
+<p><strong><em>variable</em> <em>op</em> <em>term</em></strong></p>
+<p>where</p>
+<ul>
+<li><em>variable</em> must be a variable bound in a non-negated body atom.</li>
+<li><em>op</em> is a comparison operator, one of: <code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code></li>
+<li><em>term</em> is a constant or variable term; if a variable, it must be
+bound in a non-negated body atom.</li>
+</ul>
+<h2 id="export-declarations"><a class="header" href="#export-declarations">Export Declarations</a></h2>
+<p>By default, all facts inferred via axioms or rules are returned to the
+script as <a href="../library/type.joe.Fact.html"><code>Fact</code></a> values.  An export
+declaration directs Nero to return all facts having a given relation
+as some other kind of Joe value.</p>
+<p>An export declaration has this form:</p>
+<p><strong>export <em>relation</em> [as <em>expression</em>];</strong></p>
+<p>where</p>
+<ul>
+<li><em>relation</em> is a relation used in an axiom or in the head of a rule.</li>
+<li>If no <code>as</code> clause is given, <em>relation</em> must also be the name of a type
+that is in scope whose initializer takes the same number of arguments
+as the relevant atoms have terms.</li>
+<li>If the <code>as</code> clause is given, <em>expression</em> must be a Joe expression that
+evaluates to a callable in the current scope.</li>
+</ul>
+<p>However specified, the callable will be used to convert all facts having
+the given relation to Joe values on output from the rule set.</p>
 
                     </main>
 

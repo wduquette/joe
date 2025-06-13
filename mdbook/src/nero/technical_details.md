@@ -34,7 +34,52 @@ better support integration into Joe scripts.
 
 ## Stratified Negation
 
-TODO
+A Nero program uses rules to produce new facts.  Those rules are allowed
+to be recursive: relation A can depend on facts of type B, while
+simultaneously relation B can depend on facts of type A, either directly
+or indirectly.  For example, the following program says that `A` is true
+of `x` IFF `B` is true of `x`.
+
+```nero
+// OK
+A(x) :- B(x);
+B(x) :- A(x);
+```
+
+But when negation is added, this changes.  Consider this program:
+
+```nero
+// BAD
+B(#anne);
+A(x) :- C(x), not B(x);
+B(x) : A(x);
+```
+
+This will infer:
+
+- `A(#anne)` because we have `C(#anne)` and no `B(#anne)`
+- `B(#anne)` because we have `A(#anne)`
+- But now we have both `A(#anne)` and `B(#anne)`, which contradicts the first
+  rule.  This is the Datalog equivalent of a memory corruption error in other
+  languages.
+
+To prevent this kind of problem, Nero (like many Datalog engines) requires
+that every ruleset meets the following condition: 
+
+- If relation `A` depends on relation `B` with negation, directly or indirectly,
+  relation `B` cannot depend on relation `A`, directly or indirectly.
+
+To prevent this, Nero uses a technique called _stratified negation_, in which
+the head relations in the rule set are divided into *strata* such that if
+relation `A` depends on relation `B` with negation, the rules that
+infer B are all in a lower strata than the rules that infer `A`.  If the
+rules cannot be so stratified, then the program is rejected.
+
+In this case, look for the kind of circular dependency with negation shown
+above.
+
+
+
 
 ## References
 

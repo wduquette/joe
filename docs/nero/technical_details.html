@@ -208,7 +208,42 @@ creates no binding.</li>
 named-field patterns.</li>
 </ul>
 <h2 id="stratified-negation"><a class="header" href="#stratified-negation">Stratified Negation</a></h2>
-<p>TODO</p>
+<p>A Nero program uses rules to produce new facts.  Those rules are allowed
+to be recursive: relation A can depend on facts of type B, while
+simultaneously relation B can depend on facts of type A, either directly
+or indirectly.  For example, the following program says that <code>A</code> is true
+of <code>x</code> IFF <code>B</code> is true of <code>x</code>.</p>
+<pre><code class="language-nero">// OK
+A(x) :- B(x);
+B(x) :- A(x);
+</code></pre>
+<p>But when negation is added, this changes.  Consider this program:</p>
+<pre><code class="language-nero">// BAD
+B(#anne);
+A(x) :- C(x), not B(x);
+B(x) : A(x);
+</code></pre>
+<p>This will infer:</p>
+<ul>
+<li><code>A(#anne)</code> because we have <code>C(#anne)</code> and no <code>B(#anne)</code></li>
+<li><code>B(#anne)</code> because we have <code>A(#anne)</code></li>
+<li>But now we have both <code>A(#anne)</code> and <code>B(#anne)</code>, which contradicts the first
+rule.  This is the Datalog equivalent of a memory corruption error in other
+languages.</li>
+</ul>
+<p>To prevent this kind of problem, Nero (like many Datalog engines) requires
+that every ruleset meets the following condition:</p>
+<ul>
+<li>If relation <code>A</code> depends on relation <code>B</code> with negation, directly or indirectly,
+relation <code>B</code> cannot depend on relation <code>A</code>, directly or indirectly.</li>
+</ul>
+<p>To prevent this, Nero uses a technique called <em>stratified negation</em>, in which
+the head relations in the rule set are divided into <em>strata</em> such that if
+relation <code>A</code> depends on relation <code>B</code> with negation, the rules that
+infer B are all in a lower strata than the rules that infer <code>A</code>.  If the
+rules cannot be so stratified, then the program is rejected.</p>
+<p>In this case, look for the kind of circular dependency with negation shown
+above.</p>
 <h2 id="references"><a class="header" href="#references">References</a></h2>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Datalog">Datalog</a> (wikipedia)</li>

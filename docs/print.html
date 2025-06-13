@@ -2078,7 +2078,235 @@ are the same.  This shows an important principle:  when matching facts,
 Datalog binds a variable to a value on first appearance from left to
 right. Subsequent appearances must match the bound value.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="embedded-nero"><a class="header" href="#embedded-nero">Embedded Nero</a></h1>
+<p>A Nero program is embedded in a Joe script using the <code>ruleset</code>
+declaration.  The following declaration defines a
+<a href="nero/../library/type.joe.RuleSet.html"><code>RuleSet</code></a>
+called <code>myRules</code>. The content of the declaration's body is just a
+Nero program, as described in the <a href="nero/nero_tutorial.html">tutorial</a>,
+possibly augmented with
+<a href="nero/embedded_nero.html#exported-outputs"><code>export</code> declarations</a>.</p>
+<ul>
+<li><a href="nero/embedded_nero.html#a-simple-rule-set">A Simple Rule Set</a></li>
+<li><a href="nero/embedded_nero.html#the-fact-type">The <code>Fact</code> Type</a></li>
+<li><a href="nero/embedded_nero.html#scripted-input-facts">Scripted Input Facts</a></li>
+<li><a href="nero/embedded_nero.html#exporting-domain-values">Exporting Domain Values</a></li>
+</ul>
+<h2 id="a-simple-rule-set"><a class="header" href="#a-simple-rule-set">A Simple Rule Set</a></h2>
+<pre><code class="language-joe">ruleset myRules {
+    // Parent/2 - parent, child
+    Parent(#anne, #bert);
+    Parent(#bert, #clark);
+
+    // Ancestor/2 - ancestor, descendant
+    Ancestor(x, y) :- Parent(x, y);
+    Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+}
+</code></pre>
+<p>A <a href="nero/../library/type.joe.RuleSet.html"><code>RuleSet</code></a> provides a number of
+ways to infer the facts resulting from the rules; the simplest is
+<code>infer()</code>, which simply executes the rule set as is, given any
+defined axioms, and returns the resulting facts.</p>
+<pre><code class="language-joe">foreach (fact : myRules.infer()) {
+    println(fact);
+}
+</code></pre>
+<p>This will output the following:</p>
+<pre><code>Fact(Ancestor, #anne, #bert)
+Fact(Ancestor, #bert, #clark)
+Fact(Parent, #anne, #bert)
+Fact(Parent, #bert, #clark)
+Fact(Ancestor, #anne, #clark)
+</code></pre>
+<h2 id="the-fact-type"><a class="header" href="#the-fact-type">The 'Fact' Type</a></h2>
+<p>By default, all new facts inferred by an embedded Nero rule set are of
+type <a href="nero/../library/type.joe.Fact.html"><code>Fact</code></a>.  A <code>Fact</code> consists of a
+relation, e.g., <code>"Ancestor"</code>, and a list of terms, e.g., <code>#anne</code> and
+<code>#bert</code>.</p>
+<p>In most ways a <code>Fact</code> value can be treated like an
+<em>ad hoc</em> Joe record value, i.e., the same pattern that will match a record of
+type <code>Ancestor</code> will also match a <code>Fact</code> whose relation is <code>"Ancestor"</code>:</p>
+<pre><code class="language-joe">foreach (Ancestor(a, d) : myRules.infer()) {
+    println(a + " is an ancestor of " + d);
+}
+</code></pre>
+<p>When inferred facts are going to be used immediately, e.g., to produce
+output, the <code>Fact</code> type is often sufficient.  However, it is also possible
+to make the rule set produce outputs using the script's own defined
+types; see <a href="nero/embedded_nero.html#exported-domain-values">Exported Domain Values</a>, below.</p>
+<h2 id="scripted-input-facts"><a class="header" href="#scripted-input-facts">Scripted Input Facts</a></h2>
+<p>A Nero rule set can include axioms, as shown above, but usually it gets its
+input facts from the script.  Any Joe value with named fields can be used
+as an input fact.  This includes instances of:</p>
+<ul>
+<li>The <a href="nero/../library/type.joe.Fact.html"><code>Fact</code></a> type.</li>
+<li>Any Joe <a href="nero/../records.html">record</a> type.</li>
+<li>Any joe <a href="nero/../classes.html">class</a>.</li>
+<li>Native types whose proxies define fields.</li>
+</ul>
+<p>The type's type name is used as the input fact's relation, and its
+fields as the fact's terms.</p>
+<p>The scripts a list or set of all of the input facts, and passes it
+to the rule set's <code>infer()</code> method.</p>
+<pre><code class="language-joe">record Parent(parent, child) {}
+
+var inputs = [
+    Parent(#anne, #bert),
+    Parent(#bert, #clark)
+];
+
+ruleset myRules {
+    // Ancestor/2 - ancestor, descendant
+    Ancestor(x, y) :- Parent(x, y);
+    Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+}
+
+foreach (fact : myRules.infer(inputs)) {
+    println(fact);
+}
+</code></pre>
+<h3 id="input-facts-without-ordered-fields"><a class="header" href="#input-facts-without-ordered-fields">Input Facts without Ordered Fields</a></h3>
+<p>Class instances do not have ordered fields the way <code>Fact</code> values and record
+values do. Therefore, the usual rule syntax that depends on
+ordered fields will not work:</p>
+<pre><code class="language-joe">class Parent {
+    method init(parent, child) {
+        @parent = parent;
+        @child = child;
+    }
+}
+
+ruleset myRules {
+    // Parent(x, y) cannot match an instance of class parent!
+    Ancestor(x, y) :- Parent(x, y);
+    Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+}
+</code></pre>
+<p>Consequently, we must use named-field atoms for class instances
+and other types with named fields but not ordered fields:</p>
+<pre><code class="language-joe">ruleset myRules {
+    Ancestor(x, y) :- Parent(parent: x, child: y);
+    Ancestor(x, y) :- Parent(parent: x, child: z), Ancestor(z, y);
+}
+</code></pre>
+<p>Named-field atoms also allow a rule to match on a subset of a fact's
+fields, whether ordered or not.</p>
+<h2 id="exported-domain-values"><a class="header" href="#exported-domain-values">Exported Domain Values</a></h2>
+<p>As noted <a href="nero/embedded_nero.html#the-fact-type">above</a>, a rule set outputs inferred facts
+using the <a href="nero/../library/type.joe.Fact.html"><code>Fact</code></a> type.  This is sufficient
+in many cases; but it is also common to want the outputs to be of types
+defined by the script itself.  Accomplish this by adding <code>export</code>
+declarations to the rule set.</p>
+<p>The simplest <code>export</code> declaration simply states that a given relation
+has a matching domain type in the current scope. When rule set execution
+is complete, facts with the exported relation will be converted to
+values of the named type using the type's initializer.</p>
+<p>For example, the following script defines a record type called
+<code>Ancestor</code> and tells the rule set to export all <code>Ancestor</code> facts using
+the <code>Ancestor</code> type.</p>
+<pre><code class="language-joe">record Ancestor(ancestor, dependent) {}
+
+ruleset myRules {
+    export Ancestor;
+    Ancestor(x, y) :- Parent(x, y);
+    Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+}
+</code></pre>
+<ul>
+<li>The <code>Ancestor</code> type must be in scope when the rule set is defined.</li>
+<li>The <code>Ancestor</code> type's initializer must take the same number of arguments
+as the <code>Ancestor</code> relation in the rule set.</li>
+</ul>
+<p>However, it is also possible to export an inferred fact as any kind of
+value the script's author desires by providing an explicit creation
+function as a callable reference.  For example, suppose the script
+author wants <code>Ancestor</code> facts returned as two-item lists:</p>
+<pre><code class="language-joe">function ancestor2list(x, y) {
+    return [x, y];
+}
+
+ruleset myRules {
+    export Ancestor as ancestor2list;
+    Ancestor(x, y) :- Parent(x, y);
+    Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+}
+</code></pre>
+<p>A lambda function could also be used:</p>
+<pre><code class="language-joe">ruleset myRules {
+    export Ancestor as \x,y -&gt; [x, y];
+    Ancestor(x, y) :- Parent(x, y);
+    Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+}
+</code></pre>
+<p>The only restriction is that the callable referenced by the <code>as</code> clause
+is defined in the scope in which the rule set is declared.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ruleset-reference"><a class="header" href="#ruleset-reference">'ruleset' Reference</a></h1>
+<p>A Nero rule set is defined within a Joe script using the <code>ruleset</code>
+declaration.</p>
+<h2 id="the-ruleset-declaration"><a class="header" href="#the-ruleset-declaration">The <code>ruleset</code> declaration</a></h2>
+<p>A <code>ruleset</code> declaration has this form:</p>
+<p><strong>ruleset <em>name</em> { <em>body</em> }</strong></p>
+<p>where</p>
+<ul>
+<li><em>name</em> is a simple identifier, like a function name.</li>
+<li><em>body</em> consists of Nero axioms and rules, just like a standalone Nero
+program, but may also contain any number of <code>export</code> declarations.</li>
+</ul>
+<h2 id="axioms"><a class="header" href="#axioms">Axioms</a></h2>
+<p>An axiom has this form:</p>
+<p><strong><em>relation</em> (<em>term</em>, [<em>term</em>...]);</strong></p>
+<p>where</p>
+<ul>
+<li><em>relation</em> is an identifier, conventionally beginning with an uppercase
+letter.</li>
+<li>The <em>terms</em> are constant terms: Joe keywords, strings, numbers, <code>true</code>,
+<code>false</code>, or <code>null</code>.</li>
+</ul>
+<h2 id="rules"><a class="header" href="#rules">Rules</a></h2>
+<p>A rule has this form:</p>
+<p><strong><em>head</em> :- <em>bodyAtom</em> [, <em>bodyAtom</em>...] [where <em>constraints</em>] ;</strong></p>
+<p>The rule head is an atom whose terms are constant or variable terms:</p>
+<p><strong><em>relation</em> (<em>term</em>, [<em>term</em>...])</strong></p>
+<ul>
+<li>All variable terms in the head must be bound in the rule's body.</li>
+</ul>
+<p>A body atom is an atom, possibly negated, whose terms may be
+constants, variables, or wildcards:</p>
+<p><strong>[not] <em>relation</em> (<em>term</em>, [<em>term</em>...])</strong></p>
+<ul>
+<li>The first body atom must not be negated.</li>
+<li>Variables used in negated atoms and constraints must be bound by
+non-negated atoms to their left in the rule's body.</li>
+</ul>
+<p>A rule may have zero or more optional constraints using
+the <code>where</code> clause:</p>
+<p><strong>where <em>constraint</em> [, <em>constraint</em>...]</strong></p>
+<p>A constraint has this form:</p>
+<p><strong><em>variable</em> <em>op</em> <em>term</em></strong></p>
+<p>where</p>
+<ul>
+<li><em>variable</em> must be a variable bound in a non-negated body atom.</li>
+<li><em>op</em> is a comparison operator, one of: <code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code></li>
+<li><em>term</em> is a constant or variable term; if a variable, it must be
+bound in a non-negated body atom.</li>
+</ul>
+<h2 id="export-declarations"><a class="header" href="#export-declarations">Export Declarations</a></h2>
+<p>By default, all facts inferred via axioms or rules are returned to the
+script as <a href="nero/../library/type.joe.Fact.html"><code>Fact</code></a> values.  An export
+declaration directs Nero to return all facts having a given relation
+as some other kind of Joe value.</p>
+<p>An export declaration has this form:</p>
+<p><strong>export <em>relation</em> [as <em>expression</em>];</strong></p>
+<p>where</p>
+<ul>
+<li><em>relation</em> is a relation used in an axiom or in the head of a rule.</li>
+<li>If no <code>as</code> clause is given, <em>relation</em> must also be the name of a type
+that is in scope whose initializer takes the same number of arguments
+as the relevant atoms have terms.</li>
+<li>If the <code>as</code> clause is given, <em>expression</em> must be a Joe expression that
+evaluates to a callable in the current scope.</li>
+</ul>
+<p>However specified, the callable will be used to convert all facts having
+the given relation to Joe values on output from the rule set.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="technical-details"><a class="header" href="#technical-details">Technical Details</a></h1>
 <p>This section contains details about Nero and its implementation for
 those familiar with other implementations of Datalog, and for those
@@ -2114,7 +2342,42 @@ creates no binding.</li>
 named-field patterns.</li>
 </ul>
 <h2 id="stratified-negation"><a class="header" href="#stratified-negation">Stratified Negation</a></h2>
-<p>TODO</p>
+<p>A Nero program uses rules to produce new facts.  Those rules are allowed
+to be recursive: relation A can depend on facts of type B, while
+simultaneously relation B can depend on facts of type A, either directly
+or indirectly.  For example, the following program says that <code>A</code> is true
+of <code>x</code> IFF <code>B</code> is true of <code>x</code>.</p>
+<pre><code class="language-nero">// OK
+A(x) :- B(x);
+B(x) :- A(x);
+</code></pre>
+<p>But when negation is added, this changes.  Consider this program:</p>
+<pre><code class="language-nero">// BAD
+B(#anne);
+A(x) :- C(x), not B(x);
+B(x) : A(x);
+</code></pre>
+<p>This will infer:</p>
+<ul>
+<li><code>A(#anne)</code> because we have <code>C(#anne)</code> and no <code>B(#anne)</code></li>
+<li><code>B(#anne)</code> because we have <code>A(#anne)</code></li>
+<li>But now we have both <code>A(#anne)</code> and <code>B(#anne)</code>, which contradicts the first
+rule.  This is the Datalog equivalent of a memory corruption error in other
+languages.</li>
+</ul>
+<p>To prevent this kind of problem, Nero (like many Datalog engines) requires
+that every ruleset meets the following condition:</p>
+<ul>
+<li>If relation <code>A</code> depends on relation <code>B</code> with negation, directly or indirectly,
+relation <code>B</code> cannot depend on relation <code>A</code>, directly or indirectly.</li>
+</ul>
+<p>To prevent this, Nero uses a technique called <em>stratified negation</em>, in which
+the head relations in the rule set are divided into <em>strata</em> such that if
+relation <code>A</code> depends on relation <code>B</code> with negation, the rules that
+infer B are all in a lower strata than the rules that infer <code>A</code>.  If the
+rules cannot be so stratified, then the program is rejected.</p>
+<p>In this case, look for the kind of circular dependency with negation shown
+above.</p>
 <h2 id="references"><a class="header" href="#references">References</a></h2>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Datalog">Datalog</a> (wikipedia)</li>
