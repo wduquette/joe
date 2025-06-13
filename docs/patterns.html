@@ -337,7 +337,8 @@ var {#id: i,  #color: c}  = Thing(123, "red");
 the object's fields.</p>
 <h2 id="named-field-patterns"><a class="header" href="#named-field-patterns">Named-Field Patterns</a></h2>
 <p>A named-field pattern matches the type and field values for any
-Joe value with named fields.</p>
+Joe value with named fields.  It will also match a
+<a href="library/type.joe.Fact.html"><code>Fact</code></a> value based on its relation and fields.</p>
 <pre><code class="language-joe">class Thing {
     method init(id, color) {
         this.id = id;

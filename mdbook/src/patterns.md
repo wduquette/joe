@@ -221,7 +221,8 @@ the object's fields.
 ## Named-Field Patterns
 
 A named-field pattern matches the type and field values for any 
-Joe value with named fields. 
+Joe value with named fields.  It will also match a 
+[`Fact`](library/type.joe.Fact.md) value based on its relation and fields.
 
 ```joe
 class Thing {
