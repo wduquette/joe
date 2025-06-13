@@ -485,6 +485,7 @@ public class MatcherTest extends Ted {
         @Override public Object get(String name) { return fields.get(name); }
         @Override public void set(String name, Object value) { }
         @Override public boolean hasOrderedFields() { return true; }
+        @Override public Map<String,Object> getFieldMap() { return fields; }
     }
 
     private record Pair(Object first, Object second) {}

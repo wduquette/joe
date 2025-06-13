@@ -208,6 +208,13 @@ function testNamedField_record() {
     assertEquals(a, person.age);
 }
 
+function testNamedField_fact() {
+    var person = Fact("Person", "Joe", 80);
+    var Person(f0: name, f1: age) = person;
+    assertEquals(name, person.f0);
+    assertEquals(age, person.f1);
+}
+
 //-----------------------------------------------------------------------------
 // Ordered-Field Patterns
 
@@ -230,6 +237,13 @@ function testOrderedField_good() {
     var Person(name, age) = person;
     assertEquals(name, person.name);
     assertEquals(age, person.age);
+}
+
+function testOrderedField_fact() {
+    var person = Fact("Person", "Joe", 80);
+    var Person(name, age) = person;
+    assertEquals(name, person.f0);
+    assertEquals(age, person.f1);
 }
 
 //-----------------------------------------------------------------------------

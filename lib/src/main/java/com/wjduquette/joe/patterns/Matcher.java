@@ -3,6 +3,8 @@ package com.wjduquette.joe.patterns;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeValue;
 import com.wjduquette.joe.Keyword;
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.types.FactValue;
 
 import java.util.*;
 
@@ -133,14 +135,22 @@ public class Matcher {
             }
 
             case Pattern.NamedFieldPattern p -> {
-                var obj = joe.getJoeValue(value);
-                if (!hasType(obj, p.typeName())) yield false;
+                Map<String,Object> map;
+
+                if (value instanceof FactValue fact) {
+                    if (!fact.relation().equals(p.typeName())) yield false;
+                    map = fact.getFieldMap();
+                } else {
+                    var obj = joe.getJoeValue(value);
+                    if (!hasType(obj, p.typeName())) yield false;
+                    map = obj.getFieldMap();
+                }
 
                 for (var e : p.fieldMap().entrySet()) {
                     var field = e.getKey();
-                    if (!obj.hasField(field)) yield false;
+                    if (!map.containsKey(field)) yield false;
 
-                    if (!bind(joe, e.getValue(), obj.get(field), getter, binder)) {
+                    if (!bind(joe, e.getValue(), map.get(field), getter, binder)) {
                         yield false;
                     }
                 }
@@ -150,23 +160,29 @@ public class Matcher {
             }
 
             case Pattern.OrderedFieldPattern p -> {
-                // FIRST, check type and shape.  The value must be
-                // a JoeValue of a record type; there must be one
-                // pattern for each field; and each pattern must match
-                // the corresponding field.
-                var obj = joe.getJoeValue(value);
-                if (!obj.hasOrderedFields()) yield false;
-                if (!obj.type().name().equals(p.typeName())) yield false;
+                List<Object> fields;
 
-                var fields = obj.getFieldNames();
+                if (value instanceof FactValue fact) {
+                    if (!fact.relation().equals(p.typeName())) yield false;
+                    fields = fact.getFields();
+                } else {
+                    // FIRST, check type and shape.  The value must be
+                    // a JoeValue of a record type; there must be one
+                    // pattern for each field; and each pattern must match
+                    // the corresponding field.
+                    var obj = joe.getJoeValue(value);
+                    if (!obj.hasOrderedFields()) yield false;
+                    if (!obj.type().name().equals(p.typeName())) yield false;
+
+                    fields = obj.getFieldNames().stream().map(obj::get).toList();
+                }
+
                 var size = p.patterns().size();
                 if (fields.size() != size) yield false;
 
-                var list = fields.stream().map(obj::get).toList();
-
                 // NEXT, match items
                 for (var i = 0; i < size; i++) {
-                    if (!bind(joe, p.patterns().get(i), list.get(i), getter, binder)) {
+                    if (!bind(joe, p.patterns().get(i), fields.get(i), getter, binder)) {
                         yield false;
                     }
                 }

@@ -13,6 +13,15 @@ function testValid() {
     }
 }
 
+function testUnstratified() {
+    assertError(\-> {
+        ruleset rules {
+            A(x) :- B(x), not C(x);
+            C(x) :- A(x);
+        }
+    }, "Rule set 'rules' is not stratified.");
+}
+
 // A simple `export` must name a callable in the current scope.
 function testExport_good() {
     record Ancestor(a, d) {}

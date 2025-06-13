@@ -21,35 +21,14 @@ function testToString() {
     """);
 }
 
-// RuleSet::isStratified() should return true for stratified
-// rule sets.
+// RuleSet::isStratified() should always return true; unstratified
+// rule sets are rejected on creation.
 function testIsStratified_true() {
     ruleset rules {
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     }
     check(rules.isStratified()).eq(true);
-}
-
-// RuleSet::isStratified() should return false for unstratified
-// rule sets.
-function testIsStratified_false() {
-    ruleset rules {
-        A(x) :- B(x), not C(x);
-        C(x) :- A(x);
-    }
-    check(rules.isStratified()).eq(false);
-}
-
-// RuleSet::infer should always throw an error for unstratified
-// rule sets.
-function testInfer_notStratified() {
-    ruleset rules {
-        A(x) :- B(x), not C(x);
-        C(x) :- A(x);
-    }
-    assertError(\-> rules.infer(),
-        "Rule set is not stratified.");
 }
 
 // RuleSet::infer should always run successfully when no
