@@ -9,6 +9,10 @@
     - Clark is now the default engine.
     - Bert has been removed.
 - Language
+  - Added Nero, an implementation of the Datalog query language.
+    - Nero can be used as a standalone language via the `joe nero` tool, or
+      embedded in scripts to perform queries or translations of scripted input
+      data.
   - Merged `let`'s capability into `var`, and removed `let`.
     - `var` can now do destructuring binds while still handling simple variable
       declarations efficiently.
@@ -20,7 +24,6 @@
     pattern syntax.
   - "record" pattern syntax is now called "ordered-field" pattern syntax, as
     we now have non-record-types with ordered fields.
-    
 - Extensibility
   - Simplified implementation of proxy types for native record types.
     - Any `ProxyType` can now easily define read-only fields for its proxied
