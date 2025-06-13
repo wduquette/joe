@@ -770,6 +770,11 @@ class VirtualMachine {
                 case RULESET -> {
                     var name = readString();
                     var ruleset = readRuleSet();
+
+                    if (!ruleset.isStratified()) {
+                        throw error("Rule set '" + name + "' is not stratified.");
+                    }
+
                     @SuppressWarnings("unchecked")
                     var exports = (Map<String,Object>)pop();
 

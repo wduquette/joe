@@ -324,6 +324,13 @@ class Interpreter {
                 var rsc = new RuleSetCompiler(stmt.ruleSet());
                 rsc.setFactFactory(FactValue::new);
                 var ruleset = rsc.compile();
+
+                if (!ruleset.isStratified()) {
+                    throw new RuntimeError(stmt.name().span(),
+                        "Rule set '" + stmt.name().lexeme() +
+                            "' is not stratified.");
+                }
+
                 var exports = new HashMap<String, Object>();
 
                 for (var export : stmt.exports().entrySet()) {
