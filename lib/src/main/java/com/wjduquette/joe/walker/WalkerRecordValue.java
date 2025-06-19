@@ -3,7 +3,6 @@ package com.wjduquette.joe.walker;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.ListFact;
-import com.wjduquette.joe.nero.MapFact;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -101,7 +101,8 @@ public interface JoeValue extends Fact {
      * @throws JoeError if !isFact().
      */
     default Fact toFact() {
-        throw new JoeError("Type cannot be used as a Fact: '" +
+        throw new UnsupportedOperationException(
+            "Values of this type cannot be used as facts: '" +
             type().name() + "'.");
     }
 
