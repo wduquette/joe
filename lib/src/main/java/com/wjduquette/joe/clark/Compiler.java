@@ -9,7 +9,6 @@ import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SourceBuffer.Span;
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.TokenType;
-import com.wjduquette.joe.types.FactValue;
 
 import static com.wjduquette.joe.clark.Opcode.*;
 
@@ -617,7 +616,7 @@ class Compiler {
             case Stmt.RuleSet s -> {
                 // FIRST, compile the rule set.
                 var rsc = new RuleSetCompiler(s.ruleSet());
-                rsc.setFactFactory(FactValue::new);
+                rsc.setFactFactory(ListFact::new);
                 var ruleset = rsc.compile();
 
                 // Get the exports                // Stack effects

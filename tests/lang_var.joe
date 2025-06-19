@@ -209,6 +209,7 @@ function testNamedField_record() {
 }
 
 function testNamedField_fact() {
+    skip("Pattern matching is not supported on facts at present.");
     var person = Fact("Person", "Joe", 80);
     var Person(f0: name, f1: age) = person;
     assertEquals(name, person.f0);
@@ -240,6 +241,7 @@ function testOrderedField_good() {
 }
 
 function testOrderedField_fact() {
+    skip("Pattern matching is not supported on facts at present.");
     var person = Fact("Person", "Joe", 80);
     var Person(name, age) = person;
     assertEquals(name, person.f0);

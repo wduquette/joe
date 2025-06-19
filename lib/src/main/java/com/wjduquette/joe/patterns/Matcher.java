@@ -3,7 +3,7 @@ package com.wjduquette.joe.patterns;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeValue;
 import com.wjduquette.joe.Keyword;
-import com.wjduquette.joe.types.FactValue;
+import com.wjduquette.joe.nero.Fact;
 
 import java.util.*;
 
@@ -149,14 +149,14 @@ public class Matcher {
             case Pattern.NamedFieldPattern p -> {
                 Map<String,Object> map;
 
-                if (value instanceof FactValue fact) {
-                    if (!fact.relation().equals(p.typeName())) yield false;
-                    map = fact.getFieldMap();
-                } else {
+//                if (value instanceof Fact fact) {
+//                    if (!fact.relation().equals(p.typeName())) yield false;
+//                    map = fact.getFieldMap();
+//                } else {
                     var obj = joe.getJoeValue(value);
                     if (!hasType(obj, p.typeName())) yield false;
                     map = obj.getFieldMap();
-                }
+//                }
 
                 for (var e : p.fieldMap().entrySet()) {
                     var field = e.getKey();
@@ -174,10 +174,11 @@ public class Matcher {
             case Pattern.OrderedFieldPattern p -> {
                 List<Object> fields;
 
-                if (value instanceof FactValue fact) {
-                    if (!fact.relation().equals(p.typeName())) yield false;
-                    fields = fact.getFields();
-                } else {
+                // TODO: Revisit after changeover is complete.
+//                if (value instanceof Fact fact) {
+//                    if (!fact.relation().equals(p.typeName())) yield false;
+//                    fields = fact.getFields();
+//                } else {
                     // FIRST, check type and shape.  The value must be
                     // a JoeValue of a record type; there must be one
                     // pattern for each field; and each pattern must match
@@ -187,7 +188,7 @@ public class Matcher {
                     if (!obj.type().name().equals(p.typeName())) yield false;
 
                     fields = obj.getFieldNames().stream().map(obj::get).toList();
-                }
+//                }
 
                 var size = p.patterns().size();
                 if (fields.size() != size) yield false;

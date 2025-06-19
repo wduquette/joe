@@ -1,8 +1,8 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.ListFact;
 import com.wjduquette.joe.nero.Nero;
-import com.wjduquette.joe.types.FactValue;
 import com.wjduquette.joe.types.RuleSetValue;
 import com.wjduquette.joe.types.SetValue;
 
@@ -73,7 +73,7 @@ public class JoeNero {
 
         // NEXT, Execute the rule set.
         var nero = new Nero(rsv.ruleset());
-        nero.setFactFactory(FactValue::new);
+        nero.setFactFactory(ListFact::new);
         nero.infer(inputFacts);
 
         // NEXT, build the list of known facts.  We want the input
@@ -95,7 +95,7 @@ public class JoeNero {
     }
 
     private Fact asNeroFact(Object value) {
-        if (value instanceof FactValue fv) {
+        if (value instanceof Fact fv) {
             return fv;
         }
 

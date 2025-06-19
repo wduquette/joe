@@ -493,8 +493,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testRecordPattern_notRecord() {
-        test("testRecordPattern_notRecord");
+    public void testOrderedFieldPattern_notRecord() {
+        test("testOrderedFieldPattern_notRecord");
 
         constants = List.of("123", "red");
         var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
@@ -507,8 +507,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testRecordPattern_wrongType() {
-        test("testRecordPattern_wrongType");
+    public void testOrderedFieldPattern_wrongType() {
+        test("testOrderedFieldPattern_wrongType");
 
         constants = List.of("123", "red");
         var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
@@ -523,8 +523,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testRecordPattern_wrongSize() {
-        test("testRecordPattern_wrongSize");
+    public void testOrderedFieldPattern_wrongSize() {
+        test("testOrderedFieldPattern_wrongSize");
 
         constants = List.of("123", "red", 456.0);
         var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
@@ -540,8 +540,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testRecordPattern_wrongFieldValue() {
-        test("testRecordPattern_wrongFieldValue");
+    public void testOrderedFieldPattern_wrongFieldValue() {
+        test("testOrderedFieldPattern_wrongFieldValue");
 
         constants = List.of("123", "green");
         var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
@@ -556,8 +556,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testRecordPattern_good() {
-        test("testRecordPattern_good");
+    public void testOrderedFieldPattern_good() {
+        test("testOrderedFieldPattern_good");
 
         constants = List.of("123", "red");
         var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
@@ -573,8 +573,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testRecordPattern_proxiedType() {
-        test("testRecordPattern_good");
+    public void testOrderedFieldPattern_proxiedType() {
+        test("testOrderedFieldPattern_good");
 
         constants = List.of("123", "red");
         var pattern = new Pattern.OrderedFieldPattern("Pair", List.of(
