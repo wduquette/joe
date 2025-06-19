@@ -1,6 +1,8 @@
 package com.wjduquette.joe.patterns;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.RecordFact;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -612,6 +614,10 @@ public class MatcherTest extends Ted {
         @Override public void set(String name, Object value) { }
         @Override public boolean hasOrderedFields() { return true; }
         @Override public Map<String,Object> getFieldMap() { return fields; }
+        @Override public boolean isFact() { return true; }
+        @Override public Fact toFact() {
+            return new RecordFact(typeName, List.of("id", "color"), fields);
+        }
     }
 
     private record Pair(Object first, Object second) {}

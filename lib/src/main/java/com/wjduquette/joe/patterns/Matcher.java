@@ -131,12 +131,14 @@ public class Matcher {
                     yield true;
                 } else {
                     var obj = joe.getJoeValue(value);
+                    if (!obj.isFact()) yield false;
+                    var map = obj.toFact().getFieldMap();
 
                     for (var e : p.patterns().entrySet()) {
                         var field = key2field(getter.get(e.getKey().id()));
-                        if (!obj.hasField(field)) yield false;
+                        if (!map.containsKey(field)) yield false;
 
-                        if (!doBind(joe, e.getValue(), obj.get(field), getter, bindings)) {
+                        if (!doBind(joe, e.getValue(), map.get(field), getter, bindings)) {
                             yield false;
                         }
                     }
@@ -147,16 +149,21 @@ public class Matcher {
             }
 
             case Pattern.NamedFieldPattern p -> {
-                Map<String,Object> map;
+                Fact fact;
 
-//                if (value instanceof Fact fact) {
-//                    if (!fact.relation().equals(p.typeName())) yield false;
-//                    map = fact.getFieldMap();
-//                } else {
+                if (value instanceof Fact f) {
+                    fact = f;
+                } else {
                     var obj = joe.getJoeValue(value);
-                    if (!hasType(obj, p.typeName())) yield false;
-                    map = obj.getFieldMap();
-//                }
+                    if (!obj.isFact()) yield false;
+
+                    fact = obj.toFact();
+                    if (!p.typeName().equals(fact.relation()) &&
+                        !hasType(obj, p.typeName())
+                    ) yield false;
+                }
+
+                var map = fact.getFieldMap();
 
                 for (var e : p.fieldMap().entrySet()) {
                     var field = e.getKey();
@@ -172,24 +179,24 @@ public class Matcher {
             }
 
             case Pattern.OrderedFieldPattern p -> {
-                List<Object> fields;
+                Fact fact;
 
-                // TODO: Revisit after changeover is complete.
-//                if (value instanceof Fact fact) {
-//                    if (!fact.relation().equals(p.typeName())) yield false;
-//                    fields = fact.getFields();
-//                } else {
-                    // FIRST, check type and shape.  The value must be
-                    // a JoeValue of a record type; there must be one
-                    // pattern for each field; and each pattern must match
-                    // the corresponding field.
+                if (value instanceof Fact f) {
+                    fact = f;
+                    if (!fact.relation().equals(p.typeName())) yield false;
+                } else {
                     var obj = joe.getJoeValue(value);
-                    if (!obj.hasOrderedFields()) yield false;
+                    if (!obj.isFact()) yield false;
+                    fact = obj.toFact();
+                    if (!fact.isOrdered()) yield false;
                     if (!obj.type().name().equals(p.typeName())) yield false;
 
-                    fields = obj.getFieldNames().stream().map(obj::get).toList();
-//                }
+                    if (!p.typeName().equals(fact.relation()) &&
+                        !hasType(obj, p.typeName())
+                    ) yield false;
+                }
 
+                var fields = fact.getFields();
                 var size = p.patterns().size();
                 if (fields.size() != size) yield false;
 

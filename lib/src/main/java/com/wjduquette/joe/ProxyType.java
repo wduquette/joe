@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.RecordFact;
 import com.wjduquette.joe.types.TypeType;
 
 import java.util.*;
@@ -368,6 +370,38 @@ public class ProxyType<V>
         }
 
         return map;
+    }
+
+    /**
+     * Returns whether the given instance can be converted to a Nero
+     * Fact.  Unless overridden, this will return true if this proxy
+     * defines script-visible fields, and false otherwise.
+     * @param joe The interpreter
+     * @param value The instance
+     * @return true or false
+     */
+    @SuppressWarnings("unused")
+    public Boolean isFact(Joe joe, Object value) {
+        return !fieldNames.isEmpty();
+    }
+
+    /**
+     * Returns the instance as a Nero Fact.  Unless overridden, this will
+     * succeed so long as the proxy defines script-visible fields.
+     * @param joe The interpreter
+     * @param value The instance
+     * @return true or false
+     * @throws UnsupportedOperationException if !isFact
+     */
+    @SuppressWarnings("unused")
+    public Fact toFact(Joe joe, Object value) {
+        if (!fieldNames.isEmpty()) {
+            return new RecordFact(name(), fieldNames, getFieldMap(value));
+        } else {
+            throw new UnsupportedOperationException(
+                "Values of this type cannot be used as facts: '" +
+                    type().name() + "'.");
+        }
     }
 
     //-------------------------------------------------------------------------

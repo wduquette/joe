@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.nero.Fact;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,16 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
     }
 
     @Override
+    public boolean isFact() {
+        return proxy.isFact(joe, value);
+    }
+
+    @Override
+    public Fact toFact() {
+        return proxy.toFact(joe, value);
+    }
+
+    @Override
     public boolean canIterate() {
         return proxy.canIterate();
     }
@@ -62,7 +74,7 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
     }
 
     //-------------------------------------------------------------------------
-    // Fact API (every JoeValue is a Fact)
+    // Fact API
 
     @Override
     public boolean hasOrderedFields() {
