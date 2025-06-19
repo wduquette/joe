@@ -1,6 +1,8 @@
 package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.ListFact;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,6 +96,16 @@ public class ClarkRecordValue implements JoeValue {
     public void set(String name, Object value) {
         throw new JoeError("Values of type " + type.name() +
             " have no mutable properties.");
+    }
+
+    @Override
+    public boolean isFact() {
+        return !fields.isEmpty();
+    }
+
+    @Override
+    public Fact toFact() {
+        return new ListFact(type.name(), getFields());
     }
 
     @Override

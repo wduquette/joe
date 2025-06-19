@@ -1,6 +1,8 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.MapFact;
 
 import java.util.*;
 
@@ -66,6 +68,16 @@ class WalkerInstance implements JoeValue {
     public String stringify(Joe joe) {
         var callable = get(TO_STRING);
         return (String)joe.call(callable);
+    }
+
+    @Override
+    public boolean isFact() {
+        return !fields.isEmpty();
+    }
+
+    @Override
+    public Fact toFact() {
+        return new MapFact(joeClass.name(), fields);
     }
 
     @Override

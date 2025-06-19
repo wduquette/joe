@@ -86,6 +86,25 @@ public interface JoeValue extends Fact {
         return toString();
     }
 
+    /**
+     * Returns true if this value can be used as a Nero Fact and false
+     * otherwise.
+     * @return true or false
+     */
+    default boolean isFact() {
+        return false;
+    }
+
+    /**
+     * If isFact(), returns this value as a Nero Fact.
+     * @return The fact
+     * @throws JoeError if !isFact().
+     */
+    default Fact toFact() {
+        throw new JoeError("Type cannot be used as a Fact: '" +
+            type().name() + "'.");
+    }
+
     //-------------------------------------------------------------------------
     // Fact API
 
