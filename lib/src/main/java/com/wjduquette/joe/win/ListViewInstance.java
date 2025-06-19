@@ -60,7 +60,6 @@ public class ListViewInstance extends ListView<Object> implements JoeValue {
 
     @Override public JoeType type() { return core.type(); }
     @Override public List<String> getFieldNames() { return core.getFieldNames(); }
-    @Override public boolean hasField(String name) { return core.hasField(name); }
     @Override public Object get(String name) { return core.get(name); }
     @Override public void set(String name, Object value) { core.set(name, value); }
     @Override public String stringify(Joe joe) { return core.stringify(joe); }

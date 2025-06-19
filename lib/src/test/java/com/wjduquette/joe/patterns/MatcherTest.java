@@ -608,12 +608,9 @@ public class MatcherTest extends Ted {
         }
 
         @Override public JoeType type() { return new TestType(typeName); }
-        @Override public boolean hasField(String name) { return fields.containsKey(name); }
         @Override public List<String> getFieldNames() { return List.of("id", "color"); }
         @Override public Object get(String name) { return fields.get(name); }
         @Override public void set(String name, Object value) { }
-        @Override public boolean hasOrderedFields() { return true; }
-        @Override public Map<String,Object> getFieldMap() { return fields; }
         @Override public boolean isFact() { return true; }
         @Override public Fact toFact() {
             return new RecordFact(typeName, List.of("id", "color"), fields);

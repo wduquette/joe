@@ -57,11 +57,6 @@ public class ClarkInstance implements JoeValue {
     }
 
     @Override
-    public boolean hasField(String name) {
-        return fields.containsKey(name);
-    }
-
-    @Override
     public Object get(String name) {
         if (fields.containsKey(name)) {
             return fields.get(name);
@@ -99,14 +94,6 @@ public class ClarkInstance implements JoeValue {
     public String stringify(Joe joe) {
         var callable = get(TO_STRING);
         return (String)joe.call(callable);
-    }
-
-    //-------------------------------------------------------------------------
-    // Fact API
-
-    @Override
-    public Map<String,Object> getFieldMap() {
-        return Collections.unmodifiableMap(fields);
     }
 
     //-------------------------------------------------------------------------

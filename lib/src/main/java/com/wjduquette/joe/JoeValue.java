@@ -4,7 +4,6 @@ import com.wjduquette.joe.nero.Fact;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * An interface for a Java value type implemented to play well with Joe.  A
@@ -17,15 +16,6 @@ public interface JoeValue {
      * @return The type.
      */
     JoeType type();
-
-    /**
-     * Returns true if the object has the named field property, and
-     * false otherwise. Note: this checks only for actual fields, not
-     * for method properties.
-     * @param name The field name
-     * @return true or false
-     */
-    boolean hasField(String name);
 
     /**
      * Gets an unmodifiable list of the names of the value's known fields.
@@ -93,47 +83,5 @@ public interface JoeValue {
         throw new UnsupportedOperationException(
             "Values of this type cannot be used as facts: '" +
             type().name() + "'.");
-    }
-
-    //-------------------------------------------------------------------------
-    // Fact API
-
-    // TODO: See what we need here when all is done.
-
-    /**
-     * As a fact, a JoeValue's "relation" is its type name.
-     * @return The relation
-     */
-    default String relation() {
-        return type().name();
-    }
-
-    /**
-     * By default, JoeValues do not have ordered fields.  Values that
-     * do have ordered fields should override both this and getFields().
-     * @return true or false
-     */
-    default boolean hasOrderedFields() { return false; }
-
-    /**
-     * If the value's type hasOrderedFields(), the list of field
-     * values.  Values that do have ordered fields should override
-     * this.
-     * @return the list
-     * @throws IllegalStateException if !isIndexed.
-     */
-    default List<Object> getFields() {
-        throw new IllegalStateException(
-            "Fact does not have ordered fields!");
-    }
-
-    /**
-     * Gets a map of the fact's field values by name.
-     * Values that do have fields should override this.
-     * @return The map
-     */
-    default Map<String, Object> getFieldMap() {
-        throw new IllegalStateException(
-            "Fact does not have fields!");
     }
 }

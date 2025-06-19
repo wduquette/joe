@@ -203,11 +203,6 @@ public class ProxyType<V>
     }
 
     @Override
-    public boolean hasField(String name) {
-        return constants.containsKey(name);
-    }
-
-    @Override
     public List<String> getFieldNames() {
         return new ArrayList<>(constants.keySet());
     }
@@ -253,18 +248,6 @@ public class ProxyType<V>
     //
     // In particular, this API defines the interface to the type's defined
     // field properties.  Fields are presumed to be ordered and read-only.
-
-    /**
-     * Returns true if the value has a field with the given name, and
-     * false otherwise.
-     *
-     * @param value A value of the proxied type
-     * @param fieldName The field name
-     * @return true or false
-     */
-    public boolean hasField(Object value, String fieldName) {
-        return getters.containsKey(fieldName);
-    }
 
     /**
      * Returns a list of the names of the value's fields.  The
@@ -315,42 +298,6 @@ public class ProxyType<V>
             throw new JoeError("Values of type " + name() +
                 " have no mutable properties.");
         }
-    }
-
-    /**
-     * If the instance has any fields, they are assumed to be ordered.
-     * Subclasses may override to base the predicate on the instance's
-     * own state.
-     * @param ignored The instance
-     * @return true or false
-     */
-    public boolean hasOrderedFields(Object ignored) {
-        return !fieldNames.isEmpty();
-    }
-
-    /**
-     * Gets a list of the value's field values, provided that the
-     * value has ordered fields.
-     * @param value The instance
-     * @return The list of values
-     */
-    @SuppressWarnings("unchecked")
-    public List<Object> getFields(Object value) {
-        if (!hasOrderedFields(value)) {
-            throw new IllegalStateException(
-                "This value does not have ordered fields.");
-        }
-
-        var list = new ArrayList<>();
-
-        for (var name : fieldNames) {
-            var getter = getters.get(name);
-            if (getter != null) {
-                list.add(getter.apply((V)value));
-            }
-        }
-
-        return list;
     }
 
     /**

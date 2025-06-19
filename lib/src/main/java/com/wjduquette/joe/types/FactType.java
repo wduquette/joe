@@ -69,17 +69,6 @@ public class FactType extends ProxyType<Fact> {
     // Support for instance fields
 
     /**
-     * If the instance has any fields, they are assumed to be ordered.
-     * Subclasses can override.
-     * @return true or false
-     */
-    @Override
-    public boolean hasOrderedFields(Object value) {
-        assert value instanceof Fact;
-        return ((Fact)value).isOrdered();
-    }
-
-    /**
      * Returns true if the value has a field with the given name, and
      * false otherwise.
      *

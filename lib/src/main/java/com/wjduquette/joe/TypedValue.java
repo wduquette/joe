@@ -4,7 +4,6 @@ import com.wjduquette.joe.nero.Fact;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A value bound to its ProxyType.  It is the responsibility
@@ -23,11 +22,6 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
     @Override
     public JoeType type() {
         return proxy;
-    }
-
-    @Override
-    public boolean hasField(String name) {
-        return proxy.hasField(value, name);
     }
 
     @Override
@@ -71,23 +65,5 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
 
     @Override public String toString() {
         return stringify(joe);
-    }
-
-    //-------------------------------------------------------------------------
-    // Fact API
-
-    @Override
-    public boolean hasOrderedFields() {
-        return proxy.hasOrderedFields(value);
-    }
-
-    @Override
-    public List<Object> getFields() {
-        return proxy.getFields(value);
-    }
-
-    @Override
-    public Map<String, Object> getFieldMap() {
-        return proxy.getFieldMap(value);
     }
 }

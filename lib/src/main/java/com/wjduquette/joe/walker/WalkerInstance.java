@@ -33,11 +33,6 @@ class WalkerInstance implements JoeValue {
     }
 
     @Override
-    public boolean hasField(String name) {
-        return fields.containsKey(name);
-    }
-
-    @Override
     public List<String> getFieldNames() {
         return new ArrayList<>(fields.keySet());
     }
@@ -83,13 +78,5 @@ class WalkerInstance implements JoeValue {
     @Override
     public String toString() {
         return "<" + joeClass.name() + "@" + String.format("%x",hashCode()) + ">";
-    }
-
-    //-------------------------------------------------------------------------
-    // Fact API
-
-    @Override
-    public Map<String,Object> getFieldMap() {
-        return Collections.unmodifiableMap(fields);
     }
 }

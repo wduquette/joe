@@ -89,11 +89,6 @@ class WalkerRecord implements JoeClass, JoeValue, NativeCallable {
         return name;
     }
 
-    @Override
-    public boolean hasOrderedFields() {
-        return true;
-    }
-
     //-------------------------------------------------------------------------
     // JoeClass API
 
@@ -132,11 +127,6 @@ class WalkerRecord implements JoeClass, JoeValue, NativeCallable {
     @Override
     public JoeType type() {
         return TypeType.TYPE;
-    }
-
-    @Override
-    public boolean hasField(String name) {
-        return fields.containsKey(name);
     }
 
     @Override
