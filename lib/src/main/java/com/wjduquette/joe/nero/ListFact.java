@@ -13,7 +13,7 @@ import java.util.Map;
 public record ListFact(String relation, List<Object> fields)
     implements Fact
 {
-    @Override public boolean hasOrderedFields() { return true; }
+    @Override public boolean isOrdered() { return true; }
     @Override public List<Object> getFields() { return fields; }
 
     @Override

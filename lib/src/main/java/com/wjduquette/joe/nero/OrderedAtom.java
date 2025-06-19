@@ -22,7 +22,7 @@ public record OrderedAtom(String relation, List<Term> terms)
             return null;
         }
 
-        if (!fact.hasOrderedFields()) {
+        if (!fact.isOrdered()) {
             return null;
         }
 

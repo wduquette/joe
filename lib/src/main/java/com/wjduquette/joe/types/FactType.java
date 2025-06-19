@@ -54,7 +54,7 @@ public class FactType extends ProxyType<Fact> {
     public String stringify(Joe joe, Object value) {
         assert value instanceof Fact;
         var fact = (Fact)value;
-        String fields = fact.hasOrderedFields()
+        String fields = fact.isOrdered()
             ? fact.getFields().stream()
                 .map(joe::stringify)
                 .collect(Collectors.joining(", "))
@@ -76,7 +76,7 @@ public class FactType extends ProxyType<Fact> {
     @Override
     public boolean hasOrderedFields(Object value) {
         assert value instanceof Fact;
-        return ((Fact)value).hasOrderedFields();
+        return ((Fact)value).isOrdered();
     }
 
     /**
@@ -196,7 +196,7 @@ public class FactType extends ProxyType<Fact> {
     // [[List.method.isOrdered]].
     private Object _fields(Fact value, Joe joe, Args args) {
         args.exactArity(0, "fields()");
-        if (value.hasOrderedFields()) {
+        if (value.isOrdered()) {
             return joe.readonlyList(value.getFields());
         } else {
             throw joe.expected("fact with ordered fields", value);
@@ -209,7 +209,7 @@ public class FactType extends ProxyType<Fact> {
     // Returns true if the fact has ordered fields, and false otherwise.
     private Object _isOrdered(Fact value, Joe joe, Args args) {
         args.exactArity(0, "isOrdered()");
-        return value.hasOrderedFields();
+        return value.isOrdered();
     }
 
     //**

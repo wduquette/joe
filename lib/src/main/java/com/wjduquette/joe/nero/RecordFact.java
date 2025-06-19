@@ -44,7 +44,7 @@ public class RecordFact implements Fact {
     // Fact API
 
     @Override public String              relation()         { return relation; }
-    @Override public boolean             hasOrderedFields() { return true; }
+    @Override public boolean isOrdered() { return true; }
     @Override public List<Object>        getFields()        { return fields; }
     @Override public Map<String, Object> getFieldMap()      { return fieldMap; }
 

@@ -13,7 +13,7 @@ public record MapFact(String relation, Map<String, Object> fieldMap)
     implements Fact
 {
     @Override
-    public boolean hasOrderedFields() {
+    public boolean isOrdered() {
         return false;
     }
 

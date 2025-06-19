@@ -256,7 +256,7 @@ public class Nero {
             var b = rule.body().get(i);
 
             if (b.requiresOrderedFields() &&
-                !tuple[i].hasOrderedFields()
+                !tuple[i].isOrdered()
             ) {
                 throw new JoeError(
                     "'" + b.relation() +

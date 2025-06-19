@@ -23,10 +23,10 @@ public interface Fact {
 
     /**
      * Gets whether the fact's fields can be accessed positionally via the
-     * fields() method or whether they must be accessed by name.
+     * getFields() method or whether they must be accessed by name.
      * @return true or false
      */
-    boolean hasOrderedFields();
+    boolean isOrdered();
 
     /**
      * If hasOrderedFields(), the list of field values.
