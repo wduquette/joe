@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
  * @param relation The relation
  * @param getFields The values.
  */
-public record ConcreteFact(String relation, List<Object> getFields)
+public record OrderedFieldFact(String relation, List<Object> getFields)
     implements Fact
 {
     @Override
@@ -38,7 +38,7 @@ public record ConcreteFact(String relation, List<Object> getFields)
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        ConcreteFact fact = (ConcreteFact) o;
+        OrderedFieldFact fact = (OrderedFieldFact) o;
         return relation.equals(fact.relation) && getFields.equals(fact.getFields);
     }
 
