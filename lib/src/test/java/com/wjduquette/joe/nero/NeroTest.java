@@ -24,11 +24,11 @@ public class NeroTest extends Ted {
             Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
             """;
         check(infer(source)).eq("""
-            Ancestor(#bert, #clark)
-            Ancestor(#walker, #bert)
-            Ancestor(#walker, #clark)
-            Parent(#bert, #clark)
-            Parent(#walker, #bert)
+            ListFact[relation=Ancestor, fields=[#bert, #clark]]
+            ListFact[relation=Ancestor, fields=[#walker, #bert]]
+            ListFact[relation=Ancestor, fields=[#walker, #clark]]
+            ListFact[relation=Parent, fields=[#bert, #clark]]
+            ListFact[relation=Parent, fields=[#walker, #bert]]
             """);
     }
 
@@ -42,11 +42,11 @@ public class NeroTest extends Ted {
             Ancestor(x, y) :- Parent(f0: x, f1: z), Ancestor(f0: z, f1: y);
             """;
         check(infer(source)).eq("""
-            Ancestor(#bert, #clark)
-            Ancestor(#walker, #bert)
-            Ancestor(#walker, #clark)
-            Parent(#bert, #clark)
-            Parent(#walker, #bert)
+            ListFact[relation=Ancestor, fields=[#bert, #clark]]
+            ListFact[relation=Ancestor, fields=[#walker, #bert]]
+            ListFact[relation=Ancestor, fields=[#walker, #clark]]
+            ListFact[relation=Parent, fields=[#bert, #clark]]
+            ListFact[relation=Parent, fields=[#walker, #bert]]
             """);
     }
 
@@ -63,11 +63,11 @@ public class NeroTest extends Ted {
             Large(x) :- Thing(x, size) where size > 5;
             """;
         check(infer(source)).eq("""
-            Large(#desk)
-            Small(#pen)
-            Thing(#desk, 10.0)
-            Thing(#pen, 1.0)
-            Thing(#whatsit, #unknown)
+            ListFact[relation=Large, fields=[#desk]]
+            ListFact[relation=Small, fields=[#pen]]
+            ListFact[relation=Thing, fields=[#desk, 10.0]]
+            ListFact[relation=Thing, fields=[#pen, 1.0]]
+            ListFact[relation=Thing, fields=[#whatsit, #unknown]]
             """);
     }
 
@@ -81,10 +81,10 @@ public class NeroTest extends Ted {
             Homeless(x) :- Thing(x), not Location(x, _);
             """;
         check(infer(source)).eq("""
-            Homeless(#pen)
-            Location(#desk, #office)
-            Thing(#desk)
-            Thing(#pen)
+            ListFact[relation=Homeless, fields=[#pen]]
+            ListFact[relation=Location, fields=[#desk, #office]]
+            ListFact[relation=Thing, fields=[#desk]]
+            ListFact[relation=Thing, fields=[#pen]]
             """);
     }
 
@@ -97,9 +97,9 @@ public class NeroTest extends Ted {
             Twin(x) :- Pair(x, x);
             """;
         check(infer(source)).eq("""
-            Pair(#a, #b)
-            Pair(#c, #c)
-            Twin(#c)
+            ListFact[relation=Pair, fields=[#a, #b]]
+            ListFact[relation=Pair, fields=[#c, #c]]
+            ListFact[relation=Twin, fields=[#c]]
             """);
     }
 
@@ -138,20 +138,20 @@ public class NeroTest extends Ted {
             Edge(#c, #b);
             """;
         check(infer(source)).eq("""
-            CanGo(#a, #b)
-            CanGo(#b, #b)
-            CanGo(#b, #c)
-            CanGo(#c, #b)
-            CantGo(#a, #a)
-            CantGo(#b, #a)
-            CantGo(#c, #a)
-            Edge(#a, #b)
-            Edge(#b, #b)
-            Edge(#b, #c)
-            Edge(#c, #b)
-            Node(#a)
-            Node(#b)
-            Node(#c)
+            ListFact[relation=CanGo, fields=[#a, #b]]
+            ListFact[relation=CanGo, fields=[#b, #b]]
+            ListFact[relation=CanGo, fields=[#b, #c]]
+            ListFact[relation=CanGo, fields=[#c, #b]]
+            ListFact[relation=CantGo, fields=[#a, #a]]
+            ListFact[relation=CantGo, fields=[#b, #a]]
+            ListFact[relation=CantGo, fields=[#c, #a]]
+            ListFact[relation=Edge, fields=[#a, #b]]
+            ListFact[relation=Edge, fields=[#b, #b]]
+            ListFact[relation=Edge, fields=[#b, #c]]
+            ListFact[relation=Edge, fields=[#c, #b]]
+            ListFact[relation=Node, fields=[#a]]
+            ListFact[relation=Node, fields=[#b]]
+            ListFact[relation=Node, fields=[#c]]
             """);
     }
 
