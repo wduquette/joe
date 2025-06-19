@@ -60,15 +60,15 @@ public class JoeNero {
         var inputFacts = new HashSet<Fact>();
 
         for (var input : inputs) {
-            // Throws JoeError if the input is not a valid NeroFact.
-            var fact = asNeroFact(input);
+            // Throws JoeError if the input cannot be converted to a Fact
+            var fact = joe.toFact(input);
 
             if (heads.contains(fact.relation())) {
                 throw new JoeError(
                     "Input fact type collides with rule set's head relation: '" +
                     fact.relation() + "'.");
             }
-            inputFacts.add(asNeroFact(input));
+            inputFacts.add(fact);
         }
 
         // NEXT, Execute the rule set.
@@ -92,19 +92,5 @@ public class JoeNero {
             }
         }
         return result;
-    }
-
-    private Fact asNeroFact(Object value) {
-        if (value instanceof Fact fv) {
-            return fv;
-        }
-
-        var fact = joe.getJoeValue(value);
-
-        if (fact.hasFields()) {
-            return fact;
-        } else {
-            throw joe.expected("fact", value);
-        }
     }
 }

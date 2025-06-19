@@ -10,11 +10,8 @@ import java.util.Map;
  * An interface for a Java value type implemented to play well with Joe.  A
  * JoeValue knows the name of its type, can have mutable or immutable
  * fields, can optionally be iterated over, and has a string representation.
- * In addition, every JoeValue is potentially a
- * {@link com.wjduquette.joe.nero.Fact}, provided that it has visible
- * fields.
  */
-public interface JoeValue extends Fact {
+public interface JoeValue {
     /**
      * Gets the object's type.
      * @return The type.
@@ -35,14 +32,6 @@ public interface JoeValue extends Fact {
      * @return The list
      */
     List<String> getFieldNames();
-
-    /**
-     * Checks whether or not the value has named fields.
-     * @return true or false
-     */
-    default boolean hasFields() {
-        return !getFieldNames().isEmpty();
-    }
 
     /**
      * Get the value of the named object property, a method or a field.
@@ -109,11 +98,12 @@ public interface JoeValue extends Fact {
     //-------------------------------------------------------------------------
     // Fact API
 
+    // TODO: See what we need here when all is done.
+
     /**
      * As a fact, a JoeValue's "relation" is its type name.
      * @return The relation
      */
-    @Override
     default String relation() {
         return type().name();
     }
@@ -123,7 +113,7 @@ public interface JoeValue extends Fact {
      * do have ordered fields should override both this and getFields().
      * @return true or false
      */
-    @Override default boolean hasOrderedFields() { return false; }
+    default boolean hasOrderedFields() { return false; }
 
     /**
      * If the value's type hasOrderedFields(), the list of field

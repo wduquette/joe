@@ -2,7 +2,7 @@ package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.ListFact;
+import com.wjduquette.joe.nero.RecordFact;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -105,7 +105,7 @@ public class ClarkRecordValue implements JoeValue {
 
     @Override
     public Fact toFact() {
-        return new ListFact(type.name(), getFields());
+        return new RecordFact(type.name(), type.getRecordFields(), fields);
     }
 
     @Override

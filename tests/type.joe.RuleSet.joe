@@ -87,7 +87,7 @@ function testInfer_noFields() {
     }
 
     assertError(\-> rules.infer(inputs),
-        "'Parent' in rule 'Ancestor(x, y) :- Parent(x, y);' requires ordered fields, but a provided fact is not ordered.");
+        "Expected Nero-compatible fact, got: Parent 'Parent()'.");
 }
 
 // RuleSet::infer(inputs) should accept proxied values with
