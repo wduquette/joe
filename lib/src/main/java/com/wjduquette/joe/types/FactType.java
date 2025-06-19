@@ -69,26 +69,12 @@ public class FactType extends ProxyType<Fact> {
     // Support for instance fields
 
     /**
-     * Returns true if the value has a field with the given name, and
-     * false otherwise.
-     *
-     * @param value A value of the proxied type
-     * @param fieldName The field name
-     * @return true or false
-     */
-    @SuppressWarnings("unused")
-    public boolean hasField(Object value, String fieldName) {
-        assert value instanceof Fact;
-        return ((Fact)value).getFieldMap().containsKey(fieldName);
-    }
-
-    /**
      * Returns a list of the names of the value's fields.  The
      * list will be empty if the value has no fields.
      * @param value A value of the proxied type
      * @return The list
      */
-    @SuppressWarnings("unused")
+    @Override
     public List<String> getFieldNames(Object value) {
         assert value instanceof Fact;
         return new ArrayList<>(((Fact)value).getFieldMap().keySet());
@@ -101,7 +87,7 @@ public class FactType extends ProxyType<Fact> {
      * @param propertyName The property name
      * @return The property value
      */
-    @SuppressWarnings({"unused"})
+    @Override
     public Object get(Object value, String propertyName) {
         var method = bind(value, propertyName);
 
@@ -127,7 +113,7 @@ public class FactType extends ProxyType<Fact> {
      * @param other The value to
      * @return The property value
      */
-    @SuppressWarnings("unused")
+    @Override
     public Object set(Object value, String fieldName, Object other) {
         throw new JoeError("Values of type " + name() +
             " have no mutable properties.");

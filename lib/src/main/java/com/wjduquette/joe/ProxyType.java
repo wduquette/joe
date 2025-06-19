@@ -300,24 +300,6 @@ public class ProxyType<V>
         }
     }
 
-    /**
-     * Gets a map of the value's field names, by name.
-     * @param value The instance
-     * @return The map
-     */
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> getFieldMap(Object value) {
-        var map = new HashMap<String,Object>();
-
-        for (var name : fieldNames) {
-            var getter = getters.get(name);
-            if (getter != null) {
-                map.put(name, getter.apply((V)value));
-            }
-        }
-
-        return map;
-    }
 
     /**
      * Returns whether the given instance can be converted to a Nero
@@ -349,6 +331,21 @@ public class ProxyType<V>
                 "Values of this type cannot be used as facts: '" +
                     type().name() + "'.");
         }
+    }
+
+    // Gets a map of the value's field names, by name.
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getFieldMap(Object value) {
+        var map = new HashMap<String,Object>();
+
+        for (var name : fieldNames) {
+            var getter = getters.get(name);
+            if (getter != null) {
+                map.put(name, getter.apply((V)value));
+            }
+        }
+
+        return map;
     }
 
     //-------------------------------------------------------------------------
