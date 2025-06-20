@@ -213,7 +213,7 @@ public class NeroTool implements Tool {
         if (field instanceof String s) {
             return Joe.quote(s);
         } else {
-            return field.toString();
+            return Objects.toString(field);
         }
     }
 

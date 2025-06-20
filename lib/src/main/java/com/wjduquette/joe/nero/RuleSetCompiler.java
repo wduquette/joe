@@ -2,6 +2,7 @@ package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.parser.ASTRuleSet;
+import com.wjduquette.joe.scanner.TokenType;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -69,7 +70,7 @@ public class RuleSetCompiler {
         var terms = new ArrayList<>();
         for (var t : atom.terms()) {
             if (t instanceof ASTRuleSet.ASTConstant c) {
-                terms.add(c.token().literal());
+                terms.add(ast2constant(c).value());
             } else {
                 throw new IllegalStateException(
                     "Invalid fact; Atom contains a non-constant term.");
@@ -131,9 +132,20 @@ public class RuleSetCompiler {
 
     private Term ast2term(ASTRuleSet.ASTTerm term) {
         return switch (term) {
-            case ASTRuleSet.ASTConstant c -> new Constant(c.token().literal());
+            case ASTRuleSet.ASTConstant c -> ast2constant(c);
             case ASTRuleSet.ASTVariable v -> new Variable(v.token().lexeme());
             case ASTRuleSet.ASTWildcard w -> new Wildcard(w.token().lexeme());
         };
+    }
+
+    private Constant ast2constant(ASTRuleSet.ASTConstant constant) {
+        var value = switch (constant.token().type()) {
+            case TokenType.TRUE -> true;
+            case TokenType.FALSE -> false;
+            case TokenType.NULL -> null;
+            default -> constant.token().literal();
+        };
+
+        return new Constant(value);
     }
 }
