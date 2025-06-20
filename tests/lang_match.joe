@@ -151,3 +151,15 @@ function testGuard() {
 
     assertEquals(result, #c);
 }
+
+function testCanBindToItem() {
+    var list = [#a, 2];
+    match (list) {
+        case a@[b, c] -> {
+            assertEquals(a, [#a, 2]);
+            assertEquals(b, #a);
+            assertEquals(c, 2);
+        }
+        default -> fail("Didn't match target.");
+    }
+}

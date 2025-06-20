@@ -127,3 +127,12 @@ function testBind_canInterpolate() {
     }
     assertEquals(result, #b);
 }
+
+function testBind_canBindToItem() {
+    var list = [[#a, 2]];
+    foreach (a@[b, c] : list) {
+        assertEquals(a, [#a, 2]);
+        assertEquals(b, #a);
+        assertEquals(c, 2);
+    }
+}

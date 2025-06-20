@@ -1,266 +1,31 @@
-// Tests the "var" statement and pattern syntax
+// Tests the "var" statement
 //
 // Language tests should confine themselves to the basic test API.
 
-//-----------------------------------------------------------------------------
-// Simple variable binding
+function testDeclareOnly() {
+    var a;
+    assertEquals(a, null);
+}
 
-function testOneVar() {
+function testDeclareAndInitialize() {
     var a = 1;
     assertEquals(a, 1);
 }
 
-function testCapture() {
-    var [a, b=[c, d], e] = [1, [2, 3], 4];
-    assertEquals(a, 1);
-    assertEquals(b, [2, 3]);
-    assertEquals(c, 2);
-    assertEquals(d, 3);
-    assertEquals(e, 4);
-}
-
-//-----------------------------------------------------------------------------
-// List Patterns
-
-function testList_noMatch() {
-    assertError(\-> { var [a, b] = 5; },
-        "'var' pattern failed to match target value.");
-}
-
-function testList_noTail() {
+function testBind_simple() {
     var [a, b] = [1, 2];
     assertEquals(a, 1);
     assertEquals(b, 2);
 }
 
-function testList_emptyTail() {
-    var [a, b : c] = [1, 2];
-    assertEquals(a, 1);
-    assertEquals(b, 2);
-    assertEquals(c, []);
+function testBind_complex() {
+    var a@[b, c] = [1, 2];
+    assertEquals(a, [1, 2]);
+    assertEquals(b, 1);
+    assertEquals(c, 2);
 }
 
-function testList_fullTail() {
-    var [a, b : c] = [1, 2, 3, 4];
-    assertEquals(a, 1);
-    assertEquals(b, 2);
-    assertEquals(c, [3, 4]);
-}
-
-function testNested() {
-    var [a, [b, c], d] = [1, [2, 3], 4];
-    assertEquals(a, 1);
-    assertEquals(b, 2);
-    assertEquals(c, 3);
-    assertEquals(d, 4);
-}
-
-//-----------------------------------------------------------------------------
-// Literal Constants
-
-function testLiteralConstant() {
-    // NOTE: We use list patterns here because `var` rejects a pattern
-    // that lacks a variable.
-
-    var [a, true] = [1, true];
-    assertEquals(a, 1);
-
-    var [b, false] = [2, false];
-    assertEquals(b, 2);
-
-    var [c, null] = [3, null];
-    assertEquals(c, 3);
-
-    var [d, 99] = [4, 99];
-    assertEquals(d, 4);
-
-    var [e, "abc"] = [5, "abc"];
-    assertEquals(e, 5);
-
-    var [f, #abc] = [6, #abc];
-    assertEquals(f, 6);
-
-    assertError(\-> { var [a, 4] = 5; },
+function testBind_structureMismatch() {
+    assertError(\-> { var [a, b] = [1]; },
         "'var' pattern failed to match target value.");
 }
-
-//-----------------------------------------------------------------------------
-// Interpolated Expressions
-
-function testInterpolatedExpression() {
-    var x = 10;
-    var y = 20;
-    var [a, $(x + y)] = [5, 30];
-    assertEquals(a, 5);
-}
-
-function testInterpolatedVariable() {
-    var first = "Joe";
-    var [$first, last] = ["Joe", "Pro"];
-    assertEquals(last, "Pro");
-}
-
-//-----------------------------------------------------------------------------
-// Wildcards
-
-function testWildcard() {
-    var [a, _] = [1, #abc];
-    assertEquals(a, 1);
-
-    var [b, _withName] = [2, #xyz];
-    assertEquals(b, 2);
-}
-
-//-----------------------------------------------------------------------------
-// Map Patterns
-
-function testMap_noMap() {
-    assertError(\-> { var {#abc: a} = 5; },
-        "'var' pattern failed to match target value.");
-}
-
-function testMap_missingKey() {
-    assertError(\-> { var {#abc: a} = {#def: 5}; },
-        "'var' pattern failed to match target value.");
-}
-
-function testMap_badValue() {
-    assertError(\-> { var {#abc: a, #def: 7} = {#abc: 5, #def: 6}; },
-        "'var' pattern failed to match target value.");
-}
-
-function testMap_good() {
-    var {"abc": a} = {"abc": 5, "def": 6};
-    assertEquals(a, 5);
-}
-
-function testMap_withInstance_stringKeys() {
-    var {"id": i, "color": c} = Thing(123, "red");
-    assertEquals(i, 123);
-    assertEquals(c, "red");
-}
-
-function testMap_withInstance_keywordKeys() {
-    var {#id: i, #color: c} = Thing(123, "red");
-    assertEquals(i, 123);
-    assertEquals(c, "red");
-}
-
-function testMap_withInstance_badKeyType() {
-    assertError(\-> { var {123: i, #color: c} = Thing(123, "red"); },
-        "'var' pattern failed to match target value.");
-}
-
-function testMap_withInstance_unknownKey() {
-    assertError(\-> { var {#nonesuch: i, #color: c} = Thing(123, "red"); },
-        "'var' pattern failed to match target value.");
-}
-
-function testMap_fancyKey() {
-    var key = #joe;
-    var {$key: value} = {#joe: #language};
-    assertEquals(value, #language);
-}
-
-//-----------------------------------------------------------------------------
-// Named-Field Patterns
-
-function testNamedField_notInstance() {
-    assertError(\-> { var Thing(id: id) = "abc"; },
-        "'var' pattern failed to match target value.");
-}
-
-function testNamedField_wrongType() {
-    var thing = Thing(123, "red");
-
-    assertError(\-> { var Gizmo(id: id) = thing; },
-        "'var' pattern failed to match target value.");
-}
-
-function testNamedField_badField() {
-    var thing = Thing(123, "red");
-
-    assertError(\-> { var Thing(id: id, style: s) = thing; },
-        "'var' pattern failed to match target value.");
-}
-
-function testNamedField_good() {
-    var thing = Thing(123, "red");
-
-    var Thing(id: i, color: c) = thing;
-    assertEquals(i, thing.id);
-    assertEquals(c, thing.color);
-}
-
-function testNamedField_supertype_good() {
-    var gizmo = Gizmo(123, "red");
-
-    var Thing(id: i, color: c) = gizmo;
-    assertEquals(i, gizmo.id);
-    assertEquals(c, gizmo.color);
-}
-
-function testNamedField_record() {
-    var person = Person("Joe", 80);
-
-    var Person(name: n, age: a) = person;
-    assertEquals(n, person.name);
-    assertEquals(a, person.age);
-}
-
-function testNamedField_fact() {
-    var person = Fact("Person", "Joe", 80);
-    var Person(f0: name, f1: age) = person;
-    assertEquals(name, person.f0);
-    assertEquals(age, person.f1);
-}
-
-//-----------------------------------------------------------------------------
-// Ordered-Field Patterns
-
-function testOrderedField_notRecord() {
-    // Thing is a normal class instance, not a record.
-    assertError(\-> { var Thing(id, color) = Thing(123, "red"); },
-        "'var' pattern failed to match target value.");
-}
-
-function testOrderedField_wrongType() {
-    var person = Person("Joe", 80);
-
-    assertError(\-> { var Cowboy(name, age) = person; },
-        "'var' pattern failed to match target value.");
-}
-
-function testOrderedField_good() {
-    var person = Person("Joe", 80);
-
-    var Person(name, age) = person;
-    assertEquals(name, person.name);
-    assertEquals(age, person.age);
-}
-
-function testOrderedField_fact() {
-    var person = Fact("Person", "Joe", 80);
-    var Person(name, age) = person;
-    assertEquals(name, person.f0);
-    assertEquals(age, person.f1);
-}
-
-//-----------------------------------------------------------------------------
-// Helpers
-
-class Thing {
-    method init(id, color) {
-        @id = id;
-        @color = color;
-    }
-}
-
-class Gizmo extends Thing {
-    method init(id, color) {
-        super.init(id, color);
-    }
-}
-
-record Person(name, age) {}
-

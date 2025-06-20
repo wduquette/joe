@@ -209,6 +209,23 @@ function testOrderedField_fact() {
     assertEquals(age, person.f1);
 }
 
+// Can match based on type only if the pattern has no field patterns.
+function testOrderedField_noFieldPatterns() {
+    record Gizmo(x, y) {}
+    var gizmo = Gizmo(1, 2);
+    assertTrue(gizmo ~ Gizmo());
+    assertFalse(gizmo ~ Number());
+}
+
+// Can match based on type for types without fields if the pattern has no
+// field patterns.
+function testOrderedField_noFieldPatterns() {
+    skip("Not yet supported");
+    assertTrue("abc" ~ String());
+    assertFalse("abc" ~ Number());
+}
+
+
 //-----------------------------------------------------------------------------
 // Pattern-Bindings
 
