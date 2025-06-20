@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.RecordFact;
 import com.wjduquette.joe.types.TypeType;
 
 import java.util.*;
@@ -201,11 +203,6 @@ public class ProxyType<V>
     }
 
     @Override
-    public boolean hasField(String name) {
-        return constants.containsKey(name);
-    }
-
-    @Override
     public List<String> getFieldNames() {
         return new ArrayList<>(constants.keySet());
     }
@@ -251,18 +248,6 @@ public class ProxyType<V>
     //
     // In particular, this API defines the interface to the type's defined
     // field properties.  Fields are presumed to be ordered and read-only.
-
-    /**
-     * Returns true if the value has a field with the given name, and
-     * false otherwise.
-     *
-     * @param value A value of the proxied type
-     * @param fieldName The field name
-     * @return true or false
-     */
-    public boolean hasField(Object value, String fieldName) {
-        return getters.containsKey(fieldName);
-    }
 
     /**
      * Returns a list of the names of the value's fields.  The
@@ -315,49 +300,42 @@ public class ProxyType<V>
         }
     }
 
+
     /**
-     * If the instance has any fields, they are assumed to be ordered.
-     * Subclasses may override to base the predicate on the instance's
-     * own state.
-     * @param ignored The instance
+     * Returns whether the given instance can be converted to a Nero
+     * Fact.  Unless overridden, this will return true if this proxy
+     * defines script-visible fields, and false otherwise.
+     * @param joe The interpreter
+     * @param value The instance
      * @return true or false
      */
-    public boolean hasOrderedFields(Object ignored) {
+    @SuppressWarnings("unused")
+    public Boolean isFact(Joe joe, Object value) {
         return !fieldNames.isEmpty();
     }
 
     /**
-     * Gets a list of the value's field values, provided that the
-     * value has ordered fields.
+     * Returns the instance as a Nero Fact.  Unless overridden, this will
+     * succeed so long as the proxy defines script-visible fields.
+     * @param joe The interpreter
      * @param value The instance
-     * @return The list of values
+     * @return true or false
+     * @throws UnsupportedOperationException if !isFact
      */
-    @SuppressWarnings("unchecked")
-    public List<Object> getFields(Object value) {
-        if (!hasOrderedFields(value)) {
-            throw new IllegalStateException(
-                "This value does not have ordered fields.");
+    @SuppressWarnings("unused")
+    public Fact toFact(Joe joe, Object value) {
+        if (!fieldNames.isEmpty()) {
+            return new RecordFact(name(), fieldNames, getFieldMap(value));
+        } else {
+            throw new UnsupportedOperationException(
+                "Values of this type cannot be used as facts: '" +
+                    type().name() + "'.");
         }
-
-        var list = new ArrayList<>();
-
-        for (var name : fieldNames) {
-            var getter = getters.get(name);
-            if (getter != null) {
-                list.add(getter.apply((V)value));
-            }
-        }
-
-        return list;
     }
 
-    /**
-     * Gets a map of the value's field names, by name.
-     * @param value The instance
-     * @return The map
-     */
+    // Gets a map of the value's field names, by name.
     @SuppressWarnings("unchecked")
-    public Map<String, Object> getFieldMap(Object value) {
+    private Map<String, Object> getFieldMap(Object value) {
         var map = new HashMap<String,Object>();
 
         for (var name : fieldNames) {

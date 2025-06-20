@@ -8,7 +8,6 @@ import com.wjduquette.joe.patterns.Matcher;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.TokenType;
-import com.wjduquette.joe.types.FactValue;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.types.RuleSetValue;
@@ -318,7 +317,7 @@ class Interpreter {
             // Evaluate the rule set.
             case Stmt.RuleSet stmt -> {
                 var rsc = new RuleSetCompiler(stmt.ruleSet());
-                rsc.setFactFactory(FactValue::new);
+                rsc.setFactFactory(ListFact::new);
                 var ruleset = rsc.compile();
 
                 if (!ruleset.isStratified()) {

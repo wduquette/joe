@@ -5,7 +5,9 @@
 function testInitializer() {
     var fact = Fact("Thing", #car, #red);
     check(fact.relation()).eq("Thing");
+    check(fact.isOrdered()).eq(true);
     check(fact.fields()).eq([#car, #red]);
+    check(fact.fieldMap()).eq({"f0": #car, "f1": #red});
     check(fact.f0).eq(#car);
     check(fact.f1).eq(#red);
     check(fact.toString()).eq("Fact(Thing, #car, #red)");
@@ -14,9 +16,31 @@ function testInitializer() {
 function testOf() {
     var fact = Fact.of("Thing", [#car, #red]);
     check(fact.relation()).eq("Thing");
+    check(fact.isOrdered()).eq(true);
     check(fact.fields()).eq([#car, #red]);
+    check(fact.fieldMap()).eq({"f0": #car, "f1": #red});
     check(fact.f0).eq(#car);
     check(fact.f1).eq(#red);
+    check(fact.toString()).eq("Fact(Thing, #car, #red)");
+}
+
+function testOfMap() {
+    var fact = Fact.ofMap("Thing", {"id": #car, "color": #red});
+    check(fact.relation()).eq("Thing");
+    check(fact.isOrdered()).eq(false);
+    check(fact.fieldMap()).eq({"id": #car, "color": #red});
+    check(fact.id).eq(#car);
+    check(fact.color).eq(#red);
+}
+
+function testOfPairs() {
+    var fact = Fact.ofPairs("Thing", ["id", #car, "color", #red]);
+    check(fact.relation()).eq("Thing");
+    check(fact.isOrdered()).eq(true);
+    check(fact.fields()).eq([#car, #red]);
+    check(fact.fieldMap()).eq({"id": #car, "color": #red});
+    check(fact.id).eq(#car);
+    check(fact.color).eq(#red);
     check(fact.toString()).eq("Fact(Thing, #car, #red)");
 }
 

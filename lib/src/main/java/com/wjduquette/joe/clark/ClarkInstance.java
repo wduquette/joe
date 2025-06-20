@@ -1,6 +1,8 @@
 package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.MapFact;
 
 import java.util.*;
 
@@ -15,7 +17,7 @@ public class ClarkInstance implements JoeValue {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The object's class, which will de facto be a BertClass.
+    // The object's class, which will de facto be a ClarkClass.
     final JoeClass klass;
 
     // The object's field values.
@@ -55,11 +57,6 @@ public class ClarkInstance implements JoeValue {
     }
 
     @Override
-    public boolean hasField(String name) {
-        return fields.containsKey(name);
-    }
-
-    @Override
     public Object get(String name) {
         if (fields.containsKey(name)) {
             return fields.get(name);
@@ -84,17 +81,19 @@ public class ClarkInstance implements JoeValue {
     }
 
     @Override
+    public boolean isFact() {
+        return !fields.isEmpty();
+    }
+
+    @Override
+    public Fact toFact() {
+        return new MapFact(klass.name(), fields);
+    }
+
+    @Override
     public String stringify(Joe joe) {
         var callable = get(TO_STRING);
         return (String)joe.call(callable);
-    }
-
-    //-------------------------------------------------------------------------
-    // Fact API
-
-    @Override
-    public Map<String,Object> getFieldMap() {
-        return Collections.unmodifiableMap(fields);
     }
 
     //-------------------------------------------------------------------------

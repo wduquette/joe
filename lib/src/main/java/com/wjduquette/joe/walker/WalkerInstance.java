@@ -1,6 +1,8 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.MapFact;
 
 import java.util.*;
 
@@ -28,11 +30,6 @@ class WalkerInstance implements JoeValue {
     @Override
     public JoeType type() {
         return joeClass;
-    }
-
-    @Override
-    public boolean hasField(String name) {
-        return fields.containsKey(name);
     }
 
     @Override
@@ -69,15 +66,17 @@ class WalkerInstance implements JoeValue {
     }
 
     @Override
-    public String toString() {
-        return "<" + joeClass.name() + "@" + String.format("%x",hashCode()) + ">";
+    public boolean isFact() {
+        return !fields.isEmpty();
     }
 
-    //-------------------------------------------------------------------------
-    // Fact API
+    @Override
+    public Fact toFact() {
+        return new MapFact(joeClass.name(), fields);
+    }
 
     @Override
-    public Map<String,Object> getFieldMap() {
-        return Collections.unmodifiableMap(fields);
+    public String toString() {
+        return "<" + joeClass.name() + "@" + String.format("%x",hashCode()) + ">";
     }
 }

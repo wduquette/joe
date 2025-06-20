@@ -46,7 +46,7 @@ public class NamedAtomTest extends Ted {
         map.put("f2", W);
         var atom = new NamedAtom("Thing", map);
 
-        var fact = new ConcreteFact("Gizmo", List.of(1, "abc", 2));
+        var fact = new ListFact("Gizmo", List.of(1, "abc", 2));
         check(atom.matches(fact, EMPTY)).eq(null);
     }
 
@@ -58,7 +58,7 @@ public class NamedAtomTest extends Ted {
         map.put("f2", W);
         var atom = new NamedAtom("Thing", map);
 
-        var fact = new ConcreteFact("Thing", List.of(1, "def", 2));
+        var fact = new ListFact("Thing", List.of(1, "def", 2));
         check(atom.matches(fact, EMPTY)).eq(null);
     }
 
@@ -70,7 +70,7 @@ public class NamedAtomTest extends Ted {
         map.put("f2", W);
         var atom = new NamedAtom("Thing", map);
 
-        var fact = new ConcreteFact("Thing", List.of(1, "abc", 2));
+        var fact = new ListFact("Thing", List.of(1, "abc", 2));
         var bindings = new Bindings();
         bindings.put(X, 0);
         check(atom.matches(fact, bindings)).eq(null);
@@ -84,7 +84,7 @@ public class NamedAtomTest extends Ted {
         map.put("f2", W);
         var atom = new NamedAtom("Thing", map);
 
-        var fact = new ConcreteFact("Thing", List.of(1, "abc", 2));
+        var fact = new ListFact("Thing", List.of(1, "abc", 2));
 
         var expected = new Bindings();
         expected.put(X, 1);
@@ -99,7 +99,7 @@ public class NamedAtomTest extends Ted {
         map.put("f2", W);
         var atom = new NamedAtom("Thing", map);
 
-        var fact = new ConcreteFact("Thing", List.of(1, "abc", 2));
+        var fact = new ListFact("Thing", List.of(1, "abc", 2));
 
         var expected = new Bindings();
         expected.put(X, 1);
@@ -114,7 +114,7 @@ public class NamedAtomTest extends Ted {
         map.put("f2", Y);
         var atom = new NamedAtom("Thing", map);
 
-        var fact = new ConcreteFact("Thing", List.of(1, "abc", 2));
+        var fact = new ListFact("Thing", List.of(1, "abc", 2));
         var given  = new Bindings();
         given.put(X, 1);
         var expected  = new Bindings(given);
@@ -130,7 +130,7 @@ public class NamedAtomTest extends Ted {
         map.put("f2", X);
         var atom = new NamedAtom("Thing", map);
 
-        var fact = new ConcreteFact("Thing", List.of(1, "abc", 1));
+        var fact = new ListFact("Thing", List.of(1, "abc", 1));
 
         var expected  = new Bindings();
         expected.put(X, 1);
@@ -145,7 +145,7 @@ public class NamedAtomTest extends Ted {
         map.put("f2", X);
         var atom = new NamedAtom("Thing", map);
 
-        var fact = new ConcreteFact("Thing", List.of(1, "abc", 2));
+        var fact = new ListFact("Thing", List.of(1, "abc", 2));
         check(atom.matches(fact, EMPTY)).eq(null);
     }
 }

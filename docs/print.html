@@ -3925,8 +3925,12 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.Fact.html">Fact</a>
 <ul>
 <li><a href="library/type.joe.Fact.html#static.of">Fact.of(<em>relation</em>, <em>fields</em>)</a></li>
+<li><a href="library/type.joe.Fact.html#static.ofMap">Fact.ofMap(<em>relation</em>, <em>fieldMap</em>)</a></li>
+<li><a href="library/type.joe.Fact.html#static.ofPairs">Fact.ofPairs(<em>relation</em>, <em>pairs</em>)</a></li>
 <li><a href="library/type.joe.Fact.html#init">Fact(<em>relation</em>, <em>field</em>, ...)</a> → <a href="library/type.joe.Fact.html">Fact</a></li>
+<li><a href="library/type.joe.Fact.html#method.fieldMap"><em>fact</em>.fieldMap()</a> → <a href="library/type.joe.Map.html">Map</a></li>
 <li><a href="library/type.joe.Fact.html#method.fields"><em>fact</em>.fields()</a> → <a href="library/type.joe.List.html">List</a></li>
+<li><a href="library/type.joe.Fact.html#method.isOrdered"><em>fact</em>.isOrdered()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Fact.html#method.relation"><em>fact</em>.relation()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Fact.html#method.toString"><em>fact</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -3937,10 +3941,12 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.Joe.html#static.compare">Joe.compare(<em>a</em>, <em>b</em>)</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/type.joe.Joe.html#static.currentTimeMillis">Joe.currentTimeMillis()</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/type.joe.Joe.html#static.getFieldNames">Joe.getFieldNames(<em>value</em>)</a> → <a href="library/type.joe.List.html">List</a></li>
+<li><a href="library/type.joe.Joe.html#static.isFact">Joe.isFact(<em>value</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Joe.html#static.isOpaque">Joe.isOpaque(<em>value</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Joe.html#static.isType">Joe.isType(<em>value</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Joe.html#static.stringify">Joe.stringify(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Joe.html#static.supertypeOf">Joe.supertypeOf(<em>type</em>)</a> → type</li>
+<li><a href="library/type.joe.Joe.html#static.toFact">Joe.toFact(<em>value</em>)</a> → <a href="library/type.joe.Fact.html">Fact</a></li>
 <li><a href="library/type.joe.Joe.html#static.typeOf">Joe.typeOf(<em>value</em>)</a> → type</li>
 </ul>
 </li>
@@ -4741,12 +4747,15 @@ and rethrow the error.</p>
 <p>Gets the name of the concrete error type.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="fact-type-joe"><a class="header" href="#fact-type-joe"><code>Fact</code> type (<code>joe</code>)</a></h1>
 <hr />
-<p>An ad hoc type for Nero facts, consisting of a relation name
-and a list of field values.  A Nero <code>ruleset</code> will accept
-Facts as input and produces Facts as output by default.</p>
+<p>An ad hoc type for Nero facts, consisting of a <code>relation</code> name
+and ordered or named fields.  A Nero <code>ruleset</code> produces
+<code>Fact</code> values by default, and also accepts <code>Facts</code> as input.
+Many Joe values can be converted to <code>Facts</code>.</p>
 <p><strong><a href="library/type.joe.Fact.html#statics">Static Methods</a></strong></p>
 <ul>
 <li><a href="library/type.joe.Fact.html#static.of">Fact.of(<em>relation</em>, <em>fields</em>)</a></li>
+<li><a href="library/type.joe.Fact.html#static.ofMap">Fact.ofMap(<em>relation</em>, <em>fieldMap</em>)</a></li>
+<li><a href="library/type.joe.Fact.html#static.ofPairs">Fact.ofPairs(<em>relation</em>, <em>pairs</em>)</a></li>
 </ul>
 <p><strong><a href="library/type.joe.Fact.html#init">Initializer</a></strong></p>
 <ul>
@@ -4754,33 +4763,57 @@ Facts as input and produces Facts as output by default.</p>
 </ul>
 <p><strong><a href="library/type.joe.Fact.html#methods">Methods</a></strong></p>
 <ul>
+<li><a href="library/type.joe.Fact.html#method.fieldMap"><em>fact</em>.fieldMap()</a> → <a href="library/type.joe.Map.html">Map</a></li>
 <li><a href="library/type.joe.Fact.html#method.fields"><em>fact</em>.fields()</a> → <a href="library/type.joe.List.html">List</a></li>
+<li><a href="library/type.joe.Fact.html#method.isOrdered"><em>fact</em>.isOrdered()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Fact.html#method.relation"><em>fact</em>.relation()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Fact.html#method.toString"><em>fact</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
-<p>A Fact's fields have names <code>f0</code>, <code>f1</code>, ....</p>
 <h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
 <hr />
 <p><span id="static.of"> </span></p>
 <h3 id="factof"><a class="header" href="#factof">Fact.of()</a></h3>
 <hr />
 <p><strong>Fact.of(<em>relation</em>, <em>fields</em>)</strong></p>
-<p>Creates a new <code>Fact</code> given the relation and a list of
+<p>Creates a new ordered <code>Fact</code> given the relation and a list of
 field values. The <code>Fact</code> will be an instance of the Java
-<code>FactValue</code> class.</p>
+<code>ListFact</code> class.</p>
+<p><span id="static.ofMap"> </span></p>
+<h3 id="factofmap"><a class="header" href="#factofmap">Fact.ofMap()</a></h3>
+<hr />
+<p><strong>Fact.ofMap(<em>relation</em>, <em>fieldMap</em>)</strong></p>
+<p>Creates a new unordered <code>Fact</code> given the relation and the field map.
+The <code>Fact</code> will be an instance of the Java <code>MapFact</code> class.</p>
+<p><span id="static.ofPairs"> </span></p>
+<h3 id="factofpairs"><a class="header" href="#factofpairs">Fact.ofPairs()</a></h3>
+<hr />
+<p><strong>Fact.ofPairs(<em>relation</em>, <em>pairs</em>)</strong></p>
+<p>Creates a new ordered <code>Fact</code> given a flat list of field name/value
+pairs. The <code>Fact</code> will be an instance of the Java <code>RecordFact</code> class.</p>
 <h2 id="init"><a class="header" href="#init">Fact Initializer</a></h2>
 <hr />
 <p><strong>Fact(<em>relation</em>, <em>field</em>, ...) → <a href="library/type.joe.Fact.html">Fact</a></strong></p>
 <p>Creates a new <code>Fact</code> given the relation and one or more the
 field values. The <code>Fact</code> will be an instance of the Java
-<code>FactValue</code> class.</p>
+<code>ListFact</code> class.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
+<p><span id="method.fieldMap"> </span></p>
+<h3 id="factfieldmap"><a class="header" href="#factfieldmap"><em>fact</em>.fieldMap()</a></h3>
+<hr />
+<p><strong><em>fact</em>.fieldMap() → <a href="library/type.joe.Map.html">Map</a></strong></p>
+<p>Returns a read-only map of the field values.</p>
 <p><span id="method.fields"> </span></p>
 <h3 id="factfields"><a class="header" href="#factfields"><em>fact</em>.fields()</a></h3>
 <hr />
 <p><strong><em>fact</em>.fields() → <a href="library/type.joe.List.html">List</a></strong></p>
-<p>Returns a list of the field values.</p>
+<p>Returns a read-only list of the field values, if the fact
+<a href="library/type.joe.Fact.html#method.isOrdered"><code>isOrdered()</code></a>.</p>
+<p><span id="method.isOrdered"> </span></p>
+<h3 id="factisordered"><a class="header" href="#factisordered"><em>fact</em>.isOrdered()</a></h3>
+<hr />
+<p><strong><em>fact</em>.isOrdered() → <a href="library/type.joe.Boolean.html">Boolean</a></strong></p>
+<p>Returns true if the fact has ordered fields, and false otherwise.</p>
 <p><span id="method.relation"> </span></p>
 <h3 id="factrelation"><a class="header" href="#factrelation"><em>fact</em>.relation()</a></h3>
 <hr />
@@ -4804,10 +4837,12 @@ Joe types.</p>
 <li><a href="library/type.joe.Joe.html#static.compare">Joe.compare(<em>a</em>, <em>b</em>)</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/type.joe.Joe.html#static.currentTimeMillis">Joe.currentTimeMillis()</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/type.joe.Joe.html#static.getFieldNames">Joe.getFieldNames(<em>value</em>)</a> → <a href="library/type.joe.List.html">List</a></li>
+<li><a href="library/type.joe.Joe.html#static.isFact">Joe.isFact(<em>value</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Joe.html#static.isOpaque">Joe.isOpaque(<em>value</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Joe.html#static.isType">Joe.isType(<em>value</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Joe.html#static.stringify">Joe.stringify(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Joe.html#static.supertypeOf">Joe.supertypeOf(<em>type</em>)</a> → type</li>
+<li><a href="library/type.joe.Joe.html#static.toFact">Joe.toFact(<em>value</em>)</a> → <a href="library/type.joe.Fact.html">Fact</a></li>
 <li><a href="library/type.joe.Joe.html#static.typeOf">Joe.typeOf(<em>value</em>)</a> → type</li>
 </ul>
 <h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
@@ -4838,6 +4873,12 @@ type's static fields.</p>
 instance's fields just by looking at its type, generally speaking.
 Distinct instances of the same Joe <code>class</code> might have different
 fields.</p>
+<p><span id="static.isFact"> </span></p>
+<h3 id="joeisfact"><a class="header" href="#joeisfact">Joe.isFact()</a></h3>
+<hr />
+<p><strong>Joe.isFact(<em>value</em>) → <a href="library/type.joe.Boolean.html">Boolean</a></strong></p>
+<p>Returns true if the <em>value</em> can be used as a Nero <a href="library/type.joe.Fact.html"><code>Fact</code></a>, and
+false otherwise.</p>
 <p><span id="static.isOpaque"> </span></p>
 <h3 id="joeisopaque"><a class="header" href="#joeisopaque">Joe.isOpaque()</a></h3>
 <hr />
@@ -4866,6 +4907,12 @@ available if needed.</p>
 <p><strong>Joe.supertypeOf(<em>type</em>) → type</strong></p>
 <p>Returns the supertype of the given <em>type</em>, or null if the <em>type</em>
 has no supertype.</p>
+<p><span id="static.toFact"> </span></p>
+<h3 id="joetofact"><a class="header" href="#joetofact">Joe.toFact()</a></h3>
+<hr />
+<p><strong>Joe.toFact(<em>value</em>) → <a href="library/type.joe.Fact.html">Fact</a></strong></p>
+<p>Returns the value as a Nero <a href="library/type.joe.Fact.html"><code>Fact</code></a>.
+Throws an <a href="library/type.joe.Error.html"><code>Error</code></a> if <code>!isFact(value)</code>.</p>
 <p><span id="static.typeOf"> </span></p>
 <h3 id="joetypeof"><a class="header" href="#joetypeof">Joe.typeOf()</a></h3>
 <hr />
@@ -9006,8 +9053,12 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.Fact.html">Fact</a>
 <ul>
 <li><a href="library/type.joe.Fact.html#static.of">Fact.of(<em>relation</em>, <em>fields</em>)</a></li>
+<li><a href="library/type.joe.Fact.html#static.ofMap">Fact.ofMap(<em>relation</em>, <em>fieldMap</em>)</a></li>
+<li><a href="library/type.joe.Fact.html#static.ofPairs">Fact.ofPairs(<em>relation</em>, <em>pairs</em>)</a></li>
 <li><a href="library/type.joe.Fact.html#init">Fact(<em>relation</em>, <em>field</em>, ...)</a> → <a href="library/type.joe.Fact.html">Fact</a></li>
+<li><a href="library/type.joe.Fact.html#method.fieldMap"><em>fact</em>.fieldMap()</a> → <a href="library/type.joe.Map.html">Map</a></li>
 <li><a href="library/type.joe.Fact.html#method.fields"><em>fact</em>.fields()</a> → <a href="library/type.joe.List.html">List</a></li>
+<li><a href="library/type.joe.Fact.html#method.isOrdered"><em>fact</em>.isOrdered()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Fact.html#method.relation"><em>fact</em>.relation()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Fact.html#method.toString"><em>fact</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -9018,10 +9069,12 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.Joe.html#static.compare">Joe.compare(<em>a</em>, <em>b</em>)</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/type.joe.Joe.html#static.currentTimeMillis">Joe.currentTimeMillis()</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/type.joe.Joe.html#static.getFieldNames">Joe.getFieldNames(<em>value</em>)</a> → <a href="library/type.joe.List.html">List</a></li>
+<li><a href="library/type.joe.Joe.html#static.isFact">Joe.isFact(<em>value</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Joe.html#static.isOpaque">Joe.isOpaque(<em>value</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Joe.html#static.isType">Joe.isType(<em>value</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.Joe.html#static.stringify">Joe.stringify(<em>value</em>)</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Joe.html#static.supertypeOf">Joe.supertypeOf(<em>type</em>)</a> → type</li>
+<li><a href="library/type.joe.Joe.html#static.toFact">Joe.toFact(<em>value</em>)</a> → <a href="library/type.joe.Fact.html">Fact</a></li>
 <li><a href="library/type.joe.Joe.html#static.typeOf">Joe.typeOf(<em>value</em>)</a> → type</li>
 </ul>
 </li>

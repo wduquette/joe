@@ -90,11 +90,6 @@ class ClarkRecord
         return name;
     }
 
-    @Override
-    public boolean hasOrderedFields() {
-        return true;
-    }
-
     //-------------------------------------------------------------------------
     // JoeClass API
 
@@ -120,11 +115,6 @@ class ClarkRecord
     @Override
     public JoeType type() {
         return TypeType.TYPE;
-    }
-
-    @Override
-    public boolean hasField(String name) {
-        return fields.containsKey(name);
     }
 
     @Override

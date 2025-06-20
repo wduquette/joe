@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 public class RuleSetCompiler {
     /**
      * The default fact factory used by the compiler; it creates
-     * {@link ConcreteFact} objects.
+     * {@link ListFact} objects.
      */
-    public static final FactFactory DEFAULT_FACT_FACTORY = ConcreteFact::new;
+    public static final FactFactory DEFAULT_FACT_FACTORY = ListFact::new;
 
     //-------------------------------------------------------------------------
     // Instance Variables

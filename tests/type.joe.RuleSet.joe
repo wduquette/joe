@@ -87,7 +87,7 @@ function testInfer_noFields() {
     }
 
     assertError(\-> rules.infer(inputs),
-        "Expected fact, got: Parent 'Parent()'.");
+        "Expected Nero-compatible fact, got: Parent 'Parent()'.");
 }
 
 // RuleSet::infer(inputs) should accept proxied values with

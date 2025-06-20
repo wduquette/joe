@@ -183,10 +183,12 @@ Joe types.</p>
 <li><a href="type.joe.Joe.html#static.compare">Joe.compare(<em>a</em>, <em>b</em>)</a> → <a href="type.joe.Number.html">Number</a></li>
 <li><a href="type.joe.Joe.html#static.currentTimeMillis">Joe.currentTimeMillis()</a> → <a href="type.joe.Number.html">Number</a></li>
 <li><a href="type.joe.Joe.html#static.getFieldNames">Joe.getFieldNames(<em>value</em>)</a> → <a href="type.joe.List.html">List</a></li>
+<li><a href="type.joe.Joe.html#static.isFact">Joe.isFact(<em>value</em>)</a> → <a href="type.joe.Boolean.html">Boolean</a></li>
 <li><a href="type.joe.Joe.html#static.isOpaque">Joe.isOpaque(<em>value</em>)</a> → <a href="type.joe.Boolean.html">Boolean</a></li>
 <li><a href="type.joe.Joe.html#static.isType">Joe.isType(<em>value</em>)</a> → <a href="type.joe.Boolean.html">Boolean</a></li>
 <li><a href="type.joe.Joe.html#static.stringify">Joe.stringify(<em>value</em>)</a> → <a href="type.joe.String.html">String</a></li>
 <li><a href="type.joe.Joe.html#static.supertypeOf">Joe.supertypeOf(<em>type</em>)</a> → type</li>
+<li><a href="type.joe.Joe.html#static.toFact">Joe.toFact(<em>value</em>)</a> → <a href="type.joe.Fact.html">Fact</a></li>
 <li><a href="type.joe.Joe.html#static.typeOf">Joe.typeOf(<em>value</em>)</a> → type</li>
 </ul>
 <h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
@@ -217,6 +219,12 @@ type's static fields.</p>
 instance's fields just by looking at its type, generally speaking.
 Distinct instances of the same Joe <code>class</code> might have different
 fields.</p>
+<p><span id="static.isFact"> </span></p>
+<h3 id="joeisfact"><a class="header" href="#joeisfact">Joe.isFact()</a></h3>
+<hr />
+<p><strong>Joe.isFact(<em>value</em>) → <a href="type.joe.Boolean.html">Boolean</a></strong></p>
+<p>Returns true if the <em>value</em> can be used as a Nero <a href="type.joe.Fact.html"><code>Fact</code></a>, and
+false otherwise.</p>
 <p><span id="static.isOpaque"> </span></p>
 <h3 id="joeisopaque"><a class="header" href="#joeisopaque">Joe.isOpaque()</a></h3>
 <hr />
@@ -245,6 +253,12 @@ available if needed.</p>
 <p><strong>Joe.supertypeOf(<em>type</em>) → type</strong></p>
 <p>Returns the supertype of the given <em>type</em>, or null if the <em>type</em>
 has no supertype.</p>
+<p><span id="static.toFact"> </span></p>
+<h3 id="joetofact"><a class="header" href="#joetofact">Joe.toFact()</a></h3>
+<hr />
+<p><strong>Joe.toFact(<em>value</em>) → <a href="type.joe.Fact.html">Fact</a></strong></p>
+<p>Returns the value as a Nero <a href="type.joe.Fact.html"><code>Fact</code></a>.
+Throws an <a href="type.joe.Error.html"><code>Error</code></a> if <code>!isFact(value)</code>.</p>
 <p><span id="static.typeOf"> </span></p>
 <h3 id="joetypeof"><a class="header" href="#joetypeof">Joe.typeOf()</a></h3>
 <hr />

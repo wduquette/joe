@@ -33,9 +33,11 @@ public class JoeSingleton extends ProxyType<Void> {
         staticMethod("currentTimeMillis", this::_currentTimeMillis);
         staticMethod("getFieldNames",     this::_getFieldNames);
         staticMethod("isOpaque",          this::_isOpaque);
+        staticMethod("isFact",            this::_isFact);
         staticMethod("isType",            this::_isType);
         staticMethod("stringify",         this::_stringify);
         staticMethod("supertypeOf",       this::_supertypeOf);
+        staticMethod("toFact",            this::_toFact);
         staticMethod("typeOf",            this::_typeOf);
     }
 
@@ -89,6 +91,17 @@ public class JoeSingleton extends ProxyType<Void> {
     }
 
     //**
+    // @static isFact
+    // @args value
+    // @result Boolean
+    // Returns true if the *value* can be used as a Nero [[Fact]], and
+    // false otherwise.
+    private Object _isFact(Joe joe, Args args) {
+        args.exactArity(1, "isFact(value)");
+        return joe.getJoeValue(args.next()).isFact();
+    }
+
+    //**
     // @static isOpaque
     // @args value
     // @result Boolean
@@ -138,6 +151,17 @@ public class JoeSingleton extends ProxyType<Void> {
         args.exactArity(1, "supertypeOf(type)");
         var type = joe.toJoeType(args.next());
         return type.supertype();
+    }
+
+    //**
+    // @static toFact
+    // @args value
+    // @result Fact
+    // Returns the value as a Nero [[Fact]].
+    // Throws an [[Error]] if `!isFact(value)`.
+    private Object _toFact(Joe joe, Args args) {
+        args.exactArity(1, "toFact(value)");
+        return joe.toFact(args.next());
     }
 
     //**

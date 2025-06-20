@@ -5,15 +5,19 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.ProxyType;
 import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.ListFact;
+import com.wjduquette.joe.nero.MapFact;
+import com.wjduquette.joe.nero.RecordFact;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * A ProxyType for the FactValue type.
+ * A ProxyType for the Fact interface.
  */
-public class FactType extends ProxyType<FactValue> {
+public class FactType extends ProxyType<Fact> {
     /** The type, ready for installation. */
     public static final FactType TYPE = new FactType();
 
@@ -29,20 +33,23 @@ public class FactType extends ProxyType<FactValue> {
         //**
         // @package joe
         // @type Fact
-        // An ad hoc type for Nero facts, consisting of a relation name
-        // and a list of field values.  A Nero `ruleset` will accept
-        // Facts as input and produces Facts as output by default.
-        //
-        // A Fact's fields have names `f0`, `f1`, ....
-        proxies(FactValue.class);
+        // An ad hoc type for Nero facts, consisting of a `relation` name
+        // and ordered or named fields.  A Nero `ruleset` produces
+        // `Fact` values by default, and also accepts `Facts` as input.
+        // Many Joe values can be converted to `Facts`.
+        proxies(Fact.class);
 
-        staticMethod("of",  this::_of);
+        staticMethod("of",      this::_of);
+        staticMethod("ofMap",   this::_ofMap);
+        staticMethod("ofPairs", this::_ofPairs);
 
         initializer(this::_init);
 
-        method("fields",    this::_fields);
-        method("relation",  this::_relation);
-        method("toString",  this::_toString);
+        method("fieldMap",    this::_fieldMap);
+        method("fields",      this::_fields);
+        method("isOrdered",   this::_isOrdered);
+        method("relation",    this::_relation);
+        method("toString",    this::_toString);
     }
 
     //-------------------------------------------------------------------------
@@ -50,11 +57,15 @@ public class FactType extends ProxyType<FactValue> {
 
     @Override
     public String stringify(Joe joe, Object value) {
-        assert value instanceof FactValue;
-        var fact = (FactValue)value;
-        var fields = fact.getFields().stream()
-            .map(joe::stringify)
-            .collect(Collectors.joining(", "));
+        assert value instanceof Fact;
+        var fact = (Fact)value;
+        String fields = fact.isOrdered()
+            ? fact.getFields().stream()
+                .map(joe::stringify)
+                .collect(Collectors.joining(", "))
+            : fact.getFieldMap().entrySet().stream()
+                .map(e -> e.getKey() + ": " + joe.stringify(e.getValue()))
+                .collect(Collectors.joining(", "));
 
         return "Fact(" + fact.relation() + ", " + fields + ")";
     }
@@ -63,38 +74,15 @@ public class FactType extends ProxyType<FactValue> {
     // Support for instance fields
 
     /**
-     * If the instance has any fields, they are assumed to be ordered.
-     * Subclasses can override.
-     * @return true or false
-     */
-    public boolean hasOrderedFields() {
-        return true;
-    }
-
-    /**
-     * Returns true if the value has a field with the given name, and
-     * false otherwise.
-     *
-     * @param value A value of the proxied type
-     * @param fieldName The field name
-     * @return true or false
-     */
-    @SuppressWarnings("unused")
-    public boolean hasField(Object value, String fieldName) {
-        assert value instanceof FactValue;
-        return ((FactValue)value).getFieldMap().containsKey(fieldName);
-    }
-
-    /**
      * Returns a list of the names of the value's fields.  The
      * list will be empty if the value has no fields.
      * @param value A value of the proxied type
      * @return The list
      */
-    @SuppressWarnings("unused")
+    @Override
     public List<String> getFieldNames(Object value) {
-        assert value instanceof FactValue;
-        return new ArrayList<>(((FactValue)value).getFieldMap().keySet());
+        assert value instanceof Fact;
+        return new ArrayList<>(((Fact)value).getFieldMap().keySet());
     }
 
     /**
@@ -104,7 +92,7 @@ public class FactType extends ProxyType<FactValue> {
      * @param propertyName The property name
      * @return The property value
      */
-    @SuppressWarnings({"unused"})
+    @Override
     public Object get(Object value, String propertyName) {
         var method = bind(value, propertyName);
 
@@ -112,8 +100,8 @@ public class FactType extends ProxyType<FactValue> {
             return method;
         }
 
-        assert value instanceof FactValue;
-        var map = ((FactValue)value).getFieldMap();
+        assert value instanceof Fact;
+        var map = ((Fact)value).getFieldMap();
 
         if (map.containsKey(propertyName)) {
             return map.get(propertyName);
@@ -130,7 +118,7 @@ public class FactType extends ProxyType<FactValue> {
      * @param other The value to
      * @return The property value
      */
-    @SuppressWarnings("unused")
+    @Override
     public Object set(Object value, String fieldName, Object other) {
         throw new JoeError("Values of type " + name() +
             " have no mutable properties.");
@@ -143,14 +131,64 @@ public class FactType extends ProxyType<FactValue> {
     //**
     // @static of
     // @args relation, fields
-    // Creates a new `Fact` given the relation and a list of
+    // Creates a new ordered `Fact` given the relation and a list of
     // field values. The `Fact` will be an instance of the Java
-    // `FactValue` class.
+    // `ListFact` class.
     private Object _of(Joe joe, Args args) {
         args.exactArity(2, "Fact.of(relation, fields)");
         var relation = joe.toString(args.next());
         var fields = joe.toList(args.next());
-        return new FactValue(relation, fields);
+        return new ListFact(relation, fields);
+    }
+
+    //**
+    // @static ofMap
+    // @args relation, fieldMap
+    // Creates a new unordered `Fact` given the relation and the field map.
+    // The `Fact` will be an instance of the Java `MapFact` class.
+    private Object _ofMap(Joe joe, Args args) {
+        args.exactArity(2, "Fact.ofMap(relation, fieldMap)");
+        var relation = joe.toString(args.next());
+        var map = joe.toMap(args.next());
+        var fieldMap = new HashMap<String, Object>();
+        for (var e : map.entrySet()) {
+            var name = e.getKey().toString();
+            if (Joe.isIdentifier(name)) {
+                fieldMap.put(name, e.getValue());
+            } else {
+                throw joe.expected("field name", e.getKey());
+            }
+        }
+        return new MapFact(relation, fieldMap);
+    }
+
+    //**
+    // @static ofPairs
+    // @args relation, pairs
+    // Creates a new ordered `Fact` given a flat list of field name/value
+    // pairs. The `Fact` will be an instance of the Java `RecordFact` class.
+    private Object _ofPairs(Joe joe, Args args) {
+        args.exactArity(2, "Fact.ofPairs(relation, pairs)");
+        var relation = joe.toString(args.next());
+        var pairsArg = args.next();
+        var pairs = joe.toList(pairsArg);
+
+        if (pairs.size() % 2 != 0) {
+            throw joe.expected("flat list of pairs", pairsArg);
+        }
+
+        var names = new ArrayList<String>();
+        var fieldMap = new HashMap<String, Object>();
+        for (var i = 0; i < pairs.size(); i += 2) {
+            var name = pairs.get(i).toString();
+            if (Joe.isIdentifier(name)) {
+                names.add(name);
+                fieldMap.put(name, pairs.get(i+1));
+            } else {
+                throw joe.expected("field name", pairs.get(i));
+            }
+        }
+        return new RecordFact(relation, names, fieldMap);
     }
 
     //-------------------------------------------------------------------------
@@ -161,24 +199,47 @@ public class FactType extends ProxyType<FactValue> {
     // @args relation, field, ...
     // Creates a new `Fact` given the relation and one or more the
     // field values. The `Fact` will be an instance of the Java
-    // `FactValue` class.
+    // `ListFact` class.
     private Object _init(Joe joe, Args args) {
         args.minArity(2, "Fact(relation, field, ...)");
         var relation = joe.toString(args.next());
         var fields = args.remainderAsList();
-        return new FactValue(relation, fields);
+        return new ListFact(relation, fields);
     }
 
     //-------------------------------------------------------------------------
     // Instance Method Implementations
 
     //**
+    // @method fieldMap
+    // @result Map
+    // Returns a read-only map of the field values.
+    private Object _fieldMap(Fact value, Joe joe, Args args) {
+        args.exactArity(0, "fieldMap()");
+        return joe.readonlyMap(value.getFieldMap());
+    }
+
+    //**
     // @method fields
     // @result List
-    // Returns a list of the field values.
+    // Returns a read-only list of the field values, if the fact
+    // [[Fact#method.isOrdered]].
     private Object _fields(Fact value, Joe joe, Args args) {
         args.exactArity(0, "fields()");
-        return new ListValue(value.getFields());
+        if (value.isOrdered()) {
+            return joe.readonlyList(value.getFields());
+        } else {
+            throw joe.expected("fact with ordered fields", value);
+        }
+    }
+
+    //**
+    // @method isOrdered
+    // @result Boolean
+    // Returns true if the fact has ordered fields, and false otherwise.
+    private Object _isOrdered(Fact value, Joe joe, Args args) {
+        args.exactArity(0, "isOrdered()");
+        return value.isOrdered();
     }
 
     //**

@@ -1,9 +1,9 @@
 package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.RecordFact;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,11 +62,6 @@ public class ClarkRecordValue implements JoeValue {
     }
 
     @Override
-    public boolean hasField(String name) {
-        return fields.containsKey(name);
-    }
-
-    @Override
     public List<String> getFieldNames() {
         return type.getRecordFields();
     }
@@ -97,41 +92,19 @@ public class ClarkRecordValue implements JoeValue {
     }
 
     @Override
+    public boolean isFact() {
+        return !fields.isEmpty();
+    }
+
+    @Override
+    public Fact toFact() {
+        return new RecordFact(type.name(), type.getRecordFields(), fields);
+    }
+
+    @Override
     public String stringify(Joe joe) {
         var callable = get(TO_STRING);
         return (String)joe.call(callable);
-    }
-
-    //-------------------------------------------------------------------------
-    // Fact API
-
-    /**
-     * Every record instance has ordered fields.
-     * @return true
-     */
-    @Override
-    public final boolean hasOrderedFields() {
-        return true;
-    }
-
-    /**
-     * Gets the values of the record's fields, in order.
-     * @return The values
-     */
-    @Override
-    public final List<Object> getFields() {
-        var list = new ArrayList<>();
-
-        for (var name : type.getRecordFields()) {
-            list.add(get(name));
-        }
-
-        return list;
-    }
-
-    @Override
-    public Map<String, Object> getFieldMap() {
-        return Collections.unmodifiableMap(fields);
     }
 
     //-------------------------------------------------------------------------

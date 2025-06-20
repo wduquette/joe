@@ -14,13 +14,13 @@ public class Nero {
     // Static
 
     /**
-     * Nero's default fact factory; it creates {@link ConcreteFact} objects.
+     * Nero's default fact factory; it creates {@link ListFact} objects.
      */
     public static final FactFactory DEFAULT_FACT_FACTORY =
         Nero::defaultFactFactory;
 
     private static Fact defaultFactFactory(String relation, List<Object> terms) {
-        return new ConcreteFact(relation, terms);
+        return new ListFact(relation, terms);
     }
 
     //-------------------------------------------------------------------------
@@ -256,7 +256,7 @@ public class Nero {
             var b = rule.body().get(i);
 
             if (b.requiresOrderedFields() &&
-                !tuple[i].hasOrderedFields()
+                !tuple[i].isOrdered()
             ) {
                 throw new JoeError(
                     "'" + b.relation() +

@@ -1,6 +1,7 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.clark.ClarkEngine;
+import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.types.*;
 import com.wjduquette.joe.walker.WalkerEngine;
@@ -783,6 +784,22 @@ public class Joe {
         }
 
         throw expected(classTypeName(cls), arg);
+    }
+
+    /**
+     * Requires that the argument is a Nero Fact or can be converted
+     * to a Nero Fact, and returns it as a Fact.
+     * @param arg The argument
+     * @return The Fact
+     * @throws JoeError if the value cannot be used as a Fact.
+     */
+    public Fact toFact(Object arg) {
+        if (arg instanceof Fact f) return f;
+        var jv = getJoeValue(arg);
+
+        if (jv.isFact()) return jv.toFact();
+
+        throw expected("Nero-compatible fact", arg);
     }
 
     /**
