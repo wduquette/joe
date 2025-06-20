@@ -1645,11 +1645,18 @@ is assigned the corresponding value in the match target.</p>
 <pre><code class="language-joe">var [a, b] = [1, 2];    // a = 1, b = 2.
 </code></pre>
 <p>A binding variable can also be used to capture a subpattern.  In the
-following example, the variable <code>b</code> is assigned list <code>[2, 3]</code> while
-<code>c</code> and <code>d</code> are assigned the values of the list's items.</p>
+following example, the variable <code>b</code> is bound to the list <code>[2, 3]</code> while
+<code>c</code> and <code>d</code> are bound to the values of the list's items.</p>
 <pre><code class="language-joe">var list = [1, [2, 3], 4];
 
-var [a, b = [c, d], e];
+var [a, b@[c, d], e];
+</code></pre>
+<p>Capturing a subpattern is especially useful with <code>foreach</code>: the pattern
+can capture the entire item if the pattern matches.  The following
+code pulls two-item lists out of a heterogeneous list of values.</p>
+<pre><code class="language-joe">foreach (item@[_, _] : inputs) { 
+    println(item);
+}
 </code></pre>
 <p>If a variable appears in the pattern more than once, it is bound on
 first appearance and the bound value must match on subsequent appearances.</p>
@@ -1797,7 +1804,7 @@ See <a href="introspection.html#unscoped-types">Unscoped Types</a> for more info
 <h2 id="ordered-field-patterns"><a class="header" href="#ordered-field-patterns">Ordered-Field Patterns</a></h2>
 <p>Ordered-field patterns match Joe values with ordered fields, i.e., fields that
 can be accessed by index as well as by name.  Joe <a href="records.html">records</a>
-and <a href="library/type.joe.Fact.html"><code>Fact</code> values</a> have ordered fields, and
+and most <a href="library/type.joe.Fact.html"><code>Fact</code> values</a> have ordered fields, and
 proxied types can have ordered fields as well.  This allows a stream-lined
 pattern syntax.</p>
 <pre><code class="language-joe">record Person(name, age) {}
@@ -9803,19 +9810,20 @@ map_entry       → expression ":" expression ;
 <h2 id="patterns"><a class="header" href="#patterns">Patterns</a></h2>
 <p>A <code>pattern</code> is a destructuring pattern that can be used with the <code>~</code>
 operator, and with a number of Joe statements.</p>
-<pre><code>pattern         → constantPattern
+<pre><code>pattern         → patternBinding
+                | constantPattern
                 | wildcardPattern
                 | valueBinding
                 | listPattern
                 | mapPattern 
-                | instancePattern 
-                | recordPattern ;
+                | namedFieldPattern 
+                | orderedFieldPattern ;
                 
 </code></pre>
-<p>A <code>subpattern</code> is a pattern that appears as a subpattern in a larger
-pattern.  It can optionally include a binding variable, which will
-receive the value matched by the subpattern.</p>
-<pre><code>subpattern      | (IDENTIFIER "=")? pattern ;
+<p>A <code>patternBinding</code> is a pattern that binds a subpattern's matched value
+to a binding variable.  <code>patternBindings</code> are disallows as the top
+pattern in some contexts.</p>
+<pre><code>patternBinding   | IDENTIFIER "@" pattern ;
 </code></pre>
 <p>A <code>constantPattern</code> matches a literal or computed constant.  Variables
 referenced in a <code>constantPattern</code> must be defined in the enclosing scope
@@ -9844,19 +9852,20 @@ matching on the map keys.</p>
                   "}" ;
 entryPattern    → constantPattern ":" subpattern ;
 </code></pre>
-<p>An <code>instancePattern</code> is similar to a <code>mapPattern</code>, but matches the type
-and fields of a Joe object. The first <code>IDENTIFIER</code> must match the
+<p>A <code>namedFieldPattern</code> matches the type and fields of a Joe value, matching
+fields by name rather than by position. The first <code>IDENTIFIER</code> must match the
 value's type name.</p>
-<pre><code>instancePattern → IDENTIFIER "{"
+<pre><code>namedFieldPattern → IDENTIFIER "("
                       ( fieldPattern ( "," fieldPattern )* ","? )?
-                  "}"
+                  ")" ;
 fieldPattern    → IDENTIFIER ":" subpattern ;
 </code></pre>
-<p>A <code>recordPattern</code> matches the fields of a Joe record.  An instance of a
-Joe record can be matched by an <code>instancePattern</code>, but because a record has
-a fixed number of ordered fields it can also be matched in a <code>listPattern</code>-like
-fashion.</p>
-<pre><code>recordPattern   → IDENTIFIER listPattern ;
+<p>An <code>orderedFieldPattern</code> matches the type and fields of a Joe object that has
+ordered fields (e.g., Joe records).  The fields are matched by position
+rather than by name in a list-pattern-like fashion.</p>
+<pre><code>orderedFieldPattern  → IDENTIFIER "(" 
+                           ( pattern ( "," pattern )* ","? )? 
+                       ")" ;
 </code></pre>
 <h2 id="nero"><a class="header" href="#nero">Nero</a></h2>
 <p>This is the grammar for Nero, Joe's dialect of Datalog.  Nero rule sets can
