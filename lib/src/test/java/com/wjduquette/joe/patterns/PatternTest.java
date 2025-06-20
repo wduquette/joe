@@ -88,8 +88,8 @@ public class PatternTest extends Ted {
     }
 
     @Test
-    public void testRecordPattern() {
-        test("testRecordPattern");
+    public void testOrderedFieldPattern_normal() {
+        test("testOrderedFieldPattern");
 
         var p = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Wildcard("_xyz"),

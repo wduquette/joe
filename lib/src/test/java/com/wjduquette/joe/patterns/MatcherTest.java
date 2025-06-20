@@ -495,8 +495,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testOrderedFieldPattern_notRecord() {
-        test("testOrderedFieldPattern_notRecord");
+    public void testOrderedFieldPattern_scalar() {
+        test("testOrderedFieldPattern_scalar");
 
         constants = List.of("123", "red");
         var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
@@ -555,6 +555,20 @@ public class MatcherTest extends Ted {
 
         var bindings = bind(pattern, target);
         check(bindings).eq(null);
+    }
+
+    @Test
+    public void testOrderedFieldPattern_typeNameOnly() {
+        test("testOrderedFieldPattern_typeNameOnly");
+
+        constants = List.of();
+        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of());
+
+        var target = new TestObject("Thing", "123", "red");
+
+        var bindings = bind(pattern, target);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
     }
 
     @Test

@@ -188,13 +188,20 @@ public class Matcher {
                     var obj = joe.getJoeValue(value);
                     if (!obj.isFact()) yield false;
                     fact = obj.toFact();
-                    if (!fact.isOrdered()) yield false;
                     if (!obj.type().name().equals(p.typeName())) yield false;
 
                     if (!p.typeName().equals(fact.relation()) &&
                         !hasType(obj, p.typeName())
                     ) yield false;
                 }
+
+                // At this point the type name/relation matches.
+
+                // If no field patterns, just yield true.
+                if (p.patterns().isEmpty()) yield true;
+
+                // Check the fields; the fact must be ordered.
+                if (!fact.isOrdered()) yield false;
 
                 var fields = fact.getFields();
                 var size = p.patterns().size();

@@ -404,6 +404,15 @@ function testMatchOp_withWorkingStack() {
    assertEquals(b, 2);
 }
 
+// Verify that an OrderedFieldPattern can match a type based only
+// on its name when the pattern has no field patterns.
+function testMatchOp_typeNameOnly() {
+    record Gizmo(x, y) {}
+    var gizmo = Gizmo(1, 2);
+    assertTrue(gizmo ~ Gizmo());
+    assertFalse(gizmo ~ Number());
+}
+
 //-----------------------------------------------------------------------------
 // Helpers
 
