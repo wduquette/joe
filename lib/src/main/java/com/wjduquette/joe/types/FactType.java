@@ -6,8 +6,11 @@ import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.ProxyType;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.ListFact;
+import com.wjduquette.joe.nero.MapFact;
+import com.wjduquette.joe.nero.RecordFact;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,15 +39,17 @@ public class FactType extends ProxyType<Fact> {
         // Many Joe values can be converted to `Facts`.
         proxies(Fact.class);
 
-        staticMethod("of",  this::_of);
+        staticMethod("of",      this::_of);
+        staticMethod("ofMap",   this::_ofMap);
+        staticMethod("ofPairs", this::_ofPairs);
 
         initializer(this::_init);
 
-        method("fieldMap",  this::_fieldMap);
-        method("fields",    this::_fields);
-        method("isOrdered", this::_isOrdered);
-        method("relation",  this::_relation);
-        method("toString",  this::_toString);
+        method("fieldMap",    this::_fieldMap);
+        method("fields",      this::_fields);
+        method("isOrdered",   this::_isOrdered);
+        method("relation",    this::_relation);
+        method("toString",    this::_toString);
     }
 
     //-------------------------------------------------------------------------
@@ -126,7 +131,7 @@ public class FactType extends ProxyType<Fact> {
     //**
     // @static of
     // @args relation, fields
-    // Creates a new `Fact` given the relation and a list of
+    // Creates a new ordered `Fact` given the relation and a list of
     // field values. The `Fact` will be an instance of the Java
     // `ListFact` class.
     private Object _of(Joe joe, Args args) {
@@ -134,6 +139,56 @@ public class FactType extends ProxyType<Fact> {
         var relation = joe.toString(args.next());
         var fields = joe.toList(args.next());
         return new ListFact(relation, fields);
+    }
+
+    //**
+    // @static ofMap
+    // @args relation, fieldMap
+    // Creates a new unordered `Fact` given the relation and the field map.
+    // The `Fact` will be an instance of the Java `MapFact` class.
+    private Object _ofMap(Joe joe, Args args) {
+        args.exactArity(2, "Fact.ofMap(relation, fieldMap)");
+        var relation = joe.toString(args.next());
+        var map = joe.toMap(args.next());
+        var fieldMap = new HashMap<String, Object>();
+        for (var e : map.entrySet()) {
+            var name = e.getKey().toString();
+            if (Joe.isIdentifier(name)) {
+                fieldMap.put(name, e.getValue());
+            } else {
+                throw joe.expected("field name", e.getKey());
+            }
+        }
+        return new MapFact(relation, fieldMap);
+    }
+
+    //**
+    // @static ofPairs
+    // @args relation, pairs
+    // Creates a new ordered `Fact` given a flat list of field name/value
+    // pairs. The `Fact` will be an instance of the Java `RecordFact` class.
+    private Object _ofPairs(Joe joe, Args args) {
+        args.exactArity(2, "Fact.ofPairs(relation, pairs)");
+        var relation = joe.toString(args.next());
+        var pairsArg = args.next();
+        var pairs = joe.toList(pairsArg);
+
+        if (pairs.size() % 2 != 0) {
+            throw joe.expected("flat list of pairs", pairsArg);
+        }
+
+        var names = new ArrayList<String>();
+        var fieldMap = new HashMap<String, Object>();
+        for (var i = 0; i < pairs.size(); i += 2) {
+            var name = pairs.get(i).toString();
+            if (Joe.isIdentifier(name)) {
+                names.add(name);
+                fieldMap.put(name, pairs.get(i+1));
+            } else {
+                throw joe.expected("field name", pairs.get(i));
+            }
+        }
+        return new RecordFact(relation, names, fieldMap);
     }
 
     //-------------------------------------------------------------------------
@@ -168,7 +223,7 @@ public class FactType extends ProxyType<Fact> {
     // @method fields
     // @result List
     // Returns a read-only list of the field values, if the fact
-    // [[List.method.isOrdered]].
+    // [[Fact#method.isOrdered]].
     private Object _fields(Fact value, Joe joe, Args args) {
         args.exactArity(0, "fields()");
         if (value.isOrdered()) {
