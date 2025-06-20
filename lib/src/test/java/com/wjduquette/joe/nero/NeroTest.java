@@ -121,14 +121,14 @@ public class NeroTest extends Ted {
             // Transitive closure of connections in a directed graph.
             // Strata 0: CanGo
             // Strata 1: CantGo
-            
+
             // There is a path from node x to node y.
             CanGo(x,y) :- Edge(x,y);
             CanGo(x,y) :- Edge(x,z), CanGo(z,y);
-            
+
             // There is no path from node x to node y.
             CantGo(x,y) :- Node(x), Node(y), not CanGo(x,y);
-            
+
             Node(#a);
             Node(#b);
             Node(#c);
@@ -139,9 +139,11 @@ public class NeroTest extends Ted {
             """;
         check(infer(source)).eq("""
             ListFact[relation=CanGo, fields=[#a, #b]]
+            ListFact[relation=CanGo, fields=[#a, #c]]
             ListFact[relation=CanGo, fields=[#b, #b]]
             ListFact[relation=CanGo, fields=[#b, #c]]
             ListFact[relation=CanGo, fields=[#c, #b]]
+            ListFact[relation=CanGo, fields=[#c, #c]]
             ListFact[relation=CantGo, fields=[#a, #a]]
             ListFact[relation=CantGo, fields=[#b, #a]]
             ListFact[relation=CantGo, fields=[#c, #a]]

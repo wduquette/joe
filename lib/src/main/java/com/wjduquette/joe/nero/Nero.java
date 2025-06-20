@@ -234,10 +234,11 @@ public class Nero {
                     var iter = new TupleIterator(rule);
                     while (iter.hasNext()) {
                         var tuple = iter.next();
+                        if (debug) System.out.println("    Tuple: " + tupleString(tuple));
                         var fact = matchRule(rule, tuple);
 
                         if (fact != null && addFact(fact)) {
-                            if (debug) System.out.println("    Fact: " + fact);
+                            if (debug) System.out.println("      Fact: " + fact);
                             gotNewFact = true;
                             inferredFacts.add(fact);
                         }
@@ -297,6 +298,10 @@ public class Nero {
         }
 
         return factFactory.create(rule.head().relation(), terms);
+    }
+
+    private String tupleString(Fact[] tuple) {
+        return Arrays.asList(tuple).toString();
     }
 
     private boolean constraintMet(
@@ -363,7 +368,7 @@ public class Nero {
 
         private final List<List<Fact>> inputs = new ArrayList<>();
         private Fact[] tuple = null;
-        private final int total;
+        private final int tupleCount;
         private int next = 0;
 
         //---------------------------------------------------------------------
@@ -372,30 +377,31 @@ public class Nero {
         TupleIterator(Rule rule) {
             // FIRST, get the lists of facts in the order referenced in the
             // rule's body.
-            int sum = 0;
+            int product = 1;
             for (var b : rule.body()) {
                 var relation = b.relation();
                 var facts = getFacts(relation);
 
                 if (facts.isEmpty()) {
                     inputs.clear();
-                    total = 0;
+                    tupleCount = 0;
                     return;
                 }
                 inputs.add(facts);
-                sum += facts.size();
+                product = product * facts.size();
             }
 
             // NEXT, save the max number of tuples
-            total = sum;
             tuple = new Fact[inputs.size()];
+
+            tupleCount = product;
         }
 
         //---------------------------------------------------------------------
         // API
 
         public boolean hasNext() {
-            return total != next;
+            return tupleCount != next;
         }
 
         public Fact[] next() {
