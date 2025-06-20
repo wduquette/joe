@@ -129,22 +129,23 @@ A `pattern` is a destructuring pattern that can be used with the `~`
 operator, and with a number of Joe statements.
 
 ```
-pattern         → constantPattern
+pattern         → patternBinding
+                | constantPattern
                 | wildcardPattern
                 | valueBinding
                 | listPattern
                 | mapPattern 
-                | instancePattern 
-                | recordPattern ;
+                | namedFieldPattern 
+                | orderedFieldPattern ;
                 
 ```
 
-A `subpattern` is a pattern that appears as a subpattern in a larger
-pattern.  It can optionally include a binding variable, which will
-receive the value matched by the subpattern.
+A `patternBinding` is a pattern that binds a subpattern's matched value
+to a binding variable.  `patternBindings` are disallows as the top 
+pattern in some contexts.
 
 ```
-subpattern      | (IDENTIFIER "=")? pattern ;
+patternBinding   | IDENTIFIER "@" pattern ;
 ```
 
 A `constantPattern` matches a literal or computed constant.  Variables
@@ -186,24 +187,25 @@ mapPattern      → "{"
 entryPattern    → constantPattern ":" subpattern ;
 ```
 
-An `instancePattern` is similar to a `mapPattern`, but matches the type
-and fields of a Joe object. The first `IDENTIFIER` must match the 
+A `namedFieldPattern` matches the type and fields of a Joe value, matching
+fields by name rather than by position. The first `IDENTIFIER` must match the 
 value's type name.
 
 ```
-instancePattern → IDENTIFIER "{"
+namedFieldPattern → IDENTIFIER "("
                       ( fieldPattern ( "," fieldPattern )* ","? )?
-                  "}"
+                  ")" ;
 fieldPattern    → IDENTIFIER ":" subpattern ;
 ```
 
-A `recordPattern` matches the fields of a Joe record.  An instance of a
-Joe record can be matched by an `instancePattern`, but because a record has
-a fixed number of ordered fields it can also be matched in a `listPattern`-like
-fashion.
+An `orderedFieldPattern` matches the type and fields of a Joe object that has
+ordered fields (e.g., Joe records).  The fields are matched by position
+rather than by name in a list-pattern-like fashion.
 
 ```
-recordPattern   → IDENTIFIER listPattern ;
+orderedFieldPattern  → IDENTIFIER "(" 
+                           ( pattern ( "," pattern )* ","? )? 
+                       ")" ;
 ```
 
 ## Nero
