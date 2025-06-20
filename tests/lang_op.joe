@@ -367,6 +367,8 @@ function testNI() {
 //-----------------------------------------------------------------------------
 // ~ Operator
 
+// See lang_matching.joe for pattern syntax tests using `~`
+
 function testMatchOp_simple() {
    var list = [1, 2];
    assertTrue(list ~ [_, _]);
@@ -402,15 +404,6 @@ function testMatchOp_withWorkingStack() {
    assertEquals(value, "(true)");
    assertEquals(a, 1);
    assertEquals(b, 2);
-}
-
-// Verify that an OrderedFieldPattern can match a type based only
-// on its name when the pattern has no field patterns.
-function testMatchOp_typeNameOnly() {
-    record Gizmo(x, y) {}
-    var gizmo = Gizmo(1, 2);
-    assertTrue(gizmo ~ Gizmo());
-    assertFalse(gizmo ~ Number());
 }
 
 //-----------------------------------------------------------------------------

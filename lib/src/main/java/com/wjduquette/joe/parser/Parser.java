@@ -948,12 +948,14 @@ public class Parser {
 
     private ASTPattern pattern() {
         var walkerPattern = new ASTPattern();
-        var pattern = parsePattern(walkerPattern, false); // Not a subpattern
+        var pattern = parsePattern(walkerPattern, true);
         walkerPattern.setPattern(pattern);
         return walkerPattern;
     }
 
-    private Pattern parsePattern(ASTPattern wp, boolean isSubpattern) {
+    // Parses a pattern into the AST. `var @ pattern` is allowed if
+    // canPatternBind.
+    private Pattern parsePattern(ASTPattern wp, boolean canPatternBind) {
         var constant = constantPattern(wp);
 
         if (constant != null) {
@@ -980,7 +982,7 @@ public class Parser {
             wp.saveBinding(identifier);
             var name = identifier.lexeme();
 
-            if (isSubpattern && scanner.match(EQUAL)) {
+            if (canPatternBind && scanner.match(AT)) {
                 var subpattern = parsePattern(wp, false);
                 return new Pattern.PatternBinding(name, subpattern);
             } else {

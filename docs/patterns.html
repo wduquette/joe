@@ -220,11 +220,18 @@ is assigned the corresponding value in the match target.</p>
 <pre><code class="language-joe">var [a, b] = [1, 2];    // a = 1, b = 2.
 </code></pre>
 <p>A binding variable can also be used to capture a subpattern.  In the
-following example, the variable <code>b</code> is assigned list <code>[2, 3]</code> while
-<code>c</code> and <code>d</code> are assigned the values of the list's items.</p>
+following example, the variable <code>b</code> is bound to the list <code>[2, 3]</code> while
+<code>c</code> and <code>d</code> are bound to the values of the list's items.</p>
 <pre><code class="language-joe">var list = [1, [2, 3], 4];
 
-var [a, b = [c, d], e];
+var [a, b@[c, d], e];
+</code></pre>
+<p>Capturing a subpattern is especially useful with <code>foreach</code>: the pattern
+can capture the entire item if the pattern matches.  The following
+code pulls two-item lists out of a heterogeneous list of values.</p>
+<pre><code class="language-joe">foreach (item@[_, _] : inputs) { 
+    println(item);
+}
 </code></pre>
 <p>If a variable appears in the pattern more than once, it is bound on
 first appearance and the bound value must match on subsequent appearances.</p>
@@ -372,7 +379,7 @@ See <a href="introspection.html#unscoped-types">Unscoped Types</a> for more info
 <h2 id="ordered-field-patterns"><a class="header" href="#ordered-field-patterns">Ordered-Field Patterns</a></h2>
 <p>Ordered-field patterns match Joe values with ordered fields, i.e., fields that
 can be accessed by index as well as by name.  Joe <a href="records.html">records</a>
-and <a href="library/type.joe.Fact.html"><code>Fact</code> values</a> have ordered fields, and
+and most <a href="library/type.joe.Fact.html"><code>Fact</code> values</a> have ordered fields, and
 proxied types can have ordered fields as well.  This allows a stream-lined
 pattern syntax.</p>
 <pre><code class="language-joe">record Person(name, age) {}

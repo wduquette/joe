@@ -1,0 +1,264 @@
+// lang_matching.joe
+//
+// This test tests Joe's pattern matching syntax in detail, using the
+// `~` operator.  Other test suites (`lang_var.joe`, etc.)
+// test pattern matching in specific contexts.
+
+//----------------------------------------------------------------------------
+// Simple Patterns
+
+// Verify that a binding variable matches anything.
+function testOneVar() {
+    assertTrue(1 ~ a);
+    assertEquals(a, 1);
+}
+
+// Verify that a wildcard matches anything, and doesn't create a binding.
+function testWildcard() {
+    assertTrue(1 ~ _);
+}
+
+// Verify that a literal constant only matches the same value.
+function testLiteralConstant() {
+    assertTrue(1 ~ 1);
+    assertFalse(1 ~ 2);
+}
+
+// Verify that an interpolated variable yields a constant.
+function testInterpolatedVariable() {
+    var x = 1;
+    var y = 2;
+    assertTrue(1 ~ $x);
+    assertFalse(1 ~ $y);
+}
+
+// Verify that an interpolated expression yields a constant.
+function testInterpolatedExpression() {
+    assertTrue(2 ~ $(1 + 1));
+    assertFalse(1 ~ $(1 + 1));
+}
+
+//-------------------------------------------------------------------------
+// List Patterns
+
+function testList_noMatch() {
+    assertFalse(5 ~ [1, 2]);
+}
+
+function testList_noTail() {
+    assertTrue([1, 2] ~ [a, b]);
+    assertEquals(a, 1);
+    assertEquals(b, 2);
+}
+
+function testList_emptyTail() {
+    assertTrue([1, 2] ~ [a, b : c]);
+    assertEquals(a, 1);
+    assertEquals(b, 2);
+    assertEquals(c, []);
+}
+
+function testList_fullTail() {
+    assertTrue([1, 2, 3, 4] ~ [a, b : c]);
+    assertEquals(a, 1);
+    assertEquals(b, 2);
+    assertEquals(c, [3, 4]);
+}
+
+function testList_nestedPattern() {
+    assertTrue([1, [2, 3], 4] ~ [a, [b, c], d]);
+    assertEquals(a, 1);
+    assertEquals(b, 2);
+    assertEquals(c, 3);
+    assertEquals(d, 4);
+}
+
+//-------------------------------------------------------------------------
+// Map Patterns
+
+// Value isn't a map
+function testMap_noMap() {
+    assertFalse(5 ~ {#abc: a});
+}
+
+// Value is a map, but is missing a key that appears in the pattern.
+function testMap_missingKey() {
+    assertFalse({#def: 5} ~ {#abc: a});
+}
+
+// Value has the right keys, but one of the values is wrong.
+function testMap_valueMismatch() {
+    assertFalse({#abc: 5, #def: 6} ~ {#abc: a, #def: 7});
+}
+
+// The pattern matches.
+function testMap_good() {
+    assertTrue({"abc": 5, "def": 6} ~ {"abc": a});
+    assertEquals(a, 5);
+}
+
+// A map pattern can match a Joe value using strings as field names.
+function testMap_joeValue_stringKeys() {
+    assertTrue(Thing(123, "red") ~ {"id": i, "color": c});
+    assertEquals(i, 123);
+    assertEquals(c, "red");
+}
+
+// A map pattern can match a Joe value using keywords as field names.
+function testMap_joeValue_keywordKeys() {
+    assertTrue(Thing(123, "red") ~ {#id: i, #color: c});
+    assertEquals(i, 123);
+    assertEquals(c, "red");
+}
+
+// Only strings and keywords can match a field name.
+function testMap_joeValue_badKeyType() {
+    assertFalse(Thing(123, "red") ~ {123: i, #color: c});
+}
+
+// The map won't match the JoeValue if the pattern contains a
+// key that doesn't match a known field.
+function testMap_joeValue_unknownKey() {
+    assertFalse(Thing(123, "red") ~ {#id: i, #size: s});
+}
+
+// Map keys can be interpolated into the pattern.
+function testMap_interpolatedKey() {
+    var key = #joe;
+    assertTrue({#joe: #value} ~ {$key: value});
+    assertEquals(value, #value);
+}
+
+//-----------------------------------------------------------------------------
+// Named-Field Patterns
+
+// Can't match a value that has no script-visible fields.
+function testNamedField_noFields() {
+    assertFalse("abc" ~ Thing(id: id));
+}
+
+// Can't match a value of the different type.
+function testNamedField_valueWrongType() {
+    var thing = Thing(123, "red");
+
+    assertFalse(thing ~ Gizmo(id: id));
+}
+
+// Can't match if a pattern field doesn't exist in the value.
+function testNamedField_unknownField() {
+    var thing = Thing(123, "red");
+
+    assertFalse(thing ~ Thing(id: id, style: s));
+}
+
+// Can match if the type name and the field names match.
+function testNamedField_good() {
+    var thing = Thing(123, "red");
+
+    assertTrue(thing ~ Thing(id: i, color: c));
+    assertEquals(i, thing.id);
+    assertEquals(c, thing.color);
+}
+
+// Can match if the pattern names a supertype of the value.
+function testNamedField_supertype_good() {
+    var gizmo = Gizmo(123, "red");
+
+    assertTrue(gizmo ~ Thing(id: i, color: c));
+    assertEquals(i, gizmo.id);
+    assertEquals(c, gizmo.color);
+}
+
+// Can match a Fact by its relation
+function testNamedField_fact() {
+    var person = Fact("Person", "Joe", 80);
+    assertTrue(person ~ Person(f0: name, f1: age));
+    assertEquals(name, person.f0);
+    assertEquals(age, person.f1);
+}
+
+//-----------------------------------------------------------------------------
+// Ordered-Field Patterns
+
+// Can't match a value with unordered fields
+function testOrderedField_notOrdered() {
+    assertFalse(Thing(123, "red") ~ Thing(id, color));
+}
+
+// Can't match if the type is wrong.
+function testOrderedField_wrongType() {
+    var person = Person("Joe", 80);
+
+    assertFalse(person ~ PersonNonGrata(name, age));
+}
+
+// Can match if the number of fields is correct.
+function testOrderedField_good() {
+    var person = Person("Joe", 80);
+
+    assertTrue(person ~ Person(name, age));
+    assertEquals(name, person.name);
+    assertEquals(age, person.age);
+}
+
+// Can match a Fact by its relation provided that it has ordered fields.
+function testOrderedField_fact() {
+    var person = Fact("Person", "Joe", 80);
+    assertTrue(person ~ Person(name, age));
+    assertEquals(name, person.f0);
+    assertEquals(age, person.f1);
+}
+
+// Can match based on type only if the pattern has no field patterns.
+function testOrderedField_noFieldPatterns() {
+    record Gizmo(x, y) {}
+    var gizmo = Gizmo(1, 2);
+    assertTrue(gizmo ~ Gizmo());
+    assertFalse(gizmo ~ Number());
+}
+
+// Can match based on type for types without fields if the pattern has no
+// field patterns.
+function testOrderedField_noFieldPatterns() {
+    skip("Not yet supported");
+    assertTrue("abc" ~ String());
+    assertFalse("abc" ~ Number());
+}
+
+
+//-----------------------------------------------------------------------------
+// Pattern-Bindings
+
+function testPatternBinding_atTop() {
+    assertTrue([1, 2] ~ a@[b, c]);
+    assertEquals(a, [1, 2]);
+    assertEquals(b, 1);
+    assertEquals(c, 2);
+}
+
+function testPatternBinding_nested() {
+    assertTrue([1, [2, 3], 4] ~ [a, b@[c, d], e]);
+    assertEquals(a, 1);
+    assertEquals(b, [2, 3]);
+    assertEquals(c, 2);
+    assertEquals(d, 3);
+    assertEquals(e, 4);
+}
+
+//-----------------------------------------------------------------------------
+// Helpers
+
+class Thing {
+    method init(id, color) {
+        @id = id;
+        @color = color;
+    }
+}
+
+class Gizmo extends Thing {
+    method init(id, color) {
+        super.init(id, color);
+    }
+}
+
+record Person(name, age) {}

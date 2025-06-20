@@ -61,13 +61,23 @@ var [a, b] = [1, 2];    // a = 1, b = 2.
 ```
 
 A binding variable can also be used to capture a subpattern.  In the
-following example, the variable `b` is assigned list `[2, 3]` while
-`c` and `d` are assigned the values of the list's items.
+following example, the variable `b` is bound to the list `[2, 3]` while
+`c` and `d` are bound to the values of the list's items.
 
 ```joe
 var list = [1, [2, 3], 4];
 
-var [a, b = [c, d], e];
+var [a, b@[c, d], e];
+```
+
+Capturing a subpattern is especially useful with `foreach`: the pattern
+can capture the entire item if the pattern matches.  The following
+code pulls two-item lists out of a heterogeneous list of values.
+
+```joe
+foreach (item@[_, _] : inputs) { 
+    println(item);
+}
 ```
 
 If a variable appears in the pattern more than once, it is bound on 
@@ -264,7 +274,7 @@ See [Unscoped Types](introspection.md#unscoped-types) for more information.
 
 Ordered-field patterns match Joe values with ordered fields, i.e., fields that 
 can be accessed by index as well as by name.  Joe [records](records.md) 
-and [`Fact` values](library/type.joe.Fact.md) have ordered fields, and 
+and most [`Fact` values](library/type.joe.Fact.md) have ordered fields, and 
 proxied types can have ordered fields as well.  This allows a stream-lined
 pattern syntax.
 
