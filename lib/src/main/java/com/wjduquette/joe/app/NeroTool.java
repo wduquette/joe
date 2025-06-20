@@ -1,9 +1,6 @@
 package com.wjduquette.joe.app;
 
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.SyntaxError;
-import com.wjduquette.joe.Trace;
+import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Nero;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.RuleSetCompiler;
@@ -17,6 +14,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The implementation for the {@code joe nero} tool.
@@ -198,11 +196,27 @@ public class NeroTool implements Tool {
             trace.message());
     }
 
-    void dumpFacts(String title, Collection<Fact> facts) {
+    private void dumpFacts(String title, Collection<Fact> facts) {
         println(title);
-        facts.stream().map(Fact::toString).sorted()
+        facts.stream().map(this::factString).sorted()
             .forEach(this::println);
     }
+
+    private String factString(Fact fact) {
+        var fields = fact.getFields().stream()
+            .map(this::fieldString)
+            .collect(Collectors.joining(", "));
+        return fact.relation() + "(" + fields + ")";
+    }
+
+    private String fieldString(Object field) {
+        if (field instanceof String s) {
+            return Joe.quote(s);
+        } else {
+            return field.toString();
+        }
+    }
+
 
     //-------------------------------------------------------------------------
     // Main
