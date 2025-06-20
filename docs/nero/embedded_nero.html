@@ -238,6 +238,8 @@ as an input fact.  This includes instances of:</p>
 <li>Any Joe <a href="../records.html">record</a> type.</li>
 <li>Any joe <a href="../classes.html">class</a>.</li>
 <li>Native types whose proxies define fields.</li>
+<li>Any native type whose proxy explicitly overrides <code>isFact</code> and <code>toFact</code> to
+do something sensible in context.</li>
 </ul>
 <p>The type's type name is used as the input fact's relation, and its
 fields as the fact's terms.</p>

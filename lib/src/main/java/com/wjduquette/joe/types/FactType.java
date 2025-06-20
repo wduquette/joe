@@ -37,6 +37,31 @@ public class FactType extends ProxyType<Fact> {
         // and ordered or named fields.  A Nero `ruleset` produces
         // `Fact` values by default, and also accepts `Facts` as input.
         // Many Joe values can be converted to `Facts`.
+        //
+        // ## Fact Fields and Field Names
+        //
+        // A `Fact`'s field values are accessible by the
+        // [[Fact#method.fields]] method if the `Fact`
+        // [[Fact#method.isOrdered]], and as a map of field names and
+        // values via the
+        // [[Fact#method.fieldMap]] method.
+        //
+        // In addition, a fact's fields can be access as normal Joe object
+        // fields:
+        //
+        // ```joe
+        // // Simple ordered fact; field names are `f1` and `f2`.
+        // var fact = Fact("Thing", #car, #red);
+        //
+        // // Prints "This Thing is #red"
+        // println("This " + fact.relation() + " is " + fact.f2);
+        //
+        // // Simple unordered fact; field names are as given.
+        // var fact2 = Fact.ofMap("Thing", {"id": #car, "color": #red});
+        //
+        // // Prints "This Thing is #red"
+        // println("This " + fact.relation() + " is " + fact.color);
+        // ```
         proxies(Fact.class);
 
         staticMethod("of",      this::_of);
@@ -132,8 +157,9 @@ public class FactType extends ProxyType<Fact> {
     // @static of
     // @args relation, fields
     // Creates a new ordered `Fact` given the relation and a list of
-    // field values. The `Fact` will be an instance of the Java
-    // `ListFact` class.
+    // field values. Its fields will be named `f0`, `f1`, etc.
+    //
+    // The `Fact` will be an instance of the Java `ListFact` class.
     private Object _of(Joe joe, Args args) {
         args.exactArity(2, "Fact.of(relation, fields)");
         var relation = joe.toString(args.next());
@@ -145,6 +171,8 @@ public class FactType extends ProxyType<Fact> {
     // @static ofMap
     // @args relation, fieldMap
     // Creates a new unordered `Fact` given the relation and the field map.
+    // Its fields will have the names given as keys in the map.
+    //
     // The `Fact` will be an instance of the Java `MapFact` class.
     private Object _ofMap(Joe joe, Args args) {
         args.exactArity(2, "Fact.ofMap(relation, fieldMap)");
@@ -166,7 +194,9 @@ public class FactType extends ProxyType<Fact> {
     // @static ofPairs
     // @args relation, pairs
     // Creates a new ordered `Fact` given a flat list of field name/value
-    // pairs. The `Fact` will be an instance of the Java `RecordFact` class.
+    // pairs. Its fields will have the names given in the list.
+    //
+    // The `Fact` will be an instance of the Java `RecordFact` class.
     private Object _ofPairs(Joe joe, Args args) {
         args.exactArity(2, "Fact.ofPairs(relation, pairs)");
         var relation = joe.toString(args.next());
@@ -198,8 +228,9 @@ public class FactType extends ProxyType<Fact> {
     // @init
     // @args relation, field, ...
     // Creates a new `Fact` given the relation and one or more the
-    // field values. The `Fact` will be an instance of the Java
-    // `ListFact` class.
+    // field values. Its fields will be named `f0`, `f1`, etc.
+    //
+    // The `Fact` will be an instance of the Java `ListFact` class.
     private Object _init(Joe joe, Args args) {
         args.minArity(2, "Fact(relation, field, ...)");
         var relation = joe.toString(args.next());

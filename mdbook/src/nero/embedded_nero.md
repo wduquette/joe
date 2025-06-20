@@ -80,6 +80,8 @@ as an input fact.  This includes instances of:
 - Any Joe [record](../records.md) type.
 - Any joe [class](../classes.md).
 - Native types whose proxies define fields.
+- Any native type whose proxy explicitly overrides `isFact` and `toFact` to
+  do something sensible in context.
 
 The type's type name is used as the input fact's relation, and its 
 fields as the fact's terms.

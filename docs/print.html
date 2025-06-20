@@ -2156,6 +2156,8 @@ as an input fact.  This includes instances of:</p>
 <li>Any Joe <a href="nero/../records.html">record</a> type.</li>
 <li>Any joe <a href="nero/../classes.html">class</a>.</li>
 <li>Native types whose proxies define fields.</li>
+<li>Any native type whose proxy explicitly overrides <code>isFact</code> and <code>toFact</code> to
+do something sensible in context.</li>
 </ul>
 <p>The type's type name is used as the input fact's relation, and its
 fields as the fact's terms.</p>
@@ -4769,6 +4771,26 @@ Many Joe values can be converted to <code>Facts</code>.</p>
 <li><a href="library/type.joe.Fact.html#method.relation"><em>fact</em>.relation()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.Fact.html#method.toString"><em>fact</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
+<h2 id="fact-fields-and-field-names"><a class="header" href="#fact-fields-and-field-names">Fact Fields and Field Names</a></h2>
+<p>A <code>Fact</code>'s field values are accessible by the
+<a href="library/type.joe.Fact.html#method.fields"><code>fields()</code></a> method if the <code>Fact</code>
+<a href="library/type.joe.Fact.html#method.isOrdered"><code>isOrdered()</code></a>, and as a map of field names and
+values via the
+<a href="library/type.joe.Fact.html#method.fieldMap"><code>fieldMap()</code></a> method.</p>
+<p>In addition, a fact's fields can be access as normal Joe object
+fields:</p>
+<pre><code class="language-joe">// Simple ordered fact; field names are `f1` and `f2`.
+var fact = Fact("Thing", #car, #red);
+
+// Prints "This Thing is #red"
+println("This " + fact.relation() + " is " + fact.f2);
+
+// Simple unordered fact; field names are as given.
+var fact2 = Fact.ofMap("Thing", {"id": #car, "color": #red});
+
+// Prints "This Thing is #red"
+println("This " + fact.relation() + " is " + fact.color);
+</code></pre>
 <h2 id="statics"><a class="header" href="#statics">Static Methods</a></h2>
 <hr />
 <p><span id="static.of"> </span></p>
@@ -4776,26 +4798,28 @@ Many Joe values can be converted to <code>Facts</code>.</p>
 <hr />
 <p><strong>Fact.of(<em>relation</em>, <em>fields</em>)</strong></p>
 <p>Creates a new ordered <code>Fact</code> given the relation and a list of
-field values. The <code>Fact</code> will be an instance of the Java
-<code>ListFact</code> class.</p>
+field values. Its fields will be named <code>f0</code>, <code>f1</code>, etc.</p>
+<p>The <code>Fact</code> will be an instance of the Java <code>ListFact</code> class.</p>
 <p><span id="static.ofMap"> </span></p>
 <h3 id="factofmap"><a class="header" href="#factofmap">Fact.ofMap()</a></h3>
 <hr />
 <p><strong>Fact.ofMap(<em>relation</em>, <em>fieldMap</em>)</strong></p>
 <p>Creates a new unordered <code>Fact</code> given the relation and the field map.
-The <code>Fact</code> will be an instance of the Java <code>MapFact</code> class.</p>
+Its fields will have the names given as keys in the map.</p>
+<p>The <code>Fact</code> will be an instance of the Java <code>MapFact</code> class.</p>
 <p><span id="static.ofPairs"> </span></p>
 <h3 id="factofpairs"><a class="header" href="#factofpairs">Fact.ofPairs()</a></h3>
 <hr />
 <p><strong>Fact.ofPairs(<em>relation</em>, <em>pairs</em>)</strong></p>
 <p>Creates a new ordered <code>Fact</code> given a flat list of field name/value
-pairs. The <code>Fact</code> will be an instance of the Java <code>RecordFact</code> class.</p>
+pairs. Its fields will have the names given in the list.</p>
+<p>The <code>Fact</code> will be an instance of the Java <code>RecordFact</code> class.</p>
 <h2 id="init"><a class="header" href="#init">Fact Initializer</a></h2>
 <hr />
 <p><strong>Fact(<em>relation</em>, <em>field</em>, ...) → <a href="library/type.joe.Fact.html">Fact</a></strong></p>
 <p>Creates a new <code>Fact</code> given the relation and one or more the
-field values. The <code>Fact</code> will be an instance of the Java
-<code>ListFact</code> class.</p>
+field values. Its fields will be named <code>f0</code>, <code>f1</code>, etc.</p>
+<p>The <code>Fact</code> will be an instance of the Java <code>ListFact</code> class.</p>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
 <hr />
 <p><span id="method.fieldMap"> </span></p>
