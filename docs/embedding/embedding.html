@@ -251,7 +251,7 @@ joe.setOutputHandler(text -&gt; log(text));
 through this handler.  Further, <code>Joe</code> provides Java-level <code>print()</code> and
 <code>println()</code> functions that do the same; this allows the body of any
 native function to easily output whatever it likes.</p>
-<pre><code class="language-java">private Object _square(Joe joe, ArgQueue args) {
+<pre><code class="language-java">private Object _square(Joe joe, Args args) {
     ...
     joe.println("In square()!");
 }

@@ -98,7 +98,7 @@ through this handler.  Further, `Joe` provides Java-level `print()` and
 native function to easily output whatever it likes.
 
 ```java
-private Object _square(Joe joe, ArgQueue args) {
+private Object _square(Joe joe, Args args) {
     ...
     joe.println("In square()!");
 }

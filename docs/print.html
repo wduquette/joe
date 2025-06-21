@@ -2483,7 +2483,7 @@ joe.setOutputHandler(text -&gt; log(text));
 through this handler.  Further, <code>Joe</code> provides Java-level <code>print()</code> and
 <code>println()</code> functions that do the same; this allows the body of any
 native function to easily output whatever it likes.</p>
-<pre><code class="language-java">private Object _square(Joe joe, ArgQueue args) {
+<pre><code class="language-java">private Object _square(Joe joe, Args args) {
     ...
     joe.println("In square()!");
 }
@@ -2512,17 +2512,16 @@ to existing Java types.  This section explains how the trick is done.</p>
 Joe Javadoc for details.</p>
 <p>But first, a little philosophy.</p>
 <h2 id="handwritten-bindings-vs-generated-bindings"><a class="header" href="#handwritten-bindings-vs-generated-bindings">Handwritten Bindings vs. Generated Bindings</a></h2>
-<p>It is quite possible, using Java reflection or by scanning the Java source code,
-to automatically generate script-level bindings for Java classes, as
-<a href="https://swig.org">Swig</a> is often used to create dynamic language bindings for
-C APIs.</p>
-<p>In my experience, such generated bindings fall far short of what can be
-done with handwritten bindings.  A handwritten binding:</p>
+<p>It is possible to automatically generate script-level bindings for Java classes
+by using Java reflection or by scanning the Java source code, as
+<a href="https://swig.org">Swig</a> is often used to create dynamic language bindings for C APIs.</p>
+<p>In my experience, an automatically generated binding falls far short of what
+can be done with a good handwritten binding.  A handwritten binding:</p>
 <ul>
 <li>
-<p>Can take full advantage of the dynamic nature of the
-scripting language to provide a simpler, easier, more powerful API to the
-programmer.</p>
+<p>Can take full advantage of the dynamic nature of the scripting language to
+provide a simpler, easier, more powerful API to the programmer, rather than
+simply mimicking the Java API.</p>
 </li>
 <li>
 <p>Can trivially ignore those aspects of the Java API
@@ -2532,10 +2531,15 @@ that need not or should not be exposed at the scripting level.</p>
 <p>Can do a much better job of providing useful, detailed error messages
 to the user.</p>
 </li>
+<li>
+<p>Need not expose dangerous Java APIs (e.g., network APIs) to clients of
+the binding.</p>
+</li>
 </ul>
-<p>Therefore, it is a non-goal of Joe to automatically provide bindings to
-existing classes via Java reflection.  And it is very much a goal of Joe
-to make writing handwritten bindings as easily and pain-free as possible.</p>
+<p>It is therefore a non-goal of Joe to automatically provide bindings to
+existing classes via Java reflection or code generation.  And it is very much
+a goal of Joe to make writing handwritten bindings as easily and
+pain-free as possible.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="joe-and-java-data-types"><a class="header" href="#joe-and-java-data-types">Joe and Java Data Types</a></h1>
 <p>Joe supports three kinds of data type:</p>
 <ul>
@@ -2546,27 +2550,28 @@ to make writing handwritten bindings as easily and pain-free as possible.</p>
 <h2 id="standard-types"><a class="header" href="#standard-types">Standard Types</a></h2>
 <p>Joe provides a number of standard data types, as described in the
 <a href="extending/../types.html">Types and Values</a> section and the
-<a href="extending/../library/pkg.joe.html">Joe Standard Library</a> section.  Each of these
-represented internally as a normal Java value.</p>
+<a href="extending/../library/pkg.joe.html">Joe Standard Library</a> section.  Values of these
+types are represented internally as normal Java values.</p>
 <div class="table-wrapper"><table><thead><tr><th>Joe Type</th><th>Java Type</th></tr></thead><tbody>
 <tr><td><code>Boolean</code></td><td><code>java.lang.Boolean</code></td></tr>
 <tr><td><code>Error</code></td><td><code>com.wjduquette.joe.JoeError</code> (a <code>RuntimeException</code>)</td></tr>
 <tr><td><code>Keyword</code></td><td><code>com.wjduquette.joe.Keyword</code></td></tr>
-<tr><td><code>List</code></td><td><code>com.wjduquette.joe.JoeList</code> (a <code>List&lt;Object&gt;</code>)</td></tr>
+<tr><td><code>List</code></td><td><code>com.wjduquette.joe.JoeValue</code> (a <code>List&lt;Object&gt;</code>)</td></tr>
 <tr><td><code>Number</code></td><td><code>java.lang.Double</code></td></tr>
 <tr><td><code>String</code></td><td><code>java.lang.String</code></td></tr>
 </tbody></table>
 </div>
-<p>When used in Java code, consequently, a Joe <code>List</code> is a Java <code>List&lt;Object&gt;</code>.
-A Joe string is a Java <code>String</code>.  A Joe <code>Number</code> is a Java <code>double</code>.
-This greatly decreases the amount of work a binding needs to do when
-working with Joe values.</p>
+<p>When used in Java code, consequently, a Joe <code>List</code> is a Java
+<code>List&lt;Object&gt;</code>. A Joe string is a Java <code>String</code>.  A Joe <code>Number</code> is a
+Java <code>double</code>. This greatly decreases the amount of work a binding
+needs to do when working with Joe values, compared to other embedded
+languages I have used.</p>
 <p>A client binding should generally try to make the best use of these
 types.</p>
 <h2 id="opaque-types"><a class="header" href="#opaque-types">Opaque Types</a></h2>
 <p>Every Java value, without exception<sup class="footnote-reference"><a href="#primitive">1</a></sup>, is a valid Joe value, and
-can be assigned to a Joe variable, passed to a Joe function, and returned
-by a Joe function, whether Joe knows anything special about the value's
+can be assigned to Joe variables, passed to a Joe functions, and returned
+by Joe functions, whether Joe knows anything special about the value's
 type or not.</p>
 <p>A Java type that Joe knows nothing special about is called an <em>opaque type</em>.
 But every such type is still a Java class and a subtype of
@@ -2579,10 +2584,9 @@ Given such a value, Joe can:</p>
 <li>Use it as a key in a hash table</li>
 <li>If it's a <code>Collection&lt;?&gt;</code>, iterate over its members</li>
 </ul>
-<p>For many domain-specific use cases, that may be all that's required.
-When more is wanted, the client can register a
-<a href="extending/registered_types.html">proxy type</a> for the type, thus turning the opaque
-type into a registered type.</p>
+<p>That might be all that's needed for many domain-specific use cases. When more
+is wanted, the client can register a <a href="extending/registered_types.html">proxy type</a> for
+the type, thus turning the opaque type into a registered type.</p>
 <h2 id="registered-types"><a class="header" href="#registered-types">Registered Types</a></h2>
 <p>A <em>registered type</em> is a Java type for which the client has registered
 a <a href="extending/registered_types.html">proxy type</a>. The proxy type can give the Joe
@@ -2590,14 +2594,15 @@ interpreter the ability to:</p>
 <ul>
 <li>Create instances of the type</li>
 <li>Call methods on values of the type</li>
+<li>Access fields of values of the type</li>
 <li>Customize the string representation for the type</li>
 <li>Define static constants and methods for the type</li>
 <li>Make the type iterable, so that its contents can be iterated over via
 the <code>foreach</code> statement.</li>
 </ul>
-<p><strong>Note</strong>: the standard Joe types are nothing more than registered types
-that are registered with every Joe interpreter.  There's no magic; or,
-rather, the magic is fully available for use in client bindings.</p>
+<p><strong>Note</strong>: Most of the standard Joe types are nothing more than registered
+types that are registered automatically with every Joe interpreter.  There's
+no magic; or, rather, the magic is fully available for use in client bindings.</p>
 <div class="footnote-definition" id="primitive"><sup class="footnote-definition-label">1</sup>
 <p>Primitive types are represented as their boxed equivalents,
 e.g, <code>double</code> by <code>Double</code>.</p>
@@ -2605,7 +2610,7 @@ e.g, <code>double</code> by <code>Double</code>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="native-functions"><a class="header" href="#native-functions">Native Functions</a></h1>
 <p>A <em>native function</em> is a Java method that is exposed as a function at the
 script level.  Every native function has the same Java signature:</p>
-<pre><code class="language-java">Object _myFunction(Joe joe, ArgQueue args) { ... }
+<pre><code class="language-java">Object _myFunction(Joe joe, Args args) { ... }
 </code></pre>
 <ul>
 <li>Every native function returns a Joe value, possibly <code>null</code>.</li>
@@ -2617,24 +2622,24 @@ script level.  Every native function has the same Java signature:</p>
 <li><a href="extending/native_functions.html#arity-checking">Arity Checking</a>: Ensure that it has received the correct
 number of arguments.</li>
 <li><a href="extending/native_functions.html#argument-conversion">Argument Conversion</a>: Ensure that those arguments have
-the desired Java data types.</li>
+the desired Java data types, and throw meaningful errors if they do not.</li>
 <li>Do the required computation—which often involves making a simple
 call to some Java API.</li>
 <li><a href="extending/native_functions.html#return-the-result">Return the Result</a>: If any.</li>
 </ul>
 <p>Joe provides the tools to make each of these steps simple and concise.</p>
 <p>For example, a simple function to square a number would look like this:</p>
-<pre><code class="language-java">Object _square(Joe joe, ArgQueue args) {
+<pre><code class="language-java">Object _square(Joe joe, Args args) {
     args.exactArity(1, "square(x)");       // Arity check
     var x = joe.toDouble(args.next());     // Argument conversion
-    return x*x;                            // Computation
+    return x*x;                            // Computation and return
 }
 </code></pre>
 <h2 id="installing-a-native-function"><a class="header" href="#installing-a-native-function">Installing a Native Function</a></h2>
 <p>To install a native function, use the <code>Joe::installGlobalFunction</code> method:</p>
 <pre><code class="language-java">var joe = new Joe();
 
-joe.install("square", this::_square);
+joe.installGlobalFunction("square", this::_square);
 </code></pre>
 <h2 id="arity-checking"><a class="header" href="#arity-checking">Arity Checking</a></h2>
 <p>A function's <em>arity</em> is the number of arguments it takes.  Joe provides four
@@ -2653,7 +2658,7 @@ takes two arguments:</p>
 <p>If <em>args</em> doesn't contain exactly the correct number of arguments,
 <code>exactArity()</code> will use <code>Args.arityFailure()</code> to throw a <code>JoeError</code>
 with this message:</p>
-<p><code>    Wrong number of arguments, expected: square(x)</code></p>
+<p><code>Wrong number of arguments, expected: square(x).</code></p>
 <h3 id="minimum-arity-and-arity-ranges"><a class="header" href="#minimum-arity-and-arity-ranges">Minimum Arity and Arity Ranges</a></h3>
 <p>Similarly, the <code>Args::minArity</code> method checks that the <em>args</em> contains
 at least a minimum number of arguments.  For example,
@@ -2676,10 +2681,10 @@ false within a certain range.  For example, the
 }
 </code></pre>
 <h2 id="argument-conversion"><a class="header" href="#argument-conversion">Argument Conversion</a></h2>
-<p>Before passing an <code>Object</code> to a Java method, it's necessary to make sure it
-has the correct type, and to produce an appropriate error message if it does
-not.  Joe provides a family of argument conversion methods for this purpose;
-client-specific converters are easily implemented.</p>
+<p>Before passing an <code>Object</code> to a Java method, it's necessary to cast it or
+convert it to the required type, and to produce an appropriate error message
+if that cannot be done.  Joe provides a family of argument conversion methods
+for this purpose, and client-specific converters are easily implemented.</p>
 <p>For example,</p>
 <pre><code class="language-java">var x = joe.toDouble(args.next());
 </code></pre>
@@ -2689,16 +2694,21 @@ client-specific converters are easily implemented.</p>
 or throws a <code>JoeError</code>.</li>
 </ul>
 <p>The <code>JoeError</code> message will look like this:</p>
-<p><code>    Expected number, got: &lt;actualType&gt; '&lt;actualValue&gt;'.</code></p>
-<p>See the <code>Joe</code> class Javadoc for the family of converters, and the <code>Joe</code> class
-source code for how they are implemented, and the many <code>TypeProxies</code> in
-<code>com.wjduquette.joe.types</code> for examples of their use.</p>
+<p><code>Expected number, got: &lt;actualType&gt; '&lt;actualValue&gt;'.</code></p>
+<p>See the <code>Joe</code> class's Javadoc for the family of converters, and the
+<code>Joe</code> class's source code for how they are implemented; and the many
+<code>ProxyTypes</code> in <code>com.wjduquette.joe.types</code> for examples of their use.</p>
 <h3 id="converting-strings"><a class="header" href="#converting-strings">Converting Strings</a></h3>
 <p>There are two ways to convert an argument that is to be treated as a String.</p>
-<p>First, <code>joe.toString(arg)</code> will require that the value is actually a Java
-<code>String</code>.</p>
-<p>Alternatively, <code>joe.stringify(arg)</code> will convert the argument, of whatever type,
-to its string representation.</p>
+<ul>
+<li>
+<p><code>joe.toString(arg)</code> requires that the value is already a Java <code>String</code>.</p>
+</li>
+<li>
+<p><code>joe.stringify(arg)</code> will convert the argument, of whatever type,
+to its string representation.  Proxy types can customize that representation.</p>
+</li>
+</ul>
 <p>Which of these you use will depend on the native function in question.  To
 some extent it's a matter of taste.</p>
 <h3 id="converting-booleans"><a class="header" href="#converting-booleans">Converting Booleans</a></h3>
@@ -2720,20 +2730,19 @@ doubles, but integers are an <a href="extending/java_types.html#opaque-types">op
 </code></pre>
 <p><strong>Returning Lists</strong>: Most lists should be returned as <code>ListValue</code> values,
 which can be modified freely at the script level.</p>
-<p>If java code produces a list that need not be modified, then it can
+<p>If Java code produces a list that need not or must not be modified, then it can
 be made read-only:</p>
 <pre><code class="language-java">return joe.readonlyList(myList);
 </code></pre>
-<p>If the list is not a <code>List&lt;Object&gt;</code>, and needs to be modified in place
+<p>If the Java list is not a <code>List&lt;Object&gt;</code>, and needs to be modified in place
 at the script level, wrap it and specify the item type.  (This is
 often necessary in JavaFX-related code):</p>
-<pre><code class="language-dtd">return joe.wrapList(myList, MyItemType.class);
+<pre><code class="language-java">return joe.wrapList(myList, MyItemType.class);
 </code></pre>
 <p>Joe will then ensure that only values assignable to <code>MyItemType</code> are
-added to the list.</p>
-<p><strong>Other Collections</strong>: At time of writing, Joe does not yet support
-maps or sets; when it does, they should be returned in the same way
-as lists.</p>
+added to the list.  There are several variants of <code>Joe::wrapList</code>.</p>
+<p><strong>Other Collections</strong>: Joe supports maps and sets in much the same way as
+lists.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="registered-types-1"><a class="header" href="#registered-types-1">Registered Types</a></h1>
 <p>A <em>registered type</em> is a Java data type for which Joe has been provided
 a <em>proxy type</em>: an object that provides information about the type.
@@ -2746,7 +2755,7 @@ it with Joe for use.</p>
 For example,</p>
 <pre><code class="language-java">public class StringType extends ProxyType&lt;String&gt; {
     public StringType() {
-        ...
+        super("String");
     }
     ...
 }
@@ -2754,7 +2763,9 @@ For example,</p>
 <p>By convention, a Java proxy types have names ending
 with "Type", as in <code>StringType</code>.  If the type can be subclassed by a scripted
 Joe <code>class</code>, then the proxy type's name should end in "Class", as in
-<code>TextBuilderClass</code>.</p>
+<code>TextBuilderClass</code>.  If the type has no instances, but exists only as the
+owner of static methods and/or constants, it should end in "Singleton",
+as in the <code>JoeSingleton</code> class.</p>
 <p>The constructor defines the various aspects of the proxy:</p>
 <ul>
 <li><a href="extending/registered_types.html#the-script-level-type-name">The Script-level Type Name</a></li>
@@ -2794,8 +2805,9 @@ kindness to the client.</li>
 same name as the type, e.g., <code>String</code>.</p>
 <h2 id="the-proxied-types"><a class="header" href="#the-proxied-types">The Proxied Types</a></h2>
 <p>Second, the proxy must explicitly identify the proxied type or types.</p>
-<p>Usually a proxy will proxy the single type <code>V</code>, but if <code>V</code> is an interface
-the relevant classes need to be identified. Here's the first case:</p>
+<p>Usually a proxy will proxy the single type <code>V</code>, but if <code>V</code> is an interface or
+a base class, it might be desirable to explicitly identify the concrete
+classes.  For example, a Joe <code>String</code> is just exactly a Java <code>String</code>.</p>
 <pre><code class="language-java">public class StringType extends ProxyType&lt;String&gt; {
     public StringType() {
         super("String");
@@ -2804,8 +2816,8 @@ the relevant classes need to be identified. Here's the first case:</p>
     ...
 }
 </code></pre>
-<p>And here's an example of the second.  <code>JoeList</code> is an interface, so we must
-tell Joe which types the interpreter should look for.</p>
+<p>But a Joe <code>List</code> could be a Java <code>ListValue</code> or <code>ListWrapper</code>, both of which
+implement the <code>JoeList</code> interface:</p>
 <pre><code class="language-java">public class ListType extends ProxyType&lt;JoeList&gt; {
     public ListType() {
         super("List");
@@ -2816,45 +2828,32 @@ tell Joe which types the interpreter should look for.</p>
 }
 </code></pre>
 <h2 id="type-lookup"><a class="header" href="#type-lookup">Type Lookup</a></h2>
-<p>At runtime, Joe sees a value and looks for the value's proxy type
+<p>At runtime, Joe sees a value and looks up the value's proxy type
 in its type registry.  This section explains how
 the lookup is done, as it can get complicated.</p>
-<p>First, Joe maintains two lookup tables:</p>
-<ul>
-<li>The <code>proxyTable</code>, a map from <code>Class</code> objects to <code>ProxyType&lt;?&gt;</code> objects.</li>
-</ul>
-<p>Given these, the lookup logic is as follows:</p>
+<p>Joe keeps registered type information in the <code>proxyTable</code>, a map from
+Java <code>Class</code> objects to Java <code>ProxyType&lt;?&gt;</code> objects.</p>
 <ul>
 <li>
 <p>If value's <code>Class</code> is found in the <code>proxyTable</code>, the proxy is returned
 immediately.  This is the most common case.</p>
 </li>
 <li>
-<p>Next, if the <code>Class</code> is found in the <code>opaqueTypes</code> table, the lookup
-fails immediately.</p>
-</li>
-<li>
-<p>Next, Joe checks the <code>proxyTable</code> for the value's superclass, and so on
+<p>Next, Joe looks in the <code>proxyTable</code> for the value's superclass, and so on
 up the class hierarchy.</p>
-<ul>
-<li>If a proxy is found, it is cached back into the <code>proxyTable</code> for the
-value's concrete class.  It will be found immediately next time.</li>
-</ul>
 </li>
 <li>
-<p>Next, Joe checks the <code>proxyTable</code> for any interfaces implemented by the
+<p>Next, Joe looks in the <code>proxyTable</code> for any interfaces implemented by the
 value's type, starting with the type's own <code>Class</code> and working its way
 up the class hierarchy.</p>
-<ul>
-<li>If a proxy is found, it is cached back into the <code>proxyTable</code> for the
-value's concrete class.  It will be found immediately next time.</li>
-</ul>
 </li>
 <li>
-<p>Finally, if no proxy has been found an <code>OpaqueType</code> is created and
+<p>Finally, if no proxy has been found then an <code>OpaqueType</code> proxy is created and
 registered for the value's <code>Class</code>.</p>
 </li>
 </ul>
+<p>Whatever proxy is found, it is cached back into the <code>proxyTable</code> for the
+value's concrete class so that it will be found immediately next time.</p>
 <p><strong>NOTE</strong>: when looking for registered interfaces, Joe only looks at the
 interfaces directly implemented by the value's class or its superclasses;
 it does <em>not</em> check any interfaces that those interfaces might extend.
@@ -2876,8 +2875,10 @@ method:</p>
 }
 </code></pre>
 <h2 id="stringification"><a class="header" href="#stringification">Stringification</a></h2>
-<p>When Joe converts a value to a string, it does so via <code>Joe::stringify</code>.  For
-proxied types, this defaults to returning the value's normal Java <code>toString()</code>.</p>
+<p>When Joe converts a value to a string, it does so using a function called
+<code>Joe::stringify</code>.  If the value belongs to a proxied type, <code>Joe::stringify</code>
+calls the proxy's <code>stringify()</code> method, which returns the result of the
+values <code>toString()</code> by default.</p>
 <p>To change how a value is stringified at the script level, override
 <code>ProxyType::stringify</code>.  For example, <code>NumberType</code> ensures that
 integer-valued numbers are displayed without a trailing <code>.0</code>:</p>
@@ -2898,8 +2899,7 @@ can iterate over or search the following kinds of collection values:</p>
 <ul>
 <li>Any Java <code>Collection&lt;?&gt;</code></li>
 <li>Any value that implements the <code>JoeIterable</code> interface</li>
-<li>Any <code>JoeObject</code>, e.g., any registered type, that can convert its values
-into a list for iteration.</li>
+<li>Any proxied type whose <code>ProxyType</code> can produce a list of items for iteration.</li>
 </ul>
 <p>To make your registered type iterable, provide an iterables supplier, a
 function that accepts a value of your type and returns a <code>Collection&lt;?&gt;</code>.</p>
@@ -2922,13 +2922,13 @@ by its property name and the relevant Joe value.</p>
     public NumberType() {
         super("Number");
         ...
-        constant("E", Math.E);
+        constant("PI", Math.PI);
         ...
     }
     ...
 }
 </code></pre>
-<p>In this case, the constant is accessible as <code>Number.E</code>.</p>
+<p>In this case, the constant is accessible as <code>Number.PI</code>.</p>
 <h2 id="static-methods"><a class="header" href="#static-methods">Static Methods</a></h2>
 <p>A proxy may also define any number of static methods, called as properties
 of the type object.  For example, the <code>String</code> type defines the
@@ -2944,7 +2944,7 @@ as a property of a list object.</p>
     }
     ...
     
-    private Object _join(Joe joe, ArgQueue args) {
+    private Object _join(Joe joe, Args args) {
         args.exactArity(2, "join(delimiter, list)");
         ...
     }
@@ -2964,8 +2964,9 @@ of the type, and may take any desired arguments.</p>
         ...
     }
 
-    private Object _init(Joe joe, ArgQueue args) {
-        return new ListValue(args.asList());
+    private Object _init(Joe joe, Args args) {
+        ... create a new list given the arguments ...
+        return new ListValue(list);
     }
 </code></pre>
 <h2 id="static-types"><a class="header" href="#static-types">Static Types</a></h2>
@@ -2991,8 +2992,8 @@ This need not be the case.  It is common to define a static type as a named
 library of functions with no related Java type.  For example, consider
 a library to convert between Joe values and JSON strings.  It might look
 like this:</p>
-<pre><code class="language-java">public class JSONType extends ProxyType&lt;Void&gt; {
-    public JSONType() {
+<pre><code class="language-java">public class JSONSingleton extends ProxyType&lt;Void&gt; {
+    public JSONSingleton() {
         super("JSON");
         staticType();
         
@@ -3007,11 +3008,10 @@ like this:</p>
 <p>Most type proxies will define one or more instance methods for values of the
 type.  For example, <a href="extending/../library/type.joe.String.html"><code>String</code></a> and
 <a href="extending/../library/type.joe.List.html"><code>List</code></a> provide a great many instance methods.</p>
-<p>An instance method is quite similar to a <a href="extending/native_functions.html">native function</a>;
-the only practical difference is that an instance method is bound to a value
-of the proxied type, and so has a slightly different signature.  For example,
-here is the implementation of the <code>String</code> type's
-<a href="extending/../library/type.joe.String.html#method.length"><code>length()</code></a> method.</p>
+<p>An instance method is quite similar to a <a href="extending/native_functions.html">native function</a>, but
+an instance method is bound to a value of the proxied type, and so has a
+slightly different signature.  For example, here is the implementation of
+the <code>String</code> type's <a href="extending/../library/type.joe.String.html#method.length"><code>length()</code></a> method.</p>
 <pre><code class="language-java">public class StringType extends ProxyType&lt;String&gt; {
     public StringType() {
         ...
@@ -3020,7 +3020,7 @@ here is the implementation of the <code>String</code> type's
     }
     ...
 
-    private Object _length(String value, Joe joe, ArgQueue args) {
+    private Object _length(String value, Joe joe, Args args) {
         args.exactArity(0, "length()");
         return (double)value.length();
     }

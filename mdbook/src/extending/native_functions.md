@@ -4,7 +4,7 @@ A *native function* is a Java method that is exposed as a function at the
 script level.  Every native function has the same Java signature:
 
 ```java
-Object _myFunction(Joe joe, ArgQueue args) { ... }
+Object _myFunction(Joe joe, Args args) { ... }
 ```
 
 - Every native function returns a Joe value, possibly `null`.
@@ -16,7 +16,7 @@ It is the function's task to do the following:
 - [Arity Checking](#arity-checking): Ensure that it has received the correct 
   number of arguments.
 - [Argument Conversion](#argument-conversion): Ensure that those arguments have 
-  the desired Java data types.
+  the desired Java data types, and throw meaningful errors if they do not.
 - Do the required computation—which often involves making a simple
   call to some Java API.
 - [Return the Result](#return-the-result): If any.
@@ -26,10 +26,10 @@ Joe provides the tools to make each of these steps simple and concise.
 For example, a simple function to square a number would look like this:
 
 ```java
-Object _square(Joe joe, ArgQueue args) {
+Object _square(Joe joe, Args args) {
     args.exactArity(1, "square(x)");       // Arity check
     var x = joe.toDouble(args.next());     // Argument conversion
-    return x*x;                            // Computation
+    return x*x;                            // Computation and return
 }
 ```
 
@@ -40,7 +40,7 @@ To install a native function, use the `Joe::installGlobalFunction` method:
 ```java
 var joe = new Joe();
 
-joe.install("square", this::_square);
+joe.installGlobalFunction("square", this::_square);
 ```
 
 ## Arity Checking
@@ -66,7 +66,7 @@ If *args* doesn't contain exactly the correct number of arguments,
 `exactArity()` will use `Args.arityFailure()` to throw a `JoeError`
 with this message:
 
-`    Wrong number of arguments, expected: square(x)`
+`Wrong number of arguments, expected: square(x).`
 
 ### Minimum Arity and Arity Ranges
 
@@ -102,10 +102,10 @@ if (args.size() > 7) {
 
 ## Argument Conversion
 
-Before passing an `Object` to a Java method, it's necessary to make sure it
-has the correct type, and to produce an appropriate error message if it does
-not.  Joe provides a family of argument conversion methods for this purpose;
-client-specific converters are easily implemented.  
+Before passing an `Object` to a Java method, it's necessary to cast it or 
+convert it to the required type, and to produce an appropriate error message 
+if that cannot be done.  Joe provides a family of argument conversion methods 
+for this purpose, and client-specific converters are easily implemented.  
 
 For example,
 
@@ -119,21 +119,20 @@ var x = joe.toDouble(args.next());
 
 The `JoeError` message will look like this:
 
-`    Expected number, got: <actualType> '<actualValue>'.`
+`Expected number, got: <actualType> '<actualValue>'.`
 
-See the `Joe` class Javadoc for the family of converters, and the `Joe` class
-source code for how they are implemented, and the many `TypeProxies` in
-`com.wjduquette.joe.types` for examples of their use.
+See the `Joe` class's Javadoc for the family of converters, and the 
+`Joe` class's source code for how they are implemented; and the many 
+`ProxyTypes` in `com.wjduquette.joe.types` for examples of their use.
 
 ### Converting Strings
 
 There are two ways to convert an argument that is to be treated as a String.
 
-First, `joe.toString(arg)` will require that the value is actually a Java
-`String`.
+- `joe.toString(arg)` requires that the value is already a Java `String`.
 
-Alternatively, `joe.stringify(arg)` will convert the argument, of whatever type,
-to its string representation.
+- `joe.stringify(arg)` will convert the argument, of whatever type,
+  to its string representation.  Proxy types can customize that representation.
 
 Which of these you use will depend on the native function in question.  To
 some extent it's a matter of taste.
@@ -168,25 +167,23 @@ return (double)text.indexOf("abc");  // Convert integer index to double
 **Returning Lists**: Most lists should be returned as `ListValue` values,
 which can be modified freely at the script level.  
 
-If java code produces a list that need not be modified, then it can 
+If Java code produces a list that need not or must not be modified, then it can 
 be made read-only:
 
 ```java
 return joe.readonlyList(myList);
 ```
 
-If the list is not a `List<Object>`, and needs to be modified in place
+If the Java list is not a `List<Object>`, and needs to be modified in place
 at the script level, wrap it and specify the item type.  (This is
 often necessary in JavaFX-related code):
 
-```dtd
+```java
 return joe.wrapList(myList, MyItemType.class);
 ```
 
 Joe will then ensure that only values assignable to `MyItemType` are 
-added to the list.
+added to the list.  There are several variants of `Joe::wrapList`.
 
-**Other Collections**: At time of writing, Joe does not yet support
-maps or sets; when it does, they should be returned in the same way
-as lists.
-
+**Other Collections**: Joe supports maps and sets in much the same way as
+lists.

@@ -176,7 +176,7 @@
                         <h1 id="native-functions"><a class="header" href="#native-functions">Native Functions</a></h1>
 <p>A <em>native function</em> is a Java method that is exposed as a function at the
 script level.  Every native function has the same Java signature:</p>
-<pre><code class="language-java">Object _myFunction(Joe joe, ArgQueue args) { ... }
+<pre><code class="language-java">Object _myFunction(Joe joe, Args args) { ... }
 </code></pre>
 <ul>
 <li>Every native function returns a Joe value, possibly <code>null</code>.</li>
@@ -188,24 +188,24 @@ script level.  Every native function has the same Java signature:</p>
 <li><a href="#arity-checking">Arity Checking</a>: Ensure that it has received the correct
 number of arguments.</li>
 <li><a href="#argument-conversion">Argument Conversion</a>: Ensure that those arguments have
-the desired Java data types.</li>
+the desired Java data types, and throw meaningful errors if they do not.</li>
 <li>Do the required computation—which often involves making a simple
 call to some Java API.</li>
 <li><a href="#return-the-result">Return the Result</a>: If any.</li>
 </ul>
 <p>Joe provides the tools to make each of these steps simple and concise.</p>
 <p>For example, a simple function to square a number would look like this:</p>
-<pre><code class="language-java">Object _square(Joe joe, ArgQueue args) {
+<pre><code class="language-java">Object _square(Joe joe, Args args) {
     args.exactArity(1, "square(x)");       // Arity check
     var x = joe.toDouble(args.next());     // Argument conversion
-    return x*x;                            // Computation
+    return x*x;                            // Computation and return
 }
 </code></pre>
 <h2 id="installing-a-native-function"><a class="header" href="#installing-a-native-function">Installing a Native Function</a></h2>
 <p>To install a native function, use the <code>Joe::installGlobalFunction</code> method:</p>
 <pre><code class="language-java">var joe = new Joe();
 
-joe.install("square", this::_square);
+joe.installGlobalFunction("square", this::_square);
 </code></pre>
 <h2 id="arity-checking"><a class="header" href="#arity-checking">Arity Checking</a></h2>
 <p>A function's <em>arity</em> is the number of arguments it takes.  Joe provides four
@@ -224,7 +224,7 @@ takes two arguments:</p>
 <p>If <em>args</em> doesn't contain exactly the correct number of arguments,
 <code>exactArity()</code> will use <code>Args.arityFailure()</code> to throw a <code>JoeError</code>
 with this message:</p>
-<p><code>    Wrong number of arguments, expected: square(x)</code></p>
+<p><code>Wrong number of arguments, expected: square(x).</code></p>
 <h3 id="minimum-arity-and-arity-ranges"><a class="header" href="#minimum-arity-and-arity-ranges">Minimum Arity and Arity Ranges</a></h3>
 <p>Similarly, the <code>Args::minArity</code> method checks that the <em>args</em> contains
 at least a minimum number of arguments.  For example,
@@ -247,10 +247,10 @@ false within a certain range.  For example, the
 }
 </code></pre>
 <h2 id="argument-conversion"><a class="header" href="#argument-conversion">Argument Conversion</a></h2>
-<p>Before passing an <code>Object</code> to a Java method, it's necessary to make sure it
-has the correct type, and to produce an appropriate error message if it does
-not.  Joe provides a family of argument conversion methods for this purpose;
-client-specific converters are easily implemented.</p>
+<p>Before passing an <code>Object</code> to a Java method, it's necessary to cast it or
+convert it to the required type, and to produce an appropriate error message
+if that cannot be done.  Joe provides a family of argument conversion methods
+for this purpose, and client-specific converters are easily implemented.</p>
 <p>For example,</p>
 <pre><code class="language-java">var x = joe.toDouble(args.next());
 </code></pre>
@@ -260,16 +260,21 @@ client-specific converters are easily implemented.</p>
 or throws a <code>JoeError</code>.</li>
 </ul>
 <p>The <code>JoeError</code> message will look like this:</p>
-<p><code>    Expected number, got: &lt;actualType&gt; '&lt;actualValue&gt;'.</code></p>
-<p>See the <code>Joe</code> class Javadoc for the family of converters, and the <code>Joe</code> class
-source code for how they are implemented, and the many <code>TypeProxies</code> in
-<code>com.wjduquette.joe.types</code> for examples of their use.</p>
+<p><code>Expected number, got: &lt;actualType&gt; '&lt;actualValue&gt;'.</code></p>
+<p>See the <code>Joe</code> class's Javadoc for the family of converters, and the
+<code>Joe</code> class's source code for how they are implemented; and the many
+<code>ProxyTypes</code> in <code>com.wjduquette.joe.types</code> for examples of their use.</p>
 <h3 id="converting-strings"><a class="header" href="#converting-strings">Converting Strings</a></h3>
 <p>There are two ways to convert an argument that is to be treated as a String.</p>
-<p>First, <code>joe.toString(arg)</code> will require that the value is actually a Java
-<code>String</code>.</p>
-<p>Alternatively, <code>joe.stringify(arg)</code> will convert the argument, of whatever type,
-to its string representation.</p>
+<ul>
+<li>
+<p><code>joe.toString(arg)</code> requires that the value is already a Java <code>String</code>.</p>
+</li>
+<li>
+<p><code>joe.stringify(arg)</code> will convert the argument, of whatever type,
+to its string representation.  Proxy types can customize that representation.</p>
+</li>
+</ul>
 <p>Which of these you use will depend on the native function in question.  To
 some extent it's a matter of taste.</p>
 <h3 id="converting-booleans"><a class="header" href="#converting-booleans">Converting Booleans</a></h3>
@@ -291,20 +296,19 @@ doubles, but integers are an <a href="java_types.html#opaque-types">opaque type<
 </code></pre>
 <p><strong>Returning Lists</strong>: Most lists should be returned as <code>ListValue</code> values,
 which can be modified freely at the script level.</p>
-<p>If java code produces a list that need not be modified, then it can
+<p>If Java code produces a list that need not or must not be modified, then it can
 be made read-only:</p>
 <pre><code class="language-java">return joe.readonlyList(myList);
 </code></pre>
-<p>If the list is not a <code>List&lt;Object&gt;</code>, and needs to be modified in place
+<p>If the Java list is not a <code>List&lt;Object&gt;</code>, and needs to be modified in place
 at the script level, wrap it and specify the item type.  (This is
 often necessary in JavaFX-related code):</p>
-<pre><code class="language-dtd">return joe.wrapList(myList, MyItemType.class);
+<pre><code class="language-java">return joe.wrapList(myList, MyItemType.class);
 </code></pre>
 <p>Joe will then ensure that only values assignable to <code>MyItemType</code> are
-added to the list.</p>
-<p><strong>Other Collections</strong>: At time of writing, Joe does not yet support
-maps or sets; when it does, they should be returned in the same way
-as lists.</p>
+added to the list.  There are several variants of <code>Joe::wrapList</code>.</p>
+<p><strong>Other Collections</strong>: Joe supports maps and sets in much the same way as
+lists.</p>
 
                     </main>
 

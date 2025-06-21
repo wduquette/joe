@@ -15,7 +15,7 @@ For example,
 ```java
 public class StringType extends ProxyType<String> {
     public StringType() {
-        ...
+        super("String");
     }
     ...
 }
@@ -24,7 +24,9 @@ public class StringType extends ProxyType<String> {
 By convention, a Java proxy types have names ending
 with "Type", as in `StringType`.  If the type can be subclassed by a scripted
 Joe `class`, then the proxy type's name should end in "Class", as in 
-`TextBuilderClass`.
+`TextBuilderClass`.  If the type has no instances, but exists only as the 
+owner of static methods and/or constants, it should end in "Singleton",
+as in the `JoeSingleton` class.
 
 The constructor defines the various aspects of the proxy:
 
@@ -72,8 +74,9 @@ same name as the type, e.g., `String`.
 
 Second, the proxy must explicitly identify the proxied type or types.
 
-Usually a proxy will proxy the single type `V`, but if `V` is an interface
-the relevant classes need to be identified. Here's the first case:
+Usually a proxy will proxy the single type `V`, but if `V` is an interface or
+a base class, it might be desirable to explicitly identify the concrete
+classes.  For example, a Joe `String` is just exactly a Java `String`.
 
 ```java
 public class StringType extends ProxyType<String> {
@@ -85,8 +88,8 @@ public class StringType extends ProxyType<String> {
 }
 ```
 
-And here's an example of the second.  `JoeList` is an interface, so we must
-tell Joe which types the interpreter should look for.
+But a Joe `List` could be a Java `ListValue` or `ListWrapper`, both of which
+implement the `JoeList` interface:
 
 ```java
 public class ListType extends ProxyType<JoeList> {
@@ -101,35 +104,28 @@ public class ListType extends ProxyType<JoeList> {
 
 ## Type Lookup
 
-At runtime, Joe sees a value and looks for the value's proxy type 
+At runtime, Joe sees a value and looks up the value's proxy type 
 in its type registry.  This section explains how
 the lookup is done, as it can get complicated.
 
-First, Joe maintains two lookup tables:
-
-- The `proxyTable`, a map from `Class` objects to `ProxyType<?>` objects.
-
-Given these, the lookup logic is as follows: 
+Joe keeps registered type information in the `proxyTable`, a map from 
+Java `Class` objects to Java `ProxyType<?>` objects.
 
 - If value's `Class` is found in the `proxyTable`, the proxy is returned 
   immediately.  This is the most common case.
 
-- Next, if the `Class` is found in the `opaqueTypes` table, the lookup
-  fails immediately.
-
-- Next, Joe checks the `proxyTable` for the value's superclass, and so on
+- Next, Joe looks in the `proxyTable` for the value's superclass, and so on
   up the class hierarchy.
-  - If a proxy is found, it is cached back into the `proxyTable` for the
-    value's concrete class.  It will be found immediately next time.
 
-- Next, Joe checks the `proxyTable` for any interfaces implemented by the
+- Next, Joe looks in the `proxyTable` for any interfaces implemented by the
   value's type, starting with the type's own `Class` and working its way
   up the class hierarchy.
-  - If a proxy is found, it is cached back into the `proxyTable` for the
-    value's concrete class.  It will be found immediately next time.
 
-- Finally, if no proxy has been found an `OpaqueType` is created and 
+- Finally, if no proxy has been found then an `OpaqueType` proxy is created and 
   registered for the value's `Class`.
+
+Whatever proxy is found, it is cached back into the `proxyTable` for the
+value's concrete class so that it will be found immediately next time.
 
 **NOTE**: when looking for registered interfaces, Joe only looks at the 
 interfaces directly implemented by the value's class or its superclasses; 
@@ -159,8 +155,10 @@ public class AssertErrorProxy extends ProxyType<AssertError> {
 
 ## Stringification
 
-When Joe converts a value to a string, it does so via `Joe::stringify`.  For
-proxied types, this defaults to returning the value's normal Java `toString()`.
+When Joe converts a value to a string, it does so using a function called
+`Joe::stringify`.  If the value belongs to a proxied type, `Joe::stringify`
+calls the proxy's `stringify()` method, which returns the result of the
+values `toString()` by default.
 
 To change how a value is stringified at the script level, override 
 `ProxyType::stringify`.  For example, `NumberType` ensures that 
@@ -186,8 +184,7 @@ can iterate over or search the following kinds of collection values:
 
 - Any Java `Collection<?>`
 - Any value that implements the `JoeIterable` interface
-- Any `JoeObject`, e.g., any registered type, that can convert its values
-  into a list for iteration.
+- Any proxied type whose `ProxyType` can produce a list of items for iteration.
 
 To make your registered type iterable, provide an iterables supplier, a
 function that accepts a value of your type and returns a `Collection<?>`.
@@ -216,14 +213,14 @@ public class NumberType extends ProxyType<Double> {
     public NumberType() {
         super("Number");
         ...
-        constant("E", Math.E);
+        constant("PI", Math.PI);
         ...
     }
     ...
 }
 ```
 
-In this case, the constant is accessible as `Number.E`.
+In this case, the constant is accessible as `Number.PI`.
 
 ## Static Methods
 
@@ -244,7 +241,7 @@ public class StringType extends ProxyType<String> {
     }
     ...
     
-    private Object _join(Joe joe, ArgQueue args) {
+    private Object _join(Joe joe, Args args) {
         args.exactArity(2, "join(delimiter, list)");
         ...
     }
@@ -269,8 +266,9 @@ public class ListType extends ProxyType<JoeList> {
         ...
     }
 
-    private Object _init(Joe joe, ArgQueue args) {
-        return new ListValue(args.asList());
+    private Object _init(Joe joe, Args args) {
+        ... create a new list given the arguments ...
+        return new ListValue(list);
     }
 ```
 
@@ -304,8 +302,8 @@ a library to convert between Joe values and JSON strings.  It might look
 like this:
 
 ```java
-public class JSONType extends ProxyType<Void> {
-    public JSONType() {
+public class JSONSingleton extends ProxyType<Void> {
+    public JSONSingleton() {
         super("JSON");
         staticType();
         
@@ -323,11 +321,10 @@ Most type proxies will define one or more instance methods for values of the
 type.  For example, [`String`](../library/type.joe.String.md) and 
 [`List`](../library/type.joe.List.md) provide a great many instance methods.
 
-An instance method is quite similar to a [native function](native_functions.md);
-the only practical difference is that an instance method is bound to a value
-of the proxied type, and so has a slightly different signature.  For example,
-here is the implementation of the `String` type's 
-[`length()`](../library/type.joe.String.md#method.length) method.
+An instance method is quite similar to a [native function](native_functions.md), but
+an instance method is bound to a value of the proxied type, and so has a 
+slightly different signature.  For example, here is the implementation of 
+the `String` type's [`length()`](../library/type.joe.String.md#method.length) method.
 
 ```java
 public class StringType extends ProxyType<String> {
@@ -338,7 +335,7 @@ public class StringType extends ProxyType<String> {
     }
     ...
 
-    private Object _length(String value, Joe joe, ArgQueue args) {
+    private Object _length(String value, Joe joe, Args args) {
         args.exactArity(0, "length()");
         return (double)value.length();
     }
@@ -382,6 +379,5 @@ var joe = new Joe();
 
 joe.installType(StringType.TYPE);
 ```
-
 
 

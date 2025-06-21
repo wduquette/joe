@@ -185,7 +185,7 @@ it with Joe for use.</p>
 For example,</p>
 <pre><code class="language-java">public class StringType extends ProxyType&lt;String&gt; {
     public StringType() {
-        ...
+        super("String");
     }
     ...
 }
@@ -193,7 +193,9 @@ For example,</p>
 <p>By convention, a Java proxy types have names ending
 with "Type", as in <code>StringType</code>.  If the type can be subclassed by a scripted
 Joe <code>class</code>, then the proxy type's name should end in "Class", as in
-<code>TextBuilderClass</code>.</p>
+<code>TextBuilderClass</code>.  If the type has no instances, but exists only as the
+owner of static methods and/or constants, it should end in "Singleton",
+as in the <code>JoeSingleton</code> class.</p>
 <p>The constructor defines the various aspects of the proxy:</p>
 <ul>
 <li><a href="#the-script-level-type-name">The Script-level Type Name</a></li>
@@ -233,8 +235,9 @@ kindness to the client.</li>
 same name as the type, e.g., <code>String</code>.</p>
 <h2 id="the-proxied-types"><a class="header" href="#the-proxied-types">The Proxied Types</a></h2>
 <p>Second, the proxy must explicitly identify the proxied type or types.</p>
-<p>Usually a proxy will proxy the single type <code>V</code>, but if <code>V</code> is an interface
-the relevant classes need to be identified. Here's the first case:</p>
+<p>Usually a proxy will proxy the single type <code>V</code>, but if <code>V</code> is an interface or
+a base class, it might be desirable to explicitly identify the concrete
+classes.  For example, a Joe <code>String</code> is just exactly a Java <code>String</code>.</p>
 <pre><code class="language-java">public class StringType extends ProxyType&lt;String&gt; {
     public StringType() {
         super("String");
@@ -243,8 +246,8 @@ the relevant classes need to be identified. Here's the first case:</p>
     ...
 }
 </code></pre>
-<p>And here's an example of the second.  <code>JoeList</code> is an interface, so we must
-tell Joe which types the interpreter should look for.</p>
+<p>But a Joe <code>List</code> could be a Java <code>ListValue</code> or <code>ListWrapper</code>, both of which
+implement the <code>JoeList</code> interface:</p>
 <pre><code class="language-java">public class ListType extends ProxyType&lt;JoeList&gt; {
     public ListType() {
         super("List");
@@ -255,45 +258,32 @@ tell Joe which types the interpreter should look for.</p>
 }
 </code></pre>
 <h2 id="type-lookup"><a class="header" href="#type-lookup">Type Lookup</a></h2>
-<p>At runtime, Joe sees a value and looks for the value's proxy type
+<p>At runtime, Joe sees a value and looks up the value's proxy type
 in its type registry.  This section explains how
 the lookup is done, as it can get complicated.</p>
-<p>First, Joe maintains two lookup tables:</p>
-<ul>
-<li>The <code>proxyTable</code>, a map from <code>Class</code> objects to <code>ProxyType&lt;?&gt;</code> objects.</li>
-</ul>
-<p>Given these, the lookup logic is as follows:</p>
+<p>Joe keeps registered type information in the <code>proxyTable</code>, a map from
+Java <code>Class</code> objects to Java <code>ProxyType&lt;?&gt;</code> objects.</p>
 <ul>
 <li>
 <p>If value's <code>Class</code> is found in the <code>proxyTable</code>, the proxy is returned
 immediately.  This is the most common case.</p>
 </li>
 <li>
-<p>Next, if the <code>Class</code> is found in the <code>opaqueTypes</code> table, the lookup
-fails immediately.</p>
-</li>
-<li>
-<p>Next, Joe checks the <code>proxyTable</code> for the value's superclass, and so on
+<p>Next, Joe looks in the <code>proxyTable</code> for the value's superclass, and so on
 up the class hierarchy.</p>
-<ul>
-<li>If a proxy is found, it is cached back into the <code>proxyTable</code> for the
-value's concrete class.  It will be found immediately next time.</li>
-</ul>
 </li>
 <li>
-<p>Next, Joe checks the <code>proxyTable</code> for any interfaces implemented by the
+<p>Next, Joe looks in the <code>proxyTable</code> for any interfaces implemented by the
 value's type, starting with the type's own <code>Class</code> and working its way
 up the class hierarchy.</p>
-<ul>
-<li>If a proxy is found, it is cached back into the <code>proxyTable</code> for the
-value's concrete class.  It will be found immediately next time.</li>
-</ul>
 </li>
 <li>
-<p>Finally, if no proxy has been found an <code>OpaqueType</code> is created and
+<p>Finally, if no proxy has been found then an <code>OpaqueType</code> proxy is created and
 registered for the value's <code>Class</code>.</p>
 </li>
 </ul>
+<p>Whatever proxy is found, it is cached back into the <code>proxyTable</code> for the
+value's concrete class so that it will be found immediately next time.</p>
 <p><strong>NOTE</strong>: when looking for registered interfaces, Joe only looks at the
 interfaces directly implemented by the value's class or its superclasses;
 it does <em>not</em> check any interfaces that those interfaces might extend.
@@ -315,8 +305,10 @@ method:</p>
 }
 </code></pre>
 <h2 id="stringification"><a class="header" href="#stringification">Stringification</a></h2>
-<p>When Joe converts a value to a string, it does so via <code>Joe::stringify</code>.  For
-proxied types, this defaults to returning the value's normal Java <code>toString()</code>.</p>
+<p>When Joe converts a value to a string, it does so using a function called
+<code>Joe::stringify</code>.  If the value belongs to a proxied type, <code>Joe::stringify</code>
+calls the proxy's <code>stringify()</code> method, which returns the result of the
+values <code>toString()</code> by default.</p>
 <p>To change how a value is stringified at the script level, override
 <code>ProxyType::stringify</code>.  For example, <code>NumberType</code> ensures that
 integer-valued numbers are displayed without a trailing <code>.0</code>:</p>
@@ -337,8 +329,7 @@ can iterate over or search the following kinds of collection values:</p>
 <ul>
 <li>Any Java <code>Collection&lt;?&gt;</code></li>
 <li>Any value that implements the <code>JoeIterable</code> interface</li>
-<li>Any <code>JoeObject</code>, e.g., any registered type, that can convert its values
-into a list for iteration.</li>
+<li>Any proxied type whose <code>ProxyType</code> can produce a list of items for iteration.</li>
 </ul>
 <p>To make your registered type iterable, provide an iterables supplier, a
 function that accepts a value of your type and returns a <code>Collection&lt;?&gt;</code>.</p>
@@ -361,13 +352,13 @@ by its property name and the relevant Joe value.</p>
     public NumberType() {
         super("Number");
         ...
-        constant("E", Math.E);
+        constant("PI", Math.PI);
         ...
     }
     ...
 }
 </code></pre>
-<p>In this case, the constant is accessible as <code>Number.E</code>.</p>
+<p>In this case, the constant is accessible as <code>Number.PI</code>.</p>
 <h2 id="static-methods"><a class="header" href="#static-methods">Static Methods</a></h2>
 <p>A proxy may also define any number of static methods, called as properties
 of the type object.  For example, the <code>String</code> type defines the
@@ -383,7 +374,7 @@ as a property of a list object.</p>
     }
     ...
     
-    private Object _join(Joe joe, ArgQueue args) {
+    private Object _join(Joe joe, Args args) {
         args.exactArity(2, "join(delimiter, list)");
         ...
     }
@@ -403,8 +394,9 @@ of the type, and may take any desired arguments.</p>
         ...
     }
 
-    private Object _init(Joe joe, ArgQueue args) {
-        return new ListValue(args.asList());
+    private Object _init(Joe joe, Args args) {
+        ... create a new list given the arguments ...
+        return new ListValue(list);
     }
 </code></pre>
 <h2 id="static-types"><a class="header" href="#static-types">Static Types</a></h2>
@@ -430,8 +422,8 @@ This need not be the case.  It is common to define a static type as a named
 library of functions with no related Java type.  For example, consider
 a library to convert between Joe values and JSON strings.  It might look
 like this:</p>
-<pre><code class="language-java">public class JSONType extends ProxyType&lt;Void&gt; {
-    public JSONType() {
+<pre><code class="language-java">public class JSONSingleton extends ProxyType&lt;Void&gt; {
+    public JSONSingleton() {
         super("JSON");
         staticType();
         
@@ -446,11 +438,10 @@ like this:</p>
 <p>Most type proxies will define one or more instance methods for values of the
 type.  For example, <a href="../library/type.joe.String.html"><code>String</code></a> and
 <a href="../library/type.joe.List.html"><code>List</code></a> provide a great many instance methods.</p>
-<p>An instance method is quite similar to a <a href="native_functions.html">native function</a>;
-the only practical difference is that an instance method is bound to a value
-of the proxied type, and so has a slightly different signature.  For example,
-here is the implementation of the <code>String</code> type's
-<a href="../library/type.joe.String.html#method.length"><code>length()</code></a> method.</p>
+<p>An instance method is quite similar to a <a href="native_functions.html">native function</a>, but
+an instance method is bound to a value of the proxied type, and so has a
+slightly different signature.  For example, here is the implementation of
+the <code>String</code> type's <a href="../library/type.joe.String.html#method.length"><code>length()</code></a> method.</p>
 <pre><code class="language-java">public class StringType extends ProxyType&lt;String&gt; {
     public StringType() {
         ...
@@ -459,7 +450,7 @@ here is the implementation of the <code>String</code> type's
     }
     ...
 
-    private Object _length(String value, Joe joe, ArgQueue args) {
+    private Object _length(String value, Joe joe, Args args) {
         args.exactArity(0, "length()");
         return (double)value.length();
     }

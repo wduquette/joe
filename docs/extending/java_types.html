@@ -183,27 +183,28 @@
 <h2 id="standard-types"><a class="header" href="#standard-types">Standard Types</a></h2>
 <p>Joe provides a number of standard data types, as described in the
 <a href="../types.html">Types and Values</a> section and the
-<a href="../library/pkg.joe.html">Joe Standard Library</a> section.  Each of these
-represented internally as a normal Java value.</p>
+<a href="../library/pkg.joe.html">Joe Standard Library</a> section.  Values of these
+types are represented internally as normal Java values.</p>
 <div class="table-wrapper"><table><thead><tr><th>Joe Type</th><th>Java Type</th></tr></thead><tbody>
 <tr><td><code>Boolean</code></td><td><code>java.lang.Boolean</code></td></tr>
 <tr><td><code>Error</code></td><td><code>com.wjduquette.joe.JoeError</code> (a <code>RuntimeException</code>)</td></tr>
 <tr><td><code>Keyword</code></td><td><code>com.wjduquette.joe.Keyword</code></td></tr>
-<tr><td><code>List</code></td><td><code>com.wjduquette.joe.JoeList</code> (a <code>List&lt;Object&gt;</code>)</td></tr>
+<tr><td><code>List</code></td><td><code>com.wjduquette.joe.JoeValue</code> (a <code>List&lt;Object&gt;</code>)</td></tr>
 <tr><td><code>Number</code></td><td><code>java.lang.Double</code></td></tr>
 <tr><td><code>String</code></td><td><code>java.lang.String</code></td></tr>
 </tbody></table>
 </div>
-<p>When used in Java code, consequently, a Joe <code>List</code> is a Java <code>List&lt;Object&gt;</code>.
-A Joe string is a Java <code>String</code>.  A Joe <code>Number</code> is a Java <code>double</code>.
-This greatly decreases the amount of work a binding needs to do when
-working with Joe values.</p>
+<p>When used in Java code, consequently, a Joe <code>List</code> is a Java
+<code>List&lt;Object&gt;</code>. A Joe string is a Java <code>String</code>.  A Joe <code>Number</code> is a
+Java <code>double</code>. This greatly decreases the amount of work a binding
+needs to do when working with Joe values, compared to other embedded
+languages I have used.</p>
 <p>A client binding should generally try to make the best use of these
 types.</p>
 <h2 id="opaque-types"><a class="header" href="#opaque-types">Opaque Types</a></h2>
 <p>Every Java value, without exception<sup class="footnote-reference"><a href="#primitive">1</a></sup>, is a valid Joe value, and
-can be assigned to a Joe variable, passed to a Joe function, and returned
-by a Joe function, whether Joe knows anything special about the value's
+can be assigned to Joe variables, passed to a Joe functions, and returned
+by Joe functions, whether Joe knows anything special about the value's
 type or not.</p>
 <p>A Java type that Joe knows nothing special about is called an <em>opaque type</em>.
 But every such type is still a Java class and a subtype of
@@ -216,10 +217,9 @@ Given such a value, Joe can:</p>
 <li>Use it as a key in a hash table</li>
 <li>If it's a <code>Collection&lt;?&gt;</code>, iterate over its members</li>
 </ul>
-<p>For many domain-specific use cases, that may be all that's required.
-When more is wanted, the client can register a
-<a href="registered_types.html">proxy type</a> for the type, thus turning the opaque
-type into a registered type.</p>
+<p>That might be all that's needed for many domain-specific use cases. When more
+is wanted, the client can register a <a href="registered_types.html">proxy type</a> for
+the type, thus turning the opaque type into a registered type.</p>
 <h2 id="registered-types"><a class="header" href="#registered-types">Registered Types</a></h2>
 <p>A <em>registered type</em> is a Java type for which the client has registered
 a <a href="registered_types.html">proxy type</a>. The proxy type can give the Joe
@@ -227,14 +227,15 @@ interpreter the ability to:</p>
 <ul>
 <li>Create instances of the type</li>
 <li>Call methods on values of the type</li>
+<li>Access fields of values of the type</li>
 <li>Customize the string representation for the type</li>
 <li>Define static constants and methods for the type</li>
 <li>Make the type iterable, so that its contents can be iterated over via
 the <code>foreach</code> statement.</li>
 </ul>
-<p><strong>Note</strong>: the standard Joe types are nothing more than registered types
-that are registered with every Joe interpreter.  There's no magic; or,
-rather, the magic is fully available for use in client bindings.</p>
+<p><strong>Note</strong>: Most of the standard Joe types are nothing more than registered
+types that are registered automatically with every Joe interpreter.  There's
+no magic; or, rather, the magic is fully available for use in client bindings.</p>
 <div class="footnote-definition" id="primitive"><sup class="footnote-definition-label">1</sup>
 <p>Primitive types are represented as their boxed equivalents,
 e.g, <code>double</code> by <code>Double</code>.</p>
