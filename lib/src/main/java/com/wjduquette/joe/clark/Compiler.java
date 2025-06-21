@@ -613,26 +613,6 @@ class Compiler {
                     emitReturn(); // Includes initializer magic
                 }
             }
-            case Stmt.RuleSet s -> {
-                // FIRST, compile the rule set.
-                var rsc = new RuleSetCompiler(s.ruleSet());
-                rsc.setFactFactory(ListFact::new);
-                var ruleset = rsc.compile();
-
-                // Get the exports                // Stack effects
-                emit(MAPNEW);                     // map       ; Map of exports
-                for (var export : s.exports().entrySet()) {
-                    var name = export.getKey().lexeme();
-                    emitCONST(name);              // map k     ; export name
-                    emit(export.getValue());      // map k v   ; export value
-                    emit(MAPPUT);                 // map       ; put k v
-                }
-                emit(RULESET,                     // rsv       ; RuleSetValue
-                    constant(s.name().lexeme()),
-                    constant(ruleset));
-                defineVar(s.name());
-            }
-
             case Stmt.Switch s -> {
                 beginScope();
                 emit(s.expr());
@@ -985,6 +965,22 @@ class Compiler {
                 emit(e.value());          // o a b  ; compute update value
                 emit(mathOp);             // o c    ; c = a op b
                 emit(PROPSET, name);      // c      ; o.name = c
+            }
+            case Expr.RuleSet e -> {
+                // FIRST, compile the rule set.
+                var rsc = new RuleSetCompiler(e.ruleSet());
+                rsc.setFactFactory(ListFact::new);
+                var ruleset = rsc.compile();
+
+                // Get the exports                // Stack effects
+                emit(MAPNEW);                     // map       ; Map of exports
+                for (var export : e.exports().entrySet()) {
+                    var name = export.getKey().lexeme();
+                    emitCONST(name);              // map k     ; export name
+                    emit(export.getValue());      // map k v   ; export value
+                    emit(MAPPUT);                 // map       ; put k v
+                }
+                emit(RULESET, constant(ruleset)); // rsv       ; RuleSetValue
             }
             case Expr.Super e -> {
                 if (currentType == null || !currentType.inInstanceMethod) {

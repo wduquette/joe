@@ -105,18 +105,6 @@ public class ASTDumper {
             case Stmt.Return s -> s.value() == null
                 ? ""
                 : buffer().nl().dump(s.value());
-            case Stmt.RuleSet s -> {
-                var buff = buffer()
-                    .println(" '" + s.name().lexeme() + "'").nl()
-                    .dump("ruleset", s.ruleSet());
-
-                for (var export : s.exports().entrySet()) {
-                    buff.dump("export " + export.getKey().lexeme(),
-                        export.getValue());
-                }
-
-                yield buff.toString();
-            }
             case Stmt.Switch s -> {
                 var buff = buffer().nl();
                 buff.dump("value", s.expr());
@@ -237,6 +225,16 @@ public class ASTDumper {
                 .println("'" + e.op().lexeme() + "'")
                 .dump("object", e.object())
                 .dump("value", e.value());
+            case Expr.RuleSet e -> {
+                var buff = buffer().nl()
+                    .dump("ruleset", e.ruleSet());
+                for (var export : e.exports().entrySet()) {
+                    buff.dump("export " + export.getKey().lexeme(),
+                        export.getValue());
+                }
+                yield buff.toString();
+            }
+
             case Expr.Super e -> buffer()
                 .println(" '" + e.method().lexeme() + "'");
             case Expr.Ternary e -> buffer().nl()

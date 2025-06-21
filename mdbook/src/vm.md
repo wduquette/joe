@@ -78,7 +78,7 @@ The byte-engine is a stack machine with a few registers:
 | PROPSET *name*         | *obj a* → *a*           | Set property value        |
 | RECORD *name fields*   | ∅ → *type*              | Create record type        |
 | RETURN                 | *a* → *a*               | Return                    |
-| RULESET *name ruleset* | *exports* → *rsv*       | Evaluate rule set         |
+| RULESET *ruleset*      | *exports* → *rsv*       | Evaluate rule set         |
 | SUB                    | *a b* → *c*             | c = a - b                 |
 | SUPGET *name*          | *obj sup* → *f*         | Get superclass method     |
 | SWAP                   | *a b* → *b a*           | Swap top stack items      |
@@ -608,10 +608,10 @@ result is popped and returned to the Java caller.
 
 ### RULESET
 ---
-**RULESET** *name ruleset* | *exports* → *rsv*
+**RULESET** *ruleset* | *exports* → *rsv*
 
 Given a `RuleSet` as a constant, and a map of callable expressions by relation 
-name on the stack, creates a `RuleSetValue`.
+name on the stack, pushes a `RuleSetValue`.
 
 ### SUB
 ---
