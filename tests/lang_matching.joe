@@ -220,7 +220,6 @@ function testOrderedField_noFieldPatterns() {
 // Can match based on type for types without fields if the pattern has no
 // field patterns.
 function testOrderedField_noFieldPatterns() {
-    skip("Not yet supported");
     assertTrue("abc" ~ String());
     assertFalse("abc" ~ Number());
 }

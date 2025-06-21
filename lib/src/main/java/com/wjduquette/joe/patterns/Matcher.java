@@ -180,24 +180,35 @@ public class Matcher {
 
             case Pattern.OrderedFieldPattern p -> {
                 Fact fact;
+                var jv = joe.getJoeValue(value);
 
                 if (value instanceof Fact f) {
+                    // It's a `Fact` object; use it as is.
                     fact = f;
                     if (!fact.relation().equals(p.typeName())) yield false;
-                } else {
-                    var obj = joe.getJoeValue(value);
-                    if (!obj.isFact()) yield false;
-                    fact = obj.toFact();
-                    if (!obj.type().name().equals(p.typeName())) yield false;
+                } else if (jv.isFact()) {
+                    // It's convertible to a fact object; verify that the
+                    // requested name is the object's relation, type,
+                    // or a supertype.
+                    fact = jv.toFact();
 
                     if (!p.typeName().equals(fact.relation()) &&
-                        !hasType(obj, p.typeName())
+                        !hasType(jv, p.typeName())
                     ) yield false;
+                } else {
+                    // It's not convertible to a fact, i.e., it has no
+                    // fields. If the pattern has no field patterns,
+                    // check the name; otherwise it fails.
+
+                    yield p.patterns().isEmpty() && hasType(jv, p.typeName());
                 }
 
-                // At this point the type name/relation matches.
+                // At this point we know:
+                //
+                // - The type name/relation matches.
+                // - The `fact` variable makes the fields visible.
 
-                // If no field patterns, just yield true.
+                // Check for field patterns.
                 if (p.patterns().isEmpty()) yield true;
 
                 // Check the fields; the fact must be ordered.
