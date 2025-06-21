@@ -4070,8 +4070,10 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.RuleSet.html">RuleSet</a>
 <ul>
 <li><a href="library/type.joe.RuleSet.html#method.infer"><em>ruleSet</em>.infer([<em>inputs</em>])</a> → <a href="library/type.joe.Set.html">Set</a></li>
+<li><a href="library/type.joe.RuleSet.html#method.isDebug"><em>ruleSet</em>.isDebug()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.isStratified"><em>ruleSet</em>.isStratified()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.name"><em>ruleSet</em>.name()</a> → <a href="library/type.joe.String.html">String</a></li>
+<li><a href="library/type.joe.RuleSet.html#method.setDebug"><em>ruleSet</em>.setDebug(<em>flag</em>)</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.toString"><em>ruleSet</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
 </li>
@@ -5606,8 +5608,10 @@ base facts, and any input facts provided by the script.</p>
 <p><strong><a href="library/type.joe.RuleSet.html#methods">Methods</a></strong></p>
 <ul>
 <li><a href="library/type.joe.RuleSet.html#method.infer"><em>ruleSet</em>.infer([<em>inputs</em>])</a> → <a href="library/type.joe.Set.html">Set</a></li>
+<li><a href="library/type.joe.RuleSet.html#method.isDebug"><em>ruleSet</em>.isDebug()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.isStratified"><em>ruleSet</em>.isStratified()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.name"><em>ruleSet</em>.name()</a> → <a href="library/type.joe.String.html">String</a></li>
+<li><a href="library/type.joe.RuleSet.html#method.setDebug"><em>ruleSet</em>.setDebug(<em>flag</em>)</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.toString"><em>ruleSet</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
 <h2 id="methods"><a class="header" href="#methods">Methods</a></h2>
@@ -5624,16 +5628,27 @@ if any input fact's type name is the same as a relation used in
 one of the rule set's rule heads or axioms.</p>
 <p>However, an <code>export</code> declaration can achieve the same effect.
 See the Nero tutorial for details.</p>
+<p><span id="method.isDebug"> </span></p>
+<h3 id="rulesetisdebug"><a class="header" href="#rulesetisdebug"><em>ruleSet</em>.isDebug()</a></h3>
+<hr />
+<p><strong><em>ruleSet</em>.isDebug() → <a href="library/type.joe.Boolean.html">Boolean</a></strong></p>
+<p>Returns the rule set's debug flag.</p>
 <p><span id="method.isStratified"> </span></p>
 <h3 id="rulesetisstratified"><a class="header" href="#rulesetisstratified"><em>ruleSet</em>.isStratified()</a></h3>
 <hr />
 <p><strong><em>ruleSet</em>.isStratified() → <a href="library/type.joe.Boolean.html">Boolean</a></strong></p>
-<p>Returns the value's string representation.</p>
+<p>Returns whether the rule set is stratified or not.</p>
 <p><span id="method.name"> </span></p>
 <h3 id="rulesetname"><a class="header" href="#rulesetname"><em>ruleSet</em>.name()</a></h3>
 <hr />
 <p><strong><em>ruleSet</em>.name() → <a href="library/type.joe.String.html">String</a></strong></p>
 <p>Returns the rule set's name.</p>
+<p><span id="method.setDebug"> </span></p>
+<h3 id="rulesetsetdebug"><a class="header" href="#rulesetsetdebug"><em>ruleSet</em>.setDebug()</a></h3>
+<hr />
+<p><strong><em>ruleSet</em>.setDebug(<em>flag</em>)</strong></p>
+<p>Sets the rule set's debug flag.  If enabled,
+<a href="library/type.joe.RuleSet.html#method.infer"><code>infer()</code></a> will output a detailed execution trace.</p>
 <p><span id="method.toString"> </span></p>
 <h3 id="rulesettostring"><a class="header" href="#rulesettostring"><em>ruleSet</em>.toString()</a></h3>
 <hr />
@@ -9220,8 +9235,10 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.RuleSet.html">RuleSet</a>
 <ul>
 <li><a href="library/type.joe.RuleSet.html#method.infer"><em>ruleSet</em>.infer([<em>inputs</em>])</a> → <a href="library/type.joe.Set.html">Set</a></li>
+<li><a href="library/type.joe.RuleSet.html#method.isDebug"><em>ruleSet</em>.isDebug()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.isStratified"><em>ruleSet</em>.isStratified()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.name"><em>ruleSet</em>.name()</a> → <a href="library/type.joe.String.html">String</a></li>
+<li><a href="library/type.joe.RuleSet.html#method.setDebug"><em>ruleSet</em>.setDebug(<em>flag</em>)</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.toString"><em>ruleSet</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
 </li>

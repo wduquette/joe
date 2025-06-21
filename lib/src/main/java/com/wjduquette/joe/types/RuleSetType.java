@@ -30,8 +30,10 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
         proxies(RuleSetValue.class);
 
         method("infer",        this::_infer);
+        method("isDebug",      this::_isDebug);
         method("isStratified", this::_isStratified);
         method("name",         this::_name);
+        method("setDebug",     this::_setDebug);
         method("toString",     this::_toString);
     }
 
@@ -84,9 +86,18 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
     }
 
     //**
+    // @method isDebug
+    // @result Boolean
+    // Returns the rule set's debug flag.
+    private Object _isDebug(RuleSetValue value, Joe joe, Args args) {
+        args.exactArity(0, "isDebug()");
+        return value.isDebug();
+    }
+
+    //**
     // @method isStratified
     // @result Boolean
-    // Returns the value's string representation.
+    // Returns whether the rule set is stratified or not.
     private Object _isStratified(RuleSetValue value, Joe joe, Args args) {
         args.exactArity(0, "isStratified()");
         return value.isStratified();
@@ -99,6 +110,18 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
     private Object _name(RuleSetValue value, Joe joe, Args args) {
         args.exactArity(0, "name()");
         return value.name();
+    }
+
+    //**
+    // @method setDebug
+    // @args flag
+    // Sets the rule set's debug flag.  If enabled,
+    // [[RuleSet#method.infer]] will output a detailed execution trace.
+
+    private Object _setDebug(RuleSetValue value, Joe joe, Args args) {
+        args.exactArity(1, "setDebug(flag)");
+        value.setDebug(joe.toBoolean(args.next()));
+        return null;
     }
 
     //**

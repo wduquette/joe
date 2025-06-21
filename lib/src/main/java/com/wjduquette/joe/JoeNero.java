@@ -73,6 +73,7 @@ public class JoeNero {
 
         // NEXT, Execute the rule set.
         var nero = new Nero(rsv.ruleset());
+        nero.setDebug(rsv.isDebug());
         nero.setFactFactory(ListFact::new);
         nero.infer(inputFacts);
 
