@@ -72,7 +72,6 @@ matchStmt       → "match" "(" expression ")" "{"
                   "}" ;                  
 printStmt       → "print" expression ";" ;
 returnStmt      → "return" expression? ";" ;
-rulesetStmt     → "ruleset" "{" ruleset "}" ;
 switchStmt      → "switch" "(" expression ")" "{"
                   ( "case" expression ( "," expression )* "->" statement )+
                   ( "default" "->" statement )?
@@ -111,6 +110,7 @@ primary         → "true" | "false" | "nil"
                 | NUMBER | STRING | KEYWORD
                 | "this"
                 | "@" IDENTIFIER
+                | "ruleset" "{" ruleset "}" ;
                 | IDENTIFIER 
                 | lambda 
                 | grouping

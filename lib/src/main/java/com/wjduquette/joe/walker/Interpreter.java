@@ -314,29 +314,6 @@ class Interpreter {
 
                 throw new Return(value);
             }
-            // Evaluate the rule set.
-            case Stmt.RuleSet stmt -> {
-                var rsc = new RuleSetCompiler(stmt.ruleSet());
-                rsc.setFactFactory(ListFact::new);
-                var ruleset = rsc.compile();
-
-                if (!ruleset.isStratified()) {
-                    throw new RuntimeError(stmt.name().span(),
-                        "Rule set '" + stmt.name().lexeme() +
-                            "' is not stratified.");
-                }
-
-                var exports = new HashMap<String, Object>();
-
-                for (var export : stmt.exports().entrySet()) {
-                    var name = export.getKey();
-                    var callable = evaluate(export.getValue());
-                    exports.put(name.lexeme(), checkCallable(name, callable));
-                }
-
-                environment.setVar(stmt.name().lexeme(),
-                    new RuleSetValue(stmt.name().lexeme(), ruleset, exports));
-            }
             case Stmt.Switch stmt -> {
                 var value = evaluate(stmt.expr());
                 for (var c : stmt.cases()) {
@@ -743,6 +720,27 @@ class Interpreter {
 
                 instance.set(name, right);
                 yield right;
+            }
+            // Evaluate the rule set.
+            case Expr.RuleSet expr -> {
+                var rsc = new RuleSetCompiler(expr.ruleSet());
+                rsc.setFactFactory(ListFact::new);
+                var ruleset = rsc.compile();
+
+                if (!ruleset.isStratified()) {
+                    throw new RuntimeError(expr.keyword().span(),
+                        "Rule set is not stratified.");
+                }
+
+                var exports = new HashMap<String, Object>();
+
+                for (var export : expr.exports().entrySet()) {
+                    var name = export.getKey();
+                    var callable = evaluate(export.getValue());
+                    exports.put(name.lexeme(), checkCallable(name, callable));
+                }
+
+                yield new RuleSetValue(ruleset, exports);
             }
             // Handle `super.<methodName>` in methods
             case Expr.Super expr -> {

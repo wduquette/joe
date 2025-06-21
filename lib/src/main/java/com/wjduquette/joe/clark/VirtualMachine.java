@@ -778,11 +778,10 @@ class VirtualMachine {
                     }
                 }
                 case RULESET -> {
-                    var name = readString();
                     var ruleset = readRuleSet();
 
                     if (!ruleset.isStratified()) {
-                        throw error("Rule set '" + name + "' is not stratified.");
+                        throw error("Rule set is not stratified.");
                     }
 
                     @SuppressWarnings("unchecked")
@@ -792,7 +791,7 @@ class VirtualMachine {
                         checkCallable(callable);
                     }
 
-                    push(new RuleSetValue(name, ruleset, exports));
+                    push(new RuleSetValue(ruleset, exports));
                 }
                 case SUB -> {
                     var b = pop();

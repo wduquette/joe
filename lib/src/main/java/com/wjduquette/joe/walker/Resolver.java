@@ -222,11 +222,6 @@ class Resolver {
                     resolve(stmt.value());
                 }
             }
-            case Stmt.RuleSet stmt -> {
-                declare(stmt.name());
-                define(stmt.name());
-                stmt.exports().values().forEach(this::resolve);
-            }
             case Stmt.Switch stmt -> {
                 resolve(stmt.expr());
                 for (var c : stmt.cases()) {
@@ -308,6 +303,8 @@ class Resolver {
                 resolve(expr.value());
                 resolve(expr.object());
             }
+            case Expr.RuleSet expr ->
+                expr.exports().values().forEach(this::resolve);
             case Expr.Super expr -> {
                 if (currentClass == ClassType.NONE) {
                     error(expr.keyword(),

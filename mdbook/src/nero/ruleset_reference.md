@@ -1,19 +1,17 @@
 # 'ruleset' Reference
 
 A Nero rule set is defined within a Joe script using the `ruleset`
-declaration.
+expression, which returns a [`RuleSet`](../library/type.joe.RuleSet.md)
+value.
 
-## The `ruleset` declaration
+## The `ruleset` Expression
 
-A `ruleset` declaration has this form:
+A `ruleset` expression has this form:
 
-**ruleset *name* { *body* }**
+**ruleset { *body* }**
 
-where
-
-- *name* is a simple identifier, like a function name.
-- *body* consists of Nero axioms and rules, just like a standalone Nero 
-  program, but may also contain any number of `export` declarations.
+where *body* consists of Nero axioms and rules, just like a standalone Nero 
+program, but may also contain any number of `export` declarations.
 
 ## Axioms
 

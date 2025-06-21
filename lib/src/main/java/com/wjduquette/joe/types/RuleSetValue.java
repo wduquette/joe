@@ -18,7 +18,6 @@ public class RuleSetValue {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final String name;
     private final RuleSet ruleset;
     private final Map<String, Object> exports;
     private boolean debug = false;
@@ -28,26 +27,19 @@ public class RuleSetValue {
 
     /**
      * Creates a RuleSetValue.
-     * @param name The rule set's name.
      * @param ruleset The Nero rule set.
      * @param exports map from relation to export callable
      */
     public RuleSetValue(
-        String name,
         RuleSet ruleset,
         Map<String, Object> exports
     ) {
-        this.name = name;
         this.ruleset = ruleset;
         this.exports = exports;
     }
 
     //-------------------------------------------------------------------------
     // API
-
-    public String name() {
-        return name;
-    }
 
     /**
      * Gets the underlying Nero rule set.

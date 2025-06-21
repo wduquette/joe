@@ -134,7 +134,6 @@ public class Parser {
             if (scanner.match(FUNCTION)) return functionDeclaration(
                 FunctionType.FUNCTION, "function");
             if (scanner.match(RECORD)) return recordDeclaration();
-            if (scanner.match(RULESET)) return rulesetDeclaration();
             if (scanner.match(VAR)) return varDeclaration();
 
             return statement();
@@ -483,51 +482,6 @@ public class Parser {
             List.of(
                 new Stmt.ForEachBind(keyword, pattern, listExpr, body)
             ));
-
-//
-//
-//        switch (pattern.getPattern()) {
-//            case Pattern.Constant ignored ->
-//                throw errorSync(scanner.previous(), "Expected loop variable name.");
-//            case Pattern.Wildcard ignored ->
-//                throw errorSync(scanner.previous(), "Expected loop variable name.");
-//            case Pattern.ValueBinding ignored -> {
-//                var varName = scanner.previous();
-//                scanner.consume(COLON, "Expected ':' after loop variable name.");
-//
-//                // List Expression
-//                Expr listExpr = expression();
-//                scanner.consume(RIGHT_PAREN, "Expected ')' after loop expression.");
-//
-//                // Body
-//                var body = statement();
-//                var end = scanner.previous().span().end();
-//
-//                return new Stmt.Block(
-//                    source.span(start, end),
-//                    List.of(
-//                        new Stmt.Var(varName, new Expr.Null()),
-//                        new Stmt.ForEach(keyword, varName, listExpr, body)
-//                    ));
-//            }
-//            default -> {
-//                scanner.consume(COLON, "Expected ':' after loop pattern.");
-//
-//                // List Expression
-//                Expr listExpr = expression();
-//                scanner.consume(RIGHT_PAREN, "Expected ')' after loop expression.");
-//
-//                // Body
-//                var body = statement();
-//                var end = scanner.previous().span().end();
-//
-//                return new Stmt.Block(
-//                    source.span(start, end),
-//                    List.of(
-//                        new Stmt.ForEachBind(keyword, pattern, listExpr, body)
-//                    ));
-//            }
-//        }
     }
 
 
@@ -899,6 +853,7 @@ public class Parser {
             return new Expr.PropGet(obj, name);
         }
 
+        if (scanner.match(RULESET)) return rulesetExpression();
 
         if (scanner.match(SUPER)) {
             Token keyword = scanner.previous();
@@ -1162,15 +1117,13 @@ public class Parser {
      * this method should be ignored.
      * @return The parsed rule set.
      */
-    public Stmt.RuleSet rulesetDeclaration() {
+    public Expr.RuleSet rulesetExpression() {
         var keyword = scanner.previous();
         var facts = new ArrayList<ASTRuleSet.ASTOrderedAtom>();
         var rules = new ArrayList<ASTRuleSet.ASTRule>();
         var heads = new HashSet<String>();
         var exports = new HashMap<Token, Expr>();
 
-        scanner.consume(IDENTIFIER, "expected rule set name after 'ruleset'.");
-        var ruleSetName = scanner.previous();
         scanner.consume(LEFT_BRACE, "expected '{' after 'ruleset'.");
 
         while (!scanner.match(RIGHT_BRACE)) {
@@ -1217,7 +1170,7 @@ public class Parser {
 
 
         var ast = new ASTRuleSet(facts, rules);
-        return new Stmt.RuleSet(keyword, ruleSetName, ast, exports);
+        return new Expr.RuleSet(keyword, ast, exports);
     }
 
     /**

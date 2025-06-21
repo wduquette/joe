@@ -175,16 +175,13 @@
                     <main>
                         <h1 id="ruleset-reference"><a class="header" href="#ruleset-reference">'ruleset' Reference</a></h1>
 <p>A Nero rule set is defined within a Joe script using the <code>ruleset</code>
-declaration.</p>
-<h2 id="the-ruleset-declaration"><a class="header" href="#the-ruleset-declaration">The <code>ruleset</code> declaration</a></h2>
-<p>A <code>ruleset</code> declaration has this form:</p>
-<p><strong>ruleset <em>name</em> { <em>body</em> }</strong></p>
-<p>where</p>
-<ul>
-<li><em>name</em> is a simple identifier, like a function name.</li>
-<li><em>body</em> consists of Nero axioms and rules, just like a standalone Nero
-program, but may also contain any number of <code>export</code> declarations.</li>
-</ul>
+expression, which returns a <a href="../library/type.joe.RuleSet.html"><code>RuleSet</code></a>
+value.</p>
+<h2 id="the-ruleset-expression"><a class="header" href="#the-ruleset-expression">The <code>ruleset</code> Expression</a></h2>
+<p>A <code>ruleset</code> expression has this form:</p>
+<p><strong>ruleset { <em>body</em> }</strong></p>
+<p>where <em>body</em> consists of Nero axioms and rules, just like a standalone Nero
+program, but may also contain any number of <code>export</code> declarations.</p>
 <h2 id="axioms"><a class="header" href="#axioms">Axioms</a></h2>
 <p>An axiom has this form:</p>
 <p><strong><em>relation</em> (<em>term</em>, [<em>term</em>...]);</strong></p>

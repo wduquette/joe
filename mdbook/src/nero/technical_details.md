@@ -78,9 +78,6 @@ rules cannot be so stratified, then the program is rejected.
 In this case, look for the kind of circular dependency with negation shown
 above.
 
-
-
-
 ## References
 
 - [Datalog](https://en.wikipedia.org/wiki/Datalog) (wikipedia)

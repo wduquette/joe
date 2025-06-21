@@ -3,19 +3,12 @@
 // This script tests the behavior of RuleSet objects once created.
 // Errors found during creation are tested by lang_ruleset.joe.
 
-function testName() {
-    ruleset rules {
-        Ancestor(x, y) :- Parent(x, y);
-    }
-    check(rules.name()).eq("rules");
-}
-
 function testToString() {
-    ruleset rules {
+    var rules = ruleset {
         Ancestor(x, y) :- Parent(x, y);
-    }
+    };
     check(rules.toString()).eq("""
-        ruleset rules {
+        ruleset {
             Ancestor(x, y) :- Parent(x, y);
         }
     """);
@@ -24,22 +17,22 @@ function testToString() {
 // RuleSet::isStratified() should always return true; unstratified
 // rule sets are rejected on creation.
 function testIsStratified_true() {
-    ruleset rules {
+    var rules = ruleset {
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    }
+    };
     check(rules.isStratified()).eq(true);
 }
 
 // RuleSet::infer should always run successfully when no
 // input facts are provided.
 function testInfer_noScriptedFacts() {
-    ruleset rules {
+    var rules = ruleset {
         Parent(#anne, #bert);
         Parent(#bert, #clark);
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    }
+    };
     var results = rules.infer().map(Joe.stringify).sorted();
     check(results).eq([
         "Fact(Ancestor, #anne, #bert)",
@@ -60,10 +53,10 @@ function testInfer_headCollision() {
         Ancestor(#jacob, #moses)
     ];
 
-    ruleset rules {
+    var rules = ruleset {
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    }
+    };
 
     assertError(\-> rules.infer(inputs),
         "Input fact type collides with rule set's head relation: 'Ancestor'.");
@@ -81,10 +74,10 @@ function testInfer_noFields() {
         Parent()
     ];
 
-    ruleset rules {
+    var rules = ruleset {
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    }
+    };
 
     assertError(\-> rules.infer(inputs),
         "Expected Nero-compatible fact, got: Parent 'Parent()'.");
@@ -98,10 +91,10 @@ function testInfer_proxiedValue_ordered() {
         Fact("Parent", #bert, #clark)
     ];
 
-    ruleset rules {
+    var rules = ruleset {
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    }
+    };
     var results = rules.infer(inputs).map(Joe.stringify).sorted();
 
     check(results).eq([
@@ -121,10 +114,10 @@ function testInfer_proxiedValue_named() {
         Fact("Parent", #bert, #clark)
     ];
 
-    ruleset rules {
+    var rules = ruleset {
         Ancestor(x, y) :- Parent(f0:x, f1:y);
         Ancestor(x, y) :- Parent(f0:x, f1:z), Ancestor(z, y);
-    }
+    };
     var results = rules.infer(inputs).map(Joe.stringify).sorted();
 
     check(results).eq([
@@ -145,10 +138,10 @@ function testInfer_record_ordered() {
         Parent(#bert, #clark)
     ];
 
-    ruleset rules {
+    var rules = ruleset {
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    }
+    };
     var results = rules.infer(inputs).map(Joe.stringify).sorted();
     check(results).eq([
         "Fact(Ancestor, #anne, #bert)",
@@ -168,10 +161,10 @@ function testInfer_record_named() {
         Parent(#bert, #clark)
     ];
 
-    ruleset rules {
+    var rules = ruleset {
         Ancestor(x, y) :- Parent(p:x, c:y);
         Ancestor(x, y) :- Parent(p:x, c:z), Ancestor(z, y);
-    }
+    };
     var results = rules.infer(inputs).map(Joe.stringify).sorted();
     check(results).eq([
         "Fact(Ancestor, #anne, #bert)",
@@ -200,10 +193,10 @@ function testInfer_class_named() {
         Parent(#bert, #clark)
     ];
 
-    ruleset rules {
+    var rules = ruleset {
         Ancestor(x, y) :- Parent(p:x, c:y);
         Ancestor(x, y) :- Parent(p:x, c:z), Ancestor(z, y);
-    }
+    };
     var results = rules.infer(inputs).map(Joe.stringify).sorted();
     check(results).eq([
         "Fact(Ancestor, #anne, #bert)",
@@ -233,10 +226,10 @@ function testInfer_class_ordered() {
         Parent(#bert, #clark)
     ];
 
-    ruleset rules {
+    var rules = ruleset {
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    }
+    };
 
     assertError(\-> rules.infer(inputs),
         "'Parent' in rule 'Ancestor(x, y) :- Parent(x, y);' requires ordered fields, but a provided fact is not ordered.");
@@ -246,7 +239,7 @@ function testInfer_class_ordered() {
 function testExport() {
     record Parent(p, c) {}
 
-    ruleset rules {
+    var rules = ruleset {
         export Parent;
         Parent(#anne, #bert);
         Parent(#bert, #clark);
@@ -254,7 +247,7 @@ function testExport() {
         export Ancestor as \x,y -> [x, y];
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    }
+    };
     var results = rules.infer().map(Joe.stringify).sorted();
     check(results).eq([
         "Parent(#anne, #bert)",
