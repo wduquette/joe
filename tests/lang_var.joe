@@ -2,14 +2,24 @@
 //
 // Language tests should confine themselves to the basic test API.
 
-function testDeclareOnly() {
+function testDeclareOnly_normal() {
     var a;
     assertEquals(a, null);
 }
 
-function testDeclareAndInitialize() {
+function testDeclareOnly_wildcard() {
+    var _;
+    assertEquals(_, null);
+}
+
+function testDeclareAndInitialize_normal() {
     var a = 1;
     assertEquals(a, 1);
+}
+
+function testDeclareAndInitialize_wildcard() {
+    var _ = 1;
+    assertEquals(_, 1);
 }
 
 function testBind_simple() {

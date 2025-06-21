@@ -311,34 +311,31 @@ public class Parser {
         Token keyword = scanner.previous();
         ASTPattern pattern = pattern();
 
-        return switch (pattern.getPattern()) {
-            case Pattern.ValueBinding ignored -> {
-                var name = scanner.previous();
+        if (pattern.getPattern() instanceof Pattern.ValueBinding ||
+            pattern.getPattern() instanceof Pattern.Wildcard
+        ) {
+            var name = scanner.previous();
 
-                var initializer = scanner.match(EQUAL)
-                    ? expression()
-                    : new Expr.Null();
+            var initializer = scanner.match(EQUAL)
+                ? expression()
+                : new Expr.Null();
 
-                scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
-                yield new Stmt.Var(name, initializer);
+            scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
+            return new Stmt.Var(name, initializer);
+        } else if (pattern.getPattern() instanceof Pattern.Constant) {
+            throw errorSync(scanner.previous(), "Expected variable name.");
+        } else {
+            if (pattern.getBindings().isEmpty()) {
+                error(scanner.previous(),
+                    "'var' pattern must declare at least one variable.");
             }
-            case Pattern.Constant ignored ->
-                throw errorSync(scanner.previous(), "Expected variable name.");
-            case Pattern.Wildcard ignored ->
-                throw errorSync(scanner.previous(), "Expected variable name.");
-            default -> {
-                if (pattern.getBindings().isEmpty()) {
-                    error(scanner.previous(),
-                        "'var' pattern must declare at least one variable.");
-                }
 
-                scanner.consume(EQUAL, "Expected '=' after pattern.");
-                var target = expression();
-                scanner.consume(SEMICOLON, "Expected ';' after target expression.");
+            scanner.consume(EQUAL, "Expected '=' after pattern.");
+            var target = expression();
+            scanner.consume(SEMICOLON, "Expected ';' after target expression.");
 
-                yield new Stmt.VarPattern(keyword, pattern, target);
-            }
-        };
+            return new Stmt.VarPattern(keyword, pattern, target);
+        }
     }
 
     private Stmt statement() {

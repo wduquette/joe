@@ -15,7 +15,9 @@ function testOneVar() {
 
 // Verify that a wildcard matches anything, and doesn't create a binding.
 function testWildcard() {
+    var _ = 5;
     assertTrue(1 ~ _);
+    assertEquals(_, 5);
 }
 
 // Verify that a literal constant only matches the same value.
