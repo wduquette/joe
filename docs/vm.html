@@ -247,7 +247,7 @@ value.</li>
 <tr><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
 <tr><td>RECORD <em>name fields</em></td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
 <tr><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
-<tr><td>RULESET <em>name ruleset</em></td><td><em>exports</em> → <em>rsv</em></td><td>Evaluate rule set</td></tr>
+<tr><td>RULESET <em>ruleset</em></td><td><em>exports</em> → <em>rsv</em></td><td>Evaluate rule set</td></tr>
 <tr><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
 <tr><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
 <tr><td>SWAP</td><td><em>a b</em> → <em>b a</em></td><td>Swap top stack items</td></tr>
@@ -660,9 +660,9 @@ from Java via <code>VirtualMachine::execute</code> or <code>VirtualMachine::call
 result is popped and returned to the Java caller.</p>
 <h3 id="ruleset"><a class="header" href="#ruleset">RULESET</a></h3>
 <hr />
-<p><strong>RULESET</strong> <em>name ruleset</em> | <em>exports</em> → <em>rsv</em></p>
+<p><strong>RULESET</strong> <em>ruleset</em> | <em>exports</em> → <em>rsv</em></p>
 <p>Given a <code>RuleSet</code> as a constant, and a map of callable expressions by relation
-name on the stack, creates a <code>RuleSetValue</code>.</p>
+name on the stack, pushes a <code>RuleSetValue</code>.</p>
 <h3 id="sub"><a class="header" href="#sub">SUB</a></h3>
 <hr />
 <p><strong>SUB</strong> | <em>a</em> <em>b</em> → *c, where <em>c</em> = (<em>a</em> - <em>b</em>)</p>

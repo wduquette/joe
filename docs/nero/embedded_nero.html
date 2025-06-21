@@ -174,13 +174,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="embedded-nero"><a class="header" href="#embedded-nero">Embedded Nero</a></h1>
-<p>A Nero program is embedded in a Joe script using the <code>ruleset</code>
-declaration.  The following declaration defines a
-<a href="../library/type.joe.RuleSet.html"><code>RuleSet</code></a>
-called <code>myRules</code>. The content of the declaration's body is just a
-Nero program, as described in the <a href="nero_tutorial.html">tutorial</a>,
-possibly augmented with
-<a href="#exported-outputs"><code>export</code> declarations</a>.</p>
+<p>This section explains how to use Nero within Joe scripts.</p>
 <ul>
 <li><a href="#a-simple-rule-set">A Simple Rule Set</a></li>
 <li><a href="#the-fact-type">The <code>Fact</code> Type</a></li>
@@ -188,7 +182,14 @@ possibly augmented with
 <li><a href="#exporting-domain-values">Exporting Domain Values</a></li>
 </ul>
 <h2 id="a-simple-rule-set"><a class="header" href="#a-simple-rule-set">A Simple Rule Set</a></h2>
-<pre><code class="language-joe">ruleset myRules {
+<p>A Nero program is embedded in a Joe script using the <code>ruleset</code>
+expression.  The following declaration defines a
+<a href="../library/type.joe.RuleSet.html"><code>RuleSet</code></a>
+called <code>myRules</code>. The content of the expression's body is just a
+Nero program, as described in the <a href="nero_tutorial.html">tutorial</a>,
+possibly augmented with
+<a href="#exported-outputs"><code>export</code> declarations</a>.</p>
+<pre><code class="language-joe">var myRules = ruleset {
     // Parent/2 - parent, child
     Parent(#anne, #bert);
     Parent(#bert, #clark);
@@ -196,7 +197,7 @@ possibly augmented with
     // Ancestor/2 - ancestor, descendant
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 </code></pre>
 <p>A <a href="../library/type.joe.RuleSet.html"><code>RuleSet</code></a> provides a number of
 ways to infer the facts resulting from the rules; the simplest is
@@ -252,11 +253,11 @@ var inputs = [
     Parent(#bert, #clark)
 ];
 
-ruleset myRules {
+var myRules = ruleset {
     // Ancestor/2 - ancestor, descendant
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 
 foreach (fact : myRules.infer(inputs)) {
     println(fact);
@@ -273,18 +274,18 @@ ordered fields will not work:</p>
     }
 }
 
-ruleset myRules {
+var myRules = ruleset {
     // Parent(x, y) cannot match an instance of class parent!
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 </code></pre>
 <p>Consequently, we must use named-field atoms for class instances
 and other types with named fields but not ordered fields:</p>
-<pre><code class="language-joe">ruleset myRules {
+<pre><code class="language-joe">var myRules = ruleset {
     Ancestor(x, y) :- Parent(parent: x, child: y);
     Ancestor(x, y) :- Parent(parent: x, child: z), Ancestor(z, y);
-}
+};
 </code></pre>
 <p>Named-field atoms also allow a rule to match on a subset of a fact's
 fields, whether ordered or not.</p>
@@ -303,11 +304,11 @@ values of the named type using the type's initializer.</p>
 the <code>Ancestor</code> type.</p>
 <pre><code class="language-joe">record Ancestor(ancestor, dependent) {}
 
-ruleset myRules {
+var myRules = ruleset {
     export Ancestor;
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 </code></pre>
 <ul>
 <li>The <code>Ancestor</code> type must be in scope when the rule set is defined.</li>
@@ -322,18 +323,18 @@ author wants <code>Ancestor</code> facts returned as two-item lists:</p>
     return [x, y];
 }
 
-ruleset myRules {
+var myRules = ruleset {
     export Ancestor as ancestor2list;
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 </code></pre>
 <p>A lambda function could also be used:</p>
-<pre><code class="language-joe">ruleset myRules {
+<pre><code class="language-joe">var myRules = ruleset {
     export Ancestor as \x,y -&gt; [x, y];
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 </code></pre>
 <p>The only restriction is that the callable referenced by the <code>as</code> clause
 is defined in the scope in which the rule set is declared.</p>

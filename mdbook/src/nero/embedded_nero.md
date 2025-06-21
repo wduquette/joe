@@ -1,12 +1,6 @@
 # Embedded Nero
 
-A Nero program is embedded in a Joe script using the `ruleset` 
-declaration.  The following declaration defines a
-[`RuleSet`](../library/type.joe.RuleSet.md)
-called `myRules`. The content of the declaration's body is just a
-Nero program, as described in the [tutorial](nero_tutorial.md),
-possibly augmented with 
-[`export` declarations](#exported-outputs).
+This section explains how to use Nero within Joe scripts.
 
 - [A Simple Rule Set](#a-simple-rule-set)
 - [The `Fact` Type](#the-fact-type)
@@ -15,8 +9,16 @@ possibly augmented with
 
 ## A Simple Rule Set
 
+A Nero program is embedded in a Joe script using the `ruleset`
+expression.  The following declaration defines a
+[`RuleSet`](../library/type.joe.RuleSet.md)
+called `myRules`. The content of the expression's body is just a
+Nero program, as described in the [tutorial](nero_tutorial.md),
+possibly augmented with
+[`export` declarations](#exported-outputs).
+
 ```joe
-ruleset myRules {
+var myRules = ruleset {
     // Parent/2 - parent, child
     Parent(#anne, #bert);
     Parent(#bert, #clark);
@@ -24,7 +26,7 @@ ruleset myRules {
     // Ancestor/2 - ancestor, descendant
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 ```
 
 A [`RuleSet`](../library/type.joe.RuleSet.md) provides a number of
@@ -97,11 +99,11 @@ var inputs = [
     Parent(#bert, #clark)
 ];
 
-ruleset myRules {
+var myRules = ruleset {
     // Ancestor/2 - ancestor, descendant
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 
 foreach (fact : myRules.infer(inputs)) {
     println(fact);
@@ -122,11 +124,11 @@ class Parent {
     }
 }
 
-ruleset myRules {
+var myRules = ruleset {
     // Parent(x, y) cannot match an instance of class parent!
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 ```
 
 Consequently, we must use named-field atoms for class instances
@@ -134,10 +136,10 @@ and other types with named fields but not ordered fields:
 
 
 ```joe
-ruleset myRules {
+var myRules = ruleset {
     Ancestor(x, y) :- Parent(parent: x, child: y);
     Ancestor(x, y) :- Parent(parent: x, child: z), Ancestor(z, y);
-}
+};
 ```
 
 Named-field atoms also allow a rule to match on a subset of a fact's
@@ -163,11 +165,11 @@ the `Ancestor` type.
 ```joe
 record Ancestor(ancestor, dependent) {}
 
-ruleset myRules {
+var myRules = ruleset {
     export Ancestor;
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 ```
 
 - The `Ancestor` type must be in scope when the rule set is defined.
@@ -184,21 +186,21 @@ function ancestor2list(x, y) {
     return [x, y];
 }
 
-ruleset myRules {
+var myRules = ruleset {
     export Ancestor as ancestor2list;
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 ```
 
 A lambda function could also be used:
 
 ```joe
-ruleset myRules {
+var myRules = ruleset {
     export Ancestor as \x,y -> [x, y];
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 ```
 
 The only restriction is that the callable referenced by the `as` clause

@@ -2099,13 +2099,7 @@ are the same.  This shows an important principle:  when matching facts,
 Datalog binds a variable to a value on first appearance from left to
 right. Subsequent appearances must match the bound value.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="embedded-nero"><a class="header" href="#embedded-nero">Embedded Nero</a></h1>
-<p>A Nero program is embedded in a Joe script using the <code>ruleset</code>
-declaration.  The following declaration defines a
-<a href="nero/../library/type.joe.RuleSet.html"><code>RuleSet</code></a>
-called <code>myRules</code>. The content of the declaration's body is just a
-Nero program, as described in the <a href="nero/nero_tutorial.html">tutorial</a>,
-possibly augmented with
-<a href="nero/embedded_nero.html#exported-outputs"><code>export</code> declarations</a>.</p>
+<p>This section explains how to use Nero within Joe scripts.</p>
 <ul>
 <li><a href="nero/embedded_nero.html#a-simple-rule-set">A Simple Rule Set</a></li>
 <li><a href="nero/embedded_nero.html#the-fact-type">The <code>Fact</code> Type</a></li>
@@ -2113,7 +2107,14 @@ possibly augmented with
 <li><a href="nero/embedded_nero.html#exporting-domain-values">Exporting Domain Values</a></li>
 </ul>
 <h2 id="a-simple-rule-set"><a class="header" href="#a-simple-rule-set">A Simple Rule Set</a></h2>
-<pre><code class="language-joe">ruleset myRules {
+<p>A Nero program is embedded in a Joe script using the <code>ruleset</code>
+expression.  The following declaration defines a
+<a href="nero/../library/type.joe.RuleSet.html"><code>RuleSet</code></a>
+called <code>myRules</code>. The content of the expression's body is just a
+Nero program, as described in the <a href="nero/nero_tutorial.html">tutorial</a>,
+possibly augmented with
+<a href="nero/embedded_nero.html#exported-outputs"><code>export</code> declarations</a>.</p>
+<pre><code class="language-joe">var myRules = ruleset {
     // Parent/2 - parent, child
     Parent(#anne, #bert);
     Parent(#bert, #clark);
@@ -2121,7 +2122,7 @@ possibly augmented with
     // Ancestor/2 - ancestor, descendant
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 </code></pre>
 <p>A <a href="nero/../library/type.joe.RuleSet.html"><code>RuleSet</code></a> provides a number of
 ways to infer the facts resulting from the rules; the simplest is
@@ -2177,11 +2178,11 @@ var inputs = [
     Parent(#bert, #clark)
 ];
 
-ruleset myRules {
+var myRules = ruleset {
     // Ancestor/2 - ancestor, descendant
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 
 foreach (fact : myRules.infer(inputs)) {
     println(fact);
@@ -2198,18 +2199,18 @@ ordered fields will not work:</p>
     }
 }
 
-ruleset myRules {
+var myRules = ruleset {
     // Parent(x, y) cannot match an instance of class parent!
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 </code></pre>
 <p>Consequently, we must use named-field atoms for class instances
 and other types with named fields but not ordered fields:</p>
-<pre><code class="language-joe">ruleset myRules {
+<pre><code class="language-joe">var myRules = ruleset {
     Ancestor(x, y) :- Parent(parent: x, child: y);
     Ancestor(x, y) :- Parent(parent: x, child: z), Ancestor(z, y);
-}
+};
 </code></pre>
 <p>Named-field atoms also allow a rule to match on a subset of a fact's
 fields, whether ordered or not.</p>
@@ -2228,11 +2229,11 @@ values of the named type using the type's initializer.</p>
 the <code>Ancestor</code> type.</p>
 <pre><code class="language-joe">record Ancestor(ancestor, dependent) {}
 
-ruleset myRules {
+var myRules = ruleset {
     export Ancestor;
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 </code></pre>
 <ul>
 <li>The <code>Ancestor</code> type must be in scope when the rule set is defined.</li>
@@ -2247,33 +2248,30 @@ author wants <code>Ancestor</code> facts returned as two-item lists:</p>
     return [x, y];
 }
 
-ruleset myRules {
+var myRules = ruleset {
     export Ancestor as ancestor2list;
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 </code></pre>
 <p>A lambda function could also be used:</p>
-<pre><code class="language-joe">ruleset myRules {
+<pre><code class="language-joe">var myRules = ruleset {
     export Ancestor as \x,y -&gt; [x, y];
     Ancestor(x, y) :- Parent(x, y);
     Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-}
+};
 </code></pre>
 <p>The only restriction is that the callable referenced by the <code>as</code> clause
 is defined in the scope in which the rule set is declared.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ruleset-reference"><a class="header" href="#ruleset-reference">'ruleset' Reference</a></h1>
 <p>A Nero rule set is defined within a Joe script using the <code>ruleset</code>
-declaration.</p>
-<h2 id="the-ruleset-declaration"><a class="header" href="#the-ruleset-declaration">The <code>ruleset</code> declaration</a></h2>
-<p>A <code>ruleset</code> declaration has this form:</p>
-<p><strong>ruleset <em>name</em> { <em>body</em> }</strong></p>
-<p>where</p>
-<ul>
-<li><em>name</em> is a simple identifier, like a function name.</li>
-<li><em>body</em> consists of Nero axioms and rules, just like a standalone Nero
-program, but may also contain any number of <code>export</code> declarations.</li>
-</ul>
+expression, which returns a <a href="nero/../library/type.joe.RuleSet.html"><code>RuleSet</code></a>
+value.</p>
+<h2 id="the-ruleset-expression"><a class="header" href="#the-ruleset-expression">The <code>ruleset</code> Expression</a></h2>
+<p>A <code>ruleset</code> expression has this form:</p>
+<p><strong>ruleset { <em>body</em> }</strong></p>
+<p>where <em>body</em> consists of Nero axioms and rules, just like a standalone Nero
+program, but may also contain any number of <code>export</code> declarations.</p>
 <h2 id="axioms"><a class="header" href="#axioms">Axioms</a></h2>
 <p>An axiom has this form:</p>
 <p><strong><em>relation</em> (<em>term</em>, [<em>term</em>...]);</strong></p>
@@ -4072,7 +4070,6 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.RuleSet.html#method.infer"><em>ruleSet</em>.infer([<em>inputs</em>])</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.isDebug"><em>ruleSet</em>.isDebug()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.isStratified"><em>ruleSet</em>.isStratified()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
-<li><a href="library/type.joe.RuleSet.html#method.name"><em>ruleSet</em>.name()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.setDebug"><em>ruleSet</em>.setDebug(<em>flag</em>)</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.toString"><em>ruleSet</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -5610,7 +5607,6 @@ base facts, and any input facts provided by the script.</p>
 <li><a href="library/type.joe.RuleSet.html#method.infer"><em>ruleSet</em>.infer([<em>inputs</em>])</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.isDebug"><em>ruleSet</em>.isDebug()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.isStratified"><em>ruleSet</em>.isStratified()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
-<li><a href="library/type.joe.RuleSet.html#method.name"><em>ruleSet</em>.name()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.setDebug"><em>ruleSet</em>.setDebug(<em>flag</em>)</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.toString"><em>ruleSet</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -5638,11 +5634,6 @@ See the Nero tutorial for details.</p>
 <hr />
 <p><strong><em>ruleSet</em>.isStratified() → <a href="library/type.joe.Boolean.html">Boolean</a></strong></p>
 <p>Returns whether the rule set is stratified or not.</p>
-<p><span id="method.name"> </span></p>
-<h3 id="rulesetname"><a class="header" href="#rulesetname"><em>ruleSet</em>.name()</a></h3>
-<hr />
-<p><strong><em>ruleSet</em>.name() → <a href="library/type.joe.String.html">String</a></strong></p>
-<p>Returns the rule set's name.</p>
 <p><span id="method.setDebug"> </span></p>
 <h3 id="rulesetsetdebug"><a class="header" href="#rulesetsetdebug"><em>ruleSet</em>.setDebug()</a></h3>
 <hr />
@@ -9237,7 +9228,6 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.RuleSet.html#method.infer"><em>ruleSet</em>.infer([<em>inputs</em>])</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.isDebug"><em>ruleSet</em>.isDebug()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.isStratified"><em>ruleSet</em>.isStratified()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
-<li><a href="library/type.joe.RuleSet.html#method.name"><em>ruleSet</em>.name()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.setDebug"><em>ruleSet</em>.setDebug(<em>flag</em>)</a></li>
 <li><a href="library/type.joe.RuleSet.html#method.toString"><em>ruleSet</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
 </ul>
@@ -9777,7 +9767,6 @@ matchStmt       → "match" "(" expression ")" "{"
                   "}" ;                  
 printStmt       → "print" expression ";" ;
 returnStmt      → "return" expression? ";" ;
-rulesetStmt     → "ruleset" "{" ruleset "}" ;
 switchStmt      → "switch" "(" expression ")" "{"
                   ( "case" expression ( "," expression )* "-&gt;" statement )+
                   ( "default" "-&gt;" statement )?
@@ -9813,6 +9802,7 @@ primary         → "true" | "false" | "nil"
                 | NUMBER | STRING | KEYWORD
                 | "this"
                 | "@" IDENTIFIER
+                | "ruleset" "{" ruleset "}" ;
                 | IDENTIFIER 
                 | lambda 
                 | grouping
@@ -10058,7 +10048,7 @@ value.</li>
 <tr><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
 <tr><td>RECORD <em>name fields</em></td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
 <tr><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
-<tr><td>RULESET <em>name ruleset</em></td><td><em>exports</em> → <em>rsv</em></td><td>Evaluate rule set</td></tr>
+<tr><td>RULESET <em>ruleset</em></td><td><em>exports</em> → <em>rsv</em></td><td>Evaluate rule set</td></tr>
 <tr><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
 <tr><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
 <tr><td>SWAP</td><td><em>a b</em> → <em>b a</em></td><td>Swap top stack items</td></tr>
@@ -10471,9 +10461,9 @@ from Java via <code>VirtualMachine::execute</code> or <code>VirtualMachine::call
 result is popped and returned to the Java caller.</p>
 <h3 id="ruleset"><a class="header" href="#ruleset">RULESET</a></h3>
 <hr />
-<p><strong>RULESET</strong> <em>name ruleset</em> | <em>exports</em> → <em>rsv</em></p>
+<p><strong>RULESET</strong> <em>ruleset</em> | <em>exports</em> → <em>rsv</em></p>
 <p>Given a <code>RuleSet</code> as a constant, and a map of callable expressions by relation
-name on the stack, creates a <code>RuleSetValue</code>.</p>
+name on the stack, pushes a <code>RuleSetValue</code>.</p>
 <h3 id="sub"><a class="header" href="#sub">SUB</a></h3>
 <hr />
 <p><strong>SUB</strong> | <em>a</em> <em>b</em> → *c, where <em>c</em> = (<em>a</em> - <em>b</em>)</p>
