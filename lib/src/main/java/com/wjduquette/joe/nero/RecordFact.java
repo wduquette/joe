@@ -3,6 +3,7 @@ package com.wjduquette.joe.nero;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A {@link Nero} {@link Fact} type providing both ordered and named-field
@@ -16,6 +17,7 @@ public class RecordFact implements Fact {
     // Instance Variables
 
     private final String relation;
+    private final List<String> fieldNames;
     private final Map<String, Object> fieldMap;
     private final List<Object> fields;
 
@@ -33,6 +35,7 @@ public class RecordFact implements Fact {
         Map<String, Object> fieldMap
     ) {
         this.relation = relation;
+        this.fieldNames = fieldNames;
         this.fieldMap = fieldMap;
         this.fields = new ArrayList<>(fieldNames.size());
         for (var name : fieldNames) {
@@ -43,9 +46,16 @@ public class RecordFact implements Fact {
     //-------------------------------------------------------------------------
     // Fact API
 
-    @Override public String              relation()         { return relation; }
-    @Override public boolean isOrdered() { return true; }
-    @Override public List<Object>        getFields()        { return fields; }
-    @Override public Map<String, Object> getFieldMap()      { return fieldMap; }
+    @Override public String              relation()    { return relation; }
+    @Override public boolean             isOrdered()   { return true; }
+    @Override public List<Object>        getFields()   { return fields; }
+    @Override public Map<String, Object> getFieldMap() { return fieldMap; }
 
+    @Override
+    public String toString() {
+        var mapString = fieldNames.stream()
+            .map(n -> n + "=" + fieldMap.get(n))
+            .collect(Collectors.joining(", "));
+        return "RecordFact[" + relation + ", " + mapString + "]";
+    }
 }
