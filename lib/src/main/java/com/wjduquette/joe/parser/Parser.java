@@ -439,48 +439,95 @@ public class Parser {
         scanner.consume(LEFT_PAREN, "Expected '(' after 'foreach'.");
         var pattern = pattern();
 
-        switch (pattern.getPattern()) {
-            case Pattern.Constant ignored ->
-                throw errorSync(scanner.previous(), "Expected loop variable name.");
-            case Pattern.Wildcard ignored ->
-                throw errorSync(scanner.previous(), "Expected loop variable name.");
-            case Pattern.ValueBinding ignored -> {
-                var varName = scanner.previous();
-                scanner.consume(COLON, "Expected ':' after loop variable name.");
-
-                // List Expression
-                Expr listExpr = expression();
-                scanner.consume(RIGHT_PAREN, "Expected ')' after loop expression.");
-
-                // Body
-                var body = statement();
-                var end = scanner.previous().span().end();
-
-                return new Stmt.Block(
-                    source.span(start, end),
-                    List.of(
-                        new Stmt.Var(varName, new Expr.Null()),
-                        new Stmt.ForEach(keyword, varName, listExpr, body)
-                    ));
-            }
-            default -> {
-                scanner.consume(COLON, "Expected ':' after loop pattern.");
-
-                // List Expression
-                Expr listExpr = expression();
-                scanner.consume(RIGHT_PAREN, "Expected ')' after loop expression.");
-
-                // Body
-                var body = statement();
-                var end = scanner.previous().span().end();
-
-                return new Stmt.Block(
-                    source.span(start, end),
-                    List.of(
-                        new Stmt.ForEachBind(keyword, pattern, listExpr, body)
-                    ));
-            }
+        // FIRST, Simple constants are invalid.
+        if (pattern.getPattern() instanceof Pattern.Constant) {
+            throw errorSync(scanner.previous(), "Expected loop variable name.");
         }
+
+        // NEXT, One variable (a single wildcard is treated as variable name.
+        if (pattern.getPattern() instanceof Pattern.ValueBinding ||
+            pattern.getPattern() instanceof Pattern.Wildcard
+        ) {
+            var varName = scanner.previous();
+            scanner.consume(COLON, "Expected ':' after loop variable name.");
+
+            // List Expression
+            Expr listExpr = expression();
+            scanner.consume(RIGHT_PAREN, "Expected ')' after loop expression.");
+
+            // Body
+            var body = statement();
+            var end = scanner.previous().span().end();
+
+            return new Stmt.Block(
+                source.span(start, end),
+                List.of(
+                    new Stmt.Var(varName, new Expr.Null()),
+                    new Stmt.ForEach(keyword, varName, listExpr, body)
+                ));
+        }
+
+        // NEXT, A more complex pattern
+        scanner.consume(COLON, "Expected ':' after loop pattern.");
+
+        // List Expression
+        Expr listExpr = expression();
+        scanner.consume(RIGHT_PAREN, "Expected ')' after loop expression.");
+
+        // Body
+        var body = statement();
+        var end = scanner.previous().span().end();
+
+        return new Stmt.Block(
+            source.span(start, end),
+            List.of(
+                new Stmt.ForEachBind(keyword, pattern, listExpr, body)
+            ));
+
+//
+//
+//        switch (pattern.getPattern()) {
+//            case Pattern.Constant ignored ->
+//                throw errorSync(scanner.previous(), "Expected loop variable name.");
+//            case Pattern.Wildcard ignored ->
+//                throw errorSync(scanner.previous(), "Expected loop variable name.");
+//            case Pattern.ValueBinding ignored -> {
+//                var varName = scanner.previous();
+//                scanner.consume(COLON, "Expected ':' after loop variable name.");
+//
+//                // List Expression
+//                Expr listExpr = expression();
+//                scanner.consume(RIGHT_PAREN, "Expected ')' after loop expression.");
+//
+//                // Body
+//                var body = statement();
+//                var end = scanner.previous().span().end();
+//
+//                return new Stmt.Block(
+//                    source.span(start, end),
+//                    List.of(
+//                        new Stmt.Var(varName, new Expr.Null()),
+//                        new Stmt.ForEach(keyword, varName, listExpr, body)
+//                    ));
+//            }
+//            default -> {
+//                scanner.consume(COLON, "Expected ':' after loop pattern.");
+//
+//                // List Expression
+//                Expr listExpr = expression();
+//                scanner.consume(RIGHT_PAREN, "Expected ')' after loop expression.");
+//
+//                // Body
+//                var body = statement();
+//                var end = scanner.previous().span().end();
+//
+//                return new Stmt.Block(
+//                    source.span(start, end),
+//                    List.of(
+//                        new Stmt.ForEachBind(keyword, pattern, listExpr, body)
+//                    ));
+//            }
+//        }
     }
 
 

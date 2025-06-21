@@ -16,6 +16,18 @@ function testForeach_simple() {
     assertEquals(result, list);
 }
 
+// Foreach loop with underscore variable
+function testForeach_underscore() {
+    var list = ["a", "b", "c"];
+    var result = [];
+
+    foreach (_ : list)
+        result.add(_);
+
+    assertEquals(result, list);
+}
+
+
 // Basic foreach loop with block.
 function testForeach_block() {
     var list = ["a", "b", "c"];
