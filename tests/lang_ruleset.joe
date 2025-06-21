@@ -5,58 +5,58 @@
 // test suite tests the behavior of the `RuleSet` object once created.
 
 function testValid() {
-    ruleset rules {
+    var rules = ruleset {
         Parent(#walker, #bert);
         Parent(#bert, #clark);
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    }
+    };
 }
 
 function testUnstratified() {
     assertError(\-> {
-        ruleset rules {
+        var rules = ruleset {
             A(x) :- B(x), not C(x);
             C(x) :- A(x);
-        }
-    }, "Rule set 'rules' is not stratified.");
+        };
+    }, "Rule set is not stratified.");
 }
 
 // A simple `export` must name a callable in the current scope.
 function testExport_good() {
     record Ancestor(a, d) {}
-    ruleset rules {
+    var rules = ruleset {
         export Ancestor;
         Ancestor(x, y) :- Parent(x, y);
-    }
+    };
 }
 
 // A simple `export` must name a callable in the current scope.
 function testExport_bad() {
     assertError(\-> {
-        ruleset rules {
+        var rules = ruleset {
             export Ancestor;
             Ancestor(x, y) :- Parent(x, y);
-        }
+        };
     }, "Undefined variable: 'Ancestor'.");
 }
 
 // An `export as` must provide an expression that's valid in the
 // current scope.
 function testExportAs_good() {
-    ruleset rules {
+    var rules = ruleset {
         export Ancestor as \x,y -> [x, y];
         Ancestor(x, y) :- Parent(x, y);
-    }
+    };
 }
 
 // An `export as` must provide an expression that's valid in the
 // current scope.
 function testExport_bad() {
     assertError(\-> {
-        ruleset rules {
+        var rules = ruleset {
             export Ancestor as MyAncestor;
             Ancestor(x, y) :- Parent(x, y);
-        }
+        };
     }, "Undefined variable: 'MyAncestor'.");
 }
