@@ -62,7 +62,7 @@ public class ProxyType<V>
     private final Map<String, Function<V,Object>> getters = new HashMap<>();
 
     // The supplier for iteration, if this type is iterable.
-    private Function<V, Collection<?>> iterableSupplier = null;
+    private IterableSupplier iterableSupplier = null;
 
 
     //-------------------------------------------------------------------------
@@ -179,7 +179,7 @@ public class ProxyType<V>
      * @param supplier The iterable supplier.
      */
     @SuppressWarnings("unused")
-    protected void iterables(Function<V,Collection<?>> supplier) {
+    protected void iterableSupplier(IterableSupplier supplier) {
         this.iterableSupplier = supplier;
     }
 
@@ -395,9 +395,8 @@ public class ProxyType<V>
      * @param value The value
      * @return The items
      */
-    @SuppressWarnings("unchecked")
-    public Collection<?> getItems(Object value) {
-        return iterableSupplier.apply((V)value);
+    public Collection<?> getItems(Joe joe, Object value) {
+        return iterableSupplier.get(joe, value);
     }
 
     //-------------------------------------------------------------------------

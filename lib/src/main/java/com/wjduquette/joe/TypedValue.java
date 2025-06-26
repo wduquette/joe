@@ -56,7 +56,7 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
 
     @Override
     public Collection<?> getItems() {
-        return proxy.getItems(value);
+        return proxy.getItems(joe, value);
     }
 
     @Override public String stringify(Joe joe) {

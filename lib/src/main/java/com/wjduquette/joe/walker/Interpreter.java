@@ -880,20 +880,18 @@ class Interpreter {
 
     // Gets the argument as a collection, if possible
     private Collection<?> toCollection(Token token, Object arg) {
-        return switch (arg) {
-            case Collection<?> c -> c;
-            case JoeIterable i -> i.getItems();
-            default -> {
-                var instance = joe.getJoeValue(arg);
-                if (instance.canIterate()) {
-                    yield instance.getItems();
-                } else {
-                    throw new RuntimeError(token.span(),
-                        "Expected iterable, got: " +
-                            joe.typedValue(arg) + ".");
-                }
+        if (arg instanceof Collection<?> c) {
+            return c;
+        } else {
+            var instance = joe.getJoeValue(arg);
+            if (instance.canIterate()) {
+                return instance.getItems();
+            } else {
+                throw new RuntimeError(token.span(),
+                    "Expected iterable, got: " +
+                        joe.typedValue(arg) + ".");
             }
-        };
+        }
     }
 
     //-------------------------------------------------------------------------

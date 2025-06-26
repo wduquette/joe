@@ -923,19 +923,17 @@ class VirtualMachine {
 
     // Gets the argument as a collection, if possible
     private Collection<?> checkCollection(Object arg) {
-        return switch (arg) {
-            case Collection<?> c -> c;
-            case JoeIterable i -> i.getItems();
-            default -> {
-                var instance = joe.getJoeValue(arg);
-                if (instance.canIterate()) {
-                    yield instance.getItems();
-                } else {
-                    throw error("Expected iterable, got: " +
-                            joe.typedValue(arg) + ".");
-                }
+        if (arg instanceof Collection<?> c) {
+            return c;
+        } else {
+            var instance = joe.getJoeValue(arg);
+            if (instance.canIterate()) {
+                return instance.getItems();
+            } else {
+                throw error("Expected iterable, got: " +
+                        joe.typedValue(arg) + ".");
             }
-        };
+        }
     }
 
     private void checkCallable(Object arg) {
