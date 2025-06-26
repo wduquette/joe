@@ -162,7 +162,7 @@ public class FactType extends ProxyType<Fact> {
     // The `Fact` will be an instance of the Java `ListFact` class.
     private Object _of(Joe joe, Args args) {
         args.exactArity(2, "Fact.of(relation, fields)");
-        var relation = joe.toString(args.next());
+        var relation = joe.toIdentifier(args.next());
         var fields = joe.toList(args.next());
         return new ListFact(relation, fields);
     }
@@ -176,16 +176,12 @@ public class FactType extends ProxyType<Fact> {
     // The `Fact` will be an instance of the Java `MapFact` class.
     private Object _ofMap(Joe joe, Args args) {
         args.exactArity(2, "Fact.ofMap(relation, fieldMap)");
-        var relation = joe.toString(args.next());
+        var relation = joe.toIdentifier(args.next());
         var map = joe.toMap(args.next());
         var fieldMap = new HashMap<String, Object>();
         for (var e : map.entrySet()) {
-            var name = e.getKey().toString();
-            if (Joe.isIdentifier(name)) {
-                fieldMap.put(name, e.getValue());
-            } else {
-                throw joe.expected("field name", e.getKey());
-            }
+            var name = joe.toIdentifier(e.getKey().toString());
+            fieldMap.put(name, e.getValue());
         }
         return new MapFact(relation, fieldMap);
     }
@@ -199,7 +195,7 @@ public class FactType extends ProxyType<Fact> {
     // The `Fact` will be an instance of the Java `RecordFact` class.
     private Object _ofPairs(Joe joe, Args args) {
         args.exactArity(2, "Fact.ofPairs(relation, pairs)");
-        var relation = joe.toString(args.next());
+        var relation = joe.toIdentifier(args.next());
         var pairsArg = args.next();
         var pairs = joe.toList(pairsArg);
 
@@ -210,13 +206,9 @@ public class FactType extends ProxyType<Fact> {
         var names = new ArrayList<String>();
         var fieldMap = new HashMap<String, Object>();
         for (var i = 0; i < pairs.size(); i += 2) {
-            var name = pairs.get(i).toString();
-            if (Joe.isIdentifier(name)) {
-                names.add(name);
-                fieldMap.put(name, pairs.get(i+1));
-            } else {
-                throw joe.expected("field name", pairs.get(i));
-            }
+            var name = joe.toIdentifier(pairs.get(i).toString());
+            names.add(name);
+            fieldMap.put(name, pairs.get(i+1));
         }
         return new RecordFact(relation, names, fieldMap);
     }
@@ -233,7 +225,7 @@ public class FactType extends ProxyType<Fact> {
     // The `Fact` will be an instance of the Java `ListFact` class.
     private Object _init(Joe joe, Args args) {
         args.minArity(2, "Fact(relation, field, ...)");
-        var relation = joe.toString(args.next());
+        var relation = joe.toIdentifier(args.next());
         var fields = args.remainderAsList();
         return new ListFact(relation, fields);
     }

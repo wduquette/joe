@@ -2,7 +2,7 @@
 //
 // Tests for the `Fact` type
 
-function testInitializer() {
+function testInitializer_good() {
     var fact = Fact("Thing", #car, #red);
     check(fact.relation()).eq("Thing");
     check(fact.isOrdered()).eq(true);
@@ -11,6 +11,11 @@ function testInitializer() {
     check(fact.f0).eq(#car);
     check(fact.f1).eq(#red);
     check(fact.toString()).eq("Fact(Thing, #car, #red)");
+}
+
+function testInitializer_badRelation() {
+    assertError(\-> Fact("@Thing", #car, #red),
+        "Expected identifier, got: String '@Thing'.");
 }
 
 function testOf() {
@@ -24,6 +29,11 @@ function testOf() {
     check(fact.toString()).eq("Fact(Thing, #car, #red)");
 }
 
+function testOf_badRelation() {
+    assertError(\-> Fact.of("@Thing", [#car, #red]),
+        "Expected identifier, got: String '@Thing'.");
+}
+
 function testOfMap() {
     var fact = Fact.ofMap("Thing", {"id": #car, "color": #red});
     check(fact.relation()).eq("Thing");
@@ -31,6 +41,16 @@ function testOfMap() {
     check(fact.fieldMap()).eq({"id": #car, "color": #red});
     check(fact.id).eq(#car);
     check(fact.color).eq(#red);
+}
+
+function testOfMap_badRelation() {
+    assertError(\-> Fact.ofMap("@Thing", {"type": #car}),
+        "Expected identifier, got: String '@Thing'.");
+}
+
+function testOfMap_badFieldName() {
+    assertError(\-> Fact.ofMap("Thing", {"@type": #car}),
+        "Expected identifier, got: String '@type'.");
 }
 
 function testOfPairs() {
@@ -42,6 +62,16 @@ function testOfPairs() {
     check(fact.id).eq(#car);
     check(fact.color).eq(#red);
     check(fact.toString()).eq("Fact(Thing, #car, #red)");
+}
+
+function testOfPairs_badRelation() {
+    assertError(\-> Fact.ofPairs("@Thing", ["type", #car]),
+        "Expected identifier, got: String '@Thing'.");
+}
+
+function testOfPairs_badFieldName() {
+    assertError(\-> Fact.ofPairs("Thing", ["@type", #car]),
+        "Expected identifier, got: String '@type'.");
 }
 
 function testBadField() {

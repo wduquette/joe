@@ -803,6 +803,23 @@ public class Joe {
     }
 
     /**
+     * Requires that the argument is a valid identifier String, and returns
+     * it as such.
+     * @param arg The argument
+     * @return The string
+     * @throws JoeError if the argument is not a valid identifier string
+     */
+    public String toIdentifier(Object arg) {
+        if (arg instanceof String string &&
+            Joe.isIdentifier(string)
+        ) {
+            return string;
+        }
+
+        throw expected("identifier", arg);
+    }
+
+    /**
      * Requires that the argument is a Double, and returns it as an
      * integer for further processing.  Any fractional part is
      * truncated.
