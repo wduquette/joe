@@ -243,6 +243,52 @@ function testSelect_facts() {
     check(results).eq(expected);
 }
 
+//-------------------------------------------------------------------------
+// update
+
+function testUpdate_bad_exports() {
+    var db = FactBase([
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ]);
+
+    var rules = ruleset {
+        export Ancestor;
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+
+    assertError(\-> db.update(rules),
+        "Cannot `export` facts in update().");
+}
+
+function testUpdate_good() {
+    var db = FactBase([
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ]);
+
+    var results = db.update(ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    });
+
+    var expected = Set(
+        Fact("Ancestor", #anne, #bert),
+        Fact("Ancestor", #anne, #clark),
+        Fact("Ancestor", #bert, #clark)
+    );
+
+    // Returns the new facts
+    check(results).eq(expected);
+
+    // The relation's set was updated.
+    check(db.byRelation("Ancestor")).eq(expected);
+
+    // The set of all facts was updated.
+    check(db.all().containsAll(expected)).eq(true);
+}
+
 
 //-------------------------------------------------------------------------
 // Utilities
