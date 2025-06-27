@@ -110,6 +110,22 @@ public class ClarkRecordValue implements JoeValue {
     //-------------------------------------------------------------------------
     // Object API
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ClarkRecordValue that = (ClarkRecordValue) o;
+        return type.equals(that.type) && fields.equals(that.fields);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + fields.hashCode();
+        return result;
+    }
+
     @Override
     public String toString() {
         return "<" + type.name() + "@" + String.format("%x",hashCode()) + ">";
