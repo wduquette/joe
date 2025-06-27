@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * A collection of Facts indexed by relation.
  */
-public class FactBase {
+public class FactSet {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -18,7 +18,7 @@ public class FactBase {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public FactBase() {
+    public FactSet() {
         // Nothing to do
     }
 
@@ -57,7 +57,7 @@ public class FactBase {
      * Adds the contents of another FactBase to the database
      * @param other The other FactBase
      */
-    public void addAll(FactBase other) {
+    public void addAll(FactSet other) {
         facts.addAll(other.facts);
         for (var e : other.index.entrySet()) {
             indexSet(e.getKey()).addAll(e.getValue());
@@ -97,7 +97,7 @@ public class FactBase {
      * Deletes the facts in another FactBase from the database.
      * @param other The other FactBase
      */
-    public void deleteAll(FactBase other) {
+    public void deleteAll(FactSet other) {
         // There are a number of ways one could do this; consider
         // timing to find out.
         facts.removeAll(other.facts);
