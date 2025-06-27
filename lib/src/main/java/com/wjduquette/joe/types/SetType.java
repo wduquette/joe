@@ -33,6 +33,7 @@ public class SetType extends ProxyType<JoeSet> {
         method("addAll",        this::_addAll);
         method("clear",         this::_clear);
         method("contains",      this::_contains);
+        method("containsAll",   this::_containsAll);
         method("copy",          this::_copy);
         method("filter",        this::_filter);
         method("isEmpty",       this::_isEmpty);
@@ -117,6 +118,19 @@ public class SetType extends ProxyType<JoeSet> {
         args.exactArity(1, "contains(value)");
 
         return set.contains(args.next());
+    }
+
+    //**
+    // @method containsAll
+    // @args collection
+    // @result Boolean
+    // Returns `true` if the set contains the values in the
+    // *collection*, and `false` otherwise.
+    private Object _containsAll(JoeSet set, Joe joe, Args args) {
+        args.exactArity(1, "contains(collection)");
+        var collection = joe.toCollection(args.next());
+
+        return set.containsAll(collection);
     }
 
     //**

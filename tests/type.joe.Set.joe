@@ -36,6 +36,12 @@ function testContains() {
     check(set.contains(#b)).isFalse();
 }
 
+function testContainsAll() {
+    var set = Set(#a, #b, #c, #d);
+    check(set.containsAll(Set(#a, #c))).isTrue();
+    check(set.containsAll(Set(#c, #e))).isFalse();
+}
+
 function testCopy() {
     var set = Set(#a);
     var set2 = set.copy();
