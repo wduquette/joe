@@ -5,6 +5,7 @@ import java.util.*;
 /**
  * A collection of Facts indexed by relation.
  */
+@SuppressWarnings("unused")
 public class FactSet {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -86,7 +87,7 @@ public class FactSet {
      * Deletes a collection of facts from the database.
      * @param collection The facts
      */
-    public void deleteAll(Collection<?> collection) {
+    public void deleteAll(Collection<Fact> collection) {
         // There are several ways one could do this; consider timing
         // to determine which is fastest.
         facts.removeAll(collection);
@@ -113,6 +114,14 @@ public class FactSet {
     }
 
     /**
+     * Gets the set of relations represented in this FactSet
+     * @return The set
+     */
+    public Set<String> getRelations() {
+        return Collections.unmodifiableSet(index.keySet());
+    }
+
+    /**
      * Gets a read-only set of all facts in the database that have
      * the given relation.
      * @return The set
@@ -127,5 +136,18 @@ public class FactSet {
         for (var fact : facts) {
             indexSet(fact.relation()).add(fact);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FactSet factSet = (FactSet) o;
+        return facts.equals(factSet.facts);
+    }
+
+    @Override
+    public int hashCode() {
+        return facts.hashCode();
     }
 }
