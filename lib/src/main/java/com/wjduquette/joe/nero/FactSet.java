@@ -130,6 +130,22 @@ public class FactSet {
         return Collections.unmodifiableSet(indexSet(relation));
     }
 
+    /**
+     * Is the database empty?
+     * @return true or false
+     */
+    public boolean isEmpty() {
+        return facts.isEmpty();
+    }
+
+    /**
+     * Returns the number of facts in the database.
+     * @return the count
+     */
+    public int size() {
+        return facts.size();
+    }
+
     // Re-indexes the set of facts, e.g., after major deletions.
     private void reindex() {
         index.clear();

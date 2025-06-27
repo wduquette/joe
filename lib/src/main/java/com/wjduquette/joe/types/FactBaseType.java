@@ -47,10 +47,12 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
 //        method("deleteIf",     this::_deleteIf);
 //        method("filter",       this::_filter);
         method("isDebug",      this::_isDebug);
+        method("isEmpty",      this::_isEmpty);
 //        method("map",          this::_map);
         method("relations",    this::_relations);
         method("select",       this::_select);
         method("setDebug",     this::_setDebug);
+        method("size",         this::_size);
         method("toString",     this::_toString);
         method("update",       this::_update);
     }
@@ -68,8 +70,11 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
         for (var relation : db.getRelations().stream().sorted().toList()) {
             var items = db.getRelation(relation);
             if (!items.isEmpty()) {
-                buff.append(", ").append(items.size()).append(" ")
-                    .append(relation);
+                buff.append(", ")
+                    .append(relation)
+                    .append("[")
+                    .append(items.size())
+                    .append("]");
             }
         }
         buff.append("]");
@@ -140,7 +145,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @result Set
     // Returns a read-only [[Set]] of all facts in the database.
     private Object _all(FactBaseValue db, Joe joe, Args args) {
-        args.exactArity(1, "all()");
+        args.exactArity(0, "all()");
         return joe.readonlySet(db.getAll());
     }
 
@@ -213,12 +218,21 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     }
 
     //**
+    // @method isEmpty
+    // @result Boolean
+    // Returns true if the database is empty, and false otherwise.
+    private Object _isEmpty(FactBaseValue db, Joe joe, Args args) {
+        args.exactArity(0, "isEmpty()");
+        return db.isEmpty();
+    }
+
+    //**
     // @method relations
     // @result Set
     // Returns a read-only [[Set]] of the names of the relations
     // of the facts in the database.
     private Object _relations(FactBaseValue db, Joe joe, Args args) {
-        args.exactArity(1, "relations()");
+        args.exactArity(0, "relations()");
         var set = db.getRelations().stream()
             .filter(r -> !db.getRelation(r).isEmpty())
             .collect(Collectors.toSet());
@@ -238,6 +252,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
         var ruleset = joe.toType(RuleSetValue.class, args.next());
 
         // TODO Revise execution to make best use of FactSet indexing.
+        // TODO use debug flag
         return ruleset.infer(joe, db.getAll());
     }
 
@@ -253,6 +268,15 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
         args.exactArity(1, "setDebug(flag)");
         db.setDebug(joe.toBoolean(args.next()));
         return db;
+    }
+
+    //**
+    // @method size
+    // @result Number
+    // Returns the number of facts in the database.
+    private Object _size(FactBaseValue db, Joe joe, Args args) {
+        args.exactArity(0, "size()");
+        return (double)db.size();
     }
 
     //**
@@ -280,6 +304,8 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
         }
 
         // TODO Revise execution to make best use of FactSet indexing.
+        // TODO use debug flag
+
         var newFacts = ruleset.infer(joe, db.getAll());
         newFacts.forEach(f -> db.add(joe.toFact(f)));
         return newFacts;

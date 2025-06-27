@@ -1,0 +1,222 @@
+// type.joe.FactBase.joe
+//
+// This script tests the behavior of FactBase objects.
+
+//-----------------------------------------------------------------------------
+// Helper types
+
+record Parent(parent, child) {}
+
+//-----------------------------------------------------------------------------
+// Creation
+
+function testCreation_empty() {
+    var db = FactBase();
+    check(db.isEmpty()).eq(true);
+    check(db.size()).eq(0);
+    check(db.all().isEmpty()).eq(true);
+    check(db.relations().isEmpty()).eq(true);
+    check(db.byRelation("Thing").isEmpty()).eq(true);
+    check(db.toString()).eq("FactBase[0]");
+}
+
+function testCreation_collection() {
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+    var facts = asSetOfFacts(inputs);
+
+    var db = FactBase(inputs);
+    check(db.isEmpty()).eq(false);
+    check(db.size()).eq(2);
+    check(db.all().isEmpty()).eq(false);
+    check(db.all()).eq(facts);
+    check(db.relations().isEmpty()).eq(false);
+    check(db.relations()).eq(Set("Parent"));
+    check(db.byRelation("Parent")).eq(facts);
+    check(db.toString()).eq("FactBase[2, Parent[2]]");
+}
+
+function testCreation_FactBase() {
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+    var other = asFactBase(inputs);
+
+    var db = FactBase(other);
+    check(db.isEmpty()).eq(false);
+    check(db.size()).eq(2);
+    check(db.all().isEmpty()).eq(false);
+    check(db.all()).eq(other.all());
+    check(db.relations().isEmpty()).eq(false);
+    check(db.relations()).eq(Set("Parent"));
+    check(db.byRelation("Parent")).eq(other.all());
+    check(db.toString()).eq("FactBase[2, Parent[2]]");
+}
+
+function testCreation_badInputs() {
+    var inputs = ["abc"];
+
+    assertError(\-> FactBase(inputs),
+        "Expected Nero-compatible fact, got: String 'abc'.");
+}
+
+//-------------------------------------------------------------------------
+// add
+
+function testAdd_good() {
+    var db = FactBase();
+    var fact = Joe.toFact(Parent(#anne, #bert));
+
+    db.add(Parent(#anne, #bert));
+
+    check(db.all()).eq(Set(fact));
+    check(db.byRelation("Parent")).eq(Set(fact));
+    check(db.relations()).eq(Set("Parent"));
+}
+
+function testAdd_bad() {
+    var db = FactBase();
+
+    assertError(\-> db.add("abc"),
+        "Expected Nero-compatible fact, got: String 'abc'.");
+}
+
+function testAddAll_collection() {
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+    var db = FactBase();
+    var facts = asSetOfFacts(inputs);
+
+    db.addAll(facts);
+    check(db.all()).eq(facts);
+    check(db.byRelation("Parent")).eq(facts);
+}
+
+function testAddAll_FactBase() {
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+    var db = FactBase();
+    var other = asFactBase(inputs);
+
+    db.addAll(other);
+    check(db.all()).eq(other.all());
+    check(db.byRelation("Parent")).eq(other.all());
+}
+
+function testAddAll_badInputs() {
+    var inputs = ["abc"];
+    var db = FactBase();
+
+    assertError(\-> db.addAll(inputs),
+        "Expected Nero-compatible fact, got: String 'abc'.");
+}
+
+//-------------------------------------------------------------------------
+// clear
+
+function testClear() {
+    var db = FactBase();
+    db.add(Parent(#anne, #bert));
+    db.clear();
+    check(db.isEmpty()).eq(true);
+    check(db.size()).eq(0);
+    check(db.all().isEmpty()).eq(true);
+    check(db.relations().isEmpty()).eq(true);
+}
+
+//-------------------------------------------------------------------------
+// delete
+
+function testDelete_good() {
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+    var remainder = Set(Joe.toFact(Parent(#bert, #clark)));
+    var db = FactBase(inputs);
+    db.delete(Parent(#anne, #bert));
+
+    check(db.all()).eq(remainder);
+    check(db.byRelation("Parent")).eq(remainder);
+}
+
+function testDelete_bad() {
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+    var db = FactBase(inputs);
+
+    assertError(\-> db.delete("abc"),
+        "Expected Nero-compatible fact, got: String 'abc'.");
+}
+
+//-------------------------------------------------------------------------
+// delete
+
+function testDeleteAll_collection() {
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+    var remainder = Set(Joe.toFact(Parent(#bert, #clark)));
+    var db = FactBase(inputs);
+    db.deleteAll([Parent(#anne, #bert)]);
+
+    check(db.all()).eq(remainder);
+    check(db.byRelation("Parent")).eq(remainder);
+}
+
+function testDeleteAll_FactBase() {
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+    var remainder = Set(Joe.toFact(Parent(#bert, #clark)));
+    var db = FactBase(inputs);
+
+    var other = FactBase([Parent(#anne, #bert)]);
+    db.deleteAll(other);
+
+    check(db.all()).eq(remainder);
+    check(db.byRelation("Parent")).eq(remainder);
+}
+
+function testDeleteAll_bad() {
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+    var db = FactBase(inputs);
+
+    assertError(\-> db.deleteAll(["abc"]),
+        "Expected Nero-compatible fact, got: String 'abc'.");
+}
+
+//-------------------------------------------------------------------------
+// Utilities
+
+function asSetOfFacts(items) {
+    var set = Set();
+    foreach (item : items) {
+        set.add(Joe.toFact(item));
+    }
+
+    return set;
+}
+
+function asFactBase(items) {
+    var db = FactBase();
+    foreach (item : items) {
+        db.add(item);
+    }
+
+    return db;
+}
