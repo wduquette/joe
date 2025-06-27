@@ -6,6 +6,7 @@
 // Helper types
 
 record Parent(parent, child) {}
+record Ancestor(ancestor, descendant) {}
 
 //-----------------------------------------------------------------------------
 // Creation
@@ -199,6 +200,49 @@ function testDeleteAll_bad() {
     assertError(\-> db.deleteAll(["abc"]),
         "Expected Nero-compatible fact, got: String 'abc'.");
 }
+
+//-------------------------------------------------------------------------
+// select
+
+function testSelect_exports() {
+    var db = FactBase([
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ]);
+
+    var results = db.select(ruleset {
+        export Ancestor;
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    });
+
+    var expected = Set(
+        Ancestor(#anne, #bert),
+        Ancestor(#anne, #clark),
+        Ancestor(#bert, #clark)
+    );
+    check(results).eq(expected);
+}
+
+function testSelect_facts() {
+    var db = FactBase([
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ]);
+
+    var results = db.select(ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    });
+
+    var expected = Set(
+        Fact("Ancestor", #anne, #bert),
+        Fact("Ancestor", #anne, #clark),
+        Fact("Ancestor", #bert, #clark)
+    );
+    check(results).eq(expected);
+}
+
 
 //-------------------------------------------------------------------------
 // Utilities
