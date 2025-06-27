@@ -1,7 +1,6 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.ListFact;
 import com.wjduquette.joe.nero.Nero;
 import com.wjduquette.joe.types.RuleSetValue;
 import com.wjduquette.joe.types.SetValue;
@@ -38,8 +37,10 @@ public class JoeNero {
     // API
 
     /**
-     * Preliminary implementation of infer().
-     * @return The set of known facts.
+     * Infers facts using the rule set given the inputs.  Returns a set of
+     * the inferred facts, either as [[Fact]] values or as exported
+     * domain values.
+     * @return The set of inferred facts.
      * @throws JoeError if the rule set is not stratified.
      */
     public SetValue infer() {
@@ -47,9 +48,11 @@ public class JoeNero {
     }
 
     /**
-     * Preliminary implementation of infer().
+     * Infers facts using the rule set given the inputs.  Returns a set of
+     * the inferred facts, either as [[Fact]] values or as exported
+     * domain values.
      * @param inputs The set of scripted input facts.
-     * @return The set of known facts.
+     * @return The set of inferred facts
      * @throws JoeError if the rule set is not stratified.
      */
     public SetValue infer(Collection<?> inputs) {
@@ -65,7 +68,7 @@ public class JoeNero {
 
             if (heads.contains(fact.relation())) {
                 throw new JoeError(
-                    "Input fact type collides with rule set's head relation: '" +
+                    "Rule head relation collides with input fact relation: '" +
                     fact.relation() + "'.");
             }
             inputFacts.add(fact);
@@ -74,14 +77,12 @@ public class JoeNero {
         // NEXT, Execute the rule set.
         var nero = new Nero(rsv.ruleset());
         nero.setDebug(rsv.isDebug());
-        nero.setFactFactory(ListFact::new);
         nero.infer(inputFacts);
 
         // NEXT, build the list of known facts.  We want the input
         // facts as they were given to us, plus the newly inferred
         // facts, converted according to any export declarations.
         var result = new SetValue();
-        result.addAll(inputs);
 
         for (var fact : nero.getInferredFacts()) {
             var creator = rsv.exports().get(fact.relation());
@@ -92,6 +93,7 @@ public class JoeNero {
                 result.add(fact);
             }
         }
+
         return result;
     }
 }

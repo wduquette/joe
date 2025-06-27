@@ -59,7 +59,7 @@ function testInfer_headCollision() {
     };
 
     assertError(\-> rules.infer(inputs),
-        "Input fact type collides with rule set's head relation: 'Ancestor'.");
+        "Rule head relation collides with input fact relation: 'Ancestor'.");
 }
 
 
@@ -101,8 +101,6 @@ function testInfer_proxiedValue_ordered() {
         "Fact(Ancestor, #anne, #bert)",
         "Fact(Ancestor, #anne, #clark)",
         "Fact(Ancestor, #bert, #clark)",
-        "Fact(Parent, #anne, #bert)",
-        "Fact(Parent, #bert, #clark)"
     ]);
 }
 
@@ -124,8 +122,6 @@ function testInfer_proxiedValue_named() {
         "Fact(Ancestor, #anne, #bert)",
         "Fact(Ancestor, #anne, #clark)",
         "Fact(Ancestor, #bert, #clark)",
-        "Fact(Parent, #anne, #bert)",
-        "Fact(Parent, #bert, #clark)"
     ]);
 }
 
@@ -147,8 +143,6 @@ function testInfer_record_ordered() {
         "Fact(Ancestor, #anne, #bert)",
         "Fact(Ancestor, #anne, #clark)",
         "Fact(Ancestor, #bert, #clark)",
-        "Parent(#anne, #bert)",
-        "Parent(#bert, #clark)"
     ]);
 }
 
@@ -170,8 +164,6 @@ function testInfer_record_named() {
         "Fact(Ancestor, #anne, #bert)",
         "Fact(Ancestor, #anne, #clark)",
         "Fact(Ancestor, #bert, #clark)",
-        "Parent(#anne, #bert)",
-        "Parent(#bert, #clark)"
     ]);
 }
 
@@ -202,8 +194,6 @@ function testInfer_class_named() {
         "Fact(Ancestor, #anne, #bert)",
         "Fact(Ancestor, #anne, #clark)",
         "Fact(Ancestor, #bert, #clark)",
-        "Parent(#anne, #bert)",
-        "Parent(#bert, #clark)"
     ]);
 }
 
