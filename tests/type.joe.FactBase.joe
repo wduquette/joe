@@ -65,6 +65,21 @@ function testCreation_badInputs() {
 }
 
 //-------------------------------------------------------------------------
+// Can Iterate
+
+function testIterable() {
+    var db = FactBase([
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ]);
+
+    var set = Set();
+    foreach(fact : db) set.add(fact);
+    check(set).eq(db.all());
+}
+
+
+//-------------------------------------------------------------------------
 // add
 
 function testAdd_good() {
@@ -84,6 +99,9 @@ function testAdd_bad() {
     assertError(\-> db.add("abc"),
         "Expected Nero-compatible fact, got: String 'abc'.");
 }
+
+//-------------------------------------------------------------------------
+// addAll
 
 function testAddAll_collection() {
     var inputs = [
@@ -120,6 +138,16 @@ function testAddAll_badInputs() {
 }
 
 //-------------------------------------------------------------------------
+// all
+
+// Tested in use by other tests
+
+//-------------------------------------------------------------------------
+// byRelation
+
+// Tested in use by other tests
+
+//-------------------------------------------------------------------------
 // clear
 
 function testClear() {
@@ -133,49 +161,85 @@ function testClear() {
 }
 
 //-------------------------------------------------------------------------
-// delete
+// filter
 
-function testDelete_good() {
+function testFilter() {
+    var inputs = [
+        Fact("Parent", #anne, #bert),
+        Fact("Parent", #bert, #clark)
+    ];
+    var db = FactBase(inputs);
+
+    var set = db.filter(\f -> f ~ Parent(#anne, _));
+    check(set).eq(Set(Fact("Parent", #anne, #bert)));
+}
+
+// TODO
+
+//-------------------------------------------------------------------------
+// isDebug/setDebug
+
+// TODO
+
+//-------------------------------------------------------------------------
+// isEmpty
+
+// Tested in use by other tests
+
+//-------------------------------------------------------------------------
+// map
+
+// TODO
+
+//-------------------------------------------------------------------------
+// relations
+
+// Tested in use by other tests
+
+//-------------------------------------------------------------------------
+// remove
+
+function testRemove_good() {
     var inputs = [
         Parent(#anne, #bert),
         Parent(#bert, #clark)
     ];
     var remainder = Set(Joe.toFact(Parent(#bert, #clark)));
     var db = FactBase(inputs);
-    db.delete(Parent(#anne, #bert));
+    db.remove(Parent(#anne, #bert));
 
     check(db.all()).eq(remainder);
     check(db.byRelation("Parent")).eq(remainder);
 }
 
-function testDelete_bad() {
+function testRemove_bad() {
     var inputs = [
         Parent(#anne, #bert),
         Parent(#bert, #clark)
     ];
     var db = FactBase(inputs);
 
-    assertError(\-> db.delete("abc"),
+    assertError(\-> db.remove("abc"),
         "Expected Nero-compatible fact, got: String 'abc'.");
 }
 
 //-------------------------------------------------------------------------
-// delete
+// removeAll
 
-function testDeleteAll_collection() {
+function testRemoveAll_collection() {
     var inputs = [
         Parent(#anne, #bert),
         Parent(#bert, #clark)
     ];
     var remainder = Set(Joe.toFact(Parent(#bert, #clark)));
     var db = FactBase(inputs);
-    db.deleteAll([Parent(#anne, #bert)]);
+    db.removeAll([Parent(#anne, #bert)]);
 
     check(db.all()).eq(remainder);
     check(db.byRelation("Parent")).eq(remainder);
 }
 
-function testDeleteAll_FactBase() {
+function testRemoveAll_FactBase() {
     var inputs = [
         Parent(#anne, #bert),
         Parent(#bert, #clark)
@@ -184,22 +248,27 @@ function testDeleteAll_FactBase() {
     var db = FactBase(inputs);
 
     var other = FactBase([Parent(#anne, #bert)]);
-    db.deleteAll(other);
+    db.removeAll(other);
 
     check(db.all()).eq(remainder);
     check(db.byRelation("Parent")).eq(remainder);
 }
 
-function testDeleteAll_bad() {
+function testRemoveAll_bad() {
     var inputs = [
         Parent(#anne, #bert),
         Parent(#bert, #clark)
     ];
     var db = FactBase(inputs);
 
-    assertError(\-> db.deleteAll(["abc"]),
+    assertError(\-> db.removeAll(["abc"]),
         "Expected Nero-compatible fact, got: String 'abc'.");
 }
+
+//-------------------------------------------------------------------------
+// removeIf
+
+// TODO
 
 //-------------------------------------------------------------------------
 // select
@@ -242,6 +311,16 @@ function testSelect_facts() {
     );
     check(results).eq(expected);
 }
+
+//-------------------------------------------------------------------------
+// size
+
+// Tested in use by other tests
+
+//-------------------------------------------------------------------------
+// toString
+
+// TODO
 
 //-------------------------------------------------------------------------
 // update

@@ -1,12 +1,11 @@
 package com.wjduquette.joe.types;
 
-import com.wjduquette.joe.Args;
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.ProxyType;
+import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.FactSet;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 /**
@@ -42,14 +41,14 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
         method("all",          this::_all);
         method("byRelation",   this::_byRelation);
         method("clear",        this::_clear);
-        method("delete",       this::_delete);
-        method("deleteAll",    this::_deleteAll);
-//        method("deleteIf",     this::_deleteIf);
-//        method("filter",       this::_filter);
+        method("filter",       this::_filter);
         method("isDebug",      this::_isDebug);
         method("isEmpty",      this::_isEmpty);
-//        method("map",          this::_map);
+        method("map",          this::_map);
         method("relations",    this::_relations);
+        method("remove",       this::_remove);
+        method("removeAll",    this::_removeAll);
+        method("removeIf",     this::_removeIf);
         method("select",       this::_select);
         method("setDebug",     this::_setDebug);
         method("size",         this::_size);
@@ -172,40 +171,22 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     }
 
     //**
-    // @method delete
-    // @args fact
-    // @result this
-    // Deletes a single [[Fact]] from the database.
-    private Object _delete(FactBaseValue db, Joe joe, Args args) {
-        args.exactArity(1, "delete(fact)");
-        db.delete(joe.toFact(args.next()));
-        return db;
-    }
+    // @method filter
+    // @args predicate
+    // @result Set
+    // Returns a set containing the elements for which the filter
+    // *predicate* is true.
+    private Object _filter(FactBaseValue db, Joe joe, Args args) {
+        args.exactArity(1, "filter(predicate)");
+        var callable = args.next();
 
-    //**
-    // @method deleteAll
-    // @args facts
-    // @result this
-    // Deletes a collection of *facts* from the database.
-    // The *facts* value can be a FactBase or a collection of values
-    // to be converted to facts.
-    private Object _deleteAll(FactBaseValue db, Joe joe, Args args) {
-        args.exactArity(1, "deleteAll(facts)");
-
-        var arg = args.next();
-
-        if (arg instanceof FactSet facts) {
-            db.deleteAll(facts);
-        } else {
-            var facts = joe.toCollection(arg);
-            var factSet = new FactSet();
-            for (var fact : facts) {
-                factSet.add(joe.toFact(fact));
+        var result = new SetValue();
+        for (var item : db.getAll()) {
+            if (Joe.isTruthy(joe.call(callable, item))) {
+                result.add(item);
             }
-            db.deleteAll(factSet);
         }
-
-        return db;
+        return result;
     }
 
     //**
@@ -217,6 +198,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
         return db.isDebug();
     }
 
+
     //**
     // @method isEmpty
     // @result Boolean
@@ -224,6 +206,23 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     private Object _isEmpty(FactBaseValue db, Joe joe, Args args) {
         args.exactArity(0, "isEmpty()");
         return db.isEmpty();
+    }
+
+    //**
+    // @method map
+    // @args func
+    // @result Set
+    // Returns a set containing the items that result from applying
+    // function *func* to each item in this set.
+    private Object _map(FactBaseValue db, Joe joe, Args args) {
+        args.exactArity(1, "map(func)");
+        var callable = args.next();
+
+        var result = new SetValue();
+        for (var item : db.getAll()) {
+            result.add(joe.call(callable, item));
+        }
+        return result;
     }
 
     //**
@@ -238,6 +237,63 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
             .collect(Collectors.toSet());
         return joe.readonlySet(set);
     }
+
+    //**
+    // @method remove
+    // @args fact
+    // @result this
+    // Deletes a single [[Fact]] from the database.
+    private Object _remove(FactBaseValue db, Joe joe, Args args) {
+        args.exactArity(1, "remove(fact)");
+        db.remove(joe.toFact(args.next()));
+        return db;
+    }
+
+    //**
+    // @method removeAll
+    // @args facts
+    // @result this
+    // Deletes a collection of *facts* from the database.
+    // The *facts* value can be a FactBase or a collection of values
+    // to be converted to facts.
+    private Object _removeAll(FactBaseValue db, Joe joe, Args args) {
+        args.exactArity(1, "removeAll(facts)");
+
+        var arg = args.next();
+
+        if (arg instanceof FactSet facts) {
+            db.removeAll(facts);
+        } else {
+            var facts = joe.toCollection(arg);
+            var factSet = new FactSet();
+            for (var fact : facts) {
+                factSet.add(joe.toFact(fact));
+            }
+            db.removeAll(factSet);
+        }
+
+        return db;
+    }
+
+    //**
+    // @method removeIf
+    // @args predicate
+    // @result this
+    // Deletes facts matching the predicate from the database.
+    private Object _removeIf(FactBaseValue db, Joe joe, Args args) {
+        args.exactArity(1, "filter(predicate)");
+        var callable = args.next();
+
+        var items = new HashSet<Fact>();
+        for (var item : db.getAll()) {
+            if (Joe.isTruthy(joe.call(callable, item))) {
+                items.add(item);
+            }
+        }
+        db.removeAll(items);
+        return db;
+    }
+
 
     //**
     // @method select

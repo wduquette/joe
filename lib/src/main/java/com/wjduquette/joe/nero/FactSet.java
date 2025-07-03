@@ -77,7 +77,7 @@ public class FactSet {
      * Deletes a specific fact from the database
      * @param fact The fact
      */
-    public void delete(Fact fact) {
+    public void remove(Fact fact) {
         if (facts.remove(fact)) {
             indexSet(fact.relation()).remove(fact);
         }
@@ -87,7 +87,7 @@ public class FactSet {
      * Deletes a collection of facts from the database.
      * @param collection The facts
      */
-    public void deleteAll(Collection<Fact> collection) {
+    public void removeAll(Collection<Fact> collection) {
         // There are several ways one could do this; consider timing
         // to determine which is fastest.
         facts.removeAll(collection);
@@ -98,7 +98,7 @@ public class FactSet {
      * Deletes the facts in another FactBase from the database.
      * @param other The other FactBase
      */
-    public void deleteAll(FactSet other) {
+    public void removeAll(FactSet other) {
         // There are a number of ways one could do this; consider
         // timing to find out.
         facts.removeAll(other.facts);
