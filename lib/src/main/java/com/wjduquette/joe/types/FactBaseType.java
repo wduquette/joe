@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * A ProxyType for the FactBaseValue type.
  */
-public class FactBaseType extends ProxyType<FactBaseValue> {
+public class FactBaseType extends ProxyType<FactBase> {
     /** The type, ready for installation. */
     public static final FactBaseType TYPE = new FactBaseType();
 
@@ -48,7 +48,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
         // - All field values must be scalar values representable as
         //   Joe literals.
 
-        proxies(FactBaseValue.class);
+        proxies(FactBase.class);
 
         initializer(this::_init);
         iterableSupplier(this::_iterableSupplier);
@@ -82,8 +82,8 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
 
     @Override
     public String stringify(Joe joe, Object value) {
-        assert value instanceof FactBaseValue;
-        var db = (FactBaseValue)value;
+        assert value instanceof FactBase;
+        var db = (FactBase)value;
 
         var buff = new StringBuilder();
         buff.append("FactBase[").append(db.getAll().size());
@@ -119,14 +119,14 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
         args.exactArity(1, "FactBase.asNero(facts)");
         var arg = args.next();
 
-        if (arg instanceof FactBaseValue fb) {
+        if (arg instanceof FactBase fb) {
             return FactBaseType.factBase2nero(joe, fb);
         } else {
             var facts = new ArrayList<Fact>();
             for (var fact : joe.toCollection(arg)) {
                 facts.add(joe.toFact(fact));
             }
-            var fb = new FactBaseValue();
+            var fb = new FactBase();
             fb.addAll(facts);
             return FactBaseType.factBase2nero(joe, fb);
         }
@@ -144,7 +144,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
         var ruleset = JoeNero.compile(script);
         var nero = new Nero(ruleset);
         nero.infer();
-        var db = new FactBaseValue();
+        var db = new FactBase();
         db.addAll(nero.getAllFacts());
         return db;
     }
@@ -161,7 +161,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // be used as a `Fact`.
     private Object _init(Joe joe, Args args) {
         args.arityRange(0, 1, "FactBase([facts])");
-        var db = new FactBaseValue();
+        var db = new FactBase();
         if (!args.isEmpty()) {
             addAll(db, joe, args.next());
         }
@@ -170,8 +170,8 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
 
     // Returns a read-only SetWrapper for the FactBase's set of facts.
     private Collection<?> _iterableSupplier(Joe joe, Object value) {
-        assert value instanceof FactBaseValue;
-        var db = (FactBaseValue)value;
+        assert value instanceof FactBase;
+        var db = (FactBase)value;
         return joe.readonlySet(db.getAll());
     }
 
@@ -184,7 +184,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @result this
     // Adds a single value to the database as a [[Fact]].  Throws an
     // [[Error]] if the value cannot be used as a `Fact`.
-    private Object _add(FactBaseValue db, Joe joe, Args args) {
+    private Object _add(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "add(fact)");
         db.add(joe.toFact(args.next()));
         return db;
@@ -201,7 +201,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     //
     // **Note**: adding the contents of another FactBase is much faster
     // than adding an arbitrary collection.
-    private Object _addAll(FactBaseValue db, Joe joe, Args args) {
+    private Object _addAll(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "add(facts)");
         addAll(db, joe, args.next());
         return db;
@@ -211,18 +211,18 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @method all
     // @result Set
     // Returns a read-only [[Set]] of all facts in the database.
-    private Object _all(FactBaseValue db, Joe joe, Args args) {
+    private Object _all(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "all()");
         return joe.readonlySet(db.getAll());
     }
 
     //**
     // @method byRelation
-    // @arg relation
+    // @args relation
     // @result Set
     // Returns a read-only [[Set]] of all facts in the database that
     // have the given *relation*.
-    private Object _byRelation(FactBaseValue db, Joe joe, Args args) {
+    private Object _byRelation(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "byRelation(relation)");
         return joe.readonlySet(
             db.getRelation(joe.toIdentifier(args.next())));
@@ -232,7 +232,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @method clear
     // @result this
     // Clears the database of all content.
-    private Object _clear(FactBaseValue db, Joe joe, Args args) {
+    private Object _clear(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "clear()");
         db.clear();
         return db;
@@ -244,7 +244,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @result Set
     // Returns a set containing the elements for which the filter
     // *predicate* is true.
-    private Object _filter(FactBaseValue db, Joe joe, Args args) {
+    private Object _filter(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "filter(predicate)");
         var callable = args.next();
 
@@ -261,7 +261,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @method isDebug
     // @result Boolean
     // Returns the database's debug flag.
-    private Object _isDebug(FactBaseValue db, Joe joe, Args args) {
+    private Object _isDebug(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "isDebug()");
         return db.isDebug();
     }
@@ -271,7 +271,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @method isEmpty
     // @result Boolean
     // Returns true if the database is empty, and false otherwise.
-    private Object _isEmpty(FactBaseValue db, Joe joe, Args args) {
+    private Object _isEmpty(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "isEmpty()");
         return db.isEmpty();
     }
@@ -282,7 +282,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @result Set
     // Returns a set containing the items that result from applying
     // function *func* to each item in this set.
-    private Object _map(FactBaseValue db, Joe joe, Args args) {
+    private Object _map(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "map(func)");
         var callable = args.next();
 
@@ -298,7 +298,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @result Set
     // Returns a read-only [[Set]] of the names of the relations
     // of the facts in the database.
-    private Object _relations(FactBaseValue db, Joe joe, Args args) {
+    private Object _relations(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "relations()");
         var set = db.getRelations().stream()
             .filter(r -> !db.getRelation(r).isEmpty())
@@ -311,7 +311,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @args fact
     // @result this
     // Deletes a single [[Fact]] from the database.
-    private Object _remove(FactBaseValue db, Joe joe, Args args) {
+    private Object _remove(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "remove(fact)");
         db.remove(joe.toFact(args.next()));
         return db;
@@ -324,7 +324,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // Deletes a collection of *facts* from the database.
     // The *facts* value can be a FactBase or a collection of values
     // to be converted to facts.
-    private Object _removeAll(FactBaseValue db, Joe joe, Args args) {
+    private Object _removeAll(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "removeAll(facts)");
 
         var arg = args.next();
@@ -348,7 +348,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @args predicate
     // @result this
     // Deletes facts matching the predicate from the database.
-    private Object _removeIf(FactBaseValue db, Joe joe, Args args) {
+    private Object _removeIf(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "filter(predicate)");
         var callable = args.next();
 
@@ -365,14 +365,14 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
 
     //**
     // @method select
-    // @args ruleset
+    // @args rules
     // @result Set
-    // Queries the database using the *ruleset* and returns all inferred
-    // facts.  If the *ruleset* contains `export` directives, the relevant
+    // Queries the database using the Nero *rules* and returns all inferred
+    // facts.  If the rule set contains `export` directives then the relevant
     // facts will be exported as domain values.  The database itself
     // is not modified.
-    private Object _select(FactBaseValue db, Joe joe, Args args) {
-        args.exactArity(1, "select(ruleset)");
+    private Object _select(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "select(rules)");
         var ruleset = joe.toType(RuleSetValue.class, args.next());
 
         // TODO Revise execution to make best use of FactSet indexing.
@@ -388,7 +388,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // [[FactBase#method.update]] and
     // [[FactBase#method.query]] will output a
     // detailed Nero execution trace.
-    private Object _setDebug(FactBaseValue db, Joe joe, Args args) {
+    private Object _setDebug(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "setDebug(flag)");
         db.setDebug(joe.toBoolean(args.next()));
         return db;
@@ -398,7 +398,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @method size
     // @result Number
     // Returns the number of facts in the database.
-    private Object _size(FactBaseValue db, Joe joe, Args args) {
+    private Object _size(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "size()");
         return (double)db.size();
     }
@@ -408,7 +408,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @result String
     // Returns a Nero script containing the database items as
     // Nero axioms.
-    private Object _toNero(FactBaseValue db, Joe joe, Args args) {
+    private Object _toNero(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "toNero()");
         return FactBaseType.factBase2nero(joe, db);
     }
@@ -417,19 +417,19 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // @method toString
     // @result String
     // Returns the value's string representation.
-    private Object _toString(FactBaseValue db, Joe joe, Args args) {
+    private Object _toString(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "toString()");
         return stringify(joe, db);
     }
 
     //**
     // @method update
-    // @args ruleset
+    // @args rules
     // @result Set
-    // Updates the database using the *ruleset*.  Inferred facts
+    // Updates the database using the Nero *rules*.  Inferred facts
     // are added to the database and then returned to the caller.
-    // It is an error if the *ruleset* contains `export` directives.
-    private Object _update(FactBaseValue db, Joe joe, Args args) {
+    // It is an error if the rule set contains `export` directives.
+    private Object _update(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "update(ruleset)");
         var ruleset = joe.toType(RuleSetValue.class, args.next());
         if (!ruleset.exports().isEmpty()) {
@@ -451,7 +451,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
     // Adds the contents of the argument to the database as
     // efficiently as possible.  Throws a JoeError if the argument isn't
     // a collection or contains a non-fact.
-    private void addAll(FactBaseValue db, Joe joe, Object arg) {
+    private void addAll(FactBase db, Joe joe, Object arg) {
         if (arg instanceof FactSet facts) {
             db.addAll(facts);
         } else {
@@ -471,7 +471,7 @@ public class FactBaseType extends ProxyType<FactBaseValue> {
      * @return The Nero source text
      * @throws JoeError if constraints are not met.
      */
-    public static String factBase2nero(Joe joe, FactBaseValue db) {
+    public static String factBase2nero(Joe joe, FactBase db) {
         var buff = new StringBuilder();
         var relations = db.getRelations().stream().sorted().toList();
 

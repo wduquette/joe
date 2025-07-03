@@ -7,7 +7,7 @@ import com.wjduquette.joe.nero.FactSet;
  * {@link com.wjduquette.joe.nero.FactSet} augmented for use as a Joe
  * FactBase.
  */
-public class FactBaseValue extends FactSet {
+public class FactBase extends FactSet {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -16,7 +16,7 @@ public class FactBaseValue extends FactSet {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public FactBaseValue() {
+    public FactBase() {
         super();
     }
 

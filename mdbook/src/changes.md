@@ -26,6 +26,9 @@
     we now have non-record-types with ordered fields.
   - Both "named-field" and "ordered-field" patterns can match the `Fact` 
     objects produced by Nero rule sets.
+- Types
+  - Added `FactBase`, an in-memory database of Nero facts.
+  - Added new methods to a variety of types.
 - Extensibility
   - Simplified implementation of proxy types for native record types.
     - Any `ProxyType` can now easily define read-only fields for its proxied
