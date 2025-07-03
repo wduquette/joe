@@ -1,0 +1,522 @@
+package com.wjduquette.joe.types;
+
+import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.FactSet;
+import com.wjduquette.joe.nero.Nero;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.stream.Collectors;
+
+/**
+ * A ProxyType for the FactBaseValue type.
+ */
+public class FactBaseType extends ProxyType<FactBase> {
+    /** The type, ready for installation. */
+    public static final FactBaseType TYPE = new FactBaseType();
+
+    //-------------------------------------------------------------------------
+    // Constructor
+
+    /**
+     * Creates the proxy.
+     */
+    FactBaseType() {
+        super("FactBase");
+
+        //**
+        // @package joe
+        // @type FactBase
+        //
+        // A FactBase is an in-memory database of Nero [[Fact]] values.
+        // The database can be updated and queried using Nero
+        // [[FactBase]] values.
+        //
+        // ## Input/Output
+        //
+        // Subject to particular constraints, the contents of a FactBase can
+        // be output as a Nero script via the
+        // [[FactBase#static.asNero]] and [[FactBase#method.toNero]]
+        // methods, and later read back in via the
+        // [[FactBase#static.fromNero]] method.
+        //
+        // The constraints are (currently) as follows:
+        //
+        // - All facts must be ordered
+        // - All field values must be scalar values representable as
+        //   Joe literals.
+
+        proxies(FactBase.class);
+
+        initializer(this::_init);
+        iterableSupplier(this::_iterableSupplier);
+
+        staticMethod("asNero",   this::_asNero);
+        staticMethod("fromNero", this::_fromNero);
+
+        method("add",          this::_add);
+        method("addAll",       this::_addAll);
+        method("all",          this::_all);
+        method("byRelation",   this::_byRelation);
+        method("clear",        this::_clear);
+        method("filter",       this::_filter);
+        method("isDebug",      this::_isDebug);
+        method("isEmpty",      this::_isEmpty);
+        method("map",          this::_map);
+        method("relations",    this::_relations);
+        method("remove",       this::_remove);
+        method("removeAll",    this::_removeAll);
+        method("removeIf",     this::_removeIf);
+        method("select",       this::_select);
+        method("setDebug",     this::_setDebug);
+        method("size",         this::_size);
+        method("toNero",       this::_toNero);
+        method("toString",     this::_toString);
+        method("update",       this::_update);
+    }
+
+    //-------------------------------------------------------------------------
+    // Stringify
+
+    @Override
+    public String stringify(Joe joe, Object value) {
+        assert value instanceof FactBase;
+        var db = (FactBase)value;
+
+        var buff = new StringBuilder();
+        buff.append("FactBase[").append(db.getAll().size());
+        for (var relation : db.getRelations().stream().sorted().toList()) {
+            var items = db.getRelation(relation);
+            if (!items.isEmpty()) {
+                buff.append(", ")
+                    .append(relation)
+                    .append("[")
+                    .append(items.size())
+                    .append("]");
+            }
+        }
+        buff.append("]");
+
+        return buff.toString();
+    }
+
+    //-------------------------------------------------------------------------
+    // Static Method Implementations
+
+    //**
+    // @static asNero
+    // @args facts
+    // @result String
+    // Given a set of *facts*, outputs the facts as a script of Nero
+    // axioms subject to certain constraints.
+    //
+    // The *facts* value can be a FactBase or a collection of values
+    // to be converted to facts. Throws an [[Error]] if any value cannot
+    // be used as a `Fact`.
+    private Object _asNero(Joe joe, Args args) {
+        args.exactArity(1, "FactBase.asNero(facts)");
+        var arg = args.next();
+
+        if (arg instanceof FactBase fb) {
+            return FactBaseType.factBase2nero(joe, fb);
+        } else {
+            var facts = new ArrayList<Fact>();
+            for (var fact : joe.toCollection(arg)) {
+                facts.add(joe.toFact(fact));
+            }
+            var fb = new FactBase();
+            fb.addAll(facts);
+            return FactBaseType.factBase2nero(joe, fb);
+        }
+    }
+
+    //**
+    // @static fromNero
+    // @args script
+    // @result FactBase
+    // Given a Nero script, executes the script and returns a FactBase
+    // containing all known facts.
+    private Object _fromNero(Joe joe, Args args) {
+        args.exactArity(1, "FactBase.fromNero(script)");
+        var script = joe.toString(args.next());
+        var ruleset = JoeNero.compile(script);
+        var nero = new Nero(ruleset);
+        nero.infer();
+        var db = new FactBase();
+        db.addAll(nero.getAllFacts());
+        return db;
+    }
+
+    //-------------------------------------------------------------------------
+    // Method Implementations
+
+    //**
+    // @init
+    // @args [facts]
+    // Creates an FactBase, optionally populating it with the given *facts*.
+    // The *facts* value can be a FactBase or a collection of values
+    // to be converted to facts. Throws an [[Error]] if any value cannot
+    // be used as a `Fact`.
+    private Object _init(Joe joe, Args args) {
+        args.arityRange(0, 1, "FactBase([facts])");
+        var db = new FactBase();
+        if (!args.isEmpty()) {
+            addAll(db, joe, args.next());
+        }
+        return db;
+    }
+
+    // Returns a read-only SetWrapper for the FactBase's set of facts.
+    private Collection<?> _iterableSupplier(Joe joe, Object value) {
+        assert value instanceof FactBase;
+        var db = (FactBase)value;
+        return joe.readonlySet(db.getAll());
+    }
+
+    //-------------------------------------------------------------------------
+    // Instance Method Implementations
+
+    //**
+    // @method add
+    // @args fact
+    // @result this
+    // Adds a single value to the database as a [[Fact]].  Throws an
+    // [[Error]] if the value cannot be used as a `Fact`.
+    private Object _add(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "add(fact)");
+        db.add(joe.toFact(args.next()));
+        return db;
+    }
+
+    //**
+    // @method addAll
+    // @args facts
+    // @result this
+    // Adds a collection of values to the database as [[Fact]] values.
+    // The *facts* value can be a FactBase or a collection of values
+    // to be converted to facts. Throws an [[Error]] if any value cannot
+    // be used as a `Fact`.
+    //
+    // **Note**: adding the contents of another FactBase is much faster
+    // than adding an arbitrary collection.
+    private Object _addAll(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "add(facts)");
+        addAll(db, joe, args.next());
+        return db;
+    }
+
+    //**
+    // @method all
+    // @result Set
+    // Returns a read-only [[Set]] of all facts in the database.
+    private Object _all(FactBase db, Joe joe, Args args) {
+        args.exactArity(0, "all()");
+        return joe.readonlySet(db.getAll());
+    }
+
+    //**
+    // @method byRelation
+    // @args relation
+    // @result Set
+    // Returns a read-only [[Set]] of all facts in the database that
+    // have the given *relation*.
+    private Object _byRelation(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "byRelation(relation)");
+        return joe.readonlySet(
+            db.getRelation(joe.toIdentifier(args.next())));
+    }
+
+    //**
+    // @method clear
+    // @result this
+    // Clears the database of all content.
+    private Object _clear(FactBase db, Joe joe, Args args) {
+        args.exactArity(0, "clear()");
+        db.clear();
+        return db;
+    }
+
+    //**
+    // @method filter
+    // @args predicate
+    // @result Set
+    // Returns a set containing the elements for which the filter
+    // *predicate* is true.
+    private Object _filter(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "filter(predicate)");
+        var callable = args.next();
+
+        var result = new SetValue();
+        for (var item : db.getAll()) {
+            if (Joe.isTruthy(joe.call(callable, item))) {
+                result.add(item);
+            }
+        }
+        return result;
+    }
+
+    //**
+    // @method isDebug
+    // @result Boolean
+    // Returns the database's debug flag.
+    private Object _isDebug(FactBase db, Joe joe, Args args) {
+        args.exactArity(0, "isDebug()");
+        return db.isDebug();
+    }
+
+
+    //**
+    // @method isEmpty
+    // @result Boolean
+    // Returns true if the database is empty, and false otherwise.
+    private Object _isEmpty(FactBase db, Joe joe, Args args) {
+        args.exactArity(0, "isEmpty()");
+        return db.isEmpty();
+    }
+
+    //**
+    // @method map
+    // @args func
+    // @result Set
+    // Returns a set containing the items that result from applying
+    // function *func* to each item in this set.
+    private Object _map(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "map(func)");
+        var callable = args.next();
+
+        var result = new SetValue();
+        for (var item : db.getAll()) {
+            result.add(joe.call(callable, item));
+        }
+        return result;
+    }
+
+    //**
+    // @method relations
+    // @result Set
+    // Returns a read-only [[Set]] of the names of the relations
+    // of the facts in the database.
+    private Object _relations(FactBase db, Joe joe, Args args) {
+        args.exactArity(0, "relations()");
+        var set = db.getRelations().stream()
+            .filter(r -> !db.getRelation(r).isEmpty())
+            .collect(Collectors.toSet());
+        return joe.readonlySet(set);
+    }
+
+    //**
+    // @method remove
+    // @args fact
+    // @result this
+    // Deletes a single [[Fact]] from the database.
+    private Object _remove(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "remove(fact)");
+        db.remove(joe.toFact(args.next()));
+        return db;
+    }
+
+    //**
+    // @method removeAll
+    // @args facts
+    // @result this
+    // Deletes a collection of *facts* from the database.
+    // The *facts* value can be a FactBase or a collection of values
+    // to be converted to facts.
+    private Object _removeAll(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "removeAll(facts)");
+
+        var arg = args.next();
+
+        if (arg instanceof FactSet facts) {
+            db.removeAll(facts);
+        } else {
+            var facts = joe.toCollection(arg);
+            var factSet = new FactSet();
+            for (var fact : facts) {
+                factSet.add(joe.toFact(fact));
+            }
+            db.removeAll(factSet);
+        }
+
+        return db;
+    }
+
+    //**
+    // @method removeIf
+    // @args predicate
+    // @result this
+    // Deletes facts matching the predicate from the database.
+    private Object _removeIf(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "filter(predicate)");
+        var callable = args.next();
+
+        var items = new HashSet<Fact>();
+        for (var item : db.getAll()) {
+            if (Joe.isTruthy(joe.call(callable, item))) {
+                items.add(item);
+            }
+        }
+        db.removeAll(items);
+        return db;
+    }
+
+
+    //**
+    // @method select
+    // @args rules
+    // @result Set
+    // Queries the database using the Nero *rules* and returns all inferred
+    // facts.  If the rule set contains `export` directives then the relevant
+    // facts will be exported as domain values.  The database itself
+    // is not modified.
+    private Object _select(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "select(rules)");
+        var ruleset = joe.toType(RuleSetValue.class, args.next());
+
+        // TODO Revise execution to make best use of FactSet indexing.
+        // TODO use debug flag
+        return ruleset.infer(joe, db.getAll());
+    }
+
+    //**
+    // @method setDebug
+    // @args flag
+    // @result this
+    // Sets the database's debug flag.  If enabled,
+    // [[FactBase#method.update]] and
+    // [[FactBase#method.query]] will output a
+    // detailed Nero execution trace.
+    private Object _setDebug(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "setDebug(flag)");
+        db.setDebug(joe.toBoolean(args.next()));
+        return db;
+    }
+
+    //**
+    // @method size
+    // @result Number
+    // Returns the number of facts in the database.
+    private Object _size(FactBase db, Joe joe, Args args) {
+        args.exactArity(0, "size()");
+        return (double)db.size();
+    }
+
+    //**
+    // @method toNero
+    // @result String
+    // Returns a Nero script containing the database items as
+    // Nero axioms.
+    private Object _toNero(FactBase db, Joe joe, Args args) {
+        args.exactArity(0, "toNero()");
+        return FactBaseType.factBase2nero(joe, db);
+    }
+
+    //**
+    // @method toString
+    // @result String
+    // Returns the value's string representation.
+    private Object _toString(FactBase db, Joe joe, Args args) {
+        args.exactArity(0, "toString()");
+        return stringify(joe, db);
+    }
+
+    //**
+    // @method update
+    // @args rules
+    // @result Set
+    // Updates the database using the Nero *rules*.  Inferred facts
+    // are added to the database and then returned to the caller.
+    // It is an error if the rule set contains `export` directives.
+    private Object _update(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "update(ruleset)");
+        var ruleset = joe.toType(RuleSetValue.class, args.next());
+        if (!ruleset.exports().isEmpty()) {
+            throw new JoeError(
+                "Cannot `export` facts in update().");
+        }
+
+        // TODO Revise execution to make best use of FactSet indexing.
+        // TODO use debug flag
+
+        var newFacts = ruleset.infer(joe, db.getAll());
+        newFacts.forEach(f -> db.add(joe.toFact(f)));
+        return newFacts;
+    }
+
+    //-------------------------------------------------------------------------
+    // Utilities
+
+    // Adds the contents of the argument to the database as
+    // efficiently as possible.  Throws a JoeError if the argument isn't
+    // a collection or contains a non-fact.
+    private void addAll(FactBase db, Joe joe, Object arg) {
+        if (arg instanceof FactSet facts) {
+            db.addAll(facts);
+        } else {
+            var facts = joe.toCollection(arg);
+            var factSet = new FactSet();
+            for (var fact : facts) {
+                factSet.add(joe.toFact(fact));
+            }
+            db.addAll(factSet);
+        }
+    }
+
+    /**
+     * Outputs the contents of a FactBase to Nero format, if possible.
+     * @param joe The interpreter
+     * @param db The FactBase
+     * @return The Nero source text
+     * @throws JoeError if constraints are not met.
+     */
+    public static String factBase2nero(Joe joe, FactBase db) {
+        var buff = new StringBuilder();
+        var relations = db.getRelations().stream().sorted().toList();
+
+        for (var relation : relations) {
+            for (var fact : db.getRelation(relation)) {
+                buff.append(fact2nero(joe, fact)).append("\n");
+            }
+        }
+        return buff.toString();
+    }
+
+    /**
+     * Outputs a Fact as a Nero axiom, if possible.
+     * @param joe The interpreter
+     * @param fact The Fact
+     * @return The axiom text
+     * @throws JoeError if constraints are not met.
+     */
+    public static String fact2nero(Joe joe, Fact fact) {
+        var buff = new StringBuilder();
+        buff.append(fact.relation()).append("(");
+        if (fact.isOrdered()) {
+            var terms = fact.getFields().stream()
+                .map(t -> term2nero(joe, t))
+                .collect(Collectors.joining(", "));
+
+            buff.append(terms);
+        } else {
+            throw new JoeError("Unordered fact: " + fact);
+        }
+        buff.append(");");
+        return buff.toString();
+    }
+
+    public static String term2nero(Joe joe, Object term) {
+        // At present, all we support are the standard scalar literals;
+        // this is the easiest way to limit the output to that.
+        return switch (term) {
+            case null -> "null";
+            case Boolean b -> joe.stringify(b);
+            case Double d -> joe.stringify(d);
+            case Keyword k -> joe.stringify(k);
+            case String s -> Joe.quote(s);
+            default -> throw new JoeError(
+                "Non-Nero term: '" + joe.stringify(term));
+        };
+    }
+}

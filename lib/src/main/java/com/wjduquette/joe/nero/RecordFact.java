@@ -52,6 +52,24 @@ public class RecordFact implements Fact {
     @Override public Map<String, Object> getFieldMap() { return fieldMap; }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RecordFact that = (RecordFact) o;
+        return relation.equals(that.relation)
+            && fieldNames.equals(that.fieldNames)
+            && fields.equals(that.fields);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = relation.hashCode();
+        result = 31 * result + fieldNames.hashCode();
+        result = 31 * result + fields.hashCode();
+        return result;
+    }
+
+    @Override
     public String toString() {
         var mapString = fieldNames.stream()
             .map(n -> n + "=" + fieldMap.get(n))

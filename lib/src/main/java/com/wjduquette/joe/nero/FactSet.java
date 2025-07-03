@@ -1,0 +1,169 @@
+package com.wjduquette.joe.nero;
+
+import java.util.*;
+
+/**
+ * A collection of Facts indexed by relation.
+ */
+@SuppressWarnings("unused")
+public class FactSet {
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
+    // All facts in the database.
+    private final Set<Fact> facts = new HashSet<>();
+
+    // Facts by relation
+    private final Map<String,Set<Fact>> index = new HashMap<>();
+
+    //-------------------------------------------------------------------------
+    // Constructor
+
+    public FactSet() {
+        // Nothing to do
+    }
+
+    //-------------------------------------------------------------------------
+    // Internals
+
+    private Set<Fact> indexSet(String relation) {
+        return index.computeIfAbsent(relation, key -> new HashSet<>());
+    }
+
+    //-------------------------------------------------------------------------
+    // Public API
+
+    /**
+     * Adds a fact to the database
+     * @param fact The fact.
+     */
+    public void add(Fact fact) {
+        if (facts.add(fact)) {
+            indexSet(fact.relation()).add(fact);
+        }
+    }
+
+    /**
+     * Adds all facts in the collection to the database.
+     * @param collection The collection
+     */
+    public void addAll(Collection<Fact> collection) {
+        // There are several ways one could do this; consider timing
+        // to determine which is fastest.
+        facts.addAll(collection);
+        reindex();
+    }
+
+    /**
+     * Adds the contents of another FactBase to the database
+     * @param other The other FactBase
+     */
+    public void addAll(FactSet other) {
+        facts.addAll(other.facts);
+        for (var e : other.index.entrySet()) {
+            indexSet(e.getKey()).addAll(e.getValue());
+        }
+    }
+
+    /**
+     * Clears all content from the database.
+     */
+    public void clear() {
+        facts.clear();
+        index.clear();
+    }
+
+    /**
+     * Deletes a specific fact from the database
+     * @param fact The fact
+     */
+    public void remove(Fact fact) {
+        if (facts.remove(fact)) {
+            indexSet(fact.relation()).remove(fact);
+        }
+    }
+
+    /**
+     * Deletes a collection of facts from the database.
+     * @param collection The facts
+     */
+    public void removeAll(Collection<Fact> collection) {
+        // There are several ways one could do this; consider timing
+        // to determine which is fastest.
+        facts.removeAll(collection);
+        reindex();
+    }
+
+    /**
+     * Deletes the facts in another FactBase from the database.
+     * @param other The other FactBase
+     */
+    public void removeAll(FactSet other) {
+        // There are a number of ways one could do this; consider
+        // timing to find out.
+        facts.removeAll(other.facts);
+        reindex();
+    }
+
+    /**
+     * Gets a read-only set of all facts in the database.
+     * @return The set
+     */
+    public Set<Fact> getAll() {
+        return Collections.unmodifiableSet(facts);
+    }
+
+    /**
+     * Gets the set of relations represented in this FactSet
+     * @return The set
+     */
+    public Set<String> getRelations() {
+        return Collections.unmodifiableSet(index.keySet());
+    }
+
+    /**
+     * Gets a read-only set of all facts in the database that have
+     * the given relation.
+     * @return The set
+     */
+    public Set<Fact> getRelation(String relation) {
+        return Collections.unmodifiableSet(indexSet(relation));
+    }
+
+    /**
+     * Is the database empty?
+     * @return true or false
+     */
+    public boolean isEmpty() {
+        return facts.isEmpty();
+    }
+
+    /**
+     * Returns the number of facts in the database.
+     * @return the count
+     */
+    public int size() {
+        return facts.size();
+    }
+
+    // Re-indexes the set of facts, e.g., after major deletions.
+    private void reindex() {
+        index.clear();
+        for (var fact : facts) {
+            indexSet(fact.relation()).add(fact);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FactSet factSet = (FactSet) o;
+        return facts.equals(factSet.facts);
+    }
+
+    @Override
+    public int hashCode() {
+        return facts.hashCode();
+    }
+}

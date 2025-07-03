@@ -64,16 +64,19 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
     // @method infer
     // @args [inputs]
     // @result Set
-    // Returns a set of known facts, both input and inferred, given
-    // the rule set and any provided *inputs*.
+    // Executes the Nero rule set given the *inputs*, and returns a
+    // [[Set]] of the inferred facts. If the rule set contains
+    // `export` directives, the relevant facts will be returned as
+    // exported domain values; otherwise they will be [[Fact]] values.
+    //
+    // The inputs values are converted to Nero [[Fact]] values;
+    // `infer` throws an error if given any input that cannot be converted
+    // to a [[Fact]].
     //
     // **NOTE:** By default, a rule set cannot infer facts of the same
     // types as the given *inputs*: `infer(inputs)` throws an error
     // if any input fact's type name is the same as a relation used in
     // one of the rule set's rule heads or axioms.
-    //
-    // However, an `export` declaration can achieve the same effect.
-    // See the Nero tutorial for details.
 
     private Object _infer(RuleSetValue value, Joe joe, Args args) {
         args.arityRange(0, 1, "infer([inputs])");

@@ -90,6 +90,21 @@ class WalkerRecordValue implements JoeValue {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        WalkerRecordValue that = (WalkerRecordValue) o;
+        return type.equals(that.type) && fields.equals(that.fields);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + fields.hashCode();
+        return result;
+    }
+
+    @Override
     public String toString() {
         // This is for debugging only; it isn't used for the string rep.
         return "<" + type.name() + "@" + String.format("%x",hashCode()) + ">";

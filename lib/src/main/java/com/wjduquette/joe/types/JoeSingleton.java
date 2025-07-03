@@ -35,6 +35,7 @@ public class JoeSingleton extends ProxyType<Void> {
         staticMethod("isOpaque",          this::_isOpaque);
         staticMethod("isFact",            this::_isFact);
         staticMethod("isType",            this::_isType);
+        staticMethod("javaTypeOf",        this::_javaTypeOf);
         staticMethod("stringify",         this::_stringify);
         staticMethod("supertypeOf",       this::_supertypeOf);
         staticMethod("toFact",            this::_toFact);
@@ -123,6 +124,16 @@ public class JoeSingleton extends ProxyType<Void> {
     private Object _isType(Joe joe, Args args) {
         args.exactArity(1, "isType(value)");
         return args.next() instanceof JoeType;
+    }
+
+    //**
+    // @static javaTypeOf
+    // @args value
+    // @result String
+    // Returns a string representation of the value's Java type.
+    private Object _javaTypeOf(Joe joe, Args args) {
+        args.exactArity(1, "javaTypeOf(value)");
+        return args.next().getClass().getName();
     }
 
     //**
