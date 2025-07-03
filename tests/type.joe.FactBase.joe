@@ -7,6 +7,16 @@
 
 record Parent(parent, child) {}
 record Ancestor(ancestor, descendant) {}
+record Person(name, age) {}
+record Place(id) {}
+record Thing(id, color) {}
+
+var JOE = Person(#joe, 90);
+var JOE_FACT = Joe.toFact(JOE);
+var TEXAS = Place(#texas);
+var TEXAS_FACT = Joe.toFact(TEXAS);
+var HAT = Thing(#hat, #black);
+var HAT_FACT = Joe.toFact(HAT);
 
 //-----------------------------------------------------------------------------
 // Creation
@@ -22,29 +32,19 @@ function testCreation_empty() {
 }
 
 function testCreation_collection() {
-    var inputs = [
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ];
-    var facts = asSetOfFacts(inputs);
-
-    var db = FactBase(inputs);
+    var db = FactBase([JOE, TEXAS, HAT]);
     check(db.isEmpty()).eq(false);
-    check(db.size()).eq(2);
+    check(db.size()).eq(3);
     check(db.all().isEmpty()).eq(false);
-    check(db.all()).eq(facts);
+    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT, HAT_FACT));
     check(db.relations().isEmpty()).eq(false);
-    check(db.relations()).eq(Set.of("Parent"));
-    check(db.byRelation("Parent")).eq(facts);
-    check(db.toString()).eq("FactBase[2, Parent[2]]");
+    check(db.relations()).eq(Set.of("Person", "Place", "Thing"));
+    check(db.byRelation("Person")).eq(Set.of(JOE_FACT));
+    check(db.toString()).eq("FactBase[3, Person[1], Place[1], Thing[1]]");
 }
 
 function testCreation_FactBase() {
-    var inputs = [
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ];
-    var other = asFactBase(inputs);
+    var other = FactBase([JOE, HAT]);
 
     var db = FactBase(other);
     check(db.isEmpty()).eq(false);
@@ -52,9 +52,9 @@ function testCreation_FactBase() {
     check(db.all().isEmpty()).eq(false);
     check(db.all()).eq(other.all());
     check(db.relations().isEmpty()).eq(false);
-    check(db.relations()).eq(Set.of("Parent"));
-    check(db.byRelation("Parent")).eq(other.all());
-    check(db.toString()).eq("FactBase[2, Parent[2]]");
+    check(db.relations()).eq(other.relations());
+    check(db.byRelation("Person")).eq(other.byRelation("Person"));
+    check(db.toString()).eq("FactBase[2, Person[1], Thing[1]]");
 }
 
 function testCreation_badInputs() {
@@ -68,10 +68,7 @@ function testCreation_badInputs() {
 // Can Iterate
 
 function testIterable() {
-    var db = FactBase([
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ]);
+    var db = FactBase([JOE, TEXAS, HAT]);
 
     var set = Set();
     foreach(fact : db) set.add(fact);
@@ -84,13 +81,12 @@ function testIterable() {
 
 function testAdd_good() {
     var db = FactBase();
-    var fact = Joe.toFact(Parent(#anne, #bert));
 
-    db.add(Parent(#anne, #bert));
+    db.add(JOE);
 
-    check(db.all()).eq(Set.of(fact));
-    check(db.byRelation("Parent")).eq(Set.of(fact));
-    check(db.relations()).eq(Set.of("Parent"));
+    check(db.all()).eq(Set.of(JOE_FACT));
+    check(db.byRelation("Person")).eq(Set.of(JOE_FACT));
+    check(db.relations()).eq(Set.of("Person"));
 }
 
 function testAdd_bad() {
@@ -104,29 +100,19 @@ function testAdd_bad() {
 // addAll
 
 function testAddAll_collection() {
-    var inputs = [
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ];
     var db = FactBase();
-    var facts = asSetOfFacts(inputs);
-
-    db.addAll(facts);
-    check(db.all()).eq(facts);
-    check(db.byRelation("Parent")).eq(facts);
+    db.addAll([JOE, HAT]);
+    check(db.all()).eq(Set.of(JOE_FACT, HAT_FACT));
+    check(db.byRelation("Person")).eq(Set.of(JOE_FACT));
 }
 
 function testAddAll_FactBase() {
-    var inputs = [
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ];
     var db = FactBase();
-    var other = asFactBase(inputs);
+    var other = FactBase([JOE, HAT]);
 
     db.addAll(other);
     check(db.all()).eq(other.all());
-    check(db.byRelation("Parent")).eq(other.all());
+    check(db.byRelation("Person")).eq(other.byRelation("Person"));
 }
 
 function testAddAll_badInputs() {
@@ -152,7 +138,7 @@ function testAddAll_badInputs() {
 
 function testClear() {
     var db = FactBase();
-    db.add(Parent(#anne, #bert));
+    db.add(JOE);
     db.clear();
     check(db.isEmpty()).eq(true);
     check(db.size()).eq(0);
@@ -164,22 +150,23 @@ function testClear() {
 // filter
 
 function testFilter() {
-    var inputs = [
-        Fact("Parent", #anne, #bert),
-        Fact("Parent", #bert, #clark)
-    ];
-    var db = FactBase(inputs);
+    var db = FactBase([JOE, TEXAS, HAT]);
 
-    var set = db.filter(\f -> f ~ Parent(#anne, _));
-    check(set).eq(Set.of(Fact("Parent", #anne, #bert)));
+    var set = db.filter(\f -> f ~ Person());
+    check(set).eq(Set.of(JOE_FACT));
 }
-
-// TODO
 
 //-------------------------------------------------------------------------
 // isDebug/setDebug
 
-// TODO
+function testDebug_setGet() {
+    var db = FactBase();
+    check(db.isDebug()).eq(false);
+    db.setDebug(true);
+    check(db.isDebug()).eq(true);
+    db.setDebug(false);
+    check(db.isDebug()).eq(false);
+}
 
 //-------------------------------------------------------------------------
 // isEmpty
@@ -189,7 +176,15 @@ function testFilter() {
 //-------------------------------------------------------------------------
 // map
 
-// TODO
+function testMap() {
+    var db = FactBase([JOE, TEXAS, HAT]);
+    var strings = db.map(Joe.stringify).sorted();
+    check(strings).eq([
+        "Fact(Person, #joe, 90)",
+        "Fact(Place, #texas)",
+        "Fact(Thing, #hat, #black)"
+    ]);
+}
 
 //-------------------------------------------------------------------------
 // relations
@@ -200,16 +195,11 @@ function testFilter() {
 // remove
 
 function testRemove_good() {
-    var inputs = [
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ];
-    var remainder = Set.of(Joe.toFact(Parent(#bert, #clark)));
-    var db = FactBase(inputs);
-    db.remove(Parent(#anne, #bert));
+    var db = FactBase([JOE, TEXAS, HAT]);
+    db.remove(HAT);
 
-    check(db.all()).eq(remainder);
-    check(db.byRelation("Parent")).eq(remainder);
+    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
+    check(db.byRelation("Thing")).eq(Set());
 }
 
 function testRemove_bad() {
@@ -227,39 +217,24 @@ function testRemove_bad() {
 // removeAll
 
 function testRemoveAll_collection() {
-    var inputs = [
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ];
-    var remainder = Set.of(Joe.toFact(Parent(#bert, #clark)));
-    var db = FactBase(inputs);
-    db.removeAll([Parent(#anne, #bert)]);
+    var db = FactBase([JOE, TEXAS, HAT]);
+    db.removeAll([HAT]);
 
-    check(db.all()).eq(remainder);
-    check(db.byRelation("Parent")).eq(remainder);
+    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
+    check(db.byRelation("Thing")).eq(Set());
 }
 
 function testRemoveAll_FactBase() {
-    var inputs = [
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ];
-    var remainder = Set.of(Joe.toFact(Parent(#bert, #clark)));
-    var db = FactBase(inputs);
-
-    var other = FactBase([Parent(#anne, #bert)]);
+    var db = FactBase([JOE, TEXAS, HAT]);
+    var other = FactBase([HAT]);
     db.removeAll(other);
 
-    check(db.all()).eq(remainder);
-    check(db.byRelation("Parent")).eq(remainder);
+    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
+    check(db.byRelation("Thing")).eq(Set());
 }
 
 function testRemoveAll_bad() {
-    var inputs = [
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ];
-    var db = FactBase(inputs);
+    var db = FactBase();
 
     assertError(\-> db.removeAll(["abc"]),
         "Expected Nero-compatible fact, got: String 'abc'.");
@@ -268,10 +243,34 @@ function testRemoveAll_bad() {
 //-------------------------------------------------------------------------
 // removeIf
 
-// TODO
+function testRemoveIf() {
+    var db = FactBase([JOE, TEXAS, HAT]);
+    db.removeIf(\f -> f ~ Thing());
+    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
+    check(db.byRelation("Thing")).eq(Set());
+}
 
 //-------------------------------------------------------------------------
 // select
+
+function testSelect_facts() {
+    var db = FactBase([
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ]);
+
+    var results = db.select(ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    });
+
+    var expected = Set.of(
+        Fact("Ancestor", #anne, #bert),
+        Fact("Ancestor", #anne, #clark),
+        Fact("Ancestor", #bert, #clark)
+    );
+    check(results).eq(expected);
+}
 
 function testSelect_exports() {
     var db = FactBase([
@@ -293,24 +292,6 @@ function testSelect_exports() {
     check(results).eq(expected);
 }
 
-function testSelect_facts() {
-    var db = FactBase([
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ]);
-
-    var results = db.select(ruleset {
-        Ancestor(x, y) :- Parent(x, y);
-        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    });
-
-    var expected = Set.of(
-        Fact("Ancestor", #anne, #bert),
-        Fact("Ancestor", #anne, #clark),
-        Fact("Ancestor", #bert, #clark)
-    );
-    check(results).eq(expected);
-}
 
 //-------------------------------------------------------------------------
 // size
@@ -320,16 +301,12 @@ function testSelect_facts() {
 //-------------------------------------------------------------------------
 // toString
 
-// TODO
+// Test in use by other tests
 
 //-------------------------------------------------------------------------
 // update
 
 function testUpdate_bad_exports() {
-    var db = FactBase([
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ]);
 
     var rules = ruleset {
         export Ancestor;
@@ -337,6 +314,7 @@ function testUpdate_bad_exports() {
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     };
 
+    var db = FactBase();
     assertError(\-> db.update(rules),
         "Cannot `export` facts in update().");
 }
@@ -368,24 +346,3 @@ function testUpdate_good() {
     check(db.all().containsAll(expected)).eq(true);
 }
 
-
-//-------------------------------------------------------------------------
-// Utilities
-
-function asSetOfFacts(items) {
-    var set = Set();
-    foreach (item : items) {
-        set.add(Joe.toFact(item));
-    }
-
-    return set;
-}
-
-function asFactBase(items) {
-    var db = FactBase();
-    foreach (item : items) {
-        db.add(item);
-    }
-
-    return db;
-}
