@@ -27,6 +27,9 @@ public class SetType extends ProxyType<JoeSet> {
         super("Set");
         proxies(SetValue.class);    // Types that implement `JoeSet`
         proxies(SetWrapper.class);
+
+        staticMethod("of",     this::_of);
+
         initializer(this::_init);
 
         method("add",           this::_add);
@@ -46,15 +49,32 @@ public class SetType extends ProxyType<JoeSet> {
     }
 
     //-------------------------------------------------------------------------
+    // Static Method Implementations
+
+    //**
+    // @static of
+    // @args values...
+    // Creates a `Set` of the argument values.
+    private Object _of(Joe joe, Args args) {
+        return new SetValue(args.asList());
+    }
+
+    //-------------------------------------------------------------------------
     // Initializer Implementation
 
     //**
     // @init
-    // @args values...
-    // Creates a `Set` of the argument values, which must be a flat list of
-    // key/value pairs.
+    // @args [other]
+    // Creates a `Set`, optionally populating it with the items from the
+    // *other* collection.
     private Object _init(Joe joe, Args args) {
-        return new SetValue(args.asList());
+        args.arityRange(0, 1, "Set([other])");
+
+        if (args.isEmpty()) {
+            return new SetValue();
+        } else {
+            return new SetValue(joe.toCollection(args.next()));
+        }
     }
 
     //-------------------------------------------------------------------------

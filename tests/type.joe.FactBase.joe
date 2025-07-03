@@ -34,7 +34,7 @@ function testCreation_collection() {
     check(db.all().isEmpty()).eq(false);
     check(db.all()).eq(facts);
     check(db.relations().isEmpty()).eq(false);
-    check(db.relations()).eq(Set("Parent"));
+    check(db.relations()).eq(Set.of("Parent"));
     check(db.byRelation("Parent")).eq(facts);
     check(db.toString()).eq("FactBase[2, Parent[2]]");
 }
@@ -52,7 +52,7 @@ function testCreation_FactBase() {
     check(db.all().isEmpty()).eq(false);
     check(db.all()).eq(other.all());
     check(db.relations().isEmpty()).eq(false);
-    check(db.relations()).eq(Set("Parent"));
+    check(db.relations()).eq(Set.of("Parent"));
     check(db.byRelation("Parent")).eq(other.all());
     check(db.toString()).eq("FactBase[2, Parent[2]]");
 }
@@ -88,9 +88,9 @@ function testAdd_good() {
 
     db.add(Parent(#anne, #bert));
 
-    check(db.all()).eq(Set(fact));
-    check(db.byRelation("Parent")).eq(Set(fact));
-    check(db.relations()).eq(Set("Parent"));
+    check(db.all()).eq(Set.of(fact));
+    check(db.byRelation("Parent")).eq(Set.of(fact));
+    check(db.relations()).eq(Set.of("Parent"));
 }
 
 function testAdd_bad() {
@@ -171,7 +171,7 @@ function testFilter() {
     var db = FactBase(inputs);
 
     var set = db.filter(\f -> f ~ Parent(#anne, _));
-    check(set).eq(Set(Fact("Parent", #anne, #bert)));
+    check(set).eq(Set.of(Fact("Parent", #anne, #bert)));
 }
 
 // TODO
@@ -204,7 +204,7 @@ function testRemove_good() {
         Parent(#anne, #bert),
         Parent(#bert, #clark)
     ];
-    var remainder = Set(Joe.toFact(Parent(#bert, #clark)));
+    var remainder = Set.of(Joe.toFact(Parent(#bert, #clark)));
     var db = FactBase(inputs);
     db.remove(Parent(#anne, #bert));
 
@@ -231,7 +231,7 @@ function testRemoveAll_collection() {
         Parent(#anne, #bert),
         Parent(#bert, #clark)
     ];
-    var remainder = Set(Joe.toFact(Parent(#bert, #clark)));
+    var remainder = Set.of(Joe.toFact(Parent(#bert, #clark)));
     var db = FactBase(inputs);
     db.removeAll([Parent(#anne, #bert)]);
 
@@ -244,7 +244,7 @@ function testRemoveAll_FactBase() {
         Parent(#anne, #bert),
         Parent(#bert, #clark)
     ];
-    var remainder = Set(Joe.toFact(Parent(#bert, #clark)));
+    var remainder = Set.of(Joe.toFact(Parent(#bert, #clark)));
     var db = FactBase(inputs);
 
     var other = FactBase([Parent(#anne, #bert)]);
@@ -285,7 +285,7 @@ function testSelect_exports() {
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     });
 
-    var expected = Set(
+    var expected = Set.of(
         Ancestor(#anne, #bert),
         Ancestor(#anne, #clark),
         Ancestor(#bert, #clark)
@@ -304,7 +304,7 @@ function testSelect_facts() {
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     });
 
-    var expected = Set(
+    var expected = Set.of(
         Fact("Ancestor", #anne, #bert),
         Fact("Ancestor", #anne, #clark),
         Fact("Ancestor", #bert, #clark)
@@ -352,7 +352,7 @@ function testUpdate_good() {
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     });
 
-    var expected = Set(
+    var expected = Set.of(
         Fact("Ancestor", #anne, #bert),
         Fact("Ancestor", #anne, #clark),
         Fact("Ancestor", #bert, #clark)
