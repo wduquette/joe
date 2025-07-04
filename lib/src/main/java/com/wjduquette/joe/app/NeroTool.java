@@ -3,9 +3,6 @@ package com.wjduquette.joe.app;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Nero;
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.RuleSetCompiler;
-import com.wjduquette.joe.parser.ASTRuleSet;
-import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 
@@ -47,12 +44,11 @@ public class NeroTool implements Tool {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    private final Nero nero = new Nero();
+
     private boolean dumpAST = false;
-    private boolean debug = false;
     private boolean dumpAll = false;
     private final List<String> relations = new ArrayList<>();
-
-    private boolean gotParseError = false;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -82,7 +78,7 @@ public class NeroTool implements Tool {
             switch (opt) {
                 case "--ast", "-a"      -> dumpAST = true;
                 case "--all"            -> dumpAll = true;
-                case "--debug", "-d"    -> debug = true;
+                case "--debug", "-d"    -> nero.setDebug(true);
                 case "--relation", "-r" ->
                     relations.add(toOptArg(opt, argq));
                 default -> {
@@ -115,22 +111,22 @@ public class NeroTool implements Tool {
 
         try {
             // FIRST, dump the AST if they asked for that.
-            if (dumpAST) dumpAST(source);
+            if (dumpAST) println(nero.dumpAST(source));
 
             // NEXT, compile and execute it.
-            var nero = compile(source);
+            var results = nero.execute(source);
 
             if (dumpNew) {
-                var newFacts = new HashSet<>(nero.getInferredFacts());
-                newFacts.removeAll(nero.getAxioms());
+                var newFacts = new HashSet<>(results.getInferredFacts());
+                newFacts.removeAll(results.getAxioms());
                 dumpFacts("New Facts:", newFacts);
             } else if (dumpAll) {
                 // If we dump everything, no need to do specific queries.
-                dumpFacts("All Facts:", nero.getAllFacts());
+                dumpFacts("All Facts:", results.getAllFacts());
             } else {
                 for (var relation : relations) {
                     dumpFacts("Relation: " + relation,
-                        nero.getFacts(relation));
+                        results.getFacts(relation));
                 }
             }
         } catch (SyntaxError ex) {
@@ -141,11 +137,6 @@ public class NeroTool implements Tool {
             System.err.println(ex.getMessage());
             System.exit(1);
         }
-    }
-
-    private void dumpAST(SourceBuffer source) {
-        var ast = parse(source);
-        println(ast);
     }
 
     /**
@@ -161,39 +152,6 @@ public class NeroTool implements Tool {
         var script = new String(bytes, Charset.defaultCharset());
 
         return new SourceBuffer(path.getFileName().toString(), script);
-    }
-
-    /**
-     * Just a convenient entry point for getting some source code into
-     * the module.  This will undoubtedly change a lot over time.
-     *
-     * @param buff The Nero source.
-     * @throws JoeError if the script could not be compiled.
-     */
-    public Nero compile(SourceBuffer buff) {
-        // FIRST, compile the source.
-        var ast = parse(buff);
-        var compiler = new RuleSetCompiler(ast);
-        var ruleset = compiler.compile();
-
-        // Will throw JoeError if the rules aren't stratified.
-        var nero = new Nero(ruleset);
-        nero.setDebug(debug);
-        nero.infer();
-        return nero;
-    }
-
-    public ASTRuleSet parse(SourceBuffer source) {
-        var parser = new Parser(source, this::errorHandler);
-        var ast = parser.parseNero();
-        if (gotParseError) throw new JoeError("Error in Nero input.");
-        return ast;
-    }
-
-    private void errorHandler(Trace trace, boolean incomplete) {
-        gotParseError = true;
-        System.out.println("line " + trace.line() + ": " +
-            trace.message());
     }
 
     private void dumpFacts(String title, Collection<Fact> facts) {

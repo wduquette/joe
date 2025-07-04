@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A {@link Nero} {@link Fact} type providing efficient ordered-field access
+ * A {@link NeroEngine} {@link Fact} type providing efficient ordered-field access
  * to a list of field values.  Field names are `f0`, `f1`, `f2`, etc.
  * @param relation The relation
  * @param fields The values.

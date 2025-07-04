@@ -1,10 +1,7 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.Nero;
-import com.wjduquette.joe.nero.RuleSet;
-import com.wjduquette.joe.nero.RuleSetCompiler;
-import com.wjduquette.joe.parser.Parser;
+import com.wjduquette.joe.nero.NeroEngine;
 import com.wjduquette.joe.types.RuleSetValue;
 import com.wjduquette.joe.types.SetValue;
 
@@ -14,7 +11,7 @@ import java.util.List;
 
 /**
  * The JoeNero class wraps the
- * {@link com.wjduquette.joe.nero.Nero} Datalog engine, doing the work to
+ * {@link NeroEngine} Datalog engine, doing the work to
  * translate between Joe data and Nero data.
  */
 public class JoeNero {
@@ -78,7 +75,7 @@ public class JoeNero {
         }
 
         // NEXT, Execute the rule set.
-        var nero = new Nero(rsv.ruleset());
+        var nero = new NeroEngine(rsv.ruleset());
         nero.setDebug(rsv.isDebug());
         nero.infer(inputFacts);
 
@@ -98,44 +95,5 @@ public class JoeNero {
         }
 
         return result;
-    }
-
-    //-------------------------------------------------------------------------
-    // Static API
-
-    /**
-     * Compiles a Nero script into a RuleSet.
-     * @param script The script
-     * @return The RuleSet
-     * @throws JoeError on any error
-     */
-    public static RuleSet compile(String script) {
-        return new Compiler(script).compile();
-    }
-
-    private static class Compiler {
-        private final String script;
-        private boolean gotParseError = false;
-        private final JoeError error = new JoeError("Error in Nero input.");
-
-        public Compiler(String script) {
-            this.script = script;
-        }
-
-        public RuleSet compile() {
-            var source = new SourceBuffer("*script*", script);
-            var parser = new Parser(source, this::errorHandler);
-            var ast = parser.parseNero();
-            if (gotParseError) {
-                throw error;
-            }
-
-            return new RuleSetCompiler(ast).compile();
-        }
-
-        private void errorHandler(Trace trace, boolean incomplete) {
-            gotParseError = true;
-            error.addFrame(trace.context(), trace.message());
-        }
     }
 }
