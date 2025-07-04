@@ -3,7 +3,7 @@ package com.wjduquette.joe.types;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.FactSet;
-import com.wjduquette.joe.nero.Nero;
+import com.wjduquette.joe.nero.NeroEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -142,7 +142,7 @@ public class FactBaseType extends ProxyType<FactBase> {
         args.exactArity(1, "FactBase.fromNero(script)");
         var script = joe.toString(args.next());
         var ruleset = JoeNero.compile(script);
-        var nero = new Nero(ruleset);
+        var nero = new NeroEngine(ruleset);
         nero.infer();
         var db = new FactBase();
         db.addAll(nero.getAllFacts());

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A {@link Nero} {@link Fact} type providing efficient named-field access
+ * A {@link NeroEngine} {@link Fact} type providing efficient named-field access
  * to a map of field names and values.
  * @param relation The relation
  * @param fieldMap The values.

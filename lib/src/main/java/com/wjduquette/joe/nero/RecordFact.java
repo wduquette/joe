@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * A {@link Nero} {@link Fact} type providing both ordered and named-field
+ * A {@link NeroEngine} {@link Fact} type providing both ordered and named-field
  * access with provided field names.
  *
  * <p>This type is designed for use with Joe's scripted records, which

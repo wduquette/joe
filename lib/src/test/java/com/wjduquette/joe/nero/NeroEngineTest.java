@@ -13,7 +13,7 @@ import static com.wjduquette.joe.checker.Checker.check;
 
 // Tests for the Nero engine. This test suite does NOT check for parsing
 // errors.
-public class NeroTest extends Ted {
+public class NeroEngineTest extends Ted {
     @Test
     public void testSimple() {
         test("testSimple");
@@ -162,12 +162,12 @@ public class NeroTest extends Ted {
 
     private boolean gotParseError = false;
 
-    private Nero compile(String source) {
+    private NeroEngine compile(String source) {
         gotParseError = false;
         var buff = new SourceBuffer("-", source);
         var ast = parse(buff);
         var ruleset = new RuleSetCompiler(ast).compile();
-        return new Nero(ruleset);
+        return new NeroEngine(ruleset);
     }
 
     public ASTRuleSet parse(SourceBuffer source) {

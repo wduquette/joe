@@ -1,7 +1,7 @@
 package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.nero.Nero;
+import com.wjduquette.joe.nero.NeroEngine;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.RuleSetCompiler;
 import com.wjduquette.joe.parser.ASTRuleSet;
@@ -170,14 +170,14 @@ public class NeroTool implements Tool {
      * @param buff The Nero source.
      * @throws JoeError if the script could not be compiled.
      */
-    public Nero compile(SourceBuffer buff) {
+    public NeroEngine compile(SourceBuffer buff) {
         // FIRST, compile the source.
         var ast = parse(buff);
         var compiler = new RuleSetCompiler(ast);
         var ruleset = compiler.compile();
 
         // Will throw JoeError if the rules aren't stratified.
-        var nero = new Nero(ruleset);
+        var nero = new NeroEngine(ruleset);
         nero.setDebug(debug);
         nero.infer();
         return nero;

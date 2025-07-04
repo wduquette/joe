@@ -9,7 +9,7 @@ import java.util.*;
  * an additional set of input {@link Fact Facts}, Nero will infer the
  * new Facts implied by the input and the RuleSet's {@link Rule Rules}.
  */
-public class Nero {
+public class NeroEngine {
     //-------------------------------------------------------------------------
     // Static
 
@@ -17,7 +17,7 @@ public class Nero {
      * Nero's default fact factory; it creates {@link ListFact} objects.
      */
     public static final FactFactory DEFAULT_FACT_FACTORY =
-        Nero::defaultFactFactory;
+        NeroEngine::defaultFactFactory;
 
     private static Fact defaultFactFactory(String relation, List<Object> terms) {
         return new ListFact(relation, terms);
@@ -54,7 +54,7 @@ public class Nero {
      * Creates an instance of Nero for the given {@link RuleSet}.
      * @param ruleset The rule set.
      */
-    public Nero(RuleSet ruleset) {
+    public NeroEngine(RuleSet ruleset) {
         this.ruleset = ruleset;
 
         // NEXT, Categorize the rules by head relation

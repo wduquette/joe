@@ -1,7 +1,7 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.Nero;
+import com.wjduquette.joe.nero.NeroEngine;
 import com.wjduquette.joe.nero.RuleSet;
 import com.wjduquette.joe.nero.RuleSetCompiler;
 import com.wjduquette.joe.parser.Parser;
@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * The JoeNero class wraps the
- * {@link com.wjduquette.joe.nero.Nero} Datalog engine, doing the work to
+ * {@link NeroEngine} Datalog engine, doing the work to
  * translate between Joe data and Nero data.
  */
 public class JoeNero {
@@ -78,7 +78,7 @@ public class JoeNero {
         }
 
         // NEXT, Execute the rule set.
-        var nero = new Nero(rsv.ruleset());
+        var nero = new NeroEngine(rsv.ruleset());
         nero.setDebug(rsv.isDebug());
         nero.infer(inputFacts);
 

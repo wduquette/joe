@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link Nero} analyzes input Facts and infers output facts based on
+ * {@link NeroEngine} analyzes input Facts and infers output facts based on
  * {@link Rule Rules} in the Nero rule set.  Any object that implements the
  * Fact interface can be used as an input fact.
  *
