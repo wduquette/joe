@@ -56,25 +56,27 @@ public class FactBaseType extends ProxyType<FactBase> {
         staticMethod("asNero",   this::_asNero);
         staticMethod("fromNero", this::_fromNero);
 
-        method("add",          this::_add);
-        method("addAll",       this::_addAll);
-        method("all",          this::_all);
-        method("byRelation",   this::_byRelation);
-        method("clear",        this::_clear);
-        method("filter",       this::_filter);
-        method("isDebug",      this::_isDebug);
-        method("isEmpty",      this::_isEmpty);
-        method("map",          this::_map);
-        method("relations",    this::_relations);
-        method("remove",       this::_remove);
-        method("removeAll",    this::_removeAll);
-        method("removeIf",     this::_removeIf);
-        method("select",       this::_select);
-        method("setDebug",     this::_setDebug);
-        method("size",         this::_size);
-        method("toNero",       this::_toNero);
-        method("toString",     this::_toString);
-        method("update",       this::_update);
+        method("add",            this::_add);
+        method("addAll",         this::_addAll);
+        method("all",            this::_all);
+        method("clear",          this::_clear);
+        method("filter",         this::_filter);
+        method("isDebug",        this::_isDebug);
+        method("isEmpty",        this::_isEmpty);
+        method("map",            this::_map);
+        method("relation",       this::_relation);
+        method("relations",      this::_relations);
+        method("remove",         this::_remove);
+        method("removeAll",      this::_removeAll);
+        method("removeIf",       this::_removeIf);
+        method("removeRelation", this::_removeRelation);
+        method("renameRelation", this::_renameRelation);
+        method("select",         this::_select);
+        method("setDebug",       this::_setDebug);
+        method("size",           this::_size);
+        method("toNero",         this::_toNero);
+        method("toString",       this::_toString);
+        method("update",         this::_update);
     }
 
     //-------------------------------------------------------------------------
@@ -212,18 +214,6 @@ public class FactBaseType extends ProxyType<FactBase> {
     }
 
     //**
-    // @method byRelation
-    // @args relation
-    // @result Set
-    // Returns a read-only [[Set]] of all facts in the database that
-    // have the given *relation*.
-    private Object _byRelation(FactBase db, Joe joe, Args args) {
-        args.exactArity(1, "byRelation(relation)");
-        return joe.readonlySet(
-            db.getRelation(joe.toIdentifier(args.next())));
-    }
-
-    //**
     // @method clear
     // @result this
     // Clears the database of all content.
@@ -286,6 +276,18 @@ public class FactBaseType extends ProxyType<FactBase> {
             result.add(joe.call(callable, item));
         }
         return result;
+    }
+
+    //**
+    // @method relation
+    // @args relation
+    // @result Set
+    // Returns a read-only [[Set]] of all facts in the database that
+    // have the given *relation*.
+    private Object _relation(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "relation(relation)");
+        return joe.readonlySet(
+            db.getRelation(joe.toIdentifier(args.next())));
     }
 
     //**
@@ -354,6 +356,32 @@ public class FactBaseType extends ProxyType<FactBase> {
             }
         }
         db.removeAll(items);
+        return db;
+    }
+
+    //**
+    // @method removeRelation
+    // @args name
+    // @result this
+    // Deletes an entire relation from the database.
+    private Object _removeRelation(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "removeRelation(name)");
+        db.removeRelation(joe.toIdentifier(args.next()));
+        return db;
+    }
+
+    //**
+    // @method renameRelation
+    // @args oldName, newName
+    // @result this
+    // Renames a relation, replacing any existing relation that has the new
+    // name.
+    private Object _renameRelation(FactBase db, Joe joe, Args args) {
+        args.exactArity(2, "renameRelation(oldName)");
+        db.renameRelation(
+            joe.toIdentifier(args.next()),
+            joe.toIdentifier(args.next())
+        );
         return db;
     }
 

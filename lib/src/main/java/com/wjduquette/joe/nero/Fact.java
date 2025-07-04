@@ -13,7 +13,9 @@ import java.util.Map;
  * explicit field names; in this case, the standard is to use field
  * names "f0", "f1", etc.</p>
  */
-public interface Fact {
+public sealed interface Fact
+    permits ListFact, MapFact, RecordFact
+{
     /**
      * The fact's relation name.
      * @return The relation

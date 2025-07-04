@@ -130,6 +130,40 @@ public class FactSet {
     }
 
     /**
+     * Removes all facts with the given relation.
+     * @param relation The relation
+     */
+    public void removeRelation(String relation) {
+        facts.removeAll(indexSet(relation));
+        index.remove(relation);
+    }
+
+    /**
+     * Renames a relation, replacing any previous relation with the same name.
+     * @param oldName The name of an existing relation
+     * @param newName A new name for the existing relation.
+     */
+    public void renameRelation(String oldName, String newName) {
+        var newFacts = new HashSet<Fact>();
+        for (var fact : indexSet(oldName)) {
+            var newFact = switch (fact) {
+                case ListFact f ->
+                    new ListFact(newName, f.fields());
+                case MapFact f ->
+                    new MapFact(newName, f.fieldMap());
+                case RecordFact f ->
+                    new RecordFact(newName, f.getFieldNames(), f.getFieldMap());
+            };
+            newFacts.add(newFact);
+        }
+
+        removeRelation(oldName);
+        removeRelation(newName);
+        facts.addAll(newFacts);
+        index.put(newName, newFacts);
+    }
+
+    /**
      * Gets a read-only set of all facts in the database.
      * @return The set
      */

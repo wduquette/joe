@@ -3956,22 +3956,24 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.FactBase.html#method.add"><em>factBase</em>.add(<em>fact</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.addAll"><em>factBase</em>.addAll(<em>facts</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.all"><em>factBase</em>.all()</a> → <a href="library/type.joe.Set.html">Set</a></li>
-<li><a href="library/type.joe.FactBase.html#method.byRelation"><em>factBase</em>.byRelation(<em>relation</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.clear"><em>factBase</em>.clear()</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.filter"><em>factBase</em>.filter(<em>predicate</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.isDebug"><em>factBase</em>.isDebug()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.FactBase.html#method.isEmpty"><em>factBase</em>.isEmpty()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.FactBase.html#method.map"><em>factBase</em>.map(<em>func</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
+<li><a href="library/type.joe.FactBase.html#method.relation"><em>factBase</em>.relation(<em>relation</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.relations"><em>factBase</em>.relations()</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.remove"><em>factBase</em>.remove(<em>fact</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.removeAll"><em>factBase</em>.removeAll(<em>facts</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.removeIf"><em>factBase</em>.removeIf(<em>predicate</em>)</a> → this</li>
+<li><a href="library/type.joe.FactBase.html#method.removeRelation"><em>factBase</em>.removeRelation(<em>name</em>)</a> → this</li>
+<li><a href="library/type.joe.FactBase.html#method.renameRelation"><em>factBase</em>.renameRelation(<em>oldName</em>, <em>newName</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.select"><em>factBase</em>.select(<em>rules</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.setDebug"><em>factBase</em>.setDebug(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.size"><em>factBase</em>.size()</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/type.joe.FactBase.html#method.toNero"><em>factBase</em>.toNero()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.FactBase.html#method.toString"><em>factBase</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
-<li><a href="library/type.joe.FactBase.html#method.update"><em>factBase</em>.update(<em>rules</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
+<li><a href="library/type.joe.FactBase.html#method.update"><em>factBase</em>.update(<em>rules</em>)</a> → this</li>
 </ul>
 </li>
 <li><a href="library/type.joe.Function.html">Function</a></li>
@@ -4909,22 +4911,24 @@ The database can be updated and queried using Nero
 <li><a href="library/type.joe.FactBase.html#method.add"><em>factBase</em>.add(<em>fact</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.addAll"><em>factBase</em>.addAll(<em>facts</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.all"><em>factBase</em>.all()</a> → <a href="library/type.joe.Set.html">Set</a></li>
-<li><a href="library/type.joe.FactBase.html#method.byRelation"><em>factBase</em>.byRelation(<em>relation</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.clear"><em>factBase</em>.clear()</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.filter"><em>factBase</em>.filter(<em>predicate</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.isDebug"><em>factBase</em>.isDebug()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.FactBase.html#method.isEmpty"><em>factBase</em>.isEmpty()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.FactBase.html#method.map"><em>factBase</em>.map(<em>func</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
+<li><a href="library/type.joe.FactBase.html#method.relation"><em>factBase</em>.relation(<em>relation</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.relations"><em>factBase</em>.relations()</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.remove"><em>factBase</em>.remove(<em>fact</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.removeAll"><em>factBase</em>.removeAll(<em>facts</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.removeIf"><em>factBase</em>.removeIf(<em>predicate</em>)</a> → this</li>
+<li><a href="library/type.joe.FactBase.html#method.removeRelation"><em>factBase</em>.removeRelation(<em>name</em>)</a> → this</li>
+<li><a href="library/type.joe.FactBase.html#method.renameRelation"><em>factBase</em>.renameRelation(<em>oldName</em>, <em>newName</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.select"><em>factBase</em>.select(<em>rules</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.setDebug"><em>factBase</em>.setDebug(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.size"><em>factBase</em>.size()</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/type.joe.FactBase.html#method.toNero"><em>factBase</em>.toNero()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.FactBase.html#method.toString"><em>factBase</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
-<li><a href="library/type.joe.FactBase.html#method.update"><em>factBase</em>.update(<em>rules</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
+<li><a href="library/type.joe.FactBase.html#method.update"><em>factBase</em>.update(<em>rules</em>)</a> → this</li>
 </ul>
 <h2 id="inputoutput"><a class="header" href="#inputoutput">Input/Output</a></h2>
 <p>Subject to particular constraints, the contents of a FactBase can
@@ -4985,12 +4989,6 @@ than adding an arbitrary collection.</p>
 <hr />
 <p><strong><em>factBase</em>.all() → <a href="library/type.joe.Set.html">Set</a></strong></p>
 <p>Returns a read-only <a href="library/type.joe.Set.html"><code>Set</code></a> of all facts in the database.</p>
-<p><span id="method.byRelation"> </span></p>
-<h3 id="factbasebyrelation"><a class="header" href="#factbasebyrelation"><em>factBase</em>.byRelation()</a></h3>
-<hr />
-<p><strong><em>factBase</em>.byRelation(<em>relation</em>) → <a href="library/type.joe.Set.html">Set</a></strong></p>
-<p>Returns a read-only <a href="library/type.joe.Set.html"><code>Set</code></a> of all facts in the database that
-have the given <em>relation</em>.</p>
 <p><span id="method.clear"> </span></p>
 <h3 id="factbaseclear"><a class="header" href="#factbaseclear"><em>factBase</em>.clear()</a></h3>
 <hr />
@@ -5018,6 +5016,12 @@ have the given <em>relation</em>.</p>
 <p><strong><em>factBase</em>.map(<em>func</em>) → <a href="library/type.joe.Set.html">Set</a></strong></p>
 <p>Returns a set containing the items that result from applying
 function <em>func</em> to each item in this set.</p>
+<p><span id="method.relation"> </span></p>
+<h3 id="factbaserelation"><a class="header" href="#factbaserelation"><em>factBase</em>.relation()</a></h3>
+<hr />
+<p><strong><em>factBase</em>.relation(<em>relation</em>) → <a href="library/type.joe.Set.html">Set</a></strong></p>
+<p>Returns a read-only <a href="library/type.joe.Set.html"><code>Set</code></a> of all facts in the database that
+have the given <em>relation</em>.</p>
 <p><span id="method.relations"> </span></p>
 <h3 id="factbaserelations"><a class="header" href="#factbaserelations"><em>factBase</em>.relations()</a></h3>
 <hr />
@@ -5041,6 +5045,17 @@ to be converted to facts.</p>
 <hr />
 <p><strong><em>factBase</em>.removeIf(<em>predicate</em>) → this</strong></p>
 <p>Deletes facts matching the predicate from the database.</p>
+<p><span id="method.removeRelation"> </span></p>
+<h3 id="factbaseremoverelation"><a class="header" href="#factbaseremoverelation"><em>factBase</em>.removeRelation()</a></h3>
+<hr />
+<p><strong><em>factBase</em>.removeRelation(<em>name</em>) → this</strong></p>
+<p>Deletes an entire relation from the database.</p>
+<p><span id="method.renameRelation"> </span></p>
+<h3 id="factbaserenamerelation"><a class="header" href="#factbaserenamerelation"><em>factBase</em>.renameRelation()</a></h3>
+<hr />
+<p><strong><em>factBase</em>.renameRelation(<em>oldName</em>, <em>newName</em>) → this</strong></p>
+<p>Renames a relation, replacing any existing relation that has the new
+name.</p>
 <p><span id="method.select"> </span></p>
 <h3 id="factbaseselect"><a class="header" href="#factbaseselect"><em>factBase</em>.select()</a></h3>
 <hr />
@@ -5076,7 +5091,7 @@ Nero axioms.</p>
 <p><span id="method.update"> </span></p>
 <h3 id="factbaseupdate"><a class="header" href="#factbaseupdate"><em>factBase</em>.update()</a></h3>
 <hr />
-<p><strong><em>factBase</em>.update(<em>rules</em>) → <a href="library/type.joe.Set.html">Set</a></strong></p>
+<p><strong><em>factBase</em>.update(<em>rules</em>) → this</strong></p>
 <p>Updates the database using the Nero <em>rules</em>.  Inferred facts
 are added to the database and then returned to the caller.
 It is an error if the rule set contains <code>export</code> directives.</p>
@@ -9361,22 +9376,24 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.FactBase.html#method.add"><em>factBase</em>.add(<em>fact</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.addAll"><em>factBase</em>.addAll(<em>facts</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.all"><em>factBase</em>.all()</a> → <a href="library/type.joe.Set.html">Set</a></li>
-<li><a href="library/type.joe.FactBase.html#method.byRelation"><em>factBase</em>.byRelation(<em>relation</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.clear"><em>factBase</em>.clear()</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.filter"><em>factBase</em>.filter(<em>predicate</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.isDebug"><em>factBase</em>.isDebug()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.FactBase.html#method.isEmpty"><em>factBase</em>.isEmpty()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.FactBase.html#method.map"><em>factBase</em>.map(<em>func</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
+<li><a href="library/type.joe.FactBase.html#method.relation"><em>factBase</em>.relation(<em>relation</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.relations"><em>factBase</em>.relations()</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.remove"><em>factBase</em>.remove(<em>fact</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.removeAll"><em>factBase</em>.removeAll(<em>facts</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.removeIf"><em>factBase</em>.removeIf(<em>predicate</em>)</a> → this</li>
+<li><a href="library/type.joe.FactBase.html#method.removeRelation"><em>factBase</em>.removeRelation(<em>name</em>)</a> → this</li>
+<li><a href="library/type.joe.FactBase.html#method.renameRelation"><em>factBase</em>.renameRelation(<em>oldName</em>, <em>newName</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.select"><em>factBase</em>.select(<em>rules</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.setDebug"><em>factBase</em>.setDebug(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.size"><em>factBase</em>.size()</a> → <a href="library/type.joe.Number.html">Number</a></li>
 <li><a href="library/type.joe.FactBase.html#method.toNero"><em>factBase</em>.toNero()</a> → <a href="library/type.joe.String.html">String</a></li>
 <li><a href="library/type.joe.FactBase.html#method.toString"><em>factBase</em>.toString()</a> → <a href="library/type.joe.String.html">String</a></li>
-<li><a href="library/type.joe.FactBase.html#method.update"><em>factBase</em>.update(<em>rules</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
+<li><a href="library/type.joe.FactBase.html#method.update"><em>factBase</em>.update(<em>rules</em>)</a> → this</li>
 </ul>
 </li>
 <li><a href="library/type.joe.Function.html">Function</a></li>

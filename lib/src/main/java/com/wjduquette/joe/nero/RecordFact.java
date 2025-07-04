@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * <p>This type is designed for use with Joe's scripted records, which
  * have a list of field names and a HashMap of field values.</p>
  */
-public class RecordFact implements Fact {
+public final class RecordFact implements Fact {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -41,6 +41,14 @@ public class RecordFact implements Fact {
         for (var name : fieldNames) {
             fields.add(fieldMap.get(name));
         }
+    }
+
+    /**
+     * Gets the fact's field names.
+     * @return The names
+     */
+    public List<String> getFieldNames() {
+        return fieldNames;
     }
 
     //-------------------------------------------------------------------------

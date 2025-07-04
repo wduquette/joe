@@ -27,7 +27,7 @@ function testCreation_empty() {
     check(db.size()).eq(0);
     check(db.all().isEmpty()).eq(true);
     check(db.relations().isEmpty()).eq(true);
-    check(db.byRelation("Thing").isEmpty()).eq(true);
+    check(db.relation("Thing").isEmpty()).eq(true);
     check(db.toString()).eq("FactBase[0]");
 }
 
@@ -39,7 +39,7 @@ function testCreation_collection() {
     check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT, HAT_FACT));
     check(db.relations().isEmpty()).eq(false);
     check(db.relations()).eq(Set.of("Person", "Place", "Thing"));
-    check(db.byRelation("Person")).eq(Set.of(JOE_FACT));
+    check(db.relation("Person")).eq(Set.of(JOE_FACT));
     check(db.toString()).eq("FactBase[3, Person[1], Place[1], Thing[1]]");
 }
 
@@ -53,7 +53,7 @@ function testCreation_FactBase() {
     check(db.all()).eq(other.all());
     check(db.relations().isEmpty()).eq(false);
     check(db.relations()).eq(other.relations());
-    check(db.byRelation("Person")).eq(other.byRelation("Person"));
+    check(db.relation("Person")).eq(other.relation("Person"));
     check(db.toString()).eq("FactBase[2, Person[1], Thing[1]]");
 }
 
@@ -85,7 +85,7 @@ function testAdd_good() {
     db.add(JOE);
 
     check(db.all()).eq(Set.of(JOE_FACT));
-    check(db.byRelation("Person")).eq(Set.of(JOE_FACT));
+    check(db.relation("Person")).eq(Set.of(JOE_FACT));
     check(db.relations()).eq(Set.of("Person"));
 }
 
@@ -103,7 +103,7 @@ function testAddAll_collection() {
     var db = FactBase();
     db.addAll([JOE, HAT]);
     check(db.all()).eq(Set.of(JOE_FACT, HAT_FACT));
-    check(db.byRelation("Person")).eq(Set.of(JOE_FACT));
+    check(db.relation("Person")).eq(Set.of(JOE_FACT));
 }
 
 function testAddAll_FactBase() {
@@ -112,7 +112,7 @@ function testAddAll_FactBase() {
 
     db.addAll(other);
     check(db.all()).eq(other.all());
-    check(db.byRelation("Person")).eq(other.byRelation("Person"));
+    check(db.relation("Person")).eq(other.relation("Person"));
 }
 
 function testAddAll_badInputs() {
@@ -125,11 +125,6 @@ function testAddAll_badInputs() {
 
 //-------------------------------------------------------------------------
 // all
-
-// Tested in use by other tests
-
-//-------------------------------------------------------------------------
-// byRelation
 
 // Tested in use by other tests
 
@@ -187,6 +182,11 @@ function testMap() {
 }
 
 //-------------------------------------------------------------------------
+// relation
+
+// Tested in use by other tests
+
+//-------------------------------------------------------------------------
 // relations
 
 // Tested in use by other tests
@@ -199,7 +199,7 @@ function testRemove_good() {
     db.remove(HAT);
 
     check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
-    check(db.byRelation("Thing")).eq(Set());
+    check(db.relation("Thing")).eq(Set());
 }
 
 function testRemove_bad() {
@@ -221,7 +221,7 @@ function testRemoveAll_collection() {
     db.removeAll([HAT]);
 
     check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
-    check(db.byRelation("Thing")).eq(Set());
+    check(db.relation("Thing")).eq(Set());
 }
 
 function testRemoveAll_FactBase() {
@@ -230,7 +230,7 @@ function testRemoveAll_FactBase() {
     db.removeAll(other);
 
     check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
-    check(db.byRelation("Thing")).eq(Set());
+    check(db.relation("Thing")).eq(Set());
 }
 
 function testRemoveAll_bad() {
@@ -247,7 +247,29 @@ function testRemoveIf() {
     var db = FactBase([JOE, TEXAS, HAT]);
     db.removeIf(\f -> f ~ Thing());
     check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
-    check(db.byRelation("Thing")).eq(Set());
+    check(db.relation("Thing")).eq(Set());
+}
+
+//-------------------------------------------------------------------------
+// removeRelation
+
+function testRemoveRelation() {
+    var db = FactBase([JOE, TEXAS, HAT]);
+    db.removeRelation("Thing");
+    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
+    check(db.relation("Thing")).eq(Set());
+}
+
+//-------------------------------------------------------------------------
+// renameRelation
+
+function testRenameRelation() {
+    var db = FactBase([JOE, TEXAS, HAT]);
+    var newFact = Fact.ofPairs("Location", ["id", #texas]);
+    db.renameRelation("Place", "Location");
+    check(db.all()).eq(Set.of(JOE_FACT, newFact, HAT_FACT));
+    check(db.relation("Place")).eq(Set());
+    check(db.relation("Location")).eq(Set.of(newFact));
 }
 
 //-------------------------------------------------------------------------
@@ -337,7 +359,7 @@ function testUpdate_good() {
     );
 
     // The relation's set was updated.
-    check(db.byRelation("Ancestor")).eq(expected);
+    check(db.relation("Ancestor")).eq(expected);
 
     // The set of all facts was updated.
     check(db.all().containsAll(expected)).eq(true);
