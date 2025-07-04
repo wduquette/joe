@@ -19,8 +19,27 @@ public class FactSet {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an empty FactSet
+     */
     public FactSet() {
         // Nothing to do
+    }
+
+    /**
+     * Creates a FactSet containing the collection of Facts.
+     * @param facts The facts
+     */
+    public FactSet(Collection<Fact> facts) {
+        addAll(facts);
+    }
+
+    /**
+     * Creates a copy of an existing FactSet.
+     * @param other The facts
+     */
+    public FactSet(FactSet other) {
+        addAll(other);
     }
 
     //-------------------------------------------------------------------------
@@ -34,12 +53,17 @@ public class FactSet {
     // Public API
 
     /**
-     * Adds a fact to the database
+     * Adds a fact to the database.  Returns true if the fact wasn't already
+     * present, and false otherwise.
      * @param fact The fact.
+     * @return true or false
      */
-    public void add(Fact fact) {
+    public boolean add(Fact fact) {
         if (facts.add(fact)) {
             indexSet(fact.relation()).add(fact);
+            return true;
+        } else {
+            return false;
         }
     }
 

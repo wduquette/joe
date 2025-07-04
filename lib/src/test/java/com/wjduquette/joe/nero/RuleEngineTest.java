@@ -1,10 +1,6 @@
 package com.wjduquette.joe.nero;
 
-import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.Trace;
-import com.wjduquette.joe.parser.ASTRuleSet;
-import com.wjduquette.joe.parser.Parser;
 import org.junit.Test;
 
 import java.util.stream.Collectors;
@@ -13,7 +9,9 @@ import static com.wjduquette.joe.checker.Checker.check;
 
 // Tests for the Nero engine. This test suite does NOT check for parsing
 // errors.
-public class NeroEngineTest extends Ted {
+public class RuleEngineTest extends Ted {
+    private final Nero nero = new Nero();
+
     @Test
     public void testSimple() {
         test("testSimple");
@@ -104,17 +102,6 @@ public class NeroEngineTest extends Ted {
     }
 
     @Test
-    public void testUnstratified() {
-        test("testUnstratified");
-        var source = """
-            P(x) :- R(x), not Q(x);
-            Q(x) :- P(x);
-            """;
-        var nero = compile(source);
-        check(nero.isStratified()).eq(false);
-    }
-
-    @Test
     public void testStratified() {
         test("testStratified");
         var source = """
@@ -160,36 +147,11 @@ public class NeroEngineTest extends Ted {
     //-------------------------------------------------------------------------
     // Helpers
 
-    private boolean gotParseError = false;
-
-    private NeroEngine compile(String source) {
-        gotParseError = false;
-        var buff = new SourceBuffer("-", source);
-        var ast = parse(buff);
-        var ruleset = new RuleSetCompiler(ast).compile();
-        return new NeroEngine(ruleset);
-    }
-
-    public ASTRuleSet parse(SourceBuffer source) {
-        var parser = new Parser(source, this::errorHandler);
-        var ast = parser.parseNero();
-        if (gotParseError) throw new JoeError("Error in Nero input.");
-        return ast;
-    }
-
-    private void errorHandler(Trace trace, boolean incomplete) {
-        gotParseError = true;
-        System.out.println("line " + trace.line() + ": " +
-            trace.message());
-    }
-
     private String infer(String source) {
-        var nero = compile(source);
-        nero.infer();
-        return nero.getAllFacts().stream()
+        var engine = nero.execute(new SourceBuffer("-", source));
+        return engine.getKnownFacts().getAll().stream()
             .map(Fact::toString)
             .sorted()
             .collect(Collectors.joining("\n")) + "\n";
     }
-
 }

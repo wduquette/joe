@@ -81,9 +81,9 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
     private Object _infer(RuleSetValue value, Joe joe, Args args) {
         args.arityRange(0, 1, "infer([inputs])");
         if (args.isEmpty()) {
-            return value.infer(joe);
+            return value.inferAndExport(joe);
         } else {
-            return value.infer(joe, joe.toCollection(args.next()));
+            return value.inferAndExport(joe, joe.toCollection(args.next()));
         }
     }
 

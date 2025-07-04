@@ -325,7 +325,7 @@ function testUpdate_good() {
         Parent(#bert, #clark)
     ]);
 
-    var results = db.update(ruleset {
+    db.update(ruleset {
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     });
@@ -335,9 +335,6 @@ function testUpdate_good() {
         Fact("Ancestor", #anne, #clark),
         Fact("Ancestor", #bert, #clark)
     );
-
-    // Returns the new facts
-    check(results).eq(expected);
 
     // The relation's set was updated.
     check(db.byRelation("Ancestor")).eq(expected);

@@ -37,13 +37,13 @@ public class Nero {
     // Compiles the source to a NeroEngine, and checks for stratification.
     // Throws SyntaxError on any parse error and JoeError if the rule set
     // is not stratified.
-    private NeroEngine compile(SourceBuffer source) {
+    public RuleEngine compile(SourceBuffer source) {
         var ast = parse(source);
         var ruleSet = new RuleSetCompiler(ast).compile();
         if (!ruleSet.isStratified()) {
             throw new JoeError("Nero rule set is not stratified.");
         }
-        var engine = new NeroEngine(ruleSet);
+        var engine = new RuleEngine(ruleSet);
         engine.setDebug(debug);
 
         return engine;
@@ -88,15 +88,15 @@ public class Nero {
 
     /**
      * Executes the Nero script, throwing an appropriate error on failure
-     * and returning a NeroEngine containing the results on success.
+     * and returning a RuleEngine containing the results on success.
      * The filename is usually the bare file name of the script file,
      * but can be any string relevant to the application.
      * @param source The source buffer
-     * @return The NeroEngine
+     * @return The RuleEngine
      * @throws SyntaxError if the script could not be compiled.
      * @throws JoeError on all runtime errors.
      */
-    public NeroEngine execute(SourceBuffer source)
+    public RuleEngine execute(SourceBuffer source)
         throws SyntaxError, JoeError
     {
         var engine = compile(source);

@@ -5,11 +5,14 @@ import com.wjduquette.joe.JoeError;
 import java.util.*;
 
 /**
- * The Nero inference engine.  Given a {@link RuleSet}, and optionally
- * an additional set of input {@link Fact Facts}, Nero will infer the
- * new Facts implied by the input and the RuleSet's {@link Rule Rules}.
+ * The Nero inference engine.  Given a {@link RuleSet} and a set of
+ * input {@link Fact Facts}, the engine will infer the facts implied by
+ * the two.
  */
-public class NeroEngine {
+public class RuleEngine {
+    public static final String INFER_ERROR =
+        "Call `infer()` before querying results.";
+
     //-------------------------------------------------------------------------
     // Static
 
@@ -17,7 +20,7 @@ public class NeroEngine {
      * Nero's default fact factory; it creates {@link ListFact} objects.
      */
     public static final FactFactory DEFAULT_FACT_FACTORY =
-        NeroEngine::defaultFactFactory;
+        RuleEngine::defaultFactFactory;
 
     private static Fact defaultFactFactory(String relation, List<Object> terms) {
         return new ListFact(relation, terms);
@@ -26,35 +29,50 @@ public class NeroEngine {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    //
+    // Constructor Data
+    //
+
+    // The Nero rule set, i.e., the compiled Nero program.
     private final RuleSet ruleset;
 
     // Map from head relation to rules with that head.
     private final Map<String,List<Rule>> ruleMap = new HashMap<>();
 
-    // Facts inferred from the rule set's axioms and rules
-    // (the "intensional database")
-    private final Set<Fact> inferredFacts = new HashSet<>();
+    //
+    // Configuration Data
+    //
 
-    // The current set of known facts.
-    private final Set<Fact> knownFacts = new HashSet<>();
-
-    // Facts by relation
-    private final Map<String, List<Fact>> factMap = new HashMap<>();
-
-    // Fact Creator
+    // The factory used to create new facts.
     private FactFactory factFactory = DEFAULT_FACT_FACTORY;
 
     // Debug Flag
     private boolean debug = false;
 
+    //
+    // Working Data
+    //
+
+    // The set of known facts, initialized by the constructor
+    private final FactSet knownFacts = new FactSet();
+
+    // Whether the infer() method has been called or not.  We only do
+    // inference once per instance of the engine.
+    private boolean inferenceComplete = false;
+
+    // Facts inferred from the rule set's axioms and rules (aka,
+    // the "intensional database" in Datalog jargon).
+    private final Set<Fact> inferredFacts = new HashSet<>();
+
     //-------------------------------------------------------------------------
     // Constructor
 
     /**
-     * Creates an instance of Nero for the given {@link RuleSet}.
-     * @param ruleset The rule set.
+     * Creates a new RuleEngine with the given ruleset and no external database
+     * of facts.
+     * @param ruleset The ruleset
      */
-    public NeroEngine(RuleSet ruleset) {
+    public RuleEngine(RuleSet ruleset) {
         this.ruleset = ruleset;
 
         // NEXT, Categorize the rules by head relation
@@ -63,23 +81,21 @@ public class NeroEngine {
             var list = ruleMap.computeIfAbsent(head, k -> new ArrayList<>());
             list.add(rule);
         }
+    }
 
-        // NEXT, save the axiomatic facts as inferred facts, and add
-        // them to the known facts list.
-        this.inferredFacts.addAll(ruleset.facts());
-        inferredFacts.forEach(this::addFact);
+    /**
+     * Creates a new RuleEngine with the given ruleset and the given set of
+     * input facts.
+     * @param ruleset The ruleset
+     * @param facts The fact set
+     */
+    public RuleEngine(RuleSet ruleset, FactSet facts) {
+        this(ruleset);
+        knownFacts.addAll(facts);
     }
 
     //-------------------------------------------------------------------------
-    // Public API
-
-    /**
-     * Gets whether the provided rule set is stratified or not.
-     * @return true or false
-     */
-    public boolean isStratified() {
-        return ruleset.isStratified();
-    }
+    // Configuration
 
     /**
      * Gets whether debugging is enabled or not.
@@ -120,102 +136,77 @@ public class NeroEngine {
         this.factFactory = factFactory;
     }
 
-    /**
-     * Gets the known facts that have the given relation.
-     * @param relation The relation
-     * @return The facts.
-     */
-    public List<Fact> getFacts(String relation) {
-        return factMap.computeIfAbsent(relation,
-            key -> new ArrayList<>());
-    }
+    //-------------------------------------------------------------------------
+    // Queries
 
     /**
-     * Gets all known facts.
-     * @return The facts.
-     */
-    public Set<Fact> getAllFacts() {
-        return Collections.unmodifiableSet(knownFacts);
-    }
-
-    /**
-     * Gets axiomatic facts from the rule set.
-     * @return The axioms
+     * Gets the facts inferred from rule set axioms.
+     * @return The axiomatic facts.
      */
     public Set<Fact> getAxioms() {
         return ruleset.facts();
     }
 
     /**
-     * Gets any facts inferred by Nero from the rule set's axioms and
-     * rules.
-     * @return The inferred facts.
+     * Gets all facts known after inference is complete.
+     * @return The known facts.
      */
-    public Set<Fact> getInferredFacts() {
-        return inferredFacts;
+    public FactSet getKnownFacts() {
+        if (!inferenceComplete) {
+            throw new IllegalStateException(INFER_ERROR);
+        }
+        return knownFacts;
     }
 
     /**
-     * Adds the fact into the set of known facts.  Returns true if the
-     * fact was previously unknown, and false otherwise.
-     * Eventually this will be public, but we'll need to extend the
-     * data model.
-     * @param fact The fact
-     * @return true or false
+     * Gets the facts inferred from the inputs given the axioms and rules.
+     * @return The inferred facts.
      */
-    private boolean addFact(Fact fact) {
-        if (!knownFacts.contains(fact)) {
-            var list = getFacts(fact.relation());
-            list.add(fact);
-
-            knownFacts.add(fact);
-            return true;
-        } else {
-            return false;
+    public Set<Fact> getInferredFacts() {
+        if (!inferenceComplete) {
+            throw new IllegalStateException(INFER_ERROR);
         }
+        return inferredFacts;
     }
-
 
     //-------------------------------------------------------------------------
     // Inference
 
     /**
      * Executes the inference algorithm, computing all facts knowable
-     * from the axioms and rules.
+     * from the axioms and rules given the input facts
+     * (the "extensional database").
      * @throws JoeError if the rule set is not stratified.
      */
     public void infer() {
-        infer(List.of());
-    }
-
-    /**
-     * Executes the inference algorithm, computing all facts knowable
-     * from the axioms and rules given the set of scripted input facts
-     * (the "extensional database").
-     * @param inputFacts The scripted input facts
-     * @throws JoeError if the rule set is not stratified.
-     */
-    public void infer(Collection<Fact> inputFacts) {
-        // FIRST, check validity
+        // FIRST, check stratification
         if (!ruleset.isStratified()) {
             throw new JoeError("Rule set is not stratified.");
         }
 
+        // NEXT, check for rule/inputs relation collision
+        for (var relation : knownFacts.getRelations()) {
+            if (ruleMap.containsKey(relation)) {
+                throw new JoeError(
+                    "Rule head relation collides with input fact relation: '" +
+                        relation + "'.");
+            }
+        }
+
+        // NEXT, only do inference once.
+        if (inferenceComplete) return;
+        inferenceComplete = true;
+
+        // NEXT, initialize the data structures
+        knownFacts.addAll(ruleset.facts());
+        inferredFacts.addAll(ruleset.facts());
+
+        // NEXT, execute the rules.
         if (debug) {
             System.out.println("Rule Strata: " +
                 ruleset.getStrata());
         }
 
-        // NEXT, initialize the data structures
-        inferredFacts.clear();
-        knownFacts.clear();
-        factMap.clear();
-
-        inferredFacts.addAll(ruleset.facts());
-        ruleset.facts().forEach(this::addFact);
-        inputFacts.forEach(this::addFact);
-
-        // NEXT, execute the rules.
         for (var i = 0; i < ruleset.getStrata().size(); i++) {
             infer(i, ruleset.getStrata().get(i));
         }
@@ -237,7 +228,7 @@ public class NeroEngine {
                         if (debug) System.out.println("    Tuple: " + tupleString(tuple));
                         var fact = matchRule(rule, tuple);
 
-                        if (fact != null && addFact(fact)) {
+                        if (fact != null && knownFacts.add(fact)) {
                             if (debug) System.out.println("      Fact: " + fact);
                             gotNewFact = true;
                             inferredFacts.add(fact);
@@ -261,9 +252,9 @@ public class NeroEngine {
             ) {
                 throw new JoeError(
                     "'" + b.relation() +
-                    "' in rule '" + rule +
-                    "' requires ordered fields, but a provided " +
-                    "fact is not ordered.");
+                        "' in rule '" + rule +
+                        "' requires ordered fields, but a provided " +
+                        "fact is not ordered.");
             }
             bindings = b.matches(tuple[i], bindings);
             if (bindings == null) return null;
@@ -278,7 +269,7 @@ public class NeroEngine {
 
         // NEXT, check the bindings against the negations.
         for (var atom : rule.negations()) {
-            for (var fact : getFacts(atom.relation())) {
+            for (var fact : knownFacts.getRelation(atom.relation())) {
                 if (atom.matches(fact, bindings) != null) {
                     return null;
                 }
@@ -380,14 +371,14 @@ public class NeroEngine {
             int product = 1;
             for (var b : rule.body()) {
                 var relation = b.relation();
-                var facts = getFacts(relation);
+                var facts = knownFacts.getRelation(relation);
 
                 if (facts.isEmpty()) {
                     inputs.clear();
                     tupleCount = 0;
                     return;
                 }
-                inputs.add(facts);
+                inputs.add(new ArrayList<>(facts));
                 product = product * facts.size();
             }
 

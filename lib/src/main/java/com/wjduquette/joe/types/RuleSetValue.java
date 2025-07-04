@@ -1,12 +1,12 @@
 package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeNero;
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.FactSet;
+import com.wjduquette.joe.nero.RuleEngine;
 import com.wjduquette.joe.nero.RuleSet;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A RuleSetValue wraps up a Nero
@@ -76,22 +76,48 @@ public class RuleSetValue {
     }
 
     /**
-     * Infer facts from the rule set.
-     * @return The set of all known facts.
+     * Infer facts from the rule set and the database of facts.
+     * @return The new facts.
      */
-    public SetValue infer(Joe joe) {
-        var nero = new JoeNero(joe, this);
-        return nero.infer();
+    public Set<Fact> infer(FactBase db) {
+        var engine = new RuleEngine(ruleset, db);
+        engine.infer();
+        return engine.getInferredFacts();
     }
 
     /**
-     * Infer facts from the rule set and the set of scripted input facts.
-     * @param inputs The input facts
-     * @return The set of all known facts.
+     * Infer facts from the rule set, exporting to domain values as needed.
+     * @return The new (possibly exported) facts.
      */
-    public SetValue infer(Joe joe, Collection<?> inputs) {
-        var nero = new JoeNero(joe, this);
-        return nero.infer(inputs);
+    public SetValue inferAndExport(Joe joe) {
+        var engine = new RuleEngine(ruleset, new FactSet());
+        engine.infer();
+        return withExports(joe, engine.getInferredFacts());
+    }
+
+    /**
+     * Infer facts from the rule set and the set of input facts, exporting
+     * to domain values as needed.
+     * @param inputs The input facts
+     * @return The new (possibly exported) facts.
+     */
+    public SetValue inferAndExport(Joe joe, Collection<?> inputs) {
+        var factSet = toFactSet(joe, inputs);
+        var engine = new RuleEngine(ruleset, factSet);
+        engine.infer();
+        return withExports(joe, engine.getInferredFacts());
+    }
+
+    /**
+     * Infer facts from the rule set and the set of input facts, exporting
+     * to domain values as needed.
+     * @param db The input facts
+     * @return The new (possibly exported) facts.
+     */
+    public SetValue inferAndExport(Joe joe, FactBase db) {
+        var engine = new RuleEngine(ruleset, db);
+        engine.infer();
+        return withExports(joe, engine.getInferredFacts());
     }
 
     /**
@@ -100,5 +126,35 @@ public class RuleSetValue {
      */
     public boolean isStratified() {
         return ruleset.isStratified();
+    }
+
+    private FactSet toFactSet(Joe joe, Collection<?> inputs) {
+        // FIRST, Build the list of input facts, wrapping values of proxied
+        // types as TypedValues so that they can be used as Facts
+        // by Nero.
+        var factSet = new FactSet();
+
+        for (var input : inputs) {
+            // Throws JoeError if the input cannot be converted to a Fact
+            factSet.add(joe.toFact(input));
+        }
+
+        return factSet;
+    }
+
+    private SetValue withExports(Joe joe, Set<Fact> facts) {
+        var result = new SetValue();
+
+        for (var fact : facts) {
+            var creator = exports().get(fact.relation());
+
+            if (creator != null) {
+                result.add(joe.call(creator, fact.getFields().toArray()));
+            } else {
+                result.add(fact);
+            }
+        }
+
+        return result;
     }
 }
