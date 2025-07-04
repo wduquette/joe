@@ -19,8 +19,27 @@ public class FactSet {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an empty FactSet
+     */
     public FactSet() {
         // Nothing to do
+    }
+
+    /**
+     * Creates a FactSet containing the collection of Facts.
+     * @param facts The facts
+     */
+    public FactSet(Collection<Fact> facts) {
+        addAll(facts);
+    }
+
+    /**
+     * Creates a copy of an existing FactSet.
+     * @param other The facts
+     */
+    public FactSet(FactSet other) {
+        addAll(other);
     }
 
     //-------------------------------------------------------------------------

@@ -126,8 +126,7 @@ public class FactBaseType extends ProxyType<FactBase> {
             for (var fact : joe.toCollection(arg)) {
                 facts.add(joe.toFact(fact));
             }
-            var fb = new FactBase();
-            fb.addAll(facts);
+            var fb = new FactBase(facts);
             return FactBaseType.factBase2nero(joe, fb);
         }
     }
@@ -142,9 +141,7 @@ public class FactBaseType extends ProxyType<FactBase> {
         args.exactArity(1, "FactBase.fromNero(script)");
         var script = joe.toString(args.next());
         var results = new Nero().execute(new SourceBuffer("*fromNero*", script));
-        var db = new FactBase();
-        db.addAll(results.getAllFacts());
-        return db;
+        return new FactBase(results.getAllFacts());
     }
 
     //-------------------------------------------------------------------------
