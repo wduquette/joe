@@ -37,7 +37,7 @@ public class Nero {
     // Compiles the source to a NeroEngine, and checks for stratification.
     // Throws SyntaxError on any parse error and JoeError if the rule set
     // is not stratified.
-    private RuleEngine compile(SourceBuffer source) {
+    public RuleEngine compile(SourceBuffer source) {
         var ast = parse(source);
         var ruleSet = new RuleSetCompiler(ast).compile();
         if (!ruleSet.isStratified()) {
