@@ -53,12 +53,17 @@ public class FactSet {
     // Public API
 
     /**
-     * Adds a fact to the database
+     * Adds a fact to the database.  Returns true if the fact wasn't already
+     * present, and false otherwise.
      * @param fact The fact.
+     * @return true or false
      */
-    public void add(Fact fact) {
+    public boolean add(Fact fact) {
         if (facts.add(fact)) {
             indexSet(fact.relation()).add(fact);
+            return true;
+        } else {
+            return false;
         }
     }
 

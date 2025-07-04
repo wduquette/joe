@@ -141,7 +141,7 @@ public class FactBaseType extends ProxyType<FactBase> {
         args.exactArity(1, "FactBase.fromNero(script)");
         var script = joe.toString(args.next());
         var results = new Nero().execute(new SourceBuffer("*fromNero*", script));
-        return new FactBase(results.getAllFacts());
+        return new FactBase(results.getKnownFacts());
     }
 
     //-------------------------------------------------------------------------

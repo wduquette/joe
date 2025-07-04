@@ -122,11 +122,11 @@ public class NeroTool implements Tool {
                 dumpFacts("New Facts:", newFacts);
             } else if (dumpAll) {
                 // If we dump everything, no need to do specific queries.
-                dumpFacts("All Facts:", results.getAllFacts());
+                dumpFacts("All Facts:", results.getKnownFacts().getAll());
             } else {
                 for (var relation : relations) {
                     dumpFacts("Relation: " + relation,
-                        results.getFacts(relation));
+                        results.getKnownFacts().getRelation(relation));
                 }
             }
         } catch (SyntaxError ex) {
