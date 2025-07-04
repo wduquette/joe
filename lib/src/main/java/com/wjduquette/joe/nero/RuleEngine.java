@@ -64,8 +64,6 @@ public class RuleEngine {
     // the "intensional database" in Datalog jargon).
     private final Set<Fact> inferredFacts = new HashSet<>();
 
-
-
     //-------------------------------------------------------------------------
     // Constructor
 
@@ -92,17 +90,6 @@ public class RuleEngine {
      * @param facts The fact set
      */
     public RuleEngine(RuleSet ruleset, FactSet facts) {
-        this(ruleset);
-        knownFacts.addAll(facts);
-    }
-
-    /**
-     * Creates a new RuleEngine with the given ruleset and the given collection
-     * of input facts.
-     * @param ruleset The ruleset
-     * @param facts The fact set
-     */
-    public RuleEngine(RuleSet ruleset, Collection<Fact> facts) {
         this(ruleset);
         knownFacts.addAll(facts);
     }
@@ -192,9 +179,18 @@ public class RuleEngine {
      * @throws JoeError if the rule set is not stratified.
      */
     public void infer() {
-        // FIRST, check validity
+        // FIRST, check stratification
         if (!ruleset.isStratified()) {
             throw new JoeError("Rule set is not stratified.");
+        }
+
+        // NEXT, check for rule/inputs relation collision
+        for (var relation : knownFacts.getRelations()) {
+            if (ruleMap.containsKey(relation)) {
+                throw new JoeError(
+                    "Rule head relation collides with input fact relation: '" +
+                        relation + "'.");
+            }
         }
 
         // NEXT, only do inference once.

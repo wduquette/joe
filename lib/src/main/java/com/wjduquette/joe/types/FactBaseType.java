@@ -357,7 +357,6 @@ public class FactBaseType extends ProxyType<FactBase> {
         return db;
     }
 
-
     //**
     // @method select
     // @args rules
@@ -368,11 +367,9 @@ public class FactBaseType extends ProxyType<FactBase> {
     // is not modified.
     private Object _select(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "select(rules)");
-        var ruleset = joe.toType(RuleSetValue.class, args.next());
+        var rsv = joe.toType(RuleSetValue.class, args.next());
 
-        // TODO Revise execution to make best use of FactSet indexing.
-        // TODO use debug flag
-        return ruleset.infer(joe, db.getAll());
+        return rsv.inferAndExport(joe, db);
     }
 
     //**
@@ -420,24 +417,20 @@ public class FactBaseType extends ProxyType<FactBase> {
     //**
     // @method update
     // @args rules
-    // @result Set
+    // @result this
     // Updates the database using the Nero *rules*.  Inferred facts
     // are added to the database and then returned to the caller.
     // It is an error if the rule set contains `export` directives.
     private Object _update(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "update(ruleset)");
-        var ruleset = joe.toType(RuleSetValue.class, args.next());
-        if (!ruleset.exports().isEmpty()) {
+        var rsv = joe.toType(RuleSetValue.class, args.next());
+        if (!rsv.exports().isEmpty()) {
             throw new JoeError(
                 "Cannot `export` facts in update().");
         }
 
-        // TODO Revise execution to make best use of FactSet indexing.
-        // TODO use debug flag
-
-        var newFacts = ruleset.infer(joe, db.getAll());
-        newFacts.forEach(f -> db.add(joe.toFact(f)));
-        return newFacts;
+        db.addAll(rsv.infer(db));
+        return db;
     }
 
     //-------------------------------------------------------------------------
