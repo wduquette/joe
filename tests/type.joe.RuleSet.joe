@@ -218,7 +218,6 @@ function testInfer_class_ordered() {
 
     var rules = ruleset {
         Ancestor(x, y) :- Parent(x, y);
-        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     };
 
     assertError(\-> rules.infer(inputs),
