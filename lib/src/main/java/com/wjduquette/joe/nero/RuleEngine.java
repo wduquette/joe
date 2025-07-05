@@ -220,7 +220,7 @@ public class RuleEngine {
             if (debug) System.out.println("Iteration " + stratum + "." + (++count) + ":");
             for (var head : heads) {
                 for (var rule : ruleMap.get(head)) {
-                    if (matchRule2(rule)) gotNewFact = true;
+                    if (matchRule(rule)) gotNewFact = true;
                 }
             }
         } while (gotNewFact);
@@ -228,7 +228,7 @@ public class RuleEngine {
 
     // Matches the rule against the known facts, adding any new facts and
     // returning true if there were any and false otherwise.
-    private boolean matchRule2(Rule rule) {
+    private boolean matchRule(Rule rule) {
         if (debug) System.out.println("  Rule: " + rule);
 
         var bc = new BindingContext(rule);
@@ -241,16 +241,6 @@ public class RuleEngine {
             return true;
         } else {
             return false;
-        }
-    }
-
-    private static class BindingContext {
-        private final Rule rule;
-        private final List<Fact> inferredFacts = new ArrayList<>();
-        private Bindings bindings = new Bindings();
-
-        BindingContext(Rule rule) {
-            this.rule = rule;
         }
     }
 
@@ -341,85 +331,6 @@ public class RuleEngine {
         return factFactory.create(bc.rule.head().relation(), terms);
     }
 
-    //-------------------------------------------------------------------------
-    // Old Rule Matching
-
-    private boolean matchRule(Rule rule) {
-        if (debug) System.out.println("  Rule: " + rule);
-
-        var gotNewFact = false;
-        var iter = new TupleIterator(rule);
-        while (iter.hasNext()) {
-            var tuple = iter.next();
-            if (debug) System.out.println("    Tuple: " + tupleString(tuple));
-            var fact = matchTuple(rule, tuple);
-
-            if (fact != null && knownFacts.add(fact)) {
-                if (debug) System.out.println("      Fact: " + fact);
-                gotNewFact = true;
-                inferredFacts.add(fact);
-            }
-        }
-
-        return gotNewFact;
-    }
-
-    private Fact matchTuple(Rule rule, Fact[] tuple) {
-        // FIRST, match each pattern in the rule with a fact from
-        // the tuple, binding variables from left to right.
-        var bindings = new Bindings();
-
-        for (int i = 0; i < tuple.length; i++) {
-            var b = rule.body().get(i);
-
-            if (b.requiresOrderedFields() &&
-                !tuple[i].isOrdered()
-            ) {
-                throw new JoeError(
-                    "'" + b.relation() +
-                        "' in rule '" + rule +
-                        "' requires ordered fields, but a provided " +
-                        "fact is not ordered.");
-            }
-            bindings = b.matches(tuple[i], bindings);
-            if (bindings == null) return null;
-        }
-
-        // NEXT, check the bindings against the constraints.
-        for (var c : rule.constraints()) {
-            if (!constraintMet(c, bindings)) {
-                return null;
-            }
-        }
-
-        // NEXT, check the bindings against the negations.
-        for (var atom : rule.negations()) {
-            for (var fact : knownFacts.getRelation(atom.relation())) {
-                if (atom.matches(fact, bindings) != null) {
-                    return null;
-                }
-            }
-        }
-
-        // NEXT, build the list of terms and return the new fact.
-        var terms = new ArrayList<>();
-
-        for (var term : rule.head().terms()) {
-            switch (term) {
-                case Constant c -> terms.add(c.value());
-                case Variable v -> terms.add(bindings.get(v));
-                case Wildcard ignored -> throw new IllegalStateException(
-                    "Rule head contains a Wildcard term.");
-            }
-        }
-
-        return factFactory.create(rule.head().relation(), terms);
-    }
-
-    private String tupleString(Fact[] tuple) {
-        return Arrays.asList(tuple).toString();
-    }
-
     private boolean constraintMet(
         Constraint constraint,
         Map<Variable,Object> bindings
@@ -476,66 +387,17 @@ public class RuleEngine {
     }
 
     //-------------------------------------------------------------------------
-    // TupleIterator
+    // Helpers
 
-    private class TupleIterator {
-        //---------------------------------------------------------------------
-        // Instance Variables
+    // The context for the recursive matchBodyAtom method.
+    private static class BindingContext {
+        private final Rule rule;
+        private final List<Fact> inferredFacts = new ArrayList<>();
+        private Bindings bindings = new Bindings();
 
-        private final List<List<Fact>> inputs = new ArrayList<>();
-        private Fact[] tuple = null;
-        private final int tupleCount;
-        private int next = 0;
-
-        //---------------------------------------------------------------------
-        // Constructor
-
-        TupleIterator(Rule rule) {
-            // FIRST, get the lists of facts in the order referenced in the
-            // rule's body.
-            int product = 1;
-            for (var b : rule.body()) {
-                var relation = b.relation();
-                var facts = knownFacts.getRelation(relation);
-
-                if (facts.isEmpty()) {
-                    inputs.clear();
-                    tupleCount = 0;
-                    return;
-                }
-                inputs.add(new ArrayList<>(facts));
-                product = product * facts.size();
-            }
-
-            // NEXT, save the max number of tuples
-            tuple = new Fact[inputs.size()];
-
-            tupleCount = product;
-        }
-
-        //---------------------------------------------------------------------
-        // API
-
-        public boolean hasNext() {
-            return tupleCount != next;
-        }
-
-        public Fact[] next() {
-            if (!hasNext()) {
-                throw new IllegalStateException("Iterator is empty.");
-            }
-
-            var n = next++;
-            var indices = new int[tuple.length];
-
-            for (var i = 0; i < inputs.size(); i++) {
-                var input = inputs.get(i);
-                indices[i] = n % input.size();
-                tuple[i] = input.get(indices[i]);
-                n /= input.size();
-            }
-
-            return tuple;
+        BindingContext(Rule rule) {
+            this.rule = rule;
         }
     }
+
 }
