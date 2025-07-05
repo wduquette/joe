@@ -208,11 +208,11 @@ public class RuleEngine {
         }
 
         for (var i = 0; i < ruleset.getStrata().size(); i++) {
-            infer(i, ruleset.getStrata().get(i));
+            inferStratum(i, ruleset.getStrata().get(i));
         }
     }
 
-    private void infer(int stratum, List<String> heads) {
+    private void inferStratum(int stratum, List<String> heads) {
         int count = 0;
         boolean gotNewFact;
         do {
@@ -220,26 +220,35 @@ public class RuleEngine {
             if (debug) System.out.println("Iteration " + stratum + "." + (++count) + ":");
             for (var head : heads) {
                 for (var rule : ruleMap.get(head)) {
-                    if (debug) System.out.println("  Rule: " + rule);
-
-                    var iter = new TupleIterator(rule);
-                    while (iter.hasNext()) {
-                        var tuple = iter.next();
-                        if (debug) System.out.println("    Tuple: " + tupleString(tuple));
-                        var fact = matchRule(rule, tuple);
-
-                        if (fact != null && knownFacts.add(fact)) {
-                            if (debug) System.out.println("      Fact: " + fact);
-                            gotNewFact = true;
-                            inferredFacts.add(fact);
-                        }
+                    if (matchRule(rule)) {
+                        gotNewFact = true;
                     }
                 }
             }
         } while (gotNewFact);
     }
 
-    private Fact matchRule(Rule rule, Fact[] tuple) {
+    private boolean matchRule(Rule rule) {
+        if (debug) System.out.println("  Rule: " + rule);
+
+        var gotNewFact = false;
+        var iter = new TupleIterator(rule);
+        while (iter.hasNext()) {
+            var tuple = iter.next();
+            if (debug) System.out.println("    Tuple: " + tupleString(tuple));
+            var fact = matchTuple(rule, tuple);
+
+            if (fact != null && knownFacts.add(fact)) {
+                if (debug) System.out.println("      Fact: " + fact);
+                gotNewFact = true;
+                inferredFacts.add(fact);
+            }
+        }
+
+        return gotNewFact;
+    }
+
+    private Fact matchTuple(Rule rule, Fact[] tuple) {
         // FIRST, match each pattern in the rule with a fact from
         // the tuple, binding variables from left to right.
         var bindings = new Bindings();
