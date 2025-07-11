@@ -198,6 +198,7 @@ API documentation.<sup class="footnote-reference"><a href="#markdown">1</a></sup
 <li><a href="#the-constant-entity">The <code>@constant</code> Entity</a></li>
 <li><a href="#the-static-entity">The <code>@static</code> Entity</a></li>
 <li><a href="#the-init-entity">The <code>@init</code> Entity</a></li>
+<li><a href="#the-field-entity">The <code>@field</code> Entity</a></li>
 <li><a href="#the-method-entity">The <code>@method</code> Entity</a></li>
 <li><a href="#the-mixin-entity">The <code>@mixin</code> Entity</a></li>
 </ul>
@@ -228,6 +229,7 @@ following types of entity:</p>
 <li>Constants</li>
 <li>Static Methods</li>
 <li>Initializers</li>
+<li>Fields</li>
 <li>Methods</li>
 </ul>
 </li>
@@ -275,6 +277,7 @@ entity tags.</p>
 <li><a href="#the-constant-entity"><code>@constant &lt;name&gt;</code></a></li>
 <li><a href="#the-static-entity"><code>@static &lt;name&gt;</code></a></li>
 <li><a href="#the-init-entity"><code>@init</code></a></li>
+<li><a href="#the-field-entity"><code>@field &lt;name&gt;</code></a></li>
 <li><a href="#the-method-entity"><code>@method &lt;name&gt;</code></a></li>
 <li><a href="#the-typetopic-entity"><code>@typeTopic &lt;name&gt;</code></a></li>
 </ul>
@@ -286,6 +289,7 @@ entity tags.</p>
 <ul>
 <li><a href="#the-constant-entity"><code>@constant &lt;name&gt;</code></a></li>
 <li><a href="#the-static-entity"><code>@static &lt;name&gt;</code></a></li>
+<li><a href="#the-field-entity"><code>@field &lt;name&gt;</code></a></li>
 <li><a href="#the-method-entity"><code>@method &lt;name&gt;</code></a></li>
 <li><a href="#the-typetopic-entity"><code>@typeTopic &lt;name&gt;</code></a></li>
 </ul>
@@ -297,7 +301,7 @@ has a parent, and the parentage is indicated by the outline.</p>
 <li><code>@package</code> and <code>@mixin</code> entities belong to the documentation set.</li>
 <li>Every <code>@function</code> and <code>@type</code> entity belongs to the <code>@package</code> that
 most nearly precedes it in the same file.</li>
-<li>Every <code>@constant</code>, <code>@static</code>, <code>@init</code>, and <code>@method</code> entity belongs to
+<li>Every <code>@constant</code>, <code>@static</code>, <code>@init</code>, <code>@field</code> and <code>@method</code> entity belongs to
 the <code>@type</code> or <code>@mixin</code> that most nearly precedes it in the same file.</li>
 <li>It's an error if the expected parent entity is missing.</li>
 <li><code>joe doc</code> checks carefully for duplicate names.</li>
@@ -432,6 +436,7 @@ the including type.</p>
 <a href="#the-constant-entity"><code>@constant</code></a>,
 <a href="#the-static-entity"><code>@static</code></a>,
 <a href="#the-init-entity"><code>@init</code></a>,
+<a href="#the-field-entity"><code>@field</code></a>,
 <a href="#the-method-entity"><code>@method</code></a>,
 and
 <a href="#the-method-entity"><code>@typeTopic</code></a>
@@ -487,6 +492,10 @@ the same name as the type.</p>
 <p>The <code>@init</code> entity accepts the <code>@args</code> metadata tag, just as any
 function or method does, but not the <code>@result</code> tag, as its result is
 always an instance of the current type.</p>
+<h3 id="the-field-entity"><a class="header" href="#the-field-entity">The <code>@field</code> Entity</a></h3>
+<p>The <code>@field</code> entity documents an instance field defined by the current type,
+and begins with <code>@field &lt;name&gt;</code> where the <em>name</em> is the name of the field.
+The entity has Markdown content but no metadata tags.</p>
 <h3 id="the-method-entity"><a class="header" href="#the-method-entity">The <code>@method</code> Entity</a></h3>
 <p>The <code>@method</code> entity documents a method defined by the
 current type, and begins with <code>@method &lt;name&gt;</code>.  The <em>name</em> should be
@@ -502,6 +511,7 @@ the documentation set.</p>
 <p>Mixins have no metadata tags, and may have Markdown content and
 <a href="#the-constant-entity"><code>@constant</code></a>,
 <a href="#the-static-entity"><code>@static</code></a>,
+<a href="#the-field-entity"><code>@field</code></a>,
 <a href="#the-method-entity"><code>@method</code></a>,
 and
 <a href="#the-method-entity"><code>@typeTopic</code></a>
