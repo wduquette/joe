@@ -606,12 +606,12 @@ public class MatcherTest extends Ted {
     public void testTypeName_fact() {
         test("testTypeName_fact");
 
-        var pattern = new Pattern.TypeName("Thing");
+        var p1 = new Pattern.TypeName("Thing");
+        var p2 = new Pattern.TypeName("Fact");
         var value = new ListFact("Thing", List.of("hat"));
 
-        var bindings = bind(pattern, value);
-        check(bindings).ne(null);
-        check(bindings.isEmpty()).eq(true);
+        check(bind(p1, value)).ne(null);
+        check(bind(p2, value)).ne(null);
     }
 
     @Test

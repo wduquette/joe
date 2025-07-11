@@ -215,7 +215,8 @@ public class Matcher {
                 if (value instanceof Fact f) {
                     // It's a `Fact` object; use it as is.
                     fact = f;
-                    yield fact.relation().equals(p.typeName());
+                    yield p.typeName().equals(fact.relation())
+                        || p.typeName().equals("Fact");
                 } else if (jv.isFact()) {
                     // It's convertible to a fact object; verify that the
                     // requested name is the object's relation, type,
