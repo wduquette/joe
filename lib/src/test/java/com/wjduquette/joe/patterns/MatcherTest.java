@@ -24,9 +24,35 @@ public class MatcherTest extends Ted {
         return Matcher.bind(joe, pattern, value, constants::get);
     }
 
+    //-------------------------------------------------------------------------
+
     @Test
     public void testConstant_bad() {
         test("testConstant_bad");
+
+        var pattern = new Pattern.Constant("abc");
+        var value = "def";
+        check(bind(pattern, value)).eq(null);
+    }
+
+    @Test
+    public void testConstant_good() {
+        test("testConstant_good");
+
+        var pattern = new Pattern.Constant("abc");
+        var value = "abc";
+
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
+    }
+
+    //-------------------------------------------------------------------------
+    // Expression
+
+    @Test
+    public void testExpression_bad() {
+        test("testExpression_bad");
 
         constants = List.of("abc");
         var pattern = new Pattern.Expression(0);
@@ -36,8 +62,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testConstant_good() {
-        test("testConstant_good");
+    public void testExpression_good() {
+        test("testExpression_good");
 
         constants = List.of("abc");
         var pattern = new Pattern.Expression(0);

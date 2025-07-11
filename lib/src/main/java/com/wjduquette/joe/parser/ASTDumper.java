@@ -281,6 +281,8 @@ public class ASTDumper {
         buffer.print("Pattern." + pattern.getClass().getSimpleName());
 
         var content = switch (pattern) {
+            case Pattern.Constant p -> buffer()
+                .println(" '" + p.value() + "'");
             case Pattern.Expression p -> buffer()
                 .println(" '" + p.id() + "'");
             case Pattern.ListPattern p -> {

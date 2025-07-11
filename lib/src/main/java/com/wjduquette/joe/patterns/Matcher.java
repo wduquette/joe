@@ -60,6 +60,9 @@ public class Matcher {
         Map<String,Object> bindings
     ) {
         return switch (pattern) {
+            case Pattern.Constant p ->
+                Objects.equals(p.value(), value);
+
             case Pattern.Expression p ->
                 Objects.equals(getter.get(p.id()), value);
 

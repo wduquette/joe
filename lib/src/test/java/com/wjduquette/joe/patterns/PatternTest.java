@@ -17,6 +17,14 @@ public class PatternTest extends Ted {
     public void testConstant() {
         test("testConstant");
 
+        var p = new Pattern.Constant(5);
+        check(p.toString()).eq("5");
+    }
+
+    @Test
+    public void testExpression() {
+        test("testExpression");
+
         var p = new Pattern.Expression(5);
         check(p.toString()).eq("$5");
     }

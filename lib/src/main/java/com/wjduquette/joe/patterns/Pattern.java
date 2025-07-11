@@ -4,6 +4,7 @@ import com.wjduquette.joe.JoeValue;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  * variable.</p>
  */
 public sealed interface Pattern permits
+    Pattern.Constant,
     Pattern.Expression,
     Pattern.ListPattern,
     Pattern.MapPattern,
@@ -30,6 +32,21 @@ public sealed interface Pattern permits
     Pattern.ValueBinding,
     Pattern.Wildcard
 {
+    /**
+     * A pattern that requires the target value to be exactly equal to a
+     * literal constant.
+     * @param value The constant's value
+     */
+    record Constant(Object value) implements Pattern {
+        /**
+         * Returns the value's string representation.
+         * @return The string
+         */
+        @Override public String toString() {
+            return Objects.toString(value);
+        }
+    }
+
     /**
      * A pattern that requires the target value to be exactly equal to a
      * computed value.  Expressions are passed out-of-band, based on an
