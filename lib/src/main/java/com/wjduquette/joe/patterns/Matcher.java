@@ -2,6 +2,7 @@ package com.wjduquette.joe.patterns;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeValue;
+import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.nero.Fact;
 
 import java.util.*;
@@ -61,10 +62,10 @@ public class Matcher {
     ) {
         return switch (pattern) {
             case Pattern.Constant p ->
-                Objects.equals(p.value(), value);
+                matchConstant(p.value(), value);
 
             case Pattern.Expression p ->
-                Objects.equals(getter.get(p.id()), value);
+                matchConstant(getter.get(p.id()), value);
 
             case Pattern.ListPattern p -> {
                 // FIRST, check type and shape
@@ -249,6 +250,13 @@ public class Matcher {
             default -> throw new IllegalStateException(
                 "Invalid map key pattern: '" + pattern + "'.");
         };
+    }
+
+    private static boolean matchConstant(Object constant, Object value) {
+        if (Objects.equals(constant, value)) return true;
+        return constant instanceof Keyword k
+            && value instanceof Enum<?> e
+            && k.name().equalsIgnoreCase(e.name());
     }
 
     // Determines whether the type name is the name of the object's

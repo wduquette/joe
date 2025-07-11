@@ -47,6 +47,17 @@ public class MatcherTest extends Ted {
         check(bindings.isEmpty()).eq(true);
     }
 
+    @Test
+    public void testConstant_keywordAndEnum() {
+        test("testConstant_keywordAndEnum");
+
+        var pattern = new Pattern.Constant(new Keyword("sweet"));
+
+        check(bind(pattern, new Keyword("sweet"))).ne(null);
+        check(bind(pattern, Flavor.SWEET)).ne(null);
+        check(bind(pattern, Flavor.SOUR)).eq(null);
+    }
+
     //-------------------------------------------------------------------------
     // Expression
 
@@ -74,6 +85,17 @@ public class MatcherTest extends Ted {
         check(bindings.isEmpty()).eq(true);
     }
 
+    @Test
+    public void testExpression_keywordAndEnum() {
+        test("testExpression_keywordAndEnum");
+
+        constants = List.of(new Keyword("sweet"));
+        var pattern = new Pattern.Expression(0);
+
+        check(bind(pattern, new Keyword("sweet"))).ne(null);
+        check(bind(pattern, Flavor.SWEET)).ne(null);
+        check(bind(pattern, Flavor.SOUR)).eq(null);
+    }
 
     //-------------------------------------------------------------------------
     // ListPattern
@@ -689,6 +711,8 @@ public class MatcherTest extends Ted {
 
     //-------------------------------------------------------------------------
     // Helper
+
+    private enum Flavor { SWEET, SOUR }
 
     public record TestType(String name) implements JoeType {
     }
