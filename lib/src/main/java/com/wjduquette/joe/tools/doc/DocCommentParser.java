@@ -68,6 +68,7 @@ class DocCommentParser {
     private static final String CONSTANT = "@constant";
     private static final String STATIC = "@static";
     private static final String INIT = "@init";
+    private static final String FIELD = "@field";
     private static final String METHOD = "@method";
 
     private static final Set<String> MIXIN_ENDERS = Set.of(
@@ -88,7 +89,7 @@ class DocCommentParser {
 
     private static final Set<String> TYPE_CHILD_ENDERS = Set.of(
         PACKAGE, MIXIN, FUNCTION, TYPE, ENUM, PACKAGE_TOPIC,
-        CONSTANT, STATIC, INIT, METHOD, TYPE_TOPIC
+        CONSTANT, STATIC, INIT, FIELD, METHOD, TYPE_TOPIC
     );
 
     private void _parse() {
@@ -296,6 +297,7 @@ class DocCommentParser {
                 case CONSTANT -> _constant(type, tag);
                 case STATIC -> _static(type, tag);
                 case INIT -> _init(type, tag);
+                case FIELD -> _field(type, tag);
                 case METHOD -> _method(type, tag);
                 case TYPE_TOPIC -> _typeTopic(type, tag);
                 default -> throw error(previous(), "Unexpected tag: " + tag);
@@ -454,6 +456,33 @@ class DocCommentParser {
             } else {
                 throw error(previous(), "Unexpected tag: " + tag);
             }
+        }
+    }
+
+    private void _field(TypeOrMixin parent, Tag fieldTag) {
+        var isType = parent instanceof TypeEntry;
+        var type = isType ? (TypeEntry)parent : null;
+
+        if (!Joe.isIdentifier(fieldTag.value())) {
+            throw error(previous(), expected(fieldTag));
+        }
+
+        FieldEntry field = new FieldEntry(type, fieldTag.value());
+
+        if (isType) remember(field);
+
+        parent.fields().add(field);
+
+        // Fields have no tags, only content.
+        if (!advanceToTag(field)) return;
+
+        var tag = peek().getTag();
+
+        var enders = isType ? TYPE_CHILD_ENDERS : MIXIN_CHILD_ENDERS;
+
+        if (!enders.contains(tag.name())) {
+            advance();
+            throw error(previous(), "Unexpected tag: " + tag);
         }
     }
 

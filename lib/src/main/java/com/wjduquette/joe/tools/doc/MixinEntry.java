@@ -18,6 +18,7 @@ class MixinEntry extends Entry implements TypeOrMixin {
 
     private final List<ConstantEntry> constants = new ArrayList<>();
     private final List<StaticMethodEntry> staticMethods = new ArrayList<>();
+    private final List<FieldEntry> fields = new ArrayList<>();
     private final List<MethodEntry> methods = new ArrayList<>();
     private final List<TopicEntry> topics = new ArrayList<>();
 
@@ -36,6 +37,7 @@ class MixinEntry extends Entry implements TypeOrMixin {
     public String                  name()          { return name; }
     public List<ConstantEntry>     constants()     { return constants; }
     public List<StaticMethodEntry> staticMethods() { return staticMethods; }
+    public List<FieldEntry>        fields()        { return fields; }
     public List<MethodEntry>       methods()       { return methods; }
     public List<TopicEntry>        topics()        { return topics; }
 
