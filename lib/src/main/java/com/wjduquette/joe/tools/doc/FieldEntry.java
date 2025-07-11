@@ -23,6 +23,7 @@ class FieldEntry extends TypeMember {
     // Accessors
 
     public String name()          { return name; }
+    public String prefix()        { return type().valuePrefix(); }
     public String id()            { return "field." + name; }
     public String fullMnemonic()  { return type().fullMnemonic() + "#" + id(); }
     public String shortMnemonic() { return type().shortMnemonic() + "#" + id(); }

@@ -279,6 +279,14 @@ class Generator {
             out.println();
         }
 
+        if (!type.fields().isEmpty()) {
+            out.hb("fields", "Fields");
+            out.println();
+            sorted(type.fields(), FieldEntry::name)
+                .forEach(m -> writeFieldLink(out, 0, m));
+            out.println();
+        }
+
         if (!type.methods().isEmpty()) {
             out.hb("methods", "Methods");
             out.println();
@@ -316,6 +324,12 @@ class Generator {
         if (type.initializer() != null) {
             out.h2("init", type.name() + " Initializer");
             writeInitializerBody(out, type.initializer());
+        }
+
+        // NEXT, output Instance Fields
+        if (!type.fields().isEmpty()) {
+            out.h2("fields","Fields");
+            writeFieldBodies(out, type.fields());
         }
 
         // NEXT, output Instance Methods
@@ -389,6 +403,36 @@ class Generator {
         out.println(leader + "- [" +
             constant.type().prefix() + "." + constant.name() +
             "](" +constant.filename() + "#" + constant.id() + ")"
+        );
+    }
+
+    //-------------------------------------------------------------------------
+    // Fields
+
+    private void writeFieldBodies(
+        ContentWriter out,
+        List<FieldEntry> fields
+    ) {
+        sorted(fields, FieldEntry::name)
+            .forEach(c -> writeFieldBody(out, c));
+        out.println();
+    }
+
+    private void writeFieldBody(ContentWriter out, FieldEntry field) {
+        out.h3(field.id(), ital(field.prefix()) + "." + field.name());
+        expandMnemonicLinks(field.content()).forEach(out::println);
+        out.println();
+    }
+
+    private void writeFieldLink(
+        ContentWriter out,
+        int indent,
+        FieldEntry field
+    ) {
+        var leader = " ".repeat(indent);
+        out.println(leader + "- [" +
+            ital(field.prefix()) + "." + field.name() +
+            "](" +field.filename() + "#" + field.id() + ")"
         );
     }
 
