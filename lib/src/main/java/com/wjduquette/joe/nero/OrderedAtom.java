@@ -13,46 +13,6 @@ import java.util.stream.Collectors;
 public record OrderedAtom(String relation, List<Term> terms)
     implements Atom
 {
-    @Override public boolean requiresOrderedFields() { return true; }
-
-    @Override public Bindings matches(Fact fact, Bindings given) {
-        var bindings = new Bindings(given);
-
-        if (!fact.relation().equals(relation)) {
-            return null;
-        }
-
-        if (!fact.isOrdered()) {
-            return null;
-        }
-
-        var n = terms().size();
-        if (fact.getFields().size() != n) return null;
-
-        for (var i = 0; i < terms().size(); i++) {
-            var t = terms().get(i);
-            var f = fact.getFields().get(i);
-
-            switch (t) {
-                case Variable v -> {
-                    var bound = bindings.get(v);
-
-                    if (bound == null) {
-                        bindings.put(v, f);
-                    } else if (!bound.equals(f)) {
-                        return null;
-                    }
-                }
-                case Constant c -> {
-                    if (!f.equals(c.value())) return null;
-                }
-                case Wildcard ignored -> {}
-            }
-        }
-
-        return bindings;
-    }
-
     @Override public String toString() {
         var termString = terms.stream().map(Term::toString)
             .collect(Collectors.joining(", "));
