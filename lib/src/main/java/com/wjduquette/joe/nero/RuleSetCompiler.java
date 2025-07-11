@@ -96,7 +96,7 @@ public class RuleSetCompiler {
         );
     }
 
-    private BodyAtom ast2body(ASTRuleSet.ASTAtom atom) {
+    private Atom ast2body(ASTRuleSet.ASTAtom atom) {
         return switch (atom) {
             case ASTRuleSet.ASTOrderedAtom a -> new OrderedAtom(
                 a.relation().lexeme(),

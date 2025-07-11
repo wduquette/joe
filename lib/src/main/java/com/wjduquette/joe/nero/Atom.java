@@ -1,9 +1,11 @@
 package com.wjduquette.joe.nero;
 
 /**
- * An atom in the body of a rule.
+ * A Nero atom, i.e., a relation with its terms.
  */
-public interface BodyAtom {
+public sealed interface Atom permits
+    NamedAtom, OrderedAtom
+{
     /**
      * Gets whether this atom requires ordered fields or not.
      * @return true or false.

@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * An IndexedAtom is a {@link BodyAtom} consisting of a relation name and a
+ * An IndexedAtom is a {@link Atom} consisting of a relation name and a
  * list of {@link Term Terms}, which may be variables, wildcards, or constants.
  * An IndexedAtom can match indexed {@link Fact Facts}.
  * @param relation The relation name
  * @param terms The terms
  */
 public record OrderedAtom(String relation, List<Term> terms)
-    implements BodyAtom
+    implements Atom
 {
     @Override public boolean requiresOrderedFields() { return true; }
 

@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * A map of variable bindings, used while matching
- * {@link BodyAtom BodyAtoms} against {@link Fact Facts}.
+ * {@link Atom BodyAtoms} against {@link Fact Facts}.
  */
 public class Bindings extends HashMap<Variable,Object> {
     /**

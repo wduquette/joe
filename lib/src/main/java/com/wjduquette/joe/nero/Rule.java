@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 /**
  * A rule, consisting of a head {@link HeadAtom} (a template for creating new
  * facts), and a body, which consists of normal and negated
- * {@link BodyAtom BodyAtoms} and a list of constraints.  The normal BodyAtoms
+ * {@link Atom BodyAtoms} and a list of constraints.  The normal BodyAtoms
  * match facts and bind body variables.  For the rule to fire, the bound
  * variables must meet the constraints, and there can be no facts that match
  * the negated BodyAtoms given the bound variables.
@@ -26,15 +26,15 @@ import java.util.stream.Collectors;
  */
 public record Rule(
     HeadAtom head,
-    List<BodyAtom> body,
-    List<BodyAtom> negations,
+    List<Atom> body,
+    List<Atom> negations,
     List<Constraint> constraints
 ) {
     @Override
     public String toString() {
-        var bodyString = body.stream().map(BodyAtom::toString)
+        var bodyString = body.stream().map(Atom::toString)
             .collect(Collectors.joining(", "));
-        var negString = "not " + negations.stream().map(BodyAtom::toString)
+        var negString = "not " + negations.stream().map(Atom::toString)
             .collect(Collectors.joining(", not "));
         var constraintString = constraints.stream().map(Constraint::toString)
             .collect(Collectors.joining(", "));

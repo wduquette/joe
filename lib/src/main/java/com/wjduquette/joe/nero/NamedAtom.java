@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * An NameAtom is a {@link BodyAtom} consisting of a relation name and a
+ * An NamedAtom is a {@link Atom} consisting of a relation name and a
  * map of field names and {@link Term Terms}, which may be variables,
  * wildcards, or constants. A NamedAtom can match any {@link Fact},
  * identifying fields by name.
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * @param terms The terms
  */
 public record NamedAtom(String relation, Map<String,Term> terms)
-    implements BodyAtom
+    implements Atom
 {
     @Override public boolean requiresOrderedFields() { return false; }
 
