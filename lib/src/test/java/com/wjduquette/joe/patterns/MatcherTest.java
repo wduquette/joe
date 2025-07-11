@@ -743,8 +743,8 @@ public class MatcherTest extends Ted {
         PairType() {
             super("Pair");
             proxies(Pair.class);
-            field("first", Pair::first);
-            field("second", Pair::second);
+            field("first", this::_first);
+            field("second", this::_second);
 
             initializer(this::_init);
         }
@@ -752,6 +752,14 @@ public class MatcherTest extends Ted {
         private Object _init(Joe joe, Args args) {
             args.exactArity(2, "Pair(first,second)");
             return new Pair(args.next(), args.next());
+        }
+
+        private Object _first(Joe joe, Pair value) {
+            return value.first();
+        }
+
+        private Object _second(Joe joe, Pair value) {
+            return value.second();
         }
     }
 }

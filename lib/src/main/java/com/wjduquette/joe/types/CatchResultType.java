@@ -28,11 +28,11 @@ public class CatchResultType extends ProxyType<CatchResult> {
         // The record has two fields, `result` and `error`.
         proxies(CatchResult.class);
 
-        field("result", CatchResult::result);
-        field("error",  CatchResult::error);
-
         staticMethod("ok",    this::_ok);
         staticMethod("error", this::_error);
+
+        field("result", this::_resultField);
+        field("error",  this::_errorField);
 
         method("isOK",        this::_isOK);
         method("isError",     this::_isError);
@@ -71,6 +71,19 @@ public class CatchResultType extends ProxyType<CatchResult> {
         } else {
             throw joe.expected("Error or String", arg);
         }
+    }
+
+    //-------------------------------------------------------------------------
+    // Field Implementations
+
+    // TODO: field docs
+    private Object _resultField(Joe joe, CatchResult value) {
+        return value.result();
+    }
+
+    // TODO: field docs
+    private Object _errorField(Joe joe, CatchResult value) {
+        return value.error();
     }
 
     //-------------------------------------------------------------------------

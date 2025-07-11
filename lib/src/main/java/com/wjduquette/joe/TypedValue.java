@@ -31,7 +31,7 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
 
     @Override
     public Object get(String name) {
-        return proxy.get(value, name);
+        return proxy.get(joe, value, name);
     }
 
     @Override

@@ -118,7 +118,7 @@ public class FactType extends ProxyType<Fact> {
      * @return The property value
      */
     @Override
-    public Object get(Object value, String propertyName) {
+    public Object get(Joe joe, Object value, String propertyName) {
         var method = bind(value, propertyName);
 
         if (method != null) {

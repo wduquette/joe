@@ -5,7 +5,6 @@ import com.wjduquette.joe.nero.RecordFact;
 import com.wjduquette.joe.types.TypeType;
 
 import java.util.*;
-import java.util.function.Function;
 
 /**
  * A JoeType that serves as a proxy for a native Java type.  The proxy type
@@ -15,6 +14,18 @@ import java.util.function.Function;
 public class ProxyType<V>
     implements JoeClass, JoeValue, NativeCallable
 {
+    //-------------------------------------------------------------------------
+    // Types
+
+    /**
+     * An interface for retrieving a field value for an object of the
+     * proxied type.
+     * @param <V> The proxied type.
+     */
+    public interface FieldLambda<V> {
+        Object get(Joe joe, V object);
+    }
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -59,7 +70,7 @@ public class ProxyType<V>
     private final List<String> fieldNames = new ArrayList<>();
 
     // The getters used to retrieve field values, by field name.
-    private final Map<String, Function<V,Object>> getters = new HashMap<>();
+    private final Map<String, FieldLambda<V>> getters = new HashMap<>();
 
     // The supplier for iteration, if this type is iterable.
     private IterableSupplier iterableSupplier = null;
@@ -159,7 +170,7 @@ public class ProxyType<V>
      * @param fieldName The field's name
      * @param getter The getter
      */
-    protected void field(String fieldName, Function<V, Object> getter) {
+    protected void field(String fieldName, FieldLambda<V> getter) {
         fieldNames.add(fieldName);
         getters.put(fieldName, getter);
     }
@@ -267,7 +278,7 @@ public class ProxyType<V>
      * @return The property value
      */
     @SuppressWarnings("unchecked")
-    public Object get(Object value, String propertyName) {
+    public Object get(Joe joe, Object value, String propertyName) {
         var method = bind(value, propertyName);
 
         if (method != null) {
@@ -276,7 +287,7 @@ public class ProxyType<V>
 
         var getter = getters.get(propertyName);
         if (getter != null) {
-            return getter.apply((V)value);
+            return getter.get(joe, (V)value);
         }
 
         throw new JoeError("Undefined property '" +
@@ -325,7 +336,7 @@ public class ProxyType<V>
     @SuppressWarnings("unused")
     public Fact toFact(Joe joe, Object value) {
         if (!fieldNames.isEmpty()) {
-            return new RecordFact(name(), fieldNames, getFieldMap(value));
+            return new RecordFact(name(), fieldNames, getFieldMap(joe, value));
         } else {
             throw new UnsupportedOperationException(
                 "Values of this type cannot be used as facts: '" +
@@ -335,13 +346,13 @@ public class ProxyType<V>
 
     // Gets a map of the value's field names, by name.
     @SuppressWarnings("unchecked")
-    private Map<String, Object> getFieldMap(Object value) {
+    private Map<String, Object> getFieldMap(Joe joe, Object value) {
         var map = new HashMap<String,Object>();
 
         for (var name : fieldNames) {
             var getter = getters.get(name);
             if (getter != null) {
-                map.put(name, getter.apply((V)value));
+                map.put(name, getter.get(joe, (V)value));
             }
         }
 
