@@ -15,7 +15,7 @@ public class ASTPattern {
     // Instance Variables
 
     private Pattern pattern = null;
-    private final List<Expr> constants = new ArrayList<>();
+    private final List<Expr> exprs = new ArrayList<>();
     private final List<Token> bindings = new ArrayList<>();
 
     //-------------------------------------------------------------------------
@@ -38,37 +38,37 @@ public class ASTPattern {
 
     /**
      * Adds a simple literal constant to the constants list, and returns
-     * the {@link com.wjduquette.joe.patterns.Pattern.Constant} for
+     * the {@link Pattern.Expression} for
      * inclusion in the larger pattern.
      * @param value A double, string, boolean, keyword, or null.
      * @return The pattern
      */
-    public Pattern.Constant addLiteralConstant(Object value) {
-        return addExprConstant(new Expr.Literal(value));
+    public Pattern.Expression addLiteralConstant(Object value) {
+        return addExpr(new Expr.Literal(value));
     }
 
     /**
      * Adds an interpolated variable constant to the constants list, and
-     * returns the {@link com.wjduquette.joe.patterns.Pattern.Constant} for
+     * returns the {@link Pattern.Expression} for
      * inclusion in the larger pattern.
      * @param varName A variable name token.
      * @return The pattern
      */
-    public Pattern.Constant addVarConstant(Token varName) {
-        return addExprConstant(new Expr.VarGet(varName));
+    public Pattern.Expression addVarExpr(Token varName) {
+        return addExpr(new Expr.VarGet(varName));
     }
 
     /**
      * Adds an interpolated expression constant to the constants list, and
-     * returns the {@link com.wjduquette.joe.patterns.Pattern.Constant} for
+     * returns the {@link Pattern.Expression} for
      * inclusion in the larger pattern.
      * @param expr The expression
      * @return The pattern
      */
-    public Pattern.Constant addExprConstant(Expr expr) {
-        int index = constants.size();
-        constants.add(expr);
-        return new Pattern.Constant(index);
+    public Pattern.Expression addExpr(Expr expr) {
+        int index = exprs.size();
+        exprs.add(expr);
+        return new Pattern.Expression(index);
     }
 
     /**
@@ -95,8 +95,8 @@ public class ASTPattern {
      * constant IDs in the pattern.
      * @return The list
      */
-    public List<Expr> getConstants() {
-        return constants;
+    public List<Expr> getExprs() {
+        return exprs;
     }
 
     /**

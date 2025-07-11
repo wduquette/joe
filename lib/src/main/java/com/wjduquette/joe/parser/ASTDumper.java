@@ -269,7 +269,7 @@ public class ASTDumper {
 
         buffer.indent("bindings: " + tokenList(pattern.getBindings()));
         int i = 0;
-        for (var c : pattern.getConstants()) {
+        for (var c : pattern.getExprs()) {
             buffer.indent("constant[" + i++ + "]: " + dump(c));
         }
         buffer.dump("pattern", pattern.getPattern());
@@ -281,7 +281,7 @@ public class ASTDumper {
         buffer.print("Pattern." + pattern.getClass().getSimpleName());
 
         var content = switch (pattern) {
-            case Pattern.Constant p -> buffer()
+            case Pattern.Expression p -> buffer()
                 .println(" '" + p.id() + "'");
             case Pattern.ListPattern p -> {
                 var buff = buffer().nl();

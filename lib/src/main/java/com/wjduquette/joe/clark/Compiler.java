@@ -753,7 +753,7 @@ class Compiler {
         var bindings = constant(astPattern.getBindings().stream()
             .map(Token::lexeme)
             .toList());
-        emitList(astPattern.getConstants());
+        emitList(astPattern.getExprs());
         emit(PATTERN, index, bindings);
     }
 

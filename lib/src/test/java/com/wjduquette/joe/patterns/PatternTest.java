@@ -17,7 +17,7 @@ public class PatternTest extends Ted {
     public void testConstant() {
         test("testConstant");
 
-        var p = new Pattern.Constant(5);
+        var p = new Pattern.Expression(5);
         check(p.toString()).eq("$5");
     }
 
@@ -26,13 +26,13 @@ public class PatternTest extends Ted {
         test("testListPattern");
 
         var p1 = new Pattern.ListPattern(List.of(
-            new Pattern.Constant(3),
+            new Pattern.Expression(3),
             new Pattern.Wildcard("_xyz")
         ), null);
         check(p1.toString()).eq("[$3, _xyz]");
 
         var p2 = new Pattern.ListPattern(List.of(
-            new Pattern.Constant(3),
+            new Pattern.Expression(3),
             new Pattern.Wildcard("_xyz")
         ), "tail");
         check(p2.toString()).eq("[$3, _xyz | ?tail]");
@@ -42,9 +42,9 @@ public class PatternTest extends Ted {
     public void testMapPattern() {
         test("testMapPattern");
 
-        var map = new LinkedHashMap<Pattern.Constant, Pattern>();
-        map.put(new Pattern.Constant(3), new Pattern.Wildcard("_xyz"));
-        map.put(new Pattern.Constant(4), new Pattern.ValueBinding("a"));
+        var map = new LinkedHashMap<Pattern.Expression, Pattern>();
+        map.put(new Pattern.Expression(3), new Pattern.Wildcard("_xyz"));
+        map.put(new Pattern.Expression(4), new Pattern.ValueBinding("a"));
 
         var p = new Pattern.MapPattern(map);
         check(p.toString()).eq("{$3: _xyz, $4: ?a}");

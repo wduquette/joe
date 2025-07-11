@@ -191,7 +191,7 @@ class Interpreter {
             case Stmt.ForEachBind stmt -> {
                 // Evaluate the pattern's constants
                 var constants = new ArrayList<>();
-                stmt.pattern().getConstants().forEach(e ->
+                stmt.pattern().getExprs().forEach(e ->
                     constants.add(evaluate(e)));
 
                 // Evaluate the collection
@@ -232,7 +232,7 @@ class Interpreter {
                 for (var c : stmt.cases()) {
                     // case pattern ->
                     var constants = new ArrayList<>();
-                    c.pattern().getConstants().forEach(e ->
+                    c.pattern().getExprs().forEach(e ->
                         constants.add(evaluate(e)));
 
                     var previous = this.environment;
@@ -350,7 +350,7 @@ class Interpreter {
             }
             case Stmt.VarPattern stmt -> {
                 var constants = new ArrayList<>();
-                stmt.pattern().getConstants().forEach(e ->
+                stmt.pattern().getExprs().forEach(e ->
                     constants.add(evaluate(e)));
                 var target = evaluate(stmt.target());
                 var bound = Matcher.bind(
@@ -652,7 +652,7 @@ class Interpreter {
                 // FIRST, Evaluate the target and any pattern constants
                 var target = evaluate(expr.target());
                 var constants = new ArrayList<>();
-                expr.pattern().getConstants().forEach(e ->
+                expr.pattern().getExprs().forEach(e ->
                     constants.add(evaluate(e)));
 
                 // NEXT, do the pattern match

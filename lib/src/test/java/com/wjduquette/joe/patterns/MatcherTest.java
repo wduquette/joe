@@ -29,7 +29,7 @@ public class MatcherTest extends Ted {
         test("testConstant_bad");
 
         constants = List.of("abc");
-        var pattern = new Pattern.Constant(0);
+        var pattern = new Pattern.Expression(0);
         var value = "xyz";
 
         check(bind(pattern, value)).eq(null);
@@ -40,7 +40,7 @@ public class MatcherTest extends Ted {
         test("testConstant_good");
 
         constants = List.of("abc");
-        var pattern = new Pattern.Constant(0);
+        var pattern = new Pattern.Expression(0);
         var value = "abc";
 
         var bindings = bind(pattern, value);
@@ -58,7 +58,7 @@ public class MatcherTest extends Ted {
 
         constants = List.of("abc");
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.Constant(0)
+            new Pattern.Expression(0)
         ), null);
         var value = "abc";
 
@@ -72,9 +72,9 @@ public class MatcherTest extends Ted {
 
         constants = List.of("abc", "def", "ghi");
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1),
-            new Pattern.Constant(2)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1),
+            new Pattern.Expression(2)
         ), null);
         var value = List.of("abc", "def");
 
@@ -88,7 +88,7 @@ public class MatcherTest extends Ted {
 
         constants = List.of("abc");
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.Constant(0)
+            new Pattern.Expression(0)
         ), null);
         var value = List.of("abc", "def");
 
@@ -102,8 +102,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("abc", "def");
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1)
         ), null);
         var value = List.of("abc", "xyz");
 
@@ -130,8 +130,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("abc", "def");
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1)
         ), null);
         var value = List.of("abc", "def");
 
@@ -146,8 +146,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("abc", "def");
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1)
         ), "tail");
         var value = List.of("abc", "def");
 
@@ -162,8 +162,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("abc", "def");
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1)
         ), "tail");
         var value = List.of("abc", "def", "ghi", "jkl");
 
@@ -208,10 +208,10 @@ public class MatcherTest extends Ted {
 
         constants = List.of("k1", "v1", "k2", "v2");
         var pattern = new Pattern.MapPattern(Map.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1),
-            new Pattern.Constant(2),
-            new Pattern.Constant(3)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1),
+            new Pattern.Expression(2),
+            new Pattern.Expression(3)
         ));
         var value = "abc";
 
@@ -225,10 +225,10 @@ public class MatcherTest extends Ted {
 
         constants = List.of("k1", "v1", "k2", "v2");
         var pattern = new Pattern.MapPattern(Map.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1),
-            new Pattern.Constant(2),
-            new Pattern.Constant(3)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1),
+            new Pattern.Expression(2),
+            new Pattern.Expression(3)
         ));
         var value = Map.of("k1", "v1");
 
@@ -242,10 +242,10 @@ public class MatcherTest extends Ted {
 
         constants = List.of("k1", "v1", "k2", "v2");
         var pattern = new Pattern.MapPattern(Map.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1),
-            new Pattern.Constant(2),
-            new Pattern.Constant(3)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1),
+            new Pattern.Expression(2),
+            new Pattern.Expression(3)
         ));
         var value = Map.of("k1", "v1", "k2", "nonesuch");
 
@@ -272,10 +272,10 @@ public class MatcherTest extends Ted {
 
         constants = List.of("k1", "v1", "k2", "v2");
         var pattern = new Pattern.MapPattern(Map.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1),
-            new Pattern.Constant(2),
-            new Pattern.Constant(3)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1),
+            new Pattern.Expression(2),
+            new Pattern.Expression(3)
         ));
         var value = Map.of("k1", "v1", "k2", "v2");
 
@@ -290,10 +290,10 @@ public class MatcherTest extends Ted {
 
         constants = List.of("k1", "v1", "k2", "v2");
         var pattern = new Pattern.MapPattern(Map.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1),
-            new Pattern.Constant(2),
-            new Pattern.Constant(3)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1),
+            new Pattern.Expression(2),
+            new Pattern.Expression(3)
         ));
         var value = Map.of("k1", "v1", "k2", "v2", "k3", "v3");
 
@@ -311,8 +311,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("123", "red");
         Map<String,Pattern> fieldMap = Map.of(
-            "id", new Pattern.Constant(0),
-            "red", new Pattern.Constant(1)
+            "id", new Pattern.Expression(0),
+            "red", new Pattern.Expression(1)
         );
         var pattern = new Pattern.NamedFieldPattern("Thing", fieldMap);
 
@@ -328,8 +328,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("123", "fancy");
         Map<String,Pattern> fieldMap = Map.of(
-            "id", new Pattern.Constant(0),
-            "style", new Pattern.Constant(1)
+            "id", new Pattern.Expression(0),
+            "style", new Pattern.Expression(1)
         );
         var pattern = new Pattern.NamedFieldPattern("Thing", fieldMap);
 
@@ -345,8 +345,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("123", "red");
         Map<String,Pattern> fieldMap = Map.of(
-            "id", new Pattern.Constant(0),
-            "color", new Pattern.Constant(1)
+            "id", new Pattern.Expression(0),
+            "color", new Pattern.Expression(1)
         );
         var pattern = new Pattern.NamedFieldPattern("Thing", fieldMap);
 
@@ -363,8 +363,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("v1", "v2");
         Map<String,Pattern> fieldMap = Map.of(
-            "first", new Pattern.Constant(0),
-            "second", new Pattern.Constant(1)
+            "first", new Pattern.Expression(0),
+            "second", new Pattern.Expression(1)
         );
         var pattern = new Pattern.NamedFieldPattern("Pair", fieldMap);
 
@@ -384,8 +384,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("123", "red");
         var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1)
         ));
 
         var bindings = bind(pattern, "abc");
@@ -398,8 +398,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("123", "red");
         var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1)
         ));
 
         var target = new TestObject("Gizmo", "123", "red");
@@ -414,9 +414,9 @@ public class MatcherTest extends Ted {
 
         constants = List.of("123", "red", 456.0);
         var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1),
-            new Pattern.Constant(2)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1),
+            new Pattern.Expression(2)
         ));
 
         var target = new TestObject("Thing", "123", "red");
@@ -431,8 +431,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("123", "green");
         var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1)
         ));
 
         var target = new TestObject("Thing", "123", "red");
@@ -461,8 +461,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("123", "red");
         var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1)
         ));
 
         var target = new TestObject("Thing", "123", "red");
@@ -478,8 +478,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("123", "red");
         var pattern = new Pattern.OrderedFieldPattern("Pair", List.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1)
+            new Pattern.Expression(0),
+            new Pattern.Expression(1)
         ));
 
         var target = new Pair("123", "red");
@@ -498,7 +498,7 @@ public class MatcherTest extends Ted {
 
         constants = List.of("abc");
         var pattern = new Pattern.PatternBinding("x",
-            new Pattern.Constant(0));
+            new Pattern.Expression(0));
         var value = "xyz";
 
         check(bind(pattern, value)).eq(null);
@@ -510,7 +510,7 @@ public class MatcherTest extends Ted {
 
         constants = List.of("abc");
         var pattern = new Pattern.PatternBinding("x",
-            new Pattern.Constant(0));
+            new Pattern.Expression(0));
         var value = "abc";
 
         var bindings = bind(pattern, value);
@@ -526,7 +526,7 @@ public class MatcherTest extends Ted {
         var pattern = new Pattern.ListPattern(List.of(
             new Pattern.ValueBinding("x"),
             new Pattern.PatternBinding("x",
-                new Pattern.Constant(0))
+                new Pattern.Expression(0))
         ), null);
         var value = List.of("abc", "def");
 
@@ -542,7 +542,7 @@ public class MatcherTest extends Ted {
         var pattern = new Pattern.ListPattern(List.of(
             new Pattern.ValueBinding("x"),
             new Pattern.PatternBinding("x",
-                new Pattern.Constant(0))
+                new Pattern.Expression(0))
         ), null);
         var value = List.of("abc", "abc");
 

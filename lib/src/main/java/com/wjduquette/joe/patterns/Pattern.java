@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * variable.</p>
  */
 public sealed interface Pattern permits
-    Pattern.Constant,
+    Pattern.Expression,
     Pattern.ListPattern,
     Pattern.MapPattern,
     Pattern.NamedFieldPattern,
@@ -29,15 +29,16 @@ public sealed interface Pattern permits
     Pattern.TypeName,
     Pattern.ValueBinding,
     Pattern.Wildcard
-
 {
     /**
      * A pattern that requires the target value to be exactly equal to a
-     * constant value.  Constants are passed out-of-band, based on an
-     * integer ID, because the details depend on the language engine.
+     * computed value.  Expressions are passed out-of-band, based on an
+     * integer ID, because the actual expression needs to be computed by
+     * the language engine and the result provided to the matching
+     * algorithm.
      * @param id The constant's ID
      */
-    record Constant(int id) implements Pattern {
+    record Expression(int id) implements Pattern {
         /**
          * Returns "$id" as the string representation.
          * @return The string
@@ -46,8 +47,6 @@ public sealed interface Pattern permits
             return "$" + id;
         }
     }
-
-
 
     /**
      * A pattern that matches a target
@@ -84,7 +83,7 @@ public sealed interface Pattern permits
      * the key's value in the target map.
      * @param patterns The key constants and value patterns
      */
-    record MapPattern(Map<Constant,Pattern> patterns)
+    record MapPattern(Map<Expression,Pattern> patterns)
         implements Pattern
     {
         @Override public String toString() {

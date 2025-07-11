@@ -14,12 +14,12 @@ public class Matcher {
     private Matcher() {} // Not instantiable
 
     /**
-     * A function to retrieve a pattern constant's value given its
+     * A function to retrieve an Expression pattern's value given its
      * ID.
      */
-    public interface ConstantGetter {
+    public interface ExpressionGetter {
         /**
-         * Gets the value of the constant with the given ID.
+         * Gets the value of the Expression with the given ID.
          * @param id The ID
          * @return the value
          */
@@ -40,7 +40,7 @@ public class Matcher {
         Joe joe,
         Pattern pattern,
         Object value,
-        ConstantGetter getter
+        ExpressionGetter getter
     ) {
         // Use a LinkedHashMap to ensure that values are ordered!
         var bindings = new LinkedHashMap<String,Object>();
@@ -56,11 +56,11 @@ public class Matcher {
         Joe joe,
         Pattern pattern,
         Object value,
-        ConstantGetter getter,
+        ExpressionGetter getter,
         Map<String,Object> bindings
     ) {
         return switch (pattern) {
-            case Pattern.Constant p ->
+            case Pattern.Expression p ->
                 Objects.equals(getter.get(p.id()), value);
 
             case Pattern.ListPattern p -> {

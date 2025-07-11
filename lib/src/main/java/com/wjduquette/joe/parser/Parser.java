@@ -321,7 +321,7 @@ public class Parser {
 
             scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
             return new Stmt.Var(name, initializer);
-        } else if (pattern.getPattern() instanceof Pattern.Constant) {
+        } else if (pattern.getPattern() instanceof Pattern.Expression) {
             throw errorSync(scanner.previous(), "Expected variable name.");
         } else {
             if (pattern.getBindings().isEmpty()) {
@@ -439,7 +439,7 @@ public class Parser {
         var pattern = pattern();
 
         // FIRST, Simple constants are invalid.
-        if (pattern.getPattern() instanceof Pattern.Constant) {
+        if (pattern.getPattern() instanceof Pattern.Expression) {
             throw errorSync(scanner.previous(), "Expected loop variable name.");
         }
 
@@ -994,7 +994,7 @@ public class Parser {
         }
     }
 
-    private Pattern.Constant constantPattern(ASTPattern wp) {
+    private Pattern.Expression constantPattern(ASTPattern wp) {
         if (scanner.match(TRUE)) {
             return wp.addLiteralConstant(true);
         } else if (scanner.match(FALSE)) {
@@ -1005,13 +1005,13 @@ public class Parser {
             return wp.addLiteralConstant(scanner.previous().literal());
         } else if (scanner.match(DOLLAR)) {
             if (scanner.match(IDENTIFIER)) {
-                return wp.addVarConstant(scanner.previous());
+                return wp.addVarExpr(scanner.previous());
             } else {
                 scanner.consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
                 var expr = expression();
                 scanner.consume(RIGHT_PAREN,
                     "Expected ')' after interpolated expression.");
-                return wp.addExprConstant(expr);
+                return wp.addExpr(expr);
             }
         } else {
             return null;
@@ -1045,7 +1045,7 @@ public class Parser {
     }
 
     private Pattern.MapPattern mapPattern(ASTPattern wp) {
-        var map = new LinkedHashMap<Pattern.Constant,Pattern>();
+        var map = new LinkedHashMap<Pattern.Expression,Pattern>();
 
         if (scanner.match(RIGHT_BRACE)) {
             return new Pattern.MapPattern(map);
