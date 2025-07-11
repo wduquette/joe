@@ -186,21 +186,6 @@ function testOrderedField_fact() {
     assertEquals(age, person.f1);
 }
 
-// Can match based on type only if the pattern has no field patterns.
-function testOrderedField_noFieldPatterns() {
-    record Gizmo(x, y) {}
-    var gizmo = Gizmo(1, 2);
-    assertTrue(gizmo ~ Gizmo());
-    assertFalse(gizmo ~ Number());
-}
-
-// Can match based on type for types without fields if the pattern has no
-// field patterns.
-function testOrderedField_noFieldPatterns() {
-    assertTrue("abc" ~ String());
-    assertFalse("abc" ~ Number());
-}
-
 
 //-----------------------------------------------------------------------------
 // Pattern-Bindings
@@ -219,6 +204,19 @@ function testPatternBinding_nested() {
     assertEquals(c, 2);
     assertEquals(d, 3);
     assertEquals(e, 4);
+}
+
+//-----------------------------------------------------------------------------
+// TypeNames
+
+// Matches on type only for any type.
+function testTypeName() {
+    record Gizmo(x, y) {}
+    var gizmo = Gizmo(1, 2);
+    assertTrue(gizmo ~ Gizmo());
+    assertFalse(gizmo ~ Number());
+    assertTrue("abc" ~ String());
+    assertFalse("abc" ~ Number());
 }
 
 //-----------------------------------------------------------------------------

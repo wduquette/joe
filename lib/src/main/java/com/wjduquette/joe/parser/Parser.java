@@ -946,10 +946,10 @@ public class Parser {
     // Patterns
 
     private ASTPattern pattern() {
-        var walkerPattern = new ASTPattern();
-        var pattern = parsePattern(walkerPattern, true);
-        walkerPattern.setPattern(pattern);
-        return walkerPattern;
+        var astPattern = new ASTPattern();
+        var pattern = parsePattern(astPattern, true);
+        astPattern.setPattern(pattern);
+        return astPattern;
     }
 
     // Parses a pattern into the AST. `var @ pattern` is allowed if
@@ -971,7 +971,9 @@ public class Parser {
             if (identifier.lexeme().startsWith("_")) {
                 return new Pattern.Wildcard(identifier.lexeme());
             } else if (scanner.match(LEFT_PAREN)) {
-                if (scanner.peekNext().type() == COLON) {
+                if (scanner.match(RIGHT_PAREN)) {
+                    return new Pattern.TypeName(identifier.lexeme());
+                } else if (scanner.peekNext().type() == COLON) {
                     return namedFieldPattern(wp, identifier);
                 } else {
                     return recordPattern(wp, identifier);
