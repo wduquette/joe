@@ -315,6 +315,8 @@ public class ASTDumper {
                 }
                 yield buff.toString();
             }
+            case Pattern.TypeName p -> buffer()
+                .println(" '" + p.typeName() + "'");
             case Pattern.ValueBinding p -> buffer()
                 .println(" '" + p.name() + "'");
             case Pattern.Wildcard p -> buffer()

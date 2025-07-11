@@ -62,26 +62,6 @@ public class Matcher {
         return switch (pattern) {
             case Pattern.Constant p ->
                 Objects.equals(getter.get(p.id()), value);
-            case Pattern.Wildcard ignored
-                -> true;
-            case Pattern.ValueBinding p -> {
-                if (bindings.containsKey(p.name()) &&
-                    !bindings.get(p.name()).equals(value)
-                ) {
-                    yield false;
-                }
-                bindings.put(p.name(), value);
-                yield true;
-            }
-            case Pattern.PatternBinding p -> {
-                if (bindings.containsKey(p.name()) &&
-                    !bindings.get(p.name()).equals(value)
-                ) {
-                    yield false;
-                }
-                bindings.put(p.name(), value);
-                yield doBind(joe, p.subpattern(), value, getter, bindings);
-            }
 
             case Pattern.ListPattern p -> {
                 // FIRST, check type and shape
@@ -213,6 +193,49 @@ public class Matcher {
                 // FINALLY, match succeeds.
                 yield true;
             }
+
+            case Pattern.PatternBinding p -> {
+                if (bindings.containsKey(p.name()) &&
+                    !bindings.get(p.name()).equals(value)
+                ) {
+                    yield false;
+                }
+                bindings.put(p.name(), value);
+                yield doBind(joe, p.subpattern(), value, getter, bindings);
+            }
+
+            case Pattern.TypeName p -> {
+                Fact fact;
+                var jv = joe.getJoeValue(value);
+
+                if (value instanceof Fact f) {
+                    // It's a `Fact` object; use it as is.
+                    fact = f;
+                    yield fact.relation().equals(p.typeName());
+                } else if (jv.isFact()) {
+                    // It's convertible to a fact object; verify that the
+                    // requested name is the object's relation, type,
+                    // or a supertype.
+                    fact = jv.toFact();
+                    yield fact.relation().equals(p.typeName())
+                        || hasType(jv, p.typeName());
+                } else {
+                    yield hasType(jv, p.typeName());
+                }
+            }
+
+            case Pattern.ValueBinding p -> {
+                if (bindings.containsKey(p.name()) &&
+                    !bindings.get(p.name()).equals(value)
+                ) {
+                    yield false;
+                }
+                bindings.put(p.name(), value);
+                yield true;
+            }
+
+            case Pattern.Wildcard ignored
+                -> true;
         };
     }
 

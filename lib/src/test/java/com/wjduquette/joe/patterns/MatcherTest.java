@@ -2,6 +2,7 @@ package com.wjduquette.joe.patterns;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.ListFact;
 import com.wjduquette.joe.nero.RecordFact;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,117 +48,9 @@ public class MatcherTest extends Ted {
         check(bindings.isEmpty()).eq(true);
     }
 
-    @Test
-    public void testWildcard() {
-        test("testWildcard");
 
-        var pattern = new Pattern.Wildcard("_");
-        var value = "abc";
-
-        var bindings = bind(pattern, value);
-        check(bindings).ne(null);
-        check(bindings.isEmpty()).eq(true);
-    }
-
-    @Test
-    public void testValueBinding_newVar() {
-        test("testValueBinding_newVar");
-
-        var pattern = new Pattern.ValueBinding("x");
-        var value = "abc";
-
-        var bindings = bind(pattern, value);
-        check(bindings).ne(null);
-        check(bindings.get("x")).eq("abc");
-    }
-
-    @Test
-    public void testValueBinding_boundVar_bad() {
-        test("testValueBinding_boundVar_bad");
-
-        var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.ValueBinding("x"),
-            new Pattern.ValueBinding("x")
-        ), null);
-        var value = List.of("abc", "def");
-
-        var bindings = bind(pattern, value);
-        check(bindings).eq(null);
-    }
-
-    @Test
-    public void testValueBinding_boundVar_good() {
-        test("testValueBinding_boundVar_good");
-
-        var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.ValueBinding("x"),
-            new Pattern.ValueBinding("x")
-        ), null);
-        var value = List.of("abc", "abc");
-
-        var bindings = bind(pattern, value);
-        check(bindings).ne(null);
-        check(bindings.get("x")).eq("abc");
-    }
-
-    @Test
-    public void testPatternBinding_bad() {
-        test("testPatternBinding_bad");
-
-        constants = List.of("abc");
-        var pattern = new Pattern.PatternBinding("x",
-            new Pattern.Constant(0));
-        var value = "xyz";
-
-        check(bind(pattern, value)).eq(null);
-    }
-
-    @Test
-    public void testPatternBinding_good() {
-        test("testPatternBinding_good");
-
-        constants = List.of("abc");
-        var pattern = new Pattern.PatternBinding("x",
-            new Pattern.Constant(0));
-        var value = "abc";
-
-        var bindings = bind(pattern, value);
-        check(bindings).ne(null);
-        check(bindings.get("x")).eq("abc");
-    }
-
-    @Test
-    public void testPatternBinding_boundVar_bad() {
-        test("testPatternBinding_boundVar_bad");
-
-        constants = List.of("abc");
-        var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.ValueBinding("x"),
-            new Pattern.PatternBinding("x",
-                new Pattern.Constant(0))
-        ), null);
-        var value = List.of("abc", "def");
-
-        var bindings = bind(pattern, value);
-        check(bindings).eq(null);
-    }
-
-    @Test
-    public void testPatternBinding_boundVar_good() {
-        test("testPatternBinding_boundVar_good");
-
-        constants = List.of("abc");
-        var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.ValueBinding("x"),
-            new Pattern.PatternBinding("x",
-                new Pattern.Constant(0))
-        ), null);
-        var value = List.of("abc", "abc");
-
-        var bindings = bind(pattern, value);
-        check(bindings).ne(null);
-        check(bindings.get("x")).eq("abc");
-    }
+    //-------------------------------------------------------------------------
+    // ListPattern
 
     @Test
     public void testListPattern_notList() {
@@ -306,6 +199,9 @@ public class MatcherTest extends Ted {
         check(bindings.get("x")).eq(List.of("abc"));
     }
 
+    //-------------------------------------------------------------------------
+    // MapPattern
+
     @Test
     public void testMapPattern_bad_noMap() {
         test("testMapPattern_bad_missingKey");
@@ -406,6 +302,9 @@ public class MatcherTest extends Ted {
         check(bindings.isEmpty()).eq(true);
     }
 
+    //-------------------------------------------------------------------------
+    // NamedFieldPattern
+
     @Test
     public void testNamedFieldPattern_bad_wrongType() {
         test("testNamedFieldPattern_bad_wrongType");
@@ -475,6 +374,9 @@ public class MatcherTest extends Ted {
         check(bindings).ne(null);
         check(bindings.isEmpty()).eq(true);
     }
+
+    //-------------------------------------------------------------------------
+    // OrderedFieldPattern
 
     @Test
     public void testOrderedFieldPattern_scalar() {
@@ -586,6 +488,178 @@ public class MatcherTest extends Ted {
         check(bindings).ne(null);
         check(bindings.isEmpty()).eq(true);
     }
+
+    //-------------------------------------------------------------------------
+    // PatternBinding
+
+    @Test
+    public void testPatternBinding_bad() {
+        test("testPatternBinding_bad");
+
+        constants = List.of("abc");
+        var pattern = new Pattern.PatternBinding("x",
+            new Pattern.Constant(0));
+        var value = "xyz";
+
+        check(bind(pattern, value)).eq(null);
+    }
+
+    @Test
+    public void testPatternBinding_good() {
+        test("testPatternBinding_good");
+
+        constants = List.of("abc");
+        var pattern = new Pattern.PatternBinding("x",
+            new Pattern.Constant(0));
+        var value = "abc";
+
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.get("x")).eq("abc");
+    }
+
+    @Test
+    public void testPatternBinding_boundVar_bad() {
+        test("testPatternBinding_boundVar_bad");
+
+        constants = List.of("abc");
+        var pattern = new Pattern.ListPattern(List.of(
+            new Pattern.ValueBinding("x"),
+            new Pattern.PatternBinding("x",
+                new Pattern.Constant(0))
+        ), null);
+        var value = List.of("abc", "def");
+
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
+    }
+
+    @Test
+    public void testPatternBinding_boundVar_good() {
+        test("testPatternBinding_boundVar_good");
+
+        constants = List.of("abc");
+        var pattern = new Pattern.ListPattern(List.of(
+            new Pattern.ValueBinding("x"),
+            new Pattern.PatternBinding("x",
+                new Pattern.Constant(0))
+        ), null);
+        var value = List.of("abc", "abc");
+
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.get("x")).eq("abc");
+    }
+
+    //-------------------------------------------------------------------------
+    // TypeName
+
+    @Test
+    public void testTypeName_fact() {
+        test("testTypeName_fact");
+
+        var pattern = new Pattern.TypeName("Thing");
+        var value = new ListFact("Thing", List.of("hat"));
+
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
+    }
+
+    @Test
+    public void testTypeName_canBeFact() {
+        test("testTypeName_canBeFact");
+
+        var pattern = new Pattern.TypeName("Thing");
+        var value = new TestObject("Thing", "hat", "black");
+
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
+    }
+
+    @Test
+    public void testTypeName_notFact() {
+        test("testTypeName_notFact");
+
+        var pattern = new Pattern.TypeName("String");
+        var value = "abc";
+
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
+    }
+
+    @Test
+    public void testTypeName_noMatch() {
+        test("testTypeName_noMatch");
+
+        var pattern = new Pattern.TypeName("String");
+        var value = 5;
+
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
+    }
+
+    //-------------------------------------------------------------------------
+    // ValueBinding
+
+    @Test
+    public void testValueBinding_newVar() {
+        test("testValueBinding_newVar");
+
+        var pattern = new Pattern.ValueBinding("x");
+        var value = "abc";
+
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.get("x")).eq("abc");
+    }
+
+    @Test
+    public void testValueBinding_boundVar_bad() {
+        test("testValueBinding_boundVar_bad");
+
+        var pattern = new Pattern.ListPattern(List.of(
+            new Pattern.ValueBinding("x"),
+            new Pattern.ValueBinding("x")
+        ), null);
+        var value = List.of("abc", "def");
+
+        var bindings = bind(pattern, value);
+        check(bindings).eq(null);
+    }
+
+    @Test
+    public void testValueBinding_boundVar_good() {
+        test("testValueBinding_boundVar_good");
+
+        var pattern = new Pattern.ListPattern(List.of(
+            new Pattern.ValueBinding("x"),
+            new Pattern.ValueBinding("x")
+        ), null);
+        var value = List.of("abc", "abc");
+
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.get("x")).eq("abc");
+    }
+
+    //-------------------------------------------------------------------------
+    // Wildcard
+
+    @Test
+    public void testWildcard() {
+        test("testWildcard");
+
+        var pattern = new Pattern.Wildcard("_");
+        var value = "abc";
+
+        var bindings = bind(pattern, value);
+        check(bindings).ne(null);
+        check(bindings.isEmpty()).eq(true);
+    }
+
 
     //-------------------------------------------------------------------------
     // Helper

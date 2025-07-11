@@ -22,31 +22,6 @@ public class PatternTest extends Ted {
     }
 
     @Test
-    public void testWildcard() {
-        test("testWildcard");
-
-        var p = new Pattern.Wildcard("_xyz");
-        check(p.toString()).eq("_xyz");
-    }
-
-    @Test
-    public void testValueBinding() {
-        test("testValueBinding");
-
-        var p = new Pattern.ValueBinding("a");
-        check(p.toString()).eq("?a");
-    }
-
-    @Test
-    public void testPatternBinding() {
-        test("testPatternBinding");
-
-        var p = new Pattern.PatternBinding("a",
-            new Pattern.Wildcard("_xyz"));
-        check(p.toString()).eq("?a = _xyz");
-    }
-
-    @Test
     public void testListPattern() {
         test("testListPattern");
 
@@ -97,4 +72,38 @@ public class PatternTest extends Ted {
         ));
         check(p.toString()).eq("Thing(_xyz, ?a)");
     }
+
+    @Test
+    public void testPatternBinding() {
+        test("testPatternBinding");
+
+        var p = new Pattern.PatternBinding("a",
+            new Pattern.Wildcard("_xyz"));
+        check(p.toString()).eq("?a@_xyz");
+    }
+
+    @Test
+    public void testTypeName() {
+        test("testTypeName");
+
+        var p = new Pattern.TypeName("Thing");
+        check(p.toString()).eq("Thing()");
+    }
+
+    @Test
+    public void testValueBinding() {
+        test("testValueBinding");
+
+        var p = new Pattern.ValueBinding("a");
+        check(p.toString()).eq("?a");
+    }
+
+    @Test
+    public void testWildcard() {
+        test("testWildcard");
+
+        var p = new Pattern.Wildcard("_xyz");
+        check(p.toString()).eq("_xyz");
+    }
+
 }
