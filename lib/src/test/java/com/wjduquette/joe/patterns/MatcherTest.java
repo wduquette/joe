@@ -407,24 +407,6 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testMapPattern_proxiedType() {
-        test("testMapPattern_proxiedType");
-
-        constants = List.of("first", "v1", "second", "v2");
-        var pattern = new Pattern.MapPattern(Map.of(
-            new Pattern.Constant(0),
-            new Pattern.Constant(1),
-            new Pattern.Constant(2),
-            new Pattern.Constant(3)
-        ));
-        var value = new Pair("v1", "v2");
-
-        var bindings = bind(pattern, value);
-        check(bindings).ne(null);
-        check(bindings.isEmpty()).eq(true);
-    }
-
-    @Test
     public void testNamedFieldPattern_bad_wrongType() {
         test("testNamedFieldPattern_bad_wrongType");
 

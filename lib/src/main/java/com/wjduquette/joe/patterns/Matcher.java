@@ -2,7 +2,6 @@ package com.wjduquette.joe.patterns;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeValue;
-import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.nero.Fact;
 
 import java.util.*;
@@ -129,23 +128,9 @@ public class Matcher {
 
                     // FINALLY, match succeeds
                     yield true;
-                } else {
-                    var obj = joe.getJoeValue(value);
-                    if (!obj.isFact()) yield false;
-                    var map = obj.toFact().getFieldMap();
-
-                    for (var e : p.patterns().entrySet()) {
-                        var field = key2field(getter.get(e.getKey().id()));
-                        if (!map.containsKey(field)) yield false;
-
-                        if (!doBind(joe, e.getValue(), map.get(field), getter, bindings)) {
-                            yield false;
-                        }
-                    }
-
-                    // FINALLY, match succeeds
-                    yield true;
                 }
+
+                yield false;
             }
 
             case Pattern.NamedFieldPattern p -> {
@@ -229,16 +214,6 @@ public class Matcher {
                 yield true;
             }
         };
-    }
-
-    private static String key2field(Object key) {
-        if (key instanceof String s) {
-            return s;
-        } else if (key instanceof Keyword k) {
-            return k.name();
-        } else {
-            return null;
-        }
     }
 
     // Determines whether the type name is the name of the object's
