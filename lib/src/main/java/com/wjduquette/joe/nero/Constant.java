@@ -5,7 +5,7 @@ import com.wjduquette.joe.Joe;
 import java.util.Objects;
 
 /**
- * A Constant in a Nero {@link HeadAtom} or {@link Atom}.  The
+ * A Constant in a Nero {@link Atom}.  The
  * Constant's value is an arbitrary Java object.
  * @param value The value
  */

@@ -63,21 +63,14 @@ public class RuleSetCompiler {
 
     private Rule ast2rule(ASTRuleSet.ASTRule rule) {
         return new Rule(
-            ast2head(rule.head()),
-            rule.body().stream().map(this::ast2body).toList(),
-            rule.negations().stream().map(this::ast2body).toList(),
+            ast2atom(rule.head()),
+            rule.body().stream().map(this::ast2atom).toList(),
+            rule.negations().stream().map(this::ast2atom).toList(),
             rule.constraints().stream().map(this::ast2constraint).toList()
         );
     }
 
-    private HeadAtom ast2head(ASTRuleSet.ASTOrderedAtom atom) {
-        return new HeadAtom(
-            atom.relation().lexeme(),
-            atom.terms().stream().map(this::ast2term).toList()
-        );
-    }
-
-    private Atom ast2body(ASTRuleSet.ASTAtom atom) {
+    private Atom ast2atom(ASTRuleSet.ASTAtom atom) {
         return switch (atom) {
             case ASTRuleSet.ASTOrderedAtom a -> new OrderedAtom(
                 a.relation().lexeme(),

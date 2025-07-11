@@ -336,18 +336,35 @@ public class RuleEngine {
     }
 
     private Fact createFact(BindingContext bc) {
-        var terms = new ArrayList<>();
+        return switch (bc.rule.head()) {
+            case NamedAtom atom -> {
+                var terms = new HashMap<String,Object>();
 
-        for (var term : bc.rule.head().terms()) {
-            switch (term) {
-                case Constant c -> terms.add(c.value());
-                case Variable v -> terms.add(bc.bindings.get(v));
-                case Wildcard ignored -> throw new IllegalStateException(
-                    "Rule head contains a Wildcard term.");
+                for (var e : atom.terms().entrySet()) {
+                    terms.put(e.getKey(), term2value(e.getValue(), bc));
+                }
+
+                yield new MapFact(atom.relation(), terms);
             }
-        }
+            case OrderedAtom atom -> {
+                var terms = new ArrayList<>();
 
-        return new ListFact(bc.rule.head().relation(), terms);
+                for (var term : atom.terms()) {
+                    terms.add(term2value(term, bc));
+                }
+
+                yield new ListFact(atom.relation(), terms);
+            }
+        };
+    }
+
+    private Object term2value(Term term, BindingContext bc) {
+        return switch (term) {
+            case Constant c -> c.value();
+            case Variable v -> bc.bindings.get(v);
+            case Wildcard ignored -> throw new IllegalStateException(
+                "Rule head contains a Wildcard term.");
+        };
     }
 
     private boolean constraintMet(
