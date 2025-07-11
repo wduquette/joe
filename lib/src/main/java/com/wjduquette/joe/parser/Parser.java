@@ -8,6 +8,7 @@ import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.patterns.Pattern;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 import static com.wjduquette.joe.scanner.TokenType.*;
 
@@ -1121,30 +1122,9 @@ public class Parser {
      */
     public Expr.RuleSet rulesetExpression() {
         var keyword = scanner.previous();
-        var facts = new ArrayList<ASTRuleSet.ASTOrderedAtom>();
-        var rules = new ArrayList<ASTRuleSet.ASTRule>();
-
         scanner.consume(LEFT_BRACE, "expected '{' after 'ruleset'.");
 
-        while (!scanner.match(RIGHT_BRACE)) {
-            try {
-                var head = head();
-
-                if (scanner.match(SEMICOLON)) {
-                    facts.add(fact(head));
-                } else if (scanner.match(COLON_MINUS)) {
-                    rules.add(rule(head));
-                } else {
-                    scanner.advance();
-                    throw errorSync(scanner.previous(),
-                        "expected fact or rule.");
-                }
-            } catch (ErrorSync error) {
-                synchronize();
-            }
-        }
-
-        var ast = new ASTRuleSet(facts, rules);
+        var ast = parseRuleSet(() -> scanner.match(RIGHT_BRACE));
         return new Expr.RuleSet(keyword, ast);
     }
 
@@ -1159,10 +1139,14 @@ public class Parser {
         this.scanner = new Scanner(source, this::errorInScanner);
         scanner.prime();
 
+        return parseRuleSet(() -> scanner.isAtEnd());
+    }
+
+    private ASTRuleSet parseRuleSet(Supplier<Boolean> endCondition) {
         List<ASTRuleSet.ASTOrderedAtom> facts = new ArrayList<>();
         List<ASTRuleSet.ASTRule> rules = new ArrayList<>();
 
-        while (!scanner.isAtEnd()) {
+        while (!endCondition.get()) {
             try {
                 var head = head();
 
@@ -1182,6 +1166,7 @@ public class Parser {
 
         // No exports; return an empty map.
         return new ASTRuleSet(facts, rules);
+
     }
 
     private ASTRuleSet.ASTOrderedAtom head() {
