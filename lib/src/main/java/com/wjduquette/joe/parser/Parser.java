@@ -321,6 +321,8 @@ public class Parser {
 
             scanner.consume(SEMICOLON, "Expected ';' after variable declaration.");
             return new Stmt.Var(name, initializer);
+        } else if (pattern.getPattern() instanceof Pattern.Constant) {
+            throw errorSync(scanner.previous(), "Expected variable name.");
         } else if (pattern.getPattern() instanceof Pattern.Expression) {
             throw errorSync(scanner.previous(), "Expected variable name.");
         } else {
@@ -994,15 +996,15 @@ public class Parser {
         }
     }
 
-    private Pattern.Expression constantPattern(ASTPattern wp) {
+    private Pattern constantPattern(ASTPattern wp) {
         if (scanner.match(TRUE)) {
-            return wp.addLiteralConstant(true);
+            return new Pattern.Constant(true);
         } else if (scanner.match(FALSE)) {
-            return wp.addLiteralConstant(false);
+            return new Pattern.Constant(false);
         } else if (scanner.match(NULL)) {
-            return wp.addLiteralConstant(null);
+            return new Pattern.Constant(null);
         } else if (scanner.match(NUMBER) || scanner.match(STRING) || scanner.match(KEYWORD)) {
-            return wp.addLiteralConstant(scanner.previous().literal());
+            return new Pattern.Constant(scanner.previous().literal());
         } else if (scanner.match(DOLLAR)) {
             if (scanner.match(IDENTIFIER)) {
                 return wp.addVarExpr(scanner.previous());
@@ -1045,7 +1047,7 @@ public class Parser {
     }
 
     private Pattern.MapPattern mapPattern(ASTPattern wp) {
-        var map = new LinkedHashMap<Pattern.Expression,Pattern>();
+        var map = new LinkedHashMap<Pattern,Pattern>();
 
         if (scanner.match(RIGHT_BRACE)) {
             return new Pattern.MapPattern(map);

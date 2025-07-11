@@ -37,17 +37,6 @@ public class ASTPattern {
     }
 
     /**
-     * Adds a simple literal constant to the constants list, and returns
-     * the {@link Pattern.Expression} for
-     * inclusion in the larger pattern.
-     * @param value A double, string, boolean, keyword, or null.
-     * @return The pattern
-     */
-    public Pattern.Expression addLiteralConstant(Object value) {
-        return addExpr(new Expr.Literal(value));
-    }
-
-    /**
      * Adds an interpolated variable constant to the constants list, and
      * returns the {@link Pattern.Expression} for
      * inclusion in the larger pattern.

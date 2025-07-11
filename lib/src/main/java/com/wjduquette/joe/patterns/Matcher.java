@@ -100,7 +100,7 @@ public class Matcher {
                 if (value instanceof Map<?,?> map) {
                     // NEXT, match keys and values
                     for (var e : p.patterns().entrySet()) {
-                        var key = getter.get(e.getKey().id());
+                        var key = getConstant(e.getKey(), getter);
                         if (!map.containsKey(key)) yield false;
 
                         var item = map.get(key);
@@ -239,6 +239,15 @@ public class Matcher {
 
             case Pattern.Wildcard ignored
                 -> true;
+        };
+    }
+
+    private static Object getConstant(Pattern pattern, ExpressionGetter getter) {
+        return switch (pattern) {
+            case Pattern.Constant p -> p.value();
+            case Pattern.Expression p -> getter.get(p.id());
+            default -> throw new IllegalStateException(
+                "Invalid map key pattern: '" + pattern + "'.");
         };
     }
 

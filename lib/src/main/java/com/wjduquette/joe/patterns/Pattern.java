@@ -100,7 +100,7 @@ public sealed interface Pattern permits
      * the key's value in the target map.
      * @param patterns The key constants and value patterns
      */
-    record MapPattern(Map<Expression,Pattern> patterns)
+    record MapPattern(Map<Pattern,Pattern> patterns)
         implements Pattern
     {
         @Override public String toString() {

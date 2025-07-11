@@ -50,7 +50,7 @@ public class PatternTest extends Ted {
     public void testMapPattern() {
         test("testMapPattern");
 
-        var map = new LinkedHashMap<Pattern.Expression, Pattern>();
+        var map = new LinkedHashMap<Pattern, Pattern>();
         map.put(new Pattern.Expression(3), new Pattern.Wildcard("_xyz"));
         map.put(new Pattern.Expression(4), new Pattern.ValueBinding("a"));
 
