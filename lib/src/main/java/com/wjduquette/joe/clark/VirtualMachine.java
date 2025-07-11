@@ -784,14 +784,7 @@ class VirtualMachine {
                         throw error("Rule set is not stratified.");
                     }
 
-                    @SuppressWarnings("unchecked")
-                    var exports = (Map<String,Object>)pop();
-
-                    for (var callable : exports.values()) {
-                        checkCallable(callable);
-                    }
-
-                    push(new RuleSetValue(ruleset, exports));
+                    push(new RuleSetValue(ruleset));
                 }
                 case SUB -> {
                     var b = pop();
@@ -933,13 +926,6 @@ class VirtualMachine {
                 throw error("Expected iterable, got: " +
                         joe.typedValue(arg) + ".");
             }
-        }
-    }
-
-    private void checkCallable(Object arg) {
-        if (!(arg instanceof JoeCallable)) {
-            throw error("Expected callable, got: " +
-                joe.typedValue(arg) + ".");
         }
     }
 

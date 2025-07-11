@@ -17,8 +17,6 @@ import static com.wjduquette.joe.scanner.TokenType.*;
  */
 public class Parser {
     public static final String ARGS = "args";
-    public static final String AS = "as";
-    public static final String EXPORT = "export";
     private static final int MAX_CALL_ARGUMENTS = 255;
 
     //-------------------------------------------------------------------------
@@ -1125,56 +1123,29 @@ public class Parser {
         var keyword = scanner.previous();
         var facts = new ArrayList<ASTRuleSet.ASTOrderedAtom>();
         var rules = new ArrayList<ASTRuleSet.ASTRule>();
-        var heads = new HashSet<String>();
-        var exports = new HashMap<Token, Expr>();
 
         scanner.consume(LEFT_BRACE, "expected '{' after 'ruleset'.");
 
         while (!scanner.match(RIGHT_BRACE)) {
             try {
-                if (scanner.matchIdentifier(EXPORT)) {
-                    scanner.consume(IDENTIFIER,
-                        "expected relation name after 'export'.");
-                    var name = scanner.previous();
+                var head = head();
 
-                    if (scanner.matchIdentifier(AS)) {
-                        var expr = expression();
-                        exports.put(name, expr);
-                    } else {
-                        exports.put(name, new Expr.VarGet(name));
-                    }
-                    scanner.consume(SEMICOLON,
-                        "expected ';' after export declaration.");
+                if (scanner.match(SEMICOLON)) {
+                    facts.add(fact(head));
+                } else if (scanner.match(COLON_MINUS)) {
+                    rules.add(rule(head));
                 } else {
-                    var head = head();
-                    heads.add(head.relation().lexeme());
-
-                    if (scanner.match(SEMICOLON)) {
-                        facts.add(fact(head));
-                    } else if (scanner.match(COLON_MINUS)) {
-                        rules.add(rule(head));
-                    } else {
-                        scanner.advance();
-                        throw errorSync(scanner.previous(),
-                            "expected fact or rule.");
-                    }
+                    scanner.advance();
+                    throw errorSync(scanner.previous(),
+                        "expected fact or rule.");
                 }
             } catch (ErrorSync error) {
                 synchronize();
             }
         }
 
-        for (var token : exports.keySet()) {
-            if (!heads.contains(token.lexeme())) {
-                error(token,
-                    "exported relation is not used in any axiom or rule head: '"
-                    + token.lexeme() + "'.");
-            }
-        }
-
-
         var ast = new ASTRuleSet(facts, rules);
-        return new Expr.RuleSet(keyword, ast, exports);
+        return new Expr.RuleSet(keyword, ast);
     }
 
     /**

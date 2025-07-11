@@ -397,7 +397,7 @@ public class FactBaseType extends ProxyType<FactBase> {
         args.exactArity(1, "select(rules)");
         var rsv = joe.toType(RuleSetValue.class, args.next());
 
-        return rsv.inferAndExport(joe, db);
+        return rsv.infer(db);
     }
 
     //**
@@ -452,11 +452,6 @@ public class FactBaseType extends ProxyType<FactBase> {
     private Object _update(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "update(ruleset)");
         var rsv = joe.toType(RuleSetValue.class, args.next());
-        if (!rsv.exports().isEmpty()) {
-            throw new JoeError(
-                "Cannot `export` facts in update().");
-        }
-
         db.addAll(rsv.infer(db));
         return db;
     }

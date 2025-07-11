@@ -294,26 +294,6 @@ function testSelect_facts() {
     check(results).eq(expected);
 }
 
-function testSelect_exports() {
-    var db = FactBase([
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ]);
-
-    var results = db.select(ruleset {
-        export Ancestor;
-        Ancestor(x, y) :- Parent(x, y);
-        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    });
-
-    var expected = Set.of(
-        Ancestor(#anne, #bert),
-        Ancestor(#anne, #clark),
-        Ancestor(#bert, #clark)
-    );
-    check(results).eq(expected);
-}
-
 
 //-------------------------------------------------------------------------
 // size
@@ -327,19 +307,6 @@ function testSelect_exports() {
 
 //-------------------------------------------------------------------------
 // update
-
-function testUpdate_bad_exports() {
-
-    var rules = ruleset {
-        export Ancestor;
-        Ancestor(x, y) :- Parent(x, y);
-        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    };
-
-    var db = FactBase();
-    assertError(\-> db.update(rules),
-        "Cannot `export` facts in update().");
-}
 
 function testUpdate_good() {
     var db = FactBase([

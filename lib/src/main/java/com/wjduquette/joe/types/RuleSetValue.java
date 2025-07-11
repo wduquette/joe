@@ -19,7 +19,6 @@ public class RuleSetValue {
     // Instance Variables
 
     private final RuleSet ruleset;
-    private final Map<String, Object> exports;
     private boolean debug = false;
 
     //-------------------------------------------------------------------------
@@ -28,14 +27,9 @@ public class RuleSetValue {
     /**
      * Creates a RuleSetValue.
      * @param ruleset The Nero rule set.
-     * @param exports map from relation to export callable
      */
-    public RuleSetValue(
-        RuleSet ruleset,
-        Map<String, Object> exports
-    ) {
+    public RuleSetValue(RuleSet ruleset) {
         this.ruleset = ruleset;
-        this.exports = exports;
     }
 
     //-------------------------------------------------------------------------
@@ -47,15 +41,6 @@ public class RuleSetValue {
      */
     public RuleSet ruleset() {
         return ruleset;
-    }
-
-    /**
-     * Gets the map from exported relation to factory callable
-     * for exported facts.
-     * @return The map
-     */
-    public Map<String,Object> exports() {
-        return Collections.unmodifiableMap(exports);
     }
 
     /**
@@ -79,6 +64,16 @@ public class RuleSetValue {
      * Infer facts from the rule set and the database of facts.
      * @return The new facts.
      */
+    public Set<Fact> infer() {
+        var engine = new RuleEngine(ruleset);
+        engine.infer();
+        return engine.getInferredFacts();
+    }
+
+    /**
+     * Infer facts from the rule set and the database of facts.
+     * @return The new facts.
+     */
     public Set<Fact> infer(FactBase db) {
         var engine = new RuleEngine(ruleset, db);
         engine.infer();
@@ -86,38 +81,15 @@ public class RuleSetValue {
     }
 
     /**
-     * Infer facts from the rule set, exporting to domain values as needed.
-     * @return The new (possibly exported) facts.
-     */
-    public SetValue inferAndExport(Joe joe) {
-        var engine = new RuleEngine(ruleset, new FactSet());
-        engine.infer();
-        return withExports(joe, engine.getInferredFacts());
-    }
-
-    /**
-     * Infer facts from the rule set and the set of input facts, exporting
-     * to domain values as needed.
+     * Infer facts from the rule set and the set of input facts.
      * @param inputs The input facts
      * @return The new (possibly exported) facts.
      */
-    public SetValue inferAndExport(Joe joe, Collection<?> inputs) {
+    public Set<Fact> infer(Joe joe, Collection<?> inputs) {
         var factSet = toFactSet(joe, inputs);
         var engine = new RuleEngine(ruleset, factSet);
         engine.infer();
-        return withExports(joe, engine.getInferredFacts());
-    }
-
-    /**
-     * Infer facts from the rule set and the set of input facts, exporting
-     * to domain values as needed.
-     * @param db The input facts
-     * @return The new (possibly exported) facts.
-     */
-    public SetValue inferAndExport(Joe joe, FactBase db) {
-        var engine = new RuleEngine(ruleset, db);
-        engine.infer();
-        return withExports(joe, engine.getInferredFacts());
+        return engine.getInferredFacts();
     }
 
     /**
@@ -140,21 +112,5 @@ public class RuleSetValue {
         }
 
         return factSet;
-    }
-
-    private SetValue withExports(Joe joe, Set<Fact> facts) {
-        var result = new SetValue();
-
-        for (var fact : facts) {
-            var creator = exports().get(fact.relation());
-
-            if (creator != null) {
-                result.add(joe.call(creator, fact.getFields().toArray()));
-            } else {
-                result.add(fact);
-            }
-        }
-
-        return result;
     }
 }

@@ -39,7 +39,7 @@ public record ASTRuleSet(
     // Clauses
 
     public record ASTRule(
-        ASTOrderedAtom head,
+        ASTAtom head,
         List<ASTAtom> body,
         List<ASTAtom> negations,
         List<ASTConstraint> constraints
