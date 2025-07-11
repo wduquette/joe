@@ -36,7 +36,7 @@ public class RuleSetCompiler {
      * @throws JoeError on compilation failure.
      */
     public RuleSet compile() {
-        Set<Fact> facts = ast.facts().stream().map(this::ast2fact)
+        Set<Fact> facts = ast.axioms().stream().map(this::ast2fact)
             .collect(Collectors.toSet());
         Set<Rule> rules = ast.rules().stream().map(this::ast2rule)
             .collect(Collectors.toSet());
@@ -47,18 +47,34 @@ public class RuleSetCompiler {
     //-------------------------------------------------------------------------
     // Compilation
 
-    private Fact ast2fact(ASTRuleSet.ASTOrderedAtom atom) {
-        var terms = new ArrayList<>();
-        for (var t : atom.terms()) {
-            if (t instanceof ASTRuleSet.ASTConstant c) {
-                terms.add(ast2constant(c).value());
-            } else {
-                throw new IllegalStateException(
-                    "Invalid fact; Atom contains a non-constant term.");
+    private Fact ast2fact(ASTRuleSet.ASTAtom atom) {
+        return switch (atom) {
+            case ASTRuleSet.ASTOrderedAtom a -> {
+                var terms = new ArrayList<>();
+                for (var t : a.terms()) {
+                    if (t instanceof ASTRuleSet.ASTConstant c) {
+                        terms.add(ast2constant(c).value());
+                    } else {
+                        throw new IllegalStateException(
+                            "Invalid fact; Atom contains a non-constant term.");
+                    }
+                }
+                yield new ListFact(a.relation().lexeme(), terms);
             }
-        }
-
-        return new ListFact(atom.relation().lexeme(), terms);
+            case ASTRuleSet.ASTNamedAtom a -> {
+                var termMap = new LinkedHashMap<String,Object>();
+                for (var e : a.termMap().entrySet()) {
+                    var t = e.getValue();
+                    if (t instanceof ASTRuleSet.ASTConstant c) {
+                        termMap.put(e.getKey().lexeme(), ast2constant(c).value());
+                    } else {
+                        throw new IllegalStateException(
+                            "Invalid fact; Atom contains a non-constant term.");
+                    }
+                }
+                yield new MapFact(a.relation().lexeme(), termMap);
+            }
+        };
     }
 
     private Rule ast2rule(ASTRuleSet.ASTRule rule) {

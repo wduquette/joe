@@ -327,8 +327,8 @@ public class ASTDumper {
         var buff = new Buffer();
         buff.println(ruleset.getClass().getSimpleName());
 
-        for (var fact : ruleset.facts()) {
-            buff.indent("fact: " + dump(fact));
+        for (var axiom : ruleset.axioms()) {
+            buff.indent("axiom: " + axiom.toString());
         }
 
         for (var rule : ruleset.rules()) {
@@ -336,10 +336,6 @@ public class ASTDumper {
         }
 
         return buff.toString();
-    }
-
-    private static String dump(ASTRuleSet.ASTOrderedAtom atom) {
-        return atom.toString();
     }
 
     private static String dump(ASTRuleSet.ASTRule rule) {

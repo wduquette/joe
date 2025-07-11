@@ -1143,15 +1143,15 @@ public class Parser {
     }
 
     private ASTRuleSet parseRuleSet(Supplier<Boolean> endCondition) {
-        List<ASTRuleSet.ASTOrderedAtom> facts = new ArrayList<>();
+        List<ASTRuleSet.ASTAtom> facts = new ArrayList<>();
         List<ASTRuleSet.ASTRule> rules = new ArrayList<>();
 
         while (!endCondition.get()) {
             try {
-                var head = head();
+                var head = atom();
 
                 if (scanner.match(SEMICOLON)) {
-                    facts.add(fact(head));
+                    facts.add(axiom(head));
                 } else if (scanner.match(COLON_MINUS)) {
                     rules.add(rule(head));
                 } else {
@@ -1169,17 +1169,9 @@ public class Parser {
 
     }
 
-    private ASTRuleSet.ASTOrderedAtom head() {
-        // NEXT, parse the atom.
-        scanner.consume(IDENTIFIER, "expected relation.");
-        var relation = scanner.previous();
-        scanner.consume(LEFT_PAREN, "expected '(' after relation.");
-        return indexedAtom(relation);
-    }
-
-    private ASTRuleSet.ASTOrderedAtom fact(ASTRuleSet.ASTOrderedAtom head) {
+    private ASTRuleSet.ASTAtom axiom(ASTRuleSet.ASTAtom head) {
         // Verify that there are no non-constant terms.
-        for (var term : head.terms()) {
+        for (var term : head.getTerms()) {
             if (!(term instanceof ASTRuleSet.ASTConstant)) {
                 error(term.token(), "fact contains a non-constant term.");
             }
@@ -1187,7 +1179,7 @@ public class Parser {
         return head;
     }
 
-    private ASTRuleSet.ASTRule rule(ASTRuleSet.ASTOrderedAtom head) {
+    private ASTRuleSet.ASTRule rule(ASTRuleSet.ASTAtom head) {
         var body = new ArrayList<ASTRuleSet.ASTAtom>();
         var negations = new ArrayList<ASTRuleSet.ASTAtom>();
         var constraints = new ArrayList<ASTRuleSet.ASTConstraint>();
@@ -1196,7 +1188,7 @@ public class Parser {
         do {
             var negated = scanner.match(NOT);
 
-            var atom = bodyAtom();
+            var atom = atom();
             if (negated) {
                 for (var name : atom.getVariableTokens()) {
                     if (!bodyVar.contains(name.lexeme())) {
@@ -1217,7 +1209,7 @@ public class Parser {
         scanner.consume(SEMICOLON, "expected ';' after rule body.");
 
         // Verify that the head contains only valid terms.
-        for (var term : head.terms()) {
+        for (var term : head.getTerms()) {
             switch (term) {
                 case ASTRuleSet.ASTConstant ignored -> {}
                 case ASTRuleSet.ASTVariable v -> {
@@ -1276,7 +1268,7 @@ public class Parser {
         return new ASTRuleSet.ASTConstraint(a, op, b);
     }
 
-    private ASTRuleSet.ASTAtom bodyAtom() {
+    private ASTRuleSet.ASTAtom atom() {
         // NEXT, parse the atom.
         scanner.consume(IDENTIFIER, "expected relation.");
         var relation = scanner.previous();
@@ -1285,11 +1277,11 @@ public class Parser {
         if (scanner.checkTwo(IDENTIFIER, COLON)) {
             return namedAtom(relation);
         } else {
-            return indexedAtom(relation);
+            return orderedAtom(relation);
         }
     }
 
-    private ASTRuleSet.ASTOrderedAtom indexedAtom(Token relation) {
+    private ASTRuleSet.ASTOrderedAtom orderedAtom(Token relation) {
         var terms = new ArrayList<ASTRuleSet.ASTTerm>();
 
         do {
