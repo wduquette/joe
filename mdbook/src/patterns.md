@@ -18,9 +18,10 @@ quite complicated data structures.
 - [Wildcards](#wildcards)
 - [Constants](#constants)
 - [Interpolated Expressions](#interpolated-expressions)
+- [Matching Java Enums](#matching-java-enums)
 - [List Patterns](#list-patterns)
 - [Map Patterns](#map-patterns)
-- [Matching Instances with Map Patterns](#matching-instances-with-map-patterns)
+- [Type-Name Patterns](#type-name-patterns)
 - [Named-Field Patterns](#named-field-patterns)
 - [Ordered-Field Patterns](#ordered-field-patterns)
 
@@ -52,7 +53,7 @@ Here, `var` matches the list returned by `f()` against the pattern
 
 ## Binding Variables
 
-We've seen binding variables in most of the examples shown above.
+We've seen binding variables in the examples shown above.
 A binding variable is a variable name that appears within the pattern and
 is assigned the corresponding value in the match target.
 
@@ -140,6 +141,7 @@ The constant must be a literal
 [keyword](types.md#keywords),
 or `null`.
 
+
 ## Interpolated Expressions
 
 To use a computed value as a constant, interpolate
@@ -163,6 +165,44 @@ var wanted = "Pro";
 
 var [first, $wanted] = ["Joe", "Pro"];   
 ```
+
+## Matching Java Enums
+
+Suppose the client application will pass values of this enum type into
+Joe code:
+
+```java
+enum Flavor {SWEET, SOUR}
+```
+
+The Java `EnumType<E>` proxy will define that enum in Joe code so that the
+constants are accessible as `Flavor.SWEET` and `Flavor.SOUR`.  Unfortunately,
+these are Joe expressions, not literal constants, and so cannot appear as
+literal constants in patterns.
+
+There are two ways a pattern can match a Java enum.
+
+First, it can use an interpolated expression:
+
+```joe
+if (myEnum ~ [id, $(Flavor.SWEET)]) {
+    println(id + " is sweet!");
+}
+```
+
+Second, it can use a 
+[keyword](types.md#keywords) constant
+with the same name as the enum constant, disregarding case:
+
+```joe
+if (myEnum ~ [id, #sweet]) {
+    println(id + " is sweet!");
+}
+```
+
+Which option to use is a matter of taste; but it is typical for native
+functions and methods that take enum arguments to accept keywords in 
+this way as well.
 
 ## List Patterns
 
@@ -213,31 +253,32 @@ var ($x: value} = someMap;                   // value = someMap.get(x)
 var {#a: [a, b, c], #b: x} = someMap;
 ```
 
-## Matching Instances with Map Patterns
+## Type-Name Patterns
 
-A map pattern can also match any Joe value with field properties, e.g.,
-an instance of a Joe `class`.  The pattern's keys match the field names
-and the pattern's values match the field values.
-
-- Key patterns must be string or Keyword [constants](#constants) that 
-  correspond to the field names, or interpolated expressions that evaluate 
-  to such strings or keywords.
+A type-name pattern matches the target value's type by name.  It is
+written as the type name followed by parentheses:
 
 ```joe
-class Thing {
-    method init(id, color) {
-        this.id = id;
-        this.color = color;
-    }
+if (myValue ~ List()) {
+   println(myValue + " is a List!");
 }
-
-// These two statements are equivalent
-var {"id": i, "color": c} = Thing(123, "red");
-var {#id: i,  #color: c}  = Thing(123, "red");
 ```
 
-As when matching `Map` values, the pattern can reference a subset of
-the object's fields.
+Every value knows its type; there is no requirement that the named type 
+actually be in scope.
+
+There are a number of special cases.
+
+- If the target value is a class instance, then the pattern will match given 
+  the name of the class or any superclass.
+- If the target value can be converted to a 
+  [`Fact`](library/type.joe.Fact.md) via
+  [`Joe.toFact(value)`](library/type.joe.Joe.md#static.toFact), then 
+  the pattern will match given either the name or the type or the 
+  converted fact's relation name.
+- If the target value simply *is* a [`Fact`](library/type.joe.Fact.md), then
+  the given pattern will match given either `Fact` or the fact's
+  relation name.
 
 ## Named-Field Patterns
 
@@ -293,6 +334,5 @@ fields must be represented.  The field subpatterns can be any arbitrary
 patterns, as usual.
 
 Values with ordered fields can also be matched by 
-[map patterns](#map-patterns) and
 [named-field patterns](#named-field-patterns).
 
