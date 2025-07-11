@@ -323,6 +323,8 @@ public class Parser {
             return new Stmt.Var(name, initializer);
         } else if (pattern.getPattern() instanceof Pattern.Constant) {
             throw errorSync(scanner.previous(), "Expected variable name.");
+        } else if (pattern.getPattern() instanceof Pattern.Expression) {
+            throw errorSync(scanner.previous(), "Expected variable name.");
         } else {
             if (pattern.getBindings().isEmpty()) {
                 error(scanner.previous(),
@@ -439,7 +441,7 @@ public class Parser {
         var pattern = pattern();
 
         // FIRST, Simple constants are invalid.
-        if (pattern.getPattern() instanceof Pattern.Constant) {
+        if (pattern.getPattern() instanceof Pattern.Expression) {
             throw errorSync(scanner.previous(), "Expected loop variable name.");
         }
 
@@ -946,10 +948,10 @@ public class Parser {
     // Patterns
 
     private ASTPattern pattern() {
-        var walkerPattern = new ASTPattern();
-        var pattern = parsePattern(walkerPattern, true);
-        walkerPattern.setPattern(pattern);
-        return walkerPattern;
+        var astPattern = new ASTPattern();
+        var pattern = parsePattern(astPattern, true);
+        astPattern.setPattern(pattern);
+        return astPattern;
     }
 
     // Parses a pattern into the AST. `var @ pattern` is allowed if
@@ -971,7 +973,9 @@ public class Parser {
             if (identifier.lexeme().startsWith("_")) {
                 return new Pattern.Wildcard(identifier.lexeme());
             } else if (scanner.match(LEFT_PAREN)) {
-                if (scanner.peekNext().type() == COLON) {
+                if (scanner.match(RIGHT_PAREN)) {
+                    return new Pattern.TypeName(identifier.lexeme());
+                } else if (scanner.peekNext().type() == COLON) {
                     return namedFieldPattern(wp, identifier);
                 } else {
                     return recordPattern(wp, identifier);
@@ -992,24 +996,24 @@ public class Parser {
         }
     }
 
-    private Pattern.Constant constantPattern(ASTPattern wp) {
+    private Pattern constantPattern(ASTPattern wp) {
         if (scanner.match(TRUE)) {
-            return wp.addLiteralConstant(true);
+            return new Pattern.Constant(true);
         } else if (scanner.match(FALSE)) {
-            return wp.addLiteralConstant(false);
+            return new Pattern.Constant(false);
         } else if (scanner.match(NULL)) {
-            return wp.addLiteralConstant(null);
+            return new Pattern.Constant(null);
         } else if (scanner.match(NUMBER) || scanner.match(STRING) || scanner.match(KEYWORD)) {
-            return wp.addLiteralConstant(scanner.previous().literal());
+            return new Pattern.Constant(scanner.previous().literal());
         } else if (scanner.match(DOLLAR)) {
             if (scanner.match(IDENTIFIER)) {
-                return wp.addVarConstant(scanner.previous());
+                return wp.addVarExpr(scanner.previous());
             } else {
                 scanner.consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
                 var expr = expression();
                 scanner.consume(RIGHT_PAREN,
                     "Expected ')' after interpolated expression.");
-                return wp.addExprConstant(expr);
+                return wp.addExpr(expr);
             }
         } else {
             return null;
@@ -1043,7 +1047,7 @@ public class Parser {
     }
 
     private Pattern.MapPattern mapPattern(ASTPattern wp) {
-        var map = new LinkedHashMap<Pattern.Constant,Pattern>();
+        var map = new LinkedHashMap<Pattern,Pattern>();
 
         if (scanner.match(RIGHT_BRACE)) {
             return new Pattern.MapPattern(map);

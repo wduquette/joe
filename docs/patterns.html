@@ -191,9 +191,10 @@ quite complicated data structures.</p>
 <li><a href="#wildcards">Wildcards</a></li>
 <li><a href="#constants">Constants</a></li>
 <li><a href="#interpolated-expressions">Interpolated Expressions</a></li>
+<li><a href="#matching-java-enums">Matching Java Enums</a></li>
 <li><a href="#list-patterns">List Patterns</a></li>
 <li><a href="#map-patterns">Map Patterns</a></li>
-<li><a href="#matching-instances-with-map-patterns">Matching Instances with Map Patterns</a></li>
+<li><a href="#type-name-patterns">Type-Name Patterns</a></li>
 <li><a href="#named-field-patterns">Named-Field Patterns</a></li>
 <li><a href="#ordered-field-patterns">Ordered-Field Patterns</a></li>
 </ul>
@@ -214,7 +215,7 @@ var y = result[1];
 <p>Here, <code>var</code> matches the list returned by <code>f()</code> against the pattern
 <code>[x, y]</code> and binds variables <code>x</code> and <code>y</code> to the matched values.</p>
 <h2 id="binding-variables"><a class="header" href="#binding-variables">Binding Variables</a></h2>
-<p>We've seen binding variables in most of the examples shown above.
+<p>We've seen binding variables in the examples shown above.
 A binding variable is a variable name that appears within the pattern and
 is assigned the corresponding value in the match target.</p>
 <pre><code class="language-joe">var [a, b] = [1, 2];    // a = 1, b = 2.
@@ -292,6 +293,31 @@ a variable name:</p>
 
 var [first, $wanted] = ["Joe", "Pro"];   
 </code></pre>
+<h2 id="matching-java-enums"><a class="header" href="#matching-java-enums">Matching Java Enums</a></h2>
+<p>Suppose the client application will pass values of this enum type into
+Joe code:</p>
+<pre><code class="language-java">enum Flavor {SWEET, SOUR}
+</code></pre>
+<p>The Java <code>EnumType&lt;E&gt;</code> proxy will define that enum in Joe code so that the
+constants are accessible as <code>Flavor.SWEET</code> and <code>Flavor.SOUR</code>.  Unfortunately,
+these are Joe expressions, not literal constants, and so cannot appear as
+literal constants in patterns.</p>
+<p>There are two ways a pattern can match a Java enum.</p>
+<p>First, it can use an interpolated expression:</p>
+<pre><code class="language-joe">if (myEnum ~ [id, $(Flavor.SWEET)]) {
+    println(id + " is sweet!");
+}
+</code></pre>
+<p>Second, it can use a
+<a href="types.html#keywords">keyword</a> constant
+with the same name as the enum constant, disregarding case:</p>
+<pre><code class="language-joe">if (myEnum ~ [id, #sweet]) {
+    println(id + " is sweet!");
+}
+</code></pre>
+<p>Which option to use is a matter of taste; but it is typical for native
+functions and methods that take enum arguments to accept keywords in
+this way as well.</p>
 <h2 id="list-patterns"><a class="header" href="#list-patterns">List Patterns</a></h2>
 <p>We've seen many list patterns in the above examples.  Syntactically,
 a list pattern is simply a list of patterns that matches a <code>List</code> of
@@ -328,28 +354,28 @@ the pattern.</li>
 var ($x: value} = someMap;                   // value = someMap.get(x)
 var {#a: [a, b, c], #b: x} = someMap;
 </code></pre>
-<h2 id="matching-instances-with-map-patterns"><a class="header" href="#matching-instances-with-map-patterns">Matching Instances with Map Patterns</a></h2>
-<p>A map pattern can also match any Joe value with field properties, e.g.,
-an instance of a Joe <code>class</code>.  The pattern's keys match the field names
-and the pattern's values match the field values.</p>
-<ul>
-<li>Key patterns must be string or Keyword <a href="#constants">constants</a> that
-correspond to the field names, or interpolated expressions that evaluate
-to such strings or keywords.</li>
-</ul>
-<pre><code class="language-joe">class Thing {
-    method init(id, color) {
-        this.id = id;
-        this.color = color;
-    }
+<h2 id="type-name-patterns"><a class="header" href="#type-name-patterns">Type-Name Patterns</a></h2>
+<p>A type-name pattern matches the target value's type by name.  It is
+written as the type name followed by parentheses:</p>
+<pre><code class="language-joe">if (myValue ~ List()) {
+   println(myValue + " is a List!");
 }
-
-// These two statements are equivalent
-var {"id": i, "color": c} = Thing(123, "red");
-var {#id: i,  #color: c}  = Thing(123, "red");
 </code></pre>
-<p>As when matching <code>Map</code> values, the pattern can reference a subset of
-the object's fields.</p>
+<p>Every value knows its type; there is no requirement that the named type
+actually be in scope.</p>
+<p>There are a number of special cases.</p>
+<ul>
+<li>If the target value is a class instance, then the pattern will match given
+the name of the class or any superclass.</li>
+<li>If the target value can be converted to a
+<a href="library/type.joe.Fact.html"><code>Fact</code></a> via
+<a href="library/type.joe.Joe.html#static.toFact"><code>Joe.toFact(value)</code></a>, then
+the pattern will match given either the name or the type or the
+converted fact's relation name.</li>
+<li>If the target value simply <em>is</em> a <a href="library/type.joe.Fact.html"><code>Fact</code></a>, then
+the given pattern will match given either <code>Fact</code> or the fact's
+relation name.</li>
+</ul>
 <h2 id="named-field-patterns"><a class="header" href="#named-field-patterns">Named-Field Patterns</a></h2>
 <p>A named-field pattern matches the type and field values for any
 Joe value with named fields.  It will also match a
@@ -394,7 +420,6 @@ var Person(name: n, age: a) = person;    // Named-field
 fields must be represented.  The field subpatterns can be any arbitrary
 patterns, as usual.</p>
 <p>Values with ordered fields can also be matched by
-<a href="#map-patterns">map patterns</a> and
 <a href="#named-field-patterns">named-field patterns</a>.</p>
 
                     </main>

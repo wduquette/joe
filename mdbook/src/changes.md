@@ -20,12 +20,14 @@
   - The new `~` operator is a comparison operator that checks whether a Joe
     value matches a Joe pattern, binding any variables in the local scope.
     It replaces the existing `if let` statement, which has been removed.
-  - Replaced the "instance" pattern syntax with the friendly "named-field"
+  - Replaced the "instance" pattern syntax with the friendlier "named-field"
     pattern syntax.
   - "record" pattern syntax is now called "ordered-field" pattern syntax, as
     we now have non-record-types with ordered fields.
   - Both "named-field" and "ordered-field" patterns can match the `Fact` 
     objects produced by Nero rule sets.
+  - In patterns, keyword constants will now also match Java enum values that
+    have the same name, disregarding case.
 - Types
   - Added `FactBase`, an in-memory database of Nero facts.
   - Added new methods to a variety of types.

@@ -15,12 +15,12 @@ public class Matcher {
     private Matcher() {} // Not instantiable
 
     /**
-     * A function to retrieve a pattern constant's value given its
+     * A function to retrieve an Expression pattern's value given its
      * ID.
      */
-    public interface ConstantGetter {
+    public interface ExpressionGetter {
         /**
-         * Gets the value of the constant with the given ID.
+         * Gets the value of the Expression with the given ID.
          * @param id The ID
          * @return the value
          */
@@ -41,7 +41,7 @@ public class Matcher {
         Joe joe,
         Pattern pattern,
         Object value,
-        ConstantGetter getter
+        ExpressionGetter getter
     ) {
         // Use a LinkedHashMap to ensure that values are ordered!
         var bindings = new LinkedHashMap<String,Object>();
@@ -57,32 +57,15 @@ public class Matcher {
         Joe joe,
         Pattern pattern,
         Object value,
-        ConstantGetter getter,
+        ExpressionGetter getter,
         Map<String,Object> bindings
     ) {
         return switch (pattern) {
             case Pattern.Constant p ->
-                Objects.equals(getter.get(p.id()), value);
-            case Pattern.Wildcard ignored
-                -> true;
-            case Pattern.ValueBinding p -> {
-                if (bindings.containsKey(p.name()) &&
-                    !bindings.get(p.name()).equals(value)
-                ) {
-                    yield false;
-                }
-                bindings.put(p.name(), value);
-                yield true;
-            }
-            case Pattern.PatternBinding p -> {
-                if (bindings.containsKey(p.name()) &&
-                    !bindings.get(p.name()).equals(value)
-                ) {
-                    yield false;
-                }
-                bindings.put(p.name(), value);
-                yield doBind(joe, p.subpattern(), value, getter, bindings);
-            }
+                matchConstant(p.value(), value);
+
+            case Pattern.Expression p ->
+                matchConstant(getter.get(p.id()), value);
 
             case Pattern.ListPattern p -> {
                 // FIRST, check type and shape
@@ -118,7 +101,7 @@ public class Matcher {
                 if (value instanceof Map<?,?> map) {
                     // NEXT, match keys and values
                     for (var e : p.patterns().entrySet()) {
-                        var key = getter.get(e.getKey().id());
+                        var key = getConstant(e.getKey(), getter);
                         if (!map.containsKey(key)) yield false;
 
                         var item = map.get(key);
@@ -129,23 +112,9 @@ public class Matcher {
 
                     // FINALLY, match succeeds
                     yield true;
-                } else {
-                    var obj = joe.getJoeValue(value);
-                    if (!obj.isFact()) yield false;
-                    var map = obj.toFact().getFieldMap();
-
-                    for (var e : p.patterns().entrySet()) {
-                        var field = key2field(getter.get(e.getKey().id()));
-                        if (!map.containsKey(field)) yield false;
-
-                        if (!doBind(joe, e.getValue(), map.get(field), getter, bindings)) {
-                            yield false;
-                        }
-                    }
-
-                    // FINALLY, match succeeds
-                    yield true;
                 }
+
+                yield false;
             }
 
             case Pattern.NamedFieldPattern p -> {
@@ -228,17 +197,67 @@ public class Matcher {
                 // FINALLY, match succeeds.
                 yield true;
             }
+
+            case Pattern.PatternBinding p -> {
+                if (bindings.containsKey(p.name()) &&
+                    !bindings.get(p.name()).equals(value)
+                ) {
+                    yield false;
+                }
+                bindings.put(p.name(), value);
+                yield doBind(joe, p.subpattern(), value, getter, bindings);
+            }
+
+            case Pattern.TypeName p -> {
+                Fact fact;
+                var jv = joe.getJoeValue(value);
+
+                if (value instanceof Fact f) {
+                    // It's a `Fact` object; use it as is.
+                    fact = f;
+                    yield p.typeName().equals(fact.relation())
+                        || p.typeName().equals("Fact");
+                } else if (jv.isFact()) {
+                    // It's convertible to a fact object; verify that the
+                    // requested name is the object's relation, type,
+                    // or a supertype.
+                    fact = jv.toFact();
+                    yield fact.relation().equals(p.typeName())
+                        || hasType(jv, p.typeName());
+                } else {
+                    yield hasType(jv, p.typeName());
+                }
+            }
+
+            case Pattern.ValueBinding p -> {
+                if (bindings.containsKey(p.name()) &&
+                    !bindings.get(p.name()).equals(value)
+                ) {
+                    yield false;
+                }
+                bindings.put(p.name(), value);
+                yield true;
+            }
+
+            case Pattern.Wildcard ignored
+                -> true;
         };
     }
 
-    private static String key2field(Object key) {
-        if (key instanceof String s) {
-            return s;
-        } else if (key instanceof Keyword k) {
-            return k.name();
-        } else {
-            return null;
-        }
+    private static Object getConstant(Pattern pattern, ExpressionGetter getter) {
+        return switch (pattern) {
+            case Pattern.Constant p -> p.value();
+            case Pattern.Expression p -> getter.get(p.id());
+            default -> throw new IllegalStateException(
+                "Invalid map key pattern: '" + pattern + "'.");
+        };
+    }
+
+    private static boolean matchConstant(Object constant, Object value) {
+        if (Objects.equals(constant, value)) return true;
+        return constant instanceof Keyword k
+            && value instanceof Enum<?> e
+            && k.name().equalsIgnoreCase(e.name());
     }
 
     // Determines whether the type name is the name of the object's

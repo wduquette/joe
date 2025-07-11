@@ -207,12 +207,14 @@ declarations efficiently.</li>
 <li>The new <code>~</code> operator is a comparison operator that checks whether a Joe
 value matches a Joe pattern, binding any variables in the local scope.
 It replaces the existing <code>if let</code> statement, which has been removed.</li>
-<li>Replaced the "instance" pattern syntax with the friendly "named-field"
+<li>Replaced the "instance" pattern syntax with the friendlier "named-field"
 pattern syntax.</li>
 <li>"record" pattern syntax is now called "ordered-field" pattern syntax, as
 we now have non-record-types with ordered fields.</li>
 <li>Both "named-field" and "ordered-field" patterns can match the <code>Fact</code>
 objects produced by Nero rule sets.</li>
+<li>In patterns, keyword constants will now also match Java enum values that
+have the same name, disregarding case.</li>
 </ul>
 </li>
 <li>Types

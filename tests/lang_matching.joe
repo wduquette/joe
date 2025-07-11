@@ -99,31 +99,6 @@ function testMap_good() {
     assertEquals(a, 5);
 }
 
-// A map pattern can match a Joe value using strings as field names.
-function testMap_joeValue_stringKeys() {
-    assertTrue(Thing(123, "red") ~ {"id": i, "color": c});
-    assertEquals(i, 123);
-    assertEquals(c, "red");
-}
-
-// A map pattern can match a Joe value using keywords as field names.
-function testMap_joeValue_keywordKeys() {
-    assertTrue(Thing(123, "red") ~ {#id: i, #color: c});
-    assertEquals(i, 123);
-    assertEquals(c, "red");
-}
-
-// Only strings and keywords can match a field name.
-function testMap_joeValue_badKeyType() {
-    assertFalse(Thing(123, "red") ~ {123: i, #color: c});
-}
-
-// The map won't match the JoeValue if the pattern contains a
-// key that doesn't match a known field.
-function testMap_joeValue_unknownKey() {
-    assertFalse(Thing(123, "red") ~ {#id: i, #size: s});
-}
-
 // Map keys can be interpolated into the pattern.
 function testMap_interpolatedKey() {
     var key = #joe;
@@ -211,21 +186,6 @@ function testOrderedField_fact() {
     assertEquals(age, person.f1);
 }
 
-// Can match based on type only if the pattern has no field patterns.
-function testOrderedField_noFieldPatterns() {
-    record Gizmo(x, y) {}
-    var gizmo = Gizmo(1, 2);
-    assertTrue(gizmo ~ Gizmo());
-    assertFalse(gizmo ~ Number());
-}
-
-// Can match based on type for types without fields if the pattern has no
-// field patterns.
-function testOrderedField_noFieldPatterns() {
-    assertTrue("abc" ~ String());
-    assertFalse("abc" ~ Number());
-}
-
 
 //-----------------------------------------------------------------------------
 // Pattern-Bindings
@@ -244,6 +204,19 @@ function testPatternBinding_nested() {
     assertEquals(c, 2);
     assertEquals(d, 3);
     assertEquals(e, 4);
+}
+
+//-----------------------------------------------------------------------------
+// TypeNames
+
+// Matches on type only for any type.
+function testTypeName() {
+    record Gizmo(x, y) {}
+    var gizmo = Gizmo(1, 2);
+    assertTrue(gizmo ~ Gizmo());
+    assertFalse(gizmo ~ Number());
+    assertTrue("abc" ~ String());
+    assertFalse("abc" ~ Number());
 }
 
 //-----------------------------------------------------------------------------

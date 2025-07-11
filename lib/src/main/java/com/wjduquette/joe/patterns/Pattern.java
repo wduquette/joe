@@ -4,6 +4,7 @@ import com.wjduquette.joe.JoeValue;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -21,77 +22,46 @@ import java.util.stream.Collectors;
  */
 public sealed interface Pattern permits
     Pattern.Constant,
-    Pattern.Wildcard,
-    Pattern.PatternBinding,
-    Pattern.ValueBinding,
+    Pattern.Expression,
     Pattern.ListPattern,
     Pattern.MapPattern,
     Pattern.NamedFieldPattern,
-    Pattern.OrderedFieldPattern
-
+    Pattern.OrderedFieldPattern,
+    Pattern.PatternBinding,
+    Pattern.TypeName,
+    Pattern.ValueBinding,
+    Pattern.Wildcard
 {
     /**
      * A pattern that requires the target value to be exactly equal to a
-     * constant value.  Constants are passed out-of-band, based on an
-     * integer ID, because the details depend on the language engine.
+     * literal constant.
+     * @param value The constant's value
+     */
+    record Constant(Object value) implements Pattern {
+        /**
+         * Returns the value's string representation.
+         * @return The string
+         */
+        @Override public String toString() {
+            return Objects.toString(value);
+        }
+    }
+
+    /**
+     * A pattern that requires the target value to be exactly equal to a
+     * computed value.  Expressions are passed out-of-band, based on an
+     * integer ID, because the actual expression needs to be computed by
+     * the language engine and the result provided to the matching
+     * algorithm.
      * @param id The constant's ID
      */
-    record Constant(int id) implements Pattern {
+    record Expression(int id) implements Pattern {
         /**
          * Returns "$id" as the string representation.
          * @return The string
          */
         @Override public String toString() {
             return "$" + id;
-        }
-    }
-
-    /**
-     * A pattern that matches any value at all.  A wildcard's name is an
-     * identifier with an initial underscore.  A single underscore,
-     * "{@code _}", is common, but longer names can be used to improve
-     * readability.  The name has no effect at all on the pattern
-     * match.
-     * @param name The wildcard name.
-     */
-    record Wildcard(String name) implements Pattern {
-        /**
-         * Returns the wildcard's name as the string representation.
-         * @return The string
-         */
-        @Override public String toString() {
-            return name;
-        }
-    }
-
-    /**
-     * A pattern that binds the matching target value to the binding variable
-     * with the given name.
-     * @param name A binding variable name
-     */
-    record ValueBinding(String name) implements Pattern {
-        /**
-         * Returns "?name" as the string representation.
-         * @return The string
-         */
-        @Override public String toString() {
-            return "?" + name;
-        }
-    }
-
-    /**
-     * A pattern that matches a subpattern and binds its value to a binding
-     * variable.
-     * @param name A binding variable name
-     * @param subpattern The subpattern to match.
-     */
-    record PatternBinding(String name, Pattern subpattern) implements Pattern {
-        /**
-         * Returns "?id" as the string representation.
-         * @return The string
-         */
-        @Override public String toString() {
-            return "?" + name + " = " + subpattern;
         }
     }
 
@@ -130,7 +100,7 @@ public sealed interface Pattern permits
      * the key's value in the target map.
      * @param patterns The key constants and value patterns
      */
-    record MapPattern(Map<Constant,Pattern> patterns)
+    record MapPattern(Map<Pattern,Pattern> patterns)
         implements Pattern
     {
         @Override public String toString() {
@@ -177,6 +147,71 @@ public sealed interface Pattern permits
                 .map(Object::toString)
                 .collect(Collectors.joining(", "));
             return typeName + "(" + list + ")";
+        }
+    }
+
+    /**
+     * A pattern that matches a subpattern and binds its value to a binding
+     * variable.
+     * @param name A binding variable name
+     * @param subpattern The subpattern to match.
+     */
+    record PatternBinding(String name, Pattern subpattern) implements Pattern {
+        /**
+         * Returns "?id" as the string representation.
+         * @return The string
+         */
+        @Override public String toString() {
+            return "?" + name + "@" + subpattern;
+        }
+    }
+
+    /**
+     * A pattern that requires the target value to have a specific type
+     * name.
+     * @param typeName The required type name.
+     */
+    record TypeName(String typeName) implements Pattern {
+        /**
+         * Returns "name" as the string representation.
+         * @return The string
+         */
+        @Override public String toString() {
+            return typeName + "()";
+        }
+    }
+
+    /**
+     * A pattern that binds the matching target value to the binding variable
+     * with the given name.
+     * @param name A binding variable name
+     */
+    record ValueBinding(String name) implements Pattern {
+        /**
+         * Returns "?name" as the string representation.
+         * @return The string
+         */
+        @Override public String toString() {
+            return "?" + name;
+        }
+    }
+
+
+    /**
+     * A pattern that matches any value at all.  A wildcard's name is an
+     * identifier with an initial underscore.  A single underscore,
+     * "{@code _}", is common, but longer names can be used to improve
+     * readability.  The name has no effect at all on the pattern
+     * match.
+     * @param name The wildcard name.
+     */
+    record Wildcard(String name) implements Pattern {
+        /**
+         * Returns the wildcard's name as the string representation.
+         * @return The string
+         */
+        @Override public String toString() {
+            return name;
         }
     }
 }

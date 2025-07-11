@@ -145,7 +145,7 @@ class Resolver {
             }
             case Stmt.ForEachBind stmt -> {
                 ++loopCounter;
-                stmt.pattern().getConstants().forEach(this::resolve);
+                stmt.pattern().getExprs().forEach(this::resolve);
                 stmt.pattern().getBindings().forEach(this::declare);
                 stmt.pattern().getBindings().forEach(this::define);
                 resolve(stmt.items());
@@ -166,7 +166,7 @@ class Resolver {
             case Stmt.Match stmt -> {
                 resolve(stmt.expr());
                 for (var c : stmt.cases()) {
-                    c.pattern().getConstants().forEach(this::resolve);
+                    c.pattern().getExprs().forEach(this::resolve);
                     beginScope();
                     c.pattern().getBindings().forEach(this::declare);
                     c.pattern().getBindings().forEach(this::define);
@@ -240,7 +240,7 @@ class Resolver {
             }
             case Stmt.VarPattern stmt -> {
                 stmt.pattern().getBindings().forEach(this::declare);
-                stmt.pattern().getConstants().forEach(this::resolve);
+                stmt.pattern().getExprs().forEach(this::resolve);
                 resolve(stmt.target());
                 stmt.pattern().getBindings().forEach(this::define);
             }
@@ -292,7 +292,7 @@ class Resolver {
             case Expr.MapLiteral expr -> expr.entries().forEach(this::resolve);
             case Expr.Match expr -> {
                 resolve(expr.target());
-                expr.pattern().getConstants().forEach(this::resolve);
+                expr.pattern().getExprs().forEach(this::resolve);
                 expr.pattern().getBindings().forEach(this::declare);
                 expr.pattern().getBindings().forEach(this::define);
             }
