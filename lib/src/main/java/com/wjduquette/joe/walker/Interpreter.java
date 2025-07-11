@@ -724,7 +724,6 @@ class Interpreter {
             // Evaluate the rule set.
             case Expr.RuleSet expr -> {
                 var rsc = new RuleSetCompiler(expr.ruleSet());
-                rsc.setFactFactory(ListFact::new);
                 var ruleset = rsc.compile();
 
                 if (!ruleset.isStratified()) {

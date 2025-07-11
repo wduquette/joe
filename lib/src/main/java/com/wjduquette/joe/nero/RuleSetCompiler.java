@@ -14,20 +14,11 @@ import java.util.stream.Collectors;
  * {@link com.wjduquette.joe.parser.ASTRuleSet} given its configuration.
  */
 public class RuleSetCompiler {
-    /**
-     * The default fact factory used by the compiler; it creates
-     * {@link ListFact} objects.
-     */
-    public static final FactFactory DEFAULT_FACT_FACTORY = ListFact::new;
-
     //-------------------------------------------------------------------------
     // Instance Variables
 
     // The AST
     private final ASTRuleSet ast;
-
-    // The factory to use to create fact values
-    private FactFactory factFactory = DEFAULT_FACT_FACTORY;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -38,16 +29,6 @@ public class RuleSetCompiler {
 
     //-------------------------------------------------------------------------
     // Public API
-
-
-    @SuppressWarnings("unused")
-    public FactFactory getFactFactory() {
-        return factFactory;
-    }
-
-    public void setFactFactory(FactFactory factFactory) {
-        this.factFactory = factFactory;
-    }
 
     /**
      * Compiles the Nero source, producing a rule set.
@@ -77,7 +58,7 @@ public class RuleSetCompiler {
             }
         }
 
-        return factFactory.create(atom.relation().lexeme(), terms);
+        return new ListFact(atom.relation().lexeme(), terms);
     }
 
     private Rule ast2rule(ASTRuleSet.ASTRule rule) {

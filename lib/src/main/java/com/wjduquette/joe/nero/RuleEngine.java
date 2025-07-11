@@ -14,19 +14,6 @@ public class RuleEngine {
         "Call `infer()` before querying results.";
 
     //-------------------------------------------------------------------------
-    // Static
-
-    /**
-     * Nero's default fact factory; it creates {@link ListFact} objects.
-     */
-    public static final FactFactory DEFAULT_FACT_FACTORY =
-        RuleEngine::defaultFactFactory;
-
-    private static Fact defaultFactFactory(String relation, List<Object> terms) {
-        return new ListFact(relation, terms);
-    }
-
-    //-------------------------------------------------------------------------
     // Instance Variables
 
     //
@@ -42,9 +29,6 @@ public class RuleEngine {
     //
     // Configuration Data
     //
-
-    // The factory used to create new facts.
-    private FactFactory factFactory = DEFAULT_FACT_FACTORY;
 
     // Debug Flag
     private boolean debug = false;
@@ -114,26 +98,6 @@ public class RuleEngine {
      */
     public void setDebug(boolean debug) {
         this.debug = debug;
-    }
-
-    /**
-     * Gets the factory used to create new {@link Fact Facts} given a
-     * relation and list of terms.
-     * @return The factory
-     */
-    @SuppressWarnings("unused")
-    public FactFactory getFactFactory() {
-        return factFactory;
-    }
-
-    /**
-     * Sets the factory used to create new {@link Fact Facts} given a
-     * relation and list of terms.
-     * @param factFactory The factory
-     */
-    @SuppressWarnings("unused")
-    public void setFactFactory(FactFactory factFactory) {
-        this.factFactory = factFactory;
     }
 
     //-------------------------------------------------------------------------
@@ -383,7 +347,7 @@ public class RuleEngine {
             }
         }
 
-        return factFactory.create(bc.rule.head().relation(), terms);
+        return new ListFact(bc.rule.head().relation(), terms);
     }
 
     private boolean constraintMet(

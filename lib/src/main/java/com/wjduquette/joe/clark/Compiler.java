@@ -969,7 +969,6 @@ class Compiler {
             case Expr.RuleSet e -> {
                 // FIRST, compile the rule set.
                 var rsc = new RuleSetCompiler(e.ruleSet());
-                rsc.setFactFactory(ListFact::new);
                 var ruleset = rsc.compile();
 
                 // Get the exports                // Stack effects
