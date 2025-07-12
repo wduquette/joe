@@ -35,11 +35,12 @@ Object _square(Joe joe, Args args) {
 
 ## Installing a Native Function
 
-To install a native function, use the `Joe::installGlobalFunction` method:
+To install a native function into a Joe interpreter, use the 
+`Joe::installGlobalFunction` method:
 
 ```java
 var joe = new Joe();
-
+...
 joe.installGlobalFunction("square", this::_square);
 ```
 
@@ -49,38 +50,31 @@ A function's *arity* is the number of arguments it takes.  Joe provides four
 methods for checking that a native function has received the correct number of
 arguments.  There are several cases:
 
-### Exact Arity
-
-The `Args::exactArity` method checks that the function has received exactly a 
-specific number of arguments, as shown in the `_square()` example above.  It
-takes two arguments:
+**Exact Arity:** the `Args::exactArity` method checks that the function has 
+received exactly the required number of arguments, as shown in the `_square()` 
+example above.  It takes two arguments: the required number, and the 
+function's signature:
 
 ```java
 args.exactArity(1, "square(x)");
 ```
 
-- The number of arguments expected.
-- A string representing the function's signature.
-
-If *args* doesn't contain exactly the correct number of arguments, 
-`exactArity()` will use `Args.arityFailure()` to throw a `JoeError`
-with this message:
+If *args* contains an incorrect number of arguments, 
+`exactArity()` will throw a `JoeError`:
 
 `Wrong number of arguments, expected: square(x).`
 
-### Minimum Arity and Arity Ranges
-
-Similarly, the `Args::minArity` method checks that the *args* contains
-at least a minimum number of arguments.  For example, 
-[`Number.max()`](../library/type.joe.Number.md#static.max) requires
-at least 1 argument but can take any number of arguments.
+**Minimum Arity**: the `Args::minArity` method checks that the 
+*args* contains at least a minimum number of arguments.  For example, 
+[`Number.max()`](../library/type.joe.Number.md#static.max) requires at least 1 argument but can take any number of 
+arguments.
 
 ```java
 args.minArity(1, "Number.max(number,...)");
 ```
 
-And the `Args::arityRange` method checks that the number of arguments
-false within a certain range.  For example, the 
+**Arity Range**: the `Args::arityRange` method checks that the number of 
+arguments false within a certain range.  For example, the 
 [`String`](../library/type.joe.String.md) type's 
 [`substring()`](../library/type.joe.String.md#method.substring) method takes
 1 or 2 arguments:
@@ -89,10 +83,9 @@ false within a certain range.  For example, the
 args.arityRange(1, 2, "substring(beginIndex, [endIndex])");
 ```
 
-### More Complex Cases
-
-In rare cases, it's simplest for the native function to access the 
-`Args`'s size directly, and throw an `arityFailure` explicitly:
+**More Complex Cases**: in rare cases the function will examine the arguments
+more closely and throw an `arityFailure` explicitly if some required pattern
+isn't found.
 
 ```java
 if (args.size() > 7) {
@@ -102,10 +95,12 @@ if (args.size() > 7) {
 
 ## Argument Conversion
 
-Before passing an `Object` to a Java method, it's necessary to cast it or 
-convert it to the required type, and to produce an appropriate error message 
-if that cannot be done.  Joe provides a family of argument conversion methods 
-for this purpose, and client-specific converters are easily implemented.  
+Before passing an `Object` to a Java method it's necessary to cast it or 
+convert it to the required type.  Joe catches unexpected Java errors in
+native functions, but it's better to check explicitly and to produce an 
+appropriate error message if a value has the wrong type. Joe provides a 
+family of argument conversion methods for this purpose, and client-specific 
+converters are easily implemented.  
 
 For example,
 
@@ -115,32 +110,36 @@ var x = joe.toDouble(args.next());
 
 - `args.next()` pulls the next unprocessed argument from the *args* queue.
 - `joe.toDouble()` verifies that it's a `Double` and returns it as a `double`,
-  or throws a `JoeError`.
+  or throws a `JoeError` if it is not.
 
 The `JoeError` message will look like this:
 
 `Expected number, got: <actualType> '<actualValue>'.`
 
-See the `Joe` class's Javadoc for the family of converters, and the 
-`Joe` class's source code for how they are implemented; and the many 
-`ProxyTypes` in `com.wjduquette.joe.types` for examples of their use.
+See:
+
+- The `Joe` class's Javadoc for the family of converters
+- The `Joe` class's source code for how they are implemented
+- The many `ProxyTypes` in `com.wjduquette.joe.types` for examples of their use.
 
 ### Converting Strings
 
-There are two ways to convert an argument that is to be treated as a String.
+There are three ways to convert an argument that is to be treated as a String.
 
 - `joe.toString(arg)` requires that the value is already a Java `String`.
-
 - `joe.stringify(arg)` will convert the argument, of whatever type,
-  to its string representation.  Proxy types can customize that representation.
+  to its Joe-specific string representation.  Proxy types can customize 
+  that representation.
+- `arg.toString()` will convert the argument to its default Java string
+  representation.  Usually it's better to use `joe.stringify(arg)`.
 
 Which of these you use will depend on the native function in question.  To
 some extent it's a matter of taste.
 
 ### Converting Booleans
 
-In Joe, any value can be used in a Boolean expression.  `false` and `null`
-are interpreted as false; any other value is interpreted as true.  As a result,
+Joe allows any value to appear in Boolean expressions.  `false` and `null`
+are interpreted as false; all other values are interpreted as true.  As a result,
 it's best to convert arguments meant to be used as Booleans with the
 `Joe.isTruthy()` function; this guarantees that the native function handles
 boolean values in the same way as Joe does at the script level:
@@ -158,7 +157,7 @@ Any other value can be returned as is, but the following rules will make
 life easier:
 
 **Returning Integers**: cast integer results to `double`.  Joe understands 
-doubles, but integers are an [opaque type](java_types.md#opaque-types).
+supports doubles directly, but integers are an [opaque type](java_types.md#opaque-types).
 
 ```java
 return (double)text.indexOf("abc");  // Convert integer index to double
