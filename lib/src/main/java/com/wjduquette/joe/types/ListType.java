@@ -39,6 +39,7 @@ public class ListType extends ProxyType<JoeList> {
         method("containsAll", this::_containsAll);
         method("copy",        this::_copy);
         method("filter",      this::_filter);
+        method("find",        this::_find);
         method("get",         this::_get);
         method("getFirst",    this::_getFirst);
         method("getLast",     this::_getLast);
@@ -235,6 +236,28 @@ public class ListType extends ProxyType<JoeList> {
             }
         }
         return result;
+    }
+
+    //**
+    // @method find
+    // @args predicate, [start]
+    // @result List
+    // Searches for the first list item for which the predicate is true.
+    // If found, returns a list `[`*index*, *item*`]`; otherwise returns
+    // null.  If *start* is provided, the search starts at the *start*
+    // index rather than at index 0.
+    private Object _find(JoeList list, Joe joe, Args args) {
+        args.arityRange(1, 2, "filter(predicate, [start])");
+        var callable = args.next();
+        var start = args.hasNext() ? joe.toIndex(args.next(), list.size()) : 0;
+
+        for (var i = start; i < list.size(); i++) {
+            var item = list.get(i);
+            if (Joe.isTruthy(joe.call(callable, item))) {
+                return ListValue.pair((double)i, item);
+            }
+        }
+        return null;
     }
 
     //**

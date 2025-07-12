@@ -14,6 +14,22 @@ public class ListValue
     implements JoeList
 {
     //-------------------------------------------------------------------------
+    // Static Methods
+
+    /**
+     * Returns a pair of values as a list.
+     * @param first The first
+     * @param second The second
+     * @return The list
+     */
+    public static ListValue pair(Object first, Object second) {
+        var list = new ListValue(2);
+        list.add(first);
+        list.add(second);
+        return list;
+    }
+
+    //-------------------------------------------------------------------------
     // Constructor
 
     /**
@@ -22,6 +38,14 @@ public class ListValue
     @SuppressWarnings("unused")
     public ListValue() {
         // nothing to do
+    }
+
+    /**
+     * Creates an empty list with the given capacity.
+     */
+    @SuppressWarnings("unused")
+    public ListValue(int capacity) {
+        super(capacity);
     }
 
     /**

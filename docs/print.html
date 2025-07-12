@@ -4049,6 +4049,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.List.html#method.containsAll"><em>list</em>.containsAll(<em>collection</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.List.html#method.copy"><em>list</em>.copy()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.List.html#method.filter"><em>list</em>.filter(<em>predicate</em>)</a> → <a href="library/type.joe.List.html">List</a></li>
+<li><a href="library/type.joe.List.html#method.find"><em>list</em>.find(<em>predicate</em>, [<em>start</em>])</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.List.html#method.get"><em>list</em>.get(<em>index</em>)</a> → value</li>
 <li><a href="library/type.joe.List.html#method.getFirst"><em>list</em>.getFirst()</a> → value</li>
 <li><a href="library/type.joe.List.html#method.getLast"><em>list</em>.getLast()</a> → value</li>
@@ -5306,6 +5307,7 @@ Java code might be read-only or require a specific item type.</p>
 <li><a href="library/type.joe.List.html#method.containsAll"><em>list</em>.containsAll(<em>collection</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.List.html#method.copy"><em>list</em>.copy()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.List.html#method.filter"><em>list</em>.filter(<em>predicate</em>)</a> → <a href="library/type.joe.List.html">List</a></li>
+<li><a href="library/type.joe.List.html#method.find"><em>list</em>.find(<em>predicate</em>, [<em>start</em>])</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.List.html#method.get"><em>list</em>.get(<em>index</em>)</a> → value</li>
 <li><a href="library/type.joe.List.html#method.getFirst"><em>list</em>.getFirst()</a> → value</li>
 <li><a href="library/type.joe.List.html#method.getLast"><em>list</em>.getLast()</a> → value</li>
@@ -5384,6 +5386,14 @@ the <em>collection</em>, and <code>false</code> otherwise.</p>
 <p><strong><em>list</em>.filter(<em>predicate</em>) → <a href="library/type.joe.List.html">List</a></strong></p>
 <p>Returns a list containing the elements for which the filter
 <em>predicate</em> is true.</p>
+<p><span id="method.find"> </span></p>
+<h3 id="listfind"><a class="header" href="#listfind"><em>list</em>.find()</a></h3>
+<hr />
+<p><strong><em>list</em>.find(<em>predicate</em>, [<em>start</em>]) → <a href="library/type.joe.List.html">List</a></strong></p>
+<p>Searches for the first list item for which the predicate is true.
+If found, returns a list <code>[</code><em>index</em>, <em>item</em><code>]</code>; otherwise returns
+null.  If <em>start</em> is provided, the search starts at the <em>start</em>
+index rather than at index 0.</p>
 <p><span id="method.get"> </span></p>
 <h3 id="listget"><a class="header" href="#listget"><em>list</em>.get()</a></h3>
 <hr />
@@ -9485,6 +9495,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.List.html#method.containsAll"><em>list</em>.containsAll(<em>collection</em>)</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.List.html#method.copy"><em>list</em>.copy()</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.List.html#method.filter"><em>list</em>.filter(<em>predicate</em>)</a> → <a href="library/type.joe.List.html">List</a></li>
+<li><a href="library/type.joe.List.html#method.find"><em>list</em>.find(<em>predicate</em>, [<em>start</em>])</a> → <a href="library/type.joe.List.html">List</a></li>
 <li><a href="library/type.joe.List.html#method.get"><em>list</em>.get(<em>index</em>)</a> → value</li>
 <li><a href="library/type.joe.List.html#method.getFirst"><em>list</em>.getFirst()</a> → value</li>
 <li><a href="library/type.joe.List.html#method.getLast"><em>list</em>.getLast()</a> → value</li>
@@ -10400,7 +10411,7 @@ value.</li>
 <tr><td>PROPSET <em>name</em></td><td><em>obj a</em> → <em>a</em></td><td>Set property value</td></tr>
 <tr><td>RECORD <em>name fields</em></td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
 <tr><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
-<tr><td>RULESET <em>ruleset</em></td><td><em>exports</em> → <em>rsv</em></td><td>Evaluate rule set</td></tr>
+<tr><td>RULESET <em>ruleset</em></td><td>∅ → <em>rsv</em></td><td>Evaluate rule set</td></tr>
 <tr><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
 <tr><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
 <tr><td>SWAP</td><td><em>a b</em> → <em>b a</em></td><td>Swap top stack items</td></tr>
@@ -10813,9 +10824,11 @@ from Java via <code>VirtualMachine::execute</code> or <code>VirtualMachine::call
 result is popped and returned to the Java caller.</p>
 <h3 id="ruleset"><a class="header" href="#ruleset">RULESET</a></h3>
 <hr />
-<p><strong>RULESET</strong> <em>ruleset</em> | <em>exports</em> → <em>rsv</em></p>
-<p>Given a <code>RuleSet</code> as a constant, and a map of callable expressions by relation
-name on the stack, pushes a <code>RuleSetValue</code>.</p>
+<p><strong>RULESET</strong> <em>ruleset</em> | ∅ → <em>rsv</em></p>
+<p>Given a <code>RuleSet</code> as a constant, pushes a <code>RuleSetValue</code>.
+<strong>Note:</strong> this could be compiled as a <code>CONSTANT</code> at this point, creating
+the <code>RuleSetValue</code> at compile time, but if we add interpolated expressions
+to rules we'll need to compile them and retrieve them from the stack.</p>
 <h3 id="sub"><a class="header" href="#sub">SUB</a></h3>
 <hr />
 <p><strong>SUB</strong> | <em>a</em> <em>b</em> → *c, where <em>c</em> = (<em>a</em> - <em>b</em>)</p>

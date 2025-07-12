@@ -118,6 +118,27 @@ function testFilter() {
 }
 
 //-----------------------------------------------------------------------------
+// find()
+
+function testFind_notFound() {
+    var list = ["abc", "def", "ghi", "efg"];
+    var result = list.find(\s -> s.contains("xy"));
+    check(result).eq(null);
+}
+
+function testFind_noStart() {
+    var list = ["abc", "def", "ghi", "efg"];
+    var result = list.find(\s -> s.contains("ef"));
+    check(result).eq([1, "def"]);
+}
+
+function testFind_start() {
+    var list = ["abc", "def", "ghi", "efg"];
+    var result = list.find(\s -> s.contains("ef"), 2);
+    check(result).eq([3, "efg"]);
+}
+
+//-----------------------------------------------------------------------------
 // testGet()
 
 function testGet() {
