@@ -31,8 +31,8 @@ if ("A" in list) println("Got it!");
 if ("D" ni list) println("Nope, not there!");
 ```
 
-These operators work with the same set of collection values as the 
-[`foreach` statement](statements.md#foreach-loops).
+These operators work with any Java `Collection<?>`, and with any 
+[registered type](extending/registered_types.md) that supports iteration.
 
 ## Matching Operator
 

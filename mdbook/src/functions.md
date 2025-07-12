@@ -86,3 +86,5 @@ var list = List(1,2,3,4,5);
 // Compute a list of the squares of the numbers in the original list.
 var squares = list.map(\x -> x*x);
 ```
+
+A lambda may take any number of parameters, including none.
