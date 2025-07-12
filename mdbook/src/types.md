@@ -104,6 +104,10 @@ A keyword literal is an identifier preceded by a `#` character:
 - `#no`
 - `#descending`
 
+It is common for native API bindings that expect Java enums
+to accept keyword values as well, provided that the keyword's name 
+matches the enum's name (disregarding case).
+
 ## Lists
 
 A [List](library/type.joe.List.md) is a Java `List<Object>` that contains an ordered collection 
@@ -195,11 +199,11 @@ var map = {#a: 1, #b: 2, #c, 3};
 Map literals are allowed to have a trailing comma:
 
 ```joe
-var map = [
+var map = {
   #a: 1,
   #b: 2,
   #c: 3,
-];
+};
 ```
 
 Maps can be queried much as in Java:
@@ -224,7 +228,7 @@ map[#d] = 4;       // map.put(#d, 4);
 ## Sets
 
 A [Set](library/type.joe.Set.md) is a Java `Set<Object>`.  It has much 
-the same operations as Java sets. See the link for the full API.
+the same operations as Java sets, along with some advanced methods.
 
 ```joe
 var set = Set(#a, #b);
@@ -273,6 +277,9 @@ have:
 - Static variables
 - Static methods
 - A static initializer
+
+Joe record values can be trivially converted into 
+[Nero](nero/nero.md) `Facts`.
 
 See the section on [Records](records.md) for more information.
 

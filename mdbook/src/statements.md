@@ -5,10 +5,10 @@ by a semicolon or (sometimes) a block, as in Java.
 
 - [Variable Declarations](#variable-declarations)
 - [Function Declarations](#function-declarations)
-- [Class Declarations](#class-declarations)
+- [Class and Record Declarations](#class-declarations)
 - [Expression Statements](#expression-statements)
 - [Blocks](#blocks)
-- [Return](#return)
+- [Return Statement](#return)
 - [If Statements](#if-statements)
 - [While Loops](#while-loops)
 - [For Loops](#for-loops)
@@ -75,10 +75,10 @@ destructuring binds, including Joe's full pattern syntax.
 Functions are declared with the `function` statement.  See
 [Functions](functions.md) for more details.
 
-## Class Declarations
+## Class and Record Declarations
 
-Classes are declared with the `class` statement.  See
-[Classes](classes.md) for more details.
+[Class](classes.md) and [record](records.md) types are declared with 
+the `class` and `record` statements respectively.
 
 ## Expression Statements
 
@@ -106,7 +106,7 @@ var x = 5;
 println(x);     // Prints "5"
 ```
 
-## Return
+## Return Statement
 
 The `return` statement is used to return from functions and methods.  As in 
 Java, it takes an optional expression to return a value.

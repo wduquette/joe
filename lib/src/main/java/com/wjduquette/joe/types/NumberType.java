@@ -108,8 +108,6 @@ public class NumberType extends ProxyType<Double> {
         staticMethod("tan",       this::_tan);
         staticMethod("toDegrees", this::_toDegrees);
         staticMethod("toRadians", this::_toRadians);
-
-
     }
 
     //-------------------------------------------------------------------------

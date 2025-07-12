@@ -14,8 +14,8 @@
 - [Functions](functions.md)
 - [Classes](classes.md)
 - [Records](records.md)
-- [Pattern Matching](patterns.md)
 - [Introspection](introspection.md)
+- [Pattern Matching](patterns.md)
 - [Nero Datalog](nero/nero.md)
   - [Nero Tutorial](nero/nero_tutorial.md)
   - [Embedded Nero](nero/embedded_nero.md)
@@ -31,8 +31,8 @@
   - [Native Functions](extending/native_functions.md)
   - [Registered Types](extending/registered_types.md)
   - [Joe Packages](extending/packages.md)
-  - [Native Classes](extending/native_classes.md)
   - [Native Records](extending/native_records.md)
+  - [Native Classes](extending/native_classes.md)
 
 # Joe Tools
 - [`joe version`](joe_version.md)

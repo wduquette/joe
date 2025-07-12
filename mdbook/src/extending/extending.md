@@ -7,8 +7,8 @@ to existing Java types.  This section explains how the trick is done.
 - [Native Functions](native_functions.md)
 - [Registered Types](registered_types.md)
 - [Joe Packages](packages.md)
-- [Native Classes](native_classes.md)
 - [Native Records](native_records.md)
+- [Native Classes](native_classes.md)
 
 These sections will refer constantly to Joe's Java API.  See the 
 Joe Javadoc for details.
@@ -24,7 +24,7 @@ by using Java reflection or by scanning the Java source code, as
 In my experience, an automatically generated binding falls far short of what 
 can be done with a good handwritten binding.  A handwritten binding:
 
-- Can take full advantage of the dynamic nature of the scripting language to 
+- Can take full advantage of the features of the scripting language to 
   provide a simpler, easier, more powerful API to the programmer, rather than
   simply mimicking the Java API.
  
@@ -32,7 +32,7 @@ can be done with a good handwritten binding.  A handwritten binding:
   that need not or should not be exposed at the scripting level.
 
 - Can do a much better job of providing useful, detailed error messages
-  to the user.
+  to the user than a generated binding.
  
 - Need not expose dangerous Java APIs (e.g., network APIs) to clients of
   the binding.

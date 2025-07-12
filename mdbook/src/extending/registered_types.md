@@ -1,9 +1,9 @@
 # Registered Types
 
-A *registered type* is a Java data type for which Joe has been provided
-a *proxy type*: an object that provides information about the type.
-Most of Joe's standard types, e.g., 
-[`String`](../library/type.joe.String.md), are implemented in just this
+A *registered type* is a Java data type for which the client has registered
+a *proxy type* with the Joe interpreter.  A proxy type is an object
+that provides information about the instances of the type.
+Most of Joe's standard types, e.g., [`String`](../library/type.joe.String.md), are implemented in just this
 way.  This section explains how to define a `ProxyType<V>` and register
 it with Joe for use.
 
@@ -21,32 +21,37 @@ public class StringType extends ProxyType<String> {
 }
 ```
 
-By convention, a Java proxy types have names ending
-with "Type", as in `StringType`.  If the type can be subclassed by a scripted
-Joe `class`, then the proxy type's name should end in "Class", as in 
-`TextBuilderClass`.  If the type has no instances, but exists only as the 
-owner of static methods and/or constants, it should end in "Singleton",
-as in the `JoeSingleton` class.
+By convention, Java proxy type names end with "Type", e.g., `StringType`.
 
-The constructor defines the various aspects of the proxy:
+- If the type can be subclassed by a scripted Joe `class`, the name should
+  end with "Class", e.g., `TextBuilderClass`.
+- If the type has no instances, i.e., if it exists only as the owner of 
+  static methods and/or constants, its name should end with "Singleton", 
+  e.g., `JoeSingleton`.
+
+The proxy type defines the various aspects of the proxy.  Most details
+are configured in the type's constructor; others involve overriding
+various `ProxyType` methods.
 
 - [The Script-level Type Name](#the-script-level-type-name)
 - [The Proxied Types](#the-proxied-types)
 - [Type Lookup](#type-lookup)
-- [The Supertype](#the-supertype)
+- [Extending Supertype Proxies](#the-supertype)
 - [Stringification](#stringification)
-- [Iterability](#iterability)
 - [Static Constants](#static-constants)
 - [Static Methods](#static-methods)
-- [Initializer](#initializer)
 - [Static Types](#static-types)
+- [Initializer](#initializer)
+- [Iterability](#iterability)
+- [Instance Fields](#instance-fields)
 - [Instance Methods](#instance-methods)
+- [Nero Fact Conversion](#nero-fact-conversion)
 - [Installing a Proxy Type](#installing-a-type-proxy)
 
 ## The Script-level Type Name
 
-First, the proxy defines the script-level type name, which by convention
-should always begin with an uppercase letter.  For example:
+First, the proxy's constructor defines the script-level type name, which by 
+convention should always begin with an uppercase letter.  For example:
 
 ```java
 public class StringType extends ProxyType<String> {
@@ -75,7 +80,7 @@ same name as the type, e.g., `String`.
 Second, the proxy must explicitly identify the proxied type or types.
 
 Usually a proxy will proxy the single type `V`, but if `V` is an interface or
-a base class, it might be desirable to explicitly identify the concrete
+a base class then it might be desirable to explicitly identify the concrete
 classes.  For example, a Joe `String` is just exactly a Java `String`.
 
 ```java
@@ -134,35 +139,41 @@ This is intentional, as expanding the search is too likely to lead to
 false positives and much unintentional comedy.  Registered interfaces
 should be used with great care!
 
-## The Supertype
+## Extending Supertype Proxies
 
-Sometimes it happens that both a type and its supertype are registered types;
-this is the case with Joe's `Error` and `AssertError` types.  In such a case,
-the subtype's proxy can "inherit" the supertype's methods via the `supertype()`
-method:
+Sometimes it happens that both a Java type and its Java supertype are 
+registered types; this is the case with Joe's `AssertError` and `Error` 
+types, which are represented internally by the Java `AssertError` and 
+`JoeError` types.  In such a case, the subtype's proxy can "inherit" the 
+supertype's methods via the `extendsProxy()` method:
 
 ```java
 public class AssertErrorProxy extends ProxyType<AssertError> {
-  public AssertErrorProxy() {
-    super("AssertError");
-    proxies(AssertError.class);
-    extendsProxy(ErrorProxy.TYPE);
-  }
+    public AssertErrorProxy() {
+        super("AssertError");
+        proxies(AssertError.class);
+        extendsProxy(ErrorProxy.TYPE);
+    }
     ...
 }
 ```
 
-
 ## Stringification
 
-When Joe converts a value to a string, it does so using a function called
-`Joe::stringify`.  If the value belongs to a proxied type, `Joe::stringify`
-calls the proxy's `stringify()` method, which returns the result of the
-values `toString()` by default.
+Joe doesn't use `Object::toString` when it needs to convert a value to
+a string; instead it calls `Joe::stringify`, which allows Joe to customize
+the value's script-level string representation.  
 
-To change how a value is stringified at the script level, override 
-`ProxyType::stringify`.  For example, `NumberType` ensures that 
-integer-valued numbers are displayed without a trailing `.0`:
+For example, all Joe numbers are java `Doubles`. The default string 
+representation for doubles includes the fractional part, but Joe includes
+the fractional part only when it is non-zero.
+
+For proxied types, `Joe::stringify` calls the proxy's `stringify` method,
+which calls `Object::toString` by default.  The client can override 
+the proxy's `stringify` method to customize the returned value. 
+
+For example, `NumberType`'s `stringify` method removes the decimal part
+when it is zero.
 
 ```java
 @Override
@@ -177,36 +188,12 @@ public String stringify(Joe joe, Object value) {
 }
 ```
 
-## Iterability
-
-Joe's `foreach` statement, and its `in` and `ni` operators,  
-can iterate over or search the following kinds of collection values:
-
-- Any Java `Collection<?>`
-- Any value that implements the `JoeIterable` interface
-- Any proxied type whose `ProxyType` can produce a list of items for iteration.
-
-To make your registered type iterable, provide an iterables supplier, a
-function that accepts a value of your type and returns a `Collection<?>`.
-
-```java
-public class MyProxyType extends ProxyType<MyType> {
-  public MyProxyType() {
-    super("MyType");
-        ...
-        iterables(myValue -> myValue.getItems());
-        ...
-  }
-    ...
-}
-```
-
 ## Static Constants
 
 A proxy may define any number of named constants, to be presented at
 the script level as properties of the type object.  For example,
 `NumberType` defines several numeric constants.  A constant is defined
-by its property name and the relevant Joe value.
+by its property name and the relevant Joe value using the `constant` method.
 
 ```java
 public class NumberType extends ProxyType<Double> {
@@ -220,17 +207,18 @@ public class NumberType extends ProxyType<Double> {
 }
 ```
 
-In this case, the constant is accessible as `Number.PI`.
+The constant is accessible as `Number.PI`.
 
 ## Static Methods
 
 A proxy may also define any number of static methods, called as properties
 of the type object.  For example, the `String` type defines the 
 [`String.join()`](../library/type.joe.String.md#static.join) method, which
-joins the items in the list into a string with a given delimiter.
+joins the items in the list into a string with a given delimiter,
+and the `Number` type defines a great many math functions as static methods.
 
 A static method is simply a [native function](native_functions.md) defined
-as a property of a list object.
+as a property of a list object using the `staticMethod` method:
 
 ```java
 public class StringType extends ProxyType<String> {
@@ -245,6 +233,28 @@ public class StringType extends ProxyType<String> {
         args.exactArity(2, "join(delimiter, list)");
         ...
     }
+}
+```
+
+## Static Types
+
+A proxy type can be defined as a kind of library of static constants and
+methods.  `JoeSingleton` is just such a proxy type.  There are no 
+instances of `Joe` at the script level, and so there are instance fields or
+methods.
+
+In this case, the type can be declared to be a *static type*.  Among other
+things, this means that attempts to create an instance using the type's
+initializer will get a suitable error message.
+
+```java
+public class JoeSingleton extends ProxyType<Void> {
+    public JoeSingleton() {
+        super("Joe");
+        staticType();
+        ...
+    }
+    ...
 }
 ```
 
@@ -267,53 +277,74 @@ public class ListType extends ProxyType<JoeList> {
     }
 
     private Object _init(Joe joe, Args args) {
-        ... create a new list given the arguments ...
-        return new ListValue(list);
-    }
-```
-
-## Static Types
-
-A proxy type can be defined as a kind of library of static constants and
-methods.  The `NumberType` is just such a proxy.  Numbers have no methods
-in Joe, and they do not need an initializer as they can be typed directly
-into a script.  
-
-In this case, the type can be declared to be a *static type*.  Among other
-things, this means that attempts to create an instance using the type's
-initializer will get a suitable error message.
-
-```java
-public class NumberType extends ProxyType<Double> {
-    public NumberType() {
-        super("Number");
-        staticType();
-        proxies(Double.class);
         ...
+        // Create a copy of another list.
+        var other = args.next();
+        return new ListValue(other);
     }
     ...
 }
 ```
 
-In the case of the `Number` type, the proxy still proxies an actual data type.
-This need not be the case.  It is common to define a static type as a named
-library of functions with no related Java type.  For example, consider
-a library to convert between Joe values and JSON strings.  It might look
-like this:
+## Iterability
+
+Joe's `foreach` statement, and its `in` and `ni` operators, can iterate over or 
+search the following kinds of collection values:
+
+- Any Java `Collection<?>`
+- Any proxied type whose `ProxyType` can produce a list of items for iteration.
+
+To make your registered type iterable, provide an iterable supplier, a
+function that accepts a value of your type and returns a `Collection<?>`.
 
 ```java
-public class JSONSingleton extends ProxyType<Void> {
-    public JSONSingleton() {
-        super("JSON");
-        staticType();
-        
-        staticMethod("toJSON",   this::_toJSON);
-        staticMethod("fromJSON", this::_fromJSON);
+public class MyProxyType extends ProxyType<MyType> {
+    public MyProxyType() {
+        super("MyType");
+        ...
+        iterableSupplier(this::_iterables);
         ...
     }
-    ...
+    
+    private Object _iterables(Joe joe, MyType value) {
+        return value.getItems();
+    }
 }
 ```
+
+## Instance Fields
+
+A proxy type can expose a value's properties as read-only fields at the script 
+level using the `field` method.  For example, suppose `MyType` has an `id` 
+property and the client wishes to expose that property as a read-only field 
+rather than as an instance method:
+
+```java
+public class MyProxyType extends ProxyType<MyType> {
+    public MyProxyType() {
+        super("MyType");
+        ...
+        field(this::_id);
+        ...
+    }
+
+    private Object _id(Joe joe, MyType value) {
+        return value.getId();
+    }
+}
+```
+
+This technique is appropriate if all instances of the type have the same
+fields, and the fields are all read-only, which is the usual case.  
+
+In unusual cases it is necessary to override the following `ProxyType` methods:
+
+- `getFieldNames(Object value)`
+- `get(Joe joe, Object value, String propertyName)`
+- `set(Joe joe, Object value, String fieldName, Object other)`
+ 
+This is an advanced move; see the `com.wjduquette.joe.types.FactType` for an 
+example.
 
 ## Instance Methods
 
@@ -321,9 +352,9 @@ Most type proxies will define one or more instance methods for values of the
 type.  For example, [`String`](../library/type.joe.String.md) and 
 [`List`](../library/type.joe.List.md) provide a great many instance methods.
 
-An instance method is quite similar to a [native function](native_functions.md), but
-an instance method is bound to a value of the proxied type, and so has a 
-slightly different signature.  For example, here is the implementation of 
+An instance method is like a [native function](native_functions.md), but has a different
+signature because it is bound to a value of the proxied type.
+For example, here is the implementation of 
 the `String` type's [`length()`](../library/type.joe.String.md#method.length) method.
 
 ```java
@@ -343,13 +374,34 @@ public class StringType extends ProxyType<String> {
 ```
 
 Each instance method takes an initial argument that receives the bound value.
-The argument's type is type `V`, as defined in the proxy's `extends` clause.
+The argument's type is of type `V`, as defined in the proxy's `extends` clause.
 Otherwise, this is nothing more than a native function, and it is implemented
 in precisely the same way.
 
+## Nero Fact Conversion
+
+Scripted values that are to be used as inputs to 
+[Nero rule sets](../nero/nero.md) must first be converted to `Fact` values.
+The conversion done automatically, but the type must support the conversion by
+overriding the `ProxyType`'s `isFact(Joe, Object)` and `toFact(Joe, Object)` 
+methods.
+
+- `isFact(Joe, Object)` indicates whether the object (a value of type `V`) can
+  be converted into a `Fact`.
+- `toFact(Joe, Object)` actually does the conversion.
+
+If a `ProxyType` defines script-visible [instance fields](#instance-fields) 
+using the `ProxyType::field` method, then `isFact` and `toFact` are defined
+automatically.  `toFact` will produce a `RecordFact` whose relation is the type
+name and whose fields are the type's visible fields. 
+
+However, proxy types are free to override these, to provide `Facts` in some
+other way.
+
 ## Installing a Proxy Type
 
-Proxy types are installed using the `Joe::installType` method:
+Proxy types are installed using the `Joe::installType` method (or by
+including them in a [Joe Package](packages.md)):
 
 ```java
 var joe = new Joe();
@@ -363,7 +415,7 @@ Installation creates the `MyType` object, and registers the type so that
 If a proxy type has no dynamic data, i.e., if it need not be configured with
 application-specific data in order to do its job, it is customary to create
 a single instance that can be reused with any number of instances of `Joe`.
-This is the case for all of the proxies in Joe's standard library.  For example,
+This is the case for most of the proxies in Joe's standard library.  For example,
 
 ```java
 public class StringType extends ProxyType<String> {
@@ -379,5 +431,3 @@ var joe = new Joe();
 
 joe.installType(StringType.TYPE);
 ```
-
-

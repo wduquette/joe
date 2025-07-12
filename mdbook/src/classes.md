@@ -64,6 +64,10 @@ var joe = Person("Joe", "Pro");
 joe.greet();    // Prints "Howdy, Joe Pro!"
 ```
 
+## The `toString` Method
+
+If the class defines a `toString()` method, then `Joe::stringify` will use
+it to convert instances of the class to their string representations.  
 
 ## The Class Initializer
 

@@ -29,7 +29,8 @@ Defining a package is much like defining a
 - Give the package a name
 - Add content.
 
-For example, the [Standard Library] package, `joe`, is defined like this:
+For example, the [Standard Library](../library/pkg.joe.md) package, `joe`, 
+is defined like this:
 
 ```java
 public class StandardLibrary extends JoePackage {
@@ -87,16 +88,16 @@ joe.installPackage(MyPackage.PACKAGE);
 Reusable libraries, such as Joe's standard library, are usually defined 
 as `JoePackage` subclasses, as shown here.
 
-Often, though, a particular component, e.g., `joe test`, will define a
-component-specific package of code, which is installed automatically by
+Sometimes a particular component, e.g., `joe test`, will define a
+component-specific package of code to be installed by
 the component into the component's own instance of `Joe`.  In this 
 case the component might or might not define an explicit `JoePackage` subclass,
 as the `JoePackage` is primarily a convenient way for a client to install
 reusable bindings.
 
-However, the component API should still be thought of as a package, and
+However, the component's API should still be thought of as a package, and
 given a package name, as this is how distinct bindings are distinguished
 in the documentation produced by the `joe doc` tool.
 
 [^import]: Of course, a client could choose to provide a native function
-for importing its own packages....
+for importing its own packages.

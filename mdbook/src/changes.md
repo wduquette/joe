@@ -6,31 +6,39 @@
   - Replaced the Bert byte-code engine and its single-pass compiler with the
     Clark byte-code engine, which shares a parser and scanner with the Walker
     engine.  This will make Joe easier to evolve.
-    - Clark is now the default engine.
-    - Bert has been removed.
 - Language
-  - Added Nero, an implementation of the Datalog query language.
+  - [Nero Datalog](nero/nero.md)
+    - Nero is Joe's implementation of the Datalog query language.
     - Nero can be used as a standalone language via the `joe nero` tool, or
       embedded in scripts to perform queries or translations of scripted input
       data.
-  - Merged `let`'s capability into `var`, and removed `let`.
-    - `var` can now do destructuring binds while still handling simple variable
-      declarations efficiently.
-  - `foreach` can now do a destructuring bind on each item in the collection.
-  - The new `~` operator is a comparison operator that checks whether a Joe
-    value matches a Joe pattern, binding any variables in the local scope.
-    It replaces the existing `if let` statement, which has been removed.
-  - Replaced the "instance" pattern syntax with the friendlier "named-field"
-    pattern syntax.
-  - "record" pattern syntax is now called "ordered-field" pattern syntax, as
-    we now have non-record-types with ordered fields.
-  - Both "named-field" and "ordered-field" patterns can match the `Fact` 
-    objects produced by Nero rule sets.
-  - In patterns, keyword constants will now also match Java enum values that
-    have the same name, disregarding case.
-- Types
-  - Added `FactBase`, an in-memory database of Nero facts.
+    - See also the `Fact`, `RuleSet`, and `FactBase` types.
+  - [Pattern-Matching](patterns.md) Changes
+    - Merged `let`'s capability into `var`, and removed `let`.
+      - `var` can now do destructuring binds while still handling simple variable
+        declarations efficiently.
+    - `foreach` can now do a destructuring bind on each item in the collection.
+    - Replaced `if let` with a new `~` comparison operator.  
+      - `~` checks whether a Joe value matches a Joe pattern, binding any 
+        pattern variables in the current scope and returning true or false.
+    - Replaced the "instance" pattern syntax with the friendlier "named-field"
+      pattern syntax.
+    - "record" pattern syntax is now called "ordered-field" pattern syntax, as
+      we now have non-record-types with ordered fields.
+    - Both "named-field" and "ordered-field" patterns can match the `Fact` 
+      objects produced by Nero rule sets.
+    - The new "type-name" pattern will match a value's type by name.
+    - Map patterns can no longer match class and record instances.
+    - In patterns, keyword constants will now also match Java enum values that
+      have the same name, disregarding case.
+- Library
+  - Added the `RuleSet` type, an embedded Nero rule set
+  - Added the `Fact` type, a Nero fact
+  - Added the `FactBase` type, an in-memory database of Nero facts.
   - Added new methods to a variety of types.
+    - `Joe`: `isFact`, `toFact`
+    - `List`: `find`
+    - `Set`: `filter`, `map`, `sorted`
 - Extensibility
   - Simplified implementation of proxy types for native record types.
     - Any `ProxyType` can now easily define read-only fields for its proxied
@@ -41,6 +49,8 @@
     - The script's Abstract Syntax Tree (AST)
     - The script's legacy Bert byte-code
   - Revised the AST dump format for readability and easy maintenance.
+  - `joe doc` can now document a type's visible fields via the
+    `@field` entity.
 
 ## Changes in 0.6.0 (28 March 2025) 
 

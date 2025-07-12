@@ -27,6 +27,7 @@ have:
 - static methods
 - static fields
 - a static initializer
+- a `toString()` method
 
 A record type differs from a class in the following ways:
 
