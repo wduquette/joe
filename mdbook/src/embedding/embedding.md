@@ -32,7 +32,6 @@ in the [Extending Joe](../extending/extending.md) section.  Use the following
 - `installGlobalFunction()` to install a native function.
 - `installType()` to register a type proxy for a native type
 - `installScriptResource()` to load a Joe script from the project jar file.
-- `installScriptResource()` to load a Joe script from the project jar file.
 
 See the above link and `Joe`'s javadoc for details on how to create these 
 various kinds of bindings.
@@ -49,13 +48,12 @@ Each can throw two Joe-specific exceptions.
 Joe throws `SyntaxError` if there's any error found while parsing the
 script.  The exception's message is fairly vanilla; but the exception
 includes a list of "details" describing all syntax errors found, by 
-source line.  `SyntaxError::getErrorsByLine()` returns the list;
-`SyntaxError::printErrorsByLine()` will print the errors to either
-`System.out` (as `joe run` does) or to the `PrintStream` of your choice.
+source line.  `SyntaxError::getErrorReport()` returns the list as
+a string for output.
 
 Joe throws `JoeError` for any runtime error.  There are three subclasses.
 
-- `RuntimeError` is an error thrown by Joe's interpreter itself.  
+- `RuntimeError` is an error thrown by Joe's virtual machine itself.  
   `RuntimeError` exceptions will usually include the source line number
   at which the error occurred; see the `line()` method.
 - `AssertError` is an error thrown by Joe's `assert` statement.  The message
@@ -64,8 +62,8 @@ Joe throws `JoeError` for any runtime error.  There are three subclasses.
   script using Joe's `throw` statement.
 
 All kinds of `JoeError` can accumulate a script-level stack trace.  Use
-the exception's `getFrames()` method to get the stack frames (a list of 
-strings); or its `getJoeStackTrace()` method to get the stack trace in a 
+the exception's `getTraces()` method to get a list of the stack frames; or 
+its `getJoeStackTrace()` method to get the stack trace in a 
 form suitable for printing.
 
 ## Executing a REPL
@@ -77,12 +75,12 @@ implement its own REPL with its own bindings; see
 some I/O code wrapped around the `joe.run()` call.
 
 Joe doesn't provide a `Joe` method for invoking the REPL simply because
-clients users will want to customize it heavily for their needs.
+most clients will want to customize it heavily for their needs.
 
 ## Redirecting Output
 
 The Joe tools, `joe run` *et al*, send their output to `System.out`.  This
-is appropriate for a simple command-line tool; a more complex application
+is appropriate for simple command-line tools; a more complex application
 might wish to redirect all script output to a log, or perhaps to swallow
 it unseen.  Joe handles this via its `outputHandler`, a simple 
 `Consumer<String>`.

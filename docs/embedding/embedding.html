@@ -199,7 +199,6 @@ in the <a href="../extending/extending.html">Extending Joe</a> section.  Use the
 <li><code>installGlobalFunction()</code> to install a native function.</li>
 <li><code>installType()</code> to register a type proxy for a native type</li>
 <li><code>installScriptResource()</code> to load a Joe script from the project jar file.</li>
-<li><code>installScriptResource()</code> to load a Joe script from the project jar file.</li>
 </ul>
 <p>See the above link and <code>Joe</code>'s javadoc for details on how to create these
 various kinds of bindings.</p>
@@ -213,12 +212,11 @@ various kinds of bindings.</p>
 <p>Joe throws <code>SyntaxError</code> if there's any error found while parsing the
 script.  The exception's message is fairly vanilla; but the exception
 includes a list of "details" describing all syntax errors found, by
-source line.  <code>SyntaxError::getErrorsByLine()</code> returns the list;
-<code>SyntaxError::printErrorsByLine()</code> will print the errors to either
-<code>System.out</code> (as <code>joe run</code> does) or to the <code>PrintStream</code> of your choice.</p>
+source line.  <code>SyntaxError::getErrorReport()</code> returns the list as
+a string for output.</p>
 <p>Joe throws <code>JoeError</code> for any runtime error.  There are three subclasses.</p>
 <ul>
-<li><code>RuntimeError</code> is an error thrown by Joe's interpreter itself.<br />
+<li><code>RuntimeError</code> is an error thrown by Joe's virtual machine itself.<br />
 <code>RuntimeError</code> exceptions will usually include the source line number
 at which the error occurred; see the <code>line()</code> method.</li>
 <li><code>AssertError</code> is an error thrown by Joe's <code>assert</code> statement.  The message
@@ -227,8 +225,8 @@ details the condition that failed.</li>
 script using Joe's <code>throw</code> statement.</li>
 </ul>
 <p>All kinds of <code>JoeError</code> can accumulate a script-level stack trace.  Use
-the exception's <code>getFrames()</code> method to get the stack frames (a list of
-strings); or its <code>getJoeStackTrace()</code> method to get the stack trace in a
+the exception's <code>getTraces()</code> method to get a list of the stack frames; or
+its <code>getJoeStackTrace()</code> method to get the stack trace in a
 form suitable for printing.</p>
 <h2 id="executing-a-repl"><a class="header" href="#executing-a-repl">Executing a REPL</a></h2>
 <p>Joe provides <a href="../joe_repl.html"><code>joe repl</code></a>, a tool that invokes an interactive
@@ -237,10 +235,10 @@ implement its own REPL with its own bindings; see
 <code>com.wjduquette.joe.tools.ReplTool</code> for an example.  It's essentially
 some I/O code wrapped around the <code>joe.run()</code> call.</p>
 <p>Joe doesn't provide a <code>Joe</code> method for invoking the REPL simply because
-clients users will want to customize it heavily for their needs.</p>
+most clients will want to customize it heavily for their needs.</p>
 <h2 id="redirecting-output"><a class="header" href="#redirecting-output">Redirecting Output</a></h2>
 <p>The Joe tools, <code>joe run</code> <em>et al</em>, send their output to <code>System.out</code>.  This
-is appropriate for a simple command-line tool; a more complex application
+is appropriate for simple command-line tools; a more complex application
 might wish to redirect all script output to a log, or perhaps to swallow
 it unseen.  Joe handles this via its <code>outputHandler</code>, a simple
 <code>Consumer&lt;String&gt;</code>.</p>
