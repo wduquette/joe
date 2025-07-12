@@ -724,7 +724,6 @@ class Interpreter {
             // Evaluate the rule set.
             case Expr.RuleSet expr -> {
                 var rsc = new RuleSetCompiler(expr.ruleSet());
-                rsc.setFactFactory(ListFact::new);
                 var ruleset = rsc.compile();
 
                 if (!ruleset.isStratified()) {
@@ -732,15 +731,7 @@ class Interpreter {
                         "Rule set is not stratified.");
                 }
 
-                var exports = new HashMap<String, Object>();
-
-                for (var export : expr.exports().entrySet()) {
-                    var name = export.getKey();
-                    var callable = evaluate(export.getValue());
-                    exports.put(name.lexeme(), checkCallable(name, callable));
-                }
-
-                yield new RuleSetValue(ruleset, exports);
+                yield new RuleSetValue(ruleset);
             }
             // Handle `super.<methodName>` in methods
             case Expr.Super expr -> {
@@ -945,15 +936,6 @@ class Interpreter {
             }
         } else {
             throw expected(bracket.span(), "list index", index);
-        }
-    }
-
-    private JoeCallable checkCallable(Token token, Object value) {
-        if (value instanceof JoeCallable jc) {
-            return jc;
-        } else {
-            throw new RuntimeError(token.span(),
-                "Expected callable, got: " + joe.typedValue(value) + ".");
         }
     }
 }

@@ -8,6 +8,7 @@ import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.patterns.Pattern;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 import static com.wjduquette.joe.scanner.TokenType.*;
 
@@ -17,8 +18,6 @@ import static com.wjduquette.joe.scanner.TokenType.*;
  */
 public class Parser {
     public static final String ARGS = "args";
-    public static final String AS = "as";
-    public static final String EXPORT = "export";
     private static final int MAX_CALL_ARGUMENTS = 255;
 
     //-------------------------------------------------------------------------
@@ -1123,58 +1122,10 @@ public class Parser {
      */
     public Expr.RuleSet rulesetExpression() {
         var keyword = scanner.previous();
-        var facts = new ArrayList<ASTRuleSet.ASTOrderedAtom>();
-        var rules = new ArrayList<ASTRuleSet.ASTRule>();
-        var heads = new HashSet<String>();
-        var exports = new HashMap<Token, Expr>();
-
         scanner.consume(LEFT_BRACE, "expected '{' after 'ruleset'.");
 
-        while (!scanner.match(RIGHT_BRACE)) {
-            try {
-                if (scanner.matchIdentifier(EXPORT)) {
-                    scanner.consume(IDENTIFIER,
-                        "expected relation name after 'export'.");
-                    var name = scanner.previous();
-
-                    if (scanner.matchIdentifier(AS)) {
-                        var expr = expression();
-                        exports.put(name, expr);
-                    } else {
-                        exports.put(name, new Expr.VarGet(name));
-                    }
-                    scanner.consume(SEMICOLON,
-                        "expected ';' after export declaration.");
-                } else {
-                    var head = head();
-                    heads.add(head.relation().lexeme());
-
-                    if (scanner.match(SEMICOLON)) {
-                        facts.add(fact(head));
-                    } else if (scanner.match(COLON_MINUS)) {
-                        rules.add(rule(head));
-                    } else {
-                        scanner.advance();
-                        throw errorSync(scanner.previous(),
-                            "expected fact or rule.");
-                    }
-                }
-            } catch (ErrorSync error) {
-                synchronize();
-            }
-        }
-
-        for (var token : exports.keySet()) {
-            if (!heads.contains(token.lexeme())) {
-                error(token,
-                    "exported relation is not used in any axiom or rule head: '"
-                    + token.lexeme() + "'.");
-            }
-        }
-
-
-        var ast = new ASTRuleSet(facts, rules);
-        return new Expr.RuleSet(keyword, ast, exports);
+        var ast = parseRuleSet(() -> scanner.match(RIGHT_BRACE));
+        return new Expr.RuleSet(keyword, ast);
     }
 
     /**
@@ -1188,15 +1139,19 @@ public class Parser {
         this.scanner = new Scanner(source, this::errorInScanner);
         scanner.prime();
 
-        List<ASTRuleSet.ASTOrderedAtom> facts = new ArrayList<>();
+        return parseRuleSet(() -> scanner.isAtEnd());
+    }
+
+    private ASTRuleSet parseRuleSet(Supplier<Boolean> endCondition) {
+        List<ASTRuleSet.ASTAtom> facts = new ArrayList<>();
         List<ASTRuleSet.ASTRule> rules = new ArrayList<>();
 
-        while (!scanner.isAtEnd()) {
+        while (!endCondition.get()) {
             try {
-                var head = head();
+                var head = atom();
 
                 if (scanner.match(SEMICOLON)) {
-                    facts.add(fact(head));
+                    facts.add(axiom(head));
                 } else if (scanner.match(COLON_MINUS)) {
                     rules.add(rule(head));
                 } else {
@@ -1211,19 +1166,12 @@ public class Parser {
 
         // No exports; return an empty map.
         return new ASTRuleSet(facts, rules);
+
     }
 
-    private ASTRuleSet.ASTOrderedAtom head() {
-        // NEXT, parse the atom.
-        scanner.consume(IDENTIFIER, "expected relation.");
-        var relation = scanner.previous();
-        scanner.consume(LEFT_PAREN, "expected '(' after relation.");
-        return indexedAtom(relation);
-    }
-
-    private ASTRuleSet.ASTOrderedAtom fact(ASTRuleSet.ASTOrderedAtom head) {
+    private ASTRuleSet.ASTAtom axiom(ASTRuleSet.ASTAtom head) {
         // Verify that there are no non-constant terms.
-        for (var term : head.terms()) {
+        for (var term : head.getTerms()) {
             if (!(term instanceof ASTRuleSet.ASTConstant)) {
                 error(term.token(), "fact contains a non-constant term.");
             }
@@ -1231,7 +1179,7 @@ public class Parser {
         return head;
     }
 
-    private ASTRuleSet.ASTRule rule(ASTRuleSet.ASTOrderedAtom head) {
+    private ASTRuleSet.ASTRule rule(ASTRuleSet.ASTAtom head) {
         var body = new ArrayList<ASTRuleSet.ASTAtom>();
         var negations = new ArrayList<ASTRuleSet.ASTAtom>();
         var constraints = new ArrayList<ASTRuleSet.ASTConstraint>();
@@ -1240,7 +1188,7 @@ public class Parser {
         do {
             var negated = scanner.match(NOT);
 
-            var atom = bodyAtom();
+            var atom = atom();
             if (negated) {
                 for (var name : atom.getVariableTokens()) {
                     if (!bodyVar.contains(name.lexeme())) {
@@ -1261,7 +1209,7 @@ public class Parser {
         scanner.consume(SEMICOLON, "expected ';' after rule body.");
 
         // Verify that the head contains only valid terms.
-        for (var term : head.terms()) {
+        for (var term : head.getTerms()) {
             switch (term) {
                 case ASTRuleSet.ASTConstant ignored -> {}
                 case ASTRuleSet.ASTVariable v -> {
@@ -1320,7 +1268,7 @@ public class Parser {
         return new ASTRuleSet.ASTConstraint(a, op, b);
     }
 
-    private ASTRuleSet.ASTAtom bodyAtom() {
+    private ASTRuleSet.ASTAtom atom() {
         // NEXT, parse the atom.
         scanner.consume(IDENTIFIER, "expected relation.");
         var relation = scanner.previous();
@@ -1329,11 +1277,11 @@ public class Parser {
         if (scanner.checkTwo(IDENTIFIER, COLON)) {
             return namedAtom(relation);
         } else {
-            return indexedAtom(relation);
+            return orderedAtom(relation);
         }
     }
 
-    private ASTRuleSet.ASTOrderedAtom indexedAtom(Token relation) {
+    private ASTRuleSet.ASTOrderedAtom orderedAtom(Token relation) {
         var terms = new ArrayList<ASTRuleSet.ASTTerm>();
 
         do {

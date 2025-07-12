@@ -303,8 +303,7 @@ class Resolver {
                 resolve(expr.value());
                 resolve(expr.object());
             }
-            case Expr.RuleSet expr ->
-                expr.exports().values().forEach(this::resolve);
+            case Expr.RuleSet ignored -> {}
             case Expr.Super expr -> {
                 if (currentClass == ClassType.NONE) {
                     error(expr.keyword(),

@@ -969,17 +969,9 @@ class Compiler {
             case Expr.RuleSet e -> {
                 // FIRST, compile the rule set.
                 var rsc = new RuleSetCompiler(e.ruleSet());
-                rsc.setFactFactory(ListFact::new);
                 var ruleset = rsc.compile();
 
                 // Get the exports                // Stack effects
-                emit(MAPNEW);                     // map       ; Map of exports
-                for (var export : e.exports().entrySet()) {
-                    var name = export.getKey().lexeme();
-                    emitCONST(name);              // map k     ; export name
-                    emit(export.getValue());      // map k v   ; export value
-                    emit(MAPPUT);                 // map       ; put k v
-                }
                 emit(RULESET, constant(ruleset)); // rsv       ; RuleSetValue
             }
             case Expr.Super e -> {

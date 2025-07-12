@@ -182,7 +182,7 @@ public class ParserTest extends Ted {
     //-------------------------------------------------------------------------
     // bodyAtom()
 
-    @Test public void testBodyAtom_expectedRelation() {
+    @Test public void testAtom_expectedRelation() {
         test("testBodyAtom_expectedRelation");
 
         var source = """
@@ -192,7 +192,7 @@ public class ParserTest extends Ted {
             .eq("[line 1] error at ';', expected relation.");
     }
 
-    @Test public void testBodyAtom_expectedLeftParen() {
+    @Test public void testAtom_expectedLeftParen() {
         test("testBodyAtom_expectedLeftParen");
 
         var source = """
@@ -205,7 +205,7 @@ public class ParserTest extends Ted {
     //-------------------------------------------------------------------------
     // indexedAtom()
 
-    @Test public void testIndexedAtom_expectedFieldName() {
+    @Test public void testOrderedAtom_expectedFieldName() {
         test("testIndexedAtom_expectedFieldName");
 
         var source = """
@@ -215,7 +215,7 @@ public class ParserTest extends Ted {
             .eq("[line 1] error at '#a', expected field name.");
     }
 
-    @Test public void testIndexedAtom_expectedColon() {
+    @Test public void testOrderedAtom_expectedColon() {
         test("testIndexedAtom_expectedColon");
 
         var source = """
@@ -225,7 +225,7 @@ public class ParserTest extends Ted {
             .eq("[line 1] error at '#a', expected ':' after field name.");
     }
 
-    @Test public void testIndexedAtom_expectedRightParen() {
+    @Test public void testOrderedAtom_expectedRightParen() {
         test("testIndexedAtom_expectedRightParen");
 
         var source = """

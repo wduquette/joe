@@ -34,17 +34,17 @@ public class RuleEngineTest extends Ted {
     public void testSimple_named() {
         test("testSimple_named");
         var source = """
-            Parent(#walker, #bert);
-            Parent(#bert, #clark);
-            Ancestor(x, y) :- Parent(f0: x, f1: y);
-            Ancestor(x, y) :- Parent(f0: x, f1: z), Ancestor(f0: z, f1: y);
+            Parent(p: #walker, c: #bert);
+            Parent(p: #bert, c: #clark);
+            Ancestor(a: x, d: y) :- Parent(p: x, c: y);
+            Ancestor(a: x, d: y) :- Parent(p: x, c: z), Ancestor(a: z, d: y);
             """;
         check(infer(source)).eq("""
-            ListFact[relation=Ancestor, fields=[#bert, #clark]]
-            ListFact[relation=Ancestor, fields=[#walker, #bert]]
-            ListFact[relation=Ancestor, fields=[#walker, #clark]]
-            ListFact[relation=Parent, fields=[#bert, #clark]]
-            ListFact[relation=Parent, fields=[#walker, #bert]]
+            MapFact[relation=Ancestor, fieldMap={a=#bert, d=#clark}]
+            MapFact[relation=Ancestor, fieldMap={a=#walker, d=#bert}]
+            MapFact[relation=Ancestor, fieldMap={a=#walker, d=#clark}]
+            MapFact[relation=Parent, fieldMap={p=#bert, c=#clark}]
+            MapFact[relation=Parent, fieldMap={p=#walker, c=#bert}]
             """);
     }
 

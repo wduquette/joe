@@ -14,20 +14,11 @@ import java.util.stream.Collectors;
  * {@link com.wjduquette.joe.parser.ASTRuleSet} given its configuration.
  */
 public class RuleSetCompiler {
-    /**
-     * The default fact factory used by the compiler; it creates
-     * {@link ListFact} objects.
-     */
-    public static final FactFactory DEFAULT_FACT_FACTORY = ListFact::new;
-
     //-------------------------------------------------------------------------
     // Instance Variables
 
     // The AST
     private final ASTRuleSet ast;
-
-    // The factory to use to create fact values
-    private FactFactory factFactory = DEFAULT_FACT_FACTORY;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -39,23 +30,13 @@ public class RuleSetCompiler {
     //-------------------------------------------------------------------------
     // Public API
 
-
-    @SuppressWarnings("unused")
-    public FactFactory getFactFactory() {
-        return factFactory;
-    }
-
-    public void setFactFactory(FactFactory factFactory) {
-        this.factFactory = factFactory;
-    }
-
     /**
      * Compiles the Nero source, producing a rule set.
      * @return The RuleSet
      * @throws JoeError on compilation failure.
      */
     public RuleSet compile() {
-        Set<Fact> facts = ast.facts().stream().map(this::ast2fact)
+        Set<Fact> facts = ast.axioms().stream().map(this::ast2fact)
             .collect(Collectors.toSet());
         Set<Rule> rules = ast.rules().stream().map(this::ast2rule)
             .collect(Collectors.toSet());
@@ -66,37 +47,46 @@ public class RuleSetCompiler {
     //-------------------------------------------------------------------------
     // Compilation
 
-    private Fact ast2fact(ASTRuleSet.ASTOrderedAtom atom) {
-        var terms = new ArrayList<>();
-        for (var t : atom.terms()) {
-            if (t instanceof ASTRuleSet.ASTConstant c) {
-                terms.add(ast2constant(c).value());
-            } else {
-                throw new IllegalStateException(
-                    "Invalid fact; Atom contains a non-constant term.");
+    private Fact ast2fact(ASTRuleSet.ASTAtom atom) {
+        return switch (atom) {
+            case ASTRuleSet.ASTOrderedAtom a -> {
+                var terms = new ArrayList<>();
+                for (var t : a.terms()) {
+                    if (t instanceof ASTRuleSet.ASTConstant c) {
+                        terms.add(ast2constant(c).value());
+                    } else {
+                        throw new IllegalStateException(
+                            "Invalid fact; Atom contains a non-constant term.");
+                    }
+                }
+                yield new ListFact(a.relation().lexeme(), terms);
             }
-        }
-
-        return factFactory.create(atom.relation().lexeme(), terms);
+            case ASTRuleSet.ASTNamedAtom a -> {
+                var termMap = new LinkedHashMap<String,Object>();
+                for (var e : a.termMap().entrySet()) {
+                    var t = e.getValue();
+                    if (t instanceof ASTRuleSet.ASTConstant c) {
+                        termMap.put(e.getKey().lexeme(), ast2constant(c).value());
+                    } else {
+                        throw new IllegalStateException(
+                            "Invalid fact; Atom contains a non-constant term.");
+                    }
+                }
+                yield new MapFact(a.relation().lexeme(), termMap);
+            }
+        };
     }
 
     private Rule ast2rule(ASTRuleSet.ASTRule rule) {
         return new Rule(
-            ast2head(rule.head()),
-            rule.body().stream().map(this::ast2body).toList(),
-            rule.negations().stream().map(this::ast2body).toList(),
+            ast2atom(rule.head()),
+            rule.body().stream().map(this::ast2atom).toList(),
+            rule.negations().stream().map(this::ast2atom).toList(),
             rule.constraints().stream().map(this::ast2constraint).toList()
         );
     }
 
-    private HeadAtom ast2head(ASTRuleSet.ASTOrderedAtom atom) {
-        return new HeadAtom(
-            atom.relation().lexeme(),
-            atom.terms().stream().map(this::ast2term).toList()
-        );
-    }
-
-    private BodyAtom ast2body(ASTRuleSet.ASTAtom atom) {
+    private Atom ast2atom(ASTRuleSet.ASTAtom atom) {
         return switch (atom) {
             case ASTRuleSet.ASTOrderedAtom a -> new OrderedAtom(
                 a.relation().lexeme(),

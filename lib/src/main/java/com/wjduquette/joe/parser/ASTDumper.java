@@ -225,16 +225,8 @@ public class ASTDumper {
                 .println("'" + e.op().lexeme() + "'")
                 .dump("object", e.object())
                 .dump("value", e.value());
-            case Expr.RuleSet e -> {
-                var buff = buffer().nl()
+            case Expr.RuleSet e -> buffer().nl()
                     .dump("ruleset", e.ruleSet());
-                for (var export : e.exports().entrySet()) {
-                    buff.dump("export " + export.getKey().lexeme(),
-                        export.getValue());
-                }
-                yield buff.toString();
-            }
-
             case Expr.Super e -> buffer()
                 .println(" '" + e.method().lexeme() + "'");
             case Expr.Ternary e -> buffer().nl()
@@ -335,8 +327,8 @@ public class ASTDumper {
         var buff = new Buffer();
         buff.println(ruleset.getClass().getSimpleName());
 
-        for (var fact : ruleset.facts()) {
-            buff.indent("fact: " + dump(fact));
+        for (var axiom : ruleset.axioms()) {
+            buff.indent("axiom: " + axiom.toString());
         }
 
         for (var rule : ruleset.rules()) {
@@ -344,10 +336,6 @@ public class ASTDumper {
         }
 
         return buff.toString();
-    }
-
-    private static String dump(ASTRuleSet.ASTOrderedAtom atom) {
-        return atom.toString();
     }
 
     private static String dump(ASTRuleSet.ASTRule rule) {

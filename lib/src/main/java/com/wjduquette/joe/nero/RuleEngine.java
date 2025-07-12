@@ -14,19 +14,6 @@ public class RuleEngine {
         "Call `infer()` before querying results.";
 
     //-------------------------------------------------------------------------
-    // Static
-
-    /**
-     * Nero's default fact factory; it creates {@link ListFact} objects.
-     */
-    public static final FactFactory DEFAULT_FACT_FACTORY =
-        RuleEngine::defaultFactFactory;
-
-    private static Fact defaultFactFactory(String relation, List<Object> terms) {
-        return new ListFact(relation, terms);
-    }
-
-    //-------------------------------------------------------------------------
     // Instance Variables
 
     //
@@ -42,9 +29,6 @@ public class RuleEngine {
     //
     // Configuration Data
     //
-
-    // The factory used to create new facts.
-    private FactFactory factFactory = DEFAULT_FACT_FACTORY;
 
     // Debug Flag
     private boolean debug = false;
@@ -114,26 +98,6 @@ public class RuleEngine {
      */
     public void setDebug(boolean debug) {
         this.debug = debug;
-    }
-
-    /**
-     * Gets the factory used to create new {@link Fact Facts} given a
-     * relation and list of terms.
-     * @return The factory
-     */
-    @SuppressWarnings("unused")
-    public FactFactory getFactFactory() {
-        return factFactory;
-    }
-
-    /**
-     * Sets the factory used to create new {@link Fact Facts} given a
-     * relation and list of terms.
-     * @param factFactory The factory
-     */
-    @SuppressWarnings("unused")
-    public void setFactFactory(FactFactory factFactory) {
-        this.factFactory = factFactory;
     }
 
     //-------------------------------------------------------------------------
@@ -233,7 +197,7 @@ public class RuleEngine {
 
         var bc = new BindingContext(rule);
 
-        matchBodyAtom(bc, 0);
+        matchNextBodyAtom(bc, 0);
 
         if (!bc.inferredFacts.isEmpty()) {
             knownFacts.addAll(bc.inferredFacts);
@@ -245,7 +209,7 @@ public class RuleEngine {
     }
 
     // Matches the rule's index-th body atom against the relevant facts.
-    private void matchBodyAtom(BindingContext bc, int index) {
+    private void matchNextBodyAtom(BindingContext bc, int index) {
         var atom = bc.rule.body().get(index);
         var facts = knownFacts.getRelation(atom.relation());
 
@@ -257,24 +221,13 @@ public class RuleEngine {
             // FIRST, Copy the bindings for this fact.
             bc.bindings = new Bindings(givenBindings);
 
-            // NEXT, Verify that the fact can be matched by this atom.
-            if (atom.requiresOrderedFields() && !fact.isOrdered()) {
-                throw new JoeError(
-                    "'" + atom.relation() +
-                        "' in rule '" + bc.rule +
-                        "' requires ordered fields, but a provided " +
-                        "fact is not ordered.");
-            }
-
             // NEXT, if it doesn't match, go on to the next fact.
-            // TODO: Improve the `BodyAtom::matches` API
-            bc.bindings = atom.matches(fact, bc.bindings);
-            if (bc.bindings == null) continue;
+            if (!matchAtom(atom, fact, bc)) continue;
 
             // NEXT, it matches.  If there's another body atom, check it and
             // then go on to the next fact.
             if (index + 1 < bc.rule.body().size()) {
-                matchBodyAtom(bc, index + 1);
+                matchNextBodyAtom(bc, index + 1);
                 continue;
             }
 
@@ -296,6 +249,72 @@ public class RuleEngine {
         }
     }
 
+    // Attempts to match the atom and the fact, given the current bindings.
+    // Returns true on success and false on failure.  Any new bindings are
+    // added to the current bindings.
+    private boolean matchAtom(
+        Atom bodyAtom,
+        Fact fact,
+        BindingContext bc
+    ) {
+         switch (bodyAtom) {
+             case NamedAtom atom -> {
+                 for (var e : atom.terms().entrySet()) {
+                     var name = e.getKey();
+
+                     if (!fact.getFieldMap().containsKey(name)) {
+                         return false;
+                     }
+                     var f = fact.getFieldMap().get(name);
+                     var t = e.getValue();
+                     if (!matchTerm(t, f, bc)) return false;
+                 }
+                 return true;
+             }
+             case OrderedAtom atom -> {
+                 if (!fact.isOrdered()) {
+                     throw new JoeError(
+                         "'" + atom.relation() +
+                             "' in rule '" + bc.rule +
+                             "' requires ordered fields, but a provided " +
+                             "fact is not ordered.");
+                 }
+
+                 var n = atom.terms().size();
+                 if (fact.getFields().size() != n) return false;
+
+                 for (var i = 0; i < atom.terms().size(); i++) {
+                     var t = atom.terms().get(i);
+                     var f = fact.getFields().get(i);
+
+                     if (!matchTerm(t, f, bc)) return false;
+                 }
+                 return true;
+             }
+         }
+    }
+
+    private boolean matchTerm(
+        Term term,
+        Object value,
+        BindingContext bc
+    ) {
+        return switch (term) {
+            case Variable v -> {
+                var bound = bc.bindings.get(v);
+
+                if (bound == null) {
+                    bc.bindings.put(v, value);
+                    yield true;
+                } else {
+                    yield Objects.equals(bound, value);
+                }
+            }
+            case Constant c -> Objects.equals(value, c.value());
+            case Wildcard ignored -> true;
+        };
+    }
+
     private boolean constraintsMet(BindingContext bc) {
         for (var constraint : bc.rule.constraints()) {
             if (!constraintMet(constraint, bc.bindings)) {
@@ -308,7 +327,7 @@ public class RuleEngine {
     private boolean checkNegations(BindingContext bc) {
         for (var atom : bc. rule.negations()) {
             for (var fact : knownFacts.getRelation(atom.relation())) {
-                if (atom.matches(fact, bc.bindings) != null) {
+                if (matchAtom(atom, fact, bc)) {
                     return false;
                 }
             }
@@ -317,18 +336,35 @@ public class RuleEngine {
     }
 
     private Fact createFact(BindingContext bc) {
-        var terms = new ArrayList<>();
+        return switch (bc.rule.head()) {
+            case NamedAtom atom -> {
+                var terms = new HashMap<String,Object>();
 
-        for (var term : bc.rule.head().terms()) {
-            switch (term) {
-                case Constant c -> terms.add(c.value());
-                case Variable v -> terms.add(bc.bindings.get(v));
-                case Wildcard ignored -> throw new IllegalStateException(
-                    "Rule head contains a Wildcard term.");
+                for (var e : atom.terms().entrySet()) {
+                    terms.put(e.getKey(), term2value(e.getValue(), bc));
+                }
+
+                yield new MapFact(atom.relation(), terms);
             }
-        }
+            case OrderedAtom atom -> {
+                var terms = new ArrayList<>();
 
-        return factFactory.create(bc.rule.head().relation(), terms);
+                for (var term : atom.terms()) {
+                    terms.add(term2value(term, bc));
+                }
+
+                yield new ListFact(atom.relation(), terms);
+            }
+        };
+    }
+
+    private Object term2value(Term term, BindingContext bc) {
+        return switch (term) {
+            case Constant c -> c.value();
+            case Variable v -> bc.bindings.get(v);
+            case Wildcard ignored -> throw new IllegalStateException(
+                "Rule head contains a Wildcard term.");
+        };
     }
 
     private boolean constraintMet(

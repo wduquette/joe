@@ -3,7 +3,6 @@ package com.wjduquette.joe.parser;
 import com.wjduquette.joe.SourceBuffer.Span;
 import com.wjduquette.joe.scanner.Token;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The various kinds of expression that can appear in Joe's AST.
@@ -222,12 +221,10 @@ public sealed interface Expr permits
      * A `ruleset` expression, containing a Nero rule set's AST.
      * @param keyword The `ruleset` keyword
      * @param ruleSet The rule set as parsed
-     * @param exports The exported relations
      */
     record RuleSet(
         Token keyword,
-        ASTRuleSet ruleSet,
-        Map<Token,Expr> exports
+        ASTRuleSet ruleSet
     ) implements Expr {
         public Span location() { return keyword.span(); }
     }
