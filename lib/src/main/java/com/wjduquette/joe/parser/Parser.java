@@ -1,6 +1,7 @@
 package com.wjduquette.joe.parser;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.nero.Schema;
+import com.wjduquette.joe.nero.Shape;
 import com.wjduquette.joe.scanner.Scanner;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
@@ -19,6 +20,7 @@ import static com.wjduquette.joe.scanner.TokenType.*;
  */
 public class Parser {
     public static final String ARGS = "args";
+    public static final String DEFINE = "define";
     private static final int MAX_CALL_ARGUMENTS = 255;
 
     //-------------------------------------------------------------------------
@@ -1150,6 +1152,10 @@ public class Parser {
 
         while (!endCondition.get()) {
             try {
+                if (scanner.matchIdentifier(DEFINE)) {
+                    defineDeclaration(schema);
+                    continue;
+                }
                 var headToken = scanner.peek();
                 var head = atom();
 
@@ -1177,7 +1183,48 @@ public class Parser {
 
         // No exports; return an empty map.
         return new ASTRuleSet(schema, facts, rules);
+    }
 
+    private void defineDeclaration(Schema schema) {
+        scanner.consume(IDENTIFIER, "expected relation after 'define'.");
+        var relation = scanner.previous();
+        scanner.consume(SLASH, "expected '/' after relation.");
+
+        Shape shape;
+
+        if (scanner.match(NUMBER)) {
+            var arity = (Double)scanner.previous().literal();
+            if (arity - arity.intValue() != 0.0) {
+                error(scanner.previous(), "expected integer arity.");
+            }
+            if (arity <= 0) {
+                error(scanner.previous(), "expected positive arity.");
+            }
+            shape = new Shape.ListShape(relation.lexeme(), arity.intValue());
+        } else if (scanner.match(DOT_DOT_DOT)) {
+            shape = new Shape.MapShape(relation.lexeme());
+        } else if (scanner.check(IDENTIFIER)) {
+            var names = new ArrayList<String>();
+            do {
+                scanner.consume(IDENTIFIER, "expected field name.");
+                var name = scanner.previous().lexeme();
+                if (names.contains(name)) {
+                    error(scanner.previous(), "duplicate field name.");
+                }
+                names.add(name);
+            } while (scanner.match(COMMA));
+
+            shape = new Shape.PairShape(relation.lexeme(), names);
+        } else {
+            scanner.advance();
+            throw errorSync(scanner.previous(),
+                "expected arity, '...', or field names.");
+        }
+        scanner.consume(SEMICOLON, "expected ';' after definition.");
+
+        if (!schema.checkAndAdd(shape)) {
+            error(relation, "definition clashes with earlier entry.");
+        }
     }
 
     private ASTRuleSet.ASTAtom axiom(ASTRuleSet.ASTAtom head) {

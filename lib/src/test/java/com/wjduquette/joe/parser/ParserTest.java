@@ -47,7 +47,7 @@ public class ParserTest extends Ted {
             .eq("[line 2] error at 'Person', axiom's shape is incompatible with previous definitions for this relation.");
     }
 
-    @Test public void testParseRuleSet_headismatch() {
+    @Test public void testParseRuleSet_headMismatch() {
         test("testParseRuleSet_headMismatch");
 
         var source = """
@@ -56,6 +56,101 @@ public class ParserTest extends Ted {
             """;
         check(parseNero(source))
             .eq("[line 2] error at 'Result', rule head's shape is incompatible with previous definitions for this relation.");
+    }
+
+    //-------------------------------------------------------------------------
+    // defineDeclaration
+
+    @Test public void testDefineDeclaration_expectedRelation() {
+        test("testDefineDeclaration_expectedRelation");
+
+        var source = """
+            define 2;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '2', expected relation after 'define'.");
+    }
+
+    @Test public void testDefineDeclaration_expectedSlash() {
+        test("testDefineDeclaration_expectedSlash");
+
+        var source = """
+            define Person:2;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at ':', expected '/' after relation.");
+    }
+
+    @Test public void testDefineDeclaration_expectedIntegerArity() {
+        test("testDefineDeclaration_expectedIntegerArity");
+
+        var source = """
+            define Person/2.5;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '2.5', expected integer arity.");
+    }
+
+    @Test public void testDefineDeclaration_expectedPositiveArity() {
+        test("testDefineDeclaration_expectedPositiveArity");
+
+        var source = """
+            define Person/0;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '0', expected positive arity.");
+    }
+
+    @Test public void testDefineDeclaration_expectedFieldName() {
+        test("testDefineDeclaration_expectedFieldName");
+
+        var source = """
+            define Thing/id, 2;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '2', expected field name.");
+    }
+
+    @Test public void testDefineDeclaration_duplicateFieldName() {
+        test("testDefineDeclaration_duplicateFieldName");
+
+        var source = """
+            define Thing/id, id;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'id', duplicate field name.");
+    }
+
+    @Test public void testDefineDeclaration_expectedValidShape() {
+        test("testDefineDeclaration_expectedValidShape");
+
+        var source = """
+            define Thing/null;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'null', expected arity, '...', or field names.");
+    }
+
+    @Test public void testDefineDeclaration_expectedSemicolon() {
+        test("testDefineDeclaration_expectedSemicolon");
+
+        var source = """
+            define Thing/2
+            define Place/2;
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at 'define', expected ';' after definition.");
+    }
+
+    @Test public void testDefineDeclaration_definitionClashes() {
+        test("testDefineDeclaration_definitionClashes");
+
+        var source = """
+            Thing(#a, #b);
+            define Thing/1;
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at 'Thing', definition clashes with earlier entry.");
     }
 
     //-------------------------------------------------------------------------
@@ -286,6 +381,7 @@ public class ParserTest extends Ted {
     //-------------------------------------------------------------------------
     // Helpers
 
+    @SuppressWarnings("unused")
     private String parseJoe(String input) {
         errors.clear();
         var buffer = new SourceBuffer("-", input);

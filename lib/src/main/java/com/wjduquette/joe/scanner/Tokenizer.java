@@ -129,7 +129,7 @@ public class Tokenizer {
             case ':' -> makeToken(match('-') ? COLON_MINUS : COLON);
             case ',' -> makeToken(COMMA);
             case '$' -> makeToken(DOLLAR);
-            case '.' -> makeToken(DOT);
+            case '.' -> makeToken(matchNext("..") ? DOT_DOT_DOT : DOT);
             case '?' -> makeToken(QUESTION);
             case '~' -> makeToken(TILDE);
             case '-' -> {
