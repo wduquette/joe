@@ -127,7 +127,7 @@ public class SchemaTest extends Ted {
     //-------------------------------------------------------------------------
     // checkAndAdd(ASTATom)
 
-    // TODO: Add checkAndAdd(ASTAtom) tests once `RuleSet` includes a schema.
+    // Add checkAndAdd(ASTAtom) tests once `RuleSet` includes a schema.
 
     //-------------------------------------------------------------------------
     // inferSchema

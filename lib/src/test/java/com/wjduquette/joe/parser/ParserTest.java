@@ -26,14 +26,36 @@ public class ParserTest extends Ted {
     //-------------------------------------------------------------------------
     // parseNero()
 
-    @Test public void testParseNero_expectedClause() {
-        test("testParseNero");
+    @Test public void testParseRuleSet_expectedAxiomOrRule() {
+        test("testParseRuleSet_expectedAxiomOrRule");
 
         var source = """
             Head(x), Body(x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at ',', expected fact or rule.");
+            .eq("[line 1] error at ',', expected axiom or rule.");
+    }
+
+    @Test public void testParseRuleSet_axiomMismatch() {
+        test("testParseRuleSet_axiomMismatch");
+
+        var source = """
+            Person(#joe);
+            Person(#joe, 90);
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at 'Person', axiom's shape is incompatible with previous definitions for this relation.");
+    }
+
+    @Test public void testParseRuleSet_headismatch() {
+        test("testParseRuleSet_headMismatch");
+
+        var source = """
+            Result(x) :- Person(x, _);
+            Result(x, y) :- Person(x, y);
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at 'Result', rule head's shape is incompatible with previous definitions for this relation.");
     }
 
     //-------------------------------------------------------------------------

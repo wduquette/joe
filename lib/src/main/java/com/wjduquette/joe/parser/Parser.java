@@ -1,5 +1,6 @@
 package com.wjduquette.joe.parser;
 import com.wjduquette.joe.SyntaxError;
+import com.wjduquette.joe.nero.Schema;
 import com.wjduquette.joe.scanner.Scanner;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
@@ -1145,19 +1146,29 @@ public class Parser {
     private ASTRuleSet parseRuleSet(Supplier<Boolean> endCondition) {
         List<ASTRuleSet.ASTAtom> facts = new ArrayList<>();
         List<ASTRuleSet.ASTRule> rules = new ArrayList<>();
+        var schema = new Schema();
 
         while (!endCondition.get()) {
             try {
+                var headToken = scanner.peek();
                 var head = atom();
 
                 if (scanner.match(SEMICOLON)) {
+                    if (!schema.checkAndAdd(head)) {
+                        error(headToken,
+                            "axiom's shape is incompatible with previous definitions for this relation.");
+                    }
                     facts.add(axiom(head));
                 } else if (scanner.match(COLON_MINUS)) {
+                    if (!schema.checkAndAdd(head)) {
+                        error(headToken,
+                            "rule head's shape is incompatible with previous definitions for this relation.");
+                    }
                     rules.add(rule(head));
                 } else {
                     scanner.advance();
                     throw errorSync(scanner.previous(),
-                        "expected fact or rule.");
+                        "expected axiom or rule.");
                 }
             } catch (ErrorSync error) {
                 synchronize();
