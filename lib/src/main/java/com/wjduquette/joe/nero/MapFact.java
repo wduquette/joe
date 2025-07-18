@@ -12,15 +12,9 @@ import java.util.Map;
 public record MapFact(String relation, Map<String, Object> fieldMap)
     implements Fact
 {
-    @Override
-    public boolean isOrdered() {
-        return false;
-    }
-
-    @Override
-    public Map<String, Object> getFieldMap() {
-        return fieldMap;
-    }
+    @Override public boolean             isOrdered()   { return false; }
+    @Override public int                 arity()       { return fieldMap.size(); }
+    @Override public Map<String, Object> getFieldMap() { return fieldMap; }
 
     @Override
     public List<Object> getFields() {

@@ -37,6 +37,15 @@ public class Nero {
     // Compiles the source to a NeroEngine, and checks for stratification.
     // Throws SyntaxError on any parse error and JoeError if the rule set
     // is not stratified.
+
+    /**
+     * Compiles the source, checking for syntax errors and stratification.
+     * Returns a RuleEngine on success and throws an appropriate error
+     * on error.
+     * @param source The source
+     * @return The engine, which has not yet be run.
+     * @throws JoeError on error.
+     */
     public RuleEngine compile(SourceBuffer source) {
         var ast = parse(source);
         var ruleSet = new RuleSetCompiler(ast).compile();
@@ -49,8 +58,13 @@ public class Nero {
         return engine;
     }
 
-    // Parses the source, throwing a SyntaxError on error.
-    private ASTRuleSet parse(SourceBuffer source) {
+    /**
+     * Parses the source, returning an AST on success.
+     * @param source The source
+     * @return The AST
+     * @throws SyntaxError on error.
+     */
+    public ASTRuleSet parse(SourceBuffer source) {
         traces = new ArrayList<>();
         var parser = new Parser(source, this::errorHandler);
         var ast = parser.parseNero();

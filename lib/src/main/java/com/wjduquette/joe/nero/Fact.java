@@ -30,6 +30,12 @@ public sealed interface Fact
     boolean isOrdered();
 
     /**
+     * Returns the number of fields in the fact.
+     * @return The number.
+     */
+    int arity();
+
+    /**
      * If hasOrderedFields(), the list of field values.
      * @return the list
      * @throws IllegalStateException if !isIndexed.

@@ -72,9 +72,10 @@ public final class PairFact implements Fact {
     //-------------------------------------------------------------------------
     // Fact API
 
-    @Override public String              relation()    { return relation; }
-    @Override public boolean             isOrdered()   { return true; }
-    @Override public List<Object>        getFields()   { return fields; }
+    @Override public String        relation()  { return relation; }
+    @Override public boolean       isOrdered() { return true; }
+    @Override public int           arity()     { return fields.size(); }
+    @Override public List<Object>  getFields() { return fields; }
 
     @Override public Map<String, Object> getFieldMap() {
         // Construct the field map on demand.
