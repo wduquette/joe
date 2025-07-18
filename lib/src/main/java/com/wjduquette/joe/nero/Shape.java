@@ -13,6 +13,12 @@ public sealed interface Shape permits
     // Interface API
 
     /**
+     * The shape's relation name.
+     * @return The name
+     */
+    String relation();
+
+    /**
      * The arity of facts having this shape.  Returns -1 if the arity can
      * vary for different facts of this shape.
      * @return The arity
