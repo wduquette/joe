@@ -1176,7 +1176,7 @@ public class Parser {
         }
 
         // No exports; return an empty map.
-        return new ASTRuleSet(facts, rules);
+        return new ASTRuleSet(schema, facts, rules);
 
     }
 
