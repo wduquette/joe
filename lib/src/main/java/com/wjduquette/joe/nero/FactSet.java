@@ -151,8 +151,8 @@ public class FactSet {
                     new ListFact(newName, f.fields());
                 case MapFact f ->
                     new MapFact(newName, f.fieldMap());
-                case RecordFact f ->
-                    new RecordFact(newName, f.getFieldNames(), f.getFieldMap());
+                case PairFact f ->
+                    new PairFact(newName, f.getFieldNames(), f.getFieldMap());
             };
             newFacts.add(newFact);
         }

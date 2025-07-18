@@ -3,7 +3,7 @@ package com.wjduquette.joe.patterns;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.ListFact;
-import com.wjduquette.joe.nero.RecordFact;
+import com.wjduquette.joe.nero.PairFact;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -733,7 +733,7 @@ public class MatcherTest extends Ted {
         @Override public void set(String name, Object value) { }
         @Override public boolean isFact() { return true; }
         @Override public Fact toFact() {
-            return new RecordFact(typeName, List.of("id", "color"), fields);
+            return new PairFact(typeName, List.of("id", "color"), fields);
         }
     }
 
