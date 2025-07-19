@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.parser.ASTRuleSet;
 import org.junit.Test;
@@ -24,6 +25,7 @@ public class ShapeTest extends Ted {
         check(shape.relation()).eq("List");
         check(shape.arity()).eq(2);
         check(shape.toString()).eq("ListShape[relation=List, arity=2]");
+        check(shape.toSpec()).eq("List/2");
     }
 
     @Test
@@ -33,6 +35,7 @@ public class ShapeTest extends Ted {
         check(shape.relation()).eq("Map");
         check(shape.arity()).eq(-1);
         check(shape.toString()).eq("MapShape[relation=Map]");
+        check(shape.toSpec()).eq("Map/...");
     }
 
     @Test
@@ -42,6 +45,7 @@ public class ShapeTest extends Ted {
         check(shape.relation()).eq("Pair");
         check(shape.arity()).eq(2);
         check(shape.toString()).eq("PairShape[relation=Pair, fieldNames=[a, b]]");
+        check(shape.toSpec()).eq("Pair/a,b");
     }
 
     @Test
@@ -69,6 +73,6 @@ public class ShapeTest extends Ted {
 
     private ASTRuleSet parse(String text) {
         var source = new SourceBuffer("*test*", text);
-        return new Nero().parse(source);
+        return new Nero(new Joe()).parse(source);
     }
 }

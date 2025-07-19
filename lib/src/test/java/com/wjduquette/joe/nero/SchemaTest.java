@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.parser.ASTRuleSet;
 import org.junit.Before;
@@ -279,6 +280,6 @@ public class SchemaTest extends Ted {
     @SuppressWarnings("unused")
     private ASTRuleSet parse(String text) {
         var source = new SourceBuffer("*test*", text);
-        return new Nero().parse(source);
+        return new Nero(new Joe()).parse(source);
     }
 }

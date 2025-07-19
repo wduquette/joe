@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
 import org.junit.Test;
 
@@ -10,7 +11,7 @@ import static com.wjduquette.joe.checker.Checker.check;
 // Tests for the Nero engine. This test suite does NOT check for parsing
 // errors.
 public class RuleEngineTest extends Ted {
-    private final Nero nero = new Nero();
+    private final Nero nero = new Nero(new Joe());
 
     @Test
     public void testSimple() {

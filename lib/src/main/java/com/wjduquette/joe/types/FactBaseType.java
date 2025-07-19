@@ -5,7 +5,6 @@ import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.FactSet;
 import com.wjduquette.joe.nero.Nero;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -121,15 +120,14 @@ public class FactBaseType extends ProxyType<FactBase> {
         args.exactArity(1, "FactBase.asNero(facts)");
         var arg = args.next();
 
-        if (arg instanceof FactBase fb) {
-            return FactBaseType.factBase2nero(joe, fb);
+        if (arg instanceof FactBase db) {
+            return new Nero(joe).asNeroScript(db);
         } else {
-            var facts = new ArrayList<Fact>();
+            var db = new FactBase();
             for (var fact : joe.toCollection(arg)) {
-                facts.add(joe.toFact(fact));
+                db.add(joe.toFact(fact));
             }
-            var fb = new FactBase(facts);
-            return FactBaseType.factBase2nero(joe, fb);
+            return new Nero(joe).asNeroScript(db);
         }
     }
 
@@ -142,7 +140,8 @@ public class FactBaseType extends ProxyType<FactBase> {
     private Object _fromNero(Joe joe, Args args) {
         args.exactArity(1, "FactBase.fromNero(script)");
         var script = joe.toString(args.next());
-        var results = new Nero().execute(new SourceBuffer("*fromNero*", script));
+        var results = new Nero(joe)
+            .execute(new SourceBuffer("*fromNero*", script));
         return new FactBase(results.getKnownFacts());
     }
 
@@ -430,7 +429,7 @@ public class FactBaseType extends ProxyType<FactBase> {
     // Nero axioms.
     private Object _toNero(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "toNero()");
-        return FactBaseType.factBase2nero(joe, db);
+        return new Nero(joe).asNeroScript(db);
     }
 
     //**
@@ -473,61 +472,5 @@ public class FactBaseType extends ProxyType<FactBase> {
             }
             db.addAll(factSet);
         }
-    }
-
-    /**
-     * Outputs the contents of a FactBase to Nero format, if possible.
-     * @param joe The interpreter
-     * @param db The FactBase
-     * @return The Nero source text
-     * @throws JoeError if constraints are not met.
-     */
-    public static String factBase2nero(Joe joe, FactBase db) {
-        var buff = new StringBuilder();
-        var relations = db.getRelations().stream().sorted().toList();
-
-        for (var relation : relations) {
-            for (var fact : db.getRelation(relation)) {
-                buff.append(fact2nero(joe, fact)).append("\n");
-            }
-        }
-        return buff.toString();
-    }
-
-    /**
-     * Outputs a Fact as a Nero axiom, if possible.
-     * @param joe The interpreter
-     * @param fact The Fact
-     * @return The axiom text
-     * @throws JoeError if constraints are not met.
-     */
-    public static String fact2nero(Joe joe, Fact fact) {
-        var buff = new StringBuilder();
-        buff.append(fact.relation()).append("(");
-        if (fact.isOrdered()) {
-            var terms = fact.getFields().stream()
-                .map(t -> term2nero(joe, t))
-                .collect(Collectors.joining(", "));
-
-            buff.append(terms);
-        } else {
-            throw new JoeError("Unordered fact: " + fact);
-        }
-        buff.append(");");
-        return buff.toString();
-    }
-
-    public static String term2nero(Joe joe, Object term) {
-        // At present, all we support are the standard scalar literals;
-        // this is the easiest way to limit the output to that.
-        return switch (term) {
-            case null -> "null";
-            case Boolean b -> joe.stringify(b);
-            case Double d -> joe.stringify(d);
-            case Keyword k -> joe.stringify(k);
-            case String s -> Joe.quote(s);
-            default -> throw new JoeError(
-                "Non-Nero term: '" + joe.stringify(term));
-        };
     }
 }

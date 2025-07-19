@@ -25,6 +25,13 @@ public sealed interface Shape permits
      */
     int arity();
 
+    /**
+     * Gets the string representation of the shape, as it appears
+     * in `define` declarations.
+     * @return The string representation.
+     */
+    String toSpec();
+
     //-------------------------------------------------------------------------
     // Concrete Shape Types
 
@@ -36,6 +43,7 @@ public sealed interface Shape permits
     record ListShape(String relation, int arity)
         implements Shape
     {
+        @Override public String toSpec() { return relation + "/" + arity; }
     }
 
     /**
@@ -46,6 +54,7 @@ public sealed interface Shape permits
         implements Shape
     {
         @Override public int arity() { return -1; }
+        @Override public String toSpec() { return relation + "/..."; }
     }
 
     /**
@@ -57,6 +66,9 @@ public sealed interface Shape permits
         implements Shape
     {
         @Override public int arity() { return fieldNames.size(); }
+        @Override public String toSpec() {
+            return relation + "/" + String.join(",", fieldNames);
+        }
     }
 
     //-------------------------------------------------------------------------
