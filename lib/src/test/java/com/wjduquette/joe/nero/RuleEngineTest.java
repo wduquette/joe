@@ -144,6 +144,20 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    @Test
+    public void testPairFactCreation() {
+        var source = """
+            define Pair/left, right;
+            Pair(#c, #c);
+            define Twin/id;
+            Twin(x) :- Pair(x, x);
+            """;
+        check(infer(source)).eq("""
+            PairFact[relation=Pair, fieldNames=[left, right], fields=[#c, #c]]
+            PairFact[relation=Twin, fieldNames=[id], fields=[#c]]
+            """);
+    }
+
     //-------------------------------------------------------------------------
     // Helpers
 

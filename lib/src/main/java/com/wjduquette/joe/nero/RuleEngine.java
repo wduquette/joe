@@ -197,6 +197,7 @@ public class RuleEngine {
 
         var bc = new BindingContext(rule);
 
+
         matchNextBodyAtom(bc, 0);
 
         if (!bc.inferredFacts.isEmpty()) {
@@ -352,8 +353,11 @@ public class RuleEngine {
                 for (var term : atom.terms()) {
                     terms.add(term2value(term, bc));
                 }
-
-                yield new ListFact(atom.relation(), terms);
+                if (bc.shape instanceof Shape.PairShape ps) {
+                    yield new PairFact(atom.relation(), ps.fieldNames(), terms);
+                } else {
+                    yield new ListFact(atom.relation(), terms);
+                }
             }
         };
     }
@@ -426,13 +430,15 @@ public class RuleEngine {
     // Helpers
 
     // The context for the recursive matchBodyAtom method.
-    private static class BindingContext {
+    private class BindingContext {
         private final Rule rule;
+        private final Shape shape;
         private final List<Fact> inferredFacts = new ArrayList<>();
         private Bindings bindings = new Bindings();
 
         BindingContext(Rule rule) {
             this.rule = rule;
+            this.shape = ruleset.schema().get(rule.head().relation());
         }
     }
 

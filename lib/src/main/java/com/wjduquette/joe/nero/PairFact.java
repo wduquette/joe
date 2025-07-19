@@ -108,9 +108,7 @@ public final class PairFact implements Fact {
 
     @Override
     public String toString() {
-        var mapString = fieldNames.stream()
-            .map(n -> n + "=" + fieldMap.get(n))
-            .collect(Collectors.joining(", "));
-        return "PairFact[" + relation + ", " + mapString + "]";
+        return "PairFact[relation=" + relation + ", fieldNames=" + fieldNames
+            + ", fields=" + fields + "]";
     }
 }
