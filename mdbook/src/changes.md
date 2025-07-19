@@ -1,6 +1,10 @@
 # Change Log
 
-## Changes in 0.7.0 (in development)
+## Changes in 0.8.0 (in development)
+
+- None yet
+
+## Changes in 0.7.0 (19 July 2025)
 
 - Internals
   - Replaced the Bert byte-code engine and its single-pass compiler with the
