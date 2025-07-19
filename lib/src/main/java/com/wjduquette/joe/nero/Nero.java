@@ -52,37 +52,13 @@ public class Nero {
      * @return The engine, which has not yet be run.
      * @throws JoeError on error.
      */
-    public RuleEngine compile(SourceBuffer source) {
+    public RuleSet compile(SourceBuffer source) {
         var ast = parse(source);
         var ruleSet = new RuleSetCompiler(ast).compile();
         if (!ruleSet.isStratified()) {
             throw new JoeError("Nero rule set is not stratified.");
         }
-        var engine = new RuleEngine(ruleSet);
-        engine.setDebug(debug);
-
-        return engine;
-    }
-
-    /**
-     * Compiles the source, checking for syntax errors and stratification.
-     * Returns a RuleEngine on success and throws an appropriate error
-     * on error.
-     * @param source The source
-     * @param db The input facts
-     * @return The engine, which has not yet be run.
-     * @throws JoeError on error.
-     */
-    public RuleEngine compile(SourceBuffer source, FactSet db) {
-        var ast = parse(source);
-        var ruleSet = new RuleSetCompiler(ast).compile();
-        if (!ruleSet.isStratified()) {
-            throw new JoeError("Nero rule set is not stratified.");
-        }
-        var engine = new RuleEngine(ruleSet, db);
-        engine.setDebug(debug);
-
-        return engine;
+        return ruleSet;
     }
 
     /**
@@ -135,7 +111,8 @@ public class Nero {
     public RuleEngine execute(SourceBuffer source)
         throws SyntaxError, JoeError
     {
-        var engine = compile(source);
+        var ruleSet = compile(source);
+        var engine = new RuleEngine(ruleSet);
         engine.setDebug(debug);
         engine.infer();
         return engine;
@@ -154,7 +131,8 @@ public class Nero {
     public RuleEngine execute(SourceBuffer source, FactSet db)
         throws SyntaxError, JoeError
     {
-        var engine = compile(source, db);
+        var ruleSet = compile(source);
+        var engine = new RuleEngine(ruleSet, db);
         engine.setDebug(debug);
         engine.infer();
         return engine;
