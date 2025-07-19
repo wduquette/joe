@@ -99,7 +99,7 @@ public record ASTRuleSet(
     ) implements ASTAtom {
         @Override public Collection<ASTTerm> getTerms() { return terms(); }
         @Override public String toString() {
-            return "ASTIndexedAtom(" + relation.lexeme() + "," + terms + ")";
+            return "ASTOrderedAtom(" + relation.lexeme() + "," + terms + ")";
         }
     }
 
