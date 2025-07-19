@@ -1177,7 +1177,7 @@ public class Parser {
                         "expected axiom or rule.");
                 }
             } catch (ErrorSync error) {
-                synchronize();
+                synchronizeNero();
             }
         }
 
@@ -1426,6 +1426,27 @@ public class Parser {
                     case WHILE:
                         return;
                 }
+
+                // Discard this token.
+                scanner.advance();
+            }
+        } finally {
+            synchronizing = false;
+        }
+    }
+
+    // Discard tokens until we are at the beginning of the next statement.
+    // For Nero code, that just means whatever follows the next semicolon.
+    private void synchronizeNero() {
+        try {
+            synchronizing = true;
+
+            // Discard this token
+            scanner.advance();
+
+            while (!scanner.isAtEnd()) {
+                // If we see we just completed a statement, return.
+                if (scanner.previous().type() == SEMICOLON) return;
 
                 // Discard this token.
                 scanner.advance();
