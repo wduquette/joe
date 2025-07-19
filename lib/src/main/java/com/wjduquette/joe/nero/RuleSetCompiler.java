@@ -41,7 +41,7 @@ public class RuleSetCompiler {
         Set<Rule> rules = ast.rules().stream().map(this::ast2rule)
             .collect(Collectors.toSet());
 
-        return new RuleSet(facts, rules);
+        return new RuleSet(ast.schema(), facts, rules);
     }
 
     //-------------------------------------------------------------------------

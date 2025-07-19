@@ -108,7 +108,7 @@ public class RuleEngine {
      * @return The axiomatic facts.
      */
     public Set<Fact> getAxioms() {
-        return ruleset.facts();
+        return ruleset.axioms();
     }
 
     /**
@@ -162,17 +162,17 @@ public class RuleEngine {
         inferenceComplete = true;
 
         // NEXT, initialize the data structures
-        knownFacts.addAll(ruleset.facts());
-        inferredFacts.addAll(ruleset.facts());
+        knownFacts.addAll(ruleset.axioms());
+        inferredFacts.addAll(ruleset.axioms());
 
         // NEXT, execute the rules.
         if (debug) {
             System.out.println("Rule Strata: " +
-                ruleset.getStrata());
+                ruleset.strata());
         }
 
-        for (var i = 0; i < ruleset.getStrata().size(); i++) {
-            inferStratum(i, ruleset.getStrata().get(i));
+        for (var i = 0; i < ruleset.strata().size(); i++) {
+            inferStratum(i, ruleset.strata().get(i));
         }
     }
 
