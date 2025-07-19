@@ -12,8 +12,7 @@ with:
 
 - Stratified negation
 - Constraints
-- The ability to use arbitrary Joe values as input facts.
-- The ability to export inferred facts as values of particular Joe types.
+- The ability to reference fact fields by name as well as by position.
 
 Nero's syntax and conventions have been modified from standard Datalog to 
 better support integration into Joe scripts.
@@ -29,7 +28,7 @@ better support integration into Joe scripts.
   identifiers with a leading underscore.  A wildcard matches any value and
   creates no binding.
 - Rule constraints appear at the end of the rule, prefixed with `where`.
-- Rule body atoms can match named fields in the manner of Joe's
+- Named atoms can match named fields in the manner of Joe's
   named-field patterns.
 
 ## Stratified Negation
@@ -84,5 +83,3 @@ above.
 - [Datalog and Logic Databases](https://www.amazon.com/Datalog-Databases-Synthesis-Lectures-Management/dp/3031007263/ref=sr_1_1) by Greco & Molinaro
 - [Modern Datalog Engines](https://www.amazon.com/Modern-Datalog-Engines-Foundations-Databases/dp/1638280428/ref=sr_1_2) by Ketsman & Koutris
  
-
-

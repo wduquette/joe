@@ -18,8 +18,8 @@
 - [Pattern Matching](patterns.md)
 - [Nero Datalog](nero/nero.md)
   - [Nero Tutorial](nero/nero_tutorial.md)
-  - [Embedded Nero](nero/embedded_nero.md)
-  - ['ruleset' Reference](nero/ruleset_reference.md)
+  - [Nero Reference](nero/reference.md)
+  - [Nero in Joe Scripts](nero/embedded_nero.md)
   - [Technical Details](nero/technical_details.md)
 
 ---
