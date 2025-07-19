@@ -1,17 +1,17 @@
 package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.nero.FactSet;
 import com.wjduquette.joe.nero.Nero;
-import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * The implementation for the {@code joe nero} tool.
@@ -22,21 +22,25 @@ public class NeroTool implements Tool {
      */
     public static final ToolInfo INFO = new ToolInfo(
         "nero",
-        "[options...] file.nero",
+        "[options...] file.nero [file.nero...]",
         "Executes Nero scripts.",
         """
         Nero is Joe's implementation of Datalog.  This tool executes Nero
         scripts and supports Nero debugging.
         
-        By default, the tool executes the rule set and outputs all computed
-        facts.
+        The tool executes the provided rule sets in sequence, accumulating the
+        inferred facts, which are then written output as a Nero script.
         
         Option:
         
-        --ast, -a                 Dumps the abstract syntax tree (AST)
-        --debug, -d               Enable debugging
-        --all                     Dumps all known facts.
-        --relation, -r relation   Dumps facts with the given relation.
+        --ast, -a
+            Dumps the abstract syntax tree (AST) to standard output.
+        
+        --debug, -d
+            Enable execution debugging
+        
+        --out filename, -o filename
+            Writes the inferred facts to the given file.
         """,
         NeroTool::main
     );
@@ -47,8 +51,7 @@ public class NeroTool implements Tool {
     private final Nero nero = new Nero(new Joe());
 
     private boolean dumpAST = false;
-    private boolean dumpAll = false;
-    private final List<String> relations = new ArrayList<>();
+    private String outFile = null;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -76,66 +79,68 @@ public class NeroTool implements Tool {
         while (!argq.isEmpty() && argq.peek().startsWith("-")) {
             var opt = argq.poll();
             switch (opt) {
-                case "--ast", "-a"      -> dumpAST = true;
-                case "--all"            -> dumpAll = true;
-                case "--debug", "-d"    -> nero.setDebug(true);
-                case "--relation", "-r" ->
-                    relations.add(toOptArg(opt, argq));
+                case "--ast", "-a"    -> dumpAST = true;
+                case "--debug", "-d"  -> nero.setDebug(true);
+                case "--out", "-o"    -> outFile = toOptArg(opt, argq);
                 default -> {
                     System.err.println("Unknown option: '" + opt + "'.");
-                    System.exit(64);
+                    System.exit(1);
                 }
             }
         }
 
         if (argq.isEmpty()) {
             printUsage(App.NAME);
-            System.exit(64);
-        }
-
-        // NEXT, get the source.
-        var path = argq.poll();
-        SourceBuffer source = null;
-
-        try {
-            source = readSource(path);
-        } catch (IOException ex) {
-            System.err.println("Could not read script: " + path +
-                "\n*** " + ex.getMessage());
             System.exit(1);
         }
-        assert source != null;
 
-        // NEXT, figure out what to do.
-        var dumpNew = !dumpAST && !dumpAll && relations.isEmpty();
+        var inputs = new ArrayList<>(argq);
 
         try {
-            // FIRST, dump the AST if they asked for that.
-            if (dumpAST) println(nero.dumpAST(source));
-
-            // NEXT, compile and execute it.
-            var results = nero.execute(source);
-
-            if (dumpNew) {
-                var newFacts = new HashSet<>(results.getInferredFacts());
-                newFacts.removeAll(results.getAxioms());
-                dumpFacts("New Facts:", newFacts);
-            } else if (dumpAll) {
-                // If we dump everything, no need to do specific queries.
-                dumpFacts("All Facts:", results.getKnownFacts().getAll());
+            if (dumpAST) {
+                dumpASTs(inputs);
             } else {
-                for (var relation : relations) {
-                    dumpFacts("Relation: " + relation,
-                        results.getKnownFacts().getRelation(relation));
-                }
+                execute(inputs);
             }
+        } catch (IOException ex) {
+            System.err.println("Error reading input: " + ex.getMessage());
+            System.exit(1);
         } catch (SyntaxError ex) {
             System.err.println(ex.getErrorReport());
             System.err.println("*** " + ex.getMessage());
-            System.exit(65);
+            System.exit(1);
         } catch (JoeError ex) {
             System.err.println(ex.getMessage());
             System.exit(1);
+        }
+    }
+
+    private void dumpASTs(List<String> inputs) throws IOException {
+        for (var name : inputs) {
+            var source = readSource(name);
+            println("AST: " + name);
+            println(nero.dumpAST(source));
+        }
+    }
+
+    private void execute(List<String> inputs) throws IOException {
+        var db = new FactSet();
+
+        for (var name : inputs) {
+            var source = readSource(name);
+            var engine = nero.execute(source, db);
+            db.addAll(engine.getInferredFacts());
+        }
+
+        if (outFile == null) {
+            println(nero.asNeroScript(db));
+        } else {
+            println("Writing: " + outFile);
+            var path = Path.of(outFile);
+            if (Files.exists(path)) {
+                Files.copy(path, Path.of(outFile + "~"));
+            }
+            Files.writeString(path, nero.asNeroScript(db));
         }
     }
 
@@ -153,28 +158,6 @@ public class NeroTool implements Tool {
 
         return new SourceBuffer(path.getFileName().toString(), script);
     }
-
-    private void dumpFacts(String title, Collection<Fact> facts) {
-        println(title);
-        facts.stream().map(this::factString).sorted()
-            .forEach(this::println);
-    }
-
-    private String factString(Fact fact) {
-        var fields = fact.getFields().stream()
-            .map(this::fieldString)
-            .collect(Collectors.joining(", "));
-        return fact.relation() + "(" + fields + ")";
-    }
-
-    private String fieldString(Object field) {
-        if (field instanceof String s) {
-            return Joe.quote(s);
-        } else {
-            return Objects.toString(field);
-        }
-    }
-
 
     //-------------------------------------------------------------------------
     // Main
