@@ -1,7 +1,7 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.RecordFact;
+import com.wjduquette.joe.nero.PairFact;
 import com.wjduquette.joe.types.TypeType;
 
 import java.util.*;
@@ -336,7 +336,7 @@ public class ProxyType<V>
     @SuppressWarnings("unused")
     public Fact toFact(Joe joe, Object value) {
         if (!fieldNames.isEmpty()) {
-            return new RecordFact(name(), fieldNames, getFieldMap(joe, value));
+            return new PairFact(name(), fieldNames, getFieldMap(joe, value));
         } else {
             throw new UnsupportedOperationException(
                 "Values of this type cannot be used as facts: '" +

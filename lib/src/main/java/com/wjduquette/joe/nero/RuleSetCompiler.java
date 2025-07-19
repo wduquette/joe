@@ -41,7 +41,7 @@ public class RuleSetCompiler {
         Set<Rule> rules = ast.rules().stream().map(this::ast2rule)
             .collect(Collectors.toSet());
 
-        return new RuleSet(facts, rules);
+        return new RuleSet(ast.schema(), facts, rules);
     }
 
     //-------------------------------------------------------------------------
@@ -59,7 +59,13 @@ public class RuleSetCompiler {
                             "Invalid fact; Atom contains a non-constant term.");
                     }
                 }
-                yield new ListFact(a.relation().lexeme(), terms);
+                var shape = ast.schema().get(a.relation().lexeme());
+                if (shape instanceof Shape.PairShape ps) {
+                    yield new PairFact(a.relation().lexeme(),
+                        ps.fieldNames(), terms);
+                } else {
+                    yield new ListFact(a.relation().lexeme(), terms);
+                }
             }
             case ASTRuleSet.ASTNamedAtom a -> {
                 var termMap = new LinkedHashMap<String,Object>();

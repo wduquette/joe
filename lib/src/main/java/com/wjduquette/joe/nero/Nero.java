@@ -6,6 +6,8 @@ import com.wjduquette.joe.parser.Parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  * The Nero class provides standalone parsing and execution of Nero scripts.
@@ -18,6 +20,9 @@ public class Nero {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The Joe instance
+    private final Joe joe;
+
     // The debug flag
     private boolean debug = false;
 
@@ -27,16 +32,26 @@ public class Nero {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Nero() {
-        // Nothing to do
+    /**
+     * Creates a new instance of the Nero entry point.  The instance of
+     * Joe is required to access `Joe::stringify`.
+     * @param joe A Joe interpreter.
+     */
+    public Nero(Joe joe) {
+        this.joe = joe;
     }
 
     //-------------------------------------------------------------------------
-    // Internals
+    // Public API
 
-    // Compiles the source to a NeroEngine, and checks for stratification.
-    // Throws SyntaxError on any parse error and JoeError if the rule set
-    // is not stratified.
+    /**
+     * Compiles the source, checking for syntax errors and stratification.
+     * Returns a RuleEngine on success and throws an appropriate error
+     * on error.
+     * @param source The source
+     * @return The engine, which has not yet be run.
+     * @throws JoeError on error.
+     */
     public RuleEngine compile(SourceBuffer source) {
         var ast = parse(source);
         var ruleSet = new RuleSetCompiler(ast).compile();
@@ -49,8 +64,13 @@ public class Nero {
         return engine;
     }
 
-    // Parses the source, throwing a SyntaxError on error.
-    private ASTRuleSet parse(SourceBuffer source) {
+    /**
+     * Parses the source, returning an AST on success.
+     * @param source The source
+     * @return The AST
+     * @throws SyntaxError on error.
+     */
+    public ASTRuleSet parse(SourceBuffer source) {
         traces = new ArrayList<>();
         var parser = new Parser(source, this::errorHandler);
         var ast = parser.parseNero();
@@ -65,9 +85,6 @@ public class Nero {
     private void errorHandler(Trace trace, boolean incomplete) {
         traces.add(trace);
     }
-
-    //-------------------------------------------------------------------------
-    // Public API
 
     /**
      * Gets whether Joe is configured for debugging output.
@@ -114,5 +131,82 @@ public class Nero {
      */
     public String dumpAST(SourceBuffer source) throws SyntaxError {
         return parse(source).toString();
+    }
+
+    /**
+     * Converts the contents of the FactSet into a string in Nero format, if
+     * possible.  All fact terms must be expressible as Nero literal terms.
+     * @param db The factSet
+     * @return The Nero source text
+     * @throws JoeError if constraints are not met.
+     */
+    public String asNeroScript(FactSet db) {
+        var schema = Schema.inferSchema(db.getAll());
+        var buff = new StringBuilder();
+        var relations = db.getRelations().stream().sorted().toList();
+        var gotFirst = false;
+
+        for (var relation : relations) {
+            var shape = schema.get(relation).toSpec();
+            if (gotFirst) buff.append("\n");
+            buff.append("define ").append(shape).append(";\n");
+            gotFirst = true;
+
+            var axioms = db.getRelation(relation).stream()
+                .map(this::asNeroAxiom)
+                .sorted()
+                .collect(Collectors.joining("\n"));
+            buff.append(axioms).append("\n");
+        }
+
+        return buff.toString();
+    }
+
+    /**
+     * Outputs a Fact as a Nero axiom, if possible.
+     * The fact's terms must be expressible as Nero literal terms.
+     * @param fact The Fact
+     * @return The axiom text
+     * @throws JoeError if constraints are not met.
+     */
+    public String asNeroAxiom(Fact fact) {
+        var buff = new StringBuilder();
+        buff.append(fact.relation()).append("(");
+
+        String terms;
+
+        if (fact.isOrdered()) {
+            terms = fact.getFields().stream()
+                .map(this::asNeroTerm)
+                .collect(Collectors.joining(", "));
+        } else {
+            var map = new TreeMap<>(fact.getFieldMap());
+            terms = map.entrySet().stream()
+                .map(e -> e.getKey() + ": " + asNeroTerm(e.getValue()))
+                .collect(Collectors.joining(", "));
+        }
+
+        buff.append(terms).append(");");
+        return buff.toString();
+    }
+
+    /**
+     * Outputs a value as a Nero literal term, if possible.
+     * @param term The term
+     * @return The term's literal
+     * @throws JoeError if the term cannot be expressed as a Nero literal.
+     */
+    public String asNeroTerm(Object term) {
+        // At present, all we support are the standard scalar literals;
+        // this is the easiest way to limit the output to that.
+        return switch (term) {
+            case null -> "null";
+            case Boolean b -> joe.stringify(b);
+            case Double d -> joe.stringify(d);
+            case Keyword k -> joe.stringify(k);
+            case String s -> Joe.quote(s);
+            default -> throw new JoeError(
+                "Non-Nero term: '" + joe.stringify(term));
+        };
     }
 }

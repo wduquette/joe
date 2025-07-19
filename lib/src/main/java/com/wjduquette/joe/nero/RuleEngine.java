@@ -108,7 +108,7 @@ public class RuleEngine {
      * @return The axiomatic facts.
      */
     public Set<Fact> getAxioms() {
-        return ruleset.facts();
+        return ruleset.axioms();
     }
 
     /**
@@ -162,17 +162,17 @@ public class RuleEngine {
         inferenceComplete = true;
 
         // NEXT, initialize the data structures
-        knownFacts.addAll(ruleset.facts());
-        inferredFacts.addAll(ruleset.facts());
+        knownFacts.addAll(ruleset.axioms());
+        inferredFacts.addAll(ruleset.axioms());
 
         // NEXT, execute the rules.
         if (debug) {
             System.out.println("Rule Strata: " +
-                ruleset.getStrata());
+                ruleset.strata());
         }
 
-        for (var i = 0; i < ruleset.getStrata().size(); i++) {
-            inferStratum(i, ruleset.getStrata().get(i));
+        for (var i = 0; i < ruleset.strata().size(); i++) {
+            inferStratum(i, ruleset.strata().get(i));
         }
     }
 
@@ -196,6 +196,7 @@ public class RuleEngine {
         if (debug) System.out.println("  Rule: " + rule);
 
         var bc = new BindingContext(rule);
+
 
         matchNextBodyAtom(bc, 0);
 
@@ -352,8 +353,11 @@ public class RuleEngine {
                 for (var term : atom.terms()) {
                     terms.add(term2value(term, bc));
                 }
-
-                yield new ListFact(atom.relation(), terms);
+                if (bc.shape instanceof Shape.PairShape ps) {
+                    yield new PairFact(atom.relation(), ps.fieldNames(), terms);
+                } else {
+                    yield new ListFact(atom.relation(), terms);
+                }
             }
         };
     }
@@ -426,13 +430,15 @@ public class RuleEngine {
     // Helpers
 
     // The context for the recursive matchBodyAtom method.
-    private static class BindingContext {
+    private class BindingContext {
         private final Rule rule;
+        private final Shape shape;
         private final List<Fact> inferredFacts = new ArrayList<>();
         private Bindings bindings = new Bindings();
 
         BindingContext(Rule rule) {
             this.rule = rule;
+            this.shape = ruleset.schema().get(rule.head().relation());
         }
     }
 

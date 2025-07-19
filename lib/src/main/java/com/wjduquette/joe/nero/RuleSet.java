@@ -6,14 +6,17 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A collection of facts and rules, ready for processing by the Nero engine.
+ * A collection of axioms and rules, ready for processing by the Nero engine.
  */
 public class RuleSet {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The facts and rules
-    private final Set<Fact> facts;
+    // The Schema
+    private final Schema schema;
+
+    // The axioms and rules
+    private final Set<Fact> axioms;
     private final Set<Rule> rules;
 
     // Rule Head relations by stratum.
@@ -24,14 +27,15 @@ public class RuleSet {
     // Constructor
 
     /**
-     * Creates a new rule set given the facts and rules.  Transfers ownership
-     * of the two sets to the new instance, and computes the stratification
-     * of the rules.
-     * @param facts The facts
+     * Creates a new rule set given the schema and the sets of axioms and
+     * rules.  Transfers ownership of the two sets to the new instance, and
+     * computes the stratification of the rules.
+     * @param axioms The axiomatic facts
      * @param rules The rules
      */
-    public RuleSet(Set<Fact> facts, Set<Rule> rules) {
-        this.facts = facts;
+    public RuleSet(Schema schema, Set<Fact> axioms, Set<Rule> rules) {
+        this.schema = schema;
+        this.axioms = axioms;
         this.rules = rules;
 
         var stratifier = new Stratifier(rules);
@@ -47,12 +51,16 @@ public class RuleSet {
         return isStratified;
     }
 
-    public List<List<String>> getStrata() {
+    public List<List<String>> strata() {
         return strata;
     }
 
-    public Set<Fact> facts() {
-        return Collections.unmodifiableSet(facts);
+    public Schema schema() {
+        return schema;
+    }
+
+    public Set<Fact> axioms() {
+        return Collections.unmodifiableSet(axioms);
     }
 
     public Set<Rule> rules() {
@@ -63,9 +71,10 @@ public class RuleSet {
      * Gets the set of relation names inferred by the rule set.
      * @return The set
      */
+    @SuppressWarnings("unused")
     public Set<String> getHeadRelations() {
         var set = new HashSet<String>();
-        facts.stream().map(Fact::relation).forEach(set::add);
+        axioms.stream().map(Fact::relation).forEach(set::add);
         rules.stream().map(r -> r.head().relation()).forEach(set::add);
         return set;
     }

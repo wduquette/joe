@@ -14,7 +14,7 @@ import java.util.Map;
  * names "f0", "f1", etc.</p>
  */
 public sealed interface Fact
-    permits ListFact, MapFact, RecordFact
+    permits ListFact, MapFact, PairFact
 {
     /**
      * The fact's relation name.
@@ -28,6 +28,12 @@ public sealed interface Fact
      * @return true or false
      */
     boolean isOrdered();
+
+    /**
+     * Returns the number of fields in the fact.
+     * @return The number.
+     */
+    int arity();
 
     /**
      * If hasOrderedFields(), the list of field values.

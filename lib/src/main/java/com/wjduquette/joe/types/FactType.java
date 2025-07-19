@@ -7,7 +7,7 @@ import com.wjduquette.joe.ProxyType;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.ListFact;
 import com.wjduquette.joe.nero.MapFact;
-import com.wjduquette.joe.nero.RecordFact;
+import com.wjduquette.joe.nero.PairFact;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -192,7 +192,7 @@ public class FactType extends ProxyType<Fact> {
     // Creates a new ordered `Fact` given a flat list of field name/value
     // pairs. Its fields will have the names given in the list.
     //
-    // The `Fact` will be an instance of the Java `RecordFact` class.
+    // The `Fact` will be an instance of the Java `PairFact` class.
     private Object _ofPairs(Joe joe, Args args) {
         args.exactArity(2, "Fact.ofPairs(relation, pairs)");
         var relation = joe.toIdentifier(args.next());
@@ -210,7 +210,7 @@ public class FactType extends ProxyType<Fact> {
             names.add(name);
             fieldMap.put(name, pairs.get(i+1));
         }
-        return new RecordFact(relation, names, fieldMap);
+        return new PairFact(relation, names, fieldMap);
     }
 
     //-------------------------------------------------------------------------

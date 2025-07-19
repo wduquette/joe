@@ -1,5 +1,6 @@
 package com.wjduquette.joe.parser;
 
+import com.wjduquette.joe.nero.Schema;
 import com.wjduquette.joe.scanner.Token;
 
 import java.util.Collection;
@@ -10,10 +11,12 @@ import java.util.stream.Collectors;
 /**
  * This class contains the Abstract Syntax Tree (AST) types for Nero
  * rule sets.
+ * @param schema The schema for the rule set's relations
  * @param axioms The axioms read from the rule set
  * @param rules The rules read from the rule set
  */
 public record ASTRuleSet(
+    Schema schema,
     List<ASTAtom> axioms,
     List<ASTRule> rules
 ) {

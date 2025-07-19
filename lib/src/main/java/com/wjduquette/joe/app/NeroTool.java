@@ -44,7 +44,7 @@ public class NeroTool implements Tool {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Nero nero = new Nero();
+    private final Nero nero = new Nero(new Joe());
 
     private boolean dumpAST = false;
     private boolean dumpAll = false;
