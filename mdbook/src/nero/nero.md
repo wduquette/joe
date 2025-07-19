@@ -13,10 +13,11 @@ The following subsections discuss these in turn.
 
 - The [Nero Tutorial](nero_tutorial.md) describes Nero as a standalone
   language.
-- [Embedded Nero](embedded_nero.md) describes how Nero is used within a
-  Joe script, and particularly how to use scripted input facts and how to 
-  produce outputs in the script's domain types.
-- ['ruleset' Reference](ruleset_reference.md) is a concise statement of the
+- [Nero in Joe Scripts](embedded_nero.md) describes how Nero is used within a
+  Joe script, including the `ruleset` expression and how to use the
+  [`RuleSet`](../library/type.joe.RuleSet.md) and
+  [`FactBase`](../library/type.joe.FactBase.md) types.
+- [Nero Reference](reference.md) is a concise statement of the
   syntax and semantics of Nero rule sets.
 - [Technical Details](technical_details.md) places Nero within the larger 
   family of Datalog implementations, and describes specific differences from

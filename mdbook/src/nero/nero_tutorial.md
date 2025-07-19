@@ -1,13 +1,24 @@
 # Nero Tutorial
 
-This section describes the Nero language as a standalone language.  Nero
-in this form can be used via the [`joe nero`](../joe_nero.md) tool.  
-
-Standalone Nero, as provided by `joe nero`, is useful in these ways:
+This section describes the Nero language as a standalone language. The
+[`joe nero`](../joe_nero.md) tool is used to execute Nero scripts
+and to maintain small databases using Nero syntax as a data format.
+It can also be used:
 
 - To experiment with and learn Nero syntax.
-- To prototype Nero rule sets for particular purposes.
+- To prototype Nero rule sets intended for use in Joe scripts
 - As a test bed for Nero's Datalog implementation.
+
+## Topics
+
+- [Axioms and Rules](#axioms-and-rules)
+- [Basic Execution](#basic-execution)
+- [Facts](#facts)
+- [Named Atoms](#named-atoms)
+- [`define` Declarations](#define-declarations)
+- [Wildcards](#wildcards)
+- [Negation](#negation)
+- [Constraints](#constraints)
 
 ## Axioms and Rules
 
@@ -16,16 +27,17 @@ facts and rules derive new facts from known facts.  These derived or
 _inferred_ facts constitute the output of the program.
 
 For example the following program asserts the parent/child relationships
-between certain individuals, and gives rules for determine ancestors and their
-descendants. (Comments begin with `//` and continue to the end of the line, 
-as in Joe.)
+between certain individuals, and gives rules for determining ancestors and 
+their descendants. Comments begin with `//` and continue to the end of the 
+line, as in Joe. The [`define` declarations](#define-declarations) are 
+optional, and define the *shape* of the inferred facts.
 
 ```nero
-// Parent/2 - parent, child
+define Parent/2; // parent, child
 Parent(#anne, #bert);
 Parent(#bert, #clark);
 
-// Ancestor/2 - ancestor, descendant
+define Ancestor/2; // ancestor, descendant
 Ancestor(x, y) :- Parent(x, y);
 Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
 ```
@@ -37,9 +49,6 @@ The axiom `Parent(#anne, #bert)` asserts the logical predicate that
 - `#anne` and `#bert` are _constant terms_ representing individuals.
   - A literal constant term in a Nero program must be one of the following:
     - A Joe keyword, string, number, `true`, `false`, or `null`.
-- The string `Parent/2` appearing in the comment indicates that
-  `Parent` is a relation with an arity of 2, i.e., it always takes two
-  terms.
 - A form consisting of a relation and one or more terms is called an *atom*.
 
 The collection of `Parent` axioms is essentially equivalent to a table
@@ -64,7 +73,8 @@ of `y`, then `x` must be an ancestor of `y`.
 A Nero program can contain any number of axioms and rules, making use of
 any number of distinct relations.
 
-## Execution
+
+## Basic Execution
 
 Executing a Nero program amounts to iterating over the rules, matching
 the body of each rule against the known facts.  For each
@@ -104,6 +114,72 @@ Notice how the variables are used in the second rule:
   `y` is then bound to the descendant.
 - The bound values of `x` and `y` are then inserted into `Ancestor(x, y)` to
   produce the new `Ancestor` fact.
+ 
+## Facts
+
+Axioms and rules infer *facts*: data records consisting of a relation
+name and some number of constant terms.  Nero supports three kinds of
+fact, also known as *shapes*, represented in Java by the
+`ListFact`, `MapFact`, and `PairFact` classes.
+
+**List facts** have a relation name and a list of one or more constant terms,
+also known as *fields*.  A list fact's fields are usually referenced
+by position, as in the axioms and rules shown above, but may also be
+referenced using the field names `f0`, `f1`, etc.
+
+List facts having the same relation should always have the same arity.
+
+**Map facts** have a relation name and an arbitrary number of fields,
+which are always referenced by field name.
+
+**Pair facts** have a relation name and a list of field name/value pairs.
+A pair fact's fields are usually referenced by position but can also
+be referenced by field name.
+
+Pair facts having the same relation should always have the same arity
+and the same field names in the same order.
+
+## Named Atoms
+
+The atoms in the examples shown above are all "ordered atoms".  As
+axioms and rule heads they create facts given an ordered list of values;
+as body atoms, they match fact terms by position.
+
+Nero also supports "named atoms", which reference terms by field name.  As
+axiom and rule heads, they create map facts; as body atoms, they match
+fact terms by field name.  Unlike ordered atoms, which must match all of
+a fact's terms, a named atom can match a subset of terms.
+
+```nero
+Thing(id: #car, color: #red, make: #mini);
+Thing(id: #desk, color: #brown, drawers: 1);
+RedThing(id: x) :- Thing(color: #red);
+```
+
+## `define` Declarations
+
+Nero can determine an inferred fact's *shape* from the atom used to create
+it: ordered atoms produce list facts, and named atoms produce map facts.
+A `define` declaration explicitly states the shape of a given relation's
+facts, and also the Nero script to produce pair facts.
+
+```nero
+// A list shape is defined by its relation and arity.
+define Parent/2;
+Parent(#joe, #charles);
+
+// A map shape is defined by its relation an an ellipsis.
+define Thing/...;
+Thing(id: #car, color: #red, make: #mini);
+
+// A pair shape is defined by its relation and field names.
+define Place/name,kind;
+Place("Texas", #state);
+```
+
+It isn't necessary to use `define` declarations (unless you want to
+create pair facts), but it's good practice as it helps document
+the rule set.
 
 ## Wildcards
 
