@@ -65,6 +65,27 @@ public class Nero {
     }
 
     /**
+     * Compiles the source, checking for syntax errors and stratification.
+     * Returns a RuleEngine on success and throws an appropriate error
+     * on error.
+     * @param source The source
+     * @param db The input facts
+     * @return The engine, which has not yet be run.
+     * @throws JoeError on error.
+     */
+    public RuleEngine compile(SourceBuffer source, FactSet db) {
+        var ast = parse(source);
+        var ruleSet = new RuleSetCompiler(ast).compile();
+        if (!ruleSet.isStratified()) {
+            throw new JoeError("Nero rule set is not stratified.");
+        }
+        var engine = new RuleEngine(ruleSet, db);
+        engine.setDebug(debug);
+
+        return engine;
+    }
+
+    /**
      * Parses the source, returning an AST on success.
      * @param source The source
      * @return The AST
@@ -106,8 +127,6 @@ public class Nero {
     /**
      * Executes the Nero script, throwing an appropriate error on failure
      * and returning a RuleEngine containing the results on success.
-     * The filename is usually the bare file name of the script file,
-     * but can be any string relevant to the application.
      * @param source The source buffer
      * @return The RuleEngine
      * @throws SyntaxError if the script could not be compiled.
@@ -117,6 +136,25 @@ public class Nero {
         throws SyntaxError, JoeError
     {
         var engine = compile(source);
+        engine.setDebug(debug);
+        engine.infer();
+        return engine;
+    }
+
+    /**
+     * Executes the Nero script with the given input facts, throwing an
+     * appropriate error on failure and returning a RuleEngine containing
+     * the results on success.
+     * @param source The source buffer
+     * @param db The input facts
+     * @return The RuleEngine
+     * @throws SyntaxError if the script could not be compiled.
+     * @throws JoeError on all runtime errors.
+     */
+    public RuleEngine execute(SourceBuffer source, FactSet db)
+        throws SyntaxError, JoeError
+    {
+        var engine = compile(source, db);
         engine.setDebug(debug);
         engine.infer();
         return engine;

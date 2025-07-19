@@ -4,6 +4,8 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.wjduquette.joe.checker.Checker.check;
@@ -147,6 +149,7 @@ public class RuleEngineTest extends Ted {
 
     @Test
     public void testPairFactCreation() {
+        test("testPairFactCreation");
         var source = """
             define Pair/left, right;
             Pair(#c, #c);
@@ -159,12 +162,38 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    @Test
+    public void testKeywordMatchesEnum() {
+        test("testKeywordMatchesEnum");
+        Set<Fact> facts = Set.of(
+            new ListFact("Topic", List.of(Topic.THIS, "abc")),
+            new ListFact("Topic", List.of(Topic.THAT, "def"))
+        );
+        var source = """
+            Match(x) :- Topic(#this, x);
+            """;
+        check(infer(source, facts)).eq("""
+            ListFact[relation=Match, fields=[abc]]
+            """);
+    }
+
     //-------------------------------------------------------------------------
     // Helpers
+
+    private enum Topic { THIS, THAT }
 
     private String infer(String source) {
         var engine = nero.execute(new SourceBuffer("-", source));
         return engine.getKnownFacts().getAll().stream()
+            .map(Fact::toString)
+            .sorted()
+            .collect(Collectors.joining("\n")) + "\n";
+    }
+
+    private String infer(String source, Set<Fact> facts) {
+        var db = new FactSet(facts);
+        var engine = nero.execute(new SourceBuffer("-", source), db);
+        return engine.getInferredFacts().stream()
             .map(Fact::toString)
             .sorted()
             .collect(Collectors.joining("\n")) + "\n";

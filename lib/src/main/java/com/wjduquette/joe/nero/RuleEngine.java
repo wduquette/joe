@@ -1,6 +1,7 @@
 package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.JoeError;
+import com.wjduquette.joe.Keyword;
 
 import java.util.*;
 
@@ -311,7 +312,16 @@ public class RuleEngine {
                     yield Objects.equals(bound, value);
                 }
             }
-            case Constant c -> Objects.equals(value, c.value());
+            case Constant c -> {
+                if (Objects.equals(value, c.value())) {
+                    yield true;
+                }
+                if (value instanceof Enum<?> e &&
+                    c.value() instanceof Keyword k) {
+                    yield e.name().equalsIgnoreCase(k.name());
+                }
+                yield false;
+            }
             case Wildcard ignored -> true;
         };
     }
