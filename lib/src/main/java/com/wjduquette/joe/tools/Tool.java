@@ -24,7 +24,7 @@ public interface Tool {
     }
 
     /**
-     * Prints an object System.out.
+     * Prints an object to System.out.
      * @param object The object
      */
     default void println(Object object) {
