@@ -2,7 +2,10 @@
 
 ## Changes in 0.7.1 (in development)
 
-- None yet
+- Language
+  - Fixed bug: Nero now parses negative numbers correctly.
+- Standard Library
+  - Added `Fact::get`
 
 ## Changes in 0.7.0 (19 July 2025)
 

@@ -999,6 +999,12 @@ public class Parser {
     }
 
     private Pattern constantPattern(ASTPattern wp) {
+        if (scanner.match(MINUS)) {
+            scanner.consume(NUMBER, "Expected number after '-'.");
+            var number = (Double)scanner.previous().literal();
+            return new Pattern.Constant(-number);
+        }
+
         if (scanner.match(TRUE)) {
             return new Pattern.Constant(true);
         } else if (scanner.match(FALSE)) {
