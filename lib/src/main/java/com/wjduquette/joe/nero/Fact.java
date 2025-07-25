@@ -50,4 +50,13 @@ public sealed interface Fact
      * @return The map
      */
     Map<String, Object> getFieldMap();
+
+    /**
+     * Gets the named field's value, or null if it's undefined.
+     * @param name The field name
+     * @return The value
+     */
+    default Object get(String name) {
+        return getFieldMap().get(name);
+    }
 }
