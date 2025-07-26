@@ -111,7 +111,19 @@ public class Nero {
     public RuleEngine execute(SourceBuffer source)
         throws SyntaxError, JoeError
     {
-        var ruleSet = compile(source);
+        return execute(compile(source));
+    }
+
+    /**
+     * Executes the Nero rule set, throwing an appropriate error on failure
+     * and returning a RuleEngine containing the results on success.
+     * @param ruleSet The rule set
+     * @return The RuleEngine
+     * @throws JoeError on all runtime errors.
+     */
+    public RuleEngine execute(RuleSet ruleSet)
+        throws JoeError
+    {
         var engine = new RuleEngine(ruleSet);
         engine.setDebug(debug);
         engine.infer();
@@ -131,7 +143,21 @@ public class Nero {
     public RuleEngine execute(SourceBuffer source, FactSet db)
         throws SyntaxError, JoeError
     {
-        var ruleSet = compile(source);
+        return execute(compile(source), db);
+    }
+
+    /**
+     * Executes the Nero rule set with the given input facts, throwing an
+     * appropriate error on failure and returning a RuleEngine containing
+     * the results on success.
+     * @param ruleSet The rule set
+     * @param db The input facts
+     * @return The RuleEngine
+     * @throws JoeError on all runtime errors.
+     */
+    public RuleEngine execute(RuleSet ruleSet, FactSet db)
+        throws JoeError
+    {
         var engine = new RuleEngine(ruleSet, db);
         engine.setDebug(debug);
         engine.infer();
