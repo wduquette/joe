@@ -1380,8 +1380,19 @@ public class Parser {
             } else {
                 return new ASTRuleSet.ASTVariable(name);
             }
-        } else if (scanner.match(KEYWORD, NUMBER, STRING, TRUE, FALSE, NULL)) {
-            return new ASTRuleSet.ASTConstant(scanner.previous());
+        } else if (scanner.match(MINUS)) {
+            scanner.consume(NUMBER, "Expected number after '-'.");
+            var number = (Double)scanner.previous().literal();
+            return new ASTRuleSet.ASTConstant(scanner.previous(), -number);
+        } else if (scanner.match(TRUE)) {
+            return new ASTRuleSet.ASTConstant(scanner.previous(), true);
+        } else if (scanner.match(FALSE)) {
+            return new ASTRuleSet.ASTConstant(scanner.previous(), false);
+        } else if (scanner.match(NULL)) {
+            return new ASTRuleSet.ASTConstant(scanner.previous(), null);
+        } else if (scanner.match(KEYWORD, NUMBER, STRING)) {
+            return new ASTRuleSet.ASTConstant(
+                scanner.previous(), scanner.previous().literal());
         } else {
             scanner.advance();
             throw errorSync(scanner.previous(), "expected term.");

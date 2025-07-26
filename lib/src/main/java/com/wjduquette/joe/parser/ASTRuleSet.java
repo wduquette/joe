@@ -149,12 +149,14 @@ public record ASTRuleSet(
 
     /**
      * A token representing a constant term: a keyword, string, or
-     * integer.
+     * integer.  The token is of little interest and will eventually
+     * be removed.
      * @param token The value token
+     * @param value The constant value
      */
-    public record ASTConstant(Token token) implements ASTTerm {
+    public record ASTConstant(Token token, Object value) implements ASTTerm {
         @Override public String toString() {
-            return token.lexeme();
+            return value != null ? value.toString() : token.lexeme();
         }
     }
 
