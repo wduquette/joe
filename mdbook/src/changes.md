@@ -1,6 +1,6 @@
 # Change Log
 
-## Changes in 0.7.1 (in development)
+## Changes in 0.8.0 (in development)
 
 - Language
   - Fixed bug: Nero now parses negative numbers correctly.
