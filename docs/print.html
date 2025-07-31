@@ -915,8 +915,8 @@ types:</p>
 <li><a href="types.html#raw-string-literals">Raw String Literals</a></li>
 <li><a href="types.html#keywords">Keywords</a></li>
 <li><a href="types.html#lists">Lists</a></li>
-<li><a href="types.html#maps">Maps</a></li>
 <li><a href="types.html#sets">Sets</a></li>
+<li><a href="types.html#maps">Maps</a></li>
 <li><a href="types.html#errors">Errors</a></li>
 <li><a href="types.html#functions-and-methods">Functions and Methods</a></li>
 <li><a href="types.html#classes">Classes</a></li>
@@ -1007,7 +1007,8 @@ list.add("d");
 <pre><code class="language-joe">var list = List.of("a", "b", "c", "d");
 </code></pre>
 <p>However, lists are usually created using Joe's list literal syntax:</p>
-<pre><code class="language-joe">var list = ["a", "b", "c", "d"];
+<pre><code class="language-joe">var empty = [];
+var list = ["a", "b", "c", "d"];
 </code></pre>
 <p>List literals are allowed to have a trailing comma:</p>
 <pre><code class="language-joe">var list = [
@@ -1030,6 +1031,31 @@ var c = list[2];    // list.get(2)
 list[3] = "xyz";    // list.set(3, "xyz");
 </code></pre>
 <p>Indices are zero-based, and must refer to an existing item.</p>
+<h2 id="sets"><a class="header" href="#sets">Sets</a></h2>
+<p>A <a href="library/type.joe.Set.html">Set</a> is a Java <code>Set&lt;Object&gt;</code>.  It has much
+the same operations as Java sets, along with some advanced methods.</p>
+<p>There are several ways to create sets:</p>
+<pre><code class="language-joe">var set = Set();
+set.add(#a);
+set.add(#b);
+</code></pre>
+<p>Or use the Java-like <code>Set.of()</code> method:</p>
+<pre><code class="language-joe">var set = Set.of(#a, #b);
+</code></pre>
+<p>But sets are usually created using Joe's set literal syntax:</p>
+<pre><code class="language-joe">var empty = {};
+var set = {#a, #b};
+</code></pre>
+<p>Set literals are allowed to have a trailing comma:</p>
+<pre><code class="language-joe">var set = {
+    #a, 
+    #b,
+};
+</code></pre>
+<p>Set member is tested with <code>contains()</code>, as in Java:</p>
+<pre><code class="language-joe">var set = {#a, #b};
+var flag = set.contains(#a);  // true!
+</code></pre>
 <h2 id="maps"><a class="header" href="#maps">Maps</a></h2>
 <p>A <a href="library/type.joe.Map.html">Map</a> is a Java <code>Map&lt;Object,Object&gt;</code>,
 key/value store.  It has much the same operations as Java maps.
@@ -1045,7 +1071,8 @@ map.put(#c, 3);
 <pre><code class="language-joe">var map = Map.of(#a, 1, #b, 2, #c, 3);
 </code></pre>
 <p>However, maps are usually created using Joe's map literal syntax:</p>
-<pre><code class="language-joe">var map = {#a: 1, #b: 2, #c, 3};
+<pre><code class="language-joe">var empty = {:};
+var map = {#a: 1, #b: 2, #c, 3};
 </code></pre>
 <p>Map literals are allowed to have a trailing comma:</p>
 <pre><code class="language-joe">var map = {
@@ -1066,12 +1093,6 @@ map.get(#b);        // 2
 
 var c = map[#c];   // map.get(#c);
 map[#d] = 4;       // map.put(#d, 4);
-</code></pre>
-<h2 id="sets"><a class="header" href="#sets">Sets</a></h2>
-<p>A <a href="library/type.joe.Set.html">Set</a> is a Java <code>Set&lt;Object&gt;</code>.  It has much
-the same operations as Java sets, along with some advanced methods.</p>
-<pre><code class="language-joe">var set = Set(#a, #b);
-println(set.contains(#b)); // Outputs "true".
 </code></pre>
 <h2 id="errors"><a class="header" href="#errors">Errors</a></h2>
 <p>An <a href="library/type.joe.Error.html">Error</a> is a Java <code>JoeError</code> exception:

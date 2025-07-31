@@ -11,8 +11,8 @@ types:
 - [Raw String Literals](#raw-string-literals)
 - [Keywords](#keywords)
 - [Lists](#lists)
-- [Maps](#maps)
 - [Sets](#sets)
+- [Maps](#maps)
 - [Errors](#errors)
 - [Functions and Methods](#functions-and-methods)
 - [Classes](#classes)
@@ -134,6 +134,7 @@ var list = List.of("a", "b", "c", "d");
 However, lists are usually created using Joe's list literal syntax:
 
 ```joe
+var empty = [];
 var list = ["a", "b", "c", "d"];
 ```
 
@@ -168,6 +169,48 @@ list[3] = "xyz";    // list.set(3, "xyz");
 
 Indices are zero-based, and must refer to an existing item.
 
+## Sets
+
+A [Set](library/type.joe.Set.md) is a Java `Set<Object>`.  It has much
+the same operations as Java sets, along with some advanced methods.
+
+There are several ways to create sets:
+
+```joe
+var set = Set();
+set.add(#a);
+set.add(#b);
+```
+
+Or use the Java-like `Set.of()` method:
+
+```joe
+var set = Set.of(#a, #b);
+```
+
+But sets are usually created using Joe's set literal syntax:
+
+```joe
+var empty = {};
+var set = {#a, #b};
+```
+
+Set literals are allowed to have a trailing comma:
+
+```joe
+var set = {
+    #a, 
+    #b,
+};
+```
+
+Set member is tested with `contains()`, as in Java:
+
+```joe
+var set = {#a, #b};
+var flag = set.contains(#a);  // true!
+```
+
 ## Maps
 
 A [Map](library/type.joe.Map.md) is a Java `Map<Object,Object>`, 
@@ -193,6 +236,7 @@ var map = Map.of(#a, 1, #b, 2, #c, 3);
 However, maps are usually created using Joe's map literal syntax:
 
 ```joe
+var empty = {:};
 var map = {#a: 1, #b: 2, #c, 3};
 ```
 
@@ -223,16 +267,6 @@ var map = {#a: 1, #b: 2, #c, 3};
 
 var c = map[#c];   // map.get(#c);
 map[#d] = 4;       // map.put(#d, 4);
-```
-
-## Sets
-
-A [Set](library/type.joe.Set.md) is a Java `Set<Object>`.  It has much 
-the same operations as Java sets, along with some advanced methods.
-
-```joe
-var set = Set(#a, #b);
-println(set.contains(#b)); // Outputs "true".
 ```
 
 ## Errors
