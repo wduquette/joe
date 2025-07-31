@@ -974,6 +974,10 @@ class Compiler {
                 // Get the exports                // Stack effects
                 emit(RULESET, constant(ruleset)); // rsv       ; RuleSetValue
             }
+            case Expr.SetLiteral e -> {
+                // Stack effects
+                emitSet(e.list());       // set      ; compute set
+            }
             case Expr.Super e -> {
                 if (currentType == null || !currentType.inInstanceMethod) {
                     error(e.keyword(), "Can't use '" + e.keyword().lexeme() +
@@ -1468,6 +1472,15 @@ class Compiler {
         for (var item : items) {
             emit(item);
             emit(LISTADD);
+        }
+    }
+
+    // Builds a new SetValue from multiple expressions.
+    private void emitSet(List<Expr> items) {
+        emit(SETNEW);
+        for (var item : items) {
+            emit(item);
+            emit(SETADD);
         }
     }
 

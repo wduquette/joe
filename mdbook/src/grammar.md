@@ -6,9 +6,6 @@ used in *Crafting Interpreters*.  Below that is the full
 
 ## Grammar
 
-Here is the grammar; see [Semantic Constraints](#semantic-constraints)
-for some conditions enforced by the compiler.
-
 - [Statements](#statements)
 - [Expressions](#expressions)
 - [Patterns](#patterns)
@@ -114,12 +111,16 @@ primary         → "true" | "false" | "nil"
                 | IDENTIFIER 
                 | lambda 
                 | grouping
-                | list 
+                | list
+                | set
+                | map 
                 | "super" "." IDENTIFIER ;
 grouping        → "(" expression ")"
 lambda          → "\" parameters? "->" ( expression | block ) ; 
 list            → "[" (expression ( "," expression )* ","? )? "]" ;
-map             → "{" (map_entry ( "," map_entry )* ","? )? "]" ;
+set             → "{" (expression ( "," expression )* ","? )? "}" ;
+map             → "{:}" 
+                | {" (map_entry ( "," map_entry )* ","? )? "]" ;
 map_entry       → expression ":" expression ;
 ```
 
@@ -246,13 +247,6 @@ constant    → KEYWORD | STRING | NUMBER | TRUE | FALSE | NULL ;
 variable    → IDENTIFIER ;     // No leading "_"
 wildcard    → IDENTIFIER ;     // With leading "_"
 ```
-
-Semantic restrictions:
-
-- Normal body atoms can contain free variables to bind against facts.  All 
-  variables in a rule's head, negated body atoms, or constraints must be
-  bound in normal body atoms.
-- Only body atoms (negated or otherwise) may contain wildcard terms.
 
 
 ## JLox Grammar

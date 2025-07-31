@@ -304,6 +304,7 @@ class Resolver {
                 resolve(expr.object());
             }
             case Expr.RuleSet ignored -> {}
+            case Expr.SetLiteral expr -> expr.list().forEach(this::resolve);
             case Expr.Super expr -> {
                 if (currentClass == ClassType.NONE) {
                     error(expr.keyword(),

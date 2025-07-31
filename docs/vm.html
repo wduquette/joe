@@ -248,6 +248,8 @@ value.</li>
 <tr><td>RECORD <em>name fields</em></td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
 <tr><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
 <tr><td>RULESET <em>ruleset</em></td><td>∅ → <em>rsv</em></td><td>Evaluate rule set</td></tr>
+<tr><td>SETADD</td><td><em>set a</em> → <em>set</em></td><td>Add item to set</td></tr>
+<tr><td>SETNEW</td><td>∅ → <em>set</em></td><td>Push empty set</td></tr>
 <tr><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
 <tr><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
 <tr><td>SWAP</td><td><em>a b</em> → <em>b a</em></td><td>Swap top stack items</td></tr>
@@ -665,6 +667,14 @@ result is popped and returned to the Java caller.</p>
 <strong>Note:</strong> this could be compiled as a <code>CONSTANT</code> at this point, creating
 the <code>RuleSetValue</code> at compile time, but if we add interpolated expressions
 to rules we'll need to compile them and retrieve them from the stack.</p>
+<h3 id="setadd"><a class="header" href="#setadd">SETADD</a></h3>
+<hr />
+<p><strong>SETADD</strong> | <em>set</em> <em>a</em> → <em>set</em></p>
+<p>Pops <em>a</em> and adds it to the <em>set</em> value.</p>
+<h3 id="setnew"><a class="header" href="#setnew">SETNEW</a></h3>
+<hr />
+<p><strong>SETNEW</strong> | ∅ → <em>set</em></p>
+<p>Pushes an empty <em>set</em> value onto the stack.</p>
 <h3 id="sub"><a class="header" href="#sub">SUB</a></h3>
 <hr />
 <p><strong>SUB</strong> | <em>a</em> <em>b</em> → *c, where <em>c</em> = (<em>a</em> - <em>b</em>)</p>

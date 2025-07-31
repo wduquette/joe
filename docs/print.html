@@ -293,6 +293,12 @@ buy him lunch.</p>
 <li>Language
 <ul>
 <li>Fixed bug: Nero now parses negative numbers correctly.</li>
+<li>Added set literals, <code>{#a, #b, #c}</code>.
+<ul>
+<li><code>{}</code> now denotes an empty set, not an empty map.</li>
+<li><code>{:}</code> denotes an empty map.</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>Standard Library
@@ -915,8 +921,8 @@ types:</p>
 <li><a href="types.html#raw-string-literals">Raw String Literals</a></li>
 <li><a href="types.html#keywords">Keywords</a></li>
 <li><a href="types.html#lists">Lists</a></li>
-<li><a href="types.html#maps">Maps</a></li>
 <li><a href="types.html#sets">Sets</a></li>
+<li><a href="types.html#maps">Maps</a></li>
 <li><a href="types.html#errors">Errors</a></li>
 <li><a href="types.html#functions-and-methods">Functions and Methods</a></li>
 <li><a href="types.html#classes">Classes</a></li>
@@ -1007,7 +1013,8 @@ list.add("d");
 <pre><code class="language-joe">var list = List.of("a", "b", "c", "d");
 </code></pre>
 <p>However, lists are usually created using Joe's list literal syntax:</p>
-<pre><code class="language-joe">var list = ["a", "b", "c", "d"];
+<pre><code class="language-joe">var empty = [];
+var list = ["a", "b", "c", "d"];
 </code></pre>
 <p>List literals are allowed to have a trailing comma:</p>
 <pre><code class="language-joe">var list = [
@@ -1030,6 +1037,31 @@ var c = list[2];    // list.get(2)
 list[3] = "xyz";    // list.set(3, "xyz");
 </code></pre>
 <p>Indices are zero-based, and must refer to an existing item.</p>
+<h2 id="sets"><a class="header" href="#sets">Sets</a></h2>
+<p>A <a href="library/type.joe.Set.html">Set</a> is a Java <code>Set&lt;Object&gt;</code>.  It has much
+the same operations as Java sets, along with some advanced methods.</p>
+<p>There are several ways to create sets:</p>
+<pre><code class="language-joe">var set = Set();
+set.add(#a);
+set.add(#b);
+</code></pre>
+<p>Or use the Java-like <code>Set.of()</code> method:</p>
+<pre><code class="language-joe">var set = Set.of(#a, #b);
+</code></pre>
+<p>But sets are usually created using Joe's set literal syntax:</p>
+<pre><code class="language-joe">var empty = {};
+var set = {#a, #b};
+</code></pre>
+<p>Set literals are allowed to have a trailing comma:</p>
+<pre><code class="language-joe">var set = {
+    #a, 
+    #b,
+};
+</code></pre>
+<p>Set member is tested with <code>contains()</code>, as in Java:</p>
+<pre><code class="language-joe">var set = {#a, #b};
+var flag = set.contains(#a);  // true!
+</code></pre>
 <h2 id="maps"><a class="header" href="#maps">Maps</a></h2>
 <p>A <a href="library/type.joe.Map.html">Map</a> is a Java <code>Map&lt;Object,Object&gt;</code>,
 key/value store.  It has much the same operations as Java maps.
@@ -1045,7 +1077,8 @@ map.put(#c, 3);
 <pre><code class="language-joe">var map = Map.of(#a, 1, #b, 2, #c, 3);
 </code></pre>
 <p>However, maps are usually created using Joe's map literal syntax:</p>
-<pre><code class="language-joe">var map = {#a: 1, #b: 2, #c, 3};
+<pre><code class="language-joe">var empty = {:};
+var map = {#a: 1, #b: 2, #c, 3};
 </code></pre>
 <p>Map literals are allowed to have a trailing comma:</p>
 <pre><code class="language-joe">var map = {
@@ -1066,12 +1099,6 @@ map.get(#b);        // 2
 
 var c = map[#c];   // map.get(#c);
 map[#d] = 4;       // map.put(#d, 4);
-</code></pre>
-<h2 id="sets"><a class="header" href="#sets">Sets</a></h2>
-<p>A <a href="library/type.joe.Set.html">Set</a> is a Java <code>Set&lt;Object&gt;</code>.  It has much
-the same operations as Java sets, along with some advanced methods.</p>
-<pre><code class="language-joe">var set = Set(#a, #b);
-println(set.contains(#b)); // Outputs "true".
 </code></pre>
 <h2 id="errors"><a class="header" href="#errors">Errors</a></h2>
 <p>An <a href="library/type.joe.Error.html">Error</a> is a Java <code>JoeError</code> exception:
@@ -10191,8 +10218,6 @@ types, methods, and constants include in Joe's aPackage.</p>
 used in <em>Crafting Interpreters</em>.  Below that is the full
 <a href="grammar.html#jlox-grammar">JLox grammar</a>.</p>
 <h2 id="grammar"><a class="header" href="#grammar">Grammar</a></h2>
-<p>Here is the grammar; see <a href="grammar.html#semantic-constraints">Semantic Constraints</a>
-for some conditions enforced by the compiler.</p>
 <ul>
 <li><a href="grammar.html#statements">Statements</a></li>
 <li><a href="grammar.html#expressions">Expressions</a></li>
@@ -10294,12 +10319,16 @@ primary         → "true" | "false" | "nil"
                 | IDENTIFIER 
                 | lambda 
                 | grouping
-                | list 
+                | list
+                | set
+                | map 
                 | "super" "." IDENTIFIER ;
 grouping        → "(" expression ")"
 lambda          → "\" parameters? "-&gt;" ( expression | block ) ; 
 list            → "[" (expression ( "," expression )* ","? )? "]" ;
-map             → "{" (map_entry ( "," map_entry )* ","? )? "]" ;
+set             → "{" (expression ( "," expression )* ","? )? "}" ;
+map             → "{:}" 
+                | {" (map_entry ( "," map_entry )* ","? )? "]" ;
 map_entry       → expression ":" expression ;
 </code></pre>
 <h2 id="patterns"><a class="header" href="#patterns">Patterns</a></h2>
@@ -10397,13 +10426,6 @@ constant    → KEYWORD | STRING | NUMBER | TRUE | FALSE | NULL ;
 variable    → IDENTIFIER ;     // No leading "_"
 wildcard    → IDENTIFIER ;     // With leading "_"
 </code></pre>
-<p>Semantic restrictions:</p>
-<ul>
-<li>Normal body atoms can contain free variables to bind against facts.  All
-variables in a rule's head, negated body atoms, or constraints must be
-bound in normal body atoms.</li>
-<li>Only body atoms (negated or otherwise) may contain wildcard terms.</li>
-</ul>
 <h2 id="jlox-grammar"><a class="header" href="#jlox-grammar">JLox Grammar</a></h2>
 <p>Here is Nystrom's JLox grammar, for comparison.</p>
 <pre><code>// Statements
@@ -10537,6 +10559,8 @@ value.</li>
 <tr><td>RECORD <em>name fields</em></td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
 <tr><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
 <tr><td>RULESET <em>ruleset</em></td><td>∅ → <em>rsv</em></td><td>Evaluate rule set</td></tr>
+<tr><td>SETADD</td><td><em>set a</em> → <em>set</em></td><td>Add item to set</td></tr>
+<tr><td>SETNEW</td><td>∅ → <em>set</em></td><td>Push empty set</td></tr>
 <tr><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
 <tr><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
 <tr><td>SWAP</td><td><em>a b</em> → <em>b a</em></td><td>Swap top stack items</td></tr>
@@ -10954,6 +10978,14 @@ result is popped and returned to the Java caller.</p>
 <strong>Note:</strong> this could be compiled as a <code>CONSTANT</code> at this point, creating
 the <code>RuleSetValue</code> at compile time, but if we add interpolated expressions
 to rules we'll need to compile them and retrieve them from the stack.</p>
+<h3 id="setadd-1"><a class="header" href="#setadd-1">SETADD</a></h3>
+<hr />
+<p><strong>SETADD</strong> | <em>set</em> <em>a</em> → <em>set</em></p>
+<p>Pops <em>a</em> and adds it to the <em>set</em> value.</p>
+<h3 id="setnew"><a class="header" href="#setnew">SETNEW</a></h3>
+<hr />
+<p><strong>SETNEW</strong> | ∅ → <em>set</em></p>
+<p>Pushes an empty <em>set</em> value onto the stack.</p>
 <h3 id="sub"><a class="header" href="#sub">SUB</a></h3>
 <hr />
 <p><strong>SUB</strong> | <em>a</em> <em>b</em> → *c, where <em>c</em> = (<em>a</em> - <em>b</em>)</p>

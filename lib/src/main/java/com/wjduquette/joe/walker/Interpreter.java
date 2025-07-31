@@ -11,6 +11,7 @@ import com.wjduquette.joe.scanner.TokenType;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.types.RuleSetValue;
+import com.wjduquette.joe.types.SetValue;
 
 import java.util.*;
 
@@ -732,6 +733,14 @@ class Interpreter {
                 }
 
                 yield new RuleSetValue(ruleset);
+            }
+            // A set literal
+            case Expr.SetLiteral expr -> {
+                var list = new SetValue();
+                for (var e : expr.list()) {
+                    list.add(evaluate(e));
+                }
+                yield list;
             }
             // Handle `super.<methodName>` in methods
             case Expr.Super expr -> {

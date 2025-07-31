@@ -80,19 +80,21 @@ public class Opcode {
     /** Opcode */ public static final char RECORD  = 58;
     /** Opcode */ public static final char RETURN  = 59;
     /** Opcode */ public static final char RULESET = 60;
-    /** Opcode */ public static final char SUB     = 61;
-    /** Opcode */ public static final char SUPGET  = 62;
-    /** Opcode */ public static final char SWAP    = 63;
-    /** Opcode */ public static final char TGET    = 64;
-    /** Opcode */ public static final char THROW   = 65;
-    /** Opcode */ public static final char TPUT    = 66;
-    /** Opcode */ public static final char TRCPOP  = 67;
-    /** Opcode */ public static final char TRCPUSH = 68;
-    /** Opcode */ public static final char TSET    = 69;
-    /** Opcode */ public static final char TRUE    = 70;
-    /** Opcode */ public static final char UPCLOSE = 71;
-    /** Opcode */ public static final char UPGET   = 72;
-    /** Opcode */ public static final char UPSET   = 73;
+    /** Opcode */ public static final char SETADD  = 61;
+    /** Opcode */ public static final char SETNEW  = 62;
+    /** Opcode */ public static final char SUB     = 63;
+    /** Opcode */ public static final char SUPGET  = 64;
+    /** Opcode */ public static final char SWAP    = 65;
+    /** Opcode */ public static final char TGET    = 66;
+    /** Opcode */ public static final char THROW   = 67;
+    /** Opcode */ public static final char TPUT    = 68;
+    /** Opcode */ public static final char TRCPOP  = 69;
+    /** Opcode */ public static final char TRCPUSH = 70;
+    /** Opcode */ public static final char TSET    = 71;
+    /** Opcode */ public static final char TRUE    = 72;
+    /** Opcode */ public static final char UPCLOSE = 73;
+    /** Opcode */ public static final char UPGET   = 74;
+    /** Opcode */ public static final char UPSET   = 75;
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -163,6 +165,8 @@ public class Opcode {
         "RECORD",
         "RETURN",
         "RULESET",
+        "SETADD",
+        "SETNEW",
         "SUB",
         "SUPGET",
         "SWAP",

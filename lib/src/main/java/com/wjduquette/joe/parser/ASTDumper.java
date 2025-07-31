@@ -227,6 +227,11 @@ public class ASTDumper {
                 .dump("value", e.value());
             case Expr.RuleSet e -> buffer().nl()
                     .dump("ruleset", e.ruleSet());
+            case Expr.SetLiteral e -> {
+                var buff = buffer().nl();
+                e.list().forEach(buff::dump);
+                yield buff.toString();
+            }
             case Expr.Super e -> buffer()
                 .println(" '" + e.method().lexeme() + "'");
             case Expr.Ternary e -> buffer().nl()

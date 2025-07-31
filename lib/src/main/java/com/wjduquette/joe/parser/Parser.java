@@ -447,7 +447,7 @@ public class Parser {
             throw errorSync(scanner.previous(), "Expected loop variable name.");
         }
 
-        // NEXT, One variable (a single wildcard is treated as variable name.
+        // NEXT, One variable (a single wildcard is treated as variable name).
         if (pattern.getPattern() instanceof Pattern.ValueBinding ||
             pattern.getPattern() instanceof Pattern.Wildcard
         ) {
@@ -899,51 +899,93 @@ public class Parser {
             return new Expr.Grouping(expr);
         }
 
-        // List literal
-        if (scanner.match(LEFT_BRACKET)) {
-            var bracket = scanner.previous();
-            var list = new ArrayList<Expr>();
+        // Other literals
+        if (scanner.match(LEFT_BRACKET)) return listLiteral();
+        if (scanner.match(LEFT_BRACE)) return setOrMapLiteral();
 
-            if (!scanner.check(RIGHT_BRACKET)) {
+        throw errorSync(scanner.peek(), "Expected expression.");
+    }
+
+    private Expr listLiteral() {
+        var bracket = scanner.previous();
+        var list = new ArrayList<Expr>();
+
+        if (!scanner.check(RIGHT_BRACKET)) {
+            list.add(expression());
+
+            while (scanner.match(COMMA)) {
+                // Allow trailing comma
+                if (scanner.check(RIGHT_BRACKET)) break;
                 list.add(expression());
-
-                while (scanner.match(COMMA)) {
-                    // Allow trailing comma
-                    if (scanner.check(RIGHT_BRACKET)) break;
-                    list.add(expression());
-                }
             }
-
-            scanner.consume(RIGHT_BRACKET, "Expected ']' after list items.");
-
-            return new Expr.ListLiteral(bracket, list);
         }
 
-        // Map literal
-        if (scanner.match(LEFT_BRACE)) {
-            var brace = scanner.previous();
-            var entries = new ArrayList<Expr>();
+        scanner.consume(RIGHT_BRACKET, "Expected ']' after list items.");
 
-            if (!scanner.check(RIGHT_BRACE)) {
+        return new Expr.ListLiteral(bracket, list);
+    }
+
+    private Expr setOrMapLiteral() {
+        var brace = scanner.previous();
+
+        // FIRST, look for empty set
+        if (scanner.match(RIGHT_BRACE)) {
+            return new Expr.SetLiteral(brace, List.of());
+        }
+
+        // NEXT, look for empty map
+        if (scanner.match(COLON)) {
+            scanner.consume(RIGHT_BRACE,
+                "expected '}' after ':' in empty map literal.");
+            return new Expr.MapLiteral(brace, List.of());
+        }
+
+        // NEXT, get first expression
+        var first = expression();
+
+        // NEXT, is it a set or a map?
+        if (scanner.match(COLON)) {
+            return mapLiteral(brace, first);
+        } else {
+            return setLiteral(brace, first);
+        }
+    }
+
+    private Expr setLiteral(Token brace, Expr first) {
+        var list = new ArrayList<Expr>();
+        list.add(first);
+
+        if (!scanner.check(RIGHT_BRACE)) {
+            while (scanner.match(COMMA)) {
+                // Allow trailing comma
+                if (scanner.check(RIGHT_BRACE)) break;
+                list.add(expression());
+            }
+        }
+
+        scanner.consume(RIGHT_BRACE, "Expected '}' after set items.");
+
+        return new Expr.SetLiteral(brace, list);
+    }
+
+    private Expr mapLiteral(Token brace, Expr first) {
+        var entries = new ArrayList<Expr>();
+        entries.add(first);
+        entries.add(expression()); // The colon was already parsed
+
+        if (!scanner.check(RIGHT_BRACE)) {
+            while (scanner.match(COMMA)) {
+                // Allow trailing comma
+                if (scanner.check(RIGHT_BRACE)) break;
                 entries.add(expression());
                 scanner.consume(COLON, "Expected ':' after map key.");
                 entries.add(expression());
-
-                while (scanner.match(COMMA)) {
-                    // Allow trailing comma
-                    if (scanner.check(RIGHT_BRACE)) break;
-                    entries.add(expression());
-                    scanner.consume(COLON, "Expected ':' after map key.");
-                    entries.add(expression());
-                }
             }
-
-            scanner.consume(RIGHT_BRACE, "Expected '}' after map entries.");
-
-            return new Expr.MapLiteral(brace, entries);
         }
 
-        throw errorSync(scanner.peek(), "Expected expression.");
+        scanner.consume(RIGHT_BRACE, "Expected '}' after map entries.");
+
+        return new Expr.MapLiteral(brace, entries);
     }
 
     //-------------------------------------------------------------------------
@@ -1267,8 +1309,10 @@ public class Parser {
         } while (scanner.match(COMMA));
 
         if (scanner.match(WHERE)) {
-            constraints.add(constraint(bodyVar));
-        } while (scanner.match(COMMA));
+            do {
+                constraints.add(constraint(bodyVar));
+            } while (scanner.match(COMMA));
+        }
 
         scanner.consume(SEMICOLON, "expected ';' after rule body.");
 

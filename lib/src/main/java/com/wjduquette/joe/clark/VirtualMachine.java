@@ -9,6 +9,7 @@ import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.types.RuleSetValue;
+import com.wjduquette.joe.types.SetValue;
 
 import java.util.*;
 
@@ -549,17 +550,6 @@ class VirtualMachine {
                         throw error(
                             "'var' pattern failed to match target value.");
                     }
-//
-//                    if (!Matcher.bind(
-//                        joe,
-//                        pv.pattern,
-//                        target,
-//                        pv.constants::get,
-//                        (id, value) -> push(value)
-//                    )) {
-//                        throw error(
-//                            "'var' pattern failed to match target value.");
-//                    }
                 }
                 case LOCGET -> {
                     var slot = readInt();
@@ -786,6 +776,12 @@ class VirtualMachine {
 
                     push(new RuleSetValue(ruleset));
                 }
+                case SETADD -> {
+                    var item = pop();
+                    var set = (SetValue)peek(0);
+                    set.add(item);
+                }
+                case SETNEW -> push(new SetValue());
                 case SUB -> {
                     var b = pop();
                     var a = pop();

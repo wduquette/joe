@@ -85,7 +85,7 @@ public class SetType extends ProxyType<JoeSet> {
         assert object instanceof JoeSet;
         var set = (JoeSet)object;
 
-        return "Set(" + joe.join(", ", set) + ")";
+        return "{" + joe.join(", ", set) + "}";
     }
 
     //-------------------------------------------------------------------------

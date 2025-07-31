@@ -4,6 +4,9 @@
 
 - Language
   - Fixed bug: Nero now parses negative numbers correctly.
+  - Added set literals, `{#a, #b, #c}`.
+    - `{}` now denotes an empty set, not an empty map.
+    - `{:}` denotes an empty map.
 - Standard Library
   - Added `Fact::get`
 
