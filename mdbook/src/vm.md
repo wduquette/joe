@@ -17,81 +17,83 @@ The byte-engine is a stack machine with a few registers:
 ## Instruction Set
 
 
-| Mnemonic/argument      | Stack effect            | Description               |
-|------------------------|-------------------------|---------------------------|
-| ADD                    | *a b* → *c*             | c = a + b                 |
-| ASSERT                 | *msg* → ∅               | Throws AssertError        |
-| CALL *argc*            | *f args* → *c*          | c = f(args)               |
-| CLASS *name*           | ∅ → *type*              | Create class              |
-| CLOSURE *func...*      | ∅ → *f*                 | Load closure              |
-| COMMENT *name*         | ∅ → ∅                   | No-op comment             |
-| CONST *constant*       | ∅ → *a*                 | Load constant             |
-| DECR                   | *a* → *b*               | b = a - 1                 |
-| DIV                    | *a b* → *c*             | c = a/b                   |
-| DUP                    | *a* → *a* *a*           | Duplicate top             |
-| DUP2                   | *a b* → *a b a b*       | Duplicate top 2           |
-| EQ                     | *a b* → *c*             | c = a == b                |
-| FALSE                  | ∅ → false               | Load `false`              |
-| GE                     | *a b* → *c*             | c = a >= b                |
-| GETNEXT                | *iter* → *a*            | a = iter.next()           |
-| GLOBIND                | *p t* → *flag*          | Bind target to pattern    |
-| GLOBINO                | *p t* → ∅               | Bind target to pattern    |
-| GLODEF *name*          | *a* → ∅                 | Define global             |
-| GLOGET *name*          | ∅ → *a*                 | Get global                |
-| GLOSET *name*          | *a* → *a*               | Set global                |
-| GT                     | *a b* → *a* > *b*       | Compare: greater          |
-| HASNEXT                | *iter* → *flag*         | flag = iter.hasNext()     |
-| IN                     | *a coll* → *flag*       | a in collection           |
-| INCR                   | *a* → *b*               | b = a + 1                 |
-| INDGET                 | *coll i* → *a*          | `a = coll[i]`             |
-| INDSET                 | *coll i a* → *a*        | `coll[i] = a`             |
-| INHERIT                | *sup sub* → *sup*       | Inheritance               |
-| ITER                   | *coll* → *iter*         | iter = coll.iterator()    |
-| JIF *offset*           | *flag* → ∅              | Jump if false             |
-| JIFKEEP *offset*       | *flag* → *flag*         | Jump if false, keep value |
-| JIT *offset*           | *flag* → ∅              | Jump if true              |
-| JITKEEP *offset*       | *flag* → *flag*         | Jump if true, keep value  |
-| JUMP *offset*          | ∅ → ∅                   | Jump forwards             |
-| LE                     | *a b* → *a* <= *b*      | Compare: less or equal    |
-| LISTADD                | *list a* → *list*       | Add item to list          |
-| LISTNEW                | ∅ → *list*              | Push empty list           |
-| LOCBIND                | *p t* → *vs*            | Bind target to pattern    |
-| LOCGET *slot*          | ∅ → *a*                 | Get local                 |
-| LOCMOVE *slot n*       | ... *vars* → *vars* ... | Get local                 |
-| LOCSET *slot*          | *a* → *a*               | Set local                 |
-| LOOP *offset*          | ∅ → ∅                   | Jump backwards            |
-| LT                     | *a b* → *a* <= *b*      | Compare: less than        |
-| MAPNEW                 | ∅ → *map*               | Push empty ma p           |
-| MAPPUT                 | *map k a* → *map*       | Add entry to map          |
-| MATCH                  | *p t* → *vs? flag*      | Match pattern to target   |
-| METHOD *name*          | *type f* → *type*       | Add method to type        |
-| MUL                    | *a b* → *c*             | c = a*b                   |
-| NE                     | *a b* → *c*             | c = a != b                |
-| NEGATE                 | *a* → *b*               | b = -a                    |
-| NI                     | *a coll* → *flag*       | a not in collection       |
-| NOT                    | *a* → *b*               | b = !a                    |
-| NULL                   | ∅ → null                | Load `null`               |
-| PATTERN *p* *bs*       | *constants* → *pv*      | Evaluate the pattern      |
-| POP                    | *a* → ∅                 | Pops one value            |
-| POPN *n*               | *a...* → ∅              | Pops *n* values           |
-| PROPGET *name*         | *obj* → *a*             | Get property value        |
-| PROPSET *name*         | *obj a* → *a*           | Set property value        |
-| RECORD *name fields*   | ∅ → *type*              | Create record type        |
-| RETURN                 | *a* → *a*               | Return                    |
-| RULESET *ruleset*      | ∅ → *rsv*               | Evaluate rule set         |
-| SUB                    | *a b* → *c*             | c = a - b                 |
-| SUPGET *name*          | *obj sup* → *f*         | Get superclass method     |
-| SWAP                   | *a b* → *b a*           | Swap top stack items      |
-| TGET                   | ∅ → *a*                 | *a* = T                   |
-| THROW                  | *a* → ∅                 | Throw error               |
-| TPUT                   | *a* → ∅                 | T = *a*, pop *a*          |
-| TRCPOP                 | ∅ → ∅                   | Pops a post-trace         |
-| TRCPUSH *trace*        | ∅ → ∅                   | Pushes a post-trace       |
-| TRUE                   | ∅ → true                | Load `true`               |
-| TSET                   | *a* → *a*               | T = *a*                   |
-| UPCLOSE *n*            | *v...* → ∅              | Closes *n* upvalue(s)     |
-| UPGET *slot*           | ∅ → *a*                 | Get upvalue               |
-| UPSET *slot*           | *a* → *a*               | Set upvalue               |
+| Mnemonic/argument    | Stack effect            | Description               |
+|----------------------|-------------------------|---------------------------|
+| ADD                  | *a b* → *c*             | c = a + b                 |
+| ASSERT               | *msg* → ∅               | Throws AssertError        |
+| CALL *argc*          | *f args* → *c*          | c = f(args)               |
+| CLASS *name*         | ∅ → *type*              | Create class              |
+| CLOSURE *func...*    | ∅ → *f*                 | Load closure              |
+| COMMENT *name*       | ∅ → ∅                   | No-op comment             |
+| CONST *constant*     | ∅ → *a*                 | Load constant             |
+| DECR                 | *a* → *b*               | b = a - 1                 |
+| DIV                  | *a b* → *c*             | c = a/b                   |
+| DUP                  | *a* → *a* *a*           | Duplicate top             |
+| DUP2                 | *a b* → *a b a b*       | Duplicate top 2           |
+| EQ                   | *a b* → *c*             | c = a == b                |
+| FALSE                | ∅ → false               | Load `false`              |
+| GE                   | *a b* → *c*             | c = a >= b                |
+| GETNEXT              | *iter* → *a*            | a = iter.next()           |
+| GLOBIND              | *p t* → *flag*          | Bind target to pattern    |
+| GLOBINO              | *p t* → ∅               | Bind target to pattern    |
+| GLODEF *name*        | *a* → ∅                 | Define global             |
+| GLOGET *name*        | ∅ → *a*                 | Get global                |
+| GLOSET *name*        | *a* → *a*               | Set global                |
+| GT                   | *a b* → *a* > *b*       | Compare: greater          |
+| HASNEXT              | *iter* → *flag*         | flag = iter.hasNext()     |
+| IN                   | *a coll* → *flag*       | a in collection           |
+| INCR                 | *a* → *b*               | b = a + 1                 |
+| INDGET               | *coll i* → *a*          | `a = coll[i]`             |
+| INDSET               | *coll i a* → *a*        | `coll[i] = a`             |
+| INHERIT              | *sup sub* → *sup*       | Inheritance               |
+| ITER                 | *coll* → *iter*         | iter = coll.iterator()    |
+| JIF *offset*         | *flag* → ∅              | Jump if false             |
+| JIFKEEP *offset*     | *flag* → *flag*         | Jump if false, keep value |
+| JIT *offset*         | *flag* → ∅              | Jump if true              |
+| JITKEEP *offset*     | *flag* → *flag*         | Jump if true, keep value  |
+| JUMP *offset*        | ∅ → ∅                   | Jump forwards             |
+| LE                   | *a b* → *a* <= *b*      | Compare: less or equal    |
+| LISTADD              | *list a* → *list*       | Add item to list          |
+| LISTNEW              | ∅ → *list*              | Push empty list           |
+| LOCBIND              | *p t* → *vs*            | Bind target to pattern    |
+| LOCGET *slot*        | ∅ → *a*                 | Get local                 |
+| LOCMOVE *slot n*     | ... *vars* → *vars* ... | Get local                 |
+| LOCSET *slot*        | *a* → *a*               | Set local                 |
+| LOOP *offset*        | ∅ → ∅                   | Jump backwards            |
+| LT                   | *a b* → *a* <= *b*      | Compare: less than        |
+| MAPNEW               | ∅ → *map*               | Push empty ma p           |
+| MAPPUT               | *map k a* → *map*       | Add entry to map          |
+| MATCH                | *p t* → *vs? flag*      | Match pattern to target   |
+| METHOD *name*        | *type f* → *type*       | Add method to type        |
+| MUL                  | *a b* → *c*             | c = a*b                   |
+| NE                   | *a b* → *c*             | c = a != b                |
+| NEGATE               | *a* → *b*               | b = -a                    |
+| NI                   | *a coll* → *flag*       | a not in collection       |
+| NOT                  | *a* → *b*               | b = !a                    |
+| NULL                 | ∅ → null                | Load `null`               |
+| PATTERN *p* *bs*     | *constants* → *pv*      | Evaluate the pattern      |
+| POP                  | *a* → ∅                 | Pops one value            |
+| POPN *n*             | *a...* → ∅              | Pops *n* values           |
+| PROPGET *name*       | *obj* → *a*             | Get property value        |
+| PROPSET *name*       | *obj a* → *a*           | Set property value        |
+| RECORD *name fields* | ∅ → *type*              | Create record type        |
+| RETURN               | *a* → *a*               | Return                    |
+| RULESET *ruleset*    | ∅ → *rsv*               | Evaluate rule set         |
+| SETADD               | *set a* → *set*         | Add item to set           |
+| SETNEW               | ∅ → *set*               | Push empty set            |
+| SUB                  | *a b* → *c*             | c = a - b                 |
+| SUPGET *name*        | *obj sup* → *f*         | Get superclass method     |
+| SWAP                 | *a b* → *b a*           | Swap top stack items      |
+| TGET                 | ∅ → *a*                 | *a* = T                   |
+| THROW                | *a* → ∅                 | Throw error               |
+| TPUT                 | *a* → ∅                 | T = *a*, pop *a*          |
+| TRCPOP               | ∅ → ∅                   | Pops a post-trace         |
+| TRCPUSH *trace*      | ∅ → ∅                   | Pushes a post-trace       |
+| TRUE                 | ∅ → true                | Load `true`               |
+| TSET                 | *a* → *a*               | T = *a*                   |
+| UPCLOSE *n*          | *v...* → ∅              | Closes *n* upvalue(s)     |
+| UPGET *slot*         | ∅ → *a*                 | Get upvalue               |
+| UPSET *slot*         | *a* → *a*               | Set upvalue               |
 
 **Stack Effects:** in the stack effect column, the top of the stack is on the 
 right.  
@@ -614,6 +616,18 @@ Given a `RuleSet` as a constant, pushes a `RuleSetValue`.
 **Note:** this could be compiled as a `CONSTANT` at this point, creating
 the `RuleSetValue` at compile time, but if we add interpolated expressions
 to rules we'll need to compile them and retrieve them from the stack.
+
+### SETADD
+---
+**SETADD** | *set* *a* → *set*
+
+Pops *a* and adds it to the *set* value.
+
+### SETNEW
+---
+**SETNEW** | ∅ → *set*
+
+Pushes an empty *set* value onto the stack.
 
 ### SUB
 ---

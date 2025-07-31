@@ -178,8 +178,6 @@
 used in <em>Crafting Interpreters</em>.  Below that is the full
 <a href="#jlox-grammar">JLox grammar</a>.</p>
 <h2 id="grammar"><a class="header" href="#grammar">Grammar</a></h2>
-<p>Here is the grammar; see <a href="#semantic-constraints">Semantic Constraints</a>
-for some conditions enforced by the compiler.</p>
 <ul>
 <li><a href="#statements">Statements</a></li>
 <li><a href="#expressions">Expressions</a></li>
@@ -281,12 +279,16 @@ primary         → "true" | "false" | "nil"
                 | IDENTIFIER 
                 | lambda 
                 | grouping
-                | list 
+                | list
+                | set
+                | map 
                 | "super" "." IDENTIFIER ;
 grouping        → "(" expression ")"
 lambda          → "\" parameters? "-&gt;" ( expression | block ) ; 
 list            → "[" (expression ( "," expression )* ","? )? "]" ;
-map             → "{" (map_entry ( "," map_entry )* ","? )? "]" ;
+set             → "{" (expression ( "," expression )* ","? )? "}" ;
+map             → "{:}" 
+                | {" (map_entry ( "," map_entry )* ","? )? "]" ;
 map_entry       → expression ":" expression ;
 </code></pre>
 <h2 id="patterns"><a class="header" href="#patterns">Patterns</a></h2>
@@ -384,13 +386,6 @@ constant    → KEYWORD | STRING | NUMBER | TRUE | FALSE | NULL ;
 variable    → IDENTIFIER ;     // No leading "_"
 wildcard    → IDENTIFIER ;     // With leading "_"
 </code></pre>
-<p>Semantic restrictions:</p>
-<ul>
-<li>Normal body atoms can contain free variables to bind against facts.  All
-variables in a rule's head, negated body atoms, or constraints must be
-bound in normal body atoms.</li>
-<li>Only body atoms (negated or otherwise) may contain wildcard terms.</li>
-</ul>
 <h2 id="jlox-grammar"><a class="header" href="#jlox-grammar">JLox Grammar</a></h2>
 <p>Here is Nystrom's JLox grammar, for comparison.</p>
 <pre><code>// Statements

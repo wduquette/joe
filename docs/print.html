@@ -10191,8 +10191,6 @@ types, methods, and constants include in Joe's aPackage.</p>
 used in <em>Crafting Interpreters</em>.  Below that is the full
 <a href="grammar.html#jlox-grammar">JLox grammar</a>.</p>
 <h2 id="grammar"><a class="header" href="#grammar">Grammar</a></h2>
-<p>Here is the grammar; see <a href="grammar.html#semantic-constraints">Semantic Constraints</a>
-for some conditions enforced by the compiler.</p>
 <ul>
 <li><a href="grammar.html#statements">Statements</a></li>
 <li><a href="grammar.html#expressions">Expressions</a></li>
@@ -10294,12 +10292,16 @@ primary         → "true" | "false" | "nil"
                 | IDENTIFIER 
                 | lambda 
                 | grouping
-                | list 
+                | list
+                | set
+                | map 
                 | "super" "." IDENTIFIER ;
 grouping        → "(" expression ")"
 lambda          → "\" parameters? "-&gt;" ( expression | block ) ; 
 list            → "[" (expression ( "," expression )* ","? )? "]" ;
-map             → "{" (map_entry ( "," map_entry )* ","? )? "]" ;
+set             → "{" (expression ( "," expression )* ","? )? "}" ;
+map             → "{:}" 
+                | {" (map_entry ( "," map_entry )* ","? )? "]" ;
 map_entry       → expression ":" expression ;
 </code></pre>
 <h2 id="patterns"><a class="header" href="#patterns">Patterns</a></h2>
@@ -10397,13 +10399,6 @@ constant    → KEYWORD | STRING | NUMBER | TRUE | FALSE | NULL ;
 variable    → IDENTIFIER ;     // No leading "_"
 wildcard    → IDENTIFIER ;     // With leading "_"
 </code></pre>
-<p>Semantic restrictions:</p>
-<ul>
-<li>Normal body atoms can contain free variables to bind against facts.  All
-variables in a rule's head, negated body atoms, or constraints must be
-bound in normal body atoms.</li>
-<li>Only body atoms (negated or otherwise) may contain wildcard terms.</li>
-</ul>
 <h2 id="jlox-grammar"><a class="header" href="#jlox-grammar">JLox Grammar</a></h2>
 <p>Here is Nystrom's JLox grammar, for comparison.</p>
 <pre><code>// Statements
@@ -10537,6 +10532,8 @@ value.</li>
 <tr><td>RECORD <em>name fields</em></td><td>∅ → <em>type</em></td><td>Create record type</td></tr>
 <tr><td>RETURN</td><td><em>a</em> → <em>a</em></td><td>Return</td></tr>
 <tr><td>RULESET <em>ruleset</em></td><td>∅ → <em>rsv</em></td><td>Evaluate rule set</td></tr>
+<tr><td>SETADD</td><td><em>set a</em> → <em>set</em></td><td>Add item to set</td></tr>
+<tr><td>SETNEW</td><td>∅ → <em>set</em></td><td>Push empty set</td></tr>
 <tr><td>SUB</td><td><em>a b</em> → <em>c</em></td><td>c = a - b</td></tr>
 <tr><td>SUPGET <em>name</em></td><td><em>obj sup</em> → <em>f</em></td><td>Get superclass method</td></tr>
 <tr><td>SWAP</td><td><em>a b</em> → <em>b a</em></td><td>Swap top stack items</td></tr>
@@ -10954,6 +10951,14 @@ result is popped and returned to the Java caller.</p>
 <strong>Note:</strong> this could be compiled as a <code>CONSTANT</code> at this point, creating
 the <code>RuleSetValue</code> at compile time, but if we add interpolated expressions
 to rules we'll need to compile them and retrieve them from the stack.</p>
+<h3 id="setadd-1"><a class="header" href="#setadd-1">SETADD</a></h3>
+<hr />
+<p><strong>SETADD</strong> | <em>set</em> <em>a</em> → <em>set</em></p>
+<p>Pops <em>a</em> and adds it to the <em>set</em> value.</p>
+<h3 id="setnew"><a class="header" href="#setnew">SETNEW</a></h3>
+<hr />
+<p><strong>SETNEW</strong> | ∅ → <em>set</em></p>
+<p>Pushes an empty <em>set</em> value onto the stack.</p>
 <h3 id="sub"><a class="header" href="#sub">SUB</a></h3>
 <hr />
 <p><strong>SUB</strong> | <em>a</em> <em>b</em> → *c, where <em>c</em> = (<em>a</em> - <em>b</em>)</p>

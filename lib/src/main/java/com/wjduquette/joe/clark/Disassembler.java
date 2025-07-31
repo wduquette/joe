@@ -158,7 +158,7 @@ public class Disassembler {
                  LISTADD, LISTNEW, LE, LT,
                  MAPNEW, MAPPUT, MATCH, MATCHG, MATCHL, MUL,
                  NE, NEGATE, NI, NOT, NULL,
-                 POP, RETURN, SUB, SWAP,
+                 POP, RETURN, SETADD, SETNEW, SUB, SWAP,
                  TGET, THROW, TPUT, TRUE, TRCPOP, TSET
                 -> {
                 lines.add(new Line(ip, prefix));

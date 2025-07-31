@@ -19,7 +19,7 @@ public sealed interface Expr permits
     Expr.Null,
     Expr.PropGet, Expr.PropIncrDecr, Expr.PropSet,
     Expr.RuleSet,
-    Expr.Super,
+    Expr.SetLiteral, Expr.Super,
     Expr.This, Expr.Ternary, Expr.True,
     Expr.Unary,
     Expr.VarGet, Expr.VarIncrDecr, Expr.VarSet
@@ -227,6 +227,16 @@ public sealed interface Expr permits
         ASTRuleSet ruleSet
     ) implements Expr {
         public Span location() { return keyword.span(); }
+    }
+
+    /**
+     * A Set literal: a list of expressions used to initialize a
+     * SetValue.
+     * @param bracket The opening left bracket
+     * @param list The list of expressions.
+     */
+    record SetLiteral(Token bracket, List<Expr> list) implements Expr {
+        public Span location() { return bracket.span(); }
     }
 
     /**
