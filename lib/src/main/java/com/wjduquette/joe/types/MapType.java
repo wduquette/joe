@@ -99,6 +99,8 @@ public class MapType extends ProxyType<JoeMap> {
         assert object instanceof JoeMap;
         var map = (JoeMap)object;
 
+        if (map.isEmpty()) return "{:}";
+
         return "{"
             + map.entrySet().stream()
                 .map(e -> joe.stringify(e.getKey()) + ": " + joe.stringify(e.getValue()))
