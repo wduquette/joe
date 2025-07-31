@@ -1,49 +1,49 @@
 // type.joe.Set.joe: Set tests
 
 function testInitializer() {
-    var set1 = Set();
+    var set1 = {};
     check(set1.isEmpty()).isTrue();
     check(set1.size()).eq(0);
 
-    var set2 = Set.of(#a, #b);
+    var set2 = {#a, #b};
     check(set2.isEmpty()).isFalse();
     check(set2.size()).eq(2);
 }
 
 function testAdd() {
-    var set = Set();
+    var set = {};
     check(set.add(#a)).isTrue();
-    check(set).eq(Set.of(#a));
+    check(set).eq({#a});
 }
 
 function testAddAll() {
-    var set1 = Set.of(#a, #b);
-    var set2 = Set.of(#c);
+    var set1 = {#a, #b};
+    var set2 = {#c};
     check(set2.addAll(set1)).isTrue();
-    check(set2).eq(Set.of(#a, #b, #c));
+    check(set2).eq({#a, #b, #c});
 }
 
 function testClear() {
-    var set = Set.of(#a);
+    var set = {#a};
     set.clear();
     check(set.isEmpty()).isTrue();
     check(set.size()).eq(0);
 }
 
 function testContains() {
-    var set = Set.of(#a);
+    var set = {#a};
     check(set.contains(#a)).isTrue();
     check(set.contains(#b)).isFalse();
 }
 
 function testContainsAll() {
-    var set = Set.of(#a, #b, #c, #d);
-    check(set.containsAll(Set.of(#a, #c))).isTrue();
-    check(set.containsAll(Set.of(#c, #e))).isFalse();
+    var set = {#a, #b, #c, #d};
+    check(set.containsAll({#a, #c})).isTrue();
+    check(set.containsAll({#c, #e})).isFalse();
 }
 
 function testCopy() {
-    var set = Set.of(#a);
+    var set = {#a};
     var set2 = set.copy();
     check(set2).eq(set);
     set2.clear();
@@ -51,43 +51,43 @@ function testCopy() {
 }
 
 function testFilter() {
-    var set = Set.of(1, 2, 3, 4, 5);
+    var set = {1, 2, 3, 4, 5};
     var filtered = set.filter(\x -> x > 3);
-    check(filtered).eq(Set.of(4, 5));
+    check(filtered).eq({4, 5});
 }
 
 function testIsEmpty() {
-    check(Set().isEmpty()).isTrue();
-    check(Set.of(#a).isEmpty()).isFalse();
+    check({}.isEmpty()).isTrue();
+    check({#a}.isEmpty()).isFalse();
 }
 
 function testMap() {
-    var set = Set.of(1, 2, 3);
+    var set = {1, 2, 3};
     var filtered = set.map(Joe.stringify);
-    check(filtered).eq(Set.of("1", "2", "3"));
+    check(filtered).eq({"1", "2", "3"});
 }
 
 function testRemove() {
-    var set = Set.of(#a, #b, #c);
+    var set = {#a, #b, #c};
     check(set.remove(#b)).isTrue();
-    check(set).eq(Set.of(#a, #c));
+    check(set).eq({#a, #c});
     check(set.remove(#d)).isFalse();
-    check(set).eq(Set.of(#a, #c));
+    check(set).eq({#a, #c});
 }
 
 function testRemoveAll() {
-    var set = Set.of(#a, #b, #c);
-    check(set.removeAll(Set.of(#b))).isTrue();
-    check(set).eq(Set.of(#a, #c));
+    var set = {#a, #b, #c};
+    check(set.removeAll({#b})).isTrue();
+    check(set).eq({#a, #c});
 }
 
 function testSize() {
-    check(Set().size()).eq(0);
-    check(Set.of(#a, #b).size()).eq(2);
+    check({}.size()).eq(0);
+    check({#a, #b}.size()).eq(2);
 }
 
 function testSorted_string() {
-    var list = Set.of("b", "c", "a", "d").sorted();
+    var list = {"b", "c", "a", "d"}.sorted();
     check(list).eq(["a", "b", "c", "d"]);
 }
 
@@ -101,10 +101,10 @@ function testSorted_nonString_comparator() {
         return Joe.compare(Joe.stringify(a), Joe.stringify(b));
     }
 
-    var list = Set.of(#a, #b, #c, #d).sorted(comp);
+    var list = {#a, #b, #c, #d}.sorted(comp);
     check(list).eq([#a, #b, #c, #d]);
 }
 
 function testToString() {
-    check(Set.of(#a, #b).toString()).eq("Set(#a, #b)");
+    check({#a, #b}.toString()).eq("{#a, #b}");
 }

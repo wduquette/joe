@@ -2,7 +2,7 @@
 
 function testOf_empty() {
     var map = Map.of();
-    check(map).eq({});
+    check(map).eq({:});
     check(map.isEmpty()).isTrue();
 }
 
@@ -79,7 +79,7 @@ function testKeySet() {
 }
 
 function testPut() {
-    var map = {};
+    var map = {:};
     map.put(#a, 1);
     check(map).eq({#a: 1});
     check(map.get(#a)).eq(1);
