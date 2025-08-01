@@ -104,6 +104,8 @@ public sealed interface Pattern permits
         implements Pattern
     {
         @Override public String toString() {
+            if (patterns.isEmpty()) return "{:}";
+
             var map = patterns.entrySet().stream()
                 .map(e -> e.getKey() + ": " + e.getValue())
                 .collect(Collectors.joining(", "));
