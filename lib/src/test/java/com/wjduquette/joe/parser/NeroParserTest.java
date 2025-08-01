@@ -11,33 +11,23 @@ import java.util.List;
 import static com.wjduquette.joe.checker.Checker.check;
 
 /**
- * The Joe `Parser` is mostly tested by the scripted test suite.
- * This test suite is aimed at testing parse errors, which the scripted
- * test suite cannot easily do.
+ * Joe's parsers are mostly tested by the scripted test suite.
+ * This test suite is aimed at testing parse errors in the Nero parser,
+ * which the scripted test suite cannot easily do.
  *
  * <p>The structure of this test suite matches the structure of the
- * `Parser` itself.  There is a test case for each specific parse error,
- * organized by the `Parser` method that detects the error, reading
+ * `NeroParser` itself.  There is a test case for each specific parse error,
+ * organized by the `NeroParser` method that detects the error, reading
  * from top to bottom.
  */
-public class ParserTest extends Ted {
+public class NeroParserTest extends Ted {
     private final List<Trace> errors = new ArrayList<>();
 
     //-------------------------------------------------------------------------
-    // parseNero()
+    // parse()
 
-    @Test public void testParseRuleSet_expectedAxiomOrRule() {
-        test("testParseRuleSet_expectedAxiomOrRule");
-
-        var source = """
-            Head(x), Body(x);
-            """;
-        check(parseNero(source))
-            .eq("[line 1] error at ',', expected axiom or rule.");
-    }
-
-    @Test public void testParseRuleSet_axiomMismatch() {
-        test("testParseRuleSet_axiomMismatch");
+    @Test public void testParse_axiomMismatch() {
+        test("testParse_axiomMismatch");
 
         var source = """
             Person(#joe);
@@ -47,8 +37,8 @@ public class ParserTest extends Ted {
             .eq("[line 2] error at 'Person', axiom's shape is incompatible with previous definitions for this relation.");
     }
 
-    @Test public void testParseRuleSet_headMismatch() {
-        test("testParseRuleSet_headMismatch");
+    @Test public void testParse_headMismatch() {
+        test("testParse_headMismatch");
 
         var source = """
             Result(x) :- Person(x, _);
@@ -57,6 +47,17 @@ public class ParserTest extends Ted {
         check(parseNero(source))
             .eq("[line 2] error at 'Result', rule head's shape is incompatible with previous definitions for this relation.");
     }
+
+    @Test public void testParse_expectedAxiomOrRule() {
+        test("testParse_expectedAxiomOrRule");
+
+        var source = """
+            Head(x), Body(x);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at ',', expected axiom or rule.");
+    }
+
 
     //-------------------------------------------------------------------------
     // defineDeclaration
@@ -177,10 +178,10 @@ public class ParserTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // fact()
+    // axiom()
 
-    @Test public void testFact_nonConstantTerm() {
-        test("testFact_nonConstantTerm");
+    @Test public void testAxiom_nonConstantTerm() {
+        test("testAxiom_nonConstantTerm");
 
         var source = """
             Thing(x);
@@ -297,10 +298,10 @@ public class ParserTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // bodyAtom()
+    // atom()
 
     @Test public void testAtom_expectedRelation() {
-        test("testBodyAtom_expectedRelation");
+        test("testAtom_expectedRelation");
 
         var source = """
             A(x) :- ;
@@ -320,30 +321,10 @@ public class ParserTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // indexedAtom()
-
-    @Test public void testOrderedAtom_expectedFieldName() {
-        test("testIndexedAtom_expectedFieldName");
-
-        var source = """
-            A(x, y) :- B(f0: x, #a);
-            """;
-        check(parseNero(source))
-            .eq("[line 1] error at '#a', expected field name.");
-    }
-
-    @Test public void testOrderedAtom_expectedColon() {
-        test("testIndexedAtom_expectedColon");
-
-        var source = """
-            A(x, y) :- B(f0: x, f1 #a);
-            """;
-        check(parseNero(source))
-            .eq("[line 1] error at '#a', expected ':' after field name.");
-    }
+    // orderedAtom()
 
     @Test public void testOrderedAtom_expectedRightParen() {
-        test("testIndexedAtom_expectedRightParen");
+        test("testOrderedAtom_expectedRightParen");
 
         var source = """
             A(x) :- B(x;
@@ -353,20 +334,28 @@ public class ParserTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // indexedAtom()
+    // namedAtom()
 
-    @Test public void testASTTerm_expectedTerm() {
-        test("testASTTerm_expectedTerm");
+    @Test public void testNamedAtom_expectedFieldName() {
+        test("testNamedAtom_expectedFieldName");
 
         var source = """
-            A(*);
+            A(x, y) :- B(f0: x, #a);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '*', expected term.");
+            .eq("[line 1] error at '#a', expected field name.");
     }
 
-    //-------------------------------------------------------------------------
-    // namedAtom()
+    @Test public void testNamedAtom_expectedColon() {
+        test("testNamedAtom_expectedColon");
+
+        var source = """
+            A(x, y) :- B(f0: x, f1 #a);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '#a', expected ':' after field name.");
+    }
+
 
     @Test public void testNamedAtom_expectedRightParen() {
         test("testNamedAtom_expectedRightParen");
@@ -379,19 +368,31 @@ public class ParserTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // Helpers
+    // term()
 
-    @SuppressWarnings("unused")
-    private String parseJoe(String input) {
-        errors.clear();
-        var buffer = new SourceBuffer("-", input);
-        var parser = new Parser(buffer, this::errorHandler);
-        parser.parseJoe();
-        check(errors.isEmpty()).eq(false);
+    @Test public void testTerm_expectedNumberAfterMinus() {
+        test("testTerm_expectedNumberAfterMinus");
 
-        var trace = errors.get(0);
-        return "[line " + trace.line() + "] " + trace.message();
+        var source = """
+            A(-#abc);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '#abc', expected number after '-'.");
     }
+
+    @Test public void testTerm_expectedTerm() {
+        test("testTerm_expectedTerm");
+
+        var source = """
+            A(*);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '*', expected term.");
+    }
+
+
+    //-------------------------------------------------------------------------
+    // Helpers
 
     private String parseNero(String input) {
         errors.clear();

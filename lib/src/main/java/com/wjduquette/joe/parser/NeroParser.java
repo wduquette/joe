@@ -203,7 +203,7 @@ class NeroParser extends EmbeddedParser {
     }
 
     private ASTRuleSet.ASTConstraint constraint(Set<String> bodyVar) {
-        var term = astTerm();
+        var term = term();
         Token op;
         ASTRuleSet.ASTVariable a = null;
 
@@ -231,7 +231,7 @@ class NeroParser extends EmbeddedParser {
             throw errorSync(scanner.previous(), "expected comparison operator.");
         }
 
-        var b = astTerm();
+        var b = term();
 
         if (b instanceof ASTRuleSet.ASTVariable v) {
             if (!bodyVar.contains(v.token().lexeme())) {
@@ -261,7 +261,7 @@ class NeroParser extends EmbeddedParser {
         var terms = new ArrayList<ASTRuleSet.ASTTerm>();
 
         do {
-            terms.add(astTerm());
+            terms.add(term());
         } while (scanner.match(COMMA));
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
@@ -276,7 +276,7 @@ class NeroParser extends EmbeddedParser {
             scanner.consume(IDENTIFIER, "expected field name.");
             var name = scanner.previous();
             scanner.consume(COLON, "expected ':' after field name.");
-            terms.put(name, astTerm());
+            terms.put(name, term());
         } while (scanner.match(COMMA));
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
@@ -284,7 +284,7 @@ class NeroParser extends EmbeddedParser {
         return new ASTRuleSet.ASTNamedAtom(relation, terms);
     }
 
-    private ASTRuleSet.ASTTerm astTerm() {
+    private ASTRuleSet.ASTTerm term() {
         if (scanner.match(IDENTIFIER)) {
             var name = scanner.previous();
             if (name.lexeme().startsWith("_")) {
@@ -293,7 +293,7 @@ class NeroParser extends EmbeddedParser {
                 return new ASTRuleSet.ASTVariable(name);
             }
         } else if (scanner.match(MINUS)) {
-            scanner.consume(NUMBER, "Expected number after '-'.");
+            scanner.consume(NUMBER, "expected number after '-'.");
             var number = (Double)scanner.previous().literal();
             return new ASTRuleSet.ASTConstant(scanner.previous(), -number);
         } else if (scanner.match(TRUE)) {
