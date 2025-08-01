@@ -102,7 +102,7 @@ public class Schema {
      * @return true or false
      */
     public boolean checkAndAdd(ASTRuleSet.ASTAtom head) {
-        var relation = head.relation().lexeme();
+        var relation = head.relation();
         var defined = get(relation);
 
         // FIRST, save the inferred shape if there's no shape already defined.

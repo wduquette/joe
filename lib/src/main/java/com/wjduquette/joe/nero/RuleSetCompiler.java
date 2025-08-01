@@ -58,12 +58,12 @@ public class RuleSetCompiler {
                             "Invalid axiom; atom contains a non-constant term.");
                     }
                 }
-                var shape = ast.schema().get(a.relation().lexeme());
+                var shape = ast.schema().get(a.relation());
                 if (shape instanceof Shape.PairShape ps) {
-                    yield new PairFact(a.relation().lexeme(),
+                    yield new PairFact(a.relation(),
                         ps.fieldNames(), terms);
                 } else {
-                    yield new ListFact(a.relation().lexeme(), terms);
+                    yield new ListFact(a.relation(), terms);
                 }
             }
             case ASTRuleSet.ASTNamedAtom a -> {
@@ -77,7 +77,7 @@ public class RuleSetCompiler {
                             "Invalid axiom; atom contains a non-constant term.");
                     }
                 }
-                yield new MapFact(a.relation().lexeme(), termMap);
+                yield new MapFact(a.relation(), termMap);
             }
         };
     }
@@ -94,13 +94,13 @@ public class RuleSetCompiler {
     private Atom ast2atom(ASTRuleSet.ASTAtom atom) {
         return switch (atom) {
             case ASTRuleSet.ASTOrderedAtom a -> new OrderedAtom(
-                a.relation().lexeme(), a.terms());
+                a.relation(), a.terms());
             case ASTRuleSet.ASTNamedAtom a -> {
                 var terms = new LinkedHashMap<String,Term>();
                 for (var e : a.termMap().entrySet()) {
                     terms.put(e.getKey().lexeme(), e.getValue());
                 }
-                yield new NamedAtom(a.relation().lexeme(), terms);
+                yield new NamedAtom(a.relation(), terms);
             }
         };
     }

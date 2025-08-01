@@ -64,7 +64,7 @@ public record ASTRuleSet(
          * The Atom's relation
          * @return The relation name
          */
-        Token relation();
+        String relation();
 
         /**
          * The atom's terms.  This is to be used for retrieving data about
@@ -86,17 +86,17 @@ public record ASTRuleSet(
     }
 
     public record ASTOrderedAtom(
-        Token relation,
+        String relation,
         List<Term> terms
     ) implements ASTAtom {
         @Override public Collection<Term> getTerms() { return terms(); }
         @Override public String toString() {
-            return "ASTOrderedAtom(" + relation.lexeme() + "," + terms + ")";
+            return "ASTOrderedAtom(" + relation + "," + terms + ")";
         }
     }
 
     public record ASTNamedAtom(
-        Token relation,
+        String relation,
         Map<Token,Term> termMap
     ) implements ASTAtom {
         @Override public Collection<Term> getTerms() {
@@ -107,23 +107,7 @@ public record ASTRuleSet(
             var termString = termMap.entrySet().stream()
                 .map(e -> e.getKey() + ": " + e.getValue())
                 .collect(Collectors.joining(", "));
-            return "ASTNamedAtom(" + relation.lexeme() + ", [" + termString + "])";
+            return "ASTNamedAtom(" + relation() + ", [" + termString + "])";
         }
     }
-
-//    /**
-//     * A constraint of the form "a OP b".
-//     * @param a A bound variable
-//     * @param op A comparison operator
-//     * @param b A bound variable or constant
-//     */
-//    public record ASTConstraint(
-//        Variable a,
-//        Token op,
-//        Term b)
-//    {
-//        @Override public String toString() {
-//            return "ASTConstraint(" + a + "," + op.lexeme() + "," + b + ")";
-//        }
-//    }
 }

@@ -97,9 +97,9 @@ public sealed interface Shape permits
     static Shape infer(ASTRuleSet.ASTAtom head) {
         return switch (head) {
             case ASTRuleSet.ASTOrderedAtom a ->
-                new ListShape(a.relation().lexeme(), a.terms().size());
+                new ListShape(a.relation(), a.terms().size());
             case ASTRuleSet.ASTNamedAtom a
-                -> new MapShape(a.relation().lexeme());
+                -> new MapShape(a.relation());
         };
     }
 }

@@ -79,13 +79,13 @@ class NeroParser extends EmbeddedParser {
                         error(headToken,
                             "axiom's shape is incompatible with previous definitions for this relation.");
                     }
-                    facts.add(axiom(head));
+                    facts.add(axiom(headToken, head));
                 } else if (scanner.match(COLON_MINUS)) {
                     if (!schema.checkAndAdd(head)) {
                         error(headToken,
                             "rule head's shape is incompatible with previous definitions for this relation.");
                     }
-                    rules.add(rule(head));
+                    rules.add(rule(headToken, head));
                 } else {
                     scanner.advance();
                     throw errorSync(scanner.previous(),
@@ -142,12 +142,11 @@ class NeroParser extends EmbeddedParser {
         }
     }
 
-    private ASTRuleSet.ASTAtom axiom(ASTRuleSet.ASTAtom head) {
+    private ASTRuleSet.ASTAtom axiom(Token token, ASTRuleSet.ASTAtom head) {
         // Verify that there are no non-constant terms.
-        var headToken = head.relation();
         for (var term : head.getTerms()) {
             if (!(term instanceof Constant)) {
-                error(headToken,
+                error(token,
                     "axiom contains a non-constant term: '" +
                     term + "'.");
             }
@@ -155,8 +154,7 @@ class NeroParser extends EmbeddedParser {
         return head;
     }
 
-    private ASTRuleSet.ASTRule rule(ASTRuleSet.ASTAtom head) {
-        var headToken = head.relation();
+    private ASTRuleSet.ASTRule rule(Token headToken, ASTRuleSet.ASTAtom head) {
         var body = new ArrayList<ASTRuleSet.ASTAtom>();
         var negations = new ArrayList<ASTRuleSet.ASTAtom>();
         var constraints = new ArrayList<Constraint>();
@@ -280,7 +278,7 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new ASTRuleSet.ASTOrderedAtom(relation, terms);
+        return new ASTRuleSet.ASTOrderedAtom(relation.lexeme(), terms);
     }
 
     private ASTRuleSet.ASTNamedAtom namedAtom(Token relation) {
@@ -295,7 +293,7 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new ASTRuleSet.ASTNamedAtom(relation, terms);
+        return new ASTRuleSet.ASTNamedAtom(relation.lexeme(), terms);
     }
 
     private Term term() {
