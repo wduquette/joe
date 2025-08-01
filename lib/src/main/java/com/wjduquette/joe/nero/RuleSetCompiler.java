@@ -37,10 +37,8 @@ public class RuleSetCompiler {
     public RuleSet compile() {
         Set<Fact> facts = ast.axioms().stream().map(this::ast2fact)
             .collect(Collectors.toSet());
-        Set<Rule> rules = ast.rules().stream().map(this::ast2rule)
-            .collect(Collectors.toSet());
 
-        return new RuleSet(ast.schema(), facts, rules);
+        return new RuleSet(ast.schema(), facts, ast.rules());
     }
 
     //-------------------------------------------------------------------------
@@ -80,14 +78,5 @@ public class RuleSetCompiler {
                 yield new MapFact(a.relation(), termMap);
             }
         };
-    }
-
-    private Rule ast2rule(ASTRuleSet.ASTRule rule) {
-        return new Rule(
-            rule.head(),
-            rule.body(),
-            rule.negations(),
-            rule.constraints()
-        );
     }
 }

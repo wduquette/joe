@@ -62,7 +62,7 @@ class NeroParser extends EmbeddedParser {
 
     private ASTRuleSet parse(Supplier<Boolean> endCondition) {
         List<Atom> facts = new ArrayList<>();
-        List<ASTRuleSet.ASTRule> rules = new ArrayList<>();
+        Set<Rule> rules = new HashSet<>();
         var schema = new Schema();
 
         while (!endCondition.get()) {
@@ -154,7 +154,7 @@ class NeroParser extends EmbeddedParser {
         return head;
     }
 
-    private ASTRuleSet.ASTRule rule(Token headToken, Atom head) {
+    private Rule rule(Token headToken, Atom head) {
         var body = new ArrayList<Atom>();
         var negations = new ArrayList<Atom>();
         var constraints = new ArrayList<Constraint>();
@@ -204,7 +204,7 @@ class NeroParser extends EmbeddedParser {
             }
         }
 
-        return new ASTRuleSet.ASTRule(head, body, negations, constraints);
+        return new Rule(head, body, negations, constraints);
     }
 
     private Constraint constraint(Set<String> bodyVar) {

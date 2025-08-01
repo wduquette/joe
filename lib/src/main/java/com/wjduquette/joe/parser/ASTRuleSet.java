@@ -3,6 +3,7 @@ package com.wjduquette.joe.parser;
 import com.wjduquette.joe.nero.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class contains the Abstract Syntax Tree (AST) types for Nero
@@ -14,7 +15,7 @@ import java.util.List;
 public record ASTRuleSet(
     Schema schema,
     List<Atom> axioms,
-    List<ASTRule> rules
+    Set<Rule> rules
 ) {
     @Override
     public String toString() {
@@ -32,20 +33,5 @@ public record ASTRuleSet(
         buff.append("]");
 
         return buff.toString();
-    }
-
-    //-------------------------------------------------------------------------
-    // Clauses
-
-    public record ASTRule(
-        Atom head,
-        List<Atom> body,
-        List<Atom> negations,
-        List<Constraint> constraints
-    ) {
-        @Override public String toString() {
-            return "ASTRule(head=" + head + ",body=" + body +
-                ",neg=" + negations + ",where=" + constraints + ")";
-        }
     }
 }

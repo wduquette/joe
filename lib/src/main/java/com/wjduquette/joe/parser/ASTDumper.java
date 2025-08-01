@@ -338,28 +338,7 @@ public class ASTDumper {
         }
 
         for (var rule : ruleset.rules()) {
-            buff.indent("rule: " + dump(rule));
-        }
-
-        return buff.toString();
-    }
-
-    private static String dump(ASTRuleSet.ASTRule rule) {
-        var buff = new Buffer();
-        buff.print(rule.getClass().getSimpleName())
-            .print(" ")
-            .println(rule.head().toString());
-
-        for (var atom : rule.body()) {
-            buff.indent("body: " + atom.toString());
-        }
-
-        for (var atom : rule.negations()) {
-            buff.indent("not: " + atom.toString());
-        }
-
-        for (var constraint : rule.constraints()) {
-            buff.indent("where: " + constraint.toString());
+            buff.indent("rule: " + rule);
         }
 
         return buff.toString();
