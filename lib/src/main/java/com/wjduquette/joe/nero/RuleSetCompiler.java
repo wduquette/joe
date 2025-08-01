@@ -51,11 +51,11 @@ public class RuleSetCompiler {
             case ASTRuleSet.ASTOrderedAtom a -> {
                 var terms = new ArrayList<>();
                 for (var t : a.terms()) {
-                    if (t instanceof ASTRuleSet.ASTConstant c) {
+                    if (t instanceof Constant c) {
                         terms.add(c.value());
                     } else {
                         throw new IllegalStateException(
-                            "Invalid fact; Atom contains a non-constant term.");
+                            "Invalid axiom; atom contains a non-constant term.");
                     }
                 }
                 var shape = ast.schema().get(a.relation().lexeme());
@@ -70,11 +70,11 @@ public class RuleSetCompiler {
                 var termMap = new LinkedHashMap<String,Object>();
                 for (var e : a.termMap().entrySet()) {
                     var t = e.getValue();
-                    if (t instanceof ASTRuleSet.ASTConstant c) {
+                    if (t instanceof Constant c) {
                         termMap.put(e.getKey().lexeme(), c.value());
                     } else {
                         throw new IllegalStateException(
-                            "Invalid fact; Atom contains a non-constant term.");
+                            "Invalid axiom; atom contains a non-constant term.");
                     }
                 }
                 yield new MapFact(a.relation().lexeme(), termMap);
@@ -94,13 +94,11 @@ public class RuleSetCompiler {
     private Atom ast2atom(ASTRuleSet.ASTAtom atom) {
         return switch (atom) {
             case ASTRuleSet.ASTOrderedAtom a -> new OrderedAtom(
-                a.relation().lexeme(),
-                a.terms().stream().map(this::ast2term).toList()
-            );
+                a.relation().lexeme(), a.terms());
             case ASTRuleSet.ASTNamedAtom a -> {
                 var terms = new LinkedHashMap<String,Term>();
                 for (var e : a.termMap().entrySet()) {
-                    terms.put(e.getKey().lexeme(), ast2term(e.getValue()));
+                    terms.put(e.getKey().lexeme(), e.getValue());
                 }
                 yield new NamedAtom(a.relation().lexeme(), terms);
             }
@@ -119,21 +117,9 @@ public class RuleSetCompiler {
                 "Unknown operator token: " + constraint.op());
         };
         return new Constraint(
-            (Variable)ast2term(constraint.a()),
+            constraint.a(),
             realOp,
-            ast2term(constraint.b())
+            constraint.b()
         );
-    }
-
-    private Term ast2term(ASTRuleSet.ASTTerm term) {
-        return switch (term) {
-            case ASTRuleSet.ASTConstant c -> ast2constant(c);
-            case ASTRuleSet.ASTVariable v -> new Variable(v.token().lexeme());
-            case ASTRuleSet.ASTWildcard w -> new Wildcard(w.token().lexeme());
-        };
-    }
-
-    private Constant ast2constant(ASTRuleSet.ASTConstant constant) {
-        return new Constant(constant.value());
     }
 }

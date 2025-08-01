@@ -1,6 +1,8 @@
 package com.wjduquette.joe.parser;
 
 import com.wjduquette.joe.nero.Schema;
+import com.wjduquette.joe.nero.Term;
+import com.wjduquette.joe.nero.Variable;
 import com.wjduquette.joe.scanner.Token;
 
 import java.util.Collection;
@@ -68,18 +70,7 @@ public record ASTRuleSet(
          * the terms, i.e., variable names.
          * @return The terms
          */
-        Collection<ASTTerm> getTerms();
-
-        /**
-         * Gets a list of the variable tokens used in the atom.
-         * @return The list
-         */
-        default List<Token> getVariableTokens() {
-            return getTerms().stream()
-                .filter(t -> t instanceof ASTVariable)
-                .map(ASTTerm::token)
-                .toList();
-        }
+        Collection<Term> getTerms();
 
         /**
          * Gets a list of the variable names used in the item.
@@ -87,17 +78,17 @@ public record ASTRuleSet(
          */
         default List<String> getVariableNames() {
             return getTerms().stream()
-                .filter(t -> t instanceof ASTVariable)
-                .map(t -> t.token().lexeme())
+                .filter(t -> t instanceof Variable)
+                .map(t -> ((Variable)t).name())
                 .toList();
         }
     }
 
     public record ASTOrderedAtom(
         Token relation,
-        List<ASTTerm> terms
+        List<Term> terms
     ) implements ASTAtom {
-        @Override public Collection<ASTTerm> getTerms() { return terms(); }
+        @Override public Collection<Term> getTerms() { return terms(); }
         @Override public String toString() {
             return "ASTOrderedAtom(" + relation.lexeme() + "," + terms + ")";
         }
@@ -105,9 +96,9 @@ public record ASTRuleSet(
 
     public record ASTNamedAtom(
         Token relation,
-        Map<Token,ASTTerm> termMap
+        Map<Token,Term> termMap
     ) implements ASTAtom {
-        @Override public Collection<ASTTerm> getTerms() {
+        @Override public Collection<Term> getTerms() {
             return termMap.values();
         }
 
@@ -126,58 +117,12 @@ public record ASTRuleSet(
      * @param b A bound variable or constant
      */
     public record ASTConstraint(
-        ASTVariable a,
+        Variable a,
         Token op,
-        ASTTerm b)
+        Term b)
     {
         @Override public String toString() {
             return "ASTConstraint(" + a + "," + op.lexeme() + "," + b + ")";
-        }
-    }
-
-    //-------------------------------------------------------------------------
-    // Terms
-
-    /**
-     * A term in an atom, either a constant or a variable.
-     */
-    public sealed interface ASTTerm
-        permits ASTConstant, ASTVariable, ASTWildcard
-    {
-        Token token();
-    }
-
-    /**
-     * A token representing a constant term: a keyword, string, or
-     * integer.  The token is of little interest and will eventually
-     * be removed.
-     * @param token The value token
-     * @param value The constant value
-     */
-    public record ASTConstant(Token token, Object value) implements ASTTerm {
-        @Override public String toString() {
-            return value != null ? value.toString() : token.lexeme();
-        }
-    }
-
-    /**
-     * A token representing a variable term: an identifier.
-     * @param token The token token
-     */
-    public record ASTVariable(Token token) implements ASTTerm {
-        @Override public String toString() {
-            return token.lexeme();
-        }
-    }
-
-    /**
-     * A token representing a wildcard term: an identifier beginning
-     * with an underscore
-     * @param token The token token
-     */
-    public record ASTWildcard(Token token) implements ASTTerm {
-        @Override public String toString() {
-            return token.lexeme();
         }
     }
 }
