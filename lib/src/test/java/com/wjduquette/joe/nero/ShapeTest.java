@@ -5,6 +5,7 @@ import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.parser.ASTRuleSet;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +54,8 @@ public class ShapeTest extends Ted {
         test("testInfer_head_list");
 
         var ast = parse("List(#a, #b);");
-        var shape = (Shape.ListShape)Shape.infer(ast.axioms().getFirst());
+        var axioms = new ArrayList<>(ast.axioms());
+        var shape = (Shape.ListShape)Shape.infer(axioms.getFirst());
 
         check(shape.relation()).eq("List");
         check(shape.arity()).eq(2);
@@ -65,7 +67,8 @@ public class ShapeTest extends Ted {
         test("testInfer_head_map");
 
         var ast = parse("Map(x: #a, y: #b);");
-        var shape = (Shape.MapShape)Shape.infer(ast.axioms().getFirst());
+        var axioms = new ArrayList<>(ast.axioms());
+        var shape = (Shape.MapShape)Shape.infer(axioms.getFirst());
 
         check(shape.relation()).eq("Map");
         check(shape.toString()).eq("MapShape[relation=Map]");

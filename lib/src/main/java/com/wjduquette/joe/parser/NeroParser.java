@@ -61,7 +61,7 @@ class NeroParser extends EmbeddedParser {
     // The Parser
 
     private ASTRuleSet parse(Supplier<Boolean> endCondition) {
-        List<Atom> facts = new ArrayList<>();
+        Set<Atom> axioms = new HashSet<>();
         Set<Rule> rules = new HashSet<>();
         var schema = new Schema();
 
@@ -79,7 +79,7 @@ class NeroParser extends EmbeddedParser {
                         error(headToken,
                             "axiom's shape is incompatible with previous definitions for this relation.");
                     }
-                    facts.add(axiom(headToken, head));
+                    axioms.add(axiom(headToken, head));
                 } else if (scanner.match(COLON_MINUS)) {
                     if (!schema.checkAndAdd(head)) {
                         error(headToken,
@@ -96,8 +96,7 @@ class NeroParser extends EmbeddedParser {
             }
         }
 
-        // No exports; return an empty map.
-        return new ASTRuleSet(schema, facts, rules);
+        return new ASTRuleSet(schema, axioms, rules);
     }
 
     private void defineDeclaration(Schema schema) {

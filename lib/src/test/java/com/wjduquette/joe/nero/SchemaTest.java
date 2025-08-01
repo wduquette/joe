@@ -6,6 +6,7 @@ import com.wjduquette.joe.parser.ASTRuleSet;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -134,7 +135,7 @@ public class SchemaTest extends Ted {
         test("testCheckAndAdd_head_new");
 
         var ast = parse("Person(#a, #b);");
-        var head = ast.axioms().getFirst();
+        var head = new ArrayList<>(ast.axioms()).getFirst();
         var shape = Shape.infer(head);
         check(schema.checkAndAdd(head)).eq(true);
 
@@ -152,7 +153,7 @@ public class SchemaTest extends Ted {
         schema.checkAndAdd(shape);
 
         var ast = parse("Person(#a, #b);");
-        var head = ast.axioms().getFirst();
+        var head = new ArrayList<>(ast.axioms()).getFirst();
         check(schema.checkAndAdd(head)).eq(true);
 
         check(schema.getRelations()).eq(Set.of("Person"));
@@ -169,7 +170,7 @@ public class SchemaTest extends Ted {
         schema.checkAndAdd(shape);
 
         var ast = parse("Person(#a, #b, #c);");
-        var head = ast.axioms().getFirst();
+        var head = new ArrayList<>(ast.axioms()).getFirst();
         check(schema.checkAndAdd(head)).eq(false);
 
         check(schema.getRelations()).eq(Set.of("Person"));
@@ -185,7 +186,7 @@ public class SchemaTest extends Ted {
         schema.checkAndAdd(shape);
 
         var ast = parse("Thing(a: #a, b: #b);");
-        var head = ast.axioms().getFirst();
+        var head = new ArrayList<>(ast.axioms()).getFirst();
         check(schema.checkAndAdd(head)).eq(true);
 
         check(schema.getRelations()).eq(Set.of("Thing"));
@@ -201,7 +202,7 @@ public class SchemaTest extends Ted {
         schema.checkAndAdd(shape);
 
         var ast = parse("Thing(#a, #b);");
-        var head = ast.axioms().getFirst();
+        var head = new ArrayList<>(ast.axioms()).getFirst();
         check(schema.checkAndAdd(head)).eq(false);
 
         check(schema.getRelations()).eq(Set.of("Thing"));
@@ -218,7 +219,7 @@ public class SchemaTest extends Ted {
         schema.checkAndAdd(shape);
 
         var ast = parse("Person(#a, #b);");
-        var head = ast.axioms().getFirst();
+        var head = new ArrayList<>(ast.axioms()).getFirst();
         check(schema.checkAndAdd(head)).eq(true);
 
         check(schema.getRelations()).eq(Set.of("Person"));
@@ -235,7 +236,7 @@ public class SchemaTest extends Ted {
         schema.checkAndAdd(shape);
 
         var ast = parse("Person(#a, #b, #c);");
-        var head = ast.axioms().getFirst();
+        var head = new ArrayList<>(ast.axioms()).getFirst();
         check(schema.checkAndAdd(head)).eq(false);
 
         check(schema.getRelations()).eq(Set.of("Person"));

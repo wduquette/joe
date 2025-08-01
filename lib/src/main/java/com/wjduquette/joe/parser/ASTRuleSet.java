@@ -2,7 +2,6 @@ package com.wjduquette.joe.parser;
 
 import com.wjduquette.joe.nero.*;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -14,7 +13,7 @@ import java.util.Set;
  */
 public record ASTRuleSet(
     Schema schema,
-    List<Atom> axioms,
+    Set<Atom> axioms,
     Set<Rule> rules
 ) {
     @Override

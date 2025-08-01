@@ -104,11 +104,7 @@ public class RuleEngine {
     //-------------------------------------------------------------------------
     // Queries
 
-    /**
-     * Gets the facts inferred from rule set axioms.
-     * @return The axiomatic facts.
-     */
-    public Set<Fact> getAxioms() {
+    public Set<Atom> getAxioms() {
         return ruleset.axioms();
     }
 
@@ -162,9 +158,12 @@ public class RuleEngine {
         if (inferenceComplete) return;
         inferenceComplete = true;
 
-        // NEXT, initialize the data structures
-        knownFacts.addAll(ruleset.axioms());
-        inferredFacts.addAll(ruleset.axioms());
+        // NEXT, infer all axioms.
+        for (var axiom : ruleset.axioms()) {
+            var fact = axiom2fact(axiom);
+            knownFacts.add(fact);
+            inferredFacts.add(fact);
+        }
 
         // NEXT, execute the rules.
         if (debug) {
@@ -344,6 +343,33 @@ public class RuleEngine {
             }
         }
         return true;
+    }
+
+    private Fact axiom2fact(Atom axiom) {
+        return switch (axiom) {
+            case NamedAtom atom -> {
+                var termMap = new HashMap<String,Object>();
+
+                for (var e : atom.termMap().entrySet()) {
+                    termMap.put(e.getKey(), ((Constant)e.getValue()).value());
+                }
+
+                yield new MapFact(atom.relation(), termMap);
+            }
+            case OrderedAtom atom -> {
+                var shape = ruleset.schema().get(atom.relation());
+                var terms = new ArrayList<>();
+
+                for (var term : atom.terms()) {
+                    terms.add(((Constant)term).value());
+                }
+                if (shape instanceof Shape.PairShape ps) {
+                    yield new PairFact(atom.relation(), ps.fieldNames(), terms);
+                } else {
+                    yield new ListFact(atom.relation(), terms);
+                }
+            }
+        };
     }
 
     private Fact createFact(BindingContext bc) {

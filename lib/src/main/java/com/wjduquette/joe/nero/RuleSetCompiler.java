@@ -35,48 +35,6 @@ public class RuleSetCompiler {
      * @throws JoeError on compilation failure.
      */
     public RuleSet compile() {
-        Set<Fact> facts = ast.axioms().stream().map(this::ast2fact)
-            .collect(Collectors.toSet());
-
-        return new RuleSet(ast.schema(), facts, ast.rules());
-    }
-
-    //-------------------------------------------------------------------------
-    // Compilation
-
-    private Fact ast2fact(Atom atom) {
-        return switch (atom) {
-            case OrderedAtom a -> {
-                var terms = new ArrayList<>();
-                for (var t : a.terms()) {
-                    if (t instanceof Constant c) {
-                        terms.add(c.value());
-                    } else {
-                        throw new IllegalStateException(
-                            "Invalid axiom; atom contains a non-constant term.");
-                    }
-                }
-                var shape = ast.schema().get(a.relation());
-                if (shape instanceof Shape.PairShape ps) {
-                    yield new PairFact(a.relation(),
-                        ps.fieldNames(), terms);
-                } else {
-                    yield new ListFact(a.relation(), terms);
-                }
-            }
-            case NamedAtom a -> {
-                var termMap = new LinkedHashMap<String,Object>();
-                for (var e : a.termMap().entrySet()) {
-                    var t = e.getValue();
-                    if (t instanceof Constant c) {
-                        termMap.put(e.getKey(), c.value());
-                    } else {
-                        throw new IllegalStateException(
-                            "Invalid axiom; atom contains a non-constant term.");
-                    }
-                }
-                yield new MapFact(a.relation(), termMap);
-            }
-        };
+        return new RuleSet(ast.schema(), ast.axioms(), ast.rules());
     }
 }
