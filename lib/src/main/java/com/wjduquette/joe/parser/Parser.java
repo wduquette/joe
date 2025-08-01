@@ -1,7 +1,5 @@
 package com.wjduquette.joe.parser;
 import com.wjduquette.joe.SyntaxError;
-import com.wjduquette.joe.nero.Schema;
-import com.wjduquette.joe.nero.Shape;
 import com.wjduquette.joe.scanner.Scanner;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
@@ -10,7 +8,6 @@ import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.patterns.Pattern;
 
 import java.util.*;
-import java.util.function.Supplier;
 
 import static com.wjduquette.joe.scanner.TokenType.*;
 
@@ -20,7 +17,6 @@ import static com.wjduquette.joe.scanner.TokenType.*;
  */
 public class Parser {
     public static final String ARGS = "args";
-    public static final String DEFINE = "define";
     private static final int MAX_CALL_ARGUMENTS = 255;
 
     //-------------------------------------------------------------------------
@@ -636,7 +632,12 @@ public class Parser {
     //-------------------------------------------------------------------------
     // Expressions
 
-    private Expr expression() {
+    /**
+     * Parses an Expr from the token stream.  Intentionally package-private,
+     * so that it is available to EmbeddedParsers.
+     * @return The Expr.
+     */
+    Expr expression() {
         return assignment();
     }
 
@@ -992,174 +993,7 @@ public class Parser {
     // Patterns
 
     private ASTPattern pattern() {
-        var astPattern = new ASTPattern();
-        var pattern = parsePattern(astPattern, true);
-        astPattern.setPattern(pattern);
-        return astPattern;
-    }
-
-    // Parses a pattern into the AST. `var @ pattern` is allowed if
-    // canPatternBind.
-    private Pattern parsePattern(ASTPattern wp, boolean canPatternBind) {
-        var constant = constantPattern(wp);
-
-        if (constant != null) {
-            return constant;
-        }
-
-        if (scanner.match(LEFT_BRACKET)) {
-            return listPattern(wp);
-        } else if (scanner.match(LEFT_BRACE)) {
-            return mapPattern(wp);
-        } else if (scanner.match(IDENTIFIER)) {
-            var identifier = scanner.previous();
-
-            if (identifier.lexeme().startsWith("_")) {
-                return new Pattern.Wildcard(identifier.lexeme());
-            } else if (scanner.match(LEFT_PAREN)) {
-                if (scanner.match(RIGHT_PAREN)) {
-                    return new Pattern.TypeName(identifier.lexeme());
-                } else if (scanner.peekNext().type() == COLON) {
-                    return namedFieldPattern(wp, identifier);
-                } else {
-                    return recordPattern(wp, identifier);
-                }
-            }
-
-            wp.saveBinding(identifier);
-            var name = identifier.lexeme();
-
-            if (canPatternBind && scanner.match(AT)) {
-                var subpattern = parsePattern(wp, false);
-                return new Pattern.PatternBinding(name, subpattern);
-            } else {
-                return new Pattern.ValueBinding(name);
-            }
-        } else {
-            throw errorSync(scanner.peek(), "Expected pattern.");
-        }
-    }
-
-    private Pattern constantPattern(ASTPattern wp) {
-        if (scanner.match(MINUS)) {
-            scanner.consume(NUMBER, "Expected number after '-'.");
-            var number = (Double)scanner.previous().literal();
-            return new Pattern.Constant(-number);
-        }
-
-        if (scanner.match(TRUE)) {
-            return new Pattern.Constant(true);
-        } else if (scanner.match(FALSE)) {
-            return new Pattern.Constant(false);
-        } else if (scanner.match(NULL)) {
-            return new Pattern.Constant(null);
-        } else if (scanner.match(NUMBER) || scanner.match(STRING) || scanner.match(KEYWORD)) {
-            return new Pattern.Constant(scanner.previous().literal());
-        } else if (scanner.match(DOLLAR)) {
-            if (scanner.match(IDENTIFIER)) {
-                return wp.addVarExpr(scanner.previous());
-            } else {
-                scanner.consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
-                var expr = expression();
-                scanner.consume(RIGHT_PAREN,
-                    "Expected ')' after interpolated expression.");
-                return wp.addExpr(expr);
-            }
-        } else {
-            return null;
-        }
-    }
-
-    private Pattern listPattern(ASTPattern wp) {
-        var list = new ArrayList<Pattern>();
-
-        if (scanner.match(RIGHT_BRACKET)) {
-            return new Pattern.ListPattern(list, null);
-        }
-
-        do {
-            if (scanner.check(RIGHT_BRACKET) || scanner.check(COLON)) {
-                break;
-            }
-            list.add(parsePattern(wp, true));
-        } while (scanner.match(COMMA));
-
-        String tailName = null;
-        if (scanner.match(COLON)) {
-            scanner.consume(IDENTIFIER, "Expected binding variable for list tail.");
-            var tailVar = scanner.previous();
-            wp.saveBinding(tailVar);
-            tailName = tailVar.lexeme();
-        }
-        scanner.consume(RIGHT_BRACKET, "Expected ']' after list pattern.");
-
-        return new Pattern.ListPattern(list, tailName);
-    }
-
-    private Pattern.MapPattern mapPattern(ASTPattern wp) {
-        var map = new LinkedHashMap<Pattern,Pattern>();
-
-        if (scanner.match(COLON)) {
-            scanner.consume(RIGHT_BRACE, "expected '}' after empty map pattern.");
-            return new Pattern.MapPattern(map);
-        }
-
-        do {
-            if (scanner.check(RIGHT_BRACE)) {
-                break;
-            }
-            var key = constantPattern(wp);
-            scanner.consume(COLON, "Expected ':' after map key.");
-            var value = parsePattern(wp, true);
-            map.put(key, value);
-        } while (scanner.match(COMMA));
-
-        scanner.consume(RIGHT_BRACE, "Expected '}' after map pattern.");
-
-        return new Pattern.MapPattern(map);
-    }
-
-    private Pattern namedFieldPattern(ASTPattern wp, Token identifier) {
-        var fieldMap = new LinkedHashMap<String, Pattern>();
-
-        if (scanner.match(RIGHT_PAREN)) {
-            return new Pattern.NamedFieldPattern(identifier.lexeme(), fieldMap);
-        }
-
-        do {
-            if (scanner.check(RIGHT_PAREN)) {
-                break;
-            }
-
-            scanner.consume(IDENTIFIER, "Expected field name.");
-            var key = scanner.previous().lexeme();
-            scanner.consume(COLON, "Expected ':' after field name.");
-            var value = parsePattern(wp, true);
-            fieldMap.put(key, value);
-        } while (scanner.match(COMMA));
-
-        scanner.consume(RIGHT_PAREN, "Expected ')' after field pattern.");
-
-        return new Pattern.NamedFieldPattern(identifier.lexeme(), fieldMap);
-    }
-
-    private Pattern recordPattern(ASTPattern wp, Token identifier) {
-        var list = new ArrayList<Pattern>();
-
-        if (scanner.match(RIGHT_PAREN)) {
-            return new Pattern.OrderedFieldPattern(identifier.lexeme(), list);
-        }
-
-        do {
-            if (scanner.check(RIGHT_PAREN)) {
-                break;
-            }
-            list.add(parsePattern(wp, true));
-        } while (scanner.match(COMMA));
-
-        scanner.consume(RIGHT_PAREN, "Expected ')' after record pattern.");
-
-        return new Pattern.OrderedFieldPattern(identifier.lexeme(), list);
+        return new PatternParser(this).parse();
     }
 
     //-------------------------------------------------------------------------
@@ -1176,7 +1010,7 @@ public class Parser {
         var keyword = scanner.previous();
         scanner.consume(LEFT_BRACE, "expected '{' after 'ruleset'.");
 
-        var ast = parseRuleSet(() -> scanner.match(RIGHT_BRACE));
+        var ast = new NeroParser(this, NeroParser.Mode.EMBEDDED).parse();
         return new Expr.RuleSet(keyword, ast);
     }
 
@@ -1190,264 +1024,27 @@ public class Parser {
     public ASTRuleSet parseNero() {
         this.scanner = new Scanner(source, this::errorInScanner);
         scanner.prime();
-
-        return parseRuleSet(() -> scanner.isAtEnd());
-    }
-
-    private ASTRuleSet parseRuleSet(Supplier<Boolean> endCondition) {
-        List<ASTRuleSet.ASTAtom> facts = new ArrayList<>();
-        List<ASTRuleSet.ASTRule> rules = new ArrayList<>();
-        var schema = new Schema();
-
-        while (!endCondition.get()) {
-            try {
-                if (scanner.matchIdentifier(DEFINE)) {
-                    defineDeclaration(schema);
-                    continue;
-                }
-                var headToken = scanner.peek();
-                var head = atom();
-
-                if (scanner.match(SEMICOLON)) {
-                    if (!schema.checkAndAdd(head)) {
-                        error(headToken,
-                            "axiom's shape is incompatible with previous definitions for this relation.");
-                    }
-                    facts.add(axiom(head));
-                } else if (scanner.match(COLON_MINUS)) {
-                    if (!schema.checkAndAdd(head)) {
-                        error(headToken,
-                            "rule head's shape is incompatible with previous definitions for this relation.");
-                    }
-                    rules.add(rule(head));
-                } else {
-                    scanner.advance();
-                    throw errorSync(scanner.previous(),
-                        "expected axiom or rule.");
-                }
-            } catch (ErrorSync error) {
-                synchronizeNero();
-            }
-        }
-
-        // No exports; return an empty map.
-        return new ASTRuleSet(schema, facts, rules);
-    }
-
-    private void defineDeclaration(Schema schema) {
-        scanner.consume(IDENTIFIER, "expected relation after 'define'.");
-        var relation = scanner.previous();
-        scanner.consume(SLASH, "expected '/' after relation.");
-
-        Shape shape;
-
-        if (scanner.match(NUMBER)) {
-            var arity = (Double)scanner.previous().literal();
-            if (arity - arity.intValue() != 0.0) {
-                error(scanner.previous(), "expected integer arity.");
-            }
-            if (arity <= 0) {
-                error(scanner.previous(), "expected positive arity.");
-            }
-            shape = new Shape.ListShape(relation.lexeme(), arity.intValue());
-        } else if (scanner.match(DOT_DOT_DOT)) {
-            shape = new Shape.MapShape(relation.lexeme());
-        } else if (scanner.check(IDENTIFIER)) {
-            var names = new ArrayList<String>();
-            do {
-                scanner.consume(IDENTIFIER, "expected field name.");
-                var name = scanner.previous().lexeme();
-                if (names.contains(name)) {
-                    error(scanner.previous(), "duplicate field name.");
-                }
-                names.add(name);
-            } while (scanner.match(COMMA));
-
-            shape = new Shape.PairShape(relation.lexeme(), names);
-        } else {
-            scanner.advance();
-            throw errorSync(scanner.previous(),
-                "expected arity, '...', or field names.");
-        }
-        scanner.consume(SEMICOLON, "expected ';' after definition.");
-
-        if (!schema.checkAndAdd(shape)) {
-            error(relation, "definition clashes with earlier entry.");
-        }
-    }
-
-    private ASTRuleSet.ASTAtom axiom(ASTRuleSet.ASTAtom head) {
-        // Verify that there are no non-constant terms.
-        for (var term : head.getTerms()) {
-            if (!(term instanceof ASTRuleSet.ASTConstant)) {
-                error(term.token(), "fact contains a non-constant term.");
-            }
-        }
-        return head;
-    }
-
-    private ASTRuleSet.ASTRule rule(ASTRuleSet.ASTAtom head) {
-        var body = new ArrayList<ASTRuleSet.ASTAtom>();
-        var negations = new ArrayList<ASTRuleSet.ASTAtom>();
-        var constraints = new ArrayList<ASTRuleSet.ASTConstraint>();
-
-        var bodyVar = new HashSet<String>();
-        do {
-            var negated = scanner.match(NOT);
-
-            var atom = atom();
-            if (negated) {
-                for (var name : atom.getVariableTokens()) {
-                    if (!bodyVar.contains(name.lexeme())) {
-                        error(name, "negated body atom contains unbound variable.");
-                    }
-                }
-                negations.add(atom);
-            } else {
-                body.add(atom);
-                bodyVar.addAll(atom.getVariableNames());
-            }
-        } while (scanner.match(COMMA));
-
-        if (scanner.match(WHERE)) {
-            do {
-                constraints.add(constraint(bodyVar));
-            } while (scanner.match(COMMA));
-        }
-
-        scanner.consume(SEMICOLON, "expected ';' after rule body.");
-
-        // Verify that the head contains only valid terms.
-        for (var term : head.getTerms()) {
-            switch (term) {
-                case ASTRuleSet.ASTConstant ignored -> {}
-                case ASTRuleSet.ASTVariable v -> {
-                    if (!bodyVar.contains(v.token().lexeme())) {
-                        error(v.token(),
-                            "head atom contains unbound variable.");
-                    }
-                }
-                case ASTRuleSet.ASTWildcard w -> error(w.token(),
-                    "head atom contains wildcard.");
-            }
-        }
-
-        return new ASTRuleSet.ASTRule(head, body, negations, constraints);
-    }
-
-    private ASTRuleSet.ASTConstraint constraint(Set<String> bodyVar) {
-        var term = astTerm();
-        Token op;
-        ASTRuleSet.ASTVariable a = null;
-
-        switch (term) {
-            case ASTRuleSet.ASTConstant c ->
-                error(c.token(), "expected bound variable.");
-            case ASTRuleSet.ASTVariable v -> {
-                a = v;
-                if (!bodyVar.contains(v.token().lexeme())) {
-                    error(v.token(), "expected bound variable.");
-                }
-            }
-            case ASTRuleSet.ASTWildcard c ->
-                error(c.token(), "expected bound variable.");
-        }
-
-        if (scanner.match(
-            BANG_EQUAL, EQUAL_EQUAL,
-            GREATER, GREATER_EQUAL,
-            LESS, LESS_EQUAL)
-        ) {
-            op = scanner.previous();
-        } else {
-            scanner.advance();
-            throw errorSync(scanner.previous(), "expected comparison operator.");
-        }
-
-        var b = astTerm();
-
-        if (b instanceof ASTRuleSet.ASTVariable v) {
-            if (!bodyVar.contains(v.token().lexeme())) {
-                error(v.token(), "expected bound variable or constant.");
-            }
-        } else if (b instanceof ASTRuleSet.ASTWildcard w) {
-            error(w.token(), "expected bound variable or constant.");
-        }
-
-        return new ASTRuleSet.ASTConstraint(a, op, b);
-    }
-
-    private ASTRuleSet.ASTAtom atom() {
-        // NEXT, parse the atom.
-        scanner.consume(IDENTIFIER, "expected relation.");
-        var relation = scanner.previous();
-        scanner.consume(LEFT_PAREN, "expected '(' after relation.");
-
-        if (scanner.checkTwo(IDENTIFIER, COLON)) {
-            return namedAtom(relation);
-        } else {
-            return orderedAtom(relation);
-        }
-    }
-
-    private ASTRuleSet.ASTOrderedAtom orderedAtom(Token relation) {
-        var terms = new ArrayList<ASTRuleSet.ASTTerm>();
-
-        do {
-            terms.add(astTerm());
-        } while (scanner.match(COMMA));
-
-        scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
-
-        return new ASTRuleSet.ASTOrderedAtom(relation, terms);
-    }
-
-    private ASTRuleSet.ASTNamedAtom namedAtom(Token relation) {
-        var terms = new LinkedHashMap<Token,ASTRuleSet.ASTTerm>();
-
-        do {
-            scanner.consume(IDENTIFIER, "expected field name.");
-            var name = scanner.previous();
-            scanner.consume(COLON, "expected ':' after field name.");
-            terms.put(name, astTerm());
-        } while (scanner.match(COMMA));
-
-        scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
-
-        return new ASTRuleSet.ASTNamedAtom(relation, terms);
-    }
-
-    private ASTRuleSet.ASTTerm astTerm() {
-        if (scanner.match(IDENTIFIER)) {
-            var name = scanner.previous();
-            if (name.lexeme().startsWith("_")) {
-                return new ASTRuleSet.ASTWildcard(name);
-            } else {
-                return new ASTRuleSet.ASTVariable(name);
-            }
-        } else if (scanner.match(MINUS)) {
-            scanner.consume(NUMBER, "Expected number after '-'.");
-            var number = (Double)scanner.previous().literal();
-            return new ASTRuleSet.ASTConstant(scanner.previous(), -number);
-        } else if (scanner.match(TRUE)) {
-            return new ASTRuleSet.ASTConstant(scanner.previous(), true);
-        } else if (scanner.match(FALSE)) {
-            return new ASTRuleSet.ASTConstant(scanner.previous(), false);
-        } else if (scanner.match(NULL)) {
-            return new ASTRuleSet.ASTConstant(scanner.previous(), null);
-        } else if (scanner.match(KEYWORD, NUMBER, STRING)) {
-            return new ASTRuleSet.ASTConstant(
-                scanner.previous(), scanner.previous().literal());
-        } else {
-            scanner.advance();
-            throw errorSync(scanner.previous(), "expected term.");
-        }
+        return new NeroParser(this, NeroParser.Mode.STANDALONE).parse();
     }
 
     //-------------------------------------------------------------------------
     // Primitives
 
-    // Saves the error detail, with no synchronization.
+    /**
+     * Returns the scanner, for use by EmbeddedParsers.
+     * Intentionally package-private.
+     * @return The scanner
+     */
+    Scanner scanner() {
+        return scanner;
+    }
+
+    /**
+     * Reports the error with no synchronization.  Use this for semantic
+     * errors where the syntax is OK.  Intentionally package-private.
+     * @param token The token at which the error was detected.
+     * @param message The error message.
+     */
     void error(Token token, String message) {
         var msg = token.type() == TokenType.EOF
             ? "error at end, " + message
@@ -1456,10 +1053,27 @@ public class Parser {
             token.type() == TokenType.EOF);
     }
 
-    // Saves the error detail, with synchronization.
-    private ErrorSync errorSync(Token token, String message) {
+    /**
+     * Reports the error, returning an ErrorSync exception to trigger
+     * synchronization.  The exception is thrown by the caller.
+     * Use this for syntax errors where the parser would get confused
+     * without synchronization.  Intentionally package-private.
+     * @param token The token at which the error was detected.
+     * @param message The error message.
+     * @return The exception
+     */
+    ErrorSync errorSync(Token token, String message) {
         error(token, message);
         return new ErrorSync(message);
+    }
+
+    /**
+     * Sets the synchronizing flag.  For use by EmbeddedParsers that do
+     * their own synchronization.  Intentionally package-private.
+     * @param flag true or false
+     */
+    void setSynchronizing(boolean flag) {
+        this.synchronizing = flag;
     }
 
     // Discard tokens until we are at the beginning of the next statement.
@@ -1497,31 +1111,10 @@ public class Parser {
         }
     }
 
-    // Discard tokens until we are at the beginning of the next statement.
-    // For Nero code, that just means whatever follows the next semicolon.
-    private void synchronizeNero() {
-        try {
-            synchronizing = true;
-
-            // Discard this token
-            scanner.advance();
-
-            while (!scanner.isAtEnd()) {
-                // If we see we just completed a statement, return.
-                if (scanner.previous().type() == SEMICOLON) return;
-
-                // Discard this token.
-                scanner.advance();
-            }
-        } finally {
-            synchronizing = false;
-        }
-    }
-
     /**
-     * An exception used to synchronize errors.
+     * An exception used to synchronize errors.  Intentionally package-private.
      */
-    private static class ErrorSync extends RuntimeException {
+    static class ErrorSync extends RuntimeException {
         ErrorSync(String message) {
             super(message);
         }
