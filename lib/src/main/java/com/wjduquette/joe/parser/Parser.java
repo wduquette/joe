@@ -1447,7 +1447,21 @@ public class Parser {
     //-------------------------------------------------------------------------
     // Primitives
 
-    // Saves the error detail, with no synchronization.
+    /**
+     * Returns the scanner, for use by EmbeddedParsers.
+     * Intentionally package-private.
+     * @return The scanner
+     */
+    Scanner scanner() {
+        return scanner;
+    }
+
+    /**
+     * Reports the error with no synchronization.  Use this for semantic
+     * errors where the syntax is OK.  Intentionally package-private.
+     * @param token The token at which the error was detected.
+     * @param message The error message.
+     */
     void error(Token token, String message) {
         var msg = token.type() == TokenType.EOF
             ? "error at end, " + message
@@ -1456,10 +1470,27 @@ public class Parser {
             token.type() == TokenType.EOF);
     }
 
-    // Saves the error detail, with synchronization.
-    private ErrorSync errorSync(Token token, String message) {
+    /**
+     * Reports the error, returning an ErrorSync exception to trigger
+     * synchronization.  The exception is thrown by the caller.
+     * Use this for syntax errors where the parser would get confused
+     * without synchronization.  Intentionally package-private.
+     * @param token The token at which the error was detected.
+     * @param message The error message.
+     * @return The exception
+     */
+    ErrorSync errorSync(Token token, String message) {
         error(token, message);
         return new ErrorSync(message);
+    }
+
+    /**
+     * Sets the synchronizing flag.  For use by EmbeddedParsers that do
+     * their own synchronization.  Intentionally package-private.
+     * @param flag true or false
+     */
+    void setSynchronizing(boolean flag) {
+        this.synchronizing = flag;
     }
 
     // Discard tokens until we are at the beginning of the next statement.
@@ -1519,9 +1550,9 @@ public class Parser {
     }
 
     /**
-     * An exception used to synchronize errors.
+     * An exception used to synchronize errors.  Intentionally package-private.
      */
-    private static class ErrorSync extends RuntimeException {
+    static class ErrorSync extends RuntimeException {
         ErrorSync(String message) {
             super(message);
         }
