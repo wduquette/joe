@@ -61,7 +61,7 @@ class NeroParser extends EmbeddedParser {
     // The Parser
 
     private ASTRuleSet parse(Supplier<Boolean> endCondition) {
-        List<ASTRuleSet.ASTAtom> facts = new ArrayList<>();
+        List<Atom> facts = new ArrayList<>();
         List<ASTRuleSet.ASTRule> rules = new ArrayList<>();
         var schema = new Schema();
 
@@ -142,9 +142,9 @@ class NeroParser extends EmbeddedParser {
         }
     }
 
-    private ASTRuleSet.ASTAtom axiom(Token token, ASTRuleSet.ASTAtom head) {
+    private Atom axiom(Token token, Atom head) {
         // Verify that there are no non-constant terms.
-        for (var term : head.getTerms()) {
+        for (var term : head.getAllTerms()) {
             if (!(term instanceof Constant)) {
                 error(token,
                     "axiom contains a non-constant term: '" +
@@ -154,9 +154,9 @@ class NeroParser extends EmbeddedParser {
         return head;
     }
 
-    private ASTRuleSet.ASTRule rule(Token headToken, ASTRuleSet.ASTAtom head) {
-        var body = new ArrayList<ASTRuleSet.ASTAtom>();
-        var negations = new ArrayList<ASTRuleSet.ASTAtom>();
+    private ASTRuleSet.ASTRule rule(Token headToken, Atom head) {
+        var body = new ArrayList<Atom>();
+        var negations = new ArrayList<Atom>();
         var constraints = new ArrayList<Constraint>();
         var bodyVar = new HashSet<String>();
 
@@ -189,7 +189,7 @@ class NeroParser extends EmbeddedParser {
         scanner.consume(SEMICOLON, "expected ';' after rule body.");
 
         // Verify that the head contains only valid terms.
-        for (var term : head.getTerms()) {
+        for (var term : head.getAllTerms()) {
             switch (term) {
                 case Constant ignored -> {}
                 case Variable v -> {
@@ -256,7 +256,7 @@ class NeroParser extends EmbeddedParser {
         return new Constraint(a, op, b);
     }
 
-    private ASTRuleSet.ASTAtom atom() {
+    private Atom atom() {
         // NEXT, parse the atom.
         scanner.consume(IDENTIFIER, "expected relation.");
         var relation = scanner.previous();
@@ -269,7 +269,7 @@ class NeroParser extends EmbeddedParser {
         }
     }
 
-    private ASTRuleSet.ASTOrderedAtom orderedAtom(Token relation) {
+    private Atom orderedAtom(Token relation) {
         var terms = new ArrayList<Term>();
 
         do {
@@ -278,22 +278,22 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new ASTRuleSet.ASTOrderedAtom(relation.lexeme(), terms);
+        return new OrderedAtom(relation.lexeme(), terms);
     }
 
-    private ASTRuleSet.ASTNamedAtom namedAtom(Token relation) {
-        var terms = new LinkedHashMap<Token,Term>();
+    private NamedAtom namedAtom(Token relation) {
+        var terms = new LinkedHashMap<String,Term>();
 
         do {
             scanner.consume(IDENTIFIER, "expected field name.");
             var name = scanner.previous();
             scanner.consume(COLON, "expected ':' after field name.");
-            terms.put(name, term());
+            terms.put(name.lexeme(), term());
         } while (scanner.match(COMMA));
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new ASTRuleSet.ASTNamedAtom(relation.lexeme(), terms);
+        return new NamedAtom(relation.lexeme(), terms);
     }
 
     private Term term() {

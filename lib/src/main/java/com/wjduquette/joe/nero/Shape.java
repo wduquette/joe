@@ -1,7 +1,5 @@
 package com.wjduquette.joe.nero;
 
-import com.wjduquette.joe.parser.ASTRuleSet;
-
 import java.util.List;
 
 public sealed interface Shape permits
@@ -94,12 +92,10 @@ public sealed interface Shape permits
      * @param head The head atom
      * @return The inferred shape
      */
-    static Shape infer(ASTRuleSet.ASTAtom head) {
+    static Shape infer(Atom head) {
         return switch (head) {
-            case ASTRuleSet.ASTOrderedAtom a ->
-                new ListShape(a.relation(), a.terms().size());
-            case ASTRuleSet.ASTNamedAtom a
-                -> new MapShape(a.relation());
+            case OrderedAtom a -> new ListShape(a.relation(), a.terms().size());
+            case NamedAtom a -> new MapShape(a.relation());
         };
     }
 }

@@ -46,9 +46,9 @@ public class RuleSetCompiler {
     //-------------------------------------------------------------------------
     // Compilation
 
-    private Fact ast2fact(ASTRuleSet.ASTAtom atom) {
+    private Fact ast2fact(Atom atom) {
         return switch (atom) {
-            case ASTRuleSet.ASTOrderedAtom a -> {
+            case OrderedAtom a -> {
                 var terms = new ArrayList<>();
                 for (var t : a.terms()) {
                     if (t instanceof Constant c) {
@@ -66,12 +66,12 @@ public class RuleSetCompiler {
                     yield new ListFact(a.relation(), terms);
                 }
             }
-            case ASTRuleSet.ASTNamedAtom a -> {
+            case NamedAtom a -> {
                 var termMap = new LinkedHashMap<String,Object>();
                 for (var e : a.termMap().entrySet()) {
                     var t = e.getValue();
                     if (t instanceof Constant c) {
-                        termMap.put(e.getKey().lexeme(), c.value());
+                        termMap.put(e.getKey(), c.value());
                     } else {
                         throw new IllegalStateException(
                             "Invalid axiom; atom contains a non-constant term.");
@@ -84,24 +84,10 @@ public class RuleSetCompiler {
 
     private Rule ast2rule(ASTRuleSet.ASTRule rule) {
         return new Rule(
-            ast2atom(rule.head()),
-            rule.body().stream().map(this::ast2atom).toList(),
-            rule.negations().stream().map(this::ast2atom).toList(),
+            rule.head(),
+            rule.body(),
+            rule.negations(),
             rule.constraints()
         );
-    }
-
-    private Atom ast2atom(ASTRuleSet.ASTAtom atom) {
-        return switch (atom) {
-            case ASTRuleSet.ASTOrderedAtom a -> new OrderedAtom(
-                a.relation(), a.terms());
-            case ASTRuleSet.ASTNamedAtom a -> {
-                var terms = new LinkedHashMap<String,Term>();
-                for (var e : a.termMap().entrySet()) {
-                    terms.put(e.getKey().lexeme(), e.getValue());
-                }
-                yield new NamedAtom(a.relation(), terms);
-            }
-        };
     }
 }

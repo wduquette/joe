@@ -261,7 +261,7 @@ public class RuleEngine {
     ) {
          switch (bodyAtom) {
              case NamedAtom atom -> {
-                 for (var e : atom.terms().entrySet()) {
+                 for (var e : atom.termMap().entrySet()) {
                      var name = e.getKey();
 
                      if (!fact.getFieldMap().containsKey(name)) {
@@ -351,7 +351,7 @@ public class RuleEngine {
             case NamedAtom atom -> {
                 var terms = new HashMap<String,Object>();
 
-                for (var e : atom.terms().entrySet()) {
+                for (var e : atom.termMap().entrySet()) {
                     terms.put(e.getKey(), term2value(e.getValue(), bc));
                 }
 
