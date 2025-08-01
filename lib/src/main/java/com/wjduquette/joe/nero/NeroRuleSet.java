@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * A collection of axioms and rules, ready for processing by the Nero engine.
  */
-public class RuleSet {
+public class NeroRuleSet {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -32,7 +32,7 @@ public class RuleSet {
      * @param axioms The axiomatic facts
      * @param rules The rules
      */
-    public RuleSet(Schema schema, Set<Atom> axioms, Set<Rule> rules) {
+    public NeroRuleSet(Schema schema, Set<Atom> axioms, Set<Rule> rules) {
         this.schema = schema;
         this.axioms = axioms;
         this.rules = rules;

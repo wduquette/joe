@@ -1,7 +1,6 @@
 package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.parser.ASTRuleSet;
 import com.wjduquette.joe.parser.Parser;
 
 import java.util.ArrayList;
@@ -52,9 +51,8 @@ public class Nero {
      * @return The engine, which has not yet be run.
      * @throws JoeError on error.
      */
-    public RuleSet compile(SourceBuffer source) {
-        var ast = parse(source);
-        var ruleSet = new RuleSetCompiler(ast).compile();
+    public NeroRuleSet compile(SourceBuffer source) {
+        var ruleSet = parse(source);
         if (!ruleSet.isStratified()) {
             throw new JoeError("Nero rule set is not stratified.");
         }
@@ -62,12 +60,13 @@ public class Nero {
     }
 
     /**
-     * Parses the source, returning an AST on success.
+     * Parses the source, checking for syntax errors.
+     * Returns a RuleSet on success.
      * @param source The source
-     * @return The AST
+     * @return The rule set
      * @throws SyntaxError on error.
      */
-    public ASTRuleSet parse(SourceBuffer source) {
+    public NeroRuleSet parse(SourceBuffer source) {
         traces = new ArrayList<>();
         var parser = new Parser(source, this::errorHandler);
         var ast = parser.parseNero();
@@ -121,7 +120,7 @@ public class Nero {
      * @return The RuleEngine
      * @throws JoeError on all runtime errors.
      */
-    public RuleEngine execute(RuleSet ruleSet)
+    public RuleEngine execute(NeroRuleSet ruleSet)
         throws JoeError
     {
         var engine = new RuleEngine(ruleSet);
@@ -155,7 +154,7 @@ public class Nero {
      * @return The RuleEngine
      * @throws JoeError on all runtime errors.
      */
-    public RuleEngine execute(RuleSet ruleSet, FactSet db)
+    public RuleEngine execute(NeroRuleSet ruleSet, FactSet db)
         throws JoeError
     {
         var engine = new RuleEngine(ruleSet, db);

@@ -1,5 +1,6 @@
 package com.wjduquette.joe.parser;
 
+import com.wjduquette.joe.nero.NeroRuleSet;
 import com.wjduquette.joe.patterns.Pattern;
 import com.wjduquette.joe.scanner.Token;
 
@@ -329,7 +330,7 @@ public class ASTDumper {
         return buffer.toString();
     }
 
-    private static String dump(ASTRuleSet ruleset) {
+    private static String dump(NeroRuleSet ruleset) {
         var buff = new Buffer();
         buff.println(ruleset.getClass().getSimpleName());
 
@@ -447,7 +448,7 @@ public class ASTDumper {
             return indent(ASTDumper.dump(pattern));
         }
 
-        Buffer dump(String name, ASTRuleSet ruleset) {
+        Buffer dump(String name, NeroRuleSet ruleset) {
             return indent(name + ": " + ASTDumper.dump(ruleset));
         }
 

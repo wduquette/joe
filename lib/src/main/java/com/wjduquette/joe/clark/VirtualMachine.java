@@ -1,7 +1,7 @@
 package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.nero.RuleSet;
+import com.wjduquette.joe.nero.NeroRuleSet;
 import com.wjduquette.joe.parser.FunctionType;
 import com.wjduquette.joe.patterns.Matcher;
 import com.wjduquette.joe.patterns.Pattern;
@@ -994,9 +994,9 @@ class VirtualMachine {
 
     // Reads a constant index from the chunk, and returns the indexed
     // constant as a RuleSet.
-    private RuleSet readRuleSet() {
+    private NeroRuleSet readRuleSet() {
         var index = frame.closure.function.code[frame.ip++];
-        return (RuleSet)frame.closure.function.constants[index];
+        return (NeroRuleSet)frame.closure.function.constants[index];
     }
 
     //-------------------------------------------------------------------------

@@ -49,7 +49,7 @@ class NeroParser extends EmbeddedParser {
      * @return The rule set
      */
     @SuppressWarnings("Convert2MethodRef")
-    public ASTRuleSet parse() {
+    public NeroRuleSet parse() {
         Supplier<Boolean> endCondition = mode == Mode.STANDALONE
             ? () -> scanner.isAtEnd()
             : () -> scanner.match(RIGHT_BRACE);
@@ -60,7 +60,7 @@ class NeroParser extends EmbeddedParser {
     //-------------------------------------------------------------------------
     // The Parser
 
-    private ASTRuleSet parse(Supplier<Boolean> endCondition) {
+    private NeroRuleSet parse(Supplier<Boolean> endCondition) {
         Set<Atom> axioms = new HashSet<>();
         Set<Rule> rules = new HashSet<>();
         var schema = new Schema();
@@ -96,7 +96,7 @@ class NeroParser extends EmbeddedParser {
             }
         }
 
-        return new ASTRuleSet(schema, axioms, rules);
+        return new NeroRuleSet(schema, axioms, rules);
     }
 
     private void defineDeclaration(Schema schema) {

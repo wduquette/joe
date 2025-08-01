@@ -6,7 +6,7 @@ import com.wjduquette.joe.Keyword;
 import java.util.*;
 
 /**
- * The Nero inference engine.  Given a {@link RuleSet} and a set of
+ * The Nero inference engine.  Given a {@link NeroRuleSet} and a set of
  * input {@link Fact Facts}, the engine will infer the facts implied by
  * the two.
  */
@@ -22,7 +22,7 @@ public class RuleEngine {
     //
 
     // The Nero rule set, i.e., the compiled Nero program.
-    private final RuleSet ruleset;
+    private final NeroRuleSet ruleset;
 
     // Map from head relation to rules with that head.
     private final Map<String,List<Rule>> ruleMap = new HashMap<>();
@@ -57,7 +57,7 @@ public class RuleEngine {
      * of facts.
      * @param ruleset The ruleset
      */
-    public RuleEngine(RuleSet ruleset) {
+    public RuleEngine(NeroRuleSet ruleset) {
         this.ruleset = ruleset;
 
         // NEXT, Categorize the rules by head relation
@@ -74,7 +74,7 @@ public class RuleEngine {
      * @param ruleset The ruleset
      * @param facts The fact set
      */
-    public RuleEngine(RuleSet ruleset, FactSet facts) {
+    public RuleEngine(NeroRuleSet ruleset, FactSet facts) {
         this(ruleset);
         knownFacts.addAll(facts);
     }
@@ -103,10 +103,6 @@ public class RuleEngine {
 
     //-------------------------------------------------------------------------
     // Queries
-
-    public Set<Atom> getAxioms() {
-        return ruleset.axioms();
-    }
 
     /**
      * Gets all facts known after inference is complete.

@@ -2,7 +2,6 @@ package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.parser.ASTRuleSet;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public class ShapeTest extends Ted {
         check(shape.toString()).eq("MapShape[relation=Map]");
     }
 
-    private ASTRuleSet parse(String text) {
+    private NeroRuleSet parse(String text) {
         var source = new SourceBuffer("*test*", text);
         return new Nero(new Joe()).parse(source);
     }

@@ -1,6 +1,7 @@
 package com.wjduquette.joe.parser;
 
 import com.wjduquette.joe.SourceBuffer.Span;
+import com.wjduquette.joe.nero.NeroRuleSet;
 import com.wjduquette.joe.scanner.Token;
 import java.util.List;
 
@@ -218,13 +219,13 @@ public sealed interface Expr permits
     }
 
     /**
-     * A `ruleset` expression, containing a Nero rule set's AST.
+     * A `ruleset` expression, containing a Nero rule set.
      * @param keyword The `ruleset` keyword
      * @param ruleSet The rule set as parsed
      */
     record RuleSet(
         Token keyword,
-        ASTRuleSet ruleSet
+        NeroRuleSet ruleSet
     ) implements Expr {
         public Span location() { return keyword.span(); }
     }

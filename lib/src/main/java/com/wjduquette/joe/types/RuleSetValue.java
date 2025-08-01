@@ -4,13 +4,13 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.FactSet;
 import com.wjduquette.joe.nero.RuleEngine;
-import com.wjduquette.joe.nero.RuleSet;
+import com.wjduquette.joe.nero.NeroRuleSet;
 
 import java.util.*;
 
 /**
  * A RuleSetValue wraps up a Nero
- * {@link com.wjduquette.joe.nero.RuleSet} with the additional data
+ * {@link NeroRuleSet} with the additional data
  * required to make use of it in Joe scripts.  RuleSetValues are created
  * by Joe's `ruleset` declaration.
  */
@@ -18,7 +18,7 @@ public class RuleSetValue {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final RuleSet ruleset;
+    private final NeroRuleSet ruleset;
     private boolean debug = false;
 
     //-------------------------------------------------------------------------
@@ -28,7 +28,7 @@ public class RuleSetValue {
      * Creates a RuleSetValue.
      * @param ruleset The Nero rule set.
      */
-    public RuleSetValue(RuleSet ruleset) {
+    public RuleSetValue(NeroRuleSet ruleset) {
         this.ruleset = ruleset;
     }
 
@@ -39,7 +39,7 @@ public class RuleSetValue {
      * Gets the underlying Nero rule set.
      * @return The rule set
      */
-    public RuleSet ruleset() {
+    public NeroRuleSet ruleset() {
         return ruleset;
     }
 
