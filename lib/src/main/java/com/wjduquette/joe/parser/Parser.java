@@ -1,5 +1,6 @@
 package com.wjduquette.joe.parser;
 import com.wjduquette.joe.SyntaxError;
+import com.wjduquette.joe.nero.NeroRuleSet;
 import com.wjduquette.joe.scanner.Scanner;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
@@ -1010,8 +1011,8 @@ public class Parser {
         var keyword = scanner.previous();
         scanner.consume(LEFT_BRACE, "expected '{' after 'ruleset'.");
 
-        var ast = new NeroParser(this, NeroParser.Mode.EMBEDDED).parse();
-        return new Expr.RuleSet(keyword, ast);
+        var ruleSet = new NeroParser(this, NeroParser.Mode.EMBEDDED).parse();
+        return new Expr.RuleSet(keyword, ruleSet);
     }
 
     /**
@@ -1021,7 +1022,7 @@ public class Parser {
      * this method should be ignored.
      * @return The parsed rule set.
      */
-    public ASTRuleSet parseNero() {
+    public NeroRuleSet parseNero() {
         this.scanner = new Scanner(source, this::errorInScanner);
         scanner.prime();
         return new NeroParser(this, NeroParser.Mode.STANDALONE).parse();

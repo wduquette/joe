@@ -1,7 +1,6 @@
 package com.wjduquette.joe.parser;
 
-import com.wjduquette.joe.nero.Schema;
-import com.wjduquette.joe.nero.Shape;
+import com.wjduquette.joe.nero.*;
 import com.wjduquette.joe.scanner.Token;
 
 import java.util.*;
@@ -50,7 +49,7 @@ class NeroParser extends EmbeddedParser {
      * @return The rule set
      */
     @SuppressWarnings("Convert2MethodRef")
-    public ASTRuleSet parse() {
+    public NeroRuleSet parse() {
         Supplier<Boolean> endCondition = mode == Mode.STANDALONE
             ? () -> scanner.isAtEnd()
             : () -> scanner.match(RIGHT_BRACE);
@@ -61,9 +60,9 @@ class NeroParser extends EmbeddedParser {
     //-------------------------------------------------------------------------
     // The Parser
 
-    private ASTRuleSet parse(Supplier<Boolean> endCondition) {
-        List<ASTRuleSet.ASTAtom> facts = new ArrayList<>();
-        List<ASTRuleSet.ASTRule> rules = new ArrayList<>();
+    private NeroRuleSet parse(Supplier<Boolean> endCondition) {
+        Set<Atom> axioms = new HashSet<>();
+        Set<Rule> rules = new HashSet<>();
         var schema = new Schema();
 
         while (!endCondition.get()) {
@@ -80,13 +79,13 @@ class NeroParser extends EmbeddedParser {
                         error(headToken,
                             "axiom's shape is incompatible with previous definitions for this relation.");
                     }
-                    facts.add(axiom(head));
+                    axioms.add(axiom(headToken, head));
                 } else if (scanner.match(COLON_MINUS)) {
                     if (!schema.checkAndAdd(head)) {
                         error(headToken,
                             "rule head's shape is incompatible with previous definitions for this relation.");
                     }
-                    rules.add(rule(head));
+                    rules.add(rule(headToken, head));
                 } else {
                     scanner.advance();
                     throw errorSync(scanner.previous(),
@@ -97,8 +96,7 @@ class NeroParser extends EmbeddedParser {
             }
         }
 
-        // No exports; return an empty map.
-        return new ASTRuleSet(schema, facts, rules);
+        return new NeroRuleSet(schema, axioms, rules);
     }
 
     private void defineDeclaration(Schema schema) {
@@ -143,30 +141,35 @@ class NeroParser extends EmbeddedParser {
         }
     }
 
-    private ASTRuleSet.ASTAtom axiom(ASTRuleSet.ASTAtom head) {
+    private Atom axiom(Token token, Atom head) {
         // Verify that there are no non-constant terms.
-        for (var term : head.getTerms()) {
-            if (!(term instanceof ASTRuleSet.ASTConstant)) {
-                error(term.token(), "fact contains a non-constant term.");
+        for (var term : head.getAllTerms()) {
+            if (!(term instanceof Constant)) {
+                error(token,
+                    "axiom contains a non-constant term: '" +
+                    term + "'.");
             }
         }
         return head;
     }
 
-    private ASTRuleSet.ASTRule rule(ASTRuleSet.ASTAtom head) {
-        var body = new ArrayList<ASTRuleSet.ASTAtom>();
-        var negations = new ArrayList<ASTRuleSet.ASTAtom>();
-        var constraints = new ArrayList<ASTRuleSet.ASTConstraint>();
-
+    private Rule rule(Token headToken, Atom head) {
+        var body = new ArrayList<Atom>();
+        var negations = new ArrayList<Atom>();
+        var constraints = new ArrayList<Constraint>();
         var bodyVar = new HashSet<String>();
+
         do {
             var negated = scanner.match(NOT);
 
+            var token = scanner.peek();
             var atom = atom();
             if (negated) {
-                for (var name : atom.getVariableTokens()) {
-                    if (!bodyVar.contains(name.lexeme())) {
-                        error(name, "negated body atom contains unbound variable.");
+                for (var name : atom.getVariableNames()) {
+                    if (!bodyVar.contains(name)) {
+                        error(token,
+                            "negated body atom contains unbound variable: '" +
+                            name + "'.");
                     }
                 }
                 negations.add(atom);
@@ -185,47 +188,54 @@ class NeroParser extends EmbeddedParser {
         scanner.consume(SEMICOLON, "expected ';' after rule body.");
 
         // Verify that the head contains only valid terms.
-        for (var term : head.getTerms()) {
+        for (var term : head.getAllTerms()) {
             switch (term) {
-                case ASTRuleSet.ASTConstant ignored -> {}
-                case ASTRuleSet.ASTVariable v -> {
-                    if (!bodyVar.contains(v.token().lexeme())) {
-                        error(v.token(),
-                            "head atom contains unbound variable.");
+                case Constant ignored -> {}
+                case Variable v -> {
+                    if (!bodyVar.contains(v.name())) {
+                        error(headToken,
+                            "head atom contains unbound variable: '" +
+                            v.name() + "'.");
                     }
                 }
-                case ASTRuleSet.ASTWildcard w -> error(w.token(),
-                    "head atom contains wildcard.");
+                case Wildcard w -> error(headToken,
+                    "head atom contains wildcard: '" + w.name() + "'.");
             }
         }
 
-        return new ASTRuleSet.ASTRule(head, body, negations, constraints);
+        return new Rule(head, body, negations, constraints);
     }
 
-    private ASTRuleSet.ASTConstraint constraint(Set<String> bodyVar) {
+    private Constraint constraint(Set<String> bodyVar) {
         var term = term();
-        Token op;
-        ASTRuleSet.ASTVariable a = null;
+        Constraint.Op op;
+        Variable a = null;
 
         switch (term) {
-            case ASTRuleSet.ASTConstant c ->
-                error(c.token(), "expected bound variable.");
-            case ASTRuleSet.ASTVariable v -> {
+            case Constant ignored ->
+                error(scanner.previous(), "expected bound variable.");
+            case Variable v -> {
                 a = v;
-                if (!bodyVar.contains(v.token().lexeme())) {
-                    error(v.token(), "expected bound variable.");
+                if (!bodyVar.contains(v.name())) {
+                    error(scanner.previous(), "expected bound variable.");
                 }
             }
-            case ASTRuleSet.ASTWildcard c ->
-                error(c.token(), "expected bound variable.");
+            case Wildcard ignored ->
+                error(scanner.previous(), "expected bound variable.");
         }
 
-        if (scanner.match(
-            BANG_EQUAL, EQUAL_EQUAL,
-            GREATER, GREATER_EQUAL,
-            LESS, LESS_EQUAL)
-        ) {
-            op = scanner.previous();
+        if (scanner.match(BANG_EQUAL)) {
+            op = Constraint.Op.NE;
+        } else if (scanner.match(EQUAL_EQUAL)) {
+            op = Constraint.Op.EQ;
+        } else if (scanner.match(GREATER)) {
+            op = Constraint.Op.GT;
+        } else if (scanner.match(GREATER_EQUAL)) {
+            op = Constraint.Op.GE;
+        } else if (scanner.match(LESS)) {
+            op = Constraint.Op.LT;
+        } else if (scanner.match(LESS_EQUAL)) {
+            op = Constraint.Op.LE;
         } else {
             scanner.advance();
             throw errorSync(scanner.previous(), "expected comparison operator.");
@@ -233,18 +243,19 @@ class NeroParser extends EmbeddedParser {
 
         var b = term();
 
-        if (b instanceof ASTRuleSet.ASTVariable v) {
-            if (!bodyVar.contains(v.token().lexeme())) {
-                error(v.token(), "expected bound variable or constant.");
+        if (b instanceof Variable v) {
+            if (!bodyVar.contains(v.name())) {
+                error(scanner.previous(),
+                    "expected bound variable or constant.");
             }
-        } else if (b instanceof ASTRuleSet.ASTWildcard w) {
-            error(w.token(), "expected bound variable or constant.");
+        } else if (b instanceof Wildcard) {
+            error(scanner.previous(), "expected bound variable or constant.");
         }
 
-        return new ASTRuleSet.ASTConstraint(a, op, b);
+        return new Constraint(a, op, b);
     }
 
-    private ASTRuleSet.ASTAtom atom() {
+    private Atom atom() {
         // NEXT, parse the atom.
         scanner.consume(IDENTIFIER, "expected relation.");
         var relation = scanner.previous();
@@ -257,8 +268,8 @@ class NeroParser extends EmbeddedParser {
         }
     }
 
-    private ASTRuleSet.ASTOrderedAtom orderedAtom(Token relation) {
-        var terms = new ArrayList<ASTRuleSet.ASTTerm>();
+    private Atom orderedAtom(Token relation) {
+        var terms = new ArrayList<Term>();
 
         do {
             terms.add(term());
@@ -266,45 +277,44 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new ASTRuleSet.ASTOrderedAtom(relation, terms);
+        return new OrderedAtom(relation.lexeme(), terms);
     }
 
-    private ASTRuleSet.ASTNamedAtom namedAtom(Token relation) {
-        var terms = new LinkedHashMap<Token,ASTRuleSet.ASTTerm>();
+    private NamedAtom namedAtom(Token relation) {
+        var terms = new LinkedHashMap<String,Term>();
 
         do {
             scanner.consume(IDENTIFIER, "expected field name.");
             var name = scanner.previous();
             scanner.consume(COLON, "expected ':' after field name.");
-            terms.put(name, term());
+            terms.put(name.lexeme(), term());
         } while (scanner.match(COMMA));
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new ASTRuleSet.ASTNamedAtom(relation, terms);
+        return new NamedAtom(relation.lexeme(), terms);
     }
 
-    private ASTRuleSet.ASTTerm term() {
+    private Term term() {
         if (scanner.match(IDENTIFIER)) {
             var name = scanner.previous();
             if (name.lexeme().startsWith("_")) {
-                return new ASTRuleSet.ASTWildcard(name);
+                return new Wildcard(name.lexeme());
             } else {
-                return new ASTRuleSet.ASTVariable(name);
+                return new Variable(name.lexeme());
             }
         } else if (scanner.match(MINUS)) {
             scanner.consume(NUMBER, "expected number after '-'.");
             var number = (Double)scanner.previous().literal();
-            return new ASTRuleSet.ASTConstant(scanner.previous(), -number);
+            return new Constant(-number);
         } else if (scanner.match(TRUE)) {
-            return new ASTRuleSet.ASTConstant(scanner.previous(), true);
+            return new Constant(true);
         } else if (scanner.match(FALSE)) {
-            return new ASTRuleSet.ASTConstant(scanner.previous(), false);
+            return new Constant(false);
         } else if (scanner.match(NULL)) {
-            return new ASTRuleSet.ASTConstant(scanner.previous(), null);
+            return new Constant(null);
         } else if (scanner.match(KEYWORD, NUMBER, STRING)) {
-            return new ASTRuleSet.ASTConstant(
-                scanner.previous(), scanner.previous().literal());
+            return new Constant(scanner.previous().literal());
         } else {
             scanner.advance();
             throw errorSync(scanner.previous(), "expected term.");

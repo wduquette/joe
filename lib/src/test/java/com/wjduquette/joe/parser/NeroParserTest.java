@@ -187,7 +187,7 @@ public class NeroParserTest extends Ted {
             Thing(x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'x', fact contains a non-constant term.");
+            .eq("[line 1] error at 'Thing', axiom contains a non-constant term: 'x'.");
     }
 
     //-------------------------------------------------------------------------
@@ -200,7 +200,7 @@ public class NeroParserTest extends Ted {
             Thing(x) :- not Attribute(y);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'y', negated body atom contains unbound variable.");
+            .eq("[line 1] error at 'Attribute', negated body atom contains unbound variable: 'y'.");
     }
 
     @Test public void testRule_expectedSemicolon() {
@@ -221,7 +221,7 @@ public class NeroParserTest extends Ted {
             Thing(x) :- Attribute(y);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'x', head atom contains unbound variable.");
+            .eq("[line 1] error at 'Thing', head atom contains unbound variable: 'x'.");
     }
 
     @Test public void testRule_headWildcard() {
@@ -231,7 +231,7 @@ public class NeroParserTest extends Ted {
             Thing(_) :- Attribute(y);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '_', head atom contains wildcard.");
+            .eq("[line 1] error at 'Thing', head atom contains wildcard: '_'.");
     }
 
     //-------------------------------------------------------------------------

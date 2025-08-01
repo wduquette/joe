@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,6 +14,10 @@ import java.util.stream.Collectors;
 public record OrderedAtom(String relation, List<Term> terms)
     implements Atom
 {
+    @Override public Collection<Term> getAllTerms() {
+        return terms;
+    }
+
     @Override public String toString() {
         var termString = terms.stream().map(Term::toString)
             .collect(Collectors.joining(", "));

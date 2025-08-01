@@ -3,7 +3,6 @@ package com.wjduquette.joe.clark;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Trace;
-import com.wjduquette.joe.nero.*;
 import com.wjduquette.joe.parser.*;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SourceBuffer.Span;
@@ -968,11 +967,9 @@ class Compiler {
             }
             case Expr.RuleSet e -> {
                 // FIRST, compile the rule set.
-                var rsc = new RuleSetCompiler(e.ruleSet());
-                var ruleset = rsc.compile();
 
-                // Get the exports                // Stack effects
-                emit(RULESET, constant(ruleset)); // rsv       ; RuleSetValue
+                // Get the exports                    // Stack effects
+                emit(RULESET, constant(e.ruleSet())); // rsv    ; RuleSet
             }
             case Expr.SetLiteral e -> {
                 // Stack effects

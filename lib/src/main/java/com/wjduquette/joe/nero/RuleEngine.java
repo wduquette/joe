@@ -6,7 +6,7 @@ import com.wjduquette.joe.Keyword;
 import java.util.*;
 
 /**
- * The Nero inference engine.  Given a {@link RuleSet} and a set of
+ * The Nero inference engine.  Given a {@link NeroRuleSet} and a set of
  * input {@link Fact Facts}, the engine will infer the facts implied by
  * the two.
  */
@@ -22,7 +22,7 @@ public class RuleEngine {
     //
 
     // The Nero rule set, i.e., the compiled Nero program.
-    private final RuleSet ruleset;
+    private final NeroRuleSet ruleset;
 
     // Map from head relation to rules with that head.
     private final Map<String,List<Rule>> ruleMap = new HashMap<>();
@@ -57,7 +57,7 @@ public class RuleEngine {
      * of facts.
      * @param ruleset The ruleset
      */
-    public RuleEngine(RuleSet ruleset) {
+    public RuleEngine(NeroRuleSet ruleset) {
         this.ruleset = ruleset;
 
         // NEXT, Categorize the rules by head relation
@@ -74,7 +74,7 @@ public class RuleEngine {
      * @param ruleset The ruleset
      * @param facts The fact set
      */
-    public RuleEngine(RuleSet ruleset, FactSet facts) {
+    public RuleEngine(NeroRuleSet ruleset, FactSet facts) {
         this(ruleset);
         knownFacts.addAll(facts);
     }
@@ -103,14 +103,6 @@ public class RuleEngine {
 
     //-------------------------------------------------------------------------
     // Queries
-
-    /**
-     * Gets the facts inferred from rule set axioms.
-     * @return The axiomatic facts.
-     */
-    public Set<Fact> getAxioms() {
-        return ruleset.axioms();
-    }
 
     /**
      * Gets all facts known after inference is complete.
@@ -162,9 +154,12 @@ public class RuleEngine {
         if (inferenceComplete) return;
         inferenceComplete = true;
 
-        // NEXT, initialize the data structures
-        knownFacts.addAll(ruleset.axioms());
-        inferredFacts.addAll(ruleset.axioms());
+        // NEXT, infer all axioms.
+        for (var axiom : ruleset.axioms()) {
+            var fact = axiom2fact(axiom);
+            knownFacts.add(fact);
+            inferredFacts.add(fact);
+        }
 
         // NEXT, execute the rules.
         if (debug) {
@@ -261,7 +256,7 @@ public class RuleEngine {
     ) {
          switch (bodyAtom) {
              case NamedAtom atom -> {
-                 for (var e : atom.terms().entrySet()) {
+                 for (var e : atom.termMap().entrySet()) {
                      var name = e.getKey();
 
                      if (!fact.getFieldMap().containsKey(name)) {
@@ -346,12 +341,39 @@ public class RuleEngine {
         return true;
     }
 
+    private Fact axiom2fact(Atom axiom) {
+        return switch (axiom) {
+            case NamedAtom atom -> {
+                var termMap = new HashMap<String,Object>();
+
+                for (var e : atom.termMap().entrySet()) {
+                    termMap.put(e.getKey(), ((Constant)e.getValue()).value());
+                }
+
+                yield new MapFact(atom.relation(), termMap);
+            }
+            case OrderedAtom atom -> {
+                var shape = ruleset.schema().get(atom.relation());
+                var terms = new ArrayList<>();
+
+                for (var term : atom.terms()) {
+                    terms.add(((Constant)term).value());
+                }
+                if (shape instanceof Shape.PairShape ps) {
+                    yield new PairFact(atom.relation(), ps.fieldNames(), terms);
+                } else {
+                    yield new ListFact(atom.relation(), terms);
+                }
+            }
+        };
+    }
+
     private Fact createFact(BindingContext bc) {
         return switch (bc.rule.head()) {
             case NamedAtom atom -> {
                 var terms = new HashMap<String,Object>();
 
-                for (var e : atom.terms().entrySet()) {
+                for (var e : atom.termMap().entrySet()) {
                     terms.put(e.getKey(), term2value(e.getValue(), bc));
                 }
 

@@ -1,7 +1,6 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.nero.*;
 import com.wjduquette.joe.parser.Expr;
 import com.wjduquette.joe.parser.Stmt;
 import com.wjduquette.joe.patterns.Matcher;
@@ -724,8 +723,7 @@ class Interpreter {
             }
             // Evaluate the rule set.
             case Expr.RuleSet expr -> {
-                var rsc = new RuleSetCompiler(expr.ruleSet());
-                var ruleset = rsc.compile();
+                var ruleset = expr.ruleSet();
 
                 if (!ruleset.isStratified()) {
                     throw new RuntimeError(expr.keyword().span(),

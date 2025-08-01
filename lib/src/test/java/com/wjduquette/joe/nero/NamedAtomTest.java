@@ -21,7 +21,7 @@ public class NamedAtomTest extends Ted {
         map.put("f2", W);
         var atom = new NamedAtom("Thing", map);
         check(atom.relation()).eq("Thing");
-        check(atom.terms()).eq(Map.of("f0", X, "f1", ABC, "f2", W));
+        check(atom.termMap()).eq(Map.of("f0", X, "f1", ABC, "f2", W));
     }
 
     @Test

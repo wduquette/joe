@@ -1,7 +1,6 @@
 package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.parser.ASTRuleSet;
 
 import java.util.*;
 
@@ -101,8 +100,8 @@ public class Schema {
      * @param head The head atom whose shape is to be added.
      * @return true or false
      */
-    public boolean checkAndAdd(ASTRuleSet.ASTAtom head) {
-        var relation = head.relation().lexeme();
+    public boolean checkAndAdd(Atom head) {
+        var relation = head.relation();
         var defined = get(relation);
 
         // FIRST, save the inferred shape if there's no shape already defined.
@@ -114,13 +113,13 @@ public class Schema {
         // NEXT, make sure the atom is compatible with the defined shape.
         return switch (defined) {
             case Shape.ListShape s ->
-                head instanceof ASTRuleSet.ASTOrderedAtom a &&
-                s.arity() == a.getTerms().size();
+                head instanceof OrderedAtom a &&
+                s.arity() == a.terms().size();
             case Shape.MapShape ignored ->
-                head instanceof ASTRuleSet.ASTNamedAtom;
+                head instanceof NamedAtom;
             case Shape.PairShape s ->
-                head instanceof ASTRuleSet.ASTOrderedAtom a &&
-                s.arity() == a.getTerms().size();
+                head instanceof OrderedAtom a &&
+                s.arity() == a.terms().size();
         };
     }
 
