@@ -1,5 +1,6 @@
 package com.wjduquette.joe.parser;
 
+import com.wjduquette.joe.nero.Constraint;
 import com.wjduquette.joe.nero.Schema;
 import com.wjduquette.joe.nero.Term;
 import com.wjduquette.joe.nero.Variable;
@@ -47,7 +48,7 @@ public record ASTRuleSet(
         ASTAtom head,
         List<ASTAtom> body,
         List<ASTAtom> negations,
-        List<ASTConstraint> constraints
+        List<Constraint> constraints
     ) {
         @Override public String toString() {
             return "ASTRule(head=" + head + ",body=" + body +
@@ -110,19 +111,19 @@ public record ASTRuleSet(
         }
     }
 
-    /**
-     * A constraint of the form "a OP b".
-     * @param a A bound variable
-     * @param op A comparison operator
-     * @param b A bound variable or constant
-     */
-    public record ASTConstraint(
-        Variable a,
-        Token op,
-        Term b)
-    {
-        @Override public String toString() {
-            return "ASTConstraint(" + a + "," + op.lexeme() + "," + b + ")";
-        }
-    }
+//    /**
+//     * A constraint of the form "a OP b".
+//     * @param a A bound variable
+//     * @param op A comparison operator
+//     * @param b A bound variable or constant
+//     */
+//    public record ASTConstraint(
+//        Variable a,
+//        Token op,
+//        Term b)
+//    {
+//        @Override public String toString() {
+//            return "ASTConstraint(" + a + "," + op.lexeme() + "," + b + ")";
+//        }
+//    }
 }

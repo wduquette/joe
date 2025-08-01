@@ -159,7 +159,7 @@ class NeroParser extends EmbeddedParser {
         var headToken = head.relation();
         var body = new ArrayList<ASTRuleSet.ASTAtom>();
         var negations = new ArrayList<ASTRuleSet.ASTAtom>();
-        var constraints = new ArrayList<ASTRuleSet.ASTConstraint>();
+        var constraints = new ArrayList<Constraint>();
         var bodyVar = new HashSet<String>();
 
         do {
@@ -209,9 +209,9 @@ class NeroParser extends EmbeddedParser {
         return new ASTRuleSet.ASTRule(head, body, negations, constraints);
     }
 
-    private ASTRuleSet.ASTConstraint constraint(Set<String> bodyVar) {
+    private Constraint constraint(Set<String> bodyVar) {
         var term = term();
-        Token op;
+        Constraint.Op op;
         Variable a = null;
 
         switch (term) {
@@ -227,12 +227,18 @@ class NeroParser extends EmbeddedParser {
                 error(scanner.previous(), "expected bound variable.");
         }
 
-        if (scanner.match(
-            BANG_EQUAL, EQUAL_EQUAL,
-            GREATER, GREATER_EQUAL,
-            LESS, LESS_EQUAL)
-        ) {
-            op = scanner.previous();
+        if (scanner.match(BANG_EQUAL)) {
+            op = Constraint.Op.NE;
+        } else if (scanner.match(EQUAL_EQUAL)) {
+            op = Constraint.Op.EQ;
+        } else if (scanner.match(GREATER)) {
+            op = Constraint.Op.GT;
+        } else if (scanner.match(GREATER_EQUAL)) {
+            op = Constraint.Op.GE;
+        } else if (scanner.match(LESS)) {
+            op = Constraint.Op.LT;
+        } else if (scanner.match(LESS_EQUAL)) {
+            op = Constraint.Op.LE;
         } else {
             scanner.advance();
             throw errorSync(scanner.previous(), "expected comparison operator.");
@@ -249,7 +255,7 @@ class NeroParser extends EmbeddedParser {
             error(scanner.previous(), "expected bound variable or constant.");
         }
 
-        return new ASTRuleSet.ASTConstraint(a, op, b);
+        return new Constraint(a, op, b);
     }
 
     private ASTRuleSet.ASTAtom atom() {

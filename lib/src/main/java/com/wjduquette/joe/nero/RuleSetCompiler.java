@@ -87,7 +87,7 @@ public class RuleSetCompiler {
             ast2atom(rule.head()),
             rule.body().stream().map(this::ast2atom).toList(),
             rule.negations().stream().map(this::ast2atom).toList(),
-            rule.constraints().stream().map(this::ast2constraint).toList()
+            rule.constraints()
         );
     }
 
@@ -103,23 +103,5 @@ public class RuleSetCompiler {
                 yield new NamedAtom(a.relation().lexeme(), terms);
             }
         };
-    }
-
-    private Constraint ast2constraint(ASTRuleSet.ASTConstraint constraint) {
-        var realOp = switch (constraint.op().type()) {
-            case BANG_EQUAL -> Constraint.Op.NE;
-            case EQUAL_EQUAL -> Constraint.Op.EQ;
-            case GREATER -> Constraint.Op.GT;
-            case GREATER_EQUAL -> Constraint.Op.GE;
-            case LESS -> Constraint.Op.LT;
-            case LESS_EQUAL -> Constraint.Op.LE;
-            default -> throw new IllegalStateException(
-                "Unknown operator token: " + constraint.op());
-        };
-        return new Constraint(
-            constraint.a(),
-            realOp,
-            constraint.b()
-        );
     }
 }
