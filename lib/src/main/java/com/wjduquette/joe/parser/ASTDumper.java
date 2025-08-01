@@ -285,6 +285,7 @@ public class ASTDumper {
             case Pattern.ListPattern p -> {
                 var buff = buffer().nl();
                 p.patterns().forEach(buff::dump);
+                buff.println("tail: " + p.tailVar());
                 yield buff.toString();
             }
             case Pattern.MapPattern p -> {
@@ -303,9 +304,6 @@ public class ASTDumper {
                 }
                 yield buff.toString();
             }
-            case Pattern.PatternBinding p -> buffer()
-                .println(" '" + p.name() + "'")
-                .dump(p.subpattern());
             case Pattern.OrderedFieldPattern p -> {
                 var buff = buffer()
                     .println(" '" + p.typeName() + "'");
@@ -314,6 +312,9 @@ public class ASTDumper {
                 }
                 yield buff.toString();
             }
+            case Pattern.PatternBinding p -> buffer()
+                .println(" '" + p.name() + "'")
+                .dump(p.subpattern());
             case Pattern.TypeName p -> buffer()
                 .println(" '" + p.typeName() + "'");
             case Pattern.ValueBinding p -> buffer()

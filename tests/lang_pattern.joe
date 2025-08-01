@@ -1,4 +1,4 @@
-// lang_matching.joe
+// lang_pattern.joe
 //
 // This test tests Joe's pattern matching syntax in detail, using the
 // `~` operator.  Other test suites (`lang_var.joe`, etc.)
@@ -77,6 +77,11 @@ function testList_nestedPattern() {
 
 //-------------------------------------------------------------------------
 // Map Patterns
+
+function testMap_matchEmptyMap() {
+    // The {} pattern should be "{:}".
+    assertTrue({:} ~ {:});
+}
 
 // Value isn't a map
 function testMap_noMap() {

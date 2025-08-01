@@ -1099,7 +1099,8 @@ public class Parser {
     private Pattern.MapPattern mapPattern(ASTPattern wp) {
         var map = new LinkedHashMap<Pattern,Pattern>();
 
-        if (scanner.match(RIGHT_BRACE)) {
+        if (scanner.match(COLON)) {
+            scanner.consume(RIGHT_BRACE, "expected '}' after empty map pattern.");
             return new Pattern.MapPattern(map);
         }
 
