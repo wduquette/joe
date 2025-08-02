@@ -349,10 +349,10 @@ public class RuleEngine {
     ) {
         return switch (term) {
             case Variable v -> {
-                var bound = bc.bindings.get(v);
+                var bound = bc.bindings.get(v.name());
 
                 if (bound == null) {
-                    bc.bindings.put(v, value);
+                    bc.bindings.bind(v.name(), value);
                     yield true;
                 } else {
                     yield Objects.equals(bound, value);
@@ -448,7 +448,7 @@ public class RuleEngine {
     private Object term2value(Term term, BindingContext bc) {
         return switch (term) {
             case Constant c -> c.value();
-            case Variable v -> bc.bindings.get(v);
+            case Variable v -> bc.bindings.get(v.name());
             case Wildcard ignored -> throw new IllegalStateException(
                 "Rule head contains a Wildcard term.");
         };
@@ -456,12 +456,12 @@ public class RuleEngine {
 
     private boolean constraintMet(
         Constraint constraint,
-        Map<Variable,Object> bindings
+        Bindings bindings
     ) {
-        var a = bindings.get(constraint.a());
+        var a = bindings.get(constraint.a().name());
 
         var b = switch (constraint.b()) {
-            case Variable v -> bindings.get(v);
+            case Variable v -> bindings.get(v.name());
             case Constant c -> c.value();
             case Wildcard ignored -> throw new IllegalStateException(
                 "Constraint contains a Wildcard term.");
@@ -564,7 +564,7 @@ public class RuleEngine {
         var term = a.terms().get(index);
         assert term instanceof Variable;
         var theVar = (Variable)term;
-        return bc.bindings.get(theVar);
+        return bc.bindings.get(theVar.name());
     }
 
     //-------------------------------------------------------------------------
