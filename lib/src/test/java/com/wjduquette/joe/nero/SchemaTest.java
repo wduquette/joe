@@ -84,7 +84,7 @@ public class SchemaTest extends Ted {
         test("testCheckAndAdd_fact_new");
 
         var fact = new ListFact("Person", List.of("Joe", 90));
-        var shape = Shape.infer(fact);
+        var shape = Shape.inferShape(fact);
         check(schema.checkAndAdd(fact)).eq(true);
 
         check(schema.getRelations()).eq(Set.of("Person"));
@@ -135,7 +135,7 @@ public class SchemaTest extends Ted {
 
         var ast = parse("Person(#a, #b);");
         var head = new ArrayList<>(ast.axioms()).getFirst();
-        var shape = Shape.infer(head);
+        var shape = Shape.inferDefaultShape(head);
         check(schema.checkAndAdd(head)).eq(true);
 
         check(schema.getRelations()).eq(Set.of("Person"));

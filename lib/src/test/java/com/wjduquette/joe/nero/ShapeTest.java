@@ -21,7 +21,7 @@ public class ShapeTest extends Ted {
     @Test
     public void testInfer_fact_list() {
         test("testInfer_fact_list");
-        var shape = (Shape.ListShape)Shape.infer(LIST_FACT);
+        var shape = (Shape.ListShape)Shape.inferShape(LIST_FACT);
         check(shape.relation()).eq("List");
         check(shape.arity()).eq(2);
         check(shape.toString()).eq("ListShape[relation=List, arity=2]");
@@ -31,7 +31,7 @@ public class ShapeTest extends Ted {
     @Test
     public void testInfer_fact_map() {
         test("testInfer_fact_map");
-        var shape = (Shape.MapShape)Shape.infer(MAP_FACT);
+        var shape = (Shape.MapShape)Shape.inferShape(MAP_FACT);
         check(shape.relation()).eq("Map");
         check(shape.arity()).eq(-1);
         check(shape.toString()).eq("MapShape[relation=Map]");
@@ -41,7 +41,7 @@ public class ShapeTest extends Ted {
     @Test
     public void testInfer_fact_pair() {
         test("testInfer_fact_pair");
-        var shape = (Shape.PairShape)Shape.infer(PAIR_FACT);
+        var shape = (Shape.PairShape)Shape.inferShape(PAIR_FACT);
         check(shape.relation()).eq("Pair");
         check(shape.arity()).eq(2);
         check(shape.toString()).eq("PairShape[relation=Pair, fieldNames=[a, b]]");
@@ -54,7 +54,7 @@ public class ShapeTest extends Ted {
 
         var ast = parse("List(#a, #b);");
         var axioms = new ArrayList<>(ast.axioms());
-        var shape = (Shape.ListShape)Shape.infer(axioms.getFirst());
+        var shape = (Shape.ListShape)Shape.inferDefaultShape(axioms.getFirst());
 
         check(shape.relation()).eq("List");
         check(shape.arity()).eq(2);
@@ -67,7 +67,7 @@ public class ShapeTest extends Ted {
 
         var ast = parse("Map(x: #a, y: #b);");
         var axioms = new ArrayList<>(ast.axioms());
-        var shape = (Shape.MapShape)Shape.infer(axioms.getFirst());
+        var shape = (Shape.MapShape)Shape.inferDefaultShape(axioms.getFirst());
 
         check(shape.relation()).eq("Map");
         check(shape.toString()).eq("MapShape[relation=Map]");

@@ -6,6 +6,7 @@ import com.wjduquette.joe.scanner.Token;
 import java.util.*;
 import java.util.function.Supplier;
 
+import static com.wjduquette.joe.nero.RuleEngine.*;
 import static com.wjduquette.joe.scanner.TokenType.*;
 
 /**
@@ -74,13 +75,23 @@ class NeroParser extends EmbeddedParser {
                 var headToken = scanner.peek();
                 var head = atom();
 
+                // Check before adding the head
+
                 if (scanner.match(SEMICOLON)) {
+                    if (RuleEngine.isBuiltIn(head.relation())) {
+                        throw errorSync(headToken,
+                            "found built-in predicate in axiom.");
+                    }
                     if (!schema.checkAndAdd(head)) {
                         error(headToken,
                             "axiom's shape is incompatible with previous definitions for this relation.");
                     }
                     axioms.add(axiom(headToken, head));
                 } else if (scanner.match(COLON_MINUS)) {
+                    if (RuleEngine.isBuiltIn(head.relation())) {
+                        throw errorSync(headToken,
+                            "found built-in predicate in rule head.");
+                    }
                     if (!schema.checkAndAdd(head)) {
                         error(headToken,
                             "rule head's shape is incompatible with previous definitions for this relation.");
@@ -102,7 +113,14 @@ class NeroParser extends EmbeddedParser {
     private void defineDeclaration(Schema schema) {
         scanner.consume(IDENTIFIER, "expected relation after 'define'.");
         var relation = scanner.previous();
+
+        if (RuleEngine.isBuiltIn(relation.lexeme())) {
+            throw errorSync(relation,
+                "found built-in predicate in 'define' declaration.");
+        }
+
         scanner.consume(SLASH, "expected '/' after relation.");
+
 
         Shape shape;
 
@@ -157,7 +175,7 @@ class NeroParser extends EmbeddedParser {
         var body = new ArrayList<Atom>();
         var negations = new ArrayList<Atom>();
         var constraints = new ArrayList<Constraint>();
-        var bodyVar = new HashSet<String>();
+        var bodyVars = new HashSet<String>();
 
         do {
             var negated = scanner.match(NOT);
@@ -165,8 +183,12 @@ class NeroParser extends EmbeddedParser {
             var token = scanner.peek();
             var atom = atom();
             if (negated) {
+                if (RuleEngine.isBuiltIn(atom.relation())) {
+                    throw errorSync(token,
+                        "found built-in predicate in negated body atom.");
+                }
                 for (var name : atom.getVariableNames()) {
-                    if (!bodyVar.contains(name)) {
+                    if (!bodyVars.contains(name)) {
                         error(token,
                             "negated body atom contains unbound variable: '" +
                             name + "'.");
@@ -174,14 +196,17 @@ class NeroParser extends EmbeddedParser {
                 }
                 negations.add(atom);
             } else {
+                if (RuleEngine.isBuiltIn(atom.relation())) {
+                    checkBuiltIn(token, bodyVars, atom);
+                }
                 body.add(atom);
-                bodyVar.addAll(atom.getVariableNames());
+                bodyVars.addAll(atom.getVariableNames());
             }
         } while (scanner.match(COMMA));
 
         if (scanner.match(WHERE)) {
             do {
-                constraints.add(constraint(bodyVar));
+                constraints.add(constraint(bodyVars));
             } while (scanner.match(COMMA));
         }
 
@@ -192,7 +217,7 @@ class NeroParser extends EmbeddedParser {
             switch (term) {
                 case Constant ignored -> {}
                 case Variable v -> {
-                    if (!bodyVar.contains(v.name())) {
+                    if (!bodyVars.contains(v.name())) {
                         error(headToken,
                             "head atom contains unbound variable: '" +
                             v.name() + "'.");
@@ -204,6 +229,44 @@ class NeroParser extends EmbeddedParser {
         }
 
         return new Rule(head, body, negations, constraints);
+    }
+
+    // Verify that this is a valid built-in.
+    private void checkBuiltIn(Token token, Set<String> bodyVars, Atom atom) {
+        var shape = RuleEngine.getBuiltInShape(atom.relation());
+        assert shape != null;
+        if (!Shape.conformsTo(atom, shape)) {
+            error(token, "expected " + shape.toSpec() + ", got: " +
+                Shape.inferDefaultShape(atom).toSpec() + ".");
+            return;
+        }
+
+        switch (atom.relation()) {
+            case MEMBER ->
+                requireBound(token, bodyVars, atom, 1);
+            case INDEXED_MEMBER, KEYED_MEMBER ->
+                requireBound(token, bodyVars, atom, 2);
+            default -> throw new IllegalStateException(
+                "Unexpected built-in-predicate: '" + atom.relation() + "'.");
+        }
+    }
+
+    // Checks whether the index'th term in the atom is a bound variable.
+    private void requireBound(
+        Token relation,
+        Set<String> bodyVars,
+        Atom atom,
+        int index
+    ) {
+        // We've checked the shape of the atom, and it conforms to a
+        // built-in predicate; therefore it is an OrderedAtom, and it
+        // has the expected number of terms.
+        assert atom instanceof OrderedAtom;
+        var a = (OrderedAtom)atom;
+        var term = a.terms().get(index);
+        if (term instanceof Variable v && bodyVars.contains(v.name())) return;
+        error(relation, "expected bound variable as term " + index +
+            ", got: '" + term + "'.");
     }
 
     private Constraint constraint(Set<String> bodyVar) {

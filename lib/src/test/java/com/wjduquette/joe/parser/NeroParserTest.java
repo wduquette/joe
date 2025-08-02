@@ -26,6 +26,26 @@ public class NeroParserTest extends Ted {
     //-------------------------------------------------------------------------
     // parse()
 
+    @Test public void testParse_axiomBuiltIn() {
+        test("testParse_axiomBuiltIn");
+
+        var source = """
+            member(#joe, 90);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'member', found built-in predicate in axiom.");
+    }
+
+    @Test public void testParse_ruleHeadBuiltIn() {
+        test("testParse_axiomBuiltIn");
+
+        var source = """
+            member(x, y) :- Foo(x, y);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'member', found built-in predicate in rule head.");
+    }
+
     @Test public void testParse_axiomMismatch() {
         test("testParse_axiomMismatch");
 
@@ -70,6 +90,16 @@ public class NeroParserTest extends Ted {
             """;
         check(parseNero(source))
             .eq("[line 1] error at '2', expected relation after 'define'.");
+    }
+
+    @Test public void testDefineDeclaration_foundBuiltIn() {
+        test("testDefineDeclaration_foundBuiltIn");
+
+        var source = """
+            define member/2;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'member', found built-in predicate in 'define' declaration.");
     }
 
     @Test public void testDefineDeclaration_expectedSlash() {
@@ -193,6 +223,16 @@ public class NeroParserTest extends Ted {
     //-------------------------------------------------------------------------
     // rule()
 
+    @Test public void testRule_negatedMember() {
+        test("testRule_negatedMember");
+
+        var source = """
+            Thing(x) :- Foo(list), Bar(x), not member(x, list);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'member', found built-in predicate in negated body atom.");
+    }
+
     @Test public void testRule_negatedUnbound() {
         test("testRule_negatedUnbound");
 
@@ -232,6 +272,45 @@ public class NeroParserTest extends Ted {
             """;
         check(parseNero(source))
             .eq("[line 1] error at 'Thing', head atom contains wildcard: '_'.");
+    }
+
+    //-------------------------------------------------------------------------
+    // checkBuiltIn()
+
+    @Test public void testCheckBuiltIn_shape() {
+        test("testCheckBuiltIn_shape");
+        var source = """
+            Thing(x) :- Foo(list), member(x, list, y);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'member', expected member/item,collection, got: member/3.");
+    }
+
+    @Test public void testCheckBuiltIn_memberUnbound() {
+        test("testCheckBuiltIn_memberUnbound");
+        var source = """
+            Thing(x) :- Foo(list), member(x, items);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'member', expected bound variable as term 1, got: 'items'.");
+    }
+
+    @Test public void testCheckBuiltIn_indexedMemberUnbound() {
+        test("testCheckBuiltIn_indexedMemberUnbound");
+        var source = """
+            Thing(x) :- Foo(list), indexedMember(i, x, items);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'indexedMember', expected bound variable as term 2, got: 'items'.");
+    }
+
+    @Test public void testCheckBuiltIn_keyedMemberUnbound() {
+        test("testCheckBuiltIn_keyedMemberUnbound");
+        var source = """
+            Thing(x) :- Foo(map), keyedMember(k, v, items);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'keyedMember', expected bound variable as term 2, got: 'items'.");
     }
 
     //-------------------------------------------------------------------------

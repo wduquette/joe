@@ -15,6 +15,44 @@ public class RuleEngine {
         "Call `infer()` before querying results.";
 
     //-------------------------------------------------------------------------
+    // Static Built-In Predicate Schema
+
+    private static final Schema BUILT_INS = new Schema();
+    public static final String MEMBER = "member";
+    public static final String INDEXED_MEMBER = "indexedMember";
+    public static final String KEYED_MEMBER = "keyedMember";
+
+    static {
+        BUILT_INS.checkAndAdd(new Shape.PairShape(MEMBER,
+            List.of("item", "collection")));
+        BUILT_INS.checkAndAdd(new Shape.PairShape(INDEXED_MEMBER,
+            List.of("index", "item", "list")));
+        BUILT_INS.checkAndAdd(new Shape.PairShape(KEYED_MEMBER,
+            List.of("key", "value", "map")));
+    }
+
+    /**
+     * Returns true if the relation names a built-in predicate, and false
+     * otherwise.  All built-in predicates have names with an
+     * initial lowercase letter.
+     * @param relation The relation
+     * @return true or false
+     */
+    public static boolean isBuiltIn(String relation) {
+        return BUILT_INS.get(relation) != null;
+    }
+
+    /**
+     * Gets the relation's shape from the built-in predicate's schema.
+     * @param relation The relation
+     * @return The shape or null.
+     */
+    public static Shape getBuiltInShape(String relation) {
+        return BUILT_INS.get(relation);
+    }
+
+
+    //-------------------------------------------------------------------------
     // Instance Variables
 
     //
@@ -208,7 +246,20 @@ public class RuleEngine {
     // Matches the rule's index-th body atom against the relevant facts.
     private void matchNextBodyAtom(BindingContext bc, int index) {
         var atom = bc.rule.body().get(index);
-        var facts = knownFacts.getRelation(atom.relation());
+        Set<Fact> facts;
+
+        if (isBuiltIn(atom.relation())) {
+            // The NeroParser ensures that atom conforms to the built-in's shape.
+            // TODO: Make BindingContext static, and add a registry.
+            facts = switch (atom.relation()) {
+                case MEMBER -> _member(bc, atom);
+                case INDEXED_MEMBER -> _indexedMember(bc, atom);
+                case KEYED_MEMBER -> _keyedMember(bc, atom);
+                default -> throw new UnsupportedOperationException("TODO");
+            };
+        } else {
+            facts = knownFacts.getRelation(atom.relation());
+        }
 
         // FIRST, Save the current bindings, as we will begin with them for each
         // fact.
@@ -456,6 +507,64 @@ public class RuleEngine {
                 }
             }
         };
+    }
+
+    //-------------------------------------------------------------------------
+    // Built-In Predicates
+
+    // member/item,collection
+    private Set<Fact> _member(BindingContext bc, Atom atom) {
+        var coll = extractVar(bc, atom, 1);
+
+        var facts = new HashSet<Fact>();
+        if (coll instanceof Collection<?> c) {
+            for (var item : c) {
+                facts.add(new ListFact(MEMBER, List.of(item, c)));
+            }
+        }
+
+        return facts;
+    }
+
+    // indexedMember/index,item,list
+    private Set<Fact> _indexedMember(BindingContext bc, Atom atom) {
+        var coll = extractVar(bc, atom, 2);
+
+        var facts = new HashSet<Fact>();
+        if (coll instanceof List<?> list) {
+            int index = 0;
+            for (var item : list) {
+                facts.add(new ListFact(INDEXED_MEMBER,
+                    List.of((double)index, item, list)));
+                ++index;
+            }
+        }
+
+        return facts;
+    }
+
+    // keyedMember/key,value,map
+    private Set<Fact> _keyedMember(BindingContext bc, Atom atom) {
+        var coll = extractVar(bc, atom, 2);
+        var facts = new HashSet<Fact>();
+
+        if (coll instanceof Map<?,?> map) {
+            for (var e : map.entrySet()) {
+                facts.add(new ListFact(KEYED_MEMBER,
+                    List.of(e.getKey(), e.getValue(), map)));
+            }
+        }
+
+        return facts;
+    }
+
+    private Object extractVar(BindingContext bc, Atom atom, int index) {
+        assert atom instanceof OrderedAtom;
+        var a = (OrderedAtom)atom;
+        var term = a.terms().get(index);
+        assert term instanceof Variable;
+        var theVar = (Variable)term;
+        return bc.bindings.get(theVar);
     }
 
     //-------------------------------------------------------------------------
