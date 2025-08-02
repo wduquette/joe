@@ -17,18 +17,36 @@ public class RuleEngine {
     //-------------------------------------------------------------------------
     // Static Built-In Predicate Schema
 
-    private static final Schema BUILT_INS = new Schema();
+    private interface BuiltInFunction {
+        Set<Fact> compute(BindingContext bc, Atom builtIn);
+    }
+    private record BuiltIn(
+        Shape shape,
+        BuiltInFunction function
+    ) {}
+
+    private static final Map<String,BuiltIn> BUILT_INS = new HashMap<>();
     public static final String MEMBER = "member";
     public static final String INDEXED_MEMBER = "indexedMember";
     public static final String KEYED_MEMBER = "keyedMember";
 
     static {
-        BUILT_INS.checkAndAdd(new Shape.PairShape(MEMBER,
-            List.of("item", "collection")));
-        BUILT_INS.checkAndAdd(new Shape.PairShape(INDEXED_MEMBER,
-            List.of("index", "item", "list")));
-        BUILT_INS.checkAndAdd(new Shape.PairShape(KEYED_MEMBER,
-            List.of("key", "value", "map")));
+        builtIn(MEMBER, List.of("item", "collection"),
+            RuleEngine::_member);
+        builtIn(INDEXED_MEMBER, List.of("index", "item", "list"),
+            RuleEngine::_indexedMember);
+        builtIn(KEYED_MEMBER, List.of("key", "value", "map"),
+            RuleEngine::_keyedMember);
+    }
+
+    private static void builtIn(
+        String name,
+        List<String> fields,
+        BuiltInFunction function)
+    {
+        var shape = new Shape.PairShape(name, fields);
+        var builtIn = new BuiltIn(shape, function);
+        BUILT_INS.put(shape.relation(), builtIn);
     }
 
     /**
@@ -48,7 +66,8 @@ public class RuleEngine {
      * @return The shape or null.
      */
     public static Shape getBuiltInShape(String relation) {
-        return BUILT_INS.get(relation);
+        var builtIn = BUILT_INS.get(relation);
+        return builtIn != null ? builtIn.shape() : null;
     }
 
 
@@ -229,8 +248,8 @@ public class RuleEngine {
     private boolean matchRule(Rule rule) {
         if (debug) System.out.println("  Rule: " + rule);
 
-        var bc = new BindingContext(rule);
-
+        var bc = new BindingContext(rule,
+            ruleset.schema().get(rule.head().relation()));
 
         matchNextBodyAtom(bc, 0);
 
@@ -250,13 +269,7 @@ public class RuleEngine {
 
         if (isBuiltIn(atom.relation())) {
             // The NeroParser ensures that atom conforms to the built-in's shape.
-            // TODO: Make BindingContext static, and add a registry.
-            facts = switch (atom.relation()) {
-                case MEMBER -> _member(bc, atom);
-                case INDEXED_MEMBER -> _indexedMember(bc, atom);
-                case KEYED_MEMBER -> _keyedMember(bc, atom);
-                default -> throw new UnsupportedOperationException("TODO");
-            };
+            facts = BUILT_INS.get(atom.relation()).function().compute(bc, atom);
         } else {
             facts = knownFacts.getRelation(atom.relation());
         }
@@ -513,7 +526,7 @@ public class RuleEngine {
     // Built-In Predicates
 
     // member/item,collection
-    private Set<Fact> _member(BindingContext bc, Atom atom) {
+    private static Set<Fact> _member(BindingContext bc, Atom atom) {
         var coll = extractVar(bc, atom, 1);
 
         var facts = new HashSet<Fact>();
@@ -527,7 +540,7 @@ public class RuleEngine {
     }
 
     // indexedMember/index,item,list
-    private Set<Fact> _indexedMember(BindingContext bc, Atom atom) {
+    private static Set<Fact> _indexedMember(BindingContext bc, Atom atom) {
         var coll = extractVar(bc, atom, 2);
 
         var facts = new HashSet<Fact>();
@@ -544,7 +557,7 @@ public class RuleEngine {
     }
 
     // keyedMember/key,value,map
-    private Set<Fact> _keyedMember(BindingContext bc, Atom atom) {
+    private static Set<Fact> _keyedMember(BindingContext bc, Atom atom) {
         var coll = extractVar(bc, atom, 2);
         var facts = new HashSet<Fact>();
 
@@ -558,7 +571,7 @@ public class RuleEngine {
         return facts;
     }
 
-    private Object extractVar(BindingContext bc, Atom atom, int index) {
+    private static Object extractVar(BindingContext bc, Atom atom, int index) {
         assert atom instanceof OrderedAtom;
         var a = (OrderedAtom)atom;
         var term = a.terms().get(index);
@@ -571,16 +584,15 @@ public class RuleEngine {
     // Helpers
 
     // The context for the recursive matchBodyAtom method.
-    private class BindingContext {
+    private static class BindingContext {
         private final Rule rule;
         private final Shape shape;
         private final List<Fact> inferredFacts = new ArrayList<>();
         private Bindings bindings = new Bindings();
 
-        BindingContext(Rule rule) {
+        BindingContext(Rule rule, Shape shape) {
             this.rule = rule;
-            this.shape = ruleset.schema().get(rule.head().relation());
+            this.shape = shape;
         }
     }
-
 }
