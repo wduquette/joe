@@ -75,18 +75,23 @@ class NeroParser extends EmbeddedParser {
                 var headToken = scanner.peek();
                 var head = atom();
 
-                if (RuleEngine.isBuiltIn(head.relation())) {
-                    throw errorSync(headToken,
-                        "found built-in predicate in axiom or rule head.");
-                }
+                // Check before adding the head
 
                 if (scanner.match(SEMICOLON)) {
+                    if (RuleEngine.isBuiltIn(head.relation())) {
+                        throw errorSync(headToken,
+                            "found built-in predicate in axiom.");
+                    }
                     if (!schema.checkAndAdd(head)) {
                         error(headToken,
                             "axiom's shape is incompatible with previous definitions for this relation.");
                     }
                     axioms.add(axiom(headToken, head));
                 } else if (scanner.match(COLON_MINUS)) {
+                    if (RuleEngine.isBuiltIn(head.relation())) {
+                        throw errorSync(headToken,
+                            "found built-in predicate in rule head.");
+                    }
                     if (!schema.checkAndAdd(head)) {
                         error(headToken,
                             "rule head's shape is incompatible with previous definitions for this relation.");
@@ -108,12 +113,14 @@ class NeroParser extends EmbeddedParser {
     private void defineDeclaration(Schema schema) {
         scanner.consume(IDENTIFIER, "expected relation after 'define'.");
         var relation = scanner.previous();
-        scanner.consume(SLASH, "expected '/' after relation.");
 
         if (RuleEngine.isBuiltIn(relation.lexeme())) {
             throw errorSync(relation,
                 "found built-in predicate in 'define' declaration.");
         }
+
+        scanner.consume(SLASH, "expected '/' after relation.");
+
 
         Shape shape;
 
@@ -177,7 +184,7 @@ class NeroParser extends EmbeddedParser {
             var atom = atom();
             if (negated) {
                 if (RuleEngine.isBuiltIn(atom.relation())) {
-                    throw errorSync(headToken,
+                    throw errorSync(token,
                         "found built-in predicate in negated body atom.");
                 }
                 for (var name : atom.getVariableNames()) {
@@ -259,7 +266,7 @@ class NeroParser extends EmbeddedParser {
         var term = a.terms().get(index);
         if (term instanceof Variable v && bodyVars.contains(v.name())) return;
         error(relation, "expected bound variable as term " + index +
-            ", got: " + term);
+            ", got: '" + term + "'.");
     }
 
     private Constraint constraint(Set<String> bodyVar) {
