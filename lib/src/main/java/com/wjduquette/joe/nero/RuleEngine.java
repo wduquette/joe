@@ -252,7 +252,9 @@ public class RuleEngine {
             // The NeroParser ensures that atom conforms to the built-in's shape.
             // TODO: Make BindingContext static, and add a registry.
             facts = switch (atom.relation()) {
-                case "member" -> _member(bc, atom);
+                case MEMBER -> _member(bc, atom);
+                case INDEXED_MEMBER -> _indexedMember(bc, atom);
+                case KEYED_MEMBER -> _keyedMember(bc, atom);
                 default -> throw new UnsupportedOperationException("TODO");
             };
         } else {
@@ -511,15 +513,45 @@ public class RuleEngine {
     // Built-In Predicates
 
     // member/item,collection
-    //
-    // The collection
     private Set<Fact> _member(BindingContext bc, Atom atom) {
         var coll = extractVar(bc, atom, 1);
 
         var facts = new HashSet<Fact>();
         if (coll instanceof Collection<?> c) {
             for (var item : c) {
-                facts.add(new ListFact("member", List.of(item, c)));
+                facts.add(new ListFact(MEMBER, List.of(item, c)));
+            }
+        }
+
+        return facts;
+    }
+
+    // indexedMember/index,item,list
+    private Set<Fact> _indexedMember(BindingContext bc, Atom atom) {
+        var coll = extractVar(bc, atom, 2);
+
+        var facts = new HashSet<Fact>();
+        if (coll instanceof List<?> list) {
+            int index = 0;
+            for (var item : list) {
+                facts.add(new ListFact(INDEXED_MEMBER,
+                    List.of((double)index, item, list)));
+                ++index;
+            }
+        }
+
+        return facts;
+    }
+
+    // keyedMember/key,value,map
+    private Set<Fact> _keyedMember(BindingContext bc, Atom atom) {
+        var coll = extractVar(bc, atom, 2);
+        var facts = new HashSet<Fact>();
+
+        if (coll instanceof Map<?,?> map) {
+            for (var e : map.entrySet()) {
+                facts.add(new ListFact(KEYED_MEMBER,
+                    List.of(e.getKey(), e.getValue(), map)));
             }
         }
 
