@@ -18,13 +18,16 @@ public class RuleEngine {
     // Static Built-In Predicate Schema
 
     private static final Schema BUILT_INS = new Schema();
+    public static final String MEMBER = "member";
+    public static final String INDEXED_MEMBER = "indexedMember";
+    public static final String KEYED_MEMBER = "keyedMember";
 
     static {
-        BUILT_INS.checkAndAdd(new Shape.PairShape("member",
+        BUILT_INS.checkAndAdd(new Shape.PairShape(MEMBER,
             List.of("item", "collection")));
-        BUILT_INS.checkAndAdd(new Shape.PairShape("indexedMember",
+        BUILT_INS.checkAndAdd(new Shape.PairShape(INDEXED_MEMBER,
             List.of("index", "item", "list")));
-        BUILT_INS.checkAndAdd(new Shape.PairShape("keyedMember",
+        BUILT_INS.checkAndAdd(new Shape.PairShape(KEYED_MEMBER,
             List.of("key", "value", "map")));
     }
 
@@ -40,16 +43,14 @@ public class RuleEngine {
     }
 
     /**
-     * Returns true if the atom's relation names a built-in predicate
-     * and the atom's shape is conformable to the predicate's shape,
-     * and false otherwise.
-     * @param atom The atom
-     * @return true or false.
+     * Gets the relation's shape from the built-in predicate's schema.
+     * @param relation The relation
+     * @return The shape or null.
      */
-    public static boolean hasBuiltInShape(Atom atom) {
-        var shape = BUILT_INS.get(atom.relation());
-        return shape != null && Shape.conformsTo(atom, shape);
+    public static Shape getBuiltInShape(String relation) {
+        return BUILT_INS.get(relation);
     }
+
 
     //-------------------------------------------------------------------------
     // Instance Variables
