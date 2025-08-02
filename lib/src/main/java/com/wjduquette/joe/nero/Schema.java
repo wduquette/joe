@@ -79,7 +79,7 @@ public class Schema {
      * @return true or false
      */
     public boolean checkAndAdd(Fact fact) {
-        var shape = Shape.infer(fact);
+        var shape = Shape.inferShape(fact);
         return checkAndAdd(shape);
     }
 
@@ -106,21 +106,12 @@ public class Schema {
 
         // FIRST, save the inferred shape if there's no shape already defined.
         if (defined == null) {
-            shapeMap.put(relation, Shape.infer(head));
+            shapeMap.put(relation, Shape.inferDefaultShape(head));
             return true;
         }
 
         // NEXT, make sure the atom is compatible with the defined shape.
-        return switch (defined) {
-            case Shape.ListShape s ->
-                head instanceof OrderedAtom a &&
-                s.arity() == a.terms().size();
-            case Shape.MapShape ignored ->
-                head instanceof NamedAtom;
-            case Shape.PairShape s ->
-                head instanceof OrderedAtom a &&
-                s.arity() == a.terms().size();
-        };
+        return Shape.conformsTo(head, defined);
     }
 
     //-------------------------------------------------------------------------

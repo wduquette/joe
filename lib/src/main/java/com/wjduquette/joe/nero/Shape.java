@@ -78,7 +78,7 @@ public sealed interface Shape permits
      * @param fact The fact
      * @return The shape
      */
-    static Shape infer(Fact fact) {
+    static Shape inferShape(Fact fact) {
         return switch (fact) {
             case ListFact f -> new ListShape(f.relation(), f.arity());
             case MapFact f  -> new MapShape(f.relation());
@@ -87,15 +87,35 @@ public sealed interface Shape permits
     }
 
     /**
-     * Infer the shape of a fact from a rule or axiom head atom.  Infers the
+     * Infer the default shape of a fact from a rule or axiom head atom.  Infers the
      * list shape for ordered atoms and the map shape for named atoms.
      * @param head The head atom
      * @return The inferred shape
      */
-    static Shape infer(Atom head) {
+    static Shape inferDefaultShape(Atom head) {
         return switch (head) {
             case OrderedAtom a -> new ListShape(a.relation(), a.terms().size());
             case NamedAtom a -> new MapShape(a.relation());
+        };
+    }
+
+    /**
+     * Returns true if the atom conforms to the given Shape, and false
+     * otherwise.
+     * @param atom The atom
+     * @param shape The shape
+     * @return true or false
+     */
+    static boolean conformsTo(Atom atom, Shape shape) {
+        return switch (shape) {
+            case Shape.ListShape s ->
+                atom instanceof OrderedAtom a &&
+                    s.arity() == a.terms().size();
+            case Shape.MapShape ignored ->
+                atom instanceof NamedAtom;
+            case Shape.PairShape s ->
+                atom instanceof OrderedAtom a &&
+                    s.arity() == a.terms().size();
         };
     }
 }

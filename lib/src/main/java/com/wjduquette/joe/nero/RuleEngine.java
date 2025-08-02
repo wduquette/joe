@@ -15,6 +15,43 @@ public class RuleEngine {
         "Call `infer()` before querying results.";
 
     //-------------------------------------------------------------------------
+    // Static Built-In Predicate Schema
+
+    private static final Schema BUILT_INS = new Schema();
+
+    static {
+        BUILT_INS.checkAndAdd(new Shape.PairShape("member",
+            List.of("item", "collection")));
+        BUILT_INS.checkAndAdd(new Shape.PairShape("indexedMember",
+            List.of("index", "item", "list")));
+        BUILT_INS.checkAndAdd(new Shape.PairShape("keyedMember",
+            List.of("key", "value", "map")));
+    }
+
+    /**
+     * Returns true if the relation names a built-in predicate, and false
+     * otherwise.  All built-in predicates have names with an
+     * initial lowercase letter.
+     * @param relation The relation
+     * @return true or false
+     */
+    public static boolean isBuiltIn(String relation) {
+        return BUILT_INS.get(relation) != null;
+    }
+
+    /**
+     * Returns true if the atom's relation names a built-in predicate
+     * and the atom's shape is conformable to the predicate's shape,
+     * and false otherwise.
+     * @param atom The atom
+     * @return true or false.
+     */
+    public static boolean hasBuiltInShape(Atom atom) {
+        var shape = BUILT_INS.get(atom.relation());
+        return shape != null && Shape.conformsTo(atom, shape);
+    }
+
+    //-------------------------------------------------------------------------
     // Instance Variables
 
     //
@@ -208,7 +245,18 @@ public class RuleEngine {
     // Matches the rule's index-th body atom against the relevant facts.
     private void matchNextBodyAtom(BindingContext bc, int index) {
         var atom = bc.rule.body().get(index);
-        var facts = knownFacts.getRelation(atom.relation());
+        Set<Fact> facts;
+
+        if (isBuiltIn(atom.relation())) {
+            // The NeroParser ensures that atom conforms to the built-in's shape.
+            // TODO: Make BindingContext static, and add a registry.
+            facts = switch (atom.relation()) {
+                case "member" -> _member(bc, atom);
+                default -> throw new UnsupportedOperationException("TODO");
+            };
+        } else {
+            facts = knownFacts.getRelation(atom.relation());
+        }
 
         // FIRST, Save the current bindings, as we will begin with them for each
         // fact.
@@ -456,6 +504,34 @@ public class RuleEngine {
                 }
             }
         };
+    }
+
+    //-------------------------------------------------------------------------
+    // Built-In Predicates
+
+    // member/item,collection
+    //
+    // The collection
+    private Set<Fact> _member(BindingContext bc, Atom atom) {
+        var coll = extractVar(bc, atom, 1);
+
+        var facts = new HashSet<Fact>();
+        if (coll instanceof Collection<?> c) {
+            for (var item : c) {
+                facts.add(new ListFact("member", List.of(item, c)));
+            }
+        }
+
+        return facts;
+    }
+
+    private Object extractVar(BindingContext bc, Atom atom, int index) {
+        assert atom instanceof OrderedAtom;
+        var a = (OrderedAtom)atom;
+        var term = a.terms().get(index);
+        assert term instanceof Variable;
+        var theVar = (Variable)term;
+        return bc.bindings.get(theVar);
     }
 
     //-------------------------------------------------------------------------
