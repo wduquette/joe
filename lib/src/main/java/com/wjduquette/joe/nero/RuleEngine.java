@@ -352,7 +352,7 @@ public class RuleEngine {
                 var bound = bc.bindings.get(v.name());
 
                 if (bound == null) {
-                    bc.bindings.put(v.name(), value);
+                    bc.bindings.bind(v.name(), value);
                     yield true;
                 } else {
                     yield Objects.equals(bound, value);
