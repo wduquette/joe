@@ -178,6 +178,9 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    //-------------------------------------------------------------------------
+    // Transience
+
     @Test
     public void testTransient_transient_axiom() {
         test("testTransient_transient_axiom");
@@ -234,6 +237,33 @@ public class RuleEngineTest extends Ted {
         check(infer(source)).eq("""
             ListFact[relation=A, fields=[#a]]
             ListFact[relation=C, fields=[#a]]
+            """);
+    }
+
+    //-------------------------------------------------------------------------
+    // Updating Semantics
+
+    @Test public void testUpdating_axioms() {
+        test("testUpdating_axioms");
+        var source = """
+            A(#a);
+            A!(#b);
+            """;
+        check(infer(source)).eq("""
+            ListFact[relation=A, fields=[#b]]
+            """);
+    }
+
+    @Test public void testUpdating_rules() {
+        test("testUpdating_rules");
+        var source = """
+            A(#a, 5);
+            A(#b, 7);
+            A!(x) :- A(x, _);
+            """;
+        check(infer(source)).eq("""
+            ListFact[relation=A, fields=[#a]]
+            ListFact[relation=A, fields=[#b]]
             """);
     }
 

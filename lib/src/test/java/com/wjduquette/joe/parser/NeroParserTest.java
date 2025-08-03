@@ -255,6 +255,16 @@ public class NeroParserTest extends Ted {
     //-------------------------------------------------------------------------
     // rule()
 
+    @Test public void testRule_foundUpdateMarker() {
+        test("testRule_foundUpdateMarker");
+
+        var source = """
+            Thing(x) :- Bar!(x);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'Bar', found update marker '!' in body atom of non-updating rule.");
+    }
+
     @Test public void testRule_negatedMember() {
         test("testRule_negatedMember");
 
