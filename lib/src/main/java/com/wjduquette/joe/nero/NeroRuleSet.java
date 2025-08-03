@@ -1,8 +1,6 @@
 package com.wjduquette.joe.nero;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A collection of axioms and rules, ready for processing by the Nero engine.
@@ -64,5 +62,16 @@ public class NeroRuleSet {
 
     public Set<Rule> rules() {
         return Collections.unmodifiableSet(rules);
+    }
+
+    /**
+     * Gets a set of the names of all relations used in the rule set.
+     * @return The set
+     */
+    public Set<String> getRelations() {
+        var result = new HashSet<String>();
+        axioms.forEach(a -> result.add(a.relation()));
+        rules.forEach(r -> result.add(r.head().relation()));
+        return result;
     }
 }

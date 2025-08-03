@@ -28,6 +28,10 @@ class NeroParser extends EmbeddedParser {
         /** Mode */ EMBEDDED
     }
 
+    // A parsed relation.  Includes the token, as location info, and the
+    // name, which might include a '!'.
+    record Relation(Token token, String name) { }
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -118,15 +122,24 @@ class NeroParser extends EmbeddedParser {
         return new NeroRuleSet(schema, axioms, rules);
     }
 
+    private Relation relation(String message) {
+        scanner.consume(IDENTIFIER, message);
+        var token = scanner.previous();
+        var name = scanner.match(BANG) ? token.lexeme() + "!" : token.lexeme();
+        return new Relation(token, name);
+    }
+
+    private boolean hasBang(String name) {
+        return name.endsWith("!");
+    }
+
     private void defineDeclaration(Schema schema) {
         var transience = scanner.matchIdentifier(TRANSIENT);
 
-        scanner.consume(IDENTIFIER,
-            "expected relation after 'define [transient]'.");
-        var relation = scanner.previous();
+        var relation = relation("expected relation after 'define [transient]'.");
 
-        if (RuleEngine.isBuiltIn(relation.lexeme())) {
-            throw errorSync(relation,
+        if (RuleEngine.isBuiltIn(relation.token().lexeme())) {
+            throw errorSync(relation.token(),
                 "found built-in predicate in 'define' declaration.");
         }
 
@@ -143,9 +156,9 @@ class NeroParser extends EmbeddedParser {
             if (arity <= 0) {
                 error(scanner.previous(), "expected positive arity.");
             }
-            shape = new Shape.ListShape(relation.lexeme(), arity.intValue());
+            shape = new Shape.ListShape(relation.name(), arity.intValue());
         } else if (scanner.match(DOT_DOT_DOT)) {
-            shape = new Shape.MapShape(relation.lexeme());
+            shape = new Shape.MapShape(relation.name());
         } else if (scanner.check(IDENTIFIER)) {
             var names = new ArrayList<String>();
             do {
@@ -157,7 +170,7 @@ class NeroParser extends EmbeddedParser {
                 names.add(name);
             } while (scanner.match(COMMA));
 
-            shape = new Shape.PairShape(relation.lexeme(), names);
+            shape = new Shape.PairShape(relation.name(), names);
         } else {
             scanner.advance();
             throw errorSync(scanner.previous(),
@@ -166,24 +179,23 @@ class NeroParser extends EmbeddedParser {
         scanner.consume(SEMICOLON, "expected ';' after definition.");
 
         if (schema.checkAndAdd(shape)) {
-            if (transience) schema.setTransient(relation.lexeme(), true);
+            if (transience) schema.setTransient(relation.name(), true);
         } else {
-            error(relation, "definition clashes with earlier entry.");
+            error(relation.token(), "definition clashes with earlier entry.");
         }
     }
 
     private void transientDeclaration(Schema schema) {
-        scanner.consume(IDENTIFIER, "expected relation after 'transient'.");
-        var relation = scanner.previous();
+        var relation = relation("expected relation after 'transient'.");
 
-        if (RuleEngine.isBuiltIn(relation.lexeme())) {
-            throw errorSync(relation,
+        if (RuleEngine.isBuiltIn(relation.token().lexeme())) {
+            throw errorSync(relation.token(),
                 "found built-in predicate in 'transient' declaration.");
         }
 
         scanner.consume(SEMICOLON, "expected ';' after relation.");
 
-        schema.setTransient(relation.lexeme(), true);
+        schema.setTransient(relation.name(), true);
     }
 
     private Atom axiom(Token token, Atom head) {
@@ -209,6 +221,11 @@ class NeroParser extends EmbeddedParser {
 
             var token = scanner.peek();
             var atom = atom();
+
+            if (hasBang(atom.relation()) && !hasBang(head.relation())) {
+                error(token, "found update marker '!' in body atom of non-updating rule.");
+            }
+
             if (negated) {
                 if (RuleEngine.isBuiltIn(atom.relation())) {
                     throw errorSync(token,
@@ -347,18 +364,17 @@ class NeroParser extends EmbeddedParser {
 
     private Atom atom() {
         // NEXT, parse the atom.
-        scanner.consume(IDENTIFIER, "expected relation.");
-        var relation = scanner.previous();
+        var relation = relation("expected relation.");
         scanner.consume(LEFT_PAREN, "expected '(' after relation.");
 
         if (scanner.checkTwo(IDENTIFIER, COLON)) {
-            return namedAtom(relation);
+            return namedAtom(relation.name());
         } else {
-            return orderedAtom(relation);
+            return orderedAtom(relation.name());
         }
     }
 
-    private Atom orderedAtom(Token relation) {
+    private Atom orderedAtom(String relation) {
         var terms = new ArrayList<Term>();
 
         do {
@@ -367,10 +383,10 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new OrderedAtom(relation.lexeme(), terms);
+        return new OrderedAtom(relation, terms);
     }
 
-    private NamedAtom namedAtom(Token relation) {
+    private NamedAtom namedAtom(String relation) {
         var terms = new LinkedHashMap<String,Term>();
 
         do {
@@ -382,7 +398,7 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new NamedAtom(relation.lexeme(), terms);
+        return new NamedAtom(relation, terms);
     }
 
     private Term term() {

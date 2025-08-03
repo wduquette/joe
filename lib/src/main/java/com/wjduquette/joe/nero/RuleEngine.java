@@ -233,6 +233,18 @@ public class RuleEngine {
             knownFacts.drop(name);
             inferredFacts.drop(name);
         }
+
+        // NEXT, handle update semantics
+        for (var name : ruleset.getRelations()) {
+            if (!name.endsWith("!")) continue;
+
+            var oldName = name.substring(0, name.length() - 1);
+            knownFacts.drop(oldName);
+            knownFacts.rename(name, oldName);
+            inferredFacts.drop(oldName);
+            inferredFacts.rename(name, oldName);
+        }
+
     }
 
     private void inferStratum(int stratum, List<String> heads) {
