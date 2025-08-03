@@ -121,7 +121,7 @@ public class NeroParserTest extends Ted {
             define 2;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '2', expected relation after 'define'.");
+            .eq("[line 1] error at '2', expected relation after 'define [transient]'.");
     }
 
     @Test public void testDefineDeclaration_foundBuiltIn() {
