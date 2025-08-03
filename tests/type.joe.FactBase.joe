@@ -142,6 +142,16 @@ function testClear() {
 }
 
 //-------------------------------------------------------------------------
+// drop
+
+function testDrop() {
+    var db = FactBase([JOE, TEXAS, HAT]);
+    db.drop("Thing");
+    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
+    check(db.relation("Thing")).eq(Set());
+}
+
+//-------------------------------------------------------------------------
 // filter
 
 function testFilter() {
@@ -251,22 +261,12 @@ function testRemoveIf() {
 }
 
 //-------------------------------------------------------------------------
-// removeRelation
+// rename
 
-function testRemoveRelation() {
-    var db = FactBase([JOE, TEXAS, HAT]);
-    db.removeRelation("Thing");
-    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
-    check(db.relation("Thing")).eq(Set());
-}
-
-//-------------------------------------------------------------------------
-// renameRelation
-
-function testRenameRelation() {
+function testRename() {
     var db = FactBase([JOE, TEXAS, HAT]);
     var newFact = Fact.ofPairs("Location", ["id", #texas]);
-    db.renameRelation("Place", "Location");
+    db.rename("Place", "Location");
     check(db.all()).eq(Set.of(JOE_FACT, newFact, HAT_FACT));
     check(db.relation("Place")).eq(Set());
     check(db.relation("Location")).eq(Set.of(newFact));

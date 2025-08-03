@@ -98,6 +98,15 @@ public class FactSet {
     }
 
     /**
+     * Drops a relation from the database, removing the relation's facts.
+     * @param relation The relation
+     */
+    public void drop(String relation) {
+        facts.removeAll(indexSet(relation));
+        index.remove(relation);
+    }
+
+    /**
      * Deletes a specific fact from the database
      * @param fact The fact
      */
@@ -130,20 +139,11 @@ public class FactSet {
     }
 
     /**
-     * Removes all facts with the given relation.
-     * @param relation The relation
-     */
-    public void removeRelation(String relation) {
-        facts.removeAll(indexSet(relation));
-        index.remove(relation);
-    }
-
-    /**
      * Renames a relation, replacing any previous relation with the same name.
      * @param oldName The name of an existing relation
      * @param newName A new name for the existing relation.
      */
-    public void renameRelation(String oldName, String newName) {
+    public void rename(String oldName, String newName) {
         var newFacts = new HashSet<Fact>();
         for (var fact : indexSet(oldName)) {
             var newFact = switch (fact) {
@@ -157,8 +157,8 @@ public class FactSet {
             newFacts.add(newFact);
         }
 
-        removeRelation(oldName);
-        removeRelation(newName);
+        drop(oldName);
+        drop(newName);
         facts.addAll(newFacts);
         index.put(newName, newFacts);
     }

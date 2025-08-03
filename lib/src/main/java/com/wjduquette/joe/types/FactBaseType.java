@@ -58,6 +58,7 @@ public class FactBaseType extends ProxyType<FactBase> {
         method("add",            this::_add);
         method("addAll",         this::_addAll);
         method("all",            this::_all);
+        method("drop",           this::_drop);
         method("clear",          this::_clear);
         method("filter",         this::_filter);
         method("isDebug",        this::_isDebug);
@@ -68,8 +69,7 @@ public class FactBaseType extends ProxyType<FactBase> {
         method("remove",         this::_remove);
         method("removeAll",      this::_removeAll);
         method("removeIf",       this::_removeIf);
-        method("removeRelation", this::_removeRelation);
-        method("renameRelation", this::_renameRelation);
+        method("rename",         this::_rename);
         method("select",         this::_select);
         method("setDebug",       this::_setDebug);
         method("size",           this::_size);
@@ -223,6 +223,17 @@ public class FactBaseType extends ProxyType<FactBase> {
     }
 
     //**
+    // @method drop
+    // @args name
+    // @result this
+    // Drops a relation from the database, removing all its facts.
+    private Object _drop(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "drop(name)");
+        db.drop(joe.toIdentifier(args.next()));
+        return db;
+    }
+
+    //**
     // @method filter
     // @args predicate
     // @result Set
@@ -359,25 +370,14 @@ public class FactBaseType extends ProxyType<FactBase> {
     }
 
     //**
-    // @method removeRelation
-    // @args name
-    // @result this
-    // Deletes an entire relation from the database.
-    private Object _removeRelation(FactBase db, Joe joe, Args args) {
-        args.exactArity(1, "removeRelation(name)");
-        db.removeRelation(joe.toIdentifier(args.next()));
-        return db;
-    }
-
-    //**
-    // @method renameRelation
+    // @method rename
     // @args oldName, newName
     // @result this
     // Renames a relation, replacing any existing relation that has the new
     // name.
-    private Object _renameRelation(FactBase db, Joe joe, Args args) {
-        args.exactArity(2, "renameRelation(oldName)");
-        db.renameRelation(
+    private Object _rename(FactBase db, Joe joe, Args args) {
+        args.exactArity(2, "rename(oldName)");
+        db.rename(
             joe.toIdentifier(args.next()),
             joe.toIdentifier(args.next())
         );
