@@ -119,7 +119,10 @@ class NeroParser extends EmbeddedParser {
     }
 
     private void defineDeclaration(Schema schema) {
-        scanner.consume(IDENTIFIER, "expected relation after 'define'.");
+        var transience = scanner.matchIdentifier(TRANSIENT);
+
+        scanner.consume(IDENTIFIER,
+            "expected relation after 'define [transient]'.");
         var relation = scanner.previous();
 
         if (RuleEngine.isBuiltIn(relation.lexeme())) {
@@ -127,7 +130,6 @@ class NeroParser extends EmbeddedParser {
                 "found built-in predicate in 'define' declaration.");
         }
 
-        var transience = scanner.matchIdentifier(TRANSIENT);
 
         scanner.consume(SLASH, "expected '/' after relation.");
 

@@ -54,6 +54,10 @@ public class Schema {
         }
     }
 
+    public Set<String> getTransients() {
+        return transients;
+    }
+
     /**
      * Gets whether or not a shape is defined for this relation.
      * @param relation The relation
