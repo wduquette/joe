@@ -104,7 +104,7 @@ public class RuleEngine {
 
     // Facts inferred from the rule set's axioms and rules (aka,
     // the "intensional database" in Datalog jargon).
-    private final Set<Fact> inferredFacts = new HashSet<>();
+    private final FactSet inferredFacts = new FactSet();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -180,7 +180,7 @@ public class RuleEngine {
         if (!inferenceComplete) {
             throw new IllegalStateException(INFER_ERROR);
         }
-        return inferredFacts;
+        return inferredFacts.getAll();
     }
 
     //-------------------------------------------------------------------------
@@ -226,6 +226,12 @@ public class RuleEngine {
 
         for (var i = 0; i < ruleset.strata().size(); i++) {
             inferStratum(i, ruleset.strata().get(i));
+        }
+
+        // NEXT, drop the transient relations.
+        for (var name : ruleset.schema().getTransients()) {
+            knownFacts.drop(name);
+            inferredFacts.drop(name);
         }
     }
 

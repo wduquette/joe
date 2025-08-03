@@ -78,6 +78,38 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at ',', expected axiom or rule.");
     }
 
+    //-------------------------------------------------------------------------
+    // transientDeclaration
+
+    @Test public void testTransientDeclaration_expectedRelation() {
+        test("testTransientDeclaration_expectedRelation");
+
+        var source = """
+            transient 2;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '2', expected relation after 'transient'.");
+    }
+
+    @Test public void testTransientDeclaration_foundBuiltIn() {
+        test("testTransientDeclaration_foundBuiltIn");
+
+        var source = """
+            transient member;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'member', found built-in predicate in 'transient' declaration.");
+    }
+
+    @Test public void testTransientDeclaration_expectedSemicolon() {
+        test("testDefineDeclaration_expectedSemicolon");
+
+        var source = """
+            transient Person:
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at ':', expected ';' after relation.");
+    }
 
     //-------------------------------------------------------------------------
     // defineDeclaration

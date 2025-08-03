@@ -15,6 +15,7 @@ import static com.wjduquette.joe.scanner.TokenType.*;
  */
 class NeroParser extends EmbeddedParser {
     private static final String DEFINE = "define";
+    private static final String TRANSIENT = "transient";
 
     //-------------------------------------------------------------------------
     // Types
@@ -68,14 +69,21 @@ class NeroParser extends EmbeddedParser {
 
         while (!endCondition.get()) {
             try {
+                // define
                 if (scanner.matchIdentifier(DEFINE)) {
                     defineDeclaration(schema);
                     continue;
                 }
+
+                // transient
+                if (scanner.matchIdentifier(TRANSIENT)) {
+                    transientDeclaration(schema);
+                    continue;
+                }
+
+                // Axiom or Rule
                 var headToken = scanner.peek();
                 var head = atom();
-
-                // Check before adding the head
 
                 if (scanner.match(SEMICOLON)) {
                     if (RuleEngine.isBuiltIn(head.relation())) {
@@ -111,7 +119,10 @@ class NeroParser extends EmbeddedParser {
     }
 
     private void defineDeclaration(Schema schema) {
-        scanner.consume(IDENTIFIER, "expected relation after 'define'.");
+        var transience = scanner.matchIdentifier(TRANSIENT);
+
+        scanner.consume(IDENTIFIER,
+            "expected relation after 'define [transient]'.");
         var relation = scanner.previous();
 
         if (RuleEngine.isBuiltIn(relation.lexeme())) {
@@ -119,8 +130,8 @@ class NeroParser extends EmbeddedParser {
                 "found built-in predicate in 'define' declaration.");
         }
 
-        scanner.consume(SLASH, "expected '/' after relation.");
 
+        scanner.consume(SLASH, "expected '/' after relation.");
 
         Shape shape;
 
@@ -154,9 +165,25 @@ class NeroParser extends EmbeddedParser {
         }
         scanner.consume(SEMICOLON, "expected ';' after definition.");
 
-        if (!schema.checkAndAdd(shape)) {
+        if (schema.checkAndAdd(shape)) {
+            if (transience) schema.setTransient(relation.lexeme(), true);
+        } else {
             error(relation, "definition clashes with earlier entry.");
         }
+    }
+
+    private void transientDeclaration(Schema schema) {
+        scanner.consume(IDENTIFIER, "expected relation after 'transient'.");
+        var relation = scanner.previous();
+
+        if (RuleEngine.isBuiltIn(relation.lexeme())) {
+            throw errorSync(relation,
+                "found built-in predicate in 'transient' declaration.");
+        }
+
+        scanner.consume(SEMICOLON, "expected ';' after relation.");
+
+        schema.setTransient(relation.lexeme(), true);
     }
 
     private Atom axiom(Token token, Atom head) {

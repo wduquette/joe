@@ -15,7 +15,12 @@ public class Schema {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The relation shapes, by relation name.
     private final Map<String,Shape> shapeMap = new HashMap<>();
+
+    // The set of transient relations.  Transient relations are dropped after
+    // inference is complete.
+    private final Set<String> transients = new HashSet<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -26,6 +31,32 @@ public class Schema {
 
     //-------------------------------------------------------------------------
     // Public API
+
+    /**
+     * Returns true if the relation is marked transient in this schema.
+     * @param relation The relation name
+     * @return true or false
+     */
+    public boolean isTransient(String relation) {
+        return transients.contains(relation);
+    }
+
+    /**
+     * Sets/clears the transient flag for the given relation.
+     * @param relation The relation name
+     * @param flag The transient flag
+     */
+    public void setTransient(String relation, boolean flag) {
+        if (flag) {
+            transients.add(relation);
+        } else {
+            transients.remove(relation);
+        }
+    }
+
+    public Set<String> getTransients() {
+        return transients;
+    }
 
     /**
      * Gets whether or not a shape is defined for this relation.

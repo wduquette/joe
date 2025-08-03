@@ -32,6 +32,20 @@ public class SchemaTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
+    // Transience
+
+    @Test public void testTransience() {
+        test("testTransience");
+
+        check(schema.isTransient("Foo")).eq(false);
+        schema.setTransient("Foo", true);
+        check(schema.isTransient("Foo")).eq(true);
+        schema.setTransient("Foo", false);
+        check(schema.isTransient("Foo")).eq(false);
+    }
+
+
+    //-------------------------------------------------------------------------
     // checkAndAdd(shape)
 
     // A shape is always accepted if the relation isn't previously known.

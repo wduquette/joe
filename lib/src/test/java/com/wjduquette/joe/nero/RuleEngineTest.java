@@ -2,6 +2,7 @@ package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.SyntaxError;
 import org.junit.Test;
 
 import java.util.List;
@@ -177,17 +178,81 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    @Test
+    public void testTransient_transient_axiom() {
+        test("testTransient_transient_axiom");
+
+        var source = """
+            transient A;
+            A(#a);
+            B(#b);
+            """;
+        check(infer(source)).eq("""
+            ListFact[relation=B, fields=[#b]]
+            """);
+    }
+
+    @Test
+    public void testTransient_define_transient_axiom() {
+        test("testTransient_define_transient_axiom");
+
+        var source = """
+            define transient A/1;
+            A(#a);
+            B(#b);
+            """;
+        check(infer(source)).eq("""
+            ListFact[relation=B, fields=[#b]]
+            """);
+    }
+
+    @Test
+    public void testTransient_transient_rule() {
+        test("testTransient_transient_axiom");
+
+        var source = """
+            transient B;
+            A(#a);
+            B(x) :- A(x);
+            C(x) :- B(x);
+            """;
+        check(infer(source)).eq("""
+            ListFact[relation=A, fields=[#a]]
+            ListFact[relation=C, fields=[#a]]
+            """);
+    }
+
+    @Test
+    public void testTransient_define_transient_rule() {
+        test("testTransient_define_transient_axiom");
+        var source = """
+            define transient B/1;
+            A(#a);
+            B(x) :- A(x);
+            C(x) :- B(x);
+            """;
+        check(infer(source)).eq("""
+            ListFact[relation=A, fields=[#a]]
+            ListFact[relation=C, fields=[#a]]
+            """);
+    }
+
     //-------------------------------------------------------------------------
     // Helpers
 
     private enum Topic { THIS, THAT }
 
     private String infer(String source) {
-        var engine = nero.execute(new SourceBuffer("-", source));
-        return engine.getKnownFacts().getAll().stream()
-            .map(Fact::toString)
-            .sorted()
-            .collect(Collectors.joining("\n")) + "\n";
+        try {
+            var engine = nero.execute(new SourceBuffer("-", source));
+            return engine.getKnownFacts().getAll().stream()
+                .map(Fact::toString)
+                .sorted()
+                .collect(Collectors.joining("\n")) + "\n";
+        } catch (SyntaxError ex) {
+            println(ex.getErrorReport());
+            throw ex;
+        }
     }
 
     private String infer(String source, Set<Fact> facts) {
