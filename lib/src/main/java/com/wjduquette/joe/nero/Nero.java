@@ -3,9 +3,7 @@ package com.wjduquette.joe.nero;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.parser.Parser;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -238,14 +236,35 @@ public class Nero {
      * @throws JoeError if the term cannot be expressed as a Nero literal.
      */
     public String asNeroTerm(Object term) {
-        // At present, all we support are the standard scalar literals;
-        // this is the easiest way to limit the output to that.
+        // This is the easiest way to limit the output to Nero literals.
         return switch (term) {
             case null -> "null";
             case Boolean b -> joe.stringify(b);
             case Double d -> joe.stringify(d);
             case Keyword k -> joe.stringify(k);
             case String s -> Joe.quote(s);
+            case List<?> t -> {
+                var list = t.stream()
+                    .map(this::asNeroTerm)
+                    .collect(Collectors.joining(", "));
+                yield "[" + list + "]";
+            }
+            case Map<?,?> t -> {
+                if (t.isEmpty()) yield "{:}";
+                var list = t.entrySet().stream()
+                    .map(e -> asNeroTerm(e.getKey()) +
+                        ": " + asNeroTerm(e.getValue()))
+                    .sorted()
+                    .collect(Collectors.joining(", "));
+                yield "{" + list + "}";
+            }
+            case Set<?> t -> {
+                var list = t.stream()
+                    .map(this::asNeroTerm)
+                    .sorted()
+                    .collect(Collectors.joining(", "));
+                yield "{" + list + "}";
+            }
             default -> throw new JoeError(
                 "Non-Nero term: '" + joe.stringify(term));
         };
