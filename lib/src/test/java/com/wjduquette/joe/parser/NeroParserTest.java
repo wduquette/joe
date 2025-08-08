@@ -303,7 +303,7 @@ public class NeroParserTest extends Ted {
             Thing(x) :- Attribute(y);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Thing', head atom contains unbound variable: 'x'.");
+            .eq("[line 1] error at 'Thing', found unbound variable(s) in rule head.");
     }
 
     @Test public void testRule_headWildcard() {
@@ -313,7 +313,7 @@ public class NeroParserTest extends Ted {
             Thing(_) :- Attribute(y);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Thing', head atom contains wildcard: '_'.");
+            .eq("[line 1] error at '_', found wildcard in axiom or head atom.");
     }
 
     //-------------------------------------------------------------------------
@@ -378,14 +378,14 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at 'y', expected bound variable.");
     }
 
-    @Test public void testConstraint_expectedBound3() {
-        test("testConstraint_expectedBound2");
+    @Test public void testConstraint_wildcard_a() {
+        test("testConstraint_wildcard_a");
 
         var source = """
             Thing(x) :- Attribute(x) where _ == x;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '_', expected bound variable.");
+            .eq("[line 1] error at '_', found wildcard in constraint.");
     }
 
     @Test public void testConstraint_expectedComparison() {
@@ -415,7 +415,7 @@ public class NeroParserTest extends Ted {
             Thing(x) :- Attribute(x) where x == _;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '_', expected bound variable or constant.");
+            .eq("[line 1] error at '_', found wildcard in constraint.");
     }
 
     //-------------------------------------------------------------------------
