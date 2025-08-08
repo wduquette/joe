@@ -432,8 +432,22 @@ class NeroParser extends EmbeddedParser {
             if (ctx == Context.HEAD) {
                 return listTerm();
             } else {
+                // Patterns will take over in rule bodies.
                 throw errorSync(scanner.previous(),
-                    "found list literal in " + ctx.place() + ".");
+                    "found collection literal in " + ctx.place() + ".");
+            }
+        } else if (scanner.match(LEFT_BRACE)) {
+            if (ctx == Context.HEAD) {
+                var first = term(ctx);
+                if (scanner.match(COLON)) {
+                    return mapTerm(first);
+                } else {
+                    return setTerm(first);
+                }
+            } else {
+                // Patterns will take over in rule bodies.
+                throw errorSync(scanner.previous(),
+                    "found collection literal in " + ctx.place() + ".");
             }
         } else {
             scanner.advance();
@@ -453,6 +467,37 @@ class NeroParser extends EmbeddedParser {
         scanner.consume(RIGHT_BRACKET, "expected ']' after list literal.");
 
         return new ListTerm(list);
+    }
+
+    private Term setTerm(Term first) {
+        var list = new ArrayList<Term>();
+        list.add(first);
+
+        while (scanner.match(COMMA)) {
+            if (scanner.check(RIGHT_BRACE)) break;
+            list.add(term(Context.HEAD));
+
+        }
+        scanner.consume(RIGHT_BRACE, "expected '}' after set literal.");
+
+        return new SetTerm(list);
+    }
+
+    private Term mapTerm(Term first) {
+        var list = new ArrayList<Term>();
+        list.add(first);
+        // Colon is already matched
+        list.add(term(Context.HEAD));
+
+        while (scanner.match(COMMA)) {
+            if (scanner.check(RIGHT_BRACE)) break;
+            list.add(term(Context.HEAD));
+            scanner.consume(COLON, "expected ':' after key term.");
+            list.add(term(Context.HEAD));
+        }
+        scanner.consume(RIGHT_BRACE, "expected '}' after map literal.");
+
+        return new MapTerm(list);
     }
 
     // Discard tokens until we are at the beginning of the next statement.
