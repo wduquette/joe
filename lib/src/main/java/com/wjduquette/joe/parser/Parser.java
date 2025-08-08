@@ -309,7 +309,7 @@ public class Parser {
         Token keyword = scanner.previous();
         ASTPattern pattern = pattern();
 
-        if (pattern.getPattern() instanceof Pattern.ValueBinding ||
+        if (pattern.getPattern() instanceof Pattern.Variable ||
             pattern.getPattern() instanceof Pattern.Wildcard
         ) {
             var name = scanner.previous();
@@ -445,7 +445,7 @@ public class Parser {
         }
 
         // NEXT, One variable (a single wildcard is treated as variable name).
-        if (pattern.getPattern() instanceof Pattern.ValueBinding ||
+        if (pattern.getPattern() instanceof Pattern.Variable ||
             pattern.getPattern() instanceof Pattern.Wildcard
         ) {
             var varName = scanner.previous();

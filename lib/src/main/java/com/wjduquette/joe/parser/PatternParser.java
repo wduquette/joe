@@ -87,9 +87,9 @@ class PatternParser extends EmbeddedParser {
 
             if (canPatternBind && scanner.match(AT)) {
                 var subpattern = parsePattern(wp, false);
-                return new Pattern.PatternBinding(name, subpattern);
+                return new Pattern.Subpattern(name, subpattern);
             } else {
-                return new Pattern.ValueBinding(name);
+                return new Pattern.Variable(name);
             }
         } else {
             throw errorSync(scanner.peek(), "Expected pattern.");

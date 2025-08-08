@@ -225,7 +225,7 @@ public class MatcherTest extends Ted {
         test("testListPattern_bad_boundTail");
 
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.ValueBinding("x")
+            new Pattern.Variable("x")
         ), "x");
         var value = List.of(List.of("abc"), "def");
 
@@ -238,7 +238,7 @@ public class MatcherTest extends Ted {
         test("testListPattern_good_boundTail");
 
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.ValueBinding("x")
+            new Pattern.Variable("x")
         ), "x");
         var value = List.of(List.of("abc"), "abc");
 
@@ -545,7 +545,7 @@ public class MatcherTest extends Ted {
         test("testPatternBinding_bad");
 
         constants = List.of("abc");
-        var pattern = new Pattern.PatternBinding("x",
+        var pattern = new Pattern.Subpattern("x",
             new Pattern.Expression(0));
         var value = "xyz";
 
@@ -557,7 +557,7 @@ public class MatcherTest extends Ted {
         test("testPatternBinding_good");
 
         constants = List.of("abc");
-        var pattern = new Pattern.PatternBinding("x",
+        var pattern = new Pattern.Subpattern("x",
             new Pattern.Expression(0));
         var value = "abc";
 
@@ -572,8 +572,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("abc");
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.ValueBinding("x"),
-            new Pattern.PatternBinding("x",
+            new Pattern.Variable("x"),
+            new Pattern.Subpattern("x",
                 new Pattern.Expression(0))
         ), null);
         var value = List.of("abc", "def");
@@ -588,8 +588,8 @@ public class MatcherTest extends Ted {
 
         constants = List.of("abc");
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.ValueBinding("x"),
-            new Pattern.PatternBinding("x",
+            new Pattern.Variable("x"),
+            new Pattern.Subpattern("x",
                 new Pattern.Expression(0))
         ), null);
         var value = List.of("abc", "abc");
@@ -656,7 +656,7 @@ public class MatcherTest extends Ted {
     public void testValueBinding_newVar() {
         test("testValueBinding_newVar");
 
-        var pattern = new Pattern.ValueBinding("x");
+        var pattern = new Pattern.Variable("x");
         var value = "abc";
 
         var bindings = bind(pattern, value);
@@ -669,8 +669,8 @@ public class MatcherTest extends Ted {
         test("testValueBinding_boundVar_bad");
 
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.ValueBinding("x"),
-            new Pattern.ValueBinding("x")
+            new Pattern.Variable("x"),
+            new Pattern.Variable("x")
         ), null);
         var value = List.of("abc", "def");
 
@@ -683,8 +683,8 @@ public class MatcherTest extends Ted {
         test("testValueBinding_boundVar_good");
 
         var pattern = new Pattern.ListPattern(List.of(
-            new Pattern.ValueBinding("x"),
-            new Pattern.ValueBinding("x")
+            new Pattern.Variable("x"),
+            new Pattern.Variable("x")
         ), null);
         var value = List.of("abc", "abc");
 

@@ -313,12 +313,12 @@ public class ASTDumper {
                 }
                 yield buff.toString();
             }
-            case Pattern.PatternBinding p -> buffer()
+            case Pattern.Subpattern p -> buffer()
                 .println(" '" + p.name() + "'")
                 .dump(p.subpattern());
             case Pattern.TypeName p -> buffer()
                 .println(" '" + p.typeName() + "'");
-            case Pattern.ValueBinding p -> buffer()
+            case Pattern.Variable p -> buffer()
                 .println(" '" + p.name() + "'");
             case Pattern.Wildcard p -> buffer()
                 .println(" '" + p.name() + "'");

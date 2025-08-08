@@ -198,7 +198,7 @@ public class Matcher {
                 yield true;
             }
 
-            case Pattern.PatternBinding p -> {
+            case Pattern.Subpattern p -> {
                 if (bindings.containsKey(p.name()) &&
                     !bindings.get(p.name()).equals(value)
                 ) {
@@ -229,7 +229,7 @@ public class Matcher {
                 }
             }
 
-            case Pattern.ValueBinding p -> {
+            case Pattern.Variable p -> {
                 if (bindings.containsKey(p.name()) &&
                     !bindings.get(p.name()).equals(value)
                 ) {

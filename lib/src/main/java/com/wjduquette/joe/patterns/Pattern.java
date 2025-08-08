@@ -27,9 +27,9 @@ public sealed interface Pattern permits
     Pattern.MapPattern,
     Pattern.NamedFieldPattern,
     Pattern.OrderedFieldPattern,
-    Pattern.PatternBinding,
+    Pattern.Subpattern,
     Pattern.TypeName,
-    Pattern.ValueBinding,
+    Pattern.Variable,
     Pattern.Wildcard
 {
     /**
@@ -158,7 +158,7 @@ public sealed interface Pattern permits
      * @param name A binding variable name
      * @param subpattern The subpattern to match.
      */
-    record PatternBinding(String name, Pattern subpattern) implements Pattern {
+    record Subpattern(String name, Pattern subpattern) implements Pattern {
         /**
          * Returns "?id" as the string representation.
          * @return The string
@@ -188,7 +188,7 @@ public sealed interface Pattern permits
      * with the given name.
      * @param name A binding variable name
      */
-    record ValueBinding(String name) implements Pattern {
+    record Variable(String name) implements Pattern {
         /**
          * Returns "?name" as the string representation.
          * @return The string

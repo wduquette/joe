@@ -52,7 +52,7 @@ public class PatternTest extends Ted {
 
         var map = new LinkedHashMap<Pattern, Pattern>();
         map.put(new Pattern.Expression(3), new Pattern.Wildcard("_xyz"));
-        map.put(new Pattern.Expression(4), new Pattern.ValueBinding("a"));
+        map.put(new Pattern.Expression(4), new Pattern.Variable("a"));
 
         var p = new Pattern.MapPattern(map);
         check(p.toString()).eq("{$3: _xyz, $4: ?a}");
@@ -64,7 +64,7 @@ public class PatternTest extends Ted {
 
         var map = new LinkedHashMap<String, Pattern>();
         map.put("id", new Pattern.Wildcard("_xyz"));
-        map.put("color", new Pattern.ValueBinding("a"));
+        map.put("color", new Pattern.Variable("a"));
 
         var p = new Pattern.NamedFieldPattern("Thing", map);
         check(p.toString()).eq("Thing(id: _xyz, color: ?a)");
@@ -76,7 +76,7 @@ public class PatternTest extends Ted {
 
         var p = new Pattern.OrderedFieldPattern("Thing", List.of(
             new Pattern.Wildcard("_xyz"),
-            new Pattern.ValueBinding("a")
+            new Pattern.Variable("a")
         ));
         check(p.toString()).eq("Thing(_xyz, ?a)");
     }
@@ -85,7 +85,7 @@ public class PatternTest extends Ted {
     public void testPatternBinding() {
         test("testPatternBinding");
 
-        var p = new Pattern.PatternBinding("a",
+        var p = new Pattern.Subpattern("a",
             new Pattern.Wildcard("_xyz"));
         check(p.toString()).eq("?a@_xyz");
     }
@@ -102,7 +102,7 @@ public class PatternTest extends Ted {
     public void testValueBinding() {
         test("testValueBinding");
 
-        var p = new Pattern.ValueBinding("a");
+        var p = new Pattern.Variable("a");
         check(p.toString()).eq("?a");
     }
 
