@@ -242,14 +242,14 @@ public class NeroParserTest extends Ted {
     //-------------------------------------------------------------------------
     // axiom()
 
-    @Test public void testAxiom_nonConstantTerm() {
-        test("testAxiom_nonConstantTerm");
+    @Test public void testAxiom_variable() {
+        test("testAxiom_variable");
 
         var source = """
             Thing(x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Thing', axiom contains a non-constant term: 'x'.");
+            .eq("[line 1] error at 'Thing', found variable(s) in axiom.");
     }
 
     //-------------------------------------------------------------------------

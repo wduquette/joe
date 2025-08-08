@@ -215,13 +215,11 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Atom axiom(Token token, Atom head) {
-        // Verify that there are no non-constant terms.
-        for (var term : head.getAllTerms()) {
-            if (!(term instanceof Constant)) {
-                error(token,
-                    "axiom contains a non-constant term: '" +
-                    term + "'.");
-            }
+        // At this point, anything in the head other than a
+        // constant, variable, or collection term has already been
+        // flagged as an error.  So just check for variables.
+        if (!head.getVariableNames().isEmpty()) {
+            error(token, "found variable(s) in axiom.");
         }
         return head;
     }
@@ -430,10 +428,31 @@ class NeroParser extends EmbeddedParser {
             return new Constant(null);
         } else if (scanner.match(KEYWORD, NUMBER, STRING)) {
             return new Constant(scanner.previous().literal());
+        } else if (scanner.match(LEFT_BRACKET)) {
+            if (ctx == Context.HEAD) {
+                return listTerm();
+            } else {
+                throw errorSync(scanner.previous(),
+                    "found list literal in " + ctx.place() + ".");
+            }
         } else {
             scanner.advance();
             throw errorSync(scanner.previous(), "expected term.");
         }
+    }
+
+    private Term listTerm() {
+        // '[' has already been matched.
+        var list = new ArrayList<Term>();
+
+        do {
+            if (scanner.check(RIGHT_BRACKET)) break;
+            list.add(term(Context.HEAD));
+
+        } while (scanner.match(COMMA));
+        scanner.consume(RIGHT_BRACKET, "expected ']' after list literal.");
+
+        return new ListTerm(list);
     }
 
     // Discard tokens until we are at the beginning of the next statement.

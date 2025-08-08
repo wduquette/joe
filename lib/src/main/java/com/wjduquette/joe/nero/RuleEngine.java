@@ -430,7 +430,7 @@ public class RuleEngine {
                 var termMap = new HashMap<String,Object>();
 
                 for (var e : atom.termMap().entrySet()) {
-                    termMap.put(e.getKey(), ((Constant)e.getValue()).value());
+                    termMap.put(e.getKey(), Term.toValue(e.getValue(), null));
                 }
 
                 yield new MapFact(atom.relation(), termMap);
@@ -440,7 +440,7 @@ public class RuleEngine {
                 var terms = new ArrayList<>();
 
                 for (var term : atom.terms()) {
-                    terms.add(((Constant)term).value());
+                    terms.add(Term.toValue(term, null));
                 }
                 if (shape instanceof Shape.PairShape ps) {
                     yield new PairFact(atom.relation(), ps.fieldNames(), terms);
