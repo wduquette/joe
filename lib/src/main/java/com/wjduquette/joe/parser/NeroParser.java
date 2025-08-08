@@ -269,6 +269,7 @@ class NeroParser extends EmbeddedParser {
                 }
                 case Wildcard w -> error(headToken,
                     "head atom contains wildcard: '" + w.name() + "'.");
+                default -> throw new UnsupportedOperationException("TODO");
             }
         }
 
@@ -329,6 +330,7 @@ class NeroParser extends EmbeddedParser {
             }
             case Wildcard ignored ->
                 error(scanner.previous(), "expected bound variable.");
+            default -> throw new UnsupportedOperationException("TODO");
         }
 
         if (scanner.match(BANG_EQUAL)) {

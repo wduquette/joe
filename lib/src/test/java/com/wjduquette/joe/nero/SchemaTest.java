@@ -2,6 +2,7 @@ package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.Ted;
 import org.junit.Before;
 import org.junit.Test;
 
