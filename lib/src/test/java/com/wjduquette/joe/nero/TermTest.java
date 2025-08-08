@@ -5,41 +5,51 @@ import org.junit.Test;
 import static com.wjduquette.joe.checker.Checker.*;
 
 public class TermTest extends Ted {
-    private final Constant ONE = new Constant(1);
-    private final Constant ALSO_ONE = new Constant(1);
-    private final Constant TWO = new Constant(2);
-    private final Constant ABC = new Constant("abc");
-    private final Variable X = new Variable("x");
-    private final Variable ALSO_X = new Variable("x");
-    private final Variable Y = new Variable("y");
+    private final Bindings EMPTY = new Bindings();
 
     @Test
     public void testConstant() {
-        check(ONE.value()).eq(1);
-        check(ONE.toString()).eq("1");
+        var c = new Constant("abc");
 
-        check(ABC.value()).eq("abc");
-        check(ABC.toString()).eq("\"abc\"");
-    }
+        // The type itself
+        check(c.value()).eq("abc");
 
-    @Test
-    public void testConstant_equals() {
-        check(ONE).eq(ONE);
-        check(ONE).eq(ALSO_ONE);
-        check(ONE).ne(TWO);
-        check(ONE).ne(ABC);
+        // String rep must quote strings
+        check(c.toString()).eq("\"abc\""); // quoted!
+
+        // The term's value is just its value
+        check(Term.toValue(c, EMPTY)).eq("abc");
     }
 
     @Test
     public void testVariable() {
-        check(X.name()).eq("x");
-        check(X.toString()).eq("x");
+        var v = new Variable("x");
+        var bindings = new Bindings();
+        bindings.bind("x", "abc");
+
+        // The type itself
+        check(v.name()).eq("x");
+
+        // String rep is the variable name
+        check(v.toString()).eq("x");
+
+        // The value is whatever is in the bindings
+        check(Term.toValue(v, EMPTY)).eq(null);
+        check(Term.toValue(v, bindings)).eq("abc");
     }
 
     @Test
-    public void testVariable_equals() {
-        check(X).eq(X);
-        check(X).eq(ALSO_X);
-        check(X).ne(Y);
+    public void testWildcard() {
+        var w = new Wildcard("_");
+
+        // The type itself
+        check(w.name()).eq("_");
+
+        // String rep is the wildcard name
+        check(w.toString()).eq("_");
+
+        // Wildcard has no value.
+        checkThrow(() -> Term.toValue(w, EMPTY))
+            .containsString("toValue is unsupported for body term: Wildcard '_'.");
     }
 }
