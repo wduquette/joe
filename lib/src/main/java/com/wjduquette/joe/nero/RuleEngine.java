@@ -478,30 +478,15 @@ public class RuleEngine {
     }
 
     private Object term2value(Term term, BindingContext bc) {
-        // TODO: Use Term.toValue()!
-        return switch (term) {
-            case Constant c -> c.value();
-            case Variable v -> bc.bindings.get(v.name());
-            case Wildcard ignored -> throw new IllegalStateException(
-                "Rule head contains a Wildcard term.");
-            default -> throw new UnsupportedOperationException("TODO");
-        };
+        return Term.toValue(term, bc.bindings);
     }
 
     private boolean constraintMet(
         Constraint constraint,
         Bindings bindings
     ) {
-        var a = bindings.get(constraint.a().name());
-
-        // TODO: Use Term.toValue!
-        var b = switch (constraint.b()) {
-            case Variable v -> bindings.get(v.name());
-            case Constant c -> c.value();
-            case Wildcard ignored -> throw new IllegalStateException(
-                "Constraint contains a Wildcard term.");
-            default -> throw new UnsupportedOperationException("TODO");
-        };
+        var a = Term.toValue(constraint.a(), bindings);
+        var b = Term.toValue(constraint.b(), bindings);
 
         return switch (constraint.op()) {
             case EQ -> Objects.equals(a, b);
