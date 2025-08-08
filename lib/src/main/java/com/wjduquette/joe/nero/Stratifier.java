@@ -10,11 +10,16 @@ public class Stratifier {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // There are two conditions to check:
+    //
+    // If A depends on B with negation, B cannot depend on A.
+    // If A aggregates over B, B cannot depend on A.
+
     // Dependency Matrix:
     //
     // - dep[i][j] ==  0   -> i doesn't depend on j
-    // - dep[i][j] ==  1   -> i depends on j with no negations
-    // - dep[i][j] == -1   -> i depends on j with at least one negation
+    // - dep[i][j] ==  1   -> i depends on j in a normal way
+    // - dep[i][j] == -1   -> i depends on j requiring stratification.
     private final int[][] dep;
 
     private final List<String> heads;
@@ -55,11 +60,14 @@ public class Stratifier {
         for (var rule : rules) {
             var i = heads.indexOf(rule.head().relation());
 
-            // Set +1 for each positive dependency
+            var dependencyValue = (aggregates(rule)) ? -1 : 1;
+
+            // Set +1 for each positive dependency, unless the rule
+            // aggregates.
             for (var b : rule.body()) {
                 var j = heads.indexOf(b.relation());
                 if (j == -1) continue;  // Skip non-head predicates
-                mat[i][j] = 1;
+                mat[i][j] = dependencyValue;
             }
 
             // Set -1 for each negative dependency; this may override a
@@ -72,6 +80,19 @@ public class Stratifier {
         }
 
         return mat;
+    }
+
+    private boolean aggregates(Rule rule) {
+        for (var term : rule.head().getAllTerms()) {
+            if (term instanceof ListTerm ||
+                term instanceof MapTerm ||
+                term instanceof SetTerm
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private int[][] newMatrix(int n) {
