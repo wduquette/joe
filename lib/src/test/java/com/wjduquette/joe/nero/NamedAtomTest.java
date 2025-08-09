@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.Ted;
 import org.junit.Test;
 
 import java.util.LinkedHashMap;

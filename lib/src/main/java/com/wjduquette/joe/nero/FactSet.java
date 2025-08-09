@@ -1,6 +1,7 @@
 package com.wjduquette.joe.nero;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A collection of Facts indexed by relation.
@@ -172,11 +173,15 @@ public class FactSet {
     }
 
     /**
-     * Gets the set of relations represented in this FactSet
+     * Gets the set of relations of the facts in this FactSet
      * @return The set
      */
     public Set<String> getRelations() {
-        return Collections.unmodifiableSet(index.keySet());
+        // The index contains a relation set for each relation that has been
+        // requested, whether there are any facts or not.  Skip those.
+        return index.keySet().stream()
+            .filter(k -> !index.get(k).isEmpty())
+            .collect(Collectors.toSet());
     }
 
     /**

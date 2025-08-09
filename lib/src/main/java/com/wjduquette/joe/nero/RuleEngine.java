@@ -400,6 +400,7 @@ public class RuleEngine {
                 yield false;
             }
             case Wildcard ignored -> true;
+            default -> throw new UnsupportedOperationException("TODO");
         };
     }
 
@@ -429,7 +430,7 @@ public class RuleEngine {
                 var termMap = new HashMap<String,Object>();
 
                 for (var e : atom.termMap().entrySet()) {
-                    termMap.put(e.getKey(), ((Constant)e.getValue()).value());
+                    termMap.put(e.getKey(), Term.toValue(e.getValue(), null));
                 }
 
                 yield new MapFact(atom.relation(), termMap);
@@ -439,7 +440,7 @@ public class RuleEngine {
                 var terms = new ArrayList<>();
 
                 for (var term : atom.terms()) {
-                    terms.add(((Constant)term).value());
+                    terms.add(Term.toValue(term, null));
                 }
                 if (shape instanceof Shape.PairShape ps) {
                     yield new PairFact(atom.relation(), ps.fieldNames(), terms);
@@ -477,26 +478,15 @@ public class RuleEngine {
     }
 
     private Object term2value(Term term, BindingContext bc) {
-        return switch (term) {
-            case Constant c -> c.value();
-            case Variable v -> bc.bindings.get(v.name());
-            case Wildcard ignored -> throw new IllegalStateException(
-                "Rule head contains a Wildcard term.");
-        };
+        return Term.toValue(term, bc.bindings);
     }
 
     private boolean constraintMet(
         Constraint constraint,
         Bindings bindings
     ) {
-        var a = bindings.get(constraint.a().name());
-
-        var b = switch (constraint.b()) {
-            case Variable v -> bindings.get(v.name());
-            case Constant c -> c.value();
-            case Wildcard ignored -> throw new IllegalStateException(
-                "Constraint contains a Wildcard term.");
-        };
+        var a = Term.toValue(constraint.a(), bindings);
+        var b = Term.toValue(constraint.b(), bindings);
 
         return switch (constraint.op()) {
             case EQ -> Objects.equals(a, b);

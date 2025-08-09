@@ -30,7 +30,23 @@ class NeroParser extends EmbeddedParser {
 
     // A parsed relation.  Includes the token, as location info, and the
     // name, which might include a '!'.
-    record Relation(Token token, String name) { }
+    private record Relation(Token token, String name) { }
+
+    // The context in which atoms and terms are being parsed.  HEAD indicates
+    // either an axiom or a rule head; we don't know which it will be
+    // until after the atom is fully parsed.
+    private enum Context {
+        HEAD("axiom or head atom"),
+        BODY("body atom"),
+        CONSTRAINT("constraint");
+
+        private final String place;
+
+        Context(String place) { this.place = place; }
+
+        String place() { return place; }
+    }
+
 
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -87,7 +103,7 @@ class NeroParser extends EmbeddedParser {
 
                 // Axiom or Rule
                 var headToken = scanner.peek();
-                var head = atom();
+                var head = atom(Context.HEAD);
 
                 if (scanner.match(SEMICOLON)) {
                     if (RuleEngine.isBuiltIn(head.relation())) {
@@ -199,13 +215,11 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Atom axiom(Token token, Atom head) {
-        // Verify that there are no non-constant terms.
-        for (var term : head.getAllTerms()) {
-            if (!(term instanceof Constant)) {
-                error(token,
-                    "axiom contains a non-constant term: '" +
-                    term + "'.");
-            }
+        // At this point, anything in the head other than a
+        // constant, variable, or collection term has already been
+        // flagged as an error.  So just check for variables.
+        if (!head.getVariableNames().isEmpty()) {
+            error(token, "found variable(s) in axiom.");
         }
         return head;
     }
@@ -220,7 +234,7 @@ class NeroParser extends EmbeddedParser {
             var negated = scanner.match(NOT);
 
             var token = scanner.peek();
-            var atom = atom();
+            var atom = atom(Context.BODY);
 
             if (hasBang(atom.relation()) && !hasBang(head.relation())) {
                 error(token, "found update marker '!' in body atom of non-updating rule.");
@@ -256,20 +270,9 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(SEMICOLON, "expected ';' after rule body.");
 
-        // Verify that the head contains only valid terms.
-        for (var term : head.getAllTerms()) {
-            switch (term) {
-                case Constant ignored -> {}
-                case Variable v -> {
-                    if (!bodyVars.contains(v.name())) {
-                        error(headToken,
-                            "head atom contains unbound variable: '" +
-                            v.name() + "'.");
-                    }
-                }
-                case Wildcard w -> error(headToken,
-                    "head atom contains wildcard: '" + w.name() + "'.");
-            }
+        // Verify that all variables are bound.
+        if (!bodyVars.containsAll(head.getVariableNames())) {
+            error(headToken, "found unbound variable(s) in rule head.");
         }
 
         return new Rule(head, body, negations, constraints);
@@ -314,7 +317,7 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Constraint constraint(Set<String> bodyVar) {
-        var term = term();
+        var term = term(Context.CONSTRAINT);
         Constraint.Op op;
         Variable a = null;
 
@@ -329,6 +332,7 @@ class NeroParser extends EmbeddedParser {
             }
             case Wildcard ignored ->
                 error(scanner.previous(), "expected bound variable.");
+            default -> throw new UnsupportedOperationException("TODO");
         }
 
         if (scanner.match(BANG_EQUAL)) {
@@ -348,7 +352,7 @@ class NeroParser extends EmbeddedParser {
             throw errorSync(scanner.previous(), "expected comparison operator.");
         }
 
-        var b = term();
+        var b = term(Context.CONSTRAINT);
 
         if (b instanceof Variable v) {
             if (!bodyVar.contains(v.name())) {
@@ -362,23 +366,23 @@ class NeroParser extends EmbeddedParser {
         return new Constraint(a, op, b);
     }
 
-    private Atom atom() {
+    private Atom atom(Context ctx) {
         // NEXT, parse the atom.
         var relation = relation("expected relation.");
         scanner.consume(LEFT_PAREN, "expected '(' after relation.");
 
         if (scanner.checkTwo(IDENTIFIER, COLON)) {
-            return namedAtom(relation.name());
+            return namedAtom(ctx, relation.name());
         } else {
-            return orderedAtom(relation.name());
+            return orderedAtom(ctx, relation.name());
         }
     }
 
-    private Atom orderedAtom(String relation) {
+    private Atom orderedAtom(Context ctx, String relation) {
         var terms = new ArrayList<Term>();
 
         do {
-            terms.add(term());
+            terms.add(term(ctx));
         } while (scanner.match(COMMA));
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
@@ -386,14 +390,14 @@ class NeroParser extends EmbeddedParser {
         return new OrderedAtom(relation, terms);
     }
 
-    private NamedAtom namedAtom(String relation) {
+    private NamedAtom namedAtom(Context ctx, String relation) {
         var terms = new LinkedHashMap<String,Term>();
 
         do {
             scanner.consume(IDENTIFIER, "expected field name.");
             var name = scanner.previous();
             scanner.consume(COLON, "expected ':' after field name.");
-            terms.put(name.lexeme(), term());
+            terms.put(name.lexeme(), term(ctx));
         } while (scanner.match(COMMA));
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
@@ -401,10 +405,13 @@ class NeroParser extends EmbeddedParser {
         return new NamedAtom(relation, terms);
     }
 
-    private Term term() {
+    private Term term(Context ctx) {
         if (scanner.match(IDENTIFIER)) {
             var name = scanner.previous();
             if (name.lexeme().startsWith("_")) {
+                if (ctx != Context.BODY) {
+                    error(name, "found wildcard in " + ctx.place() + ".");
+                }
                 return new Wildcard(name.lexeme());
             } else {
                 return new Variable(name.lexeme());
@@ -421,10 +428,91 @@ class NeroParser extends EmbeddedParser {
             return new Constant(null);
         } else if (scanner.match(KEYWORD, NUMBER, STRING)) {
             return new Constant(scanner.previous().literal());
+        } else if (scanner.match(LEFT_BRACKET)) {
+            if (ctx == Context.HEAD) {
+                return listTerm();
+            } else {
+                // Patterns will take over in rule bodies.
+                throw errorSync(scanner.previous(),
+                    "found collection literal in " + ctx.place() + ".");
+            }
+        } else if (scanner.match(LEFT_BRACE)) {
+            if (ctx == Context.HEAD) {
+                return setOrMapTerm(ctx);
+            } else {
+                // Patterns will take over in rule bodies.
+                throw errorSync(scanner.previous(),
+                    "found collection literal in " + ctx.place() + ".");
+            }
         } else {
             scanner.advance();
             throw errorSync(scanner.previous(), "expected term.");
         }
+    }
+
+    private Term listTerm() {
+        // '[' has already been matched.
+        var list = new ArrayList<Term>();
+
+        do {
+            if (scanner.check(RIGHT_BRACKET)) break;
+            list.add(term(Context.HEAD));
+
+        } while (scanner.match(COMMA));
+        scanner.consume(RIGHT_BRACKET, "expected ']' after list literal.");
+
+        return new ListTerm(list);
+    }
+
+    private Term setOrMapTerm(Context ctx) {
+        // Empty terms
+        if (scanner.match(RIGHT_BRACE)) {
+            return new SetTerm(List.of());
+        } else if (scanner.match(COLON)) {
+            scanner.consume(RIGHT_BRACE,
+                "expected '}' after empty map literal.");
+            return new MapTerm(List.of());
+        }
+
+        var first = term(ctx);
+
+        if (scanner.match(COLON)) {
+            return mapTerm(first);
+        } else {
+            return setTerm(first);
+        }
+
+    }
+
+    private Term setTerm(Term first) {
+        var list = new ArrayList<Term>();
+        list.add(first);
+
+        while (scanner.match(COMMA)) {
+            if (scanner.check(RIGHT_BRACE)) break;
+            list.add(term(Context.HEAD));
+
+        }
+        scanner.consume(RIGHT_BRACE, "expected '}' after set literal.");
+
+        return new SetTerm(list);
+    }
+
+    private Term mapTerm(Term first) {
+        var list = new ArrayList<Term>();
+        list.add(first);
+        // Colon is already matched
+        list.add(term(Context.HEAD));
+
+        while (scanner.match(COMMA)) {
+            if (scanner.check(RIGHT_BRACE)) break;
+            list.add(term(Context.HEAD));
+            scanner.consume(COLON, "expected ':' after key term.");
+            list.add(term(Context.HEAD));
+        }
+        scanner.consume(RIGHT_BRACE, "expected '}' after map literal.");
+
+        return new MapTerm(list);
     }
 
     // Discard tokens until we are at the beginning of the next statement.

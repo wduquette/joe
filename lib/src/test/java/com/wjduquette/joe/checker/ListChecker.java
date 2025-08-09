@@ -1,5 +1,7 @@
 package com.wjduquette.joe.checker;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,7 +42,7 @@ public class ListChecker<Value> {
 
     @SafeVarargs
     public final ListChecker<Value> items(Value... values) {
-        var items = List.of(values);
+        var items = new ArrayList<>(Arrays.asList(values));
 
         if (list.size() != items.size()) {
             throw new AssertionError(
