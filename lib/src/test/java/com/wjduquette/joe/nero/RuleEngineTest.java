@@ -12,31 +12,39 @@ import java.util.stream.Collectors;
 
 import static com.wjduquette.joe.checker.Checker.check;
 
-// Tests for the Nero engine. This test suite does NOT check for parsing
-// errors.
+// Tests for Nero semantics. Most possible errors are detectable
+// at compile time and are found by the `NeroParser`; detection is tested
+// by `parser.NeroParserTest`.
 public class RuleEngineTest extends Ted {
     private final Nero nero = new Nero(new Joe());
 
-    @Test
-    public void testSimple() {
-        test("testSimple");
+    //-------------------------------------------------------------------------
+    // Basic Operation
+
+    // Verify that a simple Nero program can be read and executed.
+    @Test public void testSimple() {
+        test("testSimple_orderedAtoms");
         var source = """
             Parent(#walker, #bert);
             Parent(#bert, #clark);
             Ancestor(x, y) :- Parent(x, y);
             Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
             """;
-        check(infer(source)).eq("""
-            ListFact[relation=Ancestor, fields=[#bert, #clark]]
-            ListFact[relation=Ancestor, fields=[#walker, #bert]]
-            ListFact[relation=Ancestor, fields=[#walker, #clark]]
-            ListFact[relation=Parent, fields=[#bert, #clark]]
-            ListFact[relation=Parent, fields=[#walker, #bert]]
+        check(execute(source)).eq("""
+            define Ancestor/2;
+            Ancestor(#bert, #clark);
+            Ancestor(#walker, #bert);
+            Ancestor(#walker, #clark);
+            
+            define Parent/2;
+            Parent(#bert, #clark);
+            Parent(#walker, #bert);
             """);
     }
 
-    @Test
-    public void testSimple_named() {
+    // Verify that named atoms can be used as axioms, head atoms,
+    // and body atoms.
+    @Test public void testSimple_namedAtoms() {
         test("testSimple_named");
         var source = """
             Parent(p: #walker, c: #bert);
@@ -44,17 +52,50 @@ public class RuleEngineTest extends Ted {
             Ancestor(a: x, d: y) :- Parent(p: x, c: y);
             Ancestor(a: x, d: y) :- Parent(p: x, c: z), Ancestor(a: z, d: y);
             """;
-        check(infer(source)).eq("""
-            MapFact[relation=Ancestor, fieldMap={a=#bert, d=#clark}]
-            MapFact[relation=Ancestor, fieldMap={a=#walker, d=#bert}]
-            MapFact[relation=Ancestor, fieldMap={a=#walker, d=#clark}]
-            MapFact[relation=Parent, fieldMap={p=#bert, c=#clark}]
-            MapFact[relation=Parent, fieldMap={p=#walker, c=#bert}]
+        check(execute(source)).eq("""
+            define Ancestor/...;
+            Ancestor(a: #bert, d: #clark);
+            Ancestor(a: #walker, d: #bert);
+            Ancestor(a: #walker, d: #clark);
+            
+            define Parent/...;
+            Parent(c: #bert, p: #walker);
+            Parent(c: #clark, p: #bert);
             """);
     }
 
-    @Test
-    public void testConstraint() {
+    //-------------------------------------------------------------------------
+    // Negation
+
+    // Test that body atoms can be negated.
+    @Test public void testNegation() {
+        test("testNegation");
+        var source = """
+            Thing(#desk);
+            Thing(#pen);
+            Location(#desk, #office);
+            Homeless(x) :- Thing(x), not Location(x, _);
+            """;
+        check(execute(source)).eq("""
+            define Homeless/1;
+            Homeless(#pen);
+            
+            define Location/2;
+            Location(#desk, #office);
+            
+            define Thing/1;
+            Thing(#desk);
+            Thing(#pen);
+            """);
+    }
+
+    //-------------------------------------------------------------------------
+    // Constraints
+    //
+    // TODO: Should test all constraint operators
+
+    // Verifies constraint execution given a single constraint.
+    @Test public void testConstraint_single() {
         test("testConstraint");
         var source = """
             Thing(#pen,     1);
@@ -65,50 +106,92 @@ public class RuleEngineTest extends Ted {
             Small(x) :- Thing(x, size) where size < 5;
             Large(x) :- Thing(x, size) where size > 5;
             """;
-        check(infer(source)).eq("""
-            ListFact[relation=Large, fields=[#desk]]
-            ListFact[relation=Small, fields=[#pen]]
-            ListFact[relation=Thing, fields=[#desk, 10.0]]
-            ListFact[relation=Thing, fields=[#pen, 1.0]]
-            ListFact[relation=Thing, fields=[#whatsit, #unknown]]
+        check(execute(source)).eq("""
+            define Large/1;
+            Large(#desk);
+            
+            define Small/1;
+            Small(#pen);
+            
+            define Thing/2;
+            Thing(#desk, 10);
+            Thing(#pen, 1);
+            Thing(#whatsit, #unknown);
             """);
     }
 
-    @Test
-    public void testNegation() {
-        test("testNegation");
+    // Verifies constraint execution given multiple constraint.
+    @Test public void testConstraint_double() {
+        test("testConstraint");
         var source = """
-            Thing(#desk);
-            Thing(#pen);
-            Location(#desk, #office);
-            Homeless(x) :- Thing(x), not Location(x, _);
+            Thing(#pen,     1);
+            Thing(#table,   10);
+            Thing(#desk,    10);
+            Thing(#whatsit, #unknown);
+            
+            // #whatsit is neither large nor small
+            AsBigAs(x, y) :- Thing(x, xs), Thing(y, ys)
+                where xs >= ys, x != y;
             """;
-        check(infer(source)).eq("""
-            ListFact[relation=Homeless, fields=[#pen]]
-            ListFact[relation=Location, fields=[#desk, #office]]
-            ListFact[relation=Thing, fields=[#desk]]
-            ListFact[relation=Thing, fields=[#pen]]
+        check(execute(source)).eq("""
+            define AsBigAs/2;
+            AsBigAs(#desk, #pen);
+            AsBigAs(#desk, #table);
+            AsBigAs(#table, #desk);
+            AsBigAs(#table, #pen);
+            
+            define Thing/2;
+            Thing(#desk, 10);
+            Thing(#pen, 1);
+            Thing(#table, 10);
+            Thing(#whatsit, #unknown);
             """);
     }
 
-    @Test
-    public void testBindAndMatch() {
+    //-------------------------------------------------------------------------
+    // Miscellaneous Matching Details
+
+    // Verifies that a variable is bound on first appearance in an atom,
+    // and must be matched on second appearance even in the same atom.
+    @Test public void testBindAndMatch() {
         test("testBindAndMatch");
         var source = """
             Pair(#a, #b);
             Pair(#c, #c);
             Twin(x) :- Pair(x, x);
             """;
-        check(infer(source)).eq("""
-            ListFact[relation=Pair, fields=[#a, #b]]
-            ListFact[relation=Pair, fields=[#c, #c]]
-            ListFact[relation=Twin, fields=[#c]]
+        check(execute(source)).eq("""
+            define Pair/2;
+            Pair(#a, #b);
+            Pair(#c, #c);
+            
+            define Twin/1;
+            Twin(#c);
             """);
     }
 
     @Test
-    public void testStratified() {
-        test("testStratified");
+    public void testKeywordMatchesEnum() {
+        test("testKeywordMatchesEnum");
+        Set<Fact> facts = Set.of(
+            new ListFact("Topic", List.of(Topic.THIS, "abc")),
+            new ListFact("Topic", List.of(Topic.THAT, "def"))
+        );
+        var source = """
+            Match(x) :- Topic(#this, x);
+            """;
+        check(executeRaw(source, facts)).eq("""
+            ListFact[relation=Match, fields=[abc]]
+            """);
+    }
+
+
+    //-------------------------------------------------------------------------
+    // Stratification
+
+    @Test
+    public void testStratified_negation() {
+        test("testStratified_negation");
         var source = """
             // Transitive closure of connections in a directed graph.
             // Strata 0: CanGo
@@ -129,28 +212,109 @@ public class RuleEngineTest extends Ted {
             Edge(#b, #c);
             Edge(#c, #b);
             """;
-        check(infer(source)).eq("""
-            ListFact[relation=CanGo, fields=[#a, #b]]
-            ListFact[relation=CanGo, fields=[#a, #c]]
-            ListFact[relation=CanGo, fields=[#b, #b]]
-            ListFact[relation=CanGo, fields=[#b, #c]]
-            ListFact[relation=CanGo, fields=[#c, #b]]
-            ListFact[relation=CanGo, fields=[#c, #c]]
-            ListFact[relation=CantGo, fields=[#a, #a]]
-            ListFact[relation=CantGo, fields=[#b, #a]]
-            ListFact[relation=CantGo, fields=[#c, #a]]
-            ListFact[relation=Edge, fields=[#a, #b]]
-            ListFact[relation=Edge, fields=[#b, #b]]
-            ListFact[relation=Edge, fields=[#b, #c]]
-            ListFact[relation=Edge, fields=[#c, #b]]
-            ListFact[relation=Node, fields=[#a]]
-            ListFact[relation=Node, fields=[#b]]
-            ListFact[relation=Node, fields=[#c]]
+        check(execute(source)).eq("""
+            define CanGo/2;
+            CanGo(#a, #b);
+            CanGo(#a, #c);
+            CanGo(#b, #b);
+            CanGo(#b, #c);
+            CanGo(#c, #b);
+            CanGo(#c, #c);
+            
+            define CantGo/2;
+            CantGo(#a, #a);
+            CantGo(#b, #a);
+            CantGo(#c, #a);
+            
+            define Edge/2;
+            Edge(#a, #b);
+            Edge(#b, #b);
+            Edge(#b, #c);
+            Edge(#c, #b);
+            
+            define Node/1;
+            Node(#a);
+            Node(#b);
+            Node(#c);
             """);
     }
 
-    @Test
-    public void testPairFactCreation() {
+    //-------------------------------------------------------------------------
+    // Fact Creation and `define` declarations
+
+    // Ordered atoms produce ListFacts by default.
+    @Test public void testDefine_list_implicit() {
+        test("testDefine_list_implicit");
+        var source = """
+            Pair(#c, #c);
+            Twin(x) :- Pair(x, x);
+            """;
+        check(execute(source)).eq("""
+            define Pair/2;
+            Pair(#c, #c);
+            
+            define Twin/1;
+            Twin(#c);
+            """);
+    }
+
+    // Ordered atoms produce ListFacts given the define relation/n
+    @Test public void testDefine_list_explicit() {
+        test("testDefine_list_explicit");
+        var source = """
+            define Pair/2;
+            Pair(#c, #c);
+            
+            define Twin/1;
+            Twin(x) :- Pair(x, x);
+            """;
+        check(execute(source)).eq("""
+            define Pair/2;
+            Pair(#c, #c);
+            
+            define Twin/1;
+            Twin(#c);
+            """);
+    }
+
+    // Named atoms produce MapFacts by default.
+    @Test public void testDefine_map_implicit() {
+        test("testDefine_map_implicit");
+        var source = """
+            Pair(first: #c, second: #c);
+            Twin(id: x) :- Pair(first: x, second: x);
+            """;
+        check(execute(source)).eq("""
+            define Pair/...;
+            Pair(first: #c, second: #c);
+            
+            define Twin/...;
+            Twin(id: #c);
+            """);
+    }
+
+
+    // Named atoms produce MapFacts given define relation/...;
+    @Test public void testDefine_map_explicit() {
+        test("testDefine_map_explicit");
+        var source = """
+            define Pair/...;
+            Pair(first: #c, second: #c);
+            
+            define Twin/...;
+            Twin(id: x) :- Pair(first: x, second: x);
+            """;
+        check(execute(source)).eq("""
+            define Pair/...;
+            Pair(first: #c, second: #c);
+            
+            define Twin/...;
+            Twin(id: #c);
+            """);
+    }
+
+    // Given defines with field names, ordered atoms produce PairFacts.
+    @Test public void testDefine_pair_explicit() {
         test("testPairFactCreation");
         var source = """
             define Pair/left, right;
@@ -158,61 +322,36 @@ public class RuleEngineTest extends Ted {
             define Twin/id;
             Twin(x) :- Pair(x, x);
             """;
-        check(infer(source)).eq("""
-            PairFact[relation=Pair, fieldNames=[left, right], fields=[#c, #c]]
-            PairFact[relation=Twin, fieldNames=[id], fields=[#c]]
-            """);
-    }
-
-    @Test
-    public void testKeywordMatchesEnum() {
-        test("testKeywordMatchesEnum");
-        Set<Fact> facts = Set.of(
-            new ListFact("Topic", List.of(Topic.THIS, "abc")),
-            new ListFact("Topic", List.of(Topic.THAT, "def"))
-        );
-        var source = """
-            Match(x) :- Topic(#this, x);
-            """;
-        check(infer(source, facts)).eq("""
-            ListFact[relation=Match, fields=[abc]]
+        check(execute(source)).eq("""
+            define Pair/left,right;
+            Pair(#c, #c);
+            
+            define Twin/id;
+            Twin(#c);
             """);
     }
 
     //-------------------------------------------------------------------------
     // Transience
 
-    @Test
-    public void testTransient_transient_axiom() {
-        test("testTransient_transient_axiom");
+    // Facts inferred by axioms for transient relations are not retained.
+    @Test public void testTransient_axiom() {
+        test("testTransient_axiom");
 
         var source = """
             transient A;
             A(#a);
             B(#b);
             """;
-        check(infer(source)).eq("""
-            ListFact[relation=B, fields=[#b]]
-            """);
-    }
-
-    @Test
-    public void testTransient_define_transient_axiom() {
-        test("testTransient_define_transient_axiom");
-
-        var source = """
-            define transient A/1;
-            A(#a);
+        check(execute(source)).eq("""
+            define B/1;
             B(#b);
-            """;
-        check(infer(source)).eq("""
-            ListFact[relation=B, fields=[#b]]
             """);
     }
 
-    @Test
-    public void testTransient_transient_rule() {
-        test("testTransient_transient_axiom");
+    // Facts inferred by rules for transient relations are not retained.
+    @Test public void testTransient_rule() {
+        test("testTransient_rule");
 
         var source = """
             transient B;
@@ -220,24 +359,29 @@ public class RuleEngineTest extends Ted {
             B(x) :- A(x);
             C(x) :- B(x);
             """;
-        check(infer(source)).eq("""
-            ListFact[relation=A, fields=[#a]]
-            ListFact[relation=C, fields=[#a]]
+        check(execute(source)).eq("""
+            define A/1;
+            A(#a);
+            
+            define C/1;
+            C(#a);
             """);
     }
 
-    @Test
-    public void testTransient_define_transient_rule() {
-        test("testTransient_define_transient_axiom");
+    // `define transient` also triggers transience.
+    @Test public void testTransient_define() {
+        test("testTransient_define");
+
         var source = """
+            define transient A/1;
             define transient B/1;
             A(#a);
             B(x) :- A(x);
             C(x) :- B(x);
             """;
-        check(infer(source)).eq("""
-            ListFact[relation=A, fields=[#a]]
-            ListFact[relation=C, fields=[#a]]
+        check(execute(source)).eq("""
+            define C/1;
+            C(#a);
             """);
     }
 
@@ -248,10 +392,11 @@ public class RuleEngineTest extends Ted {
         test("testUpdating_axioms");
         var source = """
             A(#a);
-            A!(#b);
+            A!(#b, #c);
             """;
-        check(infer(source)).eq("""
-            ListFact[relation=A, fields=[#b]]
+        check(execute(source)).eq("""
+            define A/2;
+            A(#b, #c);
             """);
     }
 
@@ -262,9 +407,77 @@ public class RuleEngineTest extends Ted {
             A(#b, 7);
             A!(x) :- A(x, _);
             """;
-        check(infer(source)).eq("""
-            ListFact[relation=A, fields=[#a]]
-            ListFact[relation=A, fields=[#b]]
+        check(execute(source)).eq("""
+            define A/1;
+            A(#a);
+            A(#b);
+            """);
+    }
+
+    //-------------------------------------------------------------------------
+    // Known vs. Inferred Facts
+
+    // Facts inferred from axioms and rules are included in
+    // the engine's set of inferred facts.  External facts are not.
+    @Test public void testKnownVsInferred() {
+        test("testKnownVsInferred");
+
+        Set<Fact> facts = Set.of(
+            new ListFact("Owns", List.of("joe", "car")),
+            new ListFact("Owns", List.of("joe", "truck"))
+        );
+        var source = """
+            Owner("joe");
+            Thing(x) :- Owns(_, x);
+            """;
+
+        // Show all known facts
+        check(execute(source, facts)).eq("""
+            define Owner/1;
+            Owner("joe");
+            
+            define Owns/2;
+            Owns("joe", "car");
+            Owns("joe", "truck");
+            
+            define Thing/1;
+            Thing("car");
+            Thing("truck");
+            """);
+
+        // Omit `Owns` facts, which were provided as inputs.
+        check(infer(source, facts)).eq("""
+            define Owner/1;
+            Owner("joe");
+            
+            define Thing/1;
+            Thing("car");
+            Thing("truck");
+            """);
+    }
+
+    //-------------------------------------------------------------------------
+    // Bug fixes
+
+    // Nero::asNeroScript emitted this NullPointerException:
+    // Cannot invoke "com.wjduquette.joe.nero.Shape.toSpec" because the
+    // return value of "com.wjduquette.joe.nero.Scheme.get(String)" is null
+    //
+    // The error was that `FactSet::getRelations` returned the raw
+    // index key set, rather than the relations for which facts actually
+    // exist.
+    @Test public void testBug_asNeroScript_20250809() {
+        test("testBug_asNeroScript_20250809");
+
+        var source = """
+            Owner("joe");
+            Thing(x) :- Owns(_, x);
+            """;
+
+        // Show all known facts
+        check(execute(source)).eq("""
+            define Owner/1;
+            Owner("joe");
             """);
     }
 
@@ -273,20 +486,49 @@ public class RuleEngineTest extends Ted {
 
     private enum Topic { THIS, THAT }
 
-    private String infer(String source) {
+    // Execute the source, returning a Nero script of known facts.
+    private String execute(String source) {
         try {
             var engine = nero.execute(new SourceBuffer("-", source));
-            return engine.getKnownFacts().getAll().stream()
-                .map(Fact::toString)
-                .sorted()
-                .collect(Collectors.joining("\n")) + "\n";
+            return nero.asNeroScript(engine.getKnownFacts());
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;
         }
     }
 
+    // Execute the source given the input facts, returning a Nero script of
+    // known facts.
+    private String execute(String source, Set<Fact> facts) {
+        var db = new FactSet(facts);
+        try {
+            var engine = nero.execute(new SourceBuffer("-", source), db);
+            return nero.asNeroScript(engine.getKnownFacts());
+        } catch (SyntaxError ex) {
+            println(ex.getErrorReport());
+            throw ex;
+        }
+    }
+
+    // Execute the source given the input facts, returning a Nero script of
+    // inferred facts.
     private String infer(String source, Set<Fact> facts) {
+        var db = new FactSet(facts);
+        try {
+            var engine = nero.execute(new SourceBuffer("-", source), db);
+            var factSet = new FactSet(engine.getInferredFacts());
+            return nero.asNeroScript(factSet);
+        } catch (SyntaxError ex) {
+            println(ex.getErrorReport());
+            throw ex;
+        }
+    }
+
+    // Execute the source given the facts, returning a sorted list
+    // of naive string representations for the observed facts.  We use
+    // this when the use of Java data types prevents the result
+    // from being represented as a Nero script
+    private String executeRaw(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         var engine = nero.execute(new SourceBuffer("-", source), db);
         return engine.getInferredFacts().stream()
