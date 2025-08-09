@@ -727,7 +727,7 @@ class Interpreter {
 
                 if (!ruleset.isStratified()) {
                     throw new RuntimeError(expr.keyword().span(),
-                        "Rule set is not stratified.");
+                        "Nero rule set cannot be stratified.");
                 }
 
                 yield new RuleSetValue(ruleset);

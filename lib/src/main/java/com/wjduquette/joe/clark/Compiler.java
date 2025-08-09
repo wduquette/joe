@@ -966,7 +966,10 @@ class Compiler {
                 emit(PROPSET, name);      // c      ; o.name = c
             }
             case Expr.RuleSet e -> {
-                // FIRST, compile the rule set.
+                // FIRST, check for stratification
+                if (!e.ruleSet().isStratified()) {
+                    error(e.keyword(), "Nero ruleset cannot be stratified.");
+                }
 
                 // Get the exports                    // Stack effects
                 emit(RULESET, constant(e.ruleSet())); // rsv    ; RuleSet

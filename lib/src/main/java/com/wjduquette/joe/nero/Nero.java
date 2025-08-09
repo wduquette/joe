@@ -52,7 +52,7 @@ public class Nero {
     public NeroRuleSet compile(SourceBuffer source) {
         var ruleSet = parse(source);
         if (!ruleSet.isStratified()) {
-            throw new JoeError("Nero rule set is not stratified.");
+            throw new JoeError("Nero rule set cannot be stratified.");
         }
         return ruleSet;
     }

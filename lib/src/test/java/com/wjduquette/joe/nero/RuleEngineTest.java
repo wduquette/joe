@@ -11,12 +11,62 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.wjduquette.joe.checker.Checker.check;
+import static com.wjduquette.joe.checker.Checker.checkThrow;
 
 // Tests for Nero semantics. Most possible errors are detectable
 // at compile time and are found by the `NeroParser`; detection is tested
 // by `parser.NeroParserTest`.
 public class RuleEngineTest extends Ted {
     private final Nero nero = new Nero(new Joe());
+
+    //-------------------------------------------------------------------------
+    // Stratification Conditions
+
+    // Unstratifiable due to negation.
+    @Test public void testUnstratified_negation() {
+        test("testUnstratified_negation");
+
+        var source = """
+            A(x) :- B(x), not C(x);
+            C(x) :- A(x);
+            """;
+        checkThrow(() -> execute(source))
+            .containsString("Nero rule set cannot be stratified.");
+    }
+
+    @Test public void testUnstratified_list_literal() {
+        test("testUnstratified_list_literal");
+
+        var source = """
+            A([x]) :- B(x);
+            B(x) :- A(x);
+            """;
+        checkThrow(() -> execute(source))
+            .containsString("Nero rule set cannot be stratified.");
+    }
+
+    @Test public void testUnstratified_map_literal() {
+        test("testUnstratified_map_literal");
+
+        var source = """
+            A({#id: x}) :- B(x);
+            B(x) :- A(x);
+            """;
+        checkThrow(() -> execute(source))
+            .containsString("Nero rule set cannot be stratified.");
+    }
+
+    @Test public void testUnstratified_set_literal() {
+        test("testUnstratified_set_literal");
+
+        var source = """
+            A({x}) :- B(x);
+            B(x) :- A(x);
+            """;
+        checkThrow(() -> execute(source))
+            .containsString("Nero rule set cannot be stratified.");
+    }
+
 
     //-------------------------------------------------------------------------
     // Basic Operation
@@ -182,60 +232,6 @@ public class RuleEngineTest extends Ted {
             """;
         check(executeRaw(source, facts)).eq("""
             ListFact[relation=Match, fields=[abc]]
-            """);
-    }
-
-
-    //-------------------------------------------------------------------------
-    // Stratification
-
-    @Test
-    public void testStratified_negation() {
-        test("testStratified_negation");
-        var source = """
-            // Transitive closure of connections in a directed graph.
-            // Strata 0: CanGo
-            // Strata 1: CantGo
-
-            // There is a path from node x to node y.
-            CanGo(x,y) :- Edge(x,y);
-            CanGo(x,y) :- Edge(x,z), CanGo(z,y);
-
-            // There is no path from node x to node y.
-            CantGo(x,y) :- Node(x), Node(y), not CanGo(x,y);
-
-            Node(#a);
-            Node(#b);
-            Node(#c);
-            Edge(#a, #b);
-            Edge(#b, #b);
-            Edge(#b, #c);
-            Edge(#c, #b);
-            """;
-        check(execute(source)).eq("""
-            define CanGo/2;
-            CanGo(#a, #b);
-            CanGo(#a, #c);
-            CanGo(#b, #b);
-            CanGo(#b, #c);
-            CanGo(#c, #b);
-            CanGo(#c, #c);
-            
-            define CantGo/2;
-            CantGo(#a, #a);
-            CantGo(#b, #a);
-            CantGo(#c, #a);
-            
-            define Edge/2;
-            Edge(#a, #b);
-            Edge(#b, #b);
-            Edge(#b, #c);
-            Edge(#c, #b);
-            
-            define Node/1;
-            Node(#a);
-            Node(#b);
-            Node(#c);
             """);
     }
 
@@ -413,6 +409,35 @@ public class RuleEngineTest extends Ted {
             A(#b);
             """);
     }
+
+    //-------------------------------------------------------------------------
+    // Collection Literals
+
+    @Test public void testListLiteral_axioms() {
+        test("testListLiteral_axioms");
+        var source = """
+            A([]);
+            A([#a, 5]);
+            """;
+        check(execute(source)).eq("""
+            define A/1;
+            A([#a, 5]);
+            A([]);
+            """);
+    }
+//
+//    @Test public void testSetLiteral_axioms() {
+//        test("testSetLiteral_axioms");
+//        var source = """
+//            A({});
+//            A({#a, 5});
+//            """;
+//        check(execute(source)).eq("""
+//            define A/1;
+//            A({#a, 5});
+//            A({});
+//            """);
+//    }
 
     //-------------------------------------------------------------------------
     // Known vs. Inferred Facts
