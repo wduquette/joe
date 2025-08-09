@@ -141,12 +141,10 @@ public class RuleEngineTest extends Ted {
 
     //-------------------------------------------------------------------------
     // Constraints
-    //
-    // TODO: Should test all constraint operators
 
     // Verifies constraint execution given a single constraint.
     @Test public void testConstraint_single() {
-        test("testConstraint");
+        test("testConstraint_single");
         var source = """
             Thing(#pen,     1);
             Thing(#desk,    10);
@@ -172,7 +170,7 @@ public class RuleEngineTest extends Ted {
 
     // Verifies constraint execution given multiple constraint.
     @Test public void testConstraint_double() {
-        test("testConstraint");
+        test("testConstraint_double");
         var source = """
             Thing(#pen,     1);
             Thing(#table,   10);
@@ -195,6 +193,48 @@ public class RuleEngineTest extends Ted {
             Thing(#pen, 1);
             Thing(#table, 10);
             Thing(#whatsit, #unknown);
+            """);
+    }
+
+    @Test public void testConstraint_operators() {
+        test("testConstraint_operators");
+        var source = """
+            transient A;
+            A(2);
+            
+            transient B;
+            B(1);
+            B(2);
+            B(3);
+            
+            EQ(x,y) :- A(x), B(y) where x == y;
+            NE(x,y) :- A(x), B(y) where x != y;
+            GT(x,y) :- A(x), B(y) where x > y;
+            GE(x,y) :- A(x), B(y) where x >= y;
+            LT(x,y) :- A(x), B(y) where x < y;
+            LE(x,y) :- A(x), B(y) where x <= y;
+            """;
+        check(execute(source)).eq("""
+            define EQ/2;
+            EQ(2, 2);
+            
+            define GE/2;
+            GE(2, 1);
+            GE(2, 2);
+            
+            define GT/2;
+            GT(2, 1);
+            
+            define LE/2;
+            LE(2, 2);
+            LE(2, 3);
+            
+            define LT/2;
+            LT(2, 3);
+            
+            define NE/2;
+            NE(2, 1);
+            NE(2, 3);
             """);
     }
 
