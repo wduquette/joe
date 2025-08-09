@@ -413,6 +413,7 @@ public class RuleEngineTest extends Ted {
     //-------------------------------------------------------------------------
     // Collection Literals
 
+    // Verify that list literals can be used in axioms.
     @Test public void testListLiteral_axioms() {
         test("testListLiteral_axioms");
         var source = """
@@ -425,19 +426,88 @@ public class RuleEngineTest extends Ted {
             A([]);
             """);
     }
-//
-//    @Test public void testSetLiteral_axioms() {
-//        test("testSetLiteral_axioms");
-//        var source = """
-//            A({});
-//            A({#a, 5});
-//            """;
-//        check(execute(source)).eq("""
-//            define A/1;
-//            A({#a, 5});
-//            A({});
-//            """);
-//    }
+
+    // Verify that list literals can be used in rules.
+    @Test public void testListLiteral_rules() {
+        test("testListLiteral_rules");
+        var source = """
+            transient A;
+            A(#a, 5);
+            B([x, y]) :- A(x, y);
+            C(x, []) :- A(x, _);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B([#a, 5]);
+            
+            define C/2;
+            C(#a, []);
+            """);
+    }
+
+    // Verify that map literals can be used in axioms.
+    @Test public void testMapLiteral_axioms() {
+        test("testMapLiteral_axioms");
+        var source = """
+            A({:});
+            A({#a: 5});
+            """;
+        check(execute(source)).eq("""
+            define A/1;
+            A({#a: 5});
+            A({:});
+            """);
+    }
+
+    // Verify that map literals can be used in rules.
+    @Test public void testMapLiteral_rules() {
+        test("testMapLiteral_rules");
+        var source = """
+            transient A;
+            A(#a, 5);
+            B({x: y}) :- A(x, y);
+            C(x, {:}) :- A(x, _);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B({#a: 5});
+            
+            define C/2;
+            C(#a, {:});
+            """);
+    }
+
+    // Verify that set literals can be used in axioms.
+    @Test public void testSetLiteral_axioms() {
+        test("testSetLiteral_axioms");
+        var source = """
+            A({});
+            A({#a, 5});
+            """;
+        check(execute(source)).eq("""
+            define A/1;
+            A({#a, 5});
+            A({});
+            """);
+    }
+
+    // Verify that set literals can be used in rules.
+    @Test public void testSetLiteral_rules() {
+        test("testSetLiteral_rules");
+        var source = """
+            transient A;
+            A(#a, 5);
+            B({x, y}) :- A(x, y);
+            C(x, {}) :- A(x, _);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B({#a, 5});
+            
+            define C/2;
+            C(#a, {});
+            """);
+    }
 
     //-------------------------------------------------------------------------
     // Known vs. Inferred Facts

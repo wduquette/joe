@@ -438,12 +438,7 @@ class NeroParser extends EmbeddedParser {
             }
         } else if (scanner.match(LEFT_BRACE)) {
             if (ctx == Context.HEAD) {
-                var first = term(ctx);
-                if (scanner.match(COLON)) {
-                    return mapTerm(first);
-                } else {
-                    return setTerm(first);
-                }
+                return setOrMapTerm(ctx);
             } else {
                 // Patterns will take over in rule bodies.
                 throw errorSync(scanner.previous(),
@@ -467,6 +462,26 @@ class NeroParser extends EmbeddedParser {
         scanner.consume(RIGHT_BRACKET, "expected ']' after list literal.");
 
         return new ListTerm(list);
+    }
+
+    private Term setOrMapTerm(Context ctx) {
+        // Empty terms
+        if (scanner.match(RIGHT_BRACE)) {
+            return new SetTerm(List.of());
+        } else if (scanner.match(COLON)) {
+            scanner.consume(RIGHT_BRACE,
+                "expected '}' after empty map literal.");
+            return new MapTerm(List.of());
+        }
+
+        var first = term(ctx);
+
+        if (scanner.match(COLON)) {
+            return mapTerm(first);
+        } else {
+            return setTerm(first);
+        }
+
     }
 
     private Term setTerm(Term first) {
