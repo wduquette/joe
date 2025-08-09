@@ -176,11 +176,11 @@ public class RuleEngine {
      * Gets the facts inferred from the inputs given the axioms and rules.
      * @return The inferred facts.
      */
-    public Set<Fact> getInferredFacts() {
+    public FactSet getInferredFacts() {
         if (!inferenceComplete) {
             throw new IllegalStateException(INFER_ERROR);
         }
-        return inferredFacts.getAll();
+        return inferredFacts;
     }
 
     //-------------------------------------------------------------------------

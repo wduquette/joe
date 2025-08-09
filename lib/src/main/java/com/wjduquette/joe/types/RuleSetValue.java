@@ -67,7 +67,7 @@ public class RuleSetValue {
     public Set<Fact> infer() {
         var engine = new RuleEngine(ruleset);
         engine.infer();
-        return engine.getInferredFacts();
+        return engine.getInferredFacts().getAll();
     }
 
     /**
@@ -77,7 +77,7 @@ public class RuleSetValue {
     public Set<Fact> infer(FactBase db) {
         var engine = new RuleEngine(ruleset, db);
         engine.infer();
-        return engine.getInferredFacts();
+        return engine.getInferredFacts().getAll();
     }
 
     /**
@@ -89,7 +89,7 @@ public class RuleSetValue {
         var factSet = toFactSet(joe, inputs);
         var engine = new RuleEngine(ruleset, factSet);
         engine.infer();
-        return engine.getInferredFacts();
+        return engine.getInferredFacts().getAll();
     }
 
     /**

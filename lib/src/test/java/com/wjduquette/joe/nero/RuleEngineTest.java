@@ -270,7 +270,7 @@ public class RuleEngineTest extends Ted {
         var source = """
             Match(x) :- Topic(#this, x);
             """;
-        check(executeRaw(source, facts)).eq("""
+        check(inferRaw(source, facts)).eq("""
             ListFact[relation=Match, fields=[abc]]
             """);
     }
@@ -663,10 +663,10 @@ public class RuleEngineTest extends Ted {
     // of naive string representations for the observed facts.  We use
     // this when the use of Java data types prevents the result
     // from being represented as a Nero script
-    private String executeRaw(String source, Set<Fact> facts) {
+    private String inferRaw(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         var engine = nero.execute(new SourceBuffer("-", source), db);
-        return engine.getInferredFacts().stream()
+        return engine.getInferredFacts().getAll().stream()
             .map(Fact::toString)
             .sorted()
             .collect(Collectors.joining("\n")) + "\n";
