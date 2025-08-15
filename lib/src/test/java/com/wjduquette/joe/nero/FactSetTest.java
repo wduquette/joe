@@ -162,6 +162,24 @@ public class FactSetTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
+    // contains()
+
+    @Test public void testContains() {
+        test("testContains");
+
+        var a1 = fact("A", 1);
+        var a2 = fact("A", 2);
+        var b1 = fact("B", 1);
+        var b2 = fact("B", 2);
+
+        var db = new FactSet(Set.of(a1, a2, b1));
+
+        check(db.contains(a1)).eq(true);
+        check(db.contains(a2)).eq(true);
+        check(db.contains(b1)).eq(true);
+        check(db.contains(b2)).eq(false);
+    }
+    //-------------------------------------------------------------------------
     // drop()
 
     @Test public void testDrop() {
