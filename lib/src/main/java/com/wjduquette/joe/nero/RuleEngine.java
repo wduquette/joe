@@ -2,6 +2,8 @@ package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.Keyword;
+import com.wjduquette.joe.types.ListValue;
+import com.wjduquette.joe.types.SetValue;
 
 import java.util.*;
 
@@ -612,8 +614,10 @@ public class RuleEngine {
 
         // NEXT, aggregate using the function
         return switch (term.aggregator()) {
+            case LIST -> aggregateList(term.names(), bc.matches);
             case MAX -> aggregateMax(term.names(), bc.matches);
             case MIN -> aggregateMin(term.names(), bc.matches);
+            case SET -> aggregateSet(term.names(), bc.matches);
             case SUM -> aggregateSum(term.names(), bc.matches);
         };
     }
@@ -623,6 +627,24 @@ public class RuleEngine {
             if (term instanceof Aggregate a) return a;
         }
         return null;
+    }
+
+    private List<Bindings> aggregateList(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the lists by group
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings,ListValue>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+            var list = groups.computeIfAbsent(match, g -> new ListValue());
+            list.add(o);
+        }
+
+        return objectAggregates(groups);
     }
 
     private List<Bindings> aggregateMax(
@@ -645,15 +667,7 @@ public class RuleEngine {
             }
         }
 
-        // NEXT, produce the results
-        var result = new ArrayList<Bindings>();
-        for (var e : groups.entrySet()) {
-            var bindings = e.getKey();
-            bindings.bind(AGGREGATE, e.getValue().value);
-            result.add(bindings);
-        }
-
-        return result;
+        return cellAggregates(groups);
     }
 
     private List<Bindings> aggregateMin(
@@ -676,15 +690,25 @@ public class RuleEngine {
             }
         }
 
-        // NEXT, produce the results
-        var result = new ArrayList<Bindings>();
-        for (var e : groups.entrySet()) {
-            var bindings = e.getKey();
-            bindings.bind(AGGREGATE, e.getValue().value);
-            result.add(bindings);
+        return cellAggregates(groups);
+    }
+
+    private List<Bindings> aggregateSet(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the sets by group
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings, SetValue>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+            var set = groups.computeIfAbsent(match, g -> new SetValue());
+            set.add(o);
         }
 
-        return result;
+        return objectAggregates(groups);
     }
 
     private List<Bindings> aggregateSum(
@@ -707,6 +731,20 @@ public class RuleEngine {
         }
 
         // NEXT, produce the results
+        return cellAggregates(groups);
+    }
+
+    private List<Bindings> objectAggregates(Map<Bindings,?> groups) {
+        var result = new ArrayList<Bindings>();
+        for (var e : groups.entrySet()) {
+            var bindings = e.getKey();
+            bindings.bind(AGGREGATE, e.getValue());
+            result.add(bindings);
+        }
+        return result;
+    }
+
+    private List<Bindings> cellAggregates(Map<Bindings,DoubleCell> groups) {
         var result = new ArrayList<Bindings>();
         for (var e : groups.entrySet()) {
             var bindings = e.getKey();
@@ -714,7 +752,6 @@ public class RuleEngine {
             bindings.bind(AGGREGATE, sum);
             result.add(bindings);
         }
-
         return result;
     }
 

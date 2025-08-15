@@ -562,6 +562,21 @@ public class RuleEngineTest extends Ted {
     //-------------------------------------------------------------------------
     // Aggregation Functions
 
+    // Verify that we aggregate all matches.
+    @Test public void testAggregate_list() {
+        test("testAggregate_set");
+        var source = """
+            transient A;
+            A(#a, 1);
+            A(#b, 1);
+            B(list(x)) :- A(_, x);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B([1, 1]);
+            """);
+    }
+
     // Verify that if there are matches but no numbers to take the maximum
     // of, we get no match.
     // of zero.
@@ -653,6 +668,23 @@ public class RuleEngineTest extends Ted {
         check(execute(source)).eq("""
             define B/1;
             B(5);
+            """);
+    }
+
+    // Verify that we aggregate all matches.
+    @Test public void testAggregate_set() {
+        test("testAggregate_set");
+        var source = """
+            transient A;
+            A(#a, 1);
+            A(#a, 2);
+            A(#b, 1);
+            A(#c, 1);
+            B(set(x)) :- A(x, _);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B({#a, #b, #c});
             """);
     }
 
