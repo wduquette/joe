@@ -6,37 +6,46 @@ package com.wjduquette.joe.nero;
  */
 public enum Aggregator {
     /**
-     * Aggregates a list of the matched items.  The order is unpredictable,
-     * but all elements will be retained.
+     * {@code indexList(index, item)}: Aggregates a list of the matched items,
+     * sorting them by their index values.  The order is stable, and will be
+     * as expected if the indices are all numbers or all strings.
+     */
+    INDEXED_LIST("indexedList", 2),
+
+    /**
+     * {@code list(item)}: Aggregates a list of the matched items.  The order
+     * is unpredictable, but all elements will be retained.
      */
     LIST("list", 1),
 
     /**
-     * Aggregates a map of key/value pairs.  The RuleEngine will throw an
-     * error if there are duplicate keys.
+     * {@code map(key, value)}: Aggregates a map of key/value pairs.  The
+     * RuleEngine will throw an error if there are duplicate keys.
      */
     MAP("map", 2),
 
     /**
-     * Aggregates the maximum of the values, ignoring non-numeric values.
-     * If there are no numeric values, the rule will not fire.
+     * {@code max(x)}: Aggregates the maximum of the values, ignoring
+     * non-numeric values. If there are no numeric values, the rule will
+     * not fire.
      */
     MAX("max", 1),
 
     /**
-     * Aggregates the minimum of the values, ignoring non-numeric values.
-     * If there are no numeric values, the rule will not fire.
+     * {@code min(x)}: Aggregates the minimum of the values, ignoring
+     * non-numeric values. If there are no numeric values, the rule will
+     * not fire.
      */
     MIN("min", 1),
 
     /**
-     * Aggregates a set of the matched items.
+     * {@code set(x)}: Aggregates a set of the matched items.
      */
     SET("set", 1),
 
     /**
-     * Aggregates the sum of the values, ignoring non-numeric values.
-     * If there are no numeric values, the sum will be 0.
+     * {@code sum(x)}: Aggregates the sum of the values, ignoring non-numeric
+     * values. If there are no numeric values, the sum will be 0.
      */
     SUM("sum", 1);
 

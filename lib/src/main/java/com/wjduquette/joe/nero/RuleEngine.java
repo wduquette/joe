@@ -7,6 +7,7 @@ import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.types.SetValue;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * The Nero inference engine.  Given a {@link NeroRuleSet} and a set of
@@ -620,6 +621,7 @@ public class RuleEngine {
 
         // NEXT, aggregate using the function
         return switch (term.aggregator()) {
+            case INDEXED_LIST -> aggregateIndexedList(term.names(), bc.matches);
             case LIST -> aggregateList(term.names(), bc.matches);
             case MAP -> aggregateMap(term.names(), bc.matches);
             case MAX -> aggregateMax(term.names(), bc.matches);
@@ -634,6 +636,48 @@ public class RuleEngine {
             if (term instanceof Aggregate a) return a;
         }
         return null;
+    }
+
+    private List<Bindings> aggregateIndexedList(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the lists by group
+        var indexVar = names.get(0);
+        var itemVar = names.get(1);
+        var groups = new HashMap<Bindings,ArrayList<Pair>>();
+
+        for (var match : matches) {
+            var index = match.get(indexVar);
+            var item = match.get(itemVar);
+            match.unbindAll(names);
+            var list = groups.computeIfAbsent(match, g -> new ArrayList<>());
+            list.add(new Pair(index, item));
+        }
+
+        return aggregates(groups, this::pairs2items);
+    }
+
+    private ListValue pairs2items(ArrayList<Pair> pairs) {
+        return new ListValue(pairs.stream()
+            .sorted(this::comparePairs)
+            .map(Pair::item)
+            .toList());
+    }
+
+    private int comparePairs(Pair a, Pair b) {
+        if (a.index() instanceof Double da &&
+            b.index() instanceof Double db
+        ) {
+            return da.compareTo(db);
+        } else if (
+            a.index() instanceof String sa &&
+            b.index() instanceof String sb
+        ) {
+            return sa.compareTo(sb);
+        } else {
+            return Integer.compare(Objects.hashCode(a), Objects.hashCode(b));
+        }
     }
 
     private List<Bindings> aggregateList(
@@ -651,7 +695,7 @@ public class RuleEngine {
             list.add(o);
         }
 
-        return objectAggregates(groups);
+        return aggregates(groups);
     }
 
     private List<Bindings> aggregateMap(
@@ -682,7 +726,7 @@ public class RuleEngine {
             }
         }
 
-        return objectAggregates(groups);
+        return aggregates(groups);
     }
 
     private List<Bindings> aggregateMax(
@@ -705,7 +749,7 @@ public class RuleEngine {
             }
         }
 
-        return cellAggregates(groups);
+        return aggregates(groups, DoubleCell::value);
     }
 
     private List<Bindings> aggregateMin(
@@ -728,7 +772,7 @@ public class RuleEngine {
             }
         }
 
-        return cellAggregates(groups);
+        return aggregates(groups, DoubleCell::value);
     }
 
     private List<Bindings> aggregateSet(
@@ -746,7 +790,7 @@ public class RuleEngine {
             set.add(o);
         }
 
-        return objectAggregates(groups);
+        return aggregates(groups);
     }
 
     private List<Bindings> aggregateSum(
@@ -769,25 +813,27 @@ public class RuleEngine {
         }
 
         // NEXT, produce the results
-        return cellAggregates(groups);
+        return aggregates(groups, DoubleCell::value);
     }
 
-    private List<Bindings> objectAggregates(Map<Bindings,?> groups) {
+    private <V> List<Bindings> aggregates(
+        Map<Bindings,V> groups,
+        Function<V,Object> converter
+    ) {
         var result = new ArrayList<Bindings>();
         for (var e : groups.entrySet()) {
             var bindings = e.getKey();
-            bindings.bind(AGGREGATE, e.getValue());
+            bindings.bind(AGGREGATE, converter.apply(e.getValue()));
             result.add(bindings);
         }
         return result;
     }
 
-    private List<Bindings> cellAggregates(Map<Bindings,DoubleCell> groups) {
+    private List<Bindings> aggregates(Map<Bindings,?> groups) {
         var result = new ArrayList<Bindings>();
         for (var e : groups.entrySet()) {
             var bindings = e.getKey();
-            var sum = e.getValue().value;
-            bindings.bind(AGGREGATE, sum);
+            bindings.bind(AGGREGATE, e.getValue());
             result.add(bindings);
         }
         return result;
@@ -809,6 +855,9 @@ public class RuleEngine {
         }
     }
 
+    // Used when aggregating indexed lists.
+    private record Pair(Object index, Object item) {}
+
     private enum Sentinel {
         DUPLICATE_KEY   // Used for map(k,v) values given duplicate keys.
     }
@@ -816,5 +865,6 @@ public class RuleEngine {
     private static class DoubleCell {
         double value;
         DoubleCell(double value) { this.value = value; }
+        double value() { return value; }
     }
 }

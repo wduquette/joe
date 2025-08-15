@@ -562,6 +562,58 @@ public class RuleEngineTest extends Ted {
     //-------------------------------------------------------------------------
     // Aggregation Functions
 
+    // Verify that we aggregate all matches, sorting by numeric indices.
+    @Test public void testAggregate_indexedList_numbers() {
+        test("testAggregate_indexedList_numbers");
+        var source = """
+            transient A;
+            A(#a, 2);
+            A(#b, 1);
+            A(#c, 4);
+            A(#d, 3);
+            B(indexedList(i, item)) :- A(item, i);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B([#b, #a, #d, #c]);
+            """);
+    }
+
+    // Verify that we aggregate all matches, sorting by string indices.
+    @Test public void testAggregate_indexedList_strings() {
+        test("testAggregate_indexedList_strings");
+        var source = """
+            transient A;
+            A(#a, "2");
+            A(#b, "1");
+            A(#c, "4");
+            A(#d, "3");
+            B(indexedList(i, item)) :- A(item, i);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B([#b, #a, #d, #c]);
+            """);
+    }
+
+    // Verify that we aggregate all matches, sorting by mixed indices.
+    @Test public void testAggregate_indexedList_mixed() {
+        test("testAggregate_indexedList_strings");
+        var source = """
+            transient A;
+            A(#a, "2");
+            A(#b, "1");
+            A(#c, #one);
+            A(#d, #two);
+            B(indexedList(i, item)) :- A(item, i);
+            """;
+        // The order is unpredictable, but should be stable over time.
+        check(execute(source)).eq("""
+            define B/1;
+            B([#b, #a, #c, #d]);
+            """);
+    }
+
     // Verify that we aggregate all matches.
     @Test public void testAggregate_list() {
         test("testAggregate_set");
