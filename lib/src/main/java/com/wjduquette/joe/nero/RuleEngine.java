@@ -612,6 +612,8 @@ public class RuleEngine {
 
         // NEXT, aggregate using the function
         return switch (term.aggregator()) {
+            case MAX -> aggregateMax(term.names(), bc.matches);
+            case MIN -> aggregateMin(term.names(), bc.matches);
             case SUM -> aggregateSum(term.names(), bc.matches);
         };
     }
@@ -621,6 +623,68 @@ public class RuleEngine {
             if (term instanceof Aggregate a) return a;
         }
         return null;
+    }
+
+    private List<Bindings> aggregateMax(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the max by group, ignoring non-numeric values.
+        // If there are no non-numeric values then there is no match.
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings,DoubleCell>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+
+            // Only create a group for a numeric match.
+            if (o instanceof Double d) {
+                var cell = groups.computeIfAbsent(match, g -> new DoubleCell(d));
+                cell.value = Math.max(cell.value, d);
+            }
+        }
+
+        // NEXT, produce the results
+        var result = new ArrayList<Bindings>();
+        for (var e : groups.entrySet()) {
+            var bindings = e.getKey();
+            bindings.bind(AGGREGATE, e.getValue().value);
+            result.add(bindings);
+        }
+
+        return result;
+    }
+
+    private List<Bindings> aggregateMin(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the max by group, ignoring non-numeric values.
+        // If there are no non-numeric values then there is no match.
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings,DoubleCell>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+
+            // Only create a group for a numeric match.
+            if (o instanceof Double d) {
+                var cell = groups.computeIfAbsent(match, g -> new DoubleCell(d));
+                cell.value = Math.min(cell.value, d);
+            }
+        }
+
+        // NEXT, produce the results
+        var result = new ArrayList<Bindings>();
+        for (var e : groups.entrySet()) {
+            var bindings = e.getKey();
+            bindings.bind(AGGREGATE, e.getValue().value);
+            result.add(bindings);
+        }
+
+        return result;
     }
 
     private List<Bindings> aggregateSum(

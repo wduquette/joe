@@ -5,6 +5,8 @@ package com.wjduquette.joe.nero;
  * provides the function's name and arity.
  */
 public enum Aggregator {
+    MAX("max", 1),
+    MIN("min", 1),
     SUM("sum", 1);
 
     //-------------------------------------------------------------------------

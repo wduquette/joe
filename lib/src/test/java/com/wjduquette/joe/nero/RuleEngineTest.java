@@ -562,6 +562,68 @@ public class RuleEngineTest extends Ted {
     //-------------------------------------------------------------------------
     // Aggregation Functions
 
+    // Verify that if there are matches but no numbers to take the maximum
+    // of, we get no match.
+    // of zero.
+    @Test public void testAggregate_max_noNumericMatches() {
+        test("testAggregate_max_noNumericMatches");
+        var source = """
+            A(#a);
+            B(max(x)) :- A(x);
+            """;
+        check(execute(source)).eq("""
+            define A/1;
+            A(#a);
+            """);
+    }
+
+    // Verify that we find the maximum of all numeric matches
+    @Test public void testAggregate_max_numericMatches() {
+        test("testAggregate_max_numericMatches");
+        var source = """
+            transient A;
+            A(1);
+            A(2);
+            A(3);
+            B(max(x)) :- A(x);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B(3);
+            """);
+    }
+
+    // Verify that if there are matches but no numbers to take the minimum
+    // of, we get no match.
+    // of zero.
+    @Test public void testAggregate_min_noNumericMatches() {
+        test("testAggregate_min_noNumericMatches");
+        var source = """
+            A(#a);
+            B(min(x)) :- A(x);
+            """;
+        check(execute(source)).eq("""
+            define A/1;
+            A(#a);
+            """);
+    }
+
+    // Verify that we find the minimum of all numeric matches
+    @Test public void testAggregate_min_numericMatches() {
+        test("testAggregate_min_numericMatches");
+        var source = """
+            transient A;
+            A(1);
+            A(2);
+            A(3);
+            B(min(x)) :- A(x);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B(1);
+            """);
+    }
+
     // Verify that if there are matches but no numbers to sum, we get a sum
     // of zero.
     @Test public void testAggregate_sum_noNumericMatches() {
