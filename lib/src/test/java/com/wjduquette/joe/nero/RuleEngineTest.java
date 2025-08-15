@@ -550,6 +550,41 @@ public class RuleEngineTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
+    // Aggregation Functions
+
+    // Verify that if there are matches but no numbers to sum, we get a sum
+    // of zero.
+    @Test public void testAggregate_sum_noNumericMatches() {
+        test("testAggregate_sum_noNumericMatches");
+        var source = """
+            transient A;
+            A(#a);
+            B(sum(x)) :- A(x);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B(0);
+            """);
+    }
+
+    // Verify that we sum all matches.
+    @Test public void testAggregate_sum_numericMatches() {
+        test("testAggregate_sum_numericMatches");
+        var source = """
+            transient A;
+            A(#a, #foo);
+            A(#a, 1);
+            A(#b, 1);
+            A(#a, 3);
+            B(sum(x)) :- A(_, x);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B(5);
+            """);
+    }
+
+    //-------------------------------------------------------------------------
     // Known vs. Inferred Facts
 
     // Facts inferred from axioms and rules are included in
