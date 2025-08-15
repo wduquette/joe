@@ -241,6 +241,7 @@ public class Nero {
             case null -> "null";
             case Boolean b -> joe.stringify(b);
             case Double d -> joe.stringify(d);
+            case Enum<?> e -> "#" + e.name().toLowerCase();
             case Keyword k -> joe.stringify(k);
             case String s -> Joe.quote(s);
             case List<?> t -> {

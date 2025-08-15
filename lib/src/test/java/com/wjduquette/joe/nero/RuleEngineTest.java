@@ -577,6 +577,24 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    // Verify that we aggregate all matches, and that a key with more than
+    // one distinct value gets flagged as a `DUPLICATE_KEY`.
+    @Test public void testAggregate_map() {
+        test("testAggregate_set");
+        var source = """
+            transient A;
+            A(#a, 1);
+            A(#a, 2);
+            A(#b, 2);
+            A(#c, 3);
+            B(map(k,v)) :- A(k, v);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B({#a: #duplicate_key, #b: 2, #c: 3});
+            """);
+    }
+
     // Verify that if there are matches but no numbers to take the maximum
     // of, we get no match.
     // of zero.

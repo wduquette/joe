@@ -3,6 +3,7 @@ package com.wjduquette.joe.nero;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.types.ListValue;
+import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.types.SetValue;
 
 import java.util.*;
@@ -19,6 +20,11 @@ public class RuleEngine {
      */
     static final String AGGREGATE = "*aggregate*";
 
+    /**
+     * A sentinel value used when map(k,v) aggregation finds a duplicate key
+     * with two different values.
+     */
+    public static Object DUPLICATE_KEY = Sentinel.DUPLICATE_KEY;
     public static final String INFER_ERROR =
         "Call `infer()` before querying results.";
 
@@ -615,6 +621,7 @@ public class RuleEngine {
         // NEXT, aggregate using the function
         return switch (term.aggregator()) {
             case LIST -> aggregateList(term.names(), bc.matches);
+            case MAP -> aggregateMap(term.names(), bc.matches);
             case MAX -> aggregateMax(term.names(), bc.matches);
             case MIN -> aggregateMin(term.names(), bc.matches);
             case SET -> aggregateSet(term.names(), bc.matches);
@@ -642,6 +649,37 @@ public class RuleEngine {
             match.unbindAll(names);
             var list = groups.computeIfAbsent(match, g -> new ListValue());
             list.add(o);
+        }
+
+        return objectAggregates(groups);
+    }
+
+    private List<Bindings> aggregateMap(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the lists by group
+        var kVar = names.get(0);
+        var vVar = names.get(1);
+        var groups = new HashMap<Bindings, MapValue>();
+
+        for (var match : matches) {
+            var k = match.get(kVar);
+            var v = match.get(vVar);
+            match.unbindAll(names);
+            var map = groups.computeIfAbsent(match, g -> new MapValue());
+
+            // If a key has multiple values, set the value to duplicate key.
+            // DUPLICATE_KEY.  This allows the client to handle the error
+            // as desired without raising an exception, rather like returning
+            // `NaN` or `Infinity` from a bad numeric computation.
+            if (map.containsKey(k)) {
+                if (!map.get(k).equals(v)) {
+                    map.put(k, DUPLICATE_KEY);
+                }
+            } else {
+                map.put(k, v);
+            }
         }
 
         return objectAggregates(groups);
@@ -769,6 +807,10 @@ public class RuleEngine {
             this.rule = rule;
             this.shape = shape;
         }
+    }
+
+    private enum Sentinel {
+        DUPLICATE_KEY   // Used for map(k,v) values given duplicate keys.
     }
 
     private static class DoubleCell {
