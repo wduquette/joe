@@ -250,13 +250,13 @@ function testStaticInitializer_multiple() {
 }
 
 //-----------------------------------------------------------------------------
-// `@` operator
+// `.` operator
 
-// `@` can be used instead of `this.`
+// `.` can be used instead of `this.`
 function testCanUseAt() {
     record Thing(name, color) {
         method info() {
-            return "name='" + @name + "' color='" + @color + "'";
+            return "name='" + .name + "' color='" + .color + "'";
         }
     }
     var thing = Thing("Fred", "red");
@@ -280,12 +280,12 @@ function testThisInNestedFunction() {
     assertEquals(Nest("Howard").whoAmI(), "Howard");
 }
 
-// `@` is available in functions nested in methods
+// `.` is available in functions nested in methods
 function testAtInNestedFunction() {
     record Nest(name) {
         method whoAmI() {
             function getName() {
-                return @name;
+                return .name;
             }
             return getName();
         }

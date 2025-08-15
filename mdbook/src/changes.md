@@ -7,6 +7,8 @@
   - Added set literals, `{#a, #b, #c}`.
     - `{}` now denotes an empty set, not an empty map.
     - `{:}` denotes an empty map.
+  - Replaced `@` with `.` as the property reference operator in instance 
+    methods.
 - Standard Library
   - Added `Fact::get`
 

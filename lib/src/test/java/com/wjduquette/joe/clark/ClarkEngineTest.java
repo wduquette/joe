@@ -59,7 +59,7 @@ public class ClarkEngineTest extends Ted {
         // instance.
         var script = """
             class Thing {
-                method init(name) { @name = name; }
+                method init(name) { .name = name; }
             }
             """;
 

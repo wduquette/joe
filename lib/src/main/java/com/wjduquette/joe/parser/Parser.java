@@ -851,7 +851,7 @@ public class Parser {
             return new Expr.Literal(scanner.previous().literal());
         }
 
-        if (scanner.match(AT)) {
+        if (scanner.match(DOT)) {
             Token keyword = scanner.previous();
             scanner.consume(IDENTIFIER, "Expected class property name.");
             var name = scanner.previous();

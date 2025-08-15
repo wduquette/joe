@@ -106,7 +106,7 @@ arguments       → expression ( "," expression )* ;
 primary         → "true" | "false" | "nil"
                 | NUMBER | STRING | KEYWORD
                 | "this"
-                | "@" IDENTIFIER
+                | "." IDENTIFIER
                 | "ruleset" "{" ruleset "}" ;
                 | IDENTIFIER 
                 | lambda 

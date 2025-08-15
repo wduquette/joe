@@ -90,25 +90,28 @@ var joe = Person("Joe", "Pro");
 The `init` method can be called directly on an instance to reinitialize
 the object, but this is rarely done.
 
-## The `@` Operator
+## The `.` Operator
 
-Joe requires that methods refer to all instance variables and methods
-using `this.`, which yields cluttered, noisy looking code.  As a convenience,
-the `@` operator is equivalent to `this.`, enabling code like this:
+Joe requires that instance properties (i.e., fields and methods) are referred 
+to relative to the instance using the `.` operator, e.g.,
+`myObject.x, this.x`.  However, the constant repetition of `this.` in 
+instant methods yields cluttered, noisy looking code.  As a convenience,
+then, a bare `.` operator is treated as equivalent to `this.` in instance 
+methods:
 
 ```joe
 class Person {
     method init(first, last) {
-        @first = first;
-        @last = last;
+        .first = first;
+        .last = last;
     }
     
     method fullname() {
-        return @first + " " + @last; 
+        return .first + " " + .last; 
     }
     
     method greet(greeting) {
-        return greeting + ", " + @fullname() + "!";
+        return greeting + ", " + .fullname() + "!";
     }
 }
 ```

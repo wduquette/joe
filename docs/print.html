@@ -299,6 +299,8 @@ buy him lunch.</p>
 <li><code>{:}</code> denotes an empty map.</li>
 </ul>
 </li>
+<li>Replaced <code>@</code> with <code>.</code> as the property reference operator in instance
+methods.</li>
 </ul>
 </li>
 <li>Standard Library
@@ -1219,9 +1221,9 @@ right-hand side is a string, just as <code>+</code> does.</p>
 </code></pre>
 <h2 id="pre--and-post-incrementdecrement-operators"><a class="header" href="#pre--and-post-incrementdecrement-operators">Pre- and Post-Increment/Decrement Operators</a></h2>
 <p>The <code>++</code> and <code>--</code> operators work as they do in Java.</p>
-<h2 id="the--operator"><a class="header" href="#the--operator">The <code>@</code> Operator</a></h2>
-<p>The <code>@</code> operator is used in instance methods as a synonym for <code>this.</code>.
-See <a href="classes.html">Classes</a> for more details.</p>
+<h2 id="the--property-reference-operator"><a class="header" href="#the--property-reference-operator">The <code>.</code> Property Reference Operator</a></h2>
+<p>In instance methods, a bare <code>.</code> operator can be used as a synonym <code>this.</code>,
+resulting in neater, more concise code. See <a href="classes.html">Classes</a> for details.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="statements"><a class="header" href="#statements">Statements</a></h1>
 <p>The Joe language provides the following statements. Statements are terminated
 by a semicolon or (sometimes) a block, as in Java.</p>
@@ -1581,22 +1583,25 @@ var joe = Person("Joe", "Pro");
 </code></pre>
 <p>The <code>init</code> method can be called directly on an instance to reinitialize
 the object, but this is rarely done.</p>
-<h2 id="the--operator-1"><a class="header" href="#the--operator-1">The <code>@</code> Operator</a></h2>
-<p>Joe requires that methods refer to all instance variables and methods
-using <code>this.</code>, which yields cluttered, noisy looking code.  As a convenience,
-the <code>@</code> operator is equivalent to <code>this.</code>, enabling code like this:</p>
+<h2 id="the--operator"><a class="header" href="#the--operator">The <code>.</code> Operator</a></h2>
+<p>Joe requires that instance properties (i.e., fields and methods) are referred
+to relative to the instance using the <code>.</code> operator, e.g.,
+<code>myObject.x, this.x</code>.  However, the constant repetition of <code>this.</code> in
+instant methods yields cluttered, noisy looking code.  As a convenience,
+then, a bare <code>.</code> operator is treated as equivalent to <code>this.</code> in instance
+methods:</p>
 <pre><code class="language-joe">class Person {
     method init(first, last) {
-        @first = first;
-        @last = last;
+        .first = first;
+        .last = last;
     }
     
     method fullname() {
-        return @first + " " + @last; 
+        return .first + " " + .last; 
     }
     
     method greet(greeting) {
-        return greeting + ", " + @fullname() + "!";
+        return greeting + ", " + .fullname() + "!";
     }
 }
 </code></pre>
@@ -4146,6 +4151,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.FactBase.html#method.addAll"><em>factBase</em>.addAll(<em>facts</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.all"><em>factBase</em>.all()</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.clear"><em>factBase</em>.clear()</a> → this</li>
+<li><a href="library/type.joe.FactBase.html#method.drop"><em>factBase</em>.drop(<em>name</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.filter"><em>factBase</em>.filter(<em>predicate</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.isDebug"><em>factBase</em>.isDebug()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.FactBase.html#method.isEmpty"><em>factBase</em>.isEmpty()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
@@ -4155,8 +4161,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.FactBase.html#method.remove"><em>factBase</em>.remove(<em>fact</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.removeAll"><em>factBase</em>.removeAll(<em>facts</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.removeIf"><em>factBase</em>.removeIf(<em>predicate</em>)</a> → this</li>
-<li><a href="library/type.joe.FactBase.html#method.removeRelation"><em>factBase</em>.removeRelation(<em>name</em>)</a> → this</li>
-<li><a href="library/type.joe.FactBase.html#method.renameRelation"><em>factBase</em>.renameRelation(<em>oldName</em>, <em>newName</em>)</a> → this</li>
+<li><a href="library/type.joe.FactBase.html#method.rename"><em>factBase</em>.rename(<em>oldName</em>, <em>newName</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.select"><em>factBase</em>.select(<em>rules</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.setDebug"><em>factBase</em>.setDebug(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.size"><em>factBase</em>.size()</a> → <a href="library/type.joe.Number.html">Number</a></li>
@@ -5118,6 +5123,7 @@ The database can be updated and queried using Nero
 <li><a href="library/type.joe.FactBase.html#method.addAll"><em>factBase</em>.addAll(<em>facts</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.all"><em>factBase</em>.all()</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.clear"><em>factBase</em>.clear()</a> → this</li>
+<li><a href="library/type.joe.FactBase.html#method.drop"><em>factBase</em>.drop(<em>name</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.filter"><em>factBase</em>.filter(<em>predicate</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.isDebug"><em>factBase</em>.isDebug()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.FactBase.html#method.isEmpty"><em>factBase</em>.isEmpty()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
@@ -5127,8 +5133,7 @@ The database can be updated and queried using Nero
 <li><a href="library/type.joe.FactBase.html#method.remove"><em>factBase</em>.remove(<em>fact</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.removeAll"><em>factBase</em>.removeAll(<em>facts</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.removeIf"><em>factBase</em>.removeIf(<em>predicate</em>)</a> → this</li>
-<li><a href="library/type.joe.FactBase.html#method.removeRelation"><em>factBase</em>.removeRelation(<em>name</em>)</a> → this</li>
-<li><a href="library/type.joe.FactBase.html#method.renameRelation"><em>factBase</em>.renameRelation(<em>oldName</em>, <em>newName</em>)</a> → this</li>
+<li><a href="library/type.joe.FactBase.html#method.rename"><em>factBase</em>.rename(<em>oldName</em>, <em>newName</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.select"><em>factBase</em>.select(<em>rules</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.setDebug"><em>factBase</em>.setDebug(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.size"><em>factBase</em>.size()</a> → <a href="library/type.joe.Number.html">Number</a></li>
@@ -5200,6 +5205,11 @@ than adding an arbitrary collection.</p>
 <hr />
 <p><strong><em>factBase</em>.clear() → this</strong></p>
 <p>Clears the database of all content.</p>
+<p><span id="method.drop"> </span></p>
+<h3 id="factbasedrop"><a class="header" href="#factbasedrop"><em>factBase</em>.drop()</a></h3>
+<hr />
+<p><strong><em>factBase</em>.drop(<em>name</em>) → this</strong></p>
+<p>Drops a relation from the database, removing all its facts.</p>
 <p><span id="method.filter"> </span></p>
 <h3 id="factbasefilter"><a class="header" href="#factbasefilter"><em>factBase</em>.filter()</a></h3>
 <hr />
@@ -5251,15 +5261,10 @@ to be converted to facts.</p>
 <hr />
 <p><strong><em>factBase</em>.removeIf(<em>predicate</em>) → this</strong></p>
 <p>Deletes facts matching the predicate from the database.</p>
-<p><span id="method.removeRelation"> </span></p>
-<h3 id="factbaseremoverelation"><a class="header" href="#factbaseremoverelation"><em>factBase</em>.removeRelation()</a></h3>
+<p><span id="method.rename"> </span></p>
+<h3 id="factbaserename"><a class="header" href="#factbaserename"><em>factBase</em>.rename()</a></h3>
 <hr />
-<p><strong><em>factBase</em>.removeRelation(<em>name</em>) → this</strong></p>
-<p>Deletes an entire relation from the database.</p>
-<p><span id="method.renameRelation"> </span></p>
-<h3 id="factbaserenamerelation"><a class="header" href="#factbaserenamerelation"><em>factBase</em>.renameRelation()</a></h3>
-<hr />
-<p><strong><em>factBase</em>.renameRelation(<em>oldName</em>, <em>newName</em>) → this</strong></p>
+<p><strong><em>factBase</em>.rename(<em>oldName</em>, <em>newName</em>) → this</strong></p>
 <p>Renames a relation, replacing any existing relation that has the new
 name.</p>
 <p><span id="method.select"> </span></p>
@@ -9592,6 +9597,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.FactBase.html#method.addAll"><em>factBase</em>.addAll(<em>facts</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.all"><em>factBase</em>.all()</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.clear"><em>factBase</em>.clear()</a> → this</li>
+<li><a href="library/type.joe.FactBase.html#method.drop"><em>factBase</em>.drop(<em>name</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.filter"><em>factBase</em>.filter(<em>predicate</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.isDebug"><em>factBase</em>.isDebug()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
 <li><a href="library/type.joe.FactBase.html#method.isEmpty"><em>factBase</em>.isEmpty()</a> → <a href="library/type.joe.Boolean.html">Boolean</a></li>
@@ -9601,8 +9607,7 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/type.joe.FactBase.html#method.remove"><em>factBase</em>.remove(<em>fact</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.removeAll"><em>factBase</em>.removeAll(<em>facts</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.removeIf"><em>factBase</em>.removeIf(<em>predicate</em>)</a> → this</li>
-<li><a href="library/type.joe.FactBase.html#method.removeRelation"><em>factBase</em>.removeRelation(<em>name</em>)</a> → this</li>
-<li><a href="library/type.joe.FactBase.html#method.renameRelation"><em>factBase</em>.renameRelation(<em>oldName</em>, <em>newName</em>)</a> → this</li>
+<li><a href="library/type.joe.FactBase.html#method.rename"><em>factBase</em>.rename(<em>oldName</em>, <em>newName</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.select"><em>factBase</em>.select(<em>rules</em>)</a> → <a href="library/type.joe.Set.html">Set</a></li>
 <li><a href="library/type.joe.FactBase.html#method.setDebug"><em>factBase</em>.setDebug(<em>flag</em>)</a> → this</li>
 <li><a href="library/type.joe.FactBase.html#method.size"><em>factBase</em>.size()</a> → <a href="library/type.joe.Number.html">Number</a></li>
@@ -10314,7 +10319,7 @@ arguments       → expression ( "," expression )* ;
 primary         → "true" | "false" | "nil"
                 | NUMBER | STRING | KEYWORD
                 | "this"
-                | "@" IDENTIFIER
+                | "." IDENTIFIER
                 | "ruleset" "{" ruleset "}" ;
                 | IDENTIFIER 
                 | lambda 

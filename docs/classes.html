@@ -242,22 +242,25 @@ var joe = Person("Joe", "Pro");
 </code></pre>
 <p>The <code>init</code> method can be called directly on an instance to reinitialize
 the object, but this is rarely done.</p>
-<h2 id="the--operator"><a class="header" href="#the--operator">The <code>@</code> Operator</a></h2>
-<p>Joe requires that methods refer to all instance variables and methods
-using <code>this.</code>, which yields cluttered, noisy looking code.  As a convenience,
-the <code>@</code> operator is equivalent to <code>this.</code>, enabling code like this:</p>
+<h2 id="the--operator"><a class="header" href="#the--operator">The <code>.</code> Operator</a></h2>
+<p>Joe requires that instance properties (i.e., fields and methods) are referred
+to relative to the instance using the <code>.</code> operator, e.g.,
+<code>myObject.x, this.x</code>.  However, the constant repetition of <code>this.</code> in
+instant methods yields cluttered, noisy looking code.  As a convenience,
+then, a bare <code>.</code> operator is treated as equivalent to <code>this.</code> in instance
+methods:</p>
 <pre><code class="language-joe">class Person {
     method init(first, last) {
-        @first = first;
-        @last = last;
+        .first = first;
+        .last = last;
     }
     
     method fullname() {
-        return @first + " " + @last; 
+        return .first + " " + .last; 
     }
     
     method greet(greeting) {
-        return greeting + ", " + @fullname() + "!";
+        return greeting + ", " + .fullname() + "!";
     }
 }
 </code></pre>

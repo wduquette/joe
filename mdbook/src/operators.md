@@ -107,7 +107,7 @@ x = y = 5;  // Assigns 5 to x and y.
 
 The `++` and `--` operators work as they do in Java.
 
-## The `@` Operator
+## The `.` Property Reference Operator
 
-The `@` operator is used in instance methods as a synonym for `this.`.
-See [Classes](classes.md) for more details.
+In instance methods, a bare `.` operator can be used as a synonym `this.`, 
+resulting in neater, more concise code. See [Classes](classes.md) for details.

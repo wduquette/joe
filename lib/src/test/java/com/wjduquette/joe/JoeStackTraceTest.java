@@ -98,10 +98,10 @@ public class JoeStackTraceTest extends Ted {
         var script = """
             class Thing {
                 method a(x) {
-                    return @b(x);
+                    return .b(x);
                 }
                 method b(x) {
-                    return @c(x);
+                    return .c(x);
                 }
                 method c(x) {
                     throw "Simulated error!";
