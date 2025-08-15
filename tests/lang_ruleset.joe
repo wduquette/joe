@@ -1,8 +1,9 @@
 // lang_ruleset.joe
 //
-// The purpose of this test suite is to look for semantic errors, found on
-// rule set creation, e.g., undefined fact types.  The `type.joe.RuleSet.joe`
-// test suite tests the behavior of the `RuleSet` object once created.
+// The purpose of this test suite is simply to verify that a Nero ruleset can be
+// created in a Joe script. Nero semantics is tested by `RuleEngineTest`,
+// Nero parsing is tested by `NeroParserTest`, and the behavior of an
+// embedded Nero ruleset is tested in `type.joe.Ruleset.joe`.
 
 function testValid() {
     var rules = ruleset {
@@ -13,12 +14,4 @@ function testValid() {
     };
 }
 
-function testUnstratified() {
-    assertError(\-> {
-        var rules = ruleset {
-            A(x) :- B(x), not C(x);
-            C(x) :- A(x);
-        };
-    }, "Rule set is not stratified.");
-}
 
