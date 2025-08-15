@@ -271,13 +271,18 @@ public class RuleEngine {
 
         matchNextBodyAtom(bc, 0);
 
-        if (!bc.inferredFacts.isEmpty()) {
-            knownFacts.addAll(bc.inferredFacts);
-            inferredFacts.addAll(bc.inferredFacts);
-            return true;
-        } else {
-            return false;
+        var gotNew = false;
+        if (!bc.matches.isEmpty()) {
+            for (var bindings : bc.matches) {
+                bc.bindings = bindings;
+                var newFact = createFact(bc);
+                if (knownFacts.add(newFact)) {
+                    inferredFacts.add(newFact);
+                    gotNew = true;
+                }
+            }
         }
+        return gotNew;
     }
 
     // Matches the rule's index-th body atom against the relevant facts.
@@ -320,11 +325,7 @@ public class RuleEngine {
 
             // NEXT, the rule has matched.  Build the inferred fact, and see
             // if it's actually new.
-            var newFact = createFact(bc);
-            if (!knownFacts.getAll().contains(newFact)) {
-                bc.inferredFacts.add(newFact);
-                if (debug) System.out.println("      Fact: " + newFact);
-            }
+            bc.matches.add(bc.bindings);
         }
     }
 
@@ -595,7 +596,7 @@ public class RuleEngine {
     private static class BindingContext {
         private final Rule rule;
         private final Shape shape;
-        private final List<Fact> inferredFacts = new ArrayList<>();
+        private final List<Bindings> matches = new ArrayList<>();
         private Bindings bindings = new Bindings();
 
         BindingContext(Rule rule, Shape shape) {
