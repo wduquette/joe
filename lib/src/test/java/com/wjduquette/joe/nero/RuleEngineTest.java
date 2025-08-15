@@ -461,6 +461,125 @@ public class RuleEngineTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
+    // Built-in _predicates
+
+    @Test public void testBuiltIn_member_disaggregate() {
+        test("testBuiltIn_member_disaggregate");
+        var source = """
+            transient Owner;
+            Owner(#joe, [#hat, #boots, #truck]);
+            Owns(id, item) :- Owner(id, list), member(item, list);
+            """;
+        check(execute(source)).eq("""
+            define Owns/2;
+            Owns(#joe, #boots);
+            Owns(#joe, #hat);
+            Owns(#joe, #truck);
+            """);
+    }
+
+    @Test public void testBuiltIn_member_match() {
+        test("testBuiltIn_member_match");
+        var source = """
+            transient Owner;
+            Owner(#joe, [#hat, #boots, #truck]);
+            OwnsHat(id) :- Owner(id, list), member(#hat, list);
+            """;
+        check(execute(source)).eq("""
+            define OwnsHat/1;
+            OwnsHat(#joe);
+            """);
+    }
+
+    @Test public void testBuiltIn_member_noCollection() {
+        test("testBuiltIn_member_noCollection");
+        var source = """
+            transient Owner;
+            Owner(#joe, #notCollection);
+            Owns(id, item) :- Owner(id, list), member(item, list);
+            """;
+        check(execute(source)).eq("""
+            """);
+    }
+
+    @Test public void testBuiltIn_indexedMember_disaggregate() {
+        test("testBuiltIn_indexedMember_disaggregate");
+        var source = """
+            transient Owner;
+            Owner(#joe, [#hat, #boots, #truck]);
+            Owns(id, i, item) :- Owner(id, list), indexedMember(i, item, list);
+            """;
+        check(execute(source)).eq("""
+            define Owns/3;
+            Owns(#joe, 0, #hat);
+            Owns(#joe, 1, #boots);
+            Owns(#joe, 2, #truck);
+            """);
+    }
+
+    @Test public void testBuiltIn_indexedMember_match() {
+        test("testBuiltIn_indexedMember_match");
+        var source = """
+            transient Owner;
+            Owner(#joe, [#hat, #boots, #truck]);
+            OwnsHat(id, i) :- Owner(id, list), indexedMember(i, #hat, list);
+            """;
+        check(execute(source)).eq("""
+            define OwnsHat/2;
+            OwnsHat(#joe, 0);
+            """);
+    }
+
+    @Test public void testBuiltIn_indexedMember_noCollection() {
+        test("testBuiltIn_indexedMember_noCollection");
+        var source = """
+            transient Owner;
+            Owner(#joe, #notCollection);
+            Owns(id, i, item) :- Owner(id, list), indexedMember(i, item, list);
+            """;
+        check(execute(source)).eq("""
+            """);
+    }
+
+    @Test public void testBuiltIn_keyedMember_disaggregate() {
+        test("testBuiltIn_keyedMember_disaggregate");
+        var source = """
+            transient Owner;
+            Owner(#joe, {#head: #hat, #feet: #boots});
+            Wears(id, k, v) :- Owner(id, map), keyedMember(k, v, map);
+            """;
+        check(execute(source)).eq("""
+            define Wears/3;
+            Wears(#joe, #feet, #boots);
+            Wears(#joe, #head, #hat);
+            """);
+    }
+
+    @Test public void testBuiltIn_keyedMember_match() {
+        test("testBuiltIn_keyedMember_match");
+        var source = """
+            transient Owner;
+            Owner(#joe, {#head: #hat, #feet: #boots});
+            WearsHat(id, k) :- Owner(id, map), keyedMember(k, #hat, map);
+            """;
+        check(execute(source)).eq("""
+            define WearsHat/2;
+            WearsHat(#joe, #head);
+            """);
+    }
+
+    @Test public void testBuiltIn_keyedMember_noCollection() {
+        test("testBuiltIn_keyedMember_noCollection");
+        var source = """
+            transient Owner;
+            Owner(#joe, #notCollection);
+            Wears(id, k, v) :- Owner(id, map), keyedMember(k, v, map);
+            """;
+        check(execute(source)).eq("""
+            """);
+    }
+
+    //-------------------------------------------------------------------------
     // Collection Literals
 
     // Verify that list literals can be used in axioms.
