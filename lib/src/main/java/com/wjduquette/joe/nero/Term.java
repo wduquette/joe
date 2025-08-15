@@ -4,8 +4,12 @@ import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.types.SetValue;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /** A Term in a Nero {@link Atom}. */
 public sealed interface Term permits
+    Aggregate,
     Constant,
     ListTerm,
     MapTerm,
@@ -21,6 +25,7 @@ public sealed interface Term permits
      */
     static Object toValue(Term term, Bindings bindings) {
         return switch (term) {
+            case Aggregate ignored -> bindings.get(RuleEngine.AGGREGATE);
             case Constant c -> c.value();
             case ListTerm lt -> {
                 var result = new ListValue();
@@ -51,6 +56,19 @@ public sealed interface Term permits
                 "toValue is unsupported for body term: " +
                     term.getClass().getSimpleName() + " '" +
                     term + "'.");
+        };
+    }
+
+    /**
+     * Gets the term's variable names.
+     * @param term The term
+     * @return the set of names.
+     */
+    static Set<String> getVariableNames(Term term) {
+        return switch (term) {
+            case Aggregate a -> new HashSet<>(a.names());
+            case Variable v -> Set.of(v.name());
+            default -> Set.of();
         };
     }
 }

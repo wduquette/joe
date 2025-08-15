@@ -67,6 +67,16 @@ public class RuleEngineTest extends Ted {
             .containsString("Nero rule set cannot be stratified.");
     }
 
+    @Test public void testUnstratified_aggregator() {
+        test("testUnstratified_aggregator");
+
+        var source = """
+            A(sum(x)) :- B(x);
+            B(x) :- A(x);
+            """;
+        checkThrow(() -> execute(source))
+            .containsString("Nero rule set cannot be stratified.");
+    }
 
     //-------------------------------------------------------------------------
     // Basic Operation
@@ -546,6 +556,205 @@ public class RuleEngineTest extends Ted {
             
             define C/2;
             C(#a, {});
+            """);
+    }
+
+    //-------------------------------------------------------------------------
+    // Aggregation Functions
+
+    // Verify that we aggregate all matches, sorting by numeric indices.
+    @Test public void testAggregate_indexedList_numbers() {
+        test("testAggregate_indexedList_numbers");
+        var source = """
+            transient A;
+            A(#a, 2);
+            A(#b, 1);
+            A(#c, 4);
+            A(#d, 3);
+            B(indexedList(i, item)) :- A(item, i);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B([#b, #a, #d, #c]);
+            """);
+    }
+
+    // Verify that we aggregate all matches, sorting by string indices.
+    @Test public void testAggregate_indexedList_strings() {
+        test("testAggregate_indexedList_strings");
+        var source = """
+            transient A;
+            A(#a, "2");
+            A(#b, "1");
+            A(#c, "4");
+            A(#d, "3");
+            B(indexedList(i, item)) :- A(item, i);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B([#b, #a, #d, #c]);
+            """);
+    }
+
+    // Verify that we aggregate all matches, sorting by mixed indices.
+    @Test public void testAggregate_indexedList_mixed() {
+        test("testAggregate_indexedList_strings");
+        var source = """
+            transient A;
+            A(#a, "2");
+            A(#b, "1");
+            A(#c, #one);
+            A(#d, #two);
+            B(indexedList(i, item)) :- A(item, i);
+            """;
+        // The order is unpredictable, but should be stable over time.
+        check(execute(source)).eq("""
+            define B/1;
+            B([#b, #a, #c, #d]);
+            """);
+    }
+
+    // Verify that we aggregate all matches.
+    @Test public void testAggregate_list() {
+        test("testAggregate_set");
+        var source = """
+            transient A;
+            A(#a, 1);
+            A(#b, 1);
+            B(list(x)) :- A(_, x);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B([1, 1]);
+            """);
+    }
+
+    // Verify that we aggregate all matches, and that a key with more than
+    // one distinct value gets flagged as a `DUPLICATE_KEY`.
+    @Test public void testAggregate_map() {
+        test("testAggregate_set");
+        var source = """
+            transient A;
+            A(#a, 1);
+            A(#a, 2);
+            A(#b, 2);
+            A(#c, 3);
+            B(map(k,v)) :- A(k, v);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B({#a: #duplicate_key, #b: 2, #c: 3});
+            """);
+    }
+
+    // Verify that if there are matches but no numbers to take the maximum
+    // of, we get no match.
+    // of zero.
+    @Test public void testAggregate_max_noNumericMatches() {
+        test("testAggregate_max_noNumericMatches");
+        var source = """
+            A(#a);
+            B(max(x)) :- A(x);
+            """;
+        check(execute(source)).eq("""
+            define A/1;
+            A(#a);
+            """);
+    }
+
+    // Verify that we find the maximum of all numeric matches
+    @Test public void testAggregate_max_numericMatches() {
+        test("testAggregate_max_numericMatches");
+        var source = """
+            transient A;
+            A(1);
+            A(2);
+            A(3);
+            B(max(x)) :- A(x);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B(3);
+            """);
+    }
+
+    // Verify that if there are matches but no numbers to take the minimum
+    // of, we get no match.
+    // of zero.
+    @Test public void testAggregate_min_noNumericMatches() {
+        test("testAggregate_min_noNumericMatches");
+        var source = """
+            A(#a);
+            B(min(x)) :- A(x);
+            """;
+        check(execute(source)).eq("""
+            define A/1;
+            A(#a);
+            """);
+    }
+
+    // Verify that we find the minimum of all numeric matches
+    @Test public void testAggregate_min_numericMatches() {
+        test("testAggregate_min_numericMatches");
+        var source = """
+            transient A;
+            A(1);
+            A(2);
+            A(3);
+            B(min(x)) :- A(x);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B(1);
+            """);
+    }
+
+    // Verify that if there are matches but no numbers to sum, we get a sum
+    // of zero.
+    @Test public void testAggregate_sum_noNumericMatches() {
+        test("testAggregate_sum_noNumericMatches");
+        var source = """
+            transient A;
+            A(#a);
+            B(sum(x)) :- A(x);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B(0);
+            """);
+    }
+
+    // Verify that we sum all matches.
+    @Test public void testAggregate_sum_numericMatches() {
+        test("testAggregate_sum_numericMatches");
+        var source = """
+            transient A;
+            A(#a, #foo);
+            A(#a, 1);
+            A(#b, 1);
+            A(#a, 3);
+            B(sum(x)) :- A(_, x);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B(5);
+            """);
+    }
+
+    // Verify that we aggregate all matches.
+    @Test public void testAggregate_set() {
+        test("testAggregate_set");
+        var source = """
+            transient A;
+            A(#a, 1);
+            A(#a, 2);
+            A(#b, 1);
+            A(#c, 1);
+            B(set(x)) :- A(x, _);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B({#a, #b, #c});
             """);
     }
 

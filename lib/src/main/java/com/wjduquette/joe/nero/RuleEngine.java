@@ -2,8 +2,12 @@ package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.Keyword;
+import com.wjduquette.joe.types.ListValue;
+import com.wjduquette.joe.types.MapValue;
+import com.wjduquette.joe.types.SetValue;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * The Nero inference engine.  Given a {@link NeroRuleSet} and a set of
@@ -11,6 +15,17 @@ import java.util.*;
  * the two.
  */
 public class RuleEngine {
+    /**
+     * The variable name used in Bindings for the result of an aggregation
+     * function.  Intentionally package-private.
+     */
+    static final String AGGREGATE = "*aggregate*";
+
+    /**
+     * A sentinel value used when map(k,v) aggregation finds a duplicate key
+     * with two different values.
+     */
+    public static Object DUPLICATE_KEY = Sentinel.DUPLICATE_KEY;
     public static final String INFER_ERROR =
         "Call `infer()` before querying results.";
 
@@ -266,18 +281,29 @@ public class RuleEngine {
     private boolean matchRule(Rule rule) {
         if (debug) System.out.println("  Rule: " + rule);
 
+        // FIRST, match the rule against the known facts and find matches.
         var bc = new BindingContext(rule,
             ruleset.schema().get(rule.head().relation()));
 
         matchNextBodyAtom(bc, 0);
 
-        if (!bc.inferredFacts.isEmpty()) {
-            knownFacts.addAll(bc.inferredFacts);
-            inferredFacts.addAll(bc.inferredFacts);
-            return true;
-        } else {
-            return false;
+        if (bc.matches.isEmpty()) return false;
+
+        // NEXT, do any aggregation
+        var aggregatedMatches = aggregate(bc);
+
+        // NEXT, convert the matches into facts, and see if we've got anything
+        // new
+        var gotNew = false;
+        for (var bindings : aggregatedMatches) {
+            bc.bindings = bindings;
+            var newFact = createFact(bc);
+            if (knownFacts.add(newFact)) {
+                inferredFacts.add(newFact);
+                gotNew = true;
+            }
         }
+        return gotNew;
     }
 
     // Matches the rule's index-th body atom against the relevant facts.
@@ -320,11 +346,7 @@ public class RuleEngine {
 
             // NEXT, the rule has matched.  Build the inferred fact, and see
             // if it's actually new.
-            var newFact = createFact(bc);
-            if (!knownFacts.getAll().contains(newFact)) {
-                bc.inferredFacts.add(newFact);
-                if (debug) System.out.println("      Fact: " + newFact);
-            }
+            bc.matches.add(bc.bindings);
         }
     }
 
@@ -400,7 +422,8 @@ public class RuleEngine {
                 yield false;
             }
             case Wildcard ignored -> true;
-            default -> throw new UnsupportedOperationException("TODO");
+            default -> throw new IllegalStateException(
+                "Unexpected term type in body atom: '" + term + "'.");
         };
     }
 
@@ -589,18 +612,259 @@ public class RuleEngine {
     }
 
     //-------------------------------------------------------------------------
+    // Aggregation
+
+    private List<Bindings> aggregate(BindingContext bc) {
+        // FIRST, get the Aggregate term, if any.
+        var term = getAggregate(bc.rule.head());
+        if (term == null) return bc.matches;
+
+        // NEXT, aggregate using the function
+        return switch (term.aggregator()) {
+            case INDEXED_LIST -> aggregateIndexedList(term.names(), bc.matches);
+            case LIST -> aggregateList(term.names(), bc.matches);
+            case MAP -> aggregateMap(term.names(), bc.matches);
+            case MAX -> aggregateMax(term.names(), bc.matches);
+            case MIN -> aggregateMin(term.names(), bc.matches);
+            case SET -> aggregateSet(term.names(), bc.matches);
+            case SUM -> aggregateSum(term.names(), bc.matches);
+        };
+    }
+
+    private Aggregate getAggregate(Atom head) {
+        for (var term : head.getAllTerms()) {
+            if (term instanceof Aggregate a) return a;
+        }
+        return null;
+    }
+
+    private List<Bindings> aggregateIndexedList(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the lists by group
+        var indexVar = names.get(0);
+        var itemVar = names.get(1);
+        var groups = new HashMap<Bindings,ArrayList<Pair>>();
+
+        for (var match : matches) {
+            var index = match.get(indexVar);
+            var item = match.get(itemVar);
+            match.unbindAll(names);
+            var list = groups.computeIfAbsent(match, g -> new ArrayList<>());
+            list.add(new Pair(index, item));
+        }
+
+        return aggregates(groups, this::pairs2items);
+    }
+
+    private ListValue pairs2items(ArrayList<Pair> pairs) {
+        return new ListValue(pairs.stream()
+            .sorted(this::comparePairs)
+            .map(Pair::item)
+            .toList());
+    }
+
+    private int comparePairs(Pair a, Pair b) {
+        if (a.index() instanceof Double da &&
+            b.index() instanceof Double db
+        ) {
+            return da.compareTo(db);
+        } else if (
+            a.index() instanceof String sa &&
+            b.index() instanceof String sb
+        ) {
+            return sa.compareTo(sb);
+        } else {
+            return Integer.compare(Objects.hashCode(a), Objects.hashCode(b));
+        }
+    }
+
+    private List<Bindings> aggregateList(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the lists by group
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings,ListValue>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+            var list = groups.computeIfAbsent(match, g -> new ListValue());
+            list.add(o);
+        }
+
+        return aggregates(groups);
+    }
+
+    private List<Bindings> aggregateMap(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the lists by group
+        var kVar = names.get(0);
+        var vVar = names.get(1);
+        var groups = new HashMap<Bindings, MapValue>();
+
+        for (var match : matches) {
+            var k = match.get(kVar);
+            var v = match.get(vVar);
+            match.unbindAll(names);
+            var map = groups.computeIfAbsent(match, g -> new MapValue());
+
+            // If a key has multiple values, set the value to duplicate key.
+            // DUPLICATE_KEY.  This allows the client to handle the error
+            // as desired without raising an exception, rather like returning
+            // `NaN` or `Infinity` from a bad numeric computation.
+            if (map.containsKey(k)) {
+                if (!map.get(k).equals(v)) {
+                    map.put(k, DUPLICATE_KEY);
+                }
+            } else {
+                map.put(k, v);
+            }
+        }
+
+        return aggregates(groups);
+    }
+
+    private List<Bindings> aggregateMax(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the max by group, ignoring non-numeric values.
+        // If there are no non-numeric values then there is no match.
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings,DoubleCell>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+
+            // Only create a group for a numeric match.
+            if (o instanceof Double d) {
+                var cell = groups.computeIfAbsent(match, g -> new DoubleCell(d));
+                cell.value = Math.max(cell.value, d);
+            }
+        }
+
+        return aggregates(groups, DoubleCell::value);
+    }
+
+    private List<Bindings> aggregateMin(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the max by group, ignoring non-numeric values.
+        // If there are no non-numeric values then there is no match.
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings,DoubleCell>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+
+            // Only create a group for a numeric match.
+            if (o instanceof Double d) {
+                var cell = groups.computeIfAbsent(match, g -> new DoubleCell(d));
+                cell.value = Math.min(cell.value, d);
+            }
+        }
+
+        return aggregates(groups, DoubleCell::value);
+    }
+
+    private List<Bindings> aggregateSet(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the sets by group
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings, SetValue>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+            var set = groups.computeIfAbsent(match, g -> new SetValue());
+            set.add(o);
+        }
+
+        return aggregates(groups);
+    }
+
+    private List<Bindings> aggregateSum(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the sum by group, ignoring non-numeric values.
+        // If there are no non-numeric values, the sum is 0.
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings,DoubleCell>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+            var cell = groups.computeIfAbsent(match, g -> new DoubleCell(0));
+
+            if (o instanceof Double d) {
+                cell.value += d;
+            }
+        }
+
+        // NEXT, produce the results
+        return aggregates(groups, DoubleCell::value);
+    }
+
+    private <V> List<Bindings> aggregates(
+        Map<Bindings,V> groups,
+        Function<V,Object> converter
+    ) {
+        var result = new ArrayList<Bindings>();
+        for (var e : groups.entrySet()) {
+            var bindings = e.getKey();
+            bindings.bind(AGGREGATE, converter.apply(e.getValue()));
+            result.add(bindings);
+        }
+        return result;
+    }
+
+    private List<Bindings> aggregates(Map<Bindings,?> groups) {
+        var result = new ArrayList<Bindings>();
+        for (var e : groups.entrySet()) {
+            var bindings = e.getKey();
+            bindings.bind(AGGREGATE, e.getValue());
+            result.add(bindings);
+        }
+        return result;
+    }
+
+    //-------------------------------------------------------------------------
     // Helpers
 
     // The context for the recursive matchBodyAtom method.
     private static class BindingContext {
         private final Rule rule;
         private final Shape shape;
-        private final List<Fact> inferredFacts = new ArrayList<>();
+        private final List<Bindings> matches = new ArrayList<>();
         private Bindings bindings = new Bindings();
 
         BindingContext(Rule rule, Shape shape) {
             this.rule = rule;
             this.shape = shape;
         }
+    }
+
+    // Used when aggregating indexed lists.
+    private record Pair(Object index, Object item) {}
+
+    private enum Sentinel {
+        DUPLICATE_KEY   // Used for map(k,v) values given duplicate keys.
+    }
+
+    private static class DoubleCell {
+        double value;
+        DoubleCell(double value) { this.value = value; }
+        double value() { return value; }
     }
 }

@@ -99,6 +99,15 @@ public class FactSet {
     }
 
     /**
+     * Gets whether the database contains the given fact or not.
+     * @param fact The fact
+     * @return true or false
+     */
+    public boolean contains(Fact fact) {
+        return facts.contains(fact);
+    }
+
+    /**
      * Drops a relation from the database, removing the relation's facts.
      * @param relation The relation
      */

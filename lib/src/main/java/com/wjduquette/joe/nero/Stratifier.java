@@ -84,7 +84,8 @@ public class Stratifier {
 
     private boolean aggregates(Rule rule) {
         for (var term : rule.head().getAllTerms()) {
-            if (term instanceof ListTerm ||
+            if (term instanceof Aggregate ||
+                term instanceof ListTerm ||
                 term instanceof MapTerm ||
                 term instanceof SetTerm
             ) {

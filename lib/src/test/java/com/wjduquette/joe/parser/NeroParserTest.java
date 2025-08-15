@@ -242,6 +242,16 @@ public class NeroParserTest extends Ted {
     //-------------------------------------------------------------------------
     // axiom()
 
+    @Test public void testAxiom_aggregate() {
+        test("testAxiom_aggregate");
+
+        var source = """
+            Thing(sum(x));
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'Thing', found aggregation function in axiom.");
+    }
+
     @Test public void testAxiom_variable() {
         test("testAxiom_variable");
 
@@ -249,7 +259,7 @@ public class NeroParserTest extends Ted {
             Thing(x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Thing', found variable(s) in axiom.");
+            .eq("[line 1] error at 'Thing', found variable in axiom.");
     }
 
     //-------------------------------------------------------------------------
@@ -314,6 +324,27 @@ public class NeroParserTest extends Ted {
             """;
         check(parseNero(source))
             .eq("[line 1] error at '_', found wildcard in axiom or head atom.");
+    }
+
+    //-------------------------------------------------------------------------
+    // checkAggregates()
+
+    @Test public void testCheckAggregates_count() {
+        test("testCheckAggregates_count");
+        var source = """
+            A(sum(x), sum(y)) :- B(x, y);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'A', rule head contains more than one aggregation function.");
+    }
+
+    @Test public void testCheckAggregates_duplicates() {
+        test("testCheckAggregates_duplicates");
+        var source = """
+            A(x, sum(x)) :- B(x);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'A', aggregated variable(s) found elsewhere in rule head.");
     }
 
     //-------------------------------------------------------------------------
@@ -511,6 +542,48 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at '*', expected term.");
     }
 
+    //-------------------------------------------------------------------------
+    // term()
+
+    @Test public void testAggregate_unknown() {
+        test("testAggregate_unknown");
+
+        var source = """
+            A(foo(x)) :- B(x);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'foo', unknown aggregation function.");
+    }
+
+    @Test public void testAggregate_expectedVariableName() {
+        test("testAggregate_expectedVariableName");
+
+        var source = """
+            A(sum(1)) :- B(x);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '1', expected aggregation variable name.");
+    }
+
+    @Test public void testAggregate_expectedRightParen() {
+        test("testAggregate_expectedRightParen");
+
+        var source = """
+            A(sum(x :- B(x);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at ':-', expected ')' after aggregation variable name(s).");
+    }
+
+    @Test public void testAggregate_arity() {
+        test("testAggregate_arity");
+
+        var source = """
+            A(sum(x,y) :- B(x);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'sum', expected 1 variable name(s).");
+    }
 
     //-------------------------------------------------------------------------
     // Helpers
