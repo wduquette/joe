@@ -6,6 +6,7 @@ import com.wjduquette.joe.types.SetValue;
 
 /** A Term in a Nero {@link Atom}. */
 public sealed interface Term permits
+    Aggregate,
     Constant,
     ListTerm,
     MapTerm,
@@ -21,6 +22,7 @@ public sealed interface Term permits
      */
     static Object toValue(Term term, Bindings bindings) {
         return switch (term) {
+            case Aggregate ignored -> bindings.get(RuleEngine.AGGREGATE);
             case Constant c -> c.value();
             case ListTerm lt -> {
                 var result = new ListValue();

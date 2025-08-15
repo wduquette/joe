@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,5 +41,26 @@ public class Bindings {
 
     public void bind(String name, Object value) {
         map.put(name, value);
+    }
+
+    /**
+     * Unbinds the given variable names.
+     * @param names The names
+     */
+    public void unbindAll(Collection<String> names) {
+        for (var name : names) map.remove(name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Bindings bindings = (Bindings) o;
+        return map.equals(bindings.map);
+    }
+
+    @Override
+    public int hashCode() {
+        return map.hashCode();
     }
 }

@@ -11,6 +11,12 @@ import java.util.*;
  * the two.
  */
 public class RuleEngine {
+    /**
+     * The variable name used in Bindings for the result of an aggregation
+     * function.  Intentionally package-private.
+     */
+    static final String AGGREGATE = "*aggregate*";
+
     public static final String INFER_ERROR =
         "Call `infer()` before querying results.";
 
@@ -266,20 +272,26 @@ public class RuleEngine {
     private boolean matchRule(Rule rule) {
         if (debug) System.out.println("  Rule: " + rule);
 
+        // FIRST, match the rule against the known facts and find matches.
         var bc = new BindingContext(rule,
             ruleset.schema().get(rule.head().relation()));
 
         matchNextBodyAtom(bc, 0);
 
+        if (bc.matches.isEmpty()) return false;
+
+        // NEXT, do any aggregation
+        var aggregatedMatches = aggregate(bc);
+
+        // NEXT, convert the matches into facts, and see if we've got anything
+        // new
         var gotNew = false;
-        if (!bc.matches.isEmpty()) {
-            for (var bindings : bc.matches) {
-                bc.bindings = bindings;
-                var newFact = createFact(bc);
-                if (knownFacts.add(newFact)) {
-                    inferredFacts.add(newFact);
-                    gotNew = true;
-                }
+        for (var bindings : aggregatedMatches) {
+            bc.bindings = bindings;
+            var newFact = createFact(bc);
+            if (knownFacts.add(newFact)) {
+                inferredFacts.add(newFact);
+                gotNew = true;
             }
         }
         return gotNew;
@@ -401,7 +413,8 @@ public class RuleEngine {
                 yield false;
             }
             case Wildcard ignored -> true;
-            default -> throw new UnsupportedOperationException("TODO");
+            default -> throw new IllegalStateException(
+                "Unexpected term type in body atom: '" + term + "'.");
         };
     }
 
@@ -590,6 +603,58 @@ public class RuleEngine {
     }
 
     //-------------------------------------------------------------------------
+    // Aggregation
+
+    private List<Bindings> aggregate(BindingContext bc) {
+        // FIRST, get the Aggregate term, if any.
+        var term = getAggregate(bc.rule.head());
+        if (term == null) return bc.matches;
+
+        // NEXT, aggregate using the function
+        return switch (term.aggregator()) {
+            case SUM -> aggregateSum(term.names(), bc.matches);
+        };
+    }
+
+    private Aggregate getAggregate(Atom head) {
+        for (var term : head.getAllTerms()) {
+            if (term instanceof Aggregate a) return a;
+        }
+        return null;
+    }
+
+    private List<Bindings> aggregateSum(
+        List<String> names,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the sum by group, ignoring non-numeric values.
+        // If there are no non-numeric values, the sum is 0.
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings,DoubleCell>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+            var cell = groups.computeIfAbsent(match, g -> new DoubleCell(0));
+
+            if (o instanceof Double d) {
+                cell.value += d;
+            }
+        }
+
+        // NEXT, produce the results
+        var result = new ArrayList<Bindings>();
+        for (var e : groups.entrySet()) {
+            var bindings = e.getKey();
+            var sum = e.getValue().value;
+            bindings.bind(AGGREGATE, sum);
+            result.add(bindings);
+        }
+
+        return result;
+    }
+
+    //-------------------------------------------------------------------------
     // Helpers
 
     // The context for the recursive matchBodyAtom method.
@@ -603,5 +668,10 @@ public class RuleEngine {
             this.rule = rule;
             this.shape = shape;
         }
+    }
+
+    private static class DoubleCell {
+        double value;
+        DoubleCell(double value) { this.value = value; }
     }
 }
