@@ -215,11 +215,10 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Atom axiom(Token token, Atom head) {
-        // At this point, anything in the head other than a
-        // constant, variable, or collection term has already been
-        // flagged as an error.  So just check for variables.
-        if (!head.getVariableNames().isEmpty()) {
-            error(token, "found variable(s) in axiom.");
+        if (head.getAllTerms().stream().anyMatch(t -> t instanceof Aggregate)) {
+            error(token, "found aggregation function in axiom.");
+        } else if (!head.getVariableNames().isEmpty()) {
+            error(token, "found variable in axiom.");
         }
         return head;
     }
@@ -229,6 +228,8 @@ class NeroParser extends EmbeddedParser {
         var negations = new ArrayList<Atom>();
         var constraints = new ArrayList<Constraint>();
         var bodyVars = new HashSet<String>();
+
+        checkAggregates(headToken, head);
 
         do {
             var negated = scanner.match(NOT);
@@ -276,6 +277,31 @@ class NeroParser extends EmbeddedParser {
         }
 
         return new Rule(head, body, negations, constraints);
+    }
+
+    // Verify that there is at most one aggregate, and that it shares no
+    // variable names with other head atoms.
+    private void checkAggregates(Token token, Atom head) {
+        var aggVars = new HashSet<String>();
+        var others = new HashSet<String>();
+        var count = 0;
+        for (var term : head.getAllTerms()) {
+            if (term instanceof Aggregate a) {
+                ++count;
+                aggVars.addAll(a.names());
+            } else {
+                others.addAll(Term.getVariableNames(term));
+            }
+        }
+
+        if (count > 1) {
+            error(token, "rule head contains more than one aggregation function.");
+        } else if (count == 1) {
+            aggVars.retainAll(others);
+            if (!aggVars.isEmpty()) {
+                error(token, "aggregated variable(s) found elsewhere in rule head.");
+            }
+        }
     }
 
     // Verify that this is a valid built-in.
@@ -408,11 +434,14 @@ class NeroParser extends EmbeddedParser {
     private Term term(Context ctx) {
         if (scanner.match(IDENTIFIER)) {
             var name = scanner.previous();
+
             if (name.lexeme().startsWith("_")) {
                 if (ctx != Context.BODY) {
                     error(name, "found wildcard in " + ctx.place() + ".");
                 }
                 return new Wildcard(name.lexeme());
+            } else if (ctx == Context.HEAD && scanner.match(LEFT_PAREN)) {
+                return aggregate(name);
             } else {
                 return new Variable(name.lexeme());
             }
@@ -448,6 +477,26 @@ class NeroParser extends EmbeddedParser {
             scanner.advance();
             throw errorSync(scanner.previous(), "expected term.");
         }
+    }
+
+    private Term aggregate(Token name) {
+        var aggregator = Aggregator.find(name.lexeme());
+
+        if (aggregator == null) {
+            throw errorSync(name, "unknown aggregation function.");
+        }
+
+        var names = new ArrayList<String>();
+        do {
+            scanner.consume(IDENTIFIER, "expected aggregation variable name.");
+            names.add(scanner.previous().lexeme());
+        } while (scanner.match(COMMA));
+        scanner.consume(RIGHT_PAREN, "expected ')' after aggregation variable name(s).");
+
+        if (names.size() != aggregator.arity()) {
+            error(name, "expected " + aggregator.arity() + " variable name(s).");
+        }
+        return new Aggregate(aggregator, names);
     }
 
     private Term listTerm() {

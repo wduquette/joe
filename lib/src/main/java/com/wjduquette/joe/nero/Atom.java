@@ -1,8 +1,8 @@
 package com.wjduquette.joe.nero;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * A Nero atom, i.e., a relation with its terms.
@@ -21,9 +21,8 @@ public sealed interface Atom permits
 
     // Gets the names of the atom's variables.
     default Set<String> getVariableNames() {
-        return getAllTerms().stream()
-            .filter(t -> t instanceof Variable)
-            .map(v -> ((Variable)v).name())
-            .collect(Collectors.toSet());
+        var set = new HashSet<String>();
+        for (var t : getAllTerms()) set.addAll(Term.getVariableNames(t));
+        return set;
     }
 }
