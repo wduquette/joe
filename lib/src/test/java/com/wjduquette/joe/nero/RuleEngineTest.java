@@ -67,6 +67,16 @@ public class RuleEngineTest extends Ted {
             .containsString("Nero rule set cannot be stratified.");
     }
 
+    @Test public void testUnstratified_aggregator() {
+        test("testUnstratified_aggregator");
+
+        var source = """
+            A(sum(x)) :- B(x);
+            B(x) :- A(x);
+            """;
+        checkThrow(() -> execute(source))
+            .containsString("Nero rule set cannot be stratified.");
+    }
 
     //-------------------------------------------------------------------------
     // Basic Operation
