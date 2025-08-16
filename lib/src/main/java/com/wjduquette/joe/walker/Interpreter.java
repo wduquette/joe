@@ -201,7 +201,7 @@ class Interpreter {
 
                 for (var item : collection) {
                     try {
-                        var bound = Matcher.bind(
+                        var bound = Matcher.match(
                             joe,
                             stmt.pattern().getPattern(),
                             item,
@@ -239,7 +239,7 @@ class Interpreter {
                     var previous = this.environment;
                     try {
                         this.environment = new Environment(previous);
-                        var bound = Matcher.bind(
+                        var bound = Matcher.match(
                             joe,
                             c.pattern().getPattern(),
                             target,
@@ -354,7 +354,7 @@ class Interpreter {
                 stmt.pattern().getExprs().forEach(e ->
                     constants.add(evaluate(e)));
                 var target = evaluate(stmt.target());
-                var bound = Matcher.bind(
+                var bound = Matcher.match(
                     joe,
                     stmt.pattern().getPattern(),
                     target,
@@ -657,7 +657,7 @@ class Interpreter {
                     constants.add(evaluate(e)));
 
                 // NEXT, do the pattern match
-                var bound = Matcher.bind(
+                var bound = Matcher.match(
                     joe,
                     expr.pattern().getPattern(),
                     target,

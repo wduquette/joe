@@ -1,6 +1,9 @@
 package com.wjduquette.joe.util;
 
+import com.wjduquette.joe.Joe;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A map of variable bindings.  This is a mini-environment, used by Nero
@@ -77,6 +80,14 @@ public class Bindings {
     }
 
     /**
+     * Adds all of the other binding's values into this bindings.
+     * @param other The other bindings.
+     */
+    public void bindAll(Bindings other) {
+        map.putAll(other.map);
+    }
+
+    /**
      * Unbinds the given variable names.
      * @param names The names
      */
@@ -90,6 +101,14 @@ public class Bindings {
      */
     public Map<String,Object> asMap() {
         return Collections.unmodifiableMap(map);
+    }
+
+    @Override
+    public String toString() {
+        var entries = map.entrySet().stream()
+            .map(e -> Joe.quote(e.getKey()) + "=" + e.getValue())
+            .collect(Collectors.joining(","));
+        return "Bindings[" + entries + "]";
     }
 
     @Override

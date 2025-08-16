@@ -38,7 +38,7 @@ public class Matcher {
      * @param getter The Constant getter function
      * @return The bindings.
      */
-    public static Bindings bind(
+    public static Bindings match(
         Joe joe,
         Pattern pattern,
         Object value,
@@ -46,11 +46,39 @@ public class Matcher {
     ) {
         var bindings = new Bindings();
 
-        if (doBind(joe, pattern, value, getter, bindings)) {
+        if (matchWith(joe, pattern, value, getter, bindings)) {
             return bindings;
         } else {
             return null;
         }
+    }
+
+    /**
+     * Matches the pattern to the target value in the context of an existing
+     * set of bindings, binding variables in the pattern to the matching
+     * sub-elements of the value. Previously bound variables must match
+     * corresponding values in the pattern.  Newly bound variables are
+     * added to the bindings in place.
+     * @param joe The instance of Joe
+     * @param pattern The pattern
+     * @param value The value to match
+     * @param getter The getter for values of interpolated expressions
+     * @param bindings The existing Bindings
+     * @return true or false.
+     */
+    public static boolean matchWith(
+        Joe joe,
+        Pattern pattern,
+        Object value,
+        ExpressionGetter getter,
+        Bindings bindings
+    ) {
+        var theBindings = new Bindings(bindings);
+        if (doBind(joe, pattern, value, getter, theBindings)) {
+            bindings.bindAll(theBindings);
+            return true;
+        }
+        return false;
     }
 
     private static boolean doBind(
@@ -77,7 +105,7 @@ public class Matcher {
 
                 // NEXT, match items
                 for (var i = 0; i < size; i++) {
-                    if (!doBind(joe, p.patterns().get(i), list.get(i), getter, bindings)) {
+                    if (!matchWith(joe, p.patterns().get(i), list.get(i), getter, bindings)) {
                         yield false;
                     }
                 }
@@ -105,7 +133,7 @@ public class Matcher {
                         if (!map.containsKey(key)) yield false;
 
                         var item = map.get(key);
-                        if (!doBind(joe, e.getValue(), item, getter, bindings)) {
+                        if (!matchWith(joe, e.getValue(), item, getter, bindings)) {
                             yield false;
                         }
                     }
@@ -138,7 +166,7 @@ public class Matcher {
                     var field = e.getKey();
                     if (!map.containsKey(field)) yield false;
 
-                    if (!doBind(joe, e.getValue(), map.get(field), getter, bindings)) {
+                    if (!matchWith(joe, e.getValue(), map.get(field), getter, bindings)) {
                         yield false;
                     }
                 }
@@ -189,7 +217,7 @@ public class Matcher {
 
                 // NEXT, match items
                 for (var i = 0; i < size; i++) {
-                    if (!doBind(joe, p.patterns().get(i), fields.get(i), getter, bindings)) {
+                    if (!matchWith(joe, p.patterns().get(i), fields.get(i), getter, bindings)) {
                         yield false;
                     }
                 }
@@ -205,7 +233,7 @@ public class Matcher {
                     yield false;
                 }
                 bindings.bind(p.name(), value);
-                yield doBind(joe, p.subpattern(), value, getter, bindings);
+                yield matchWith(joe, p.subpattern(), value, getter, bindings);
             }
 
             case Pattern.TypeName p -> {

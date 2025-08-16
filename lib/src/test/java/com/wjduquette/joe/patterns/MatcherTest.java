@@ -22,7 +22,7 @@ public class MatcherTest extends Ted {
     }
 
     private Bindings bind(Pattern pattern, Object value) {
-        return Matcher.bind(joe, pattern, value, constants::get);
+        return Matcher.match(joe, pattern, value, constants::get);
     }
 
     //-------------------------------------------------------------------------

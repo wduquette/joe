@@ -377,7 +377,7 @@ class VirtualMachine {
                     // touch it unless the match is successful.  Save the
                     // bindings as we go, and then add them to the global
                     // environment as a group.
-                    var bound = Matcher.bind(
+                    var bound = Matcher.match(
                         joe,
                         pv.pattern,
                         target,
@@ -533,7 +533,7 @@ class VirtualMachine {
                     // so just push the bound values onto the stack.  They
                     // are being processed in the order they were defined by
                     // the compiler.
-                    var bound = Matcher.bind(
+                    var bound = Matcher.match(
                         joe,
                         pv.pattern,
                         target,
@@ -594,7 +594,7 @@ class VirtualMachine {
                     // FIRST, match the pattern against the target given the
                     // constants, pushing bound values onto the stack as the
                     // match proceeds.
-                    var bound = Matcher.bind(
+                    var bound = Matcher.match(
                         joe,
                         pv.pattern,
                         target,
@@ -615,7 +615,7 @@ class VirtualMachine {
 
                     // FIRST, see if there's a match.  Saves bound values
                     // to the global environment as it goes.
-                    var bound = Matcher.bind(
+                    var bound = Matcher.match(
                         joe,
                         pv.pattern,
                         target,
@@ -640,7 +640,7 @@ class VirtualMachine {
                     // FIRST, match the pattern against the target given the
                     // constants, pushing bound values onto the stack as the
                     // match proceeds.
-                    var bound = Matcher.bind(
+                    var bound = Matcher.match(
                         joe,
                         pv.pattern,
                         target,
