@@ -4,6 +4,7 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeValue;
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.util.Bindings;
 
 import java.util.*;
 
@@ -37,14 +38,13 @@ public class Matcher {
      * @param getter The Constant getter function
      * @return The bindings.
      */
-    public static LinkedHashMap<String,Object> bind(
+    public static Bindings bind(
         Joe joe,
         Pattern pattern,
         Object value,
         ExpressionGetter getter
     ) {
-        // Use a LinkedHashMap to ensure that values are ordered!
-        var bindings = new LinkedHashMap<String,Object>();
+        var bindings = new Bindings();
 
         if (doBind(joe, pattern, value, getter, bindings)) {
             return bindings;
@@ -58,7 +58,7 @@ public class Matcher {
         Pattern pattern,
         Object value,
         ExpressionGetter getter,
-        Map<String,Object> bindings
+        Bindings bindings
     ) {
         return switch (pattern) {
             case Pattern.Constant p ->
@@ -85,12 +85,12 @@ public class Matcher {
                 // NEXT, bind the tail to the tailId
                 if (p.tailVar() != null) {
                     var tail = list.subList(size, list.size());
-                    if (bindings.containsKey(p.tailVar()) &&
+                    if (bindings.hasBinding(p.tailVar()) &&
                         !bindings.get(p.tailVar()).equals(tail))
                     {
                         yield false;
                     }
-                    bindings.put(p.tailVar(), tail);
+                    bindings.bind(p.tailVar(), tail);
                 }
 
                 // FINALLY, match succeeds.
@@ -199,12 +199,12 @@ public class Matcher {
             }
 
             case Pattern.Subpattern p -> {
-                if (bindings.containsKey(p.name()) &&
+                if (bindings.hasBinding(p.name()) &&
                     !bindings.get(p.name()).equals(value)
                 ) {
                     yield false;
                 }
-                bindings.put(p.name(), value);
+                bindings.bind(p.name(), value);
                 yield doBind(joe, p.subpattern(), value, getter, bindings);
             }
 
@@ -230,12 +230,12 @@ public class Matcher {
             }
 
             case Pattern.Variable p -> {
-                if (bindings.containsKey(p.name()) &&
+                if (bindings.hasBinding(p.name()) &&
                     !bindings.get(p.name()).equals(value)
                 ) {
                     yield false;
                 }
-                bindings.put(p.name(), value);
+                bindings.bind(p.name(), value);
                 yield true;
             }
 

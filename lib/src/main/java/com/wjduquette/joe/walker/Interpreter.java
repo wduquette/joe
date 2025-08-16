@@ -11,6 +11,7 @@ import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.types.RuleSetValue;
 import com.wjduquette.joe.types.SetValue;
+import com.wjduquette.joe.util.Bindings;
 
 import java.util.*;
 
@@ -206,7 +207,7 @@ class Interpreter {
                             item,
                             constants::get);
                         if (bound != null) {
-                            bind(bound);
+                            bind(bound.asMap());
                             execute(stmt.body());
                         }
                     } catch (Break ex) {
@@ -244,7 +245,7 @@ class Interpreter {
                             target,
                             constants::get);
                         if (bound != null) {
-                            bind(bound);
+                            bind(bound.asMap());
                             var guard = c.guard() != null
                                 ? evaluate(c.guard()) : true;
                             if (Joe.isTruthy(guard)) {
@@ -361,7 +362,7 @@ class Interpreter {
                 );
 
                 if (bound != null) {
-                    bind(bound);
+                    bind(bound.asMap());
                 } else {
                     throw new RuntimeError(stmt.keyword().span(),
                         "'var' pattern failed to match target value.");
@@ -664,14 +665,14 @@ class Interpreter {
                 );
 
                 if (bound != null) {
-                    bind(bound);
+                    bind(bound.asMap());
                     yield true;
                 } else {
-                    bound = new LinkedHashMap<>();
+                    bound = new Bindings();
                     for (var name : expr.pattern().getBindings()) {
-                        bound.put(name.lexeme(), null);
+                        bound.bind(name.lexeme(), null);
                     }
-                    bind(bound);
+                    bind(bound.asMap());
                     yield false;
                 }
             }

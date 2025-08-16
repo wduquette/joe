@@ -4,6 +4,7 @@ import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.ListFact;
 import com.wjduquette.joe.nero.PairFact;
+import com.wjduquette.joe.util.Bindings;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class MatcherTest extends Ted {
         joe.installType(new PairType());
     }
 
-    private Map<String,Object> bind(Pattern pattern, Object value) {
+    private Bindings bind(Pattern pattern, Object value) {
         return Matcher.bind(joe, pattern, value, constants::get);
     }
 

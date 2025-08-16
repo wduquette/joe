@@ -388,7 +388,7 @@ class VirtualMachine {
                     }
 
                     // NEXT, add the bindings to the global scope.
-                    globals.putAll(bound);
+                    globals.putAll(bound.asMap());
                 }
                 case GLOSET -> {
                     var name = readString();
@@ -543,7 +543,7 @@ class VirtualMachine {
                     if (bound != null) {
                         // Note: bound is a LinkedHashMap, values are in order
                         // of binding.
-                        for (var value : bound.values()) {
+                        for (var value : bound.asMap().values()) {
                             push(value);
                         }
                     } else {
@@ -603,7 +603,7 @@ class VirtualMachine {
 
                     // NEXT, if the match succeeded push the bound values.
                     if (bound != null) {
-                        bound.values().forEach(this::push);
+                        bound.asMap().values().forEach(this::push);
                     }
 
                     // FINALLY, push the success/failure flag.
@@ -623,7 +623,7 @@ class VirtualMachine {
                     );
 
                     if (bound != null) {
-                        globals.putAll(bound);
+                        globals.putAll(bound.asMap());
                     } else {
                         // Match failed; set all relevant globals to null.
                         for (var name : pv.bindings()) {
@@ -649,7 +649,7 @@ class VirtualMachine {
 
                     // NEXT, push the bound values or nulls.
                     if (bound != null) {
-                        bound.values().forEach(this::push);
+                        bound.asMap().values().forEach(this::push);
                     } else {
                         for (var ignored : pv.bindings) {
                             push(null);

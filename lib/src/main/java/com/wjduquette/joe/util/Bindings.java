@@ -1,8 +1,6 @@
 package com.wjduquette.joe.util;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A map of variable bindings.  This is a mini-environment, used by Nero
@@ -16,7 +14,9 @@ public class Bindings {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Map<String,Object> map = new HashMap<>();
+    // Use a LinkedHashMap to preserve the order of binding.  This is
+    // particularly important for destructuring patterns in the Clark VM.
+    private final Map<String,Object> map = new LinkedHashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -39,12 +39,41 @@ public class Bindings {
     //-------------------------------------------------------------------------
     // API
 
+    /**
+     * Gets a variable's value given its name.
+     * @param name The variable name
+     * @return The value, or null if !hasBinding(name)
+     */
     public Object get(String name) {
         return map.get(name);
     }
 
+    /**
+     * Binds the named variable to the value.
+     * @param name The variable name
+     * @param value The value.
+     */
     public void bind(String name, Object value) {
         map.put(name, value);
+    }
+
+    /**
+     * Gets whether or not there is a binding for the named variable.
+     * Use this rather than checking that `get(name) == null`; a variable
+     * can be bound to `null`.
+     * @param name The name
+     * @return true or false
+     */
+    public boolean hasBinding(String name) {
+        return map.containsKey(name);
+    }
+
+    /**
+     * Returns true if no variables are bound, and false otherwise.
+     * @return true or false
+     */
+    public boolean isEmpty() {
+        return map.isEmpty();
     }
 
     /**
@@ -53,6 +82,14 @@ public class Bindings {
      */
     public void unbindAll(Collection<String> names) {
         for (var name : names) map.remove(name);
+    }
+
+    /**
+     * Gets the bindings as read-only map.
+     * @return The map
+     */
+    public Map<String,Object> asMap() {
+        return Collections.unmodifiableMap(map);
     }
 
     @Override
