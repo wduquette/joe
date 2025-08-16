@@ -3,6 +3,7 @@ package com.wjduquette.joe.nero;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.types.SetValue;
+import com.wjduquette.joe.util.Bindings;
 
 import java.util.HashSet;
 import java.util.Set;

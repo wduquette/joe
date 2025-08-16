@@ -1,12 +1,16 @@
-package com.wjduquette.joe.nero;
+package com.wjduquette.joe.util;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A map of variable bindings, used while matching
- * {@link Atom BodyAtoms} against {@link Fact Facts}.
+ * A map of variable bindings.  This is a mini-environment, used by Nero
+ * when matching
+ * {@link com.wjduquette.joe.nero.Rule Rules} to known
+ * {@link com.wjduquette.joe.nero.Fact Facts}, and when matching destructuring
+ * {@link com.wjduquette.joe.patterns.Pattern Patterns}.
+ *
  */
 public class Bindings {
     //-------------------------------------------------------------------------
