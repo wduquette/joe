@@ -5,6 +5,7 @@ import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.types.SetValue;
+import com.wjduquette.joe.util.Bindings;
 
 import java.util.*;
 import java.util.function.Function;

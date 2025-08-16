@@ -1,6 +1,7 @@
 package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.Ted;
+import com.wjduquette.joe.util.Bindings;
 import org.junit.Test;
 
 import java.util.List;

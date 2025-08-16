@@ -4,6 +4,7 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeValue;
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.util.Bindings;
 
 import java.util.*;
 
@@ -37,20 +38,47 @@ public class Matcher {
      * @param getter The Constant getter function
      * @return The bindings.
      */
-    public static LinkedHashMap<String,Object> bind(
+    public static Bindings match(
         Joe joe,
         Pattern pattern,
         Object value,
         ExpressionGetter getter
     ) {
-        // Use a LinkedHashMap to ensure that values are ordered!
-        var bindings = new LinkedHashMap<String,Object>();
+        var bindings = new Bindings();
 
-        if (doBind(joe, pattern, value, getter, bindings)) {
+        if (matchWith(joe, pattern, value, getter, bindings)) {
             return bindings;
         } else {
             return null;
         }
+    }
+
+    /**
+     * Matches the pattern to the target value in the context of an existing
+     * set of bindings, binding variables in the pattern to the matching
+     * sub-elements of the value. Previously bound variables must match
+     * corresponding values in the pattern.  Newly bound variables are
+     * added to the bindings in place.
+     * @param joe The instance of Joe
+     * @param pattern The pattern
+     * @param value The value to match
+     * @param getter The getter for values of interpolated expressions
+     * @param bindings The existing Bindings
+     * @return true or false.
+     */
+    public static boolean matchWith(
+        Joe joe,
+        Pattern pattern,
+        Object value,
+        ExpressionGetter getter,
+        Bindings bindings
+    ) {
+        var theBindings = new Bindings(bindings);
+        if (doBind(joe, pattern, value, getter, theBindings)) {
+            bindings.bindAll(theBindings);
+            return true;
+        }
+        return false;
     }
 
     private static boolean doBind(
@@ -58,7 +86,7 @@ public class Matcher {
         Pattern pattern,
         Object value,
         ExpressionGetter getter,
-        Map<String,Object> bindings
+        Bindings bindings
     ) {
         return switch (pattern) {
             case Pattern.Constant p ->
@@ -77,7 +105,7 @@ public class Matcher {
 
                 // NEXT, match items
                 for (var i = 0; i < size; i++) {
-                    if (!doBind(joe, p.patterns().get(i), list.get(i), getter, bindings)) {
+                    if (!matchWith(joe, p.patterns().get(i), list.get(i), getter, bindings)) {
                         yield false;
                     }
                 }
@@ -85,12 +113,12 @@ public class Matcher {
                 // NEXT, bind the tail to the tailId
                 if (p.tailVar() != null) {
                     var tail = list.subList(size, list.size());
-                    if (bindings.containsKey(p.tailVar()) &&
+                    if (bindings.hasBinding(p.tailVar()) &&
                         !bindings.get(p.tailVar()).equals(tail))
                     {
                         yield false;
                     }
-                    bindings.put(p.tailVar(), tail);
+                    bindings.bind(p.tailVar(), tail);
                 }
 
                 // FINALLY, match succeeds.
@@ -105,7 +133,7 @@ public class Matcher {
                         if (!map.containsKey(key)) yield false;
 
                         var item = map.get(key);
-                        if (!doBind(joe, e.getValue(), item, getter, bindings)) {
+                        if (!matchWith(joe, e.getValue(), item, getter, bindings)) {
                             yield false;
                         }
                     }
@@ -138,7 +166,7 @@ public class Matcher {
                     var field = e.getKey();
                     if (!map.containsKey(field)) yield false;
 
-                    if (!doBind(joe, e.getValue(), map.get(field), getter, bindings)) {
+                    if (!matchWith(joe, e.getValue(), map.get(field), getter, bindings)) {
                         yield false;
                     }
                 }
@@ -189,7 +217,7 @@ public class Matcher {
 
                 // NEXT, match items
                 for (var i = 0; i < size; i++) {
-                    if (!doBind(joe, p.patterns().get(i), fields.get(i), getter, bindings)) {
+                    if (!matchWith(joe, p.patterns().get(i), fields.get(i), getter, bindings)) {
                         yield false;
                     }
                 }
@@ -199,13 +227,13 @@ public class Matcher {
             }
 
             case Pattern.Subpattern p -> {
-                if (bindings.containsKey(p.name()) &&
+                if (bindings.hasBinding(p.name()) &&
                     !bindings.get(p.name()).equals(value)
                 ) {
                     yield false;
                 }
-                bindings.put(p.name(), value);
-                yield doBind(joe, p.subpattern(), value, getter, bindings);
+                bindings.bind(p.name(), value);
+                yield matchWith(joe, p.subpattern(), value, getter, bindings);
             }
 
             case Pattern.TypeName p -> {
@@ -230,12 +258,12 @@ public class Matcher {
             }
 
             case Pattern.Variable p -> {
-                if (bindings.containsKey(p.name()) &&
+                if (bindings.hasBinding(p.name()) &&
                     !bindings.get(p.name()).equals(value)
                 ) {
                     yield false;
                 }
-                bindings.put(p.name(), value);
+                bindings.bind(p.name(), value);
                 yield true;
             }
 

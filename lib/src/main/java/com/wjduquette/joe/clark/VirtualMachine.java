@@ -377,7 +377,7 @@ class VirtualMachine {
                     // touch it unless the match is successful.  Save the
                     // bindings as we go, and then add them to the global
                     // environment as a group.
-                    var bound = Matcher.bind(
+                    var bound = Matcher.match(
                         joe,
                         pv.pattern,
                         target,
@@ -388,7 +388,7 @@ class VirtualMachine {
                     }
 
                     // NEXT, add the bindings to the global scope.
-                    globals.putAll(bound);
+                    globals.putAll(bound.asMap());
                 }
                 case GLOSET -> {
                     var name = readString();
@@ -533,7 +533,7 @@ class VirtualMachine {
                     // so just push the bound values onto the stack.  They
                     // are being processed in the order they were defined by
                     // the compiler.
-                    var bound = Matcher.bind(
+                    var bound = Matcher.match(
                         joe,
                         pv.pattern,
                         target,
@@ -543,7 +543,7 @@ class VirtualMachine {
                     if (bound != null) {
                         // Note: bound is a LinkedHashMap, values are in order
                         // of binding.
-                        for (var value : bound.values()) {
+                        for (var value : bound.asMap().values()) {
                             push(value);
                         }
                     } else {
@@ -594,7 +594,7 @@ class VirtualMachine {
                     // FIRST, match the pattern against the target given the
                     // constants, pushing bound values onto the stack as the
                     // match proceeds.
-                    var bound = Matcher.bind(
+                    var bound = Matcher.match(
                         joe,
                         pv.pattern,
                         target,
@@ -603,7 +603,7 @@ class VirtualMachine {
 
                     // NEXT, if the match succeeded push the bound values.
                     if (bound != null) {
-                        bound.values().forEach(this::push);
+                        bound.asMap().values().forEach(this::push);
                     }
 
                     // FINALLY, push the success/failure flag.
@@ -615,7 +615,7 @@ class VirtualMachine {
 
                     // FIRST, see if there's a match.  Saves bound values
                     // to the global environment as it goes.
-                    var bound = Matcher.bind(
+                    var bound = Matcher.match(
                         joe,
                         pv.pattern,
                         target,
@@ -623,7 +623,7 @@ class VirtualMachine {
                     );
 
                     if (bound != null) {
-                        globals.putAll(bound);
+                        globals.putAll(bound.asMap());
                     } else {
                         // Match failed; set all relevant globals to null.
                         for (var name : pv.bindings()) {
@@ -640,7 +640,7 @@ class VirtualMachine {
                     // FIRST, match the pattern against the target given the
                     // constants, pushing bound values onto the stack as the
                     // match proceeds.
-                    var bound = Matcher.bind(
+                    var bound = Matcher.match(
                         joe,
                         pv.pattern,
                         target,
@@ -649,7 +649,7 @@ class VirtualMachine {
 
                     // NEXT, push the bound values or nulls.
                     if (bound != null) {
-                        bound.values().forEach(this::push);
+                        bound.asMap().values().forEach(this::push);
                     } else {
                         for (var ignored : pv.bindings) {
                             push(null);
