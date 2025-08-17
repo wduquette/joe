@@ -4,9 +4,9 @@
 // Basic Test API
 
 function testAssertEquals_scalar() {
-    assertEquals(5, 5);
-    assertEquals("abc", "abc");
-    assertError(\-> assertEquals("abc", 5), """
+    assertEQ(5, 5);
+    assertEQ("abc", "abc");
+    assertError(\-> assertEQ("abc", 5), """
         Computed: String 'abc'
         Expected: Number '5'
         """
@@ -16,8 +16,8 @@ function testAssertEquals_scalar() {
 function testAssertEquals_list() {
     var a = List.of("a", "b", "c");
     var b = List.of("a", "b", "c", "d");
-    assertEquals(a, a);
-    assertError(\-> assertEquals(a, b), """
+    assertEQ(a, a);
+    assertError(\-> assertEQ(a, b), """
         Computed: List [
             String 'a'
             String 'b'
@@ -36,8 +36,8 @@ function testAssertEquals_list() {
 function testAssertEquals_set() {
     var a = Set.of("a", "b", "c");
     var b = Set.of("a", "b", "c", "d");
-    assertEquals(a, a);
-    assertError(\-> assertEquals(a, b), """
+    assertEQ(a, a);
+    assertError(\-> assertEQ(a, b), """
         Computed: Set {
             String 'a'
             String 'b'
@@ -56,8 +56,8 @@ function testAssertEquals_set() {
 function testAssertEquals_map() {
     var a = Map.of("a", 1.0, "b", 2.0);
     var b = Map.of("a", 1.0, "b", 2.0, "c", 3.0);
-    assertEquals(a, a);
-    assertError(\-> assertEquals(a, b), """
+    assertEQ(a, a);
+    assertError(\-> assertEQ(a, b), """
         Computed: Map {
             String 'a': Number '1'
             String 'b': Number '2'

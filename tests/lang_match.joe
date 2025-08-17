@@ -13,7 +13,7 @@ function testMatch_firstCase() {
         case [a, 2] -> result = a;
         default -> result = #fail;
     }
-    assertEquals(result, list[0]);
+    assertEQ(result, list[0]);
 }
 
 function testMatch_secondCase() {
@@ -24,7 +24,7 @@ function testMatch_secondCase() {
         case [1, b] -> result = b;
         default -> result = #fail;
     }
-    assertEquals(result, list[1]);
+    assertEQ(result, list[1]);
 }
 
 function testMatch_defaultCase() {
@@ -35,7 +35,7 @@ function testMatch_defaultCase() {
         case [2, 3] -> result = #fail;
         default -> result = #ok;
     }
-    assertEquals(result, #ok);
+    assertEQ(result, #ok);
 }
 
 function testMatch_noDefault() {
@@ -45,7 +45,7 @@ function testMatch_noDefault() {
     match (list) {
         case [2, 3] -> result = #fail;
     }
-    assertEquals(result, #ok);
+    assertEQ(result, #ok);
 }
 
 function testMatch_caseScope_success() {
@@ -57,8 +57,8 @@ function testMatch_caseScope_success() {
         case [a, 2] -> result = a;
         default -> result = #fail;
     }
-    assertEquals(result, list[0]);
-    assertEquals(a, "A");
+    assertEQ(result, list[0]);
+    assertEQ(a, "A");
 }
 
 function testMatch_caseScope_default() {
@@ -70,8 +70,8 @@ function testMatch_caseScope_default() {
         case [a, 2] -> result = a;
         default -> result = a;
     }
-    assertEquals(result, "A");
-    assertEquals(a, "A");
+    assertEQ(result, "A");
+    assertEQ(a, "A");
 }
 
 function testMatch_finalWildcard() {
@@ -83,7 +83,7 @@ function testMatch_finalWildcard() {
         case _ -> result = #ok;
         default -> result = #fail;
     }
-    assertEquals(result, #ok);
+    assertEQ(result, #ok);
 }
 
 function testVarTarget() {
@@ -95,7 +95,7 @@ function testVarTarget() {
         case {#b: b} -> { result = b; }
         default -> { result = "no match"; }
     }
-    assertEquals(result, 2);
+    assertEQ(result, 2);
 }
 
 function testInterpolatedConstant() {
@@ -108,7 +108,7 @@ function testInterpolatedConstant() {
         case {$tag: b} -> { result = b; }
         default -> { result = "no match"; }
     }
-    assertEquals(result, 2);
+    assertEQ(result, 2);
 }
 
 // Verify that a function can close over pattern variables.
@@ -122,13 +122,13 @@ function testMatch_WithClosures() {
     }
 
     var f1 = getFunc({#a: 1});
-    assertEquals(f1(), "a1");
+    assertEQ(f1(), "a1");
 
     var f2 = getFunc({#b: 2});
-    assertEquals(f2(), "b2");
+    assertEQ(f2(), "b2");
 
     var f3 = getFunc({#c: 3});
-    assertEquals(f3(), "no match");
+    assertEQ(f3(), "no match");
 }
 
 function testGuard() {
@@ -149,16 +149,16 @@ function testGuard() {
         default                -> { result = #d; }
     }
 
-    assertEquals(result, #c);
+    assertEQ(result, #c);
 }
 
 function testCanBindToItem() {
     var list = [#a, 2];
     match (list) {
         case a@[b, c] -> {
-            assertEquals(a, [#a, 2]);
-            assertEquals(b, #a);
-            assertEquals(c, 2);
+            assertEQ(a, [#a, 2]);
+            assertEQ(b, #a);
+            assertEQ(c, 2);
         }
         default -> fail("Didn't match target.");
     }

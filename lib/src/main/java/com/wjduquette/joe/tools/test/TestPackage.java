@@ -44,13 +44,14 @@ public class TestPackage extends JoePackage {
         super("joe.test");
         this.engine = engine;
 
-        globalFunction("assertEquals", this::_assertEquals);
+        globalFunction("assertEQ",     this::_assertEQ);
         globalFunction("assertError",  this::_assertError);
         globalFunction("assertFalse",  this::_assertFalse);
         globalFunction("assertTrue",   this::_assertTrue);
         globalFunction("engine",       this::_engine);
         globalFunction("fail",         this::_fail);
         globalFunction("skip",         this::_skip);
+        globalFunction("typedValue",   this::_typedValue);
 
         scriptResource(getClass(), "pkg.joe.test.joe");
 
@@ -59,19 +60,19 @@ public class TestPackage extends JoePackage {
     }
 
     //**
-    // @function assertEquals
+    // @function assertEQ
     // @args got, expected
     // Verifies that *got* equals the *expected* value, producing an
     // informative assertion error if not.
-    private Object _assertEquals(Joe joe, Args args) {
-        args.exactArity(2, "assertEquals(got, expected)");
+    private Object _assertEQ(Joe joe, Args args) {
+        args.exactArity(2, "assertEQ(got, expected)");
         var got      = args.next();
         var expected = args.next();
 
         if (!Joe.isEqual(got, expected)) {
             throw new AssertError(
-                "Computed: " + typedValue(joe, got) +
-                "\nExpected: " + typedValue(joe, expected));
+                "Computed: " + testValue(joe, got) +
+                "\nExpected: " + testValue(joe, expected));
         }
 
         return null;
@@ -200,10 +201,21 @@ public class TestPackage extends JoePackage {
         throw new TestTool.SkipError(joe.stringify(args.next()));
     }
 
+    //**
+    // @function typedValue
+    // @args value
+    // Outputs the value's type and value for display.  Collections are output in
+    // readable format.
+    private Object _typedValue(Joe joe, Args args) {
+        args.exactArity(1, "typedValue(value)");
+        return testValue(joe, args.next());
+    }
+
+
     //------------------------------------------------------------------------
     // Helpers
 
-    private String typedValue(Joe joe, Object value) {
+    private String testValue(Joe joe, Object value) {
         return switch (value) {
             case List<?> c -> typedList(joe, c);
             case Set<?> c -> typedSet(joe, c);

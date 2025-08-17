@@ -13,7 +13,7 @@ function testForeach_simple() {
     foreach (i : list)
         result.add(i);
 
-    assertEquals(result, list);
+    assertEQ(result, list);
 }
 
 // Foreach loop with underscore variable
@@ -24,7 +24,7 @@ function testForeach_underscore() {
     foreach (_ : list)
         result.add(_);
 
-    assertEquals(result, list);
+    assertEQ(result, list);
 }
 
 
@@ -37,7 +37,7 @@ function testForeach_block() {
         result.add(i);
     }
 
-    assertEquals(result, list);
+    assertEQ(result, list);
 }
 
 // Basic foreach loop with break.
@@ -50,7 +50,7 @@ function testForeach_break() {
         result.add(i);
     }
 
-    assertEquals(result, ["a"]);
+    assertEQ(result, ["a"]);
 }
 
 // Basic foreach loop with continue
@@ -63,7 +63,7 @@ function testForeach_continue() {
         result.add(i);
     }
 
-    assertEquals(result, ["a", "c"]);
+    assertEQ(result, ["a", "c"]);
 }
 
 // Test that the foreach loop has its own scope.
@@ -88,9 +88,9 @@ function testBind_basic() {
         result.add(x.toString() + y);
     }
 
-    assertEquals(result, ["#a1", "#b2", "#c3"]);
-    assertEquals(x, "outer x");
-    assertEquals(y, "outer y");
+    assertEQ(result, ["#a1", "#b2", "#c3"]);
+    assertEQ(x, "outer x");
+    assertEQ(y, "outer y");
 }
 
 function testBind_break() {
@@ -102,7 +102,7 @@ function testBind_break() {
         result.add(x);
     }
 
-    assertEquals(result, [#a]);
+    assertEQ(result, [#a]);
 }
 
 function testBind_continue() {
@@ -114,7 +114,7 @@ function testBind_continue() {
         result.add(x);
     }
 
-    assertEquals(result, [#a, #c]);
+    assertEQ(result, [#a, #c]);
 }
 
 function testBind_hasOwnScope() {
@@ -137,14 +137,14 @@ function testBind_canInterpolate() {
     foreach ([x, $x] : list) {
         result = x;
     }
-    assertEquals(result, #b);
+    assertEQ(result, #b);
 }
 
 function testBind_canBindToItem() {
     var list = [[#a, 2]];
     foreach (a@[b, c] : list) {
-        assertEquals(a, [#a, 2]);
-        assertEquals(b, #a);
-        assertEquals(c, 2);
+        assertEQ(a, [#a, 2]);
+        assertEQ(b, #a);
+        assertEQ(c, 2);
     }
 }

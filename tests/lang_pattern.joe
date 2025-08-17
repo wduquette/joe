@@ -10,14 +10,14 @@
 // Verify that a binding variable matches anything.
 function testOneVar() {
     assertTrue(1 ~ a);
-    assertEquals(a, 1);
+    assertEQ(a, 1);
 }
 
 // Verify that a wildcard matches anything, and doesn't create a binding.
 function testWildcard() {
     var _ = 5;
     assertTrue(1 ~ _);
-    assertEquals(_, 5);
+    assertEQ(_, 5);
 }
 
 // Verify that a literal constant only matches the same value.
@@ -49,30 +49,30 @@ function testList_noMatch() {
 
 function testList_noTail() {
     assertTrue([1, 2] ~ [a, b]);
-    assertEquals(a, 1);
-    assertEquals(b, 2);
+    assertEQ(a, 1);
+    assertEQ(b, 2);
 }
 
 function testList_emptyTail() {
     assertTrue([1, 2] ~ [a, b : c]);
-    assertEquals(a, 1);
-    assertEquals(b, 2);
-    assertEquals(c, []);
+    assertEQ(a, 1);
+    assertEQ(b, 2);
+    assertEQ(c, []);
 }
 
 function testList_fullTail() {
     assertTrue([1, 2, 3, 4] ~ [a, b : c]);
-    assertEquals(a, 1);
-    assertEquals(b, 2);
-    assertEquals(c, [3, 4]);
+    assertEQ(a, 1);
+    assertEQ(b, 2);
+    assertEQ(c, [3, 4]);
 }
 
 function testList_nestedPattern() {
     assertTrue([1, [2, 3], 4] ~ [a, [b, c], d]);
-    assertEquals(a, 1);
-    assertEquals(b, 2);
-    assertEquals(c, 3);
-    assertEquals(d, 4);
+    assertEQ(a, 1);
+    assertEQ(b, 2);
+    assertEQ(c, 3);
+    assertEQ(d, 4);
 }
 
 //-------------------------------------------------------------------------
@@ -101,14 +101,14 @@ function testMap_valueMismatch() {
 // The pattern matches.
 function testMap_good() {
     assertTrue({"abc": 5, "def": 6} ~ {"abc": a});
-    assertEquals(a, 5);
+    assertEQ(a, 5);
 }
 
 // Map keys can be interpolated into the pattern.
 function testMap_interpolatedKey() {
     var key = #joe;
     assertTrue({#joe: #value} ~ {$key: value});
-    assertEquals(value, #value);
+    assertEQ(value, #value);
 }
 
 //-----------------------------------------------------------------------------
@@ -138,8 +138,8 @@ function testNamedField_good() {
     var thing = Thing(123, "red");
 
     assertTrue(thing ~ Thing(id: i, color: c));
-    assertEquals(i, thing.id);
-    assertEquals(c, thing.color);
+    assertEQ(i, thing.id);
+    assertEQ(c, thing.color);
 }
 
 // Can match if the pattern names a supertype of the value.
@@ -147,16 +147,16 @@ function testNamedField_supertype_good() {
     var gizmo = Gizmo(123, "red");
 
     assertTrue(gizmo ~ Thing(id: i, color: c));
-    assertEquals(i, gizmo.id);
-    assertEquals(c, gizmo.color);
+    assertEQ(i, gizmo.id);
+    assertEQ(c, gizmo.color);
 }
 
 // Can match a Fact by its relation
 function testNamedField_fact() {
     var person = Fact("Person", "Joe", 80);
     assertTrue(person ~ Person(f0: name, f1: age));
-    assertEquals(name, person.f0);
-    assertEquals(age, person.f1);
+    assertEQ(name, person.f0);
+    assertEQ(age, person.f1);
 }
 
 //-----------------------------------------------------------------------------
@@ -179,16 +179,16 @@ function testOrderedField_good() {
     var person = Person("Joe", 80);
 
     assertTrue(person ~ Person(name, age));
-    assertEquals(name, person.name);
-    assertEquals(age, person.age);
+    assertEQ(name, person.name);
+    assertEQ(age, person.age);
 }
 
 // Can match a Fact by its relation provided that it has ordered fields.
 function testOrderedField_fact() {
     var person = Fact("Person", "Joe", 80);
     assertTrue(person ~ Person(name, age));
-    assertEquals(name, person.f0);
-    assertEquals(age, person.f1);
+    assertEQ(name, person.f0);
+    assertEQ(age, person.f1);
 }
 
 
@@ -197,18 +197,18 @@ function testOrderedField_fact() {
 
 function testPatternBinding_atTop() {
     assertTrue([1, 2] ~ a@[b, c]);
-    assertEquals(a, [1, 2]);
-    assertEquals(b, 1);
-    assertEquals(c, 2);
+    assertEQ(a, [1, 2]);
+    assertEQ(b, 1);
+    assertEQ(c, 2);
 }
 
 function testPatternBinding_nested() {
     assertTrue([1, [2, 3], 4] ~ [a, b@[c, d], e]);
-    assertEquals(a, 1);
-    assertEquals(b, [2, 3]);
-    assertEquals(c, 2);
-    assertEquals(d, 3);
-    assertEquals(e, 4);
+    assertEQ(a, 1);
+    assertEQ(b, [2, 3]);
+    assertEQ(c, 2);
+    assertEQ(d, 3);
+    assertEQ(e, 4);
 }
 
 //-----------------------------------------------------------------------------

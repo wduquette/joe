@@ -3,26 +3,26 @@
 function testLiteral_empty() {
     var empty = {:};
     assertTrue(empty.isEmpty());
-    assertEquals(Joe.typeOf(empty), Map);
+    assertEQ(Joe.typeOf(empty), Map);
 }
 
 function testLiteral_noTrailingComma() {
     var map = {#a: 1, #b: 2};
-    assertEquals(map, Map.of(#a, 1, #b, 2));
-    assertEquals(map.get(#a), 1);
-    assertEquals(map.get(#b), 2);
+    assertEQ(map, Map.of(#a, 1, #b, 2));
+    assertEQ(map.get(#a), 1);
+    assertEQ(map.get(#b), 2);
 }
 
 function testLiteral_trailingComma() {
     // Trailing comma is allowed in non-empty maps
-    assertEquals({#a: 1,}, {#a: 1});
+    assertEQ({#a: 1,}, {#a: 1});
 }
 
 function testIndexing_get() {
     var map = {#a: 1, #b: 2, #c: 3};
-    assertEquals(map[#a], 1);
-    assertEquals(map[#b], 2);
-    assertEquals(map[#c], 3);
+    assertEQ(map[#a], 1);
+    assertEQ(map[#b], 2);
+    assertEQ(map[#c], 3);
 }
 
 function testIndexing_equal() {
@@ -31,7 +31,7 @@ function testIndexing_equal() {
     map[#b] = 4;
     map[#c] = 6;
 
-    assertEquals(map, {#a: 2, #b: 4, #c: 6});
+    assertEQ(map, {#a: 2, #b: 4, #c: 6});
 }
 
 function testIndexing_plusEqual() {
@@ -40,7 +40,7 @@ function testIndexing_plusEqual() {
     map[#b] += 4;
     map[#c] += 6;
 
-    assertEquals(map, {#a: 3, #b: 6, #c: 9});
+    assertEQ(map, {#a: 3, #b: 6, #c: 9});
 }
 
 function testIndexing_minusEqual() {
@@ -49,7 +49,7 @@ function testIndexing_minusEqual() {
     map[#b] -= 2;
     map[#c] -= 3;
 
-    assertEquals(map, {#a: 9, #b: 18, #c: 27});
+    assertEQ(map, {#a: 9, #b: 18, #c: 27});
 }
 
 function testIndexing_starEqual() {
@@ -58,7 +58,7 @@ function testIndexing_starEqual() {
     map[#b] *= 4;
     map[#c] *= 6;
 
-    assertEquals(map, {#a: 2, #b: 8, #c: 18});
+    assertEQ(map, {#a: 2, #b: 8, #c: 18});
 }
 
 function testIndexing_minusEqual() {
@@ -67,5 +67,5 @@ function testIndexing_minusEqual() {
     map[#b] /= 4;
     map[#c] /= 3;
 
-    assertEquals(map, {#a: 2, #b: 5, #c: 10});
+    assertEQ(map, {#a: 2, #b: 5, #c: 10});
 }
