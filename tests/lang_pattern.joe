@@ -9,66 +9,66 @@
 
 // Verify that a binding variable matches anything.
 function testOneVar() {
-    assertTrue(1 ~ a);
+    assertT(1 ~ a);
     assertEQ(a, 1);
 }
 
 // Verify that a wildcard matches anything, and doesn't create a binding.
 function testWildcard() {
     var _ = 5;
-    assertTrue(1 ~ _);
+    assertT(1 ~ _);
     assertEQ(_, 5);
 }
 
 // Verify that a literal constant only matches the same value.
 function testLiteralConstant() {
-    assertTrue(1 ~ 1);
-    assertFalse(1 ~ 2);
+    assertT(1 ~ 1);
+    assertF(1 ~ 2);
 }
 
 // Verify that an interpolated variable yields a constant.
 function testInterpolatedVariable() {
     var x = 1;
     var y = 2;
-    assertTrue(1 ~ $x);
-    assertFalse(1 ~ $y);
+    assertT(1 ~ $x);
+    assertF(1 ~ $y);
 }
 
 // Verify that an interpolated expression yields a constant.
 function testInterpolatedExpression() {
-    assertTrue(2 ~ $(1 + 1));
-    assertFalse(1 ~ $(1 + 1));
+    assertT(2 ~ $(1 + 1));
+    assertF(1 ~ $(1 + 1));
 }
 
 //-------------------------------------------------------------------------
 // List Patterns
 
 function testList_noMatch() {
-    assertFalse(5 ~ [1, 2]);
+    assertF(5 ~ [1, 2]);
 }
 
 function testList_noTail() {
-    assertTrue([1, 2] ~ [a, b]);
+    assertT([1, 2] ~ [a, b]);
     assertEQ(a, 1);
     assertEQ(b, 2);
 }
 
 function testList_emptyTail() {
-    assertTrue([1, 2] ~ [a, b : c]);
+    assertT([1, 2] ~ [a, b : c]);
     assertEQ(a, 1);
     assertEQ(b, 2);
     assertEQ(c, []);
 }
 
 function testList_fullTail() {
-    assertTrue([1, 2, 3, 4] ~ [a, b : c]);
+    assertT([1, 2, 3, 4] ~ [a, b : c]);
     assertEQ(a, 1);
     assertEQ(b, 2);
     assertEQ(c, [3, 4]);
 }
 
 function testList_nestedPattern() {
-    assertTrue([1, [2, 3], 4] ~ [a, [b, c], d]);
+    assertT([1, [2, 3], 4] ~ [a, [b, c], d]);
     assertEQ(a, 1);
     assertEQ(b, 2);
     assertEQ(c, 3);
@@ -80,34 +80,34 @@ function testList_nestedPattern() {
 
 function testMap_matchEmptyMap() {
     // The {} pattern should be "{:}".
-    assertTrue({:} ~ {:});
+    assertT({:} ~ {:});
 }
 
 // Value isn't a map
 function testMap_noMap() {
-    assertFalse(5 ~ {#abc: a});
+    assertF(5 ~ {#abc: a});
 }
 
 // Value is a map, but is missing a key that appears in the pattern.
 function testMap_missingKey() {
-    assertFalse({#def: 5} ~ {#abc: a});
+    assertF({#def: 5} ~ {#abc: a});
 }
 
 // Value has the right keys, but one of the values is wrong.
 function testMap_valueMismatch() {
-    assertFalse({#abc: 5, #def: 6} ~ {#abc: a, #def: 7});
+    assertF({#abc: 5, #def: 6} ~ {#abc: a, #def: 7});
 }
 
 // The pattern matches.
 function testMap_good() {
-    assertTrue({"abc": 5, "def": 6} ~ {"abc": a});
+    assertT({"abc": 5, "def": 6} ~ {"abc": a});
     assertEQ(a, 5);
 }
 
 // Map keys can be interpolated into the pattern.
 function testMap_interpolatedKey() {
     var key = #joe;
-    assertTrue({#joe: #value} ~ {$key: value});
+    assertT({#joe: #value} ~ {$key: value});
     assertEQ(value, #value);
 }
 
@@ -116,28 +116,28 @@ function testMap_interpolatedKey() {
 
 // Can't match a value that has no script-visible fields.
 function testNamedField_noFields() {
-    assertFalse("abc" ~ Thing(id: id));
+    assertF("abc" ~ Thing(id: id));
 }
 
 // Can't match a value of the different type.
 function testNamedField_valueWrongType() {
     var thing = Thing(123, "red");
 
-    assertFalse(thing ~ Gizmo(id: id));
+    assertF(thing ~ Gizmo(id: id));
 }
 
 // Can't match if a pattern field doesn't exist in the value.
 function testNamedField_unknownField() {
     var thing = Thing(123, "red");
 
-    assertFalse(thing ~ Thing(id: id, style: s));
+    assertF(thing ~ Thing(id: id, style: s));
 }
 
 // Can match if the type name and the field names match.
 function testNamedField_good() {
     var thing = Thing(123, "red");
 
-    assertTrue(thing ~ Thing(id: i, color: c));
+    assertT(thing ~ Thing(id: i, color: c));
     assertEQ(i, thing.id);
     assertEQ(c, thing.color);
 }
@@ -146,7 +146,7 @@ function testNamedField_good() {
 function testNamedField_supertype_good() {
     var gizmo = Gizmo(123, "red");
 
-    assertTrue(gizmo ~ Thing(id: i, color: c));
+    assertT(gizmo ~ Thing(id: i, color: c));
     assertEQ(i, gizmo.id);
     assertEQ(c, gizmo.color);
 }
@@ -154,7 +154,7 @@ function testNamedField_supertype_good() {
 // Can match a Fact by its relation
 function testNamedField_fact() {
     var person = Fact("Person", "Joe", 80);
-    assertTrue(person ~ Person(f0: name, f1: age));
+    assertT(person ~ Person(f0: name, f1: age));
     assertEQ(name, person.f0);
     assertEQ(age, person.f1);
 }
@@ -164,21 +164,21 @@ function testNamedField_fact() {
 
 // Can't match a value with unordered fields
 function testOrderedField_notOrdered() {
-    assertFalse(Thing(123, "red") ~ Thing(id, color));
+    assertF(Thing(123, "red") ~ Thing(id, color));
 }
 
 // Can't match if the type is wrong.
 function testOrderedField_wrongType() {
     var person = Person("Joe", 80);
 
-    assertFalse(person ~ PersonNonGrata(name, age));
+    assertF(person ~ PersonNonGrata(name, age));
 }
 
 // Can match if the number of fields is correct.
 function testOrderedField_good() {
     var person = Person("Joe", 80);
 
-    assertTrue(person ~ Person(name, age));
+    assertT(person ~ Person(name, age));
     assertEQ(name, person.name);
     assertEQ(age, person.age);
 }
@@ -186,7 +186,7 @@ function testOrderedField_good() {
 // Can match a Fact by its relation provided that it has ordered fields.
 function testOrderedField_fact() {
     var person = Fact("Person", "Joe", 80);
-    assertTrue(person ~ Person(name, age));
+    assertT(person ~ Person(name, age));
     assertEQ(name, person.f0);
     assertEQ(age, person.f1);
 }
@@ -196,14 +196,14 @@ function testOrderedField_fact() {
 // Pattern-Bindings
 
 function testPatternBinding_atTop() {
-    assertTrue([1, 2] ~ a@[b, c]);
+    assertT([1, 2] ~ a@[b, c]);
     assertEQ(a, [1, 2]);
     assertEQ(b, 1);
     assertEQ(c, 2);
 }
 
 function testPatternBinding_nested() {
-    assertTrue([1, [2, 3], 4] ~ [a, b@[c, d], e]);
+    assertT([1, [2, 3], 4] ~ [a, b@[c, d], e]);
     assertEQ(a, 1);
     assertEQ(b, [2, 3]);
     assertEQ(c, 2);
@@ -218,10 +218,10 @@ function testPatternBinding_nested() {
 function testTypeName() {
     record Gizmo(x, y) {}
     var gizmo = Gizmo(1, 2);
-    assertTrue(gizmo ~ Gizmo());
-    assertFalse(gizmo ~ Number());
-    assertTrue("abc" ~ String());
-    assertFalse("abc" ~ Number());
+    assertT(gizmo ~ Gizmo());
+    assertF(gizmo ~ Number());
+    assertT("abc" ~ String());
+    assertF("abc" ~ Number());
 }
 
 //-----------------------------------------------------------------------------

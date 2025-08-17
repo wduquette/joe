@@ -42,43 +42,43 @@ function testDivide() {
 // Test Comparisons
 
 function testEquals() {
-    assertTrue(1 == 1);
-    assertTrue("a" == "a");
-    assertTrue(#k == #k);
-    assertFalse(1 == 2);
-    assertFalse("a" == #k);
+    assertT(1 == 1);
+    assertT("a" == "a");
+    assertT(#k == #k);
+    assertF(1 == 2);
+    assertF("a" == #k);
 }
 
 function testNotEquals() {
-    assertFalse(1 != 1);
-    assertTrue(1 != 2);
-    assertTrue("a" != #k);
+    assertF(1 != 1);
+    assertT(1 != 2);
+    assertT("a" != #k);
 }
 
 function testComparisons() {
-    assertTrue(0 < 1);
-    assertFalse(1 < 1);
-    assertTrue("a" < "b");
-    assertFalse("b" < "a");
+    assertT(0 < 1);
+    assertF(1 < 1);
+    assertT("a" < "b");
+    assertF("b" < "a");
 
-    assertTrue(0 <= 1);
-    assertTrue(1 <= 1);
-    assertFalse(2 <= 1);
-    assertTrue("a" <= "b");
-    assertTrue("a" <= "a");
-    assertFalse("b" <= "a");
+    assertT(0 <= 1);
+    assertT(1 <= 1);
+    assertF(2 <= 1);
+    assertT("a" <= "b");
+    assertT("a" <= "a");
+    assertF("b" <= "a");
 
-    assertFalse(0 > 0);
-    assertTrue(1 > 0);
-    assertFalse("a" > "a");
-    assertTrue("b" > "a");
+    assertF(0 > 0);
+    assertT(1 > 0);
+    assertF("a" > "a");
+    assertT("b" > "a");
 
-    assertTrue(1 >= 0);
-    assertTrue(1 >= 1);
-    assertFalse(1 >= 2);
-    assertTrue("b" >= "a");
-    assertTrue("b" >= "b");
-    assertFalse("b" >= "c");
+    assertT(1 >= 0);
+    assertT(1 >= 1);
+    assertF(1 >= 2);
+    assertT("b" >= "a");
+    assertT("b" >= "b");
+    assertF("b" >= "c");
 
     function bad() { "a" > 1; }
     assertError(bad, "The '>' operator expects two Numbers or two Strings.");
@@ -89,13 +89,13 @@ function testComparisons() {
 
 function testAnd() {
     // With booleans
-    assertTrue(true && true);
-    assertFalse(true && false);
-    assertFalse(false && true);
-    assertFalse(false && false);
+    assertT(true && true);
+    assertF(true && false);
+    assertF(false && true);
+    assertF(false && false);
 
     // Returns first argument if first is falsey.
-    assertFalse(false && 1);
+    assertF(false && 1);
     assertEQ(null && 1, null);
 
     // Returns second argument if first is truthy
@@ -105,13 +105,13 @@ function testAnd() {
 
 function testOr() {
     // With booleans
-    assertTrue(true || true);
-    assertTrue(true || false);
-    assertTrue(false || true);
-    assertFalse(false || false);
+    assertT(true || true);
+    assertT(true || false);
+    assertT(false || true);
+    assertF(false || false);
 
     // Returns first argument if first is truthy.
-    assertTrue(true || false);
+    assertT(true || false);
     assertEQ(1 || null, 1);
 
     // Returns second argument if first is falsy
@@ -120,10 +120,10 @@ function testOr() {
 }
 
 function testNot() {
-    assertFalse(!true);
-    assertFalse(!1);
-    assertTrue(!false);
-    assertTrue(!null);
+    assertF(!true);
+    assertF(!1);
+    assertT(!false);
+    assertT(!null);
 }
 
 //-----------------------------------------------------------------------------
@@ -348,8 +348,8 @@ function testTernary() {
 
 function testIN() {
     var list = [#a, #b, #c];
-    assertTrue(#a in list);
-    assertFalse(#d in list);
+    assertT(#a in list);
+    assertF(#d in list);
 
     function bad() { return #a in #a; }
     assertError(bad, "Expected iterable, got: Keyword '#a'.");
@@ -357,8 +357,8 @@ function testIN() {
 
 function testNI() {
     var list = [#a, #b, #c];
-    assertFalse(#a ni list);
-    assertTrue(#d ni list);
+    assertF(#a ni list);
+    assertT(#d ni list);
 
     function bad() { return #a ni #a; }
     assertError(bad, "Expected iterable, got: Keyword '#a'.");
@@ -371,27 +371,27 @@ function testNI() {
 
 function testMatchOp_simple() {
    var list = [1, 2];
-   assertTrue(list ~ [_, _]);
-   assertFalse(list ~ [_, _, _]);
+   assertT(list ~ [_, _]);
+   assertF(list ~ [_, _, _]);
 }
 
 function testMatchOp_bindOnSuccess() {
    var list = [1, 2];
-   assertTrue(list ~ [a, b]);
+   assertT(list ~ [a, b]);
    assertEQ(a, 1);
    assertEQ(b, 2);
 }
 
 function testMatchOp_bindWithAnd() {
    var list = [1, 2];
-   assertFalse(list ~ [a, b] && a > b);
+   assertF(list ~ [a, b] && a > b);
    assertEQ(a, 1);
    assertEQ(b, 2);
 }
 
 function testMatchOp_declareOnFailure() {
    var list = [1, 2, 3];
-   assertFalse(list ~ [a, b]);
+   assertF(list ~ [a, b]);
    assertEQ(a, null);
    assertEQ(b, null);
 }

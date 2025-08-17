@@ -72,18 +72,18 @@ function testAssertEquals_map() {
 }
 
 function testAssertTrue() {
-    assertTrue(true);
-    assertTrue("abc");
+    assertT(true);
+    assertT("abc");
 
-    function bad() { assertTrue(false); }
+    function bad() { assertT(false); }
     assertError(bad, "Expected truthy value, got: Boolean 'false'.");
 }
 
 function testAssertFalse() {
-    assertFalse(false);
-    assertFalse(null);
+    assertF(false);
+    assertF(null);
 
-    function bad() { assertFalse(true); }
+    function bad() { assertF(true); }
     assertError(bad, "Expected falsey value, got: Boolean 'true'.");
 }
 

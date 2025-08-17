@@ -2,7 +2,7 @@
 
 function testLiteral_empty() {
     var empty = {};
-    assertTrue(empty.isEmpty());
+    assertT(empty.isEmpty());
     assertEQ(Joe.typeOf(empty), Set);
 }
 

@@ -1,7 +1,7 @@
 // lang_list.joe: tests List-specific syntax.
 
 function testLiteral() {
-    assertTrue([].isEmpty());
+    assertT([].isEmpty());
 
     var single = [#one];
     assertEQ(single.size(), 1);

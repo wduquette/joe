@@ -46,8 +46,8 @@ public class TestPackage extends JoePackage {
 
         globalFunction("assertEQ",     this::_assertEQ);
         globalFunction("assertError",  this::_assertError);
-        globalFunction("assertFalse",  this::_assertFalse);
-        globalFunction("assertTrue",   this::_assertTrue);
+        globalFunction("assertF",  this::_assertF);
+        globalFunction("assertT",   this::_assertT);
         globalFunction("engine",       this::_engine);
         globalFunction("fail",         this::_fail);
         globalFunction("skip",         this::_skip);
@@ -138,12 +138,12 @@ public class TestPackage extends JoePackage {
     }
 
     //**
-    // @function assertFalse
+    // @function assertF
     // @args condition
     // Verifies that *condition* is falsey, producing an
     // informative assertion error if not.
-    private Object _assertFalse(Joe joe, Args args) {
-        args.exactArity(1, "assertFalse(condition)");
+    private Object _assertF(Joe joe, Args args) {
+        args.exactArity(1, "assertF(condition)");
         var condition = args.next();
 
         if (Joe.isTruthy(condition)) {
@@ -155,12 +155,12 @@ public class TestPackage extends JoePackage {
     }
 
     //**
-    // @function assertTrue
+    // @function assertT
     // @args condition
     // Verifies that *condition* is truthy, producing an
     // informative assertion error if not.
-    private Object _assertTrue(Joe joe, Args args) {
-        args.exactArity(1, "assertTrue(condition)");
+    private Object _assertT(Joe joe, Args args) {
+        args.exactArity(1, "assertT(condition)");
         var condition = args.next();
 
         if (!Joe.isTruthy(condition)) {

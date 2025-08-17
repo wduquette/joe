@@ -5,8 +5,8 @@
 
 function testCatch_ok() {
     var cr = catch(\-> "abc");
-    assertTrue(cr.isOK());
-    assertFalse(cr.isError());
+    assertT(cr.isOK());
+    assertF(cr.isError());
     assertEQ(cr.result, "abc");
     assertEQ(cr.error, null);
 }
@@ -14,8 +14,8 @@ function testCatch_ok() {
 function testCatch_error() {
     function bad() { throw "Simulated error!"; }
     var cr = catch(bad);
-    assertFalse(cr.isOK());
-    assertTrue(cr.isError());
+    assertF(cr.isOK());
+    assertT(cr.isError());
     assertEQ(cr.result, null);
     assertEQ(cr.error.message(), "Simulated error!");
 }
@@ -23,8 +23,8 @@ function testCatch_error() {
 function testCatch_error_withTrace() {
     function bad() { throw "Simulated error!"; }
     var cr = catch(bad);
-    assertFalse(cr.isOK());
-    assertTrue(cr.isError());
+    assertF(cr.isOK());
+    assertT(cr.isError());
     assertEQ(cr.result, null);
     assertEQ(cr.error.message(), "Simulated error!");
 

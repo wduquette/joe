@@ -117,7 +117,7 @@ function testInitializer() {
 function testToString_default() {
     class Thing {}
     var thing = Thing();
-    assertTrue(thing.toString().startsWith("<Thing"));
+    assertT(thing.toString().startsWith("<Thing"));
     assertEQ(Joe.stringify(thing), thing.toString());
 }
 
