@@ -4,22 +4,22 @@
 
 function testInitializer_simple() {
     var error = Error("Message");
-    check(error.message()).eq("Message");
-    check(error.type()).eq("JoeError");
-    check(error.traces()).isEmpty();
-    check(error.stackTrace()).eq(error.message());
+    assertEQ(error.message(), "Message");
+    assertEQ(error.type(), "JoeError");
+    assertEmpty(error.traces());
+    assertEQ(error.stackTrace(), error.message());
 }
 
 function testInitializer_withTraces() {
     var error = Error("Message", "A", "B");
-    check(error.message()).eq("Message");
-    check(error.type()).eq("JoeError");
-    check(error.traces()).eq(["A", "B"]);
+    assertEQ(error.message(), "Message");
+    assertEQ(error.type(), "JoeError");
+    assertEQ(error.traces(), ["A", "B"]);
 }
 
 function testAddInfo() {
     var error = Error("Message");
-    check(error.traces()).isEmpty();
+    assertEmpty(error.traces());
     error.addInfo("A");
-    check(error.traces()).eq(["A"]);
+    assertEQ(error.traces(), ["A"]);
 }

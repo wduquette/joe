@@ -23,38 +23,38 @@ var HAT_FACT = Joe.toFact(HAT);
 
 function testCreation_empty() {
     var db = FactBase();
-    check(db.isEmpty()).eq(true);
-    check(db.size()).eq(0);
-    check(db.all().isEmpty()).eq(true);
-    check(db.relations().isEmpty()).eq(true);
-    check(db.relation("Thing").isEmpty()).eq(true);
-    check(db.toString()).eq("FactBase[0]");
+    assertEmpty(db);
+    assertEQ(db.size(), 0);
+    assertT(db.all().isEmpty());
+    assertT(db.relations().isEmpty());
+    assertT(db.relation("Thing").isEmpty());
+    assertEQ(db.toString(), "FactBase[0]");
 }
 
 function testCreation_collection() {
     var db = FactBase([JOE, TEXAS, HAT]);
-    check(db.isEmpty()).eq(false);
-    check(db.size()).eq(3);
-    check(db.all().isEmpty()).eq(false);
-    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT, HAT_FACT));
-    check(db.relations().isEmpty()).eq(false);
-    check(db.relations()).eq(Set.of("Person", "Place", "Thing"));
-    check(db.relation("Person")).eq(Set.of(JOE_FACT));
-    check(db.toString()).eq("FactBase[3, Person[1], Place[1], Thing[1]]");
+    assertF(db.isEmpty());
+    assertEQ(db.size(), 3);
+    assertF(db.all().isEmpty());
+    assertEQ(db.all(), {JOE_FACT, TEXAS_FACT, HAT_FACT});
+    assertF(db.relations().isEmpty());
+    assertEQ(db.relations(), {"Person", "Place", "Thing"});
+    assertEQ(db.relation("Person"), {JOE_FACT});
+    assertEQ(db.toString(), "FactBase[3, Person[1], Place[1], Thing[1]]");
 }
 
 function testCreation_FactBase() {
     var other = FactBase([JOE, HAT]);
 
     var db = FactBase(other);
-    check(db.isEmpty()).eq(false);
-    check(db.size()).eq(2);
-    check(db.all().isEmpty()).eq(false);
-    check(db.all()).eq(other.all());
-    check(db.relations().isEmpty()).eq(false);
-    check(db.relations()).eq(other.relations());
-    check(db.relation("Person")).eq(other.relation("Person"));
-    check(db.toString()).eq("FactBase[2, Person[1], Thing[1]]");
+    assertF(db.isEmpty());
+    assertEQ(db.size(), 2);
+    assertF(db.all().isEmpty());
+    assertEQ(db.all(), other.all());
+    assertF(db.relations().isEmpty());
+    assertEQ(db.relations(), other.relations());
+    assertEQ(db.relation("Person"), other.relation("Person"));
+    assertEQ(db.toString(), "FactBase[2, Person[1], Thing[1]]");
 }
 
 function testCreation_badInputs() {
@@ -72,7 +72,7 @@ function testIterable() {
 
     var set = Set();
     foreach(fact : db) set.add(fact);
-    check(set).eq(db.all());
+    assertEQ(set, db.all());
 }
 
 
@@ -84,9 +84,9 @@ function testAdd_good() {
 
     db.add(JOE);
 
-    check(db.all()).eq(Set.of(JOE_FACT));
-    check(db.relation("Person")).eq(Set.of(JOE_FACT));
-    check(db.relations()).eq(Set.of("Person"));
+    assertEQ(db.all(), {JOE_FACT});
+    assertEQ(db.relation("Person"), {JOE_FACT});
+    assertEQ(db.relations(), {"Person"});
 }
 
 function testAdd_bad() {
@@ -102,8 +102,8 @@ function testAdd_bad() {
 function testAddAll_collection() {
     var db = FactBase();
     db.addAll([JOE, HAT]);
-    check(db.all()).eq(Set.of(JOE_FACT, HAT_FACT));
-    check(db.relation("Person")).eq(Set.of(JOE_FACT));
+    assertEQ(db.all(), {JOE_FACT, HAT_FACT});
+    assertEQ(db.relation("Person"), {JOE_FACT});
 }
 
 function testAddAll_FactBase() {
@@ -111,8 +111,8 @@ function testAddAll_FactBase() {
     var other = FactBase([JOE, HAT]);
 
     db.addAll(other);
-    check(db.all()).eq(other.all());
-    check(db.relation("Person")).eq(other.relation("Person"));
+    assertEQ(db.all(), other.all());
+    assertEQ(db.relation("Person"), other.relation("Person"));
 }
 
 function testAddAll_badInputs() {
@@ -135,10 +135,10 @@ function testClear() {
     var db = FactBase();
     db.add(JOE);
     db.clear();
-    check(db.isEmpty()).eq(true);
-    check(db.size()).eq(0);
-    check(db.all().isEmpty()).eq(true);
-    check(db.relations().isEmpty()).eq(true);
+    assertT(db.isEmpty());
+    assertEQ(db.size(), 0);
+    assertT(db.all().isEmpty());
+    assertT(db.relations().isEmpty());
 }
 
 //-------------------------------------------------------------------------
@@ -147,8 +147,8 @@ function testClear() {
 function testDrop() {
     var db = FactBase([JOE, TEXAS, HAT]);
     db.drop("Thing");
-    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
-    check(db.relation("Thing")).eq(Set());
+    assertEQ(db.all(), {JOE_FACT, TEXAS_FACT});
+    assertEQ(db.relation("Thing"), Set());
 }
 
 //-------------------------------------------------------------------------
@@ -158,7 +158,7 @@ function testFilter() {
     var db = FactBase([JOE, TEXAS, HAT]);
 
     var set = db.filter(\f -> f ~ Person());
-    check(set).eq(Set.of(JOE_FACT));
+    assertEQ(set, {JOE_FACT});
 }
 
 //-------------------------------------------------------------------------
@@ -166,11 +166,11 @@ function testFilter() {
 
 function testDebug_setGet() {
     var db = FactBase();
-    check(db.isDebug()).eq(false);
+    assertF(db.isDebug());
     db.setDebug(true);
-    check(db.isDebug()).eq(true);
+    assertT(db.isDebug());
     db.setDebug(false);
-    check(db.isDebug()).eq(false);
+    assertF(db.isDebug());
 }
 
 //-------------------------------------------------------------------------
@@ -184,7 +184,7 @@ function testDebug_setGet() {
 function testMap() {
     var db = FactBase([JOE, TEXAS, HAT]);
     var strings = db.map(Joe.stringify).sorted();
-    check(strings).eq([
+    assertEQ(strings, [
         "Fact(Person, #joe, 90)",
         "Fact(Place, #texas)",
         "Fact(Thing, #hat, #black)"
@@ -208,8 +208,8 @@ function testRemove_good() {
     var db = FactBase([JOE, TEXAS, HAT]);
     db.remove(HAT);
 
-    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
-    check(db.relation("Thing")).eq(Set());
+    assertEQ(db.all(), {JOE_FACT, TEXAS_FACT});
+    assertEQ(db.relation("Thing"), Set());
 }
 
 function testRemove_bad() {
@@ -230,8 +230,8 @@ function testRemoveAll_collection() {
     var db = FactBase([JOE, TEXAS, HAT]);
     db.removeAll([HAT]);
 
-    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
-    check(db.relation("Thing")).eq(Set());
+    assertEQ(db.all(), {JOE_FACT, TEXAS_FACT});
+    assertEQ(db.relation("Thing"), Set());
 }
 
 function testRemoveAll_FactBase() {
@@ -239,8 +239,8 @@ function testRemoveAll_FactBase() {
     var other = FactBase([HAT]);
     db.removeAll(other);
 
-    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
-    check(db.relation("Thing")).eq(Set());
+    assertEQ(db.all(), {JOE_FACT, TEXAS_FACT});
+    assertEQ(db.relation("Thing"), Set());
 }
 
 function testRemoveAll_bad() {
@@ -256,8 +256,8 @@ function testRemoveAll_bad() {
 function testRemoveIf() {
     var db = FactBase([JOE, TEXAS, HAT]);
     db.removeIf(\f -> f ~ Thing());
-    check(db.all()).eq(Set.of(JOE_FACT, TEXAS_FACT));
-    check(db.relation("Thing")).eq(Set());
+    assertEQ(db.all(), {JOE_FACT, TEXAS_FACT});
+    assertEQ(db.relation("Thing"), Set());
 }
 
 //-------------------------------------------------------------------------
@@ -267,9 +267,9 @@ function testRename() {
     var db = FactBase([JOE, TEXAS, HAT]);
     var newFact = Fact.ofPairs("Location", ["id", #texas]);
     db.rename("Place", "Location");
-    check(db.all()).eq(Set.of(JOE_FACT, newFact, HAT_FACT));
-    check(db.relation("Place")).eq(Set());
-    check(db.relation("Location")).eq(Set.of(newFact));
+    assertEQ(db.all(), {JOE_FACT, newFact, HAT_FACT});
+    assertEQ(db.relation("Place"), Set());
+    assertEQ(db.relation("Location"), {newFact});
 }
 
 //-------------------------------------------------------------------------
@@ -286,12 +286,12 @@ function testSelect_facts() {
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     });
 
-    var expected = Set.of(
+    var expected = {
         Fact("Ancestor", #anne, #bert),
         Fact("Ancestor", #anne, #clark),
         Fact("Ancestor", #bert, #clark)
-    );
-    check(results).eq(expected);
+    };
+    assertEQ(results, expected);
 }
 
 
@@ -319,16 +319,16 @@ function testUpdate_good() {
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     });
 
-    var expected = Set.of(
+    var expected = {
         Fact("Ancestor", #anne, #bert),
         Fact("Ancestor", #anne, #clark),
         Fact("Ancestor", #bert, #clark)
-    );
+    };
 
     // The relation's set was updated.
-    check(db.relation("Ancestor")).eq(expected);
+    assertEQ(db.relation("Ancestor"), expected);
 
     // The set of all facts was updated.
-    check(db.all().containsAll(expected)).eq(true);
+    assertT(db.all().containsAll(expected));
 }
 

@@ -4,13 +4,13 @@
 
 function testInitializer_good() {
     var fact = Fact("Thing", #car, #red);
-    check(fact.relation()).eq("Thing");
-    check(fact.isOrdered()).eq(true);
-    check(fact.fields()).eq([#car, #red]);
-    check(fact.fieldMap()).eq({"f0": #car, "f1": #red});
-    check(fact.f0).eq(#car);
-    check(fact.f1).eq(#red);
-    check(fact.toString()).eq("Fact(Thing, #car, #red)");
+    assertEQ(fact.relation(), "Thing");
+    assertT(fact.isOrdered());
+    assertEQ(fact.fields(), [#car, #red]);
+    assertEQ(fact.fieldMap(), {"f0": #car, "f1": #red});
+    assertEQ(fact.f0, #car);
+    assertEQ(fact.f1, #red);
+    assertEQ(fact.toString(), "Fact(Thing, #car, #red)");
 }
 
 function testInitializer_badRelation() {
@@ -20,13 +20,13 @@ function testInitializer_badRelation() {
 
 function testOf() {
     var fact = Fact.of("Thing", [#car, #red]);
-    check(fact.relation()).eq("Thing");
-    check(fact.isOrdered()).eq(true);
-    check(fact.fields()).eq([#car, #red]);
-    check(fact.fieldMap()).eq({"f0": #car, "f1": #red});
-    check(fact.f0).eq(#car);
-    check(fact.f1).eq(#red);
-    check(fact.toString()).eq("Fact(Thing, #car, #red)");
+    assertEQ(fact.relation(), "Thing");
+    assertT(fact.isOrdered());
+    assertEQ(fact.fields(), [#car, #red]);
+    assertEQ(fact.fieldMap(), {"f0": #car, "f1": #red});
+    assertEQ(fact.f0, #car);
+    assertEQ(fact.f1, #red);
+    assertEQ(fact.toString(), "Fact(Thing, #car, #red)");
 }
 
 function testOf_badRelation() {
@@ -36,11 +36,11 @@ function testOf_badRelation() {
 
 function testOfMap() {
     var fact = Fact.ofMap("Thing", {"id": #car, "color": #red});
-    check(fact.relation()).eq("Thing");
-    check(fact.isOrdered()).eq(false);
-    check(fact.fieldMap()).eq({"id": #car, "color": #red});
-    check(fact.id).eq(#car);
-    check(fact.color).eq(#red);
+    assertEQ(fact.relation(), "Thing");
+    assertF(fact.isOrdered());
+    assertEQ(fact.fieldMap(), {"id": #car, "color": #red});
+    assertEQ(fact.id, #car);
+    assertEQ(fact.color, #red);
 }
 
 function testOfMap_badRelation() {
@@ -55,13 +55,13 @@ function testOfMap_badFieldName() {
 
 function testOfPairs() {
     var fact = Fact.ofPairs("Thing", ["id", #car, "color", #red]);
-    check(fact.relation()).eq("Thing");
-    check(fact.isOrdered()).eq(true);
-    check(fact.fields()).eq([#car, #red]);
-    check(fact.fieldMap()).eq({"id": #car, "color": #red});
-    check(fact.id).eq(#car);
-    check(fact.color).eq(#red);
-    check(fact.toString()).eq("Fact(Thing, #car, #red)");
+    assertEQ(fact.relation(), "Thing");
+    assertT(fact.isOrdered());
+    assertEQ(fact.fields(), [#car, #red]);
+    assertEQ(fact.fieldMap(), {"id": #car, "color": #red});
+    assertEQ(fact.id, #car);
+    assertEQ(fact.color, #red);
+    assertEQ(fact.toString(), "Fact(Thing, #car, #red)");
 }
 
 function testOfPairs_badRelation() {
@@ -82,20 +82,20 @@ function testBadField() {
 
 function testMatch_listFact() {
     var fact = Fact("Thing", #car, #red);
-    check(fact ~ Thing(#car, _)).eq(true);
-    check(fact ~ Thing(#bus, _)).eq(false);
+    assertT(fact ~ Thing(#car, _));
+    assertF(fact ~ Thing(#bus, _));
 }
 
 function testMatch_mapFact() {
     var fact = Fact.ofMap("Thing", {"id": #car, "color": #red});
-    check(fact ~ Thing(#car, _)).eq(false);
-    check(fact ~ Thing(id: #car)).eq(true);
+    assertF(fact ~ Thing(#car, _));
+    assertT(fact ~ Thing(id: #car));
 }
 
 function testMatch_recordFact() {
     var fact = Fact.ofPairs("Thing", ["id", #car, "color", #red]);
-    check(fact ~ Thing(#car, _)).eq(true);
-    check(fact ~ Thing(id: #car)).eq(true);
-    check(fact ~ Thing(#bus, _)).eq(false);
-    check(fact ~ Thing(id: #bus)).eq(false);
+    assertT(fact ~ Thing(#car, _));
+    assertT(fact ~ Thing(id: #car));
+    assertF(fact ~ Thing(#bus, _));
+    assertF(fact ~ Thing(id: #bus));
 }
