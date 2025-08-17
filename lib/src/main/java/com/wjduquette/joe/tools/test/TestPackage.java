@@ -3,6 +3,11 @@ package com.wjduquette.joe.tools.test;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.console.PathProxy;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * The package that defines the test API for test scripts.
  */
@@ -64,9 +69,9 @@ public class TestPackage extends JoePackage {
         var expected = args.next();
 
         if (!Joe.isEqual(got, expected)) {
-            throw new AssertError("Expected " +
-                joe.typedValue(expected) + ", got: " +
-                joe.typedValue(got) + ".");
+            throw new AssertError(
+                "Computed: " + typedValue(joe, got) +
+                "\nExpected: " + typedValue(joe, expected));
         }
 
         return null;
@@ -193,6 +198,61 @@ public class TestPackage extends JoePackage {
     private Object _skip(Joe joe, Args args) {
         args.exactArity(1, "skip(message)");
         throw new TestTool.SkipError(joe.stringify(args.next()));
+    }
+
+    //------------------------------------------------------------------------
+    // Helpers
+
+    private String typedValue(Joe joe, Object value) {
+        return switch (value) {
+            case List<?> c -> typedList(joe, c);
+            case Set<?> c -> typedSet(joe, c);
+            case Map<?,?> m -> typedMap(joe, m);
+            default -> joe.typedValue(value);
+        };
+    }
+
+    private String typedList(Joe joe, List<?> value) {
+        var items = value.stream()
+            .map(joe::typedValue)
+            .collect(Collectors.joining("\n"));
+        if (value.isEmpty()) {
+            return joe.typeName(value) + " []";
+        } else if (value.size() == 1) {
+            return joe.typeName(value) + " [" + items + "]";
+        } else {
+            return joe.typeName(value) + " [\n" + items.indent(4) + "]";
+        }
+    }
+    private String typedSet(Joe joe, Set<?> value) {
+        var items = value.stream()
+            .map(joe::typedValue)
+            .sorted()
+            .collect(Collectors.joining("\n"));
+        if (value.isEmpty()) {
+            return joe.typeName(value) + " {}";
+        } else if (value.size() == 1) {
+            return joe.typeName(value) + " {" + items + "}";
+        } else {
+            return joe.typeName(value) + " {\n" + items.indent(4) + "}";
+        }
+    }
+
+    private String typedMap(
+        Joe joe,
+        Map<?,?> map
+    ) {
+        var items = map.entrySet().stream()
+            .map(e -> joe.typedValue(e.getKey()) + ": " +
+                joe.typedValue(e.getValue()))
+            .collect(Collectors.joining("\n"));
+        if (map.isEmpty()) {
+            return joe.typeName(map) + " {:}";
+        } else if (map.size() == 1) {
+            return joe.typeName(map) + " {" + items + "}";
+        } else {
+            return joe.typeName(map) + " {\n" + items.indent(4) + "}";
+        }
     }
 
     //-------------------------------------------------------------------------
