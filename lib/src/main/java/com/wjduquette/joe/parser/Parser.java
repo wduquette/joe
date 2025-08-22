@@ -660,7 +660,7 @@ public class Parser {
                     get.collection(), get.bracket(), get.index(), op, value);
             }
 
-            error(op, "Invalid assignment target.");
+            error(op, "invalid assignment target.");
         }
 
         return target;
@@ -798,7 +798,7 @@ public class Parser {
                 get.collection(), get.bracket(), get.index(), op, isPre);
         }
 
-        error(op, "Invalid '" + op.lexeme() + "' target.");
+        error(op, "invalid '" + op.lexeme() + "' target.");
         return null;
     }
 
@@ -837,7 +837,7 @@ public class Parser {
             } while (scanner.match(COMMA));
         }
 
-        scanner.consume(RIGHT_PAREN, "Expect ')' after arguments.");
+        scanner.consume(RIGHT_PAREN, "expected ')' after arguments.");
         var paren = scanner.previous();
 
         return new Expr.Call(callee, paren, arguments);
@@ -854,7 +854,7 @@ public class Parser {
 
         if (scanner.match(DOT)) {
             Token keyword = scanner.previous();
-            scanner.consume(IDENTIFIER, "expected class property name.");
+            scanner.consume(IDENTIFIER, "expected property name.");
             var name = scanner.previous();
             var obj = new Expr.This(keyword);
             return new Expr.PropGet(obj, name);
@@ -986,7 +986,7 @@ public class Parser {
             }
         }
 
-        scanner.consume(RIGHT_BRACE, "expected '}' after map entries.");
+        scanner.consume(RIGHT_BRACE, "expected '}' after map items.");
 
         return new Expr.MapLiteral(brace, entries);
     }

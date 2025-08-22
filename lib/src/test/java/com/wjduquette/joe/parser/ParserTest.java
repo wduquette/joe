@@ -581,57 +581,175 @@ public class ParserTest extends Ted {
     //-------------------------------------------------------------------------
     // assignment()
 
-    // TODO
+    @Test public void testAssignment_invalidTarget() {
+        test("testAssignment_invalidTarget");
+
+        var source = """
+            1 = 2;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '=', invalid assignment target.");
+    }
 
     //-------------------------------------------------------------------------
     // ternary()
 
-    // TODO
+    @Test public void testTernary_expectedColon() {
+        test("testTernary_expectedColon");
+
+        var source = """
+            1 ? 2;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at ';', expected ':' after expression.");
+    }
 
     //-------------------------------------------------------------------------
     // prePost()
 
-    // TODO
+    @Test public void testPrePost_invalidTarget() {
+        test("testPrePost_invalidTarget");
+
+        var source = """
+            ++1;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '++', invalid '++' target.");
+    }
 
     //-------------------------------------------------------------------------
     // call()
 
-    // TODO
+    @Test public void testCall_expectedProperty() {
+        test("testCall_expectedProperty");
+
+        var source = """
+            x.1;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '1', expected property name after '.'.");
+    }
 
     //-------------------------------------------------------------------------
     // finishCall()
 
-    // TODO
+    @Test public void testFinishCall_expectedRightParen() {
+        test("testFinishCall_expectedRightParen");
+
+        var source = """
+            foo(1, 2;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at ';', expected ')' after arguments.");
+    }
 
     //-------------------------------------------------------------------------
     // primary()
 
-    // TODO
+    @Test public void testPrimary_expectedProperty() {
+        test("testPrimary_expectedProperty");
+
+        var source = """
+            .: = 5;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at ':', expected property name.");
+    }
+
+    @Test public void testPrimary_expectedDotAfterSuper() {
+        test("testPrimary_expectedDotAfterSuper");
+
+        var source = """
+            super*5;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '*', expected '.' after 'super'.");
+    }
+
+    @Test public void testPrimary_expectedRightParenAfterExpr() {
+        test("testPrimary_expectedRightParenAfterExpr");
+
+        var source = """
+            (1 + 2;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at ';', expected ')' after expression.");
+    }
+
+    @Test public void testPrimary_expectedExpression() {
+        test("testPrimary_expectedExpression");
+
+        var source = """
+            =;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '=', expected expression.");
+    }
 
     //-------------------------------------------------------------------------
     // listLiteral()
 
-    // TODO
+    @Test public void testListLiteral_expectedRightBracket() {
+        test("testListLiteral_expectedRightBracket");
+
+        var source = """
+            [1, 2;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at ';', expected ']' after list items.");
+    }
 
     //-------------------------------------------------------------------------
     // setOrMapLiteral()
 
-    // TODO
+    @Test public void testSetOrMapLiteral_expectedRightBrace() {
+        test("testSetOrMapLiteral_expectedRightBrace");
+
+        var source = """
+            var map = {:;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at ';', expected '}' after ':' in empty map literal.");
+    }
 
     //-------------------------------------------------------------------------
     // setLiteral()
 
-    // TODO
+    @Test public void testSetLiteral_expectedRightBrace() {
+        test("testSetLiteral_expectedRightBrace");
+
+        var source = """
+            var set = {1, 2;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at ';', expected '}' after set items.");
+    }
 
     //-------------------------------------------------------------------------
     // mapLiteral()
 
-    // TODO
+    @Test public void testMapLiteral_expectedRightBrace() {
+        test("testMapLiteral_expectedRightBrace");
+
+        var source = """
+            var map = {#a: 1, #b: 2;
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at ';', expected '}' after map items.");
+    }
 
     //-------------------------------------------------------------------------
     // rulesetExpression()
 
-    // TODO
+    @Test public void testRuleSet_expectedRightBrace() {
+        test("testRuleSet_expectedRightBrace");
+
+        var source = """
+            var rules = ruleset A(1); }
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at 'A', expected '{' after 'ruleset'.");
+    }
 
     //-------------------------------------------------------------------------
     // Helpers
