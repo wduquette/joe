@@ -878,6 +878,93 @@ public class RuleEngineTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
+    // Pattern Terms
+    //
+    // NamedFieldPatterns and OrderedFieldPatterns are tested in
+    // tests/type.joe.RuleSet.joe, since they require Joe values that have
+    // no literals in Nero code.
+
+    @Test public void testPattern_list() {
+        test("testPattern_list");
+        var source = """
+            transient A;
+            A(#a, [1, 2]);
+            A(#b, [3, 4]);
+            B(x, y, z) :- A(x, [y, z]);
+            """;
+        check(execute(source)).eq("""
+            define B/3;
+            B(#a, 1, 2);
+            B(#b, 3, 4);
+            """);
+    }
+
+    @Test public void testPattern_map() {
+        test("testPattern_map");
+        var source = """
+            transient A;
+            A(#a, {#a: 1, #b: 2});
+            A(#b, {#a: 3, #b: 4});
+            B(x, y, z) :- A(x, {#a: y, #b: z});
+            """;
+        check(execute(source)).eq("""
+            define B/3;
+            B(#a, 1, 2);
+            B(#b, 3, 4);
+            """);
+    }
+
+    @Test public void testPattern_typeName() {
+        test("testPattern_typeName");
+        var source = """
+            transient A;
+            A(#a, [1, 2]);
+            A(#b, [3, 4]);
+            A(#c, 5);
+            B(x) :- A(x, List());
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B(#a);
+            B(#b);
+            """);
+    }
+
+    @Test public void testPattern_subpattern_free() {
+        test("testPattern_typeName");
+        var source = """
+            transient A;
+            A(#a, [1, 2]);
+            A(#b, [3, 4]);
+            A(#c, 5);
+            B(x, y) :- A(x, y@[_,_]);
+            """;
+        check(execute(source)).eq("""
+            define B/2;
+            B(#a, [1, 2]);
+            B(#b, [3, 4]);
+            """);
+    }
+
+    // Verify that a subpattern works just fine if the subpattern variable
+    // is already bound, even if it would be a weird thing to do.
+    @Test public void testPattern_subpattern_bound() {
+        test("testPattern_typeName");
+        var source = """
+            transient A;
+            A([1, 2], [1, 2]);
+            A([3, 4], [3, 4]);
+            A([5, 6], [7, 8]);
+            B(x) :- A(x, x@[_,_]);
+            """;
+        check(execute(source)).eq("""
+            define B/1;
+            B([1, 2]);
+            B([3, 4]);
+            """);
+    }
+
+    //-------------------------------------------------------------------------
     // Known vs. Inferred Facts
 
     // Facts inferred from axioms and rules are included in

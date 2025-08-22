@@ -224,3 +224,51 @@ function testInfer_class_ordered() {
         "'Parent' in rule 'Ancestor(x, y) :- Parent(x, y);' requires ordered fields, but a provided fact is not ordered.");
 }
 
+//-----------------------------------------------------------------------------
+// PatternTerms: named-field and ordered-field patterns.
+//
+// Most pattern terms are tested in RuleEngineTest.java, but these patterns
+// require Joe class and record instances, which can't be created in Nero code.
+
+function testPattern_named() {
+    class Thing {
+        method init(id, color) {
+            .id = id;
+            .color = color;
+        }
+    }
+
+    var inputs = [
+        Fact("A", #a, Thing(#hat, #black)),
+        Fact("A", #b, Thing(#wagon, #red))
+    ];
+
+    var rules = ruleset {
+        B(x, y, z) :- A(x, Thing(id: y, color: z));
+    };
+
+    var results = rules.infer(inputs).map(Joe.stringify).sorted();
+    assertEQ(results, [
+        "Fact(B, #a, #hat, #black)",
+        "Fact(B, #b, #wagon, #red)"
+    ]);
+}
+
+function testPattern_ordered() {
+    record Thing(id, color) {}
+
+    var inputs = [
+        Fact("A", #a, Thing(#hat, #black)),
+        Fact("A", #b, Thing(#wagon, #red))
+    ];
+
+    var rules = ruleset {
+        B(x, y, z) :- A(x, Thing(y, z));
+    };
+
+    var results = rules.infer(inputs).map(Joe.stringify).sorted();
+    assertEQ(results, [
+        "Fact(B, #a, #hat, #black)",
+        "Fact(B, #b, #wagon, #red)"
+    ]);
+}
