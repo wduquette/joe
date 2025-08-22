@@ -432,17 +432,28 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Term term(Context ctx) {
-        if (scanner.match(IDENTIFIER)) {
-            var name = scanner.previous();
+        // TODO: Simplify using checkTwo
+        // Don't match(identifier), as patternTerm() will need to match it.
+        if (scanner.check(IDENTIFIER)) {
+            var name = scanner.peek();
 
+            // Wildcard
             if (name.lexeme().startsWith("_")) {
                 if (ctx != Context.BODY) {
                     error(name, "found wildcard in " + ctx.place() + ".");
                 }
+                scanner.advance(); // Past name
                 return new Wildcard(name.lexeme());
-            } else if (ctx == Context.HEAD && scanner.match(LEFT_PAREN)) {
+            } else if (ctx == Context.HEAD && scanner.checkNext(LEFT_PAREN)) {
+                scanner.advance(); // Past name
+                scanner.advance(); // Past '('
                 return aggregate(name);
+            } else if (ctx == Context.BODY &&
+                (scanner.checkNext(LEFT_PAREN) || scanner.checkNext(AT))
+            ) {
+                return patternTerm();
             } else {
+                scanner.advance(); // Past name
                 return new Variable(name.lexeme());
             }
         } else if (scanner.match(MINUS)) {
@@ -460,16 +471,18 @@ class NeroParser extends EmbeddedParser {
         } else if (scanner.match(LEFT_BRACKET)) {
             if (ctx == Context.HEAD) {
                 return listTerm();
+            } else if (ctx == Context.BODY) {
+                return patternTerm();
             } else {
-                // Patterns will take over in rule bodies.
                 throw errorSync(scanner.previous(),
                     "found collection literal in " + ctx.place() + ".");
             }
         } else if (scanner.match(LEFT_BRACE)) {
             if (ctx == Context.HEAD) {
                 return setOrMapTerm(ctx);
+            } else if (ctx == Context.BODY) {
+                return patternTerm();
             } else {
-                // Patterns will take over in rule bodies.
                 throw errorSync(scanner.previous(),
                     "found collection literal in " + ctx.place() + ".");
             }
@@ -511,6 +524,18 @@ class NeroParser extends EmbeddedParser {
         scanner.consume(RIGHT_BRACKET, "expected ']' after list literal.");
 
         return new ListTerm(list);
+    }
+
+    // Matches a destructuring pattern and returns it as a PatternTerm.
+    // The pattern will not be a Pattern.Constant, Pattern.Variable, or
+    // Pattern.Wildcard, as these are parsed as the equivalent Nero terms.
+    // Further, the pattern will not be or contain any Pattern.Expressions,
+    // as Nero does not support them.
+    private Term patternTerm() {
+        var patternParser = new PatternParser(parent);
+        // TODO: Need to ensure no expressions!
+        var ast = patternParser.parse();
+        return new PatternTerm(ast.getPattern());
     }
 
     private Term setOrMapTerm(Context ctx) {
