@@ -433,28 +433,22 @@ class NeroParser extends EmbeddedParser {
 
     private Term term(Context ctx) {
         // TODO: Simplify using checkTwo
-        // Don't match(identifier), as patternTerm() will need to match it.
-        if (scanner.check(IDENTIFIER)) {
-            var name = scanner.peek();
+        if (ctx == Context.HEAD && scanner.checkTwo(IDENTIFIER, LEFT_PAREN)) {
+            return aggregate();
+        } else if (ctx == Context.BODY && scanner.checkTwo(IDENTIFIER, LEFT_PAREN)) {
+            return patternTerm();
+        } else if (ctx == Context.BODY && scanner.checkTwo(IDENTIFIER, AT)) {
+            return patternTerm();
+        } else if (scanner.match(IDENTIFIER)) {
+            var name = scanner.previous();
 
-            // Wildcard
-            if (name.lexeme().startsWith("_")) {
+            if (!name.lexeme().startsWith("_")) {
+                return new Variable(name.lexeme());
+            } else {
                 if (ctx != Context.BODY) {
                     error(name, "found wildcard in " + ctx.place() + ".");
                 }
-                scanner.advance(); // Past name
                 return new Wildcard(name.lexeme());
-            } else if (ctx == Context.HEAD && scanner.checkNext(LEFT_PAREN)) {
-                scanner.advance(); // Past name
-                scanner.advance(); // Past '('
-                return aggregate(name);
-            } else if (ctx == Context.BODY &&
-                (scanner.checkNext(LEFT_PAREN) || scanner.checkNext(AT))
-            ) {
-                return patternTerm();
-            } else {
-                scanner.advance(); // Past name
-                return new Variable(name.lexeme());
             }
         } else if (scanner.match(MINUS)) {
             scanner.consume(NUMBER, "expected number after '-'.");
@@ -492,8 +486,11 @@ class NeroParser extends EmbeddedParser {
         }
     }
 
-    private Term aggregate(Token name) {
+    private Term aggregate() {
+        scanner.advance(); // Past name
+        var name = scanner.previous();
         var aggregator = Aggregator.find(name.lexeme());
+        scanner.advance(); // Past '('
 
         if (aggregator == null) {
             throw errorSync(name, "unknown aggregation function.");
@@ -532,8 +529,7 @@ class NeroParser extends EmbeddedParser {
     // Further, the pattern will not be or contain any Pattern.Expressions,
     // as Nero does not support them.
     private Term patternTerm() {
-        var patternParser = new PatternParser(parent);
-        // TODO: Need to ensure no expressions!
+        var patternParser = new PatternParser(parent, PatternParser.Mode.NERO);
         var ast = patternParser.parse();
         return new PatternTerm(ast.getPattern());
     }

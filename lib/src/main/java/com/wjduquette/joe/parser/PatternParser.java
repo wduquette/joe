@@ -29,11 +29,28 @@ import static com.wjduquette.joe.scanner.TokenType.TRUE;
  * and in Nero.  Intentionally package-private.
  */
 class PatternParser extends EmbeddedParser {
+    /**
+     * The context in which the parsing is being done.
+     */
+    public enum Mode { JOE, NERO }
+
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
+    // JOE or NERO
+    private final Mode mode;
+
     //-------------------------------------------------------------------------
     // Constructor
 
     public PatternParser(Parser parent) {
         super(parent);
+        this.mode = Mode.JOE;
+    }
+
+    public PatternParser(Parser parent, Mode mode) {
+        super(parent);
+        this.mode = mode;
     }
 
     //-------------------------------------------------------------------------
@@ -50,6 +67,7 @@ class PatternParser extends EmbeddedParser {
         astPattern.setPattern(pattern);
         return astPattern;
     }
+
 
     //-------------------------------------------------------------------------
     // The Parser
@@ -112,6 +130,10 @@ class PatternParser extends EmbeddedParser {
         } else if (scanner.match(NUMBER) || scanner.match(STRING) || scanner.match(KEYWORD)) {
             return new Pattern.Constant(scanner.previous().literal());
         } else if (scanner.match(DOLLAR)) {
+            if (mode == Mode.NERO) {
+                error(scanner.previous(),
+                    "found interpolated expression in Nero pattern term.");
+            }
             if (scanner.match(IDENTIFIER)) {
                 return wp.addVarExpr(scanner.previous());
             } else {
