@@ -133,6 +133,15 @@ public class Scanner {
     }
 
     /**
+     * Returns true if peekNext() has the given token type, and false otherwise.
+     * @param type The type
+     * @return true or false.
+     */
+    public boolean checkNext(TokenType type) {
+        return next.type() == type;
+    }
+
+    /**
      * Returns true if peek() has the given token type, and false otherwise.
      * @param currentType The expected type of peek()
      * @param nextType The expected type of peekNext()

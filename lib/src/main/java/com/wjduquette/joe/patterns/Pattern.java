@@ -2,9 +2,7 @@ package com.wjduquette.joe.patterns;
 
 import com.wjduquette.joe.JoeValue;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -214,6 +212,42 @@ public sealed interface Pattern permits
          */
         @Override public String toString() {
             return name;
+        }
+    }
+
+    //------------------------------------------------------------------------
+    // Static Helpers
+
+    /**
+     * Returns a set of the variable names that appear in the pattern.
+     * @param pattern The pattern
+     * @return the set
+     */
+    static Set<String> getVariableNames(Pattern pattern) {
+        var set = new HashSet<String>();
+        gatherNames(pattern, set);
+        return set;
+    }
+
+    // Gathers the names.
+    private static void gatherNames(Pattern pattern, Set<String> names) {
+        switch (pattern) {
+            case ListPattern lp -> {
+                lp.patterns().forEach(p -> gatherNames(p, names));
+                if (lp.tailVar != null) names.add(lp.tailVar);
+            }
+            case MapPattern mp ->
+                mp.patterns().values().forEach(p -> gatherNames(p, names));
+            case NamedFieldPattern nfp ->
+                nfp.fieldMap().values().forEach(p -> gatherNames(p, names));
+            case OrderedFieldPattern ofp ->
+                ofp.patterns().forEach(p -> gatherNames(p, names));
+            case Subpattern sp -> {
+                names.add(sp.name());
+                gatherNames(sp.subpattern(), names);
+            }
+            case Variable v -> names.add(v.name);
+            default -> {}
         }
     }
 }

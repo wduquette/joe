@@ -396,7 +396,7 @@ public class FactBaseType extends ProxyType<FactBase> {
         args.exactArity(1, "select(rules)");
         var rsv = joe.toType(RuleSetValue.class, args.next());
 
-        return rsv.infer(db);
+        return rsv.infer(joe, db);
     }
 
     //**
@@ -451,7 +451,7 @@ public class FactBaseType extends ProxyType<FactBase> {
     private Object _update(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "update(ruleset)");
         var rsv = joe.toType(RuleSetValue.class, args.next());
-        db.addAll(rsv.infer(db));
+        db.addAll(rsv.infer(joe, db));
         return db;
     }
 

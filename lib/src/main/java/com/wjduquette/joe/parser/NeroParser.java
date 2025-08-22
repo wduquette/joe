@@ -432,18 +432,22 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Term term(Context ctx) {
-        if (scanner.match(IDENTIFIER)) {
+        if (ctx == Context.HEAD && scanner.checkTwo(IDENTIFIER, LEFT_PAREN)) {
+            return aggregate();
+        } else if (ctx == Context.BODY && scanner.checkTwo(IDENTIFIER, LEFT_PAREN)) {
+            return patternTerm();
+        } else if (ctx == Context.BODY && scanner.checkTwo(IDENTIFIER, AT)) {
+            return patternTerm();
+        } else if (scanner.match(IDENTIFIER)) {
             var name = scanner.previous();
 
-            if (name.lexeme().startsWith("_")) {
+            if (!name.lexeme().startsWith("_")) {
+                return new Variable(name.lexeme());
+            } else {
                 if (ctx != Context.BODY) {
                     error(name, "found wildcard in " + ctx.place() + ".");
                 }
                 return new Wildcard(name.lexeme());
-            } else if (ctx == Context.HEAD && scanner.match(LEFT_PAREN)) {
-                return aggregate(name);
-            } else {
-                return new Variable(name.lexeme());
             }
         } else if (scanner.match(MINUS)) {
             scanner.consume(NUMBER, "expected number after '-'.");
@@ -457,30 +461,31 @@ class NeroParser extends EmbeddedParser {
             return new Constant(null);
         } else if (scanner.match(KEYWORD, NUMBER, STRING)) {
             return new Constant(scanner.previous().literal());
+        } else if (ctx == Context.HEAD && scanner.match(LEFT_BRACKET)) {
+            return listTerm();
+        } else if (ctx == Context.BODY && scanner.check(LEFT_BRACKET)) {
+            return patternTerm();
         } else if (scanner.match(LEFT_BRACKET)) {
-            if (ctx == Context.HEAD) {
-                return listTerm();
-            } else {
-                // Patterns will take over in rule bodies.
-                throw errorSync(scanner.previous(),
-                    "found collection literal in " + ctx.place() + ".");
-            }
+            throw errorSync(scanner.previous(),
+                "found collection literal in " + ctx.place() + ".");
+        } else if (ctx == Context.HEAD && scanner.match(LEFT_BRACE)) {
+            return setOrMapTerm(ctx);
+        } else if (ctx == Context.BODY && scanner.check(LEFT_BRACE)) {
+            return patternTerm();
         } else if (scanner.match(LEFT_BRACE)) {
-            if (ctx == Context.HEAD) {
-                return setOrMapTerm(ctx);
-            } else {
-                // Patterns will take over in rule bodies.
-                throw errorSync(scanner.previous(),
-                    "found collection literal in " + ctx.place() + ".");
-            }
+            throw errorSync(scanner.previous(),
+                "found collection literal in " + ctx.place() + ".");
         } else {
             scanner.advance();
             throw errorSync(scanner.previous(), "expected term.");
         }
     }
 
-    private Term aggregate(Token name) {
+    private Term aggregate() {
+        scanner.advance(); // Past name
+        var name = scanner.previous();
         var aggregator = Aggregator.find(name.lexeme());
+        scanner.advance(); // Past '('
 
         if (aggregator == null) {
             throw errorSync(name, "unknown aggregation function.");
@@ -508,9 +513,20 @@ class NeroParser extends EmbeddedParser {
             list.add(term(Context.HEAD));
 
         } while (scanner.match(COMMA));
-        scanner.consume(RIGHT_BRACKET, "expected ']' after list literal.");
+        scanner.consume(RIGHT_BRACKET, "expected ']' after list items.");
 
         return new ListTerm(list);
+    }
+
+    // Matches a destructuring pattern and returns it as a PatternTerm.
+    // The pattern will not be a Pattern.Constant, Pattern.Variable, or
+    // Pattern.Wildcard, as these are parsed as the equivalent Nero terms.
+    // Further, the pattern will not be or contain any Pattern.Expressions,
+    // as Nero does not support them.
+    private Term patternTerm() {
+        var patternParser = new PatternParser(parent, PatternParser.Mode.NERO);
+        var ast = patternParser.parse();
+        return new PatternTerm(ast.getPattern());
     }
 
     private Term setOrMapTerm(Context ctx) {
@@ -542,7 +558,7 @@ class NeroParser extends EmbeddedParser {
             list.add(term(Context.HEAD));
 
         }
-        scanner.consume(RIGHT_BRACE, "expected '}' after set literal.");
+        scanner.consume(RIGHT_BRACE, "expected '}' after set items.");
 
         return new SetTerm(list);
     }
@@ -559,7 +575,7 @@ class NeroParser extends EmbeddedParser {
             scanner.consume(COLON, "expected ':' after key term.");
             list.add(term(Context.HEAD));
         }
-        scanner.consume(RIGHT_BRACE, "expected '}' after map literal.");
+        scanner.consume(RIGHT_BRACE, "expected '}' after map items.");
 
         return new MapTerm(list);
     }

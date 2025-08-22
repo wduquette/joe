@@ -1,7 +1,9 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.Keyword;
+import com.wjduquette.joe.patterns.Matcher;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.types.SetValue;
@@ -94,6 +96,9 @@ public class RuleEngine {
     // Constructor Data
     //
 
+    // The Joe instance, for `Pattern` matching
+    private final Joe joe;
+
     // The Nero rule set, i.e., the compiled Nero program.
     private final NeroRuleSet ruleset;
 
@@ -128,9 +133,11 @@ public class RuleEngine {
     /**
      * Creates a new RuleEngine with the given ruleset and no external database
      * of facts.
+     * @param joe The related Joe interpreter.
      * @param ruleset The ruleset
      */
-    public RuleEngine(NeroRuleSet ruleset) {
+    public RuleEngine(Joe joe, NeroRuleSet ruleset) {
+        this.joe = joe;
         this.ruleset = ruleset;
 
         // NEXT, Categorize the rules by head relation
@@ -147,8 +154,8 @@ public class RuleEngine {
      * @param ruleset The ruleset
      * @param facts The fact set
      */
-    public RuleEngine(NeroRuleSet ruleset, FactSet facts) {
-        this(ruleset);
+    public RuleEngine(Joe joe, NeroRuleSet ruleset, FactSet facts) {
+        this(joe, ruleset);
         knownFacts.addAll(facts);
     }
 
@@ -402,16 +409,6 @@ public class RuleEngine {
         BindingContext bc
     ) {
         return switch (term) {
-            case Variable v -> {
-                var bound = bc.bindings.get(v.name());
-
-                if (bound == null) {
-                    bc.bindings.bind(v.name(), value);
-                    yield true;
-                } else {
-                    yield Objects.equals(bound, value);
-                }
-            }
             case Constant c -> {
                 if (Objects.equals(value, c.value())) {
                     yield true;
@@ -421,6 +418,18 @@ public class RuleEngine {
                     yield e.name().equalsIgnoreCase(k.name());
                 }
                 yield false;
+            }
+            case PatternTerm pt ->
+                Matcher.matchWith(joe, pt.pattern(), value, null, bc.bindings);
+            case Variable v -> {
+                var bound = bc.bindings.get(v.name());
+
+                if (bound == null) {
+                    bc.bindings.bind(v.name(), value);
+                    yield true;
+                } else {
+                    yield Objects.equals(bound, value);
+                }
             }
             case Wildcard ignored -> true;
             default -> throw new IllegalStateException(
