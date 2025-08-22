@@ -2,14 +2,14 @@
 
 function testName() {
     var name = Joe.typeOf(JoeTest.OPAQUE).name();
-    check(name).eq("OpaqueValue");
+    assertEQ(name, "OpaqueValue");
 }
 
 function testJavaName() {
     var name = Joe.typeOf(JoeTest.OPAQUE).javaName();
-    check(name).eq("com.wjduquette.joe.tools.test.TestPackage$OpaqueValue");
+    assertEQ(name, "com.wjduquette.joe.tools.test.TestPackage$OpaqueValue");
 }
 function testToString() {
     var string = JoeTest.OPAQUE.toString();
-    check(string).eq("com.wjduquette.joe.tools.test.TestPackage$OpaqueValue");
+    assertEQ(string, "com.wjduquette.joe.tools.test.TestPackage$OpaqueValue");
 }

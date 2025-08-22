@@ -2,14 +2,14 @@
 
 function testOf_empty() {
     var map = Map.of();
-    check(map).eq({:});
-    check(map.isEmpty()).isTrue();
+    assertEQ(map, {:});
+    assertT(map.isEmpty());
 }
 
 function testOf_entries() {
     var map = Map.of(#a, 1, #b, 2);
-    check(map.isEmpty()).isFalse();
-    check(map).eq({#a: 1, #b: 2});
+    assertF(map.isEmpty());
+    assertEQ(map, {#a: 1, #b: 2});
 }
 
 function testOf_odd() {
@@ -20,97 +20,97 @@ function testOf_odd() {
 
 function testInitializer() {
     var map1 = Map();
-    check(map1.isEmpty()).isTrue();
-    check(map1.size()).eq(0);
+    assertT(map1.isEmpty());
+    assertEQ(map1.size(), 0);
 
     var map2 = Map({#a: 1, #b: 2});
-    check(map2.isEmpty()).isFalse();
-    check(map2.size()).eq(2);
-    check(map2).eq({#a: 1, #b: 2});
+    assertF(map2.isEmpty());
+    assertEQ(map2.size(), 2);
+    assertEQ(map2, {#a: 1, #b: 2});
 }
 
 function testClear() {
     var map = {#a: 1};
     map.clear();
-    check(map.isEmpty()).isTrue();
-    check(map.size()).eq(0);
+    assertT(map.isEmpty());
+    assertEQ(map.size(), 0);
 }
 
 function testContainsKey() {
     var map = {#a: 1};
-    check(map.containsKey(#a)).isTrue();
-    check(map.containsKey(#b)).isFalse();
+    assertT(map.containsKey(#a));
+    assertF(map.containsKey(#b));
 }
 
 function testContainsValue() {
     var map = {#a: 1};
-    check(map.containsValue(1)).isTrue();
-    check(map.containsKey(2)).isFalse();
+    assertT(map.containsValue(1));
+    assertF(map.containsKey(2));
 }
 
 function testCopy() {
     var map = {#a: 1};
     var map2 = map.copy();
-    check(map2).eq(map);
+    assertEQ(map2, map);
     map2.clear();
-    check(map2 == map).isFalse();
+    assertF(map2 == map);
 }
 
 function testGet() {
     var map = {#a: 1};
-    check(map.get(#a)).eq(1);
-    check(map.get(#b)).isNull();
+    assertEQ(map.get(#a), 1);
+    assertEQ(map.get(#b), null);
 }
 
 function testGetOrDefault() {
     var map = {#a: 1};
-    check(map.getOrDefault(#a,0)).eq(1);
-    check(map.getOrDefault(#b,0)).eq(0);
+    assertEQ(map.getOrDefault(#a,0), 1);
+    assertEQ(map.getOrDefault(#b,0), 0);
 }
 
 function testIsEmpty() {
-    check({}.isEmpty()).isTrue();
-    check({#a: 1}.isEmpty()).isFalse();
+    assertT({}.isEmpty());
+    assertF({#a: 1}.isEmpty());
 }
 
 function testKeySet() {
     var map = {#a: 1, #b: 2};
-    check(map.keySet()).containsAll(#a, #b);
+    assertT(map.keySet().containsAll({#a, #b}));
 }
 
 function testPut() {
     var map = {:};
     map.put(#a, 1);
-    check(map).eq({#a: 1});
-    check(map.get(#a)).eq(1);
+    assertEQ(map, {#a: 1});
+    assertEQ(map.get(#a), 1);
 }
 
 function testPutAll() {
     var map1 = {#a: 1, #b: 2};
     var map2 = {#c: 3};
     map2.putAll(map1);
-    check(map2).eq({#a: 1, #b: 2, #c: 3});
+    assertEQ(map2, {#a: 1, #b: 2, #c: 3});
 }
 
 function testRemove() {
     var map = {#a: 1, #b: 2, #c: 3};
-    check(map.remove(#b)).eq(2);
-    check(map).eq({#a: 1, #c: 3});
-    check(map.remove(#d)).eq(null);
-    check(map).eq({#a: 1, #c: 3});
+    assertEQ(map.remove(#b), 2);
+    assertEQ(map, {#a: 1, #c: 3});
+    assertEQ(map.remove(#d), null);
+    assertEQ(map, {#a: 1, #c: 3});
 }
 
 function testSize() {
-    check({}.size()).eq(0);
-    check({#a: 1, #b: 2}.size()).eq(2);
+    assertEQ({}.size(), 0);
+    assertEQ({#a: 1, #b: 2}.size(), 2);
 }
 
 function testToString() {
-    check({#a: 1, #b: 2}.toString()).eq("{#a: 1, #b: 2}");
+    assertEQ({#a: 1, #b: 2}.toString(), "{#a: 1, #b: 2}");
 }
 
 function testValues() {
     var map = {#a: 1, #b: 2};
-    check(map.values()).containsAll(1, 2);
+    assertT(map.values().containsAll({1, 2}));
 }
 

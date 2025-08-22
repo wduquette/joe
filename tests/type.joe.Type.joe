@@ -4,6 +4,6 @@
 // The Type type's own info
 
 function testName() {
-    check(Type.name()).eq("Type");
+    assertEQ(Type.name(), "Type");
 }
 

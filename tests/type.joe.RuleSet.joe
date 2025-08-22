@@ -7,7 +7,7 @@ function testToString() {
     var rules = ruleset {
         Ancestor(x, y) :- Parent(x, y);
     };
-    check(rules.toString()).eq("""
+    assertEQ(rules.toString(), """
         ruleset {
             Ancestor(x, y) :- Parent(x, y);
         }
@@ -21,7 +21,7 @@ function testIsStratified_true() {
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     };
-    check(rules.isStratified()).eq(true);
+    assertT(rules.isStratified());
 }
 
 // RuleSet::infer should always run successfully when no
@@ -34,7 +34,7 @@ function testInfer_noScriptedFacts() {
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     };
     var results = rules.infer().map(Joe.stringify).sorted();
-    check(results).eq([
+    assertEQ(results, [
         "Fact(Ancestor, #anne, #bert)",
         "Fact(Ancestor, #anne, #clark)",
         "Fact(Ancestor, #bert, #clark)",
@@ -97,7 +97,7 @@ function testInfer_proxiedValue_ordered() {
     };
     var results = rules.infer(inputs).map(Joe.stringify).sorted();
 
-    check(results).eq([
+    assertEQ(results, [
         "Fact(Ancestor, #anne, #bert)",
         "Fact(Ancestor, #anne, #clark)",
         "Fact(Ancestor, #bert, #clark)",
@@ -118,7 +118,7 @@ function testInfer_proxiedValue_named() {
     };
     var results = rules.infer(inputs).map(Joe.stringify).sorted();
 
-    check(results).eq([
+    assertEQ(results, [
         "Fact(Ancestor, #anne, #bert)",
         "Fact(Ancestor, #anne, #clark)",
         "Fact(Ancestor, #bert, #clark)",
@@ -139,7 +139,7 @@ function testInfer_record_ordered() {
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     };
     var results = rules.infer(inputs).map(Joe.stringify).sorted();
-    check(results).eq([
+    assertEQ(results, [
         "Fact(Ancestor, #anne, #bert)",
         "Fact(Ancestor, #anne, #clark)",
         "Fact(Ancestor, #bert, #clark)",
@@ -160,7 +160,7 @@ function testInfer_record_named() {
         Ancestor(x, y) :- Parent(p:x, c:z), Ancestor(z, y);
     };
     var results = rules.infer(inputs).map(Joe.stringify).sorted();
-    check(results).eq([
+    assertEQ(results, [
         "Fact(Ancestor, #anne, #bert)",
         "Fact(Ancestor, #anne, #clark)",
         "Fact(Ancestor, #bert, #clark)",
@@ -190,7 +190,7 @@ function testInfer_class_named() {
         Ancestor(x, y) :- Parent(p:x, c:z), Ancestor(z, y);
     };
     var results = rules.infer(inputs).map(Joe.stringify).sorted();
-    check(results).eq([
+    assertEQ(results, [
         "Fact(Ancestor, #anne, #bert)",
         "Fact(Ancestor, #anne, #clark)",
         "Fact(Ancestor, #bert, #clark)",

@@ -2,93 +2,93 @@
 
 function testInitializer() {
     var set1 = {};
-    check(set1.isEmpty()).isTrue();
-    check(set1.size()).eq(0);
+    assertT(set1.isEmpty());
+    assertEQ(set1.size(), 0);
 
     var set2 = {#a, #b};
-    check(set2.isEmpty()).isFalse();
-    check(set2.size()).eq(2);
+    assertF(set2.isEmpty());
+    assertEQ(set2.size(), 2);
 }
 
 function testAdd() {
     var set = {};
-    check(set.add(#a)).isTrue();
-    check(set).eq({#a});
+    assertT(set.add(#a));
+    assertEQ(set, {#a});
 }
 
 function testAddAll() {
     var set1 = {#a, #b};
     var set2 = {#c};
-    check(set2.addAll(set1)).isTrue();
-    check(set2).eq({#a, #b, #c});
+    assertT(set2.addAll(set1));
+    assertEQ(set2, {#a, #b, #c});
 }
 
 function testClear() {
     var set = {#a};
     set.clear();
-    check(set.isEmpty()).isTrue();
-    check(set.size()).eq(0);
+    assertT(set.isEmpty());
+    assertEQ(set.size(), 0);
 }
 
 function testContains() {
     var set = {#a};
-    check(set.contains(#a)).isTrue();
-    check(set.contains(#b)).isFalse();
+    assertT(set.contains(#a));
+    assertF(set.contains(#b));
 }
 
 function testContainsAll() {
     var set = {#a, #b, #c, #d};
-    check(set.containsAll({#a, #c})).isTrue();
-    check(set.containsAll({#c, #e})).isFalse();
+    assertT(set.containsAll({#a, #c}));
+    assertF(set.containsAll({#c, #e}));
 }
 
 function testCopy() {
     var set = {#a};
     var set2 = set.copy();
-    check(set2).eq(set);
+    assertEQ(set2, set);
     set2.clear();
-    check(set2 == set).isFalse();
+    assertF(set2 == set);
 }
 
 function testFilter() {
     var set = {1, 2, 3, 4, 5};
     var filtered = set.filter(\x -> x > 3);
-    check(filtered).eq({4, 5});
+    assertEQ(filtered, {4, 5});
 }
 
 function testIsEmpty() {
-    check({}.isEmpty()).isTrue();
-    check({#a}.isEmpty()).isFalse();
+    assertT({}.isEmpty());
+    assertF({#a}.isEmpty());
 }
 
 function testMap() {
     var set = {1, 2, 3};
     var filtered = set.map(Joe.stringify);
-    check(filtered).eq({"1", "2", "3"});
+    assertEQ(filtered, {"1", "2", "3"});
 }
 
 function testRemove() {
     var set = {#a, #b, #c};
-    check(set.remove(#b)).isTrue();
-    check(set).eq({#a, #c});
-    check(set.remove(#d)).isFalse();
-    check(set).eq({#a, #c});
+    assertT(set.remove(#b));
+    assertEQ(set, {#a, #c});
+    assertF(set.remove(#d));
+    assertEQ(set, {#a, #c});
 }
 
 function testRemoveAll() {
     var set = {#a, #b, #c};
-    check(set.removeAll({#b})).isTrue();
-    check(set).eq({#a, #c});
+    assertT(set.removeAll({#b}));
+    assertEQ(set, {#a, #c});
 }
 
 function testSize() {
-    check({}.size()).eq(0);
-    check({#a, #b}.size()).eq(2);
+    assertEQ({}.size(), 0);
+    assertEQ({#a, #b}.size(), 2);
 }
 
 function testSorted_string() {
     var list = {"b", "c", "a", "d"}.sorted();
-    check(list).eq(["a", "b", "c", "d"]);
+    assertEQ(list, ["a", "b", "c", "d"]);
 }
 
 function testSorted_nonString_noComparator() {
@@ -102,9 +102,9 @@ function testSorted_nonString_comparator() {
     }
 
     var list = {#a, #b, #c, #d}.sorted(comp);
-    check(list).eq([#a, #b, #c, #d]);
+    assertEQ(list, [#a, #b, #c, #d]);
 }
 
 function testToString() {
-    check({#a, #b}.toString()).eq("{#a, #b}");
+    assertEQ({#a, #b}.toString(), "{#a, #b}");
 }
