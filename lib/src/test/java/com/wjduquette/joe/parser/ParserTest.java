@@ -544,12 +544,104 @@ public class ParserTest extends Ted {
     //-------------------------------------------------------------------------
     // switchStatement
 
-    // TODO
+    @Test public void testSwitch_expectedLeftParen() {
+        test("testSwitch_expectedLeftParen");
+
+        var source = """
+            switch x) {}
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at 'x', expected '(' after 'switch'."
+        );
+    }
+
+    @Test public void testSwitch_expectedRightParen() {
+        test("testSwitch_expectedRightParen");
+
+        var source = """
+            switch (x {}
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '{', expected ')' after switch expression."
+        );
+    }
+
+    @Test public void testSwitch_expectedLeftBrace() {
+        test("testSwitch_expectedLeftBrace");
+
+        var source = """
+            switch (x) }
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '}', expected '{' before switch body."
+        );
+    }
+
+    @Test public void testSwitch_expectedArrowAfterCase() {
+        test("testSwitch_expectedArrowAfterCase");
+
+        var source = """
+            switch (x) {
+                case 1 {}
+            }
+            """;
+        check(parse(source)).eq(
+            "[line 2] error at '{', expected '->' after case value."
+        );
+    }
+
+    @Test public void testSwitch_expectedCase() {
+        test("testSwitch_expectedCase");
+
+        var source = """
+            switch (x) {
+            }
+            """;
+        check(parse(source)).eq(
+            "[line 2] error at '}', expected at least one 'case' in switch."
+        );
+    }
+
+    @Test public void testSwitch_expectedArrowAfterDefault() {
+        test("testSwitch_expectedArrowAfterDefault");
+
+        var source = """
+            switch (x) {
+                case 1 -> {}
+                default {}
+            }
+            """;
+        check(parse(source)).eq(
+            "[line 3] error at '{', expected '->' after 'default'."
+        );
+    }
+
+    @Test public void testSwitch_expectedRightBrace() {
+        test("testSwitch_expectedRightBrace");
+
+        var source = """
+            switch (x) {
+                case 1 -> {}
+                default -> {}
+            """;
+        check(parse(source)).eq(
+            "[line 3] error at end, expected '}' after switch body."
+        );
+    }
 
     //-------------------------------------------------------------------------
     // throwStatement
 
-    // TODO
+    @Test public void testThrow_expectedSemiColon() {
+        test("testThrow_expectedSemiColon");
+
+        var source = """
+            throw "foo"
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at end, expected ';' after thrown error."
+        );
+    }
 
     //-------------------------------------------------------------------------
     // whileStatement()

@@ -589,13 +589,13 @@ public class Parser {
             while (scanner.match(COMMA)) {
                 values.add(expression());
             }
-            scanner.consume(MINUS_GREATER, "expected '->' after case values.");
+            scanner.consume(MINUS_GREATER, "expected '->' after case value.");
             var stmt = statement();
             cases.add(new Stmt.SwitchCase(caseKeyword, values, stmt));
         }
 
         if (cases.isEmpty()) {
-            error(scanner.previous(), "expected at least one 'case' in switch.");
+            error(scanner.peek(), "expected at least one 'case' in switch.");
         }
 
         // NEXT, parse the default case, if it exists
