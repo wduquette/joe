@@ -372,14 +372,11 @@ public class ParserTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // OLD TESTS
-
-    //-------------------------------------------------------------------------
-    // Stmt.Assert
+    // assertStatement()
 
     @Test
-    public void testStmtAssert_noSemiColon() {
-        test("testStmtAssert_noSemiColon");
+    public void testAssert_expectedSemiColon() {
+        test("testAssert_expectedSemiColon");
 
         var source = """
             assert 1 == 1
@@ -391,11 +388,11 @@ public class ParserTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // Stmt.Block
+    // block()
 
     @Test
-    public void testStmtBlock_noRightBrace() {
-        test("testStmtBlock_noRightBrace");
+    public void testBlock_expectedRightBrace() {
+        test("testBlock_expectedRightBrace");
 
         var source = """
             {
@@ -406,15 +403,43 @@ public class ParserTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // Stmt.Class
-
-
-    //-------------------------------------------------------------------------
-    // Stmt.Expression
+    // breakStatement()
 
     @Test
-    public void testStmtExpression_noSemiColon() {
-        test("testStmtExpression_noSemiColon");
+    public void testBreak_expectedSemiColon() {
+        test("testBreak_expectedSemiColon");
+
+        var source = """
+            break
+            println();
+            """;
+        check(parse(source)).eq(
+            "[line 2] error at 'println', expected ';' after 'break'."
+        );
+    }
+
+    //-------------------------------------------------------------------------
+    // continueStatement()
+
+    @Test
+    public void testContinue_expectedSemiColon() {
+        test("testContinue_expectedSemiColon");
+
+        var source = """
+            continue
+            println();
+            """;
+        check(parse(source)).eq(
+            "[line 2] error at 'println', expected ';' after 'continue'."
+        );
+    }
+
+    //-------------------------------------------------------------------------
+    // expressionStatement()
+
+    @Test
+    public void testExpression_expectedSemiColon() {
+        test("testExpression_expectedSemiColon");
 
         var source = """
             1 + 2
@@ -429,8 +454,8 @@ public class ParserTest extends Ted {
     // Stmt.For
 
     @Test
-    public void testStmtFor_noLeftParen() {
-        test("testStmtFor_noLeftParen");
+    public void testFor_expectedLeftParen() {
+        test("testFor_expectedLeftParen");
 
         var source = """
             for var i = 1; i < 5; i = i + 1) { }
@@ -440,8 +465,8 @@ public class ParserTest extends Ted {
     }
 
     @Test
-    public void testStmtFor_noSemiAfterCondition() {
-        test("testStmtFor_noSemiAfterCondition");
+    public void testFor_expectedSemiAfterCondition() {
+        test("testFor_expectedSemiAfterCondition");
 
         var source = """
             for (var i = 1; i < 5 i = i + 1) { }
@@ -452,8 +477,8 @@ public class ParserTest extends Ted {
     }
 
     @Test
-    public void testStmtFor_noRightParen() {
-        test("testStmtFor_noRightParen");
+    public void testFor_expectedRightParen() {
+        test("testFor_expectedRightParen");
 
         var source = """
             for (var i = 1; i < 5; i = i + 1 { }
@@ -463,13 +488,17 @@ public class ParserTest extends Ted {
         );
     }
 
+    //-------------------------------------------------------------------------
+    // foreachStatement()
+
+    // TODO
 
     //-------------------------------------------------------------------------
-    // Stmt.If
+    // ifStatement()
 
     @Test
-    public void testStmtIf_noLeftParen() {
-        test("testStmtIf_noLeftParen");
+    public void testIf_expectedLeftParen() {
+        test("testIf_expectedLeftParen");
 
         var source = """
             if x > 0) {}
@@ -480,23 +509,28 @@ public class ParserTest extends Ted {
     }
 
     @Test
-    public void testStmtIf_noRightParen() {
-        test("testStmtIf_noRightParen");
+    public void testIf_expectedRightParen() {
+        test("testIf_expectedRightParen");
 
         var source = """
             if (x > 0 {}
             """;
         check(parse(source)).eq(
-            "[line 1] error at '{', expected ')' after if condition."
+            "[line 1] error at '{', expected ')' after 'if' condition."
         );
     }
 
     //-------------------------------------------------------------------------
-    // Stmt.Return
+    // matchStatement
+
+    // TODO
+
+    //-------------------------------------------------------------------------
+    // returnStatement
 
     @Test
-    public void testStmtReturn_noSemiColon() {
-        test("testStmtReturn_noSemiColon");
+    public void testReturn_expectedSemiColon() {
+        test("testReturn_expectedSemiColon");
 
         var source = """
             return 1
@@ -508,15 +542,21 @@ public class ParserTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // Stmt.Var
+    // switchStatement
 
+    // TODO
 
     //-------------------------------------------------------------------------
-    // Stmt.While
+    // throwStatement
+
+    // TODO
+
+    //-------------------------------------------------------------------------
+    // whileStatement()
 
     @Test
-    public void testStmtWhile_noLeftParen() {
-        test("testStmtWhile_noLeftParen");
+    public void testWhile_expectedLeftParen() {
+        test("testWhile_expectedLeftParen");
 
         var source = """
             while x > 0) {}
@@ -527,8 +567,8 @@ public class ParserTest extends Ted {
     }
 
     @Test
-    public void testStmtWhile_noRightParen() {
-        test("testStmtWhile_noRightParen");
+    public void testWhile_expectedRightParen() {
+        test("testWhile_expectedRightParen");
 
         var source = """
             while (x > 0 {}
@@ -538,6 +578,60 @@ public class ParserTest extends Ted {
         );
     }
 
+    //-------------------------------------------------------------------------
+    // assignment()
+
+    // TODO
+
+    //-------------------------------------------------------------------------
+    // ternary()
+
+    // TODO
+
+    //-------------------------------------------------------------------------
+    // prePost()
+
+    // TODO
+
+    //-------------------------------------------------------------------------
+    // call()
+
+    // TODO
+
+    //-------------------------------------------------------------------------
+    // finishCall()
+
+    // TODO
+
+    //-------------------------------------------------------------------------
+    // primary()
+
+    // TODO
+
+    //-------------------------------------------------------------------------
+    // listLiteral()
+
+    // TODO
+
+    //-------------------------------------------------------------------------
+    // setOrMapLiteral()
+
+    // TODO
+
+    //-------------------------------------------------------------------------
+    // setLiteral()
+
+    // TODO
+
+    //-------------------------------------------------------------------------
+    // mapLiteral()
+
+    // TODO
+
+    //-------------------------------------------------------------------------
+    // rulesetExpression()
+
+    // TODO
 
     //-------------------------------------------------------------------------
     // Helpers

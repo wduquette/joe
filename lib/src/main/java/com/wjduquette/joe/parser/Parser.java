@@ -344,7 +344,7 @@ public class Parser {
         if (scanner.match(BREAK)) return breakStatement();
         if (scanner.match(CONTINUE)) return continueStatement();
         if (scanner.match(FOR)) return forStatement();
-        if (scanner.match(FOREACH)) return forEachStatement();
+        if (scanner.match(FOREACH)) return foreachStatement();
         if (scanner.match(IF)) return ifStatement();
         if (scanner.match(MATCH)) return matchStatement();
         if (scanner.match(RETURN)) return returnStatement();
@@ -376,15 +376,33 @@ public class Parser {
         return new Stmt.Assert(keyword, condition, message);
     }
 
+    private Stmt.Block blockStatement() {
+        var start = scanner.previous().span().end();
+        List<Stmt> statements = block();
+        var end = scanner.previous().span().start();
+        return new Stmt.Block(source.span(start, end), statements);
+    }
+
+    private List<Stmt> block() {
+        List<Stmt> statements = new ArrayList<>();
+
+        while (!scanner.check(RIGHT_BRACE) && !scanner.isAtEnd()) {
+            statements.add(declaration());
+        }
+
+        scanner.consume(RIGHT_BRACE, "expected '}' after block.");
+        return statements;
+    }
+
     private Stmt breakStatement() {
         Token keyword = scanner.previous();
-        scanner.consume(SEMICOLON, "expected ';' after 'break' value.");
+        scanner.consume(SEMICOLON, "expected ';' after 'break'.");
         return new Stmt.Break(keyword);
     }
 
     private Stmt continueStatement() {
         Token keyword = scanner.previous();
-        scanner.consume(SEMICOLON, "expected ';' after 'continue' value.");
+        scanner.consume(SEMICOLON, "expected ';' after 'continue'.");
         return new Stmt.Continue(keyword);
     }
 
@@ -434,7 +452,7 @@ public class Parser {
         ));
     }
 
-    private Stmt forEachStatement() {
+    private Stmt foreachStatement() {
         var keyword = scanner.previous();
         var start = keyword.span().start();
         scanner.consume(LEFT_PAREN, "expected '(' after 'foreach'.");
@@ -491,7 +509,7 @@ public class Parser {
         var keyword = scanner.previous();
         scanner.consume(LEFT_PAREN, "expected '(' after 'if'.");
         Expr condition = expression();
-        scanner.consume(RIGHT_PAREN, "expected ')' after if condition.");
+        scanner.consume(RIGHT_PAREN, "expected ')' after 'if' condition.");
 
         Stmt thenBranch = statement();
         Stmt elseBranch = null;
@@ -611,24 +629,6 @@ public class Parser {
         Stmt body = statement();
 
         return new Stmt.While(keyword, condition, body);
-    }
-
-    private Stmt.Block blockStatement() {
-        var start = scanner.previous().span().end();
-        List<Stmt> statements = block();
-        var end = scanner.previous().span().start();
-        return new Stmt.Block(source.span(start, end), statements);
-    }
-
-    private List<Stmt> block() {
-        List<Stmt> statements = new ArrayList<>();
-
-        while (!scanner.check(RIGHT_BRACE) && !scanner.isAtEnd()) {
-            statements.add(declaration());
-        }
-
-        scanner.consume(RIGHT_BRACE, "expected '}' after block.");
-        return statements;
     }
 
     //-------------------------------------------------------------------------
