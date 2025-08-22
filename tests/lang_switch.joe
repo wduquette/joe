@@ -10,10 +10,10 @@ function testSimple() {
         }
     }
 
-    assertEquals(cases(1), "a");
-    assertEquals(cases(2), "b");
-    assertEquals(cases(3), "c");
-    assertEquals(cases(4), "?");
+    assertEQ(cases(1), "a");
+    assertEQ(cases(2), "b");
+    assertEQ(cases(3), "c");
+    assertEQ(cases(4), "?");
 }
 
 function testMulti() {
@@ -26,16 +26,16 @@ function testMulti() {
         }
     }
 
-    assertEquals(cases(1), "abc");
-    assertEquals(cases(2), "abc");
-    assertEquals(cases(3), "abc");
-    assertEquals(cases(4), "def");
-    assertEquals(cases(5), "def");
-    assertEquals(cases(6), "def");
-    assertEquals(cases(7), "ghi");
-    assertEquals(cases(8), "ghi");
-    assertEquals(cases(9), "ghi");
-    assertEquals(cases(0), "?");
+    assertEQ(cases(1), "abc");
+    assertEQ(cases(2), "abc");
+    assertEQ(cases(3), "abc");
+    assertEQ(cases(4), "def");
+    assertEQ(cases(5), "def");
+    assertEQ(cases(6), "def");
+    assertEQ(cases(7), "ghi");
+    assertEQ(cases(8), "ghi");
+    assertEQ(cases(9), "ghi");
+    assertEQ(cases(0), "?");
 }
 
 function testNoDefault() {
@@ -48,10 +48,10 @@ function testNoDefault() {
         return "?";
     }
 
-    assertEquals(cases(1), "a");
-    assertEquals(cases(2), "b");
-    assertEquals(cases(3), "c");
-    assertEquals(cases(4), "?");
+    assertEQ(cases(1), "a");
+    assertEQ(cases(2), "b");
+    assertEQ(cases(3), "c");
+    assertEQ(cases(4), "?");
 }
 
 function testBlocks() {
@@ -72,8 +72,8 @@ function testBlocks() {
         }
     }
 
-    assertEquals(cases(1), "a");
-    assertEquals(cases(2), "b");
-    assertEquals(cases(3), "c");
-    assertEquals(cases(4), "?");
+    assertEQ(cases(1), "a");
+    assertEQ(cases(2), "b");
+    assertEQ(cases(3), "c");
+    assertEQ(cases(4), "?");
 }

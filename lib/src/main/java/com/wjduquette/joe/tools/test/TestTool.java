@@ -193,10 +193,10 @@ public class TestTool implements Tool {
                 println("  SKIPPED: " + ex.getMessage());
                 ++skipCount;
             } catch (AssertError ex) {
-                println("  FAILED: " + ex.getJoeStackTrace());
+                println("  FAILED:\n" + ex.getJoeStackTrace().indent(4));
                 ++failureCount;
             } catch (JoeError ex) {
-                println("  ERROR: " + ex.getJoeStackTrace());
+                println("  ERROR:\n" + ex.getJoeStackTrace().indent(4));
                 ++errorCount;
             }
         }
@@ -232,8 +232,8 @@ public class TestTool implements Tool {
             }
 
             if (error != null) {
-                System.out.printf("%-8s %s %s, %s\n",
-                    result + ":", scriptPath, test, error.getMessage());
+                System.out.printf("%-8s %s %s\n%s\n", result + ":", scriptPath,
+                    test, error.getMessage().indent(4));
             }
         }
     }

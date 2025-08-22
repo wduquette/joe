@@ -3,17 +3,17 @@
 // Keyword tests
 
 function testInitializer() {
-    check(Keyword("abc")).eq(#abc);
-    check(Keyword("#abc")).eq(#abc);
+    assertEQ(Keyword("abc"), #abc);
+    assertEQ(Keyword("#abc"), #abc);
 
-    checkCatch(\-> Keyword("a@"))
-        .message("Expected keyword name, got: String 'a@'.");
+    assertError(\-> Keyword("a@"),
+        "Expected keyword name, got: String 'a@'.");
 }
 
 function testName() {
-    check(#abc.name()).eq("abc");
+    assertEQ(#abc.name(), "abc");
 }
 
 function testToString() {
-    check(#abc.toString()).eq("#abc");
+    assertEQ(#abc.toString(), "#abc");
 }

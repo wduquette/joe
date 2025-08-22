@@ -2,16 +2,16 @@
 
 function testLiteral_empty() {
     var empty = {};
-    assertTrue(empty.isEmpty());
-    assertEquals(Joe.typeOf(empty), Set);
+    assertT(empty.isEmpty());
+    assertEQ(Joe.typeOf(empty), Set);
 }
 
 function testLiteral_noTrailingComma() {
     var set = {#a, #b, #c, #a};
-    assertEquals(set, Set.of(#a, #b, #c));
+    assertEQ(set, Set.of(#a, #b, #c));
 }
 
 function testLiteral_trailingComma() {
     var set = {#a, #b, #c, #a, };
-    assertEquals(set, Set.of(#a, #b, #c));
+    assertEQ(set, Set.of(#a, #b, #c));
 }

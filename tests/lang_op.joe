@@ -6,33 +6,33 @@
 // Arithmetic Operators
 
 function testPlus() {
-    assertEquals(1 + 2, 3);
-    assertEquals("a" + "b", "ab");
-    assertEquals("a" + 1, "a1");
-    assertEquals(1 + "a", "1a");
+    assertEQ(1 + 2, 3);
+    assertEQ("a" + "b", "ab");
+    assertEQ("a" + 1, "a1");
+    assertEQ(1 + "a", "1a");
 
     function bad() { #a + #b; }
     assertError(bad, "The '+' operator expects two Numbers or at least one String.");
 }
 
 function testMinus() {
-    assertEquals(4 - 1, 3);
-    assertEquals(1 - 4, -3);
+    assertEQ(4 - 1, 3);
+    assertEQ(1 - 4, -3);
 
     function bad() { 4 - "abc"; }
     assertError(bad, "The '-' operator expects two numeric operands.");
 }
 
 function testTimes() {
-    assertEquals(4 * 2, 8);
+    assertEQ(4 * 2, 8);
 
     function bad() { 4 * "abc"; }
     assertError(bad, "The '*' operator expects two numeric operands.");
 }
 
 function testDivide() {
-    assertEquals(4/2, 2);
-    assertEquals(String(4/0), "Infinity");  // TODO: support Infinity,  NaN
+    assertEQ(4/2, 2);
+    assertEQ(String(4/0), "Infinity");  // TODO: support Infinity,  NaN
 
     function bad() { 4 / "abc"; }
     assertError(bad, "The '/' operator expects two numeric operands.");
@@ -42,43 +42,43 @@ function testDivide() {
 // Test Comparisons
 
 function testEquals() {
-    assertTrue(1 == 1);
-    assertTrue("a" == "a");
-    assertTrue(#k == #k);
-    assertFalse(1 == 2);
-    assertFalse("a" == #k);
+    assertT(1 == 1);
+    assertT("a" == "a");
+    assertT(#k == #k);
+    assertF(1 == 2);
+    assertF("a" == #k);
 }
 
 function testNotEquals() {
-    assertFalse(1 != 1);
-    assertTrue(1 != 2);
-    assertTrue("a" != #k);
+    assertF(1 != 1);
+    assertT(1 != 2);
+    assertT("a" != #k);
 }
 
 function testComparisons() {
-    assertTrue(0 < 1);
-    assertFalse(1 < 1);
-    assertTrue("a" < "b");
-    assertFalse("b" < "a");
+    assertT(0 < 1);
+    assertF(1 < 1);
+    assertT("a" < "b");
+    assertF("b" < "a");
 
-    assertTrue(0 <= 1);
-    assertTrue(1 <= 1);
-    assertFalse(2 <= 1);
-    assertTrue("a" <= "b");
-    assertTrue("a" <= "a");
-    assertFalse("b" <= "a");
+    assertT(0 <= 1);
+    assertT(1 <= 1);
+    assertF(2 <= 1);
+    assertT("a" <= "b");
+    assertT("a" <= "a");
+    assertF("b" <= "a");
 
-    assertFalse(0 > 0);
-    assertTrue(1 > 0);
-    assertFalse("a" > "a");
-    assertTrue("b" > "a");
+    assertF(0 > 0);
+    assertT(1 > 0);
+    assertF("a" > "a");
+    assertT("b" > "a");
 
-    assertTrue(1 >= 0);
-    assertTrue(1 >= 1);
-    assertFalse(1 >= 2);
-    assertTrue("b" >= "a");
-    assertTrue("b" >= "b");
-    assertFalse("b" >= "c");
+    assertT(1 >= 0);
+    assertT(1 >= 1);
+    assertF(1 >= 2);
+    assertT("b" >= "a");
+    assertT("b" >= "b");
+    assertF("b" >= "c");
 
     function bad() { "a" > 1; }
     assertError(bad, "The '>' operator expects two Numbers or two Strings.");
@@ -89,41 +89,41 @@ function testComparisons() {
 
 function testAnd() {
     // With booleans
-    assertTrue(true && true);
-    assertFalse(true && false);
-    assertFalse(false && true);
-    assertFalse(false && false);
+    assertT(true && true);
+    assertF(true && false);
+    assertF(false && true);
+    assertF(false && false);
 
     // Returns first argument if first is falsey.
-    assertFalse(false && 1);
-    assertEquals(null && 1, null);
+    assertF(false && 1);
+    assertEQ(null && 1, null);
 
     // Returns second argument if first is truthy
-    assertEquals(1 && 2, 2);
-    assertEquals(1 && null, null);
+    assertEQ(1 && 2, 2);
+    assertEQ(1 && null, null);
 }
 
 function testOr() {
     // With booleans
-    assertTrue(true || true);
-    assertTrue(true || false);
-    assertTrue(false || true);
-    assertFalse(false || false);
+    assertT(true || true);
+    assertT(true || false);
+    assertT(false || true);
+    assertF(false || false);
 
     // Returns first argument if first is truthy.
-    assertTrue(true || false);
-    assertEquals(1 || null, 1);
+    assertT(true || false);
+    assertEQ(1 || null, 1);
 
     // Returns second argument if first is falsy
-    assertEquals(false || 2, 2);
-    assertEquals(null || 4, 4);
+    assertEQ(false || 2, 2);
+    assertEQ(null || 4, 4);
 }
 
 function testNot() {
-    assertFalse(!true);
-    assertFalse(!1);
-    assertTrue(!false);
-    assertTrue(!null);
+    assertF(!true);
+    assertF(!1);
+    assertT(!false);
+    assertT(!null);
 }
 
 //-----------------------------------------------------------------------------
@@ -136,19 +136,19 @@ function testAssignment() {
     var b;
     var c;
     c = b = a;
-    assertEquals(a, 1);
-    assertEquals(b, 1);
-    assertEquals(c, 1);
+    assertEQ(a, 1);
+    assertEQ(b, 1);
+    assertEQ(c, 1);
 }
 
 function testPlusEquals_var() {
     var x = 5;
     var s = "abc";
-    assertEquals(x += 7, 12);
-    assertEquals(x, 12);
-    assertEquals(s += "def", "abcdef");
-    assertEquals(s, "abcdef");
-    assertEquals(x += "abc", "12abc");
+    assertEQ(x += 7, 12);
+    assertEQ(x, 12);
+    assertEQ(s += "def", "abcdef");
+    assertEQ(s, "abcdef");
+    assertEQ(x += "abc", "12abc");
 
     var y = 5;
     function bad1() { y += #abc; }
@@ -160,11 +160,11 @@ function testPlusEquals_property() {
     var thing = Thing();
     thing.x = 5;
     thing.s = "abc";
-    assertEquals(thing.x += 7, 12);
-    assertEquals(thing.x, 12);
-    assertEquals(thing.s += "def", "abcdef");
-    assertEquals(thing.s, "abcdef");
-    assertEquals(thing.x += "abc", "12abc");
+    assertEQ(thing.x += 7, 12);
+    assertEQ(thing.x, 12);
+    assertEQ(thing.s += "def", "abcdef");
+    assertEQ(thing.s, "abcdef");
+    assertEQ(thing.x += "abc", "12abc");
 
     thing.y = 5;
     function bad1() { thing.y += #abc; }
@@ -175,8 +175,8 @@ function testPlusEquals_property() {
 function testMinusEquals_var() {
     var x = 5;
     var s = "abc";
-    assertEquals(x -= 7, -2);
-    assertEquals(x, -2);
+    assertEQ(x -= 7, -2);
+    assertEQ(x, -2);
 
     function bad1() { x -= "abc"; }
     function bad2() { s -= 5; }
@@ -191,8 +191,8 @@ function testMinusEquals_property() {
     var thing = Thing();
     thing.x = 5;
     thing.s = "abc";
-    assertEquals(thing.x -= 7, -2);
-    assertEquals(thing.x, -2);
+    assertEQ(thing.x -= 7, -2);
+    assertEQ(thing.x, -2);
 
     function bad1() { thing.x -= "abc"; }
     function bad2() { thing.s -= 5; }
@@ -206,8 +206,8 @@ function testMinusEquals_property() {
 function testStarEquals_var() {
     var x = 5;
     var s = "abc";
-    assertEquals(x *= 7, 35);
-    assertEquals(x, 35);
+    assertEQ(x *= 7, 35);
+    assertEQ(x, 35);
 
     function bad1() { x *= "abc"; }
     function bad2() { s *= 5; }
@@ -222,8 +222,8 @@ function testStarEquals_property() {
     var thing = Thing();
     thing.x = 5;
     thing.s = "abc";
-    assertEquals(thing.x *= 7, 35);
-    assertEquals(thing.x, 35);
+    assertEQ(thing.x *= 7, 35);
+    assertEQ(thing.x, 35);
 
     function bad1() { thing.x *= "abc"; }
     function bad2() { thing.s *= 5; }
@@ -237,8 +237,8 @@ function testStarEquals_property() {
 function testSlashEquals_var() {
     var x = 50;
     var s = "abc";
-    assertEquals(x /= 5, 10);
-    assertEquals(x, 10);
+    assertEQ(x /= 5, 10);
+    assertEQ(x, 10);
 
     function bad1() { x /= "abc"; }
     function bad2() { s /= 5; }
@@ -253,8 +253,8 @@ function testSlashEquals_property() {
     var thing = Thing();
     thing.x = 50;
     thing.s = "abc";
-    assertEquals(thing.x /= 5, 10);
-    assertEquals(thing.x, 10);
+    assertEQ(thing.x /= 5, 10);
+    assertEQ(thing.x, 10);
 
     function bad1() { thing.x /= "abc"; }
     function bad2() { thing.s /= 5; }
@@ -272,28 +272,28 @@ function testSlashEquals_property() {
 
 function testPlusPlus_pre_var() {
     var x = 0;
-    assertEquals(++x, 1);
-    assertEquals(x, 1);
+    assertEQ(++x, 1);
+    assertEQ(x, 1);
 }
 
 function testPlusPlus_pre_prop() {
     var t = Thing();
     t.x = 0;
-    assertEquals(++t.x, 1);
-    assertEquals(t.x, 1);
+    assertEQ(++t.x, 1);
+    assertEQ(t.x, 1);
 }
 
 function testPlusPlus_post_var() {
     var x = 0;
-    assertEquals(x++, 0);
-    assertEquals(x, 1);
+    assertEQ(x++, 0);
+    assertEQ(x, 1);
 }
 
 function testPlusPlus_post_prop() {
     var t = Thing();
     t.x = 0;
-    assertEquals(t.x++, 0);
-    assertEquals(t.x, 1);
+    assertEQ(t.x++, 0);
+    assertEQ(t.x, 1);
 }
 
 function testPlusPlus_nonNumber() {
@@ -304,28 +304,28 @@ function testPlusPlus_nonNumber() {
 
 function testMinusMinus_pre_var() {
     var x = 0;
-    assertEquals(--x, -1);
-    assertEquals(x, -1);
+    assertEQ(--x, -1);
+    assertEQ(x, -1);
 }
 
 function testMinusMinus_pre_prop() {
     var t = Thing();
     t.x = 0;
-    assertEquals(--t.x, -1);
-    assertEquals(t.x, -1);
+    assertEQ(--t.x, -1);
+    assertEQ(t.x, -1);
 }
 
 function testMinusMinus_post_var() {
     var x = 0;
-    assertEquals(x--, 0);
-    assertEquals(x, -1);
+    assertEQ(x--, 0);
+    assertEQ(x, -1);
 }
 
 function testMinusMinus_post_prop() {
     var t = Thing();
     t.x = 0;
-    assertEquals(t.x--, 0);
-    assertEquals(t.x, -1);
+    assertEQ(t.x--, 0);
+    assertEQ(t.x, -1);
 }
 
 function testMinusMinus_nonNumber() {
@@ -339,8 +339,8 @@ function testMinusMinus_nonNumber() {
 // Ternary Operator
 
 function testTernary() {
-    assertEquals(true ? "a" : "b", "a");
-    assertEquals(false ? "a" : "b", "b");
+    assertEQ(true ? "a" : "b", "a");
+    assertEQ(false ? "a" : "b", "b");
 }
 
 //-----------------------------------------------------------------------------
@@ -348,8 +348,8 @@ function testTernary() {
 
 function testIN() {
     var list = [#a, #b, #c];
-    assertTrue(#a in list);
-    assertFalse(#d in list);
+    assertT(#a in list);
+    assertF(#d in list);
 
     function bad() { return #a in #a; }
     assertError(bad, "Expected iterable, got: Keyword '#a'.");
@@ -357,8 +357,8 @@ function testIN() {
 
 function testNI() {
     var list = [#a, #b, #c];
-    assertFalse(#a ni list);
-    assertTrue(#d ni list);
+    assertF(#a ni list);
+    assertT(#d ni list);
 
     function bad() { return #a ni #a; }
     assertError(bad, "Expected iterable, got: Keyword '#a'.");
@@ -371,29 +371,29 @@ function testNI() {
 
 function testMatchOp_simple() {
    var list = [1, 2];
-   assertTrue(list ~ [_, _]);
-   assertFalse(list ~ [_, _, _]);
+   assertT(list ~ [_, _]);
+   assertF(list ~ [_, _, _]);
 }
 
 function testMatchOp_bindOnSuccess() {
    var list = [1, 2];
-   assertTrue(list ~ [a, b]);
-   assertEquals(a, 1);
-   assertEquals(b, 2);
+   assertT(list ~ [a, b]);
+   assertEQ(a, 1);
+   assertEQ(b, 2);
 }
 
 function testMatchOp_bindWithAnd() {
    var list = [1, 2];
-   assertFalse(list ~ [a, b] && a > b);
-   assertEquals(a, 1);
-   assertEquals(b, 2);
+   assertF(list ~ [a, b] && a > b);
+   assertEQ(a, 1);
+   assertEQ(b, 2);
 }
 
 function testMatchOp_declareOnFailure() {
    var list = [1, 2, 3];
-   assertFalse(list ~ [a, b]);
-   assertEquals(a, null);
-   assertEquals(b, null);
+   assertF(list ~ [a, b]);
+   assertEQ(a, null);
+   assertEQ(b, null);
 }
 
 // Verify that having working values on the stack
@@ -401,9 +401,9 @@ function testMatchOp_declareOnFailure() {
 function testMatchOp_withWorkingStack() {
    var list = [1, 2];
    var value = "(" + (list ~ [a, b]) + ")";
-   assertEquals(value, "(true)");
-   assertEquals(a, 1);
-   assertEquals(b, 2);
+   assertEQ(value, "(true)");
+   assertEQ(a, 1);
+   assertEQ(b, 2);
 }
 
 //-----------------------------------------------------------------------------

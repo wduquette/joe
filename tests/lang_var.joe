@@ -4,35 +4,35 @@
 
 function testDeclareOnly_normal() {
     var a;
-    assertEquals(a, null);
+    assertEQ(a, null);
 }
 
 function testDeclareOnly_wildcard() {
     var _;
-    assertEquals(_, null);
+    assertEQ(_, null);
 }
 
 function testDeclareAndInitialize_normal() {
     var a = 1;
-    assertEquals(a, 1);
+    assertEQ(a, 1);
 }
 
 function testDeclareAndInitialize_wildcard() {
     var _ = 1;
-    assertEquals(_, 1);
+    assertEQ(_, 1);
 }
 
 function testBind_simple() {
     var [a, b] = [1, 2];
-    assertEquals(a, 1);
-    assertEquals(b, 2);
+    assertEQ(a, 1);
+    assertEQ(b, 2);
 }
 
 function testBind_complex() {
     var a@[b, c] = [1, 2];
-    assertEquals(a, [1, 2]);
-    assertEquals(b, 1);
-    assertEquals(c, 2);
+    assertEQ(a, [1, 2]);
+    assertEQ(b, 1);
+    assertEQ(c, 2);
 }
 
 function testBind_structureMismatch() {

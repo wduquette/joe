@@ -2,30 +2,88 @@
 
 //-------------------------------------------------------------------------
 // Basic Test API
-//
-// Section copied to bert/pkg_test.joe
 
-function testAssertEquals() {
-    assertEquals(5, 5);
-    assertEquals("abc", "abc");
+function testAssertEquals_scalar() {
+    assertEQ(5, 5);
+    assertEQ("abc", "abc");
+    assertError(\-> assertEQ("abc", 5), """
+        Computed: String 'abc'
+        Expected: Number '5'
+        """
+    );
+}
 
-    function bad() { assertEquals("abc", 5); }
-    assertError(bad, "Expected Number '5', got: String 'abc'.");
+function testAssertEquals_list() {
+    var a = List.of("a", "b", "c");
+    var b = List.of("a", "b", "c", "d");
+    assertEQ(a, a);
+    assertError(\-> assertEQ(a, b), """
+        Computed: List [
+            String 'a'
+            String 'b'
+            String 'c'
+        ]
+        Expected: List [
+            String 'a'
+            String 'b'
+            String 'c'
+            String 'd'
+        ]
+        """
+    );
+}
+
+function testAssertEquals_set() {
+    var a = Set.of("a", "b", "c");
+    var b = Set.of("a", "b", "c", "d");
+    assertEQ(a, a);
+    assertError(\-> assertEQ(a, b), """
+        Computed: Set {
+            String 'a'
+            String 'b'
+            String 'c'
+        }
+        Expected: Set {
+            String 'a'
+            String 'b'
+            String 'c'
+            String 'd'
+        }
+        """
+    );
+}
+
+function testAssertEquals_map() {
+    var a = Map.of("a", 1.0, "b", 2.0);
+    var b = Map.of("a", 1.0, "b", 2.0, "c", 3.0);
+    assertEQ(a, a);
+    assertError(\-> assertEQ(a, b), """
+        Computed: Map {
+            String 'a': Number '1'
+            String 'b': Number '2'
+        }
+        Expected: Map {
+            String 'a': Number '1'
+            String 'b': Number '2'
+            String 'c': Number '3'
+        }
+        """
+    );
 }
 
 function testAssertTrue() {
-    assertTrue(true);
-    assertTrue("abc");
+    assertT(true);
+    assertT("abc");
 
-    function bad() { assertTrue(false); }
+    function bad() { assertT(false); }
     assertError(bad, "Expected truthy value, got: Boolean 'false'.");
 }
 
 function testAssertFalse() {
-    assertFalse(false);
-    assertFalse(null);
+    assertF(false);
+    assertF(null);
 
-    function bad() { assertFalse(true); }
+    function bad() { assertF(true); }
     assertError(bad, "Expected falsey value, got: Boolean 'true'.");
 }
 

@@ -3,6 +3,11 @@ package com.wjduquette.joe.tools.test;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.console.PathProxy;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * The package that defines the test API for test scripts.
  */
@@ -39,13 +44,14 @@ public class TestPackage extends JoePackage {
         super("joe.test");
         this.engine = engine;
 
-        globalFunction("assertEquals", this::_assertEquals);
+        globalFunction("assertEQ",     this::_assertEQ);
         globalFunction("assertError",  this::_assertError);
-        globalFunction("assertFalse",  this::_assertFalse);
-        globalFunction("assertTrue",   this::_assertTrue);
+        globalFunction("assertF",  this::_assertF);
+        globalFunction("assertT",   this::_assertT);
         globalFunction("engine",       this::_engine);
         globalFunction("fail",         this::_fail);
         globalFunction("skip",         this::_skip);
+        globalFunction("typedValue",   this::_typedValue);
 
         scriptResource(getClass(), "pkg.joe.test.joe");
 
@@ -54,19 +60,19 @@ public class TestPackage extends JoePackage {
     }
 
     //**
-    // @function assertEquals
+    // @function assertEQ
     // @args got, expected
     // Verifies that *got* equals the *expected* value, producing an
     // informative assertion error if not.
-    private Object _assertEquals(Joe joe, Args args) {
-        args.exactArity(2, "assertEquals(got, expected)");
+    private Object _assertEQ(Joe joe, Args args) {
+        args.exactArity(2, "assertEQ(got, expected)");
         var got      = args.next();
         var expected = args.next();
 
         if (!Joe.isEqual(got, expected)) {
-            throw new AssertError("Expected " +
-                joe.typedValue(expected) + ", got: " +
-                joe.typedValue(got) + ".");
+            throw new AssertError(
+                "Computed: " + testValue(joe, got) +
+                "\nExpected: " + testValue(joe, expected));
         }
 
         return null;
@@ -132,12 +138,12 @@ public class TestPackage extends JoePackage {
     }
 
     //**
-    // @function assertFalse
+    // @function assertF
     // @args condition
     // Verifies that *condition* is falsey, producing an
     // informative assertion error if not.
-    private Object _assertFalse(Joe joe, Args args) {
-        args.exactArity(1, "assertFalse(condition)");
+    private Object _assertF(Joe joe, Args args) {
+        args.exactArity(1, "assertF(condition)");
         var condition = args.next();
 
         if (Joe.isTruthy(condition)) {
@@ -149,12 +155,12 @@ public class TestPackage extends JoePackage {
     }
 
     //**
-    // @function assertTrue
+    // @function assertT
     // @args condition
     // Verifies that *condition* is truthy, producing an
     // informative assertion error if not.
-    private Object _assertTrue(Joe joe, Args args) {
-        args.exactArity(1, "assertTrue(condition)");
+    private Object _assertT(Joe joe, Args args) {
+        args.exactArity(1, "assertT(condition)");
         var condition = args.next();
 
         if (!Joe.isTruthy(condition)) {
@@ -193,6 +199,72 @@ public class TestPackage extends JoePackage {
     private Object _skip(Joe joe, Args args) {
         args.exactArity(1, "skip(message)");
         throw new TestTool.SkipError(joe.stringify(args.next()));
+    }
+
+    //**
+    // @function typedValue
+    // @args value
+    // Outputs the value's type and value for display.  Collections are output in
+    // readable format.
+    private Object _typedValue(Joe joe, Args args) {
+        args.exactArity(1, "typedValue(value)");
+        return testValue(joe, args.next());
+    }
+
+
+    //------------------------------------------------------------------------
+    // Helpers
+
+    private String testValue(Joe joe, Object value) {
+        return switch (value) {
+            case List<?> c -> typedList(joe, c);
+            case Set<?> c -> typedSet(joe, c);
+            case Map<?,?> m -> typedMap(joe, m);
+            default -> joe.typedValue(value);
+        };
+    }
+
+    private String typedList(Joe joe, List<?> value) {
+        var items = value.stream()
+            .map(joe::typedValue)
+            .collect(Collectors.joining("\n"));
+        if (value.isEmpty()) {
+            return joe.typeName(value) + " []";
+        } else if (value.size() == 1) {
+            return joe.typeName(value) + " [" + items + "]";
+        } else {
+            return joe.typeName(value) + " [\n" + items.indent(4) + "]";
+        }
+    }
+    private String typedSet(Joe joe, Set<?> value) {
+        var items = value.stream()
+            .map(joe::typedValue)
+            .sorted()
+            .collect(Collectors.joining("\n"));
+        if (value.isEmpty()) {
+            return joe.typeName(value) + " {}";
+        } else if (value.size() == 1) {
+            return joe.typeName(value) + " {" + items + "}";
+        } else {
+            return joe.typeName(value) + " {\n" + items.indent(4) + "}";
+        }
+    }
+
+    private String typedMap(
+        Joe joe,
+        Map<?,?> map
+    ) {
+        var items = map.entrySet().stream()
+            .map(e -> joe.typedValue(e.getKey()) + ": " +
+                joe.typedValue(e.getValue()))
+            .collect(Collectors.joining("\n"));
+        if (map.isEmpty()) {
+            return joe.typeName(map) + " {:}";
+        } else if (map.size() == 1) {
+            return joe.typeName(map) + " {" + items + "}";
+        } else {
+            return joe.typeName(map) + " {\n" + items.indent(4) + "}";
+        }
     }
 
     //-------------------------------------------------------------------------

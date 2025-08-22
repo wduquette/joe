@@ -8,14 +8,14 @@
 // Can declare a class
 function testDeclare() {
     class Thing {}
-    assertEquals(Joe.typeOf(Thing), Type);
+    assertEQ(Joe.typeOf(Thing), Type);
 }
 
 // Can create instances
 function testCreate() {
     class Thing {}
     var thing = Thing();
-    assertEquals(Joe.typeOf(thing), Thing);
+    assertEQ(Joe.typeOf(thing), Thing);
 }
 
 //-----------------------------------------------------------------------------
@@ -27,8 +27,8 @@ function testSetGetFields() {
     var thing = Thing();
     thing.name = "George";
     thing.color = #ginger;
-    assertEquals(thing.name, "George");
-    assertEquals(thing.color, #ginger);
+    assertEQ(thing.name, "George");
+    assertEQ(thing.color, #ginger);
 }
 
 //-----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ function testDeclareMethod() {
     class Thing {
         method info() { return "I'm a Thing!"; }
     }
-    assertEquals(Thing().info(), "I'm a Thing!");
+    assertEQ(Thing().info(), "I'm a Thing!");
 }
 
 // Method arity is checked.
@@ -71,9 +71,9 @@ function testMethod_varargs_good() {
     }
     var thing = Thing();
 
-    assertEquals(thing.varArgs(#a), "#a,[]");
-    assertEquals(thing.varArgs(#a,#b), "#a,[#b]");
-    assertEquals(thing.varArgs(#a,#b,#c), "#a,[#b, #c]");
+    assertEQ(thing.varArgs(#a), "#a,[]");
+    assertEQ(thing.varArgs(#a,#b), "#a,[#b]");
+    assertEQ(thing.varArgs(#a,#b,#c), "#a,[#b, #c]");
 
     function bad() { thing.varArgs(); }
     assertError(bad,
@@ -90,7 +90,7 @@ function testMethodsCaptureScope() {
         }
     }
 
-    assertEquals(WithStatics().howdy(), #howdy);
+    assertEQ(WithStatics().howdy(), #howdy);
 }
 
 //-----------------------------------------------------------------------------
@@ -106,8 +106,8 @@ function testInitializer() {
     }
 
     var thing = Thing("Fred", #green);
-    assertEquals(thing.name, "Fred");
-    assertEquals(thing.color, #green);
+    assertEQ(thing.name, "Fred");
+    assertEQ(thing.color, #green);
 }
 
 //-----------------------------------------------------------------------------
@@ -117,8 +117,8 @@ function testInitializer() {
 function testToString_default() {
     class Thing {}
     var thing = Thing();
-    assertTrue(thing.toString().startsWith("<Thing"));
-    assertEquals(Joe.stringify(thing), thing.toString());
+    assertT(thing.toString().startsWith("<Thing"));
+    assertEQ(Joe.stringify(thing), thing.toString());
 }
 
 // Custom toString()
@@ -127,8 +127,8 @@ function testToString_custom() {
         method toString() { return "I'm a Thing!"; }
     }
     var thing = Thing();
-    assertEquals(thing.toString(), "I'm a Thing!");
-    assertEquals(Joe.stringify(thing), thing.toString());
+    assertEQ(thing.toString(), "I'm a Thing!");
+    assertEQ(Joe.stringify(thing), thing.toString());
 }
 
 //-----------------------------------------------------------------------------
@@ -142,7 +142,7 @@ function testDeclareStaticMethod() {
         }
     }
 
-    assertEquals(WithStatics.greeting(), #howdy);
+    assertEQ(WithStatics.greeting(), #howdy);
 }
 
 // Static Methods can call each other.
@@ -156,7 +156,7 @@ function testStaticMethods() {
         }
     }
 
-    assertEquals(WithStatics.howdy(), #howdy);
+    assertEQ(WithStatics.howdy(), #howdy);
 }
 
 // Static methods can capture enclosing scope.
@@ -169,7 +169,7 @@ function testStaticMethodsCaptureScope() {
         }
     }
 
-    assertEquals(WithStatics.howdy(), #howdy);
+    assertEQ(WithStatics.howdy(), #howdy);
 }
 
 //-----------------------------------------------------------------------------
@@ -180,7 +180,7 @@ function testStaticFields() {
     class Thing {}
     Thing.greeting = #howdy;
 
-    assertEquals(Thing.greeting, #howdy);
+    assertEQ(Thing.greeting, #howdy);
 }
 
 // Methods can use static class fields
@@ -190,7 +190,7 @@ function testStaticFields_instanceMethods() {
     }
     Thing.greeting = #howdy;
 
-    assertEquals(Thing().howdy(), #howdy);
+    assertEQ(Thing().howdy(), #howdy);
 }
 
 // Static methods can use static class fields
@@ -200,7 +200,7 @@ function testStaticFields_staticMethods() {
     }
     Thing.greeting = #howdy;
 
-    assertEquals(Thing.howdy(), #howdy);
+    assertEQ(Thing.howdy(), #howdy);
 }
 
 //-----------------------------------------------------------------------------
@@ -214,7 +214,7 @@ function testStaticInitializer_initVars() {
         }
     }
 
-    assertEquals(Thing.greeting, #howdy);
+    assertEQ(Thing.greeting, #howdy);
 }
 
 // The static initializer can call static methods
@@ -226,7 +226,7 @@ function testStaticInitializer_initCallsStatics() {
         static method defaultGreeting() { return #howdy; }
     }
 
-    assertEquals(Thing.greeting, #howdy);
+    assertEQ(Thing.greeting, #howdy);
 }
 
 // The static initializer can create instances
@@ -237,7 +237,7 @@ function testStaticInitializer_initCallsStatics() {
         }
     }
 
-    assertEquals(Joe.typeOf(Thing.instance), Thing);
+    assertEQ(Joe.typeOf(Thing.instance), Thing);
 }
 
 // A class can have multiple static initializers
@@ -251,12 +251,12 @@ function testStaticInitializer_multiple() {
         method b() { return Thing.b; }
     }
 
-    assertEquals(Thing.a, 1);
-    assertEquals(Thing.b, 2);
+    assertEQ(Thing.a, 1);
+    assertEQ(Thing.b, 2);
 
     var thing = Thing();
-    assertEquals(thing.a(), 1);
-    assertEquals(thing.b(), 2);
+    assertEQ(thing.a(), 1);
+    assertEQ(thing.b(), 2);
 }
 
 //-----------------------------------------------------------------------------
@@ -273,8 +273,8 @@ function testSubclass_callParentMethod() {
     }
 
     var kid = Child();
-    assertEquals(kid.parent(), #parent);
-    assertEquals(kid.child(), #child);
+    assertEQ(kid.parent(), #parent);
+    assertEQ(kid.child(), #child);
 }
 
 // A subclass can override a superclass method
@@ -288,7 +288,7 @@ function testSubclass_overrideParentMethod() {
     }
 
     var kid = Child();
-    assertEquals(kid.parent(), #child);
+    assertEQ(kid.parent(), #child);
 }
 
 // A subclass will make use of the parent's init() if it doesn't define one
@@ -304,7 +304,7 @@ function testSubclass_parentInitializer() {
     }
 
     var kid = Child();
-    assertEquals(kid.getName(), "Parent");
+    assertEQ(kid.getName(), "Parent");
 }
 
 // A subclass will make use of the parent's init() if it doesn't define one.
@@ -318,7 +318,7 @@ function testSubclass_callSuper() {
         method getName() { return super.getName(); }
     }
     var kid = Child();
-    assertEquals(kid.getName(), #parent);
+    assertEQ(kid.getName(), #parent);
 }
 
 //-----------------------------------------------------------------------------
@@ -337,7 +337,7 @@ function testCanUseAt() {
         }
     }
     var thing = Thing("Fred", "red");
-    assertEquals(thing.info(), "name='Fred' color='red'");
+    assertEQ(thing.info(), "name='Fred' color='red'");
 }
 
 //-------------------------------------------------------------------------
@@ -355,7 +355,7 @@ function testThisInNestedFunction() {
         }
     }
 
-    assertEquals(Nest().whoAmI(), "Howard");
+    assertEQ(Nest().whoAmI(), "Howard");
 }
 
 // `.` is available in functions nested in methods
@@ -370,7 +370,7 @@ function testAtInNestedFunction() {
         }
     }
 
-    assertEquals(Nest().whoAmI(), "Howard");
+    assertEQ(Nest().whoAmI(), "Howard");
 }
 
 // `super` is available in functions nested in methods
@@ -387,7 +387,7 @@ function testSuperInNestedFunction() {
         }
     }
 
-    assertEquals(Child().name(), "*Howard*");
+    assertEQ(Child().name(), "*Howard*");
 }
 
 

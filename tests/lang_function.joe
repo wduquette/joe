@@ -5,7 +5,7 @@
 // Can declare and call functions.
 function testDeclareFunction() {
     function info() { return "I'm a Thing!"; }
-    assertEquals(info(), "I'm a Thing!");
+    assertEQ(info(), "I'm a Thing!");
 }
 
 // Call something that's not callable.
@@ -18,7 +18,7 @@ function testNotCallable() {
 // Functions return null by default.
 function testReturnsNull() {
     function f() { }
-    assertEquals(f(), null);
+    assertEQ(f(), null);
 }
 
 // Function arity is checked.
@@ -43,9 +43,9 @@ function testFunction_varargs_good() {
         return first + "," + args;
     }
 
-    assertEquals(varArgs(#a), "#a,[]");
-    assertEquals(varArgs(#a,#b), "#a,[#b]");
-    assertEquals(varArgs(#a,#b,#c), "#a,[#b, #c]");
+    assertEQ(varArgs(#a), "#a,[]");
+    assertEQ(varArgs(#a,#b), "#a,[#b]");
+    assertEQ(varArgs(#a,#b,#c), "#a,[#b, #c]");
 
     function bad() { varArgs(); }
     assertError(bad,
@@ -57,7 +57,7 @@ function testFunctionsCaptureScope() {
     var greeting = #howdy;
     function howdy() { return greeting; }
 
-    assertEquals(howdy(), #howdy);
+    assertEQ(howdy(), #howdy);
 }
 
 //-----------------------------------------------------------------------------
@@ -65,20 +65,20 @@ function testFunctionsCaptureScope() {
 
 function testLambda_expr() {
     var f = \-> 5;
-    assertEquals(f(), 5);
+    assertEQ(f(), 5);
 
     var g = \x,y -> x + y;
-    assertEquals(g(2,3), 5);
+    assertEQ(g(2,3), 5);
 }
 
 function testLambda_block() {
     var f = \-> {
         return 5;
     };
-    assertEquals(f(), 5);
+    assertEQ(f(), 5);
 
     var g = \x,y -> {
         return x + y;
     };
-    assertEquals(g(2,3), 5);
+    assertEQ(g(2,3), 5);
 }

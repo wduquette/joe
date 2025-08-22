@@ -8,14 +8,14 @@
 // Can declare a record
 function testDeclare() {
     record Thing(id, color) {}
-    assertEquals(Joe.typeOf(Thing), Type);
+    assertEQ(Joe.typeOf(Thing), Type);
 }
 
 // Can create instances
 function testCreate() {
     record Thing(id, color) {}
     var thing = Thing(123, #red);
-    assertEquals(Joe.typeOf(thing), Thing);
+    assertEQ(Joe.typeOf(thing), Thing);
 }
 
 // Creation arity is checked.
@@ -34,8 +34,8 @@ function testCreate_arity() {
 function testGetFields() {
     record Thing(id, color) {}
     var thing = Thing(123, #red);
-    assertEquals(thing.id, 123);
-    assertEquals(thing.color, #red);
+    assertEQ(thing.id, 123);
+    assertEQ(thing.color, #red);
 }
 
 //-----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ function testDeclareMethod() {
     record Thing(id, color) {
         method info() { return "I'm a Thing!"; }
     }
-    assertEquals(Thing(123, #red).info(), "I'm a Thing!");
+    assertEQ(Thing(123, #red).info(), "I'm a Thing!");
 }
 
 // Method arity is checked.
@@ -78,9 +78,9 @@ function testMethod_varargs_good() {
     }
     var thing = Thing(123);
 
-    assertEquals(thing.varArgs(#a), "#a,[]");
-    assertEquals(thing.varArgs(#a,#b), "#a,[#b]");
-    assertEquals(thing.varArgs(#a,#b,#c), "#a,[#b, #c]");
+    assertEQ(thing.varArgs(#a), "#a,[]");
+    assertEQ(thing.varArgs(#a,#b), "#a,[#b]");
+    assertEQ(thing.varArgs(#a,#b,#c), "#a,[#b, #c]");
 
     function bad() { thing.varArgs(); }
     assertError(bad,
@@ -97,7 +97,7 @@ function testMethodsCaptureScope() {
         }
     }
 
-    assertEquals(WithStatics(123).howdy(), #howdy);
+    assertEQ(WithStatics(123).howdy(), #howdy);
 }
 
 //-----------------------------------------------------------------------------
@@ -107,8 +107,8 @@ function testMethodsCaptureScope() {
 function testToString_default() {
     record Thing(id, color) {}
     var thing = Thing(123, #red);
-    assertEquals(thing.toString(), "Thing(123, #red)");
-    assertEquals(Joe.stringify(thing), thing.toString());
+    assertEQ(thing.toString(), "Thing(123, #red)");
+    assertEQ(Joe.stringify(thing), thing.toString());
 }
 
 // Custom toString()
@@ -117,8 +117,8 @@ function testToString_custom() {
         method toString() { return "I'm a Thing!"; }
     }
     var thing = Thing(123);
-    assertEquals(thing.toString(), "I'm a Thing!");
-    assertEquals(Joe.stringify(thing), thing.toString());
+    assertEQ(thing.toString(), "I'm a Thing!");
+    assertEQ(Joe.stringify(thing), thing.toString());
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +132,7 @@ function testDeclareStaticMethod() {
         }
     }
 
-    assertEquals(WithStatics.greeting(), #howdy);
+    assertEQ(WithStatics.greeting(), #howdy);
 }
 
 // Static Methods can call each other.
@@ -146,7 +146,7 @@ function testStaticMethods() {
         }
     }
 
-    assertEquals(WithStatics.howdy(), #howdy);
+    assertEQ(WithStatics.howdy(), #howdy);
 }
 
 // Static methods can capture enclosing scope.
@@ -159,7 +159,7 @@ function testStaticMethodsCaptureScope() {
         }
     }
 
-    assertEquals(WithStatics.howdy(), #howdy);
+    assertEQ(WithStatics.howdy(), #howdy);
 }
 
 //-----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ function testStaticFields() {
     record Thing(id) {}
     Thing.greeting = #howdy;
 
-    assertEquals(Thing.greeting, #howdy);
+    assertEQ(Thing.greeting, #howdy);
 }
 
 // Methods can use static record fields
@@ -180,7 +180,7 @@ function testStaticFields_instanceMethods() {
     }
     Thing.greeting = #howdy;
 
-    assertEquals(Thing(123).howdy(), #howdy);
+    assertEQ(Thing(123).howdy(), #howdy);
 }
 
 // Static methods can use static record fields
@@ -190,7 +190,7 @@ function testStaticFields_staticMethods() {
     }
     Thing.greeting = #howdy;
 
-    assertEquals(Thing.howdy(), #howdy);
+    assertEQ(Thing.howdy(), #howdy);
 }
 
 //-----------------------------------------------------------------------------
@@ -204,7 +204,7 @@ function testStaticInitializer_initVars() {
         }
     }
 
-    assertEquals(Thing.greeting, #howdy);
+    assertEQ(Thing.greeting, #howdy);
 }
 
 // The static initializer can call static methods
@@ -216,7 +216,7 @@ function testStaticInitializer_initCallsStatics() {
         static method defaultGreeting() { return #howdy; }
     }
 
-    assertEquals(Thing.greeting, #howdy);
+    assertEQ(Thing.greeting, #howdy);
 }
 
 // The static initializer can create instances
@@ -227,7 +227,7 @@ function testStaticInitializer_initCreates() {
         }
     }
 
-    assertEquals(Joe.typeOf(Thing.instance), Thing);
+    assertEQ(Joe.typeOf(Thing.instance), Thing);
 }
 
 // A record can have multiple static initializers
@@ -241,12 +241,12 @@ function testStaticInitializer_multiple() {
         method b() { return Thing.b; }
     }
 
-    assertEquals(Thing.a, 1);
-    assertEquals(Thing.b, 2);
+    assertEQ(Thing.a, 1);
+    assertEQ(Thing.b, 2);
 
     var thing = Thing(123);
-    assertEquals(thing.a(), 1);
-    assertEquals(thing.b(), 2);
+    assertEQ(thing.a(), 1);
+    assertEQ(thing.b(), 2);
 }
 
 //-----------------------------------------------------------------------------
@@ -260,7 +260,7 @@ function testCanUseAt() {
         }
     }
     var thing = Thing("Fred", "red");
-    assertEquals(thing.info(), "name='Fred' color='red'");
+    assertEQ(thing.info(), "name='Fred' color='red'");
 }
 
 //-------------------------------------------------------------------------
@@ -277,7 +277,7 @@ function testThisInNestedFunction() {
         }
     }
 
-    assertEquals(Nest("Howard").whoAmI(), "Howard");
+    assertEQ(Nest("Howard").whoAmI(), "Howard");
 }
 
 // `.` is available in functions nested in methods
@@ -291,7 +291,7 @@ function testAtInNestedFunction() {
         }
     }
 
-    assertEquals(Nest("Howard").whoAmI(), "Howard");
+    assertEQ(Nest("Howard").whoAmI(), "Howard");
 }
 
 

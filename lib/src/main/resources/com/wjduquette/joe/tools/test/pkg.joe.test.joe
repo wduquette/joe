@@ -4,6 +4,16 @@
 // @package joe.test
 
 //**
+// @function assertEmpty
+// @args value
+// Throws AssertError if the value is not empty, displaying the actual value.
+function assertEmpty(value) {
+    if (!value.isEmpty()) {
+        throw AssertError("Value is not empty:\nComputed: " + typedValue(value));
+    }
+}
+
+//**
 // @function check
 // @args value
 // @result ValueChecker

@@ -1,27 +1,27 @@
 // lang_list.joe: tests List-specific syntax.
 
 function testLiteral() {
-    assertTrue([].isEmpty());
+    assertT([].isEmpty());
 
     var single = [#one];
-    assertEquals(single.size(), 1);
-    assertEquals(single.get(0), #one);
+    assertEQ(single.size(), 1);
+    assertEQ(single.get(0), #one);
 
     var double = [#one, #two];
-    assertEquals(double.size(), 2);
-    assertEquals(double.get(0), #one);
-    assertEquals(double.get(1), #two);
+    assertEQ(double.size(), 2);
+    assertEQ(double.get(0), #one);
+    assertEQ(double.get(1), #two);
 
     // Trailing comma is allowed in non-empty lists.
-    assertEquals([#one], [#one,]);
-    assertEquals([#one, #two], [#one, #two,]);
+    assertEQ([#one], [#one,]);
+    assertEQ([#one, #two], [#one, #two,]);
 }
 
 function testIndexing_get() {
     var list = [#a, #b, #c];
-    assertEquals(list[0], #a);
-    assertEquals(list[1], #b);
-    assertEquals(list[2], #c);
+    assertEQ(list[0], #a);
+    assertEQ(list[1], #b);
+    assertEQ(list[2], #c);
 
     assertError(\-> list["abc"],
         "Expected list index, got: String 'abc'.");
@@ -36,7 +36,7 @@ function testIndexing_equal() {
     list[0] = 1;
     list[1] = 2;
     list[2] = 3;
-    assertEquals(list, [1, 2, 3]);
+    assertEQ(list, [1, 2, 3]);
 
     assertError(\-> list["abc"] = 1,
         "Expected list index, got: String 'abc'.");
@@ -51,7 +51,7 @@ function testIndexing_plusEqual() {
     list[0] += 10;
     list[1] += 20;
     list[2] += 30;
-    assertEquals(list, [11, 22, 33]);
+    assertEQ(list, [11, 22, 33]);
 
     list[0] = "abc";
     assertError(\-> list[0] -= 1,
@@ -63,7 +63,7 @@ function testIndexing_minusEqual() {
     list[0] -= 1;
     list[1] -= 2;
     list[2] -= 3;
-    assertEquals(list, [9, 18, 27]);
+    assertEQ(list, [9, 18, 27]);
 }
 
 function testIndexing_starEqual() {
@@ -71,7 +71,7 @@ function testIndexing_starEqual() {
     list[0] *= 10;
     list[1] *= 20;
     list[2] *= 30;
-    assertEquals(list, [10, 40, 90]);
+    assertEQ(list, [10, 40, 90]);
 }
 
 function testIndexing_slashEqual() {
@@ -79,15 +79,15 @@ function testIndexing_slashEqual() {
     list[0] /= 5;
     list[1] /= 4;
     list[2] /= 3;
-    assertEquals(list, [2, 5, 10]);
+    assertEQ(list, [2, 5, 10]);
 }
 
 function testPrePost_plus() {
     var list = [1, 2, 3];
-    assertEquals(++list[0], 2);
-    assertEquals(list[0], 2);
-    assertEquals(list[0]++, 2);
-    assertEquals(list[0], 3);
+    assertEQ(++list[0], 2);
+    assertEQ(list[0], 2);
+    assertEQ(list[0]++, 2);
+    assertEQ(list[0], 3);
 
     list[0] = "abc";
 
@@ -99,10 +99,10 @@ function testPrePost_plus() {
 
 function testPrePost_minus() {
     var list = [10, 20, 30];
-    assertEquals(--list[0], 9);
-    assertEquals(list[0], 9);
-    assertEquals(list[0]--, 9);
-    assertEquals(list[0], 8);
+    assertEQ(--list[0], 9);
+    assertEQ(list[0], 9);
+    assertEQ(list[0]--, 9);
+    assertEQ(list[0], 8);
 
     list[0] = "abc";
 

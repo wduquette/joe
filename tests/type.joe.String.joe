@@ -1,155 +1,152 @@
 // String type tests
 
 function testCharAt() {
-    check("abc".charAt(0)).eq("a");
-    check("abc".charAt(2)).eq("c");
-    check("abc".charAt(2.9)).eq("c");
+    assertEQ("abc".charAt(0), "a");
+    assertEQ("abc".charAt(2), "c");
+    assertEQ("abc".charAt(2.9), "c");
 
     function bad1() { "abc".charAt(-1); }
     function bad2() { "abc".charAt(3); }
-    checkCatch(bad1).message("Expected 0 <= index < 3, got: Number '-1'.");
-    checkCatch(bad2).message("Expected 0 <= index < 3, got: Number '3'.");
+    assertError(bad1, "Expected 0 <= index < 3, got: Number '-1'.");
+    assertError(bad2, "Expected 0 <= index < 3, got: Number '3'.");
 }
 
 function testContains() {
-    check("abcdef".contains("bcd")).isTrue();
-    check("abcdef".contains("123")).isFalse();
+    assertT("abcdef".contains("bcd"));
+    assertF("abcdef".contains("123"));
 }
 
 function testEndsWith() {
-    check("abcdef".endsWith("def")).isTrue();
-    check("abcdef".endsWith("cde")).isFalse();
+    assertT("abcdef".endsWith("def"));
+    assertF("abcdef".endsWith("cde"));
 }
 
 function testEqualsIgnoreCase() {
-    check("abc".equalsIgnoreCase("ABC")).isTrue();
-    check("abc".equalsIgnoreCase("ABCD")).isFalse();
+    assertT("abc".equalsIgnoreCase("ABC"));
+    assertF("abc".equalsIgnoreCase("ABCD"));
 }
 
 function testIndent() {
-    check("abc".indent(2)).eq("  abc");
+    assertEQ("abc".indent(2), "  abc");
 }
 
 function testIndexOf() {
-    check("abcdefghi".indexOf("xyz")).eq(-1);
-    check("abcdefghi".indexOf("def")).eq(3);
+    assertEQ("abcdefghi".indexOf("xyz"), -1);
+    assertEQ("abcdefghi".indexOf("def"), 3);
 
-    check("abcabcabc".indexOf("bc", 2)).eq(4);
-    check("abcdeabcde".indexOf("c", 3, 6)).eq(-1);
+    assertEQ("abcabcabc".indexOf("bc", 2), 4);
+    assertEQ("abcdeabcde".indexOf("c", 3, 6), -1);
 }
 
 function testIsBlank() {
-    check("abc".isBlank()).isFalse();
-    check("   ".isBlank()).isTrue();
-    check("".isBlank()).isTrue();
+    assertF("abc".isBlank());
+    assertT("   ".isBlank());
+    assertT("".isBlank());
 }
 
 function testIsEmpty() {
-    check("abc".isEmpty()).isFalse();
-    check("   ".isEmpty()).isFalse();
-    check("".isEmpty()).isTrue();
+    assertF("abc".isEmpty());
+    assertF("   ".isEmpty());
+    assertT("".isEmpty());
 }
 
 function testJoin() {
-    check(String.join(",", [])).eq("");
-    check(String.join(",", ["a", "b"])).eq("a,b");
-    check(String.join(",", [1, 2])).eq("1,2");
+    assertEQ(String.join(",", []), "");
+    assertEQ(String.join(",", ["a", "b"]), "a,b");
+    assertEQ(String.join(",", [1, 2]), "1,2");
 }
 
 function testLastIndexOf() {
-    check("abcdefghi".lastIndexOf("xyz")).eq(-1);
-    check("abcabc".lastIndexOf("b")).eq(4);
+    assertEQ("abcdefghi".lastIndexOf("xyz"), -1);
+    assertEQ("abcabc".lastIndexOf("b"), 4);
 
-    check("abcabc".lastIndexOf("b", 3)).eq(1);
+    assertEQ("abcabc".lastIndexOf("b", 3), 1);
 }
 
 function testLength() {
-    check("abc".length()).eq(3);
+    assertEQ("abc".length(), 3);
 }
 
 function testLines() {
-    check(" abc ".lines())
-        .eq([" abc "]);
-    check(" abc \n def ".lines())
-        .eq([" abc ", " def "]);
+    assertEQ(" abc ".lines(), [" abc "]);
+    assertEQ(" abc \n def ".lines(), [" abc ", " def "]);
 }
 
 function testMatches() {
-    check("abc".matches("[a-z]+")).isTrue();
-    check("123".matches("[a-z]+")).isFalse();
+    assertT("abc".matches("[a-z]+"));
+    assertF("123".matches("[a-z]+"));
 }
 
 function testRepeat() {
-    check("abc".repeat(0)).eq("");
-    check("abc".repeat(1)).eq("abc");
-    check("abc".repeat(2)).eq("abcabc");
+    assertEQ("abc".repeat(0), "");
+    assertEQ("abc".repeat(1), "abc");
+    assertEQ("abc".repeat(2), "abcabc");
 
     function bad() { "abc".repeat(-1); }
 
-    checkCatch(bad)
-        .message("Expected non-negative count, got: Number '-1'.");
+    assertError(bad, "Expected non-negative count, got: Number '-1'.");
 }
 
 function testReplace() {
-    check("One cow, two cow.".replace("cow", "pig"))
-        .eq("One pig, two pig.");
+    assertEQ("One cow, two cow.".replace("cow", "pig"),
+        "One pig, two pig.");
 }
 
 function testReplaceAll() {
-    check("One cow, two cow.".replaceAll("[aeiou]", "*"))
-        .eq("On* c*w, tw* c*w.");
+    assertEQ("One cow, two cow.".replaceAll("[aeiou]", "*"),
+        "On* c*w, tw* c*w.");
 }
 
 function testReplaceFirst() {
-    check("One cow, two cow.".replaceFirst("[aeiou]", "*"))
-        .eq("On* cow, two cow.");
+    assertEQ("One cow, two cow.".replaceFirst("[aeiou]", "*"),
+        "On* cow, two cow.");
 }
 
 function testSplit() {
-    check("abc,def,ghi".split(","))
-    .eq(["abc", "def", "ghi"]);
+    assertEQ("abc,def,ghi".split(","),
+        ["abc", "def", "ghi"]);
 }
 
 function testSplitWithDelimiters() {
-    check("abc,def,ghi".splitWithDelimiters(","))
-    .eq(["abc", ",", "def", ",", "ghi"]);
+    assertEQ("abc,def,ghi".splitWithDelimiters(","),
+        ["abc", ",", "def", ",", "ghi"]);
 }
 
 function testStartsWith() {
-    check("abcdef".startsWith("abc")).isTrue();
-    check("abcdef".startsWith("bcd")).isFalse();
+    assertT("abcdef".startsWith("abc"));
+    assertF("abcdef".startsWith("bcd"));
 }
 
 function testStrip() {
-    check("  abc  ".strip()).eq("abc");
+    assertEQ("  abc  ".strip(), "abc");
 }
 
 function testStripIndent() {
-    check("   abc".stripIndent()).eq("abc");
+    assertEQ("   abc".stripIndent(), "abc");
 }
 
 function testStripLeading() {
-    check("  abc  ".stripLeading()).eq("abc  ");
+    assertEQ("  abc  ".stripLeading(), "abc  ");
 }
 
 function testStripTrailing() {
-    check("  abc  ".stripTrailing()).eq("  abc");
+    assertEQ("  abc  ".stripTrailing(), "  abc");
 }
 
 function testSubstring() {
     var txt = "abcdefghi";
-    check(txt.substring(3)).eq("defghi");
-    check(txt.substring(3, 6)).eq("def");
+    assertEQ(txt.substring(3), "defghi");
+    assertEQ(txt.substring(3, 6), "def");
 }
 
 function testToLowerCase() {
-    check("ABC".toUpperCase()).eq("abc");
+    assertEQ("ABC".toLowerCase(), "abc");
 }
 
-function testToLowerCase() {
-    check("AbC".toString()).eq("AbC");
+function testToString() {
+    assertEQ("AbC".toString(), "AbC");
 }
 
 function testToUpperCase() {
-    check("abc".toUpperCase()).eq("ABC");
+    assertEQ("abc".toUpperCase(), "ABC");
 }

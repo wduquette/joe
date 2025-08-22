@@ -21,58 +21,58 @@ class MyTextBuilder extends TextBuilder {
 // compare()
 
 function testCompare_string() {
-    check(Joe.compare("a", "b")).eq(-1);
-    check(Joe.compare("b", "b")).eq(0);
-    check(Joe.compare("c", "b")).eq(1);
+    assertEQ(Joe.compare("a", "b"), -1);
+    assertEQ(Joe.compare("b", "b"), 0);
+    assertEQ(Joe.compare("c", "b"), 1);
 }
 
 function testCompare_number() {
-    check(Joe.compare(0, 1)).eq(-1);
-    check(Joe.compare(1, 1)).eq(0);
-    check(Joe.compare(2, 1)).eq(1);
+    assertEQ(Joe.compare(0, 1), -1);
+    assertEQ(Joe.compare(1, 1), 0);
+    assertEQ(Joe.compare(2, 1), 1);
 }
 
 function testCompare_mismatch() {
-    checkCatch(\-> Joe.compare(1, #a))
-        .message("Expected two strings or two numbers.");
+    assertError(\-> Joe.compare(1, #a),
+        "Expected two strings or two numbers.");
 }
 
 //-----------------------------------------------------------------------------
 // Joe.getFieldNames()
 
 function testGetFieldNames() {
-    check(Joe.getFieldNames("abc")).eq([]);
-    check(Joe.getFieldNames(String)).eq([]);
+    assertEQ(Joe.getFieldNames("abc"), []);
+    assertEQ(Joe.getFieldNames(String), []);
 
-    check(Joe.getFieldNames(Thing)).eq([]);
+    assertEQ(Joe.getFieldNames(Thing), []);
     Thing.x = 5;
-    check(Joe.getFieldNames(Thing)).eq(["x"]);
+    assertEQ(Joe.getFieldNames(Thing), ["x"]);
 
     var thing = Thing(123, "red");
-    check(Joe.getFieldNames(thing).sorted()).eq(["color", "id"]);
+    assertEQ(Joe.getFieldNames(thing).sorted(), ["color", "id"]);
 }
 
 //-----------------------------------------------------------------------------
 // Joe.isOpaque()
 
 function testIsOpaque() {
-    check(Joe.isOpaque(JoeTest.OPAQUE)).isTrue();
-    check(Joe.isOpaque("abc")).isFalse();
+    assertT(Joe.isOpaque(JoeTest.OPAQUE));
+    assertF(Joe.isOpaque("abc"));
 }
 
 //-----------------------------------------------------------------------------
 // Joe.isType()
 
 function testIsType() {
-    check(Joe.isType(String)).isTrue();
-    check(Joe.isType("abc")).isFalse();
+    assertT(Joe.isType(String));
+    assertF(Joe.isType("abc"));
 }
 
 //-------------------------------------------------------------------------
 // Joe.name()
 
 function testName() {
-    check(Joe.name()).eq("Joe");
+    assertEQ(Joe.name(), "Joe");
 }
 
 //-----------------------------------------------------------------------------
@@ -81,8 +81,8 @@ function testName() {
 // This just just verifies that the function exists; specific types
 // test their own stringification.
 function testStringify() {
-    check(Joe.stringify("abc")).eq("abc");
-    check(Joe.stringify(1.0)).eq("1");
+    assertEQ(Joe.stringify("abc"), "abc");
+    assertEQ(Joe.stringify(1.0), "1");
 }
 
 //-----------------------------------------------------------------------------
@@ -90,19 +90,19 @@ function testStringify() {
 
 function testSupertypeOf() {
     // Native Joe
-    check(Joe.supertypeOf(String)).isNull();
+    assertEQ(Joe.supertypeOf(String), null);
 
     // Scripted base class
-    check(Joe.supertypeOf(Thing)).isNull();
+    assertEQ(Joe.supertypeOf(Thing), null);
 
     // Subclass of scripted base class
-    check(Joe.supertypeOf(Gizmo)).eq(Thing);
+    assertEQ(Joe.supertypeOf(Gizmo), Thing);
 
     // Native base class
-    check(Joe.supertypeOf(TextBuilder)).eq(null);
+    assertEQ(Joe.supertypeOf(TextBuilder), null);
 
     // Subclass of native base class
-    check(Joe.supertypeOf(MyTextBuilder)).eq(TextBuilder);
+    assertEQ(Joe.supertypeOf(MyTextBuilder), TextBuilder);
 }
 
 //-----------------------------------------------------------------------------
@@ -111,9 +111,9 @@ function testSupertypeOf() {
 function testTypeOf() {
     var thing = Thing(123, "red");
 
-    check(Joe.typeOf("abc")).eq(String);
-    check(Joe.typeOf(String)).eq(Type);
-    check(Joe.typeOf(thing)).eq(Thing);
-    check(Joe.typeOf(Thing)).eq(Type);
-    check(Joe.typeOf(Joe)).eq(Type);
+    assertEQ(Joe.typeOf("abc"), String);
+    assertEQ(Joe.typeOf(String), Type);
+    assertEQ(Joe.typeOf(thing), Thing);
+    assertEQ(Joe.typeOf(Thing), Type);
+    assertEQ(Joe.typeOf(Joe), Type);
 }

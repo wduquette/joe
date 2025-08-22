@@ -5,31 +5,30 @@
 
 function testCatch_ok() {
     var cr = catch(\-> "abc");
-    check(cr.isOK()).isTrue();
-    check(cr.isError()).isFalse();
-    check(cr.result).eq("abc");
-    check(cr.error).isNull();
-
+    assertT(cr.isOK());
+    assertF(cr.isError());
+    assertEQ(cr.result, "abc");
+    assertEQ(cr.error, null);
 }
 
 function testCatch_error() {
     function bad() { throw "Simulated error!"; }
     var cr = catch(bad);
-    check(cr.isOK()).isFalse();
-    check(cr.isError()).isTrue();
-    check(cr.result).eq(null);
-    check(cr.error.message()).eq("Simulated error!");
+    assertF(cr.isOK());
+    assertT(cr.isError());
+    assertEQ(cr.result, null);
+    assertEQ(cr.error.message(), "Simulated error!");
 }
 
 function testCatch_error_withTrace() {
     function bad() { throw "Simulated error!"; }
     var cr = catch(bad);
-    check(cr.isOK()).isFalse();
-    check(cr.isError()).isTrue();
-    check(cr.result).eq(null);
-    check(cr.error.message()).eq("Simulated error!");
+    assertF(cr.isOK());
+    assertT(cr.isError());
+    assertEQ(cr.result, null);
+    assertEQ(cr.error.message(), "Simulated error!");
 
-    check(cr.error.traces()).eq([
+    assertEQ(cr.error.traces(), [
         "In function bad()",
         "In java call(<function bad()>)",
         "Called from catch()",

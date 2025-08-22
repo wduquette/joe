@@ -9,8 +9,8 @@ function testIf() {
     if (true) a = #set;
     if (false) b = #set;
 
-    assertEquals(a, #set);
-    assertEquals(b, #unset);
+    assertEQ(a, #set);
+    assertEQ(b, #unset);
 }
 
 function testIfElse() {
@@ -21,8 +21,8 @@ function testIfElse() {
             return #false;
         }
     }
-    assertEquals(get(true), #true);
-    assertEquals(get(false), #false);
+    assertEQ(get(true), #true);
+    assertEQ(get(false), #false);
 }
 
 function testIfElseIfElse() {
@@ -35,7 +35,7 @@ function testIfElseIfElse() {
             return #c;
         }
     }
-    assertEquals(get(1), #a);
-    assertEquals(get(2), #b);
-    assertEquals(get(3), #c);
+    assertEQ(get(1), #a);
+    assertEQ(get(2), #b);
+    assertEQ(get(3), #c);
 }

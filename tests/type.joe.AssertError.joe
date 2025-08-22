@@ -4,19 +4,19 @@
 
 function testInitializer_noFrames() {
     var err = AssertError("Failure");
-    check(err.message()).eq("Failure");
-    check(err.traces()).isEmpty();
+    assertEQ(err.message(), "Failure");
+    assertEmpty(err.traces());
 }
 
 function testInitializer_frames() {
     var err = AssertError("Failure", "A", "B");
-    check(err.message()).eq("Failure");
-    check(err.traces()).eq(["A", "B"]);
+    assertEQ(err.message(), "Failure");
+    assertEQ(err.traces(), ["A", "B"]);
 }
 
 function testCanThrow() {
     var err = AssertError("Failure", "A", "B");
-    checkCatch(\-> { throw err; })
-        .message("Failure");
+    assertError(\-> { throw err; },
+        "Failure");
 }
 
