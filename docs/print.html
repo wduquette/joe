@@ -306,6 +306,8 @@ methods.</li>
 <li>Standard Library
 <ul>
 <li>Added <code>Fact::get</code></li>
+<li>Revised the <code>joe.test</code> API for simplicity and for more legible and
+informative failure messages.</li>
 </ul>
 </li>
 </ul>
@@ -4421,15 +4423,17 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/pkg.joe.test.html"><code>joe.test</code> package (Joe Test Tool API)</a>
 <ul>
-<li><a href="library/pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertEQ">assertEQ(<em>got</em>, <em>expected</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertEmpty">assertEmpty(<em>value</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertError">assertError(<em>callable</em>, [<em>message</em>], [<em>frames</em>...])</a></li>
-<li><a href="library/pkg.joe.test.html#function.assertFalse">assertFalse(<em>condition</em>)</a></li>
-<li><a href="library/pkg.joe.test.html#function.assertTrue">assertTrue(<em>condition</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertF">assertF(<em>condition</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertT">assertT(<em>condition</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.engine">engine()</a> → String</li>
 <li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.skip">skip(<em>message</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.typedValue">typedValue(<em>value</em>)</a></li>
 <li><a href="library/type.joe.test.CatchChecker.html">CatchChecker</a>
 <ul>
 <li><a href="library/type.joe.test.CatchChecker.html#init">CatchChecker(<em>catchResult</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
@@ -6605,15 +6609,17 @@ Java type.</p>
 for use in <code>joe test</code> test suites.</p>
 <p><strong><a href="library/pkg.joe.test.html#functions">Functions</a></strong></p>
 <ul>
-<li><a href="library/pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertEQ">assertEQ(<em>got</em>, <em>expected</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertEmpty">assertEmpty(<em>value</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertError">assertError(<em>callable</em>, [<em>message</em>], [<em>frames</em>...])</a></li>
-<li><a href="library/pkg.joe.test.html#function.assertFalse">assertFalse(<em>condition</em>)</a></li>
-<li><a href="library/pkg.joe.test.html#function.assertTrue">assertTrue(<em>condition</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertF">assertF(<em>condition</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertT">assertT(<em>condition</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.engine">engine()</a> → String</li>
 <li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.skip">skip(<em>message</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.typedValue">typedValue(<em>value</em>)</a></li>
 </ul>
 <p><strong>Types</strong></p>
 <ul>
@@ -6629,12 +6635,17 @@ other packages so that they can be tested:</p>
 </ul>
 <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
 <hr />
-<p><span id="function.assertEquals"> </span></p>
-<h3 id="assertequals"><a class="header" href="#assertequals">assertEquals()</a></h3>
+<p><span id="function.assertEQ"> </span></p>
+<h3 id="asserteq"><a class="header" href="#asserteq">assertEQ()</a></h3>
 <hr />
-<p><strong>assertEquals(<em>got</em>, <em>expected</em>)</strong></p>
+<p><strong>assertEQ(<em>got</em>, <em>expected</em>)</strong></p>
 <p>Verifies that <em>got</em> equals the <em>expected</em> value, producing an
 informative assertion error if not.</p>
+<p><span id="function.assertEmpty"> </span></p>
+<h3 id="assertempty"><a class="header" href="#assertempty">assertEmpty()</a></h3>
+<hr />
+<p><strong>assertEmpty(<em>value</em>)</strong></p>
+<p>Throws AssertError if the value is not empty, displaying the actual value.</p>
 <p><span id="function.assertError"> </span></p>
 <h3 id="asserterror"><a class="header" href="#asserterror">assertError()</a></h3>
 <hr />
@@ -6645,16 +6656,16 @@ given <em>message</em> and stack <em>frames</em>, if they are provided.</p>
 <p>When stack <em>frames</em> are provided, the error must include at
 least the provided number of frame strings, and those strings
 must match.</p>
-<p><span id="function.assertFalse"> </span></p>
-<h3 id="assertfalse"><a class="header" href="#assertfalse">assertFalse()</a></h3>
+<p><span id="function.assertF"> </span></p>
+<h3 id="assertf"><a class="header" href="#assertf">assertF()</a></h3>
 <hr />
-<p><strong>assertFalse(<em>condition</em>)</strong></p>
+<p><strong>assertF(<em>condition</em>)</strong></p>
 <p>Verifies that <em>condition</em> is falsey, producing an
 informative assertion error if not.</p>
-<p><span id="function.assertTrue"> </span></p>
-<h3 id="asserttrue"><a class="header" href="#asserttrue">assertTrue()</a></h3>
+<p><span id="function.assertT"> </span></p>
+<h3 id="assertt"><a class="header" href="#assertt">assertT()</a></h3>
 <hr />
-<p><strong>assertTrue(<em>condition</em>)</strong></p>
+<p><strong>assertT(<em>condition</em>)</strong></p>
 <p>Verifies that <em>condition</em> is truthy, producing an
 informative assertion error if not.</p>
 <p><span id="function.check"> </span></p>
@@ -6686,6 +6697,12 @@ test immediately.</p>
 <p>Skips the current test with the given message without executing it
 further.  The test will be counted as "Skipped" in the final test
 results.</p>
+<p><span id="function.typedValue"> </span></p>
+<h3 id="typedvalue"><a class="header" href="#typedvalue">typedValue()</a></h3>
+<hr />
+<p><strong>typedValue(<em>value</em>)</strong></p>
+<p>Outputs the value's type and value for display.  Collections are output in
+readable format.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="catchchecker-type-joetest"><a class="header" href="#catchchecker-type-joetest"><code>CatchChecker</code> type (<code>joe.test</code>)</a></h1>
 <hr />
 <p>A fluent test checker for <code>catch()</code> results.
@@ -9867,15 +9884,17 @@ types, methods, and constants include in Joe's aPackage.</p>
 </li>
 <li><a href="library/pkg.joe.test.html"><code>joe.test</code> package (Joe Test Tool API)</a>
 <ul>
-<li><a href="library/pkg.joe.test.html#function.assertEquals">assertEquals(<em>got</em>, <em>expected</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertEQ">assertEQ(<em>got</em>, <em>expected</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertEmpty">assertEmpty(<em>value</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertError">assertError(<em>callable</em>, [<em>message</em>], [<em>frames</em>...])</a></li>
-<li><a href="library/pkg.joe.test.html#function.assertFalse">assertFalse(<em>condition</em>)</a></li>
-<li><a href="library/pkg.joe.test.html#function.assertTrue">assertTrue(<em>condition</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertF">assertF(<em>condition</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.assertT">assertT(<em>condition</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.engine">engine()</a> → String</li>
 <li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.skip">skip(<em>message</em>)</a></li>
+<li><a href="library/pkg.joe.test.html#function.typedValue">typedValue(<em>value</em>)</a></li>
 <li><a href="library/type.joe.test.CatchChecker.html">CatchChecker</a>
 <ul>
 <li><a href="library/type.joe.test.CatchChecker.html#init">CatchChecker(<em>catchResult</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>

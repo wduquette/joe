@@ -11,6 +11,8 @@
     methods.
 - Standard Library
   - Added `Fact::get`
+  - Revised the `joe.test` API for simplicity and for more legible and 
+    informative failure messages.
 
 ## Changes in 0.7.0 (19 July 2025)
 
