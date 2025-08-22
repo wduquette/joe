@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.patterns.Pattern;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.types.SetValue;
@@ -14,6 +15,7 @@ public sealed interface Term permits
     Constant,
     ListTerm,
     MapTerm,
+    PatternTerm,
     SetTerm,
     Variable,
     Wildcard
@@ -68,6 +70,7 @@ public sealed interface Term permits
     static Set<String> getVariableNames(Term term) {
         return switch (term) {
             case Aggregate a -> new HashSet<>(a.names());
+            case PatternTerm p -> Pattern.getVariableNames(p.pattern());
             case Variable v -> Set.of(v.name());
             default -> Set.of();
         };

@@ -121,7 +121,7 @@ public class Nero {
     public RuleEngine execute(NeroRuleSet ruleSet)
         throws JoeError
     {
-        var engine = new RuleEngine(ruleSet);
+        var engine = new RuleEngine(joe, ruleSet);
         engine.setDebug(debug);
         engine.infer();
         return engine;
@@ -155,7 +155,7 @@ public class Nero {
     public RuleEngine execute(NeroRuleSet ruleSet, FactSet db)
         throws JoeError
     {
-        var engine = new RuleEngine(ruleSet, db);
+        var engine = new RuleEngine(joe, ruleSet, db);
         engine.setDebug(debug);
         engine.infer();
         return engine;
