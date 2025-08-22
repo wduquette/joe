@@ -543,7 +543,7 @@ public class NeroParserTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // term()
+    // aggregate()
 
     @Test public void testAggregate_unknown() {
         test("testAggregate_unknown");
@@ -583,6 +583,81 @@ public class NeroParserTest extends Ted {
             """;
         check(parseNero(source))
             .eq("[line 1] error at 'sum', expected 1 variable name(s).");
+    }
+
+    //-------------------------------------------------------------------------
+    // listTerm
+
+    @Test public void testListTerm_expectedRightBracket() {
+        test("testListTerm_expectedRightBracket");
+
+        var source = """
+            A([1, 2);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at ')', expected ']' after list items.");
+    }
+
+    //-------------------------------------------------------------------------
+    // patternTerm
+
+    @Test public void testPatternTerm_foundExpression() {
+        test("testPatternTerm_foundExpression");
+
+        var source = """
+            A(x) :- B([x,$(y)]);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '$', found interpolated expression in Nero pattern term.");
+    }
+
+    //-------------------------------------------------------------------------
+    // setOrMapTerm
+
+    @Test public void testSetOrMapTerm_expectedRightBrace() {
+        test("testSetOrMapTerm_expectedRightBrace");
+
+        var source = """
+            A({:);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at ')', expected '}' after empty map literal.");
+    }
+
+    //-------------------------------------------------------------------------
+    // setTerm
+
+    @Test public void testSetTerm_expectedRightBrace() {
+        test("testSetTerm_expectedRightBrace");
+
+        var source = """
+            A({1);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at ')', expected '}' after set items.");
+    }
+
+    //-------------------------------------------------------------------------
+    // mapTerm
+
+    @Test public void testMapTerm_expectedColon() {
+        test("testMapTerm_expectedColon");
+
+        var source = """
+            A({#a: 1, #b, 2);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at ',', expected ':' after key term.");
+    }
+
+    @Test public void testMapTerm_expectedRightBrace() {
+        test("testMapTerm_expectedRightBrace");
+
+        var source = """
+            A({#a: 1);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at ')', expected '}' after map items.");
     }
 
     //-------------------------------------------------------------------------

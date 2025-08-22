@@ -432,7 +432,6 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Term term(Context ctx) {
-        // TODO: Simplify using checkTwo
         if (ctx == Context.HEAD && scanner.checkTwo(IDENTIFIER, LEFT_PAREN)) {
             return aggregate();
         } else if (ctx == Context.BODY && scanner.checkTwo(IDENTIFIER, LEFT_PAREN)) {
@@ -462,24 +461,20 @@ class NeroParser extends EmbeddedParser {
             return new Constant(null);
         } else if (scanner.match(KEYWORD, NUMBER, STRING)) {
             return new Constant(scanner.previous().literal());
+        } else if (ctx == Context.HEAD && scanner.match(LEFT_BRACKET)) {
+            return listTerm();
+        } else if (ctx == Context.BODY && scanner.check(LEFT_BRACKET)) {
+            return patternTerm();
         } else if (scanner.match(LEFT_BRACKET)) {
-            if (ctx == Context.HEAD) {
-                return listTerm();
-            } else if (ctx == Context.BODY) {
-                return patternTerm();
-            } else {
-                throw errorSync(scanner.previous(),
-                    "found collection literal in " + ctx.place() + ".");
-            }
+            throw errorSync(scanner.previous(),
+                "found collection literal in " + ctx.place() + ".");
+        } else if (ctx == Context.HEAD && scanner.match(LEFT_BRACE)) {
+            return setOrMapTerm(ctx);
+        } else if (ctx == Context.BODY && scanner.check(LEFT_BRACE)) {
+            return patternTerm();
         } else if (scanner.match(LEFT_BRACE)) {
-            if (ctx == Context.HEAD) {
-                return setOrMapTerm(ctx);
-            } else if (ctx == Context.BODY) {
-                return patternTerm();
-            } else {
-                throw errorSync(scanner.previous(),
-                    "found collection literal in " + ctx.place() + ".");
-            }
+            throw errorSync(scanner.previous(),
+                "found collection literal in " + ctx.place() + ".");
         } else {
             scanner.advance();
             throw errorSync(scanner.previous(), "expected term.");
@@ -518,7 +513,7 @@ class NeroParser extends EmbeddedParser {
             list.add(term(Context.HEAD));
 
         } while (scanner.match(COMMA));
-        scanner.consume(RIGHT_BRACKET, "expected ']' after list literal.");
+        scanner.consume(RIGHT_BRACKET, "expected ']' after list items.");
 
         return new ListTerm(list);
     }
@@ -563,7 +558,7 @@ class NeroParser extends EmbeddedParser {
             list.add(term(Context.HEAD));
 
         }
-        scanner.consume(RIGHT_BRACE, "expected '}' after set literal.");
+        scanner.consume(RIGHT_BRACE, "expected '}' after set items.");
 
         return new SetTerm(list);
     }
@@ -580,7 +575,7 @@ class NeroParser extends EmbeddedParser {
             scanner.consume(COLON, "expected ':' after key term.");
             list.add(term(Context.HEAD));
         }
-        scanner.consume(RIGHT_BRACE, "expected '}' after map literal.");
+        scanner.consume(RIGHT_BRACE, "expected '}' after map items.");
 
         return new MapTerm(list);
     }
