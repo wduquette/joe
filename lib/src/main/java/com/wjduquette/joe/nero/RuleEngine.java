@@ -317,14 +317,7 @@ public class RuleEngine {
     // Matches the rule's index-th body atom against the relevant facts.
     private void matchNextBodyAtom(BindingContext bc, int index) {
         var atom = bc.rule.body().get(index);
-        Set<Fact> facts;
-
-        if (isBuiltIn(atom.relation())) {
-            // The NeroParser ensures that atom conforms to the built-in's shape.
-            facts = BUILT_INS.get(atom.relation()).function().compute(bc, atom);
-        } else {
-            facts = knownFacts.getRelation(atom.relation());
-        }
+        Set<Fact> facts = factsForAtom(bc, atom);
 
         // FIRST, Save the current bindings, as we will begin with them for each
         // fact.
@@ -355,6 +348,15 @@ public class RuleEngine {
             // NEXT, the rule has matched.  Build the inferred fact, and see
             // if it's actually new.
             bc.matches.add(bc.bindings);
+        }
+    }
+
+    private Set<Fact> factsForAtom(BindingContext bc, Atom atom) {
+        if (isBuiltIn(atom.relation())) {
+            // The NeroParser ensures that atom conforms to the built-in's shape.
+            return BUILT_INS.get(atom.relation()).function().compute(bc, atom);
+        } else {
+            return knownFacts.getRelation(atom.relation());
         }
     }
 
@@ -447,8 +449,8 @@ public class RuleEngine {
     }
 
     private boolean checkNegations(BindingContext bc) {
-        for (var atom : bc. rule.negations()) {
-            for (var fact : knownFacts.getRelation(atom.relation())) {
+        for (var atom : bc.rule.negations()) {
+            for (var fact : factsForAtom(bc, atom)) {
                 if (matchAtom(atom, fact, bc)) {
                     return false;
                 }

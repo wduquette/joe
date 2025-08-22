@@ -579,6 +579,24 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    @Test public void testBuiltIn_negation() {
+        test("testBuiltIn_negation");
+        var source = """
+            transient Item;
+            Item(#hat);
+            Item(#boots);
+            Item(#truck);
+            Item(#car);
+            transient Owner;
+            Owner(#joe, [#hat, #boots, #truck]);
+            NotOwns(id, item) :- Owner(id, list), Item(item), not member(item, list);
+            """;
+        check(execute(source)).eq("""
+            define NotOwns/2;
+            NotOwns(#joe, #car);
+            """);
+    }
+
     //-------------------------------------------------------------------------
     // Collection Literals
 

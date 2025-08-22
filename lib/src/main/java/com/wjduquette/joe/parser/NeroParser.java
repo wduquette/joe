@@ -242,10 +242,10 @@ class NeroParser extends EmbeddedParser {
             }
 
             if (negated) {
-                if (RuleEngine.isBuiltIn(atom.relation())) {
-                    throw errorSync(token,
-                        "found built-in predicate in negated body atom.");
-                }
+//                if (RuleEngine.isBuiltIn(atom.relation())) {
+//                    throw errorSync(token,
+//                        "found built-in predicate in negated body atom.");
+//                }
                 for (var name : atom.getVariableNames()) {
                     if (!bodyVars.contains(name)) {
                         error(token,

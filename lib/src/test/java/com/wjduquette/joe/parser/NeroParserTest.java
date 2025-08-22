@@ -275,16 +275,6 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at 'Bar', found update marker '!' in body atom of non-updating rule.");
     }
 
-    @Test public void testRule_negatedMember() {
-        test("testRule_negatedMember");
-
-        var source = """
-            Thing(x) :- Foo(list), Bar(x), not member(x, list);
-            """;
-        check(parseNero(source))
-            .eq("[line 1] error at 'member', found built-in predicate in negated body atom.");
-    }
-
     @Test public void testRule_negatedUnbound() {
         test("testRule_negatedUnbound");
 
