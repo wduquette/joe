@@ -311,6 +311,88 @@ public class ProxyType<V>
         }
     }
 
+    /**
+     * Returns true if the value has fields matchable by name, and false
+     * otherwise.
+     *
+     * <p>By default, values of the proxied type will have
+     * matchable fields if this proxy defines them using the field() builder.
+     * Subtypes may override this method as needed.</p>
+     * @param joe The Joe interpreter
+     * @param value The value
+     * @return true or false
+     */
+    @SuppressWarnings("unused")
+    public boolean hasMatchableFields(Joe joe, Object value) {
+        return !fieldNames.isEmpty();
+    }
+
+    /**
+     * Returns true if the value has fields matchable by position, and false
+     * otherwise.
+     *
+     * <p>By default, values of the proxied type will have
+     * ordered matchable fields if this proxy defines them using the
+     * field() builder. Subtypes may override this method as needed.</p>
+     * @param joe The Joe interpreter
+     * @param value The value
+     * @return true or false
+     */
+    @SuppressWarnings("unused")
+    public boolean hasOrderedMatchableFields(Joe joe, Object value) {
+        return !fieldNames.isEmpty();
+    }
+
+    /**
+     * If the value {@code hasMatchableFields()}, this method returns a
+     * map of the field values by name.
+     *
+     * <p>By default, values of the proxied type will have
+     * ordered matchable fields if this proxy defines them using the
+     * field() builder. Subtypes may override this method as needed.</p>
+     * @param joe The Joe interpreter
+     * @param value The value
+     * @return The map
+     */
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getMatchableFieldMap(Joe joe, Object value) {
+        var map = new HashMap<String,Object>();
+
+        for (var name : fieldNames) {
+            var getter = getters.get(name);
+            if (getter != null) {
+                map.put(name, getter.get(joe, (V)value));
+            }
+        }
+
+        return map;
+    }
+
+    /**
+     * If the value {@code hasOrderedMatchableFields()}, this method returns a
+     * list of the field values in order.
+     *
+     * <p>By default, values of the proxied type will have
+     * ordered matchable fields if this proxy defines them using the
+     * field() builder. Subtypes may override this method as needed.</p>
+     * @param joe The Joe interpreter
+     * @param value The value
+     * @return The map
+     */
+    @SuppressWarnings({"unused", "unchecked"})
+    public List<Object> getMatchableFieldValues(Joe joe, Object value) {
+        var list = new ArrayList<>();
+
+        for (var name : fieldNames) {
+            var getter = getters.get(name);
+            if (getter != null) {
+                list.add(getter.get(joe, (V)value));
+            }
+        }
+        return list;
+    }
+
 
     /**
      * Returns whether the given instance can be converted to a Nero
@@ -336,27 +418,12 @@ public class ProxyType<V>
     @SuppressWarnings("unused")
     public Fact toFact(Joe joe, Object value) {
         if (!fieldNames.isEmpty()) {
-            return new PairFact(name(), fieldNames, getFieldMap(joe, value));
+            return new PairFact(name(), fieldNames, getMatchableFieldMap(joe, value));
         } else {
             throw new UnsupportedOperationException(
                 "Values of this type cannot be used as facts: '" +
                     type().name() + "'.");
         }
-    }
-
-    // Gets a map of the value's field names, by name.
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> getFieldMap(Joe joe, Object value) {
-        var map = new HashMap<String,Object>();
-
-        for (var name : fieldNames) {
-            var getter = getters.get(name);
-            if (getter != null) {
-                map.put(name, getter.get(joe, (V)value));
-            }
-        }
-
-        return map;
     }
 
     //-------------------------------------------------------------------------

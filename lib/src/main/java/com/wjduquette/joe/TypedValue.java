@@ -4,6 +4,7 @@ import com.wjduquette.joe.nero.Fact;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A value bound to its ProxyType.  It is the responsibility
@@ -37,6 +38,26 @@ record TypedValue(Joe joe, ProxyType<?> proxy, Object value)
     @Override
     public void set(String name, Object other) {
         proxy.set(value, name, other);
+    }
+
+    @Override
+    public boolean hasMatchableFields() {
+        return proxy.hasMatchableFields(joe, value);
+    }
+
+    @Override
+    public boolean hasOrderedMatchableFields() {
+        return proxy.hasOrderedMatchableFields(joe, value);
+    }
+
+    @Override
+    public Map<String,Object> getMatchableFieldMap() {
+        return proxy.getMatchableFieldMap(joe, value);
+    }
+
+    @Override
+    public List<Object> getMatchableFieldValues() {
+        return proxy.getMatchableFieldValues(joe, value);
     }
 
     @Override
