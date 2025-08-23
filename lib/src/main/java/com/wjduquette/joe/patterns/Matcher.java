@@ -149,13 +149,15 @@ public class Matcher {
                 Map<String,Object> map;
 
                 if (value instanceof Fact f) {
-                    // Check type name
-                    if (!p.typeName().equals(f.relation()) &&
-                        !p.typeName().equals("Fact")
-                    ) {
+                    if (p.typeName().equals(f.relation())) {
+                        map = f.getFieldMap();
+                    } else if (p.typeName().equals("Fact")) {
+                        map = new HashMap<>();
+                        map.put("relation", f.relation());
+                        map.put("fields", f.getFieldMap());
+                    } else {
                         yield false;
                     }
-                    map = f.getFieldMap();
                 } else {
                     var obj = joe.asJoeValue(value);
                     if (!hasType(obj, p.typeName())) yield false;
@@ -180,14 +182,15 @@ public class Matcher {
                 List<Object> fields;
 
                 if (value instanceof Fact f) {
-                    // Check type name
-                    if (!p.typeName().equals(f.relation()) &&
-                        !p.typeName().equals("Fact")
-                    ) {
+                    if (p.typeName().equals(f.relation())) {
+                        fields = f.getFields();
+                    } else if (p.typeName().equals("Fact")) {
+                        fields = new ArrayList<>();
+                        fields.add(f.relation());
+                        fields.add(f.getFields());
+                    } else {
                         yield false;
                     }
-                    if (!f.isOrdered()) yield false;
-                    fields = f.getFields();
                 } else {
                     var obj = joe.asJoeValue(value);
                     if (!hasType(obj, p.typeName())) yield false;
