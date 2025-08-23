@@ -96,7 +96,7 @@ class PatternParser extends EmbeddedParser {
                 } else if (scanner.peekNext().type() == COLON) {
                     return namedFieldPattern(wp, identifier);
                 } else {
-                    return recordPattern(wp, identifier);
+                    return orderedFieldPattern(wp, identifier);
                 }
             }
 
@@ -110,13 +110,13 @@ class PatternParser extends EmbeddedParser {
                 return new Pattern.Variable(name);
             }
         } else {
-            throw errorSync(scanner.peek(), "Expected pattern.");
+            throw errorSync(scanner.peek(), "expected pattern.");
         }
     }
 
     private Pattern constantPattern(ASTPattern wp) {
         if (scanner.match(MINUS)) {
-            scanner.consume(NUMBER, "Expected number after '-'.");
+            scanner.consume(NUMBER, "expected number after '-'.");
             var number = (Double)scanner.previous().literal();
             return new Pattern.Constant(-number);
         }
@@ -137,10 +137,10 @@ class PatternParser extends EmbeddedParser {
             if (scanner.match(IDENTIFIER)) {
                 return wp.addVarExpr(scanner.previous());
             } else {
-                scanner.consume(LEFT_PAREN, "Expected identifier or '(' after '$'.");
+                scanner.consume(LEFT_PAREN, "expected identifier or '(' after '$'.");
                 var expr = parent.expression();
                 scanner.consume(RIGHT_PAREN,
-                    "Expected ')' after interpolated expression.");
+                    "expected ')' after interpolated expression.");
                 return wp.addExpr(expr);
             }
         } else {
@@ -164,12 +164,12 @@ class PatternParser extends EmbeddedParser {
 
         String tailName = null;
         if (scanner.match(COLON)) {
-            scanner.consume(IDENTIFIER, "Expected binding variable for list tail.");
+            scanner.consume(IDENTIFIER, "expected tail variable after ':'.");
             var tailVar = scanner.previous();
             wp.saveBinding(tailVar);
             tailName = tailVar.lexeme();
         }
-        scanner.consume(RIGHT_BRACKET, "Expected ']' after list pattern.");
+        scanner.consume(RIGHT_BRACKET, "expected ']' after list pattern items.");
 
         return new Pattern.ListPattern(list, tailName);
     }
@@ -187,12 +187,12 @@ class PatternParser extends EmbeddedParser {
                 break;
             }
             var key = constantPattern(wp);
-            scanner.consume(COLON, "Expected ':' after map key.");
+            scanner.consume(COLON, "expected ':' after map key.");
             var value = parsePattern(wp, true);
             map.put(key, value);
         } while (scanner.match(COMMA));
 
-        scanner.consume(RIGHT_BRACE, "Expected '}' after map pattern.");
+        scanner.consume(RIGHT_BRACE, "expected '}' after map pattern items.");
 
         return new Pattern.MapPattern(map);
     }
@@ -209,19 +209,19 @@ class PatternParser extends EmbeddedParser {
                 break;
             }
 
-            scanner.consume(IDENTIFIER, "Expected field name.");
+            scanner.consume(IDENTIFIER, "expected field name.");
             var key = scanner.previous().lexeme();
-            scanner.consume(COLON, "Expected ':' after field name.");
+            scanner.consume(COLON, "expected ':' after field name.");
             var value = parsePattern(wp, true);
             fieldMap.put(key, value);
         } while (scanner.match(COMMA));
 
-        scanner.consume(RIGHT_PAREN, "Expected ')' after field pattern.");
+        scanner.consume(RIGHT_PAREN, "expected ')' after field pattern.");
 
         return new Pattern.NamedFieldPattern(identifier.lexeme(), fieldMap);
     }
 
-    private Pattern recordPattern(ASTPattern wp, Token identifier) {
+    private Pattern orderedFieldPattern(ASTPattern wp, Token identifier) {
         var list = new ArrayList<Pattern>();
 
         if (scanner.match(RIGHT_PAREN)) {
@@ -235,10 +235,8 @@ class PatternParser extends EmbeddedParser {
             list.add(parsePattern(wp, true));
         } while (scanner.match(COMMA));
 
-        scanner.consume(RIGHT_PAREN, "Expected ')' after record pattern.");
+        scanner.consume(RIGHT_PAREN, "expected ')' after field pattern.");
 
         return new Pattern.OrderedFieldPattern(identifier.lexeme(), list);
     }
-
-
 }
