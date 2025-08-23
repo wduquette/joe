@@ -456,11 +456,14 @@ public class Parser {
         var keyword = scanner.previous();
         var start = keyword.span().start();
         scanner.consume(LEFT_PAREN, "expected '(' after 'foreach'.");
+        var patternToken = scanner.peek();
         var pattern = pattern();
 
-        // FIRST, Simple constants are invalid.
-        if (pattern.getPattern() instanceof Pattern.Expression) {
-            throw errorSync(scanner.previous(), "expected loop variable name.");
+        // FIRST, Simple constants and interpolated expressions are invalid.
+        if (pattern.getPattern() instanceof Pattern.Constant ||
+            pattern.getPattern() instanceof Pattern.Expression
+        ) {
+            throw errorSync(patternToken, "expected loop variable name or pattern.");
         }
 
         // NEXT, One variable (a single wildcard is treated as variable name).
@@ -487,6 +490,10 @@ public class Parser {
         }
 
         // NEXT, A more complex pattern
+        if (pattern.getBindings().isEmpty()) {
+            error(patternToken, "expected at least one variable in loop pattern.");
+        }
+
         scanner.consume(COLON, "expected ':' after loop pattern.");
 
         // List Expression
@@ -535,13 +542,13 @@ public class Parser {
             var caseKeyword = scanner.previous();
             var pattern = pattern();
             var guard = scanner.match(IF) ? expression() : null;
-            scanner.consume(MINUS_GREATER, "expected '->' after pattern.");
+            scanner.consume(MINUS_GREATER, "expected '->' after case pattern.");
             var stmt = statement();
             cases.add(new Stmt.MatchCase(caseKeyword, pattern, guard, stmt));
         }
 
         if (cases.isEmpty()) {
-            error(scanner.previous(), "expected at least one 'case' in `match`.");
+            error(scanner.peek(), "expected at least one 'case' in 'match'.");
         }
 
         // NEXT, parse the default case, if it exists

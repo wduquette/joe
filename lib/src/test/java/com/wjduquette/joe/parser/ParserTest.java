@@ -491,7 +491,89 @@ public class ParserTest extends Ted {
     //-------------------------------------------------------------------------
     // foreachStatement()
 
-    // TODO
+    @Test public void testForeach_expectedLeftParen() {
+        test("testForeach_expectedLeftParen");
+
+        var source = """
+            foreach x : y) {}
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at 'x', expected '(' after 'foreach'."
+        );
+    }
+
+    @Test public void testForeach_expectedLoopVar_const() {
+        test("testForeach_expectedLoopVar_const");
+
+        var source = """
+            foreach (1 : y) {}
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '1', expected loop variable name or pattern."
+        );
+    }
+
+    @Test public void testForeach_expectedLoopVar_interp() {
+        test("testForeach_expectedLoopVar_interp");
+
+        var source = """
+            foreach ($x : y) {}
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '$', expected loop variable name or pattern."
+        );
+    }
+
+    @Test public void testForeach_expectedColon_var() {
+        test("testForeach_expectedColon_var");
+
+        var source = """
+            foreach (x  y) {}
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at 'y', expected ':' after loop variable name.");
+    }
+
+    @Test public void testForeach_expectedRightParen_var() {
+        test("testForeach_expectedRightParen_var");
+
+        var source = """
+            foreach (x : y {}
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '{', expected ')' after loop expression.");
+    }
+
+    @Test public void testForeach_expectedLoopVar_pattern() {
+        test("testForeach_expectedLoopVar_pattern");
+
+        var source = """
+            foreach ([1] : y) {}
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '[', expected at least one variable in loop pattern."
+        );
+    }
+
+    @Test public void testForeach_expectedColon_pattern() {
+        test("testForeach_expectedColon_pattern");
+
+        var source = """
+            foreach ([x]  y) {}
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at 'y', expected ':' after loop pattern.");
+    }
+
+    @Test public void testForeach_expectedRightParen_pattern() {
+        test("testForeach_expectedRightParen_pattern");
+
+        var source = """
+            foreach ([x] : y {}
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '{', expected ')' after loop expression.");
+    }
 
     //-------------------------------------------------------------------------
     // ifStatement()
@@ -523,7 +605,90 @@ public class ParserTest extends Ted {
     //-------------------------------------------------------------------------
     // matchStatement
 
-    // TODO
+    @Test public void testMatch_expectedLeftParen() {
+        test("testMatch_expectedLeftParen");
+
+        var source = """
+            match x) {}
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at 'x', expected '(' after 'match'."
+        );
+    }
+
+    @Test public void testMatch_expectedRightParen() {
+        test("testMatch_expectedRightParen");
+
+        var source = """
+            match (x {}
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '{', expected ')' after 'match' expression."
+        );
+    }
+
+    @Test public void testMatch_expectedLeftBrace() {
+        test("testMatch_expectedLeftBrace");
+
+        var source = """
+            match (x) }
+            """;
+        check(parse(source)).eq(
+            "[line 1] error at '}', expected '{' before 'match' body."
+        );
+    }
+
+    @Test public void testMatch_expectedArrowAfterCase() {
+        test("testMatch_expectedArrowAfterCase");
+
+        var source = """
+            match (x) {
+                case 1 {}
+            }
+            """;
+        check(parse(source)).eq(
+            "[line 2] error at '{', expected '->' after case pattern."
+        );
+    }
+
+    @Test public void testMatch_expectedCase() {
+        test("testMatch_expectedCase");
+
+        var source = """
+            match (x) {
+            }
+            """;
+        check(parse(source)).eq(
+            "[line 2] error at '}', expected at least one 'case' in 'match'."
+        );
+    }
+
+    @Test public void testMatch_expectedArrowAfterDefault() {
+        test("testMatch_expectedArrowAfterDefault");
+
+        var source = """
+            match (x) {
+                case 1 -> {}
+                default {}
+            }
+            """;
+        check(parse(source)).eq(
+            "[line 3] error at '{', expected '->' after 'default'."
+        );
+    }
+
+    @Test public void testMatch_expectedRightBrace() {
+        test("testMatch_expectedRightBrace");
+
+        var source = """
+            match (x) {
+                case 1 -> {}
+                default -> {}
+            """;
+        check(parse(source)).eq(
+            "[line 3] error at end, expected '}' after 'match' body."
+        );
+    }
 
     //-------------------------------------------------------------------------
     // returnStatement
