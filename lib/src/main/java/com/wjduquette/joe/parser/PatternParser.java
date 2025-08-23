@@ -201,7 +201,7 @@ class PatternParser extends EmbeddedParser {
         var fieldMap = new LinkedHashMap<String, Pattern>();
 
         if (scanner.match(RIGHT_PAREN)) {
-            return new Pattern.NamedFieldPattern(identifier.lexeme(), fieldMap);
+            return new Pattern.NamedField(identifier.lexeme(), fieldMap);
         }
 
         do {
@@ -218,14 +218,14 @@ class PatternParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after field pattern.");
 
-        return new Pattern.NamedFieldPattern(identifier.lexeme(), fieldMap);
+        return new Pattern.NamedField(identifier.lexeme(), fieldMap);
     }
 
     private Pattern orderedFieldPattern(ASTPattern wp, Token identifier) {
         var list = new ArrayList<Pattern>();
 
         if (scanner.match(RIGHT_PAREN)) {
-            return new Pattern.OrderedFieldPattern(identifier.lexeme(), list);
+            return new Pattern.OrderedField(identifier.lexeme(), list);
         }
 
         do {
@@ -237,6 +237,6 @@ class PatternParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after field pattern.");
 
-        return new Pattern.OrderedFieldPattern(identifier.lexeme(), list);
+        return new Pattern.OrderedField(identifier.lexeme(), list);
     }
 }

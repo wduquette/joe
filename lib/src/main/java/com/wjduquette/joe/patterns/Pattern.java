@@ -23,8 +23,8 @@ public sealed interface Pattern permits
     Pattern.Expression,
     Pattern.ListPattern,
     Pattern.MapPattern,
-    Pattern.NamedFieldPattern,
-    Pattern.OrderedFieldPattern,
+    Pattern.NamedField,
+    Pattern.OrderedField,
     Pattern.Subpattern,
     Pattern.TypeName,
     Pattern.Variable,
@@ -120,7 +120,7 @@ public sealed interface Pattern permits
      * @param typeName The name of the desired type.
      * @param fieldMap The field names and value patterns
      */
-    record NamedFieldPattern(String typeName, Map<String,Pattern> fieldMap)
+    record NamedField(String typeName, Map<String,Pattern> fieldMap)
         implements Pattern
     {
         @Override public String toString() {
@@ -139,7 +139,7 @@ public sealed interface Pattern permits
      * @param typeName The name of the desired type.
      * @param patterns The field value patterns
      */
-    record OrderedFieldPattern(String typeName, List<Pattern> patterns)
+    record OrderedField(String typeName, List<Pattern> patterns)
         implements Pattern
     {
         @Override public String toString() {
@@ -238,9 +238,9 @@ public sealed interface Pattern permits
             }
             case MapPattern mp ->
                 mp.patterns().values().forEach(p -> gatherNames(p, names));
-            case NamedFieldPattern nfp ->
+            case NamedField nfp ->
                 nfp.fieldMap().values().forEach(p -> gatherNames(p, names));
-            case OrderedFieldPattern ofp ->
+            case OrderedField ofp ->
                 ofp.patterns().forEach(p -> gatherNames(p, names));
             case Subpattern sp -> {
                 names.add(sp.name());

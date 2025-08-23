@@ -363,7 +363,7 @@ public class MatcherTest extends Ted {
             "id", new Pattern.Expression(0),
             "red", new Pattern.Expression(1)
         );
-        var pattern = new Pattern.NamedFieldPattern("Thing", fieldMap);
+        var pattern = new Pattern.NamedField("Thing", fieldMap);
 
         var gizmo = new TestObject("Gizmo", "123", "red");
 
@@ -380,7 +380,7 @@ public class MatcherTest extends Ted {
             "id", new Pattern.Expression(0),
             "style", new Pattern.Expression(1)
         );
-        var pattern = new Pattern.NamedFieldPattern("Thing", fieldMap);
+        var pattern = new Pattern.NamedField("Thing", fieldMap);
 
         var thing = new TestObject("Thing", "123", "red");
 
@@ -397,7 +397,7 @@ public class MatcherTest extends Ted {
             "id", new Pattern.Expression(0),
             "color", new Pattern.Expression(1)
         );
-        var pattern = new Pattern.NamedFieldPattern("Thing", fieldMap);
+        var pattern = new Pattern.NamedField("Thing", fieldMap);
 
         var thing = new TestObject("Thing", "123", "red");
 
@@ -415,7 +415,7 @@ public class MatcherTest extends Ted {
             "first", new Pattern.Expression(0),
             "second", new Pattern.Expression(1)
         );
-        var pattern = new Pattern.NamedFieldPattern("Pair", fieldMap);
+        var pattern = new Pattern.NamedField("Pair", fieldMap);
 
         var pair = new Pair("v1", "v2");
 
@@ -432,7 +432,7 @@ public class MatcherTest extends Ted {
         test("testOrderedFieldPattern_scalar");
 
         constants = List.of("123", "red");
-        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedField("Thing", List.of(
             new Pattern.Expression(0),
             new Pattern.Expression(1)
         ));
@@ -446,7 +446,7 @@ public class MatcherTest extends Ted {
         test("testOrderedFieldPattern_wrongType");
 
         constants = List.of("123", "red");
-        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedField("Thing", List.of(
             new Pattern.Expression(0),
             new Pattern.Expression(1)
         ));
@@ -462,7 +462,7 @@ public class MatcherTest extends Ted {
         test("testOrderedFieldPattern_wrongSize");
 
         constants = List.of("123", "red", 456.0);
-        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedField("Thing", List.of(
             new Pattern.Expression(0),
             new Pattern.Expression(1),
             new Pattern.Expression(2)
@@ -479,7 +479,7 @@ public class MatcherTest extends Ted {
         test("testOrderedFieldPattern_wrongFieldValue");
 
         constants = List.of("123", "green");
-        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedField("Thing", List.of(
             new Pattern.Expression(0),
             new Pattern.Expression(1)
         ));
@@ -495,7 +495,7 @@ public class MatcherTest extends Ted {
         test("testOrderedFieldPattern_typeNameOnly");
 
         constants = List.of();
-        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of());
+        var pattern = new Pattern.OrderedField("Thing", List.of());
 
         var target = new TestObject("Thing", "123", "red");
 
@@ -509,7 +509,7 @@ public class MatcherTest extends Ted {
         test("testOrderedFieldPattern_good");
 
         constants = List.of("123", "red");
-        var pattern = new Pattern.OrderedFieldPattern("Thing", List.of(
+        var pattern = new Pattern.OrderedField("Thing", List.of(
             new Pattern.Expression(0),
             new Pattern.Expression(1)
         ));
@@ -526,7 +526,7 @@ public class MatcherTest extends Ted {
         test("testOrderedFieldPattern_good");
 
         constants = List.of("123", "red");
-        var pattern = new Pattern.OrderedFieldPattern("Pair", List.of(
+        var pattern = new Pattern.OrderedField("Pair", List.of(
             new Pattern.Expression(0),
             new Pattern.Expression(1)
         ));

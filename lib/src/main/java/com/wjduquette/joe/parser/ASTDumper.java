@@ -297,7 +297,7 @@ public class ASTDumper {
                 }
                 yield buff.toString();
             }
-            case Pattern.NamedFieldPattern p -> {
+            case Pattern.NamedField p -> {
                 var buff = buffer()
                     .println(" '" + p.typeName() + "'");
                 for (var key : p.fieldMap().keySet()) {
@@ -305,7 +305,7 @@ public class ASTDumper {
                 }
                 yield buff.toString();
             }
-            case Pattern.OrderedFieldPattern p -> {
+            case Pattern.OrderedField p -> {
                 var buff = buffer()
                     .println(" '" + p.typeName() + "'");
                 for (var sub : p.patterns()) {

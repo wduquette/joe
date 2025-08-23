@@ -145,7 +145,7 @@ public class Matcher {
                 yield false;
             }
 
-            case Pattern.NamedFieldPattern p -> {
+            case Pattern.NamedField p -> {
                 Fact fact;
 
                 if (value instanceof Fact f) {
@@ -175,7 +175,7 @@ public class Matcher {
                 yield true;
             }
 
-            case Pattern.OrderedFieldPattern p -> {
+            case Pattern.OrderedField p -> {
                 Fact fact;
                 var jv = joe.asJoeValue(value);
 

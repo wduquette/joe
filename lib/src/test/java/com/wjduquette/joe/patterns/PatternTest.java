@@ -66,7 +66,7 @@ public class PatternTest extends Ted {
         map.put("id", new Pattern.Wildcard("_xyz"));
         map.put("color", new Pattern.Variable("a"));
 
-        var p = new Pattern.NamedFieldPattern("Thing", map);
+        var p = new Pattern.NamedField("Thing", map);
         check(p.toString()).eq("Thing(id: _xyz, color: ?a)");
     }
 
@@ -74,7 +74,7 @@ public class PatternTest extends Ted {
     public void testOrderedFieldPattern_normal() {
         test("testOrderedFieldPattern");
 
-        var p = new Pattern.OrderedFieldPattern("Thing", List.of(
+        var p = new Pattern.OrderedField("Thing", List.of(
             new Pattern.Wildcard("_xyz"),
             new Pattern.Variable("a")
         ));
