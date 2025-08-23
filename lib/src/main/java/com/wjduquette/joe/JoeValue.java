@@ -4,6 +4,7 @@ import com.wjduquette.joe.nero.Fact;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An interface for a Java value type implemented to play well with Joe.  A
@@ -64,6 +65,52 @@ public interface JoeValue {
     default String stringify(Joe joe) {
         return toString();
     }
+
+    //------------------------------------------------------------------------
+    // Matchable-value API
+
+    /**
+     * Returns true if the value has fields matchable by name, and false
+     * otherwise.
+     *
+     * <p>Subtypes should override this method as needed.</p>
+     * @return true or false
+     */
+    default boolean hasMatchableFields() { return false; }
+
+    /**
+     * Returns true if the value has fields matchable by position, and false
+     * otherwise.
+     *
+     * <p>Subtypes should override this method as needed.</p>
+     * @return true or false
+     */
+    default boolean hasOrderedMatchableFields() { return false; }
+
+    /**
+     * If the value {@code hasMatchableFields()}, this method returns a
+     * map of the field values by name.
+     *
+     * <p>Subtypes should override this method as needed.</p>
+     * @return The map
+     */
+    default Map<String,Object> getMatchableFieldMap() {
+        throw new UnsupportedOperationException("!hasMatchableFields()");
+    }
+
+    /**
+     * If the value {@code hasOrderedMatchableFields()}, this method returns a
+     * list of the field values in order.
+     *
+     * <p>Subtypes should override this method as needed.</p>
+     * @return The map
+     */
+    default List<Object> getMatchableFieldValues() {
+        throw new UnsupportedOperationException("!hasOrderedMatchableFields()");
+    }
+
+    //------------------------------------------------------------------------
+    // Fact-conversion API
 
     /**
      * Returns true if this value can be used as a Nero Fact and false

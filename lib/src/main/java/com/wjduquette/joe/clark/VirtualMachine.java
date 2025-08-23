@@ -736,7 +736,7 @@ class VirtualMachine {
                     push(value); // Push the value; this is an assignment.
                 }
                 case RECORD ->
-                    push(new ClarkRecord(readString(), readStringList()));
+                    push(new ClarkRecordType(readString(), readStringList()));
                 case RETURN -> {
                     var result = pop();
                     closeUpvalues(frame.base);

@@ -81,6 +81,16 @@ public class ClarkInstance implements JoeValue {
     }
 
     @Override
+    public boolean hasMatchableFields() {
+        return !fields.isEmpty();
+    }
+
+    @Override
+    public Map<String,Object> getMatchableFieldMap() {
+        return Collections.unmodifiableMap(fields);
+    }
+
+    @Override
     public boolean isFact() {
         return !fields.isEmpty();
     }

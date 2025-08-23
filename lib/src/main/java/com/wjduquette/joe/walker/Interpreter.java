@@ -284,7 +284,7 @@ class Interpreter {
                     methods.put(method.name().lexeme(), function);
                 }
 
-                WalkerRecord type = new WalkerRecord(
+                WalkerRecordType type = new WalkerRecordType(
                     stmt.name().lexeme(),
                     stmt.typeSpan(),
                     stmt.fields(),

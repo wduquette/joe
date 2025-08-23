@@ -1,135 +1,89 @@
 package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.types.TypeType;
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.PairFact;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
- * BertRecord is the internal representation for a scripted record type
+ * BertRecordValue is the internal representation for instances of scripted
+ * record types.
  */
-class ClarkRecord
-    implements JoeClass, JoeValue, NativeCallable, ClarkType
-{
+public class ClarkRecord implements JoeValue {
+    private final static String TO_STRING = "toString";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The type name (and the name of its global variable)
-    private final String name;
+    // The object's type
+    final ClarkRecordType type;
 
-    // Static methods and constants
-    final Map<String, Closure> staticMethods = new HashMap<>();
-    private final Map<String, Object> fields = new HashMap<>();
+    // The object's field values.
+    final Map<String,Object> fieldMap;
 
-    // Record field names
-    private final String signature;
-    private final List<String> recordFields;
+    private List<Object> fields = null;
 
-    // The class's methods.
-    final Map<String, Closure> methods = new HashMap<>();
+    // Default "toString()" implementation.
+    private final NativeCallable _toString;
 
     //-------------------------------------------------------------------------
-    // Constructor and building methods
+    // Constructor
 
     /**
-     * Creates the class object.  It is initially empty, having only a name;
-     * the compiled class declaration builds it up over a number of
-     * instructions.
-     * @param name The name
-     * @param recordFields The record's field names.
+     * Creates the internal representation for an instance of a scripted
+     * class.
+     * @param type The class.
+     * @param fieldMap The field names and values.
      */
-    ClarkRecord(String name, List<String> recordFields) {
-        this.name = name;
-        this.recordFields = recordFields;
-        this.signature = name + "(" + String.join(", ", recordFields) + ")";
+    ClarkRecord(ClarkRecordType type, Map<String,Object> fieldMap) {
+        this.type = type;
+        this.fieldMap = fieldMap;
+
+        // The class might define its own explicit toString() method;
+        // but provide a default.
+        this._toString = new NativeMethod<>(this, "toString",
+            (objc, joe, args) -> toStringRep(joe));
+    }
+
+    private String toStringRep(Joe joe) {
+        var values = type.getRecordFields().stream()
+            .map(n -> joe.stringify(fieldMap.get(n)))
+            .collect(Collectors.joining(", "));
+        return type.name() + "(" + values + ")";
     }
 
     //-------------------------------------------------------------------------
-    // BertRecord API
-
-    /**
-     * Gets a list of the names of the record's fields, in order.
-     * @return The list
-     */
-    public List<String> getRecordFields() {
-        return recordFields;
-    }
-
-    /**
-     * Adds a method to the record type.
-     * @param name The method name
-     * @param closure The closure
-     */
-    public void addMethod(String name, Closure closure) {
-        methods.put(name, closure);
-    }
-
-    public void addStaticMethod(String name, Closure closure) {
-        staticMethods.put(name, closure);
-    }
-
-    public Object call(Joe joe, Args args) {
-        args.exactArity(recordFields.size(), signature);
-        var map = new HashMap<String,Object>();
-        for (var i = 0; i < recordFields.size(); i++) {
-            map.put(recordFields.get(i), args.get(i));
-        }
-
-        return new ClarkRecordValue(this, map);
-    }
-
-
-    //-------------------------------------------------------------------------
-    // JoeType API
-
-    @Override
-    public String name() {
-        return name;
-    }
-
-    //-------------------------------------------------------------------------
-    // JoeClass API
-
-    @Override
-    public JoeCallable bind(Object value, String name) {
-        var method = methods.get(name);
-
-        if (method != null) {
-            return new BoundMethod(value, method);
-        }
-
-        return null;
-    }
-
-    @Override
-    public boolean canBeExtended() {
-        return true;
-    }
-
-    //-------------------------------------------------------------------------
-    // JoeValue API -- This refers the type object itself and its statics!
+    // JoeValue API
 
     @Override
     public JoeType type() {
-        return TypeType.TYPE;
+        return type;
     }
 
     @Override
     public List<String> getFieldNames() {
-        return new ArrayList<>(fields.keySet());
+        return type.getRecordFields();
     }
 
     @Override
     public Object get(String name) {
-        if (fields.containsKey(name)) {
-            return fields.get(name);
+        if (fieldMap.containsKey(name)) {
+            return fieldMap.get(name);
         }
 
-        if (staticMethods.containsKey(name)) {
-            return staticMethods.get(name);
+        var method = type.bind(this, name);
+
+        if (method != null) {
+            return method;
+        }
+
+        if (name.equals(TO_STRING)) {
+            return _toString;
         }
 
         throw new JoeError("Undefined property '" + name + "'.");
@@ -137,37 +91,73 @@ class ClarkRecord
 
     @Override
     public void set(String name, Object value) {
-        fields.put(name, value);
+        throw new JoeError("Values of type " + type.name() +
+            " have no mutable properties.");
     }
 
     @Override
-    public String stringify(Joe joe) {
-        return "<class " + name + ">";
-    }
-
-    //-------------------------------------------------------------------------
-    // JoeCallable API
-
-    @Override
-    public String callableType() {
-        return "record";
-    }
-
-    @Override
-    public boolean isScripted() {
+    public boolean hasMatchableFields() {
         return true;
     }
 
     @Override
-    public String signature() {
-        return signature;
+    public Map<String,Object> getMatchableFieldMap() {
+        return Collections.unmodifiableMap(fieldMap);
+    }
+
+    @Override
+    public boolean hasOrderedMatchableFields() {
+        return true;
+    }
+
+    @Override
+    public List<Object> getMatchableFieldValues() {
+        if (fields == null) {
+            fields = new ArrayList<>();
+            for (var name : type.getRecordFields()) {
+                fields.add(fieldMap.get(name));
+            }
+        }
+        return Collections.unmodifiableList(fields);
+    }
+
+    @Override
+    public boolean isFact() {
+        return !fieldMap.isEmpty();
+    }
+
+    @Override
+    public Fact toFact() {
+        return new PairFact(type.name(), type.getRecordFields(), fieldMap);
+    }
+
+    @Override
+    public String stringify(Joe joe) {
+        var callable = get(TO_STRING);
+        return (String)joe.call(callable);
     }
 
     //-------------------------------------------------------------------------
     // Object API
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ClarkRecord that = (ClarkRecord) o;
+        return type.equals(that.type) && fieldMap.equals(that.fieldMap);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + fieldMap.hashCode();
+        return result;
+    }
+
     @Override
     public String toString() {
-        return "<record " + name + ">";
+        return "<" + type.name() + "@" + String.format("%x",hashCode()) + ">";
     }
 }

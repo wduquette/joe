@@ -1,124 +1,43 @@
 package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.SourceBuffer.Span;
-import com.wjduquette.joe.types.TypeType;
+import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.PairFact;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-/**
- * A record type defined in a Joe script.
- */
-class WalkerRecord implements JoeClass, JoeValue, NativeCallable {
+class WalkerRecord implements JoeValue {
+    private final static String TO_STRING = "toString";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The type's name
-    private final String name;
+    private final WalkerRecordType type;
+    private final Map<String, Object> fieldMap;
+    private List<Object> fields = null;
 
-    // The type's span in the source code.
-    private final Span typeSpan;
-
-    // Static methods and constants
-    private final Map<String, WalkerFunction> staticMethods;
-    private final Map<String, Object> fields = new HashMap<>();
-
-    // Record field names
-    private final String signature;
-    private final List<String> recordFields;
-
-    // Instance Methods
-    private final Map<String, WalkerFunction> methods;
+    // Default "toString()" implementation.
+    private final NativeCallable _toString;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    /**
-     * Creates a new record type
-     * @param name The type's variable name.
-     * @param typeSpan The type's span in the source code
-     * @param recordFields The record field names
-     * @param staticMethods The map of static methods by name
-     * @param methods The map of methods by name
-     */
-    WalkerRecord(
-        String name,
-        Span typeSpan,
-        List<String> recordFields,
-        Map<String, WalkerFunction> staticMethods,
-        Map<String, WalkerFunction> methods
-    ) {
-        this.name = name;
-        this.typeSpan = typeSpan;
-        this.recordFields = recordFields;
-        this.staticMethods = staticMethods;
-        this.methods = methods;
-        this.signature = name + "(" + String.join(", ", recordFields) + ")";
+    WalkerRecord(WalkerRecordType type, Map<String,Object> fieldMap) {
+        this.type = type;
+        this.fieldMap = fieldMap;
+        this._toString = new NativeMethod<>(this, "toString",
+            (objc, joe, args) -> toStringRep(joe));
     }
 
-    //-------------------------------------------------------------------------
-    // WalkerClass API
-
-    @SuppressWarnings("unused")
-    public Span typeSpan() {
-        return typeSpan;
-    }
-
-    public Object call(Joe joe, Args args) {
-        args.exactArity(recordFields.size(), signature);
-        var map = new HashMap<String,Object>();
-        for (var i = 0; i < recordFields.size(); i++) {
-            map.put(recordFields.get(i), args.get(i));
-        }
-
-        return new WalkerRecordValue(this, map);
-    }
-
-    public List<String> getRecordFields() {
-        return recordFields;
-    }
-
-    //-------------------------------------------------------------------------
-    // JoeType API
-
-    @Override
-    public String name() {
-        return name;
-    }
-
-    //-------------------------------------------------------------------------
-    // JoeClass API
-
-    @Override
-    public JoeCallable bind(Object value, String name) {
-        var method = methods.get(name);
-
-        if (method != null) {
-            return method.bind((JoeValue)value);
-        }
-
-        return null;
-    }
-
-    //-------------------------------------------------------------------------
-    // JoeCallable API
-
-    @Override
-    public String callableType() {
-        return "record";
-    }
-
-    @Override
-    public String signature() {
-        return signature;
-    }
-
-    @Override
-    public boolean isScripted() {
-        return true;
+    private String toStringRep(Joe joe) {
+        var values = type.getRecordFields().stream()
+            .map(n -> joe.stringify(fieldMap.get(n)))
+            .collect(Collectors.joining(", "));
+        return type.name() + "(" + values + ")";
     }
 
     //-------------------------------------------------------------------------
@@ -126,22 +45,26 @@ class WalkerRecord implements JoeClass, JoeValue, NativeCallable {
 
     @Override
     public JoeType type() {
-        return TypeType.TYPE;
+        return type;
     }
 
     @Override
     public List<String> getFieldNames() {
-        return new ArrayList<>(fields.keySet());
+        return type.getRecordFields();
     }
 
     @Override
     public Object get(String name) {
-        if (fields.containsKey(name)) {
-            return fields.get(name);
+        if (fieldMap.containsKey(name)) {
+            return fieldMap.get(name);
         }
 
-        if (staticMethods.containsKey(name)) {
-            return staticMethods.get(name);
+        JoeCallable method = type.bind(this, name);
+
+        if (method != null) return method;
+
+        if (name.equals(TO_STRING)) {
+            return _toString;
         }
 
         throw new JoeError("Undefined property '" + name + "'.");
@@ -149,14 +72,70 @@ class WalkerRecord implements JoeClass, JoeValue, NativeCallable {
 
     @Override
     public void set(String name, Object value) {
-        fields.put(name, value);
+        throw new JoeError("Values of type " + type.name() +
+            " have no mutable properties.");
     }
 
-    //-------------------------------------------------------------------------
-    // Object API
+    @Override
+    public boolean hasMatchableFields() {
+        return true;
+    }
+
+    @Override
+    public Map<String,Object> getMatchableFieldMap() {
+        return Collections.unmodifiableMap(fieldMap);
+    }
+
+    @Override
+    public boolean hasOrderedMatchableFields() {
+        return true;
+    }
+
+    @Override
+    public List<Object> getMatchableFieldValues() {
+        if (fields == null) {
+            fields = new ArrayList<>();
+            for (var name : type.getRecordFields()) {
+                fields.add(fieldMap.get(name));
+            }
+        }
+        return Collections.unmodifiableList(fields);
+    }
+
+    @Override
+    public boolean isFact() {
+        return !fieldMap.isEmpty();
+    }
+
+    @Override
+    public Fact toFact() {
+        return new PairFact(type.name(), type.getRecordFields(), fieldMap);
+    }
+
+    @Override
+    public String stringify(Joe joe) {
+        var callable = get(TO_STRING);
+        return (String)joe.call(callable);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        WalkerRecord that = (WalkerRecord) o;
+        return type.equals(that.type) && fieldMap.equals(that.fieldMap);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + fieldMap.hashCode();
+        return result;
+    }
 
     @Override
     public String toString() {
-        return "<class " + name + ">";
+        // This is for debugging only; it isn't used for the string rep.
+        return "<" + type.name() + "@" + String.format("%x",hashCode()) + ">";
     }
 }
