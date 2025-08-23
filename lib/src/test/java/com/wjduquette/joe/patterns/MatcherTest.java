@@ -352,11 +352,11 @@ public class MatcherTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // NamedFieldPattern
+    // NamedField
 
     @Test
-    public void testNamedFieldPattern_bad_wrongType() {
-        test("testNamedFieldPattern_bad_wrongType");
+    public void testNamedField_bad_wrongType() {
+        test("testNamedField_bad_wrongType");
 
         constants = List.of("123", "red");
         Map<String,Pattern> fieldMap = Map.of(
@@ -372,8 +372,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testNamedFieldPattern_bad_wrongField() {
-        test("testNamedFieldPattern_bad_wrongField");
+    public void testNamedField_bad_wrongField() {
+        test("testNamedField_bad_wrongField");
 
         constants = List.of("123", "fancy");
         Map<String,Pattern> fieldMap = Map.of(
@@ -389,8 +389,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testNamedFieldPattern_good() {
-        test("testNamedFieldPattern_good");
+    public void testNamedField_good() {
+        test("testNamedField_good");
 
         constants = List.of("123", "red");
         Map<String,Pattern> fieldMap = Map.of(
@@ -407,8 +407,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testNamedFieldPattern_proxiedType() {
-        test("testNamedFieldPattern_proxiedType");
+    public void testNamedField_proxiedType() {
+        test("testNamedField_proxiedType");
 
         constants = List.of("v1", "v2");
         Map<String,Pattern> fieldMap = Map.of(
@@ -425,11 +425,11 @@ public class MatcherTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // OrderedFieldPattern
+    // OrderedField
 
     @Test
-    public void testOrderedFieldPattern_scalar() {
-        test("testOrderedFieldPattern_scalar");
+    public void testOrderedField_scalar() {
+        test("testOrderedField_scalar");
 
         constants = List.of("123", "red");
         var pattern = new Pattern.OrderedField("Thing", List.of(
@@ -442,8 +442,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testOrderedFieldPattern_wrongType() {
-        test("testOrderedFieldPattern_wrongType");
+    public void testOrderedField_wrongType() {
+        test("testOrderedField_wrongType");
 
         constants = List.of("123", "red");
         var pattern = new Pattern.OrderedField("Thing", List.of(
@@ -458,8 +458,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testOrderedFieldPattern_wrongSize() {
-        test("testOrderedFieldPattern_wrongSize");
+    public void testOrderedField_wrongSize() {
+        test("testOrderedField_wrongSize");
 
         constants = List.of("123", "red", 456.0);
         var pattern = new Pattern.OrderedField("Thing", List.of(
@@ -475,8 +475,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testOrderedFieldPattern_wrongFieldValue() {
-        test("testOrderedFieldPattern_wrongFieldValue");
+    public void testOrderedField_wrongFieldValue() {
+        test("testOrderedField_wrongFieldValue");
 
         constants = List.of("123", "green");
         var pattern = new Pattern.OrderedField("Thing", List.of(
@@ -491,39 +491,8 @@ public class MatcherTest extends Ted {
     }
 
     @Test
-    public void testOrderedFieldPattern_typeNameOnly() {
-        test("testOrderedFieldPattern_typeNameOnly");
-
-        constants = List.of();
-        var pattern = new Pattern.OrderedField("Thing", List.of());
-
-        var target = new TestObject("Thing", "123", "red");
-
-        var bindings = bind(pattern, target);
-        check(bindings).ne(null);
-        check(bindings.isEmpty()).eq(true);
-    }
-
-    @Test
-    public void testOrderedFieldPattern_good() {
-        test("testOrderedFieldPattern_good");
-
-        constants = List.of("123", "red");
-        var pattern = new Pattern.OrderedField("Thing", List.of(
-            new Pattern.Expression(0),
-            new Pattern.Expression(1)
-        ));
-
-        var target = new TestObject("Thing", "123", "red");
-
-        var bindings = bind(pattern, target);
-        check(bindings).ne(null);
-        check(bindings.isEmpty()).eq(true);
-    }
-
-    @Test
-    public void testOrderedFieldPattern_proxiedType() {
-        test("testOrderedFieldPattern_good");
+    public void testOrderedField_proxiedType() {
+        test("testOrderedField_good");
 
         constants = List.of("123", "red");
         var pattern = new Pattern.OrderedField("Pair", List.of(
@@ -730,6 +699,8 @@ public class MatcherTest extends Ted {
 
         @Override public JoeType type() { return new TestType(typeName); }
         @Override public List<String> getFieldNames() { return List.of("id", "color"); }
+        @Override public boolean hasMatchableFields() { return true; }
+        @Override public Map<String,Object> getMatchableFieldMap() { return fields; }
         @Override public Object get(String name) { return fields.get(name); }
         @Override public void set(String name, Object value) { }
         @Override public boolean isFact() { return true; }

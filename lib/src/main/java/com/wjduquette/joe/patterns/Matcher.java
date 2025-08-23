@@ -146,21 +146,22 @@ public class Matcher {
             }
 
             case Pattern.NamedField p -> {
-                Fact fact;
+                Map<String,Object> map;
 
                 if (value instanceof Fact f) {
-                    fact = f;
+                    // Check type name
+                    if (!p.typeName().equals(f.relation()) &&
+                        !p.typeName().equals("Fact")
+                    ) {
+                        yield false;
+                    }
+                    map = f.getFieldMap();
                 } else {
                     var obj = joe.asJoeValue(value);
-                    if (!obj.isFact()) yield false;
-
-                    fact = obj.toFact();
-                    if (!p.typeName().equals(fact.relation()) &&
-                        !hasType(obj, p.typeName())
-                    ) yield false;
+                    if (!hasType(obj, p.typeName())) yield false;
+                    if (!obj.hasMatchableFields()) yield false;
+                    map = obj.getMatchableFieldMap();
                 }
-
-                var map = fact.getFieldMap();
 
                 for (var e : p.fieldMap().entrySet()) {
                     var field = e.getKey();
@@ -176,48 +177,34 @@ public class Matcher {
             }
 
             case Pattern.OrderedField p -> {
-                Fact fact;
-                var jv = joe.asJoeValue(value);
+                List<Object> fields;
 
                 if (value instanceof Fact f) {
-                    // It's a `Fact` object; use it as is.
-                    fact = f;
-                    if (!fact.relation().equals(p.typeName())) yield false;
-                } else if (jv.isFact()) {
-                    // It's convertible to a fact object; verify that the
-                    // requested name is the object's relation, type,
-                    // or a supertype.
-                    fact = jv.toFact();
-
-                    if (!p.typeName().equals(fact.relation()) &&
-                        !hasType(jv, p.typeName())
-                    ) yield false;
+                    // Check type name
+                    if (!p.typeName().equals(f.relation()) &&
+                        !p.typeName().equals("Fact")
+                    ) {
+                        yield false;
+                    }
+                    if (!f.isOrdered()) yield false;
+                    fields = f.getFields();
                 } else {
-                    // It's not convertible to a fact, i.e., it has no
-                    // fields. If the pattern has no field patterns,
-                    // check the name; otherwise it fails.
-
-                    yield p.patterns().isEmpty() && hasType(jv, p.typeName());
+                    var obj = joe.asJoeValue(value);
+                    if (!hasType(obj, p.typeName())) yield false;
+                    if (!obj.hasOrderedMatchableFields()) yield false;
+                    fields = obj.getMatchableFieldValues();
                 }
-
-                // At this point we know:
-                //
-                // - The type name/relation matches.
-                // - The `fact` variable makes the fields visible.
 
                 // Check for field patterns.
                 if (p.patterns().isEmpty()) yield true;
-
-                // Check the fields; the fact must be ordered.
-                if (!fact.isOrdered()) yield false;
-
-                var fields = fact.getFields();
                 var size = p.patterns().size();
                 if (fields.size() != size) yield false;
 
                 // NEXT, match items
                 for (var i = 0; i < size; i++) {
-                    if (!matchWith(joe, p.patterns().get(i), fields.get(i), getter, bindings)) {
+                    if (!matchWith(joe, p.patterns().get(i), fields.get(i),
+                        getter, bindings)
+                    ) {
                         yield false;
                     }
                 }
