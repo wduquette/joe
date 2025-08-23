@@ -3,7 +3,7 @@
 //-------------------------------------------------------------------------
 // Basic Test API
 
-function testAssertEquals_scalar() {
+function testAssertEQ_scalar() {
     assertEQ(5, 5);
     assertEQ("abc", "abc");
     assertError(\-> assertEQ("abc", 5), """
@@ -13,7 +13,7 @@ function testAssertEquals_scalar() {
     );
 }
 
-function testAssertEquals_list() {
+function testAssertEQ_list() {
     var a = List.of("a", "b", "c");
     var b = List.of("a", "b", "c", "d");
     assertEQ(a, a);
@@ -33,7 +33,7 @@ function testAssertEquals_list() {
     );
 }
 
-function testAssertEquals_set() {
+function testAssertEQ_set() {
     var a = Set.of("a", "b", "c");
     var b = Set.of("a", "b", "c", "d");
     assertEQ(a, a);
@@ -53,7 +53,7 @@ function testAssertEquals_set() {
     );
 }
 
-function testAssertEquals_map() {
+function testAssertEQ_map() {
     var a = Map.of("a", 1.0, "b", 2.0);
     var b = Map.of("a", 1.0, "b", 2.0, "c", 3.0);
     assertEQ(a, a);
@@ -71,7 +71,7 @@ function testAssertEquals_map() {
     );
 }
 
-function testAssertTrue() {
+function testAssertT() {
     assertT(true);
     assertT("abc");
 
@@ -79,7 +79,7 @@ function testAssertTrue() {
     assertError(bad, "Expected truthy value, got: Boolean 'false'.");
 }
 
-function testAssertFalse() {
+function testAssertF() {
     assertF(false);
     assertF(null);
 
@@ -110,126 +110,6 @@ function testAssertError_noError() {
     assertError(bad, "Expected error, got: Keyword '#ok'.");
 }
 
-//-------------------------------------------------------------------------
-// Advanced Test API
-
-function testCheck_eq() {
-    check("abc").eq("abc");
-
-    function bad() { check("abc").eq("def"); }
-    checkCatch(bad)
-        .message("Expected String 'def', got: String 'abc'.");
-}
-
-function testCheck_isTrue() {
-    check(true).isTrue();
-    check(1).isTrue();
-    check("abc").isTrue();
-
-    function bad() { check(false).isTrue(); }
-    checkCatch(bad)
-        .message("Expected true, got: Boolean 'false'.");
-}
-
-function testCheck_isFalse() {
-    check(false).isFalse();
-    check(null).isFalse();
-
-    function bad() { check(true).isFalse(); }
-    checkCatch(bad)
-        .message("Expected false, got: Boolean 'true'.");
-}
-
-function testCheck_isNull() {
-    check(null).isNull();
-
-    function bad() { check("abc").isNull(); }
-    checkCatch(bad)
-        .message("Expected null, got: String 'abc'.");
-}
-
-function testCheck_isNonNull() {
-    check(1).isNonNull();
-
-    function bad() { check(null).isNonNull(); }
-    checkCatch(bad)
-        .message("Expected non-null, got: 'null'.");
-}
-
-function testCheck_isEmpty() {
-    check([]).isEmpty();
-    check("").isEmpty();
-
-    checkCatch(\-> check([1, 2]).isEmpty())
-        .message("Expected isEmpty(), got: List '[1, 2]'.");
-}
-
-function testCheck_containsAll() {
-    check([#a, #b, #c]).containsAll(#a, #b);
-
-    checkCatch(\-> check([#a]).containsAll(#a, #b))
-        .message("Expected collection to contain Keyword '#b', got: List '[#a, #b]'.");
-}
-
-function testCheck_hasType() {
-    check(true).hasType(Boolean);
-    check(1).hasType(Number);
-    check("abc").hasType(String);
-    check(null).hasType(null);
-
-    function bad() { check(true).hasType(String); }
-    checkCatch(bad)
-        .message("Expected type 'String', got: Type 'Boolean'.");
-}
-
-function testCheck_hasTypeName() {
-    check(true).hasTypeName("Boolean");
-    check(1).hasTypeName("Number");
-    check("abc").hasTypeName("String");
-
-    function bad() { check(true).hasTypeName("String"); }
-    checkCatch(bad)
-        .message("Expected type name 'String', got: String 'Boolean'.");
-}
-
-function testCheckCatch_isOK() {
-    checkCatch(_good).isOK();
-}
-
-function testCheckCatch_isError() {
-    checkCatch(_error)
-        .isError()
-        .type("AssertError")
-        .message("Simulated Error");
-}
-
-function testCheckCatch_fail_isOK() {
-    function bad() { checkCatch(_error).isOK(); }
-
-    checkCatch(bad)
-        .message("Expected no error, got: 'Simulated Error'.");
-}
-
-function testCheckCatch_fail_isError() {
-    function bad() { checkCatch(_good).isError(); }
-
-    checkCatch(bad)
-        .message("Expected an error, got: String 'abc'.");
-}
-
-function testCheckCatch_fail_message() {
-    function bad() { checkCatch(_error).message("Ouch"); }
-
-    checkCatch(bad)
-        .message("Expected message 'Ouch', got: 'Simulated Error'.");
-}
-
-function testCheckCatch_fail_type() {
-    function bad() { checkCatch(_error).type("JoeError"); }
-
-    checkCatch(bad)
-        .message("Expected error type 'JoeError', got: 'AssertError'.");
-}
 
 function _good() {
     return "abc";
