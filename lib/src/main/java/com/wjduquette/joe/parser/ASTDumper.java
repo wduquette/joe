@@ -265,7 +265,7 @@ public class ASTDumper {
         var buffer = new Buffer();
         buffer.println(pattern.getClass().getSimpleName());
 
-        buffer.indent("bindings: " + tokenList(pattern.getBindings()));
+        buffer.indent("bindings: " + tokenList(pattern.getVariableTokens()));
         int i = 0;
         for (var c : pattern.getExprs()) {
             buffer.indent("constant[" + i++ + "]: " + dump(c));

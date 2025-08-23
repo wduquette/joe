@@ -434,7 +434,7 @@ class Compiler {
                 // NOTE: the Parser wraps Stmt.ForEachBind as
                 // Stmt.Block[Stmt.ForEachBind]. Thus, this code needn't
                 // create a scope.
-                var vars = s.pattern().getBindings();
+                var vars = s.pattern().getVariableTokens();
 
                 // Setup                     // Stack: locals | working
                 emitPATTERN(s.pattern());    // ∅ | p           ; compile pattern
@@ -508,7 +508,7 @@ class Compiler {
                 var next1_ = -1;
                 var next2_ = -1;
                 for (var c : s.cases()) {
-                    var vars = c.pattern().getBindings();
+                    var vars = c.pattern().getVariableTokens();
 
                     patchJump(next1_);        // m | ∅        ; next1:
                     patchJump(next2_);        // m | ∅        ; next2:
@@ -688,7 +688,7 @@ class Compiler {
                 }
             }
             case Stmt.VarPattern s -> {
-                var vars = s.pattern().getBindings();
+                var vars = s.pattern().getVariableTokens();
 
                 if (!inGlobalScope()) {        // Stack: locals | working
                     declareLocals(vars);       // ∅         ; declare vars
@@ -749,7 +749,7 @@ class Compiler {
 
     private void emitPATTERN(ASTPattern astPattern) {
         var index = constant(astPattern.getPattern());
-        var bindings = constant(astPattern.getBindings().stream()
+        var bindings = constant(astPattern.getVariableTokens().stream()
             .map(Token::lexeme)
             .toList());
         emitList(astPattern.getExprs());
@@ -888,7 +888,7 @@ class Compiler {
             }
             case Expr.Match e -> {
                 // Stack effects are written for locals.
-                int nVars = e.pattern().getBindings().size();
+                int nVars = e.pattern().getVariableTokens().size();
 
                 // Set up                  // Stack: locals | working
                 emit(e.target());          // ∅ | t        ; Compute target
@@ -902,7 +902,7 @@ class Compiler {
                     emit(MATCHL);          // ∅ | vs flag  ; Do match
                     emit(TPUT);            // ∅ | vs       ; T = pop
                     defineLocals(          // ∅ | vs       ; define locals
-                        e.pattern().getBindings());
+                        e.pattern().getVariableTokens());
                     emit(LOCMOVE,         // vs | ∅       ; fixup local values
                         (char)slot,
                         (char)nVars);

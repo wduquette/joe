@@ -93,7 +93,7 @@ public class ASTPattern {
      * in the pattern.
      * @return The list
      */
-    public List<Token> getBindings() {
+    public List<Token> getVariableTokens() {
         return bindings;
     }
 }

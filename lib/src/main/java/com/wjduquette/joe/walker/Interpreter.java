@@ -669,7 +669,7 @@ class Interpreter {
                     yield true;
                 } else {
                     bound = new Bindings();
-                    for (var name : expr.pattern().getBindings()) {
+                    for (var name : expr.pattern().getVariableTokens()) {
                         bound.bind(name.lexeme(), null);
                     }
                     bind(bound.asMap());

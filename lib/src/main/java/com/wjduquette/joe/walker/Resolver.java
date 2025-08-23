@@ -146,8 +146,8 @@ class Resolver {
             case Stmt.ForEachBind stmt -> {
                 ++loopCounter;
                 stmt.pattern().getExprs().forEach(this::resolve);
-                stmt.pattern().getBindings().forEach(this::declare);
-                stmt.pattern().getBindings().forEach(this::define);
+                stmt.pattern().getVariableTokens().forEach(this::declare);
+                stmt.pattern().getVariableTokens().forEach(this::define);
                 resolve(stmt.items());
                 resolve(stmt.body());
                 --loopCounter;
@@ -168,8 +168,8 @@ class Resolver {
                 for (var c : stmt.cases()) {
                     c.pattern().getExprs().forEach(this::resolve);
                     beginScope();
-                    c.pattern().getBindings().forEach(this::declare);
-                    c.pattern().getBindings().forEach(this::define);
+                    c.pattern().getVariableTokens().forEach(this::declare);
+                    c.pattern().getVariableTokens().forEach(this::define);
                     if (c.guard() != null) resolve(c.guard());
                     resolve(c.statement());
                     endScope();
@@ -239,10 +239,10 @@ class Resolver {
                 define(stmt.name());
             }
             case Stmt.VarPattern stmt -> {
-                stmt.pattern().getBindings().forEach(this::declare);
+                stmt.pattern().getVariableTokens().forEach(this::declare);
                 stmt.pattern().getExprs().forEach(this::resolve);
                 resolve(stmt.target());
-                stmt.pattern().getBindings().forEach(this::define);
+                stmt.pattern().getVariableTokens().forEach(this::define);
             }
             case Stmt.While stmt -> {
                 ++loopCounter;
@@ -293,8 +293,8 @@ class Resolver {
             case Expr.Match expr -> {
                 resolve(expr.target());
                 expr.pattern().getExprs().forEach(this::resolve);
-                expr.pattern().getBindings().forEach(this::declare);
-                expr.pattern().getBindings().forEach(this::define);
+                expr.pattern().getVariableTokens().forEach(this::declare);
+                expr.pattern().getVariableTokens().forEach(this::define);
             }
             case Expr.Null ignored -> {}
             case Expr.PropGet expr -> resolve(expr.object());

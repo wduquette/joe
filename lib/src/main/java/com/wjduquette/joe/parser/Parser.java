@@ -326,7 +326,7 @@ public class Parser {
         } else if (pattern.getPattern() instanceof Pattern.Expression) {
             throw errorSync(patternToken, "expected variable name.");
         } else {
-            if (pattern.getBindings().isEmpty()) {
+            if (pattern.getVariableTokens().isEmpty()) {
                 error(scanner.previous(),
                     "'var' pattern must declare at least one variable.");
             }
@@ -490,7 +490,7 @@ public class Parser {
         }
 
         // NEXT, A more complex pattern
-        if (pattern.getBindings().isEmpty()) {
+        if (pattern.getVariableTokens().isEmpty()) {
             error(patternToken, "expected at least one variable in loop pattern.");
         }
 
