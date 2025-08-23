@@ -152,9 +152,17 @@ function testNamedField_supertype_good() {
 }
 
 // Can match a Fact by its relation
-function testNamedField_fact() {
+function testNamedField_fact_byRelation() {
     var person = Fact("Person", "Joe", 80);
     assertT(person ~ Person(f0: name, f1: age));
+    assertEQ(name, person.f0);
+    assertEQ(age, person.f1);
+}
+
+// Can match a Fact as a Fact
+function testNamedField_fact_asFact() {
+    var person = Fact("Person", "Joe", 80);
+    assertT(person ~ Fact(relation: "Person", fields: {"f0": name, "f1": age}));
     assertEQ(name, person.f0);
     assertEQ(age, person.f1);
 }
@@ -184,13 +192,20 @@ function testOrderedField_good() {
 }
 
 // Can match a Fact by its relation provided that it has ordered fields.
-function testOrderedField_fact() {
+function testOrderedField_fact_byRelation() {
     var person = Fact("Person", "Joe", 80);
     assertT(person ~ Person(name, age));
     assertEQ(name, person.f0);
     assertEQ(age, person.f1);
 }
 
+// Can match a Fact by its relation provided that it has ordered fields.
+function testOrderedField_fact_asFact() {
+    var person = Fact("Person", "Joe", 80);
+    assertT(person ~ Fact("Person", [name, age]));
+    assertEQ(name, person.f0);
+    assertEQ(age, person.f1);
+}
 
 //-----------------------------------------------------------------------------
 // Pattern-Bindings

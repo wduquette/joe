@@ -182,6 +182,8 @@ public class Matcher {
                 List<Object> fields;
 
                 if (value instanceof Fact f) {
+                    if (!f.isOrdered()) yield false;
+
                     if (p.typeName().equals(f.relation())) {
                         fields = f.getFields();
                     } else if (p.typeName().equals("Fact")) {
@@ -193,8 +195,8 @@ public class Matcher {
                     }
                 } else {
                     var obj = joe.asJoeValue(value);
-                    if (!hasType(obj, p.typeName())) yield false;
                     if (!obj.hasOrderedMatchableFields()) yield false;
+                    if (!hasType(obj, p.typeName())) yield false;
                     fields = obj.getMatchableFieldValues();
                 }
 
