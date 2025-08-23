@@ -442,7 +442,7 @@ public class Joe {
      * @param value The value
      * @return The JoeValue or null if the value is null.
      */
-    public JoeValue getJoeValue(Object value) {
+    public JoeValue asJoeValue(Object value) {
         if (value == null) return NULL;
         if (value instanceof JoeValue obj) return obj;
 
@@ -475,7 +475,7 @@ public class Joe {
             case null -> "null";
             case String s -> s;
             case JoeValue obj -> obj.stringify(this);
-            default -> getJoeValue(value).stringify(this);
+            default -> asJoeValue(value).stringify(this);
         };
     }
 
@@ -510,7 +510,7 @@ public class Joe {
      * @return The type string, or null.
      */
     public String typeName(Object value) {
-        return getJoeValue(value).type().name();
+        return asJoeValue(value).type().name();
     }
 
     /**
@@ -795,7 +795,7 @@ public class Joe {
      */
     public Fact toFact(Object arg) {
         if (arg instanceof Fact f) return f;
-        var jv = getJoeValue(arg);
+        var jv = asJoeValue(arg);
 
         if (jv.isFact()) return jv.toFact();
 

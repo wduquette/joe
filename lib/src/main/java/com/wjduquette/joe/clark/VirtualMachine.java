@@ -716,7 +716,7 @@ class VirtualMachine {
 
                     // Note: this works for all JoeObjects, including
                     // `BertClass` and `BertInstance`.
-                    var joeObject = joe.getJoeValue(target);
+                    var joeObject = joe.asJoeValue(target);
                     pop();
                     push(joeObject.get(name));
                 }
@@ -729,7 +729,7 @@ class VirtualMachine {
                     }
 
                     // Handle JoeObjects
-                    var joeObject = joe.getJoeValue(target);
+                    var joeObject = joe.asJoeValue(target);
                     var value = pop();
                     joeObject.set(name, value);
                     pop();       // Pop the instance
@@ -915,7 +915,7 @@ class VirtualMachine {
         if (arg instanceof Collection<?> c) {
             return c;
         } else {
-            var instance = joe.getJoeValue(arg);
+            var instance = joe.asJoeValue(arg);
             if (instance.canIterate()) {
                 return instance.getItems();
             } else {

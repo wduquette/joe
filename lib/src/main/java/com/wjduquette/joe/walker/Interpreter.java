@@ -687,13 +687,13 @@ class Interpreter {
                         "Tried to retrieve '" + expr.name().lexeme() +
                             "' property from null value.");
                 }
-                JoeValue instance = joe.getJoeValue(object);
+                JoeValue instance = joe.asJoeValue(object);
                 yield instance.get(expr.name().lexeme());
             }
             // ++ and -- with an object property
             case Expr.PropIncrDecr expr -> {
                 Object object = evaluate(expr.object());
-                JoeValue instance = joe.getJoeValue(object);
+                JoeValue instance = joe.asJoeValue(object);
                 var name = expr.name().lexeme();
                 var prior = instance.get(name);
                 checkNumericTarget(expr.op(), prior);
@@ -709,7 +709,7 @@ class Interpreter {
             // Assign a value to an object property using =, +=, -=, *=, /=
             case Expr.PropSet expr -> {
                 Object object = evaluate(expr.object());
-                JoeValue instance = joe.getJoeValue(object);
+                JoeValue instance = joe.asJoeValue(object);
 
                 Object right = evaluate(expr.value());
                 var name = expr.name().lexeme();
@@ -882,7 +882,7 @@ class Interpreter {
         if (arg instanceof Collection<?> c) {
             return c;
         } else {
-            var instance = joe.getJoeValue(arg);
+            var instance = joe.asJoeValue(arg);
             if (instance.canIterate()) {
                 return instance.getItems();
             } else {

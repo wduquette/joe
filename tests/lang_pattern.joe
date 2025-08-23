@@ -215,13 +215,21 @@ function testPatternBinding_nested() {
 // TypeNames
 
 // Matches on type only for any type.
-function testTypeName() {
+function testTypeName_joeValue() {
     record Gizmo(x, y) {}
     var gizmo = Gizmo(1, 2);
     assertT(gizmo ~ Gizmo());
     assertF(gizmo ~ Number());
     assertT("abc" ~ String());
     assertF("abc" ~ Number());
+}
+
+// For facts, matches on `Fact` or the relation.
+function testTypeName() {
+    var fact = Fact("Thing", #a);
+    assertT(fact ~ Fact());
+    assertT(fact ~ Thing());
+    assertF(fact ~ String());
 }
 
 //-----------------------------------------------------------------------------

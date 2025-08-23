@@ -151,7 +151,7 @@ public class Matcher {
                 if (value instanceof Fact f) {
                     fact = f;
                 } else {
-                    var obj = joe.getJoeValue(value);
+                    var obj = joe.asJoeValue(value);
                     if (!obj.isFact()) yield false;
 
                     fact = obj.toFact();
@@ -177,7 +177,7 @@ public class Matcher {
 
             case Pattern.OrderedFieldPattern p -> {
                 Fact fact;
-                var jv = joe.getJoeValue(value);
+                var jv = joe.asJoeValue(value);
 
                 if (value instanceof Fact f) {
                     // It's a `Fact` object; use it as is.
@@ -237,23 +237,13 @@ public class Matcher {
             }
 
             case Pattern.TypeName p -> {
-                Fact fact;
-                var jv = joe.getJoeValue(value);
-
                 if (value instanceof Fact f) {
                     // It's a `Fact` object; use it as is.
-                    fact = f;
-                    yield p.typeName().equals(fact.relation())
-                        || p.typeName().equals("Fact");
-                } else if (jv.isFact()) {
-                    // It's convertible to a fact object; verify that the
-                    // requested name is the object's relation, type,
-                    // or a supertype.
-                    fact = jv.toFact();
-                    yield fact.relation().equals(p.typeName())
-                        || hasType(jv, p.typeName());
+                    yield
+                        p.typeName().equals(f.relation()) ||
+                        p.typeName().equals("Fact");
                 } else {
-                    yield hasType(jv, p.typeName());
+                    yield hasType(joe.asJoeValue(value), p.typeName());
                 }
             }
 
