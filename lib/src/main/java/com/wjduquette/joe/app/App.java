@@ -16,7 +16,7 @@ public class App {
     private App() {} // Not instantiable
 
     /**
-     * The expected name of Joe's command-lien app.
+     * The expected name of Joe's command-line app.
      */
     public static final String NAME = "joe";
 
@@ -63,8 +63,7 @@ public class App {
             DumpTool.INFO,
             TestTool.INFO,
             DocTool.INFO,
-            WinTool.INFO,
-            NeroTool.INFO // Experimental
+            WinTool.INFO
         ));
 
         try {

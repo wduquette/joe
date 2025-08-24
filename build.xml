@@ -24,6 +24,7 @@ To do a complete clean build:
     <property name="jarfile"     value="${ant.project.name}-${version}.jar"/>
     <property name="tarfile"     value="${ant.project.name}-${version}.tar"/>
     <property name="app"         value="com.wjduquette.joe.app.App"/>
+    <property name="neroApp"     value="com.wjduquette.joe.app.NeroApp"/>
 
     <!-- Get the build date -->
     <tstamp>
@@ -69,8 +70,14 @@ To do a complete clean build:
                 <filter token="VERSION" value="${version}"/>
             </filterset>
         </copy>
+        <copy file="${basedir}/bin/nero.template" tofile="${tartree}/bin/nero">
+            <filterset>
+                <filter token="VERSION" value="${version}"/>
+            </filterset>
+        </copy>
         <exec executable="chmod" dir="${tartree}/bin">
             <arg line="+x joe"/>
+            <arg line="+x nero"/>
         </exec>
     </target>
 
@@ -121,11 +128,13 @@ To do a complete clean build:
             <tarfileset dir="${tartree}"
                         prefix="joe-${version}">
                 <exclude name="bin/joe"/>
+                <exclude name="bin/nero"/>
             </tarfileset>
             <tarfileset dir="${tartree}"
                         prefix="joe-${version}"
                         filemode="550">
                 <include name="bin/joe"/>
+                <include name="bin/nero"/>
             </tarfileset>
         </tar>
     </target>

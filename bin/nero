@@ -1,0 +1,7 @@
+#! /bin/bash
+# This script runs nero in development mode.
+export BIN_DIR="$( dirname "${BASH_SOURCE[0]}" )"
+export APP_HOME=${BIN_DIR}/..
+#echo "APP_HOME=$APP_HOME"
+java --class-path=${APP_HOME}/lib/build/libs/joe-0.8.0.jar com.wjduquette.joe.app.NeroApp $*
+

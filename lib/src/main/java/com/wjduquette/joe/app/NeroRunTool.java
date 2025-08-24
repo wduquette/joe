@@ -16,12 +16,12 @@ import java.util.*;
 /**
  * The implementation for the {@code joe nero} tool.
  */
-public class NeroTool implements Tool {
+public class NeroRunTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
      */
     public static final ToolInfo INFO = new ToolInfo(
-        "nero",
+        "run",
         "[options...] file.nero [file.nero...]",
         "Executes Nero scripts.",
         """
@@ -42,7 +42,7 @@ public class NeroTool implements Tool {
         --out filename, -o filename
             Writes the inferred facts to the given file.
         """,
-        NeroTool::main
+        NeroRunTool::main
     );
 
     //-------------------------------------------------------------------------
@@ -57,7 +57,7 @@ public class NeroTool implements Tool {
     // Constructor
 
     /** Creates the tool. */
-    public NeroTool() {
+    public NeroRunTool() {
         // Nothing to do
     }
 
@@ -167,6 +167,6 @@ public class NeroTool implements Tool {
      * @param args The command-line arguments.
      */
     public static void main(String[] args) {
-        new NeroTool().run(args);
+        new NeroRunTool().run(args);
     }
 }
