@@ -1,4 +1,4 @@
-# Appendix: Clark Virtual Machine
+# Appendix: Virtual Machine
 
 This appendix describes the Clark byte-engine's virtual machine.  
 
@@ -15,7 +15,6 @@ The byte-engine is a stack machine with a few registers:
   value.
 
 ## Instruction Set
-
 
 | Mnemonic/argument    | Stack effect            | Description               |
 |----------------------|-------------------------|---------------------------|
