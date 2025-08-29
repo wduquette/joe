@@ -176,17 +176,33 @@
                         <h1 id="change-log"><a class="header" href="#change-log">Change Log</a></h1>
 <h2 id="changes-in-080-in-development"><a class="header" href="#changes-in-080-in-development">Changes in 0.8.0 (in development)</a></h2>
 <ul>
-<li>Language
+<li>Joe Language
 <ul>
-<li>Fixed bug: Nero now parses negative numbers correctly.</li>
 <li>Added set literals, <code>{#a, #b, #c}</code>.
 <ul>
 <li><code>{}</code> now denotes an empty set, not an empty map.</li>
-<li><code>{:}</code> denotes an empty map.</li>
+<li><code>{:}</code> now denotes an empty map.</li>
 </ul>
 </li>
 <li>Replaced <code>@</code> with <code>.</code> as the property reference operator in instance
 methods.</li>
+</ul>
+</li>
+<li>Nero Language
+<ul>
+<li>Fixed bug: Nero now parses negative numbers correctly.</li>
+<li>Extended Nero, which now includes:
+<ul>
+<li>Collection literals, for use in rule heads and axioms</li>
+<li>Destructuring pattern terms, for use in body atoms.</li>
+<li>Built-in predicates for disaggregating collections into individual
+facts.</li>
+<li>Aggregation functions for accumulating statistics and aggregating
+individual values into collections.</li>
+<li>Schema declarations and update syntax for updating schemas in place.</li>
+<li>Improved APIs for working with Nero from Joe and Java code.</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>Standard Library
@@ -194,6 +210,12 @@ methods.</li>
 <li>Added <code>Fact::get</code></li>
 <li>Revised the <code>joe.test</code> API for simplicity and for more legible and
 informative failure messages.</li>
+</ul>
+</li>
+<li>Tools
+<ul>
+<li>Split out the <code>joe nero</code> tool into a standalone <code>nero</code> application so that
+it has some room to spread out.</li>
 </ul>
 </li>
 </ul>

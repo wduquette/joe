@@ -184,8 +184,6 @@ for use in <code>joe test</code> test suites.</p>
 <li><a href="pkg.joe.test.html#function.assertError">assertError(<em>callable</em>, [<em>message</em>], [<em>frames</em>...])</a></li>
 <li><a href="pkg.joe.test.html#function.assertF">assertF(<em>condition</em>)</a></li>
 <li><a href="pkg.joe.test.html#function.assertT">assertT(<em>condition</em>)</a></li>
-<li><a href="pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="type.joe.test.ValueChecker.html">ValueChecker</a></li>
-<li><a href="pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="pkg.joe.test.html#function.engine">engine()</a> → String</li>
 <li><a href="pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
 <li><a href="pkg.joe.test.html#function.skip">skip(<em>message</em>)</a></li>
@@ -193,9 +191,7 @@ for use in <code>joe test</code> test suites.</p>
 </ul>
 <p><strong>Types</strong></p>
 <ul>
-<li><a href="type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="type.joe.test.JoeTest.html">JoeTest</a></li>
-<li><a href="type.joe.test.ValueChecker.html">ValueChecker</a></li>
 </ul>
 <h2 id="imported-types"><a class="header" href="#imported-types">Imported Types</a></h2>
 <p>In addition to the APIs documented here, <code>joe.test</code> includes types from
@@ -238,17 +234,6 @@ informative assertion error if not.</p>
 <p><strong>assertT(<em>condition</em>)</strong></p>
 <p>Verifies that <em>condition</em> is truthy, producing an
 informative assertion error if not.</p>
-<p><span id="function.check"> </span></p>
-<h3 id="check"><a class="header" href="#check">check()</a></h3>
-<hr />
-<p><strong>check(<em>value</em>) → <a href="type.joe.test.ValueChecker.html">ValueChecker</a></strong></p>
-<p>Returns a checker for testing a computed value.</p>
-<p><span id="function.checkCatch"> </span></p>
-<h3 id="checkcatch"><a class="header" href="#checkcatch">checkCatch()</a></h3>
-<hr />
-<p><strong>checkCatch(<em>callable</em>) → <a href="type.joe.test.CatchChecker.html">CatchChecker</a></strong></p>
-<p>Executes a no-arg <em>callable</em> and returns a checker for checking
-the error result.</p>
 <p><span id="function.engine"> </span></p>
 <h3 id="engine"><a class="header" href="#engine">engine()</a></h3>
 <hr />

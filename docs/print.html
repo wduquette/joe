@@ -175,11 +175,43 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
-<p>Joe is a scripting language, implemented in Java, and is meant to used to
-add scriptability to Java applications and libraries.  This section lays
-out the goals (and non-goals!) of Joe, and the rationales behind them. <sup class="footnote-reference"><a href="#nuts">1</a></sup></p>
-<p>I'm implementing Joe for use in my own personal projects, and as a hobby
-language.  Others might find it useful or interesting as well.</p>
+<p>Joe is a scripting language, implemented in Java, for adding scriptability
+to Java applications and libraries.  I have developed Joe for use in my
+own personal projects, and as a hobby language; others might find it useful
+as well.</p>
+<p>The syntax is meant to be both familiar and a pleasant surprise for
+Java programmers: Joe loses much of the boilerplate and adds many new
+features.</p>
+<pre><code class="language-joe">record Greeter(name) {
+    method greet() {
+        println("Hello, " + .name + "!");
+    }
+}
+
+var greeter = Greeter("World");
+greeter.greet();
+</code></pre>
+<p>Joe includes:</p>
+<ul>
+<li>Numbers, strings, keywords, booleans, lists, sets, and maps as basic
+data types.</li>
+<li>First-class functions with proper closures.</li>
+<li>Lambdas</li>
+<li>Classes with single inheritance</li>
+<li>Immutable record types</li>
+<li>Rust-like pattern matching</li>
+<li>A complete, tightly integrated Datalog subsystem called Nero.</li>
+<li>A test runner for scripted testing.</li>
+<li>An API documentation generator based on "Joe Doc" comments.</li>
+<li>A rich Java API for embedding Joe in Java apps and libraries, and
+for extending Joe's library to support new problem domains.</li>
+<li>Support for the JavaFX GUI library</li>
+</ul>
+<p>See <a href="language.html">The Joe Language</a> and the sections that follow for
+a description of the language.</p>
+<p>The remainder of this introduction lays out my goals and non-goals for Joe,
+and the rationale for its creation, and can safely be skipped by those
+who want to get right to it.</p>
 <h2 id="goals"><a class="header" href="#goals">Goals</a></h2>
 <p>I wanted a language</p>
 <ul>
@@ -197,55 +229,60 @@ or I/O, except insofar as the client adds bindings for that purpose.</li>
 </li>
 <li>That provides a simple, easy to use API for writing bindings to native
 code</li>
+<li>That adds features Java hasn't gotten around to yet.</li>
 </ul>
-<p>Joe is growing into that language.</p>
+<p>Joe has become that language.</p>
 <h2 id="non-goals"><a class="header" href="#non-goals">Non-Goals</a></h2>
-<p><strong>High Performance</strong>: I don't need it; and I'm following the original Tcl/Tk
-dictum: write the fast code in the host language and glue it together with the
-scripting language.</p>
+<p><strong>High Performance</strong>: Joe is byte-compiled, so it's faster than it could
+be; I'm following the original Tcl/Tk dictum: write the fast code in the host
+language and glue it together with the scripting language.  (And if I were
+seeking super-high-performance, I wouldn't be working in Java anyway.)</p>
 <p><strong>Application development</strong>: See above.  Joe is meant to be a partner with
 Java, not a replacement.</p>
-<p><strong>General scripting</strong>: Use Python.  Or, better still, Tcl/Tk.</p>
+<p><strong>General scripting</strong>: Joe's ecosystem is growing to support general
+scripting, but that isn't the primary use case.</p>
 <p><strong>Pure functional programming</strong>: I'm happy to incorporate functional
-techniques in my code; but I've spent over 40 years learning how to work
-with mutable state without shooting myself in the foot.</p>
-<p><strong>Automatic binding to Java classes</strong>: I've written bindings by hand.  I've
-used generators like Swig.  Artisanal hand-crafted bindings are much more
-pleasing, at least to me.  I want to provide tools for that purpose, not
-settle for something quick and ugly.</p>
+and declarative techniques in my code; but I've spent over 40 years learning
+how to work with mutable state without shooting myself in the foot.</p>
+<p><strong>Automatic binding to Java classes</strong>: I've used generators like Swig, and
+I understand Java reflection.  I <em>could</em> write the code to let Joe call
+Java code without any help, effectively generating the glue code on the
+fly.  But in my experience, generated code like this produces APIs that
+fail to make good use of the scripting language's features, and when the
+API is used incorrectly usually produce horrible, cryptic error messages.<br />
+Artisanal hand-crafted bindings can do a much better job, and so Joe is
+designed to make it easy to write custom bindings that are a pleasure to use.</p>
 <h2 id="why-java"><a class="header" href="#why-java">Why Java?</a></h2>
-<p>I've been using Java professionally, full-time, for the last nine years.  I'm
+<p>I've been using Java professionally, full-time, for the last decade years.  I'm
 comfortable with it, I'm getting good results from it, and I like the way the
 language is evolving. I've done lots of both non-GUI and GUI programming in
 Java (using the JavaFX toolkit), and it's my currently language of choice
 for personal projects as well.</p>
 <p>It's robust. It's stable (at least since the Java 8/Java 9 fiasco).  It's
-popular.</p>
+popular. The JavaFX GUI is portable to multiple platforms.</p>
 <h2 id="why-not-javascriptluajjtclgroovy"><a class="header" href="#why-not-javascriptluajjtclgroovy">Why Not Javascript/LuaJ/JTcl/Groovy...</a></h2>
 <p>I've written lots of bindings for scripting languages, going back over a
 quarter of a century, mostly for Tcl (in C/C++) and JTcl (in Java); but I've
 also worked with the Nashorn version of Javascript, and the LuaJ implementation
-of Lua.  I've experimented with Groovy.</p>
-<p>I experimented with Groovy at one point, and bounced. I don't remember all
-the details, but I prefer a language in which the syntax isn't quite so...
-flexible.</p>
-<p>I like Tcl very much; but Tcl is not a great match for scripting Java APIs.
-Done a lot of it; it's a great command/console language; but it can be a lot
-of work.  Further, the JTcl implementation is both (A) dead, and (B) includes
-a host of code I have no need of; and (C) I really don't want to take over
-maintenance of it.</p>
-<p>I used Nashorn for a period of time, back with Java 8; I didn't care for the
-API I had to use to talk to it, particular, and I had to do a lot of work
-to provide useful error messages.  And then the powers that be deprecated it,
-and announced that the future alternative to was to switch to the Graal VM
-and run my embedded Javascript in Node.  Um, no.  The tail on that dog is
-much too big.</p>
-<p>I've used LuaJ quite a bit. It has some nice features, but the syntax and some
-of the language choices are weird from a Java point of view; the error
-messages are frequently unhelpful; the standard library is incomplete; and I
-kinda hate Lua tables with a passion.  (I've been acquainted with "associative
-arrays" since I learned Awk in the late 1980's.  But Lua tables are just weird,
-and the standard table API has some peculiar holes.)</p>
+of Lua.</p>
+<p>I like Tcl very much; but Java is innately object-oriented, and Tcl is not a
+great match for scripting object-oriented APIs. In addition, the JTcl
+implementation is dead, and as it includes a bunch of code I have no need of
+or interest in, I don't really want to fork it and take over maintenance.</p>
+<p>I used Nashorn for a period of time, back with Java 8; it was easy to get
+started with, but I didn't care for the API I had to use to talk to it, and I
+had to do a lot of work to provide useful error messages.  And then, of course,
+the powers that be deprecated it, and announced that the future alternative
+was to switch to the Graal VM and run my embedded Javascript in Node.  Um,
+no.  The tail on that dog is much too big.</p>
+<p>I've used LuaJ quite a bit. It has some nice features, and I know Lua is
+quite popular, especially for video game development; but Lua's syntax and some
+of the language choices are weird from a Java point of view, and LuaJ has
+a host of other problems.  The error messages are frequently unhelpful; the
+standard library is incomplete; and I kind of hate Lua tables with a
+passion.  (I've been acquainted with "associative arrays" since I first used
+Awk in the late 1980's.  But Lua tables are just weird, and the standard table
+API has some peculiar holes.)</p>
 <p>And then I ran into Robert Nystrom's Lox (see below), and realized that I
 could build on his example and produce a language that meets my needs and
 aesthetics.</p>
@@ -257,7 +294,7 @@ supply chain issues.</p>
 <h2 id="why-sandboxed"><a class="header" href="#why-sandboxed">Why Sandboxed?</a></h2>
 <p>Because I don't want to worry about security issues; and more particularly,
 I don't want to give clients an easy way to shoot the host application in
-the head.  Joe for solving domain-specific problems; it shouldn't have any
+the head.  Joe is for solving domain-specific problems; it shouldn't have any
 more access than the domain requires.</p>
 <h2 id="why-not-automatic-access-to-java-classes-and-methods"><a class="header" href="#why-not-automatic-access-to-java-classes-and-methods">Why not automatic access to Java classes and methods?</a></h2>
 <p>Even given that, why not use Java reflection so that a scripting API can
@@ -268,39 +305,56 @@ method. I ended up having to write custom Java classes that wrapped the native
 classes in order to provide the API I wanted with the error handling I wanted.</p>
 <p>I want an embedding API that helps me to do a good job, not one I have to
 work around.</p>
-<h2 id="joe-lox-and-jlox"><a class="header" href="#joe-lox-and-jlox">Joe, Lox and JLox</a></h2>
-<p>Lox is a little language described in Robert Nystrom's excellent book,
-<a href="https://craftinginterpreters.com"><em>Crafting Interpreters</em></a>; JLox is a
-tree-walker implementation of the language implemented in Java.</p>
-<p>The Joe language and implementation derive from Lox in general and JLox in
-particular and retains Lox semantics at its core.  I've subsequently changed
-and added syntax, refactored the implementation, etc., etc., as my needs
-(and whimsy) takes me.  But the only reason any of that is possible,
-is because Mr. Nystrom designed and built a very nice little language and wrote
-what is possibly the best programming text I've ever read to describe how the
-trick is done.<sup class="footnote-reference"><a href="#lunch">2</a></sup></p>
-<div class="footnote-definition" id="nuts"><sup class="footnote-definition-label">1</sup>
-<p>Point is, I've got reasons; here they are; I'm not inclined to argue
-about them.</p>
-</div>
-<div class="footnote-definition" id="lunch"><sup class="footnote-definition-label">2</sup>
+<h2 id="acknowledgements"><a class="header" href="#acknowledgements">Acknowledgements</a></h2>
+<p>Joe was made possible by Robert Nystrom's excellent book,
+<a href="https://craftinginterpreters.com"><em>Crafting Interpreters</em></a>. In origin, Joe
+is a dialect of Nystrom's Lox language.  I started with Nystrom's JLox
+AST-walker, ultimately adding a byte-compiler patterned after the CLox
+implementation.  Joe retains Lox semantics at its core, but I've subsequently
+changed and added syntax, refactored the implementation, added features,
+etc., etc., as my needs (and whimsy) take me.</p>
+<p>But the only reason any of that has been possible is that Mr. Nystrom designed
+and built a very nice and capable little language and wrote what is possibly
+the best programming text I've ever read to describe how the trick
+is done.<sup class="footnote-reference"><a href="#lunch">1</a></sup></p>
+<p>In addition, I want to thank my colleague Jonathan Castello for advice,
+encouragement, and a long string of lunches discussing programming language
+theory and design.  I haven't always taken his advice, but Joe and Nero are
+all the better for it for my having received it.</p>
+<div class="footnote-definition" id="lunch"><sup class="footnote-definition-label">1</sup>
 <p>Should Mr. Nystrom ever find himself in my vicinity, I'll gladly
 buy him lunch.</p>
 </div>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="change-log"><a class="header" href="#change-log">Change Log</a></h1>
 <h2 id="changes-in-080-in-development"><a class="header" href="#changes-in-080-in-development">Changes in 0.8.0 (in development)</a></h2>
 <ul>
-<li>Language
+<li>Joe Language
 <ul>
-<li>Fixed bug: Nero now parses negative numbers correctly.</li>
 <li>Added set literals, <code>{#a, #b, #c}</code>.
 <ul>
 <li><code>{}</code> now denotes an empty set, not an empty map.</li>
-<li><code>{:}</code> denotes an empty map.</li>
+<li><code>{:}</code> now denotes an empty map.</li>
 </ul>
 </li>
 <li>Replaced <code>@</code> with <code>.</code> as the property reference operator in instance
 methods.</li>
+</ul>
+</li>
+<li>Nero Language
+<ul>
+<li>Fixed bug: Nero now parses negative numbers correctly.</li>
+<li>Extended Nero, which now includes:
+<ul>
+<li>Collection literals, for use in rule heads and axioms</li>
+<li>Destructuring pattern terms, for use in body atoms.</li>
+<li>Built-in predicates for disaggregating collections into individual
+facts.</li>
+<li>Aggregation functions for accumulating statistics and aggregating
+individual values into collections.</li>
+<li>Schema declarations and update syntax for updating schemas in place.</li>
+<li>Improved APIs for working with Nero from Joe and Java code.</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>Standard Library
@@ -308,6 +362,12 @@ methods.</li>
 <li>Added <code>Fact::get</code></li>
 <li>Revised the <code>joe.test</code> API for simplicity and for more legible and
 informative failure messages.</li>
+</ul>
+</li>
+<li>Tools
+<ul>
+<li>Split out the <code>joe nero</code> tool into a standalone <code>nero</code> application so that
+it has some room to spread out.</li>
 </ul>
 </li>
 </ul>
@@ -4428,40 +4488,13 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.test.html#function.assertError">assertError(<em>callable</em>, [<em>message</em>], [<em>frames</em>...])</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertF">assertF(<em>condition</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertT">assertT(<em>condition</em>)</a></li>
-<li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
-<li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.engine">engine()</a> → String</li>
 <li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.skip">skip(<em>message</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.typedValue">typedValue(<em>value</em>)</a></li>
-<li><a href="library/type.joe.test.CatchChecker.html">CatchChecker</a>
-<ul>
-<li><a href="library/type.joe.test.CatchChecker.html#init">CatchChecker(<em>catchResult</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
-<li><a href="library/type.joe.test.CatchChecker.html#method.isError"><em>catchChecker</em>.isError()</a> → Boolean</li>
-<li><a href="library/type.joe.test.CatchChecker.html#method.isOK"><em>catchChecker</em>.isOK()</a> → this</li>
-<li><a href="library/type.joe.test.CatchChecker.html#method.message"><em>catchChecker</em>.message(<em>expected</em>)</a> → this</li>
-<li><a href="library/type.joe.test.CatchChecker.html#method.stackFrames"><em>catchChecker</em>.stackFrames(<em>frame</em>,...)</a> → this</li>
-<li><a href="library/type.joe.test.CatchChecker.html#method.stackTrace"><em>catchChecker</em>.stackTrace(<em>expected</em>)</a> → this</li>
-<li><a href="library/type.joe.test.CatchChecker.html#method.type"><em>catchChecker</em>.type(<em>expected</em>)</a> → this</li>
-</ul>
-</li>
 <li><a href="library/type.joe.test.JoeTest.html">JoeTest</a>
 <ul>
 <li><a href="library/type.joe.test.JoeTest.html#constant.OPAQUE">JoeTest.OPAQUE</a></li>
-</ul>
-</li>
-<li><a href="library/type.joe.test.ValueChecker.html">ValueChecker</a>
-<ul>
-<li><a href="library/type.joe.test.ValueChecker.html#init">ValueChecker(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.containsAll"><em>valueChecker</em>.containsAll(<em>values</em>...)</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.eq"><em>valueChecker</em>.eq(<em>expected</em>)</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.hasType"><em>valueChecker</em>.hasType(<em>type</em>)</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.hasTypeName"><em>valueChecker</em>.hasTypeName(<em>name</em>)</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.isEmpty"><em>valueChecker</em>.isEmpty()</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.isFalse"><em>valueChecker</em>.isFalse()</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.isNotNull"><em>valueChecker</em>.isNotNull()</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.isNull"><em>valueChecker</em>.isNull()</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.isTrue"><em>valueChecker</em>.isTrue()</a> → this</li>
 </ul>
 </li>
 </ul>
@@ -6614,8 +6647,6 @@ for use in <code>joe test</code> test suites.</p>
 <li><a href="library/pkg.joe.test.html#function.assertError">assertError(<em>callable</em>, [<em>message</em>], [<em>frames</em>...])</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertF">assertF(<em>condition</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertT">assertT(<em>condition</em>)</a></li>
-<li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
-<li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.engine">engine()</a> → String</li>
 <li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.skip">skip(<em>message</em>)</a></li>
@@ -6623,9 +6654,7 @@ for use in <code>joe test</code> test suites.</p>
 </ul>
 <p><strong>Types</strong></p>
 <ul>
-<li><a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/type.joe.test.JoeTest.html">JoeTest</a></li>
-<li><a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
 </ul>
 <h2 id="imported-types"><a class="header" href="#imported-types">Imported Types</a></h2>
 <p>In addition to the APIs documented here, <code>joe.test</code> includes types from
@@ -6668,17 +6697,6 @@ informative assertion error if not.</p>
 <p><strong>assertT(<em>condition</em>)</strong></p>
 <p>Verifies that <em>condition</em> is truthy, producing an
 informative assertion error if not.</p>
-<p><span id="function.check"> </span></p>
-<h3 id="check"><a class="header" href="#check">check()</a></h3>
-<hr />
-<p><strong>check(<em>value</em>) → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></strong></p>
-<p>Returns a checker for testing a computed value.</p>
-<p><span id="function.checkCatch"> </span></p>
-<h3 id="checkcatch"><a class="header" href="#checkcatch">checkCatch()</a></h3>
-<hr />
-<p><strong>checkCatch(<em>callable</em>) → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></strong></p>
-<p>Executes a no-arg <em>callable</em> and returns a checker for checking
-the error result.</p>
 <p><span id="function.engine"> </span></p>
 <h3 id="engine"><a class="header" href="#engine">engine()</a></h3>
 <hr />
@@ -9889,40 +9907,13 @@ types, methods, and constants include in Joe's aPackage.</p>
 <li><a href="library/pkg.joe.test.html#function.assertError">assertError(<em>callable</em>, [<em>message</em>], [<em>frames</em>...])</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertF">assertF(<em>condition</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.assertT">assertT(<em>condition</em>)</a></li>
-<li><a href="library/pkg.joe.test.html#function.check">check(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
-<li><a href="library/pkg.joe.test.html#function.checkCatch">checkCatch(<em>callable</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
 <li><a href="library/pkg.joe.test.html#function.engine">engine()</a> → String</li>
 <li><a href="library/pkg.joe.test.html#function.fail">fail(<em>message</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.skip">skip(<em>message</em>)</a></li>
 <li><a href="library/pkg.joe.test.html#function.typedValue">typedValue(<em>value</em>)</a></li>
-<li><a href="library/type.joe.test.CatchChecker.html">CatchChecker</a>
-<ul>
-<li><a href="library/type.joe.test.CatchChecker.html#init">CatchChecker(<em>catchResult</em>)</a> → <a href="library/type.joe.test.CatchChecker.html">CatchChecker</a></li>
-<li><a href="library/type.joe.test.CatchChecker.html#method.isError"><em>catchChecker</em>.isError()</a> → Boolean</li>
-<li><a href="library/type.joe.test.CatchChecker.html#method.isOK"><em>catchChecker</em>.isOK()</a> → this</li>
-<li><a href="library/type.joe.test.CatchChecker.html#method.message"><em>catchChecker</em>.message(<em>expected</em>)</a> → this</li>
-<li><a href="library/type.joe.test.CatchChecker.html#method.stackFrames"><em>catchChecker</em>.stackFrames(<em>frame</em>,...)</a> → this</li>
-<li><a href="library/type.joe.test.CatchChecker.html#method.stackTrace"><em>catchChecker</em>.stackTrace(<em>expected</em>)</a> → this</li>
-<li><a href="library/type.joe.test.CatchChecker.html#method.type"><em>catchChecker</em>.type(<em>expected</em>)</a> → this</li>
-</ul>
-</li>
 <li><a href="library/type.joe.test.JoeTest.html">JoeTest</a>
 <ul>
 <li><a href="library/type.joe.test.JoeTest.html#constant.OPAQUE">JoeTest.OPAQUE</a></li>
-</ul>
-</li>
-<li><a href="library/type.joe.test.ValueChecker.html">ValueChecker</a>
-<ul>
-<li><a href="library/type.joe.test.ValueChecker.html#init">ValueChecker(<em>value</em>)</a> → <a href="library/type.joe.test.ValueChecker.html">ValueChecker</a></li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.containsAll"><em>valueChecker</em>.containsAll(<em>values</em>...)</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.eq"><em>valueChecker</em>.eq(<em>expected</em>)</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.hasType"><em>valueChecker</em>.hasType(<em>type</em>)</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.hasTypeName"><em>valueChecker</em>.hasTypeName(<em>name</em>)</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.isEmpty"><em>valueChecker</em>.isEmpty()</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.isFalse"><em>valueChecker</em>.isFalse()</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.isNotNull"><em>valueChecker</em>.isNotNull()</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.isNull"><em>valueChecker</em>.isNull()</a> → this</li>
-<li><a href="library/type.joe.test.ValueChecker.html#method.isTrue"><em>valueChecker</em>.isTrue()</a> → this</li>
 </ul>
 </li>
 </ul>
