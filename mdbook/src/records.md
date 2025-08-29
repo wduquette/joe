@@ -18,7 +18,16 @@ println(joe);               // Prints "Person(Joe, Pro)"
 ```
 
 Like a Java record, a Joe record is immutable, having only the fields
-defined in the record declaration.  
+defined in the record declaration.
+
+Like Joe [classes](classes.md), a record type is a first-class value that
+may be declared in any scope, passed to functions, assigned to variables,
+and so forth.
+
+- [Records vs. Classes](#records-vs-classes)
+- [Records and Facts](#records-and-facts)
+
+## Records vs. Classes
 
 In most ways, a record type is just like a class.  That is, a record type may 
 have:
@@ -41,8 +50,9 @@ A record type differs from a class in the following ways:
 See the [Classes](classes.md) section for more information on methods,
 etc.
 
-## Records and Pattern Matching
+## Records and Facts
 
-Record types are especially useful when [pattern matching](patterns.md)
-is used.
+Any record value can be converted into a Nero fact by the
+[`Joe.toFact()` method](library/type.joe.Joe.md#static.toFact).
+The resulting fact will be a "pair" fact.
 

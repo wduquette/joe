@@ -23,10 +23,10 @@ in the [Extending Joe](extending/extending.md) section, and as
 the [`joe run`](joe_run.md) and [`joe repl`](joe_repl.md) do by
 adding the [`joe.console` package](library/pkg.joe.console.md).
 
-Joe has its origin in the JLox language from Robert Nystrom's 
+Joe has its origin in the Lox language from Robert Nystrom's 
 outstanding book and website, 
 [*Crafting Interpreters*](https://craftinginterpreters.com), but is
-by no means identical to JLox.  (If you should happen to find 
+by no means identical to Lox.  (If you should happen to find 
 Joe useful, please buy a copy of Nystrom's book.)
 
 The following sections describe the language in more detail.

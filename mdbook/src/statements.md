@@ -1,7 +1,8 @@
 # Statements
 
-The Joe language provides the following statements. Statements are terminated 
-by a semicolon or (sometimes) a block, as in Java.
+The Joe language provides the following declarations and statements. 
+Statements are terminated by a semicolon or (sometimes) a block, as 
+in Java.
 
 - [Variable Declarations](#variable-declarations)
 - [Function Declarations](#function-declarations)
@@ -305,8 +306,4 @@ The programmer may provide an optional message.
 ```joe
 assert x > 0, "x must be positive!";
 ```
-
-The various checkers and assertion functions defined in 
-`joe test`'s [Test API](library/pkg.joe.test.md) all work in terms of
-the `assert` statement.
 

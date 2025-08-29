@@ -14,8 +14,8 @@
 - [Functions](functions.md)
 - [Classes](classes.md)
 - [Records](records.md)
-- [Introspection](introspection.md)
 - [Pattern Matching](patterns.md)
+- [Introspection](introspection.md)
 
 ---
 
@@ -53,16 +53,15 @@
 ---
 
 # Tools
-- [The `joe` Application](joe_app.md)
-  - [`joe version`](joe_version.md)
-  - [`joe run`](joe_run.md)
-  - [`joe repl`](joe_repl.md)
-  - [`joe test`](joe_test.md)
-  - [`joe doc`](joe_doc.md)
-  - [`joe nero`](joe_nero.md)
-- [The `nero` Application](nero_app.md)
-  - [`nero version`](nero_version.md)
-  - [`nero run`](nero_run.md)
+- [The 'joe' Application](joe_app.md)
+  - ['joe version'](joe_version.md)
+  - ['joe run'](joe_run.md)
+  - ['joe repl'](joe_repl.md)
+  - ['joe test'](joe_test.md)
+  - ['joe doc'](joe_doc.md)
+- [The 'nero' Application](nero_app.md)
+  - ['nero version'](nero_version.md)
+  - ['nero run'](nero_run.md)
  
 ---
  

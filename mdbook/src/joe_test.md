@@ -1,4 +1,4 @@
-# joe test
+# 'joe test'
 
 The `joe test` tool is used to execute test scripts for Joe code and
 native APIs. This section explains how to write a test script,
@@ -33,11 +33,12 @@ the other tests in the file.
 
 ## Test Outcomes
 
-For each test there are three possible outcomes:
+For each test there are four possible outcomes:
 
 | Result  | Meaning                              |
 |---------|--------------------------------------|
 | Success | The test ran without error           |
+| Skipped | The test was skipped                 |
 | Failure | The test threw an `AssertError`      |
 | Error   | The test threw some other `JoeError` |
 
@@ -85,15 +86,6 @@ test runner defines a collection of functions and methods for testing
 results more simply and with better error messages.  See the 
 [Joe Test Tool API](library/pkg.joe.test.md) for the details.
 
-For example, the test above would more typically be written like this:
-
-```joe
-function testAddition() {
-    var x = 2 + 2;
-    check(x).eq(4);
-}
-```
-
 ## Running Test Scripts
 
 To run one or more test scripts, just pass their file names to `joe test`:
@@ -101,53 +93,24 @@ To run one or more test scripts, just pass their file names to `joe test`:
 ```shell
 $ cd joe/tests
 $ joe test *.joe
+Joe ?.?.? (clark engine)
+Run-time: 0.152 seconds
 
-Successes: 118
-Failures:  0
-Error:     0
-Total:     118
+Successes    413
+Skipped        0
+Failures       0
+Errors         0
+---------- -----
+Total        413
 
 ALL TESTS PASS
 ```
 
-By default, Joe will only display more information for failed tests:
-
-```shell
-$ joe test *.joe
-testEndsWith                   in file type.joe.String.joe
-  FAILED: Expected true, got: Boolean 'false'.
-
-Successes: 117
-Failures:  1
-Error:     0
-Total:     118
-```
-
+By default, Joe will only display more information for failed tests. 
 In particular, any output printed by tests is hidden.  To see all test
 output, use the `--verbose` option (aka `-v`).  The output will list
 each test script, each test name in the file, and any output related
 to each test.
-
-```shell
-$ joe test -v *.joe
-
-Running: lang_class.joe
-
-testCanSetFields               in file lang_class.joe
-testStaticInitializer          in file lang_class.joe
-testInit                       in file lang_class.joe
-testStaticMethods              in file lang_class.joe
-testCanCallMethods             in file lang_class.joe
-testClassCapturesScope         in file lang_class.joe
-...
-
-Successes: 118
-Failures:  0
-Error:     0
-Total:     118
-
-ALL TESTS PASS
-```
 
 ## Extending the Test Runner
 

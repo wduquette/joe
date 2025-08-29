@@ -19,6 +19,20 @@ println(joe.first);         // Prints "Joe"
 println(joe.fullName());    // Prints "Joe Pro"
 ```
 
+Like [functions](functions.md), classes are first-class values; they
+can be defined in any scope, saved in variables, passed to functions
+and methods, and so forth.
+
+- [Class Properties](#class-properties)
+- [Variable Properties](#variable-properties)
+- [Method Properties](#method-properties)
+- [The `toString` Method](#the-tostring-method)
+- [The Class Initializer](#the-class-initializer)
+- [The `.` Operator](#the--operator)
+- [Method References](#method-references)
+- [Superclasses and Inheritance](#superclasses-and-inheritance)
+- [Class Instances and Facts](#class-instances-and-facts)
+
 ## Class Properties
 
 A class has two kinds of property, method properties and variable properties,
@@ -156,3 +170,10 @@ println(sub.name());    // Prints "Subclass of Superclass".
 As shown in the example, a subclass can call superclass methods by
 means of the `super` variable.  `super` is only defined in methods
 of subclasses.
+
+## Class Instances and Facts
+
+Any class instance with field properties can be converted into
+a Nero fact by the 
+[`Joe.toFact()` method](library/type.joe.Joe.md#static.toFact).
+The resulting fact will be a "map" fact.

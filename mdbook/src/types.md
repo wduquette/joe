@@ -1,8 +1,7 @@
 # Types and Values
 
-In theory, every Java value, without exception, can be a valid Joe
-value.  In practice, Joe provides particular support for the following
-types:
+Every Java `Object`, without exception, is a valid Joe value. However,
+Joe provides particular support for the following types:
 
 - `null`
 - [Booleans](#booleans)
@@ -17,6 +16,12 @@ types:
 - [Functions and Methods](#functions-and-methods)
 - [Classes](#classes)
 - [Records](#records)
+
+## `null`
+
+It's fashionable to decry the inclusion of `null` in a language these
+days, but `null` is a fact of life in Java, and Joe is meant to 
+interoperate with Java.
 
 ## Booleans
 
@@ -93,8 +98,7 @@ readable.
 
 ## Keywords
 
-A [Keyword](library/type.joe.Keyword.md) is an interned symbol, 
-implemented internally using
+A [Keyword](library/type.joe.Keyword.md) is a symbolic value, implemented internally using
 Joe's `Keyword` class.  Keywords are frequently used where a Java 
 program would use enumerations.
 
@@ -290,14 +294,17 @@ time.  See the sections on [Functions](functions.md) and
 
 Joe scripts can define classes; a class can have:
 
-- An initializer
 - Instance variables
 - Instance methods
+- An initializer
 - Static variables
 - Static methods
 - A static initializer
 
 Joe classes support single inheritance.
+
+Joe class instances can be trivially converted into
+[Nero](nero/nero.md) `Facts`.
 
 See the section on [Classes](classes.md) for more information.
 
