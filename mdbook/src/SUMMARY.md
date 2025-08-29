@@ -35,9 +35,9 @@
 
 - [Nero Datalog](nero/nero.md)
   - [Datalog Basics](nero/datalog_basics.md) 
-  - [Axioms and Rules](nero/axioms_and_rules.md) 
-  - [Atoms and Terms](nero/atoms_and_terms.md)
+  - [Nero Terms](nero/terms.md)
   - [Negation](nero/negation.md)
+  - [Constraints](nero/constraints.md)
   - [Schema Declarations](nero/schema.md)
   - [Schema Maintenance](nero/schema_maintenance.md)
   - [Built-in Predicates](nero/builtin_predicates.md)
