@@ -38,6 +38,7 @@
   - [Nero Terms](nero/terms.md)
   - [Negation](nero/negation.md)
   - [Constraints](nero/constraints.md)
+  - [Named-Field Notation](nero/named_fields.md)
   - [Schema Declarations](nero/schema.md)
   - [Schema Maintenance](nero/schema_maintenance.md)
   - [Built-in Predicates](nero/builtin_predicates.md)
