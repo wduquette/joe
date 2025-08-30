@@ -990,6 +990,7 @@ Joe provides particular support for the following types:</p>
 <li><a href="types.html#functions-and-methods">Functions and Methods</a></li>
 <li><a href="types.html#classes">Classes</a></li>
 <li><a href="types.html#records">Records</a></li>
+<li><a href="types.html#rule-sets">Rule Sets</a></li>
 </ul>
 <h2 id="null"><a class="header" href="#null"><code>null</code></a></h2>
 <p>It's fashionable to decry the inclusion of <code>null</code> in a language these
@@ -1205,6 +1206,16 @@ have:</p>
 <p>Joe record values can be trivially converted into
 <a href="nero/nero.html">Nero</a> <code>Facts</code>.</p>
 <p>See the section on <a href="records.html">Records</a> for more information.</p>
+<h2 id="rule-sets"><a class="header" href="#rule-sets">Rule Sets</a></h2>
+<p>The <code>ruleset</code> keyword introduces a Nero
+<a href="library/type.joe.RuleSet.html"><code>RuleSet</code></a> literal.</p>
+<pre><code class="language-joe">var rules = ruleset {
+    ...
+};
+</code></pre>
+<p>See the <a href="nero/nero.html">Nero Datalog</a> documentation for a description of
+the Nero language, and <a href="nero/nero_and_joe.html">Using Nero with Joe</a> for
+a discussion of how to use Nero rule sets in Joe scripts.</p>
 <div class="footnote-definition" id="unicode"><sup class="footnote-definition-label">1</sup>
 <p>Joe supports Unicode escapes, e.g., <code>\u1234</code>, as in Java;
 but only within string literals.</p>

@@ -16,6 +16,7 @@ Joe provides particular support for the following types:
 - [Functions and Methods](#functions-and-methods)
 - [Classes](#classes)
 - [Records](#records)
+- [Rule Sets](#rule-sets)
 
 ## `null`
 
@@ -323,6 +324,21 @@ Joe record values can be trivially converted into
 [Nero](nero/nero.md) `Facts`.
 
 See the section on [Records](records.md) for more information.
+
+## Rule Sets
+
+The `ruleset` keyword introduces a Nero 
+[`RuleSet`](library/type.joe.RuleSet.md) literal.
+
+```joe
+var rules = ruleset {
+    ...
+};
+```
+
+See the [Nero Datalog](nero/nero.md) documentation for a description of
+the Nero language, and [Using Nero with Joe](nero/nero_and_joe.md) for
+a discussion of how to use Nero rule sets in Joe scripts.
 
 [^unicode]: Joe supports Unicode escapes, e.g., `\u1234`, as in Java;
 but only within string literals.
