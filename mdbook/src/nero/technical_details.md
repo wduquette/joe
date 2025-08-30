@@ -6,13 +6,19 @@ interested in the implementation and maintenance of Nero itself.
 
 ## Nero vs. "Standard Datalog"
 
-Semantically, Nero is a standard implementation of Datalog implemented
+At base, Nero is an implementation of standard Datalog implemented
 using fixpoint semantics and the "naive" solution algorithm, augmented
 with:
 
+- The ability to reference fact fields by name as well as by position.
 - Stratified negation
 - Constraints
-- The ability to reference fact fields by name as well as by position.
+- Built-in predicates
+- Aggregation functions
+- Collection literals
+- Destructuring patterns
+- Schema declarations
+- Update syntax
 
 Nero's syntax and conventions have been modified from standard Datalog to 
 better support integration into Joe scripts.
@@ -22,7 +28,7 @@ better support integration into Joe scripts.
   for type names.
 - Nero variable terms are simple identifiers, lowercase by convention.
 - Nero constant terms can be any of the following Joe literal values:
-  - In rules and axioms: keywords, strings, numbers, `true`, `false`, and `null`.
+  - In rules and axioms: keywords, strings, numbers, booleans, and `null`.
   - In scripted input facts: any Joe value
 - Nero body atoms can include wildcard terms, which are written as 
   identifiers with a leading underscore.  A wildcard matches any value and

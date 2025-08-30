@@ -1,17 +1,22 @@
-# Appendix: Joe Grammar
+# Appendix: Grammars
 
-This appendix shows the grammar of the Joe language, in the syntax 
-used in *Crafting Interpreters*.  Below that is the full 
-[JLox grammar](#jlox-grammar).
+This appendix shows the grammars of the Joe language and its 
+sub-languages, in the syntax used in Robert Nystrom's *Crafting Interpreters*.
 
-## Grammar
+- [Joe Grammar](#joe-grammar)
+  - [Statements](#statements)
+  - [Expressions](#expressions)
+  - [Patterns](#patterns)
+- [Nero Grammar](#nero-grammar)
+- [Lexical Grammar](#lexical-grammar)
+- [Lox Grammar](#lox-grammar)
 
-- [Statements](#statements)
-- [Expressions](#expressions)
-- [Patterns](#patterns)
-- [Nero](#nero)
+## Joe Grammar
 
-## Statements
+Joe's grammar is based on Nystrom's Lox grammar, with many changes and
+additions.
+
+### Statements
 
 ```
 program         → declaration* EOF ;
@@ -78,7 +83,7 @@ whileStmt       → "while" "(" expression ")" statement ;
 block           → "{" declaration* "}" ;
 ```
 
-## Expressions
+### Expressions
 
 ```
 expression      → assignment ;
@@ -127,131 +132,141 @@ map_entry       → expression ":" expression ;
 ## Patterns
 
 A `pattern` is a destructuring pattern that can be used with the `~` 
-operator, and with a number of Joe statements.
+operator, and with a number of Joe statements.  Patterns are also
+used as part of the [Nero Grammar](#nero-grammar).
 
 ```
-pattern         → patternBinding
-                | constantPattern
-                | wildcardPattern
-                | valueBinding
-                | listPattern
-                | mapPattern 
-                | namedFieldPattern 
-                | orderedFieldPattern ;
+pattern             → constantPattern
+                    | exprPattern
+                    | listPattern
+                    | mapPattern 
+                    | namedFieldPattern 
+                    | orderedFieldPattern
+                    | typeNamePattern
+                    | variablePattern
+                    | wildcardPattern ;
+                    
+neroPattern         → constantPattern
+                    | listPattern
+                    | mapPattern 
+                    | namedFieldPattern 
+                    | orderedFieldPattern
+                    | typeNamePattern
+                    | variablePattern
+                    | wildcardPattern ;
                 
+constantPattern     → "true" | "false" | "null" | STRING | NUMBER | KEYWORD;
+exprPattern         → "$" IDENTIFIER
+                    | "$" "(" expression ")" ;
+listPattern         → "[" 
+                          (subpattern ( "," subpattern )* ","? )?
+                          ( ":" IDENTIFIER )?
+                      "]";
+mapPattern          → "{"
+                          ( entryPattern ( "," entryPattern )* ","? )?
+                      "}" ;
+entryPattern        → (constantPattern | exprPattern) ":" subpattern ;
+namedFieldPattern   → IDENTIFIER "("
+                        ( fieldPattern ( "," fieldPattern )* ","? )?
+                    ")" ;
+orderedFieldPattern → IDENTIFIER "(" 
+                          ( pattern ( "," pattern )* ","? )? 
+                      ")" ;
+fieldPattern        → IDENTIFIER ":" subpattern ;
+subpattern          → IDENTIFIER "@" pattern ;
+typeNamePattern     → IDENTIFIER "(" ")" ;
+variablePattern     → IDENTIFIER;
 ```
 
-A `patternBinding` is a pattern that binds a subpattern's matched value
-to a binding variable.  `patternBindings` are disallows as the top 
-pattern in some contexts.
 
-```
-patternBinding   | IDENTIFIER "@" pattern ;
-```
+## Nero Grammar
 
-A `constantPattern` matches a literal or computed constant.  Variables
-referenced in a `constantPattern` must be defined in the enclosing scope
-and not shadowed by one of the pattern's binding variables.
-
-```
-constantPattern → "true" | "false" | "null" | STRING | NUMBER | KEYWORD
-                | "$" IDENTIFIER
-                | "$" "(" expression ")" ;
-```
-
-A `valueBinding` binds the matched value, whatever it is, to a variable.
-
-```
-valueBinding    → IDENTIFIER ;
-```
-
-A `listPattern` is a list of subpatterns to be matched against the items
-of a list, with an optional binding variable for the tail of the list.
-
-```
-listPattern     → "[" 
-                      (subpattern ( "," subpattern )* ","? )?
-                      ( ":" IDENTIFIER )?
-                  "]";
-```
-
-A `mapPattern` is a map of key patterns and value patterns to be matched 
-against the entries of a map value.  All keys in the pattern must appear
-in the map, but the pattern need not exhaust the map.  The key patterns
-must be `constantPatterns`; Joe does not attempt to do full pattern
-matching on the map keys.
-
-```
-mapPattern      → "{"
-                      ( entryPattern ( "," entryPattern )* ","? )?
-                  "}" ;
-entryPattern    → constantPattern ":" subpattern ;
-```
-
-A `namedFieldPattern` matches the type and fields of a Joe value, matching
-fields by name rather than by position. The first `IDENTIFIER` must match the 
-value's type name.
-
-```
-namedFieldPattern → IDENTIFIER "("
-                      ( fieldPattern ( "," fieldPattern )* ","? )?
-                  ")" ;
-fieldPattern    → IDENTIFIER ":" subpattern ;
-```
-
-An `orderedFieldPattern` matches the type and fields of a Joe object that has
-ordered fields (e.g., Joe records).  The fields are matched by position
-rather than by name in a list-pattern-like fashion.
-
-```
-orderedFieldPattern  → IDENTIFIER "(" 
-                           ( pattern ( "," pattern )* ","? )? 
-                       ")" ;
-```
-
-## Nero
-
-This is the grammar for Nero, Joe's dialect of Datalog.  Nero rule sets can
+This is the grammar for Nero, Joe's dialect of Datalog.  Nero programs can
 be parsed standalone, or as part of a Joe script via the `ruleset` expression.
 
-Differences from classic Datalog with negation:
-
-- Comments begin with `//` rather than `%`
-- Horn clauses end with `;` rather than '.'.
-- Relations usually have initial caps, to match Monica type names.
-- Constant terms can be Monica scalar values, or, if read
-  from a scripted input fact, any Monica value.
-- Variables are normal identifiers, usually lowercase.
-- Wildcards are identifiers with a leading `_`.
-- Constraints follow a `where` token.
-- Body atoms can reference fact fields either by name or by position.
-
 ```grammar
-nero        → clause* EOF ;
-ruleset     → ( clause | export )* EOF ;
-export      → "export" IDENTIFIER ( "as" expression )? ";" ;
-clause      → axiom
-            | rule ;
-axiom       → head ";"
-rule        → head ":-" body ( "where" constraints )? ";"
-head        → indexedAtom ;
-body        → "not"? bodyAtom ( "," "not"? bodyAtom )* ;
-bodyAtom    → indexedAtom | namedAtom ;
-indexedAtom → IDENTIFIER "(" term ( "," term )* ")" ;
-orderedAtom → IDENTIFIER "(" namedTerm ( "," namedTerm )* ")" ;
-namedTerm   → IDENTIFIER ":" term ;
-constrants  → constraint ( "," constraint )* ;
-constraint  → variable ( "==" | "!=" | ">" | ">=" | "<" | "<=" ) term ;
-term        → constant | variable | wildcard ;
-constant    → KEYWORD | STRING | NUMBER | TRUE | FALSE | NULL ;
-variable    → IDENTIFIER ;     // No leading "_"
-wildcard    → IDENTIFIER ;     // With leading "_"
+nero          → clause* ;
+clause        → defineDecl
+              | transientDecl
+              | axiom
+              | rule ;
+defineDecl    → "define" "transient"? relation "/" (
+                NUMBER | "..." | ( IDENTIFIER ( "," IDENTIFIER )* )
+              ) ";" ;
+              
+transientDecl → "transient" relation ";" ;
+
+axiom           → head ";"
+rule            → head ":-" body ( "where" constraints )? ";"
+head            → headAtom ;
+body            → bodyAtom ( "," "not"? bodyAtom )* ;
+headAtom        → orderedHeadAtom | namedHeadAtom ;
+orderedHeadAtom → relation "(" headTerm ( "," headTerm )* ")" ;
+namedHeadAtom   → relation "(" IDENTIFIER ":" headTerm 
+                    ( "," IDENTIFIER ":" headTerm )* 
+                  ")" ;
+bodyAtom        → orderedBodyAtom | namedBodyAtom ;
+orderedBodyAtom → relation "(" bodyTerm ( "," bodyTerm )* ")" ;
+namedBodyAtom   → relation "(" IDENTIFIER ":" bodyTerm 
+                    ( "," IDENTIFIER ":" bodyTerm )* 
+                  ")" ;
+
+constraints     → constraint ( "," constraint )* ;
+constraint      → variable ( "==" | "!=" | ">" | ">=" | "<" | "<=" ) 
+                  constraintTerm ;
+
+relation        → IDENTIFIER "!"? ;
+
+headTerm        → aggregateTerm
+                | constantTerm 
+                | listTerm
+                | mapTerm
+                | setTerm
+                | variableTerm ;
+bodyTerm        → constantTerm 
+                | patternTerm
+                | variableTerm 
+                | wildcardTerm ;
+constraintTerm  → constantTerm 
+                | variableTerm ;
+                
+aggregateTerm   → IDENTIFIER ( variableTerm ( "," variableTerm )* ) ;
+constantTerm    → KEYWORD | STRING | NUMBER | TRUE | FALSE | NULL ;
+listTerm        → "[" ( headTerm ( "," headTerm )* )? "]" ;
+setTerm         → "{" ( headTerm ( "," headTerm )* )? "}" ;
+mapTerm         → "{:}"
+                | "{" ( headTerm ":" headTerm 
+                      ( "," headTerm ":" headTerm)* )? 
+                  "}" ;
+patternTerm   → neroPattern ;  
+variableTerm  → IDENTIFIER ;     // No leading "_"
+wildcardTerm  → IDENTIFIER ;     // With leading "_"
 ```
 
+## Lexical Grammar
 
-## JLox Grammar
+Joe and Nero share the same lexical grammar and the same scanner.
 
-Here is Nystrom's JLox grammar, for comparison.
+```
+NUMBER         → DIGIT+ ( "." DIGIT+ )? ( ("e" | "E") ( "." DIGIT+ )?
+               | "0x" HEX_DIGIT+ ;
+STRING         → '"' STRING_CHAR* '"'
+               | '"""' ( STRING_CHAR | '\n' )* '"""'
+               | "'" <any char but '\n'> * "'" 
+               | "'''" <any char> "'''" ;
+STRING_CHAR    → escapes | <any character but '\' or '"'> ;
+escapes        → '\\' | '\"' | '\b' | '\t' | '\n' | '\r' | '\f' 
+               | \u HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT ;
+KEYWORD        → "#" IDENTIFIER ;
+IDENTIFIER     → ALPHA ( ALPHA | DIGIT )* ;
+ALPHA          → "a" ... "z" | "A" ... "Z" | "_" ;
+DIGIT          → "0" ... "9" ;
+HEX_DIGIT      → "0" ... "9" | "a" ... "f" | "A" ... "F" ;
+```
+
+## Lox Grammar
+
+Here is Nystrom's Lox grammar, for comparison.
 
 ```
 // Statements
@@ -289,7 +304,6 @@ returnStmt      → "return" expression? ";" ;
 whileStmt       → "while" "(" expression ")" statement ;
 block           → "{" declaration* "}" ;
 
-// Expression
 expression      → assignment ;
 assignment      → ( call "." )? IDENTIFIER "=" assignment
                 | logic_or ;

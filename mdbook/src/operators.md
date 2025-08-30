@@ -2,6 +2,16 @@
 
 Joe defines a subset of Java's operators, with a few differences.
 
+- [Arithmetic Operators](#arithmetic-operators)
+- [Comparison Operators](#comparison-operators)
+- [Membership Operators](#membership-operators)
+- [Matching Operator](#matching-operator)
+- [Logical Operators](#logical-operators)
+- [The Ternary Operator](#the-ternary-operator)
+- [Assignment Operators](#assignment-operators)
+- [Increment/Decrement Operators](#incrementdecrement-operators)
+- [Property Reference Operator](#property-reference-operator)
+
 ## Arithmetic Operators
 
 The `+`, `-`, `*`, and `/` operators (including unary `-`) are defined as in 
@@ -103,11 +113,16 @@ right-hand side is a string, just as `+` does.
 x = y = 5;  // Assigns 5 to x and y.
 ```
 
-## Pre- and Post-Increment/Decrement Operators
+## Increment/Decrement Operators
 
 The `++` and `--` operators work as they do in Java.
 
-## The `.` Property Reference Operator
+## Property Reference Operator
 
-In instance methods, a bare `.` operator can be used as a synonym `this.`, 
-resulting in neater, more concise code. See [Classes](classes.md) for details.
+The `.` operator is used in the usual way to access the fields and methods of 
+Joe values that properties, including class instances, records, and 
+various native values.
+
+In class and record instance methods a bare `.` operator can be used as a 
+synonym for `this.`, resulting in neater, more concise code. See
+[Classes](classes.md) for details.

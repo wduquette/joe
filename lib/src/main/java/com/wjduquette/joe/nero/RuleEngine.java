@@ -28,7 +28,7 @@ public class RuleEngine {
      * A sentinel value used when map(k,v) aggregation finds a duplicate key
      * with two different values.
      */
-    public static Object DUPLICATE_KEY = Sentinel.DUPLICATE_KEY;
+    public static Object DUPLICATE_KEY = new Keyword("duplicateKey");
     public static final String INFER_ERROR =
         "Call `infer()` before querying results.";
 
@@ -869,10 +869,6 @@ public class RuleEngine {
 
     // Used when aggregating indexed lists.
     private record Pair(Object index, Object item) {}
-
-    private enum Sentinel {
-        DUPLICATE_KEY   // Used for map(k,v) values given duplicate keys.
-    }
 
     private static class DoubleCell {
         double value;

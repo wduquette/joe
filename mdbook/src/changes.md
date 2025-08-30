@@ -1,18 +1,35 @@
 # Change Log
 
-## Changes in 0.8.0 (in development)
+## Changes in 0.9.0 (in development)
 
-- Language
-  - Fixed bug: Nero now parses negative numbers correctly.
+- None yet
+
+## Changes in 0.8.0 (30 August 2025)
+
+- Joe Language
   - Added set literals, `{#a, #b, #c}`.
     - `{}` now denotes an empty set, not an empty map.
-    - `{:}` denotes an empty map.
+    - `{:}` now denotes an empty map.
   - Replaced `@` with `.` as the property reference operator in instance 
     methods.
+- Nero Language
+  - Fixed bug: Nero now parses negative numbers correctly.
+  - Extended Nero, which now includes:
+    - Collection literals, for use in rule heads and axioms
+    - Destructuring pattern terms, for use in body atoms.
+    - Built-in predicates for disaggregating collections into individual
+      facts.
+    - Aggregation functions for accumulating statistics and aggregating
+      individual values into collections.
+    - Schema declarations and update syntax for updating schemas in place.
+    - Improved APIs for working with Nero from Joe and Java code.
 - Standard Library
   - Added `Fact::get`
   - Revised the `joe.test` API for simplicity and for more legible and 
     informative failure messages.
+- Tools
+  - Split out the `joe nero` tool into a standalone `nero` application so that
+    it has some room to spread out.
 
 ## Changes in 0.7.0 (19 July 2025)
 

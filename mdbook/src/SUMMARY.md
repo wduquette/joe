@@ -5,7 +5,7 @@
 
 ---
 
-# Language Reference
+# The Joe Language
 
 - [The Joe Language](language.md)
 - [Types and Values](types.md)
@@ -14,19 +14,14 @@
 - [Functions](functions.md)
 - [Classes](classes.md)
 - [Records](records.md)
-- [Introspection](introspection.md)
 - [Pattern Matching](patterns.md)
-- [Nero Datalog](nero/nero.md)
-  - [Nero Tutorial](nero/nero_tutorial.md)
-  - [Nero Reference](nero/reference.md)
-  - [Nero in Joe Scripts](nero/embedded_nero.md)
-  - [Technical Details](nero/technical_details.md)
+- [Introspection](introspection.md)
 
 ---
 
 # Embedding and Extending Joe
-- [Embedding Joe](embedding/embedding.md)
-- [Extending Joe](extending/extending.md)
+- [Embedding Joe in Java](embedding/embedding.md)
+- [Extending Joe in Java](extending/extending.md)
   - [Joe and Java Data Types](extending/java_types.md)
   - [Native Functions](extending/native_functions.md)
   - [Registered Types](extending/registered_types.md)
@@ -34,13 +29,39 @@
   - [Native Records](extending/native_records.md)
   - [Native Classes](extending/native_classes.md)
 
-# Joe Tools
-- [`joe version`](joe_version.md)
-- [`joe run`](joe_run.md)
-- [`joe repl`](joe_repl.md)
-- [`joe test`](joe_test.md)
-- [`joe doc`](joe_doc.md)
-- [`joe nero`](joe_nero.md)
+---
+
+# Nero Datalog
+
+- [Nero Datalog](nero/nero.md)
+  - [Datalog Basics](nero/datalog_basics.md) 
+  - [Nero Terms](nero/terms.md)
+  - [Negation](nero/negation.md)
+  - [Constraints](nero/constraints.md)
+  - [Named-Field Notation](nero/named_fields.md)
+  - [Schema Declarations](nero/schema.md)
+  - [Schema Maintenance](nero/schema_maintenance.md)
+  - [Built-in Predicates](nero/builtin_predicates.md)
+  - [Aggregation Functions](nero/aggregation_functions.md)
+  - [Stratification](nero/stratification.md) 
+  - [Technical Details](nero/technical_details.md)
+- [Nero as a Data Format](nero/nero_data.md)
+- [Using Nero with Joe](nero/nero_and_joe.md)
+- [Using Nero with Java](nero/nero_and_java.md)
+---
+
+# Tools
+- [The 'joe' Application](joe_app.md)
+  - ['joe version'](joe_version.md)
+  - ['joe run'](joe_run.md)
+  - ['joe repl'](joe_repl.md)
+  - ['joe test'](joe_test.md)
+  - ['joe doc'](joe_doc.md)
+  - ['joe dump'](joe_dump.md)
+  - ['joe win'](joe_win.md)
+- [The 'nero' Application](nero_app.md)
+  - ['nero version'](nero_version.md)
+  - ['nero run'](nero_run.md)
  
 ---
  
@@ -106,5 +127,5 @@
 
 ---
 
-[Appendix: Joe Grammar](grammar.md)
-[Appendix: Clark Virtual Machine](vm.md)
+[Appendix: Grammars](grammar.md)
+[Appendix: Virtual Machine](vm.md)

@@ -32,8 +32,8 @@ If used, `args` must be the last argument in the list.
 
 ## Function References
 
-Joe functions are first-class values, and can be passed to functions,
-assigned to variables, and then called.
+Joe functions are first-class values, and can be passed to functions or
+assigned to variables and called later.
 
 ```joe
 function square(x) { return x*x; }

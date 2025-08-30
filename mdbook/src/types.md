@@ -1,8 +1,7 @@
 # Types and Values
 
-In theory, every Java value, without exception, can be a valid Joe
-value.  In practice, Joe provides particular support for the following
-types:
+Every Java `Object`, without exception, is a valid Joe value. However,
+Joe provides particular support for the following types:
 
 - `null`
 - [Booleans](#booleans)
@@ -17,6 +16,13 @@ types:
 - [Functions and Methods](#functions-and-methods)
 - [Classes](#classes)
 - [Records](#records)
+- [Rule Sets](#rule-sets)
+
+## `null`
+
+It's fashionable to decry the inclusion of `null` in a language these
+days, but `null` is a fact of life in Java, and Joe is meant to 
+interoperate with Java.
 
 ## Booleans
 
@@ -93,8 +99,7 @@ readable.
 
 ## Keywords
 
-A [Keyword](library/type.joe.Keyword.md) is an interned symbol, 
-implemented internally using
+A [Keyword](library/type.joe.Keyword.md) is a symbolic value, implemented internally using
 Joe's `Keyword` class.  Keywords are frequently used where a Java 
 program would use enumerations.
 
@@ -290,14 +295,17 @@ time.  See the sections on [Functions](functions.md) and
 
 Joe scripts can define classes; a class can have:
 
-- An initializer
 - Instance variables
 - Instance methods
+- An initializer
 - Static variables
 - Static methods
 - A static initializer
 
 Joe classes support single inheritance.
+
+Joe class instances can be trivially converted into
+[Nero](nero/nero.md) `Facts`.
 
 See the section on [Classes](classes.md) for more information.
 
@@ -316,6 +324,21 @@ Joe record values can be trivially converted into
 [Nero](nero/nero.md) `Facts`.
 
 See the section on [Records](records.md) for more information.
+
+## Rule Sets
+
+The `ruleset` keyword introduces a Nero 
+[`RuleSet`](library/type.joe.RuleSet.md) literal.
+
+```joe
+var rules = ruleset {
+    ...
+};
+```
+
+See the [Nero Datalog](nero/nero.md) documentation for a description of
+the Nero language, and [Using Nero with Joe](nero/nero_and_joe.md) for
+a discussion of how to use Nero rule sets in Joe scripts.
 
 [^unicode]: Joe supports Unicode escapes, e.g., `\u1234`, as in Java;
 but only within string literals.

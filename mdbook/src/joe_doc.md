@@ -1,4 +1,4 @@
-# joe doc
+# 'joe doc'
 
 The `joe doc` processor is used to extract JoeDoc documentation comments
 from `.java` and `.joe` source files, and from them generate Markdown 
