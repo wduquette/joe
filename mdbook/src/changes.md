@@ -1,6 +1,10 @@
 # Change Log
 
-## Changes in 0.8.0 (in development)
+## Changes in 0.9.0 (in development)
+
+- None yet
+
+## Changes in 0.8.0 (30 August 2025)
 
 - Joe Language
   - Added set literals, `{#a, #b, #c}`.
