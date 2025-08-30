@@ -57,6 +57,8 @@
   - ['joe repl'](joe_repl.md)
   - ['joe test'](joe_test.md)
   - ['joe doc'](joe_doc.md)
+  - ['joe dump'](joe_dump.md)
+  - ['joe win'](joe_win.md)
 - [The 'nero' Application](nero_app.md)
   - ['nero version'](nero_version.md)
   - ['nero run'](nero_run.md)
