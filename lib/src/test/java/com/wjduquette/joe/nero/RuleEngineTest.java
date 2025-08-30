@@ -780,7 +780,7 @@ public class RuleEngineTest extends Ted {
             """;
         check(execute(source)).eq("""
             define B/1;
-            B({#a: #duplicate_key, #b: 2, #c: 3});
+            B({#a: #duplicateKey, #b: 2, #c: 3});
             """);
     }
 
