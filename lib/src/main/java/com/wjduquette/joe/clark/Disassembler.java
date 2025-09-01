@@ -208,7 +208,7 @@ public class Disassembler {
 
             // Constant Instructions
             // Pattern: opcode constantIndex
-            case CLASS, COMMENT, CONST, GLODEF, GLOGET, GLOBIND, GLOSET,
+            case CLASS, COMMENT, CONST, EXPORT, GLODEF, GLOGET, GLOBIND, GLOSET,
                  LOCBIND, METHOD, PATTERN, PROPGET, PROPSET, RULESET,
                  SUPGET, TRCPUSH
             -> {

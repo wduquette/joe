@@ -30,6 +30,7 @@ The byte-engine is a stack machine with a few registers:
 | DUP                  | *a* → *a* *a*           | Duplicate top             |
 | DUP2                 | *a b* → *a b a b*       | Duplicate top 2           |
 | EQ                   | *a b* → *c*             | c = a == b                |
+| EXPORT *name*        | ∅                       | Exports the symbol        |
 | FALSE                | ∅ → false               | Load `false`              |
 | GE                   | *a b* → *c*             | c = a >= b                |
 | GETNEXT              | *iter* → *a*            | a = iter.next()           |
@@ -234,6 +235,13 @@ Duplicates the top two values on the stack.
 
 Given two values *a* and *b*, yields `true` if the two are equal, and `false`
 otherwise.
+
+### EXPORT 
+---
+**EXPORT** *name* | ∅
+
+Exports the named symbol, copying the value from the global environment into
+the `exports` environment.
 
 ### FALSE
 ---

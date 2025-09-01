@@ -281,10 +281,17 @@ class Compiler {
                 // class is defined at local scope, as that's harder to
                 // track mentally.
 
+                if (s.isExported() && !inGlobalScope()) {
+                    error(s.name(), "exported local class.");
+                }
+
                                               // Stack: locals | working
                 beginType(Kind.CLASS);        // ∅         ; begin type def
                 emit(CLASS, name(s.name()));  // ∅ | c     ; create class
                 defineVar(s.name());          // c | ∅     ; define class var
+                if (s.isExported()) {
+                    emitEXPORT(s.name());     // c | ∅    ; export symbol
+                }
 
                 if (s.superclass() != null) {
                     currentType.hasSupertype = true;
@@ -470,8 +477,15 @@ class Compiler {
                 // Hidden locals are popped when the enclosing block ends.
             }
             case Stmt.Function s -> {
+                if (s.isExported() && !inGlobalScope()) {
+                    error(s.name(), "exported local function.");
+                }
+
                 emitFunction(s);
                 defineVar(s.name());
+                if (s.isExported()) {
+                    emitEXPORT(s.name());
+                }
             }
             case Stmt.If s -> {
                 //                    | ∅      ; Initial state
@@ -546,13 +560,20 @@ class Compiler {
                 // class is defined at local scope, as that's harder to
                 // track mentally.
 
+                if (s.isExported() && !inGlobalScope()) {
+                    error(s.name(), "exported local record.");
+                }
+
                 // Create Record              // Stack: locals | working
                 beginType(Kind.RECORD);       // ∅        ; begin type def
                 emit(RECORD,                  // ∅ | t    ; create type
                     name(s.name()),
                     constant(s.fields()));
-                defineVar(s.name());     // t | ∅    ; define type var
+                defineVar(s.name());          // t | ∅    ; define type var
                 emitGET(s.name());            // t | t    ; get type
+                if (s.isExported()) {
+                    emitEXPORT(s.name());     // t | t    ; export symbol
+                }
 
                 // Static Methods
                 for (var m : s.staticMethods()) {
@@ -758,6 +779,10 @@ class Compiler {
 
     //-------------------------------------------------------------------------
     // Code Generation: Expressions
+
+    private void emitEXPORT(Token name) {
+        emit(EXPORT, constant(name.lexeme()));
+    }
 
     // Emits a function's argument list.
     private void emitArgs(List<Expr> args) {

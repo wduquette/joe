@@ -55,6 +55,9 @@ class VirtualMachine {
     // be executed in another VM.
     private final Environment globalEnv = new Environment();
 
+    // The exports environment, populated by the EXPORT instruction.
+    private final Environment exports = new Environment();
+
     // Registers
     private Object registerT = null;
 
@@ -96,6 +99,15 @@ class VirtualMachine {
      */
     Environment getEnvironment() {
         return globalEnv;
+    }
+
+    /**
+     * Gets the environment containing this VM's exported symbols.
+     * @return The environment.
+     */
+    @SuppressWarnings("unused")
+    Environment getExports() {
+        return exports;
     }
 
     //-------------------------------------------------------------------------
@@ -322,6 +334,10 @@ class VirtualMachine {
                     var b = pop();
                     var a = pop();
                     push(Joe.isEqual(a, b));
+                }
+                case EXPORT -> {
+                    var name = readString();
+                    exports.setVariable(name, globals().getVariable(name));
                 }
                 case FALSE -> push(false);
                 case GE -> {
@@ -1076,6 +1092,7 @@ class VirtualMachine {
         }
     }
 
+    @SuppressWarnings("ManualArrayToCollectionCopy")
     private CallFrame call(Closure closure, int argCount, Origin origin) {
         if (closure.function.isVarargs) {
             // FIRST, make sure we've got the minimum arguments.
