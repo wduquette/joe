@@ -33,6 +33,11 @@ public class ClarkEngine implements Engine {
     }
 
     @Override
+    public Environment getExports() {
+        return vm.getExports();
+    }
+
+    @Override
     public Object run(String scriptName, String source)
         throws JoeError
     {

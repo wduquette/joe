@@ -15,6 +15,13 @@ public interface Engine {
     Environment getEnvironment();
 
     /**
+     * Gets the symbols exported by the current environment.
+     * @return The exports
+     */
+    @SuppressWarnings("unused")
+    Environment getExports();
+
+    /**
      * Executes the script, throwing an appropriate error on failure.
      * The filename is usually the bare file name of the script file,
      * but can be any string relevant to the application, e.g., "%repl%".

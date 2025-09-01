@@ -51,6 +51,11 @@ public class WalkerEngine implements Engine {
         return interpreter.getEnvironment();
     }
 
+    @Override
+    public Environment getExports() {
+        return interpreter.getExports();
+    }
+
     /**
      * Executes the script, throwing an appropriate error on failure.
      * @param scriptName The source of the input.
