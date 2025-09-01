@@ -39,7 +39,7 @@ public class WalkerEngineTest extends Ted {
     public void testUnexpectedException_call() {
         test("testUnexpectedException_run");
         try {
-            var unexpected = joe.getVar("unexpected");
+            var unexpected = joe.getVariable("unexpected");
             joe.call(unexpected, "simulated");
             fail("Expected error.");
         } catch (UnexpectedError ex) {
@@ -65,7 +65,7 @@ public class WalkerEngineTest extends Ted {
 
         // Test with Walker
         joe.run("*test*", script);
-        var cls = joe.getVar("Thing");
+        var cls = joe.getVariable("Thing");
 
         var result = joe.call(cls, "fred");
         check(result instanceof WalkerInstance).eq(true);

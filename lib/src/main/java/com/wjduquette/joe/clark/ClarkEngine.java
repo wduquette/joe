@@ -1,7 +1,6 @@
 package com.wjduquette.joe.clark;
 
 import com.wjduquette.joe.*;
-import java.util.Set;
 
 /**
  * The Bert byte-code engine.

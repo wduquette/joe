@@ -110,7 +110,7 @@ public class Joe {
      * Gets the names of the defined global variables.
      * @return The names
      */
-    public Set<String> getVarNames() {
+    public Set<String> getVariableNames() {
         return engine.getEnvironment().getVariableNames();
     }
 
@@ -122,7 +122,7 @@ public class Joe {
      * @return The value
      */
     @SuppressWarnings("unused")
-    public Object getVar(String name) {
+    public Object getVariable(String name) {
         return engine.getEnvironment().getVariable(name);
     }
 
@@ -132,7 +132,7 @@ public class Joe {
      * @param value The name
      */
     @SuppressWarnings("unused")
-    public void setVar(String name, Object value) {
+    public void setVariable(String name, Object value) {
         engine.getEnvironment().setVariable(name, value);
     }
 

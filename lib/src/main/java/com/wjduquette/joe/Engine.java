@@ -1,7 +1,5 @@
 package com.wjduquette.joe;
 
-import java.util.Set;
-
 /**
  * An Engine is a parsing and execution engine for the Joe language.
  * It provides a clean interface between the parsing and execution

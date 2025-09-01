@@ -154,7 +154,7 @@ public class TestTool implements Tool {
         }
 
         // NEXT, execute its tests.
-        var tests = joe.getVarNames().stream()
+        var tests = joe.getVariableNames().stream()
             .filter(name -> name.startsWith("test"))
             .toList();
 
@@ -179,7 +179,7 @@ public class TestTool implements Tool {
 
     private void runVerbosely(Joe joe, List<String> tests) {
         for (var test : tests) {
-            var callable = joe.getVar(test);
+            var callable = joe.getVariable(test);
             if (!joe.isCallable(callable)) {
                 continue;
             }
@@ -204,7 +204,7 @@ public class TestTool implements Tool {
 
     private void runQuietly(Joe joe, String scriptPath, List<String> tests) {
         for (var test : tests) {
-            var callable = joe.getVar(test);
+            var callable = joe.getVariable(test);
             if (!joe.isCallable(callable)) {
                 continue;
             }
