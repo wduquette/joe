@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 final class WalkerFunction implements NativeCallable {
     private final Interpreter interpreter;
     private final Stmt.Function declaration;
-    private final Environment closure;
+    private final WalkerEnvironment closure;
     private final boolean isInitializer;
     private final boolean isVarArgs;
     private final String signature;
@@ -29,7 +29,7 @@ final class WalkerFunction implements NativeCallable {
     WalkerFunction(
         Interpreter interpreter,
         Stmt.Function declaration,
-        Environment closure,
+        WalkerEnvironment closure,
         boolean isInitializer
     ) {
         this.interpreter = interpreter;
@@ -74,7 +74,7 @@ final class WalkerFunction implements NativeCallable {
     }
 
     WalkerFunction bind(JoeValue instance) {
-        Environment environment = new Environment(closure);
+        WalkerEnvironment environment = new WalkerEnvironment(closure);
         environment.setVar("this", instance);
         return new WalkerFunction(interpreter, declaration, environment,
             isInitializer);
@@ -96,7 +96,7 @@ final class WalkerFunction implements NativeCallable {
         }
 
         // NEXT, create the environment for the arguments.
-        Environment environment = new Environment(closure);
+        WalkerEnvironment environment = new WalkerEnvironment(closure);
 
         for (int i = 0; i < expected; i++) {
             environment.setVar(declaration.params().get(i).lexeme(),

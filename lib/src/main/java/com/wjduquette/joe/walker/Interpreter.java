@@ -20,8 +20,8 @@ class Interpreter {
     // Instance Variables
 
     private final Joe joe;
-    final GlobalEnvironment globals = new GlobalEnvironment();
-    private Environment environment;
+    final WalkerEnvironment globals = new WalkerEnvironment();
+    private WalkerEnvironment environment;
     private final Map<Expr, Integer> locals = new HashMap<>();
 
     //-------------------------------------------------------------------------
@@ -54,7 +54,7 @@ class Interpreter {
     //-------------------------------------------------------------------------
     // Public API
 
-    public GlobalEnvironment globals() {
+    public WalkerEnvironment globals() {
         return globals;
     }
 
@@ -76,7 +76,7 @@ class Interpreter {
                 }
             }
             case Stmt.Block stmt -> {
-                return executeBlock(stmt.statements(), new Environment(environment));
+                return executeBlock(stmt.statements(), new WalkerEnvironment(environment));
             }
             case Stmt.Break ignored -> throw new Break();
             case Stmt.Class stmt -> {
@@ -112,7 +112,7 @@ class Interpreter {
 
                 if (stmt.superclass() != null) {
                     // Push a new environment to contain "super"
-                    environment = new Environment(environment);
+                    environment = new WalkerEnvironment(environment);
                     environment.setVar("super", superclass);
                 }
 
@@ -238,7 +238,7 @@ class Interpreter {
 
                     var previous = this.environment;
                     try {
-                        this.environment = new Environment(previous);
+                        this.environment = new WalkerEnvironment(previous);
                         var bound = Matcher.match(
                             joe,
                             c.pattern().getPattern(),
@@ -384,8 +384,8 @@ class Interpreter {
         return null;
     }
 
-    Object executeBlock(List<Stmt> statements, Environment environment) {
-        Environment previous = this.environment;
+    Object executeBlock(List<Stmt> statements, WalkerEnvironment environment) {
+        WalkerEnvironment previous = this.environment;
         Object result = null;
 
         try {
