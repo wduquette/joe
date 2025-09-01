@@ -21,6 +21,20 @@ import static com.wjduquette.joe.checker.Checker.check;
  */
 public class ParserTest extends Ted {
     //-------------------------------------------------------------------------
+    // declaration()
+
+    @Test
+    public void testDeclaration_badExport() {
+        test("testDeclaration_badExport");
+
+        var source = """
+            export var x = 5;
+            """;
+        check(parse(source))
+            .eq("[line 1] error at 'export', expected 'export' to be followed by 'function', 'class', or 'record'.");
+    }
+
+    //-------------------------------------------------------------------------
     // classDeclaration()
 
     @Test

@@ -129,10 +129,18 @@ public class Parser {
 
     private Stmt declaration() {
         try {
-            if (scanner.match(CLASS)) return classDeclaration();
+            var isExported = scanner.match(EXPORT);
+            var exportToken = scanner.previous();
+
+            if (scanner.match(CLASS)) return classDeclaration(isExported);
             if (scanner.match(FUNCTION)) return functionDeclaration(
-                FunctionType.FUNCTION, "function");
-            if (scanner.match(RECORD)) return recordDeclaration();
+                FunctionType.FUNCTION, "function", isExported);
+            if (scanner.match(RECORD)) return recordDeclaration(isExported);
+
+            if (isExported) {
+                error(exportToken,
+                    "expected 'export' to be followed by 'function', 'class', or 'record'.");
+            }
             if (scanner.match(VAR)) return varDeclaration();
 
             return statement();
@@ -142,7 +150,7 @@ public class Parser {
         }
     }
 
-    private Stmt classDeclaration() {
+    private Stmt classDeclaration(boolean isExported) {
         // Class Name
         int start = scanner.previous().span().start();
         scanner.consume(IDENTIFIER, "expected class name.");
@@ -165,11 +173,12 @@ public class Parser {
 
         while (!scanner.check(RIGHT_BRACE) && !scanner.isAtEnd()) {
             if (scanner.match(METHOD)) {
-                methods.add(functionDeclaration(FunctionType.METHOD, "method"));
+                methods.add(
+                    functionDeclaration(FunctionType.METHOD, "method", false));
             } else if (scanner.match(STATIC)) {
                 if (scanner.match(METHOD)) {
                     staticMethods.add(functionDeclaration(
-                        FunctionType.STATIC_METHOD, "static method"));
+                        FunctionType.STATIC_METHOD, "static method", false));
                 } else {
                     scanner.consume(LEFT_BRACE,
                         "expected 'method' or '{' after 'static'.");
@@ -186,11 +195,15 @@ public class Parser {
         int end = scanner.previous().span().end();
         var classSpan = source.span(start, end);
 
-        return new Stmt.Class(name, false, classSpan, superclass,
+        return new Stmt.Class(name, isExported, classSpan, superclass,
             staticMethods, methods, staticInitializer);
     }
 
-    private Stmt.Function functionDeclaration(FunctionType type, String kind) {
+    private Stmt.Function functionDeclaration(
+        FunctionType type,
+        String kind,
+        boolean isExported
+    ) {
         var start = scanner.previous().span().start();
         scanner.consume(IDENTIFIER, "expected " + kind + " name.");
         var name = scanner.previous();
@@ -206,7 +219,7 @@ public class Parser {
         List<Stmt> body = block();
         var end = scanner.previous().span().end();
         var span = source.span(start, end);
-        return new Stmt.Function(type, false, name, parameters, body, span);
+        return new Stmt.Function(type, isExported, name, parameters, body, span);
     }
 
     private List<Token> parameters(
@@ -255,7 +268,7 @@ public class Parser {
         return parameters;
     }
 
-    private Stmt recordDeclaration() {
+    private Stmt recordDeclaration(boolean isExported) {
         // Type Name
         int start = scanner.previous().span().start();
         scanner.consume(IDENTIFIER, "expected record type name.");
@@ -280,11 +293,12 @@ public class Parser {
 
         while (!scanner.check(RIGHT_BRACE) && !scanner.isAtEnd()) {
             if (scanner.match(METHOD)) {
-                methods.add(functionDeclaration(FunctionType.METHOD, "method"));
+                methods.add(functionDeclaration(
+                    FunctionType.METHOD, "method", false));
             } else if (scanner.match(STATIC)) {
                 if (scanner.match(METHOD)) {
                     staticMethods.add(functionDeclaration(
-                        FunctionType.STATIC_METHOD, "static method"));
+                        FunctionType.STATIC_METHOD, "static method", false));
                 } else {
                     scanner.consume(LEFT_BRACE,
                         "expected 'method' or '{' after 'static'.");
@@ -301,7 +315,7 @@ public class Parser {
         int end = scanner.previous().span().end();
         var span = source.span(start, end);
 
-        return new Stmt.Record(name, false, span, recordFields,
+        return new Stmt.Record(name, isExported, span, recordFields,
             staticMethods, methods, staticInitializer);
     }
 
