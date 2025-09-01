@@ -38,8 +38,8 @@ public class Joe {
         var set = new TreeSet<String>();
         Collections.addAll(set,
             "assert", "break", "case", "class", "continue", "default",
-            "else", "extends", "false", "for", "foreach", "function",
-            "if", "in", "let", "match", "method", "ni", "not", "null",
+            "else", "export", "extends", "false", "for", "foreach", "function",
+            "if", "import", "in", "let", "match", "method", "ni", "not", "null",
             "record", "return", "ruleset", "static", "super", "switch",
             "this", "throw", "true",
             "var", "where", "while"

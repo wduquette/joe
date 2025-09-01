@@ -186,7 +186,7 @@ public class Parser {
         int end = scanner.previous().span().end();
         var classSpan = source.span(start, end);
 
-        return new Stmt.Class(name, classSpan, superclass,
+        return new Stmt.Class(name, false, classSpan, superclass,
             staticMethods, methods, staticInitializer);
     }
 
@@ -206,7 +206,7 @@ public class Parser {
         List<Stmt> body = block();
         var end = scanner.previous().span().end();
         var span = source.span(start, end);
-        return new Stmt.Function(type, name, parameters, body, span);
+        return new Stmt.Function(type, false, name, parameters, body, span);
     }
 
     private List<Token> parameters(
@@ -301,7 +301,7 @@ public class Parser {
         int end = scanner.previous().span().end();
         var span = source.span(start, end);
 
-        return new Stmt.Record(name, span, recordFields,
+        return new Stmt.Record(name, false, span, recordFields,
             staticMethods, methods, staticInitializer);
     }
 
@@ -899,7 +899,7 @@ public class Parser {
             var span = source.span(token.span().start(), end);
             var decl =
                 new Stmt.Function(FunctionType.LAMBDA,
-                    token, parameters, body, span);
+                    false, token, parameters, body, span);
             return new Expr.Lambda(decl);
         }
 
