@@ -87,36 +87,13 @@ class VirtualMachine {
     //-------------------------------------------------------------------------
     // Variable Access
 
+    /**
+     * Gets the VM's global environment.
+     * @return The environment.
+     */
     Environment getEnvironment() {
         return globals;
     }
-
-    /**
-     * Gets the set of global variable names.
-     * @return The set
-     */
-    Set<String> getVarNames() {
-        return globals.getVariableNames();
-    }
-
-    /**
-     * Gets the value of the named variable, or null if there is none.
-     * @param name The name
-     * @return The value, or null
-     */
-    Object getVar(String name) {
-        return globals.getVariable(name);
-    }
-
-    /**
-     * Sets the value of the named variable, replacing any previous value.
-     * @param name The name
-     * @param value The value
-     */
-    void setVar(String name, Object value) {
-        globals.setVariable(name, value);
-    }
-
 
     //-------------------------------------------------------------------------
     // Execution

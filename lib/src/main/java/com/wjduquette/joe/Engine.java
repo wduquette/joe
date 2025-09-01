@@ -11,24 +11,10 @@ import java.util.Set;
  */
 public interface Engine {
     /**
-     * Gets the set of variables from the global environment.
-     * @return The names.
+     * Gets the engine's global environment.
+     * @return The environment
      */
-    Set<String> getVarNames();
-
-    /**
-     * Gets the value of a global variable.
-     * @param name The name
-     * @return The value
-     */
-    Object getVar(String name);
-
-    /**
-     * Sets the value of a global variable.
-     * @param name The name
-     * @param value The value
-     */
-    void setVar(String name, Object value);
+    Environment getEnvironment();
 
     /**
      * Executes the script, throwing an appropriate error on failure.

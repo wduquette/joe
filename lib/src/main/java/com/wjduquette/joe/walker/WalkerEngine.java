@@ -47,18 +47,8 @@ public class WalkerEngine implements Engine {
     // Engine API
 
     @Override
-    public Set<String> getVarNames() {
-        return interpreter.globals().getVariableNames();
-    }
-
-    @Override
-    public Object getVar(String name) {
-        return interpreter.globals().getVariable(name);
-    }
-
-    @Override
-    public void setVar(String name, Object value) {
-        interpreter.globals().setVariable(name, value);
+    public Environment getEnvironment() {
+        return interpreter.globals();
     }
 
     /**

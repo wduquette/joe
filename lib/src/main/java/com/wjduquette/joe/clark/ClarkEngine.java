@@ -29,18 +29,8 @@ public class ClarkEngine implements Engine {
     // Engine API
 
     @Override
-    public Set<String> getVarNames() {
-        return vm.getVarNames();
-    }
-
-    @Override
-    public Object getVar(String name) {
-        return vm.getVar(name);
-    }
-
-    @Override
-    public void setVar(String name, Object value) {
-        vm.setVar(name, value);
+    public Environment getEnvironment() {
+        return vm.getEnvironment();
     }
 
     @Override

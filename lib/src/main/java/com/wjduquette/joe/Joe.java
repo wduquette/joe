@@ -101,12 +101,17 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Configuration and Embedding
 
+    @SuppressWarnings("unused")
+    public boolean hasVariable(String name) {
+        return engine.getEnvironment().hasVariable(name);
+    }
+
     /**
      * Gets the names of the defined global variables.
      * @return The names
      */
     public Set<String> getVarNames() {
-        return engine.getVarNames();
+        return engine.getEnvironment().getVariableNames();
     }
 
     /**
@@ -118,7 +123,7 @@ public class Joe {
      */
     @SuppressWarnings("unused")
     public Object getVar(String name) {
-        return engine.getVar(name);
+        return engine.getEnvironment().getVariable(name);
     }
 
     /**
@@ -128,7 +133,7 @@ public class Joe {
      */
     @SuppressWarnings("unused")
     public void setVar(String name, Object value) {
-        engine.setVar(name, value);
+        engine.getEnvironment().setVariable(name, value);
     }
 
     /**
@@ -144,7 +149,7 @@ public class Joe {
      * @param function The function
      */
     void installGlobalFunction(NativeFunction function) {
-        engine.setVar(function.name(), function);
+        engine.getEnvironment().setVariable(function.name(), function);
     }
 
     /**
@@ -154,7 +159,7 @@ public class Joe {
      * @param joeLambda The lambda
      */
     public void installGlobalFunction(String name, JoeLambda joeLambda) {
-        engine.setVar(name,
+        engine.getEnvironment().setVariable(name,
             new NativeFunction(name, "function", joeLambda));
     }
 
@@ -174,7 +179,7 @@ public class Joe {
         }
 
         // NEXT, install the type into the environment.
-        engine.setVar(proxyType.name(), proxyType);
+        engine.getEnvironment().setVariable(proxyType.name(), proxyType);
     }
 
     /**
