@@ -48,7 +48,7 @@ public class WalkerEngine implements Engine {
 
     @Override
     public Environment getEnvironment() {
-        return interpreter.globals();
+        return interpreter.getEnvironment();
     }
 
     /**

@@ -72,6 +72,10 @@ class Resolver {
                 declare(stmt.name());
                 define(stmt.name());
 
+                if (stmt.isExported() && inLocalScope()) {
+                    error(stmt.name(), "exported local class.");
+                }
+
                 // Superclass
                 if (stmt.superclass() != null) {
                     currentClass = ClassType.SUBCLASS;
@@ -155,6 +159,9 @@ class Resolver {
             case Stmt.Function stmt -> {
                 declare(stmt.name());
                 define(stmt.name());
+                if (stmt.isExported() && inLocalScope()) {
+                    error(stmt.name(), "exported local function.");
+                }
 
                 resolveFunction(stmt, FunctionType.FUNCTION);
             }
@@ -184,6 +191,10 @@ class Resolver {
 
                 declare(stmt.name());
                 define(stmt.name());
+
+                if (stmt.isExported() && inLocalScope()) {
+                    error(stmt.name(), "exported local record type.");
+                }
 
                 // Static Methods and Initializer
                 for (Stmt.Function method : stmt.staticMethods()) {
@@ -363,6 +374,10 @@ class Resolver {
                 resolveLocal(expr, expr.name());
             }
         }
+    }
+
+    private boolean inLocalScope() {
+        return !scopes.isEmpty();
     }
 
     private void resolveLocal(Expr expr, Token name) {

@@ -74,7 +74,7 @@ public sealed interface Stmt
      */
     record Class(
         Token name,
-        boolean export,
+        boolean isExported,
         Span classSpan,
         Expr.VarGet superclass,
         List<Stmt.Function> staticMethods,
@@ -161,7 +161,7 @@ public sealed interface Stmt
      */
     record Function(
         FunctionType type,
-        boolean export,
+        boolean isExported,
         Token name,
         List<Token> params,
         List<Stmt> body,
@@ -228,7 +228,7 @@ public sealed interface Stmt
      */
     record Record(
         Token name,
-        boolean export,
+        boolean isExported,
         Span typeSpan,
         List<String> fields,
         List<Stmt.Function> staticMethods,

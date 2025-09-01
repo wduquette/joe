@@ -32,6 +32,9 @@ class Interpreter {
     // The environment for the current scope.
     private WalkerEnvironment env;
 
+    // The exports environment.
+    private final Environment exports = new Environment();
+
     // Information about resolved local variables, provided by the
     // `Resolver`.
     private final Map<Expr, Integer> locals = new HashMap<>();
@@ -66,8 +69,13 @@ class Interpreter {
     //-------------------------------------------------------------------------
     // Public API
 
-    public WalkerEnvironment globals() {
+    public WalkerEnvironment getEnvironment() {
         return globals;
+    }
+
+    @SuppressWarnings("unused")
+    public Environment getExports() {
+        return exports;
     }
 
     public Object interpret(List<Stmt> statements) throws RuntimeError {
@@ -146,6 +154,10 @@ class Interpreter {
 
                 assert env != null;
                 env.assign(stmt.name(), klass);
+
+                if (stmt.isExported()) {
+                    exports.setVariable(stmt.name().lexeme(), klass);
+                }
 
                 // Static Initialization
                 if (!stmt.staticInit().isEmpty()) {
@@ -232,6 +244,9 @@ class Interpreter {
             case Stmt.Function stmt -> {
                 var function = new WalkerFunction(this, stmt, env, false);
                 env.setVariable(stmt.name().lexeme(), function);
+                if (stmt.isExported()) {
+                    exports.setVariable(stmt.name().lexeme(), function);
+                }
             }
             case Stmt.If stmt -> {
                 if (Joe.isTruthy(evaluate(stmt.condition()))) {
@@ -305,6 +320,9 @@ class Interpreter {
 
                 assert env != null;
                 env.assign(stmt.name(), type);
+                if (stmt.isExported()) {
+                    exports.setVariable(stmt.name().lexeme(), type);
+                }
 
                 // Static Initialization
                 if (!stmt.staticInit().isEmpty()) {
