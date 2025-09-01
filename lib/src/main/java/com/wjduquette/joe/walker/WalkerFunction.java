@@ -75,7 +75,7 @@ final class WalkerFunction implements NativeCallable {
 
     WalkerFunction bind(JoeValue instance) {
         WalkerEnvironment environment = new WalkerEnvironment(closure);
-        environment.setVar("this", instance);
+        environment.setVariable("this", instance);
         return new WalkerFunction(interpreter, declaration, environment,
             isInitializer);
     }
@@ -99,13 +99,13 @@ final class WalkerFunction implements NativeCallable {
         WalkerEnvironment environment = new WalkerEnvironment(closure);
 
         for (int i = 0; i < expected; i++) {
-            environment.setVar(declaration.params().get(i).lexeme(),
+            environment.setVariable(declaration.params().get(i).lexeme(),
                 args.next());
         }
 
         if (isVarArgs) {
             var varArgs = new ListValue(args.remainderAsList());
-            environment.setVar(Parser.ARGS, varArgs);
+            environment.setVariable(Parser.ARGS, varArgs);
         }
 
         try {

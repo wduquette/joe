@@ -46,7 +46,7 @@ class Interpreter {
         var env = environment;
 
         while (env != null) {
-            env.dump();
+            System.out.println(env.dump());
             env = env.enclosing;
         }
     }
@@ -99,7 +99,7 @@ class Interpreter {
                 }
 
                 // The class itself
-                environment.setVar(stmt.name().lexeme(), null);
+                environment.setVariable(stmt.name().lexeme(), null);
 
                 // Static Methods
                 Map<String, WalkerFunction> staticMethods = new HashMap<>();
@@ -113,7 +113,7 @@ class Interpreter {
                 if (stmt.superclass() != null) {
                     // Push a new environment to contain "super"
                     environment = new WalkerEnvironment(environment);
-                    environment.setVar("super", superclass);
+                    environment.setVariable("super", superclass);
                 }
 
                 Map<String, WalkerFunction> methods = new HashMap<>();
@@ -180,7 +180,7 @@ class Interpreter {
 
                 for (var item : collection) {
                     try {
-                        environment.setVar(stmt.name().lexeme(), item);
+                        environment.setVariable(stmt.name().lexeme(), item);
                         execute(stmt.body());
                     } catch (Break ex) {
                         break;
@@ -219,7 +219,7 @@ class Interpreter {
             }
             case Stmt.Function stmt -> {
                 var function = new WalkerFunction(this, stmt, environment, false);
-                environment.setVar(stmt.name().lexeme(), function);
+                environment.setVariable(stmt.name().lexeme(), function);
             }
             case Stmt.If stmt -> {
                 if (Joe.isTruthy(evaluate(stmt.condition()))) {
@@ -267,7 +267,7 @@ class Interpreter {
             }
             case Stmt.Record stmt -> {
                 // The type itself
-                environment.setVar(stmt.name().lexeme(), null);
+                environment.setVariable(stmt.name().lexeme(), null);
 
                 // Static Methods
                 Map<String, WalkerFunction> staticMethods = new HashMap<>();
@@ -347,7 +347,7 @@ class Interpreter {
             }
             case Stmt.Var stmt -> {
                 Object value = evaluate(stmt.value());
-                environment.setVar(stmt.name().lexeme(), value);
+                environment.setVariable(stmt.name().lexeme(), value);
             }
             case Stmt.VarPattern stmt -> {
                 var constants = new ArrayList<>();
@@ -405,7 +405,7 @@ class Interpreter {
     // the target.
     private void bind(Map<String,Object> bound) {
         for (var e : bound.entrySet()) {
-            environment.setVar(e.getKey(), e.getValue());
+            environment.setVariable(e.getKey(), e.getValue());
         }
     }
 

@@ -13,41 +13,67 @@ public class Environment {
     // The map from names to values.
     protected final Map<String, Object> values = new HashMap<>();
 
+    //-------------------------------------------------------------------------
+    // Constructor
+
     /**
-     * Creates an environment with no enclosing environment.
+     * Creates an environment.
      */
     public Environment() {
         // Nothing to do
     }
 
+    //-------------------------------------------------------------------------
+    // Environment API
+
     /**
-     * Gets the value of the named global variable.
+     * Returns true if the environment contains the named variable,
+     * and false otherwise.
+     * @param name The name
+     * @return true or false
+     */
+    @SuppressWarnings("unused")
+    public boolean hasVariable(String name) {
+        return values.containsKey(name);
+    }
+
+    /**
+     * Gets the value of the named variable in this environment.
      * @param name The name
      * @return The value
      */
-    public Object getVar(String name) {
+    public Object getVariable(String name) {
         return values.get(name);
     }
 
+    /**
+     * Sets the value of the named variable in this environment.
+     * @param name The name
+     * @param value The value
+     */
+    public void setVariable(String name, Object value) {
+        values.put(name, value);
+    }
 
     /**
      * Gets the names of the variables declared in the global environment.
      * @return The set.
      */
-    public Set<String> getVarNames() {
+    public Set<String> getVariableNames() {
         return Collections.unmodifiableSet(values.keySet());
     }
 
-    public void dump() {
-        System.out.println(this);
+    /**
+     * Dump the contents of this environment as a string, for debugging.
+     */
+    public String dump() {
+        var buff = new StringBuilder();
+        buff.append(this);
         var map = new TreeMap<>(values);
         for (var key : map.keySet()) {
-            System.out.printf("  %-20s %s\n", key, map.get(key).toString());
+            buff.append(String.format(
+                "  %-20s %s\n", key, map.get(key).toString()));
         }
-    }
-
-
-    public void setVar(String name, Object value) {
-        values.put(name, value);
+        return buff.toString().stripTrailing();
     }
 }

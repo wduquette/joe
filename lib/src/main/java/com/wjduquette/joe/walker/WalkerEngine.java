@@ -48,17 +48,17 @@ public class WalkerEngine implements Engine {
 
     @Override
     public Set<String> getVarNames() {
-        return interpreter.globals().getVarNames();
+        return interpreter.globals().getVariableNames();
     }
 
     @Override
     public Object getVar(String name) {
-        return interpreter.globals().getVar(name);
+        return interpreter.globals().getVariable(name);
     }
 
     @Override
     public void setVar(String name, Object value) {
-        interpreter.globals().setVar(name, value);
+        interpreter.globals().setVariable(name, value);
     }
 
     /**
@@ -136,7 +136,7 @@ public class WalkerEngine implements Engine {
                 return callable.call(joe, new Args(args));
             } catch (JoeError ex) {
                 var list = new ArrayList<>(List.of(args));
-                list.add(0, callee);
+                list.addFirst(callee);
                 var arguments = list.stream()
                     .map(joe::stringify)
                     .collect(Collectors.joining(", "));
