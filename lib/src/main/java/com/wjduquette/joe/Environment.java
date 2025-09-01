@@ -64,6 +64,14 @@ public class Environment {
     }
 
     /**
+     * Adds an entire set of variables to the environment.
+     * @param pairs
+     */
+    public void setAll(Map<String, Object> pairs) {
+        values.putAll(pairs);
+    }
+
+    /**
      * Dump the contents of this environment as a string, for debugging.
      */
     public String dump() {

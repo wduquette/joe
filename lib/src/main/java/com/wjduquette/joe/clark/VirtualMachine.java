@@ -50,7 +50,7 @@ class VirtualMachine {
     //
 
     // The global environment.
-    private final Map<String,Object> globals = new HashMap<>();
+    private final Environment globals = new Environment();
 
     // Registers
     private Object registerT = null;
@@ -87,12 +87,16 @@ class VirtualMachine {
     //-------------------------------------------------------------------------
     // Variable Access
 
+    Environment getEnvironment() {
+        return globals;
+    }
+
     /**
      * Gets the set of global variable names.
      * @return The set
      */
     Set<String> getVarNames() {
-        return globals.keySet();
+        return globals.getVariableNames();
     }
 
     /**
@@ -101,7 +105,7 @@ class VirtualMachine {
      * @return The value, or null
      */
     Object getVar(String name) {
-        return globals.get(name);
+        return globals.getVariable(name);
     }
 
     /**
@@ -110,7 +114,7 @@ class VirtualMachine {
      * @param value The value
      */
     void setVar(String name, Object value) {
-        globals.put(name, value);
+        globals.setVariable(name, value);
     }
 
 
@@ -359,11 +363,11 @@ class VirtualMachine {
                                 joe.typedValue(iterator));
                     }
                 }
-                case GLODEF -> globals.put(readString(), pop());
+                case GLODEF -> globals.setVariable(readString(), pop());
                 case GLOGET -> {
                     var name = readString();
-                    if (globals.containsKey(name)) {
-                        push(globals.get(name));
+                    if (globals.hasVariable(name)) {
+                        push(globals.getVariable(name));
                     } else {
                         throw error("Undefined variable: '" + name + "'.");
                     }
@@ -388,12 +392,12 @@ class VirtualMachine {
                     }
 
                     // NEXT, add the bindings to the global scope.
-                    globals.putAll(bound.asMap());
+                    globals.setAll(bound.asMap());
                 }
                 case GLOSET -> {
                     var name = readString();
-                    if (globals.containsKey(name)) {
-                        globals.put(name, peek(0));
+                    if (globals.hasVariable(name)) {
+                        globals.setVariable(name, peek(0));
                         // NOTE: we leave the value on the stack, since
                         // assignment is an expression.
                     } else {
@@ -623,11 +627,11 @@ class VirtualMachine {
                     );
 
                     if (bound != null) {
-                        globals.putAll(bound.asMap());
+                        globals.setAll(bound.asMap());
                     } else {
                         // Match failed; set all relevant globals to null.
                         for (var name : pv.bindings()) {
-                            globals.put(name, null);
+                            globals.setVariable(name, null);
                         }
                     }
 
