@@ -38,6 +38,20 @@ class WalkerEnvironment extends Environment {
     // WalkerEnvironment API
 
     /**
+     * Gets the global environment at the top of this chain of environments.
+     * @return The environment
+     */
+    WalkerEnvironment top() {
+        var env = this;
+
+        while (env.enclosing != null) {
+            env = env.enclosing;
+        }
+
+        return env;
+    }
+
+    /**
      * Get the variable named by the token, walking up the chain of
      * environments until it is found.
      * @param name The variable name token

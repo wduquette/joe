@@ -19,9 +19,21 @@ class Interpreter {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The Joe interpreter
     private final Joe joe;
+
+
+    // The global environment: the root of the tree of scoped environments.
+    // The interpreter shouldn't refer to this internally, but should use
+    // env.top() instead; this allows this interpreter to execute code
+    // compiled by other instances of `Interpreter`.
     final WalkerEnvironment globals = new WalkerEnvironment();
-    private WalkerEnvironment environment;
+
+    // The environment for the current scope.
+    private WalkerEnvironment env;
+
+    // Information about resolved local variables, provided by the
+    // `Resolver`.
     private final Map<Expr, Integer> locals = new HashMap<>();
 
     //-------------------------------------------------------------------------
@@ -29,7 +41,7 @@ class Interpreter {
 
     public Interpreter(Joe joe) {
         this.joe = joe;
-        this.environment = globals;
+        this.env = globals;
     }
 
     //-------------------------------------------------------------------------
@@ -43,7 +55,7 @@ class Interpreter {
             System.out.println("  [" + e.getValue() + "]: " + e.getKey());
         }
 
-        var env = environment;
+        var env = this.env;
 
         while (env != null) {
             System.out.println(env.dump());
@@ -76,7 +88,7 @@ class Interpreter {
                 }
             }
             case Stmt.Block stmt -> {
-                return executeBlock(stmt.statements(), new WalkerEnvironment(environment));
+                return executeBlock(stmt.statements(), new WalkerEnvironment(env));
             }
             case Stmt.Break ignored -> throw new Break();
             case Stmt.Class stmt -> {
@@ -99,27 +111,27 @@ class Interpreter {
                 }
 
                 // The class itself
-                environment.setVariable(stmt.name().lexeme(), null);
+                env.setVariable(stmt.name().lexeme(), null);
 
                 // Static Methods
                 Map<String, WalkerFunction> staticMethods = new HashMap<>();
                 for (Stmt.Function method : stmt.staticMethods()) {
                     WalkerFunction function =
-                        new WalkerFunction(this, method, environment, false);
+                        new WalkerFunction(this, method, env, false);
                     staticMethods.put(method.name().lexeme(), function);
                 }
 
 
                 if (stmt.superclass() != null) {
                     // Push a new environment to contain "super"
-                    environment = new WalkerEnvironment(environment);
-                    environment.setVariable("super", superclass);
+                    env = new WalkerEnvironment(env);
+                    env.setVariable("super", superclass);
                 }
 
                 Map<String, WalkerFunction> methods = new HashMap<>();
                 for (Stmt.Function method : stmt.methods()) {
                     WalkerFunction function =
-                        new WalkerFunction(this, method, environment,
+                        new WalkerFunction(this, method, env,
                             stmt.name().lexeme().equals("init"));
                     methods.put(method.name().lexeme(), function);
                 }
@@ -129,16 +141,16 @@ class Interpreter {
 
                 if (superclass != null) {
                     // Pop the "super" environment.
-                    environment = environment.enclosing;
+                    env = env.enclosing;
                 }
 
-                assert environment != null;
-                environment.assign(stmt.name(), klass);
+                assert env != null;
+                env.assign(stmt.name(), klass);
 
                 // Static Initialization
                 if (!stmt.staticInit().isEmpty()) {
                     try {
-                        executeBlock(stmt.staticInit(), environment);
+                        executeBlock(stmt.staticInit(), env);
                     } catch (JoeError ex) {
                         var buff = stmt.classSpan().buffer();
                         var context = buff.lineSpan(stmt.classSpan().endLine());
@@ -180,7 +192,7 @@ class Interpreter {
 
                 for (var item : collection) {
                     try {
-                        environment.setVariable(stmt.name().lexeme(), item);
+                        env.setVariable(stmt.name().lexeme(), item);
                         execute(stmt.body());
                     } catch (Break ex) {
                         break;
@@ -218,8 +230,8 @@ class Interpreter {
                 }
             }
             case Stmt.Function stmt -> {
-                var function = new WalkerFunction(this, stmt, environment, false);
-                environment.setVariable(stmt.name().lexeme(), function);
+                var function = new WalkerFunction(this, stmt, env, false);
+                env.setVariable(stmt.name().lexeme(), function);
             }
             case Stmt.If stmt -> {
                 if (Joe.isTruthy(evaluate(stmt.condition()))) {
@@ -236,9 +248,9 @@ class Interpreter {
                     c.pattern().getExprs().forEach(e ->
                         constants.add(evaluate(e)));
 
-                    var previous = this.environment;
+                    var previous = this.env;
                     try {
-                        this.environment = new WalkerEnvironment(previous);
+                        this.env = new WalkerEnvironment(previous);
                         var bound = Matcher.match(
                             joe,
                             c.pattern().getPattern(),
@@ -253,7 +265,7 @@ class Interpreter {
                             }
                         }
                     } finally {
-                        this.environment = previous;
+                        this.env = previous;
                     }
                 }
 
@@ -267,20 +279,20 @@ class Interpreter {
             }
             case Stmt.Record stmt -> {
                 // The type itself
-                environment.setVariable(stmt.name().lexeme(), null);
+                env.setVariable(stmt.name().lexeme(), null);
 
                 // Static Methods
                 Map<String, WalkerFunction> staticMethods = new HashMap<>();
                 for (Stmt.Function method : stmt.staticMethods()) {
                     WalkerFunction function =
-                        new WalkerFunction(this, method, environment, false);
+                        new WalkerFunction(this, method, env, false);
                     staticMethods.put(method.name().lexeme(), function);
                 }
 
                 Map<String, WalkerFunction> methods = new HashMap<>();
                 for (Stmt.Function method : stmt.methods()) {
                     WalkerFunction function =
-                        new WalkerFunction(this, method, environment, false);
+                        new WalkerFunction(this, method, env, false);
                     methods.put(method.name().lexeme(), function);
                 }
 
@@ -291,13 +303,13 @@ class Interpreter {
                     staticMethods,
                     methods);
 
-                assert environment != null;
-                environment.assign(stmt.name(), type);
+                assert env != null;
+                env.assign(stmt.name(), type);
 
                 // Static Initialization
                 if (!stmt.staticInit().isEmpty()) {
                     try {
-                        executeBlock(stmt.staticInit(), environment);
+                        executeBlock(stmt.staticInit(), env);
                     } catch (JoeError ex) {
                         var buff = stmt.typeSpan().buffer();
                         var context = buff.lineSpan(stmt.typeSpan().endLine());
@@ -347,7 +359,7 @@ class Interpreter {
             }
             case Stmt.Var stmt -> {
                 Object value = evaluate(stmt.value());
-                environment.setVariable(stmt.name().lexeme(), value);
+                env.setVariable(stmt.name().lexeme(), value);
             }
             case Stmt.VarPattern stmt -> {
                 var constants = new ArrayList<>();
@@ -385,17 +397,17 @@ class Interpreter {
     }
 
     Object executeBlock(List<Stmt> statements, WalkerEnvironment environment) {
-        WalkerEnvironment previous = this.environment;
+        WalkerEnvironment previous = this.env;
         Object result = null;
 
         try {
-            this.environment = environment;
+            this.env = environment;
 
             for (Stmt statement : statements) {
                 result = execute(statement);
             }
         } finally {
-            this.environment = previous;
+            this.env = previous;
         }
 
         return result;
@@ -405,7 +417,7 @@ class Interpreter {
     // the target.
     private void bind(Map<String,Object> bound) {
         for (var e : bound.entrySet()) {
-            environment.setVariable(e.getKey(), e.getValue());
+            env.setVariable(e.getKey(), e.getValue());
         }
     }
 
@@ -615,7 +627,7 @@ class Interpreter {
             }
             // Return a callable for the given lambda
             case Expr.Lambda expr ->
-                new WalkerFunction(this, expr.declaration(), environment, false);
+                new WalkerFunction(this, expr.declaration(), env, false);
             // A list literal
             case Expr.ListLiteral expr -> {
                 var list = new ListValue();
@@ -744,9 +756,9 @@ class Interpreter {
             // Handle `super.<methodName>` in methods
             case Expr.Super expr -> {
                 int distance = locals.get(expr);
-                JoeClass superclass = (JoeClass)environment.getAt(
+                JoeClass superclass = (JoeClass) env.getAt(
                     distance, "super");
-                JoeValue instance = (JoeValue)environment.getAt(
+                JoeValue instance = (JoeValue) env.getAt(
                     distance - 1, "this");
                 JoeCallable method =
                     superclass.bind(instance, expr.method().lexeme());
@@ -802,9 +814,9 @@ class Interpreter {
                 var result = expr.isPre() ? assigned : prior;
 
                 if (distance != null) {
-                    environment.assignAt(distance, expr.name(), assigned);
+                    env.assignAt(distance, expr.name(), assigned);
                 } else {
-                    globals.assign(expr.name(), assigned);
+                    env.top().assign(expr.name(), assigned);
                 }
                 yield result;
             }
@@ -820,9 +832,9 @@ class Interpreter {
                 }
 
                 if (distance != null) {
-                    environment.assignAt(distance, expr.name(), right);
+                    env.assignAt(distance, expr.name(), right);
                 } else {
-                    globals.assign(expr.name(), right);
+                    env.top().assign(expr.name(), right);
                 }
                 yield right;
             }
@@ -835,9 +847,9 @@ class Interpreter {
     private Object lookupVariable(Token name, Expr expr) {
         Integer distance = locals.get(expr);
         if (distance != null) {
-            return environment.getAt(distance, name.lexeme());
+            return env.getAt(distance, name.lexeme());
         } else {
-            return globals.get(name);
+            return env.top().get(name);
         }
     }
 
