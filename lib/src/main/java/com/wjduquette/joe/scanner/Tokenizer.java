@@ -25,12 +25,14 @@ public class Tokenizer {
         reserved("continue", CONTINUE);
         reserved("default",  DEFAULT);
         reserved("else",     ELSE);
+        reserved("export",   EXPORT);
         reserved("extends",  EXTENDS);
         reserved("false",    FALSE);
         reserved("for",      FOR);
         reserved("foreach",  FOREACH);
         reserved("function", FUNCTION);
         reserved("if",       IF);
+        reserved("import",   IMPORT);
         reserved("in",       IN);
         reserved("let",      LET);
         reserved("match",    MATCH);

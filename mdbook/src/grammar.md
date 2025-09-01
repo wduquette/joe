@@ -4,6 +4,7 @@ This appendix shows the grammars of the Joe language and its
 sub-languages, in the syntax used in Robert Nystrom's *Crafting Interpreters*.
 
 - [Joe Grammar](#joe-grammar)
+  - [Reserved Words](#reserved-words) 
   - [Statements](#statements)
   - [Expressions](#expressions)
   - [Patterns](#patterns)
@@ -15,6 +16,27 @@ sub-languages, in the syntax used in Robert Nystrom's *Crafting Interpreters*.
 
 Joe's grammar is based on Nystrom's Lox grammar, with many changes and
 additions.
+
+### Reserved Words
+
+Joe reserves the following words:
+
+- `assert`
+- `break`
+- `case`, `class`, `continue`
+- `default`
+- `else`, `export`, `extends`
+- `false`, `for`, `foreach`, `function`
+- `if`, `import`, `in`
+- `let`
+- `match`, `method`
+- `ni`, `not`, `null`
+- `record`, `return`, `ruleset`
+- `static`, `super`, `switch`
+- `this`, `throw`, `true`
+- `var`
+- `where`, `while`
+
 
 ### Statements
 
