@@ -49,8 +49,11 @@ class VirtualMachine {
     // Runtime Data
     //
 
-    // The global environment.
-    private final Environment globals = new Environment();
+    // The global environment.  The VM should pass this to the script's
+    // closure, but should access the global environment via the current
+    // closure's `globals` field.  This allows closures defined in one VM to
+    // be executed in another VM.
+    private final Environment globalEnv = new Environment();
 
     // Registers
     private Object registerT = null;
@@ -92,7 +95,7 @@ class VirtualMachine {
      * @return The environment.
      */
     Environment getEnvironment() {
-        return globals;
+        return globalEnv;
     }
 
     //-------------------------------------------------------------------------
@@ -107,7 +110,9 @@ class VirtualMachine {
      * @throws JoeError on compilation or execution error.
      */
     Object interpret(String scriptName, String source) {
-        var closure = new Closure(compiler.compile(scriptName, source));
+        var closure = new Closure(
+            compiler.compile(scriptName, source),
+            globalEnv);
         resetStack();
         stack[top++] = closure;
         call(closure, 0, Origin.JAVA);
@@ -281,7 +286,7 @@ class VirtualMachine {
                 case CLASS -> push(new ClarkClass(readString()));
                 case CLOSURE -> {
                     var function = readFunction();
-                    var closure = new Closure(function);
+                    var closure = new Closure(function, globals());
                     push(closure);
                     for (int i = 0; i < closure.upvalues.length; i++) {
                         boolean isLocal = readArg() == 1;
@@ -340,11 +345,11 @@ class VirtualMachine {
                                 joe.typedValue(iterator));
                     }
                 }
-                case GLODEF -> globals.setVariable(readString(), pop());
+                case GLODEF -> globals().setVariable(readString(), pop());
                 case GLOGET -> {
                     var name = readString();
-                    if (globals.hasVariable(name)) {
-                        push(globals.getVariable(name));
+                    if (globals().hasVariable(name)) {
+                        push(globals().getVariable(name));
                     } else {
                         throw error("Undefined variable: '" + name + "'.");
                     }
@@ -369,12 +374,12 @@ class VirtualMachine {
                     }
 
                     // NEXT, add the bindings to the global scope.
-                    globals.setAll(bound.asMap());
+                    globals().setAll(bound.asMap());
                 }
                 case GLOSET -> {
                     var name = readString();
-                    if (globals.hasVariable(name)) {
-                        globals.setVariable(name, peek(0));
+                    if (globals().hasVariable(name)) {
+                        globals().setVariable(name, peek(0));
                         // NOTE: we leave the value on the stack, since
                         // assignment is an expression.
                     } else {
@@ -604,11 +609,11 @@ class VirtualMachine {
                     );
 
                     if (bound != null) {
-                        globals.setAll(bound.asMap());
+                        globals().setAll(bound.asMap());
                     } else {
                         // Match failed; set all relevant globals to null.
                         for (var name : pv.bindings()) {
-                            globals.setVariable(name, null);
+                            globals().setVariable(name, null);
                         }
                     }
 
@@ -829,6 +834,11 @@ class VirtualMachine {
                 joe.println(stackText());
             }
         }
+    }
+
+    // Gets the global environment in use in the current closure.
+    private Environment globals() {
+        return frame.closure.globals;
     }
 
     // Gets the span for the source line that includes that last

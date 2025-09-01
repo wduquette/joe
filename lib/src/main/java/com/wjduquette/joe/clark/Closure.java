@@ -1,5 +1,7 @@
 package com.wjduquette.joe.clark;
 
+import com.wjduquette.joe.Environment;
+
 /**
  * Closure is the {@link VirtualMachine}'s representation for compiled
  * functions.
@@ -22,7 +24,12 @@ public class Closure implements ClarkCallable {
     // The compiled function
     final Function function;
 
-    // The closure's Upvalues
+    // The global environment at the time the closure was created.
+    // This allows the closure to be executed in other instances of
+    // `VirtualMachine`
+    final Environment globals;
+
+    // The closure's Upvalues, closing over its locals.
     final Upvalue[] upvalues;
 
     //-------------------------------------------------------------------------
@@ -32,8 +39,9 @@ public class Closure implements ClarkCallable {
      * Creates a closure from a function.
      * @param function The function.
      */
-    Closure(Function function) {
+    Closure(Function function, Environment globals) {
         this.function = function;
+        this.globals = globals;
         this.upvalues = new Upvalue[function.upvalueCount];
     }
 
