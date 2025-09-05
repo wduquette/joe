@@ -5,7 +5,7 @@ import com.wjduquette.joe.JoePackage;
 
 import java.nio.file.Path;
 
-class JoeDocPackage extends JoePackage {
+class JoeDocPackage extends NativePackage {
     private final DocConfig config;
 
     //**

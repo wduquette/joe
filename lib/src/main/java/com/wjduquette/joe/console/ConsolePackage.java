@@ -14,7 +14,7 @@ import java.util.List;
  * A package that provides basic file I/O and command line arguments to
  * Joe scripts.
  */
-public class ConsolePackage extends JoePackage {
+public class ConsolePackage extends NativePackage {
     //-------------------------------------------------------------------------
     // Instance Variables
 

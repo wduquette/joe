@@ -1,6 +1,4 @@
 // `joe test`'s Test Library
-// TODO: Consider moving assertEmpty to Java, so as to limit the degree of
-// scripting require to implement the test API.
 
 //**
 // @package joe.test
@@ -9,7 +7,7 @@
 // @function assertEmpty
 // @args value
 // Throws AssertError if the value is not empty, displaying the actual value.
-function assertEmpty(value) {
+export function assertEmpty(value) {
     if (!value.isEmpty()) {
         throw AssertError("Value is not empty:\nComputed: " + typedValue(value));
     }

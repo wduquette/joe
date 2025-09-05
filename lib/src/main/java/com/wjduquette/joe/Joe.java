@@ -88,14 +88,31 @@ public class Joe {
      */
     public Joe(String engineType) {
         this.engineName = engineType;
-        switch (engineType) {
-            case CLARK -> engine = new ClarkEngine(this);
-            case WALKER -> engine = new WalkerEngine(this);
+        this.engine = makeEngine(engineName);
+        StandardLibrary.PACKAGE.install(this);
+    }
+
+    //-------------------------------------------------------------------------
+    // Engine Management
+
+    private Engine makeEngine(String engineType) {
+        var eng = switch (engineType) {
+            case CLARK -> new ClarkEngine(this);
+            case WALKER -> new WalkerEngine(this);
             default -> throw new IllegalArgumentException(
                 "Invalid Engine type: '" + engineType + "'.");
-        }
+        };
 
-        StandardLibrary.PACKAGE.install(this);
+        // TODO: Install standard library into engine.
+        return eng;
+    }
+
+    /**
+     * Gets a vanilla engine for use in loading packages.
+     * @return The engine
+     */
+    Engine getVanillaEngine() {
+        return makeEngine(engineName);
     }
 
     //-------------------------------------------------------------------------
@@ -137,11 +154,13 @@ public class Joe {
     }
 
     /**
-     * Installs a package into Joe's global environment.
+     * Installs a package's exported symbols into Joe's global environment,
+     * loading the package if necessary.
      * @param pkg The package
      */
     public void installPackage(JoePackage pkg) {
-        pkg.install(this);
+        pkg.load(this);
+        engine.getEnvironment().merge(pkg.getExports());
     }
 
     /**
@@ -164,10 +183,22 @@ public class Joe {
     }
 
     /**
-     * Installs a registered type's proxy into Joe's global environment.
-     * @param proxyType The type proxy.
+     * Registers the proxy type and installs it into Joe's global environment.
+     * @param proxyType The proxy type
      */
     public void installType(ProxyType<?> proxyType) {
+        registerType(proxyType);
+        engine.getEnvironment().setVariable(proxyType.name(), proxyType);
+    }
+
+    /**
+     * Registered the proxy type with Joe for general use.  Does not
+     * install the type into Joe's global environment by name.
+     * Joe will know how to use values of the type, but the type itself
+     * is not visible.
+     * @param proxyType The proxy type
+     */
+    public void registerType(ProxyType<?> proxyType) {
         // FIRST, clear the type cache, as things might get looked up
         // differently with the new type.
         cachedTypes.forEach(proxyTable::remove);
@@ -177,9 +208,6 @@ public class Joe {
         for (var cls : proxyType.getProxiedTypes()) {
             proxyTable.put(cls, proxyType);
         }
-
-        // NEXT, install the type into the environment.
-        engine.getEnvironment().setVariable(proxyType.name(), proxyType);
     }
 
     /**

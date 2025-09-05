@@ -72,6 +72,14 @@ public class Environment {
     }
 
     /**
+     * Merges another environment into this one.
+     * @param other The other environment.
+     */
+    public void merge(Environment other) {
+        values.putAll(other.values);
+    }
+
+    /**
      * Dump the contents of this environment as a string, for debugging.
      */
     public String dump() {
