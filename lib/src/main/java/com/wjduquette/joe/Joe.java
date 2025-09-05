@@ -96,15 +96,12 @@ public class Joe {
     // Engine Management
 
     private Engine makeEngine(String engineType) {
-        var eng = switch (engineType) {
+        return switch (engineType) {
             case CLARK -> new ClarkEngine(this);
             case WALKER -> new WalkerEngine(this);
             default -> throw new IllegalArgumentException(
                 "Invalid Engine type: '" + engineType + "'.");
         };
-
-        // TODO: Install standard library into engine.
-        return eng;
     }
 
     /**
@@ -112,6 +109,7 @@ public class Joe {
      * @return The engine
      */
     Engine getVanillaEngine() {
+        // TODO: Install standard library into engine.
         return makeEngine(engineName);
     }
 
