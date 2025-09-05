@@ -34,6 +34,28 @@ public class PackageRegistry {
         this.joe = joe;
     }
 
+    /**
+     * Registers and loads the `joe` package into Joe's global environment.
+     */
+    void loadStandardLibrary() {
+        var pkg = StandardLibrary.PACKAGE;
+        if (isLoaded(pkg.name())) {
+            throw new IllegalStateException(
+                "The standard library has already been loaded!");
+        }
+
+        // FIRST, register the package
+        registry.put(pkg.name(), pkg);
+
+        // NEXT, load it into the global environment, which will be empty.
+        pkg.load(joe, joe.engine());
+
+        // NEXT, everything is exported, so copy the entire global environment
+        // as the package's exports.
+        exportsMap.put(StandardLibrary.PACKAGE.name(),
+            new Environment(joe.engine().getEnvironment()));
+    }
+
     //-------------------------------------------------------------------------
     // Operations
 

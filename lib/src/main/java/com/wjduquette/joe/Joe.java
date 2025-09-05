@@ -92,7 +92,7 @@ public class Joe {
         this.engineName = engineType;
         this.engine = makeEngine(engineName);
         this.packageRegistry = new PackageRegistry(this);
-        StandardLibrary.PACKAGE.install(this);
+        packageRegistry.loadStandardLibrary();
     }
 
     //-------------------------------------------------------------------------
@@ -108,12 +108,15 @@ public class Joe {
     }
 
     /**
-     * Gets a vanilla engine for use in loading packages.
+     * Gets a vanilla engine for use in loading packages.  The standard library
+     * is installed automatically.
      * @return The engine
      */
     Engine getVanillaEngine() {
-        StandardLibrary.PACKAGE.install(this);
-        return makeEngine(engineName);
+        var eng = makeEngine(engineName);
+        eng.getEnvironment()
+            .merge(packageRegistry.getExports(StandardLibrary.PACKAGE.name()));
+        return eng;
     }
 
     //-------------------------------------------------------------------------
@@ -268,6 +271,10 @@ public class Joe {
      */
     public String engineName() {
         return engineName;
+    }
+
+    public Engine engine() {
+        return engine;
     }
 
     //-------------------------------------------------------------------------

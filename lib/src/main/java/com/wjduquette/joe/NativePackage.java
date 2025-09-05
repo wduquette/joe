@@ -33,18 +33,6 @@ public class NativePackage extends JoePackage {
     // Operations
 
     /**
-     * Installs the package's native functions and types into the
-     * Joe's global environment.
-     * TODO: Possibly this will be removed.
-     * @param joe The engine
-     */
-    public final void install(Joe joe) {
-        globalFunctions.forEach(joe::installGlobalFunction);
-        types.forEach(joe::installType);
-        scriptResources.forEach(r -> joe.installScriptResource(r.cls, r.name));
-    }
-
-    /**
      * Loads the package's content into the engine, marking exports as exports.
      * @param joe The overall interpreter
      * @param engine The engine

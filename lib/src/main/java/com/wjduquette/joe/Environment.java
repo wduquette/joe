@@ -23,6 +23,14 @@ public class Environment {
         // Nothing to do
     }
 
+    /**
+     * Creates a copy of the other environment.
+     * @param other The other
+     */
+    public Environment(Environment other) {
+        merge(other);
+    }
+
     //-------------------------------------------------------------------------
     // Environment API
 
