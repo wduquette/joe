@@ -11,9 +11,6 @@ public abstract class JoePackage {
     // The package's name.
     private final String name;
 
-    // The package's exports.
-    private Environment exports = null;
-
     //-------------------------------------------------------------------------
     // Constructor
 
@@ -30,24 +27,12 @@ public abstract class JoePackage {
     // Operations
 
     /**
-     * Loads the package
-     * @param joe The Joe interpreter
-     */
-    public void load(Joe joe) {
-        if (isLoaded()) return;
-
-        var engine = joe.getVanillaEngine();
-        loadPackage(joe, engine);
-        exports = engine.getExports();
-    }
-
-    /**
      * The package subclass implements this to load the package into the
      * engine, managing the exports.
      * @param joe The Joe interpreter
      * @param engine The engine
      */
-    abstract protected void loadPackage(Joe joe, Engine engine);
+    abstract public void load(Joe joe, Engine engine);
 
     //-------------------------------------------------------------------------
     // Accessors
@@ -58,21 +43,5 @@ public abstract class JoePackage {
      */
     public String name() {
         return name;
-    }
-
-    /**
-     * The package has been loaded if it has been given exports.
-     * @return true or false
-     */
-    public boolean isLoaded() {
-        return exports != null;
-    }
-
-    /**
-     * Returns the package's exports if isLoaded(), and null otherwise.
-     * @return The exports or null.
-     */
-    public Environment getExports() {
-        return exports;
     }
 }

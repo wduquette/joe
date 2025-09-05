@@ -55,6 +55,8 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    private final PackageRegistry packageRegistry;
+
     private final String engineName;
     private final Engine engine;
     private boolean debug = false;
@@ -89,6 +91,7 @@ public class Joe {
     public Joe(String engineType) {
         this.engineName = engineType;
         this.engine = makeEngine(engineName);
+        this.packageRegistry = new PackageRegistry(this);
         StandardLibrary.PACKAGE.install(this);
     }
 
@@ -109,7 +112,7 @@ public class Joe {
      * @return The engine
      */
     Engine getVanillaEngine() {
-        // TODO: Install standard library into engine.
+        StandardLibrary.PACKAGE.install(this);
         return makeEngine(engineName);
     }
 
@@ -157,8 +160,9 @@ public class Joe {
      * @param pkg The package
      */
     public void installPackage(JoePackage pkg) {
-        pkg.load(this);
-        engine.getEnvironment().merge(pkg.getExports());
+        packageRegistry.register(pkg);
+        packageRegistry.load(pkg.name());
+        engine.getEnvironment().merge(packageRegistry.getExports(pkg.name()));
     }
 
     /**
