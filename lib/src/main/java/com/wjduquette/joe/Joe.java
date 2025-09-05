@@ -8,7 +8,6 @@ import com.wjduquette.joe.walker.WalkerEngine;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -158,6 +157,15 @@ public class Joe {
     }
 
     /**
+     * Registers a package for later load and import.
+     * @param pkg The package
+     */
+    @SuppressWarnings("unused")
+    public void registerPackage(JoePackage pkg) {
+        packageRegistry.register(pkg);
+    }
+
+    /**
      * Installs a package's exported symbols into Joe's global environment,
      * loading the package if necessary.
      * @param pkg The package
@@ -166,14 +174,6 @@ public class Joe {
         packageRegistry.register(pkg);
         packageRegistry.load(pkg.name());
         engine.getEnvironment().merge(packageRegistry.getExports(pkg.name()));
-    }
-
-    /**
-     * Installs a native function into Joe's global environment.
-     * @param function The function
-     */
-    void installGlobalFunction(NativeFunction function) {
-        engine.getEnvironment().setVariable(function.name(), function);
     }
 
     /**
@@ -188,19 +188,10 @@ public class Joe {
     }
 
     /**
-     * Registers the proxy type and installs it into Joe's global environment.
-     * @param proxyType The proxy type
-     */
-    public void installType(ProxyType<?> proxyType) {
-        registerType(proxyType);
-        engine.getEnvironment().setVariable(proxyType.name(), proxyType);
-    }
-
-    /**
-     * Registered the proxy type with Joe for general use.  Does not
-     * install the type into Joe's global environment by name.
-     * Joe will know how to use values of the type, but the type itself
-     * is not visible.
+     * Registers the proxy type with Joe, but does not install it into
+     * the global environment. Joe will know how to use values of this type,
+     * but the type object is not directly visible and its initializer,
+     * static methods and constants (if any) will be inaccessible.
      * @param proxyType The proxy type
      */
     public void registerType(ProxyType<?> proxyType) {
@@ -216,36 +207,14 @@ public class Joe {
     }
 
     /**
-     * Installs a resource file into the engine, executing it as a Joe
-     * script.  This is the standard way to add library code written
-     * in Joe from within Java.
-     * @param cls The class
-     * @param resource The resource name, including any relative path.
+     * Registers the proxy type and also installs it into Joe's global
+     * environment. Scripts can see the type and make use of its
+     * initializer, static methods and constants (if any).
+     * @param proxyType The proxy type
      */
-    public void installScriptResource(Class<?> cls, String resource) {
-        try (var stream = cls.getResourceAsStream(resource)) {
-            assert stream != null;
-            var source = new String(stream.readAllBytes(),
-                StandardCharsets.UTF_8);
-            run(resource, source);
-        } catch (SyntaxError ex) {
-            System.err.println("Could not load script resource '" +
-                resource + "' relative to class " +
-                cls.getCanonicalName() + ":\n" + ex.getMessage());
-            System.err.println(ex.getErrorReport());
-            System.exit(1);
-        } catch (JoeError ex) {
-            System.err.println("Could not install script resource '" +
-                resource + "' relative to class " +
-                cls.getCanonicalName() + ":\n" + ex.getMessage());
-            System.err.println(ex.getJoeStackTrace());
-            System.exit(1);
-        } catch (IOException ex) {
-            System.err.println("Could not read script resource '" +
-                resource + "' relative to class\n" +
-                cls.getCanonicalName() + ": " + ex.getMessage());
-            System.exit(1);
-        }
+    public void installType(ProxyType<?> proxyType) {
+        registerType(proxyType);
+        engine.getEnvironment().setVariable(proxyType.name(), proxyType);
     }
 
     /**
