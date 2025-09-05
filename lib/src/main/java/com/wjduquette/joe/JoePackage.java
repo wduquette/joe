@@ -1,8 +1,5 @@
 package com.wjduquette.joe;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * A package containing Joe functions and or types, for installation into
  * a Joe interpreter.

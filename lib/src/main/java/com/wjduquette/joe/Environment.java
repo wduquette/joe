@@ -64,11 +64,11 @@ public class Environment {
     }
 
     /**
-     * Adds an entire set of variables to the environment.
-     * @param pairs
+     * Adds an entire map of variables to the environment.
+     * @param map The map
      */
-    public void setAll(Map<String, Object> pairs) {
-        values.putAll(pairs);
+    public void setAll(Map<String, Object> map) {
+        values.putAll(map);
     }
 
     /**
