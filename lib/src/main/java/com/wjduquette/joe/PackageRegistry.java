@@ -103,4 +103,18 @@ public class PackageRegistry {
         return exportsMap.get(pkgName);
     }
 
+    //------------------------------------------------------------------------
+    // Local Package Support
+
+    /**
+     * Searches libPath, a colon-delimited list of local folders, for
+     * local Joe packages.  If verbose is true the details of the search
+     * are written to the Joe output handler.
+     * @param libPath The path
+     * @param verbose true or false
+     */
+    public void findLocalPackages(String libPath, boolean verbose) {
+        // TODO
+    }
+
 }

@@ -22,6 +22,9 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Static constants
 
+    /** The environment variable to read to find local packages. */
+    public static final String JOE_LIB_PATH = "JOE_LIB_PATH";
+
     /** Constant for selecting the AST-walker language engine. */
     public static final String WALKER = "walker";
 
@@ -242,8 +245,20 @@ public class Joe {
         return engineName;
     }
 
+    /**
+     * Gets the engine Joe is using to execute scripts.
+     * @return The engine
+     */
     public Engine engine() {
         return engine;
+    }
+
+    /**
+     * Gets Joe's package registry.
+     * @return The registry.
+     */
+    public PackageRegistry packageRegistry() {
+        return packageRegistry;
     }
 
     //-------------------------------------------------------------------------
