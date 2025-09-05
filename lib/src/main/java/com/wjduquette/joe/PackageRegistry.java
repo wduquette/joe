@@ -1,14 +1,20 @@
 package com.wjduquette.joe;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 /**
  * Stores information about Joe's registered packages, including
  * whether they have been loaded or not and their exported symbols.
  */
 public class PackageRegistry {
+    /**
+     * A Nero file containing local package information.
+     */
+    public static final String REPOSITORY_FILE = "repository.nero";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -114,7 +120,32 @@ public class PackageRegistry {
      * @param verbose true or false
      */
     public void findLocalPackages(String libPath, boolean verbose) {
-        // TODO
+        var folders = Arrays.stream(libPath.split(":"))
+            .map(s -> Path.of(s).toAbsolutePath())
+            .toList();
+        for (var folder : folders) {
+            if (verbose) joe.println("Searching folder: " + folder);
+            findRepositories(folder, verbose);
+        }
     }
 
+    private void findRepositories(Path folder, boolean verbose) {
+        try (var stream = Files.walk(folder, 10)) {
+            var repos = stream
+                .filter(p -> p.getFileName().toString().equals(REPOSITORY_FILE))
+                .toList();
+            for (var repo : repos) {
+                if (verbose) joe.println("  Found: " + repo);
+                findPackagesInRepository(repo, verbose);
+            }
+        } catch (IOException ex) {
+            if (verbose) {
+                joe.println("  Error reading folder: " + ex.getMessage());
+            }
+        }
+    }
+
+    private void findPackagesInRepository(Path repo, boolean verbose) {
+
+    }
 }
