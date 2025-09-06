@@ -1053,8 +1053,8 @@ public class RuleEngineTest extends Ted {
     // Execute the source, returning a Nero script of known facts.
     private String execute(String source) {
         try {
-            var db = NewNero.with(source).debug().infer();
-            return NewNero.toNeroScript(db);
+            var db = Nero.with(source).debug().infer();
+            return Nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;
@@ -1066,8 +1066,8 @@ public class RuleEngineTest extends Ted {
     private String execute(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         try {
-            NewNero.with(source).debug().infer(db);
-            return NewNero.toNeroScript(db);
+            Nero.with(source).debug().infer(db);
+            return Nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;
@@ -1079,11 +1079,11 @@ public class RuleEngineTest extends Ted {
     private String infer(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         try {
-            var inferred = NewNero.with(source).debug().infer(db);
+            var inferred = Nero.with(source).debug().infer(db);
 //            return NewNero.toNeroScript(db);
 //            var engine = nero.execute(new SourceBuffer("-", source), db);
 //            var factSet = new FactSet(engine.getInferredFacts());
-            return NewNero.toNeroScript(inferred);
+            return Nero.toNeroScript(inferred);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;
@@ -1096,7 +1096,7 @@ public class RuleEngineTest extends Ted {
     // from being represented as a Nero script
     private String inferRaw(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
-        var inferred = NewNero.with(source).debug().infer(db);
+        var inferred = Nero.with(source).debug().infer(db);
         return inferred.getAll().stream()
             .map(Fact::toString)
             .sorted()

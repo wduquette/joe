@@ -382,6 +382,6 @@ public class SchemaTest extends Ted {
     @SuppressWarnings("unused")
     private NeroRuleSet parse(String text) {
         var source = new SourceBuffer("*test*", text);
-        return NewNero.parse(source);
+        return Nero.parse(source);
     }
 }

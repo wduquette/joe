@@ -3,7 +3,7 @@ package com.wjduquette.joe.types;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.FactSet;
-import com.wjduquette.joe.nero.NewNero;
+import com.wjduquette.joe.nero.Nero;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -121,13 +121,13 @@ public class FactBaseType extends ProxyType<FactBase> {
         var arg = args.next();
 
         if (arg instanceof FactBase db) {
-            return NewNero.toNeroScript(joe, db);
+            return Nero.toNeroScript(joe, db);
         } else {
             var db = new FactBase();
             for (var fact : joe.toCollection(arg)) {
                 db.add(joe.toFact(fact));
             }
-            return NewNero.toNeroScript(joe, db);
+            return Nero.toNeroScript(joe, db);
         }
     }
 
@@ -141,7 +141,7 @@ public class FactBaseType extends ProxyType<FactBase> {
         args.exactArity(1, "FactBase.fromNero(script)");
         var script = joe.toString(args.next());
         var db = new FactBase();
-        NewNero.with(script).infer(db);
+        Nero.with(script).infer(db);
 //        var results = new Nero(joe)
 //            .execute(new SourceBuffer("*fromNero*", script));
         return db;
@@ -431,7 +431,7 @@ public class FactBaseType extends ProxyType<FactBase> {
     // Nero axioms.
     private Object _toNero(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "toNero()");
-        return NewNero.toNeroScript(joe, db);
+        return Nero.toNeroScript(joe, db);
     }
 
     //**

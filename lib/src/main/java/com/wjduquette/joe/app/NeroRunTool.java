@@ -2,7 +2,7 @@ package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.FactSet;
-import com.wjduquette.joe.nero.NewNero;
+import com.wjduquette.joe.nero.Nero;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 
@@ -118,7 +118,7 @@ public class NeroRunTool implements Tool {
         for (var name : inputs) {
             var source = readSource(name);
             println("AST: " + name);
-            println(NewNero.parse(source).toString());
+            println(Nero.parse(source).toString());
         }
     }
 
@@ -127,18 +127,18 @@ public class NeroRunTool implements Tool {
 
         for (var name : inputs) {
             var source = readSource(name);
-            NewNero.with(source).debug(debug).infer(db);
+            Nero.with(source).debug(debug).infer(db);
         }
 
         if (outFile == null) {
-            println(NewNero.toNeroScript(db));
+            println(Nero.toNeroScript(db));
         } else {
             println("Writing: " + outFile);
             var path = Path.of(outFile);
             if (Files.exists(path)) {
                 Files.copy(path, Path.of(outFile + "~"));
             }
-            Files.writeString(path, NewNero.toNeroScript(db));
+            Files.writeString(path, Nero.toNeroScript(db));
         }
     }
 

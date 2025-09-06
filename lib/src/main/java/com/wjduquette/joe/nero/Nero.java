@@ -6,8 +6,8 @@ import com.wjduquette.joe.parser.Parser;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class NewNero {
-    private NewNero() {} // Static Class
+public class Nero {
+    private Nero() {} // Static Class
 
     //-------------------------------------------------------------------------
     // Parsing
@@ -70,7 +70,7 @@ public class NewNero {
     }
 
     public static Pipeline with(Joe joe, SourceBuffer source) {
-        var ruleset = NewNero.compile(source);
+        var ruleset = Nero.compile(source);
         return with(joe, ruleset);
     }
 

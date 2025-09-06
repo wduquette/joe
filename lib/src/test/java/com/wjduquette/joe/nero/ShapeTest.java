@@ -75,6 +75,6 @@ public class ShapeTest extends Ted {
 
     private NeroRuleSet parse(String text) {
         var source = new SourceBuffer("*test*", text);
-        return NewNero.parse(source);
+        return Nero.parse(source);
     }
 }
