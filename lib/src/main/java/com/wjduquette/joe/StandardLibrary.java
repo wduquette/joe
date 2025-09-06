@@ -2,7 +2,7 @@ package com.wjduquette.joe;
 
 import com.wjduquette.joe.types.*;
 
-class StandardLibrary extends JoePackage {
+class StandardLibrary extends NativePackage {
     public static final StandardLibrary PACKAGE = new StandardLibrary();
 
     public StandardLibrary() {

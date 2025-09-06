@@ -8,7 +8,6 @@ import com.wjduquette.joe.walker.WalkerEngine;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -22,6 +21,9 @@ import java.util.stream.Collectors;
 public class Joe {
     //-------------------------------------------------------------------------
     // Static constants
+
+    /** The environment variable to read to find local packages. */
+    public static final String JOE_LIB_PATH = "JOE_LIB_PATH";
 
     /** Constant for selecting the AST-walker language engine. */
     public static final String WALKER = "walker";
@@ -54,6 +56,8 @@ public class Joe {
 
     //-------------------------------------------------------------------------
     // Instance Variables
+
+    private final PackageRegistry packageRegistry;
 
     private final String engineName;
     private final Engine engine;
@@ -88,14 +92,33 @@ public class Joe {
      */
     public Joe(String engineType) {
         this.engineName = engineType;
-        switch (engineType) {
-            case CLARK -> engine = new ClarkEngine(this);
-            case WALKER -> engine = new WalkerEngine(this);
+        this.engine = makeEngine(engineName);
+        this.packageRegistry = new PackageRegistry(this);
+        packageRegistry.loadStandardLibrary();
+    }
+
+    //-------------------------------------------------------------------------
+    // Engine Management
+
+    private Engine makeEngine(String engineType) {
+        return switch (engineType) {
+            case CLARK -> new ClarkEngine(this);
+            case WALKER -> new WalkerEngine(this);
             default -> throw new IllegalArgumentException(
                 "Invalid Engine type: '" + engineType + "'.");
-        }
+        };
+    }
 
-        StandardLibrary.PACKAGE.install(this);
+    /**
+     * Gets a vanilla engine for use in loading packages.  The standard library
+     * is installed automatically.
+     * @return The engine
+     */
+    Engine getVanillaEngine() {
+        var eng = makeEngine(engineName);
+        eng.getEnvironment()
+            .merge(packageRegistry.getExports(StandardLibrary.PACKAGE.name()));
+        return eng;
     }
 
     //-------------------------------------------------------------------------
@@ -137,19 +160,23 @@ public class Joe {
     }
 
     /**
-     * Installs a package into Joe's global environment.
+     * Registers a package for later load and import.
      * @param pkg The package
      */
-    public void installPackage(JoePackage pkg) {
-        pkg.install(this);
+    @SuppressWarnings("unused")
+    public void registerPackage(JoePackage pkg) {
+        packageRegistry.register(pkg);
     }
 
     /**
-     * Installs a native function into Joe's global environment.
-     * @param function The function
+     * Installs a package's exported symbols into Joe's global environment,
+     * loading the package if necessary.
+     * @param pkg The package
      */
-    void installGlobalFunction(NativeFunction function) {
-        engine.getEnvironment().setVariable(function.name(), function);
+    public void installPackage(JoePackage pkg) {
+        packageRegistry.register(pkg);
+        packageRegistry.load(pkg.name());
+        engine.getEnvironment().merge(packageRegistry.getExports(pkg.name()));
     }
 
     /**
@@ -164,10 +191,13 @@ public class Joe {
     }
 
     /**
-     * Installs a registered type's proxy into Joe's global environment.
-     * @param proxyType The type proxy.
+     * Registers the proxy type with Joe, but does not install it into
+     * the global environment. Joe will know how to use values of this type,
+     * but the type object is not directly visible and its initializer,
+     * static methods and constants (if any) will be inaccessible.
+     * @param proxyType The proxy type
      */
-    public void installType(ProxyType<?> proxyType) {
+    public void registerType(ProxyType<?> proxyType) {
         // FIRST, clear the type cache, as things might get looked up
         // differently with the new type.
         cachedTypes.forEach(proxyTable::remove);
@@ -177,42 +207,17 @@ public class Joe {
         for (var cls : proxyType.getProxiedTypes()) {
             proxyTable.put(cls, proxyType);
         }
-
-        // NEXT, install the type into the environment.
-        engine.getEnvironment().setVariable(proxyType.name(), proxyType);
     }
 
     /**
-     * Installs a resource file into the engine, executing it as a Joe
-     * script.  This is the standard way to add library code written
-     * in Joe from within Java.
-     * @param cls The class
-     * @param resource The resource name, including any relative path.
+     * Registers the proxy type and also installs it into Joe's global
+     * environment. Scripts can see the type and make use of its
+     * initializer, static methods and constants (if any).
+     * @param proxyType The proxy type
      */
-    public void installScriptResource(Class<?> cls, String resource) {
-        try (var stream = cls.getResourceAsStream(resource)) {
-            assert stream != null;
-            var source = new String(stream.readAllBytes(),
-                StandardCharsets.UTF_8);
-            run(resource, source);
-        } catch (SyntaxError ex) {
-            System.err.println("Could not load script resource '" +
-                resource + "' relative to class " +
-                cls.getCanonicalName() + ":\n" + ex.getMessage());
-            System.err.println(ex.getErrorReport());
-            System.exit(1);
-        } catch (JoeError ex) {
-            System.err.println("Could not install script resource '" +
-                resource + "' relative to class " +
-                cls.getCanonicalName() + ":\n" + ex.getMessage());
-            System.err.println(ex.getJoeStackTrace());
-            System.exit(1);
-        } catch (IOException ex) {
-            System.err.println("Could not read script resource '" +
-                resource + "' relative to class\n" +
-                cls.getCanonicalName() + ": " + ex.getMessage());
-            System.exit(1);
-        }
+    public void installType(ProxyType<?> proxyType) {
+        registerType(proxyType);
+        engine.getEnvironment().setVariable(proxyType.name(), proxyType);
     }
 
     /**
@@ -238,6 +243,22 @@ public class Joe {
      */
     public String engineName() {
         return engineName;
+    }
+
+    /**
+     * Gets the engine Joe is using to execute scripts.
+     * @return The engine
+     */
+    public Engine engine() {
+        return engine;
+    }
+
+    /**
+     * Gets Joe's package registry.
+     * @return The registry.
+     */
+    public PackageRegistry packageRegistry() {
+        return packageRegistry;
     }
 
     //-------------------------------------------------------------------------

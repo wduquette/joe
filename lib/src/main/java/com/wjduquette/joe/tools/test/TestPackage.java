@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * The package that defines the test API for test scripts.
  */
-public class TestPackage extends JoePackage {
+public class TestPackage extends NativePackage {
     // See also pkg.joe.test.Joe for the rest of the package.
 
     //-------------------------------------------------------------------------

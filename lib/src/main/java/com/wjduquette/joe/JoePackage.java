@@ -1,21 +1,15 @@
 package com.wjduquette.joe;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * A package containing Joe functions and or types, for installation into
  * a Joe interpreter.
  */
-public class JoePackage {
+public abstract class JoePackage {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The package's name.
     private final String name;
-
-    private final List<NativeFunction> globalFunctions = new ArrayList<>();
-    private final List<ProxyType<?>> types = new ArrayList<>();
-    private final List<ScriptResource> scriptResources = new ArrayList<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -30,45 +24,15 @@ public class JoePackage {
     }
 
     //-------------------------------------------------------------------------
-    // Package builders
+    // Operations
 
     /**
-     * Adds a global function to the package.
-     * @param name The function's name
-     * @param joeLambda The callable, usually a method reference.
+     * The package subclass implements this to load the package into the
+     * engine, managing the exports.
+     * @param joe The Joe interpreter
+     * @param engine The engine
      */
-    public final void globalFunction(String name, JoeLambda joeLambda) {
-        globalFunctions.add(new NativeFunction(name, "function", joeLambda));
-    }
-
-    /**
-     * Adds a registered type to the package, given its proxy.
-     * @param proxyType The proxy.
-     */
-    public final void type(ProxyType<?> proxyType) {
-        types.add(proxyType);
-    }
-
-    /**
-     * Adds a script resource file to the package given a Java class
-     * and a resource file name relative to the location of that class.
-     * @param cls The class
-     * @param resource The resource file name.
-     */
-    public final void scriptResource(Class<?> cls, String resource) {
-        scriptResources.add(new ScriptResource(cls, resource));
-    }
-
-    /**
-     * Installs the package's native functions and types into the
-     * engine.
-     * @param joe The engine
-     */
-    public final void install(Joe joe) {
-        globalFunctions.forEach(joe::installGlobalFunction);
-        types.forEach(joe::installType);
-        scriptResources.forEach(r -> joe.installScriptResource(r.cls, r.name));
-    }
+    abstract public void load(Joe joe, Engine engine);
 
     //-------------------------------------------------------------------------
     // Accessors
@@ -77,13 +41,7 @@ public class JoePackage {
      * Gets the package's name.
      * @return The name
      */
-    @SuppressWarnings("unused")
     public String name() {
         return name;
     }
-
-    //-------------------------------------------------------------------------
-    // Helper Classes
-
-    private record ScriptResource(Class<?> cls, String name) {}
 }

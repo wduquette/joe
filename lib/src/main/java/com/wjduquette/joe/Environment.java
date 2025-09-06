@@ -23,6 +23,14 @@ public class Environment {
         // Nothing to do
     }
 
+    /**
+     * Creates a copy of the other environment.
+     * @param other The other
+     */
+    public Environment(Environment other) {
+        merge(other);
+    }
+
     //-------------------------------------------------------------------------
     // Environment API
 
@@ -64,11 +72,19 @@ public class Environment {
     }
 
     /**
-     * Adds an entire set of variables to the environment.
-     * @param pairs
+     * Adds an entire map of variables to the environment.
+     * @param map The map
      */
-    public void setAll(Map<String, Object> pairs) {
-        values.putAll(pairs);
+    public void setAll(Map<String, Object> map) {
+        values.putAll(map);
+    }
+
+    /**
+     * Merges another environment into this one.
+     * @param other The other environment.
+     */
+    public void merge(Environment other) {
+        values.putAll(other.values);
     }
 
     /**

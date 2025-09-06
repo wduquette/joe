@@ -17,7 +17,7 @@ import java.util.Base64;
 /**
  * An experimental Joe package for building JavaFX GUIs
  */
-public class WinPackage extends JoePackage {
+public class WinPackage extends NativePackage {
     //-------------------------------------------------------------------------
     // Instance Variables
 

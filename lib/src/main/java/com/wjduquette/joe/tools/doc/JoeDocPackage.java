@@ -1,11 +1,10 @@
 package com.wjduquette.joe.tools.doc;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.JoePackage;
 
 import java.nio.file.Path;
 
-class JoeDocPackage extends JoePackage {
+class JoeDocPackage extends NativePackage {
     private final DocConfig config;
 
     //**
