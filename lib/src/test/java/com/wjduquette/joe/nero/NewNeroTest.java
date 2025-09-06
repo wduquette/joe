@@ -1,6 +1,5 @@
 package com.wjduquette.joe.nero;
 
-import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Ted;
 import org.junit.Test;
@@ -14,9 +13,6 @@ import static com.wjduquette.joe.checker.Checker.checkThrow;
  * Tests for the NewNero class.
  */
 public class NewNeroTest extends Ted {
-    // TEMP: needed to produce output.  That feature should be moved to NewNero.
-    private final Nero nero = new Nero(new Joe());
-
     //-------------------------------------------------------------------------
     // Parsing
 
@@ -77,7 +73,7 @@ public class NewNeroTest extends Ted {
         var script = """
             A(1);
             """;
-        check(nero.asNeroScript(NewNero.with(script).debug().infer())).eq("""
+        check(NewNero.toNeroScript(NewNero.with(script).debug().infer())).eq("""
             define A/1;
             A(1);
             """);
@@ -90,11 +86,11 @@ public class NewNeroTest extends Ted {
         var script = """
             B(2);
             """;
-        check(nero.asNeroScript(NewNero.with(script).debug().infer(db))).eq("""
+        check(NewNero.toNeroScript(NewNero.with(script).debug().infer(db))).eq("""
             define B/1;
             B(2);
             """);
-        check(nero.asNeroScript(db)).eq("""
+        check(NewNero.toNeroScript(db)).eq("""
             define A/1;
             A(1);
             
