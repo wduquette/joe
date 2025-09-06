@@ -210,12 +210,10 @@ public class RuleEngine {
     // Inference
 
     /**
-     * Executes the inference algorithm, computing all facts knowable
-     * from the axioms and rules given the input facts
-     * (the "extensional database").
+     * Executes the inference algorithm.  Returns the inferred facts.
      * @throws JoeError if the rule set is not stratified.
      */
-    public void infer() {
+    public FactSet infer() {
         // FIRST, check stratification
         if (!ruleset.isStratified()) {
             throw new JoeError("Rule set is not stratified.");
@@ -231,7 +229,7 @@ public class RuleEngine {
         }
 
         // NEXT, only do inference once.
-        if (inferenceComplete) return;
+        if (inferenceComplete) return inferredFacts;
         inferenceComplete = true;
 
         // NEXT, infer all axioms.
@@ -268,6 +266,7 @@ public class RuleEngine {
             inferredFacts.rename(name, oldName);
         }
 
+        return inferredFacts;
     }
 
     private void inferStratum(int stratum, List<String> heads) {
