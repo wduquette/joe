@@ -3,7 +3,7 @@ package com.wjduquette.joe.types;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.FactSet;
-import com.wjduquette.joe.nero.RuleEngine;
+import com.wjduquette.joe.nero.Nero;
 import com.wjduquette.joe.nero.NeroRuleSet;
 
 import java.util.*;
@@ -65,19 +65,19 @@ public class RuleSetValue {
      * @return The new facts.
      */
     public Set<Fact> infer(Joe joe) {
-        var engine = new RuleEngine(joe, ruleset);
-        engine.infer();
-        return engine.getInferredFacts().getAll();
+        return Nero.with(joe, ruleset).debug(debug).infer().getAll();
     }
 
     /**
      * Infer facts from the rule set and the database of facts.
+     * Does not update the db in place.
      * @return The new facts.
      */
     public Set<Fact> infer(Joe joe, FactBase db) {
-        var engine = new RuleEngine(joe, ruleset, db);
-        engine.infer();
-        return engine.getInferredFacts().getAll();
+        return Nero.with(joe, ruleset)
+            .debug(debug)
+            .infer(new FactSet(db))
+            .getAll();
     }
 
     /**
@@ -86,10 +86,11 @@ public class RuleSetValue {
      * @return The new (possibly exported) facts.
      */
     public Set<Fact> infer(Joe joe, Collection<?> inputs) {
-        var factSet = toFactSet(joe, inputs);
-        var engine = new RuleEngine(joe, ruleset, factSet);
-        engine.infer();
-        return engine.getInferredFacts().getAll();
+        var db = toFactSet(joe, inputs);
+        return Nero.with(joe, ruleset)
+            .debug(debug)
+            .infer(new FactSet(db))
+            .getAll();
     }
 
     /**
