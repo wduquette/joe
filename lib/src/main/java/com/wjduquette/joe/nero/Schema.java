@@ -145,6 +145,75 @@ public class Schema {
         return Shape.conformsTo(head, defined);
     }
 
+    /**
+     * Merges the other schema into this one, provided that the shapes
+     * for matching relations are merge-compatible.
+     * @param other The other schema.
+     */
+    public void merge(Schema other) {
+        var retained = new HashSet<Shape>();
+
+        for (var e : other.shapeMap.entrySet()) {
+            var b = e.getValue();
+            var a = get(e.getKey());
+            if (a == null) {
+                retained.add(b);
+            } else {
+                var keeper = promote(a, b);
+                if (keeper != null) {
+                    retained.add(keeper);
+                } else {
+                    throw new JoeError(
+                        "Schema mismatch for '" + a.relation() +
+                        "', expected shape compatible with '" +
+                        a.toSpec() + "', got: '" + b.toSpec() + "'.");
+                }
+            }
+        }
+
+        // Retain changes only on success.
+        for (var shape : retained) {
+            shapeMap.put(shape.relation(), shape);
+        }
+    }
+
+    /**
+     * Checks the two shapes for merge compatibility, returning the
+     * shape to retain.  Returns null if incompatible.
+     * @param a The first shape
+     * @param b The second shape.
+     * @return The new shape or null.
+     */
+    public static Shape promote(Shape a, Shape b) {
+        // Safety check
+        if (!a.relation().equals(b.relation())) return null;
+
+        // Handles pairs of MapShapes and pairs of ListShapes.
+        if (a.equals(b)) return a;
+
+        // A is a PairShape
+        if (a instanceof Shape.PairShape pa) {
+            if (b instanceof Shape.ListShape lb) {
+                // B is compatible ListShape
+                return pa.arity() == lb.arity() ? pa : null;
+            } else if (b instanceof Shape.PairShape pb) {
+                // B is compatible PairShape
+                return pa.arity() == pb.arity() ? pa : null;
+            } else {
+                return null;
+            }
+        }
+
+        if (a instanceof Shape.ListShape la &&
+            b instanceof Shape.PairShape pb)
+        {
+            // A is ListShape and B is compatible PairShape.
+            return la.arity() == pb.arity() ? pb : null;
+        }
+
+        return null;
+    }
+
     //-------------------------------------------------------------------------
     // Static API
 
