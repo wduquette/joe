@@ -79,14 +79,14 @@ public class NeroDatabase {
      * @throws JoeError on any Nero error.
      */
     public NeroDatabase update(SourceBuffer source) {
-        var nero = new Nero(joe);
-
-        // Throws error on Nero compilation or stratification error.
-        var ruleset = nero.compile(source);
-
-        // Throws error on schema incompatibility
-        schema.merge(ruleset.schema());
-
+//        var nero = new Nero(joe);
+//
+//        // Throws error on Nero compilation or stratification error.
+//        var ruleset = nero.compile(source);
+//
+//        // Throws error on schema incompatibility
+//        schema.merge(ruleset.schema());
+//
         // TODO
 //        RuleEngine.with(joe, ruleset).debug(debug).infer(db);
         return this;
@@ -116,12 +116,12 @@ public class NeroDatabase {
      * @return The inferred facts
      */
     public FactSet query(String script) {
-        var nero = new Nero(joe);
-
-        // Throws error on Nero compilation or stratification error.
-        var ruleset = nero.compile(new SourceBuffer("*java*", script));
-
-        // TODO
+//        var nero = new Nero(joe);
+//
+//        // Throws error on Nero compilation or stratification error.
+//        var ruleset = nero.compile(new SourceBuffer("*java*", script));
+//
+//        // TODO
         return null;
 //        return RuleEngine.with(joe, ruleset)
 //            .debug(debug)
