@@ -227,6 +227,14 @@ public class FactSet {
     }
 
     @Override
+    public String toString() {
+        var factString = facts.stream()
+            .map(Fact::toString)
+            .collect(Collectors.joining("\n"));
+        return "FactSet[\n" + factString.indent(4) + "]";
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
