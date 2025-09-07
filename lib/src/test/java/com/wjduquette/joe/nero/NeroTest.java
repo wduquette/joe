@@ -1,16 +1,12 @@
 package com.wjduquette.joe.nero;
 
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.Keyword;
-import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.Ted;
+import com.wjduquette.joe.*;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.wjduquette.joe.checker.Checker.check;
-import static com.wjduquette.joe.checker.Checker.checkThrow;
+import static com.wjduquette.joe.checker.Checker.*;
 
 /**
  * Tests for the NewNero class.
@@ -56,7 +52,7 @@ public class NeroTest extends Ted {
             .containsString("Error in Nero input");
     }
 
-    // Verify that we get errors.
+    // Verify that we get compilation errors.
     @Test public void testCompile_unstratifiable() {
         test("testCompile_unstratifiable");
         checkThrow(() -> Nero.compile(buffer("""
@@ -64,6 +60,44 @@ public class NeroTest extends Ted {
             C(x) :- A(x);
             """)))
             .containsString("Nero rule set cannot be stratified.");
+    }
+
+    // Verify that we can supply a schema.
+    @Test public void testCompile_withSchema_good() {
+        test("testCompile_withSchema_good");
+        var shape = new Shape.PairShape("A", List.of("a"));
+        var schema = new Schema();
+        schema.checkAndAdd(shape);
+
+        var ruleset = Nero.compile(schema, buffer("""
+            A(1);
+        """));
+        check(ruleset.schema()).eq(schema);
+    }
+
+    // Verify we detect mismatches with the predefined schema.
+    @Test public void testCompile_withSchema_mismatch() {
+        test("testCompile_withSchema_mismatch");
+        var shape = new Shape.PairShape("A", List.of("a"));
+        var schema = new Schema();
+        schema.checkAndAdd(shape);
+
+        check(compileError(schema, "A(1, 2);"))
+            .eq("error at 'A', axiom's shape is incompatible with previous definitions for this relation.");
+    }
+
+    // Verify that equivalent `defines` are OK.
+    @Test public void testCompile_withSchema_duplicate() {
+        test("testCompile_withSchema_duplicate");
+        var shape = new Shape.PairShape("A", List.of("a"));
+        var schema = new Schema();
+        schema.checkAndAdd(shape);
+
+        var ruleset = Nero.compile(schema, buffer("""
+            define A/a;
+            A(1);
+            """));
+        check(ruleset.schema()).eq(schema);
     }
 
     //------------------------------------------------------------------------
@@ -185,5 +219,16 @@ public class NeroTest extends Ted {
 
     private SourceBuffer buffer(String script) {
         return new SourceBuffer("*test*", script);
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private String compileError(Schema schema, String script) {
+        try {
+            Nero.compile(schema, buffer(script));
+            fail("Expected error.");
+            return null;
+        } catch (SyntaxError ex) {
+            return ex.getTraces().getFirst().message();
+        }
     }
 }

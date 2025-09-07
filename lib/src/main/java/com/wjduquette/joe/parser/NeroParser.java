@@ -70,22 +70,31 @@ class NeroParser extends EmbeddedParser {
      * to the client.
      * @return The rule set
      */
-    @SuppressWarnings("Convert2MethodRef")
     public NeroRuleSet parse() {
-        Supplier<Boolean> endCondition = mode == Mode.STANDALONE
-            ? () -> scanner.isAtEnd()
-            : () -> scanner.match(RIGHT_BRACE);
+        return doParse(new Schema());
+    }
 
-        return parse(endCondition);
+    /**
+     * Parses Nero code, using an appropriate condition for returning control
+     * to the client.  The Nero code must be compatible with the given
+     * Schema.
+     * @param schema A pre-defined schema
+     * @return The rule set
+     */
+    public NeroRuleSet parse(Schema schema) {
+        return doParse(new Schema(schema));
     }
 
     //-------------------------------------------------------------------------
     // The Parser
 
-    private NeroRuleSet parse(Supplier<Boolean> endCondition) {
+    @SuppressWarnings("Convert2MethodRef")
+    private NeroRuleSet doParse(Schema schema) {
+        Supplier<Boolean> endCondition = mode == Mode.STANDALONE
+            ? () -> scanner.isAtEnd()
+            : () -> scanner.match(RIGHT_BRACE);
         Set<Atom> axioms = new HashSet<>();
         Set<Rule> rules = new HashSet<>();
-        var schema = new Schema();
 
         while (!endCondition.get()) {
             try {

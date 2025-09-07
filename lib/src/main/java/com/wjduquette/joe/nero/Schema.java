@@ -3,6 +3,7 @@ package com.wjduquette.joe.nero;
 import com.wjduquette.joe.JoeError;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A Schema for the facts inferred by a Nero program.  Nero can infer the
@@ -25,8 +26,20 @@ public class Schema {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an empty schema.
+     */
     public Schema() {
         // Nothing to do.
+    }
+
+    /**
+     * Creates a copy of the other schema.
+     * @param other The other schema
+     */
+    public Schema(Schema other) {
+        this.shapeMap.putAll(other.shapeMap);
+        this.transients.addAll(other.transients);
     }
 
     //-------------------------------------------------------------------------
@@ -54,6 +67,10 @@ public class Schema {
         }
     }
 
+    /**
+     * Gets the set of the names of the transient relations.
+     * @return The set.
+     */
     public Set<String> getTransients() {
         return transients;
     }
@@ -212,6 +229,34 @@ public class Schema {
         }
 
         return null;
+    }
+
+    //-------------------------------------------------------------------------
+    // Object API
+
+    @Override
+    public String toString() {
+        var shapes = shapeMap.values().stream()
+            .map(Shape::toSpec)
+            .sorted()
+            .collect(Collectors.joining("\n"));
+        return "Schema [\n    transients: " + transients + "\n" +
+            shapes.indent(4) + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Schema schema = (Schema) o;
+        return shapeMap.equals(schema.shapeMap) && transients.equals(schema.transients);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = shapeMap.hashCode();
+        result = 31 * result + transients.hashCode();
+        return result;
     }
 
     //-------------------------------------------------------------------------
