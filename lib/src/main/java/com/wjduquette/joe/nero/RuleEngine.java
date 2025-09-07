@@ -29,8 +29,6 @@ public class RuleEngine {
      * with two different values.
      */
     public static Object DUPLICATE_KEY = new Keyword("duplicateKey");
-    public static final String INFER_ERROR =
-        "Call `infer()` before querying results.";
 
     //-------------------------------------------------------------------------
     // Static Built-In Predicate Schema
@@ -117,7 +115,7 @@ public class RuleEngine {
     //
 
     // The set of known facts, initialized by the constructor
-    private final FactSet knownFacts = new FactSet();
+    private final FactSet knownFacts;
 
     // Whether the infer() method has been called or not.  We only do
     // inference once per instance of the engine.
@@ -131,14 +129,20 @@ public class RuleEngine {
     // Constructor
 
     /**
-     * Creates a new RuleEngine with the given ruleset and no external database
-     * of facts.
+     * Creates a new RuleEngine with the given ruleset and initial fact
+     * database, which may be empty.  <b>The infer() method will update the
+     * fact database in place;</b> make an explicit copy if this is not wanted.
+     *
+     * <p><b>Note:</b> this constructor is intended for internal use only;</p>
+     * see {@link Nero} for the public API.
      * @param joe The related Joe interpreter.
      * @param ruleset The ruleset
+     * @param db The database of facts
      */
-    public RuleEngine(Joe joe, NeroRuleSet ruleset) {
+    RuleEngine(Joe joe, NeroRuleSet ruleset, FactSet db) {
         this.joe = joe;
         this.ruleset = ruleset;
+        this.knownFacts = db;
 
         // NEXT, Categorize the rules by head relation
         for (var rule : ruleset.rules()) {
@@ -146,17 +150,6 @@ public class RuleEngine {
             var list = ruleMap.computeIfAbsent(head, k -> new ArrayList<>());
             list.add(rule);
         }
-    }
-
-    /**
-     * Creates a new RuleEngine with the given ruleset and the given set of
-     * input facts.
-     * @param ruleset The ruleset
-     * @param facts The fact set
-     */
-    public RuleEngine(Joe joe, NeroRuleSet ruleset, FactSet facts) {
-        this(joe, ruleset);
-        knownFacts.addAll(facts);
     }
 
     //-------------------------------------------------------------------------
@@ -182,35 +175,11 @@ public class RuleEngine {
     }
 
     //-------------------------------------------------------------------------
-    // Queries
-
-    /**
-     * Gets all facts known after inference is complete.
-     * @return The known facts.
-     */
-    public FactSet getKnownFacts() {
-        if (!inferenceComplete) {
-            throw new IllegalStateException(INFER_ERROR);
-        }
-        return knownFacts;
-    }
-
-    /**
-     * Gets the facts inferred from the inputs given the axioms and rules.
-     * @return The inferred facts.
-     */
-    public FactSet getInferredFacts() {
-        if (!inferenceComplete) {
-            throw new IllegalStateException(INFER_ERROR);
-        }
-        return inferredFacts;
-    }
-
-    //-------------------------------------------------------------------------
     // Inference
 
     /**
-     * Executes the inference algorithm.  Returns the inferred facts.
+     * Executes the inference algorithm, updating the given fact set in place.
+     * Returns the inferred facts.
      * @throws JoeError if the rule set is not stratified.
      */
     public FactSet infer() {

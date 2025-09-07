@@ -129,15 +129,7 @@ public class Nero {
         public FactSet infer(FactSet facts) {
             var engine = new RuleEngine(joe, ruleset, facts);
             engine.setDebug(debug);
-            var inferred = engine.infer();
-
-            // NOTE: RuleEngine doesn't currently update the input facts in
-            // place!
-            var known = engine.getKnownFacts();
-            facts.clear();
-            facts.addAll(known);
-
-            return inferred;
+            return engine.infer();
         }
     }
 
