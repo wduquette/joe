@@ -8,11 +8,13 @@ import com.wjduquette.joe.SyntaxError;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
 
 /**
  * A convenience layer for interacting with collections of Nero facts
  * at the Java level.
  */
+@SuppressWarnings("unused")
 public class NeroDatabase {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -24,7 +26,7 @@ public class NeroDatabase {
     private Schema schema = new Schema();
 
     // The accumulated facts
-    private FactSet db = new FactSet();
+    private final FactSet db = new FactSet();
 
     // The debugging flag for inference.
     private boolean debug = false;
@@ -82,7 +84,7 @@ public class NeroDatabase {
      */
     public NeroDatabase update(SourceBuffer source) {
         var ruleset = Nero.compile(schema, source);
-        Nero.with(joe, ruleset).update(db);
+        Nero.with(joe, ruleset).debug(debug).update(db);
         schema = ruleset.schema();
 
         return this;
@@ -113,6 +115,27 @@ public class NeroDatabase {
      */
     public FactSet query(String script) {
         var ruleset = Nero.compile(schema, new SourceBuffer("*nero*", script));
-        return Nero.with(joe, ruleset).query(db);
+        return Nero.with(joe, ruleset).debug(debug).query(db);
+    }
+
+    //------------------------------------------------------------------------
+    // Queries
+
+    /**
+     * Returns all facts from the database.
+     * @return The facts
+     */
+    public Set<Fact> all() {
+        return db.getAll();
+    }
+
+
+    /**
+     * Returns all facts having the given relation.
+     * @param name The relation
+     * @return The facts
+     */
+    public Set<Fact> relation(String name) {
+        return db.getRelation(name);
     }
 }
