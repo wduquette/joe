@@ -76,7 +76,7 @@ public class RuleSetValue {
     public Set<Fact> infer(Joe joe, FactBase db) {
         return Nero.with(joe, ruleset)
             .debug(debug)
-            .infer(new FactSet(db))
+            .update(new FactSet(db))
             .getAll();
     }
 
@@ -89,7 +89,7 @@ public class RuleSetValue {
         var db = toFactSet(joe, inputs);
         return Nero.with(joe, ruleset)
             .debug(debug)
-            .infer(new FactSet(db))
+            .update(new FactSet(db))
             .getAll();
     }
 

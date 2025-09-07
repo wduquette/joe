@@ -125,7 +125,7 @@ public class NeroTest extends Ted {
         var script = """
             B(2);
             """;
-        check(Nero.toNeroScript(Nero.with(script).debug().infer(db))).eq("""
+        check(Nero.toNeroScript(Nero.with(script).debug().update(db))).eq("""
             define B/1;
             B(2);
             """);

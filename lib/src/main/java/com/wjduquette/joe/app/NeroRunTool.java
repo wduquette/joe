@@ -127,7 +127,7 @@ public class NeroRunTool implements Tool {
 
         for (var name : inputs) {
             var source = readSource(name);
-            Nero.with(source).debug(debug).infer(db);
+            Nero.with(source).debug(debug).update(db);
         }
 
         if (outFile == null) {

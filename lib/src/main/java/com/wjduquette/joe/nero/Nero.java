@@ -159,11 +159,27 @@ public class Nero {
         /**
          * Infers all known facts from the rule set and fact set, updating
          * the fact set in place.  Returns the inferred facts.  Make an
-         * explicit copy of the fact set to retain it unchanged.
+         * explicit copy of the fact set to retain it unchanged, or call
+         * query() instead.
          * @param facts The input facts
          * @return The inferred facts.
          */
-        public FactSet infer(FactSet facts) {
+        public FactSet update(FactSet facts) {
+            var engine = new RuleEngine(joe, ruleset, facts);
+            engine.setDebug(debug);
+            return engine.infer();
+        }
+
+        /**
+         * Infers all known facts from the rule set and fact set.  Makes
+         * a copy of the fact set, ensuring that the input database
+         * remains unchanged. Returns the inferred facts.
+         * If the input fact set should be updated, or if it doesn't matter,
+         * call update() instead.
+         * @param facts The input facts
+         * @return The inferred facts.
+         */
+        public FactSet query(FactSet facts) {
             var engine = new RuleEngine(joe, ruleset, facts);
             engine.setDebug(debug);
             return engine.infer();

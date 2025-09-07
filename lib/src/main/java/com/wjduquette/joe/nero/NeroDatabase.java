@@ -3,6 +3,7 @@ package com.wjduquette.joe.nero;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.SourceBuffer;
+import com.wjduquette.joe.SyntaxError;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -75,20 +76,15 @@ public class NeroDatabase {
      * Updates the content of the database given the Nero script.
      * @param source The Nero source
      * @return The database
-     * @throws JoeError on schema mismatch.
+     * @throws SyntaxError on any Nero compilation error, including schema
+     *         mismatch
      * @throws JoeError on any Nero error.
      */
     public NeroDatabase update(SourceBuffer source) {
-//        var nero = new Nero(joe);
-//
-//        // Throws error on Nero compilation or stratification error.
-//        var ruleset = nero.compile(source);
-//
-//        // Throws error on schema incompatibility
-//        schema.merge(ruleset.schema());
-//
-        // TODO
-//        RuleEngine.with(joe, ruleset).debug(debug).infer(db);
+        var ruleset = Nero.compile(schema, source);
+        Nero.with(joe, ruleset).update(db);
+        schema = ruleset.schema();
+
         return this;
     }
 
@@ -116,15 +112,7 @@ public class NeroDatabase {
      * @return The inferred facts
      */
     public FactSet query(String script) {
-//        var nero = new Nero(joe);
-//
-//        // Throws error on Nero compilation or stratification error.
-//        var ruleset = nero.compile(new SourceBuffer("*java*", script));
-//
-//        // TODO
-        return null;
-//        return RuleEngine.with(joe, ruleset)
-//            .debug(debug)
-//            .infer(new FactSet(db));
+        var ruleset = Nero.compile(schema, new SourceBuffer("*nero*", script));
+        return Nero.with(joe, ruleset).query(db);
     }
 }
