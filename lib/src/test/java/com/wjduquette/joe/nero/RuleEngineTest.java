@@ -1,7 +1,5 @@
 package com.wjduquette.joe.nero;
 
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Ted;
 import org.junit.Test;
@@ -17,8 +15,6 @@ import static com.wjduquette.joe.checker.Checker.checkThrow;
 // at compile time and are found by the `NeroParser`; detection is tested
 // by `parser.NeroParserTest`.
 public class RuleEngineTest extends Ted {
-    private final Nero nero = new Nero(new Joe());
-
     //-------------------------------------------------------------------------
     // Stratification Conditions
 
@@ -1057,8 +1053,8 @@ public class RuleEngineTest extends Ted {
     // Execute the source, returning a Nero script of known facts.
     private String execute(String source) {
         try {
-            var engine = nero.execute(new SourceBuffer("-", source));
-            return nero.asNeroScript(engine.getKnownFacts());
+            var db = Nero.with(source).debug().infer();
+            return Nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;
@@ -1070,8 +1066,8 @@ public class RuleEngineTest extends Ted {
     private String execute(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         try {
-            var engine = nero.execute(new SourceBuffer("-", source), db);
-            return nero.asNeroScript(engine.getKnownFacts());
+            Nero.with(source).debug().update(db);
+            return Nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;
@@ -1083,9 +1079,11 @@ public class RuleEngineTest extends Ted {
     private String infer(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         try {
-            var engine = nero.execute(new SourceBuffer("-", source), db);
-            var factSet = new FactSet(engine.getInferredFacts());
-            return nero.asNeroScript(factSet);
+            var inferred = Nero.with(source).debug().update(db);
+//            return NewNero.toNeroScript(db);
+//            var engine = nero.execute(new SourceBuffer("-", source), db);
+//            var factSet = new FactSet(engine.getInferredFacts());
+            return Nero.toNeroScript(inferred);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;
@@ -1098,8 +1096,8 @@ public class RuleEngineTest extends Ted {
     // from being represented as a Nero script
     private String inferRaw(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
-        var engine = nero.execute(new SourceBuffer("-", source), db);
-        return engine.getInferredFacts().getAll().stream()
+        var inferred = Nero.with(source).debug().update(db);
+        return inferred.all().stream()
             .map(Fact::toString)
             .sorted()
             .collect(Collectors.joining("\n")) + "\n";

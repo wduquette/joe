@@ -1,6 +1,7 @@
 package com.wjduquette.joe.parser;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.nero.NeroRuleSet;
+import com.wjduquette.joe.nero.Schema;
 import com.wjduquette.joe.scanner.Scanner;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.scanner.Token;
@@ -1048,6 +1049,21 @@ public class Parser {
         this.scanner = new Scanner(source, this::errorInScanner);
         scanner.prime();
         return new NeroParser(this, NeroParser.Mode.STANDALONE).parse();
+    }
+
+    /**
+     * Parses the source as a standalone Nero program, attempting to detect
+     * as many meaningful errors as possible.  The program must be compatible
+     * with the given Schema. Errors are reported via the
+     * parser's error reporter.  If errors were reported, the result of
+     * this method should be ignored.
+     * @return The parsed rule set.
+     */
+    public NeroRuleSet parseNero(Schema schema) {
+        this.scanner = new Scanner(source, this::errorInScanner);
+        scanner.prime();
+        return new NeroParser(this, NeroParser.Mode.STANDALONE)
+            .parse(schema);
     }
 
     //-------------------------------------------------------------------------

@@ -177,7 +177,7 @@ public class FactSet {
      * Gets a read-only set of all facts in the database.
      * @return The set
      */
-    public Set<Fact> getAll() {
+    public Set<Fact> all() {
         return Collections.unmodifiableSet(facts);
     }
 
@@ -198,7 +198,7 @@ public class FactSet {
      * the given relation.
      * @return The set
      */
-    public Set<Fact> getRelation(String relation) {
+    public Set<Fact> relation(String relation) {
         return Collections.unmodifiableSet(indexSet(relation));
     }
 
@@ -224,6 +224,14 @@ public class FactSet {
         for (var fact : facts) {
             indexSet(fact.relation()).add(fact);
         }
+    }
+
+    @Override
+    public String toString() {
+        var factString = facts.stream()
+            .map(Fact::toString)
+            .collect(Collectors.joining("\n"));
+        return "FactSet[\n" + factString.indent(4) + "]";
     }
 
     @Override

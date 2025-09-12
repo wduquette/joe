@@ -48,8 +48,7 @@ public class NeroRunTool implements Tool {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Nero nero = new Nero(new Joe());
-
+    private boolean debug = false;
     private boolean dumpAST = false;
     private String outFile = null;
 
@@ -80,7 +79,7 @@ public class NeroRunTool implements Tool {
             var opt = argq.poll();
             switch (opt) {
                 case "--ast", "-a"    -> dumpAST = true;
-                case "--debug", "-d"  -> nero.setDebug(true);
+                case "--debug", "-d"  -> debug = false;
                 case "--out", "-o"    -> outFile = toOptArg(opt, argq);
                 default -> {
                     System.err.println("Unknown option: '" + opt + "'.");
@@ -119,7 +118,7 @@ public class NeroRunTool implements Tool {
         for (var name : inputs) {
             var source = readSource(name);
             println("AST: " + name);
-            println(nero.dumpAST(source));
+            println(Nero.parse(source).toString());
         }
     }
 
@@ -128,19 +127,18 @@ public class NeroRunTool implements Tool {
 
         for (var name : inputs) {
             var source = readSource(name);
-            var engine = nero.execute(source, db);
-            db.addAll(engine.getInferredFacts());
+            Nero.with(source).debug(debug).update(db);
         }
 
         if (outFile == null) {
-            println(nero.asNeroScript(db));
+            println(Nero.toNeroScript(db));
         } else {
             println("Writing: " + outFile);
             var path = Path.of(outFile);
             if (Files.exists(path)) {
                 Files.copy(path, Path.of(outFile + "~"));
             }
-            Files.writeString(path, nero.asNeroScript(db));
+            Files.writeString(path, Nero.toNeroScript(db));
         }
     }
 

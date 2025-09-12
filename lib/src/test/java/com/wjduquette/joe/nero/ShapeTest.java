@@ -1,6 +1,5 @@
 package com.wjduquette.joe.nero;
 
-import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Ted;
 import org.junit.Test;
@@ -76,6 +75,6 @@ public class ShapeTest extends Ted {
 
     private NeroRuleSet parse(String text) {
         var source = new SourceBuffer("*test*", text);
-        return new Nero(new Joe()).parse(source);
+        return Nero.parse(source);
     }
 }

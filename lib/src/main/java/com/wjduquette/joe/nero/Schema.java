@@ -3,6 +3,7 @@ package com.wjduquette.joe.nero;
 import com.wjduquette.joe.JoeError;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A Schema for the facts inferred by a Nero program.  Nero can infer the
@@ -25,12 +26,32 @@ public class Schema {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an empty schema.
+     */
     public Schema() {
         // Nothing to do.
     }
 
+    /**
+     * Creates a copy of the other schema.
+     * @param other The other schema
+     */
+    public Schema(Schema other) {
+        this.shapeMap.putAll(other.shapeMap);
+        this.transients.addAll(other.transients);
+    }
+
     //-------------------------------------------------------------------------
     // Public API
+
+    /**
+     * Gets whether the schema has any defined content or not.
+     * @return true or false
+     */
+    public boolean isEmpty() {
+        return shapeMap.isEmpty() && transients.isEmpty();
+    }
 
     /**
      * Returns true if the relation is marked transient in this schema.
@@ -54,6 +75,10 @@ public class Schema {
         }
     }
 
+    /**
+     * Gets the set of the names of the transient relations.
+     * @return The set.
+     */
     public Set<String> getTransients() {
         return transients;
     }
@@ -146,6 +171,15 @@ public class Schema {
     }
 
     /**
+     * Drops the relation from the schema.
+     * @param relation The relation
+     */
+    public void drop(String relation) {
+        shapeMap.remove(relation);
+        transients.remove(relation);
+    }
+
+    /**
      * Merges the other schema into this one, provided that the shapes
      * for matching relations are merge-compatible.
      * @param other The other schema.
@@ -212,6 +246,34 @@ public class Schema {
         }
 
         return null;
+    }
+
+    //-------------------------------------------------------------------------
+    // Object API
+
+    @Override
+    public String toString() {
+        var shapes = shapeMap.values().stream()
+            .map(Shape::toSpec)
+            .sorted()
+            .collect(Collectors.joining("\n"));
+        return "Schema [\n    transients: " + transients + "\n" +
+            shapes.indent(4) + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Schema schema = (Schema) o;
+        return shapeMap.equals(schema.shapeMap) && transients.equals(schema.transients);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = shapeMap.hashCode();
+        result = 31 * result + transients.hashCode();
+        return result;
     }
 
     //-------------------------------------------------------------------------
