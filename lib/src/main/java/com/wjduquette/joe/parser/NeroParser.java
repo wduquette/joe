@@ -121,7 +121,11 @@ class NeroParser extends EmbeddedParser {
                     }
                     if (!schema.checkAndAdd(head)) {
                         error(headToken,
-                            "axiom's shape is incompatible with previous definitions for this relation.");
+                            "schema mismatch, expected shape compatible with '" +
+                            schema.get(head.relation()).toSpec() +
+                            "', got: '" +
+                            Shape.inferDefaultShape(head).toSpec() +
+                            "'.");
                     }
                     axioms.add(axiom(headToken, head));
                 } else if (scanner.match(COLON_MINUS)) {
@@ -131,7 +135,11 @@ class NeroParser extends EmbeddedParser {
                     }
                     if (!schema.checkAndAdd(head)) {
                         error(headToken,
-                            "rule head's shape is incompatible with previous definitions for this relation.");
+                            "schema mismatch, expected shape compatible with '" +
+                                schema.get(head.relation()).toSpec() +
+                                "', got: '" +
+                                Shape.inferDefaultShape(head).toSpec() +
+                                "'.");
                     }
                     rules.add(rule(headToken, head));
                 } else {

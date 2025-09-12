@@ -21,7 +21,7 @@ public class FactSetTest extends Ted {
         db = new FactSet();
         check(db.isEmpty()).eq(true);
         check(db.size()).eq(0);
-        check(db.getAll()).eq(Set.of());
+        check(db.all()).eq(Set.of());
         check(db.getRelations()).eq(Set.of());
     }
 
@@ -35,7 +35,7 @@ public class FactSetTest extends Ted {
         ));
         check(db.isEmpty()).eq(false);
         check(db.size()).eq(2);
-        check(db.getAll()).eq(Set.of(
+        check(db.all()).eq(Set.of(
             fact("A", 1),
             fact("B", 1)
         ));
@@ -53,7 +53,7 @@ public class FactSetTest extends Ted {
         db = new FactSet(other);
         check(db.isEmpty()).eq(false);
         check(db.size()).eq(2);
-        check(db.getAll()).eq(Set.of(
+        check(db.all()).eq(Set.of(
             fact("A", 1),
             fact("B", 1)
         ));
@@ -68,23 +68,23 @@ public class FactSetTest extends Ted {
         test("testAdd");
 
         db = new FactSet();
-        check(db.getRelation("A").size()).eq(0);
+        check(db.relation("A").size()).eq(0);
 
         db.add(fact("A", 1));
         check(db.size()).eq(1);
         check(db.getRelations()).eq(Set.of("A"));
-        check(db.getRelation("A")).eq(Set.of(fact("A", 1)));
+        check(db.relation("A")).eq(Set.of(fact("A", 1)));
 
         db.add(fact("B", 2));
         check(db.size()).eq(2);
         check(db.getRelations()).eq(Set.of("A", "B"));
-        check(db.getRelation("B")).eq(Set.of(fact("B", 2)));
+        check(db.relation("B")).eq(Set.of(fact("B", 2)));
 
         db.add(fact("A", 2));
         check(db.size()).eq(3);
         check(db.getRelations()).eq(Set.of("A", "B"));
-        check(db.getRelation("A")).eq(Set.of(fact("A", 1), fact("A", 2)));
-        check(db.getAll()).eq(Set.of(
+        check(db.relation("A")).eq(Set.of(fact("A", 1), fact("A", 2)));
+        check(db.all()).eq(Set.of(
             fact("A", 1),
             fact("A", 2),
             fact("B", 2)
@@ -109,9 +109,9 @@ public class FactSetTest extends Ted {
 
         check(db.size()).eq(3);
         check(db.getRelations()).eq(Set.of("A", "B"));
-        check(db.getRelation("A")).eq(Set.of(fact("A", 1), fact("A", 2)));
-        check(db.getRelation("B")).eq(Set.of(fact("B", 2)));
-        check(db.getAll()).eq(Set.of(
+        check(db.relation("A")).eq(Set.of(fact("A", 1), fact("A", 2)));
+        check(db.relation("B")).eq(Set.of(fact("B", 2)));
+        check(db.all()).eq(Set.of(
             fact("A", 1),
             fact("A", 2),
             fact("B", 2)
@@ -134,9 +134,9 @@ public class FactSetTest extends Ted {
 
         check(db.size()).eq(3);
         check(db.getRelations()).eq(Set.of("A", "B"));
-        check(db.getRelation("A")).eq(Set.of(fact("A", 1), fact("A", 2)));
-        check(db.getRelation("B")).eq(Set.of(fact("B", 2)));
-        check(db.getAll()).eq(Set.of(
+        check(db.relation("A")).eq(Set.of(fact("A", 1), fact("A", 2)));
+        check(db.relation("B")).eq(Set.of(fact("B", 2)));
+        check(db.all()).eq(Set.of(
             fact("A", 1),
             fact("A", 2),
             fact("B", 2)
@@ -194,8 +194,8 @@ public class FactSetTest extends Ted {
 
         check(db.size()).eq(1);
         check(db.getRelations()).eq(Set.of("B"));
-        check(db.getAll()).eq(Set.of(fact("B", 2)));
-        check(db.getRelation("A")).eq(Set.of());
+        check(db.all()).eq(Set.of(fact("B", 2)));
+        check(db.relation("A")).eq(Set.of());
     }
 
     //-------------------------------------------------------------------------
@@ -213,7 +213,7 @@ public class FactSetTest extends Ted {
 
         check(db.size()).eq(2);
         check(db.getRelations()).eq(Set.of("A", "B"));
-        check(db.getAll()).eq(Set.of(fact("A", 1), fact("B", 2)));
+        check(db.all()).eq(Set.of(fact("A", 1), fact("B", 2)));
     }
 
     //-------------------------------------------------------------------------
@@ -232,7 +232,7 @@ public class FactSetTest extends Ted {
 
         check(db.size()).eq(2);
         check(db.getRelations()).eq(Set.of("A", "B"));
-        check(db.getAll()).eq(Set.of(fact("A", 1), fact("B", 3)));
+        check(db.all()).eq(Set.of(fact("A", 1), fact("B", 3)));
     }
 
     @Test public void testRemoveAll_other() {
@@ -250,7 +250,7 @@ public class FactSetTest extends Ted {
 
         check(db.size()).eq(2);
         check(db.getRelations()).eq(Set.of("A", "B"));
-        check(db.getAll()).eq(Set.of(fact("A", 1), fact("B", 3)));
+        check(db.all()).eq(Set.of(fact("A", 1), fact("B", 3)));
     }
 
     //-------------------------------------------------------------------------
@@ -270,7 +270,7 @@ public class FactSetTest extends Ted {
         // Old A's are gone, Old B's are A's.
         check(db.size()).eq(2);
         check(db.getRelations()).eq(Set.of("A"));
-        check(db.getAll()).eq(Set.of(fact("A", 3), fact("A", 4)));
+        check(db.all()).eq(Set.of(fact("A", 3), fact("A", 4)));
     }
 
     //-------------------------------------------------------------------------
@@ -311,7 +311,7 @@ public class FactSetTest extends Ted {
 
         var db = new FactSet();
 
-        check(db.getRelation("Unknown")).eq(Set.of());
+        check(db.relation("Unknown")).eq(Set.of());
         check(db.getRelations()).eq(Set.of());
     }
 

@@ -65,7 +65,7 @@ public class RuleSetValue {
      * @return The new facts.
      */
     public Set<Fact> infer(Joe joe) {
-        return Nero.with(joe, ruleset).debug(debug).infer().getAll();
+        return Nero.with(joe, ruleset).debug(debug).infer().all();
     }
 
     /**
@@ -77,7 +77,7 @@ public class RuleSetValue {
         return Nero.with(joe, ruleset)
             .debug(debug)
             .update(new FactSet(db))
-            .getAll();
+            .all();
     }
 
     /**
@@ -90,7 +90,7 @@ public class RuleSetValue {
         return Nero.with(joe, ruleset)
             .debug(debug)
             .update(new FactSet(db))
-            .getAll();
+            .all();
     }
 
     /**

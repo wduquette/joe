@@ -87,9 +87,9 @@ public class FactBaseType extends ProxyType<FactBase> {
         var db = (FactBase)value;
 
         var buff = new StringBuilder();
-        buff.append("FactBase[").append(db.getAll().size());
+        buff.append("FactBase[").append(db.all().size());
         for (var relation : db.getRelations().stream().sorted().toList()) {
-            var items = db.getRelation(relation);
+            var items = db.relation(relation);
             if (!items.isEmpty()) {
                 buff.append(", ")
                     .append(relation)
@@ -170,7 +170,7 @@ public class FactBaseType extends ProxyType<FactBase> {
     private Collection<?> _iterableSupplier(Joe joe, Object value) {
         assert value instanceof FactBase;
         var db = (FactBase)value;
-        return joe.readonlySet(db.getAll());
+        return joe.readonlySet(db.all());
     }
 
     //-------------------------------------------------------------------------
@@ -211,7 +211,7 @@ public class FactBaseType extends ProxyType<FactBase> {
     // Returns a read-only [[Set]] of all facts in the database.
     private Object _all(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "all()");
-        return joe.readonlySet(db.getAll());
+        return joe.readonlySet(db.all());
     }
 
     //**
@@ -246,7 +246,7 @@ public class FactBaseType extends ProxyType<FactBase> {
         var callable = args.next();
 
         var result = new SetValue();
-        for (var item : db.getAll()) {
+        for (var item : db.all()) {
             if (Joe.isTruthy(joe.call(callable, item))) {
                 result.add(item);
             }
@@ -284,7 +284,7 @@ public class FactBaseType extends ProxyType<FactBase> {
         var callable = args.next();
 
         var result = new SetValue();
-        for (var item : db.getAll()) {
+        for (var item : db.all()) {
             result.add(joe.call(callable, item));
         }
         return result;
@@ -299,7 +299,7 @@ public class FactBaseType extends ProxyType<FactBase> {
     private Object _relation(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "relation(relation)");
         return joe.readonlySet(
-            db.getRelation(joe.toIdentifier(args.next())));
+            db.relation(joe.toIdentifier(args.next())));
     }
 
     //**
@@ -310,7 +310,7 @@ public class FactBaseType extends ProxyType<FactBase> {
     private Object _relations(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "relations()");
         var set = db.getRelations().stream()
-            .filter(r -> !db.getRelation(r).isEmpty())
+            .filter(r -> !db.relation(r).isEmpty())
             .collect(Collectors.toSet());
         return joe.readonlySet(set);
     }
@@ -362,7 +362,7 @@ public class FactBaseType extends ProxyType<FactBase> {
         var callable = args.next();
 
         var items = new HashSet<Fact>();
-        for (var item : db.getAll()) {
+        for (var item : db.all()) {
             if (Joe.isTruthy(joe.call(callable, item))) {
                 items.add(item);
             }

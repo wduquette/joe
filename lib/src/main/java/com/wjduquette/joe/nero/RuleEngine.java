@@ -324,7 +324,7 @@ public class RuleEngine {
             // The NeroParser ensures that atom conforms to the built-in's shape.
             return BUILT_INS.get(atom.relation()).function().compute(bc, atom);
         } else {
-            return knownFacts.getRelation(atom.relation());
+            return knownFacts.relation(atom.relation());
         }
     }
 

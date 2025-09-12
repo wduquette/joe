@@ -83,7 +83,7 @@ public class NeroTest extends Ted {
         schema.checkAndAdd(shape);
 
         check(compileError(schema, "A(1, 2);"))
-            .eq("error at 'A', axiom's shape is incompatible with previous definitions for this relation.");
+            .eq("error at 'A', schema mismatch, expected shape compatible with 'A/a', got: 'A/2'.");
     }
 
     // Verify that equivalent `defines` are OK.

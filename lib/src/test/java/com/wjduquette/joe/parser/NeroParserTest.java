@@ -54,7 +54,7 @@ public class NeroParserTest extends Ted {
             Person(#joe, 90);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'Person', axiom's shape is incompatible with previous definitions for this relation.");
+            .eq("[line 2] error at 'Person', schema mismatch, expected shape compatible with 'Person/1', got: 'Person/2'.");
     }
 
     @Test public void testParse_headMismatch() {
@@ -65,7 +65,7 @@ public class NeroParserTest extends Ted {
             Result(x, y) :- Person(x, y);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'Result', rule head's shape is incompatible with previous definitions for this relation.");
+            .eq("[line 2] error at 'Result', schema mismatch, expected shape compatible with 'Result/1', got: 'Result/2'.");
     }
 
     @Test public void testParse_expectedAxiomOrRule() {

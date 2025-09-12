@@ -8,13 +8,14 @@ import com.wjduquette.joe.SyntaxError;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Set;
 
 /**
  * A convenience layer for interacting with collections of Nero facts
  * at the Java level.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class NeroDatabase {
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -23,7 +24,7 @@ public class NeroDatabase {
     private final Joe joe;
 
     // The accumulated schema
-    private Schema schema = new Schema();
+    private Schema schema;
 
     // The accumulated facts
     private final FactSet db = new FactSet();
@@ -34,12 +35,37 @@ public class NeroDatabase {
     //------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates a new database with an empty schema, using an anonymous
+     * instance of Joe.
+     */
     public NeroDatabase() {
-        this(new Joe());
+        this(new Joe(), new Schema());
     }
 
+    /**
+     * Creates a new database with an empty schema, using an explicit
+     * instance of Joe.
+     */
     public NeroDatabase(Joe joe) {
+        this(joe, new Schema());
+    }
+
+    /**
+     * Creates a new database with a pre-defined schema, using an anonymous
+     * instance of Joe.
+     */
+    public NeroDatabase(Schema schema) {
+        this(new Joe(), schema);
+    }
+
+    /**
+     * Creates a new database with a pre-defined schema, using an explicit
+     * instance of Joe.
+     */
+    public NeroDatabase(Joe joe, Schema schema) {
         this.joe = joe;
+        this.schema = schema;
     }
 
     //------------------------------------------------------------------------
@@ -118,15 +144,72 @@ public class NeroDatabase {
         return Nero.with(joe, ruleset).debug(debug).query(db);
     }
 
+    /**
+     * Adds all Facts from another NeroDatabase into the database, checking
+     * for schema mismatches.
+     * @param other The other database
+     * @return this
+     * @throws JoeError if there is a schema mismatch
+     */
+    public NeroDatabase addFacts(NeroDatabase other) {
+        schema.merge(other.schema);
+        addFacts(other.db);
+        return this;
+    }
+
+    /**
+     * Adds all Facts from a FactSet into the database, checking for schema
+     * mismatches.
+     * @param factSet The fact set
+     * @return this
+     * @throws JoeError if there is a schema mismatch
+     */
+    public NeroDatabase addFacts(FactSet factSet) {
+        return addFacts(factSet.all());
+    }
+
+    /**
+     * Adds a collection of Facts into the database, checking for schema
+     * mismatches.
+     * @param facts The facts
+     * @return this
+     * @throws JoeError if there is a schema mismatch
+     */
+    public NeroDatabase addFacts(Collection<Fact> facts) {
+        // Throws error
+        schema.merge(Schema.inferSchema(facts));
+        db.addAll(facts);
+        return this;
+    }
+
+    /**
+     * Drops the relation from the database, if it exists.
+     * @param relation The relation
+     * @return this
+     */
+    public NeroDatabase drop(String relation) {
+        db.drop(relation);
+        schema.drop(relation);
+        return this;
+    }
+
     //------------------------------------------------------------------------
     // Queries
+
+    /**
+     * Gets a copy of the database's schema
+     * @return The schema
+     */
+    public Schema schema() {
+        return new Schema(schema);
+    }
 
     /**
      * Returns all facts from the database.
      * @return The facts
      */
     public Set<Fact> all() {
-        return db.getAll();
+        return db.all();
     }
 
 
@@ -136,6 +219,17 @@ public class NeroDatabase {
      * @return The facts
      */
     public Set<Fact> relation(String name) {
-        return db.getRelation(name);
+        return db.relation(name);
+    }
+
+    /**
+     * Converts the content of the database to a Nero script.
+     * Throws an error if a fact in the database contains a data value that
+     * cannot be represented in Nero syntax.
+     * @return The script
+     * @throws JoeError on non-Nero data.
+     */
+    public String toNeroScript() {
+        return Nero.toNeroScript(db);
     }
 }

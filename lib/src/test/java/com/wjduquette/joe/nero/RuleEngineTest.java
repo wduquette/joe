@@ -1097,7 +1097,7 @@ public class RuleEngineTest extends Ted {
     private String inferRaw(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         var inferred = Nero.with(source).debug().update(db);
-        return inferred.getAll().stream()
+        return inferred.all().stream()
             .map(Fact::toString)
             .sorted()
             .collect(Collectors.joining("\n")) + "\n";

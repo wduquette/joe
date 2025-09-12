@@ -46,6 +46,14 @@ public class Schema {
     // Public API
 
     /**
+     * Gets whether the schema has any defined content or not.
+     * @return true or false
+     */
+    public boolean isEmpty() {
+        return shapeMap.isEmpty() && transients.isEmpty();
+    }
+
+    /**
      * Returns true if the relation is marked transient in this schema.
      * @param relation The relation name
      * @return true or false
@@ -160,6 +168,15 @@ public class Schema {
 
         // NEXT, make sure the atom is compatible with the defined shape.
         return Shape.conformsTo(head, defined);
+    }
+
+    /**
+     * Drops the relation from the schema.
+     * @param relation The relation
+     */
+    public void drop(String relation) {
+        shapeMap.remove(relation);
+        transients.remove(relation);
     }
 
     /**

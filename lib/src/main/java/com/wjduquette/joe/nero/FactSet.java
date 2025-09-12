@@ -177,7 +177,7 @@ public class FactSet {
      * Gets a read-only set of all facts in the database.
      * @return The set
      */
-    public Set<Fact> getAll() {
+    public Set<Fact> all() {
         return Collections.unmodifiableSet(facts);
     }
 
@@ -198,7 +198,7 @@ public class FactSet {
      * the given relation.
      * @return The set
      */
-    public Set<Fact> getRelation(String relation) {
+    public Set<Fact> relation(String relation) {
         return Collections.unmodifiableSet(indexSet(relation));
     }
 

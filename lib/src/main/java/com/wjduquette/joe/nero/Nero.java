@@ -190,6 +190,31 @@ public class Nero {
     // Nero-formatting
 
     /**
+     * Converts the facts into a string in Nero format, if
+     * possible.  All fact terms must be expressible as Nero literal terms.
+     * Creates a Joe interpreter to do the term conversions.
+     * @param facts The facts
+     * @return The Nero source text
+     * @throws JoeError if constraints are not met.
+     */
+    @SuppressWarnings("unused")
+    public static String toNeroScript(Collection<Fact> facts) {
+        return toNeroScript(new FactSet(facts));
+    }
+
+    /**
+     * Converts the facts into a string in Nero format, if
+     * possible.  All fact terms must be expressible as Nero literal terms.
+     * @param joe The Joe interpreter
+     * @param facts The facts
+     * @return The Nero source text
+     * @throws JoeError if constraints are not met.
+     */
+    public static String toNeroScript(Joe joe, Collection<Fact> facts) {
+        return toNeroScript(joe, new FactSet(facts));
+    }
+
+    /**
      * Converts the contents of the FactSet into a string in Nero format, if
      * possible.  All fact terms must be expressible as Nero literal terms.
      * Creates a Joe interpreter to do the term conversions.
@@ -211,7 +236,7 @@ public class Nero {
      * @throws JoeError if constraints are not met.
      */
     public static String toNeroScript(Joe joe, FactSet db) {
-        var schema = Schema.inferSchema(db.getAll());
+        var schema = Schema.inferSchema(db.all());
         var buff = new StringBuilder();
         var relations = db.getRelations().stream().sorted().toList();
         var gotFirst = false;
@@ -222,7 +247,7 @@ public class Nero {
             buff.append("define ").append(shape).append(";\n");
             gotFirst = true;
 
-            var axioms = db.getRelation(relation).stream()
+            var axioms = db.relation(relation).stream()
                 .map(a -> toNeroAxiom(joe, a))
                 .sorted()
                 .collect(Collectors.joining("\n"));
