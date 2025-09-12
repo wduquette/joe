@@ -945,6 +945,23 @@ public class Joe {
     }
 
     /**
+     * Requires that the argument is a valid package name String, and returns
+     * it as such.
+     * @param arg The argument
+     * @return The string
+     * @throws JoeError if the argument is not a valid package name string
+     */
+    public String toPackageName(Object arg) {
+        if (arg instanceof String string &&
+            Joe.isPackageName(string)
+        ) {
+            return string;
+        }
+
+        throw expected("package name", arg);
+    }
+
+    /**
      * Requires that the argument is a String, and returns it as
      * such. Contrast this with {@code stringify()}, which converts
      * the argument to its String representation.  Which to use is

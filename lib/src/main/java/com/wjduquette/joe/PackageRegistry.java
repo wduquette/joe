@@ -1,5 +1,8 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.nero.Nero;
+import com.wjduquette.joe.nero.NeroDatabase;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -85,6 +88,7 @@ public class PackageRegistry {
     //-------------------------------------------------------------------------
     // Queries
 
+    @SuppressWarnings("unused")
     public Set<String> getPackageNames() {
         return registry.keySet();
     }
@@ -93,6 +97,7 @@ public class PackageRegistry {
         return registry.containsKey(pkgName);
     }
 
+    @SuppressWarnings("unused")
     public JoePackage getPackage(String pkgName) {
         return registry.get(pkgName);
     }
@@ -146,6 +151,55 @@ public class PackageRegistry {
     }
 
     private void findPackagesInRepository(Path repo, boolean verbose) {
+        NeroDatabase db;
+        try {
+            db = new NeroDatabase().update("""
+                    define ScriptedPackage/name, scriptFiles;
+                    define JarPackage/name, jarFile, className;
+                    """)
+                .load(repo);
+        } catch (JoeError ex) {
+            if (verbose) {
+                joe.println("    Error initializing package registry");
+                joe.println(ex.getTraceReport().indent(6));
+            }
+            return;
+        }
 
+        var folder = repo.getParent();
+        for (var f : db.all()) {
+            var map = f.getFieldMap();
+            JoePackage pkg = switch (f.relation()) {
+                case "ScriptedPackage" -> {
+                    if (verbose) joe.println("    " + Nero.toNeroAxiom(joe, f));
+                    var pkgName = joe.toPackageName(map.get("name"));
+                    var scriptFiles = joe.toList(map.get("scriptFiles"));
+                    var paths = scriptFiles.stream()
+                        .map(s -> folder.resolve(joe.stringify(s)))
+                        .toList();
+                    yield new ScriptedPackage(pkgName, folder, paths);
+                }
+                case "JarPackage" -> {
+                    if (verbose) joe.println("    " + Nero.toNeroAxiom(joe, f));
+                    if (verbose) joe.println("      (Unsupported)");
+                    yield null;
+                }
+                default -> {
+                    if (verbose) joe.println("    Unexpected fact: " +
+                        Nero.toNeroAxiom(joe, f));
+                    yield null;
+                }
+            };
+
+            if (pkg != null) {
+                if (registry.containsKey(pkg.name())) {
+                    if (verbose) joe.println(
+                        "    Duplicate package name, skipping: '" +
+                            pkg.name() + "'.");
+                } else {
+                    register(pkg);
+                }
+            }
+        }
     }
 }

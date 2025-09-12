@@ -85,7 +85,7 @@ public class NativePackage extends JoePackage {
                 ex.getJoeStackTrace());
         } catch (IOException ex) {
             throw new JoeError("Could not read package resource '" +
-                name + "' into package '" + name() + "':\n" +
+                name + "' for package '" + name() + "':\n" +
                 ex.getMessage());
         }
     }
