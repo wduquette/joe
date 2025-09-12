@@ -118,8 +118,8 @@ public class NeroTest extends Ted {
             """);
     }
 
-    @Test public void testWith_inputs() {
-        test("testWith_inputs");
+    @Test public void testWith_update() {
+        test("testWith_update");
         var db = new FactSet();
         db.add(new ListFact("A", List.of(1.0)));
         var script = """
@@ -135,6 +135,23 @@ public class NeroTest extends Ted {
             
             define B/1;
             B(2);
+            """);
+    }
+
+    @Test public void testWith_query() {
+        test("testWith_query");
+        var db = new FactSet();
+        db.add(new ListFact("A", List.of(1.0)));
+        var script = """
+            B(2);
+            """;
+        check(Nero.toNeroScript(Nero.with(script).debug().query(db))).eq("""
+            define B/1;
+            B(2);
+            """);
+        check(Nero.toNeroScript(db)).eq("""
+            define A/1;
+            A(1);
             """);
     }
 

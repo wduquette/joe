@@ -180,7 +180,7 @@ public class Nero {
          * @return The inferred facts.
          */
         public FactSet query(FactSet facts) {
-            var engine = new RuleEngine(joe, ruleset, facts);
+            var engine = new RuleEngine(joe, ruleset, new FactSet(facts));
             engine.setDebug(debug);
             return engine.infer();
         }
