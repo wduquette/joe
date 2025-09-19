@@ -423,6 +423,23 @@ class VirtualMachine {
                             joe.typedValue(iterator));
                     }
                 }
+                case IMPORT -> {
+                    var spec = readImportSpec();
+                    var reg = joe.packageRegistry();
+                    reg.load(spec.pkgName());
+                    var exports = reg.getExports(spec.pkgName());
+
+                    if (spec.symbol().equals("*")) {
+                        globalEnv.merge(exports);
+                    } else if (exports.hasVariable(spec.symbol())) {
+                        globalEnv.setVariable(spec.symbol(),
+                            exports.getVariable(spec.symbol()));
+                    } else {
+                        throw error("Package '" + spec.pkgName() +
+                                "' does not export symbol '" +
+                                spec.symbol() + "'.");
+                    }
+                }
                 case IN -> {
                     var collection = checkCollection(pop());
                     var item = pop();
@@ -990,6 +1007,13 @@ class VirtualMachine {
     private List<String> readStringList() {
         var index = frame.closure.function.code[frame.ip++];
         return (List<String>)frame.closure.function.constants[index];
+    }
+
+    // Reads a constant index from the chunk, and returns the indexed
+    // constant as an ImportSpec.
+    private ImportSpec readImportSpec() {
+        var index = frame.closure.function.code[frame.ip++];
+        return (ImportSpec)frame.closure.function.constants[index];
     }
 
     // Reads a constant index from the chunk, and returns the indexed

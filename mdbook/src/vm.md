@@ -41,6 +41,7 @@ The byte-engine is a stack machine with a few registers:
 | GLOSET *name*        | *a* → *a*               | Set global                |
 | GT                   | *a b* → *a* > *b*       | Compare: greater          |
 | HASNEXT              | *iter* → *flag*         | flag = iter.hasNext()     |
+| IMPORT *spec*        | ∅                       | Imports from package      |
 | IN                   | *a coll* → *flag*       | a in collection           |
 | INCR                 | *a* → *b*               | b = a + 1                 |
 | INDGET               | *coll i* → *a*          | `a = coll[i]`             |
@@ -313,6 +314,13 @@ Yields `true` if *a* is greater than or equal to *b*, and `false` otherwise.
 
 Gets whether iterator *iter* has another value.  The *iter* must be an
 iterator created by the `ITER` instruction.
+
+### IMPORT
+---
+**IMPORT** *spec* | ∅
+
+Imports symbol(s) from a package given the *spec*, an `ImportSpec`.  The
+symbols are added to the global spec.
 
 ### IN
 ---

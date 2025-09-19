@@ -86,9 +86,6 @@ class Compiler {
     // The type currently being compiled, or null
     private TypeInfo currentType = null;
 
-//    // The pattern currently being compiled, or null
-//    private PatternCompiler currentPattern = null;
-
     // Final statement in script; used to allow the final `Stmt.Expression`
     // to return its value.`
     private Stmt finalStatement = null;
@@ -511,8 +508,15 @@ class Compiler {
 
                 if (end_ != -1) patchJump(end_);
             }
-            case Stmt.Import s -> // TODO
-                throw new UnsupportedOperationException("TODO");
+            case Stmt.Import s -> {
+                if (!inGlobalScope()) {
+                    error(s.keyword(), "found 'import' in local scope.");
+                }
+                var spec = new ImportSpec(s.pkgName(), s.symbol());
+
+                // Setup                        // Stack:
+                emit(IMPORT, constant(spec));   // ∅
+            }
             case Stmt.Match s -> {
                 // Setup                      // Stack: locals | working
                 beginScope();                 // ∅            ; begin scope: match
