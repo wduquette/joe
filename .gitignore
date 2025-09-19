@@ -4,3 +4,4 @@ lib/build/
 /*.png
 release/
 temp/
+docs/
