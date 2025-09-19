@@ -217,6 +217,65 @@ public class ParserTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
+    // importDeclaration()
+
+    @Test
+    public void testImport_expectedPackageName() {
+        test("testImport_expectedPackageName");
+
+        var source = """
+            import 5;
+            """;
+        check(parse(source))
+            .eq("[line 1] error at '5', expected package name component after 'import'.");
+    }
+
+    @Test
+    public void testImport_expectedDot() {
+        test("testImport_expectedDot");
+
+        var source = """
+            import joe;
+            """;
+        check(parse(source))
+            .eq("[line 1] error at ';', expected '.' after package name component.");
+    }
+
+    @Test
+    public void testImport_expectedSymbol() {
+        test("testImport_expectedSymbol");
+
+        var source = """
+            import joe.;
+            """;
+        check(parse(source))
+            .eq("[line 1] error at ';', expected symbol name or '*' after '.'.");
+    }
+
+    @Test
+    public void testImport_expectedSemiAfterStar() {
+        test("testImport_expectedSemiAfterStar");
+
+        var source = """
+            import joe.*.foo;
+            """;
+        check(parse(source))
+            .eq("[line 1] error at '.', expected ';' after import spec.");
+    }
+
+    @Test
+    public void testImport_expectedSemiAfterLast() {
+        test("testImport_expectedSemiAfterLast");
+
+        var source = """
+            import joe.Foo
+            var x = 5;
+            """;
+        check(parse(source))
+            .eq("[line 2] error at 'var', expected ';' after import spec.");
+    }
+
+    //-------------------------------------------------------------------------
     // recordDeclaration()
 
     @Test

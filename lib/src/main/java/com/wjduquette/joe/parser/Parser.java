@@ -291,7 +291,7 @@ public class Parser {
 
         if (spec.size() == 1) {
             error(scanner.peek(),
-                "expected symbol name or '*' after package name.");
+                "expected symbol name or '*' after '.'.");
         }
 
         scanner.consume(SEMICOLON, "expected ';' after import spec.");
