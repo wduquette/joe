@@ -31,6 +31,9 @@ public class PackageRegistry {
     // exports environment.
     private final Map<String,Environment> exportsMap = new HashMap<>();
 
+    // Package loading stack: used to detect recursive loads.
+    private final Stack<String> loadingStack = new Stack<>();
+
     //-------------------------------------------------------------------------
     // Constructor
 
@@ -74,15 +77,27 @@ public class PackageRegistry {
 
     public void load(String pkgName) {
         if (isLoaded(pkgName)) return;
-
-        var pkg = registry.get(pkgName);
-        if (!hasPackage(pkgName)) {
-            throw new JoeError("Unknown package: '" + pkgName + "'.");
+        if (loadingStack.contains(pkgName)) {
+            var ex = new JoeError("Recursive import of package '" + pkgName + "'.");
+            for (var name : new ArrayList<>(loadingStack).reversed()) {
+                ex.addFrame("From package '" + name + "'");
+            }
+            throw ex;
         }
 
-        var engine = joe.getVanillaEngine();
-        pkg.load(joe, engine);
-        exportsMap.put(pkgName, engine.getExports());
+        try {
+            loadingStack.push(pkgName);
+            var pkg = registry.get(pkgName);
+            if (!hasPackage(pkgName)) {
+                throw new JoeError("Unknown package: '" + pkgName + "'.");
+            }
+
+            var engine = joe.getVanillaEngine();
+            pkg.load(joe, engine);
+            exportsMap.put(pkgName, engine.getExports());
+        } finally {
+            loadingStack.pop();
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -125,6 +140,10 @@ public class PackageRegistry {
      * @param verbose true or false
      */
     public void findLocalPackages(String libPath, boolean verbose) {
+        if (libPath == null) {
+            if (verbose) joe.println("No library path provided.");
+            return;
+        }
         var folders = Arrays.stream(libPath.split(":"))
             .map(s -> Path.of(s).toAbsolutePath())
             .toList();

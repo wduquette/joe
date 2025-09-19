@@ -209,7 +209,7 @@ public class Disassembler {
             // Constant Instructions
             // Pattern: opcode constantIndex
             case CLASS, COMMENT, CONST, EXPORT, GLODEF, GLOGET, GLOBIND, GLOSET,
-                 LOCBIND, METHOD, PATTERN, PROPGET, PROPSET, RULESET,
+                 IMPORT, LOCBIND, METHOD, PATTERN, PROPGET, PROPSET, RULESET,
                  SUPGET, TRCPUSH
             -> {
                 int index = chunk.code(ip + 1);

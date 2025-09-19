@@ -96,6 +96,7 @@ public class ReplTool implements Tool {
         consolePackage.setScript("<repl>");
         consolePackage.getArgs().addAll(List.of(args));
         joe.installPackage(consolePackage);
+        joe.findLocalPackages(System.getenv(Joe.JOE_LIB_PATH));
 
         try {
             System.out.println("Joe " + App.getVersion() + " (" +

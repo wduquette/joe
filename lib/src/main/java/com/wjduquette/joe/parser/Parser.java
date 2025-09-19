@@ -10,6 +10,7 @@ import com.wjduquette.joe.Trace;
 import com.wjduquette.joe.patterns.Pattern;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.wjduquette.joe.scanner.TokenType.*;
 
@@ -142,6 +143,8 @@ public class Parser {
                 error(exportToken,
                     "expected 'export' to be followed by 'function', 'class', or 'record'.");
             }
+
+            if (scanner.match(IMPORT)) return importDeclaration();
             if (scanner.match(VAR)) return varDeclaration();
 
             return statement();
@@ -267,6 +270,38 @@ public class Parser {
             terminatorString + "' after parameter list.");
 
         return parameters;
+    }
+
+    private Stmt importDeclaration() {
+        var keyword = scanner.previous();
+        var spec = new ArrayList<Token>();
+
+        scanner.consume(IDENTIFIER, "expected package name component after 'import'.");
+        spec.add(scanner.previous());
+        scanner.consume(DOT, "expected '.' after package name component.");
+
+        do {
+            if (scanner.match(IDENTIFIER)) {
+                spec.add(scanner.previous());
+            } else if (scanner.match(STAR)) {
+                spec.add(scanner.previous());
+                break;
+            }
+        } while (scanner.match(DOT));
+
+        if (spec.size() == 1) {
+            error(scanner.peek(),
+                "expected symbol name or '*' after '.'.");
+        }
+
+        scanner.consume(SEMICOLON, "expected ';' after import spec.");
+
+
+        var symbol = spec.removeLast().lexeme();
+        var pkgName = spec.stream()
+            .map(Token::lexeme)
+            .collect(Collectors.joining("."));
+        return new Stmt.Import(keyword, pkgName, symbol);
     }
 
     private Stmt recordDeclaration(boolean isExported) {

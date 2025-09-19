@@ -16,6 +16,7 @@ public sealed interface Stmt
             Stmt.Expression,
             Stmt.For, Stmt.ForEach, Stmt.ForEachBind, Stmt.Function,
             Stmt.If,
+            Stmt.Import,
             Stmt.Match,
             Stmt.Record, Stmt.Return,
             Stmt.Switch,
@@ -170,7 +171,8 @@ public sealed interface Stmt
         public Span location() { return span; }
     }
 
-    /** An "if" statement.
+    /**
+     * An "if" statement.
      * @param keyword The "if" keyword
      * @param condition The condition being tested
      * @param thenBranch Statement or block to execute if true
@@ -181,6 +183,20 @@ public sealed interface Stmt
         Expr condition,
         Stmt thenBranch,
         Stmt elseBranch
+    ) implements Stmt {
+        public Span location() { return keyword.span(); }
+    }
+
+    /**
+     * An "import" statement
+     * @param keyword The "import" keyword
+     * @param pkgName The name of the package
+     * @param symbol The imported symbol, or "*"
+     */
+    record Import(
+        Token keyword,
+        String pkgName,
+        String symbol
     ) implements Stmt {
         public Span location() { return keyword.span(); }
     }

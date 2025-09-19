@@ -83,6 +83,8 @@ public class ASTDumper {
                 }
                 yield buff.toString();
             }
+            case Stmt.Import s -> buffer()
+                .println(" from '" + s.pkgName() + "', symbol '" + s.symbol() + "'");
             case Stmt.Match s -> {
                 var buff = buffer().nl();
                 buff.dump("value", s.expr());
@@ -364,7 +366,7 @@ public class ASTDumper {
         return new Buffer();
     }
 
-    @SuppressWarnings("UnusedReturnValue")
+    @SuppressWarnings({"UnusedReturnValue", "SameParameterValue"})
     private static class Buffer {
         private static final int SPACES = 2;
         private final StringBuilder buff = new StringBuilder();

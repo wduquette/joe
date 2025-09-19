@@ -41,61 +41,62 @@ public class Opcode {
     /** Opcode */ public static final char GLOSET  = 19;
     /** Opcode */ public static final char GT      = 20;
     /** Opcode */ public static final char HASNEXT = 21;
-    /** Opcode */ public static final char IN      = 22;
-    /** Opcode */ public static final char INCR    = 23;
-    /** Opcode */ public static final char INDGET  = 24;
-    /** Opcode */ public static final char INDSET  = 25;
-    /** Opcode */ public static final char INHERIT = 26;
-    /** Opcode */ public static final char ITER    = 27;
-    /** Opcode */ public static final char JIF     = 28;
-    /** Opcode */ public static final char JIFKEEP = 29;
-    /** Opcode */ public static final char JIT     = 30;
-    /** Opcode */ public static final char JITKEEP = 31;
-    /** Opcode */ public static final char JUMP    = 32;
-    /** Opcode */ public static final char LE      = 33;
-    /** Opcode */ public static final char LISTADD = 34;
-    /** Opcode */ public static final char LISTNEW = 35;
-    /** Opcode */ public static final char LOCBIND = 36;
-    /** Opcode */ public static final char LOCGET  = 37;
-    /** Opcode */ public static final char LOCMOVE = 38;
-    /** Opcode */ public static final char LOCSET  = 39;
-    /** Opcode */ public static final char LOOP    = 40;
-    /** Opcode */ public static final char LT      = 41;
-    /** Opcode */ public static final char MAPNEW  = 42;
-    /** Opcode */ public static final char MAPPUT  = 43;
-    /** Opcode */ public static final char MATCH   = 44;
-    /** Opcode */ public static final char MATCHG  = 45;
-    /** Opcode */ public static final char MATCHL  = 46;
-    /** Opcode */ public static final char METHOD  = 47;
-    /** Opcode */ public static final char MUL     = 48;
-    /** Opcode */ public static final char NE      = 49;
-    /** Opcode */ public static final char NEGATE  = 50;
-    /** Opcode */ public static final char NI      = 51;
-    /** Opcode */ public static final char NOT     = 52;
-    /** Opcode */ public static final char NULL    = 53;
-    /** Opcode */ public static final char PATTERN = 54;
-    /** Opcode */ public static final char POP     = 55;
-    /** Opcode */ public static final char POPN    = 56;
-    /** Opcode */ public static final char PROPGET = 57;
-    /** Opcode */ public static final char PROPSET = 58;
-    /** Opcode */ public static final char RECORD  = 59;
-    /** Opcode */ public static final char RETURN  = 60;
-    /** Opcode */ public static final char RULESET = 61;
-    /** Opcode */ public static final char SETADD  = 62;
-    /** Opcode */ public static final char SETNEW  = 63;
-    /** Opcode */ public static final char SUB     = 64;
-    /** Opcode */ public static final char SUPGET  = 65;
-    /** Opcode */ public static final char SWAP    = 66;
-    /** Opcode */ public static final char TGET    = 67;
-    /** Opcode */ public static final char THROW   = 68;
-    /** Opcode */ public static final char TPUT    = 69;
-    /** Opcode */ public static final char TRCPOP  = 70;
-    /** Opcode */ public static final char TRCPUSH = 71;
-    /** Opcode */ public static final char TSET    = 72;
-    /** Opcode */ public static final char TRUE    = 73;
-    /** Opcode */ public static final char UPCLOSE = 74;
-    /** Opcode */ public static final char UPGET   = 75;
-    /** Opcode */ public static final char UPSET   = 76;
+    /** Opcode */ public static final char IMPORT  = 22;
+    /** Opcode */ public static final char IN      = 23;
+    /** Opcode */ public static final char INCR    = 24;
+    /** Opcode */ public static final char INDGET  = 25;
+    /** Opcode */ public static final char INDSET  = 26;
+    /** Opcode */ public static final char INHERIT = 27;
+    /** Opcode */ public static final char ITER    = 28;
+    /** Opcode */ public static final char JIF     = 29;
+    /** Opcode */ public static final char JIFKEEP = 30;
+    /** Opcode */ public static final char JIT     = 31;
+    /** Opcode */ public static final char JITKEEP = 32;
+    /** Opcode */ public static final char JUMP    = 33;
+    /** Opcode */ public static final char LE      = 34;
+    /** Opcode */ public static final char LISTADD = 35;
+    /** Opcode */ public static final char LISTNEW = 36;
+    /** Opcode */ public static final char LOCBIND = 37;
+    /** Opcode */ public static final char LOCGET  = 38;
+    /** Opcode */ public static final char LOCMOVE = 39;
+    /** Opcode */ public static final char LOCSET  = 40;
+    /** Opcode */ public static final char LOOP    = 41;
+    /** Opcode */ public static final char LT      = 42;
+    /** Opcode */ public static final char MAPNEW  = 43;
+    /** Opcode */ public static final char MAPPUT  = 44;
+    /** Opcode */ public static final char MATCH   = 45;
+    /** Opcode */ public static final char MATCHG  = 46;
+    /** Opcode */ public static final char MATCHL  = 47;
+    /** Opcode */ public static final char METHOD  = 48;
+    /** Opcode */ public static final char MUL     = 49;
+    /** Opcode */ public static final char NE      = 50;
+    /** Opcode */ public static final char NEGATE  = 51;
+    /** Opcode */ public static final char NI      = 52;
+    /** Opcode */ public static final char NOT     = 53;
+    /** Opcode */ public static final char NULL    = 54;
+    /** Opcode */ public static final char PATTERN = 55;
+    /** Opcode */ public static final char POP     = 56;
+    /** Opcode */ public static final char POPN    = 57;
+    /** Opcode */ public static final char PROPGET = 58;
+    /** Opcode */ public static final char PROPSET = 59;
+    /** Opcode */ public static final char RECORD  = 60;
+    /** Opcode */ public static final char RETURN  = 61;
+    /** Opcode */ public static final char RULESET = 62;
+    /** Opcode */ public static final char SETADD  = 63;
+    /** Opcode */ public static final char SETNEW  = 64;
+    /** Opcode */ public static final char SUB     = 65;
+    /** Opcode */ public static final char SUPGET  = 66;
+    /** Opcode */ public static final char SWAP    = 67;
+    /** Opcode */ public static final char TGET    = 68;
+    /** Opcode */ public static final char THROW   = 69;
+    /** Opcode */ public static final char TPUT    = 70;
+    /** Opcode */ public static final char TRCPOP  = 71;
+    /** Opcode */ public static final char TRCPUSH = 72;
+    /** Opcode */ public static final char TSET    = 73;
+    /** Opcode */ public static final char TRUE    = 74;
+    /** Opcode */ public static final char UPCLOSE = 75;
+    /** Opcode */ public static final char UPGET   = 76;
+    /** Opcode */ public static final char UPSET   = 77;
 
     //-------------------------------------------------------------------------
     // Opcode names
@@ -127,6 +128,7 @@ public class Opcode {
         "GLOSET",
         "GT",
         "HASNEXT",
+        "IMPORT",
         "IN",
         "INCR",
         "INDGET",
