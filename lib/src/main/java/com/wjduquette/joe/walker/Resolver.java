@@ -170,6 +170,11 @@ class Resolver {
                 resolve(stmt.thenBranch());
                 if (stmt.elseBranch() != null) resolve(stmt.elseBranch());
             }
+            case Stmt.Import stmt -> {
+                if (inLocalScope()) {
+                    error(stmt.keyword(), "found 'import' in local scope.");
+                }
+            }
             case Stmt.Match stmt -> {
                 resolve(stmt.expr());
                 for (var c : stmt.cases()) {

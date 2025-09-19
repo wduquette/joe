@@ -83,6 +83,8 @@ public class ASTDumper {
                 }
                 yield buff.toString();
             }
+            case Stmt.Import s -> buffer()
+                .println(" '" + s.pkgName() + "." + s.symbol() + "'");
             case Stmt.Match s -> {
                 var buff = buffer().nl();
                 buff.dump("value", s.expr());

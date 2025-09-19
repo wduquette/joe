@@ -255,6 +255,7 @@ class Interpreter {
                     return execute(stmt.elseBranch());
                 }
             }
+            case Stmt.Import stmt -> throw new UnsupportedOperationException("TODO");
             case Stmt.Match stmt -> {
                 var target = evaluate(stmt.expr());
                 for (var c : stmt.cases()) {

@@ -511,6 +511,8 @@ class Compiler {
 
                 if (end_ != -1) patchJump(end_);
             }
+            case Stmt.Import s -> // TODO
+                throw new UnsupportedOperationException("TODO");
             case Stmt.Match s -> {
                 // Setup                      // Stack: locals | working
                 beginScope();                 // ∅            ; begin scope: match
