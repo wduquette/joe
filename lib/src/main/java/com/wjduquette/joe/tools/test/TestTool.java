@@ -27,11 +27,22 @@ public class TestTool implements Tool {
         Executes a test suite consisting of one or more Joe test scripts,
         accumulating the results.
         
+        The tool searches for locally installed Joe packages on a user-provided
+        library path, which must be a colon-delimited list of folder paths.
+        By default, the library path is provided by the JOE_LIB_PATH environment
+        variable (if defined); otherwise, the user can specify a library path
+        via the --libpath option.
+        
         Options:
         
-        --clark,  -c   Use the "Clark" byte-engine (default)
-        --walker, -w   Use the "Walker" AST-walker engine.
-        --verbose, -v  Enable verbose output.
+        --libpath path, --l path
+           Sets the library path to the given path.
+        --clark, -c
+            Use the "Clark" byte-engine (default)
+        --walker, -w
+            Use the "Walker" AST-walker engine.
+        --verbose, -v
+            Enable verbose output.
         
         Test Scripts
         
@@ -48,6 +59,7 @@ public class TestTool implements Tool {
     // Instance Variables
 
     String engineType = Joe.CLARK;
+    String libPath = null;
     boolean verbose = false;
     private final List<String> testScripts = new ArrayList<>();
     private int loadErrorCount = 0;
@@ -86,6 +98,7 @@ public class TestTool implements Tool {
             var arg = argq.poll();
 
             switch (arg) {
+                case "--libpath", "-l" -> libPath = toOptArg(arg, argq);
                 case "--clark", "-c" -> engineType = Joe.CLARK;
                 case "--walker", "-w" -> engineType = Joe.WALKER;
                 case "-v", "--verbose" -> verbose = true;
@@ -133,7 +146,7 @@ public class TestTool implements Tool {
         var joe = new Joe(engineType);
         joe.installPackage(new TestPackage(engineType));
         // TODO: Can we register packages once and then simply provide them to Joe?
-        joe.findLocalPackages(System.getenv(Joe.JOE_LIB_PATH));
+        joe.findLocalPackages(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH));
 
         // Only print script output if the verbose flag is set.
         joe.setOutputHandler(this::testPrinter);

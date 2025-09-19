@@ -29,12 +29,23 @@ public class WinTool extends FXTool {
         the Joe standard library along with the optional joe.console and
         joe.win packages.  See the Joe User's Guide for details.
         
-        Executes the script.  The options are as follows:
+        The tool searches for locally installed Joe packages on a user-provided
+        library path, which must be a colon-delimited list of folder paths.
+        By default, the library path is provided by the JOE_LIB_PATH environment
+        variable (if defined); otherwise, the user can specify a library path
+        via the --libpath option.
         
-        --clark,  -c   Use the "Clark" byte-engine (default)
-        --walker, -w   Use the "Walker" AST-walker engine.
-        --debug,  -d   Enable debugging output.  This is mostly of use to
-                       the Joe maintainer.
+        The options are as follows:
+        
+        --libpath path, --l path
+           Sets the library path to the given path.
+        --clark, -c
+            Use the "Clark" byte-engine (default)
+        --walker, -w
+            Use the "Walker" AST-walker engine.
+        --debug, -d
+            Enable debugging output.  This is mostly of use to
+            the Joe maintainer.
         """,
         WinTool::main
     );
@@ -68,11 +79,13 @@ public class WinTool extends FXTool {
 
         // NEXT, parse the options.
         var engineType = Joe.CLARK;
+        String libPath = null;
         var debug = false;
 
         while (!args.isEmpty() && args.peek().startsWith("-")) {
             var opt = args.poll();
             switch (opt) {
+                case "--libpath", "-l" -> libPath = toOptArg(opt, args);
                 case "--clark", "-c" -> engineType = Joe.CLARK;
                 case "--walker", "-w" -> engineType = Joe.WALKER;
                 case "--debug", "-d" -> debug = true;
@@ -106,8 +119,7 @@ public class WinTool extends FXTool {
 
         var guiPackage = new WinPackage(stage, root);
         joe.installPackage(guiPackage);
-
-        joe.findLocalPackages(System.getenv(Joe.JOE_LIB_PATH));
+        joe.findLocalPackages(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH));
 
         // NEXT, execute the script.
         try {

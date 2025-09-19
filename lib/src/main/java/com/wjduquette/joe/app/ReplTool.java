@@ -36,12 +36,25 @@ public class ReplTool implements Tool {
             -> 2
             >
         
+        The tool searches for locally installed Joe packages on a user-provided
+        library path, which must be a colon-delimited list of folder paths.
+        By default, the library path is provided by the JOE_LIB_PATH environment
+        variable (if defined); otherwise, the user can specify a library path
+        via the --libpath option.
+        
         The options are as follows:
         
-        --clark,  -c   Use the "Clark" byte-engine (default).
-        --walker, -w   Use the "Walker" AST-walker engine.
-        --debug,  -d   Enable debugging output.  This is mostly of use to
-                       the Joe maintainer.
+        The options are as follows:
+        
+        --libpath path, --l path
+           Sets the library path to the given path.
+        --clark, -c
+            Use the "Clark" byte-engine (default)
+        --walker, -w
+            Use the "Walker" AST-walker engine.
+        --debug, -d
+            Enable debugging output.  This is mostly of use to
+            the Joe maintainer.
         """,
         ReplTool::main
     );
@@ -74,11 +87,13 @@ public class ReplTool implements Tool {
     private void run(String[] args) {
         var argq = new ArrayDeque<>(List.of(args));
         var engineType = Joe.CLARK;
+        String libPath = null;
         var debug = false;
 
         while (!argq.isEmpty() && argq.peek().startsWith("-")) {
             var opt = argq.poll();
             switch (opt) {
+                case "--libpath", "-l" -> libPath = toOptArg(opt, argq);
                 case "--walker", "-w" -> engineType = Joe.WALKER;
                 case "--clark",  "-c" -> engineType = Joe.CLARK;
                 case "--debug",  "-d" -> debug = true;
@@ -96,7 +111,7 @@ public class ReplTool implements Tool {
         consolePackage.setScript("<repl>");
         consolePackage.getArgs().addAll(List.of(args));
         joe.installPackage(consolePackage);
-        joe.findLocalPackages(System.getenv(Joe.JOE_LIB_PATH));
+        joe.findLocalPackages(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH));
 
         try {
             System.out.println("Joe " + App.getVersion() + " (" +

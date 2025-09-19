@@ -25,12 +25,25 @@ public class RunTool implements Tool {
         "[options...] file.joe",
         "Executes a Joe script.",
         """
-        Executes the script.  The options are as follows:
+        Executes the script.
         
-        --clark,  -c   Use the "Clark" byte-engine (default)
-        --walker, -w   Use the "Walker" AST-walker engine.
-        --debug,  -d   Enable debugging output.  This is mostly of use to
-                       the Joe maintainer.
+        The tool searches for locally installed Joe packages on a user-provided
+        library path, which must be a colon-delimited list of folder paths.
+        By default, the library path is provided by the JOE_LIB_PATH environment
+        variable (if defined); otherwise, the user can specify a library path
+        via the --libpath option.
+        
+        The options are as follows:
+        
+        --libpath path, --l path
+           Sets the library path to the given path.
+        --clark, -c
+            Use the "Clark" byte-engine (default)
+        --walker, -w
+            Use the "Walker" AST-walker engine.
+        --debug, -d
+            Enable debugging output.  This is mostly of use to
+            the Joe maintainer.
         """,
         RunTool::main
     );
@@ -63,12 +76,14 @@ public class RunTool implements Tool {
         }
 
         var engineType = Joe.CLARK;
+        String libPath = null;
         var debug = false;
         var measureRuntime = false;
 
         while (!argq.isEmpty() && argq.peek().startsWith("-")) {
             var opt = argq.poll();
             switch (opt) {
+                case "--libpath", "-l" -> libPath = toOptArg(opt, argq);
                 case "--clark", "-c" -> engineType = Joe.CLARK;
                 case "--walker", "-w" -> engineType = Joe.WALKER;
                 case "--time", "-t" -> measureRuntime = true;
@@ -88,7 +103,7 @@ public class RunTool implements Tool {
         consolePackage.setScript(path);
         consolePackage.getArgs().addAll(argq);
         joe.installPackage(consolePackage);
-        joe.findLocalPackages(System.getenv(Joe.JOE_LIB_PATH));
+        joe.findLocalPackages(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH));
 
         try {
             if (debug) {
