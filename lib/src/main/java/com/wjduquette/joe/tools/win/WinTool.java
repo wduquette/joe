@@ -107,6 +107,8 @@ public class WinTool extends FXTool {
         var guiPackage = new WinPackage(stage, root);
         joe.installPackage(guiPackage);
 
+        joe.findLocalPackages(System.getenv(Joe.JOE_LIB_PATH));
+
         // NEXT, execute the script.
         try {
             joe.runFile(path);

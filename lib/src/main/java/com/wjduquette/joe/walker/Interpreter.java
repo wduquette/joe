@@ -255,7 +255,24 @@ class Interpreter {
                     return execute(stmt.elseBranch());
                 }
             }
-            case Stmt.Import stmt -> throw new UnsupportedOperationException("TODO");
+            case Stmt.Import stmt -> {
+                // FIRST, load the package.
+                var reg = joe.packageRegistry();
+                reg.load(stmt.pkgName());
+                var exports = reg.getExports(stmt.pkgName());
+
+                if (stmt.symbol().equals("*")) {
+                    globals.merge(exports);
+                } else if (exports.hasVariable(stmt.symbol())) {
+                    globals.setVariable(stmt.symbol(),
+                        exports.getVariable(stmt.symbol()));
+                } else {
+                    throw new RuntimeError(stmt.location(),
+                        "Package '" + stmt.pkgName() +
+                        "' does not export symbol '" +
+                        stmt.symbol() + "'.");
+                }
+            }
             case Stmt.Match stmt -> {
                 var target = evaluate(stmt.expr());
                 for (var c : stmt.cases()) {

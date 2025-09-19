@@ -88,6 +88,7 @@ public class RunTool implements Tool {
         consolePackage.setScript(path);
         consolePackage.getArgs().addAll(argq);
         joe.installPackage(consolePackage);
+        joe.findLocalPackages(System.getenv(Joe.JOE_LIB_PATH));
 
         try {
             if (debug) {

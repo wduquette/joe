@@ -125,6 +125,10 @@ public class PackageRegistry {
      * @param verbose true or false
      */
     public void findLocalPackages(String libPath, boolean verbose) {
+        if (libPath == null) {
+            if (verbose) joe.println("No library path provided.");
+            return;
+        }
         var folders = Arrays.stream(libPath.split(":"))
             .map(s -> Path.of(s).toAbsolutePath())
             .toList();

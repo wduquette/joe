@@ -132,6 +132,8 @@ public class TestTool implements Tool {
         // NEXT, configure the engine.
         var joe = new Joe(engineType);
         joe.installPackage(new TestPackage(engineType));
+        // TODO: Can we register packages once and then simply provide them to Joe?
+        joe.findLocalPackages(System.getenv(Joe.JOE_LIB_PATH));
 
         // Only print script output if the verbose flag is set.
         joe.setOutputHandler(this::testPrinter);
