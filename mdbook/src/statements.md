@@ -6,10 +6,11 @@ in Java.
 
 - [Variable Declarations](#variable-declarations)
 - [Function Declarations](#function-declarations)
-- [Class and Record Declarations](#class-declarations)
+- [Class and Record Declarations](#class-and-record-declarations)
+- [Import Declarations](#import-declarations)
 - [Expression Statements](#expression-statements)
 - [Blocks](#blocks)
-- [Return Statement](#return)
+- [Return Statement](#return-statement)
 - [If Statements](#if-statements)
 - [While Loops](#while-loops)
 - [For Loops](#for-loops)
@@ -65,7 +66,7 @@ example shown above, then the pattern match will fail and Joe will
 throw a runtime error.  Therefore, `var` should only be used when the
 shape of the target value is known ahead of time.  Use
 the [`~` operator](operators.md#matching-operator) or the
-[`match` statement](#the-match-statement) to test whether a value matches a
+[`match` statement](#match-statements) to test whether a value matches a
 particular pattern.
 
 See [Pattern Matching](patterns.md) for more on pattern matching and
@@ -73,13 +74,47 @@ destructuring binds, including Joe's full pattern syntax.
 
 ## Function Declarations
 
-Functions are declared with the `function` statement.  See
-[Functions](functions.md) for more details.
+Functions are declared with the `function` statement.
+Functions in packages are exported for later `import` via the `export` prefix.
+See [Functions](functions.md) for more details.
 
 ## Class and Record Declarations
 
 [Class](classes.md) and [record](records.md) types are declared with 
 the `class` and `record` statements respectively.
+Types in packages are exported for later `import` via the `export` prefix.
+
+## Import Declarations
+
+Types and functions exported by a registered package can be imported using
+the `import` declaration, which looks similar to Java's `import` declarations.
+It has two forms:
+
+- **import *packageName*.\*;**
+- **import *packageName*.*name*;** 
+
+The first form imports all exported types and functions from the named package.
+The second from imports only the named type or function. 
+
+Installed packages are loaded immediately on installation, and their exported
+symbols are available without explicit import.  Registered packages are loaded
+on first import.
+
+Any exported symbol may be imported from a loaded package, whether it was
+previously imported or not.
+
+For example,
+
+```joe
+// Import MyClass from my.package
+import my.package.MyClass;
+
+// Import someFunction from other.library
+import other.library.someFunction;
+
+// Import everything from really.useful.package
+import really.useful.package.*;
+```
 
 ## Expression Statements
 

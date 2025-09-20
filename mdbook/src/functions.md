@@ -11,6 +11,16 @@ function square(x) {
 Use the `return` statement to return early from a function, or to
 return a value.
 
+## Exported Functions
+
+A [Joe package](extending/packages.md) can export global functions for
+later import.  When those functions are defined in a Joe script, they must
+be explicitly exported via the `export` prefix:
+
+```joe
+export function myExportedFunction() { ... }
+```
+
 ## Variable Length Argument Lists
 
 To write a function that takes a variable length argument list, use

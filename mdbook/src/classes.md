@@ -23,6 +23,7 @@ Like [functions](functions.md), classes are first-class values; they
 can be defined in any scope, saved in variables, passed to functions
 and methods, and so forth.
 
+- [Exported Classes](#exported-classes)
 - [Class Properties](#class-properties)
 - [Variable Properties](#variable-properties)
 - [Method Properties](#method-properties)
@@ -32,6 +33,15 @@ and methods, and so forth.
 - [Method References](#method-references)
 - [Superclasses and Inheritance](#superclasses-and-inheritance)
 - [Class Instances and Facts](#class-instances-and-facts)
+ 
+## Exported Classes
+
+A [Joe package](extending/packages.md) can export classes for
+later import.  Such classes must be defined using the `export` prefix:
+
+```joe
+export class MyExportedClass { ... }
+```
 
 ## Class Properties
 

@@ -5,27 +5,35 @@ to a `Joe` interpreter as a unit.  Joe's
 [Standard Library](../library/pkg.joe.md) is just such a package, as is
 the [Test Tool API](../library/pkg.joe.test.md) provided by `joe test`.
 
-A package can be implemented in Java as a collection of
-[native functions](native_functions.md) and
-[registered types](registered_types.md), or in Joe as a collection of
-Joe [functions](../functions.md) and [classes](../classes.md), or as 
-combination of the two.
+There are two kinds of Joe package: native packages and scripted packages.
 
-Joe intentionally provides no means of installing a package at the script
-level; it is for the Java client to determine which packages it wishes
-to make available.[^import]  Consequently, packages are usually defined
-at the Java level even when they are implemented primarily as Joe code.
-
+- [Native Packages](#native-packages)
 - [Defining a Package](#defining-a-package)
 - [Installing a Package](#installing-a-package)
-- [Library Packages vs. Component Packages](#library-packages-vs-component-packages)
+- [Registering a Package for Import](#registering-a-package-for-import)
+
+## Native Packages
+
+Native packages are implemented in Java for inclusion in an application or 
+library `.jar` file.  Such a package can contain
+
+- [native functions](native_functions.md)
+- [registered types](registered_types.md)
+- Joe scripts
+
+See [Defining a Package](#defining-a-package) for details.
+
+## Scripted Packages
+
+A scripted package is collection of one or more Joe scripts, placed in a
+[Joe Package Repository](../package_repos.md) on the local file system for
+general use.  See the link for details.
 
 ## Defining a Package
 
-Defining a package is much like defining a 
-[registered type](registered_types.md).
+Defining a package is much like defining a [registered type](registered_types.md).
 
-- Subclass `JoePackage`
+- Subclass `NativePackage`
 - Give the package a name
 - Add content.
 
@@ -42,7 +50,7 @@ public class StandardLibrary extends JoePackage {
         super("joe");
 
         // Add native functions
-        globalFunction("catch", this::_catch);
+        function("catch", this::_catch);
         ...
 
         // Add native types
@@ -57,25 +65,28 @@ public class StandardLibrary extends JoePackage {
 ```
 
 A global function is just a [native function](native_functions.md); when the
-package is installed, each defined global function will be 
-installed automatically into the interpreter using `Joe::installGlobalFunction`.
-The function implementations are typically placed within the `JoePackage` subclass 
-itself, as shown here.
+package is installed each defined global function will be 
+installed automatically into the interpreter.
+The function implementations are typically placed within the `NativePackage` 
+subclass itself, as shown here.
 
 The types are simply [registered types](registered_types.md); when the
 package is installed, each listed type will be installed automatically
-into the interpreter using `Joe::installType`.  The actual proxies
-can be defined as nested classes in the `JoePackage` subclass, but are
+into the interpreter. The actual proxies
+can be defined as nested classes in the `NativePackage` subclass, but are
 more typically defined in their own `.java` files.
 
 Finally, a script resource is simply a Joe script found as a resource file 
 in the project's jar file, usually adjacent to the package class that 
-references it.  At installation, the script resources will be loaded and 
-executed after the global functions and native types.
+references it.
+
+Script resources are loaded into the package's environment when the package
+is first loaded.  Only exported types and functions are available for
+installation or import.
 
 ## Installing a Package
 
-To install a package into an interpreter, use `Joe::installPackage`:
+To install a package directly into an interpreter, use `Joe::installPackage`:
 
 ```java
 var joe = Joe();
@@ -83,21 +94,20 @@ joe.installPackage(new MyPackage());    // OR
 joe.installPackage(MyPackage.PACKAGE);
 ```
 
-## Library Packages vs. Component Packages
+The package's exported functions and types will be immediately available to
+scripts.
 
-Reusable libraries, such as Joe's standard library, are usually defined 
-as `JoePackage` subclasses, as shown here.
+## Registering a Package for Import
 
-Sometimes a particular component, e.g., `joe test`, will define a
-component-specific package of code to be installed by
-the component into the component's own instance of `Joe`.  In this 
-case the component might or might not define an explicit `JoePackage` subclass,
-as the `JoePackage` is primarily a convenient way for a client to install
-reusable bindings.
+Alternatively, a package can be registered for later 
+[import](../statements.md#import-declarations).  Use
+`Joe::registerPackage` to register a `NativePackage` for import.
 
-However, the component's API should still be thought of as a package, and
-given a package name, as this is how distinct bindings are distinguished
-in the documentation produced by the `joe doc` tool.
+```java
+var joe = Joe();
+joe.registerPackage(new MyPackage());    // OR
+joe.registerPackage(MyPackage.PACKAGE);
+```
 
-[^import]: Of course, a client could choose to provide a native function
-for importing its own packages.
+Packages found in [Joe package repositories](../package_repos.md) are
+registered automatically.

@@ -24,8 +24,18 @@ Like Joe [classes](classes.md), a record type is a first-class value that
 may be declared in any scope, passed to functions, assigned to variables,
 and so forth.
 
+- [Exported Records](#exported-records)
 - [Records vs. Classes](#records-vs-classes)
 - [Records and Facts](#records-and-facts)
+ 
+## Exported Records
+
+A [Joe package](extending/packages.md) can export record types for
+later import.  Such types must be defined using the `export` prefix:
+
+```joe
+export record MyExportedRecord(...) { ... }
+```
 
 ## Records vs. Classes
 
