@@ -44,14 +44,14 @@ public class TestPackage extends NativePackage {
         super("joe.test");
         this.engine = engine;
 
-        globalFunction("assertEQ",     this::_assertEQ);
-        globalFunction("assertError",  this::_assertError);
-        globalFunction("assertF",  this::_assertF);
-        globalFunction("assertT",   this::_assertT);
-        globalFunction("engine",       this::_engine);
-        globalFunction("fail",         this::_fail);
-        globalFunction("skip",         this::_skip);
-        globalFunction("typedValue",   this::_typedValue);
+        function("assertEQ",     this::_assertEQ);
+        function("assertError",  this::_assertError);
+        function("assertF",  this::_assertF);
+        function("assertT",   this::_assertT);
+        function("engine",       this::_engine);
+        function("fail",         this::_fail);
+        function("skip",         this::_skip);
+        function("typedValue",   this::_typedValue);
 
         scriptResource(getClass(), "pkg.joe.test.joe");
 

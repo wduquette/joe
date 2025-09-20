@@ -12,10 +12,10 @@ class StandardLibrary extends NativePackage {
         // @package joe
         // @title Joe Standard Library
         // The `joe` package contains Joe's standard library.
-        globalFunction("catch",     this::_catch);
-        globalFunction("print",     this::_print);
-        globalFunction("printf",    this::_printf);
-        globalFunction("println",   this::_println);
+        function("catch",     this::_catch);
+        function("print",     this::_print);
+        function("printf",    this::_printf);
+        function("println",   this::_println);
 
         type(AssertErrorType.TYPE);
         type(BooleanType.TYPE);

@@ -13,8 +13,10 @@ public class NativePackage extends JoePackage {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final List<NativeFunction> globalFunctions = new ArrayList<>();
-    private final List<ProxyType<?>> types = new ArrayList<>();
+    private final List<NativeFunction> exportedFunctions = new ArrayList<>();
+    private final List<NativeFunction> packageFunctions = new ArrayList<>();
+    private final List<ProxyType<?>> exportedTypes = new ArrayList<>();
+    private final List<ProxyType<?>> packageTypes = new ArrayList<>();
     private final List<ScriptResource> scriptResources = new ArrayList<>();
 
     //-------------------------------------------------------------------------
@@ -38,17 +40,26 @@ public class NativePackage extends JoePackage {
      * @param engine The engine
      */
     public void load(Joe joe, Engine engine) {
-        // TODO: support package-private, register-only
-
-        // Export global functions
-        for (var function : globalFunctions) {
+        // Export exported functions
+        for (var function : exportedFunctions) {
             export(engine, function.name(), function);
         }
 
-        // Register and export types
-        for (var type : types) {
+        // Register and export exported types
+        for (var type : exportedTypes) {
             joe.registerType(type);
             export(engine, type.name(), type);
+        }
+
+        // Install package functions
+        for (var function : packageFunctions) {
+            install(engine, function.name(), function);
+        }
+
+        // Register and install package types
+        for (var type : packageTypes) {
+            joe.registerType(type);
+            install(engine, type.name(), type);
         }
 
         // Load script resources.
@@ -94,20 +105,42 @@ public class NativePackage extends JoePackage {
     // Package builders
 
     /**
-     * Adds a global function to the package.
+     * Adds an exported function to the package.
      * @param name The function's name
      * @param joeLambda The callable, usually a method reference.
      */
-    public final void globalFunction(String name, JoeLambda joeLambda) {
-        globalFunctions.add(new NativeFunction(name, "function", joeLambda));
+    public final void function(String name, JoeLambda joeLambda) {
+        exportedFunctions.add(new NativeFunction(name, "function", joeLambda));
     }
 
     /**
-     * Adds a registered type to the package, given its proxy.
+     * Adds an exported type to the package given its proxy.
      * @param proxyType The proxy.
      */
     public final void type(ProxyType<?> proxyType) {
-        types.add(proxyType);
+        exportedTypes.add(proxyType);
+    }
+
+    /**
+     * Adds a package-private function to the package.  Private functions
+     * are for use by the package's scripts.
+     * @param name The function's name
+     * @param joeLambda The callable, usually a method reference.
+     */
+    @SuppressWarnings("unused")
+    public final void packageFunction(String name, JoeLambda joeLambda) {
+        packageFunctions.add(new NativeFunction(name, "function", joeLambda));
+    }
+
+    /**
+     * Adds a package-private type to the package given its proxy.
+     * Private types are for use by the package's scripts.  Values
+     * of private types may be returned by exported functions.
+     * @param proxyType The proxy.
+     */
+    @SuppressWarnings("unused")
+    public final void packageType(ProxyType<?> proxyType) {
+        packageTypes.add(proxyType);
     }
 
     /**
