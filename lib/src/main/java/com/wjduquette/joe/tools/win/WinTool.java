@@ -2,6 +2,7 @@ package com.wjduquette.joe.tools.win;
 
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
+import com.wjduquette.joe.PackageFinder;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.console.ConsolePackage;
@@ -119,7 +120,10 @@ public class WinTool extends FXTool {
 
         var guiPackage = new WinPackage(stage, root);
         joe.installPackage(guiPackage);
-        joe.findLocalPackages(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH));
+        var found = PackageFinder.find(libPath != null
+            ? libPath
+            : System.getenv(Joe.JOE_LIB_PATH));
+        joe.registerPackages(found);
 
         // NEXT, execute the script.
         try {

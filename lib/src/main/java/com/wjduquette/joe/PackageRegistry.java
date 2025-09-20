@@ -1,11 +1,5 @@
 package com.wjduquette.joe;
 
-import com.wjduquette.joe.nero.Nero;
-import com.wjduquette.joe.nero.NeroDatabase;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -13,11 +7,6 @@ import java.util.*;
  * whether they have been loaded or not and their exported symbols.
  */
 public class PackageRegistry {
-    /**
-     * A Nero file containing local package information.
-     */
-    public static final String REPOSITORY_FILE = "repository.nero";
-
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -71,10 +60,30 @@ public class PackageRegistry {
     //-------------------------------------------------------------------------
     // Operations
 
+    /**
+     * Registers all packages found by the package finder.
+     * @param finder The finder
+     */
+    public void register(PackageFinder finder) {
+        for (var pkg : finder.getPackages().values()) {
+            register(pkg);
+        }
+    }
+
+    /**
+     * Registers the specific package.
+     * @param pkg The package
+     */
     public void register(JoePackage pkg) {
         registry.put(pkg.name(), pkg);
     }
 
+    /**
+     * Loads the named package.
+     * @param pkgName The package name.
+     * @throws JoeError if the package is not found.
+     * @throws JoeError if the package has a recursive dependency.
+     */
     public void load(String pkgName) {
         if (isLoaded(pkgName)) return;
         if (loadingStack.contains(pkgName)) {
@@ -127,98 +136,5 @@ public class PackageRegistry {
                 pkgName + "'.");
         }
         return exportsMap.get(pkgName);
-    }
-
-    //------------------------------------------------------------------------
-    // Local Package Support
-
-    /**
-     * Searches libPath, a colon-delimited list of local folders, for
-     * local Joe packages.  If verbose is true the details of the search
-     * are written to the Joe output handler.
-     * @param libPath The path
-     * @param verbose true or false
-     */
-    public void findLocalPackages(String libPath, boolean verbose) {
-        if (libPath == null) {
-            if (verbose) joe.println("No library path provided.");
-            return;
-        }
-        var folders = Arrays.stream(libPath.split(":"))
-            .map(s -> Path.of(s).toAbsolutePath())
-            .toList();
-        for (var folder : folders) {
-            if (verbose) joe.println("Searching folder: " + folder);
-            findRepositories(folder, verbose);
-        }
-    }
-
-    private void findRepositories(Path folder, boolean verbose) {
-        try (var stream = Files.walk(folder, 10)) {
-            var repos = stream
-                .filter(p -> p.getFileName().toString().equals(REPOSITORY_FILE))
-                .toList();
-            for (var repo : repos) {
-                if (verbose) joe.println("  Found: " + repo);
-                findPackagesInRepository(repo, verbose);
-            }
-        } catch (IOException ex) {
-            if (verbose) {
-                joe.println("  Error reading folder: " + ex.getMessage());
-            }
-        }
-    }
-
-    private void findPackagesInRepository(Path repo, boolean verbose) {
-        NeroDatabase db;
-        try {
-            db = new NeroDatabase().update("""
-                    define ScriptedPackage/name, scriptFiles;
-                    define JarPackage/name, jarFile, className;
-                    """)
-                .load(repo);
-        } catch (JoeError ex) {
-            if (verbose) {
-                joe.println("    Error initializing package registry");
-                joe.println(ex.getTraceReport().indent(6));
-            }
-            return;
-        }
-
-        var folder = repo.getParent();
-        for (var f : db.all()) {
-            var map = f.getFieldMap();
-            JoePackage pkg = switch (f.relation()) {
-                case "ScriptedPackage" -> {
-                    if (verbose) joe.println("    " + Nero.toNeroAxiom(joe, f));
-                    var pkgName = joe.toPackageName(map.get("name"));
-                    var scriptFiles = joe.toList(map.get("scriptFiles"));
-                    var paths = scriptFiles.stream()
-                        .map(s -> folder.resolve(joe.stringify(s)))
-                        .toList();
-                    yield new ScriptedPackage(pkgName, folder, paths);
-                }
-                case "JarPackage" -> {
-                    if (verbose) joe.println("    " + Nero.toNeroAxiom(joe, f));
-                    if (verbose) joe.println("      (Unsupported)");
-                    yield null;
-                }
-                default -> {
-                    if (verbose) joe.println("    Unexpected fact: " +
-                        Nero.toNeroAxiom(joe, f));
-                    yield null;
-                }
-            };
-
-            if (pkg != null) {
-                if (registry.containsKey(pkg.name())) {
-                    if (verbose) joe.println(
-                        "    Duplicate package name, skipping: '" +
-                            pkg.name() + "'.");
-                } else {
-                    register(pkg);
-                }
-            }
-        }
     }
 }

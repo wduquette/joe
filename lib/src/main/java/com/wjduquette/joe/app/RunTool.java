@@ -1,5 +1,6 @@
 package com.wjduquette.joe.app;
 
+import com.wjduquette.joe.PackageFinder;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
@@ -103,7 +104,10 @@ public class RunTool implements Tool {
         consolePackage.setScript(path);
         consolePackage.getArgs().addAll(argq);
         joe.installPackage(consolePackage);
-        joe.findLocalPackages(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH));
+        var found = PackageFinder.find(libPath != null
+            ? libPath
+            : System.getenv(Joe.JOE_LIB_PATH));
+        joe.registerPackages(found);
 
         try {
             if (debug) {

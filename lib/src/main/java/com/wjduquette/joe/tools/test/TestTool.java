@@ -63,9 +63,10 @@ public class TestTool implements Tool {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    String engineType = Joe.CLARK;
-    String libPath = null;
-    boolean verbose = false;
+    private String engineType = Joe.CLARK;
+    private String libPath = null;
+    private PackageFinder finder = null;
+    private boolean verbose = false;
     private final List<String> testScripts = new ArrayList<>();
     private int loadErrorCount = 0;
     private int successCount = 0;
@@ -111,6 +112,11 @@ public class TestTool implements Tool {
             }
         }
 
+        // FIRST, find any local packages
+        if (libPath != null) {
+            finder = PackageFinder.find(libPath);
+        }
+
         // NEXT, run the tests.
         var startTime = Instant.now();
         System.out.println("Joe " + App.getVersion() + " (" +
@@ -150,7 +156,9 @@ public class TestTool implements Tool {
         // NEXT, configure the engine.
         var joe = new Joe(engineType);
         joe.installPackage(new TestPackage(engineType));
-        joe.findLocalPackages(libPath);
+        if (finder != null) {
+            joe.registerPackages(finder);
+        }
 
         // Only print script output if the verbose flag is set.
         joe.setOutputHandler(this::testPrinter);

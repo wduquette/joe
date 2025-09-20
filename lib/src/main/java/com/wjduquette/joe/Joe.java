@@ -169,15 +169,11 @@ public class Joe {
     }
 
     /**
-     * Searches the given libPath for Joe packages on the local disk.
-     * The libPath should be a colon-delimited list of folders; Joe will
-     * search the folders for "repository.nero" files and register all
-     * packages found in them.  See the "joe lib" tool for debugging
-     * local package registration.
-     * @param libPath The lib path
+     * Registers all packages found by the package finder.
+     * @param finder The finder
      */
-    public void findLocalPackages(String libPath) {
-        packageRegistry.findLocalPackages(libPath, false);
+    public void registerPackages(PackageFinder finder) {
+        packageRegistry.register(finder);
     }
 
     /**

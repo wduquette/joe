@@ -1,6 +1,7 @@
 package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.PackageFinder;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 
@@ -21,7 +22,7 @@ public class LibTool implements Tool {
         """
         Searches the local disk for Joe packages.  By default it checks
         the folders on the JOE_LIB_PATH, a colon-delimited list of
-        library folders.  Lists all found packages, along with any 
+        library folders.  Lists all found packages, along with any
         errors encountered while searching.
         
         Options:
@@ -29,7 +30,7 @@ public class LibTool implements Tool {
         --path path     Search the given path instead of JOE_LIB_PATH.
         --check         Verifies that all packages found can be loaded.
         
-        See the Joe User's Guide for information on how to create a 
+        See the Joe User's Guide for information on how to create a
         local package.
         """,
         LibTool::main
@@ -77,9 +78,8 @@ public class LibTool implements Tool {
             System.exit(64);
         }
 
-        var joe = new Joe();
-        var reg = joe.packageRegistry();
-        reg.findLocalPackages(libPath, true);
+        var finder = new PackageFinder();
+        finder.findPackages(libPath, true);
 
         if (doCheck) {
             System.out.println("--check is not yet implemented.");
