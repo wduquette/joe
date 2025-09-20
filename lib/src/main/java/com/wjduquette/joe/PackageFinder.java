@@ -157,8 +157,10 @@ public class PackageFinder {
                 }
                 case "JarPackage" -> {
                     if (verbose) joe.println("    " + Nero.toNeroAxiom(joe, f));
-                    if (verbose) joe.println("      (Unsupported)");
-                    yield null;
+                    var pkgName = joe.toPackageName(map.get("name"));
+                    var jarFile = folder.resolve(joe.stringify(map.get("jarFile")));
+                    var className = joe.stringify(map.get("className"));
+                    yield new JarPackage(pkgName, folder, jarFile, className);
                 }
                 default -> {
                     if (verbose) joe.println("    Unexpected fact: " +
