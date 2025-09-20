@@ -4,14 +4,36 @@ The `joe test` tool is used to execute test scripts for Joe code and
 native APIs. This section explains how to write a test script,
 run tests, and interpret the results; and also how to extend Joe's
 test runner to include client-specific Joe 
-[packages](extending/packages.md).
+[packages](#testing-client-packages).
 
+- [Options](#options)
 - [Writing a Test Script](#writing-a-test-script)
 - [Test Outcomes](#test-outcomes)
 - [Test Scaffolding](#test-scaffolding)
 - [Test Checkers](#test-checkers)
 - [Running Test Scripts](#running-test-scripts)
-- [Extending the Test Runner](#extending-the-test-runner)
+- [Testing Client Packages](#testing-client-packages)
+
+## Options
+
+`joe test` takes the following options:
+
+**--verbose**, **-v**
+
+Enables verbose output.
+
+**--libpath *path***, **-l *path***
+
+Sets the [library path](#testing-client-packages) to the given path.  Use this
+to test external packages.
+
+**--clark**, **-c**
+
+Use the "Clark" byte-engine (the default).
+
+**--walker**, **-w**
+
+Use the "Walker" AST-walker engine.
 
 ## Writing a Test Script
 
@@ -112,31 +134,27 @@ output, use the `--verbose` option (aka `-v`).  The output will list
 each test script, each test name in the file, and any output related
 to each test.
 
-## Extending the Test Runner
+## Testing Client Packages
 
-As with `joe run` and `joe repl`, Joe conducts all tests in a vanilla Joe
+`joe test` conducts all tests in a vanilla Joe that provides
 interpreter; the only extensions are `joe test`'s 
-[test API](library/pkg.joe.test.md).  A client project will usually wish to use 
-the test runner for its own Joe bindings.
+[test API](library/pkg.joe.test.md).  Other packages provided as part of Joe can sometimes
+be imported into test scripts using the `import` statement.
 
-And as with `joe run`, Joe can't predict the context in which those bindings
-will need to be tested; it might be an entire scriptable application.  Thus,
-Joe expects that client will provide their own test tool.
+A client project's packages can be made available for import in one of two
+ways.  
 
-As of Joe 0.2.0, the simplest way to do this is to copy the test tool and
-modify the copy.  The test tool is defined by the Java class
-`com.wjduquette.joe.tools.test.TestTool`.  It is a short, straightforward
-file.
+First, the user can configure `joe test` to load the required packages
+from the client's `.jar` file by providing a `repository.nero` file
+and using the `--libpath`.  See [Joe Package Repositories](package_repos.md)
+for more information.
 
-The relevant code is in the `runTest()` method:
+This approach might not work for client packages that require significant
+access to a client's application's internals.  In particular, it will not
+work for `NativePackages` that lack a no-argument constructor.
 
-```java
-// NEXT, configure the engine.
-var joe = new Joe();
-joe.installPackage(TestPackage.PACKAGE);
-```
-
-At this point in `runTest`, install any required native functions, types,
-or packages as described in [Extending Joe](extending/extending.md).
-
-We hope to make this simpler in a later release.
+Second, the client project can implement its own test runner as a 
+copy of the Joe `TestTool`. At present this requires copying the entire 
+`TestTool` class, modifying it as needed, and executing it from a client 
+project application.  This is not ideal, and in the future I intend to provide 
+a better framework for this.

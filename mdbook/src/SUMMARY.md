@@ -28,7 +28,8 @@
   - [Joe Packages](extending/packages.md)
   - [Native Records](extending/native_records.md)
   - [Native Classes](extending/native_classes.md)
-
+- [Joe Package Repositories](package_repos.md)
+ 
 ---
 
 # Nero Datalog

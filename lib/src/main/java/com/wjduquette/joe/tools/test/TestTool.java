@@ -27,12 +27,6 @@ public class TestTool implements Tool {
         Executes a test suite consisting of one or more Joe test scripts,
         accumulating the results.
         
-        The tool searches for locally installed Joe packages on a user-provided
-        library path, which must be a colon-delimited list of folder paths.
-        By default, the library path is provided by the JOE_LIB_PATH environment
-        variable (if defined); otherwise, the user can specify a library path
-        via the --libpath option.
-        
         Options:
         
         --libpath path, --l path
@@ -51,6 +45,17 @@ public class TestTool implements Tool {
         throws a Joe AssertError, either via Joe's assert statement or by
         using one of the test checkers defined by the test tool.  See
         the Joe User's Guide for more details.
+        
+        Testing Joe Libraries
+        
+        If the --libpath option is used, the tool searches for
+        Joe packages on the given library path, which must be a colon-delimited
+        list of folder paths.
+        
+        NOTE: `joe test` does not load packages from the JOE_LIB_PATH, as it
+        assumes that the user is testing the library from within a code
+        repository, not as installed for general use.
+        
         """,
         TestTool::main
     );
@@ -145,8 +150,7 @@ public class TestTool implements Tool {
         // NEXT, configure the engine.
         var joe = new Joe(engineType);
         joe.installPackage(new TestPackage(engineType));
-        // TODO: Can we register packages once and then simply provide them to Joe?
-        joe.findLocalPackages(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH));
+        joe.findLocalPackages(libPath);
 
         // Only print script output if the verbose flag is set.
         joe.setOutputHandler(this::testPrinter);
