@@ -5,8 +5,8 @@ Win.setTitle("joe win: Demo")
 
 // The Page class
 class Page extends VBox {
-    method init(name) { @name = name; }
-    method toString() { return @name; }
+    method init(name) { .name = name; }
+    method toString() { return .name; }
 }
 
 // GridPanePage
@@ -30,9 +30,9 @@ class GridPanePage extends Page {
 var pageList = ListView();
 var pagePane = StackPane();
 
-var pages = List(
+var pages = [
     GridPanePage()
-);
+];
 
 //-----------------------------------------------------------------------------
 // Logic

@@ -810,7 +810,7 @@ class VirtualMachine {
                 case SUPGET -> {
                     var name = readString();
                     var superclass = (JoeClass)pop();
-                    var instance = (JoeValue)peek(0);
+                    var instance = peek(0);
                     var method = superclass.bind(instance, name);
 
                     if (method != null) {

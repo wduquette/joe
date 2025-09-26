@@ -14,6 +14,9 @@ public class Instance implements JoeValue {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The actual instance
+    private final Object self;
+
     // The class for which this is an instance
     private final JoeClass joeClass;
 
@@ -23,9 +26,25 @@ public class Instance implements JoeValue {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an instance given the Joe class and field map.
+     * @param joeClass The class
+     * @param fieldMap The field map
+     */
     public Instance(JoeClass joeClass, Map<String,Object> fieldMap) {
+        this.self = this;
         this.joeClass = joeClass;
         this.fieldMap = fieldMap;
+    }
+
+    /**
+     * Creates an instance that wraps a NativeInstance.
+     * @param joeInstance The NativeInstance
+     */
+    public Instance(JoeInstance joeInstance) {
+        this.self = joeInstance;
+        this.joeClass = joeInstance.getJoeClass();
+        this.fieldMap = joeInstance.getInstanceFieldMap();
     }
 
     //-------------------------------------------------------------------------
@@ -47,7 +66,7 @@ public class Instance implements JoeValue {
             return fieldMap.get(name);
         }
 
-        JoeCallable method = joeClass.bind(this, name);
+        JoeCallable method = joeClass.bind(self, name);
 
         if (method != null) return method;
 

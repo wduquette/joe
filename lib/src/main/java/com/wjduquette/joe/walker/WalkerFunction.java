@@ -73,7 +73,7 @@ final class WalkerFunction implements NativeCallable {
         return declaration.name().span();
     }
 
-    WalkerFunction bind(JoeValue instance) {
+    WalkerFunction bind(Object instance) {
         WalkerEnvironment environment = new WalkerEnvironment(closure);
         environment.setVariable("this", instance);
         return new WalkerFunction(interpreter, declaration, environment,

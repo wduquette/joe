@@ -2,17 +2,19 @@ package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.*;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * A Joe-equivalent for the Java StringBuilder.
+ * A Joe replacement for the Java StringBuilder.
  */
-public class TextBuilder implements JoeValue {
+public class TextBuilder implements JoeInstance {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The object infrastructure
-    private final JoeValueCore core;
+    // The Joe class and field map.
+    private final JoeClass joeClass;
+    private final Map<String,Object> fieldMap = new HashMap<>();
 
     // The buffer
     private StringBuilder buff = new StringBuilder();
@@ -25,8 +27,14 @@ public class TextBuilder implements JoeValue {
      * @param joeClass The Joe class for which this is the Java instance.
      */
     public TextBuilder(JoeClass joeClass) {
-        this.core = new JoeValueCore(joeClass, this);
+        this.joeClass = joeClass;
     }
+
+    //-------------------------------------------------------------------------
+    // NativeInstance API
+
+    @Override public JoeClass getJoeClass() { return joeClass; }
+    @Override public Map<String, Object> getInstanceFieldMap() { return fieldMap; }
 
     //-------------------------------------------------------------------------
     // TextBuilder API
@@ -55,13 +63,4 @@ public class TextBuilder implements JoeValue {
     public String toString() {
         return buff.toString();
     }
-
-    //-------------------------------------------------------------------------
-    // JoeValue API
-
-    @Override public JoeType type() { return core.type(); }
-    @Override public List<String> getFieldNames() { return core.getFieldNames(); }
-    @Override public Object get(String name) { return core.get(name); }
-    @Override public void set(String name, Object value) { core.set(name, value); }
-    @Override public String stringify(Joe joe) { return core.stringify(joe); }
 }

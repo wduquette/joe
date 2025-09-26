@@ -47,7 +47,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     }
 
     @Override
-    public JoeValue make(Joe joe, JoeClass joeClass) {
+    public Object make(Joe joe, JoeClass joeClass) {
         return new TextBuilder(joeClass);
     }
 

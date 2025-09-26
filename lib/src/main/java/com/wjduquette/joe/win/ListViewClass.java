@@ -61,7 +61,7 @@ class ListViewClass extends FXType<ListViewInstance> {
     }
 
     @Override
-    public JoeValue make(Joe joe, JoeClass joeClass) {
+    public Object make(Joe joe, JoeClass joeClass) {
         return new ListViewInstance(joe, joeClass);
     }
 
@@ -139,13 +139,9 @@ class ListViewClass extends FXType<ListViewInstance> {
     // the `ListView` itself.
     private Object _onSelect(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(1, "onSelect(callable)");
-        var handler = args.next();
+        var handler = joe.toCallable(args.next());
 
-        if (handler instanceof NativeCallable callable) {
-            node.setOnSelect(n -> joe.call(callable, n));
-        } else {
-            throw joe.expected("callable", handler);
-        }
+        node.setOnSelect(n -> joe.call(handler, n));
         return node;
     }
 

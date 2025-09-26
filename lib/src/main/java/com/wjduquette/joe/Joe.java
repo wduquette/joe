@@ -477,11 +477,15 @@ public class Joe {
      * @return The JoeValue or null if the value is null.
      */
     public JoeValue asJoeValue(Object value) {
-        if (value == null) return NULL;
-        if (value instanceof JoeValue obj) return obj;
-
-        var proxy = lookupProxy(value.getClass());
-        return new TypedValue(this, proxy, value);
+        return switch (value) {
+            case null -> NULL;
+            case JoeValue jv -> jv;
+            case JoeInstance nat -> new Instance(nat);
+            default -> {
+                var proxy = lookupProxy(value.getClass());
+                yield new TypedValue(this, proxy, value);
+            }
+        };
     }
 
     //-------------------------------------------------------------------------
@@ -725,6 +729,20 @@ public class Joe {
      */
     public boolean toBoolean(Object arg) {
         return Joe.isTruthy(arg);
+    }
+
+    /**
+     * Ensures that the argument is callable by the execution engine.
+     * @param arg The argument
+     * @return The argument
+     * @throws JoeError if the argument is not callable.
+     */
+    public Object toCallable(Object arg) {
+        if (isCallable(arg)) {
+            return arg;
+        } else {
+            throw expected("callable", arg);
+        }
     }
 
     /**
