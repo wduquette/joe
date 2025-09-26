@@ -13,6 +13,8 @@ import com.wjduquette.joe.types.TypeType;
  * A class defined in a Joe script.
  */
 class WalkerClass implements JoeClass, JoeValue, NativeCallable {
+    private final static String TO_STRING = "toString";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -29,7 +31,7 @@ class WalkerClass implements JoeClass, JoeValue, NativeCallable {
     private final Map<String, WalkerFunction> staticMethods;
     private final Map<String, Object> fields = new HashMap<>();
 
-    // JoeInstance Instance Methods
+    // Instance Methods
     private final Map<String, WalkerFunction> methods;
 
     //-------------------------------------------------------------------------
@@ -113,6 +115,11 @@ class WalkerClass implements JoeClass, JoeValue, NativeCallable {
 
         if (superclass != null) {
             return superclass.bind(value, name);
+        }
+
+        if (name.equals(TO_STRING)) {
+            return new NativeMethod<>(value, "toString",
+                (objc, joe, args) -> objc.toString());
         }
 
         return null;

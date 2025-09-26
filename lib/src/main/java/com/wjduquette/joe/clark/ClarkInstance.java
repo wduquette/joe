@@ -23,9 +23,6 @@ public class ClarkInstance implements JoeValue {
     // The object's field values.
     final Map<String,Object> fields = new HashMap<>();
 
-    // Default "toString()" implementation.
-    private final NativeCallable _toString;
-
     //-------------------------------------------------------------------------
     // Constructor
 
@@ -36,11 +33,6 @@ public class ClarkInstance implements JoeValue {
      */
     ClarkInstance(JoeClass klass) {
         this.klass = klass;
-
-        // The class might define its own explicit toString() method;
-        // but provide a default.
-        this._toString = new NativeMethod<>(this, "toString",
-            (objc, joe, args) -> this.toString());
     }
 
     //-------------------------------------------------------------------------
@@ -66,10 +58,6 @@ public class ClarkInstance implements JoeValue {
 
         if (method != null) {
             return method;
-        }
-
-        if (name.equals(TO_STRING)) {
-            return _toString;
         }
 
         throw new JoeError("Undefined property '" + name + "'.");

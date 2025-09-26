@@ -12,6 +12,8 @@ import java.util.Map;
  * BertClass is the internal representation for a scripted Joe class.
  */
 public class ClarkClass implements JoeClass, JoeValue, ClarkType, ClarkCallable {
+    private final static String TO_STRING = "toString";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -104,9 +106,14 @@ public class ClarkClass implements JoeClass, JoeValue, ClarkType, ClarkCallable 
 
         if (nativeAncestor != null) {
             return nativeAncestor.bind(value, name);
-        } else {
-            return null;
         }
+
+        if (name.equals(TO_STRING)) {
+            return new NativeMethod<>(value, "toString",
+                (objc, joe, args) -> objc.toString());
+        }
+
+        return null;
     }
 
     @Override
