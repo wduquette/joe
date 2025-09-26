@@ -141,7 +141,7 @@ class ListViewClass extends FXType<ListViewInstance> {
         args.exactArity(1, "onSelect(callable)");
         var handler = joe.toCallable(args.next());
 
-        node.setOnSelect(n -> joe.call(handler, n));
+        node.setOnSelect(new JoeConsumer<>(joe, handler));
         return node;
     }
 

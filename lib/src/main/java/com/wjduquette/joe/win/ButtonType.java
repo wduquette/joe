@@ -55,7 +55,7 @@ class ButtonType extends FXType<Button> {
     // @init
     // @args [text], [action]
     // Returns a `Button`. If the *text* is given, the button will display
-    // the text.  If the *action* is also given, it must be a no-arg
+    // the text.  If the *action* is also given, it must be a one-arg
     // callable; it will be invoked when the button is pressed.
     private Object _initializer(Joe joe, Args args) {
         args.arityRange(0, 2, "Button([text],[action])");
@@ -64,7 +64,7 @@ class ButtonType extends FXType<Button> {
             case 1 -> new Button(joe.stringify(args.next()));
             case 2 -> {
                 var btn = new Button(joe.stringify(args.next()));
-                btn.setOnAction(evt -> joe.call(args.next()));
+                btn.setOnAction(new JoeEventHandler<>(joe, args.next()));
                 yield btn;
             }
             default -> throw new IllegalStateException("Bad range.");
@@ -78,12 +78,12 @@ class ButtonType extends FXType<Button> {
     // @method action
     // @args callable
     // @result this
-    // Adds a no-arg *callable* to the button as its action; pressing the
+    // Adds a one-arg *callable* to the button as its action; pressing the
     // button will invoke the callable.
-    private Object _action(Button node, Joe joe, Args args) {
+    private Object _action(Button btn, Joe joe, Args args) {
         args.exactArity(1, "action(callable)");
-        node.setOnAction(evt -> joe.call(args.next()));
-        return node;
+        btn.setOnAction(new JoeEventHandler<>(joe, args.next()));
+        return btn;
     }
 
     //**
@@ -91,9 +91,9 @@ class ButtonType extends FXType<Button> {
     // @args text
     // @result this
     // Sets the button's *text*.
-    private Object _text(Button node, Joe joe, Args args) {
+    private Object _text(Button btn, Joe joe, Args args) {
         args.exactArity(1, "text(text)");
-        node.setText(joe.stringify(args.next()));
-        return node;
+        btn.setText(joe.stringify(args.next()));
+        return btn;
     }
 }
