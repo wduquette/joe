@@ -66,7 +66,7 @@ class WalkerClass implements JoeClass, JoeValue, NativeCallable {
     }
 
     public Object call(Joe joe, Args args) {
-        JoeValue instance = make(joe, this);
+        Object instance = make(joe, this);
         var initializer = (WalkerFunction)bind(instance, INIT);
         if (initializer != null) {
             try {
@@ -97,7 +97,7 @@ class WalkerClass implements JoeClass, JoeValue, NativeCallable {
 
 
     @Override
-    public JoeValue make(Joe joe, JoeClass joeClass) {
+    public Object make(Joe joe, JoeClass joeClass) {
         if (superclass != null) {
             return superclass.make(joe, joeClass);
         } else {
@@ -110,7 +110,7 @@ class WalkerClass implements JoeClass, JoeValue, NativeCallable {
         var method = methods.get(name);
 
         if (method != null) {
-            return method.bind((JoeValue)value);
+            return method.bind(value);
         }
 
         if (superclass != null) {

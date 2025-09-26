@@ -36,7 +36,7 @@ public interface JoeClass extends JoeType, JoeCallable {
      * @param joeClass The actual parent class, either this class or a subclass.
      * @return The instance
      */
-    default JoeValue make(Joe joe, JoeClass joeClass) {
+    default Object make(Joe joe, JoeClass joeClass) {
         throw new UnsupportedOperationException();
     }
 }

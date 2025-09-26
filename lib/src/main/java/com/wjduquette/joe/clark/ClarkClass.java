@@ -122,7 +122,7 @@ public class ClarkClass implements JoeClass, JoeValue, ClarkType, ClarkCallable 
     }
 
     @Override
-    public JoeValue make(Joe joe, JoeClass joeClass) {
+    public Object make(Joe joe, JoeClass joeClass) {
         if (superclass != null) {
             return superclass.make(joe, joeClass);
         } else {
