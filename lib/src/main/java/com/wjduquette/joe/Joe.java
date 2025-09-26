@@ -732,6 +732,20 @@ public class Joe {
     }
 
     /**
+     * Ensures that the argument is callable by the execution engine.
+     * @param arg The argument
+     * @return The argument
+     * @throws JoeError if the argument is not callable.
+     */
+    public Object toCallable(Object arg) {
+        if (isCallable(arg)) {
+            return arg;
+        } else {
+            throw expected("callable", arg);
+        }
+    }
+
+    /**
      * Requires that the argument is a value of type T.
      * @param arg The argument
      * @param cls The desired class T
