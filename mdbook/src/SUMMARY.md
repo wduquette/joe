@@ -27,7 +27,7 @@
   - [Registered Types](extending/registered_types.md)
   - [Joe Packages](extending/packages.md)
   - [Native Records](extending/native_records.md)
-  - [Native Classes](extending/native_classes.md)
+  - [Extending Native Types in Joe](extending/native_classes.md)
 - [Joe Package Repositories](package_repos.md)
  
 ---
