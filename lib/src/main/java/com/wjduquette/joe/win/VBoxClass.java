@@ -3,7 +3,6 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeClass;
-import com.wjduquette.joe.JoeValue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
@@ -62,7 +61,7 @@ class VBoxClass extends FXType<VBox> {
     }
 
     @Override
-    public JoeValue make(Joe joe, JoeClass joeClass) {
+    public Object make(Joe joe, JoeClass joeClass) {
         return new VBoxInstance(joeClass);
     }
 

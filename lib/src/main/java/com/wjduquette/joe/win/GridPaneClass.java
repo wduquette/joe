@@ -3,7 +3,6 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeClass;
-import com.wjduquette.joe.JoeValue;
 import javafx.scene.layout.GridPane;
 
 class GridPaneClass extends FXType<GridPane> {
@@ -61,7 +60,7 @@ class GridPaneClass extends FXType<GridPane> {
     }
 
     @Override
-    public JoeValue make(Joe joe, JoeClass joeClass) {
+    public Object make(Joe joe, JoeClass joeClass) {
         return new GridPaneInstance(joeClass);
     }
 

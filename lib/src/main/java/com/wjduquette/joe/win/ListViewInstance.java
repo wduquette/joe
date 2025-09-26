@@ -5,7 +5,8 @@ import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -15,15 +16,16 @@ import java.util.function.Function;
  * Joe::stringify or the client's own stringifier, and safe selection without
  * logic loops.
  */
-public class ListViewInstance extends ListView<Object> implements JoeValue {
+public class ListViewInstance extends ListView<Object> implements NativeInstance {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The Joe class and field map
+    private final JoeClass joeClass;
+    private final Map<String,Object> fieldMap = new HashMap<>();
+
     // The interpreter, needed by the list cell
     private final Joe joe;
-
-    // The core, which handles JavaFX properties, etc.
-    private final JoeValueCore core;
 
     // Whether a programmatic select*() call is in progress.
     private boolean inSelect = false;
@@ -44,7 +46,7 @@ public class ListViewInstance extends ListView<Object> implements JoeValue {
      */
     public ListViewInstance(Joe joe, JoeClass joeClass) {
         this.joe = joe;
-        this.core = new JoeValueCore(joeClass, this);
+        this.joeClass = joeClass;
 
         // Use MyCell instead of the standard ListCell.
         setCellFactory(p -> new MyCell());
@@ -56,13 +58,10 @@ public class ListViewInstance extends ListView<Object> implements JoeValue {
     }
 
     //-------------------------------------------------------------------------
-    // JoeValueCore delegations
+    // NativeInstance API
 
-    @Override public JoeType type() { return core.type(); }
-    @Override public List<String> getFieldNames() { return core.getFieldNames(); }
-    @Override public Object get(String name) { return core.get(name); }
-    @Override public void set(String name, Object value) { core.set(name, value); }
-    @Override public String stringify(Joe joe) { return core.stringify(joe); }
+    @Override public JoeClass getJoeClass() { return joeClass; }
+    @Override public Map<String, Object> getInstanceFieldMap() { return fieldMap; }
 
     //-------------------------------------------------------------------------
     // ListViewInstance Logic

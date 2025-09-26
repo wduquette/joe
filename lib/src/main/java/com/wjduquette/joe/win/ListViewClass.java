@@ -61,7 +61,7 @@ class ListViewClass extends FXType<ListViewInstance> {
     }
 
     @Override
-    public JoeValue make(Joe joe, JoeClass joeClass) {
+    public Object make(Joe joe, JoeClass joeClass) {
         return new ListViewInstance(joe, joeClass);
     }
 
