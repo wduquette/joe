@@ -23,9 +23,23 @@ public class Instance implements JoeValue {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates an instance given the Joe class and field map.
+     * @param joeClass The class
+     * @param fieldMap The field map
+     */
     public Instance(JoeClass joeClass, Map<String,Object> fieldMap) {
         this.joeClass = joeClass;
         this.fieldMap = fieldMap;
+    }
+
+    /**
+     * Creates an instance that wraps a NativeInstance.
+     * @param nativeInstance The NativeInstance
+     */
+    public Instance(NativeInstance nativeInstance) {
+        this.joeClass = nativeInstance.getJoeClass();
+        this.fieldMap = nativeInstance.getInstanceFieldMap();
     }
 
     //-------------------------------------------------------------------------

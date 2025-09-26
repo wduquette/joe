@@ -479,6 +479,7 @@ public class Joe {
     public JoeValue asJoeValue(Object value) {
         if (value == null) return NULL;
         if (value instanceof JoeValue obj) return obj;
+        if (value instanceof NativeInstance nat) return new Instance(nat);
 
         var proxy = lookupProxy(value.getClass());
         return new TypedValue(this, proxy, value);
