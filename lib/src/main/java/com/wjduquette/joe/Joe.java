@@ -477,11 +477,15 @@ public class Joe {
      * @return The JoeValue or null if the value is null.
      */
     public JoeValue asJoeValue(Object value) {
-        if (value == null) return NULL;
-        if (value instanceof JoeValue obj) return obj;
-
-        var proxy = lookupProxy(value.getClass());
-        return new TypedValue(this, proxy, value);
+        return switch (value) {
+            case null -> NULL;
+            case JoeValue jv -> jv;
+            case NativeInstance nat -> new Instance(nat);
+            default -> {
+                var proxy = lookupProxy(value.getClass());
+                yield new TypedValue(this, proxy, value);
+            }
+        };
     }
 
     //-------------------------------------------------------------------------
