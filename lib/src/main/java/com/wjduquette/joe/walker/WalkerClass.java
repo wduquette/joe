@@ -101,7 +101,7 @@ class WalkerClass implements JoeClass, JoeValue, NativeCallable {
         if (superclass != null) {
             return superclass.make(joe, joeClass);
         } else {
-            return new WalkerInstance(joeClass);
+            return new Instance(joeClass, new HashMap<>());
         }
     }
 

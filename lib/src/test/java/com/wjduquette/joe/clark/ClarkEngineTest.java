@@ -1,9 +1,6 @@
 package com.wjduquette.joe.clark;
 
-import com.wjduquette.joe.Args;
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.Ted;
-import com.wjduquette.joe.UnexpectedError;
+import com.wjduquette.joe.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -68,9 +65,9 @@ public class ClarkEngineTest extends Ted {
         var cls = joe.getVariable("Thing");
 
         var result = joe.call(cls, "fred");
-        check(result instanceof ClarkInstance).eq(true);
+        check(result instanceof Instance).eq(true);
 
-        if (result instanceof ClarkInstance thing) {
+        if (result instanceof Instance thing) {
             check(thing.get("name")).eq("fred");
         }
     }

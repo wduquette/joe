@@ -126,7 +126,7 @@ public class ClarkClass implements JoeClass, JoeValue, ClarkType, ClarkCallable 
         if (superclass != null) {
             return superclass.make(joe, joeClass);
         } else {
-            return new ClarkInstance(joeClass);
+            return new Instance(joeClass, new HashMap<>());
         }
     }
 

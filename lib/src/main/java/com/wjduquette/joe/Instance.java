@@ -1,22 +1,31 @@
-package com.wjduquette.joe.walker;
+package com.wjduquette.joe;
 
-import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.MapFact;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-class WalkerInstance implements JoeValue {
+public class Instance implements JoeValue {
     private final static String TO_STRING = "toString";
 
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The class for which this is an instance
     private final JoeClass joeClass;
-    private final Map<String, Object> fields = new HashMap<>();
 
-    WalkerInstance(JoeClass joeClass) {
+    // The instance's own fields
+    private final Map<String,Object> fieldMap;
+
+    //-------------------------------------------------------------------------
+    // Constructor
+
+    public Instance(JoeClass joeClass, Map<String,Object> fieldMap) {
         this.joeClass = joeClass;
+        this.fieldMap = fieldMap;
     }
 
     //-------------------------------------------------------------------------
@@ -29,13 +38,13 @@ class WalkerInstance implements JoeValue {
 
     @Override
     public List<String> getFieldNames() {
-        return new ArrayList<>(fields.keySet());
+        return new ArrayList<>(fieldMap.keySet());
     }
 
     @Override
     public Object get(String name) {
-        if (fields.containsKey(name)) {
-            return fields.get(name);
+        if (fieldMap.containsKey(name)) {
+            return fieldMap.get(name);
         }
 
         JoeCallable method = joeClass.bind(this, name);
@@ -47,7 +56,7 @@ class WalkerInstance implements JoeValue {
 
     @Override
     public void set(String name, Object value) {
-        fields.put(name, value);
+        fieldMap.put(name, value);
     }
 
     @Override
@@ -58,22 +67,22 @@ class WalkerInstance implements JoeValue {
 
     @Override
     public boolean hasMatchableFields() {
-        return !fields.isEmpty();
+        return !fieldMap.isEmpty();
     }
 
     @Override
     public Map<String,Object> getMatchableFieldMap() {
-        return Collections.unmodifiableMap(fields);
+        return Collections.unmodifiableMap(fieldMap);
     }
 
     @Override
     public boolean isFact() {
-        return !fields.isEmpty();
+        return !fieldMap.isEmpty();
     }
 
     @Override
     public Fact toFact() {
-        return new MapFact(joeClass.name(), fields);
+        return new MapFact(joeClass.name(), fieldMap);
     }
 
     @Override
