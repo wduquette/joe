@@ -16,7 +16,7 @@ import java.util.function.Function;
  * Joe::stringify or the client's own stringifier, and safe selection without
  * logic loops.
  */
-public class ListViewInstance extends ListView<Object> implements NativeInstance {
+public class ListViewInstance extends ListView<Object> implements JoeInstance {
     //-------------------------------------------------------------------------
     // Instance Variables
 

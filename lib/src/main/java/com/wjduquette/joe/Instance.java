@@ -39,12 +39,12 @@ public class Instance implements JoeValue {
 
     /**
      * Creates an instance that wraps a NativeInstance.
-     * @param nativeInstance The NativeInstance
+     * @param joeInstance The NativeInstance
      */
-    public Instance(NativeInstance nativeInstance) {
-        this.self = nativeInstance;
-        this.joeClass = nativeInstance.getJoeClass();
-        this.fieldMap = nativeInstance.getInstanceFieldMap();
+    public Instance(JoeInstance joeInstance) {
+        this.self = joeInstance;
+        this.joeClass = joeInstance.getJoeClass();
+        this.fieldMap = joeInstance.getInstanceFieldMap();
     }
 
     //-------------------------------------------------------------------------

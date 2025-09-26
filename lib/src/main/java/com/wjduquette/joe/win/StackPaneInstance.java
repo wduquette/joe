@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * A JavaFX StackPane that can be extended by Joe classes.
  */
-public class StackPaneInstance extends StackPane implements NativeInstance {
+public class StackPaneInstance extends StackPane implements JoeInstance {
     // The Joe class and field map
     private final JoeClass joeClass;
     private final Map<String,Object> fieldMap = new HashMap<>();

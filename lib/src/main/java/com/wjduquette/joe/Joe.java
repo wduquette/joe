@@ -480,7 +480,7 @@ public class Joe {
         return switch (value) {
             case null -> NULL;
             case JoeValue jv -> jv;
-            case NativeInstance nat -> new Instance(nat);
+            case JoeInstance nat -> new Instance(nat);
             default -> {
                 var proxy = lookupProxy(value.getClass());
                 yield new TypedValue(this, proxy, value);

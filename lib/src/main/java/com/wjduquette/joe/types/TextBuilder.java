@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * A Joe replacement for the Java StringBuilder.
  */
-public class TextBuilder implements NativeInstance {
+public class TextBuilder implements JoeInstance {
     //-------------------------------------------------------------------------
     // Instance Variables
 

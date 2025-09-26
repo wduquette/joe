@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * A JavaFX HBox that can be extended by Joe classes.
  */
-public class HBoxInstance extends HBox implements NativeInstance {
+public class HBoxInstance extends HBox implements JoeInstance {
     // The Joe class and field map
     private final JoeClass joeClass;
     private final Map<String,Object> fieldMap = new HashMap<>();

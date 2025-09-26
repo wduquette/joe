@@ -9,7 +9,7 @@ import java.util.Map;
  * (B) the binding defines a subclass of the native type that implements this
  * interface.  Joe's `asJoeValue` method does the rest of the work.
  */
-public interface NativeInstance {
+public interface JoeInstance {
     /**
      * Gets the instance's Joe class
      * @return The Joe class

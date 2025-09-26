@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * A JavaFX VBox that can be extended by Joe classes.
  */
-public class VBoxInstance extends VBox implements NativeInstance {
+public class VBoxInstance extends VBox implements JoeInstance {
     // The Joe class and field map
     private final JoeClass joeClass;
     private final Map<String,Object> fieldMap = new HashMap<>();

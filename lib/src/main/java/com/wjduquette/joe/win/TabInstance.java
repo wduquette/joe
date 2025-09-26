@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * A JavaFX Tab that can be extended by Joe classes.
  */
-public class TabInstance extends Tab implements NativeInstance {
+public class TabInstance extends Tab implements JoeInstance {
     // The Joe class and field map
     private final JoeClass joeClass;
     private final Map<String,Object> fieldMap = new HashMap<>();

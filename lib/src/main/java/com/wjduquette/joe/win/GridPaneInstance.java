@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * A JavaFX GridPane that can be extended by Joe classes.
  */
-public class GridPaneInstance extends GridPane implements NativeInstance {
+public class GridPaneInstance extends GridPane implements JoeInstance {
     // The Joe class and field map
     private final JoeClass joeClass;
     private final Map<String,Object> fieldMap = new HashMap<>();
