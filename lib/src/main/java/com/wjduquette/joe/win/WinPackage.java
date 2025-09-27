@@ -111,6 +111,9 @@ public class WinPackage extends NativePackage {
         type(MenuType.TYPE);
         type(MenuItemType.TYPE);
 
+        // Miscellaneous Types
+        type(ListenerType.TYPE);
+
         // Enums
 
         //**
