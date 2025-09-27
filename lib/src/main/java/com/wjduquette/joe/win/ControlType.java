@@ -5,7 +5,7 @@ import com.wjduquette.joe.Joe;
 import javafx.scene.control.Control;
 import javafx.scene.control.Tooltip;
 
-class ControlType extends FXType<Control> {
+class ControlType extends WidgetType<Control> {
     public static final ControlType TYPE = new ControlType();
 
     //-------------------------------------------------------------------------

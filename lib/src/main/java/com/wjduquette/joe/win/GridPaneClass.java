@@ -5,7 +5,7 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeClass;
 import javafx.scene.layout.GridPane;
 
-class GridPaneClass extends FXType<GridPane> {
+class GridPaneClass extends WidgetType<GridPane> {
     public static final GridPaneClass TYPE = new GridPaneClass();
 
     //-------------------------------------------------------------------------

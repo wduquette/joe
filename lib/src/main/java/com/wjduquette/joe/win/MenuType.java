@@ -7,7 +7,7 @@ import javafx.scene.control.MenuItem;
 
 import java.util.stream.Collectors;
 
-class MenuType extends FXType<Menu> {
+class MenuType extends WidgetType<Menu> {
     public static final MenuType TYPE = new MenuType();
 
     //-------------------------------------------------------------------------

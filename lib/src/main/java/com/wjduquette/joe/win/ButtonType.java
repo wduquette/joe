@@ -7,7 +7,7 @@ import javafx.scene.control.Button;
 /**
  * Proxy for a JavaFX Button.
  */
-class ButtonType extends FXType<Button> {
+class ButtonType extends WidgetType<Button> {
     public static final ButtonType TYPE = new ButtonType();
 
     //-------------------------------------------------------------------------

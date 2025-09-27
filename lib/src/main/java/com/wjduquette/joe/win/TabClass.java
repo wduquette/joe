@@ -8,7 +8,7 @@ import javafx.scene.control.Tab;
 
 import java.util.stream.Collectors;
 
-class TabClass extends FXType<Tab> {
+class TabClass extends WidgetType<Tab> {
     public static final TabClass TYPE = new TabClass();
 
     //-------------------------------------------------------------------------

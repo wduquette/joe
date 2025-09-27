@@ -4,7 +4,7 @@ import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import javafx.scene.control.Label;
 
-class LabelType extends FXType<Label> {
+class LabelType extends WidgetType<Label> {
     public static final LabelType TYPE = new LabelType();
 
     //-------------------------------------------------------------------------

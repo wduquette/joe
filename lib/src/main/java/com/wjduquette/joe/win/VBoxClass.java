@@ -8,7 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-class VBoxClass extends FXType<VBox> {
+class VBoxClass extends WidgetType<VBox> {
     public static final VBoxClass TYPE = new VBoxClass();
 
     //-------------------------------------------------------------------------

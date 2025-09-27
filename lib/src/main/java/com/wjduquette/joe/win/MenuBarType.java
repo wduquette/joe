@@ -5,7 +5,7 @@ import com.wjduquette.joe.Joe;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 
-class MenuBarType extends FXType<MenuBar> {
+class MenuBarType extends WidgetType<MenuBar> {
     public static final MenuBarType TYPE = new MenuBarType();
 
     //-------------------------------------------------------------------------

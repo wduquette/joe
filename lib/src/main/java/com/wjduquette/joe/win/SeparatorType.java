@@ -5,7 +5,7 @@ import com.wjduquette.joe.Joe;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Separator;
 
-class SeparatorType extends FXType<Separator> {
+class SeparatorType extends WidgetType<Separator> {
     public static final SeparatorType TYPE = new SeparatorType();
 
     //-------------------------------------------------------------------------

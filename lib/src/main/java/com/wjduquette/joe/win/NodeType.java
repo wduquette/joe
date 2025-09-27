@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.stream.Collectors;
 
-class NodeType extends FXType<Node> {
+class NodeType extends WidgetType<Node> {
     public static final NodeType TYPE = new NodeType();
 
     //-------------------------------------------------------------------------

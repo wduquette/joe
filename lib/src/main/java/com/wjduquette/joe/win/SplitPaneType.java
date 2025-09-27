@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Proxy for a JavaFX SplitPane.
  */
-class SplitPaneType extends FXType<SplitPane> {
+class SplitPaneType extends WidgetType<SplitPane> {
     public static final SplitPaneType TYPE = new SplitPaneType();
 
     //-------------------------------------------------------------------------

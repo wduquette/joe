@@ -8,7 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.HBox;
 
-class HBoxClass extends FXType<HBox> {
+class HBoxClass extends WidgetType<HBox> {
     public static final HBoxClass TYPE = new HBoxClass();
 
     //-------------------------------------------------------------------------

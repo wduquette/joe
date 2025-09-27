@@ -8,7 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 
-class StackPaneClass extends FXType<StackPane> {
+class StackPaneClass extends WidgetType<StackPane> {
     public static final StackPaneClass TYPE = new StackPaneClass();
 
     //-------------------------------------------------------------------------

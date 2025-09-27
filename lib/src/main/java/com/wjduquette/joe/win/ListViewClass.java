@@ -6,7 +6,7 @@ import javafx.scene.control.Label;
 /**
  * Proxy for a JavaFX ListViewInstance.
  */
-class ListViewClass extends FXType<ListViewInstance> {
+class ListViewClass extends WidgetType<ListViewInstance> {
     public static final ListViewClass TYPE = new ListViewClass();
 
     //-------------------------------------------------------------------------

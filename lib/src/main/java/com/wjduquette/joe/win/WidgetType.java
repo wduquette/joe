@@ -7,12 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A ProxyType that includes support for JavaFX properties.  The documentation
- * for the related methods is defined as a JoeDoc @mixin; all direct subclasses
- * (e.g., NodeType, MenuItemType) should "@includeMixin FXType".
+ * A base ProxyType for JavaFX widgets, including support for JavaFX
+ * properties.  Proxies for inheritance roots like Node and MenuItem
+ * should use `extendsProxy` and the `@extends` JoeDoc tag.
  * @param <V> The proxied type
  */
-public class FXType<V> extends ProxyType<V> {
+public class WidgetType<V> extends ProxyType<V> {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -23,20 +23,20 @@ public class FXType<V> extends ProxyType<V> {
     // Constructor
 
     //**
-    // @mixin FXType
+    // @type WidgetTypee
 
     /**
-     * Creates an FXType for the given type.
+     * Creates a WidgetType for the given widget type.
      * @param name The script-level type name.
      */
-    public FXType(String name) {
+    public WidgetType(String name) {
         super(name);
 
-        method("getProperty", this::_getProperty);
-        method("listenTo",    this::_listenTo);
-        method("properties",  this::_properties);
-        method("setProperty", this::_setProperty);
-        method("toString",    this::_toString);
+        method("getProperty",   this::_getProperty);
+        method("getProperties", this::_getProperties);
+        method("listenTo",      this::_listenTo);
+        method("setProperty",   this::_setProperty);
+        method("toString",      this::_toString);
     }
 
     //-------------------------------------------------------------------------
@@ -64,8 +64,8 @@ public class FXType<V> extends ProxyType<V> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void extendsProxy(ProxyType<? super V> superProxy) {
         super.extendsProxy(superProxy);
-        if (superProxy instanceof FXType fxType) {
-            properties.putAll(fxType.properties);
+        if (superProxy instanceof WidgetType widgetType) {
+            properties.putAll(widgetType.properties);
         }
     }
 
@@ -101,10 +101,20 @@ public class FXType<V> extends ProxyType<V> {
     }
 
     //**
+    // @method getProperties
+    // @result joe.Set
+    // Returns a readonly `Set` of the object's property keywords.
+    private Object _getProperties(V obj, Joe joe, Args args) {
+        args.exactArity(0, "getProperties()");
+        return joe.readonlySet(properties.keySet());
+    }
+
+    //**
     // @method listenTo
     // @args keyword, listener
     // @result this
-    // Adds a *listener* to the property with the given *keyword*.
+    // Adds a *listener* to the property with the given *keyword*, returning
+    // a token that can be used to "unlisten".
     // The listener should be a callable taking the three arguments:
     //
     // - The property keyword
@@ -115,20 +125,12 @@ public class FXType<V> extends ProxyType<V> {
     private Object _listenTo(V obj, Joe joe, Args args) {
         args.exactArity(2, "listenTo(keyword, listener");
         var keyword = joe.toKeyword(args.next());
-        var def =  toDef(joe, keyword).getProperty(obj);
+        var def =  toDef(joe, keyword);
+        var prop =  def.getProperty(obj);
         var handler = args.next();
 
-        def.addListener((p,o,n) -> joe.call(handler, keyword, o, n));
+        prop.addListener((p,o,n) -> joe.call(handler, keyword, o, n));
         return obj;
-    }
-
-    //**
-    // @method properties
-    // @result joe.Set
-    // Returns a readonly `Set` of the object's property keywords.
-    private Object _properties(V obj, Joe joe, Args args) {
-        args.exactArity(0, "properties()");
-        return joe.readonlySet(properties.keySet());
     }
 
     //**

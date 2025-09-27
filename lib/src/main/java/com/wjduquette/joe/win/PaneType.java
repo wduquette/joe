@@ -5,7 +5,7 @@ import com.wjduquette.joe.Joe;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
-class PaneType extends FXType<Pane> {
+class PaneType extends WidgetType<Pane> {
     public static final PaneType TYPE = new PaneType();
 
     //-------------------------------------------------------------------------

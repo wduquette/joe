@@ -5,7 +5,7 @@ import com.wjduquette.joe.Joe;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Region;
 
-class RegionType extends FXType<Region> {
+class RegionType extends WidgetType<Region> {
     public static final RegionType TYPE = new RegionType();
 
     //-------------------------------------------------------------------------

@@ -6,7 +6,7 @@ import javafx.geometry.Side;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
-class TabPaneType extends FXType<TabPane> {
+class TabPaneType extends WidgetType<TabPane> {
     public static final TabPaneType TYPE = new TabPaneType();
 
     //-------------------------------------------------------------------------
