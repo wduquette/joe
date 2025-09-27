@@ -2,6 +2,8 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
 import javafx.beans.property.Property;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +25,7 @@ public class WidgetType<V> extends ProxyType<V> {
     // Constructor
 
     //**
-    // @type WidgetTypee
+    // @type WidgetType
 
     /**
      * Creates a WidgetType for the given widget type.
@@ -111,26 +113,29 @@ public class WidgetType<V> extends ProxyType<V> {
 
     //**
     // @method listenTo
-    // @args keyword, listener
-    // @result this
-    // Adds a *listener* to the property with the given *keyword*, returning
-    // a token that can be used to "unlisten".
-    // The listener should be a callable taking the three arguments:
+    // @args keyword, callable
+    // @result listener
+    // Adds a listener *callable* to the property with the given *keyword*,
+    // returning a [[Listener]]; use the [[Listener]]'s `remove()` method
+    // to stop listening to the property.
+    //
+    // The *callable* should take three arguments:
     //
     // - The property keyword
     // - The old value of the property
     // - The new value of the property
     //
-    // The listener will be called when the property's value changes.
+    // The *callable* will be called when the property's value changes.
     private Object _listenTo(V obj, Joe joe, Args args) {
-        args.exactArity(2, "listenTo(keyword, listener");
+        args.exactArity(2, "listenTo(keyword, callable");
         var keyword = joe.toKeyword(args.next());
         var def =  toDef(joe, keyword);
         var prop =  def.getProperty(obj);
         var handler = args.next();
 
-        prop.addListener((p,o,n) -> joe.call(handler, keyword, o, n));
-        return obj;
+        var listener = new PropertyListener(prop, joe, keyword, handler);
+        prop.addListener(listener);
+        return listener;
     }
 
     //**
@@ -172,6 +177,44 @@ public class WidgetType<V> extends ProxyType<V> {
 
     //-------------------------------------------------------------------------
     // Helper Classes
+
+    public static class PropertyListener implements ChangeListener<Object> {
+        private final Property<?> property;
+        private final Joe joe;
+        private final Keyword keyword;
+        private final Object callable;
+
+        public PropertyListener(
+            Property<?> property,
+            Joe joe,
+            Keyword keyword,
+            Object callable
+        ) {
+            this.property = property;
+            this.joe = joe;
+            this.keyword = keyword;
+            this.callable = callable;
+        }
+
+        @Override
+        public void changed(
+            ObservableValue<?> ignored,
+            Object oldValue,
+            Object newValue
+        ) {
+            joe.call(callable, keyword, oldValue, newValue);
+        }
+
+        @Override
+        public String toString() {
+            return "PropertyListener[" + keyword + "]@" +
+                String.format("%x", hashCode());
+        }
+
+        public void unsubscribe() {
+            property.removeListener(this);
+        }
+    }
 
     /**
      * A functional interface for retrieving a JavaFX property from an
