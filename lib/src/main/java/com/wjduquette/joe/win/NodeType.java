@@ -20,11 +20,11 @@ class NodeType extends WidgetType<Node> {
     //**
     // @package joe.win
     // @type Node
+    // @extends Widget
     // The `Node` widget is the abstract base class for the JavaFX widget
     // hierarchy. This abstract type provides features available for
     // all widgets.
     //
-    // @includeMixin FXType
     public NodeType() {
         super("Node");
         proxies(Node.class);

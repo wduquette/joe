@@ -16,10 +16,9 @@ class MenuType extends WidgetType<Menu> {
     //**
     // @package joe.win
     // @type Menu
+    // @extends Widget
     // The `Menu` widget is a menu in a [[MenuBar]] or a submenu
     // in a parent [[Menu]].  It contains [[MenuItem]] widgets.
-    //
-    // @includeMixin FXType
     public MenuType() {
         super("Menu");
         proxies(Menu.class);
