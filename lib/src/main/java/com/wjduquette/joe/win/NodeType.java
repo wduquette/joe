@@ -90,7 +90,7 @@ class NodeType extends WidgetType<Node> {
         args.arityRange(0, 1, "hgrow([priority])");
         var priority = args.isEmpty()
             ? Priority.ALWAYS
-            : WinPackage.toPriority(joe, args.next());
+            : Win.toPriority(joe, args.next());
         HBox.setHgrow(node, priority);
         GridPane.setHgrow(node, priority);
         return node;
@@ -206,7 +206,7 @@ class NodeType extends WidgetType<Node> {
         args.arityRange(0, 1, "vgrow([priority])");
         var priority = args.isEmpty()
             ? Priority.ALWAYS
-            : WinPackage.toPriority(joe, args.next());
+            : Win.toPriority(joe, args.next());
         VBox.setVgrow(node, priority);
         GridPane.setVgrow(node, priority);
         return node;
