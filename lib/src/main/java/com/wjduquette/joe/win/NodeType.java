@@ -21,10 +21,9 @@ class NodeType extends WidgetType<Node> {
     // @package joe.win
     // @type Node
     // @extends Widget
-    // The `Node` widget is the abstract base class for the JavaFX widget
-    // hierarchy. This abstract type provides features available for
-    // all widgets.
-    //
+    // The `Node` widget is the abstract base class for JavaFX widgets
+    // that can be added to [[Pane|Panes]] in the scene graph, and provides
+    // services for all such widgets.
     public NodeType() {
         super("Node");
         proxies(Node.class);
@@ -46,20 +45,20 @@ class NodeType extends WidgetType<Node> {
         // See [[joe.win#topic.css]] for more on using CSS.
         fxProperty("disable", Node::disableProperty, Joe::toBoolean);
         fxProperty("id",      Node::idProperty,      Joe::toString);
-//        fxProperty("style",   Node::styleProperty,   Joe::toString);
+        fxProperty("style",   Node::styleProperty,   Joe::toString);
         fxProperty("visible", Node::visibleProperty, Joe::toBoolean);
 
         // Methods
-        method("setDisable",            this::_setDisable);
-        method("hgrow",                 this::_hgrow);
-        method("getId",                 this::_getId);
-        method("setId",                 this::_setId);
-        method("isDisable",             this::_isDisable);
-        method("isDisabled",            this::_isDisabled);
-        method("splitResizeWithParent", this::_splitResizeWithParent);
-//        method("styleClasses",          this::_styleClasses);
-//        method("styles",                this::_styles);
-        method("vgrow",                 this::_vgrow);
+        method("getId",            this::_getId);
+        method("hgrow",            this::_hgrow);
+        method("isDisable",        this::_isDisable);
+        method("isDisabled",       this::_isDisabled);
+        method("resizeWithParent", this::_resizeWithSplit);
+        method("setDisable",       this::_setDisable);
+        method("setId",            this::_setId);
+        method("styleClasses",     this::_styleClasses);
+        method("styles",           this::_styles);
+        method("vgrow",            this::_vgrow);
     }
 
 
@@ -97,18 +96,6 @@ class NodeType extends WidgetType<Node> {
     }
 
     //**
-    // @method setId
-    // @args id
-    // @result this
-    // Sets the node's `#id` property to the given *id* string.
-    private Object _setId(Node node, Joe joe, Args args) {
-        args.exactArity(1, "setId(id)");
-        var id = joe.toString(args.next());
-        node.setId(id);
-        return node;
-    }
-
-    //**
     // @method isDisable
     // @result joe.Boolean
     // Returns `true` if this node's `disable` property has
@@ -129,6 +116,25 @@ class NodeType extends WidgetType<Node> {
     }
 
     //**
+    // @method resizeWithSplit
+    // @args flag
+    // @result this
+    // If *flag* is `true` (the default value) the node's "split" will resize
+    // when its parent [[SplitPane]] is resized, preserving its
+    // divider fraction.  If `false`, the divider fraction will change to
+    // keep the node's width or height constant. Use this to prevent sidebars
+    // from resizing when the window is resized.
+    //
+    // This is equivalent to the
+    // [[SplitPane#static.setResizableWithParent]] method.
+    private Object _resizeWithSplit(Node node, Joe joe, Args args) {
+        args.exactArity(1, "resizeWithSplit(flag)");
+        var flag = args.isEmpty() || Joe.isTruthy(args.next());
+        SplitPane.setResizableWithParent(node, flag);
+        return node;
+    }
+
+    //**
     // @method setDisable
     // @args [flag]
     // @result this
@@ -142,23 +148,15 @@ class NodeType extends WidgetType<Node> {
         return node;
     }
 
-
     //**
-    // @method splitResizeWithParent
-    // @args flag
+    // @method setId
+    // @args id
     // @result this
-    // If *flag* is `true` (the default value) the node's "split" will resize
-    // when its parent [[SplitPane]] is resized, preserving its
-    // divider fraction.  If `false`, the divider fraction will change to
-    // keep the node's width or height constant. Use this to prevent sidebars
-    // from resizing when the window is resized.
-    //
-    // This is equivalent to the
-    // JavaFX `SplitPane.setResizeWithParent()` method.
-    private Object _splitResizeWithParent(Node node, Joe joe, Args args) {
-        args.exactArity(1, "splitResizeWithParent(flag)");
-        var flag = args.isEmpty() || Joe.isTruthy(args.next());
-        SplitPane.setResizableWithParent(node, flag);
+    // Sets the node's `#id` property to the given *id* string.
+    private Object _setId(Node node, Joe joe, Args args) {
+        args.exactArity(1, "setId(id)");
+        var id = joe.toString(args.next());
+        node.setId(id);
         return node;
     }
 

@@ -73,7 +73,7 @@ class HBoxClass extends WidgetType<HBox> {
     // @args node
     // @result Priority
     // Gets how the [[Node]] will resize itself to the height of
-    // its parent [[HBox]].
+    // its parent `HBox`.
     private Object _getHgrow(Joe joe, Args args) {
         args.exactArity(1, "HBox.getHgrow(node)");
         return HBox.getHgrow(joe.toClass(args.next(), Node.class));
@@ -83,7 +83,7 @@ class HBoxClass extends WidgetType<HBox> {
     // @static getMargin
     // @args node
     // @result Insets
-    // Gets the [[Node]]'s margin in its parent [[HBox]].
+    // Gets the [[Node]]'s margin in its parent `HBox`.
     private Object _getMargin(Joe joe, Args args) {
         args.exactArity(1, "HBox.getMargin(node)");
         return HBox.getMargin(joe.toClass(args.next(), Node.class));
@@ -93,7 +93,7 @@ class HBoxClass extends WidgetType<HBox> {
     // @static setHgrow
     // @args node, priority
     // Sets how the [[Node]] will resize itself to the height of
-    // its parent [[HBox]], given a [[Priority]] value.
+    // its parent `HBox`, given a [[Priority]] value.
     private Object _setHgrow(Joe joe, Args args) {
         args.exactArity(2, "HBox.setHgrow(node, priority)");
         HBox.setHgrow(
@@ -106,7 +106,7 @@ class HBoxClass extends WidgetType<HBox> {
     //**
     // @static setMargin
     // @args node, insets
-    // Gets the [[Node]]'s margin in its parent [[HBox]] given an
+    // Gets the [[Node]]'s margin in its parent `HBox` given an
     // [[Insets]] object.
     private Object _setMargin(Joe joe, Args args) {
         args.exactArity(2, "HBox.setMargin(node, insets)");
@@ -123,7 +123,7 @@ class HBoxClass extends WidgetType<HBox> {
 
     //**
     // @init
-    // Returns a `HBox`.
+    // Returns an `HBox`.
     private Object _initializer(Joe joe, Args args) {
         args.exactArity(0, "HBox()");
         return make(joe, this);

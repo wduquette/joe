@@ -37,21 +37,26 @@ public class WinPackage extends NativePackage {
     //
     // The `joe.win` widget type hierarchy is a subset of the JavaFX hierarchy.
     //
-    // - [[MenuItem]]: A menu item
-    // - [[Menu]]: A menu
-    // - [[Node]]: Base class
-    //   - [[Region]]: Nodes with geometry
-    //     - [[Control]]: Nodes to interact with
-    //       - [[Button]]: A button
-    //       - [[Label]]: A label
-    //       - [[MenuBar]]: A menu bar
-    //       - [[Separator]]: A horizontal or vertical separator
-    //       - [[TabPane]]: A `TabPane`
-    //     - [[Pane]]: Nodes that manage children
-    //       - [[HBox]]: A row of widgets
-    //       - [[StackPane]]: Widgets stacked like cards in a deck
-    //       - [[VBox]]: A column of widgets
-    // - [[Tab]]: A tab in a [[TabPane]]
+    // - [[Widget]]: Base Type
+    //   - [[MenuItem]]: A menu item
+    //     - [[Menu]]: A popup menu
+    //   - [[Node]]: Base class
+    //     - [[Region]]: Nodes with geometry
+    //       - [[Control]]: Nodes to interact with
+    //         - [[Button]]: A button
+    //         - [[Label]]: A label
+    //         - [[ListView]]: A scrolling list of items
+    //         - [[MenuBar]]: A menu bar
+    //         - [[Separator]]: A horizontal or vertical separator
+    //         - [[TabPane]]: A `TabPane`
+    //       - [[Pane]]: Nodes that manage children
+    //         - [[GridPane]]: A grid of widgets
+    //         - [[HBox]]: A row of widgets
+    //         - [[SplitPane]]: A row or column with adjustable dividers
+    //         - [[StackPane]]: Widgets stacked like cards in a deck
+    //         - [[TabPane]]: A pane of [[Tab]] widgets
+    //         - [[VBox]]: A column of widgets
+    //   - [[Tab]]: A tab in a [[TabPane]]
     //
     // @packageTopic css
     // @title Styling with CSS
@@ -332,10 +337,6 @@ public class WinPackage extends NativePackage {
 
     static Orientation toOrientation(Joe joe, Object arg) {
         return joe.toEnum(arg, Orientation.class);
-    }
-
-    static Priority toPriority(Joe joe, Object arg) {
-        return joe.toEnum(arg, Priority.class);
     }
 
     static int toSpan(Joe joe, Object arg) {
