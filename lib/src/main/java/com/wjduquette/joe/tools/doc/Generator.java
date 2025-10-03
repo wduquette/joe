@@ -158,7 +158,7 @@ class Generator {
         if (!pkg.topics().isEmpty()) {
             out.hb("topics", "Topics");
             out.println();
-            pkg.topics().forEach(t -> writeTopicLink(out, 0, t));
+            pkg.topics().forEach(t -> writeTopicLink(out, t));
             out.println();
         }
 
@@ -183,15 +183,15 @@ class Generator {
         // NEXT, output the remaining content
         content.forEach(out::println);
 
+        // NEXT, output the topics
+        for (var topic : pkg.topics()) {
+            writeTopicBody(out, topic);
+        }
+
         // NEXT, output the entries for each of the package's functions.
         if (!pkg.functions().isEmpty()) {
             out.h2("functions", "Functions");
             writeCallableBodies(out, pkg.functions());
-        }
-
-        // NEXT, output the topics
-        for (var topic : pkg.topics()) {
-            writeTopicBody(out, topic);
         }
     }
 
@@ -252,7 +252,7 @@ class Generator {
         if (!type.topics().isEmpty()) {
             out.hb("topics", "Topics");
             out.println();
-            type.topics().forEach(t -> writeTopicLink(out, 0, t));
+            type.topics().forEach(t -> writeTopicLink(out, t));
             out.println();
         }
 
@@ -283,7 +283,7 @@ class Generator {
             out.hb("fields", "Fields");
             out.println();
             sorted(type.fields(), FieldEntry::name)
-                .forEach(m -> writeFieldLink(out, 0, m));
+                .forEach(m -> writeFieldLink(out, m));
             out.println();
         }
 
@@ -366,11 +366,9 @@ class Generator {
 
     private void writeTopicLink(
         ContentWriter out,
-        int indent,
         TopicEntry topic
     ) {
-        var leader = " ".repeat(indent);
-        out.println(leader + "- [" +
+        out.println("- [" +
             topic.title() +
             "](" + topic.filename() + "#" + topic.id() + ")"
         );
@@ -426,11 +424,9 @@ class Generator {
 
     private void writeFieldLink(
         ContentWriter out,
-        int indent,
         FieldEntry field
     ) {
-        var leader = " ".repeat(indent);
-        out.println(leader + "- [" +
+        out.println("- [" +
             ital(field.prefix()) + "." + field.name() +
             "](" +field.filename() + "#" + field.id() + ")"
         );
@@ -581,17 +577,26 @@ class Generator {
                 return buff.toString();
             }
 
-            var mnemonic = head.substring(2, head.indexOf("]]"));
+            // Next, extract the entire mnemonic.
+            var linkSpec = head.substring(2, tail);
             head = head.substring(tail + 2);
 
-            if (docSet.lookup(mnemonic) != null) {
-                buff.append(inlineLink(docSet.lookup(mnemonic)));
-            } else if (shortTable.get(mnemonic) != null) {
-                buff.append(inlineLink(shortTable.get(mnemonic)));
-            } else {
+            // Next, look for link text.
+            var tokens = linkSpec.split("\\|");
+            var mnemonic = tokens[0];
+
+            // NEXT, get the entity.  If not found, issue a warning and
+            // leave a placeholder.
+            var entry = lookupMnemonic(mnemonic);
+            if (entry == null) {
                 // Leave it in place; it's incorrect.
                 warn("Unknown mnemonic in link: [[" + mnemonic + "]]");
-                buff.append("[[").append(mnemonic).append("]]");
+                buff.append("[[").append(linkSpec).append("]]");
+            } else {
+                var linkText = tokens.length > 1
+                    ? tokens[1]
+                    : inlineLinkText(entry);
+                buff.append(link(linkText, entry.url()));
             }
         }
 
@@ -599,8 +604,10 @@ class Generator {
         return buff.toString();
     }
 
-    private String inlineLink(Entry entry) {
-        return link(inlineLinkText(entry), entry.url());
+    private Entry lookupMnemonic(String mnemonic) {
+        var entry = docSet.lookup(mnemonic);
+        if (entry == null) entry = shortTable.get(mnemonic);
+        return entry;
     }
 
     private String inlineLinkText(Entry entry) {
