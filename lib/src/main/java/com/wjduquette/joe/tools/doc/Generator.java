@@ -104,7 +104,7 @@ class Generator {
     // Documentation Set Index
 
     private void writeDocSetIndex(ContentWriter out) {
-        out.h1("Library API Index");
+        out.h1line("Library API Index");
         out.println();
         out.println("""
             The following is a complete index of the packages, functions,
@@ -146,7 +146,7 @@ class Generator {
 
     private void writePackageFile(ContentWriter out, PackageEntry pkg) {
         // FIRST, output the header
-        out.h1(packageH1Title(pkg));
+        out.h1line(packageH1Title(pkg));
 
         // NEXT, output the first paragraph of the content.
         var content = expandMnemonicLinks(pkg.content());
@@ -225,21 +225,16 @@ class Generator {
 
     private void writeTypeFile(ContentWriter out, TypeEntry type) {
         // FIRST, output the header
-        out.h1(mono(type.name())
+        out.h1(type.name()
             + " "
             + type.kind().name().toLowerCase()
             + " ("
             + mono(type.pkg().name())
             + ")");
 
-        if (type.supertypeName() != null) {
-            out.topic("Extends", typeLinkOrName(type.supertypeName()));
-        }
-        var subtypeLinks = subtypeLinks(type);
-        if (!subtypeLinks.isEmpty()) {
-            out.topic("Extended By", subtypeLinks);
-        }
+        writeTypeHierarchy(out, type);
         out.println();
+        out.hline();
 
         // NEXT, output the first paragraph of the content.
         var content = expandMnemonicLinks(type.content());
@@ -338,6 +333,33 @@ class Generator {
             out.h2("methods","Methods");
             writeCallableBodies(out, type.methods());
         }
+    }
+
+    private void writeTypeHierarchy(ContentWriter out, TypeEntry type) {
+        var supertypes = supertypeLinks(type);
+        var subtypes = subtypeLinks(type);
+
+        if (supertypes.isEmpty() && subtypes.isEmpty()) return;
+
+        out.print("**Hierarchy**: ");
+        if (!supertypes.isEmpty()) {
+            out.print(supertypes + " ← ");
+        }
+        out.print("**" + type.name() + "**");
+        if (!subtypes.isEmpty()) {
+            out.print(" ← {" + subtypes + "}");
+        }
+        out.println();
+    }
+
+    private String supertypeLinks(TypeEntry type) {
+        var links = new ArrayList<String>();
+        var supertype = lookupType(type.supertypeName());
+        while (supertype != null) {
+            links.add(typeLinkOrName(supertype.name()));
+            supertype = lookupType(supertype.supertypeName());
+        }
+        return String.join(" ← ", links.reversed());
     }
 
     private String subtypeLinks(TypeEntry type) {
