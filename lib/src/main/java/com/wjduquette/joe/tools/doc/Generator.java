@@ -19,16 +19,19 @@ class Generator {
     // Constructor Arguments
     private final DocConfig config;
     private final DocumentationSet docSet;
+    private final boolean verbose;
 
     // Transient
     private final transient Map<String,Entry> shortTable = new HashMap<>();
+    private Path outFile = null;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Generator(DocConfig config, DocumentationSet docSet) {
+    public Generator(DocConfig config, DocumentationSet docSet, boolean verbose) {
         this.config = config;
         this.docSet = docSet;
+        this.verbose = verbose;
     }
 
     //-------------------------------------------------------------------------
@@ -104,7 +107,7 @@ class Generator {
     // Documentation Set Index
 
     private void writeDocSetIndex(ContentWriter out) {
-        out.h1("Library API Index");
+        out.h1line("Library API Index");
         out.println();
         out.println("""
             The following is a complete index of the packages, functions,
@@ -146,7 +149,7 @@ class Generator {
 
     private void writePackageFile(ContentWriter out, PackageEntry pkg) {
         // FIRST, output the header
-        out.h1(packageH1Title(pkg));
+        out.h1line(packageH1Title(pkg));
 
         // NEXT, output the first paragraph of the content.
         var content = expandMnemonicLinks(pkg.content());
@@ -156,14 +159,14 @@ class Generator {
         out.println();
 
         if (!pkg.topics().isEmpty()) {
-            out.hb("topics", "Topics");
+            out.hblink("topics", "Topics");
             out.println();
-            pkg.topics().forEach(t -> writeTopicLink(out, 0, t));
+            pkg.topics().forEach(t -> writeTopicLink(out, t));
             out.println();
         }
 
         if (!pkg.functions().isEmpty()) {
-            out.hb("functions", "Functions");
+            out.hblink("functions", "Functions");
             out.println();
             sorted(pkg.functions(), Callable::name)
                 .forEach(f -> writeCallableLink(out, 0, f));
@@ -183,15 +186,15 @@ class Generator {
         // NEXT, output the remaining content
         content.forEach(out::println);
 
+        // NEXT, output the topics
+        for (var topic : pkg.topics()) {
+            writeTopicBody(out, topic);
+        }
+
         // NEXT, output the entries for each of the package's functions.
         if (!pkg.functions().isEmpty()) {
             out.h2("functions", "Functions");
             writeCallableBodies(out, pkg.functions());
-        }
-
-        // NEXT, output the topics
-        for (var topic : pkg.topics()) {
-            writeTopicBody(out, topic);
         }
     }
 
@@ -215,10 +218,7 @@ class Generator {
         var leader = " ".repeat(indent);
 
         out.print(leader + "- [" + type.name() + "](" +
-            type.filename() + ")");
-        if (type.supertypeName() != null) {
-            out.print(" extends " + typeLinkOrName(type.supertypeName()));
-        }
+            type.filename() + ") " + type.kind().name().toLowerCase());
         out.println();
     }
 
@@ -228,19 +228,16 @@ class Generator {
 
     private void writeTypeFile(ContentWriter out, TypeEntry type) {
         // FIRST, output the header
-        out.h1(mono(type.name())
-            + " type ("
+        out.h1(type.name()
+            + " "
+            + type.kind().name().toLowerCase()
+            + " ("
             + mono(type.pkg().name())
             + ")");
 
-        if (type.supertypeName() != null) {
-            out.topic("Extends", typeLinkOrName(type.supertypeName()));
-        }
-        var subtypeLinks = subtypeLinks(type);
-        if (!subtypeLinks.isEmpty()) {
-            out.topic("Extended By", subtypeLinks);
-        }
+        writeTypeHierarchy(out, type);
         out.println();
+        out.hline();
 
         // NEXT, output the first paragraph of the content.
         var content = expandMnemonicLinks(type.content());
@@ -250,22 +247,31 @@ class Generator {
         out.println();
 
         if (!type.topics().isEmpty()) {
-            out.hb("topics", "Topics");
+            out.hblink("topics", "Topics");
             out.println();
-            type.topics().forEach(t -> writeTopicLink(out, 0, t));
+            type.topics().forEach(t -> writeTopicLink(out, t));
             out.println();
         }
 
         if (!type.constants().isEmpty()) {
             out.hb("constants", "Constants");
             out.println();
-            sorted(type.constants(), ConstantEntry::name)
-                .forEach(c -> writeConstantLink(out, 0, c));
+            out.println("| Constant | Type | Description |");
+            out.println("|----------|------|-------------|");
+            for (var c : type.constants()) {
+                out.printf("| `%s` | %s | %s |\n",
+                    c.name(),
+                    c.valueType() != null
+                        ? typeLinkOrName(c.valueType())
+                        : "-",
+                    firstLine(c.content())
+                );
+            }
             out.println();
         }
 
         if (!type.staticMethods().isEmpty()) {
-            out.hb("statics", "Static Methods");
+            out.hblink("statics", "Static Methods");
             out.println();
             sorted(type.staticMethods(), StaticMethodEntry::name)
                 .forEach(m -> writeCallableLink(out, 0, m));
@@ -273,7 +279,7 @@ class Generator {
         }
 
         if (type.initializer() != null) {
-            out.hb("init", "Initializer");
+            out.hblink("init", "Initializer");
             out.println();
             writeCallableLink(out, 0, type.initializer());
             out.println();
@@ -282,36 +288,64 @@ class Generator {
         if (!type.fields().isEmpty()) {
             out.hb("fields", "Fields");
             out.println();
-            sorted(type.fields(), FieldEntry::name)
-                .forEach(m -> writeFieldLink(out, 0, m));
+            out.println("| Field | Type | Description |");
+            out.println("|-------|------|-------------|");
+            for (var f : type.fields()) {
+                out.printf("| `%s` | %s | %s |\n",
+                    f.name(),
+                    f.valueType() != null
+                        ? typeLinkOrName(f.valueType())
+                        : "-",
+                    firstLine(f.content())
+                );
+            }
+            out.println();
+        }
+
+        if (!type.properties().isEmpty()) {
+            out.hb("properties", "JavaFX Properties");
+            out.println();
+            out.println("| Defined By | Property | Type | Description |");
+            out.println("|------------|----------|------|-------------|");
+
+            var supertype = type;
+            while (supertype != null) {
+                for (var p : supertype.properties()) {
+                    out.printf("| %s | `#%s` | %s | %s |\n",
+                        typeLinkOrName(supertype.name()),
+                        p.name(),
+                        p.valueType() != null
+                            ? typeLinkOrName(p.valueType())
+                            : "-",
+                        firstLine(p.content())
+                    );
+                }
+                supertype = lookupType(supertype.supertypeName());
+            }
             out.println();
         }
 
         if (!type.methods().isEmpty()) {
-            out.hb("methods", "Methods");
+            out.hblink("methods", "Methods");
             out.println();
             sorted(type.methods(), MethodEntry::name)
                 .forEach(m -> writeCallableLink(out, 0, m));
-            out.println();
         }
 
         var supertype = lookupType(type.supertypeName());
         while (supertype != null) {
-            out.hb(supertype.name() + " Methods");
-            out.println();
+            out.println("- " + typeLinkOrName(supertype.name()) + " methods");
             sorted(supertype.methods(), MethodEntry::name)
-                .forEach(m -> writeCallableLink(out, 0, m));
-            out.println();
+                .forEach(m -> writeCallableLink(out, 2, m));
             supertype = lookupType(supertype.supertypeName());
         }
 
         // NEXT, output the remaining content
         content.forEach(out::println);
 
-        // NEXT, output Constants.
-        if (!type.constants().isEmpty()) {
-            out.h2("constants", "Constants");
-            writeConstantBodies(out, type.constants());
+        // NEXT, output the topics
+        for (var topic : type.topics()) {
+            writeTopicBody(out, topic);
         }
 
         // NEXT, output Static Methods
@@ -326,22 +360,38 @@ class Generator {
             writeInitializerBody(out, type.initializer());
         }
 
-        // NEXT, output Instance Fields
-        if (!type.fields().isEmpty()) {
-            out.h2("fields","Fields");
-            writeFieldBodies(out, type.fields());
-        }
-
         // NEXT, output Instance Methods
         if (!type.methods().isEmpty()) {
             out.h2("methods","Methods");
             writeCallableBodies(out, type.methods());
         }
+    }
 
-        // NEXT, output the topics
-        for (var topic : type.topics()) {
-            writeTopicBody(out, topic);
+    private void writeTypeHierarchy(ContentWriter out, TypeEntry type) {
+        var supertypes = supertypeLinks(type);
+        var subtypes = subtypeLinks(type);
+
+        if (supertypes.isEmpty() && subtypes.isEmpty()) return;
+
+        out.print("**Hierarchy**: ");
+        if (!supertypes.isEmpty()) {
+            out.print(supertypes + " ← ");
         }
+        out.print("**" + type.name() + "**");
+        if (!subtypes.isEmpty()) {
+            out.print(" ← {" + subtypes + "}");
+        }
+        out.println();
+    }
+
+    private String supertypeLinks(TypeEntry type) {
+        var links = new ArrayList<String>();
+        var supertype = lookupType(type.supertypeName());
+        while (supertype != null) {
+            links.add(typeLinkOrName(supertype.name()));
+            supertype = lookupType(supertype.supertypeName());
+        }
+        return String.join(" ← ", links.reversed());
     }
 
     private String subtypeLinks(TypeEntry type) {
@@ -366,11 +416,9 @@ class Generator {
 
     private void writeTopicLink(
         ContentWriter out,
-        int indent,
         TopicEntry topic
     ) {
-        var leader = " ".repeat(indent);
-        out.println(leader + "- [" +
+        out.println("- [" +
             topic.title() +
             "](" + topic.filename() + "#" + topic.id() + ")"
         );
@@ -379,21 +427,7 @@ class Generator {
     //-------------------------------------------------------------------------
     // Constants
 
-    private void writeConstantBodies(
-        ContentWriter out,
-        List<ConstantEntry> constants
-    ) {
-        sorted(constants, ConstantEntry::name)
-            .forEach(c -> writeConstantBody(out, c));
-        out.println();
-    }
-
-    private void writeConstantBody(ContentWriter out, ConstantEntry constant) {
-        out.h3(constant.id(), constant.type().prefix() + "." + constant.name());
-        expandMnemonicLinks(constant.content()).forEach(out::println);
-        out.println();
-    }
-
+    @SuppressWarnings("SameParameterValue")
     private void writeConstantLink(
         ContentWriter out,
         int indent,
@@ -402,37 +436,7 @@ class Generator {
         var leader = " ".repeat(indent);
         out.println(leader + "- [" +
             constant.type().prefix() + "." + constant.name() +
-            "](" +constant.filename() + "#" + constant.id() + ")"
-        );
-    }
-
-    //-------------------------------------------------------------------------
-    // Fields
-
-    private void writeFieldBodies(
-        ContentWriter out,
-        List<FieldEntry> fields
-    ) {
-        sorted(fields, FieldEntry::name)
-            .forEach(c -> writeFieldBody(out, c));
-        out.println();
-    }
-
-    private void writeFieldBody(ContentWriter out, FieldEntry field) {
-        out.h3(field.id(), ital(field.prefix()) + "." + field.name());
-        expandMnemonicLinks(field.content()).forEach(out::println);
-        out.println();
-    }
-
-    private void writeFieldLink(
-        ContentWriter out,
-        int indent,
-        FieldEntry field
-    ) {
-        var leader = " ".repeat(indent);
-        out.println(leader + "- [" +
-            ital(field.prefix()) + "." + field.name() +
-            "](" +field.filename() + "#" + field.id() + ")"
+            "](" +constant.filename() + "#constants)"
         );
     }
 
@@ -529,7 +533,7 @@ class Generator {
         var type = lookupType(name);
 
         if (type != null) {
-            return "[" + name + "](" + type.filename() + ")";
+            return "[" + type.name() + "](" + type.filename() + ")";
         } else {
             return name;
         }
@@ -581,17 +585,26 @@ class Generator {
                 return buff.toString();
             }
 
-            var mnemonic = head.substring(2, head.indexOf("]]"));
+            // Next, extract the entire mnemonic.
+            var linkSpec = head.substring(2, tail);
             head = head.substring(tail + 2);
 
-            if (docSet.lookup(mnemonic) != null) {
-                buff.append(inlineLink(docSet.lookup(mnemonic)));
-            } else if (shortTable.get(mnemonic) != null) {
-                buff.append(inlineLink(shortTable.get(mnemonic)));
-            } else {
+            // Next, look for link text.
+            var tokens = linkSpec.split("\\|");
+            var mnemonic = tokens[0];
+
+            // NEXT, get the entity.  If not found, issue a warning and
+            // leave a placeholder.
+            var entry = lookupMnemonic(mnemonic);
+            if (entry == null) {
                 // Leave it in place; it's incorrect.
                 warn("Unknown mnemonic in link: [[" + mnemonic + "]]");
-                buff.append("[[").append(mnemonic).append("]]");
+                buff.append("[[").append(linkSpec).append("]]");
+            } else {
+                var linkText = tokens.length > 1
+                    ? tokens[1]
+                    : inlineLinkText(entry);
+                buff.append(link(linkText, entry.url()));
             }
         }
 
@@ -599,8 +612,10 @@ class Generator {
         return buff.toString();
     }
 
-    private String inlineLink(Entry entry) {
-        return link(inlineLinkText(entry), entry.url());
+    private Entry lookupMnemonic(String mnemonic) {
+        var entry = docSet.lookup(mnemonic);
+        if (entry == null) entry = shortTable.get(mnemonic);
+        return entry;
     }
 
     private String inlineLinkText(Entry entry) {
@@ -614,6 +629,10 @@ class Generator {
                 -> mono(m.type().name() + "." + m.name() + "()");
             case InitializerEntry fn
                 -> mono(fn.name() + "()");
+            case FieldEntry f
+                -> mono(f.prefix() + "." + f.name());
+            case PropertyEntry p
+                -> mono("#" + p.name());
             case MethodEntry m
                 -> mono(m.name() + "()");
             case TopicEntry t
@@ -657,19 +676,40 @@ class Generator {
         return result;
     }
 
+    // Extracts and returns the first sentence of the content.
+    private String firstLine(List<String> content) {
+        var text = String.join(" ", content)
+            .replaceAll("\\s+", " ");
+        var ndx = text.indexOf(".");
+        return ndx == -1
+            ? text
+            : text.substring(0, ndx + 1);
+    }
+
     private String link(String text, String url) {
         return "[" + text + "](" + url + ")";
     }
 
     private void warn(String message) {
-        System.out.println("*** " + message);
+        if (!verbose) {
+            if (outFile != null) {
+                System.out.println("In file: " + outFile);
+            }
+            outFile = null;
+        }
+        System.out.println("  *** " + message);
     }
 
     //-------------------------------------------------------------------------
     // File Output
 
     private void write(Path path, ContentFunction function) {
-        System.out.println("Writing: " + path);
+        outFile = path;
+
+        if (verbose) {
+            System.out.println("Writing: " + path);
+        }
+
         try (var writer = Files.newBufferedWriter(path)) {
             var out = new ContentWriter(writer);
             function.write(out);

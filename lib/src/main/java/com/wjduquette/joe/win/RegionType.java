@@ -56,6 +56,10 @@ class RegionType extends WidgetType<Region> {
         // | `#prefWidth`  | [[joe.Number]]  | Preferred width in pixels  |
 
         // Properties
+
+        //**
+        // @property maxHeight joe.Number
+        // Maximum height in pixels.
         fxProperty("maxHeight",  Region::maxHeightProperty,  Joe::toDouble);
         fxProperty("maxHeight",  Region::maxHeightProperty,  Joe::toDouble);
         fxProperty("minWidth",   Region::minWidthProperty,   Joe::toDouble);

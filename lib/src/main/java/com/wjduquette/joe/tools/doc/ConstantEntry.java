@@ -12,23 +12,29 @@ class ConstantEntry extends TypeMember {
     // The constant's name.
     private final String name;
 
+    // The constant's value type, or null
+    private final String valueType;
+
     //-------------------------------------------------------------------------
     // Constructor
 
-    public ConstantEntry(TypeEntry type, String name) {
+    public ConstantEntry(TypeEntry type, String name, String valueType) {
         super(type);
 
         this.name = name;
+        this.valueType = valueType;
     }
 
     //-------------------------------------------------------------------------
     // Accessors
 
-    public String name()     { return name; }
-    public String id()       { return "constant." + name; }
+    public String name()          { return name; }
+    public String valueType()     { return valueType; }
+    public String id()            { return "constant." + name; }
     public String fullMnemonic()  { return type().fullMnemonic() + "#" + id(); }
     public String shortMnemonic() { return type().shortMnemonic() + "#" + id(); }
-    public String filename() { return type().filename(); }
+    public String filename()      { return type().filename(); }
+    public String url()           { return filename() + "#constants"; }
 
     public String toString() {
         return "Constant[" + name + "]";

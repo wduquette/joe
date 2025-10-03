@@ -30,28 +30,28 @@ public class NumberType extends ProxyType<Double> {
         proxies(Double.class);
 
         //**
-        // @constant E
+        // @constant E Number
         // The double-precision value that is closer than any other to
         // <i>e</i>, the base of the natural logarithms.
         constant("E", Math.E);
 
         //**
-        // @constant MAX_INT
+        // @constant MAX_INT Number
         // The maximum value of a Java integer.
         constant("MAX_INT",             (double)Integer.MAX_VALUE);
 
         //**
-        // @constant MAX_VALUE
+        // @constant MAX_VALUE Number
         // The maximum value of a Java double.
         constant("MAX_VALUE",           Double.MAX_VALUE);
 
         //**
-        // @constant MIN_INT
+        // @constant MIN_INT Number
         // The minimum (most negative) value of a Java integer.
         constant("MIN_INT",             (double)Integer.MIN_VALUE);
 
         //**
-        // @constant MIN_VALUE
+        // @constant MIN_VALUE Number
         // The minimum (most negative) value of a Java double.
         constant("MIN_VALUE",           Double.MIN_VALUE);
 
@@ -66,7 +66,7 @@ public class NumberType extends ProxyType<Double> {
         constant("NAN",                 Double.NaN);
 
         //**
-        // @constant PI
+        // @constant PI Number
         // The double-precision value that is closer than any other to
         // 𝛑, the ratio of the circumference of a circle to its diameter.
         constant("PI", Math.PI);
@@ -77,7 +77,7 @@ public class NumberType extends ProxyType<Double> {
         constant("POSITIVE_INFINITY",   Double.POSITIVE_INFINITY);
 
         //**
-        // @constant TAU
+        // @constant TAU Number
         // The double-precision value that is closer than any other to
         // 𝛕, the ratio of the circumference of a circle to its radius.
         constant("TAU",                 Math.TAU);

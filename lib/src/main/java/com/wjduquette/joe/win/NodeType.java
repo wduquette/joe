@@ -43,6 +43,10 @@ class NodeType extends WidgetType<Node> {
         // | `#visible` | [[joe.Boolean]]  | Visibility flag    |
         //
         // See [[joe.win#topic.css]] for more on using CSS.
+
+        //**
+        // @property disable joe.Boolean
+        // If true, disables the node and its descendants.
         fxProperty("disable", Node::disableProperty, Joe::toBoolean);
         fxProperty("id",      Node::idProperty,      Joe::toString);
         fxProperty("style",   Node::styleProperty,   Joe::toString);

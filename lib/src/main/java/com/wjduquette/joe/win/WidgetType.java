@@ -24,7 +24,7 @@ public class WidgetType<V> extends ProxyType<V> {
 
     //**
     // @package joe.win
-    // @type Widget
+    // @widget Widget
     // `Widget` is the base class for JavaFX widgets as represented in Joe:
     // effectively, all JavaFX types that have JavaFX properties.  There is
     // no direct equivalent to this type in the JavaFX class hierarchy.

@@ -1,22 +1,22 @@
 package com.wjduquette.joe.tools.doc;
 
 /**
- * An entry for an instance field that belongs to a type.
+ * An entry for JavaFX instance properties belonging to a type.
  */
-class FieldEntry extends TypeMember {
+class PropertyEntry extends TypeMember {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The field's name.
+    // The property's name.
     private final String name;
 
-    // The field's value type, or null
+    // The property's value type, or null
     private final String valueType;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    public FieldEntry(TypeEntry type, String name, String valueType) {
+    public PropertyEntry(TypeEntry type, String name, String valueType) {
         super(type);
 
         this.name = name;
@@ -28,14 +28,13 @@ class FieldEntry extends TypeMember {
 
     public String name()          { return name; }
     public String valueType()     { return valueType; }
-    public String prefix()        { return type().valuePrefix(); }
-    public String id()            { return "field." + name; }
+    public String id()            { return "property." + name; }
     public String fullMnemonic()  { return type().fullMnemonic() + "#" + id(); }
     public String shortMnemonic() { return type().shortMnemonic() + "#" + id(); }
     public String filename()      { return type().filename(); }
-    public String url()           { return filename() + "#fields"; }
+    public String url()           { return filename() + "#properties"; }
 
     public String toString() {
-        return "Field[" + name + "]";
+        return "Property[" + name + "]";
     }
 }

@@ -22,10 +22,16 @@ public class DocTool implements Tool {
      */
     public static final ToolInfo INFO = new ToolInfo(
         "doc",
-        "",
-        "Scans Joe source for doc comments.",
+        "[options...]",
+        "Generates documentation from JoeDoc comments.",
         """
-        Work in progress.
+        The 'joe doc' tool scans a project's Java and Joe source for
+        JoeDoc comments and produces API documentation suitable for
+        inclusion in an mdBook document.
+        
+        Options:
+        
+        --verbose, -v    Enable verbose output.
         """,
         DocTool::main
     );
@@ -44,6 +50,9 @@ public class DocTool implements Tool {
 
     //-------------------------------------------------------------------------
     // Instance Variables
+
+    // The verbose flag
+    private boolean verbose = false;
 
     // The client's configuration
     private final DocConfig config = new DocConfig();
@@ -68,6 +77,17 @@ public class DocTool implements Tool {
     private void run(String[] args) {
         // FIRST, parse the command line.
         var argq = new ArrayDeque<>(List.of(args));
+
+        while (!argq.isEmpty() && argq.peek().startsWith("-")) {
+            var opt = argq.poll();
+            switch (opt) {
+                case "--verbose", "-v" -> verbose = true;
+                default -> {
+                    System.err.println("Unknown option: '" + opt + "'.");
+                    System.exit(64);
+                }
+            }
+        }
 
         if (!argq.isEmpty()) {
             printUsage(App.NAME);
@@ -95,13 +115,6 @@ public class DocTool implements Tool {
             exit(1);
         }
 
-//
-//        // NEXT, get the input folders.
-//        // NOTE: These will ultimately come from the joe_doc.monica file.
-//        config.inputFolders().add(Path.of("../lib/src/main/java/com/wjduquette/joe"));
-//        config.inputFolders().add(Path.of("../lib/src/main/resources/com/wjduquette/joe"));
-//        config.setOutputFolder(Path.of("src/library"));
-
         // NEXT, populate the list of files.
         scanInputFolders();
 
@@ -112,7 +125,7 @@ public class DocTool implements Tool {
 
         // NEXT, parse the files and build up the documentation set.
         var docSet = new DocumentationSet();
-        var parser = new DocCommentParser(docSet);
+        var parser = new DocCommentParser(docSet, verbose);
         var errors = 0;
         for (var file : config.inputFiles()) {
             try {
@@ -131,7 +144,7 @@ public class DocTool implements Tool {
 //        docSet.dump();
 
         // NEXT, generate the doc files
-        var generator = new Generator(config, docSet);
+        var generator = new Generator(config, docSet, verbose);
         generator.generate();
     }
 

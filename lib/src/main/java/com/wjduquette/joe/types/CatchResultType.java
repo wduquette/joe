@@ -77,7 +77,7 @@ public class CatchResultType extends ProxyType<CatchResult> {
     // Field Implementations
 
     //**
-    // @field result
+    // @field result value
     // The successful result if `isOK()`, and null otherwise.
     // (Note, a successful result can also be null.)
     private Object _resultField(Joe joe, CatchResult value) {
@@ -85,7 +85,7 @@ public class CatchResultType extends ProxyType<CatchResult> {
     }
 
     //**
-    // @field error
+    // @field error Error
     // The thrown error if `isError()`, and null otherwise.
     private Object _errorField(Joe joe, CatchResult value) {
         return value.error();

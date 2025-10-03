@@ -10,12 +10,15 @@ class TypeEntry extends Entry implements TypeOrMixin {
     // The type's name.
     private final String name;
 
-    private boolean isEnum = false;
+    // The type's kind.
+    private final Kind kind;
+
     private final List<ConstantEntry> constants = new ArrayList<>();
     private final List<StaticMethodEntry> staticMethods = new ArrayList<>();
     private String supertypeName = null;
     private InitializerEntry initializer = null;
     private final List<FieldEntry> fields = new ArrayList<>();
+    private final List<PropertyEntry> properties = new ArrayList<>();
     private final List<MethodEntry> methods = new ArrayList<>();
     private final List<TopicEntry> topics = new ArrayList<>();
     private final List<String> mixins = new ArrayList<>();
@@ -25,9 +28,10 @@ class TypeEntry extends Entry implements TypeOrMixin {
     //-------------------------------------------------------------------------
     // Constructor
 
-    TypeEntry(PackageEntry pkg, String name) {
+    TypeEntry(PackageEntry pkg, String name, Kind kind) {
         super(pkg);
         this.name = name;
+        this.kind = kind;
     }
 
     //-------------------------------------------------------------------------
@@ -37,22 +41,19 @@ class TypeEntry extends Entry implements TypeOrMixin {
     public List<StaticMethodEntry> staticMethods() { return staticMethods; }
     public String                  supertypeName() { return supertypeName; }
     public InitializerEntry        initializer()   { return initializer; }
+    public List<PropertyEntry>     properties()    { return properties; }
     public List<FieldEntry>        fields()        { return fields; }
     public List<MethodEntry>       methods()       { return methods; }
     public List<TopicEntry>        topics()        { return topics; }
     public List<String>            mixins()        { return mixins; }
 
-    public String  prefix()        { return name; }
-    public boolean isEnum()        { return isEnum; }
     public String  name()          { return name; }
+    public Kind    kind()          { return kind; }
+    public String  prefix()        { return name; }
     public String  fullMnemonic()  { return pkg().name() + "." + name; }
     public String  shortMnemonic() { return name; }
     public String  valuePrefix()   { return downCase(name); }
     public String  filename()      { return "type." + pkg().name() + "." + name + ".md"; }
-
-    public void setEnum(boolean flag) {
-        this.isEnum = flag;
-    }
 
     public void setSupertypeName(String supertypeName) {
         this.supertypeName = supertypeName;
@@ -86,7 +87,7 @@ class TypeEntry extends Entry implements TypeOrMixin {
 
         // Include Constants
         for (var c : mixin.constants()) {
-            var constant = new ConstantEntry(this, c.name());
+            var constant = new ConstantEntry(this, c.name(), c.valueType());
             copyContent(c.content(), constant.content());
             constants.add(constant);
         }

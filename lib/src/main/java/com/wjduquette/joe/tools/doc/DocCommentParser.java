@@ -19,6 +19,8 @@ class DocCommentParser {
     // Instance Variables
 
     private final DocumentationSet docSet;
+    private Path docFile = null;
+    private final boolean verbose;
     private transient List<Line> lines;
     private transient Line previous = null;
 
@@ -29,14 +31,17 @@ class DocCommentParser {
      * This parser will parse file content into the documentation set.
      * @param docSet The documentation set
      */
-    DocCommentParser(DocumentationSet docSet) {
+    DocCommentParser(DocumentationSet docSet, boolean verbose) {
         this.docSet = docSet;
+        this.verbose = verbose;
     }
 
     //-------------------------------------------------------------------------
     // API
 
     void parse(Path docFile) {
+        this.docFile = docFile;
+
         // FIRST, extract the lines from the file.
         lines = Extractor.process(docFile);
         if (lines.isEmpty()) {
@@ -45,7 +50,9 @@ class DocCommentParser {
 
         // NEXT, begin parsing.  There might be lines before the first tag;
         // if any are not blank, that's an error.
-        System.out.println("Reading: " + docFile);
+        if (verbose) {
+            System.out.println("Reading: " + docFile);
+        }
 
         _parse();
     }
@@ -61,7 +68,11 @@ class DocCommentParser {
     private static final String ARGS = "@args";
     private static final String RESULT = "@result";
     private static final String TYPE = "@type";
+    private static final String CLASS = "@class";
+    private static final String RECORD = "@record";
     private static final String ENUM = "@enum";
+    private static final String WIDGET = "@widget";
+    private static final String SINGLETON = "@singleton";
     private static final String TYPE_TOPIC = "@typeTopic";
     private static final String INCLUDE_MIXIN = "@includeMixin";
     private static final String EXTENDS = "@extends";
@@ -69,6 +80,7 @@ class DocCommentParser {
     private static final String STATIC = "@static";
     private static final String INIT = "@init";
     private static final String FIELD = "@field";
+    private static final String PROPERTY = "@property";
     private static final String METHOD = "@method";
 
     private static final Set<String> MIXIN_ENDERS = Set.of(
@@ -84,12 +96,14 @@ class DocCommentParser {
     );
 
     private static final Set<String> PACKAGE_CHILD_ENDERS = Set.of(
-        PACKAGE, MIXIN, FUNCTION, TYPE, ENUM, PACKAGE_TOPIC
+        PACKAGE, MIXIN, FUNCTION, TYPE, CLASS, RECORD, ENUM, WIDGET, SINGLETON,
+        PACKAGE_TOPIC
     );
 
     private static final Set<String> TYPE_CHILD_ENDERS = Set.of(
-        PACKAGE, MIXIN, FUNCTION, TYPE, ENUM, PACKAGE_TOPIC,
-        CONSTANT, STATIC, INIT, FIELD, METHOD, TYPE_TOPIC
+        PACKAGE, MIXIN, FUNCTION, TYPE, CLASS, RECORD, ENUM, WIDGET, SINGLETON,
+        PACKAGE_TOPIC, CONSTANT, STATIC, INIT, FIELD, PROPERTY, METHOD,
+        TYPE_TOPIC
     );
 
     private void _parse() {
@@ -186,7 +200,7 @@ class DocCommentParser {
             switch (tag.name()) {
                 case TITLE -> pkg.setTitle(tag.value());
                 case FUNCTION -> _function(pkg, tag);
-                case TYPE, ENUM -> _type(pkg, tag);
+                case TYPE, CLASS, RECORD, ENUM, WIDGET, SINGLETON -> _type(pkg, tag);
                 case PACKAGE_TOPIC -> _packageTopic(pkg, tag);
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
@@ -260,8 +274,15 @@ class DocCommentParser {
         // FIRST, create the type, validating its name and making sure
         // it's unique.
         trace("_type", typeTag);
-        TypeEntry type = new TypeEntry(pkg, typeTag.value());
-        type.setEnum(typeTag.name().equals(ENUM));
+        var kind = switch (typeTag.name()) {
+            case CLASS -> Kind.CLASS;
+            case RECORD -> Kind.RECORD;
+            case ENUM -> Kind.ENUM;
+            case WIDGET -> Kind.WIDGET;
+            case SINGLETON -> Kind.SINGLETON;
+            default -> Kind.TYPE;
+        };
+        TypeEntry type = new TypeEntry(pkg, typeTag.value(), kind);
         remember(type);
 
         if (!Joe.isIdentifier(typeTag.value())) {
@@ -270,7 +291,7 @@ class DocCommentParser {
         pkg.types().add(type);
 
         // NEXT, if it's an enum add the standard enum content.
-        if (type.isEnum()) {
+        if (kind == Kind.ENUM) {
             addEnumContent(type);
         }
 
@@ -298,6 +319,7 @@ class DocCommentParser {
                 case STATIC -> _static(type, tag);
                 case INIT -> _init(type, tag);
                 case FIELD -> _field(type, tag);
+                case PROPERTY -> _property(type, tag);
                 case METHOD -> _method(type, tag);
                 case TYPE_TOPIC -> _typeTopic(type, tag);
                 default -> throw error(previous(), "Unexpected tag: " + tag);
@@ -376,12 +398,14 @@ class DocCommentParser {
     private void _constant(TypeOrMixin parent, Tag constantTag) {
         var isType = parent instanceof TypeEntry;
         var type = isType ? (TypeEntry)parent : null;
+        var name = before(" ", constantTag.value());
+        var valueType = after(" ", constantTag.value());
 
-        if (!Joe.isIdentifier(constantTag.value())) {
+        if (!Joe.isIdentifier(name)) {
             throw error(previous(), expected(constantTag));
         }
 
-        ConstantEntry constant = new ConstantEntry(type, constantTag.value());
+        ConstantEntry constant = new ConstantEntry(type, name, valueType);
         if (isType) remember(constant);
 
         parent.constants().add(constant);
@@ -462,12 +486,14 @@ class DocCommentParser {
     private void _field(TypeOrMixin parent, Tag fieldTag) {
         var isType = parent instanceof TypeEntry;
         var type = isType ? (TypeEntry)parent : null;
+        var name = before(" ", fieldTag.value());
+        var valueType = after(" ", fieldTag.value());
 
-        if (!Joe.isIdentifier(fieldTag.value())) {
+        if (!Joe.isIdentifier(name)) {
             throw error(previous(), expected(fieldTag));
         }
 
-        FieldEntry field = new FieldEntry(type, fieldTag.value());
+        FieldEntry field = new FieldEntry(type, name, valueType);
 
         if (isType) remember(field);
 
@@ -481,6 +507,31 @@ class DocCommentParser {
         var enders = isType ? TYPE_CHILD_ENDERS : MIXIN_CHILD_ENDERS;
 
         if (!enders.contains(tag.name())) {
+            advance();
+            throw error(previous(), "Unexpected tag: " + tag);
+        }
+    }
+
+    private void _property(TypeEntry type, Tag propertyTag) {
+        var name = before(" ", propertyTag.value());
+        var valueType = after(" ", propertyTag.value());
+
+        if (!Joe.isIdentifier(name)) {
+            throw error(previous(), expected(propertyTag));
+        }
+
+        PropertyEntry property = new PropertyEntry(type, name, valueType);
+
+        remember(property);
+
+        type.properties().add(property);
+
+        // Fields have no tags, only content.
+        if (!advanceToTag(property)) return;
+
+        var tag = peek().getTag();
+
+        if (!TYPE_CHILD_ENDERS.contains(tag.name())) {
             advance();
             throw error(previous(), "Unexpected tag: " + tag);
         }
@@ -576,6 +627,25 @@ class DocCommentParser {
         }
     }
 
+    // Gets the text preceding the separator, or the whole string if
+    // none.
+    @SuppressWarnings("SameParameterValue")
+    private String before(String separator, String string) {
+        var ndx = string.indexOf(separator);
+        return ndx == -1
+            ? string
+            : string.substring(0, ndx);
+    }
+
+    // Gets the text following the separator, or null if none.
+    @SuppressWarnings("SameParameterValue")
+    private String after(String separator, String string) {
+        var ndx = string.indexOf(separator);
+        return ndx == -1
+            ? null
+            : string.substring(ndx + separator.length());
+    }
+
     // ParseError is just a convenient way to break out of the parser.
     // We halt on the first error for now.
     static class ParseError extends RuntimeException { }
@@ -627,6 +697,9 @@ class DocCommentParser {
     }
 
     private ParseError error(Line line, String message) {
+        if (!verbose) {
+            System.err.println("*** Error in " + docFile);
+        }
         System.err.println("[line " + line.number() + "] " + message);
         System.err.println("  --> // " + line.text());
         return new ParseError();

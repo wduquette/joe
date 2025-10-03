@@ -18,18 +18,27 @@ class ContentWriter extends PrintWriter {
     // Content Output Methods
 
     /**
-     * Outputs a level 1 title.
+     * Outputs a level 1 title, followed by a separator
+     * @param title The title
+     */
+    public void h1line(String title) {
+        println("# " + title);
+        hline();
+    }
+
+    /**
+     * Outputs a level 1 title, followed by a separator
      * @param title The title
      */
     public void h1(String title) {
         println("# " + title);
-        hline();
     }
 
     /**
      * Outputs a level 2 title.
      * @param title The title
      */
+    @SuppressWarnings("unused")
     public void h2(String title) {
         println("## " + title);
         hline();
@@ -48,6 +57,7 @@ class ContentWriter extends PrintWriter {
      * Outputs a level 3 title.
      * @param title The title
      */
+    @SuppressWarnings("unused")
     public void h3(String title) {
         println("### " + title);
         hline();
@@ -58,6 +68,10 @@ class ContentWriter extends PrintWriter {
     }
 
     public void hb(String id, String title) {
+        println("**<span id=\"" + id + "\">" + title + "</span>**");
+    }
+
+    public void hblink(String id, String title) {
         println("**[" + title + "](#" + id + ")**");
     }
 
