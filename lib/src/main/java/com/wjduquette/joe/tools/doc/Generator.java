@@ -291,21 +291,23 @@ class Generator {
             out.println();
             sorted(type.methods(), MethodEntry::name)
                 .forEach(m -> writeCallableLink(out, 0, m));
-            out.println();
         }
 
         var supertype = lookupType(type.supertypeName());
         while (supertype != null) {
-            out.hb(supertype.name() + " Methods");
-            out.println();
+            out.println("- " + typeLinkOrName(supertype.name()) + " methods");
             sorted(supertype.methods(), MethodEntry::name)
-                .forEach(m -> writeCallableLink(out, 0, m));
-            out.println();
+                .forEach(m -> writeCallableLink(out, 2, m));
             supertype = lookupType(supertype.supertypeName());
         }
 
         // NEXT, output the remaining content
         content.forEach(out::println);
+
+        // NEXT, output the topics
+        for (var topic : type.topics()) {
+            writeTopicBody(out, topic);
+        }
 
         // NEXT, output Constants.
         if (!type.constants().isEmpty()) {
@@ -335,11 +337,6 @@ class Generator {
         if (!type.methods().isEmpty()) {
             out.h2("methods","Methods");
             writeCallableBodies(out, type.methods());
-        }
-
-        // NEXT, output the topics
-        for (var topic : type.topics()) {
-            writeTopicBody(out, topic);
         }
     }
 
