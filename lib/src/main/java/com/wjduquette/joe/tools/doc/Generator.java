@@ -19,16 +19,19 @@ class Generator {
     // Constructor Arguments
     private final DocConfig config;
     private final DocumentationSet docSet;
+    private final boolean verbose;
 
     // Transient
     private final transient Map<String,Entry> shortTable = new HashMap<>();
+    private Path outFile = null;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    public Generator(DocConfig config, DocumentationSet docSet) {
+    public Generator(DocConfig config, DocumentationSet docSet, boolean verbose) {
         this.config = config;
         this.docSet = docSet;
+        this.verbose = verbose;
     }
 
     //-------------------------------------------------------------------------
@@ -688,14 +691,25 @@ class Generator {
     }
 
     private void warn(String message) {
-        System.out.println("*** " + message);
+        if (!verbose) {
+            if (outFile != null) {
+                System.out.println("In file: " + outFile);
+            }
+            outFile = null;
+        }
+        System.out.println("  *** " + message);
     }
 
     //-------------------------------------------------------------------------
     // File Output
 
     private void write(Path path, ContentFunction function) {
-        System.out.println("Writing: " + path);
+        outFile = path;
+
+        if (verbose) {
+            System.out.println("Writing: " + path);
+        }
+
         try (var writer = Files.newBufferedWriter(path)) {
             var out = new ContentWriter(writer);
             function.write(out);

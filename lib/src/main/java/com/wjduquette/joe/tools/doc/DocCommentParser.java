@@ -19,6 +19,8 @@ class DocCommentParser {
     // Instance Variables
 
     private final DocumentationSet docSet;
+    private Path docFile = null;
+    private final boolean verbose;
     private transient List<Line> lines;
     private transient Line previous = null;
 
@@ -29,14 +31,17 @@ class DocCommentParser {
      * This parser will parse file content into the documentation set.
      * @param docSet The documentation set
      */
-    DocCommentParser(DocumentationSet docSet) {
+    DocCommentParser(DocumentationSet docSet, boolean verbose) {
         this.docSet = docSet;
+        this.verbose = verbose;
     }
 
     //-------------------------------------------------------------------------
     // API
 
     void parse(Path docFile) {
+        this.docFile = docFile;
+
         // FIRST, extract the lines from the file.
         lines = Extractor.process(docFile);
         if (lines.isEmpty()) {
@@ -45,7 +50,9 @@ class DocCommentParser {
 
         // NEXT, begin parsing.  There might be lines before the first tag;
         // if any are not blank, that's an error.
-        System.out.println("Reading: " + docFile);
+        if (verbose) {
+            System.out.println("Reading: " + docFile);
+        }
 
         _parse();
     }
@@ -690,6 +697,9 @@ class DocCommentParser {
     }
 
     private ParseError error(Line line, String message) {
+        if (!verbose) {
+            System.err.println("*** Error in " + docFile);
+        }
         System.err.println("[line " + line.number() + "] " + message);
         System.err.println("  --> // " + line.text());
         return new ParseError();
