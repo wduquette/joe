@@ -113,8 +113,8 @@ public class WinPackage extends NativePackage {
 
         // Widgets that aren't Nodes
         type(TabClass.TYPE);
-        type(MenuType.TYPE);
         type(MenuItemType.TYPE);
+        type(MenuType.TYPE);
 
         // Miscellaneous Types
         type(ListenerType.TYPE);

@@ -26,7 +26,7 @@ class MenuItemType extends WidgetType<MenuItem> {
         //**
         // ## Properties
         //
-        // All `Node` widgets have the following properties.
+        // All `MenuItem` widgets have the following properties.
         //
         // | Property    | Type             | Description        |
         // | ----------- | ---------------- | ------------------ |
