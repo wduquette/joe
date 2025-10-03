@@ -73,6 +73,7 @@ class DocCommentParser {
     private static final String STATIC = "@static";
     private static final String INIT = "@init";
     private static final String FIELD = "@field";
+    private static final String PROPERTY = "@property";
     private static final String METHOD = "@method";
 
     private static final Set<String> MIXIN_ENDERS = Set.of(
@@ -94,7 +95,8 @@ class DocCommentParser {
 
     private static final Set<String> TYPE_CHILD_ENDERS = Set.of(
         PACKAGE, MIXIN, FUNCTION, TYPE, CLASS, RECORD, ENUM, WIDGET, SINGLETON,
-        PACKAGE_TOPIC, CONSTANT, STATIC, INIT, FIELD, METHOD, TYPE_TOPIC
+        PACKAGE_TOPIC, CONSTANT, STATIC, INIT, FIELD, PROPERTY, METHOD,
+        TYPE_TOPIC
     );
 
     private void _parse() {
@@ -310,6 +312,7 @@ class DocCommentParser {
                 case STATIC -> _static(type, tag);
                 case INIT -> _init(type, tag);
                 case FIELD -> _field(type, tag);
+                case PROPERTY -> _property(type, tag);
                 case METHOD -> _method(type, tag);
                 case TYPE_TOPIC -> _typeTopic(type, tag);
                 default -> throw error(previous(), "Unexpected tag: " + tag);
@@ -497,6 +500,31 @@ class DocCommentParser {
         var enders = isType ? TYPE_CHILD_ENDERS : MIXIN_CHILD_ENDERS;
 
         if (!enders.contains(tag.name())) {
+            advance();
+            throw error(previous(), "Unexpected tag: " + tag);
+        }
+    }
+
+    private void _property(TypeEntry type, Tag propertyTag) {
+        var name = before(" ", propertyTag.value());
+        var valueType = after(" ", propertyTag.value());
+
+        if (!Joe.isIdentifier(name)) {
+            throw error(previous(), expected(propertyTag));
+        }
+
+        PropertyEntry property = new PropertyEntry(type, name, valueType);
+
+        remember(property);
+
+        type.properties().add(property);
+
+        // Fields have no tags, only content.
+        if (!advanceToTag(property)) return;
+
+        var tag = peek().getTag();
+
+        if (!TYPE_CHILD_ENDERS.contains(tag.name())) {
             advance();
             throw error(previous(), "Unexpected tag: " + tag);
         }

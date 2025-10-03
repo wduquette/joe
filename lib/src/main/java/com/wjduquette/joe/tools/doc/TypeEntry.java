@@ -18,6 +18,7 @@ class TypeEntry extends Entry implements TypeOrMixin {
     private String supertypeName = null;
     private InitializerEntry initializer = null;
     private final List<FieldEntry> fields = new ArrayList<>();
+    private final List<PropertyEntry> properties = new ArrayList<>();
     private final List<MethodEntry> methods = new ArrayList<>();
     private final List<TopicEntry> topics = new ArrayList<>();
     private final List<String> mixins = new ArrayList<>();
@@ -40,6 +41,7 @@ class TypeEntry extends Entry implements TypeOrMixin {
     public List<StaticMethodEntry> staticMethods() { return staticMethods; }
     public String                  supertypeName() { return supertypeName; }
     public InitializerEntry        initializer()   { return initializer; }
+    public List<PropertyEntry>     properties()    { return properties; }
     public List<FieldEntry>        fields()        { return fields; }
     public List<MethodEntry>       methods()       { return methods; }
     public List<TopicEntry>        topics()        { return topics; }

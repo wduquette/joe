@@ -299,6 +299,29 @@ class Generator {
             out.println();
         }
 
+        if (!type.properties().isEmpty()) {
+            out.hb("properties", "JavaFX Properties");
+            out.println();
+            out.println("| Defined By | Property | Type | Description |");
+            out.println("|------------|----------|------|-------------|");
+
+            var supertype = type;
+            while (supertype != null) {
+                for (var p : supertype.properties()) {
+                    out.printf("| %s | `#%s` | %s | %s |\n",
+                        typeLinkOrName(supertype.name()),
+                        p.name(),
+                        p.valueType() != null
+                            ? typeLinkOrName(p.valueType())
+                            : "-",
+                        firstLine(p.content())
+                    );
+                }
+                supertype = lookupType(supertype.supertypeName());
+            }
+            out.println();
+        }
+
         if (!type.methods().isEmpty()) {
             out.hblink("methods", "Methods");
             out.println();
@@ -507,7 +530,7 @@ class Generator {
         var type = lookupType(name);
 
         if (type != null) {
-            return "[" + name + "](" + type.filename() + ")";
+            return "[" + type.name() + "](" + type.filename() + ")";
         } else {
             return name;
         }
@@ -603,6 +626,10 @@ class Generator {
                 -> mono(m.type().name() + "." + m.name() + "()");
             case InitializerEntry fn
                 -> mono(fn.name() + "()");
+            case FieldEntry f
+                -> mono(f.prefix() + "." + f.name());
+            case PropertyEntry p
+                -> mono("#" + p.name());
             case MethodEntry m
                 -> mono(m.name() + "()");
             case TopicEntry t
@@ -648,7 +675,7 @@ class Generator {
 
     // Extracts and returns the first sentence of the content.
     private String firstLine(List<String> content) {
-        var text = String.join(" ", contentIntro(content))
+        var text = String.join(" ", content)
             .replaceAll("\\s+", " ");
         var ndx = text.indexOf(".");
         return ndx == -1
