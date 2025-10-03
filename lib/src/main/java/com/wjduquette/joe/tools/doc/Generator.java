@@ -283,10 +283,19 @@ class Generator {
         }
 
         if (!type.fields().isEmpty()) {
-            out.hblink("fields", "Fields");
+            out.hb("fields", "Fields");
             out.println();
-            sorted(type.fields(), FieldEntry::name)
-                .forEach(m -> writeFieldLink(out, m));
+            out.println("| Field | Type | Description |");
+            out.println("|-------|------|-------------|");
+            for (var f : type.fields()) {
+                out.printf("| `%s` | %s | %s |\n",
+                    f.name(),
+                    f.valueType() != null
+                        ? typeLinkOrName(f.valueType())
+                        : "-",
+                    firstLine(f.content())
+                );
+            }
             out.println();
         }
 
@@ -323,12 +332,6 @@ class Generator {
         if (type.initializer() != null) {
             out.h2("init", type.name() + " Initializer");
             writeInitializerBody(out, type.initializer());
-        }
-
-        // NEXT, output Instance Fields
-        if (!type.fields().isEmpty()) {
-            out.h2("fields","Fields");
-            writeFieldBodies(out, type.fields());
         }
 
         // NEXT, output Instance Methods
@@ -408,34 +411,6 @@ class Generator {
         out.println(leader + "- [" +
             constant.type().prefix() + "." + constant.name() +
             "](" +constant.filename() + "#constants)"
-        );
-    }
-
-    //-------------------------------------------------------------------------
-    // Fields
-
-    private void writeFieldBodies(
-        ContentWriter out,
-        List<FieldEntry> fields
-    ) {
-        sorted(fields, FieldEntry::name)
-            .forEach(c -> writeFieldBody(out, c));
-        out.println();
-    }
-
-    private void writeFieldBody(ContentWriter out, FieldEntry field) {
-        out.h3(field.id(), ital(field.prefix()) + "." + field.name());
-        expandMnemonicLinks(field.content()).forEach(out::println);
-        out.println();
-    }
-
-    private void writeFieldLink(
-        ContentWriter out,
-        FieldEntry field
-    ) {
-        out.println("- [" +
-            ital(field.prefix()) + "." + field.name() +
-            "](" +field.filename() + "#" + field.id() + ")"
         );
     }
 

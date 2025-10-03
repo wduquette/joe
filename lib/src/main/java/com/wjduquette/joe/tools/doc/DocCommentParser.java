@@ -476,12 +476,14 @@ class DocCommentParser {
     private void _field(TypeOrMixin parent, Tag fieldTag) {
         var isType = parent instanceof TypeEntry;
         var type = isType ? (TypeEntry)parent : null;
+        var name = before(" ", fieldTag.value());
+        var valueType = after(" ", fieldTag.value());
 
-        if (!Joe.isIdentifier(fieldTag.value())) {
+        if (!Joe.isIdentifier(name)) {
             throw error(previous(), expected(fieldTag));
         }
 
-        FieldEntry field = new FieldEntry(type, fieldTag.value());
+        FieldEntry field = new FieldEntry(type, name, valueType);
 
         if (isType) remember(field);
 
