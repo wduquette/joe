@@ -388,12 +388,14 @@ class DocCommentParser {
     private void _constant(TypeOrMixin parent, Tag constantTag) {
         var isType = parent instanceof TypeEntry;
         var type = isType ? (TypeEntry)parent : null;
+        var name = before(" ", constantTag.value());
+        var valueType = after(" ", constantTag.value());
 
-        if (!Joe.isIdentifier(constantTag.value())) {
+        if (!Joe.isIdentifier(name)) {
             throw error(previous(), expected(constantTag));
         }
 
-        ConstantEntry constant = new ConstantEntry(type, constantTag.value());
+        ConstantEntry constant = new ConstantEntry(type, name, valueType);
         if (isType) remember(constant);
 
         parent.constants().add(constant);
@@ -586,6 +588,25 @@ class DocCommentParser {
         } else {
             docSet.remember(entry);
         }
+    }
+
+    // Gets the text preceding the separator, or the whole string if
+    // none.
+    @SuppressWarnings("SameParameterValue")
+    private String before(String separator, String string) {
+        var ndx = string.indexOf(separator);
+        return ndx == -1
+            ? string
+            : string.substring(0, ndx);
+    }
+
+    // Gets the text following the separator, or null if none.
+    @SuppressWarnings("SameParameterValue")
+    private String after(String separator, String string) {
+        var ndx = string.indexOf(separator);
+        return ndx == -1
+            ? null
+            : string.substring(ndx + separator.length());
     }
 
     // ParseError is just a convenient way to break out of the parser.

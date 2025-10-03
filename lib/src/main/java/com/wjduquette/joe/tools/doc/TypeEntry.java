@@ -85,7 +85,7 @@ class TypeEntry extends Entry implements TypeOrMixin {
 
         // Include Constants
         for (var c : mixin.constants()) {
-            var constant = new ConstantEntry(this, c.name());
+            var constant = new ConstantEntry(this, c.name(), c.valueType());
             copyContent(c.content(), constant.content());
             constants.add(constant);
         }

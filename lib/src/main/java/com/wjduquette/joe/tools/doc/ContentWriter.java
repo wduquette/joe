@@ -68,6 +68,10 @@ class ContentWriter extends PrintWriter {
     }
 
     public void hb(String id, String title) {
+        println("**<span id=\"" + id + "\">" + title + "</span>**");
+    }
+
+    public void hblink(String id, String title) {
         println("**[" + title + "](#" + id + ")**");
     }
 

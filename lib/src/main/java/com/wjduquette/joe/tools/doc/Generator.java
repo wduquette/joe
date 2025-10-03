@@ -156,14 +156,14 @@ class Generator {
         out.println();
 
         if (!pkg.topics().isEmpty()) {
-            out.hb("topics", "Topics");
+            out.hblink("topics", "Topics");
             out.println();
             pkg.topics().forEach(t -> writeTopicLink(out, t));
             out.println();
         }
 
         if (!pkg.functions().isEmpty()) {
-            out.hb("functions", "Functions");
+            out.hblink("functions", "Functions");
             out.println();
             sorted(pkg.functions(), Callable::name)
                 .forEach(f -> writeCallableLink(out, 0, f));
@@ -244,7 +244,7 @@ class Generator {
         out.println();
 
         if (!type.topics().isEmpty()) {
-            out.hb("topics", "Topics");
+            out.hblink("topics", "Topics");
             out.println();
             type.topics().forEach(t -> writeTopicLink(out, t));
             out.println();
@@ -253,13 +253,22 @@ class Generator {
         if (!type.constants().isEmpty()) {
             out.hb("constants", "Constants");
             out.println();
-            sorted(type.constants(), ConstantEntry::name)
-                .forEach(c -> writeConstantLink(out, 0, c));
+            out.println("| Constant | Type | Description |");
+            out.println("|----------|------|-------------|");
+            for (var c : type.constants()) {
+                out.printf("| `%s` | %s | %s |\n",
+                    c.name(),
+                    c.valueType() != null
+                        ? typeLinkOrName(c.valueType())
+                        : "-",
+                    firstLine(c.content())
+                );
+            }
             out.println();
         }
 
         if (!type.staticMethods().isEmpty()) {
-            out.hb("statics", "Static Methods");
+            out.hblink("statics", "Static Methods");
             out.println();
             sorted(type.staticMethods(), StaticMethodEntry::name)
                 .forEach(m -> writeCallableLink(out, 0, m));
@@ -267,14 +276,14 @@ class Generator {
         }
 
         if (type.initializer() != null) {
-            out.hb("init", "Initializer");
+            out.hblink("init", "Initializer");
             out.println();
             writeCallableLink(out, 0, type.initializer());
             out.println();
         }
 
         if (!type.fields().isEmpty()) {
-            out.hb("fields", "Fields");
+            out.hblink("fields", "Fields");
             out.println();
             sorted(type.fields(), FieldEntry::name)
                 .forEach(m -> writeFieldLink(out, m));
@@ -282,7 +291,7 @@ class Generator {
         }
 
         if (!type.methods().isEmpty()) {
-            out.hb("methods", "Methods");
+            out.hblink("methods", "Methods");
             out.println();
             sorted(type.methods(), MethodEntry::name)
                 .forEach(m -> writeCallableLink(out, 0, m));
@@ -302,12 +311,6 @@ class Generator {
         // NEXT, output the topics
         for (var topic : type.topics()) {
             writeTopicBody(out, topic);
-        }
-
-        // NEXT, output Constants.
-        if (!type.constants().isEmpty()) {
-            out.h2("constants", "Constants");
-            writeConstantBodies(out, type.constants());
         }
 
         // NEXT, output Static Methods
@@ -395,21 +398,7 @@ class Generator {
     //-------------------------------------------------------------------------
     // Constants
 
-    private void writeConstantBodies(
-        ContentWriter out,
-        List<ConstantEntry> constants
-    ) {
-        sorted(constants, ConstantEntry::name)
-            .forEach(c -> writeConstantBody(out, c));
-        out.println();
-    }
-
-    private void writeConstantBody(ContentWriter out, ConstantEntry constant) {
-        out.h3(constant.id(), constant.type().prefix() + "." + constant.name());
-        expandMnemonicLinks(constant.content()).forEach(out::println);
-        out.println();
-    }
-
+    @SuppressWarnings("SameParameterValue")
     private void writeConstantLink(
         ContentWriter out,
         int indent,
@@ -418,7 +407,7 @@ class Generator {
         var leader = " ".repeat(indent);
         out.println(leader + "- [" +
             constant.type().prefix() + "." + constant.name() +
-            "](" +constant.filename() + "#" + constant.id() + ")"
+            "](" +constant.filename() + "#constants)"
         );
     }
 
@@ -680,6 +669,16 @@ class Generator {
         }
 
         return result;
+    }
+
+    // Extracts and returns the first sentence of the content.
+    private String firstLine(List<String> content) {
+        var text = String.join(" ", contentIntro(content))
+            .replaceAll("\\s+", " ");
+        var ndx = text.indexOf(".");
+        return ndx == -1
+            ? text
+            : text.substring(0, ndx + 1);
     }
 
     private String link(String text, String url) {
