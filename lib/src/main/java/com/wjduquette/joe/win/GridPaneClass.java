@@ -3,7 +3,10 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeClass;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 
 class GridPaneClass extends WidgetType<GridPane> {
     public static final GridPaneClass TYPE = new GridPaneClass();
@@ -22,6 +25,15 @@ class GridPaneClass extends WidgetType<GridPane> {
         super("GridPane");
         proxies(GridPane.class);
         extendsProxy(PaneType.TYPE);
+
+        // Static Methods (more to come)
+        staticMethod("getHgrow",  this::_getHgrow);
+        staticMethod("getMargin", this::_getMargin);
+        staticMethod("getVgrow",  this::_getVgrow);
+        staticMethod("getHgrow",  this::_setHgrow);
+        staticMethod("setMargin", this::_setMargin);
+        staticMethod("setVgrow",  this::_setVgrow);
+
 
         // No initializer
         initializer(this::_initializer);
@@ -62,6 +74,84 @@ class GridPaneClass extends WidgetType<GridPane> {
     @Override
     public Object make(Joe joe, JoeClass joeClass) {
         return new GridPaneInstance(joeClass);
+    }
+
+    //-------------------------------------------------------------------------
+    // Static Methods
+
+    //**
+    // @static getHgrow
+    // @args node
+    // @result Priority
+    // Gets how the [[Node]] will resize itself to the height of
+    // its parent `GridPane`.
+    private Object _getHgrow(Joe joe, Args args) {
+        args.exactArity(1, "GridPane.getHgrow(node)");
+        return GridPane.getHgrow(joe.toClass(args.next(), Node.class));
+    }
+
+
+    //**
+    // @static getMargin
+    // @args node
+    // @result Insets
+    // Gets the [[Node]]'s margin in its parent `GridPane`.
+    private Object _getMargin(Joe joe, Args args) {
+        args.exactArity(1, "GridPane.getMargin(node)");
+        return GridPane.getMargin(joe.toClass(args.next(), Node.class));
+    }
+
+    //**
+    // @static getVgrow
+    // @args node
+    // @result Priority
+    // Gets how the [[Node]] will resize itself to the height of
+    // its parent `GridPane`.
+    private Object _getVgrow(Joe joe, Args args) {
+        args.exactArity(1, "GridPane.getVgrow(node)");
+        return GridPane.getVgrow(joe.toClass(args.next(), Node.class));
+    }
+
+    //**
+    // @static setHgrow
+    // @args node, priority
+    // Sets how the [[Node]] will resize itself to the height of
+    // its parent `GridPane, given a [[Priority]] value.
+    private Object _setHgrow(Joe joe, Args args) {
+        args.exactArity(2, "GridPane.setHgrow(node, priority)");
+        GridPane.setHgrow(
+            joe.toClass(args.next(), Node.class),
+            joe.toClass(args.next(), Priority.class)
+        );
+        return null;
+    }
+
+    //**
+    // @static setMargin
+    // @args node, insets
+    // Gets the [[Node]]'s margin in its parent `GridPane` given an
+    // [[Insets]] object.
+    private Object _setMargin(Joe joe, Args args) {
+        args.exactArity(2, "GridPane.setMargin(node, insets)");
+        GridPane.setMargin(
+            joe.toClass(args.next(), Node.class),
+            joe.toClass(args.next(), Insets.class)
+        );
+        return null;
+    }
+
+    //**
+    // @static setVgrow
+    // @args node, priority
+    // Sets how the [[Node]] will resize itself to the height of
+    // its parent `GridPane`, given a [[Priority]] value.
+    private Object _setVgrow(Joe joe, Args args) {
+        args.exactArity(2, "GridPane.setVgrow(node, priority)");
+        GridPane.setVgrow(
+            joe.toClass(args.next(), Node.class),
+            joe.toClass(args.next(), Priority.class)
+        );
+        return null;
     }
 
     //-------------------------------------------------------------------------

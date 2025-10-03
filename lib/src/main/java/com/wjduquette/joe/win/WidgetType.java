@@ -2,8 +2,6 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
 import javafx.beans.property.Property;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +23,11 @@ public class WidgetType<V> extends ProxyType<V> {
     // Constructor
 
     //**
-    // @type WidgetType
+    // @package joe.win
+    // @type Widget
+    // `Widget` is the base class for JavaFX widgets as represented in Joe:
+    // effectively, all JavaFX types that have JavaFX properties.  There is
+    // no direct equivalent to this type in the JavaFX class hierarchy.
 
     /**
      * Creates a WidgetType for the given widget type.
@@ -116,7 +118,7 @@ public class WidgetType<V> extends ProxyType<V> {
     // @args keyword, callable
     // @result listener
     // Adds a listener *callable* to the property with the given *keyword*,
-    // returning a [[Listener]]; use the [[Listener]]'s `remove()` method
+    // returning a [[Listener]]; use the [[Listener]]'s `cancel()` method
     // to stop listening to the property.
     //
     // The *callable* should take three arguments:
@@ -177,44 +179,6 @@ public class WidgetType<V> extends ProxyType<V> {
 
     //-------------------------------------------------------------------------
     // Helper Classes
-
-    public static class PropertyListener implements ChangeListener<Object> {
-        private final Property<?> property;
-        private final Joe joe;
-        private final Keyword keyword;
-        private final Object callable;
-
-        public PropertyListener(
-            Property<?> property,
-            Joe joe,
-            Keyword keyword,
-            Object callable
-        ) {
-            this.property = property;
-            this.joe = joe;
-            this.keyword = keyword;
-            this.callable = callable;
-        }
-
-        @Override
-        public void changed(
-            ObservableValue<?> ignored,
-            Object oldValue,
-            Object newValue
-        ) {
-            joe.call(callable, keyword, oldValue, newValue);
-        }
-
-        @Override
-        public String toString() {
-            return "PropertyListener[" + keyword + "]@" +
-                String.format("%x", hashCode());
-        }
-
-        public void unsubscribe() {
-            property.removeListener(this);
-        }
-    }
 
     /**
      * A functional interface for retrieving a JavaFX property from an

@@ -5,7 +5,7 @@ Win.setTitle("joe win: Hello")
 var name = Console.args().isEmpty()
     ? "world" : Console.args().get(0);
 
-function goodbye() {
+function goodbye(evt) {
     Console.exit(0);
 }
 

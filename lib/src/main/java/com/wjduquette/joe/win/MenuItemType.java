@@ -15,9 +15,8 @@ class MenuItemType extends WidgetType<MenuItem> {
     //**
     // @package joe.win
     // @type MenuItem
+    // @extends Widget
     // The `MenuItem` widget is an item in a [[Menu]].
-    //
-    // @includeMixin FXType
     public MenuItemType() {
         super("MenuItem");
         proxies(MenuItem.class);
@@ -27,7 +26,7 @@ class MenuItemType extends WidgetType<MenuItem> {
         //**
         // ## Properties
         //
-        // All `Node` widgets have the following properties.
+        // All `MenuItem` widgets have the following properties.
         //
         // | Property    | Type             | Description        |
         // | ----------- | ---------------- | ------------------ |

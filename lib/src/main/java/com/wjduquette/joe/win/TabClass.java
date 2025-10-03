@@ -17,10 +17,9 @@ class TabClass extends WidgetType<Tab> {
     //**
     // @package joe.win
     // @type Tab
+    // @extends Widget
     // The `Tab` widget contains a [[Node]] in a [[TabPane]].
     // Joe classes can extend the `Tab` type.
-    //
-    // @includeMixin FXType
     public TabClass() {
         super("Tab");
         proxies(Tab.class);

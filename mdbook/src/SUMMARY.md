@@ -105,6 +105,7 @@
     - [HPos Type](library/type.joe.win.HPos.md);
     - [Insets Type](library/type.joe.win.Insets.md);
     - [Label Type](library/type.joe.win.Label.md);
+    - [Listener Type](library/type.joe.win.Listener.md);
     - [ListView Type](library/type.joe.win.ListView.md);
     - [Menu Type](library/type.joe.win.Menu.md);
     - [MenuBar Type](library/type.joe.win.MenuBar.md);
@@ -123,6 +124,7 @@
     - [TabPane Type](library/type.joe.win.TabPane.md);
     - [VBox Type](library/type.joe.win.VBox.md);
     - [VPos Type](library/type.joe.win.VPos.md);
+    - [Widget Type](library/type.joe.win.Widget.md);
     - [Win Type](library/type.joe.win.Win.md);
   - [Library API Index](./library/index.md)
 

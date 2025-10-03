@@ -32,6 +32,10 @@ class SplitPaneType extends WidgetType<SplitPane> {
         extendsProxy(ControlType.TYPE);
         proxies(SplitPane.class);
 
+        // Static Methods
+        staticMethod("isResizableWithParent",  this::_isResizableWithParent);
+        staticMethod("setResizableWithParent", this::_setResizableWithParent);
+
         // Initializer
         initializer(this::_initializer);
 
@@ -55,6 +59,33 @@ class SplitPaneType extends WidgetType<SplitPane> {
         method("setDivider",       this::_setDivider);
         method("setDividers",      this::_setDividers);
         method("vertical",         this::_vertical);
+    }
+
+    //-------------------------------------------------------------------------
+    // Static Methods
+
+    //**
+    // @static isResizableWithParent
+    // @args node
+    // @result joe.Boolean
+    // Gets whether the [[Node]] will resize itself to fill its region in
+    // its parent `SplitPane`.
+    private Object _isResizableWithParent(Joe joe, Args args) {
+        args.exactArity(1, "SplitPane.isResizableWithParent(node)");
+        return SplitPane.isResizableWithParent(joe.toClass(args.next(), Node.class));
+    }
+
+    //**
+    // @static setResizableWithParent
+    // @args node, flag
+    // Sets whether the [[Node]] will resize itself to fill its region in
+    // its parent `SplitPane`.
+    private Object _setResizableWithParent(Joe joe, Args args) {
+        args.exactArity(2, "SplitPane.setResizableWithParent(node, flag)");
+        SplitPane.setResizableWithParent(
+            joe.toClass(args.next(), Node.class),
+            joe.toBoolean(args.next()));
+        return null;
     }
 
     //-------------------------------------------------------------------------
