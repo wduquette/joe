@@ -61,7 +61,11 @@ class DocCommentParser {
     private static final String ARGS = "@args";
     private static final String RESULT = "@result";
     private static final String TYPE = "@type";
+    private static final String CLASS = "@class";
+    private static final String RECORD = "@record";
     private static final String ENUM = "@enum";
+    private static final String WIDGET = "@widget";
+    private static final String SINGLETON = "@singleton";
     private static final String TYPE_TOPIC = "@typeTopic";
     private static final String INCLUDE_MIXIN = "@includeMixin";
     private static final String EXTENDS = "@extends";
@@ -84,12 +88,13 @@ class DocCommentParser {
     );
 
     private static final Set<String> PACKAGE_CHILD_ENDERS = Set.of(
-        PACKAGE, MIXIN, FUNCTION, TYPE, ENUM, PACKAGE_TOPIC
+        PACKAGE, MIXIN, FUNCTION, TYPE, CLASS, RECORD, ENUM, WIDGET, SINGLETON,
+        PACKAGE_TOPIC
     );
 
     private static final Set<String> TYPE_CHILD_ENDERS = Set.of(
-        PACKAGE, MIXIN, FUNCTION, TYPE, ENUM, PACKAGE_TOPIC,
-        CONSTANT, STATIC, INIT, FIELD, METHOD, TYPE_TOPIC
+        PACKAGE, MIXIN, FUNCTION, TYPE, CLASS, RECORD, ENUM, WIDGET, SINGLETON,
+        PACKAGE_TOPIC, CONSTANT, STATIC, INIT, FIELD, METHOD, TYPE_TOPIC
     );
 
     private void _parse() {
@@ -186,7 +191,7 @@ class DocCommentParser {
             switch (tag.name()) {
                 case TITLE -> pkg.setTitle(tag.value());
                 case FUNCTION -> _function(pkg, tag);
-                case TYPE, ENUM -> _type(pkg, tag);
+                case TYPE, CLASS, RECORD, ENUM, WIDGET, SINGLETON -> _type(pkg, tag);
                 case PACKAGE_TOPIC -> _packageTopic(pkg, tag);
                 default -> throw error(previous(), "Unexpected tag: " + tag);
             }
@@ -260,8 +265,15 @@ class DocCommentParser {
         // FIRST, create the type, validating its name and making sure
         // it's unique.
         trace("_type", typeTag);
-        TypeEntry type = new TypeEntry(pkg, typeTag.value());
-        type.setEnum(typeTag.name().equals(ENUM));
+        var kind = switch (typeTag.name()) {
+            case CLASS -> Kind.CLASS;
+            case RECORD -> Kind.RECORD;
+            case ENUM -> Kind.ENUM;
+            case WIDGET -> Kind.WIDGET;
+            case SINGLETON -> Kind.SINGLETON;
+            default -> Kind.TYPE;
+        };
+        TypeEntry type = new TypeEntry(pkg, typeTag.value(), kind);
         remember(type);
 
         if (!Joe.isIdentifier(typeTag.value())) {
@@ -270,7 +282,7 @@ class DocCommentParser {
         pkg.types().add(type);
 
         // NEXT, if it's an enum add the standard enum content.
-        if (type.isEnum()) {
+        if (kind == Kind.ENUM) {
             addEnumContent(type);
         }
 

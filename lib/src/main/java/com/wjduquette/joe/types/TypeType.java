@@ -21,7 +21,7 @@ public class TypeType extends ProxyType<Void> {
 
         //**
         // @package joe
-        // @type Type
+        // @singleton Type
         // The `Type` type is the root of the Joe type system, being the
         // meta-type of all other types.  Instances of `Type` are types
         // themselves, and are created in a variety of ways, i.e.,

@@ -201,7 +201,7 @@ public class WinPackage extends NativePackage {
         // Constructor
 
         //**
-        // @type Win
+        // @singleton Win
         // This static type provides access to the application window.
         WinProxy() {
             super("Win");

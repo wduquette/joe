@@ -10,7 +10,9 @@ class TypeEntry extends Entry implements TypeOrMixin {
     // The type's name.
     private final String name;
 
-    private boolean isEnum = false;
+    // The type's kind.
+    private final Kind kind;
+
     private final List<ConstantEntry> constants = new ArrayList<>();
     private final List<StaticMethodEntry> staticMethods = new ArrayList<>();
     private String supertypeName = null;
@@ -25,9 +27,10 @@ class TypeEntry extends Entry implements TypeOrMixin {
     //-------------------------------------------------------------------------
     // Constructor
 
-    TypeEntry(PackageEntry pkg, String name) {
+    TypeEntry(PackageEntry pkg, String name, Kind kind) {
         super(pkg);
         this.name = name;
+        this.kind = kind;
     }
 
     //-------------------------------------------------------------------------
@@ -42,17 +45,13 @@ class TypeEntry extends Entry implements TypeOrMixin {
     public List<TopicEntry>        topics()        { return topics; }
     public List<String>            mixins()        { return mixins; }
 
-    public String  prefix()        { return name; }
-    public boolean isEnum()        { return isEnum; }
     public String  name()          { return name; }
+    public Kind    kind()          { return kind; }
+    public String  prefix()        { return name; }
     public String  fullMnemonic()  { return pkg().name() + "." + name; }
     public String  shortMnemonic() { return name; }
     public String  valuePrefix()   { return downCase(name); }
     public String  filename()      { return "type." + pkg().name() + "." + name + ".md"; }
-
-    public void setEnum(boolean flag) {
-        this.isEnum = flag;
-    }
 
     public void setSupertypeName(String supertypeName) {
         this.supertypeName = supertypeName;

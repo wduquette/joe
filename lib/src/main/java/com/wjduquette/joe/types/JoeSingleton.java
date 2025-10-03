@@ -23,7 +23,7 @@ public class JoeSingleton extends ProxyType<Void> {
 
         //**
         // @package joe
-        // @type Joe
+        // @singleton Joe
         // The `Joe` singleton collects a variety of useful functions
         // related to the interpreter itself and to the installed
         // Joe types.

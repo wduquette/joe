@@ -215,10 +215,7 @@ class Generator {
         var leader = " ".repeat(indent);
 
         out.print(leader + "- [" + type.name() + "](" +
-            type.filename() + ")");
-        if (type.supertypeName() != null) {
-            out.print(" extends " + typeLinkOrName(type.supertypeName()));
-        }
+            type.filename() + ") " + type.kind().name().toLowerCase());
         out.println();
     }
 
@@ -229,7 +226,9 @@ class Generator {
     private void writeTypeFile(ContentWriter out, TypeEntry type) {
         // FIRST, output the header
         out.h1(mono(type.name())
-            + " type ("
+            + " "
+            + type.kind().name().toLowerCase()
+            + " ("
             + mono(type.pkg().name())
             + ")");
 
