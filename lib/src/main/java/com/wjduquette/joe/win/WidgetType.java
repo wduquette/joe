@@ -36,10 +36,10 @@ public class WidgetType<V> extends ProxyType<V> {
     public WidgetType(String name) {
         super(name);
 
-        method("getProperty",   this::_getProperty);
+        method("get",           this::_get);
         method("getProperties", this::_getProperties);
         method("listenTo",      this::_listenTo);
-        method("setProperty",   this::_setProperty);
+        method("set",           this::_set);
         method("toString",      this::_toString);
     }
 
@@ -94,12 +94,12 @@ public class WidgetType<V> extends ProxyType<V> {
     // Methods
 
     //**
-    // @method getProperty
+    // @method get
     // @args keyword
     // @result value
     // Gets the value of the property with the given *keyword*.
-    private Object _getProperty(V obj, Joe joe, Args args) {
-        args.exactArity(1, "getProperty(keyword)");
+    private Object _get(V obj, Joe joe, Args args) {
+        args.exactArity(1, "get(keyword)");
 
         return toDef(joe, args.next()).getProperty(obj).getValue();
     }
@@ -116,7 +116,7 @@ public class WidgetType<V> extends ProxyType<V> {
     //**
     // @method listenTo
     // @args keyword, callable
-    // @result listener
+    // @result Listener
     // Adds a listener *callable* to the property with the given *keyword*,
     // returning a [[Listener]]; use the [[Listener]]'s `cancel()` method
     // to stop listening to the property.
@@ -141,13 +141,13 @@ public class WidgetType<V> extends ProxyType<V> {
     }
 
     //**
-    // @method setProperty
+    // @method set
     // @args keyword, value
     // @result this
     // Sets the *value* of the property with the given *keyword*.
     // The *value* must be assignable to the property's value type.
-    private Object _setProperty(V obj, Joe joe, Args args) {
-        args.exactArity(2, "setProperty(keyword, value)");
+    private Object _set(V obj, Joe joe, Args args) {
+        args.exactArity(2, "set(keyword, value)");
 
         var def = toDef(joe, args.next());
         def.setProperty(joe, obj, args.next());
