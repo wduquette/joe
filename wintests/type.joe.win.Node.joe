@@ -1,0 +1,95 @@
+// joe.win.Node tests
+
+// Checks that we can set a property value and retrieve it unchanged.
+function setGet(node, property, value) {
+    node.set(property, value);
+    assertEQ(node.get(property), value);
+}
+
+function testProperties() {
+    var node = Label();
+    setGet(node, #disable, true);
+    setGet(node, #id,      "_id");
+    setGet(node, #style,   "-fx-font-size: 16;");
+    setGet(node, #visible, false);
+}
+
+function testDisable_isDisabled() {
+    var node = Label();
+    assertEQ(node.isDisable(),  false);
+    assertEQ(node.isDisabled(), false);
+    node.disable(); // No flag
+    assertEQ(node.isDisable(),  true);
+    assertEQ(node.isDisabled(), true);
+    node.disable(false); // Explicit flag
+    assertEQ(node.isDisable(),  false);
+    assertEQ(node.isDisabled(), false);
+}
+
+function testIdGetId() {
+    var node = Label();
+    node.id("abc");
+    assertEQ(node.getId(), "abc");
+    assertEQ(node.get(#id), "abc");
+}
+
+function testHgrow() {
+    var node = Label();
+    assertEQ(HBox.getHgrow(node), null);
+    assertEQ(GridPane.getHgrow(node), null);
+
+    node.hgrow(); // Default, ALWAYS
+    assertEQ(HBox.getHgrow(node), Priority.ALWAYS);
+    assertEQ(GridPane.getHgrow(node), Priority.ALWAYS);
+
+    node.hgrow(Priority.NEVER); // Explicit, enum
+    assertEQ(HBox.getHgrow(node), Priority.NEVER);
+    assertEQ(GridPane.getHgrow(node), Priority.NEVER);
+
+    node.hgrow(#always); // Explicit, keyword
+    assertEQ(HBox.getHgrow(node), Priority.ALWAYS);
+    assertEQ(GridPane.getHgrow(node), Priority.ALWAYS);
+}
+
+function testResizeWithSplit() {
+    var node = Label();
+    assertEQ(SplitPane.isResizableWithParent(node), true);
+    node.resizeWithSplit(false);
+    assertEQ(SplitPane.isResizableWithParent(node), false);
+}
+
+function testStyleClasses() {
+    var node = Label();
+    assertEQ(node.styleClasses(), ["label"]);
+    node.styleClass("my-label");
+    assertEQ(node.styleClasses(), ["label", "my-label"]);
+}
+
+function testStyles() {
+    var node = Label();
+    assertEQ(node.get(#style), "");
+    node.styles(
+        "-fx-font-family: Arial;",
+        "-fx-font-size: 16;"
+    );
+    assertEQ(node.get(#style),
+        "-fx-font-family: Arial;\n-fx-font-size: 16;");
+}
+
+function testVgrow() {
+    var node = Label();
+    assertEQ(VBox.getVgrow(node), null);
+    assertEQ(GridPane.getVgrow(node), null);
+
+    node.vgrow(); // Default, ALWAYS
+    assertEQ(VBox.getVgrow(node), Priority.ALWAYS);
+    assertEQ(GridPane.getVgrow(node), Priority.ALWAYS);
+
+    node.vgrow(Priority.NEVER); // Explicit, enum
+    assertEQ(VBox.getVgrow(node), Priority.NEVER);
+    assertEQ(GridPane.getVgrow(node), Priority.NEVER);
+
+    node.vgrow(#always); // Explicit, keyword
+    assertEQ(VBox.getVgrow(node), Priority.ALWAYS);
+    assertEQ(GridPane.getVgrow(node), Priority.ALWAYS);
+}
