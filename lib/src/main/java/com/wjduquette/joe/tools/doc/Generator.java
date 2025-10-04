@@ -264,7 +264,7 @@ class Generator {
                     c.valueType() != null
                         ? typeLinkOrName(c.valueType())
                         : "-",
-                    firstLine(c.content())
+                    flatLine(c.content())
                 );
             }
             out.println();
@@ -296,7 +296,7 @@ class Generator {
                     f.valueType() != null
                         ? typeLinkOrName(f.valueType())
                         : "-",
-                    firstLine(f.content())
+                    flatLine(f.content())
                 );
             }
             out.println();
@@ -317,7 +317,7 @@ class Generator {
                         p.valueType() != null
                             ? typeLinkOrName(p.valueType())
                             : "-",
-                        firstLine(p.content())
+                        flatLine(p.content())
                     );
                 }
                 supertype = lookupType(supertype.supertypeName());
@@ -676,14 +676,10 @@ class Generator {
         return result;
     }
 
-    // Extracts and returns the first sentence of the content.
-    private String firstLine(List<String> content) {
-        var text = String.join(" ", content)
+    // Extracts and returns the content as a single line.
+    private String flatLine(List<String> content) {
+        return String.join(" ", expandMnemonicLinks(content))
             .replaceAll("\\s+", " ");
-        var ndx = text.indexOf(".");
-        return ndx == -1
-            ? text
-            : text.substring(0, ndx + 1);
     }
 
     private String link(String text, String url) {

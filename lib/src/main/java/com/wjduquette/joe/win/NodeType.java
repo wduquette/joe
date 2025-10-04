@@ -31,25 +31,23 @@ class NodeType extends WidgetType<Node> {
         // No initializer
 
         //**
-        // ## Properties
-        //
-        // All `Node` widgets have the following properties.
-        //
-        // | Property   | Type             | Description        |
-        // | ---------- | ---------------- | ------------------ |
-        // | `#disable` | [[joe.Boolean]]  | Disable flag       |
-        // | `#id`      | [[joe.String]]   | JavaFX ID          |
-        // | `#style`   | [[joe.String]]   | FXCSS style string |
-        // | `#visible` | [[joe.Boolean]]  | Visibility flag    |
-        //
-        // See [[joe.win#topic.css]] for more on using CSS.
-
-        //**
         // @property disable joe.Boolean
         // If true, disables the node and its descendants.
         fxProperty("disable", Node::disableProperty, Joe::toBoolean);
+
+        //**
+        // @property id joe.String
+        // JavaFX widget ID
         fxProperty("id",      Node::idProperty,      Joe::toString);
+
+        //**
+        // @property style joe.String
+        // FXCSS style string. See [[joe.win#topic.css]].
         fxProperty("style",   Node::styleProperty,   Joe::toString);
+
+        //**
+        // @property visible joe.Boolean
+        // Whether the widget is visible or not.
         fxProperty("visible", Node::visibleProperty, Joe::toBoolean);
 
         // Methods
