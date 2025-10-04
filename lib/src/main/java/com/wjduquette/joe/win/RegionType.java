@@ -61,8 +61,8 @@ class RegionType extends WidgetType<Region> {
         // @property maxHeight joe.Number
         // Maximum height in pixels.
         fxProperty("maxHeight",  Region::maxHeightProperty,  Joe::toDouble);
-        fxProperty("maxHeight",  Region::maxHeightProperty,  Joe::toDouble);
-        fxProperty("minWidth",   Region::minWidthProperty,   Joe::toDouble);
+        fxProperty("maxWidth",   Region::maxWidthProperty,   Joe::toDouble);
+        fxProperty("minHeight",  Region::minHeightProperty,  Joe::toDouble);
         fxProperty("minWidth",   Region::minWidthProperty,   Joe::toDouble);
         fxProperty("padding",    Region::paddingProperty,    WinPackage::toInsets);
         fxProperty("prefHeight", Region::prefHeightProperty, Joe::toDouble);
