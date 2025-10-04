@@ -241,7 +241,8 @@ class Generator {
 
         // NEXT, output the first paragraph of the content.
         var content = expandMnemonicLinks(type.content());
-        contentIntro(content).forEach(out::println);
+        var intro = contentIntro(content);
+        intro.forEach(out::println);
 
         // NEXT, output the type index.
         out.println();
