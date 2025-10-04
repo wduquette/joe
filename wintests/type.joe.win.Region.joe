@@ -1,0 +1,80 @@
+// joe.win.Region tests
+
+// Checks that we can set a property value and retrieve it unchanged.
+function setGet(node, property, value) {
+    node.set(property, value);
+    assertEQ(node.get(property), value);
+}
+
+function testProperties() {
+    var node = Label();
+    setGet(node, #maxHeight,  1);
+    setGet(node, #maxWidth,   2);
+    setGet(node, #minHeight,  3);
+    setGet(node, #minWidth,   4);
+    setGet(node, #prefHeight, 5);
+    setGet(node, #prefWidth,  6);
+    setGet(node, #padding, Insets(7));
+}
+
+function testHeight() {
+    var node = Label();
+    node.height(5);
+    assertEQ(node.get(#maxHeight),  5);
+    assertEQ(node.get(#minHeight),  5);
+    assertEQ(node.get(#prefHeight), 5);
+}
+
+function testMaxHeight() {
+    var node = Label();
+    node.maxHeight(5);
+    assertEQ(node.get(#maxHeight),  5);
+}
+
+function testMaxWidth() {
+    var node = Label();
+    node.maxWidth(5);
+    assertEQ(node.get(#maxWidth),  5);
+}
+
+function testMinHeight() {
+    var node = Label();
+    node.minHeight(5);
+    assertEQ(node.get(#minHeight),  5);
+}
+
+function testMinWidth() {
+    var node = Label();
+    node.minWidth(5);
+    assertEQ(node.get(#minWidth),  5);
+}
+
+function testPadding() {
+    var node = Label();
+    node.padding(5);
+    assertEQ(node.get(#padding),  Insets(5));
+    node.padding(1, 2, 3, 4);
+    assertEQ(node.get(#padding),  Insets(1, 2, 3, 4));
+}
+
+function testPrefHeight() {
+    var node = Label();
+    node.prefHeight(5);
+    assertEQ(node.get(#prefHeight),  5);
+}
+
+function testPrefWidth() {
+    var node = Label();
+    node.prefWidth(5);
+    assertEQ(node.get(#prefWidth),  5);
+}
+
+function testWidth() {
+    var node = Label();
+    node.width(5);
+    assertEQ(node.get(#maxWidth),  5);
+    assertEQ(node.get(#minWidth),  5);
+    assertEQ(node.get(#prefWidth), 5);
+}
+
+
