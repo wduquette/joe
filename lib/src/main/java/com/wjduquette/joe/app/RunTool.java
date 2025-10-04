@@ -21,11 +21,11 @@ public class RunTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
      */
-    public static final ToolInfo INFO = new ToolInfo(
-        "run",
-        "[options...] file.joe",
-        "Executes a Joe script.",
-        """
+    public static final ToolInfo INFO = ToolInfo.define()
+        .name("run")
+        .argsig("[options...] file.joe")
+        .oneLiner("Executes a Joe script.")
+        .help("""
         Executes the script.
         
         The tool searches for locally installed Joe packages on a user-provided
@@ -45,9 +45,9 @@ public class RunTool implements Tool {
         --debug, -d
             Enable debugging output.  This is mostly of use to
             the Joe maintainer.
-        """,
-        RunTool::main
-    );
+        """)
+        .launcher(RunTool::main)
+        .build();
 
     //-------------------------------------------------------------------------
     // Constructor

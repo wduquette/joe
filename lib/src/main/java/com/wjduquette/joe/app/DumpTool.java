@@ -20,19 +20,19 @@ public class DumpTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
      */
-    public static final ToolInfo INFO = new ToolInfo(
-        "dump",
-        "[options...] file.joe",
-        "Dumps information about the Joe script.",
-        """
-        Dumps compilation details for the script.  The options
-        are as follows:
-        
-        --code, -c   Dump the compiled byte-code (default)
-        --ast,  -a   Dump the Abstract Syntax Tree (AST)
-        """,
-        DumpTool::main
-    );
+    public static final ToolInfo INFO = ToolInfo.define()
+        .name("dump")
+        .argsig("[options...] file.joe")
+        .oneLiner("Dumps information about the Joe script.")
+        .launcher(DumpTool::main)
+        .help("""
+            Dumps compilation details for the script.  The options
+            are as follows:
+            
+            --code, -c   Dump the compiled byte-code (default)
+            --ast,  -a   Dump the Abstract Syntax Tree (AST)
+            """)
+        .build();
 
     //-------------------------------------------------------------------------
     // Constructor

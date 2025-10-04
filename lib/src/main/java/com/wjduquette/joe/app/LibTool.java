@@ -15,26 +15,26 @@ public class LibTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
      */
-    public static final ToolInfo INFO = new ToolInfo(
-        "lib",
-        "[options...]",
-        "Searches for local Joe packages.",
-        """
-        Searches the local disk for Joe packages.  By default it checks
-        the folders on the JOE_LIB_PATH, a colon-delimited list of
-        library folders.  Lists all found packages, along with any
-        errors encountered while searching.
-        
-        Options:
-        
-        --path path     Search the given path instead of JOE_LIB_PATH.
-        --check         Verifies that all packages found can be loaded.
-        
-        See the Joe User's Guide for information on how to create a
-        local package.
-        """,
-        LibTool::main
-    );
+    public static final ToolInfo INFO = ToolInfo.define()
+        .name("lib")
+        .argsig("[options...]")
+        .oneLiner("Searches for local Joe packages.")
+        .launcher(LibTool::main)
+        .help("""
+            Searches the local disk for Joe packages.  By default it checks
+            the folders on the JOE_LIB_PATH, a colon-delimited list of
+            library folders.  Lists all found packages, along with any
+            errors encountered while searching.
+            
+            Options:
+            
+            --path path     Search the given path instead of JOE_LIB_PATH.
+            --check         Verifies that all packages found can be loaded.
+            
+            See the Joe User's Guide for information on how to create a
+            local package.
+            """)
+        .build();
 
     //-------------------------------------------------------------------------
     // Constructor

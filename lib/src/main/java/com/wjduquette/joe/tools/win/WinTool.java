@@ -6,26 +6,30 @@ import com.wjduquette.joe.PackageFinder;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.console.ConsolePackage;
+import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.win.WinPackage;
-import com.wjduquette.joe.tools.FXTool;
 import com.wjduquette.joe.tools.ToolInfo;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Deque;
+import java.util.ArrayDeque;
+import java.util.List;
 
 /**
  * A tool that runs a Joe script with the JavaFX WinPackage.
  */
-public class WinTool extends FXTool {
+public class WinTool implements Tool {
     /** The tool's metadata. */
-    public static final ToolInfo INFO = new ToolInfo(
-        "win",
-        "script.joe args...",
-        "Displays a scripted GUI.",
-        """
+    public static final ToolInfo INFO = ToolInfo.define()
+        .name("win")
+        .argsig("script.joe args...")
+        .oneLiner("Displays a scripted GUI.")
+        .javafx(true)
+        .launcher(WinTool::main)
+        .help("""
         Given a script, this tool displays a JavaFX GUI.  The tool provides
         the Joe standard library along with the optional joe.console and
         joe.win packages.  See the Joe User's Guide for details.
@@ -47,14 +51,14 @@ public class WinTool extends FXTool {
         --debug, -d
             Enable debugging output.  This is mostly of use to
             the Joe maintainer.
-        """,
-        WinTool::main
-    );
+        """)
+        .build();
 
     //------------------------------------------------------------------------
     // Instance Variables
 
     // Keeps joe from being collected.
+    private final Stage stage = new Stage();
     private final VBox root = new VBox();
 
     //------------------------------------------------------------------------
@@ -64,16 +68,25 @@ public class WinTool extends FXTool {
      * Creates the tool.
      */
     public WinTool() {
-        super(INFO);
+        // Nothing to do
     }
 
     //------------------------------------------------------------------------
-    // Main-line code
+    // Execution
 
-    @Override
-    public void run(Stage stage, Deque<String> args) {
+    /**
+     * Gets implementation info about the tool.
+     * @return The info.
+     */
+    public ToolInfo toolInfo() {
+        return INFO;
+    }
+
+
+    public void run(String[] args) {
         // FIRST, parse the command line arguments.
-        if (args.isEmpty()) {
+        var argq = new ArrayDeque<>(List.of(args));
+        if (argq.isEmpty()) {
             printUsage(App.NAME);
             exit(64);
         }
@@ -83,10 +96,10 @@ public class WinTool extends FXTool {
         String libPath = null;
         var debug = false;
 
-        while (!args.isEmpty() && args.peek().startsWith("-")) {
-            var opt = args.poll();
+        while (!argq.isEmpty() && argq.peek().startsWith("-")) {
+            var opt = argq.poll();
             switch (opt) {
-                case "--libpath", "-l" -> libPath = toOptArg(opt, args);
+                case "--libpath", "-l" -> libPath = toOptArg(opt, argq);
                 case "--clark", "-c" -> engineType = Joe.CLARK;
                 case "--walker", "-w" -> engineType = Joe.WALKER;
                 case "--debug", "-d" -> debug = true;
@@ -106,16 +119,17 @@ public class WinTool extends FXTool {
         }
 
         // NEXT, create the scene with default settings.
+        stage.setTitle("joe win");
         Scene scene = new Scene(root, 400, 300);
 //        scene.getStylesheets().add("file:foo.css");
-        stage.setTitle("joe win");
         stage.setScene(scene);
+        Platform.setImplicitExit(true);
 
         // NEXT, load the required packages
-        var path = args.poll();
+        var path = argq.poll();
         var consolePackage = new ConsolePackage();
         consolePackage.setScript(path);
-        consolePackage.getArgs().addAll(args);
+        consolePackage.getArgs().addAll(argq);
         joe.installPackage(consolePackage);
 
         var guiPackage = new WinPackage(stage, root);
@@ -154,6 +168,7 @@ public class WinTool extends FXTool {
      * @param args The command-line arguments.
      */
     public static void main(String[] args) {
-        launch(args);
+        var tool = new WinTool();
+        tool.run(args);
     }
 }

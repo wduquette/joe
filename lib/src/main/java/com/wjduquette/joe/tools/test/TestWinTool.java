@@ -4,6 +4,9 @@ import com.wjduquette.joe.*;
 import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
+import com.wjduquette.joe.win.WinPackage;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -15,18 +18,19 @@ import java.util.List;
 /**
  * The implementation of the `joe test` tool.
  */
-public class TestTool implements Tool {
+public class TestWinTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
      */
     public static final ToolInfo INFO = ToolInfo.define()
-        .name("test")
+        .name("testwin")
         .argsig("options... testFile.joe...")
-        .oneLiner("Executes Joe tests.")
-        .launcher(TestTool::main)
+        .oneLiner("Executes Joe tests in the JavaFX context.")
+        .javafx(true)
+        .launcher(TestWinTool::main)
         .help("""
-        Executes a test suite consisting of one or more Joe test scripts,
-        accumulating the results.
+        Executes a test suite consisting of one or more Joe test scripts
+        in the JavaFX context, accumulating the results.
         
         Options:
         
@@ -79,7 +83,7 @@ public class TestTool implements Tool {
     /**
      * Creates the tool.
      */
-    public TestTool() {
+    public TestWinTool() {
         // Nothing to do
     }
 
@@ -145,6 +149,7 @@ public class TestTool implements Tool {
         if (successCount == total && loadErrorCount == 0) {
             println("\nALL TESTS PASS");
         }
+        System.exit(0);
     }
 
     private void runTest(String scriptPath) {
@@ -155,6 +160,7 @@ public class TestTool implements Tool {
         // NEXT, configure the engine.
         var joe = new Joe(engineType);
         joe.installPackage(new TestPackage(engineType));
+        joe.installPackage(new WinPackage(new Stage(), new VBox()));
         if (finder != null) {
             joe.registerPackages(finder);
         }
@@ -286,6 +292,6 @@ public class TestTool implements Tool {
      * @param args The command line arguments.
      */
     public static void main(String[] args) {
-        new TestTool().run(args);
+        new TestWinTool().run(args);
     }
 }
