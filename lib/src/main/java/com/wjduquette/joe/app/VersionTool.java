@@ -13,15 +13,14 @@ public class VersionTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
      */
-    public static final ToolInfo INFO = new ToolInfo(
-        "version",
-        "",
-        "Prints Joe's version and build information.",
-        """
-        Prints Joe's version and build information.
-        """,
-        VersionTool::main
-    );
+    public static final ToolInfo INFO = ToolInfo.define()
+        .name("version")
+        .oneLiner("Prints Joe's version and build information.")
+        .launcher(VersionTool::main)
+        .help("""
+            Prints Joe's version and build information.
+            """)
+        .build();
 
     //-------------------------------------------------------------------------
     // Constructor

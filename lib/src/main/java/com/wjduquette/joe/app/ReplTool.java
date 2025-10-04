@@ -21,11 +21,11 @@ public class ReplTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
      */
-    public static final ToolInfo INFO = new ToolInfo(
-        "repl",
-        "[options...]",
-        "Invokes a simple Joe REPL.",
-        """
+    public static final ToolInfo INFO =ToolInfo.define()
+        .name("repl")
+        .argsig("[options...]")
+        .oneLiner("Invokes a simple Joe REPL.")
+        .help("""
         Invokes the REPL.
         
         - To exit, press ^D.
@@ -56,9 +56,9 @@ public class ReplTool implements Tool {
         --debug, -d
             Enable debugging output.  This is mostly of use to
             the Joe maintainer.
-        """,
-        ReplTool::main
-    );
+        """)
+        .launcher(ReplTool::main)
+        .build();
 
     //-------------------------------------------------------------------------
     // Instance Variables

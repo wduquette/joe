@@ -3,6 +3,8 @@
  */
 package com.wjduquette.joe.tools;
 
+import javafx.application.Platform;
+
 import java.util.*;
 
 /**
@@ -82,13 +84,26 @@ public class ToolLauncher {
         var subcommand = argq.poll();
 
         var tool = tools.get(subcommand);
+        String[] argv = rest(args);
 
         if (tool != null) {
-            tool.launcher().accept(rest(args));
+            if (tool.isJavaFX()) {
+                Platform.startup(() -> launchJavaFX(tool, argv));
+            } else {
+                tool.launcher().accept(argv);
+            }
         } else if (subcommand.equals("help")) {
             showHelp(argq);
         } else {
             showFailure(subcommand);
+        }
+    }
+
+    private void launchJavaFX(ToolInfo tool, String[] args) {
+        Platform.setImplicitExit(false);
+        tool.launcher().accept(args);
+        if (!Platform.isImplicitExit()) {
+            System.exit(0);
         }
     }
 

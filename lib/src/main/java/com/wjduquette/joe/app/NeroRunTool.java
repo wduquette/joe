@@ -20,11 +20,12 @@ public class NeroRunTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
      */
-    public static final ToolInfo INFO = new ToolInfo(
-        "run",
-        "[options...] file.nero [file.nero...]",
-        "Executes Nero scripts.",
-        """
+    public static final ToolInfo INFO = ToolInfo.define()
+        .name("run")
+        .argsig("[options...] file.nero [file.nero...]")
+        .oneLiner("Executes Nero scripts.")
+        .launcher(NeroRunTool::main)
+        .help("""
         Nero is Joe's implementation of Datalog.  This tool executes Nero
         scripts and supports Nero debugging.
         
@@ -41,9 +42,9 @@ public class NeroRunTool implements Tool {
         
         --out filename, -o filename
             Writes the inferred facts to the given file.
-        """,
-        NeroRunTool::main
-    );
+        """)
+        .launcher(NeroRunTool::main)
+        .build();
 
     //-------------------------------------------------------------------------
     // Instance Variables

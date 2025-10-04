@@ -20,21 +20,21 @@ public class DocTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
      */
-    public static final ToolInfo INFO = new ToolInfo(
-        "doc",
-        "[options...]",
-        "Generates documentation from JoeDoc comments.",
-        """
-        The 'joe doc' tool scans a project's Java and Joe source for
-        JoeDoc comments and produces API documentation suitable for
-        inclusion in an mdBook document.
-        
-        Options:
-        
-        --verbose, -v    Enable verbose output.
-        """,
-        DocTool::main
-    );
+    public static final ToolInfo INFO = ToolInfo.define()
+        .name("doc")
+        .argsig("[options...]")
+        .oneLiner("Generates documentation from JoeDoc comments.")
+        .launcher(DocTool::main)
+        .help("""
+            The 'joe doc' tool scans a project's Java and Joe source for
+            JoeDoc comments and produces API documentation suitable for
+            inclusion in an mdBook document.
+            
+            Options:
+            
+            --verbose, -v    Enable verbose output.
+            """)
+        .build();
 
     /**
      * The set of file types normally scanned for doc comments.

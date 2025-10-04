@@ -19,11 +19,12 @@ public class TestTool implements Tool {
     /**
      * Tool information for this tool, for use by the launcher.
      */
-    public static final ToolInfo INFO = new ToolInfo(
-        "test",
-        "options... testFile.joe...",
-        "Executes Joe tests.",
-        """
+    public static final ToolInfo INFO = ToolInfo.define()
+        .name("test")
+        .argsig("options... testFile.joe...")
+        .oneLiner("Executes Joe tests.")
+        .launcher(TestTool::main)
+        .help("""
         Executes a test suite consisting of one or more Joe test scripts,
         accumulating the results.
         
@@ -55,10 +56,8 @@ public class TestTool implements Tool {
         NOTE: `joe test` does not load packages from the JOE_LIB_PATH, as it
         assumes that the user is testing the library from within a code
         repository, not as installed for general use.
-        
-        """,
-        TestTool::main
-    );
+        """)
+        .build();
 
     //-------------------------------------------------------------------------
     // Instance Variables
