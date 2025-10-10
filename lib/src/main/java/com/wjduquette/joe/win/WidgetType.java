@@ -80,16 +80,37 @@ public class WidgetType<W> extends ProxyType<W> {
      * Defines a JavaFX property.
      * @param keywordName The identifying keyword's name.
      * @param getter The getter for the property object.
-     * @param converter The converter for the value.
+     * @param wrapper The wrapper/converter/validator for Joe values.
      * @param <P> The property's value type.
      */
     public <P> void fxProperty(
         String keywordName,
         PropertyGetter<W,P> getter,
-        ArgumentConverter<P> converter
+        Wrapper<P> wrapper
     ) {
         var keyword = new Keyword(keywordName);
-        var def = new RWPropertyDef<W,P>(keyword, getter, converter);
+        var def = new RWPropertyDef<W,P>(keyword, getter, wrapper, null);
+        properties.put(keyword, def);
+    }
+
+    /**
+     * Defines a JavaFX property that converts the internal property vlue
+     * to its Joe representation on retrieval
+     * @param keywordName The identifying keyword's name.
+     * @param getter The getter for the property object.
+     * @param wrapper The wrapper/converter/validator for Joe values.
+     * @param unwrapper The unwrapper for internal values.
+     * @param <P> The property's value type.
+     */
+    @SuppressWarnings("unused")
+    public <P> void fxProperty(
+        String keywordName,
+        PropertyGetter<W,P> getter,
+        Wrapper<P> wrapper,
+        Unwrapper<P> unwrapper
+    ) {
+        var keyword = new Keyword(keywordName);
+        var def = new RWPropertyDef<W,P>(keyword, getter, wrapper, unwrapper);
         properties.put(keyword, def);
     }
 
@@ -104,7 +125,26 @@ public class WidgetType<W> extends ProxyType<W> {
         ReadOnlyPropertyGetter<W,P> getter
     ) {
         var keyword = new Keyword(keywordName);
-        var def = new ROPropertyDef<W,P>(keyword, getter);
+        var def = new ROPropertyDef<W,P>(keyword, getter, null);
+        properties.put(keyword, def);
+    }
+
+    /**
+     * Defines a read-only JavaFX property that converts the internal
+     * property value to its Joe representation on retrieval.
+     * @param keywordName The identifying keyword's name.
+     * @param getter The getter for the property object.
+     * @param unwrapper The unwrapper for internal values.
+     * @param <P> The property's value type.
+     */
+    @SuppressWarnings("unused")
+    public <P> void fxReadOnly(
+        String keywordName,
+        ReadOnlyPropertyGetter<W,P> getter,
+        Unwrapper<P> unwrapper
+    ) {
+        var keyword = new Keyword(keywordName);
+        var def = new ROPropertyDef<W,P>(keyword, getter, unwrapper);
         properties.put(keyword, def);
     }
 
@@ -235,7 +275,6 @@ public class WidgetType<W> extends ProxyType<W> {
     //-------------------------------------------------------------------------
     // Property Definitions
 
-    // TODO Remove P?
     private sealed interface PropertyDef<W,P>
         permits RWPropertyDef, ROPropertyDef
     {
@@ -247,14 +286,18 @@ public class WidgetType<W> extends ProxyType<W> {
     private record RWPropertyDef<W, P>(
         Keyword keyword,
         PropertyGetter<W,P> getter,
-        ArgumentConverter<P> converter
+        Wrapper<P> converter,
+        Unwrapper<P> unwrapper
     ) implements PropertyDef<W, P> {
         public Property<P> getObservable(W widget) {
             return getter.get(widget);
         }
 
         public Object getValue(W widget) {
-            return getObservable(widget).getValue();
+            var value = getObservable(widget).getValue();
+            return unwrapper != null
+                ? unwrapper.unwrap(value)
+                : value;
         }
 
         void setProperty(Joe joe, W obj, Object arg) {
@@ -271,14 +314,18 @@ public class WidgetType<W> extends ProxyType<W> {
 
     private record ROPropertyDef<W, P>(
         Keyword keyword,
-        ReadOnlyPropertyGetter<W,P> getter
+        ReadOnlyPropertyGetter<W,P> getter,
+        Unwrapper<P> unwrapper
     ) implements PropertyDef<W, P> {
         public ReadOnlyProperty<P> getObservable(W obj) {
             return getter.get(obj);
         }
 
         public Object getValue(W widget) {
-            return getObservable(widget).getValue();
+            var value = getObservable(widget).getValue();
+            return unwrapper != null
+                ? unwrapper.unwrap(value)
+                : value;
         }
     }
 }
