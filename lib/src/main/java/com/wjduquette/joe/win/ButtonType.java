@@ -40,7 +40,8 @@ class ButtonType extends WidgetType<Button> {
         //
         // - *callable(1)*: A callable taking one argument
 
-        fxProperty("onAction", Button::onActionProperty, Win::toAction);
+        fxProperty("onAction", Button::onActionProperty,
+            Win::toAction, Joe::unwrapCallable);
         fxProperty("text",     Button::textProperty,     Joe::toString);
 
         // Methods

@@ -712,8 +712,12 @@ public class Joe {
      * @param wrappedCallable The wrapped callable
      * @return The unwrapped Joe callable.
      */
-    public Object unwrapCallable(JoeCallbackWrapper wrappedCallable) {
-        return wrappedCallable.getCallable();
+    public static Object unwrapCallable(Object wrappedCallable) {
+        if (wrappedCallable instanceof JoeCallbackWrapper jcw) {
+            return jcw.getCallable();
+        } else {
+            throw new IllegalArgumentException("Expected JoeCallbackWrapper");
+        }
     }
 
     //-------------------------------------------------------------------------
