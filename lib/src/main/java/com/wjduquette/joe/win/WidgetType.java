@@ -8,15 +8,16 @@ import java.util.Map;
 
 /**
  * A base ProxyType for JavaFX widgets, including support for JavaFX
- * properties.  Proxies for inheritance roots like Node and MenuItem
- * should use `extendsProxy` and the `@extends` JoeDoc tag.
- * @param <V> The proxied type
+ * properties.  Proxies for JavaFX types like Node and MenuItem
+ * should use subclass WidgetType and use the {@code @extends Widget}
+ * JoeDoc tag.
+ * @param <W> The proxied widget type
  */
-public class WidgetType<V> extends ProxyType<V> {
+public class WidgetType<W> extends ProxyType<W> {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Map<Keyword, PropertyDef<V,?>> properties =
+    private final Map<Keyword, PropertyDef<W,?>> properties =
         new HashMap<>();
 
     //-------------------------------------------------------------------------
@@ -66,7 +67,7 @@ public class WidgetType<V> extends ProxyType<V> {
      * @param superProxy The supertype's proxy
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public void extendsProxy(ProxyType<? super V> superProxy) {
+    public void extendsProxy(ProxyType<? super W> superProxy) {
         super.extendsProxy(superProxy);
         if (superProxy instanceof WidgetType widgetType) {
             properties.putAll(widgetType.properties);
@@ -82,11 +83,11 @@ public class WidgetType<V> extends ProxyType<V> {
      */
     public <P> void fxProperty(
         String keywordName,
-        PropertyGetter<V,P> getter,
-        ArgConverter<P> converter
+        PropertyGetter<W,P> getter,
+        ArgumentConverter<P> converter
     ) {
         var keyword = new Keyword(keywordName);
-        var def = new PropertyDef<V,P>(keyword, null, getter, converter);
+        var def = new PropertyDef<W,P>(keyword, null, getter, converter);
         properties.put(keyword, def);
     }
 
@@ -98,7 +99,7 @@ public class WidgetType<V> extends ProxyType<V> {
     // @args keyword
     // @result value
     // Gets the value of the property with the given *keyword*.
-    private Object _get(V obj, Joe joe, Args args) {
+    private Object _get(W obj, Joe joe, Args args) {
         args.exactArity(1, "get(keyword)");
 
         return toDef(joe, args.next()).getProperty(obj).getValue();
@@ -108,7 +109,7 @@ public class WidgetType<V> extends ProxyType<V> {
     // @method getProperties
     // @result joe.Set
     // Returns a readonly `Set` of the object's property keywords.
-    private Object _getProperties(V obj, Joe joe, Args args) {
+    private Object _getProperties(W obj, Joe joe, Args args) {
         args.exactArity(0, "getProperties()");
         return joe.readonlySet(properties.keySet());
     }
@@ -128,7 +129,7 @@ public class WidgetType<V> extends ProxyType<V> {
     // - The new value of the property
     //
     // The *callable* will be called when the property's value changes.
-    private Object _listenTo(V obj, Joe joe, Args args) {
+    private Object _listenTo(W obj, Joe joe, Args args) {
         args.exactArity(2, "listenTo(keyword, callable");
         var keyword = joe.toKeyword(args.next());
         var def =  toDef(joe, keyword);
@@ -146,7 +147,7 @@ public class WidgetType<V> extends ProxyType<V> {
     // @result this
     // Sets the *value* of the property with the given *keyword*.
     // The *value* must be assignable to the property's value type.
-    private Object _set(V obj, Joe joe, Args args) {
+    private Object _set(W obj, Joe joe, Args args) {
         args.exactArity(2, "set(keyword, value)");
 
         var def = toDef(joe, args.next());
@@ -159,7 +160,7 @@ public class WidgetType<V> extends ProxyType<V> {
     // @method toString
     // @result joe.String
     // Returns the value's string representation.
-    private Object _toString(V obj, Joe joe, Args args) {
+    private Object _toString(W obj, Joe joe, Args args) {
         args.exactArity(0, "toString()");
         return stringify(joe, obj);
     }
@@ -167,7 +168,7 @@ public class WidgetType<V> extends ProxyType<V> {
     //-------------------------------------------------------------------------
     // Utilities
 
-    private PropertyDef<V,?> toDef(Joe joe, Object arg) {
+    private PropertyDef<W,?> toDef(Joe joe, Object arg) {
         var def = properties.get(joe.toKeyword(arg));
 
         if (def == null) {
@@ -181,42 +182,25 @@ public class WidgetType<V> extends ProxyType<V> {
     // Helper Classes
 
     /**
-     * A functional interface for retrieving a JavaFX property from an
-     * object.
-     * @param <V> The object type
+     * A functional interface for retrieving a read/write JavaFX property
+     * from a widget.
+     * @param <W> The widget type
      * @param <P> The property type
      */
-    public interface PropertyGetter<V, P> {
+    public interface PropertyGetter<W, P> {
         /**
-         * Gets the value of an object property.
-         * @param value The target object
+         * Gets the value of a widget property.
+         * @param widget The widget
          * @return The property value
          */
-        Property<P> get(V value);
-    }
-
-    /**
-     * A functional interface for converting an arbitrary Object to a
-     * value of property type P.  The converter is expected to throw a
-     * JoeError on conversion failure.
-     * @param <P> The property type.
-     */
-    public interface ArgConverter<P> {
-        /**
-         * Converts the argument to a value of type P.
-         * @param joe The interpreter
-         * @param arg The argument
-         * @return The converted value
-         * @throws JoeError on conversion failure.
-         */
-        P convert(Joe joe, Object arg);
+        Property<P> get(W widget);
     }
 
     private record PropertyDef<V, P>(
         Keyword keyword,
         Class<P> propertyClass,
         PropertyGetter<V,P> getter,
-        ArgConverter<P> converter
+        ArgumentConverter<P> converter
     ) {
         Property<P> getProperty(V obj) {
             return getter.get(obj);
