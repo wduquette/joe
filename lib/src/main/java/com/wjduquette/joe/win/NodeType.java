@@ -36,14 +36,24 @@ class NodeType extends WidgetType<Node> {
         fxProperty("disable", Node::disableProperty, Joe::toBoolean);
 
         //**
+        // @property disabled joe.Boolean
+        // Is the node disabled? (read-only)
+        fxReadOnly("disabled", Node::disabledProperty);
+
+        //**
+        // @property focusTraversable joe.Boolean
+        // Can this widget receive focus?
+        fxProperty("focusTraversable", Node::focusTraversableProperty, Joe::toBoolean);
+
+        //**
         // @property id joe.String
         // JavaFX widget ID
-        fxProperty("id",      Node::idProperty,      Joe::toString);
+        fxProperty("id", Node::idProperty, Joe::toString);
 
         //**
         // @property style joe.String
         // FXCSS style string. See [[joe.win#topic.css]].
-        fxProperty("style",   Node::styleProperty,   Joe::toString);
+        fxProperty("style", Node::styleProperty, Joe::toString);
 
         //**
         // @property visible joe.Boolean
