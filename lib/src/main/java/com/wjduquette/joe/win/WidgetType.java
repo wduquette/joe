@@ -4,6 +4,12 @@ import com.wjduquette.joe.*;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.WindowEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -94,7 +100,7 @@ public class WidgetType<W> extends ProxyType<W> {
     }
 
     /**
-     * Defines a JavaFX property that converts the internal property vlue
+     * Defines a JavaFX property that converts the internal property value
      * to its Joe representation on retrieval
      * @param keywordName The identifying keyword's name.
      * @param getter The getter for the property object.
@@ -145,6 +151,101 @@ public class WidgetType<W> extends ProxyType<W> {
     ) {
         var keyword = new Keyword(keywordName);
         var def = new ROPropertyDef<W,P>(keyword, getter, unwrapper);
+        properties.put(keyword, def);
+    }
+
+    /**
+     * Defines a JavaFX property for an ActionEvent handler.
+     * @param keywordName The identifying keyword's name.
+     * @param getter The getter for the property object.
+     */
+    @SuppressWarnings("unused")
+    public void fxEvent(
+        String keywordName,
+        EventPropertyGetter<W> getter
+    ) {
+        var keyword = new Keyword(keywordName);
+        var def = new RWPropertyDef<W,EventHandler<Event>>(
+            keyword,
+            getter,
+            JoeEventHandler::new,
+            Joe::unwrapCallable);
+        properties.put(keyword, def);
+    }
+
+    /**
+     * Defines a JavaFX property for an ActionEvent handler.
+     * @param keywordName The identifying keyword's name.
+     * @param getter The getter for the property object.
+     */
+    @SuppressWarnings("unused")
+    public void fxEvent(
+        String keywordName,
+        ActionEventPropertyGetter<W> getter
+    ) {
+        var keyword = new Keyword(keywordName);
+        var def = new RWPropertyDef<W,EventHandler<ActionEvent>>(
+            keyword,
+            getter,
+            JoeEventHandler::new,
+            Joe::unwrapCallable);
+        properties.put(keyword, def);
+    }
+
+    /**
+     * Defines a JavaFX property for a KeyEvent handler.
+     * @param keywordName The identifying keyword's name.
+     * @param getter The getter for the property object.
+     */
+    @SuppressWarnings("unused")
+    public void fxEvent(
+        String keywordName,
+        KeyEventPropertyGetter<W> getter
+    ) {
+        var keyword = new Keyword(keywordName);
+        var def = new RWPropertyDef<W,EventHandler<KeyEvent>>(
+            keyword,
+            getter,
+            JoeEventHandler::new,
+            Joe::unwrapCallable);
+        properties.put(keyword, def);
+    }
+
+    /**
+     * Defines a JavaFX property for a MouseEvent handler.
+     * @param keywordName The identifying keyword's name.
+     * @param getter The getter for the property object.
+     */
+    @SuppressWarnings("unused")
+    public void fxEvent(
+        String keywordName,
+        MouseEventPropertyGetter<W> getter
+    ) {
+        var keyword = new Keyword(keywordName);
+        var def = new RWPropertyDef<W,EventHandler<MouseEvent>>(
+            keyword,
+            getter,
+            JoeEventHandler::new,
+            Joe::unwrapCallable);
+        properties.put(keyword, def);
+    }
+
+    /**
+     * Defines a JavaFX property for a WindowEvent handler.
+     * @param keywordName The identifying keyword's name.
+     * @param getter The getter for the property object.
+     */
+    @SuppressWarnings("unused")
+    public void fxEvent(
+        String keywordName,
+        WindowEventPropertyGetter<W> getter
+    ) {
+        var keyword = new Keyword(keywordName);
+        var def = new RWPropertyDef<W,EventHandler<WindowEvent>>(
+            keyword,
+            getter,
+            JoeEventHandler::new,
+            Joe::unwrapCallable);
         properties.put(keyword, def);
     }
 
@@ -255,6 +356,55 @@ public class WidgetType<W> extends ProxyType<W> {
          * @return The property value
          */
         Property<P> get(W widget);
+    }
+
+    /**
+     * A functional interface for retrieving a Javafx Event handler
+     * property from a widget.
+     * @param <W> The widget type
+     */
+    @SuppressWarnings("unused")
+    public interface EventPropertyGetter<W>
+        extends PropertyGetter<W,EventHandler<Event>> {
+    }
+
+    /**
+     * A functional interface for retrieving a Javafx ActionEvent handler
+     * property from a widget.
+     * @param <W> The widget type
+     */
+    public interface ActionEventPropertyGetter<W>
+        extends PropertyGetter<W,EventHandler<ActionEvent>> {
+    }
+
+    /**
+     * A functional interface for retrieving a Javafx KeyEvent handler
+     * property from a widget.
+     * @param <W> The widget type
+     */
+    @SuppressWarnings("unused")
+    public interface KeyEventPropertyGetter<W>
+        extends PropertyGetter<W,EventHandler<KeyEvent>> {
+    }
+
+    /**
+     * A functional interface for retrieving a Javafx MouseEvent handler
+     * property from a widget.
+     * @param <W> The widget type
+     */
+    @SuppressWarnings("unused")
+    public interface MouseEventPropertyGetter<W>
+        extends PropertyGetter<W,EventHandler<MouseEvent>> {
+    }
+
+    /**
+     * A functional interface for retrieving a Javafx WindowEvent handler
+     * property from a widget.
+     * @param <W> The widget type
+     */
+    @SuppressWarnings("unused")
+    public interface WindowEventPropertyGetter<W>
+        extends PropertyGetter<W,EventHandler<WindowEvent>> {
     }
 
     /**
