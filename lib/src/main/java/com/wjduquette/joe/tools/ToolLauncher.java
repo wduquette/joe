@@ -88,7 +88,14 @@ public class ToolLauncher {
 
         if (tool != null) {
             if (tool.isJavaFX()) {
-                Platform.startup(() -> launchJavaFX(tool, argv));
+                // FIRST, start up the JavaFX subsystem and application thread.
+                // Platform.startup() accepts a runnable, but the JavaFX
+                // event loop is unavailable until after Platform.startup()
+                // returns.
+                Platform.startup(() -> {});
+
+                // NEXT, execute the tool in the context of the event loop.
+                Platform.runLater(() -> launchJavaFX(tool, argv));
             } else {
                 tool.launcher().accept(argv);
             }
