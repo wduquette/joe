@@ -4,6 +4,7 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 
 /**
@@ -43,4 +44,17 @@ public class Win {
         return joe.toEnum(arg, Priority.class);
     }
 
+    /**
+     * Returns the argument as a Tooltip.  If it is already a Tooltip
+     * it is returned as is; otherwise, it's converted to a String
+     * and used to create a new Tooltip.
+     * @param joe the interpreter
+     * @param arg the argument
+     * @return a tooltip
+     */
+    public static Tooltip toTooltip(Joe joe, Object arg) {
+        return (arg instanceof Tooltip tip)
+            ? tip
+            : new Tooltip(joe.stringify(arg));
+    }
 }

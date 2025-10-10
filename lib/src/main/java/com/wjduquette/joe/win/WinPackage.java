@@ -4,7 +4,6 @@ import com.wjduquette.joe.*;
 import com.wjduquette.joe.types.EnumType;
 import javafx.geometry.*;
 import javafx.scene.Node;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -340,20 +339,6 @@ public class WinPackage extends NativePackage {
             throw joe.expected("positive span", arg);
         }
         return span;
-    }
-
-    /**
-     * Returns the argument as a Tooltip.  If it is already a Tooltip
-     * it is returned as is; otherwise, it's converted to a String
-     * and used to create a new Tooltip.
-     * @param joe the interpreter
-     * @param arg the argument
-     * @return a tooltip
-     */
-    public static Tooltip toTooltip(Joe joe, Object arg) {
-        return (arg instanceof Tooltip tip)
-            ? tip
-            : new Tooltip(joe.stringify(arg));
     }
 
     @SuppressWarnings("unused")

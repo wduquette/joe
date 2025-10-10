@@ -32,7 +32,7 @@ class ControlType extends WidgetType<Control> {
         // @property tooltipText joe.String
         // The control's tooltip string.
         fxProperty("tooltipText", Control::tooltipProperty,
-            WinPackage::toTooltip, Tooltip::getText);
+            Win::toTooltip, Tooltip::getText);
 
         // Methods
         method("tooltipText", this::_tooltipText);
