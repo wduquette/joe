@@ -1,0 +1,64 @@
+// Tests for joe.win.Widget.
+// This type is an abstract base class, so we test its features using
+// concrete widgets like Label.
+
+//------------------------------------------------------------------------
+// get/set
+
+// Verify that we can set and get a property.
+function testSetGet() {
+    var widget = Label();
+    assertEQ(widget.get(#text), "");
+    widget.set(#text, "ABC");
+    assertEQ(widget.get(#text), "ABC");
+}
+
+//------------------------------------------------------------------------
+// getProperties
+
+// Verify that we can retrieve a widget's set of properties.
+function testGetProperties() {
+    var widget = Pane();
+    var list = widget.getProperties()
+        .sorted(\a,b-> Joe.compare(a.toString(), b.toString()));
+    assertEQ(list, [
+        #disable,
+        #height,
+        #id,
+        #maxHeight,
+        #maxWidth,
+        #minHeight,
+        #minWidth,
+        #padding,
+        #prefHeight,
+        #prefWidth,
+        #style,
+        #visible,
+        #width
+    ]);
+}
+
+//-----------------------------------------------------------------------------
+// listenTo
+
+function testListenTo() {
+    var widget = Label();
+    var output = null;
+    var handler = \p,o,n -> output = "<" + p + "," + o + "," + n + ">";
+
+    // No listener
+    widget.set(#text, "A");
+    assertEQ(output, null);
+
+    // Listener is called
+    var listener = widget.listenTo(#text, handler);
+    widget.set(#text, "B");
+    assertEQ(output, "<#text,A,B>");
+    widget.set(#text, "C");
+    assertEQ(output, "<#text,B,C>");
+
+    // Listener is cancelled
+    listener.cancel();
+    widget.set(#text, "D");
+    assertEQ(output, "<#text,B,C>");
+}

@@ -30,7 +30,7 @@ class GridPaneClass extends WidgetType<GridPane> {
         staticMethod("getHgrow",  this::_getHgrow);
         staticMethod("getMargin", this::_getMargin);
         staticMethod("getVgrow",  this::_getVgrow);
-        staticMethod("getHgrow",  this::_setHgrow);
+        staticMethod("setHgrow",  this::_setHgrow);
         staticMethod("setMargin", this::_setMargin);
         staticMethod("setVgrow",  this::_setVgrow);
 

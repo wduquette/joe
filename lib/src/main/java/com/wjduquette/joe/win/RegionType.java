@@ -22,6 +22,7 @@ class RegionType extends WidgetType<Region> {
         extendsProxy(NodeType.TYPE);
         proxies(Region.class);
 
+
         // Constants
 
         //**
@@ -39,41 +40,65 @@ class RegionType extends WidgetType<Region> {
         // for that property.
         constant("USE_PREF_SIZE",     Region.USE_PREF_SIZE);
 
-        //**
-        // ## Properties
-        //
-        // `Region` widgets have the following properties, in addition to
-        // those inherited from superclasses.
-        //
-        // | Property      | Type            | Description                |
-        // | ------------- | --------------- | -------------------------- |
-        // | `#maxHeight`  | [[joe.Number]]  | Maximum height in pixels   |
-        // | `#maxWidth`   | [[joe.Number]]  | Maximum width in pixels    |
-        // | `#minHeight`  | [[joe.Number]]  | Minimum height in pixels   |
-        // | `#minWidth`   | [[joe.Number]]  | Minimum width in pixels    |
-        // | `#padding`    | [[Insets]]      | Preferred height in pixels |
-        // | `#prefHeight` | [[joe.Number]]  | Preferred height in pixels |
-        // | `#prefWidth`  | [[joe.Number]]  | Preferred width in pixels  |
 
         // Properties
+
+        //**
+        // @property height joe.Number
+        // Current height in pixels (read-only).
+        fxReadOnly("height", Region::heightProperty);
 
         //**
         // @property maxHeight joe.Number
         // Maximum height in pixels.
         fxProperty("maxHeight",  Region::maxHeightProperty,  Joe::toDouble);
-        fxProperty("maxHeight",  Region::maxHeightProperty,  Joe::toDouble);
+
+        //**
+        // @property maxWidth joe.Number
+        // Maximum width in pixels.
+        fxProperty("maxWidth",   Region::maxWidthProperty,   Joe::toDouble);
+
+        //**
+        // @property minHeight joe.Number
+        // Minimum height in pixels.
+        fxProperty("minHeight",  Region::minHeightProperty,  Joe::toDouble);
+
+        //**
+        // @property minWidth joe.Number
+        // Minimum width in pixels.
         fxProperty("minWidth",   Region::minWidthProperty,   Joe::toDouble);
-        fxProperty("minWidth",   Region::minWidthProperty,   Joe::toDouble);
+
+        //**
+        // @property padding Insets
+        // Padding around the widget.
         fxProperty("padding",    Region::paddingProperty,    WinPackage::toInsets);
+
+        //**
+        // @property prefHeight joe.Number
+        // Preferred height in pixels.
         fxProperty("prefHeight", Region::prefHeightProperty, Joe::toDouble);
+
+        //**
+        // @property prefWidth joe.Number
+        // Preferred width in pixels.
         fxProperty("prefWidth",  Region::prefWidthProperty,  Joe::toDouble);
+
+        //**
+        // @property width joe.Number
+        // Current width in pixels (read-only).
+        fxReadOnly("width", Region::widthProperty);
 
         // No initializer
 
         // Methods
+        method("getHeight",      this::_getHeight);
+        method("getWidth",       this::_getWidth);
         method("height",         this::_height);
         method("padding",        this::_padding);
-        method("prefWidth",      this::_prefWidth);
+        method("maxHeight",      this::_maxHeight);
+        method("maxWidth",       this::_maxWidth);
+        method("minHeight",      this::_minHeight);
+        method("minWidth",       this::_minWidth);
         method("prefHeight",     this::_prefHeight);
         method("prefWidth",      this::_prefWidth);
         method("width",          this::_width);
@@ -82,6 +107,24 @@ class RegionType extends WidgetType<Region> {
 
     //-------------------------------------------------------------------------
     // Methods
+
+    //**
+    // @method getHeight
+    // @result joe.Number
+    // Gets the node's `#height` in pixels.
+    private Object _getHeight(Region node, Joe joe, Args args) {
+        args.exactArity(0, "getHeight()");
+        return node.getHeight();
+    }
+
+    //**
+    // @method getWidth
+    // @result joe.Number
+    // Gets the node's `#width` in pixels.
+    private Object _getWidth(Region node, Joe joe, Args args) {
+        args.exactArity(0, "getWidth()");
+        return node.getWidth();
+    }
 
     //**
     // @method height
@@ -118,6 +161,50 @@ class RegionType extends WidgetType<Region> {
         };
 
         node.setPadding(insets);
+        return node;
+    }
+
+    //**
+    // @method maxHeight
+    // @args height
+    // @result this
+    // Sets the node's maximum height in pixels.
+    private Object _maxHeight(Region node, Joe joe, Args args) {
+        args.exactArity(1, "maxHeight(height)");
+        node.setMaxHeight(joe.toDouble(args.next()));
+        return node;
+    }
+
+    //**
+    // @method maxWidth
+    // @args width
+    // @result this
+    // Sets the node's maximum width in pixels.
+    private Object _maxWidth(Region node, Joe joe, Args args) {
+        args.exactArity(1, "maxWidth(width)");
+        node.setMaxWidth(joe.toDouble(args.next()));
+        return node;
+    }
+
+    //**
+    // @method minHeight
+    // @args height
+    // @result this
+    // Sets the node's minimum height in pixels.
+    private Object _minHeight(Region node, Joe joe, Args args) {
+        args.exactArity(1, "minHeight(height)");
+        node.setMinHeight(joe.toDouble(args.next()));
+        return node;
+    }
+
+    //**
+    // @method minWidth
+    // @args width
+    // @result this
+    // Sets the node's minimum width in pixels.
+    private Object _minWidth(Region node, Joe joe, Args args) {
+        args.exactArity(1, "minWidth(width)");
+        node.setMinWidth(joe.toDouble(args.next()));
         return node;
     }
 

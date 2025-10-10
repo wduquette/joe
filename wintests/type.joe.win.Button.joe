@@ -1,0 +1,17 @@
+// joe.win.Button tests
+
+// Checks that we can set a property value and retrieve it unchanged.
+function setGet(node, property, value) {
+    node.set(property, value);
+    assertEQ(node.get(property), value);
+}
+
+function testProperties() {
+    var node = Button();
+
+    setGet(node, #onAction,   \evt -> {});
+    // TODO: More stuff
+}
+
+
+

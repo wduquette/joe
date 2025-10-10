@@ -31,35 +31,34 @@ class NodeType extends WidgetType<Node> {
         // No initializer
 
         //**
-        // ## Properties
-        //
-        // All `Node` widgets have the following properties.
-        //
-        // | Property   | Type             | Description        |
-        // | ---------- | ---------------- | ------------------ |
-        // | `#disable` | [[joe.Boolean]]  | Disable flag       |
-        // | `#id`      | [[joe.String]]   | JavaFX ID          |
-        // | `#style`   | [[joe.String]]   | FXCSS style string |
-        // | `#visible` | [[joe.Boolean]]  | Visibility flag    |
-        //
-        // See [[joe.win#topic.css]] for more on using CSS.
-
-        //**
         // @property disable joe.Boolean
         // If true, disables the node and its descendants.
         fxProperty("disable", Node::disableProperty, Joe::toBoolean);
+
+        //**
+        // @property id joe.String
+        // JavaFX widget ID
         fxProperty("id",      Node::idProperty,      Joe::toString);
+
+        //**
+        // @property style joe.String
+        // FXCSS style string. See [[joe.win#topic.css]].
         fxProperty("style",   Node::styleProperty,   Joe::toString);
+
+        //**
+        // @property visible joe.Boolean
+        // Whether the widget is visible or not.
         fxProperty("visible", Node::visibleProperty, Joe::toBoolean);
 
         // Methods
+        method("disable",          this::_disable);
         method("getId",            this::_getId);
         method("hgrow",            this::_hgrow);
+        method("id",               this::_id);
         method("isDisable",        this::_isDisable);
         method("isDisabled",       this::_isDisabled);
-        method("resizeWithParent", this::_resizeWithSplit);
-        method("setDisable",       this::_setDisable);
-        method("setId",            this::_setId);
+        method("resizeWithSplit",  this::_resizeWithSplit);
+        method("styleClass",       this::_styleClass);
         method("styleClasses",     this::_styleClasses);
         method("styles",           this::_styles);
         method("vgrow",            this::_vgrow);
@@ -68,6 +67,20 @@ class NodeType extends WidgetType<Node> {
 
     //-------------------------------------------------------------------------
     // Methods
+
+    //**
+    // @method disable
+    // @args [flag]
+    // @result this
+    // Sets the node's `#disable` property to *flag*; if omitted,
+    // *flag* defaults to `true`.  While `true`, this node and its
+    // descendants in the scene graph will be disabled.
+    private Object _disable(Node node, Joe joe, Args args) {
+        args.arityRange(0, 1, "disable([flag])");
+        var flag = args.isEmpty() || Joe.isTruthy(args.next());
+        node.setDisable(flag);
+        return node;
+    }
 
     //**
     // @method getId
@@ -98,6 +111,19 @@ class NodeType extends WidgetType<Node> {
         GridPane.setHgrow(node, priority);
         return node;
     }
+
+    //**
+    // @method id
+    // @args id
+    // @result this
+    // Sets the node's `#id` property to the given *id* string.
+    private Object _id(Node node, Joe joe, Args args) {
+        args.exactArity(1, "id(id)");
+        var id = joe.toString(args.next());
+        node.setId(id);
+        return node;
+    }
+
 
     //**
     // @method isDisable
@@ -139,28 +165,16 @@ class NodeType extends WidgetType<Node> {
     }
 
     //**
-    // @method setDisable
-    // @args [flag]
+    // @method styleClass
+    // @args name
     // @result this
-    // Sets the node's `#disable` property to *flag*; if omitted,
-    // *flag* defaults to `true`.  While `true`, this node and its
-    // descendants in the scene graph will be disabled.
-    private Object _setDisable(Node node, Joe joe, Args args) {
-        args.arityRange(0, 1, "setDisable([flag])");
-        var flag = args.isEmpty() || Joe.isTruthy(args.next());
-        node.setDisable(flag);
-        return node;
-    }
-
-    //**
-    // @method setId
-    // @args id
-    // @result this
-    // Sets the node's `#id` property to the given *id* string.
-    private Object _setId(Node node, Joe joe, Args args) {
-        args.exactArity(1, "setId(id)");
-        var id = joe.toString(args.next());
-        node.setId(id);
+    // Adds a style class *name* to the list of the node's FXCSS style class
+    // names.  Values must be valid CSS style class names.
+    //
+    // See [[joe.win#topic.css]] for more on using CSS.
+    private Object _styleClass(Node node, Joe joe, Args args) {
+        args.exactArity(1, "styleClass(name)");
+        node.getStyleClass().add(joe.stringify(args.next()));
         return node;
     }
 
@@ -181,14 +195,14 @@ class NodeType extends WidgetType<Node> {
     // @args style, ...
     // @result this
     // Sets the node's FXCSS `#style` property.  The caller can pass
-    // multiple style strings, which will be joined with semicolons.
+    // multiple style strings, which will be joined with newlines.
     //
     // See [[joe.win#topic.css]] for more on using CSS.
     private Object _styles(Node node, Joe joe, Args args) {
         args.minArity(1, "styles(style, ...)");
         var styles = args.asList().stream()
             .map(joe::toString)
-            .collect(Collectors.joining(";\n"));
+            .collect(Collectors.joining("\n"));
         node.setStyle(styles);
         return node;
     }

@@ -707,6 +707,19 @@ public class Joe {
         return engine.call(callee, args);
     }
 
+    /**
+     * Unwraps a wrapped callable.
+     * @param wrappedCallable The wrapped callable
+     * @return The unwrapped Joe callable.
+     */
+    public static Object unwrapCallable(Object wrappedCallable) {
+        if (wrappedCallable instanceof JoeCallbackWrapper jcw) {
+            return jcw.getCallable();
+        } else {
+            throw new IllegalArgumentException("Expected JoeCallbackWrapper");
+        }
+    }
+
     //-------------------------------------------------------------------------
     // Argument parsing and error handling helpers
 
