@@ -23,6 +23,16 @@ public class Win {
     }
 
     /**
+     * Converts a callable/0 argument to a wrapped ActionEvent handler.
+     * @param joe The interpreter
+     * @param arg The callable
+     * @return the wrapped handler
+     */
+    static EventHandler<ActionEvent> toNoArgAction(Joe joe, Object arg) {
+        return new JoeNoArgEventHandler<>(joe, arg);
+    }
+
+    /**
      * Converts an argument to a Priority value.
      * @param joe The interpreter
      * @param arg the argument

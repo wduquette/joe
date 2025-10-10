@@ -8,10 +8,21 @@ function setGet(node, property, value) {
 
 function testProperties() {
     var node = Button();
-
-    setGet(node, #onAction,   \evt -> {});
-    // TODO: More stuff
+    setGet(node, #onAction, \evt -> {});
 }
 
+function testAction() {
+    var node = Button();
+    assertEQ(node.get(#onAction), null);
+    var handler = \->{};
+    node.action(handler);
+    assertEQ(node.get(#onAction), handler);
+}
 
-
+function testOnAction() {
+    var node = Button();
+    assertEQ(node.get(#onAction), null);
+    var handler = \evt->{};
+    node.onAction(handler);
+    assertEQ(node.get(#onAction), handler);
+}

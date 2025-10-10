@@ -313,6 +313,7 @@ public class WinPackage extends NativePackage {
     //-------------------------------------------------------------------------
     // Static converters for use with properties
 
+    @SuppressWarnings("unused")
     static HPos toHPos(Joe joe, Object arg) {
         return joe.toEnum(arg, HPos.class);
     }
@@ -341,10 +342,21 @@ public class WinPackage extends NativePackage {
         return span;
     }
 
-    static Tooltip toTooltip(Joe joe, Object arg) {
-        return joe.toClass(arg, Tooltip.class);
+    /**
+     * Returns the argument as a Tooltip.  If it is already a Tooltip
+     * it is returned as is; otherwise, it's converted to a String
+     * and used to create a new Tooltip.
+     * @param joe the interpreter
+     * @param arg the argument
+     * @return a tooltip
+     */
+    public static Tooltip toTooltip(Joe joe, Object arg) {
+        return (arg instanceof Tooltip tip)
+            ? tip
+            : new Tooltip(joe.stringify(arg));
     }
 
+    @SuppressWarnings("unused")
     static VPos toVPos(Joe joe, Object arg) {
         return joe.toEnum(arg, VPos.class);
     }

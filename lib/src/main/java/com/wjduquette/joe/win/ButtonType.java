@@ -16,38 +16,25 @@ class ButtonType extends WidgetType<Button> {
     //**
     // @package joe.win
     // @type Button
-    // @extends Control
+    // @extends Labeled
     // The `Button` type is the base class for JavaFX
     // labels like [[Button]] widgets.
     public ButtonType() {
         super("Button");
-        extendsProxy(ControlType.TYPE);
+        extendsProxy(LabeledType.TYPE);
         proxies(Button.class);
 
         // Initializer
         initializer(this::_initializer);
 
         //**
-        // ## Properties
-        //
-        // `Button` widgets have the following properties, in addition to
-        // those inherited from superclasses.
-        //
-        // | Property      | Type            | Description            |
-        // | ------------- | --------------- | ---------------------- |
-        // | `#onAction`   | *callable(1)*   | The `onAction` handler |
-        // | `#text`       | [[joe.String]]  | The button's text      |
-        //
-        // - *callable(1)*: A callable taking one argument
-
-//        fxProperty("onAction", Button::onActionProperty,
-//            Win::toAction, Joe::unwrapCallable);
-        fxEvent("onAction",    Button::onActionProperty);
-        fxProperty("text",     Button::textProperty,     Joe::toString);
+        // @property onAction callable/1
+        // See [[Button#method.onAction]].
+        fxEvent("onAction", Button::onActionProperty);
 
         // Methods
         method("action", this::_action);
-        method("text",   this::_text);
+        method("onAction", this::_onAction);
     }
 
     //-------------------------------------------------------------------------
@@ -72,22 +59,26 @@ class ButtonType extends WidgetType<Button> {
     // @method action
     // @args callable
     // @result this
-    // Adds a one-arg *callable* to the button as its action; pressing the
-    // button will invoke the callable.
+    // Adds a *callable/0* to the button as its `#onAction` handler; pressing
+    // the button will invoke the callable.
     private Object _action(Button btn, Joe joe, Args args) {
         args.exactArity(1, "action(callable)");
-        btn.setOnAction(Win.toAction(joe, args.next()));
+        btn.setOnAction(Win.toNoArgAction(joe, args.next()));
         return btn;
     }
 
     //**
-    // @method text
-    // @args text
+    // @method onAction
+    // @args callable
     // @result this
-    // Sets the button's *text*.
-    private Object _text(Button btn, Joe joe, Args args) {
-        args.exactArity(1, "text(text)");
-        btn.setText(joe.stringify(args.next()));
+    // Adds a *callable/1* to the button as its `#onAction` handler;
+    // pressing the button will invoke the callable, passing it the JavaFX
+    // `ActionEvent`.  Action event handlers rarely need the `ActionEvent`,
+    // so it's often preferable to use [[Button#method.action]], which
+    // expects a *callable/0*.
+    private Object _onAction(Button btn, Joe joe, Args args) {
+        args.exactArity(1, "onAction(callable)");
+        btn.setOnAction(Win.toAction(joe, args.next()));
         return btn;
     }
 }
