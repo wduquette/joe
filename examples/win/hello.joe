@@ -1,4 +1,4 @@
-// win_hello.joe: GUI hello world
+// hello.joe: GUI hello world
 Win.setTitle("joe win: Hello")
    .setSize(300, 150);
 
@@ -10,9 +10,11 @@ function goodbye(evt) {
 }
 
 Win.root()
-    .setProperty(#alignment, #center)
+    .set(#alignment, #center)
     .spacing(10)
     .child(Label("Hello, " + name + "!"))
-    .child(Button("Goodbye", goodbye))
+    .child(Button("Goodbye")
+        .set(#onAction, goodbye)
+    )
     ;
 

@@ -2,8 +2,6 @@ package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.types.EnumType;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
@@ -314,10 +312,6 @@ public class WinPackage extends NativePackage {
 
     //-------------------------------------------------------------------------
     // Static converters for use with properties
-
-    static EventHandler<ActionEvent> toAction(Joe joe, Object arg) {
-        return evt -> joe.call(arg, evt);
-    }
 
     static HPos toHPos(Joe joe, Object arg) {
         return joe.toEnum(arg, HPos.class);

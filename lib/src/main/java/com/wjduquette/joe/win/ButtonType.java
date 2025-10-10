@@ -40,7 +40,7 @@ class ButtonType extends WidgetType<Button> {
         //
         // - *callable(1)*: A callable taking one argument
 
-        fxProperty("onAction", Button::onActionProperty, WinPackage::toAction);
+        fxProperty("onAction", Button::onActionProperty, Win::toAction);
         fxProperty("text",     Button::textProperty,     Joe::toString);
 
         // Methods
@@ -53,22 +53,14 @@ class ButtonType extends WidgetType<Button> {
 
     //**
     // @init
-    // @args [text], [action]
+    // @args [text]
     // Returns a `Button`. If the *text* is given, the button will display
-    // the text.  If the *action* is also given, it must be a one-arg
-    // callable; it will be invoked when the button is pressed.
+    // the text.
     private Object _initializer(Joe joe, Args args) {
-        args.arityRange(0, 2, "Button([text],[action])");
-        return switch(args.size()) {
-            case 0 -> new Button();
-            case 1 -> new Button(joe.stringify(args.next()));
-            case 2 -> {
-                var btn = new Button(joe.stringify(args.next()));
-                btn.setOnAction(new JoeEventHandler<>(joe, args.next()));
-                yield btn;
-            }
-            default -> throw new IllegalStateException("Bad range.");
-        };
+        args.arityRange(0, 1, "Button([text])");
+        return args.isEmpty()
+            ? new Button()
+            : new Button(joe.stringify(args.next()));
     }
 
     //-------------------------------------------------------------------------
@@ -82,7 +74,7 @@ class ButtonType extends WidgetType<Button> {
     // button will invoke the callable.
     private Object _action(Button btn, Joe joe, Args args) {
         args.exactArity(1, "action(callable)");
-        btn.setOnAction(new JoeEventHandler<>(joe, args.next()));
+        btn.setOnAction(Win.toAction(joe, args.next()));
         return btn;
     }
 

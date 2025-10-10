@@ -37,7 +37,7 @@ class MenuItemType extends WidgetType<MenuItem> {
         //
         // See [[joe.win#topic.css]] for more on using CSS.
         fxProperty("id",       MenuItem::idProperty,      Joe::toString);
-        fxProperty("onAction", MenuItem::onActionProperty, WinPackage::toAction);
+        fxProperty("onAction", MenuItem::onActionProperty, Win::toAction);
         fxProperty("text",     MenuItem::textProperty,    Joe::toString);
         fxProperty("style",    MenuItem::styleProperty,   Joe::toString);
 
