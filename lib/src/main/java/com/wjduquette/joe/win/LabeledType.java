@@ -12,7 +12,7 @@ class LabeledType extends WidgetType<Labeled> {
 
     //**
     // @package joe.win
-    // @type Labeled
+    // @widget Labeled
     // @extends Control
     // The `Labeled` type is the base class for JavaFX widgets that display
     // text and an optional graphic, e.g., [[Label]] and [[Button]].

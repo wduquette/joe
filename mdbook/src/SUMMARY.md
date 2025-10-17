@@ -105,6 +105,7 @@
     - [HPos Enum](library/type.joe.win.HPos.md);
     - [Insets Type](library/type.joe.win.Insets.md);
     - [Label Widget](library/type.joe.win.Label.md);
+    - [Labeled Widget](library/type.joe.win.Labeled.md);
     - [Listener Type](library/type.joe.win.Listener.md);
     - [ListView Widget](library/type.joe.win.ListView.md);
     - [Menu Widget](library/type.joe.win.Menu.md);

@@ -15,7 +15,7 @@ class ButtonType extends WidgetType<Button> {
 
     //**
     // @package joe.win
-    // @type Button
+    // @widget Button
     // @extends Labeled
     // The `Button` type is the base class for JavaFX
     // labels like [[Button]] widgets.

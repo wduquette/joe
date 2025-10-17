@@ -12,9 +12,9 @@ class LabelType extends WidgetType<Label> {
 
     //**
     // @package joe.win
-    // @type Label
+    // @widget Label
     // @extends Labeled
-    // The `Label` widget.
+    // The `Label` widget, which displays text strings.
     public LabelType() {
         super("Label");
         extendsProxy(LabeledType.TYPE);
