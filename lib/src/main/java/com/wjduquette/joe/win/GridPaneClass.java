@@ -178,7 +178,7 @@ class GridPaneClass extends WidgetType<GridPane> {
         if (args.size() == 3) {
             var column = joe.toInteger(args.next());
             var row = joe.toInteger(args.next());
-            var node = WinPackage.toNode(joe, args.next());
+            var node = Win.toNode(joe, args.next());
             GridPane.setConstraints(node, column, row);
             pane.getChildren().add(node);
         } else if (args.size() == 5) {
@@ -186,7 +186,7 @@ class GridPaneClass extends WidgetType<GridPane> {
             var row = joe.toInteger(args.next());
             var columnSpan = WinPackage.toSpan(joe, args.next());
             var rowSpan = WinPackage.toSpan(joe, args.next());
-            var node = WinPackage.toNode(joe, args.next());
+            var node = Win.toNode(joe, args.next());
             GridPane.setConstraints(node, column, row, columnSpan, rowSpan);
             pane.getChildren().add(node);
         } else {

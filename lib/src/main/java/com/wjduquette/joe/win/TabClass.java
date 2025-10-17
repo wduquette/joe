@@ -16,9 +16,9 @@ class TabClass extends WidgetType<Tab> {
 
     //**
     // @package joe.win
-    // @type Tab
+    // @widget Tab
     // @extends Widget
-    // The `Tab` widget contains a [[Node]] in a [[TabPane]].
+    // The `Tab` widget contains a [[Node]] and is displayed in a [[TabPane]].
     // Joe classes can extend the `Tab` type.
     public TabClass() {
         super("Tab");
@@ -27,22 +27,23 @@ class TabClass extends WidgetType<Tab> {
         initializer(this::_initializer);
 
         //**
-        // ## Properties
-        //
-        // All `Node` widgets have the following properties.
-        //
-        // | Property   | Type             | Description        |
-        // | ---------- | ---------------- | ------------------ |
-        // | `#content` | [[Node]]         | Content node       |
-        // | `#id`      | [[joe.String]]   | JavaFX ID          |
-        // | `#style`   | [[joe.String]]   | FXCSS style string |
-        // | `#text`    | [[joe.String]]   | Tab text           |
-        //
-        // See [[joe.win#topic.css]] for more on using CSS.
-        fxProperty("content",  Tab::contentProperty,
-            (joe, value) -> joe.toClass(value, Node.class));
+        // @property content Node
+        // The content node.
+        fxProperty("content",  Tab::contentProperty, Win::toNode);
+
+        //**
+        // @property id joe.String
+        // JavaFX widget ID
         fxProperty("id",       Tab::idProperty,      Joe::toString);
+
+        //**
+        // @property text joe.String
+        // Text to display
         fxProperty("text",     Tab::textProperty,    Joe::toString);
+
+        //**
+        // @property style joe.String
+        // FXCSS style string. See [[joe.win#topic.css]].
         fxProperty("style",    Tab::styleProperty,   Joe::toString);
 
         // Methods

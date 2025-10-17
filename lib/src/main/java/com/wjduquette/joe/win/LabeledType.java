@@ -22,7 +22,7 @@ class LabeledType extends WidgetType<Labeled> {
         proxies(Labeled.class);
 
         //**
-        // @property text Joe.string
+        // @property text joe.String
         // The text to display
         fxProperty("text", Labeled::textProperty, Joe::toString);
 

@@ -29,7 +29,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
         //**
         // @property placeholder Node
         // A node to display when there are no items.
-        fxProperty("placeholder", ListViewInstance::placeholderProperty, WinPackage::toNode);
+        fxProperty("placeholder", ListViewInstance::placeholderProperty, Win::toNode);
 
         // Methods
         method("getItems",         this::_getItems);
@@ -146,7 +146,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // the widget's [[ListView#method.items]] list is empty.
     private Object _placeholder(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(1, "placeholder(node)");
-        node.setPlaceholder(WinPackage.toNode(joe, args.next()));
+        node.setPlaceholder(Win.toNode(joe, args.next()));
         return node;
     }
 

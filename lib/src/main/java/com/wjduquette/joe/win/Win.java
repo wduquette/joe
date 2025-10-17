@@ -4,6 +4,7 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 
@@ -33,6 +34,18 @@ public class Win {
         return new JoeNoArgEventHandler<>(joe, arg);
     }
 
+
+    /**
+     * Converts an argument to a Node value.
+     * @param joe The interpreter
+     * @param arg the argument
+     * @return The node
+     * @throws JoeError on conversion failure.
+     */
+    public static Node toNode(Joe joe, Object arg) {
+        return joe.toClass(arg, Node.class);
+    }
+
     /**
      * Converts an argument to a Priority value.
      * @param joe The interpreter
@@ -57,4 +70,5 @@ public class Win {
             ? tip
             : new Tooltip(joe.stringify(arg));
     }
+
 }

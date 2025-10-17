@@ -3,7 +3,6 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.types.EnumType;
 import javafx.geometry.*;
-import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -313,10 +312,6 @@ public class WinPackage extends NativePackage {
 
     static Insets toInsets(Joe joe, Object arg) {
         return joe.toClass(arg, Insets.class);
-    }
-
-    static Node toNode(Joe joe, Object arg) {
-        return joe.toClass(arg, Node.class);
     }
 
     static Pos toPos(Joe joe, Object arg) {
