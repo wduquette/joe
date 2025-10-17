@@ -34,7 +34,6 @@ public class CallbackWrapper {
 
     @SuppressWarnings("UnusedReturnValue")
     public Object callCallable(Object... args) {
-        System.out.println("Calling callable: " + joe.stringify(callable));
         return joe.call(callable, args);
     }
 

@@ -2,7 +2,6 @@ package com.wjduquette.joe.wrappers;
 
 import com.wjduquette.joe.Joe;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
