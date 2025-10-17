@@ -14,7 +14,7 @@ class MenuItemType extends WidgetType<MenuItem> {
 
     //**
     // @package joe.win
-    // @type MenuItem
+    // @widget MenuItem
     // @extends Widget
     // The `MenuItem` widget is an item in a [[Menu]].
     public MenuItemType() {
@@ -24,28 +24,31 @@ class MenuItemType extends WidgetType<MenuItem> {
         initializer(this::_initializer);
 
         //**
-        // ## Properties
-        //
-        // All `MenuItem` widgets have the following properties.
-        //
-        // | Property    | Type             | Description        |
-        // | ----------- | ---------------- | ------------------ |
-        // | `#id`       | [[joe.String]]   | JavaFX ID          |
-        // | `#onAction` | *callable(1)*    | The `onAction` handler |
-        // | `#style`    | [[joe.String]]   | FXCSS style string |
-        // | `#text`     | [[joe.String]]   | MenuItem text      |
-        //
-        // See [[joe.win#topic.css]] for more on using CSS.
-        fxProperty("id",       MenuItem::idProperty,      Joe::toString);
+        // @property id joe.String
+        // JavaFX widget ID
+        fxProperty("id", MenuItem::idProperty, Joe::toString);
+
+        //**
+        // @property onAction callable/1
+        // See [[MenuItem#method.onAction]].
         fxProperty("onAction", MenuItem::onActionProperty, Win::toAction);
-        fxProperty("text",     MenuItem::textProperty,    Joe::toString);
-        fxProperty("style",    MenuItem::styleProperty,   Joe::toString);
+
+        //**
+        // @property text joe.String
+        // The text to display
+        fxProperty("text", MenuItem::textProperty, Joe::toString);
+
+        //**
+        // @property style joe.String
+        // FXCSS style string. See [[joe.win#topic.css]].
+        fxProperty("style", MenuItem::styleProperty,   Joe::toString);
 
         // Methods
         method("action",        this::_action);
         method("disable",       this::_disable);
         method("id",            this::_id);
         method("isDisabled",    this::_isDisabled);
+        method("onAction",      this::_onAction);
         method("styleClasses",  this::_styleClasses);
         method("styles",        this::_styles);
         method("text",          this::_text);
@@ -69,8 +72,8 @@ class MenuItemType extends WidgetType<MenuItem> {
     // @method action
     // @args callable
     // @result this
-    // Adds a no-arg *callable* to the menu item as its action; pressing the
-    // button will invoke the callable.
+    // Adds a *callable/0* to the button as its `#onAction` handler; pressing
+    // the button will invoke the callable.
     private Object _action(MenuItem item, Joe joe, Args args) {
         args.exactArity(1, "action(callable)");
         item.setOnAction(evt -> joe.call(args.next()));
@@ -110,6 +113,21 @@ class MenuItemType extends WidgetType<MenuItem> {
     private Object _isDisabled(MenuItem item, Joe joe, Args args) {
         args.exactArity(0, "isDisabled()");
         return item.isDisable();
+    }
+
+    //**
+    // @method onAction
+    // @args callable
+    // @result this
+    // Adds a *callable/1* to the item as its `#onAction` handler;
+    // selecting the item will invoke the callable, passing it the JavaFX
+    // `ActionEvent`.  Action event handlers rarely need the `ActionEvent`,
+    // so it's often preferable to use [[MenuItem#method.action]], which
+    // expects a *callable/0*.
+    private Object _onAction(MenuItem btn, Joe joe, Args args) {
+        args.exactArity(1, "onAction(callable)");
+        btn.setOnAction(Win.toAction(joe, args.next()));
+        return btn;
     }
 
     //**
