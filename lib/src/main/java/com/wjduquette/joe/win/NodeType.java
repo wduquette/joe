@@ -19,7 +19,7 @@ class NodeType extends WidgetType<Node> {
 
     //**
     // @package joe.win
-    // @type Node
+    // @widget Node
     // @extends Widget
     // The `Node` widget is the abstract base class for JavaFX widgets
     // that can be added to [[Pane|Panes]] in the scene graph, and provides
