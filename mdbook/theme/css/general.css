@@ -138,6 +138,7 @@ table thead td {
 }
 table thead th {
     padding: 3px 20px;
+    text-align: left;
 }
 table thead tr {
     border: 1px var(--table-header-bg) solid;

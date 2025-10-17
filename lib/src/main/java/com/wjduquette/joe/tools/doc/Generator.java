@@ -306,7 +306,7 @@ class Generator {
         if (!type.properties().isEmpty()) {
             out.hb("properties", "JavaFX Properties");
             out.println();
-            out.println("| Defined By | Property | Type | Description |");
+            out.println("| Widget     | Property | Type | Description |");
             out.println("|------------|----------|------|-------------|");
 
             var supertype = type;
