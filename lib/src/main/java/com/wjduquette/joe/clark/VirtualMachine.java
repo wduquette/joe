@@ -961,7 +961,7 @@ class VirtualMachine {
         for (var slot = 0; slot < top; slot++) {
             buff.append(STACK_SEPARATOR)
                 .append(" ")
-                .append(joe.stringify(stack[slot]))
+                .append(stack[slot])
                 .append(" ");
         }
         return buff.toString();
