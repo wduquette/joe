@@ -13,7 +13,7 @@ class ControlType extends WidgetType<Control> {
 
     //**
     // @package joe.win
-    // @type Control
+    // @widget Control
     // @extends Region
     // The `Control` type is the base class for JavaFX
     // controls like the [[Label]] and [[Button]] widgets.

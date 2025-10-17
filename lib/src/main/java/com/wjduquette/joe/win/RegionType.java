@@ -13,7 +13,7 @@ class RegionType extends WidgetType<Region> {
 
     //**
     // @package joe.win
-    // @type Region
+    // @widget Region
     // @extends Node
     // The `Region` type is the abstract base class for JavaFX
     // [[Node]] widgets that occupy space on the screen.
