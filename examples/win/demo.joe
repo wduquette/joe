@@ -57,7 +57,7 @@ Win.root()
     )
     .child(SplitPane().vgrow().horizontal()
         .item(pageList
-            .splitResizeWithParent(false)
+            .resizeWithSplit(false)
             .prefWidth(200)
             .items(pages)
             .onSelect(showSelectedPage)
