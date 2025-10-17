@@ -401,6 +401,7 @@ class Generator {
             .map(e -> (TypeEntry)e)
             .filter(t -> type.shortMnemonic().equals(t.supertypeName()) ||
                 type.fullMnemonic().equals(t.supertypeName()))
+            .sorted(Comparator.comparing(TypeEntry::name))
             .map(t -> typeLinkOrName(t.shortMnemonic()))
             .toList();
         return String.join(", ", subtypes);
