@@ -13,7 +13,7 @@ class MenuType extends WidgetType<Menu> {
 
     //**
     // @package joe.win
-    // @type Menu
+    // @widget Menu
     // @extends MenuItem
     // The `Menu` widget is a menu in a [[MenuBar]] or a submenu
     // in a parent [[Menu]].  It contains [[MenuItem]] widgets.

@@ -19,7 +19,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
 
     //**
     // @package joe.win
-    // @type SplitPane
+    // @widget SplitPane
     // @extends Control
     // The `SplitPane` type manages one or more [[Node]] widgets with
     // movable dividers between them.
@@ -40,15 +40,8 @@ class SplitPaneType extends WidgetType<SplitPane> {
         initializer(this::_initializer);
 
         //**
-        // ## Properties
-        //
-        // `SplitPane` widgets have the following properties, in addition to
-        // those inherited from superclasses.
-        //
-        // | Property         | Type            | Description            |
-        // | ---------------- | --------------- | ---------------------- |
-        // | `#orientation`   | [[Orientation]] | Layout orientation     |
-
+        // @property orientation Orientation
+        // `#horizontal` or `#vertical`
         fxProperty("orientation", SplitPane::orientationProperty, WinPackage::toOrientation);
 
         // Methods
@@ -129,7 +122,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     // Adds a value to the widget's list of [[Node]] widgets.
     private Object _item(SplitPane node, Joe joe, Args args) {
         args.exactArity(1, "item(item)");
-        node.getItems().add(WinPackage.toNode(joe, args.next()));
+        node.getItems().add(Win.toNode(joe, args.next()));
         return node;
     }
 

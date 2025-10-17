@@ -16,7 +16,7 @@ class HBoxClass extends WidgetType<HBox> {
 
     //**
     // @package joe.win
-    // @type HBox
+    // @widget HBox
     // @extends Pane
     // The `HBox` type is a [[Pane]] that manages a row of
     // widgets. Joe classes can extend the `HBox` type.
@@ -25,27 +25,22 @@ class HBoxClass extends WidgetType<HBox> {
         proxies(HBox.class);
         extendsProxy(PaneType.TYPE);
 
-        staticMethod("getHgrow",      this::_getHgrow);
-        staticMethod("getMargin",     this::_getMargin);
-        staticMethod("setHgrow",      this::_setHgrow);
-        staticMethod("setMargin",     this::_setMargin);
+        staticMethod("getHgrow",  this::_getHgrow);
+        staticMethod("getMargin", this::_getMargin);
+        staticMethod("setHgrow",  this::_setHgrow);
+        staticMethod("setMargin", this::_setMargin);
 
         // No initializer
         initializer(this::_initializer);
 
         //**
-        // ## Properties
-        //
-        // `HBox` widgets have the following properties, in addition to
-        // those inherited from superclasses.
-        //
-        // | Property     | Type           | Description                |
-        // | ------------ | -------------- | -------------------------- |
-        // | `#alignment` | [[Pos]]        | The default alignment for children  |
-        // | `#spacing`   | [[joe.Number]] | The spacing between children in pixels |
+        // @property alignment Pos
+        // Alignment for children.
+        fxProperty("alignment", HBox::alignmentProperty, Win::toPos);
 
-        // Properties
-        fxProperty("alignment", HBox::alignmentProperty, WinPackage::toPos);
+        //**
+        // @property spacing joe.Number
+        // Spacing between children in pixels
         fxProperty("spacing",   HBox::spacingProperty,   Joe::toDouble);
 
         // Methods

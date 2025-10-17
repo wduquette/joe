@@ -37,6 +37,20 @@ public class WidgetType<W> extends ProxyType<W> {
     // `Widget` is the base class for JavaFX widgets as represented in Joe:
     // effectively, all JavaFX types that have JavaFX properties.  There is
     // no direct equivalent to this type in the JavaFX class hierarchy.
+    //
+    // @typeTopic properties
+    // @title JavaFX Properties
+    //
+    // A JavaFX property is a widget attribute implemented in terms of a JavaFX
+    // `Property` object.  A `Property`'s value can be set and retrieved, and
+    // can be listened to for change notifications.  There are as many
+    // different subtypes of `Property` as there are widget attribute types.
+    //
+    // Rather than providing bindings for every `Property` subtype, `joe.win`
+    // refers to widget properties by keyword, e.g., the [[Label]] widget has
+    // a `#text` property.  The methods provided by this `Widget` type are
+    // then used to set, get, and listen to widget properties for all
+    // `joe.win`'s concrete widget types.
 
     /**
      * Creates a WidgetType for the given widget type.

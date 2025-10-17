@@ -14,7 +14,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @package joe.win
-    // @type ListView
+    // @widget ListView
     // @extends Control
     // The `ListView` type is a JavaFX scrolling list widget.
     // Joe classes can extend the `ListView` type.
@@ -27,16 +27,9 @@ class ListViewClass extends WidgetType<ListViewInstance> {
         initializer(this::_initializer);
 
         //**
-        // ## Properties
-        //
-        // `ListViewInstance` widgets have the following properties, in addition to
-        // those inherited from superclasses.
-        //
-        // | Property         | Type            | Description            |
-        // | ---------------- | --------------- | ---------------------- |
-        // | `#placeholder`   | [[Node]]        | Empty list message     |
-
-        fxProperty("placeholder", ListViewInstance::placeholderProperty, WinPackage::toNode);
+        // @property placeholder Node
+        // A node to display when there are no items.
+        fxProperty("placeholder", ListViewInstance::placeholderProperty, Win::toNode);
 
         // Methods
         method("getItems",         this::_getItems);
@@ -153,7 +146,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // the widget's [[ListView#method.items]] list is empty.
     private Object _placeholder(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(1, "placeholder(node)");
-        node.setPlaceholder(WinPackage.toNode(joe, args.next()));
+        node.setPlaceholder(Win.toNode(joe, args.next()));
         return node;
     }
 

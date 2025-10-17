@@ -13,7 +13,7 @@ class SeparatorType extends WidgetType<Separator> {
 
     //**
     // @package joe.win
-    // @type Separator
+    // @widget Separator
     // @extends Control
     // The [[Separator]] widget is a horizontal or vertical separator.
     public SeparatorType() {
@@ -25,16 +25,8 @@ class SeparatorType extends WidgetType<Separator> {
         initializer(this::_initializer);
 
         //**
-        // ## Properties
-        //
-        // `Separator` widgets have the following properties, in addition to
-        // those inherited from superclasses.
-        //
-        // | Property       | Type            | Description            |
-        // | -------------- | --------------- | ---------------------- |
-        // | `#orientation` | [[Orientation]] | Horizontal or vertical |
-
-        // Properties
+        // @property orientation Orientation
+        // `#horizontal` or `#vertical`
         fxProperty("orientation", Separator::orientationProperty, WinPackage::toOrientation);
 
         // Methods

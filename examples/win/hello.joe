@@ -5,16 +5,12 @@ Win.setTitle("joe win: Hello")
 var name = Console.args().isEmpty()
     ? "world" : Console.args().get(0);
 
-function goodbye(evt) {
-    Console.exit(0);
-}
-
 Win.root()
     .set(#alignment, #center)
     .spacing(10)
     .child(Label("Hello, " + name + "!"))
     .child(Button("Goodbye")
-        .set(#onAction, goodbye)
+        .action(\-> Console.exit(0))
     )
     ;
 

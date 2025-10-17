@@ -1,0 +1,20 @@
+// joe.win.Control tests
+
+// Checks that we can set a property value and retrieve it unchanged.
+function setGet(node, property, value) {
+    node.set(property, value);
+    assertEQ(node.get(property), value);
+}
+
+function testProperties() {
+    var node = Label();
+    setGet(node, #tooltipText, "abc");
+}
+
+function testTooltipText() {
+    var node = Label();
+    node.tooltipText("abc");
+    assertEQ(node.get(#tooltipText),  "abc");
+}
+
+

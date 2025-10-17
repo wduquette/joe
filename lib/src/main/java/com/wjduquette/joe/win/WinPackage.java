@@ -3,8 +3,6 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.types.EnumType;
 import javafx.geometry.*;
-import javafx.scene.Node;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -33,27 +31,28 @@ public class WinPackage extends NativePackage {
     // @packageTopic hierarchy
     // @title Widget Hierarchy
     //
-    // The `joe.win` widget type hierarchy is a subset of the JavaFX hierarchy.
+    // The `joe.win` widget type hierarchy is a subset of the JavaFX Java
+    // class hierarchy.
     //
-    // - [[Widget]]: Base Type
-    //   - [[MenuItem]]: A menu item
-    //     - [[Menu]]: A popup menu
-    //   - [[Node]]: Base class
-    //     - [[Region]]: Nodes with geometry
-    //       - [[Control]]: Nodes to interact with
-    //         - [[Button]]: A button
-    //         - [[Label]]: A label
-    //         - [[ListView]]: A scrolling list of items
-    //         - [[MenuBar]]: A menu bar
-    //         - [[Separator]]: A horizontal or vertical separator
-    //         - [[TabPane]]: A `TabPane`
-    //       - [[Pane]]: Nodes that manage children
-    //         - [[GridPane]]: A grid of widgets
-    //         - [[HBox]]: A row of widgets
-    //         - [[SplitPane]]: A row or column with adjustable dividers
-    //         - [[StackPane]]: Widgets stacked like cards in a deck
-    //         - [[TabPane]]: A pane of [[Tab]] widgets
-    //         - [[VBox]]: A column of widgets
+    // - [[Widget]] (base type)
+    //   - [[MenuItem]]
+    //     - [[Menu]]
+    //   - [[Node]]: (base type)
+    //     - [[Region]]: (base type)
+    //       - [[Control]]: (base type)
+    //         - [[Labeled]]: (base type)
+    //           - [[Button]]
+    //           - [[Label]]
+    //         - [[ListView]]
+    //         - [[MenuBar]]
+    //         - [[Separator]]
+    //         - [[SplitPane]]
+    //         - [[TabPane]]
+    //       - [[Pane]]
+    //         - [[GridPane]]
+    //         - [[HBox]]
+    //         - [[StackPane]]
+    //         - [[VBox]]
     //   - [[Tab]]: A tab in a [[TabPane]]
     //
     // @packageTopic css
@@ -88,33 +87,29 @@ public class WinPackage extends NativePackage {
         // Main Singleton
         type(new WinProxy());
 
-        // Base classes
-        type(NodeType.TYPE);
-        type(RegionType.TYPE);
-
-        // Controls
-        type(ControlType.TYPE);
-        type(ButtonType.TYPE);
-        type(LabelType.TYPE);
-        type(ListViewClass.TYPE);
-        type(MenuBarType.TYPE);
-        type(SeparatorType.TYPE);
-        type(SplitPaneType.TYPE);
-        type(TabPaneType.TYPE);
-
-        // Panes
-        type(PaneType.TYPE);
-        type(GridPaneClass.TYPE);
-        type(StackPaneClass.TYPE);
-        type(VBoxClass.TYPE);
-        type(HBoxClass.TYPE);
-
-        // Widgets that aren't Nodes
-        type(TabClass.TYPE);
+        // Widget classes, indented according to hierarchy
         type(MenuItemType.TYPE);
-        type(MenuType.TYPE);
+            type(MenuType.TYPE);
+        type(NodeType.TYPE);
+            type(RegionType.TYPE);
+                type(ControlType.TYPE);
+                    type(LabeledType.TYPE);
+                        type(ButtonType.TYPE);
+                        type(LabelType.TYPE);
+                    type(ListViewClass.TYPE);
+                    type(MenuBarType.TYPE);
+                    type(SeparatorType.TYPE);
+                    type(SplitPaneType.TYPE);
+                    type(TabPaneType.TYPE);
+                type(PaneType.TYPE);
+                    type(GridPaneClass.TYPE);
+                    type(StackPaneClass.TYPE);
+                    type(VBoxClass.TYPE);
+                    type(HBoxClass.TYPE);
+        type(TabClass.TYPE);
 
         // Miscellaneous Types
+        type(InsetsType.TYPE);
         type(ListenerType.TYPE);
 
         // Enums
@@ -179,9 +174,6 @@ public class WinPackage extends NativePackage {
         // @constant CENTER
         // @constant TOP
         type(new EnumType<>("VPos", VPos.class));
-
-        // Utility Classes
-        type(InsetsType.TYPE);
     }
 
 
@@ -313,20 +305,13 @@ public class WinPackage extends NativePackage {
     //-------------------------------------------------------------------------
     // Static converters for use with properties
 
+    @SuppressWarnings("unused")
     static HPos toHPos(Joe joe, Object arg) {
         return joe.toEnum(arg, HPos.class);
     }
 
     static Insets toInsets(Joe joe, Object arg) {
         return joe.toClass(arg, Insets.class);
-    }
-
-    static Node toNode(Joe joe, Object arg) {
-        return joe.toClass(arg, Node.class);
-    }
-
-    static Pos toPos(Joe joe, Object arg) {
-        return joe.toEnum(arg, Pos.class);
     }
 
     static Orientation toOrientation(Joe joe, Object arg) {
@@ -341,10 +326,7 @@ public class WinPackage extends NativePackage {
         return span;
     }
 
-    static Tooltip toTooltip(Joe joe, Object arg) {
-        return joe.toClass(arg, Tooltip.class);
-    }
-
+    @SuppressWarnings("unused")
     static VPos toVPos(Joe joe, Object arg) {
         return joe.toEnum(arg, VPos.class);
     }

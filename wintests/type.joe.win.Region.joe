@@ -17,6 +17,15 @@ function testProperties() {
     setGet(node, #padding, Insets(7));
 }
 
+function testGetWidthAndHeight() {
+    var node = Label();
+    // No geometry management has yet been done.
+    assertEQ(node.get(#width),  0);
+    assertEQ(node.get(#height), 0);
+    assertEQ(node.getWidth(),   0);
+    assertEQ(node.getHeight(),  0);
+}
+
 function testHeight() {
     var node = Label();
     node.height(5);

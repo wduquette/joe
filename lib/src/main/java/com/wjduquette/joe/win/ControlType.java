@@ -13,30 +13,28 @@ class ControlType extends WidgetType<Control> {
 
     //**
     // @package joe.win
-    // @type Control
+    // @widget Control
     // @extends Region
     // The `Control` type is the base class for JavaFX
     // controls like the [[Label]] and [[Button]] widgets.
+    //
+    // @typeTopic tooltips
+    // @title Tooltip Text
+    // The JavaFX `Tooltip` is a popup window with many properties.  For the
+    // moment `Control` only supports `Tooltips` with a simple text string,
+    // and so has a `#tooltipText` property but not a `#tooltip` property.
     public ControlType() {
         super("Control");
         extendsProxy(RegionType.TYPE);
         proxies(Control.class);
 
         //**
-        // ## Properties
-        //
-        // `Control` widgets have the following properties, in addition to
-        // those inherited from superclasses.
-        //
-        // | Property      | Type            | Description                |
-        // | ------------- | --------------- | -------------------------- |
-        // | `#tooltip`    | [[Tooltip]]     | The control's tooltip      |
-
-        // Properties
-        fxProperty("tooltip", Control::tooltipProperty, WinPackage::toTooltip);
+        // @property tooltipText joe.String
+        // The control's tooltip string.
+        fxProperty("tooltipText", Control::tooltipProperty,
+            Win::toTooltip, Tooltip::getText);
 
         // Methods
-        method("tooltip",     this::_tooltip);
         method("tooltipText", this::_tooltipText);
     }
 
@@ -44,23 +42,12 @@ class ControlType extends WidgetType<Control> {
     // Methods
 
     //**
-    // @method tooltip
-    // @args tooltip
-    // @result this
-    // Sets the control's [[Tooltip]], or null for none.
-    private Object _tooltip(Control node, Joe joe, Args args) {
-        args.exactArity(0, "tooltip(tooltip)");
-        node.setTooltip(joe.toClass(args.next(), Tooltip.class));
-        return node;
-    }
-
-    //**
     // @method tooltipText
     // @args text
     // @result this
     // Gives the control a tooltip with the given *text*.
     private Object _tooltipText(Control node, Joe joe, Args args) {
-        args.exactArity(0, "tooltipText(text)");
+        args.exactArity(1, "tooltipText(text)");
         node.setTooltip(new Tooltip(joe.stringify(args.next())));
         return node;
     }

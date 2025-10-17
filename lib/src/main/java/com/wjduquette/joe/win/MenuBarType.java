@@ -13,10 +13,9 @@ class MenuBarType extends WidgetType<MenuBar> {
 
     //**
     // @package joe.win
-    // @type MenuBar
+    // @widget MenuBar
     // @extends Control
-    // The `MenuBar` type is the base class for JavaFX
-    // labels like [[MenuBar]] widgets.
+    // The `MenuBar` type represents a horizontal menu bar.
     public MenuBarType() {
         super("MenuBar");
         extendsProxy(ControlType.TYPE);
@@ -26,16 +25,8 @@ class MenuBarType extends WidgetType<MenuBar> {
         initializer(this::_initializer);
 
         //**
-        // ## Properties
-        //
-        // `MenuBar` widgets have the following properties, in addition to
-        // those inherited from superclasses.
-        //
-        // | Property            | Type            | Description      |
-        // | ------------------- | --------------- | ---------------- |
-        // | `#useSystemMenuBar` | [[joe.Boolean]] | Use system menu bar. |
-
-        // Properties
+        // @property useSystemMenuBar joe.Boolean
+        // Display as system menu bar on macOS.
         fxProperty("useSystemMenuBar", MenuBar::useSystemMenuBarProperty, Joe::toBoolean);
 
         // Methods

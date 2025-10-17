@@ -6,24 +6,36 @@ function setGet(node, property, value) {
     assertEQ(node.get(property), value);
 }
 
+function setGet(node, property, value) {
+    node.set(property, value);
+    assertEQ(node.get(property), value);
+}
+
 function testProperties() {
     var node = Label();
-    setGet(node, #disable, true);
-    setGet(node, #id,      "_id");
-    setGet(node, #style,   "-fx-font-size: 16;");
-    setGet(node, #visible, false);
+    setGet(node, #disable,          true);
+    setGet(node, #focusTraversable, true);
+    setGet(node, #id,               "_id");
+    setGet(node, #style,            "-fx-font-size: 16;");
+    setGet(node, #visible,          false);
 }
 
 function testDisable_isDisabled() {
     var node = Label();
-    assertEQ(node.isDisable(),  false);
-    assertEQ(node.isDisabled(), false);
+    assertEQ(node.isDisable(),    false);
+    assertEQ(node.isDisabled(),   false);
+
     node.disable(); // No flag
-    assertEQ(node.isDisable(),  true);
-    assertEQ(node.isDisabled(), true);
+    assertEQ(node.isDisable(),    true);
+    assertEQ(node.isDisabled(),   true);
+    assertEQ(node.get(#disable),  true);
+    assertEQ(node.get(#disabled), true);
+
     node.disable(false); // Explicit flag
-    assertEQ(node.isDisable(),  false);
-    assertEQ(node.isDisabled(), false);
+    assertEQ(node.isDisable(),    false);
+    assertEQ(node.isDisabled(),   false);
+    assertEQ(node.get(#disable),  false);
+    assertEQ(node.get(#disabled), false);
 }
 
 function testIdGetId() {

@@ -23,6 +23,8 @@ function testGetProperties() {
         .sorted(\a,b-> Joe.compare(a.toString(), b.toString()));
     assertEQ(list, [
         #disable,
+        #disabled,
+        #focusTraversable,
         #height,
         #id,
         #maxHeight,
@@ -34,7 +36,7 @@ function testGetProperties() {
         #prefWidth,
         #style,
         #visible,
-        #width
+        #width,
     ]);
 }
 

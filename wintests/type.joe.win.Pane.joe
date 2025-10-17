@@ -1,0 +1,25 @@
+// joe.win.Pane tests
+
+function testChildChildren() {
+    var pane = Pane();
+    var a = Label("A");
+    var b = Label("B");
+    var c = Label("C");
+    pane.child(a).child(b);
+    pane.children().add(c);
+    assertEQ(pane.children(), [a, b, c]);
+}
+
+function testSetChildren() {
+    var pane = Pane();
+    var a = Label("A");
+    var b = Label("B");
+    var c = Label("C");
+    var d = Label("D");
+    pane.setChildren([a, b]);
+    assertEQ(pane.children(), [a, b]);
+    pane.setChildren([c, d]);
+    assertEQ(pane.children(), [c, d]);
+}
+
+

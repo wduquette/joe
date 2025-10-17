@@ -306,7 +306,7 @@ class Generator {
         if (!type.properties().isEmpty()) {
             out.hb("properties", "JavaFX Properties");
             out.println();
-            out.println("| Defined By | Property | Type | Description |");
+            out.println("| Widget     | Property | Type | Description |");
             out.println("|------------|----------|------|-------------|");
 
             var supertype = type;
@@ -401,6 +401,7 @@ class Generator {
             .map(e -> (TypeEntry)e)
             .filter(t -> type.shortMnemonic().equals(t.supertypeName()) ||
                 type.fullMnemonic().equals(t.supertypeName()))
+            .sorted(Comparator.comparing(TypeEntry::name))
             .map(t -> typeLinkOrName(t.shortMnemonic()))
             .toList();
         return String.join(", ", subtypes);

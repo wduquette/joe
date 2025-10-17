@@ -27,19 +27,15 @@ class TabPaneType extends WidgetType<TabPane> {
         initializer(this::_initializer);
 
         //**
-        // ## Properties
-        //
-        // `TabPane` widgets have the following properties, in addition to
-        // those inherited from superclasses.
-        //
-        // | Property      | Type            | Description      |
-        // | ------------- | --------------- | ---------------- |
-        // | `#side`       | [[Side]]        | The position for the tabs. |
+        // @property rotateGraphic joe.Boolean
+        // Rotate graphic to match `#side`
+        fxProperty("rotateGraphic", TabPane::rotateGraphicProperty, Joe::toBoolean);
 
-        // Properties
+        //**
+        // @property side Side
+        // Position for the [[Tab|Tabs]]
         fxProperty("side", TabPane::sideProperty,
             (joe, value) -> joe.toEnum(value, Side.class));
-        fxProperty("rotateGraphic", TabPane::rotateGraphicProperty, Joe::toBoolean);
 
         // Methods
         method("tab",  this::_tab);
