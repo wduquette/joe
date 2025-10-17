@@ -314,10 +314,6 @@ public class WinPackage extends NativePackage {
         return joe.toClass(arg, Insets.class);
     }
 
-    static Pos toPos(Joe joe, Object arg) {
-        return joe.toEnum(arg, Pos.class);
-    }
-
     static Orientation toOrientation(Joe joe, Object arg) {
         return joe.toEnum(arg, Orientation.class);
     }

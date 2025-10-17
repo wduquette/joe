@@ -16,7 +16,7 @@ class StackPaneClass extends WidgetType<StackPane> {
 
     //**
     // @package joe.win
-    // @type StackPane
+    // @widget StackPane
     // @extends Pane
     // The `StackPane` type is a [[Pane]] that manages one or children
     // stacked one on top of each other like cards in a deck.
@@ -35,17 +35,9 @@ class StackPaneClass extends WidgetType<StackPane> {
         initializer(this::_initializer);
 
         //**
-        // ## Properties
-        //
-        // `StackPane` widgets have the following properties, in addition to
-        // those inherited from superclasses.
-        //
-        // | Property     | Type           | Description                |
-        // | ------------ | -------------- | -------------------------- |
-        // | `#alignment` | [[Pos]]        | The default alignment for children  |
-
-        // Properties
-        fxProperty("alignment", StackPane::alignmentProperty, WinPackage::toPos);
+        // @property alignment Pos
+        // Default alignment for children.
+        fxProperty("alignment", StackPane::alignmentProperty, Win::toPos);
 
         // Methods
         // None

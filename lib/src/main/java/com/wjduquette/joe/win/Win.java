@@ -4,6 +4,7 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
@@ -20,7 +21,7 @@ public class Win {
      * @param arg The callable
      * @return the wrapped handler
      */
-    static EventHandler<ActionEvent> toAction(Joe joe, Object arg) {
+    public static EventHandler<ActionEvent> toAction(Joe joe, Object arg) {
         return new JoeEventHandler<>(joe, arg);
     }
 
@@ -30,7 +31,7 @@ public class Win {
      * @param arg The callable
      * @return the wrapped handler
      */
-    static EventHandler<ActionEvent> toNoArgAction(Joe joe, Object arg) {
+    public static EventHandler<ActionEvent> toNoArgAction(Joe joe, Object arg) {
         return new JoeNoArgEventHandler<>(joe, arg);
     }
 
@@ -47,13 +48,24 @@ public class Win {
     }
 
     /**
+     * Converts an argument to a Pos value.
+     * @param joe The interpreter
+     * @param arg the argument
+     * @return The position
+     * @throws JoeError on conversion failure.
+     */
+    public static Pos toPos(Joe joe, Object arg) {
+        return joe.toEnum(arg, Pos.class);
+    }
+
+    /**
      * Converts an argument to a Priority value.
      * @param joe The interpreter
      * @param arg the argument
      * @return The priority
      * @throws JoeError on conversion failure.
      */
-    static Priority toPriority(Joe joe, Object arg) {
+    public static Priority toPriority(Joe joe, Object arg) {
         return joe.toEnum(arg, Priority.class);
     }
 
@@ -70,5 +82,4 @@ public class Win {
             ? tip
             : new Tooltip(joe.stringify(arg));
     }
-
 }

@@ -16,11 +16,12 @@ class GridPaneClass extends WidgetType<GridPane> {
 
     //**
     // @package joe.win
-    // @type GridPane
+    // @widget GridPane
     // @extends Pane
-    // The `GridPane` type is a [[Pane]] that manages one or children
-    // stacked one on top of each other like cards in a deck.
-    // Joe classes can extend the `GridPane` type.
+    // The `GridPane` type is a [[Pane]] that positions its children within
+    // a grid of rows and columns.  Children can occupy a single cell or
+    // span multiple rows and/or columns. Joe classes can extend the
+    // `GridPane` type.
     public GridPaneClass() {
         super("GridPane");
         proxies(GridPane.class);
@@ -34,27 +35,27 @@ class GridPaneClass extends WidgetType<GridPane> {
         staticMethod("setMargin", this::_setMargin);
         staticMethod("setVgrow",  this::_setVgrow);
 
-
         // No initializer
         initializer(this::_initializer);
 
         //**
-        // ## Properties
-        //
-        // `GridPane` widgets have the following properties, in addition to
-        // those inherited from superclasses.
-        //
-        // | Property            | Type            | Description                |
-        // | ------------------- | --------------- | -------------------------- |
-        // | `#alignment`        | [[Pos]]         | Alignment of the grid within the widget. |
-        // | `#gridLinesVisible` | [[joe.Boolean]] | Whether to draw grid lines for debugging. |
-        // | `#hgap`             | [[joe.Number]]  | Gap between columns in pixels. |
-        // | `#vgap`             | [[joe.Number]]  | Gap between rows in pixels. |
+        // @property alignment Pos
+        // Overall alignment of content
+        fxProperty("alignment", GridPane::alignmentProperty, Win::toPos);
 
-        // Properties
-        fxProperty("alignment", GridPane::alignmentProperty, WinPackage::toPos);
+        //**
+        // @property gridLinesVisible joe.Boolean
+        // Draw grid lines for debugging
         fxProperty("gridLinesVisible", GridPane::gridLinesVisibleProperty, Joe::toBoolean);
+
+        //**
+        // @property hgap joe.Number
+        // Gap between columns in pixels
         fxProperty("hgap", GridPane::hgapProperty, Joe::toDouble);
+
+        //**
+        // @property vgap joe.Number
+        // Gap between rows in pixels
         fxProperty("vgap", GridPane::vgapProperty, Joe::toDouble);
 
         // Methods

@@ -16,7 +16,7 @@ class VBoxClass extends WidgetType<VBox> {
 
     //**
     // @package joe.win
-    // @type VBox
+    // @widget VBox
     // @extends Pane
     // The `VBox` type is a [[Pane]] that manages a column of
     // widgets. Joe classes can extend the `VBox` type.
@@ -34,18 +34,13 @@ class VBoxClass extends WidgetType<VBox> {
         initializer(this::_initializer);
 
         //**
-        // ## Properties
-        //
-        // `VBox` widgets have the following properties, in addition to
-        // those inherited from superclasses.
-        //
-        // | Property     | Type           | Description                |
-        // | ------------ | -------------- | -------------------------- |
-        // | `#alignment` | [[Pos]]        | The default alignment for children  |
-        // | `#spacing`   | [[joe.Number]] | The spacing between children in pixels |
+        // @property alignment Pos
+        // Alignment for children.
+        fxProperty("alignment", VBox::alignmentProperty, Win::toPos);
 
-        // Properties
-        fxProperty("alignment", VBox::alignmentProperty, WinPackage::toPos);
+        //**
+        // @property spacing joe.Number
+        // Spacing between children in pixels
         fxProperty("spacing",   VBox::spacingProperty,   Joe::toDouble);
 
         // Methods
