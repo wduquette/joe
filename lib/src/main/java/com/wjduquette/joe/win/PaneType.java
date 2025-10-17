@@ -13,10 +13,10 @@ class PaneType extends WidgetType<Pane> {
 
     //**
     // @package joe.win
-    // @type Pane
+    // @widget Pane
     // @extends Region
     // The `Pane` type is the base class for JavaFX
-    // [[Node]] widgets that manage child nodes.
+    // widgets that manage child [[Node|Nodes]].
     public PaneType() {
         super("Pane");
         extendsProxy(RegionType.TYPE);
@@ -25,15 +25,10 @@ class PaneType extends WidgetType<Pane> {
         // No initializer
         initializer(this::_initializer);
 
-        //**
-        // ## Properties
-        //
-        // `Pane` widgets have the properties they inherit from their
-        // superclasses.
-
         // Methods
-        method("child",    this::_child);
-        method("children", this::_children);
+        method("child",       this::_child);
+        method("children",    this::_children);
+        method("setChildren", this::_setChildren);
     }
 
 
@@ -70,5 +65,20 @@ class PaneType extends WidgetType<Pane> {
     private Object _children(Pane pane, Joe joe, Args args) {
         args.exactArity(0, "children()");
         return joe.wrapList(pane.getChildren(), Node.class);
+    }
+
+    //**
+    // @method setChildren
+    // @args list
+    // @result this
+    // Replaces the widget's [[Pane#method.children]] with those from
+    // the given [[joe.List]].  All children must be [[Node|Nodes]].
+    private Object _setChildren(Pane pane, Joe joe, Args args) {
+        args.exactArity(1, "setChildren(list)");
+        pane.getChildren().clear();
+        for (var child : joe.toList(args.next())) {
+            pane.getChildren().add(joe.toClass(child, Node.class));
+        }
+        return pane;
     }
 }
