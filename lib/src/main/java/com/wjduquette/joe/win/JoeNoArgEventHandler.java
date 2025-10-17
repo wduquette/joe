@@ -1,17 +1,17 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeCallbackWrapper;
+import com.wjduquette.joe.wrappers.CallbackWrapper;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 
 /**
- * A {@link JoeCallbackWrapper} for JavaFX events.  It will invoke a Joe
+ * A {@link CallbackWrapper} for JavaFX events.  It will invoke a Joe
  * callable with one argument, the event.
  * @param <E> The event type
  */
 class JoeNoArgEventHandler<E extends Event>
-    extends JoeCallbackWrapper implements EventHandler<E>
+    extends CallbackWrapper implements EventHandler<E>
 {
     /**
      * Creates the wrapper

@@ -1,6 +1,7 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.wrappers.ConsumerWrapper;
 import javafx.scene.control.Label;
 
 /**
@@ -134,7 +135,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
         args.exactArity(1, "onSelect(callable)");
         var handler = joe.toCallable(args.next());
 
-        node.setOnSelect(new JoeConsumer<>(joe, handler));
+        node.setOnSelect(new ConsumerWrapper<>(joe, handler));
         return node;
     }
 

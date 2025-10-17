@@ -38,6 +38,7 @@ var pages = [
 // Logic
 
 function showSelectedPage(pageList) {
+    println("In showSelectedPage: " + pageList.getSelectedItem());
     pagePane.children().clear();
     var selected = pageList.getSelectedItem();
     selected != null && pagePane.child(selected);
