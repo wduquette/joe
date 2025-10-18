@@ -38,7 +38,8 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
         new SimpleObjectProperty<>();
 
     // The client's `onSelect` handler
-    private Consumer<Object> onSelect = null;
+    private final ObjectProperty<Consumer<Object>> onSelectProperty =
+        new SimpleObjectProperty<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -74,8 +75,9 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
     // Calls the user's onSelect handler only if the item was selected
     // by the user, passing it the selected item.
     private void onSelectItem() {
-        if (!inSelect && onSelect != null) {
-            onSelect.accept(getSelectionModel().getSelectedItem());
+        if (!inSelect && onSelectProperty.get() != null) {
+            onSelectProperty.get()
+                .accept(getSelectionModel().getSelectedItem());
         }
     }
 
@@ -97,8 +99,20 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
      */
     @SuppressWarnings("unused")
     public Consumer<Object> getOnSelect() {
-        return onSelect;
+        return onSelectProperty.get();
     }
+
+    /**
+     * Gets the onSelect handler, which is called when the selection changes
+     * due to some user interaction.  It is passed the selected item, or
+     * null if there is no selected item.
+     * @return The handler
+     */
+    @SuppressWarnings("unused")
+    public ObjectProperty<Consumer<Object>> onSelectProperty() {
+        return onSelectProperty;
+    }
+
     /**
      * Sets the onSelect handler, which is called when the selection changes
      * due to some user interaction.  It is passed the selected item, or
@@ -106,7 +120,7 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
      * @param handler The handler
      */
     public void setOnSelect(Consumer<Object> handler) {
-        this.onSelect = handler;
+        onSelectProperty.set(handler);
     }
 
     /**

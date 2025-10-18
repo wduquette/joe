@@ -33,6 +33,12 @@ class ListViewClass extends WidgetType<ListViewInstance> {
             Joe::wrapFunction, Joe::unwrapCallable);
 
         //**
+        // @property onSelect callable/1
+        // See [[ListView#method.onSelect]]
+        fxProperty("onSelect", ListViewInstance::onSelectProperty,
+            Joe::wrapConsumer, Joe::unwrapCallable);
+
+        //**
         // @property placeholder Node
         // A node to display when there are no items.
         fxProperty("placeholder", ListViewInstance::placeholderProperty, Win::toNode);
@@ -148,9 +154,10 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // @method onSelect
     // @args callable
     // @result this
-    // Specifies a *callable* to be called when the user selects an
-    // item in the list.  The callable will be passed one argument,
-    // the selected item, or null if there is no selected item.
+    // Sets the widget's `#onSelect` handler.  The *callable* will be called
+    // when the user selects an item in the list.  The callable will be
+    // passed one argument, the selected item, or null if there is no
+    // selected item.
     private Object _onSelect(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(1, "onSelect(callable)");
         node.setOnSelect(joe.wrapConsumer(args.next()));
