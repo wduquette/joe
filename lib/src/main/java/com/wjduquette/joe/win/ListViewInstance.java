@@ -1,19 +1,22 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
  * A JavaFX ListView for displaying arbitrary Joe values.  Supports
  * extension by Joe classes, value-to-string conversion using
- * Joe::stringify or the client's own stringifier, and safe selection without
+ * Joe::stringify or the client's own formatter, and safe selection without
  * logic loops.
  */
 public class ListViewInstance extends ListView<Object> implements JoeInstance {
@@ -30,8 +33,9 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
     // Whether a programmatic select*() call is in progress.
     private boolean inSelect = false;
 
-    // The client's stringifier
-    private Function<Object,String> stringifier = null;
+    // The client's formatter
+    private final ObjectProperty<Function<Object,Object>> formatterProperty =
+        new SimpleObjectProperty<>();
 
     // The client's `onSelect` handler
     private Consumer<ListViewInstance> onSelect = null;
@@ -76,9 +80,9 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
     }
 
     // Stringifies a value for display by MyCell.
-    private String stringifyValue(Object value) {
-        return stringifier != null
-            ? stringifier.apply(value)
+    private String formatValue(Object value) {
+        return formatterProperty.get() != null
+            ? Objects.toString(formatterProperty.get().apply(value))
             : joe.stringify(value);
     }
 
@@ -102,12 +106,30 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
     }
 
     /**
-     * Gets the widget's stringifier, or null if none is set.
-     * @return The stringifier
+     * Gets the widget's formatter, or null if none is set.
+     * @return The formatter
      */
     @SuppressWarnings("unused")
-    public Function<Object, String> getStringifier() {
-        return stringifier;
+    public Function<Object, Object> getFormatter() {
+        return formatterProperty.get();
+    }
+
+    /**
+     * The widget's formatter
+     * @return The formatter
+     */
+    @SuppressWarnings("unused")
+    public ObjectProperty<Function<Object, Object>> formatterProperty() {
+        return formatterProperty;
+    }
+
+    /**
+     * Gets the widget's formatter, the function used to convert values to
+     * strings for display (in place of Joe::stringify), or null if none is set.
+     * @param function The formatter
+     */
+    public void setFormatter(Function<Object, Object> function) {
+        formatterProperty.set(function);
     }
 
     /**
@@ -119,14 +141,6 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
         return getSelectionModel().selectedIndexProperty();
     }
 
-    /**
-     * Gets the widget's stringifier, the function used to convert values to
-     * strings for display (in place of Joe::stringify), or null if none is set.
-     * @param function The stringifier
-     */
-    public void setStringifier(Function<Object, String> function) {
-        this.stringifier = function;
-    }
 
     /**
      * Select the item at the given index.
@@ -171,7 +185,7 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
     // MyCell
 
     // A ListCell that converts an object to a string using
-    // either Joe::stringify or the client's stringifier.
+    // either Joe::stringify or the client's formatter.
     private class MyCell extends ListCell<Object> {
         @Override
         protected void updateItem(Object item, boolean empty) {
@@ -179,7 +193,7 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
             if (item == null || empty) {
                 setText("");
             } else {
-                setText(stringifyValue(item));
+                setText(formatValue(item));
             }
         }
     }

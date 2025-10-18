@@ -28,6 +28,12 @@ class ListViewClass extends WidgetType<ListViewInstance> {
         initializer(this::_initializer);
 
         //**
+        // @property formatter callable/1
+        // See [[ListView#method.formatter]]
+        fxProperty("formatter", ListViewInstance::formatterProperty,
+            Joe::wrapFunction, Joe::unwrapCallable);
+
+        //**
         // @property placeholder Node
         // A node to display when there are no items.
         fxProperty("placeholder", ListViewInstance::placeholderProperty, Win::toNode);
@@ -43,7 +49,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
         method("placeholderText",  this::_placeholderText);
         method("selectIndex",      this::_selectIndex);
         method("selectItem",       this::_selectItem);
-        method("stringifier",      this::_stringifier);
+        method("formatter",      this::_formatter);
     }
 
     //-------------------------------------------------------------------------
@@ -73,6 +79,21 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //-------------------------------------------------------------------------
     // Methods
+
+    //**
+    // @method formatter
+    // @args callable
+    // @result this
+    // Sets the widget's `#formatter` to the given *callable*, which
+    // must take one argument, a list item, and return a string
+    // representation for that item.  The returned string will be displayed
+    // in the `ListView` for the given item.
+    private Object _formatter(ListViewInstance node, Joe joe, Args args) {
+        args.exactArity(1, "formatter(callable)");
+
+        node.setFormatter(joe.wrapFunction(args.next()));
+        return node;
+    }
 
     //**
     // @method getItems
@@ -189,23 +210,4 @@ class ListViewClass extends WidgetType<ListViewInstance> {
         return node;
     }
 
-    //**
-    // @method stringifier
-    // @args callable
-    // @result this
-    // Sets the widget's stringifier to the given *callable*, which
-    // must take one argument, a list item, and return a string
-    // representation for that item.
-    private Object _stringifier(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(1, "stringifier(callable)");
-
-        var handler = args.next();
-
-        if (handler instanceof NativeCallable callable) {
-            node.setStringifier(v -> joe.call(callable, v).toString());
-        } else {
-            throw joe.expected("callable", handler);
-        }
-        return node;
-    }
 }

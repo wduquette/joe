@@ -717,7 +717,7 @@ public class Joe {
      * @param <T> The Java value type
      */
     public <T> ConsumerWrapper<T> wrapConsumer(Object callable) {
-        return new ConsumerWrapper<>(this, callable);
+        return new ConsumerWrapper<>(this, toCallable(callable));
     }
 
     /**
@@ -727,7 +727,7 @@ public class Joe {
      * @param <T> The Java input type
      */
     public <T> FunctionWrapper<T> wrapFunction(Object callable) {
-        return new FunctionWrapper<>(this, callable);
+        return new FunctionWrapper<>(this, toCallable(callable));
     }
 
     /**
