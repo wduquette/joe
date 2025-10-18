@@ -1,4 +1,6 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.wrappers;
+
+import com.wjduquette.joe.Joe;
 
 /**
  * This is a wrapper for Joe callables which are passed to Java objects as
@@ -11,7 +13,7 @@ package com.wjduquette.joe;
  * <p>This wrapper is usually used as a base class for concrete classes
  * that implement specific functional interfaces.</p>
  */
-public class JoeCallbackWrapper {
+public class CallbackWrapper {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -21,7 +23,7 @@ public class JoeCallbackWrapper {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public JoeCallbackWrapper(Joe joe, Object callable) {
+    public CallbackWrapper(Joe joe, Object callable) {
         this.joe = joe;
         this.callable = callable;
     }
@@ -33,5 +35,9 @@ public class JoeCallbackWrapper {
     @SuppressWarnings("UnusedReturnValue")
     public Object callCallable(Object... args) {
         return joe.call(callable, args);
+    }
+
+    public String toString() {
+        return "CallbackWrapper[" + joe.stringify(callable) + "]";
     }
 }

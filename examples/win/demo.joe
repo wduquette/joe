@@ -6,7 +6,6 @@ Win.setTitle("joe win: Demo")
 // The Page class
 class Page extends VBox {
     method init(name) { .name = name; }
-    method toString() { return .name; }
 }
 
 // GridPanePage
@@ -37,10 +36,9 @@ var pages = [
 //-----------------------------------------------------------------------------
 // Logic
 
-function showSelectedPage(pageList) {
+function showSelectedPage(page) {
     pagePane.children().clear();
-    var selected = pageList.getSelectedItem();
-    selected != null && pagePane.child(selected);
+    if (page != null) pagePane.child(page);
 }
 
 //-----------------------------------------------------------------------------
@@ -59,7 +57,8 @@ Win.root()
         .item(pageList
             .resizeWithSplit(false)
             .prefWidth(200)
-            .items(pages)
+            .setItems(pages)
+            .formatter(\page -> page.name)
             .onSelect(showSelectedPage)
         )
         .item(pagePane.padding(10))

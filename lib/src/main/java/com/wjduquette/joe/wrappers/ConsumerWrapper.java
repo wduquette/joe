@@ -1,14 +1,16 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.wrappers;
+
+import com.wjduquette.joe.Joe;
 
 import java.util.function.Consumer;
 
 /**
- * A {@link JoeCallbackWrapper} for the Consumer&gt;T&lt; functional interface.
+ * A {@link CallbackWrapper} for the Consumer&gt;T&lt; functional interface.
  * @param <T> The consumed value type.
  */
 @SuppressWarnings("unused")
-public class JoeConsumer<T>
-    extends JoeCallbackWrapper
+public class ConsumerWrapper<T>
+    extends CallbackWrapper
     implements Consumer<T>
 {
     /**
@@ -16,7 +18,7 @@ public class JoeConsumer<T>
      * @param joe The Joe interpreter
      * @param callable The callable.
      */
-    public JoeConsumer(Joe joe, Object callable) {
+    public ConsumerWrapper(Joe joe, Object callable) {
         super(joe, callable);
     }
 

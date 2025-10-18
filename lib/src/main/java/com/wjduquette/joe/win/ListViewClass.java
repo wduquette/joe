@@ -27,12 +27,24 @@ class ListViewClass extends WidgetType<ListViewInstance> {
         initializer(this::_initializer);
 
         //**
+        // @property formatter callable/1
+        // See [[ListView#method.formatter]]
+        fxProperty("formatter", ListViewInstance::formatterProperty,
+            Joe::wrapFunction, Joe::unwrapCallable);
+
+        //**
+        // @property onSelect callable/1
+        // See [[ListView#method.onSelect]]
+        fxProperty("onSelect", ListViewInstance::onSelectProperty,
+            Joe::wrapConsumer, Joe::unwrapCallable);
+
+        //**
         // @property placeholder Node
         // A node to display when there are no items.
         fxProperty("placeholder", ListViewInstance::placeholderProperty, Win::toNode);
 
         // Methods
-        method("getItems",         this::_getItems);
+        method("formatter",        this::_formatter);
         method("getSelectedIndex", this::_getSelectedIndex);
         method("getSelectedItem",  this::_getSelectedItem);
         method("item",             this::_item);
@@ -42,7 +54,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
         method("placeholderText",  this::_placeholderText);
         method("selectIndex",      this::_selectIndex);
         method("selectItem",       this::_selectItem);
-        method("stringifier",      this::_stringifier);
+        method("setItems",         this::_setItems);
     }
 
     //-------------------------------------------------------------------------
@@ -74,12 +86,18 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // Methods
 
     //**
-    // @method getItems
-    // @result joe.List
-    // Gets the list of the widget's items, which can be updated freely.
-    private Object _getItems(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(0, "getItems()");
-        return joe.wrapList(node.getItems(), Object.class);
+    // @method formatter
+    // @args callable
+    // @result this
+    // Sets the widget's `#formatter` to the given *callable*, which
+    // must take one argument, a list item, and return a string
+    // representation for that item.  The returned string will be displayed
+    // in the `ListView` for the given item.
+    private Object _formatter(ListViewInstance node, Joe joe, Args args) {
+        args.exactArity(1, "formatter(callable)");
+
+        node.setFormatter(joe.wrapFunction(args.next()));
+        return node;
     }
 
     //**
@@ -113,28 +131,24 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method items
-    // @args list
-    // @result this
-    // Adds the contents of the *list* to the widgets list of items.
+    // @result joe.List
+    // Gets the list of the widget's items, which can be updated freely.
     private Object _items(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(1, "items(list)");
-        var list = joe.toList(args.next());
-        node.getItems().addAll(list);
-        return node;
+        args.exactArity(0, "items()");
+        return joe.wrapList(node.getItems(), Object.class);
     }
 
     //**
     // @method onSelect
     // @args callable
     // @result this
-    // Specifies a callable to be called when the user selects an
-    // item in the list.  The callable must take one argument,
-    // the `ListView` itself.
+    // Sets the widget's `#onSelect` handler.  The *callable* will be called
+    // when the user selects an item in the list.  The callable will be
+    // passed one argument, the selected item, or null if there is no
+    // selected item.
     private Object _onSelect(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(1, "onSelect(callable)");
-        var handler = joe.toCallable(args.next());
-
-        node.setOnSelect(new JoeConsumer<>(joe, handler));
+        node.setOnSelect(joe.wrapConsumer(args.next()));
         return node;
     }
 
@@ -189,22 +203,16 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     }
 
     //**
-    // @method stringifier
-    // @args callable
+    // @method setItems
+    // @args list
     // @result this
-    // Sets the widget's stringifier to the given *callable*, which
-    // must take one argument, a list item, and return a string
-    // representation for that item.
-    private Object _stringifier(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(1, "stringifier(callable)");
-
-        var handler = args.next();
-
-        if (handler instanceof NativeCallable callable) {
-            node.setStringifier(v -> joe.call(callable, v).toString());
-        } else {
-            throw joe.expected("callable", handler);
-        }
+    // Replaces the `ListView`'s items with the contents of the *list*.
+    private Object _setItems(ListViewInstance node, Joe joe, Args args) {
+        args.exactArity(1, "setItems(list)");
+        var list = joe.toList(args.next());
+        node.getItems().clear();
+        node.getItems().addAll(list);
         return node;
     }
+
 }

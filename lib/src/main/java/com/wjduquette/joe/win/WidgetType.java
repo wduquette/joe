@@ -1,6 +1,8 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.wrappers.Unwrapper;
+import com.wjduquette.joe.wrappers.Wrapper;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.value.ObservableValue;

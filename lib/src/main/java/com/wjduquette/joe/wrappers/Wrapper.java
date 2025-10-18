@@ -1,4 +1,7 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.wrappers;
+
+import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeError;
 
 /**
  * A functional interface for converting an arbitrary Object to a

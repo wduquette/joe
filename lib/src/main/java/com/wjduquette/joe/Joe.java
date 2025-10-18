@@ -5,6 +5,9 @@ import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.types.*;
 import com.wjduquette.joe.walker.WalkerEngine;
+import com.wjduquette.joe.wrappers.CallbackWrapper;
+import com.wjduquette.joe.wrappers.ConsumerWrapper;
+import com.wjduquette.joe.wrappers.FunctionWrapper;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -708,13 +711,33 @@ public class Joe {
     }
 
     /**
+     * Wraps a Joe callable/1 as a Consumer&lt;T&gt;.
+     * @param callable The callable/1
+     * @return The wrapper
+     * @param <T> The Java value type
+     */
+    public <T> ConsumerWrapper<T> wrapConsumer(Object callable) {
+        return new ConsumerWrapper<>(this, toCallable(callable));
+    }
+
+    /**
+     * Wraps a Joe callable/1 as a Function&lt;T,Object&gt;.
+     * @param callable The callable/1
+     * @return The wrapper
+     * @param <T> The Java input type
+     */
+    public <T> FunctionWrapper<T> wrapFunction(Object callable) {
+        return new FunctionWrapper<>(this, toCallable(callable));
+    }
+
+    /**
      * Unwraps a wrapped callable.
      * @param wrapped The wrapped callable
      * @return The unwrapped Joe callable.
      */
     public static Object unwrapCallable(Object wrapped) {
         if (wrapped == null) return null;
-        if (wrapped instanceof JoeCallbackWrapper jcw) return jcw.getCallable();
+        if (wrapped instanceof CallbackWrapper jcw) return jcw.getCallable();
         throw new IllegalArgumentException("Expected JoeCallbackWrapper");
     }
 

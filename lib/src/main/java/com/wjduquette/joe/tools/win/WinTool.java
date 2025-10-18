@@ -84,7 +84,11 @@ public class WinTool implements Tool {
 
 
     public void run(String[] args) {
-        // FIRST, parse the command line arguments.
+        // FIRST, prepare to handle uncaught exceptions in the background.
+        Thread.currentThread().setUncaughtExceptionHandler(
+            (thread, ex) -> handleUncaughtException(false, ex));
+
+        // NEXT, parse the command line arguments.
         var argq = new ArrayDeque<>(List.of(args));
         if (argq.isEmpty()) {
             printUsage(App.NAME);

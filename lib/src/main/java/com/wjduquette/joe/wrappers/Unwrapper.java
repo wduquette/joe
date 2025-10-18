@@ -1,4 +1,4 @@
-package com.wjduquette.joe;
+package com.wjduquette.joe.wrappers;
 
 /**
  * A functional interface for converting the internal (i.e., native)
