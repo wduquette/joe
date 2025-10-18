@@ -44,7 +44,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
         fxProperty("placeholder", ListViewInstance::placeholderProperty, Win::toNode);
 
         // Methods
-        method("getItems",         this::_getItems);
+        method("formatter",        this::_formatter);
         method("getSelectedIndex", this::_getSelectedIndex);
         method("getSelectedItem",  this::_getSelectedItem);
         method("item",             this::_item);
@@ -54,7 +54,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
         method("placeholderText",  this::_placeholderText);
         method("selectIndex",      this::_selectIndex);
         method("selectItem",       this::_selectItem);
-        method("formatter",      this::_formatter);
+        method("setItems",         this::_setItems);
     }
 
     //-------------------------------------------------------------------------
@@ -101,15 +101,6 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     }
 
     //**
-    // @method getItems
-    // @result joe.List
-    // Gets the list of the widget's items, which can be updated freely.
-    private Object _getItems(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(0, "getItems()");
-        return joe.wrapList(node.getItems(), Object.class);
-    }
-
-    //**
     // @method getSelectedIndex
     // @result joe.Number
     // Gets the index of the selected item, or -1 if there is no selection.
@@ -140,14 +131,11 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method items
-    // @args list
-    // @result this
-    // Adds the contents of the *list* to the widgets list of items.
+    // @result joe.List
+    // Gets the list of the widget's items, which can be updated freely.
     private Object _items(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(1, "items(list)");
-        var list = joe.toList(args.next());
-        node.getItems().addAll(list);
-        return node;
+        args.exactArity(0, "items()");
+        return joe.wrapList(node.getItems(), Object.class);
     }
 
     //**
@@ -211,6 +199,19 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     private Object _selectItem(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(1, "selectItem(item)");
         node.selectItem(args.next());
+        return node;
+    }
+
+    //**
+    // @method setItems
+    // @args list
+    // @result this
+    // Replaces the `ListView`'s items with the contents of the *list*.
+    private Object _setItems(ListViewInstance node, Joe joe, Args args) {
+        args.exactArity(1, "setItems(list)");
+        var list = joe.toList(args.next());
+        node.getItems().clear();
+        node.getItems().addAll(list);
         return node;
     }
 

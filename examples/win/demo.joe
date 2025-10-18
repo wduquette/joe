@@ -57,7 +57,7 @@ Win.root()
         .item(pageList
             .resizeWithSplit(false)
             .prefWidth(200)
-            .items(pages)
+            .setItems(pages)
             .formatter(\page -> page.name)
             .onSelect(showSelectedPage)
         )
