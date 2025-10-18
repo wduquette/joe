@@ -36,10 +36,9 @@ var pages = [
 //-----------------------------------------------------------------------------
 // Logic
 
-function showSelectedPage(pageList) {
+function showSelectedPage(page) {
     pagePane.children().clear();
-    var selected = pageList.getSelectedItem();
-    selected != null && pagePane.child(selected);
+    if (page != null) pagePane.child(page);
 }
 
 //-----------------------------------------------------------------------------

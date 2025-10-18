@@ -1,7 +1,6 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.wrappers.ConsumerWrapper;
 import javafx.scene.control.Label;
 
 /**
@@ -149,14 +148,12 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // @method onSelect
     // @args callable
     // @result this
-    // Specifies a callable to be called when the user selects an
-    // item in the list.  The callable must take one argument,
-    // the `ListView` itself.
+    // Specifies a *callable* to be called when the user selects an
+    // item in the list.  The callable will be passed one argument,
+    // the selected item, or null if there is no selected item.
     private Object _onSelect(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(1, "onSelect(callable)");
-        var handler = joe.toCallable(args.next());
-
-        node.setOnSelect(new ConsumerWrapper<>(joe, handler));
+        node.setOnSelect(joe.wrapConsumer(args.next()));
         return node;
     }
 

@@ -38,7 +38,7 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
         new SimpleObjectProperty<>();
 
     // The client's `onSelect` handler
-    private Consumer<ListViewInstance> onSelect = null;
+    private Consumer<Object> onSelect = null;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -72,10 +72,10 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
 
     // Called when an item is selected, by the user or programmatically.
     // Calls the user's onSelect handler only if the item was selected
-    // by the user.
+    // by the user, passing it the selected item.
     private void onSelectItem() {
         if (!inSelect && onSelect != null) {
-            onSelect.accept(this);
+            onSelect.accept(getSelectionModel().getSelectedItem());
         }
     }
 
@@ -90,18 +90,22 @@ public class ListViewInstance extends ListView<Object> implements JoeInstance {
     // ListViewInstance public API
 
     /**
-     * Gets the onSelect handler, which takes the ListViewInstance as an argument.
+     * Gets the onSelect handler, which is called when the selection changes
+     * due to some user interaction.  It is passed the selected item, or
+     * null if there is no selected item.
      * @return The handler
      */
     @SuppressWarnings("unused")
-    public Consumer<ListViewInstance> getOnSelect() {
+    public Consumer<Object> getOnSelect() {
         return onSelect;
     }
     /**
-     * Sets the onSelect handler, which takes the ListViewInstance as an argument.
+     * Sets the onSelect handler, which is called when the selection changes
+     * due to some user interaction.  It is passed the selected item, or
+     * null if there is no selected item.
      * @param handler The handler
      */
-    public void setOnSelect(Consumer<ListViewInstance> handler) {
+    public void setOnSelect(Consumer<Object> handler) {
         this.onSelect = handler;
     }
 
