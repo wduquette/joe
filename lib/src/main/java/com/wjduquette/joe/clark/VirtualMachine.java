@@ -765,8 +765,10 @@ class VirtualMachine {
                     // called from Java, i.e., via `interpret()` or
                     // via `callFromJava()`.
                     if (frame.origin == Origin.JAVA) {
-                        // Pop the call frame's stack entries
+                        // Pop the call frame's stack entries, and restore
+                        // the previous call frame.
                         top = frame.base;
+                        if (frameCount > 0) frame = frames[frameCount - 1];
 
                         if (joe.isDebug()) {
                             joe.println(stackText());

@@ -131,6 +131,15 @@ function testToString_custom() {
     assertEQ(Joe.stringify(thing), thing.toString());
 }
 
+// The custom toString can be called implicitly
+function testToString_implicit() {
+    class Thing {
+        method toString() { return "I'm a Thing!"; }
+    }
+    var thing = Thing();
+    assertEQ("" + thing, "I'm a Thing!");
+}
+
 //-----------------------------------------------------------------------------
 // Static Methods
 

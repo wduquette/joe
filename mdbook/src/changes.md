@@ -2,7 +2,17 @@
 
 ## Changes in 0.9.0 (in development)
 
-- None yet
+- Fixed bug: scripted class `toString()` methods corrupted the call stack.
+  - Since v0.5.0. 
+  - When a class or record instance has a scripted `toString()` method, it
+    can be called implicitly by `Joe::stringify`, e.g., by the expression
+    `"Instance: " + myInstance`.
+  - In the Clark engine this corrupted the call stack so that execution 
+    terminated early and mysteriously.
+  - The corruption has been fixed, and such methods work properly.
+- Library
+  - Experimental `joe.win` Package
+    - Enhancements and cleanup 
 
 ## Changes in 0.8.0 (30 August 2025)
 
