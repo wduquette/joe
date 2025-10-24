@@ -909,7 +909,8 @@ public class Parser {
             return new Expr.Literal(scanner.previous().literal());
         }
 
-        if (scanner.match(DOT)) {
+        // Property reference operator in instance methods.
+        if (scanner.match(AT)) {
             Token keyword = scanner.previous();
             scanner.consume(IDENTIFIER, "expected property name.");
             var name = scanner.previous();

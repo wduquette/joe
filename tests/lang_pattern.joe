@@ -252,8 +252,8 @@ function testTypeName() {
 
 class Thing {
     method init(id, color) {
-        .id = id;
-        .color = color;
+        @id = id;
+        @color = color;
     }
 }
 

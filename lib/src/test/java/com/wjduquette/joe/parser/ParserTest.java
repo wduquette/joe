@@ -980,7 +980,7 @@ public class ParserTest extends Ted {
         test("testPrimary_expectedProperty");
 
         var source = """
-            .: = 5;
+            @: = 5;
             """;
         check(parse(source)).eq(
             "[line 1] error at ':', expected property name.");
@@ -1091,7 +1091,7 @@ public class ParserTest extends Ted {
         parser.parseJoe();
         check(errors.isEmpty()).eq(false);
 
-        var trace = errors.get(0);
+        var trace = errors.getFirst();
         return "[line " + trace.line() + "] " + trace.message();
     }
 }

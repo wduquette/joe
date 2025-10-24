@@ -256,7 +256,7 @@ function testStaticInitializer_multiple() {
 function testCanUseAt() {
     record Thing(name, color) {
         method info() {
-            return "name='" + .name + "' color='" + .color + "'";
+            return "name='" + @name + "' color='" + @color + "'";
         }
     }
     var thing = Thing("Fred", "red");
@@ -285,7 +285,7 @@ function testAtInNestedFunction() {
     record Nest(name) {
         method whoAmI() {
             function getName() {
-                return .name;
+                return @name;
             }
             return getName();
         }

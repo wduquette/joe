@@ -331,18 +331,18 @@ function testSubclass_callSuper() {
 }
 
 //-----------------------------------------------------------------------------
-// `.` operator
+// `@` operator
 
-// `.` can be used instead of `this.`
+// `@` can be used instead of `this.`
 function testCanUseAt() {
     class Thing {
         method init(name, color) {
-            .name = name;
-            .color = color;
+            @name = name;
+            @color = color;
         }
 
         method info() {
-            return "name='" + .name + "' color='" + .color + "'";
+            return "name='" + @name + "' color='" + @color + "'";
         }
     }
     var thing = Thing("Fred", "red");
@@ -367,13 +367,13 @@ function testThisInNestedFunction() {
     assertEQ(Nest().whoAmI(), "Howard");
 }
 
-// `.` is available in functions nested in methods
+// `@` is available in functions nested in methods
 function testAtInNestedFunction() {
     class Nest {
-        method init() { .name = "Howard"; }
+        method init() { @name = "Howard"; }
         method whoAmI() {
             function getName() {
-                return .name;
+                return @name;
             }
             return getName();
         }

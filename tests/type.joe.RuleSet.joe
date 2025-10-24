@@ -172,11 +172,11 @@ function testInfer_record_named() {
 function testInfer_class_named() {
     class Parent {
         method init(p, c) {
-            .p = p;
-            .c = c;
+            @p = p;
+            @c = c;
         }
         method toString() {
-            return "Parent(" + .p + ", " + .c + ")";
+            return "Parent(" + @p + ", " + @c + ")";
         }
     }
 
@@ -203,11 +203,11 @@ function testInfer_class_named() {
 function testInfer_class_ordered() {
     class Parent {
         method init(p, c) {
-            .p = p;
-            .c = c;
+            @p = p;
+            @c = c;
         }
         method toString() {
-            return "Parent(" + .p + ", " + .c + ")";
+            return "Parent(" + @p + ", " + @c + ")";
         }
     }
 
@@ -233,8 +233,8 @@ function testInfer_class_ordered() {
 function testPattern_named() {
     class Thing {
         method init(id, color) {
-            .id = id;
-            .color = color;
+            @id = id;
+            @color = color;
         }
     }
 

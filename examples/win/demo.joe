@@ -5,7 +5,7 @@ Win.setTitle("joe win: Demo")
 
 // The Page class
 class Page extends VBox {
-    method init(name) { .name = name; }
+    method init(name) { @name = name; }
 }
 
 // GridPanePage
