@@ -63,7 +63,7 @@ class ButtonType extends WidgetType<Button> {
     // the button will invoke the callable.
     private Object _action(Button btn, Joe joe, Args args) {
         args.exactArity(1, "action(callable)");
-        btn.setOnAction(Win.toNoArgAction(joe, args.next()));
+        btn.setOnAction(Win.toActionNoArg(joe, args.next()));
         return btn;
     }
 

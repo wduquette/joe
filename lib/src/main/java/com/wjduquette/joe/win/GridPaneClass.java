@@ -185,8 +185,8 @@ class GridPaneClass extends WidgetType<GridPane> {
         } else if (args.size() == 5) {
             var column = joe.toInteger(args.next());
             var row = joe.toInteger(args.next());
-            var columnSpan = WinPackage.toSpan(joe, args.next());
-            var rowSpan = WinPackage.toSpan(joe, args.next());
+            var columnSpan = Win.toSpan(joe, args.next());
+            var rowSpan = Win.toSpan(joe, args.next());
             var node = Win.toNode(joe, args.next());
             GridPane.setConstraints(node, column, row, columnSpan, rowSpan);
             pane.getChildren().add(node);

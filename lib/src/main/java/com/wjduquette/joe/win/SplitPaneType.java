@@ -42,7 +42,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
         //**
         // @property orientation Orientation
         // `#horizontal` or `#vertical`
-        fxProperty("orientation", SplitPane::orientationProperty, WinPackage::toOrientation);
+        fxProperty("orientation", SplitPane::orientationProperty, Win::toOrientation);
 
         // Methods
         method("getDividers",      this::_getDividers);

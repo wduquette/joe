@@ -71,7 +71,7 @@ class RegionType extends WidgetType<Region> {
         //**
         // @property padding Insets
         // Padding around the widget.
-        fxProperty("padding",    Region::paddingProperty,    WinPackage::toInsets);
+        fxProperty("padding",    Region::paddingProperty,    Win::toInsets);
 
         //**
         // @property prefHeight joe.Number

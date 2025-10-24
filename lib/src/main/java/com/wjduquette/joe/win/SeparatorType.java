@@ -27,7 +27,7 @@ class SeparatorType extends WidgetType<Separator> {
         //**
         // @property orientation Orientation
         // `#horizontal` or `#vertical`
-        fxProperty("orientation", Separator::orientationProperty, WinPackage::toOrientation);
+        fxProperty("orientation", Separator::orientationProperty, Win::toOrientation);
 
         // Methods
         method("horizontal", this::_horizontal);

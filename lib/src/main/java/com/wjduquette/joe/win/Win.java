@@ -4,7 +4,7 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
+import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Tooltip;
@@ -28,6 +28,16 @@ public class Win {
     }
 
     /**
+     * Converts a callable/0 argument to a wrapped ActionEvent handler.
+     * @param joe The interpreter
+     * @param arg The callable
+     * @return the wrapped handler
+     */
+    public static EventHandler<ActionEvent> toActionNoArg(Joe joe, Object arg) {
+        return new JoeNoArgEventHandler<>(joe, arg);
+    }
+
+    /**
      * Converts an argument to a ContentDisplay value.
      * @param joe The interpreter
      * @param arg the argument
@@ -40,15 +50,28 @@ public class Win {
     }
 
     /**
-     * Converts a callable/0 argument to a wrapped ActionEvent handler.
+     * Converts an argument to an HPos value.
      * @param joe The interpreter
-     * @param arg The callable
-     * @return the wrapped handler
+     * @param arg the argument
+     * @return The value
+     * @throws JoeError on conversion failure.
      */
-    public static EventHandler<ActionEvent> toNoArgAction(Joe joe, Object arg) {
-        return new JoeNoArgEventHandler<>(joe, arg);
+    @SuppressWarnings("unused")
+    public static HPos toHPos(Joe joe, Object arg) {
+        return joe.toEnum(arg, HPos.class);
     }
 
+    /**
+     * Converts an argument to an Insets value.
+     * @param joe The interpreter
+     * @param arg the argument
+     * @return The value
+     * @throws JoeError on conversion failure.
+     */
+    @SuppressWarnings("unused")
+    public static Insets toInsets(Joe joe, Object arg) {
+        return joe.toClass(arg, Insets.class);
+    }
 
     /**
      * Converts an argument to a Node value.
@@ -60,6 +83,19 @@ public class Win {
     public static Node toNode(Joe joe, Object arg) {
         return joe.toClass(arg, Node.class);
     }
+
+    /**
+     * Converts an argument to an Orientation value.
+     * @param joe The interpreter
+     * @param arg the argument
+     * @return The value
+     * @throws JoeError on conversion failure.
+     */
+    @SuppressWarnings("unused")
+    public static Orientation toOrientation(Joe joe, Object arg) {
+        return joe.toEnum(arg, Orientation.class);
+    }
+
 
     /**
      * Converts an argument to a Pos value.
@@ -81,6 +117,23 @@ public class Win {
      */
     public static Priority toPriority(Joe joe, Object arg) {
         return joe.toEnum(arg, Priority.class);
+    }
+
+    /**
+     * Converts an argument to a GridPane row or column
+     * span.
+     * @param joe The interpreter
+     * @param arg the argument
+     * @return The value
+     * @throws JoeError on conversion failure.
+     */
+    @SuppressWarnings("unused")
+    public static int toSpan(Joe joe, Object arg) {
+        var span = joe.toInteger(arg);
+        if (span <= 0) {
+            throw joe.expected("positive span", arg);
+        }
+        return span;
     }
 
     /**
@@ -107,5 +160,17 @@ public class Win {
         return (arg instanceof Tooltip tip)
             ? tip
             : new Tooltip(joe.stringify(arg));
+    }
+
+    /**
+     * Converts an argument to a VPos value.
+     * @param joe The interpreter
+     * @param arg the argument
+     * @return The value
+     * @throws JoeError on conversion failure.
+     */
+    @SuppressWarnings("unused")
+    public static VPos toVPos(Joe joe, Object arg) {
+        return joe.toEnum(arg, VPos.class);
     }
 }

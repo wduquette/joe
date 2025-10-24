@@ -118,82 +118,48 @@ public class WinPackage extends NativePackage {
 
         //**
         // @enum HPos
-        // @constant CENTER
-        // @constant LEFT
-        // @constant RIGHT
+        // @enumValues javafx.geometry.HPos
         type(new EnumType<>("HPos", HPos.class));
 
         //**
         // @enum ContentDisplay
-        // @constant BOTTOM
-        // @constant CENTER
-        // @constant GRAPHIC_ONLY
-        // @constant LEFT
-        // @constant RIGHT
-        // @constant TEXT_ONLY
-        // @constant TOP
+        // @enumValues javafx.scene.control.ContentDisplay
         type(new EnumType<>("ContentDisplay", ContentDisplay.class));
 
         //**
         // @enum Orientation
-        // @constant HORIZONTAL
-        // @constant VERTICAL
+        // @enumValues javafx.geometry.Orientation
         type(new EnumType<>("Orientation", Orientation.class));
 
         //**
         // @enum Pos
+        // @enumValues javafx.geometry.Pos
         // The `Pos` enum lists ways a widget can be aligned
         // relative to the boundaries of a rectangular space.
-        //
-        // @constant BASELINE_CENTER
-        // @constant BASELINE_LEFT
-        // @constant BASELINE_RIGHT
-        // @constant BOTTOM_CENTER
-        // @constant BOTTOM_LEFT
-        // @constant BOTTOM_RIGHT
-        // @constant CENTER
-        // @constant CENTER_LEFT
-        // @constant CENTER_RIGHT
-        // @constant TOP_CENTER
-        // @constant TOP_LEFT
-        // @constant TOP_RIGHT
         type(new EnumType<>("Pos", Pos.class));
 
         //**
         // @enum Priority
+        // @enumValues javafx.scene.layout.Priority
         // The `Priority` enum's values indicate when a widget
         // should resize itself to fit its parent widget.  The
         // default is generally `NEVER`.
-        //
-        // @constant ALWAYS
-        // @constant SOMETIMES
-        // @constant NEVER
         type(new EnumType<>("Priority", Priority.class));
 
         //**
         // @enum Side
+        // @enumValues javafx.geometry.Side
         // A `Side` of a rectangular region.
-        //
-        // @constant BOTTOM
-        // @constant LEFT
-        // @constant RIGHT
-        // @constant TOP
         type(new EnumType<>("Side", Side.class));
 
         //**
         // @enum TextAlignment
-        // @constant CENTER
-        // @constant JUSTIFY
-        // @constant LEFT
-        // @constant RIGHT
+        // @enumValues javafx.scene.text.TextAlignment
         type(new EnumType<>("TextAlignment", TextAlignment.class));
 
         //**
         // @enum VPos
-        // @constant BASELINE
-        // @constant BOTTOM
-        // @constant CENTER
-        // @constant TOP
+        // @enumValues javafx.geometry.VPos
         type(new EnumType<>("VPos", VPos.class));
     }
 
@@ -321,34 +287,5 @@ public class WinPackage extends NativePackage {
             stage.setTitle(title);
             return this;
         }
-    }
-
-    //-------------------------------------------------------------------------
-    // Static converters for use with properties
-
-    @SuppressWarnings("unused")
-    static HPos toHPos(Joe joe, Object arg) {
-        return joe.toEnum(arg, HPos.class);
-    }
-
-    static Insets toInsets(Joe joe, Object arg) {
-        return joe.toClass(arg, Insets.class);
-    }
-
-    static Orientation toOrientation(Joe joe, Object arg) {
-        return joe.toEnum(arg, Orientation.class);
-    }
-
-    static int toSpan(Joe joe, Object arg) {
-        var span = joe.toInteger(arg);
-        if (span <= 0) {
-            throw joe.expected("positive span", arg);
-        }
-        return span;
-    }
-
-    @SuppressWarnings("unused")
-    static VPos toVPos(Joe joe, Object arg) {
-        return joe.toEnum(arg, VPos.class);
     }
 }
