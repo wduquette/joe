@@ -259,12 +259,13 @@ The `@type` entry documents a type, and so begins with `@type <name>`. The
 
 The entry has the following optional metadata:
 
-| Metadata Tag            | Meaning                                             |
-|-------------------------|-----------------------------------------------------|
-| `@extends <type>`       | This type extends the named type.                   |
-| `@includeMixin <mixin>` | This type's documentation includes the named mixin. |
-
-- `<mixin>` should be the name of a 
+| Metadata Tag             | Meaning                                              |
+|--------------------------|------------------------------------------------------|
+| `@extends <type>`        | This type extends the named type.                    |
+| `@includeMixin <mixin>`  | This type's documentation includes the named mixin.  |
+| `%javaType <className>`  | The underlying Java type's full class name.          |
+| `%proxyType <className>` | The underlying Java `ProxyType`'s full class name.   |
+| `%enumConstants`         | **Enums Only**: Auto-populates the enum's constants. |
 
 The `@extends <type>` tag is used when this type extends (i.e., subclasses) 
 another script-visible type.  The `<type>` should be the name or qualified name 
@@ -325,13 +326,13 @@ of the enum and the enum's `@constant` entities. If the specific enum
 defines other static or instance methods, they can be included as well.
 
 If the Java enum is known to `joe doc`, the constants can be added
-automatically: use the `@enumValues` metadata tag to provide the
-enum's full Java class name.
+automatically: provide the `%javaType` and `%enumConstants` metadata tags: 
 
 ```java
 //**
 // @enum MyEnum
-// @enumValues my.project.MyEnum
+// %javaType my.project.MyEnum
+// %enumConstants
 // ... content ...
 ```
 
