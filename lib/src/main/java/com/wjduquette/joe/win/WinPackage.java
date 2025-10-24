@@ -3,8 +3,10 @@ package com.wjduquette.joe.win;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.types.EnumType;
 import javafx.geometry.*;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.nio.charset.StandardCharsets;
@@ -122,6 +124,17 @@ public class WinPackage extends NativePackage {
         type(new EnumType<>("HPos", HPos.class));
 
         //**
+        // @enum ContentDisplay
+        // @constant BOTTOM
+        // @constant CENTER
+        // @constant GRAPHIC_ONLY
+        // @constant LEFT
+        // @constant RIGHT
+        // @constant TEXT_ONLY
+        // @constant TOP
+        type(new EnumType<>("ContentDisplay", ContentDisplay.class));
+
+        //**
         // @enum Orientation
         // @constant HORIZONTAL
         // @constant VERTICAL
@@ -166,6 +179,14 @@ public class WinPackage extends NativePackage {
         // @constant RIGHT
         // @constant TOP
         type(new EnumType<>("Side", Side.class));
+
+        //**
+        // @enum TextAlignment
+        // @constant CENTER
+        // @constant JUSTIFY
+        // @constant LEFT
+        // @constant RIGHT
+        type(new EnumType<>("TextAlignment", TextAlignment.class));
 
         //**
         // @enum VPos

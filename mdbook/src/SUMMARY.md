@@ -100,6 +100,7 @@
   - [GUI API (joe.win)](./library/pkg.joe.win.md)
     - [Control Widget](library/type.joe.win.Control.md);
     - [Button Widget](library/type.joe.win.Button.md);
+    - [ContentDisplay Enum](library/type.joe.win.ContentDisplay.md);
     - [GridPane Widget](library/type.joe.win.GridPane.md);
     - [HBox Widget](library/type.joe.win.HBox.md);
     - [HPos Enum](library/type.joe.win.HPos.md);
@@ -123,6 +124,7 @@
     - [StackPane Widget](library/type.joe.win.StackPane.md);
     - [Tab Widget](library/type.joe.win.Tab.md);
     - [TabPane Widget](library/type.joe.win.TabPane.md);
+    - [TextAlignment Enum](library/type.joe.win.TextAlignment.md);
     - [VBox Widget](library/type.joe.win.VBox.md);
     - [VPos Widget](library/type.joe.win.VPos.md);
     - [Widget Widget](library/type.joe.win.Widget.md);

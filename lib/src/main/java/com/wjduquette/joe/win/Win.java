@@ -6,8 +6,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
+import javafx.scene.text.TextAlignment;
 
 /**
  * This static class defines a variety of services for widget types.
@@ -23,6 +25,18 @@ public class Win {
      */
     public static EventHandler<ActionEvent> toAction(Joe joe, Object arg) {
         return new JoeEventHandler<>(joe, arg);
+    }
+
+    /**
+     * Converts an argument to a ContentDisplay value.
+     * @param joe The interpreter
+     * @param arg the argument
+     * @return The value
+     * @throws JoeError on conversion failure.
+     */
+    @SuppressWarnings("unused")
+    public static ContentDisplay toContentDisplay(Joe joe, Object arg) {
+        return joe.toEnum(arg, ContentDisplay.class);
     }
 
     /**
@@ -67,6 +81,18 @@ public class Win {
      */
     public static Priority toPriority(Joe joe, Object arg) {
         return joe.toEnum(arg, Priority.class);
+    }
+
+    /**
+     * Converts an argument to a TextAlignment value.
+     * @param joe The interpreter
+     * @param arg the argument
+     * @return The value
+     * @throws JoeError on conversion failure.
+     */
+    @SuppressWarnings("unused")
+    public static TextAlignment toTextAlignment(Joe joe, Object arg) {
+        return joe.toEnum(arg, TextAlignment.class);
     }
 
     /**
