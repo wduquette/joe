@@ -324,6 +324,17 @@ A simple `@enum` doc comment will usually need to include only a description
 of the enum and the enum's `@constant` entities. If the specific enum
 defines other static or instance methods, they can be included as well.
 
+If the Java enum is known to `joe doc`, the constants can be added
+automatically: use the `@enumValues` metadata tag to provide the
+enum's full Java class name.
+
+```java
+//**
+// @enum MyEnum
+// @enumValues my.project.MyEnum
+// ... content ...
+```
+
 ### The `@widget` Entry
 
 The `@widget` entry is for JavaFX widgets. It is functionally equivalent 
