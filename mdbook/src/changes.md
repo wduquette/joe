@@ -10,6 +10,9 @@
   - In the Clark engine this corrupted the call stack so that execution 
     terminated early and mysteriously.
   - The corruption has been fixed, and such methods work properly.
+- Language
+    - Restored `@` as the property reference operator in instance
+      methods, replacing `.`, which proved to be highly confusing in practice.
 - Library
   - Experimental `joe.win` Package
     - Enhancements and cleanup 
