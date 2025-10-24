@@ -10,7 +10,7 @@ classes.
 ```joe
 class MarkdownBuffer extends TextBuilder {
     function h3(level, text) {
-        .println("\n### " + text);
+        this.println("\n### " + text);
     }
     ...
 }

@@ -119,10 +119,6 @@ The `++` and `--` operators work as they do in Java.
 
 ## Property Reference Operator
 
-The `.` operator is used in the usual way to access the fields and methods of 
-Joe values that properties, including class instances, records, and 
-various native values.
-
-In class and record instance methods a bare `.` operator can be used as a 
-synonym for `this.`, resulting in neater, more concise code. See
+The `@` operator can be used as a synonym for `this.` in class and record
+instance methods, resulting in neater, more concise code. See
 [Classes](classes.md) for details.
