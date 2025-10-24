@@ -18,9 +18,12 @@ class GridPaneClass extends WidgetType<GridPane> {
     // @package joe.win
     // @widget GridPane
     // @extends Pane
-    // The `GridPane` type is a [[Pane]] that positions its children within
-    // a grid of rows and columns.  Children can occupy a single cell or
-    // span multiple rows and/or columns. Joe classes can extend the
+    // %javaType com.wjduquette.joe.win.GridPaneInstance
+    // %proxyType com.wjduquette.joe.win.GridPaneClass
+    // The `GridPane` type is a [[Pane]], derived from the JavaFX
+    // [[java:javafx.scene.layout.GridPane]], that positions its children
+    // within a grid of rows and columns.  Children can occupy a single cell
+    // or span multiple rows and/or columns. Joe classes can extend the
     // `GridPane` type.
     public GridPaneClass() {
         super("GridPane");

@@ -4,10 +4,18 @@ inputFolder("../lib/src/main/resources/com/wjduquette/joe");
 outputFolder("src/library");
 
 // Javadoc roots
+javadocRoot("com.wjduquette.joe",            "javadoc/");
+javadocRoot("com.wjduquette.joe.console",    "javadoc/");
+javadocRoot("com.wjduquette.joe.tools.test", "javadoc/");
+javadocRoot("com.wjduquette.joe.types",      "javadoc/");
+javadocRoot("com.wjduquette.joe.win",        "javadoc/");
+
 var jdk = "https://docs.oracle.com/en/java/javase/21/docs/api/";
 javadocRoot("java.lang", jdk + "java.base/");
 javadocRoot("java.util", jdk + "java.base/");
 
 var jfx = "https://openjfx.io/javadoc/21/";
-javadocRoot("javafx.geometry",   jfx + "javafx.graphics/");
-javadocRoot("javafx.scene.text", jfx + "javafx.graphics/");
+javadocRoot("javafx.geometry",      jfx + "javafx.graphics/");
+javadocRoot("javafx.scene.control", jfx + "javafx.controls/");
+javadocRoot("javafx.scene.layout",  jfx + "javafx.graphics/");
+javadocRoot("javafx.scene.text",    jfx + "javafx.graphics/");

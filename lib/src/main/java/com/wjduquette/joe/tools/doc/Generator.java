@@ -235,7 +235,32 @@ class Generator {
             + mono(type.pkg().name())
             + ")");
 
+
         writeTypeHierarchy(out, type);
+
+        if (type.javaType() != null) {
+            var url = javaUrl(type.javaType());
+            var linkText = "`" + type.javaType() + "`";
+            out.print("**Java Type**: ");
+            if (url != null) {
+                out.print(link(linkText, url));
+            } else {
+                out.print(linkText);
+            }
+            out.println("<br>");
+        }
+
+        if (type.proxyType() != null) {
+            var url = javaUrl(type.proxyType());
+            var linkText = "`" + type.proxyType() + "`";
+            out.print("**Proxy Type**: ");
+            if (url != null) {
+                out.print(link(linkText, url));
+            } else {
+                out.print(linkText);
+            }
+            out.println("<br>");
+        }
         out.println();
         out.hline();
 
@@ -382,7 +407,7 @@ class Generator {
         if (!subtypes.isEmpty()) {
             out.print(" ← {" + subtypes + "}");
         }
-        out.println();
+        out.println("<br>");
     }
 
     private String supertypeLinks(TypeEntry type) {
@@ -598,17 +623,16 @@ class Generator {
             // NEXT, is this a javadoc link?
             if (mnemonic.startsWith("java:")) {
                 var className = mnemonic.substring(5);
-                var pkg = getPackageName(className);
-                var root = config.javadocRoots().get(pkg);
+                var url = javaUrl(className);
 
                 var linkText = tokens.length > 1
                     ? tokens[1] : className;
 
-                if (root == null) {
+                if (url == null) {
                     warn("Unknown Java package in '[[" + linkSpec + "]]");
                     buff.append(linkText);
                 } else {
-                    buff.append(link(linkText, javaLink(root, className)));
+                    buff.append(link(linkText, url));
                 }
             } else {
                 // FIRST, get the entity.  If not found, issue a warning and
@@ -636,7 +660,10 @@ class Generator {
         return className.substring(0, ndx);
     }
 
-    private String javaLink(String root, String className) {
+    private String javaUrl(String className) {
+        var pkg = getPackageName(className);
+        var root = config.javadocRoots().get(pkg);
+        if (root == null) return null;
         var separator = root.endsWith("/") ? "" : "/";
         return root + separator + className.replace(".", "/") + ".html";
     }

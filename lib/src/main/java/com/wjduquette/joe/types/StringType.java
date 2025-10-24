@@ -76,7 +76,7 @@ public class StringType extends ProxyType<String> {
     //
     // As with Java, the basic syntax is:
     //
-    //     %[flags][width][.precision][conversion]
+    // `%[flags][width][.precision][conversion]`
     //
     // ### Conversions
     //

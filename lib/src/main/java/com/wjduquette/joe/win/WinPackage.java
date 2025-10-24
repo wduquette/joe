@@ -118,29 +118,34 @@ public class WinPackage extends NativePackage {
 
         //**
         // @enum HPos
-        // @enumValues javafx.geometry.HPos
+        // %javaType javafx.geometry.HPos
+        // %enumConstants
         type(new EnumType<>("HPos", HPos.class));
 
         //**
         // @enum ContentDisplay
-        // @enumValues javafx.scene.control.ContentDisplay
+        // %javaType javafx.scene.control.ContentDisplay
+        // %enumConstants
         type(new EnumType<>("ContentDisplay", ContentDisplay.class));
 
         //**
         // @enum Orientation
-        // @enumValues javafx.geometry.Orientation
+        // %javaType javafx.geometry.Orientation
+        // %enumConstants
         type(new EnumType<>("Orientation", Orientation.class));
 
         //**
         // @enum Pos
-        // @enumValues javafx.geometry.Pos
+        // %javaType javafx.geometry.Pos
+        // %enumConstants
         // The `Pos` enum lists ways a widget can be aligned
         // relative to the boundaries of a rectangular space.
         type(new EnumType<>("Pos", Pos.class));
 
         //**
         // @enum Priority
-        // @enumValues javafx.scene.layout.Priority
+        // %javaType javafx.scene.layout.Priority
+        // %enumConstants
         // The `Priority` enum's values indicate when a widget
         // should resize itself to fit its parent widget.  The
         // default is generally `NEVER`.
@@ -148,18 +153,21 @@ public class WinPackage extends NativePackage {
 
         //**
         // @enum Side
-        // @enumValues javafx.geometry.Side
+        // %javaType javafx.geometry.Side
+        // %enumConstants
         // A `Side` of a rectangular region.
         type(new EnumType<>("Side", Side.class));
 
         //**
         // @enum TextAlignment
-        // @enumValues javafx.scene.text.TextAlignment
+        // %javaType javafx.scene.text.TextAlignment
+        // %enumConstants
         type(new EnumType<>("TextAlignment", TextAlignment.class));
 
         //**
         // @enum VPos
-        // @enumValues javafx.geometry.VPos
+        // %javaType javafx.geometry.VPos
+        // %enumConstants
         type(new EnumType<>("VPos", VPos.class));
     }
 

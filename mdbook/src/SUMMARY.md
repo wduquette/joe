@@ -98,9 +98,9 @@
     - [Console Type](library/type.joe.console.Console.md);
     - [Path Type](library/type.joe.console.Path.md);
   - [GUI API (joe.win)](./library/pkg.joe.win.md)
-    - [Control Widget](library/type.joe.win.Control.md);
     - [Button Widget](library/type.joe.win.Button.md);
     - [ContentDisplay Enum](library/type.joe.win.ContentDisplay.md);
+    - [Control Widget](library/type.joe.win.Control.md);
     - [GridPane Widget](library/type.joe.win.GridPane.md);
     - [HBox Widget](library/type.joe.win.HBox.md);
     - [HPos Enum](library/type.joe.win.HPos.md);
@@ -126,7 +126,7 @@
     - [TabPane Widget](library/type.joe.win.TabPane.md);
     - [TextAlignment Enum](library/type.joe.win.TextAlignment.md);
     - [VBox Widget](library/type.joe.win.VBox.md);
-    - [VPos Widget](library/type.joe.win.VPos.md);
+    - [VPos Enum](library/type.joe.win.VPos.md);
     - [Widget Widget](library/type.joe.win.Widget.md);
     - [Win Singleton](library/type.joe.win.Win.md);
   - [Library API Index](./library/index.md)

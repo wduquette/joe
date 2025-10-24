@@ -69,10 +69,12 @@ class DocCommentParser {
     private static final String ARGS = "@args";
     private static final String RESULT = "@result";
     private static final String TYPE = "@type";
+    private static final String JAVA_TYPE = "%javaType";
+    private static final String PROXY_TYPE = "%proxyType";
     private static final String CLASS = "@class";
     private static final String RECORD = "@record";
     private static final String ENUM = "@enum";
-    private static final String ENUM_VALUES = "@enumValues";
+    private static final String ENUM_CONSTANTS = "%enumConstants";
     private static final String WIDGET = "@widget";
     private static final String SINGLETON = "@singleton";
     private static final String TYPE_TOPIC = "@typeTopic";
@@ -312,11 +314,17 @@ class DocCommentParser {
 
             advance();
             switch (tag.name()) {
-                case ENUM_VALUES -> {
+                case JAVA_TYPE -> type.setJavaType(tag.value());
+                case PROXY_TYPE -> type.setProxyType(tag.value());
+                case ENUM_CONSTANTS -> {
                     if (kind != Kind.ENUM) {
                         throw error(previous(), "Unexpected tag: " + tag);
                     }
-                    addEnumConstants(type, tag.value());
+                    if (type.javaType() == null) {
+                        throw error(previous(),
+                            "%enumConstants requires %javaType, but %javaType is not set.");
+                    }
+                    addEnumConstants(type);
                 }
                 case EXTENDS -> type.setSupertypeName(_extends(tag));
                 case INCLUDE_MIXIN -> {
@@ -387,13 +395,14 @@ class DocCommentParser {
         type.methods().add(toString);
     }
 
-    private void addEnumConstants(TypeEntry type, String enumClass) {
+    private void addEnumConstants(TypeEntry type) {
         var loader = ClassLoader.getSystemClassLoader();
         Class<?> cls;
         try {
-            cls = loader.loadClass(enumClass);
+            cls = loader.loadClass(type.javaType());
         } catch (Exception ex) {
-            throw error(previous(), "Unknown class name: '" + enumClass + "'.");
+            throw error(previous(), "Enum type could not be loaded: '" +
+                type.javaType() + "'.");
         }
 
         if (cls.isEnum()) {
@@ -404,7 +413,7 @@ class DocCommentParser {
                 addConstant(type, c.toString(), "enum", "-");
             }
         } else {
-            throw error(previous(), "Not an enum: '" + enumClass + "'.");
+            throw error(previous(), "Not an enum: '" + type.javaType() + "'.");
         }
     }
 
