@@ -29,7 +29,7 @@ and methods, and so forth.
 - [Method Properties](#method-properties)
 - [The `toString` Method](#the-tostring-method)
 - [The Class Initializer](#the-class-initializer)
-- [The `.` Operator](#the--operator)
+- [The `@` Operator](#the--operator)
 - [Method References](#method-references)
 - [Superclasses and Inheritance](#superclasses-and-inheritance)
 - [Class Instances and Facts](#class-instances-and-facts)
@@ -114,28 +114,25 @@ var joe = Person("Joe", "Pro");
 The `init` method can be called directly on an instance to reinitialize
 the object, but this is rarely done.
 
-## The `.` Operator
+## The `@` Operator
 
-Joe requires that instance properties (i.e., fields and methods) are referred 
-to relative to the instance using the `.` operator, e.g.,
-`myObject.x, this.x`.  However, the constant repetition of `this.` in 
-instant methods yields cluttered, noisy looking code.  As a convenience,
-then, a bare `.` operator is treated as equivalent to `this.` in instance 
-methods:
+In instance methods, the `@` operator is treated as equivalent to `this.`. For
+example, `@x` is equivalent to `this.x` and `@myMethod()` is equivalent to
+`this.myMethod()`.  Using `@` results in cleaner, more easily readable code:
 
 ```joe
 class Person {
     method init(first, last) {
-        .first = first;
-        .last = last;
+        @first = first;
+        @last = last;
     }
     
     method fullname() {
-        return .first + " " + .last; 
+        return @first + " " + @last; 
     }
     
     method greet(greeting) {
-        return greeting + ", " + .fullname() + "!";
+        return greeting + ", " + @fullname() + "!";
     }
 }
 ```
