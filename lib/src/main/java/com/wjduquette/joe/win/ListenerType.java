@@ -43,7 +43,7 @@ class ListenerType extends ProxyType<Listener> {
 
     //**
     // @method toString
-    // @result joe.String
+    // %result joe.String
     // Gets the listener's string representation.
     private Object _toString(Listener listener, Joe joe, Args args) {
         args.exactArity(0, "toString()");

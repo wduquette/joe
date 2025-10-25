@@ -67,8 +67,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @static of
-    // @args items...
-    // @result List
+    // %args items...
+    // %result List
     // Creates a list containing the arguments.
     private Object _of(Joe joe, Args args) {
         return args.asList();
@@ -79,9 +79,9 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @init
-    // @args
-    // @args other
-    // @args size, [initValue]
+    // %args
+    // %args other
+    // %args size, [initValue]
     // Creates a new list as a copy of the *other* list, or as an empty
     // list of the given *size*.  The list elements will be filled with the
     // *initValue*, or with null if *initValue* is omitted.
@@ -135,8 +135,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method add
-    // @args [index], item
-    // @result this
+    // %args [index], item
+    // %result this
     // Adds the item to the list at the given *index*, which defaults
     // to the end of the list.
     private Object _add(JoeList list, Joe joe, Args args) {
@@ -156,8 +156,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method addAll
-    // @args [index], collection
-    // @result this
+    // %args [index], collection
+    // %result this
     // Adds all items in the *collection* to the list at the
     // given *index*, which defaults to the end of the list.
     private Object _addAll(JoeList list, Joe joe, Args args) {
@@ -177,7 +177,7 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method clear
-    // @result this
+    // %result this
     // Removes all items from the list.
     private Object _clear(JoeList list, Joe joe, Args args) {
         args.exactArity(0, "clear()");
@@ -187,8 +187,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method contains
-    // @args value
-    // @result Boolean
+    // %args value
+    // %result Boolean
     // Returns `true` if the list contains the *value*, and `false`
     // otherwise.
     private Object _contains(JoeList list, Joe joe, Args args) {
@@ -198,8 +198,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method containsAll
-    // @args collection
-    // @result Boolean
+    // %args collection
+    // %result Boolean
     // Returns `true` if the list contains all the values in
     // the *collection*, and `false` otherwise.
     private Object _containsAll(JoeList list, Joe joe, Args args) {
@@ -212,7 +212,7 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method copy
-    // @result List
+    // %result List
     // Returns a shallow copy of the list.
     private Object _copy(JoeList list, Joe joe, Args args) {
         args.exactArity(0, "copy()");
@@ -221,8 +221,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method filter
-    // @args predicate
-    // @result List
+    // %args predicate
+    // %result List
     // Returns a list containing the elements for which the filter
     // *predicate* is true.
     private Object _filter(JoeList list, Joe joe, Args args) {
@@ -240,8 +240,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method find
-    // @args predicate, [start]
-    // @result List
+    // %args predicate, [start]
+    // %result List
     // Searches for the first list item for which the predicate is true.
     // If found, returns a list `[`*index*, *item*`]`; otherwise returns
     // null.  If *start* is provided, the search starts at the *start*
@@ -262,8 +262,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method get
-    // @args index
-    // @result value
+    // %args index
+    // %result value
     // Returns the value at the given *index*.
     private Object _get(JoeList list, Joe joe, Args args) {
         args.exactArity(1, "get(index)");
@@ -272,7 +272,7 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method getFirst
-    // @result value
+    // %result value
     // Returns the first value in the list.  It's an error if
     // the list is empty.
     private Object _getFirst(JoeList list, Joe joe, Args args) {
@@ -286,7 +286,7 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method getLast
-    // @result value
+    // %result value
     // Returns the last value in the list.  It's an error if
     // the list is empty.
     private Object _getLast(JoeList list, Joe joe, Args args) {
@@ -300,8 +300,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method indexOf
-    // @args value
-    // @result Number
+    // %args value
+    // %result Number
     // Returns the index of the first occurrence of the *value* in
     // the list, or -1 if not found.
     private Object _indexOf(JoeList list, Joe joe, Args args) {
@@ -311,7 +311,7 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method isEmpty
-    // @result Boolean
+    // %result Boolean
     // Returns `true` if the list is empty, and `false` otherwise.
     private Object _isEmpty(JoeList list, Joe joe, Args args) {
         args.exactArity(0, "isEmpty()");
@@ -320,8 +320,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method lastIndexOf
-    // @args value
-    // @result Number
+    // %args value
+    // %result Number
     // Returns the index of the last occurrence of the *value* in
     // the list, or -1 if not found.
     private Object _lastIndexOf(JoeList list, Joe joe, Args args) {
@@ -331,8 +331,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method map
-    // @args func
-    // @result List
+    // %args func
+    // %result List
     // Returns a list containing the items that result from applying
     // function *func* to each item in this list.
     private Object _map(JoeList list, Joe joe, Args args) {
@@ -348,7 +348,7 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method peekFirst
-    // @result value
+    // %result value
     // Returns the first value in the list, or null if
     // the list is empty.
     private Object _peekFirst(JoeList list, Joe joe, Args args) {
@@ -362,7 +362,7 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method peekLast
-    // @result value
+    // %result value
     // Returns the last value in the list, or null if
     // the list is empty.
     private Object _peekLast(JoeList list, Joe joe, Args args) {
@@ -377,8 +377,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method remove
-    // @args value
-    // @result Boolean
+    // %args value
+    // %result Boolean
     // Removes the *value* from the list if it's present.  Returns
     // `true` if the item was removed, and `false` if it was not
     // present
@@ -389,8 +389,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method removeAll
-    // @args collection
-    // @result Boolean
+    // %args collection
+    // %result Boolean
     // Removes all items in the list that are found in the *collection*.
     // Returns `true` if any items were removed, `false` otherwise.
     private Object _removeAll(JoeList list, Joe joe, Args args) {
@@ -401,8 +401,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method removeAt
-    // @args index
-    // @result value
+    // %args index
+    // %result value
     // Removes and returns the value at the given *index*.
     private Object _removeAt(JoeList list, Joe joe, Args args) {
         args.exactArity(1, "remove(index)");
@@ -411,7 +411,7 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method removeFirst
-    // @result value
+    // %result value
     // Removes and returns the first value in the list.  It's an error if
     // the list is empty.
     private Object _removeFirst(JoeList list, Joe joe, Args args) {
@@ -425,7 +425,7 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method removeLast
-    // @result value
+    // %result value
     // Removes and returns the last value in the list.  It's an error if
     // the list is empty.
     private Object _removeLast(JoeList list, Joe joe, Args args) {
@@ -439,7 +439,7 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method reverse
-    // @result List
+    // %result List
     // Returns a reversed copy of the list.
     private Object _reversed(JoeList list, Joe joe, Args args) {
         args.exactArity(0, "reversed()");
@@ -448,8 +448,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method set
-    // @args index, newValue
-    // @result oldValue
+    // %args index, newValue
+    // %result oldValue
     // Puts the *value* at the given *index*, returning the
     // *oldValue* at that index.
     private Object _set(JoeList list, Joe joe, Args args) {
@@ -462,7 +462,7 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method size
-    // @result Number
+    // %result Number
     // Returns the number of items in the list.
     private Object _size(JoeList list, Joe joe, Args args) {
         args.exactArity(0, "size()");
@@ -471,8 +471,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method sorted
-    // @args [comparator]
-    // @result List
+    // %args [comparator]
+    // %result List
     // Returns a list, sorted in ascending order.  If no *comparator*
     // is provided, the list must be a list of strings or a list
     // of numbers.  If a *comparator* is given, it must be a function
@@ -504,8 +504,8 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method sublist
-    // @args start, [end]
-    // @result List
+    // %args start, [end]
+    // %result List
     // Returns the sublist of this list that starts at *start*
     // and ends before *end*, which defaults to the end of the list.
     private Object _sublist(JoeList list, Joe joe, Args args) {
@@ -522,7 +522,7 @@ public class ListType extends ProxyType<JoeList> {
 
     //**
     // @method toString
-    // @result String
+    // %result String
     // Returns the string representation of this list.
     private Object _toString(JoeList list, Joe joe, Args args) {
         args.exactArity(0, "toString()");

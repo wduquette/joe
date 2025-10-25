@@ -14,7 +14,7 @@ class MenuBarType extends WidgetType<MenuBar> {
     //**
     // @package joe.win
     // @widget MenuBar
-    // @extends Control
+    // %extends Control
     // The `MenuBar` type represents a horizontal menu bar.
     public MenuBarType() {
         super("MenuBar");
@@ -39,7 +39,7 @@ class MenuBarType extends WidgetType<MenuBar> {
 
     //**
     // @init
-    // @args [text]
+    // %args [text]
     // Returns a `MenuBar`.
     private Object _initializer(Joe joe, Args args) {
         args.exactArity(0, "MenuBar()");
@@ -51,8 +51,8 @@ class MenuBarType extends WidgetType<MenuBar> {
 
     //**
     // @method menu
-    // @args menu
-    // @result this
+    // %args menu
+    // %result this
     // Adds a [[Menu]] to the menu bar.
     private Object _menu(MenuBar bar, Joe joe, Args args) {
         args.exactArity(1, "menu(menu)");
@@ -63,7 +63,7 @@ class MenuBarType extends WidgetType<MenuBar> {
 
     //**
     // @method menus
-    // @result joe.List
+    // %result joe.List
     // Gets the list of the menu bar's menus, which can be updated freely.
     // All items must be instances of [[Menu]].
     private Object _menus(MenuBar bar, Joe joe, Args args) {

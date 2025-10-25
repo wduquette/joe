@@ -53,7 +53,7 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @static of
-    // @args values...
+    // %args values...
     // Creates a `Set` of the argument values.
     private Object _of(Joe joe, Args args) {
         return new SetValue(args.asList());
@@ -64,7 +64,7 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @init
-    // @args [other]
+    // %args [other]
     // Creates a `Set`, optionally populating it with the items from the
     // *other* collection.
     private Object _init(Joe joe, Args args) {
@@ -93,8 +93,8 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method add
-    // @args value
-    // @result Boolean
+    // %args value
+    // %result Boolean
     // Adds the *value* to the set, returning true if it wasn't already present.
     private Object _add(JoeSet set, Joe joe, Args args) {
         args.exactArity(1, "add(value)");
@@ -104,8 +104,8 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method addAll
-    // @args collection
-    // @result Boolean
+    // %args collection
+    // %result Boolean
     // Adds the content of the *collection* to this set.
     private Object _addAll(JoeSet set, Joe joe, Args args) {
         args.exactArity(1, "addAll(collection)");
@@ -120,7 +120,7 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method clear
-    // @result this
+    // %result this
     // Empties the set.
     private Object _clear(JoeSet set, Joe joe, Args args) {
         args.exactArity(0, "clear()");
@@ -131,8 +131,8 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method contains
-    // @args value
-    // @result Boolean
+    // %args value
+    // %result Boolean
     // Returns `true` if the set contains the *value*, and `false` otherwise.
     private Object _contains(JoeSet set, Joe joe, Args args) {
         args.exactArity(1, "contains(value)");
@@ -142,8 +142,8 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method containsAll
-    // @args collection
-    // @result Boolean
+    // %args collection
+    // %result Boolean
     // Returns `true` if the set contains the values in the
     // *collection*, and `false` otherwise.
     private Object _containsAll(JoeSet set, Joe joe, Args args) {
@@ -155,7 +155,7 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method copy
-    // @result Set
+    // %result Set
     // Returns a shallow copy of this set.
     private Object _copy(JoeSet set, Joe joe, Args args) {
         args.exactArity(0, "copy()");
@@ -165,8 +165,8 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method filter
-    // @args predicate
-    // @result Set
+    // %args predicate
+    // %result Set
     // Returns a list containing the elements for which the filter
     // *predicate* is true.
     private Object _filter(JoeSet set, Joe joe, Args args) {
@@ -184,7 +184,7 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method isEmpty
-    // @result Boolean
+    // %result Boolean
     // Returns `true` if the set is empty, and `false` otherwise.
     private Object _isEmpty(JoeSet set, Joe joe, Args args) {
         args.exactArity(0, "isEmpty()");
@@ -194,8 +194,8 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method map
-    // @args func
-    // @result Set
+    // %args func
+    // %result Set
     // Returns a set containing the items that result from applying
     // function *func* to each item in this set.
     private Object _map(JoeSet set, Joe joe, Args args) {
@@ -212,8 +212,8 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method remove
-    // @args value
-    // @result Boolean
+    // %args value
+    // %result Boolean
     // Removes the value, return `true` if it was present and `false`
     // otherwise.
     private Object _remove(JoeSet set, Joe joe, Args args) {
@@ -224,8 +224,8 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method removeAll
-    // @args collection
-    // @result Boolean
+    // %args collection
+    // %result Boolean
     // Removes all values in the *collection* from the set, returning `true`
     // if the set changed and `false` otherwise.
     private Object _removeAll(JoeSet set, Joe joe, Args args) {
@@ -241,7 +241,7 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method size
-    // @result Number
+    // %result Number
     // Returns the number of values in the set.
     private Object _size(JoeSet set, Joe joe, Args args) {
         args.exactArity(0, "size()");
@@ -251,8 +251,8 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method sorted
-    // @args [comparator]
-    // @result List
+    // %args [comparator]
+    // %result List
     // Returns a list of the set's items, sorted in ascending order.  If
     // no *comparator* is provided, then this set must be a set of
     // strings or numbers.  If a *comparator* is given, it must be a function
@@ -279,7 +279,7 @@ public class SetType extends ProxyType<JoeSet> {
 
     //**
     // @method toString
-    // @result String
+    // %result String
     // Returns the set's string representation.
     private Object _toString(JoeSet set, Joe joe, Args args) {
         args.exactArity(0, "toString()");

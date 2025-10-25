@@ -235,7 +235,32 @@ class Generator {
             + mono(type.pkg().name())
             + ")");
 
+
         writeTypeHierarchy(out, type);
+
+        if (type.javaType() != null) {
+            var url = javaUrl(type.javaType());
+            var linkText = "`" + type.javaType() + "`";
+            out.print("**Java Type**: ");
+            if (url != null) {
+                out.print(link(linkText, url));
+            } else {
+                out.print(linkText);
+            }
+            out.println("<br>");
+        }
+
+        if (type.proxyType() != null) {
+            var url = javaUrl(type.proxyType());
+            var linkText = "`" + type.proxyType() + "`";
+            out.print("**Proxy Type**: ");
+            if (url != null) {
+                out.print(link(linkText, url));
+            } else {
+                out.print(linkText);
+            }
+            out.println("<br>");
+        }
         out.println();
         out.hline();
 
@@ -382,7 +407,7 @@ class Generator {
         if (!subtypes.isEmpty()) {
             out.print(" ← {" + subtypes + "}");
         }
-        out.println();
+        out.println("<br>");
     }
 
     private String supertypeLinks(TypeEntry type) {
@@ -580,38 +605,67 @@ class Generator {
             buff.append(head, 0, ndx);
             head = head.substring(ndx);
 
-            // Check for incomplete link
+            // NEXT, for incomplete link
             var tail = head.indexOf("]]");
             if (tail == -1) {
                 buff.append(head);
                 return buff.toString();
             }
 
-            // Next, extract the entire mnemonic.
+            // NEXT, extract the entire mnemonic.
             var linkSpec = head.substring(2, tail);
             head = head.substring(tail + 2);
 
-            // Next, look for link text.
+            // NEXT, look for link text.
             var tokens = linkSpec.split("\\|");
             var mnemonic = tokens[0];
 
-            // NEXT, get the entity.  If not found, issue a warning and
-            // leave a placeholder.
-            var entry = lookupMnemonic(mnemonic);
-            if (entry == null) {
-                // Leave it in place; it's incorrect.
-                warn("Unknown mnemonic in link: [[" + mnemonic + "]]");
-                buff.append("[[").append(linkSpec).append("]]");
-            } else {
+            // NEXT, is this a javadoc link?
+            if (mnemonic.startsWith("java:")) {
+                var className = mnemonic.substring(5);
+                var url = javaUrl(className);
+
                 var linkText = tokens.length > 1
-                    ? tokens[1]
-                    : inlineLinkText(entry);
-                buff.append(link(linkText, entry.url()));
+                    ? tokens[1] : className;
+
+                if (url == null) {
+                    warn("Unknown Java package in '[[" + linkSpec + "]]");
+                    buff.append(linkText);
+                } else {
+                    buff.append(link(linkText, url));
+                }
+            } else {
+                // FIRST, get the entity.  If not found, issue a warning and
+                // leave a placeholder.
+                var entry = lookupMnemonic(mnemonic);
+                if (entry == null) {
+                    // Leave it in place; it's incorrect.
+                    warn("Unknown mnemonic in link: [[" + mnemonic + "]]");
+                    buff.append("[[").append(linkSpec).append("]]");
+                } else {
+                    var linkText = tokens.length > 1
+                        ? tokens[1]
+                        : inlineLinkText(entry);
+                    buff.append(link(linkText, entry.url()));
+                }
             }
         }
 
         buff.append(head);
         return buff.toString();
+    }
+
+    private String getPackageName(String className) {
+        var ndx = className.lastIndexOf(".");
+        return className.substring(0, ndx);
+    }
+
+    private String javaUrl(String className) {
+        var pkg = getPackageName(className);
+        var root = config.javadocRoots().get(pkg);
+        if (root == null) return null;
+        var separator = root.endsWith("/") ? "" : "/";
+        return root + separator + className.replace(".", "/") + ".html";
     }
 
     private Entry lookupMnemonic(String mnemonic) {

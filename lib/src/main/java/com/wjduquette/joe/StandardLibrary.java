@@ -10,7 +10,7 @@ class StandardLibrary extends NativePackage {
 
         //**
         // @package joe
-        // @title Joe Standard Library
+        // %title Joe Standard Library
         // The `joe` package contains Joe's standard library.
         function("catch",     this::_catch);
         function("print",     this::_print);
@@ -38,13 +38,13 @@ class StandardLibrary extends NativePackage {
 
     //**
     // @packageTopic joe
-    // @title Why "Joe"?
+    // %title Why "Joe"?
     // My friend Joe's a straight shooter, and never misses his mark.
 
     //**
     // @function catch
-    // @args callable
-    // @result CatchResult
+    // %args callable
+    // %result CatchResult
     // Executes the callable, which must not require any arguments.
     // Returns a [[CatchResult]] indicating success or failure and providing
     // the returned result or the error message respectively.
@@ -63,7 +63,7 @@ class StandardLibrary extends NativePackage {
 
     //**
     // @function print
-    // @args text
+    // %args text
     // Prints its text to standard output (which might be
     // redirected by the application).
     private Object _print(Joe joe, Args args) {
@@ -75,7 +75,7 @@ class StandardLibrary extends NativePackage {
 
     //**
     // @function printf
-    // @args fmt, [values...]
+    // %args fmt, [values...]
     // Formats its arguments given the *fmt* string, and prints the result
     // to standard output (which might be redirected by the application).
     //
@@ -91,7 +91,7 @@ class StandardLibrary extends NativePackage {
 
     //**
     // @function println
-    // @args [text]
+    // %args [text]
     // Prints its text followed by a line separator to standard output
     // (which might be redirected by the application).
     private Object _println(Joe joe, Args args) {

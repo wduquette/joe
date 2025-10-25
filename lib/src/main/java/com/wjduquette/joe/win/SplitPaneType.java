@@ -20,7 +20,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     //**
     // @package joe.win
     // @widget SplitPane
-    // @extends Control
+    // %extends Control
     // The `SplitPane` type manages one or more [[Node]] widgets with
     // movable dividers between them.
     //
@@ -42,7 +42,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
         //**
         // @property orientation Orientation
         // `#horizontal` or `#vertical`
-        fxProperty("orientation", SplitPane::orientationProperty, WinPackage::toOrientation);
+        fxProperty("orientation", SplitPane::orientationProperty, Win::toOrientation);
 
         // Methods
         method("getDividers",      this::_getDividers);
@@ -59,8 +59,8 @@ class SplitPaneType extends WidgetType<SplitPane> {
 
     //**
     // @static isResizableWithParent
-    // @args node
-    // @result joe.Boolean
+    // %args node
+    // %result joe.Boolean
     // Gets whether the [[Node]] will resize itself to fill its region in
     // its parent `SplitPane`.
     private Object _isResizableWithParent(Joe joe, Args args) {
@@ -70,7 +70,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
 
     //**
     // @static setResizableWithParent
-    // @args node, flag
+    // %args node, flag
     // Sets whether the [[Node]] will resize itself to fill its region in
     // its parent `SplitPane`.
     private Object _setResizableWithParent(Joe joe, Args args) {
@@ -97,7 +97,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
 
     //**
     // @method getDividers
-    // @result joe.List
+    // %result joe.List
     // Returns a list of the divider positions, which are fractions
     // between 0.0 and 1.0.
     private Object _getDividers(SplitPane node, Joe joe, Args args) {
@@ -107,7 +107,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
 
     //**
     // @method horizontal
-    // @result this
+    // %result this
     // Sets the orientation to horizontal
     private Object _horizontal(SplitPane node, Joe joe, Args args) {
         args.exactArity(0, "horizontal()");
@@ -117,8 +117,8 @@ class SplitPaneType extends WidgetType<SplitPane> {
 
     //**
     // @method item
-    // @args item
-    // @result this
+    // %args item
+    // %result this
     // Adds a value to the widget's list of [[Node]] widgets.
     private Object _item(SplitPane node, Joe joe, Args args) {
         args.exactArity(1, "item(item)");
@@ -128,7 +128,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
 
     //**
     // @method items
-    // @result joe.List
+    // %result joe.List
     // Gets the list of the widget's items, which can be updated freely.
     // All items must be [[Node]] widgets.
     private Object _items(SplitPane node, Joe joe, Args args) {
@@ -138,8 +138,8 @@ class SplitPaneType extends WidgetType<SplitPane> {
 
     //**
     // @method setDivider
-    // @args index position
-    // @result this
+    // %args index position
+    // %result this
     // Sets the value of divider with the given *index* to the given
     // position.
     private Object _setDivider(SplitPane node, Joe joe, Args args) {
@@ -152,8 +152,8 @@ class SplitPaneType extends WidgetType<SplitPane> {
 
     //**
     // @method setDividers
-    // @args position,...
-    // @result this
+    // %args position,...
+    // %result this
     // Sets the value of all dividers to the given positions.
     private Object _setDividers(SplitPane node, Joe joe, Args args) {
         args.minArity(1, "setDividers(positions)");
@@ -175,7 +175,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
 
     //**
     // @method vertical
-    // @result this
+    // %result this
     // Sets the orientation to vertical
     private Object _vertical(SplitPane node, Joe joe, Args args) {
         args.exactArity(0, "vertical()");

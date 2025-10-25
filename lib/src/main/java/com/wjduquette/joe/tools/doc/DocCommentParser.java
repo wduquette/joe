@@ -4,6 +4,7 @@ package com.wjduquette.joe.tools.doc;
 import com.wjduquette.joe.Joe;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -60,22 +61,28 @@ class DocCommentParser {
     //-------------------------------------------------------------------------
     // Parser
 
+    // Tags starting with "@" begin new entries.
+    // Tags starting with "%" are metadata for the current entry.
+
     private static final String MIXIN = "@mixin";
     private static final String PACKAGE = "@package";
-    private static final String TITLE = "@title";
+    private static final String TITLE = "%title";
     private static final String PACKAGE_TOPIC = "@packageTopic";
     private static final String FUNCTION = "@function";
-    private static final String ARGS = "@args";
-    private static final String RESULT = "@result";
+    private static final String ARGS = "%args";
+    private static final String RESULT = "%result";
     private static final String TYPE = "@type";
+    private static final String JAVA_TYPE = "%javaType";
+    private static final String PROXY_TYPE = "%proxyType";
     private static final String CLASS = "@class";
     private static final String RECORD = "@record";
     private static final String ENUM = "@enum";
+    private static final String ENUM_CONSTANTS = "%enumConstants";
     private static final String WIDGET = "@widget";
     private static final String SINGLETON = "@singleton";
     private static final String TYPE_TOPIC = "@typeTopic";
-    private static final String INCLUDE_MIXIN = "@includeMixin";
-    private static final String EXTENDS = "@extends";
+    private static final String INCLUDE_MIXIN = "%includeMixin";
+    private static final String EXTENDS = "%extends";
     private static final String CONSTANT = "@constant";
     private static final String STATIC = "@static";
     private static final String INIT = "@init";
@@ -310,6 +317,18 @@ class DocCommentParser {
 
             advance();
             switch (tag.name()) {
+                case JAVA_TYPE -> type.setJavaType(tag.value());
+                case PROXY_TYPE -> type.setProxyType(tag.value());
+                case ENUM_CONSTANTS -> {
+                    if (kind != Kind.ENUM) {
+                        throw error(previous(), "Unexpected tag: " + tag);
+                    }
+                    if (type.javaType() == null) {
+                        throw error(previous(),
+                            "%enumConstants requires %javaType, but %javaType is not set.");
+                    }
+                    addEnumConstants(type);
+                }
                 case EXTENDS -> type.setSupertypeName(_extends(tag));
                 case INCLUDE_MIXIN -> {
                     type.mixins().add(_includeMixin(tag));
@@ -377,6 +396,40 @@ class DocCommentParser {
             Returns the name of the enumerated constant.
             """);
         type.methods().add(toString);
+    }
+
+    private void addEnumConstants(TypeEntry type) {
+        var loader = ClassLoader.getSystemClassLoader();
+        Class<?> cls;
+        try {
+            cls = loader.loadClass(type.javaType());
+        } catch (Exception ex) {
+            throw error(previous(), "Enum type could not be loaded: '" +
+                type.javaType() + "'.");
+        }
+
+        if (cls.isEnum()) {
+            var constants = new ArrayList<>(List.of(cls.getEnumConstants()));
+            var first = constants.removeFirst();
+            addConstant(type, first.toString(), "enum", "See Javadoc for details.");
+            for (var c : constants) {
+                addConstant(type, c.toString(), "enum", "-");
+            }
+        } else {
+            throw error(previous(), "Not an enum: '" + type.javaType() + "'.");
+        }
+    }
+
+    private void addConstant(
+        TypeEntry type,
+        String name,
+        String valueType,
+        String description
+    ) {
+        var constant = new ConstantEntry(type, name, valueType);
+        constant.content().add(description);
+        type.constants().add(constant);
+        remember(constant);
     }
 
     private String _extends(Tag tag) {

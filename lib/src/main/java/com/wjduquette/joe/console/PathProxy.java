@@ -52,7 +52,7 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @init
-    // @args first,[more...]
+    // %args first,[more...]
     // Creates a path from one or more string components.
     private Object _initializer(Joe joe, Args args) {
         args.minArity(1, "Path(first,[more...])");
@@ -76,8 +76,8 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @static compare
-    // @args a, b
-    // @result Number
+    // %args a, b
+    // %result Number
     // Returns -1, 0, or 1 as *a* is less than, equal to, or greater
     // than *b* when compared lexicographically.
     private Object _compare(Joe joe, Args args) {
@@ -93,8 +93,8 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method endsWith
-    // @args path
-    // @result Boolean
+    // %args path
+    // %result Boolean
     // Returns `true` if this path ends with the given *path*.  The
     // *path* may be specified as a `Path` or a `String`.
     private Object _endsWith(Path path, Joe joe, Args args) {
@@ -104,7 +104,7 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method getFileName
-    // @result Path
+    // %result Path
     // Returns the final path component, i.e., the name of
     // the file or directory denoted by this path.
     private Object _getFileName(Path path, Joe joe, Args args) {
@@ -114,8 +114,8 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method getName
-    // @args index
-    // @result Path
+    // %args index
+    // %result Path
     // Returns the path component at the given *index*.
     private Object _getName(Path path, Joe joe, Args args) {
         args.exactArity(1, "getName(index)");
@@ -125,7 +125,7 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method getNameCount
-    // @result Number
+    // %result Number
     // Returns the number of path components.
     private Object _getNameCount(Path path, Joe joe, Args args) {
         args.exactArity(0, "getNameCount");
@@ -134,7 +134,7 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method getParent
-    // @result Path
+    // %result Path
     // Returns the parent of this path, or null if it doesn't have one.
     private Object _getParent(Path path, Joe joe, Args args) {
         args.exactArity(0, "getParent()");
@@ -143,7 +143,7 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method isAbsolute
-    // @result Boolean
+    // %result Boolean
     // Returns `true` if the path is an absolute path, and `false`
     // otherwise.
     private Object _isAbsolute(Path path, Joe joe, Args args) {
@@ -153,7 +153,7 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method normalize
-    // @result Path
+    // %result Path
     // Returns the path with redundant name elements eliminated.
     private Object _normalize(Path path, Joe joe, Args args) {
         args.exactArity(0, "normalize()");
@@ -162,8 +162,8 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method relativize
-    // @args other
-    // @result Path
+    // %args other
+    // %result Path
     // Returns a relative path from this path to the *other* path.
     //
     // The *other* path may a `Path` or a `String`.
@@ -174,8 +174,8 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method resolve
-    // @args other
-    // @result Path
+    // %args other
+    // %result Path
     // Resolves the *other* path against this path, if *other* is
     // relative, constructs a path starting with this path and
     // continuing with the other.  If *other* is absolute, it is
@@ -189,8 +189,8 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method startsWith
-    // @args path
-    // @result Boolean
+    // %args path
+    // %result Boolean
     // Returns `true` if this path starts with the given *path*.  The
     // *path* may be specified as a `Path` or a `String`.
     private Object _startsWith(Path path, Joe joe, Args args) {
@@ -200,8 +200,8 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method subpath
-    // @args start, [end]
-    // @result Path
+    // %args start, [end]
+    // %result Path
     // Returns the subpath of this path that starts at *start*
     // and ends before *end*, which defaults to the end of the path.
     private Object _subpath(Path path, Joe joe, Args args) {
@@ -222,7 +222,7 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method toAbsolutePath
-    // @result Path
+    // %result Path
     // Converts the path into an absolute path.
     private Object _toAbsolutePath(Path path, Joe joe, Args args) {
         args.exactArity(0, "toAbsolutePath()");
@@ -231,7 +231,7 @@ public class PathProxy extends ProxyType<Path> {
 
     //**
     // @method toString
-    // @result String
+    // %result String
     // Returns the path's string representation.
     private Object _toString(Path path, Joe joe, Args args) {
         args.exactArity(0, "toString()");

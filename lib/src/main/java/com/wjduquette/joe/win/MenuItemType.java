@@ -15,7 +15,7 @@ class MenuItemType extends WidgetType<MenuItem> {
     //**
     // @package joe.win
     // @widget MenuItem
-    // @extends Widget
+    // %extends Widget
     // The `MenuItem` widget is an item in a [[Menu]].
     public MenuItemType() {
         super("MenuItem");
@@ -70,8 +70,8 @@ class MenuItemType extends WidgetType<MenuItem> {
 
     //**
     // @method action
-    // @args callable
-    // @result this
+    // %args callable
+    // %result this
     // Adds a *callable/0* to the button as its `#onAction` handler; pressing
     // the button will invoke the callable.
     private Object _action(MenuItem item, Joe joe, Args args) {
@@ -82,8 +82,8 @@ class MenuItemType extends WidgetType<MenuItem> {
 
     //**
     // @method disable
-    // @args [flag]
-    // @result this
+    // %args [flag]
+    // %result this
     // Sets the item's `#disable` property to *flag*; if omitted,
     // *flag* defaults to `true`.  While `true`, this item and its
     // descendants in the scene graph will be disabled.
@@ -96,8 +96,8 @@ class MenuItemType extends WidgetType<MenuItem> {
 
     //**
     // @method id
-    // @args id
-    // @result this
+    // %args id
+    // %result this
     // Sets the item's `#id` property to the given *id* string.
     private Object _id(MenuItem item, Joe joe, Args args) {
         args.exactArity(1, "id(id)");
@@ -108,7 +108,7 @@ class MenuItemType extends WidgetType<MenuItem> {
 
     //**
     // @method isDisabled
-    // @result joe.Boolean
+    // %result joe.Boolean
     // Returns `true` if the item has been disabled, and `false` otherwise.
     private Object _isDisabled(MenuItem item, Joe joe, Args args) {
         args.exactArity(0, "isDisabled()");
@@ -117,8 +117,8 @@ class MenuItemType extends WidgetType<MenuItem> {
 
     //**
     // @method onAction
-    // @args callable
-    // @result this
+    // %args callable
+    // %result this
     // Adds a *callable/1* to the item as its `#onAction` handler;
     // selecting the item will invoke the callable, passing it the JavaFX
     // `ActionEvent`.  Action event handlers rarely need the `ActionEvent`,
@@ -132,7 +132,7 @@ class MenuItemType extends WidgetType<MenuItem> {
 
     //**
     // @method styleClasses
-    // @result joe.List
+    // %result joe.List
     // Gets the list of the item's FXCSS style class names.  Values must
     // be valid CSS style class names.
     //
@@ -144,8 +144,8 @@ class MenuItemType extends WidgetType<MenuItem> {
 
     //**
     // @method styles
-    // @args style, ...
-    // @result this
+    // %args style, ...
+    // %result this
     // Sets the item's FXCSS `#style` property.  The caller can pass
     // multiple style strings, which will be joined with semicolons.
     //
@@ -161,8 +161,8 @@ class MenuItemType extends WidgetType<MenuItem> {
 
     //**
     // @method text
-    // @args text
-    // @result this
+    // %args text
+    // %result this
     // Sets the item's text.
     private Object _text(MenuItem item, Joe joe, Args args) {
         args.exactArity(1, "text(text)");

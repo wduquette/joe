@@ -54,7 +54,7 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @static of
-    // @args values...
+    // %args values...
     // Creates a `Map` of the argument values, which must be a flat list of
     // key/value pairs.
     private Object _of(Joe joe, Args args) {
@@ -77,7 +77,7 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @init
-    // @args [other]
+    // %args [other]
     // Creates a new `Map`, optionally initializing it with the entries from
     // the *other* map.
     private Object _init(Joe joe, Args args) {
@@ -113,7 +113,7 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method clear
-    // @result this
+    // %result this
     // Empties the map.
     private Object _clear(JoeMap map, Joe joe, Args args) {
         args.exactArity(0, "clear()");
@@ -124,8 +124,8 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method containsKey
-    // @args key
-    // @result Boolean
+    // %args key
+    // %result Boolean
     // Returns `true` if the map contains the *key*, and `false` otherwise.
     private Object _containsKey(JoeMap map, Joe joe, Args args) {
         args.exactArity(1, "containsKey(key)");
@@ -135,8 +135,8 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method containsValue
-    // @args value
-    // @result Boolean
+    // %args value
+    // %result Boolean
     // Returns `true` if the map has at least one key with the given
     // *value*, and `false` otherwise.
     private Object _containsValue(JoeMap map, Joe joe, Args args) {
@@ -147,7 +147,7 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method copy
-    // @result Map
+    // %result Map
     // Returns a shallow copy of this map.
     private Object _copy(JoeMap map, Joe joe, Args args) {
         args.exactArity(0, "copy()");
@@ -157,8 +157,8 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method get
-    // @args key
-    // @result value
+    // %args key
+    // %result value
     // Gets the *key*'s value, or null if the key is not found.
     private Object _get(JoeMap map, Joe joe, Args args) {
         args.exactArity(1, "get(key)");
@@ -168,8 +168,8 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method getOrDefault
-    // @args key, defaultValue
-    // @result value
+    // %args key, defaultValue
+    // %result value
     // Gets the *key*'s value, or the *defaultValue* if the key is not found.
     private Object _getOrDefault(JoeMap map, Joe joe, Args args) {
         args.exactArity(2, "getOrDefault(key, defaultValue)");
@@ -179,7 +179,7 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method isEmpty
-    // @result Boolean
+    // %result Boolean
     // Returns `true` if the map is empty, and `false` otherwise.
     private Object _isEmpty(JoeMap map, Joe joe, Args args) {
         args.exactArity(0, "isEmpty()");
@@ -189,7 +189,7 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method keySet
-    // @result Set
+    // %result Set
     // Returns a set of the keys in the map.
     private Object _keySet(JoeMap map, Joe joe, Args args) {
         args.exactArity(0, "keySet()");
@@ -199,8 +199,8 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method put
-    // @args key, value
-    // @result value
+    // %args key, value
+    // %result value
     // Adds the *key/*value* pair to the map, returning the replaced value.
     private Object _put(JoeMap map, Joe joe, Args args) {
         args.exactArity(2, "put(key, value)");
@@ -210,8 +210,8 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method putAll
-    // @args map
-    // @result this
+    // %args map
+    // %result this
     // Adds the content of the map to this map.
     private Object _putAll(JoeMap map, Joe joe, Args args) {
         args.exactArity(1, "putAll(map)");
@@ -228,8 +228,8 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method remove
-    // @args key
-    // @result value
+    // %args key
+    // %result value
     // Removes and returns the *key*'s value, or null if the key wasn't found.
     private Object _remove(JoeMap map, Joe joe, Args args) {
         args.exactArity(1, "remove(key)");
@@ -239,7 +239,7 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method size
-    // @result Number
+    // %result Number
     // Returns the number of key/value pairs in the map.
     private Object _size(JoeMap map, Joe joe, Args args) {
         args.exactArity(0, "size()");
@@ -249,7 +249,7 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method toString
-    // @result String
+    // %result String
     // Returns the map's string representation.
     private Object _toString(JoeMap map, Joe joe, Args args) {
         args.exactArity(0, "toString()");
@@ -259,7 +259,7 @@ public class MapType extends ProxyType<JoeMap> {
 
     //**
     // @method values
-    // @result List
+    // %result List
     // Returns a list of the values in the map.
     private Object _values(JoeMap map, Joe joe, Args args) {
         args.exactArity(0, "values()");

@@ -9,84 +9,108 @@ class JoeDocPackage extends NativePackage {
 
     //**
     // @package joe.doc
-    // @title JoeDoc Configuration API
+    // %title JoeDoc Configuration API
     // The `joe.doc` package contains the Joe API used in
     // the `joe doc` configuration file, `doc_config.joe`.
     public JoeDocPackage(DocConfig config) {
         super("joe.doc");
         this.config = config;
-        type(new DocConfigProxy());
+
+        function("expand",        this::_expand);
+        function("inputFile",     this::_inputFile);
+        function("inputFolder",   this::_inputFolder);
+        function("javadocRoot",   this::_javadocRoot);
+        function("outputFolder",  this::_outputFolder);
     }
 
-    private class DocConfigProxy extends ProxyType<Void> {
-        //---------------------------------------------------------------------
-        // Instance Variables
+    //**
+    // @function expand
+    // %args sourceFile, destFile
+    // Adds the paths of a *sourceFile* to be expanded into a *destFile*
+    // after all input files has been processed.  The paths are relative
+    // to the `<docConfig>/src` folder, where `<docConfig>` is the
+    // location of the `doc_config.joe` file.
+    private Object _expand(Joe joe, Args args) {
+        args.exactArity(2, "expand(sourceFile, destFile)");
+        var srcFolder = Path.of("src").toAbsolutePath();
+        var sourceFile = srcFolder.resolve(joe.toString(args.next()));
+        var destFile = srcFolder.resolve(joe.toString(args.next()));
+        config.filePairs().add(new DocConfig.FilePair(sourceFile, destFile));
+        return null;
+    }
 
+    //**
+    // @function inputFile
+    // %args filename,...
+    // Adds the paths of one or more files to scan for JoeDoc
+    // comments.  File paths are relative to the location of the
+    // `doc_config.joe` file.
+    private Object _inputFile(Joe joe, Args args) {
+        args.minArity(1, "inputFile(filename, ...)");
 
-        //---------------------------------------------------------------------
-        // Constructor
-
-        //**
-        // @type DocConfig
-        // The `DocConfig` static type owns the static methods used to
-        // configure the `joe doc` tool.
-        public DocConfigProxy() {
-            super("DocConfig");
-            staticType();
-
-            staticMethod("inputFile",    this::_inputFile);
-            staticMethod("inputFolder",  this::_inputFolder);
-            staticMethod("outputFolder", this::_outputFolder);
+        for (var name : args.asList()) {
+            config.inputFiles().add(Path.of(joe.toString(name)));
         }
+        return null;
+    }
 
-        //**
-        // @static inputFile
-        // @args filename,...
-        // @result this
-        // Adds the paths of one or more files to scan for JoeDoc
-        // comments.  File paths are relative to the location of the
-        // `doc_config.joe` file.
-        private Object _inputFile(Joe joe, Args args) {
-            args.minArity(1, "inputFile(filename, ...)");
+    //**
+    // @function inputFolder
+    // %args folder,...
+    // Adds the paths of one or more folders to scan for files
+    // containing JoeDoc comments. `joe doc` will scan all
+    // `.java` and `.joe` files in the folders, recursing down
+    // into subfolders.
+    //
+    // Folder paths are relative to the location of the
+    // `doc_config.joe` file.
+    private Object _inputFolder(Joe joe, Args args) {
+        args.minArity(1, "inputFolder(folder, ...)");
 
-            for (var name : args.asList()) {
-                config.inputFiles().add(Path.of(joe.toString(name)));
-            }
-            return this;
+        for (var name : args.asList()) {
+            config.inputFolders().add(Path.of(joe.toString(name)));
         }
+        return null;
+    }
 
-        //**
-        // @static inputFolder
-        // @args folder,...
-        // @result this
-        // Adds the paths of one or more folders to scan for files
-        // containing JoeDoc comments. `joe doc` will scan all
-        // `.java` and `.joe` files in the folders, recursing down
-        // into subfolders.
-        //
-        // Folder paths are relative to the location of the
-        // `doc_config.joe` file.
-        private Object _inputFolder(Joe joe, Args args) {
-            args.minArity(1, "inputFolder(folder, ...)");
+    //**
+    // @function javadocRoot
+    // %args pkg, root
+    // Specifies the Javadoc URL *root* for the named package.
+    // The *root* may be an HTTP URL, or a file path relative
+    // to the mdBook `docs/` folder.
+    //
+    // ```joe
+    // var jdk = "https://docs.oracle.com/en/java/javase/21/docs/api/";
+    // javadocPrefix("java.lang", jdk + "java.base/");
+    // javadocPrefix("java.util", jdk + "java.base/");
+    //
+    // // Project javadoc is copied to docs/javadoc/
+    // javadocPrefix("my.package", "javadoc/");
+    // ```
+    //
+    // Given this prefix, `joe doc` can convert class names
+    // in the *pkg* to JavaDoc links.
+    private Object _javadocRoot(Joe joe, Args args) {
+        args.minArity(1, "javadocRoot(pkg, prefix)");
+        config.javadocRoots().put(
+            joe.toString(args.next()),
+            joe.toString(args.next())
+        );
+        return null;
+    }
 
-            for (var name : args.asList()) {
-                config.inputFolders().add(Path.of(joe.toString(name)));
-            }
-            return this;
-        }
+    //**
+    // @function outputFolder
+    // %args folder
+    // Sets the name of the folder to receive the generated outputs.
+    // If unset, defaults to the folder containing the `doc_config.joe`
+    // file.
+    private Object _outputFolder(Joe joe, Args args) {
+        args.exactArity(1, "outputFolder(folder)");
 
-        //**
-        // @static outputFolder
-        // @args folder
-        // @result this
-        // Sets the name of the folder to receive the generated outputs.
-        // If unset, defaults to the folder containing the `doc_config.joe`
-        // file.
-        private Object _outputFolder(Joe joe, Args args) {
-            args.exactArity(1, "outputFolder(folder)");
-
-            config.setOutputFolder(Path.of(joe.toString(args.next())));
-            return this;
-        }
+        config.setOutputFolder(Path.of(joe.toString(args.next())));
+        return null;
     }
 }
+

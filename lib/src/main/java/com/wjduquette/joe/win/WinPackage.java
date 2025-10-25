@@ -31,7 +31,7 @@ public class WinPackage extends NativePackage {
     // It assumes a familiarity with JavaFX.
     //
     // @packageTopic hierarchy
-    // @title Widget Hierarchy
+    // %title Widget Hierarchy
     //
     // The `joe.win` widget type hierarchy is a subset of the JavaFX Java
     // class hierarchy.
@@ -58,7 +58,7 @@ public class WinPackage extends NativePackage {
     //   - [[Tab]]: A tab in a [[TabPane]]
     //
     // @packageTopic css
-    // @title Styling with CSS
+    // %title Styling with CSS
     //
     // Scripts can style widgets using CSS in several different ways.
     //
@@ -118,82 +118,56 @@ public class WinPackage extends NativePackage {
 
         //**
         // @enum HPos
-        // @constant CENTER
-        // @constant LEFT
-        // @constant RIGHT
+        // %javaType javafx.geometry.HPos
+        // %enumConstants
         type(new EnumType<>("HPos", HPos.class));
 
         //**
         // @enum ContentDisplay
-        // @constant BOTTOM
-        // @constant CENTER
-        // @constant GRAPHIC_ONLY
-        // @constant LEFT
-        // @constant RIGHT
-        // @constant TEXT_ONLY
-        // @constant TOP
+        // %javaType javafx.scene.control.ContentDisplay
+        // %enumConstants
         type(new EnumType<>("ContentDisplay", ContentDisplay.class));
 
         //**
         // @enum Orientation
-        // @constant HORIZONTAL
-        // @constant VERTICAL
+        // %javaType javafx.geometry.Orientation
+        // %enumConstants
         type(new EnumType<>("Orientation", Orientation.class));
 
         //**
         // @enum Pos
+        // %javaType javafx.geometry.Pos
+        // %enumConstants
         // The `Pos` enum lists ways a widget can be aligned
         // relative to the boundaries of a rectangular space.
-        //
-        // @constant BASELINE_CENTER
-        // @constant BASELINE_LEFT
-        // @constant BASELINE_RIGHT
-        // @constant BOTTOM_CENTER
-        // @constant BOTTOM_LEFT
-        // @constant BOTTOM_RIGHT
-        // @constant CENTER
-        // @constant CENTER_LEFT
-        // @constant CENTER_RIGHT
-        // @constant TOP_CENTER
-        // @constant TOP_LEFT
-        // @constant TOP_RIGHT
         type(new EnumType<>("Pos", Pos.class));
 
         //**
         // @enum Priority
+        // %javaType javafx.scene.layout.Priority
+        // %enumConstants
         // The `Priority` enum's values indicate when a widget
         // should resize itself to fit its parent widget.  The
         // default is generally `NEVER`.
-        //
-        // @constant ALWAYS
-        // @constant SOMETIMES
-        // @constant NEVER
         type(new EnumType<>("Priority", Priority.class));
 
         //**
         // @enum Side
+        // %javaType javafx.geometry.Side
+        // %enumConstants
         // A `Side` of a rectangular region.
-        //
-        // @constant BOTTOM
-        // @constant LEFT
-        // @constant RIGHT
-        // @constant TOP
         type(new EnumType<>("Side", Side.class));
 
         //**
         // @enum TextAlignment
-        // @constant CENTER
-        // @constant JUSTIFY
-        // @constant LEFT
-        // @constant RIGHT
+        // %javaType javafx.scene.text.TextAlignment
+        // %enumConstants
         type(new EnumType<>("TextAlignment", TextAlignment.class));
 
         //**
         // @enum VPos
-        // @constant BASELINE
-        // @constant BOTTOM
-        // @constant CENTER
-        // @constant TOP
+        // %javaType javafx.geometry.VPos
+        // %enumConstants
         type(new EnumType<>("VPos", VPos.class));
     }
 
@@ -229,8 +203,8 @@ public class WinPackage extends NativePackage {
 
         //**
         // @static css
-        // @args css
-        // @result this
+        // %args css
+        // %result this
         // Sets the text of the CSS style sheet for the application as a
         // whole to *css*.  For example,
         //
@@ -260,8 +234,8 @@ public class WinPackage extends NativePackage {
 
         //**
         // @static cssFile
-        // @args filename
-        // @result this
+        // %args filename
+        // %result this
         // Sets the CSS style sheet for the application as a whole given
         // a path to a `.css` file.
         //
@@ -285,7 +259,7 @@ public class WinPackage extends NativePackage {
 
         //**
         // @static root
-        // @result VBox
+        // %result VBox
         // Returns the root window, a [[VBox]].
         private Object _root(Joe joe, Args args) {
             args.exactArity(0, "Win.root()");
@@ -294,8 +268,8 @@ public class WinPackage extends NativePackage {
 
         //**
         // @static setSize
-        // @args width, height
-        // @result this
+        // %args width, height
+        // %result this
         // Sets the preferred size of the root window.  The width and height
         // must be positive.
         private Object _setSize(Joe joe, Args args) {
@@ -312,8 +286,8 @@ public class WinPackage extends NativePackage {
 
         //**
         // @static setTitle
-        // @args title
-        // @result this
+        // %args title
+        // %result this
         // Sets the title of the root window.
         private Object _setTitle(Joe joe, Args args) {
             args.exactArity(1, "Win.setTitle(title)");
@@ -321,34 +295,5 @@ public class WinPackage extends NativePackage {
             stage.setTitle(title);
             return this;
         }
-    }
-
-    //-------------------------------------------------------------------------
-    // Static converters for use with properties
-
-    @SuppressWarnings("unused")
-    static HPos toHPos(Joe joe, Object arg) {
-        return joe.toEnum(arg, HPos.class);
-    }
-
-    static Insets toInsets(Joe joe, Object arg) {
-        return joe.toClass(arg, Insets.class);
-    }
-
-    static Orientation toOrientation(Joe joe, Object arg) {
-        return joe.toEnum(arg, Orientation.class);
-    }
-
-    static int toSpan(Joe joe, Object arg) {
-        var span = joe.toInteger(arg);
-        if (span <= 0) {
-            throw joe.expected("positive span", arg);
-        }
-        return span;
-    }
-
-    @SuppressWarnings("unused")
-    static VPos toVPos(Joe joe, Object arg) {
-        return joe.toEnum(arg, VPos.class);
     }
 }

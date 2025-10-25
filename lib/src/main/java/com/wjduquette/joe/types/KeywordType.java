@@ -41,7 +41,7 @@ public class KeywordType extends ProxyType<Keyword> {
 
     //**
     // @init
-    // @args name
+    // %args name
     // Creates a new keyword given its name, without or without
     // the leading `#`.
     private Object _init(Joe joe, Args args) {
@@ -66,7 +66,7 @@ public class KeywordType extends ProxyType<Keyword> {
 
     //**
     // @method name
-    // @result String
+    // %result String
     // Gets the keyword's name, omitting the leading `#`.
     private Object _name(Keyword keyword, Joe joe, Args args) {
         args.exactArity(0, "name()");
@@ -75,7 +75,7 @@ public class KeywordType extends ProxyType<Keyword> {
 
     //**
     // @method toString
-    // @result String
+    // %result String
     // Gets the keyword's string representation, including the leading `#`.
     private Object _toString(Keyword keyword, Joe joe, Args args) {
         args.exactArity(0, "toString()");

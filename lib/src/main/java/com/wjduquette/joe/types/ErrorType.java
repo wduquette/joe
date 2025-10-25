@@ -49,7 +49,7 @@ public class ErrorType extends ProxyType<JoeError> {
 
     //**
     // @init
-    // @args message, [trace, ...]
+    // %args message, [trace, ...]
     // Creates an `Error` with the given *message* and optional information
     // trace messages.
     private Object _initializer(Joe joe, Args args) {
@@ -68,8 +68,8 @@ public class ErrorType extends ProxyType<JoeError> {
 
     //**
     // @method addInfo
-    // @args message
-    // @result this
+    // %args message
+    // %result this
     // Adds an information message to the list of traces.
     private Object _addInfo(JoeError error, Joe joe, Args args) {
         args.exactArity(1, "addInfo(message)");
@@ -78,7 +78,7 @@ public class ErrorType extends ProxyType<JoeError> {
 
     //**
     // @method javaStackTrace
-    // @result String
+    // %result String
     // Returns the complete error, including the initial error messages
     // and all stack frames.
     private Object _javaStackTrace(JoeError error, Joe joe, Args args) {
@@ -88,7 +88,7 @@ public class ErrorType extends ProxyType<JoeError> {
 
     //**
     // @method message
-    // @result text
+    // %result text
     // Gets the actual error message
     private Object _message(JoeError error, Joe joe, Args args) {
         args.exactArity(0, "message()");
@@ -97,7 +97,7 @@ public class ErrorType extends ProxyType<JoeError> {
 
     //**
     // @method stackTrace
-    // @result String
+    // %result String
     // Returns the complete error, including the initial error messages
     // and all stack frames.
     private Object _stackTrace(JoeError error, Joe joe, Args args) {
@@ -107,7 +107,7 @@ public class ErrorType extends ProxyType<JoeError> {
 
     //**
     // @method traces
-    // @result List
+    // %result List
     // Returns the list of trace strings.  Clients may add to the list
     // using [[Error#method.addInfo]].
     // and rethrow the error.
@@ -121,7 +121,7 @@ public class ErrorType extends ProxyType<JoeError> {
 
     //**
     // @method type
-    // @result name
+    // %result name
     // Gets the name of the concrete error type.
     private Object _type(JoeError error, Joe joe, Args args) {
         args.exactArity(0, "type()");

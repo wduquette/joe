@@ -14,12 +14,13 @@ class ControlType extends WidgetType<Control> {
     //**
     // @package joe.win
     // @widget Control
-    // @extends Region
+    // %extends Region
+    // %javaType javafx.scene.control.Control
     // The `Control` type is the base class for JavaFX
     // controls like the [[Label]] and [[Button]] widgets.
     //
     // @typeTopic tooltips
-    // @title Tooltip Text
+    // %title Tooltip Text
     // The JavaFX `Tooltip` is a popup window with many properties.  For the
     // moment `Control` only supports `Tooltips` with a simple text string,
     // and so has a `#tooltipText` property but not a `#tooltip` property.
@@ -43,8 +44,8 @@ class ControlType extends WidgetType<Control> {
 
     //**
     // @method tooltipText
-    // @args text
-    // @result this
+    // %args text
+    // %result this
     // Gives the control a tooltip with the given *text*.
     private Object _tooltipText(Control node, Joe joe, Args args) {
         args.exactArity(1, "tooltipText(text)");

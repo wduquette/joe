@@ -15,7 +15,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     //**
     // @package joe.win
     // @widget ListView
-    // @extends Control
+    // %extends Control
     // The `ListView` type is a JavaFX scrolling list widget.
     // Joe classes can extend the `ListView` type.
     public ListViewClass() {
@@ -87,8 +87,8 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method formatter
-    // @args callable
-    // @result this
+    // %args callable
+    // %result this
     // Sets the widget's `#formatter` to the given *callable*, which
     // must take one argument, a list item, and return a string
     // representation for that item.  The returned string will be displayed
@@ -102,7 +102,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method getSelectedIndex
-    // @result joe.Number
+    // %result joe.Number
     // Gets the index of the selected item, or -1 if there is no selection.
     private Object _getSelectedIndex(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(0, "getSelectedIndex()");
@@ -111,7 +111,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method getSelectedItem
-    // @result item
+    // %result item
     // Gets the selected item, or `null` if there is no selection.
     private Object _getSelectedItem(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(0, "getSelectedItem()");
@@ -120,8 +120,8 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method item
-    // @args item
-    // @result this
+    // %args item
+    // %result this
     // Adds a value to the widget's list of items.
     private Object _item(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(1, "item(item)");
@@ -131,7 +131,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method items
-    // @result joe.List
+    // %result joe.List
     // Gets the list of the widget's items, which can be updated freely.
     private Object _items(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(0, "items()");
@@ -140,8 +140,8 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method onSelect
-    // @args callable
-    // @result this
+    // %args callable
+    // %result this
     // Sets the widget's `#onSelect` handler.  The *callable* will be called
     // when the user selects an item in the list.  The callable will be
     // passed one argument, the selected item, or null if there is no
@@ -154,8 +154,8 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method placeholder
-    // @args node
-    // @result this
+    // %args node
+    // %result this
     // Sets the widget's placeholder graphic, a [[Node]] to display when
     // the widget's [[ListView#method.items]] list is empty.
     private Object _placeholder(ListViewInstance node, Joe joe, Args args) {
@@ -166,8 +166,8 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method placeholderText
-    // @args text
-    // @result this
+    // %args text
+    // %result this
     // Sets the widget's placeholder graphic to a label displaying
     // the given text. The placeholder is shown when
     // the widget's [[ListView#method.items]] list is empty.
@@ -179,8 +179,8 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method selectIndex
-    // @args index
-    // @result this
+    // %args index
+    // %result this
     // Selects the item at the given *index*.  Throws an error if the
     // index is not in range.
     private Object _selectIndex(ListViewInstance node, Joe joe, Args args) {
@@ -192,8 +192,8 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method selectItem
-    // @args item
-    // @result this
+    // %args item
+    // %result this
     // Selects the given *item*.  The call is a no-op if the *item*
     // isn't contained in the widget's list of items.
     private Object _selectItem(ListViewInstance node, Joe joe, Args args) {
@@ -204,8 +204,8 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
     //**
     // @method setItems
-    // @args list
-    // @result this
+    // %args list
+    // %result this
     // Replaces the `ListView`'s items with the contents of the *list*.
     private Object _setItems(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(1, "setItems(list)");

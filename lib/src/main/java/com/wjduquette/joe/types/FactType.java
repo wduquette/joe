@@ -155,7 +155,7 @@ public class FactType extends ProxyType<Fact> {
 
     //**
     // @static of
-    // @args relation, fields
+    // %args relation, fields
     // Creates a new ordered `Fact` given the relation and a list of
     // field values. Its fields will be named `f0`, `f1`, etc.
     //
@@ -169,7 +169,7 @@ public class FactType extends ProxyType<Fact> {
 
     //**
     // @static ofMap
-    // @args relation, fieldMap
+    // %args relation, fieldMap
     // Creates a new unordered `Fact` given the relation and the field map.
     // Its fields will have the names given as keys in the map.
     //
@@ -188,7 +188,7 @@ public class FactType extends ProxyType<Fact> {
 
     //**
     // @static ofPairs
-    // @args relation, pairs
+    // %args relation, pairs
     // Creates a new ordered `Fact` given a flat list of field name/value
     // pairs. Its fields will have the names given in the list.
     //
@@ -218,7 +218,7 @@ public class FactType extends ProxyType<Fact> {
 
     //**
     // @init
-    // @args relation, field, ...
+    // %args relation, field, ...
     // Creates a new `Fact` given the relation and one or more the
     // field values. Its fields will be named `f0`, `f1`, etc.
     //
@@ -235,7 +235,7 @@ public class FactType extends ProxyType<Fact> {
 
     //**
     // @method fieldMap
-    // @result Map
+    // %result Map
     // Returns a read-only map of the field values.
     private Object _fieldMap(Fact value, Joe joe, Args args) {
         args.exactArity(0, "fieldMap()");
@@ -244,7 +244,7 @@ public class FactType extends ProxyType<Fact> {
 
     //**
     // @method fields
-    // @result List
+    // %result List
     // Returns a read-only list of the field values, if the fact
     // [[Fact#method.isOrdered]].
     private Object _fields(Fact value, Joe joe, Args args) {
@@ -258,7 +258,7 @@ public class FactType extends ProxyType<Fact> {
 
     //**
     // @method isOrdered
-    // @result Boolean
+    // %result Boolean
     // Returns true if the fact has ordered fields, and false otherwise.
     private Object _isOrdered(Fact value, Joe joe, Args args) {
         args.exactArity(0, "isOrdered()");
@@ -267,7 +267,7 @@ public class FactType extends ProxyType<Fact> {
 
     //**
     // @method relation
-    // @result String
+    // %result String
     // Returns the Fact's relation name.
     private Object _relation(Fact value, Joe joe, Args args) {
         args.exactArity(0, "relation()");
@@ -276,7 +276,7 @@ public class FactType extends ProxyType<Fact> {
 
     //**
     // @method toString
-    // @result String
+    // %result String
     // Returns the value's string representation.
     private Object _toString(Fact value, Joe joe, Args args) {
         args.exactArity(0, "toString()");

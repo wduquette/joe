@@ -24,7 +24,7 @@ public class AssertErrorType extends ProxyType<AssertError> {
         //**
         // @package joe
         // @type AssertError
-        // @extends Error
+        // %extends Error
         // The `AssertError` type represents an exception thrown during the
         // execution of a `Joe` script by the `assert` statement, or
         // created by the `joe.test` package to represent a test value. A
@@ -49,7 +49,7 @@ public class AssertErrorType extends ProxyType<AssertError> {
 
     //**
     // @init
-    // @args message, [trace, ...]
+    // %args message, [trace, ...]
     // Creates an `AssertError` with the given *message* and informational
     // trace messages.
     private Object _initializer(Joe joe, Args args) {

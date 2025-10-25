@@ -13,9 +13,11 @@ class TypeEntry extends Entry implements TypeOrMixin {
     // The type's kind.
     private final Kind kind;
 
+    private String supertypeName = null;
+    private String javaType = null;
+    private String proxyType = null;
     private final List<ConstantEntry> constants = new ArrayList<>();
     private final List<StaticMethodEntry> staticMethods = new ArrayList<>();
-    private String supertypeName = null;
     private InitializerEntry initializer = null;
     private final List<FieldEntry> fields = new ArrayList<>();
     private final List<PropertyEntry> properties = new ArrayList<>();
@@ -39,6 +41,8 @@ class TypeEntry extends Entry implements TypeOrMixin {
 
     public List<ConstantEntry>     constants()     { return constants; }
     public List<StaticMethodEntry> staticMethods() { return staticMethods; }
+    public String                  javaType()      { return javaType; }
+    public String                  proxyType()     { return proxyType; }
     public String                  supertypeName() { return supertypeName; }
     public InitializerEntry        initializer()   { return initializer; }
     public List<PropertyEntry>     properties()    { return properties; }
@@ -59,6 +63,14 @@ class TypeEntry extends Entry implements TypeOrMixin {
         this.supertypeName = supertypeName;
     }
 
+    public void setJavaType(String className) {
+        this.javaType = className;
+    }
+
+    public void setProxyType(String className) {
+        this.proxyType = className;
+    }
+
     public void setInitializer(InitializerEntry initializer) {
         this.initializer = initializer;
     }
@@ -73,7 +85,7 @@ class TypeEntry extends Entry implements TypeOrMixin {
             var newContent = new ArrayList<String>();
             copyContent(mixin.content(), newContent);
 
-            // Insert the new content where the @includeMixin tag was
+            // Insert the new content where the %includeMixin tag was
             // found.
             var ndx = content().indexOf("<mixin " + mixin.name() + ">");
             if (ndx == -1) {

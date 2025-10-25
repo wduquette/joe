@@ -35,8 +35,8 @@ class InsetsType extends ProxyType<Insets> {
 
     //**
     // @init
-    // @args pixels
-    // @args top, right, bottom, left
+    // %args pixels
+    // %args top, right, bottom, left
     // Returns a `Insets`, which represents a margin on the four sides
     // of a [[Node]].  If a single value *pixels* is given, the margin will
     // be the same on all four sides; otherwise, the initializer expects
@@ -60,7 +60,7 @@ class InsetsType extends ProxyType<Insets> {
 
     //**
     // @method getBottom
-    // @result Number
+    // %result Number
     // Gets the width of the margin on the bottom of the node, in pixels.
     private Object _getBottom(Insets insets, Joe joe, Args args) {
         args.exactArity(0, "getBottom()");
@@ -69,7 +69,7 @@ class InsetsType extends ProxyType<Insets> {
 
     //**
     // @method getLeft
-    // @result Number
+    // %result Number
     // Gets the width of the margin on the left of the node, in pixels.
     private Object _getLeft(Insets insets, Joe joe, Args args) {
         args.exactArity(0, "getLeft()");
@@ -78,7 +78,7 @@ class InsetsType extends ProxyType<Insets> {
 
     //**
     // @method getRight
-    // @result Number
+    // %result Number
     // Gets the width of the margin on the right of the node, in pixels.
     private Object _getRight(Insets insets, Joe joe, Args args) {
         args.exactArity(0, "getRight()");
@@ -87,7 +87,7 @@ class InsetsType extends ProxyType<Insets> {
 
     //**
     // @method getTop
-    // @result Number
+    // %result Number
     // Gets the width of the margin on the top of the node, in pixels.
     private Object _getTop(Insets insets, Joe joe, Args args) {
         args.exactArity(0, "getTop()");

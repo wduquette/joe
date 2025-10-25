@@ -25,7 +25,7 @@ public class TestPackage extends NativePackage {
 
     //**
     // @package joe.test
-    // @title Joe Test Tool API
+    // %title Joe Test Tool API
     // This package defines the test assertions and checkers that are available
     // for use in `joe test` test suites.
     //
@@ -61,7 +61,7 @@ public class TestPackage extends NativePackage {
 
     //**
     // @function assertEQ
-    // @args got, expected
+    // %args got, expected
     // Verifies that *got* equals the *expected* value, producing an
     // informative assertion error if not.
     private Object _assertEQ(Joe joe, Args args) {
@@ -80,7 +80,7 @@ public class TestPackage extends NativePackage {
 
     //**
     // @function assertError
-    // @args callable, [message], [frames...]
+    // %args callable, [message], [frames...]
     // Executes a *callable* expecting it to throw an error and
     // failing the test if it does not.  The error must have the
     // given *message* and stack *frames*, if they are provided.
@@ -139,7 +139,7 @@ public class TestPackage extends NativePackage {
 
     //**
     // @function assertF
-    // @args condition
+    // %args condition
     // Verifies that *condition* is falsey, producing an
     // informative assertion error if not.
     private Object _assertF(Joe joe, Args args) {
@@ -156,7 +156,7 @@ public class TestPackage extends NativePackage {
 
     //**
     // @function assertT
-    // @args condition
+    // %args condition
     // Verifies that *condition* is truthy, producing an
     // informative assertion error if not.
     private Object _assertT(Joe joe, Args args) {
@@ -173,7 +173,7 @@ public class TestPackage extends NativePackage {
 
     //**
     // @function engine
-    // @result String
+    // %result String
     // Returns the name of the engine in use, "walker" or "bert".
     private Object _engine(Joe joe, Args args) {
         args.exactArity(0, "engine()");
@@ -182,7 +182,7 @@ public class TestPackage extends NativePackage {
 
     //**
     // @function fail
-    // @args message
+    // %args message
     // Throws an assertion error with the given *message*, failing the
     // test immediately.
     private Object _fail(Joe joe, Args args) {
@@ -192,7 +192,7 @@ public class TestPackage extends NativePackage {
 
     //**
     // @function skip
-    // @args message
+    // %args message
     // Skips the current test with the given message without executing it
     // further.  The test will be counted as "Skipped" in the final test
     // results.
@@ -203,7 +203,7 @@ public class TestPackage extends NativePackage {
 
     //**
     // @function typedValue
-    // @args value
+    // %args value
     // Outputs the value's type and value for display.  Collections are output in
     // readable format.
     private Object _typedValue(Joe joe, Args args) {

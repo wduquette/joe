@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * A base ProxyType for JavaFX widgets, including support for JavaFX
  * properties.  Proxies for JavaFX types like Node and MenuItem
- * should use subclass WidgetType and use the {@code @extends Widget}
+ * should use subclass WidgetType and use the {@code %extends Widget}
  * JoeDoc tag.
  * @param <W> The proxied widget type
  */
@@ -41,7 +41,7 @@ public class WidgetType<W> extends ProxyType<W> {
     // no direct equivalent to this type in the JavaFX class hierarchy.
     //
     // @typeTopic properties
-    // @title JavaFX Properties
+    // %title JavaFX Properties
     //
     // A JavaFX property is a widget attribute implemented in terms of a JavaFX
     // `Property` object.  A `Property`'s value can be set and retrieved, and
@@ -270,8 +270,8 @@ public class WidgetType<W> extends ProxyType<W> {
 
     //**
     // @method get
-    // @args keyword
-    // @result value
+    // %args keyword
+    // %result value
     // Gets the value of the property with the given *keyword*.
     private Object _get(W widget, Joe joe, Args args) {
         args.exactArity(1, "get(keyword)");
@@ -280,7 +280,7 @@ public class WidgetType<W> extends ProxyType<W> {
 
     //**
     // @method getProperties
-    // @result joe.Set
+    // %result joe.Set
     // Returns a readonly `Set` of the object's property keywords.
     private Object _getProperties(W obj, Joe joe, Args args) {
         args.exactArity(0, "getProperties()");
@@ -289,8 +289,8 @@ public class WidgetType<W> extends ProxyType<W> {
 
     //**
     // @method listenTo
-    // @args keyword, callable
-    // @result Listener
+    // %args keyword, callable
+    // %result Listener
     // Adds a listener *callable* to the property with the given *keyword*,
     // returning a [[Listener]]; use the [[Listener]]'s `cancel()` method
     // to stop listening to the property.
@@ -316,8 +316,8 @@ public class WidgetType<W> extends ProxyType<W> {
 
     //**
     // @method set
-    // @args keyword, value
-    // @result this
+    // %args keyword, value
+    // %result this
     // Sets the *value* of the property with the given *keyword*.
     // The *value* must be assignable to the property's value type.
     private Object _set(W obj, Joe joe, Args args) {
@@ -336,7 +336,7 @@ public class WidgetType<W> extends ProxyType<W> {
 
     //**
     // @method toString
-    // @result joe.String
+    // %result joe.String
     // Returns the value's string representation.
     private Object _toString(W obj, Joe joe, Args args) {
         args.exactArity(0, "toString()");

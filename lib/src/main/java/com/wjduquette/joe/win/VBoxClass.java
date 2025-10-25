@@ -17,7 +17,7 @@ class VBoxClass extends WidgetType<VBox> {
     //**
     // @package joe.win
     // @widget VBox
-    // @extends Pane
+    // %extends Pane
     // The `VBox` type is a [[Pane]] that manages a column of
     // widgets. Joe classes can extend the `VBox` type.
     public VBoxClass() {
@@ -66,8 +66,8 @@ class VBoxClass extends WidgetType<VBox> {
 
     //**
     // @static getMargin
-    // @args node
-    // @result Insets
+    // %args node
+    // %result Insets
     // Gets the [[Node]]'s margin in its parent `VBox`.
     private Object _getMargin(Joe joe, Args args) {
         args.exactArity(1, "VBox.getMargin(node)");
@@ -76,8 +76,8 @@ class VBoxClass extends WidgetType<VBox> {
 
     //**
     // @static getVgrow
-    // @args node
-    // @result Priority
+    // %args node
+    // %result Priority
     // Gets how the [[Node]] will resize itself to the height of
     // its parent `VBox`.
     private Object _getVgrow(Joe joe, Args args) {
@@ -87,7 +87,7 @@ class VBoxClass extends WidgetType<VBox> {
 
     //**
     // @static setMargin
-    // @args node, insets
+    // %args node, insets
     // Gets the [[Node]]'s margin in its parent `VBox` given an
     // [[Insets]] object.
     private Object _setMargin(Joe joe, Args args) {
@@ -101,7 +101,7 @@ class VBoxClass extends WidgetType<VBox> {
 
     //**
     // @static setVgrow
-    // @args node, priority
+    // %args node, priority
     // Sets how the [[Node]] will resize itself to the height of
     // its parent `VBox`, given a [[Priority]] value.
     private Object _setVgrow(Joe joe, Args args) {
@@ -129,8 +129,8 @@ class VBoxClass extends WidgetType<VBox> {
 
     //**
     // @method spacing
-    // @args pixels
-    // @result this
+    // %args pixels
+    // %result this
     // Sets the vertical space in *pixels* between each child.
     private Object _spacing(VBox node, Joe joe, Args args) {
         args.exactArity(1, "spacing(pixels)");

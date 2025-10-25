@@ -43,8 +43,8 @@ public class CatchResultType extends ProxyType<CatchResult> {
 
     //**
     // @static ok
-    // @args result
-    // @result CatchResult
+    // %args result
+    // %result CatchResult
     // Creates a new `CatchResult` indicating a successful result.
     // The *result* is the `result` value; the `error` field will
     // be null.
@@ -55,8 +55,8 @@ public class CatchResultType extends ProxyType<CatchResult> {
 
     //**
     // @static error
-    // @args error
-    // @result CatchResult
+    // %args error
+    // %result CatchResult
     // Creates a new `CatchResult` indicating a failure.  The
     // *error* is the specific error, either a [[String]] or
     // an [[Error]].  The `CatchResult`'s `error` field will be
@@ -96,7 +96,7 @@ public class CatchResultType extends ProxyType<CatchResult> {
 
     //**
     // @method isOK
-    // @result Boolean
+    // %result Boolean
     // Returns true if the `CatchResult` represents a success
     // and false if it represents an error.
     private Object _isOK(CatchResult value, Joe joe, Args args) {
@@ -105,7 +105,7 @@ public class CatchResultType extends ProxyType<CatchResult> {
 
     //**
     // @method isError
-    // @result Boolean
+    // %result Boolean
     // Returns true if the `CatchResult` represents an error
     // and false if it represents a success.
     private Object _isError(CatchResult value, Joe joe, Args args) {

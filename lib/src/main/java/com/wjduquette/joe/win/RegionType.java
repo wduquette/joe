@@ -14,7 +14,7 @@ class RegionType extends WidgetType<Region> {
     //**
     // @package joe.win
     // @widget Region
-    // @extends Node
+    // %extends Node
     // The `Region` type is the abstract base class for JavaFX
     // [[Node]] widgets that occupy space on the screen.
     public RegionType() {
@@ -71,7 +71,7 @@ class RegionType extends WidgetType<Region> {
         //**
         // @property padding Insets
         // Padding around the widget.
-        fxProperty("padding",    Region::paddingProperty,    WinPackage::toInsets);
+        fxProperty("padding",    Region::paddingProperty,    Win::toInsets);
 
         //**
         // @property prefHeight joe.Number
@@ -110,7 +110,7 @@ class RegionType extends WidgetType<Region> {
 
     //**
     // @method getHeight
-    // @result joe.Number
+    // %result joe.Number
     // Gets the node's `#height` in pixels.
     private Object _getHeight(Region node, Joe joe, Args args) {
         args.exactArity(0, "getHeight()");
@@ -119,7 +119,7 @@ class RegionType extends WidgetType<Region> {
 
     //**
     // @method getWidth
-    // @result joe.Number
+    // %result joe.Number
     // Gets the node's `#width` in pixels.
     private Object _getWidth(Region node, Joe joe, Args args) {
         args.exactArity(0, "getWidth()");
@@ -128,8 +128,8 @@ class RegionType extends WidgetType<Region> {
 
     //**
     // @method height
-    // @args height
-    // @result this
+    // %args height
+    // %result this
     // Sets the node's preferred, minimum, and maximum height in pixels.
     private Object _height(Region node, Joe joe, Args args) {
         args.exactArity(1, "height(height)");
@@ -142,9 +142,9 @@ class RegionType extends WidgetType<Region> {
 
     //**
     // @method padding
-    // @args pixels
-    // @args top, right, bottom, left
-    // @result this
+    // %args pixels
+    // %args top, right, bottom, left
+    // %result this
     // Sets the padding in pixels on all sides of the region.
     // If a single value is given, it is used for all four sides.
     private Object _padding(Region node, Joe joe, Args args) {
@@ -166,8 +166,8 @@ class RegionType extends WidgetType<Region> {
 
     //**
     // @method maxHeight
-    // @args height
-    // @result this
+    // %args height
+    // %result this
     // Sets the node's maximum height in pixels.
     private Object _maxHeight(Region node, Joe joe, Args args) {
         args.exactArity(1, "maxHeight(height)");
@@ -177,8 +177,8 @@ class RegionType extends WidgetType<Region> {
 
     //**
     // @method maxWidth
-    // @args width
-    // @result this
+    // %args width
+    // %result this
     // Sets the node's maximum width in pixels.
     private Object _maxWidth(Region node, Joe joe, Args args) {
         args.exactArity(1, "maxWidth(width)");
@@ -188,8 +188,8 @@ class RegionType extends WidgetType<Region> {
 
     //**
     // @method minHeight
-    // @args height
-    // @result this
+    // %args height
+    // %result this
     // Sets the node's minimum height in pixels.
     private Object _minHeight(Region node, Joe joe, Args args) {
         args.exactArity(1, "minHeight(height)");
@@ -199,8 +199,8 @@ class RegionType extends WidgetType<Region> {
 
     //**
     // @method minWidth
-    // @args width
-    // @result this
+    // %args width
+    // %result this
     // Sets the node's minimum width in pixels.
     private Object _minWidth(Region node, Joe joe, Args args) {
         args.exactArity(1, "minWidth(width)");
@@ -210,8 +210,8 @@ class RegionType extends WidgetType<Region> {
 
     //**
     // @method prefHeight
-    // @args height
-    // @result this
+    // %args height
+    // %result this
     // Sets the node's preferred height in pixels.
     private Object _prefHeight(Region node, Joe joe, Args args) {
         args.exactArity(1, "prefHeight(height)");
@@ -221,8 +221,8 @@ class RegionType extends WidgetType<Region> {
 
     //**
     // @method prefWidth
-    // @args width
-    // @result this
+    // %args width
+    // %result this
     // Sets the node's preferred width in pixels.
     private Object _prefWidth(Region node, Joe joe, Args args) {
         args.exactArity(1, "prefWidth(width)");
@@ -232,8 +232,8 @@ class RegionType extends WidgetType<Region> {
 
     //**
     // @method width
-    // @args width
-    // @result this
+    // %args width
+    // %result this
     // Sets the node's preferred, minimum, and maximum width in pixels.
     private Object _width(Region node, Joe joe, Args args) {
         args.exactArity(1, "width(width)");

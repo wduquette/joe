@@ -17,7 +17,7 @@ class HBoxClass extends WidgetType<HBox> {
     //**
     // @package joe.win
     // @widget HBox
-    // @extends Pane
+    // %extends Pane
     // The `HBox` type is a [[Pane]] that manages a row of
     // widgets. Joe classes can extend the `HBox` type.
     public HBoxClass() {
@@ -65,8 +65,8 @@ class HBoxClass extends WidgetType<HBox> {
 
     //**
     // @static getHgrow
-    // @args node
-    // @result Priority
+    // %args node
+    // %result Priority
     // Gets how the [[Node]] will resize itself to the height of
     // its parent `HBox`.
     private Object _getHgrow(Joe joe, Args args) {
@@ -76,8 +76,8 @@ class HBoxClass extends WidgetType<HBox> {
 
     //**
     // @static getMargin
-    // @args node
-    // @result Insets
+    // %args node
+    // %result Insets
     // Gets the [[Node]]'s margin in its parent `HBox`.
     private Object _getMargin(Joe joe, Args args) {
         args.exactArity(1, "HBox.getMargin(node)");
@@ -86,7 +86,7 @@ class HBoxClass extends WidgetType<HBox> {
 
     //**
     // @static setHgrow
-    // @args node, priority
+    // %args node, priority
     // Sets how the [[Node]] will resize itself to the height of
     // its parent `HBox`, given a [[Priority]] value.
     private Object _setHgrow(Joe joe, Args args) {
@@ -100,7 +100,7 @@ class HBoxClass extends WidgetType<HBox> {
 
     //**
     // @static setMargin
-    // @args node, insets
+    // %args node, insets
     // Gets the [[Node]]'s margin in its parent `HBox` given an
     // [[Insets]] object.
     private Object _setMargin(Joe joe, Args args) {
@@ -129,8 +129,8 @@ class HBoxClass extends WidgetType<HBox> {
 
     //**
     // @method spacing
-    // @args pixels
-    // @result this
+    // %args pixels
+    // %result this
     // Sets the vertical space in *pixels* between each child.
     private Object _spacing(HBox node, Joe joe, Args args) {
         args.exactArity(1, "spacing(pixels)");

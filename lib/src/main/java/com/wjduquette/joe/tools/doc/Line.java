@@ -16,11 +16,12 @@ record Line(int number, String text) {
 
     /**
      * Returns true if the line's non-whitespace text begins with
-     * an "@" tag.
+     * an "@" or "%" tag.
      * @return true or false
      */
     public boolean isTagged() {
-        return text.trim().startsWith("@");
+        return text.trim().startsWith("@")
+            || text.trim().startsWith("%");
     }
 
     /**
@@ -29,7 +30,7 @@ record Line(int number, String text) {
      */
     public Tag getTag() {
         var txt = text.trim();
-        if (!txt.startsWith("@")) {
+        if (!isTagged()) {
             throw new IllegalStateException("Line has no tag.");
         }
         var ndx = txt.indexOf(" ");
