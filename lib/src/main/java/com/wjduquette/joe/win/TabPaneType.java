@@ -15,7 +15,7 @@ class TabPaneType extends WidgetType<TabPane> {
     //**
     // @package joe.win
     // @type TabPane
-    // @extends Control
+    // %extends Control
     // The `TabPane` type is the base class for JavaFX tab panes, which can
     // contain [[Tab]] objects.
     public TabPaneType() {
@@ -47,7 +47,7 @@ class TabPaneType extends WidgetType<TabPane> {
 
     //**
     // @init
-    // @args [text]
+    // %args [text]
     // Returns a `TabPane`.
     private Object _initializer(Joe joe, Args args) {
         args.exactArity(0, "TabPane()");
@@ -59,8 +59,8 @@ class TabPaneType extends WidgetType<TabPane> {
 
     //**
     // @method tab
-    // @args tab
-    // @result this
+    // %args tab
+    // %result this
     // Adds a [[Tab]] to the pane.
     private Object _tab(TabPane pane, Joe joe, Args args) {
         args.exactArity(1, "tab(tab)");
@@ -71,7 +71,7 @@ class TabPaneType extends WidgetType<TabPane> {
 
     //**
     // @method tabs
-    // @result joe.List
+    // %result joe.List
     // Gets the list of the pane's tabs, which can be updated freely.
     // All items must be instances of [[Tab]] or a subclass.
     private Object _tabs(TabPane pane, Joe joe, Args args) {

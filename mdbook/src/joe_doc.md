@@ -92,18 +92,18 @@ entry tags.
 - [`@package <name>`](#the-package-entry)
   - [`@function <name>`](#the-function-entry)
   - [`@type <name>`](#the-type-entry)
-    - [`@constant <name>`](#the-constant-entry)
+    - [`@constant <name> <valueType>`](#the-constant-entry)
     - [`@static <name>`](#the-static-entry)
     - [`@init`](#the-init-entry)
-    - [`@field <name>`](#the-field-entry)
-    - [`@property <name>`](#the-property-entry)
+    - [`@field <name> <valueType>`](#the-field-entry)
+    - [`@property <name> <valueType>`](#the-property-entry)
     - [`@method <name>`](#the-method-entry)
     - [`@typeTopic <name>`](#the-typetopic-entry)
   - [`@packageTopic <name>`](#the-packagetopic-entry)
 - [`@mixin <name>`](#the-mixin-entry)
-  - [`@constant <name>`](#the-constant-entry)
+  - [`@constant <name> <valueType>`](#the-constant-entry)
   - [`@static <name>`](#the-static-entry)
-  - [`@field <name>`](#the-field-entry)
+  - [`@field <name> <valueType>`](#the-field-entry)
   - [`@method <name>`](#the-method-entry)
   - [`@typeTopic <name>`](#the-typetopic-entry)
 
@@ -142,15 +142,15 @@ file:
 ```java
 //**
 // @package joe
-// @title Joe Standard Library
+// %title Joe Standard Library
 // The `joe` package contains Joe's standard library.
 
 ... java code ...
 
 //**
 // @function catch
-// @args callable
-// @result CatchResult
+// %args callable
+// %result CatchResult
 // Executes the callable, which must not require any arguments.
 // Returns a [[CatchResult]] indicating success or failure and providing
 // the returned result or the error message respectively.
@@ -164,8 +164,8 @@ the goes on to document each `@function` in turn.  Some things to note:
 
 - Each entry's documentation begins with its `@entry` tag.
 
-- This is followed by metadata tags: `@title` for the `@package` and
-  `@args` and `@result` for the `@function`.
+- This is followed by metadata tags: `%title` for the `@package` and
+  `%args` and `%result` for the `@function`.
  
 - And these are followed by any number of lines of Markdown text.  All such
   lines will be accumulated and ascribed to this entry until the next entry 
@@ -182,7 +182,7 @@ following optional metadata:
 
 | Metadata Tag    | Meaning                    |
 |-----------------|----------------------------|
-| `@title string` | Gives the package a title. |
+| `%title string` | Gives the package a title. |
 
 The title string is used in the generated documentation.
 
@@ -196,7 +196,7 @@ For example,
 ```java
 //**
 // @package joe
-// @title Joe Standard Library
+// %title Joe Standard Library
 // The `joe` package contains Joe's standard library.
 ```
 
@@ -212,10 +212,10 @@ the following metadata:
 
 | Metadata Tag    | Meaning                  |
 |-----------------|--------------------------|
-| `@title string` | Gives the topic a title. |
+| `%title string` | Gives the topic a title. |
 
 The title string is used as a header in the generated content, and in
-links to that content.  In theory the `@title` tag is optional, but 
+links to that content.  In theory the `%title` tag is optional, but 
 in practice one always wants to use it.
 
 
@@ -229,10 +229,10 @@ The entry has the following optional metadata:
 
 | Metadata Tag       | Meaning                         |
 |--------------------|---------------------------------|
-| `@args <spec>`     | Names the function's arguments. |
-| `@result <result>` | What the function returns.      |
+| `%args <spec>`     | Names the function's arguments. |
+| `%result <result>` | What the function returns.      |
 
-The `@args` *spec* is typically a comma-delimited list of argument
+The `%args` *spec* is typically a comma-delimited list of argument
 names, with `...` used to indicate a variable length argument list
 and square brackets used to indicate optional arguments.  Here are some
 examples:
@@ -243,10 +243,10 @@ examples:
 - `x, ...`: The argument `x` plus any number of additional arguments.
 - `name, value, [name, value]...`: One or more `name`,`value` pairs.
 
-The `@args` tag can be omitted if the function takes no arguments, and
+The `%args` tag can be omitted if the function takes no arguments, and
 can be repeated if the function has two or more distinct signatures.[^sigs]
 
-The `@result`'s *result* is a single token, usually either the name of 
+The `%result`'s *result* is a single token, usually either the name of 
 a Joe type or a variable name like `value` or `this`.  It can be
 omitted if the function returns nothing (i.e., always returns 
 `null`). If the *result* names a type, it will appear as a link to that type 
@@ -261,13 +261,13 @@ The entry has the following optional metadata:
 
 | Metadata Tag             | Meaning                                              |
 |--------------------------|------------------------------------------------------|
-| `@extends <type>`        | This type extends the named type.                    |
-| `@includeMixin <mixin>`  | This type's documentation includes the named mixin.  |
+| `%extends <type>`        | This type extends the named type.                    |
+| `%includeMixin <mixin>`  | This type's documentation includes the named mixin.  |
 | `%javaType <className>`  | The underlying Java type's full class name.          |
 | `%proxyType <className>` | The underlying Java `ProxyType`'s full class name.   |
 | `%enumConstants`         | **Enums Only**: Auto-populates the enum's constants. |
 
-The `@extends <type>` tag is used when this type extends (i.e., subclasses) 
+The `%extends <type>` tag is used when this type extends (i.e., subclasses) 
 another script-visible type.  The `<type>` should be the name or qualified name 
 of a referenced `@type`.
 
@@ -294,7 +294,7 @@ For example, in the standard library the [`AssertError`](library/type.joe.Assert
 ```java
 //**
 // @type AssertError
-// @extends Error
+// %extends Error
 // ...
 ```
 
@@ -361,10 +361,10 @@ the following metadata:
 
 | Metadata Tag    | Meaning                  |
 |-----------------|--------------------------|
-| `@title string` | Gives the topic a title. |
+| `%title string` | Gives the topic a title. |
 
 The title string is used as a header in the generated content, and in
-links to that content.  In theory the `@title` tag is optional, but
+links to that content.  In theory the `%title` tag is optional, but
 in practice one always wants to use it.
 
 As an example, the [`String` type](library/type.joe.String.md) uses a
@@ -396,8 +396,8 @@ The `@init` entry documents the current type's initializer function.
 The `@init` tag doesn't include a name, as the initializer always has
 the same name as the type.
 
-The `@init` entry accepts the `@args` metadata tag, just as any
-function or method does, but not the `@result` tag, as its result is
+The `@init` entry accepts the `%args` metadata tag, just as any
+function or method does, but not the `%result` tag, as its result is
 always an instance of the current type.
 
 ### The `@field` Entry
@@ -469,7 +469,7 @@ For example, the mixin might define:
 // The `<type>` type is able to...
 //
 // @method myMethod
-// @result <type>
+// %result <type>
 // This method...
 ```
 
@@ -480,7 +480,7 @@ Then, another type can include it like this:
 // @type MyType
 // The `MyType` type represents...
 //
-// @includeMixin MyMixin
+// %includeMixin MyMixin
 //
 // The MyMixin Markdown content is included above, replacing the include tag.
 ```

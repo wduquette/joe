@@ -14,7 +14,7 @@ class MenuType extends WidgetType<Menu> {
     //**
     // @package joe.win
     // @widget Menu
-    // @extends MenuItem
+    // %extends MenuItem
     // The `Menu` widget is a menu in a [[MenuBar]] or a submenu
     // in a parent [[Menu]].  It contains [[MenuItem]] widgets.
     public MenuType() {
@@ -45,8 +45,8 @@ class MenuType extends WidgetType<Menu> {
 
     //**
     // @method item
-    // @args item
-    // @result this
+    // %args item
+    // %result this
     // Adds a [[MenuItem]] or [[Menu]] to the menu.
     private Object _item(Menu bar, Joe joe, Args args) {
         args.exactArity(1, "item(item)");
@@ -58,7 +58,7 @@ class MenuType extends WidgetType<Menu> {
 
     //**
     // @method items
-    // @result joe.List
+    // %result joe.List
     // Gets the list of the menu's items, which can be updated freely.
     // All items must be instances of [[MenuItem]] or [[Menu]].
     private Object _items(Menu bar, Joe joe, Args args) {

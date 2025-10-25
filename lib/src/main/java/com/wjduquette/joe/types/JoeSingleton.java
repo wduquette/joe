@@ -47,8 +47,8 @@ public class JoeSingleton extends ProxyType<Void> {
 
     //**
     // @static compare
-    // @args a, b
-    // @result Number
+    // %args a, b
+    // %result Number
     //
     // Given two strings or two numbers *a* and *b*, returns -1, 0,
     // or 1 as *a* < *b*, *a* == *b*, or *a* > *b*.  This function
@@ -60,7 +60,7 @@ public class JoeSingleton extends ProxyType<Void> {
 
     //**
     // @static currentTimeMillis
-    // @result Number
+    // %result Number
     //
     // Returns Java's `System.currentTimeMillis()`, the current time in
     // milliseconds since the epoch.
@@ -71,8 +71,8 @@ public class JoeSingleton extends ProxyType<Void> {
 
     //**
     // @static getFieldNames
-    // @args value
-    // @result List
+    // %args value
+    // %result List
     // Returns a read-only list of the names of the fields defined on
     // the *value*.
     //
@@ -93,8 +93,8 @@ public class JoeSingleton extends ProxyType<Void> {
 
     //**
     // @static isFact
-    // @args value
-    // @result Boolean
+    // %args value
+    // %result Boolean
     // Returns true if the *value* can be used as a Nero [[Fact]], and
     // false otherwise.
     private Object _isFact(Joe joe, Args args) {
@@ -104,8 +104,8 @@ public class JoeSingleton extends ProxyType<Void> {
 
     //**
     // @static isOpaque
-    // @args value
-    // @result Boolean
+    // %args value
+    // %result Boolean
     // Returns true if the *value* is of an opaque type, and false
     // otherwise.  An opaque type is a Java type with no
     // defined Joe binding.
@@ -117,8 +117,8 @@ public class JoeSingleton extends ProxyType<Void> {
 
     //**
     // @static isType
-    // @args value
-    // @result Boolean
+    // %args value
+    // %result Boolean
     // Returns true if the *value* represents a Joe type, e.g.,
     // the [[String]] type or a Joe `class`, and false otherwise.
     private Object _isType(Joe joe, Args args) {
@@ -128,8 +128,8 @@ public class JoeSingleton extends ProxyType<Void> {
 
     //**
     // @static javaTypeOf
-    // @args value
-    // @result String
+    // %args value
+    // %result String
     // Returns a string representation of the value's Java type.
     private Object _javaTypeOf(Joe joe, Args args) {
         args.exactArity(1, "javaTypeOf(value)");
@@ -138,8 +138,8 @@ public class JoeSingleton extends ProxyType<Void> {
 
     //**
     // @static stringify
-    // @args value
-    // @result String
+    // %args value
+    // %result String
     // Converts its value to a string for output.  This function
     // is functionally equivalent to [[String#init]], or to
     // `value.toString()` (if the type defines a `toString()` method).
@@ -154,8 +154,8 @@ public class JoeSingleton extends ProxyType<Void> {
 
     //**
     // @static supertypeOf
-    // @args type
-    // @result type
+    // %args type
+    // %result type
     // Returns the supertype of the given *type*, or null if the *type*
     // has no supertype.
     private Object _supertypeOf(Joe joe, Args args) {
@@ -166,8 +166,8 @@ public class JoeSingleton extends ProxyType<Void> {
 
     //**
     // @static toFact
-    // @args value
-    // @result Fact
+    // %args value
+    // %result Fact
     // Returns the value as a Nero [[Fact]].
     // Throws an [[Error]] if `!isFact(value)`.
     private Object _toFact(Joe joe, Args args) {
@@ -177,8 +177,8 @@ public class JoeSingleton extends ProxyType<Void> {
 
     //**
     // @static typeOf
-    // @args value
-    // @result type
+    // %args value
+    // %result type
     // Returns the Joe type of the given *value*.
     private Object _typeOf(Joe joe, Args args) {
         args.exactArity(1, "typeOf(value)");

@@ -17,7 +17,7 @@ class StackPaneClass extends WidgetType<StackPane> {
     //**
     // @package joe.win
     // @widget StackPane
-    // @extends Pane
+    // %extends Pane
     // The `StackPane` type is a [[Pane]] that manages one or children
     // stacked one on top of each other like cards in a deck.
     // Joe classes can extend the `StackPane` type.
@@ -62,8 +62,8 @@ class StackPaneClass extends WidgetType<StackPane> {
 
     //**
     // @static getAlignment
-    // @args node
-    // @result Pos
+    // %args node
+    // %result Pos
     // Gets the [[Node]]'s alignment in its parent [[StackPane]].
     private Object _getAlignment(Joe joe, Args args) {
         args.exactArity(1, "StackPane.getAlignment(node)");
@@ -72,8 +72,8 @@ class StackPaneClass extends WidgetType<StackPane> {
 
     //**
     // @static getMargin
-    // @args node
-    // @result Insets
+    // %args node
+    // %result Insets
     // Gets the [[Node]]'s margin in its parent [[StackPane]].
     private Object _getMargin(Joe joe, Args args) {
         args.exactArity(1, "StackPane.getMargin(node)");
@@ -82,7 +82,7 @@ class StackPaneClass extends WidgetType<StackPane> {
 
     //**
     // @static setAlignment
-    // @args node, pos
+    // %args node, pos
     // Sets how [[Node]] *node* will position itself within its
     // parent [[StackPane]], given a [[Pos]] value.
     private Object _setAlignment(Joe joe, Args args) {
@@ -96,7 +96,7 @@ class StackPaneClass extends WidgetType<StackPane> {
 
     //**
     // @static setMargin
-    // @args node, insets
+    // %args node, insets
     // Gets the [[Node]]'s margin in its parent [[StackPane]] given an
     // [[Insets]] object.
     private Object _setMargin(Joe joe, Args args) {

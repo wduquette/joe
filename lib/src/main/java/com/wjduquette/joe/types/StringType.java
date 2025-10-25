@@ -67,7 +67,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @typeTopic formatting
-    // @title String Formatting
+    // %title String Formatting
     // The Joe [[String#static.format]] method formats strings similarly
     // to the Java method of the same name, supporting a subset of
     // [Java's format string syntax](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Formatter.html#syntax).
@@ -144,7 +144,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @init
-    // @args value
+    // %args value
     // Converts the value into its string representation.
     private Object _init(Joe joe, Args args) {
         args.exactArity(1, "String(value)");
@@ -156,8 +156,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @static format
-    // @args fmt, [values...]
-    // @result String
+    // %args fmt, [values...]
+    // %result String
     // Formats the values into a string given the format string. See
     // [[String#topic.formatting]], below, for the format string syntax.
     private Object _format(Joe joe, Args args) {
@@ -168,8 +168,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @static join
-    // @args delimiter, list
-    // @result String
+    // %args delimiter, list
+    // %result String
     // Given a delimiter and a list, joins the string representations of the
     // list items into a single string, delimited by the given delimiter.
     private Object _join(Joe joe, Args args) {
@@ -187,8 +187,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method charAt
-    // @args index
-    // @result String
+    // %args index
+    // %result String
     // Returns the character at the *index* as a string.
     private Object _charAt(String value, Joe joe, Args args) {
         args.exactArity(1, "charAt(index)");
@@ -199,8 +199,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method contains
-    // @args target
-    // @result Boolean
+    // %args target
+    // %result Boolean
     // Returns `true` if this contains the *target*, and `false` otherwise.
     private Object _contains(String value, Joe joe, Args args) {
         args.exactArity(1, "contains(target)");
@@ -210,8 +210,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method endsWith
-    // @args suffix
-    // @result Boolean
+    // %args suffix
+    // %result Boolean
     // Returns `true` if this string ends with the suffix, and `false` otherwise.
     private Object _endsWith(String value, Joe joe, Args args) {
         args.exactArity(1, "endsWith(suffix)");
@@ -221,8 +221,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method equalsIgnoreCase
-    // @args other
-    // @result Boolean
+    // %args other
+    // %result Boolean
     // Returns `true` if this string is equal to the string representation
     // of the *other* value, ignoring case, and `false` otherwise.
     private Object _equalsIgnoreCase(String value, Joe joe, Args args) {
@@ -232,8 +232,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method indent
-    // @args n
-    // @result String
+    // %args n
+    // %result String
     // Indents or outdents the string by *n* characters.
     //
     // Note: Java's `String::indent` returns the result with a trailing
@@ -247,8 +247,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method indexOf
-    // @args target, [beginIndex], [endIndex]
-    // @result Number
+    // %args target, [beginIndex], [endIndex]
+    // %result Number
     // Returns the index of the first occurrence of the *target* string in
     // this string, or -1 if the *target* is not found.  The search starts
     // at *beginIndex*, which defaults to 0, and ends at *endIndex*, which
@@ -273,7 +273,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method isBlank
-    // @result Boolean
+    // %result Boolean
     // Returns `true` if this string is empty or contains only
     // whitespace, and `false` otherwise.
     private Object _isBlank(String value, Joe joe, Args args) {
@@ -283,7 +283,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method isEmpty
-    // @result Boolean
+    // %result Boolean
     // Returns `true` if this string is the empty string, and `false` otherwise.
     private Object _isEmpty(String value, Joe joe, Args args) {
         args.exactArity(0, "isEmpty()");
@@ -292,8 +292,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method lastIndexOf
-    // @args target, [fromIndex]
-    // @result Number
+    // %args target, [fromIndex]
+    // %result Number
     // Returns the index of the last occurrence of the *target* string in
     // this string, or -1 if the *target* is not found.  The search starts
     // at *fromIndex*, which defaults to 0, and proceeds towards the start of
@@ -312,7 +312,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method length
-    // @result Double
+    // %result Double
     // Gets the string's length.
     private Object _length(String value, Joe joe, Args args) {
         args.exactArity(0, "length()");
@@ -321,7 +321,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method lines
-    // @result List
+    // %result List
     // Returns a list consisting of the lines of text in the string.
     private Object _lines(String value, Joe joe, Args args) {
         args.exactArity(0, "lines()");
@@ -330,8 +330,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method matches
-    // @args pattern
-    // @result Boolean
+    // %args pattern
+    // %result Boolean
     // Returns `true` if this string matches the regex pattern, and
     // `false` otherwise.
     private Object _matches(String value, Joe joe, Args args) {
@@ -341,8 +341,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method repeat
-    // @args count
-    // @result String
+    // %args count
+    // %result String
     // Creates a string containing this string repeated *count* times.
     private Object _repeat(String value, Joe joe, Args args) {
         args.exactArity(1, "repeat(count)");
@@ -358,8 +358,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method replace
-    // @args target, replacement
-    // @result String
+    // %args target, replacement
+    // %result String
     // Returns the string created by replacing every occurrence of the
     // *target* string in this string with the *replacement* string.
     private Object _replace(String value, Joe joe, Args args) {
@@ -372,8 +372,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method replaceAll
-    // @args regex, replacement
-    // @result String
+    // %args regex, replacement
+    // %result String
     // Returns the string created by replacing each substring of this
     // string that matches the *regex* with the replacement string.
     private Object _replaceAll(String value, Joe joe, Args args) {
@@ -386,8 +386,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method replaceFirst
-    // @args regex, replacement
-    // @result String
+    // %args regex, replacement
+    // %result String
     // Returns the string created by replacing the first substring of this
     // string that matches the *regex* with the replacement string.
     private Object _replaceFirst(String value, Joe joe, Args args) {
@@ -400,8 +400,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method split
-    // @args delimiter
-    // @result List
+    // %args delimiter
+    // %result List
     // Returns a list of the tokens formed by splitting the string on
     // each of the substrings that match the *delimiter* regular
     // expression pattern.  The delimiter substrings are not included
@@ -415,8 +415,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method splitWithDelimiters
-    // @args delimiter
-    // @result List
+    // %args delimiter
+    // %result List
     // Returns a list of the tokens formed by splitting the string on
     // each of the substrings that match the *delimiter* regular
     // expression pattern.  The delimiter substrings are included
@@ -430,8 +430,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method startsWith
-    // @args prefix
-    // @result Boolean
+    // %args prefix
+    // %result Boolean
     // Returns `true` if this string starts with the prefix, and `false` otherwise.
     private Object _startsWith(String value, Joe joe, Args args) {
         args.exactArity(1, "startsWith(prefix)");
@@ -441,7 +441,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method strip
-    // @result String
+    // %result String
     // Returns this string, stripped of all leading and trailing whitespace.
     private Object _strip(String value, Joe joe, Args args) {
         args.exactArity(0, "strip()");
@@ -450,7 +450,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method stripIndent
-    // @result String
+    // %result String
     // Strips the indent from each line of the string, preserving relative
     // indentation.
     private Object _stripIndent(String value, Joe joe, Args args) {
@@ -460,7 +460,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method stripLeading
-    // @result String
+    // %result String
     // Returns this string, stripped of all leading whitespace.
     private Object _stripLeading(String value, Joe joe, Args args) {
         args.exactArity(0, "stripLeading()");
@@ -469,7 +469,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method stripTrailing
-    // @result String
+    // %result String
     // Returns this string, stripped of all trailing whitespace.
     private Object _stripTrailing(String value, Joe joe, Args args) {
         args.exactArity(0, "stripTrailing()");
@@ -478,8 +478,8 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method substring
-    // @args beginIndex, [endIndex]
-    // @result String
+    // %args beginIndex, [endIndex]
+    // %result String
     // Returns the substring of this string that starts at the
     // *beginIndex* and ends at the *endIndex*; *endIndex* defaults
     // to the end of the string.
@@ -499,7 +499,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method toLowerCase
-    // @result String
+    // %result String
     // Returns this string converted to lowercase.
     private Object _toLowerCase(String value, Joe joe, Args args) {
         args.exactArity(0, "toLowerCase()");
@@ -508,7 +508,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method toString
-    // @result String
+    // %result String
     // Returns this string.
     private Object _toString(String value, Joe joe, Args args) {
         args.exactArity(0, "toString()");
@@ -517,7 +517,7 @@ public class StringType extends ProxyType<String> {
 
     //**
     // @method toUpperCase
-    // @result String
+    // %result String
     // Returns this string converted to uppercase.
     private Object _toUpperCase(String value, Joe joe, Args args) {
         args.exactArity(0, "toUpperCase()");

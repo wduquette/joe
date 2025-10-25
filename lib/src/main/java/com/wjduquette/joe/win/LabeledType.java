@@ -13,7 +13,7 @@ class LabeledType extends WidgetType<Labeled> {
     //**
     // @package joe.win
     // @widget Labeled
-    // @extends Control
+    // %extends Control
     // The `Labeled` type is the base class for JavaFX widgets that display
     // text and an optional graphic, e.g., [[Label]] and [[Button]].
     public LabeledType() {
@@ -88,8 +88,8 @@ class LabeledType extends WidgetType<Labeled> {
 
     //**
     // @method graphic
-    // @args node
-    // @result this
+    // %args node
+    // %result this
     // Sets the labeled's `#graphic` to the given [[Node]].
     private Object _graphic(Labeled node, Joe joe, Args args) {
         args.exactArity(1, "graphic(node)");
@@ -99,8 +99,8 @@ class LabeledType extends WidgetType<Labeled> {
 
     //**
     // @method text
-    // @args text
-    // @result this
+    // %args text
+    // %result this
     // Sets the labeled's `#text`.
     private Object _text(Labeled node, Joe joe, Args args) {
         args.exactArity(1, "text(text)");
@@ -110,8 +110,8 @@ class LabeledType extends WidgetType<Labeled> {
 
     //**
     // @method wrapText
-    // @args flag
-    // @result this
+    // %args flag
+    // %result this
     // Sets the labeled's `#wrapText` flag.
     private Object _wrapText(Labeled node, Joe joe, Args args) {
         args.exactArity(1, "wrapText(flag)");

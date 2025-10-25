@@ -17,7 +17,7 @@ class TabClass extends WidgetType<Tab> {
     //**
     // @package joe.win
     // @widget Tab
-    // @extends Widget
+    // %extends Widget
     // The `Tab` widget contains a [[Node]] and is displayed in a [[TabPane]].
     // Joe classes can extend the `Tab` type.
     public TabClass() {
@@ -89,8 +89,8 @@ class TabClass extends WidgetType<Tab> {
 
     //**
     // @method content
-    // @args node
-    // @result this
+    // %args node
+    // %result this
     // Sets the tab's `#content` property to *node*.
     private Object _content(Tab tab, Joe joe, Args args) {
         args.exactArity(1, "content(node)");
@@ -101,8 +101,8 @@ class TabClass extends WidgetType<Tab> {
 
     //**
     // @method disable
-    // @args [flag]
-    // @result this
+    // %args [flag]
+    // %result this
     // Sets the tab's `#disable` property to *flag*; if omitted,
     // *flag* defaults to `true`.  While `true`, this tab and its
     // descendants in the scene graph will be disabled.
@@ -115,8 +115,8 @@ class TabClass extends WidgetType<Tab> {
 
     //**
     // @method id
-    // @args id
-    // @result this
+    // %args id
+    // %result this
     // Sets the tab's `#id` property to the given *id* string.
     private Object _id(Tab tab, Joe joe, Args args) {
         args.exactArity(1, "id(id)");
@@ -127,7 +127,7 @@ class TabClass extends WidgetType<Tab> {
 
     //**
     // @method isDisabled
-    // @result joe.Boolean
+    // %result joe.Boolean
     // Returns `true` if the tab has been disabled, and `false` otherwise.
     private Object _isDisabled(Tab tab, Joe joe, Args args) {
         args.exactArity(0, "isDisabled()");
@@ -136,7 +136,7 @@ class TabClass extends WidgetType<Tab> {
 
     //**
     // @method isSelected
-    // @result joe.Boolean
+    // %result joe.Boolean
     // Returns `true` if the tab is selected, and `false` otherwise.
     private Object _isSelected(Tab tab, Joe joe, Args args) {
         args.exactArity(0, "isSelected()");
@@ -145,7 +145,7 @@ class TabClass extends WidgetType<Tab> {
 
     //**
     // @method styleClasses
-    // @result joe.List
+    // %result joe.List
     // Gets the list of the tab's FXCSS style class names.  Values must
     // be valid CSS style class names.
     //
@@ -157,8 +157,8 @@ class TabClass extends WidgetType<Tab> {
 
     //**
     // @method styles
-    // @args style, ...
-    // @result this
+    // %args style, ...
+    // %result this
     // Sets the tab's FXCSS `#style` property.  The caller can pass
     // multiple style strings, which will be joined with semicolons.
     //
@@ -174,7 +174,7 @@ class TabClass extends WidgetType<Tab> {
 
     //**
     // @method tabPane
-    // @result TabPane
+    // %result TabPane
     // Returns the [[TabPane]] to which this tab belongs, or null if
     // none.
     private Object _tabPane(Tab tab, Joe joe, Args args) {
@@ -184,8 +184,8 @@ class TabClass extends WidgetType<Tab> {
 
     //**
     // @method text
-    // @args text
-    // @result this
+    // %args text
+    // %result this
     // Sets the label's text.
     private Object _text(Tab tab, Joe joe, Args args) {
         args.exactArity(1, "text(text)");

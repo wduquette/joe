@@ -20,7 +20,7 @@ class NodeType extends WidgetType<Node> {
     //**
     // @package joe.win
     // @widget Node
-    // @extends Widget
+    // %extends Widget
     // The `Node` widget is the abstract base class for JavaFX widgets
     // that can be added to [[Pane|Panes]] in the scene graph, and provides
     // services for all such widgets.
@@ -80,8 +80,8 @@ class NodeType extends WidgetType<Node> {
 
     //**
     // @method disable
-    // @args [flag]
-    // @result this
+    // %args [flag]
+    // %result this
     // Sets the node's `#disable` property to *flag*; if omitted,
     // *flag* defaults to `true`.  While `true`, this node and its
     // descendants in the scene graph will be disabled.
@@ -94,7 +94,7 @@ class NodeType extends WidgetType<Node> {
 
     //**
     // @method getId
-    // @result joe.String
+    // %result joe.String
     // Gets the value of the node's `#id` property.
     private Object _getId(Node node, Joe joe, Args args) {
         args.exactArity(0, "getId()");
@@ -103,8 +103,8 @@ class NodeType extends WidgetType<Node> {
 
     //**
     // @method hgrow
-    // @args [priority]
-    // @result this
+    // %args [priority]
+    // %result this
     // Sets the [[HBox]] and [[GridPane]] `hgrow` constraint for the node to
     // the given [[Priority]], or to `Priority.ALWAYS` if the priority
     // is omitted.
@@ -124,8 +124,8 @@ class NodeType extends WidgetType<Node> {
 
     //**
     // @method id
-    // @args id
-    // @result this
+    // %args id
+    // %result this
     // Sets the node's `#id` property to the given *id* string.
     private Object _id(Node node, Joe joe, Args args) {
         args.exactArity(1, "id(id)");
@@ -137,7 +137,7 @@ class NodeType extends WidgetType<Node> {
 
     //**
     // @method isDisable
-    // @result joe.Boolean
+    // %result joe.Boolean
     // Returns `true` if this node's `disable` property has
     // been set, and `false` otherwise.
     private Object _isDisable(Node node, Joe joe, Args args) {
@@ -147,7 +147,7 @@ class NodeType extends WidgetType<Node> {
 
     //**
     // @method isDisabled
-    // @result joe.Boolean
+    // %result joe.Boolean
     // Returns `true` if this node is disabled because it or a parent
     // node's `disable` property has been set, and `false` otherwise.
     private Object _isDisabled(Node node, Joe joe, Args args) {
@@ -157,8 +157,8 @@ class NodeType extends WidgetType<Node> {
 
     //**
     // @method resizeWithSplit
-    // @args flag
-    // @result this
+    // %args flag
+    // %result this
     // If *flag* is `true` (the default value) the node's "split" will resize
     // when its parent [[SplitPane]] is resized, preserving its
     // divider fraction.  If `false`, the divider fraction will change to
@@ -176,8 +176,8 @@ class NodeType extends WidgetType<Node> {
 
     //**
     // @method styleClass
-    // @args name
-    // @result this
+    // %args name
+    // %result this
     // Adds a style class *name* to the list of the node's FXCSS style class
     // names.  Values must be valid CSS style class names.
     //
@@ -190,7 +190,7 @@ class NodeType extends WidgetType<Node> {
 
     //**
     // @method styleClasses
-    // @result joe.List
+    // %result joe.List
     // Gets the list of the node's FXCSS style class names.  Values must
     // be valid CSS style class names.
     //
@@ -202,8 +202,8 @@ class NodeType extends WidgetType<Node> {
 
     //**
     // @method styles
-    // @args style, ...
-    // @result this
+    // %args style, ...
+    // %result this
     // Sets the node's FXCSS `#style` property.  The caller can pass
     // multiple style strings, which will be joined with newlines.
     //
@@ -219,8 +219,8 @@ class NodeType extends WidgetType<Node> {
 
     //**
     // @method vgrow
-    // @args [priority]
-    // @result this
+    // %args [priority]
+    // %result this
     // Sets the [[VBox]] and [[GridPane]] `vgrow` constraint for the node to
     // the given [[Priority]], or to `Priority.ALWAYS` if the priority
     // is omitted.

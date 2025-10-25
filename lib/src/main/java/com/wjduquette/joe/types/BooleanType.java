@@ -37,8 +37,8 @@ public class BooleanType extends ProxyType<Boolean> {
 
     //**
     // @static valueOf
-    // @args string
-    // @result Boolean
+    // %args string
+    // %result Boolean
     // Returns `true` if *string* equals the string `"true"`, ignoring case,
     // and `false` for all other values, including null.
     //

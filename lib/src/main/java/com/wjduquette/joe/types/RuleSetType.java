@@ -62,8 +62,8 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
 
     //**
     // @method infer
-    // @args [inputs]
-    // @result Set
+    // %args [inputs]
+    // %result Set
     // Executes the Nero rule set given the *inputs*, and returns a
     // [[Set]] of the inferred facts. If the rule set contains
     // `export` directives, the relevant facts will be returned as
@@ -90,7 +90,7 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
 
     //**
     // @method isDebug
-    // @result Boolean
+    // %result Boolean
     // Returns the rule set's debug flag.
     private Object _isDebug(RuleSetValue value, Joe joe, Args args) {
         args.exactArity(0, "isDebug()");
@@ -99,7 +99,7 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
 
     //**
     // @method isStratified
-    // @result Boolean
+    // %result Boolean
     // Returns whether the rule set is stratified or not.
     private Object _isStratified(RuleSetValue value, Joe joe, Args args) {
         args.exactArity(0, "isStratified()");
@@ -108,7 +108,7 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
 
     //**
     // @method setDebug
-    // @args flag
+    // %args flag
     // Sets the rule set's debug flag.  If enabled,
     // [[RuleSet#method.infer]] will output a detailed execution trace.
 
@@ -120,7 +120,7 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
 
     //**
     // @method toString
-    // @result String
+    // %result String
     // Returns the value's string representation.
     private Object _toString(RuleSetValue value, Joe joe, Args args) {
         args.exactArity(0, "toString()");

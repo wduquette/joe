@@ -42,7 +42,7 @@ public class OpaqueType extends ProxyType<Object> {
 
         //**
         // @method name
-        // @result String
+        // %result String
         // Returns the simple name of the Java class to which the opaque
         // value belongs.  In Java terms:
         //
@@ -53,7 +53,7 @@ public class OpaqueType extends ProxyType<Object> {
 
         //**
         // @method javaName
-        // @result String
+        // %result String
         // Returns the full name of the Java class to which the opaque
         // value belongs.  In Java terms:
         //
@@ -64,7 +64,7 @@ public class OpaqueType extends ProxyType<Object> {
 
         //**
         // @method toString
-        // @result String
+        // %result String
         // Returns the same string as the `javaName()` method.
         method("toString",   this::_toString);
     }

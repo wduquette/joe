@@ -125,7 +125,7 @@ public class ConsolePackage extends NativePackage {
 
         //**
         // @static args
-        // @result List
+        // %result List
         // Returns a list of the arguments passed to the command line, as
         // filtered by the application.
         private Object _args(Joe joe, Args args) {
@@ -135,8 +135,8 @@ public class ConsolePackage extends NativePackage {
 
         //**
         // @static cd
-        // @args path
-        // @result Path
+        // %args path
+        // %result Path
         // Changes the current working directory to the given path.  If
         // the path is relative, it is treated as relative to the
         // current working directory.
@@ -148,7 +148,7 @@ public class ConsolePackage extends NativePackage {
 
         //**
         // @static exit
-        // @args [code]
+        // %args [code]
         // Exits the application with the given exit *code*, which defaults
         // to 0.
         private Object _exit(Joe joe, Args args) {
@@ -163,7 +163,7 @@ public class ConsolePackage extends NativePackage {
 
         //**
         // @static mkdir
-        // @args path
+        // %args path
         // Creates the directory given its path, including any required
         // parent directories.  If the path is relative, it is treated as
         // relative to the current working directory.
@@ -182,7 +182,7 @@ public class ConsolePackage extends NativePackage {
 
         //**
         // @static pwd
-        // @result Path
+        // %result Path
         // Returns the current working directory.
         private Object _pwd(Joe joe, Args args) {
             args.exactArity(0, "Console.pwd()");
@@ -191,7 +191,7 @@ public class ConsolePackage extends NativePackage {
 
         //**
         // @static read
-        // @result String
+        // %result String
         // Returns a string from standard input, or null at EOF.
         private Object _read(Joe joe, Args args) {
             args.exactArity(0, "Console.read()");
@@ -209,7 +209,7 @@ public class ConsolePackage extends NativePackage {
 
         //**
         // @static writeFile
-        // @args filePath, text
+        // %args filePath, text
         // Writes the *text* as a file at the given *filePath*.
         private Object _writeFile(Joe joe, Args args) {
             args.exactArity(2, "Console.writeFile(filePath, text)");
@@ -225,8 +225,8 @@ public class ConsolePackage extends NativePackage {
 
         //**
         // @static readFile
-        // @args filePath
-        // @result String
+        // %args filePath
+        // %result String
         // Reads the contents of the file at the given *filePath* and
         // returns it as a string.
         private Object _readFile(Joe joe, Args args) {
@@ -241,8 +241,8 @@ public class ConsolePackage extends NativePackage {
 
         //**
         // @static readLines
-        // @args filePath
-        // @result List
+        // %args filePath
+        // %result List
         // Reads the contents of the file at the given *filePath* and
         // returns it as a list of line strings
         private Object _readLines(Joe joe, Args args) {

@@ -16,7 +16,7 @@ class ButtonType extends WidgetType<Button> {
     //**
     // @package joe.win
     // @widget Button
-    // @extends Labeled
+    // %extends Labeled
     // %javaType javafx.scene.control.Button
     // The `Button` type is the base class for JavaFX
     // labels like [[Button]] widgets.
@@ -43,7 +43,7 @@ class ButtonType extends WidgetType<Button> {
 
     //**
     // @init
-    // @args [text]
+    // %args [text]
     // Returns a `Button`. If the *text* is given, the button will display
     // the text.
     private Object _initializer(Joe joe, Args args) {
@@ -58,8 +58,8 @@ class ButtonType extends WidgetType<Button> {
 
     //**
     // @method action
-    // @args callable
-    // @result this
+    // %args callable
+    // %result this
     // Adds a *callable/0* to the button as its `#onAction` handler; pressing
     // the button will invoke the callable.
     private Object _action(Button btn, Joe joe, Args args) {
@@ -70,8 +70,8 @@ class ButtonType extends WidgetType<Button> {
 
     //**
     // @method onAction
-    // @args callable
-    // @result this
+    // %args callable
+    // %result this
     // Adds a *callable/1* to the button as its `#onAction` handler;
     // pressing the button will invoke the callable, passing it the JavaFX
     // `ActionEvent`.  Action event handlers rarely need the `ActionEvent`,

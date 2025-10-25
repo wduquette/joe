@@ -108,8 +108,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @static asNero
-    // @args facts
-    // @result String
+    // %args facts
+    // %result String
     // Given a set of *facts*, outputs the facts as a script of Nero
     // axioms subject to certain constraints.
     //
@@ -133,8 +133,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @static fromNero
-    // @args script
-    // @result FactBase
+    // %args script
+    // %result FactBase
     // Given a Nero script, executes the script and returns a FactBase
     // containing all known facts.
     private Object _fromNero(Joe joe, Args args) {
@@ -152,7 +152,7 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @init
-    // @args [facts]
+    // %args [facts]
     // Creates an FactBase, optionally populating it with the given *facts*.
     // The *facts* value can be a FactBase or a collection of values
     // to be converted to facts. Throws an [[Error]] if any value cannot
@@ -178,8 +178,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method add
-    // @args fact
-    // @result this
+    // %args fact
+    // %result this
     // Adds a single value to the database as a [[Fact]].  Throws an
     // [[Error]] if the value cannot be used as a `Fact`.
     private Object _add(FactBase db, Joe joe, Args args) {
@@ -190,8 +190,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method addAll
-    // @args facts
-    // @result this
+    // %args facts
+    // %result this
     // Adds a collection of values to the database as [[Fact]] values.
     // The *facts* value can be a FactBase or a collection of values
     // to be converted to facts. Throws an [[Error]] if any value cannot
@@ -207,7 +207,7 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method all
-    // @result Set
+    // %result Set
     // Returns a read-only [[Set]] of all facts in the database.
     private Object _all(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "all()");
@@ -216,7 +216,7 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method clear
-    // @result this
+    // %result this
     // Clears the database of all content.
     private Object _clear(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "clear()");
@@ -226,8 +226,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method drop
-    // @args name
-    // @result this
+    // %args name
+    // %result this
     // Drops a relation from the database, removing all its facts.
     private Object _drop(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "drop(name)");
@@ -237,8 +237,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method filter
-    // @args predicate
-    // @result Set
+    // %args predicate
+    // %result Set
     // Returns a set containing the elements for which the filter
     // *predicate* is true.
     private Object _filter(FactBase db, Joe joe, Args args) {
@@ -256,7 +256,7 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method isDebug
-    // @result Boolean
+    // %result Boolean
     // Returns the database's debug flag.
     private Object _isDebug(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "isDebug()");
@@ -266,7 +266,7 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method isEmpty
-    // @result Boolean
+    // %result Boolean
     // Returns true if the database is empty, and false otherwise.
     private Object _isEmpty(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "isEmpty()");
@@ -275,8 +275,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method map
-    // @args func
-    // @result Set
+    // %args func
+    // %result Set
     // Returns a set containing the items that result from applying
     // function *func* to each item in this set.
     private Object _map(FactBase db, Joe joe, Args args) {
@@ -292,8 +292,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method relation
-    // @args relation
-    // @result Set
+    // %args relation
+    // %result Set
     // Returns a read-only [[Set]] of all facts in the database that
     // have the given *relation*.
     private Object _relation(FactBase db, Joe joe, Args args) {
@@ -304,7 +304,7 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method relations
-    // @result Set
+    // %result Set
     // Returns a read-only [[Set]] of the names of the relations
     // of the facts in the database.
     private Object _relations(FactBase db, Joe joe, Args args) {
@@ -317,8 +317,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method remove
-    // @args fact
-    // @result this
+    // %args fact
+    // %result this
     // Deletes a single [[Fact]] from the database.
     private Object _remove(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "remove(fact)");
@@ -328,8 +328,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method removeAll
-    // @args facts
-    // @result this
+    // %args facts
+    // %result this
     // Deletes a collection of *facts* from the database.
     // The *facts* value can be a FactBase or a collection of values
     // to be converted to facts.
@@ -354,8 +354,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method removeIf
-    // @args predicate
-    // @result this
+    // %args predicate
+    // %result this
     // Deletes facts matching the predicate from the database.
     private Object _removeIf(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "filter(predicate)");
@@ -373,8 +373,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method rename
-    // @args oldName, newName
-    // @result this
+    // %args oldName, newName
+    // %result this
     // Renames a relation, replacing any existing relation that has the new
     // name.
     private Object _rename(FactBase db, Joe joe, Args args) {
@@ -388,8 +388,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method select
-    // @args rules
-    // @result Set
+    // %args rules
+    // %result Set
     // Queries the database using the Nero *rules* and returns all inferred
     // facts.  If the rule set contains `export` directives then the relevant
     // facts will be exported as domain values.  The database itself
@@ -403,8 +403,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method setDebug
-    // @args flag
-    // @result this
+    // %args flag
+    // %result this
     // Sets the database's debug flag.  If enabled,
     // [[FactBase#method.update]] and
     // [[FactBase#method.select]] will output a
@@ -417,7 +417,7 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method size
-    // @result Number
+    // %result Number
     // Returns the number of facts in the database.
     private Object _size(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "size()");
@@ -426,7 +426,7 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method toNero
-    // @result String
+    // %result String
     // Returns a Nero script containing the database items as
     // Nero axioms.
     private Object _toNero(FactBase db, Joe joe, Args args) {
@@ -436,7 +436,7 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method toString
-    // @result String
+    // %result String
     // Returns the value's string representation.
     private Object _toString(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "toString()");
@@ -445,8 +445,8 @@ public class FactBaseType extends ProxyType<FactBase> {
 
     //**
     // @method update
-    // @args rules
-    // @result this
+    // %args rules
+    // %result this
     // Updates the database using the Nero *rules*.  Inferred facts
     // are added to the database and then returned to the caller.
     // It is an error if the rule set contains `export` directives.

@@ -17,7 +17,7 @@ class GridPaneClass extends WidgetType<GridPane> {
     //**
     // @package joe.win
     // @widget GridPane
-    // @extends Pane
+    // %extends Pane
     // %javaType com.wjduquette.joe.win.GridPaneInstance
     // %proxyType com.wjduquette.joe.win.GridPaneClass
     // The `GridPane` type is a [[Pane]], derived from the JavaFX
@@ -85,8 +85,8 @@ class GridPaneClass extends WidgetType<GridPane> {
 
     //**
     // @static getHgrow
-    // @args node
-    // @result Priority
+    // %args node
+    // %result Priority
     // Gets how the [[Node]] will resize itself to the height of
     // its parent `GridPane`.
     private Object _getHgrow(Joe joe, Args args) {
@@ -97,8 +97,8 @@ class GridPaneClass extends WidgetType<GridPane> {
 
     //**
     // @static getMargin
-    // @args node
-    // @result Insets
+    // %args node
+    // %result Insets
     // Gets the [[Node]]'s margin in its parent `GridPane`.
     private Object _getMargin(Joe joe, Args args) {
         args.exactArity(1, "GridPane.getMargin(node)");
@@ -107,8 +107,8 @@ class GridPaneClass extends WidgetType<GridPane> {
 
     //**
     // @static getVgrow
-    // @args node
-    // @result Priority
+    // %args node
+    // %result Priority
     // Gets how the [[Node]] will resize itself to the height of
     // its parent `GridPane`.
     private Object _getVgrow(Joe joe, Args args) {
@@ -118,7 +118,7 @@ class GridPaneClass extends WidgetType<GridPane> {
 
     //**
     // @static setHgrow
-    // @args node, priority
+    // %args node, priority
     // Sets how the [[Node]] will resize itself to the height of
     // its parent `GridPane, given a [[Priority]] value.
     private Object _setHgrow(Joe joe, Args args) {
@@ -132,7 +132,7 @@ class GridPaneClass extends WidgetType<GridPane> {
 
     //**
     // @static setMargin
-    // @args node, insets
+    // %args node, insets
     // Gets the [[Node]]'s margin in its parent `GridPane` given an
     // [[Insets]] object.
     private Object _setMargin(Joe joe, Args args) {
@@ -146,7 +146,7 @@ class GridPaneClass extends WidgetType<GridPane> {
 
     //**
     // @static setVgrow
-    // @args node, priority
+    // %args node, priority
     // Sets how the [[Node]] will resize itself to the height of
     // its parent `GridPane`, given a [[Priority]] value.
     private Object _setVgrow(Joe joe, Args args) {
@@ -174,8 +174,8 @@ class GridPaneClass extends WidgetType<GridPane> {
 
     //**
     // @method at
-    // @args column, row, [columnSpan, rowSpan], node
-    // @result this
+    // %args column, row, [columnSpan, rowSpan], node
+    // %result this
     // Adds the *node* to the grid pane at the given *column* and *row*
     // with the given spans.  If omitted, the spans default to 1.
     private Object _at(GridPane pane, Joe joe, Args args) {
@@ -202,8 +202,8 @@ class GridPaneClass extends WidgetType<GridPane> {
 
     //**
     // @method hgap
-    // @args pixels
-    // @result this
+    // %args pixels
+    // %result this
     // Sets the gap between columns to the given number of *pixels*.
     private Object _hgap(GridPane pane, Joe joe, Args args) {
         args.exactArity(1, "hgap(pixels)");
@@ -213,8 +213,8 @@ class GridPaneClass extends WidgetType<GridPane> {
 
     //**
     // @method vgap
-    // @args pixels
-    // @result this
+    // %args pixels
+    // %result this
     // Sets the gap between rows to the given number of *pixels*.
     private Object _vgap(GridPane pane, Joe joe, Args args) {
         args.exactArity(1, "vgap(pixels)");

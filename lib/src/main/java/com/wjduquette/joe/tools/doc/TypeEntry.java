@@ -85,7 +85,7 @@ class TypeEntry extends Entry implements TypeOrMixin {
             var newContent = new ArrayList<String>();
             copyContent(mixin.content(), newContent);
 
-            // Insert the new content where the @includeMixin tag was
+            // Insert the new content where the %includeMixin tag was
             // found.
             var ndx = content().indexOf("<mixin " + mixin.name() + ">");
             if (ndx == -1) {

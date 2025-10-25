@@ -61,13 +61,16 @@ class DocCommentParser {
     //-------------------------------------------------------------------------
     // Parser
 
+    // Tags starting with "@" begin new entries.
+    // Tags starting with "%" are metadata for the current entry.
+
     private static final String MIXIN = "@mixin";
     private static final String PACKAGE = "@package";
-    private static final String TITLE = "@title";
+    private static final String TITLE = "%title";
     private static final String PACKAGE_TOPIC = "@packageTopic";
     private static final String FUNCTION = "@function";
-    private static final String ARGS = "@args";
-    private static final String RESULT = "@result";
+    private static final String ARGS = "%args";
+    private static final String RESULT = "%result";
     private static final String TYPE = "@type";
     private static final String JAVA_TYPE = "%javaType";
     private static final String PROXY_TYPE = "%proxyType";
@@ -78,8 +81,8 @@ class DocCommentParser {
     private static final String WIDGET = "@widget";
     private static final String SINGLETON = "@singleton";
     private static final String TYPE_TOPIC = "@typeTopic";
-    private static final String INCLUDE_MIXIN = "@includeMixin";
-    private static final String EXTENDS = "@extends";
+    private static final String INCLUDE_MIXIN = "%includeMixin";
+    private static final String EXTENDS = "%extends";
     private static final String CONSTANT = "@constant";
     private static final String STATIC = "@static";
     private static final String INIT = "@init";

@@ -13,7 +13,7 @@ class LabelType extends WidgetType<Label> {
     //**
     // @package joe.win
     // @widget Label
-    // @extends Labeled
+    // %extends Labeled
     // The `Label` widget, which displays text strings.
     public LabelType() {
         super("Label");
@@ -29,7 +29,7 @@ class LabelType extends WidgetType<Label> {
 
     //**
     // @init
-    // @args [text]
+    // %args [text]
     // Returns a `Label`.
     private Object _initializer(Joe joe, Args args) {
         args.arityRange(0, 1, "Label([text])");

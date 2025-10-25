@@ -5,7 +5,7 @@
 
 //**
 // @function assertEmpty
-// @args value
+// %args value
 // Throws AssertError if the value is not empty, displaying the actual value.
 export function assertEmpty(value) {
     if (!value.isEmpty()) {

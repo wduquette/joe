@@ -14,7 +14,7 @@ class SeparatorType extends WidgetType<Separator> {
     //**
     // @package joe.win
     // @widget Separator
-    // @extends Control
+    // %extends Control
     // The [[Separator]] widget is a horizontal or vertical separator.
     public SeparatorType() {
         super("Separator");
@@ -50,7 +50,7 @@ class SeparatorType extends WidgetType<Separator> {
 
     //**
     // @method horizontal
-    // @result this
+    // %result this
     // Sets the orientation to horizontal
     private Object _horizontal(Separator node, Joe joe, Args args) {
         args.exactArity(0, "horizontal()");
@@ -60,7 +60,7 @@ class SeparatorType extends WidgetType<Separator> {
 
     //**
     // @method vertical
-    // @result this
+    // %result this
     // Sets the orientation to vertical
     private Object _vertical(Separator node, Joe joe, Args args) {
         args.exactArity(0, "vertical()");

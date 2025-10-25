@@ -67,8 +67,8 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
 
     //**
     // @method append
-    // @args value
-    // @result this
+    // %args value
+    // %result this
     // Adds the value to the buffer.
     private Object _append(TextBuilder buff, Joe joe, Args args) {
         args.exactArity(1, "append(value)");
@@ -78,7 +78,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
 
     //**
     // @method clear
-    // @result this
+    // %result this
     // Clears the buffer.
     private Object _clear(TextBuilder buff, Joe joe, Args args) {
         args.exactArity(0, "clear()");
@@ -88,8 +88,8 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
 
     //**
     // @method print
-    // @args value
-    // @result this
+    // %args value
+    // %result this
     // Adds the value to the buffer.
     private Object _print(TextBuilder buff, Joe joe, Args args) {
         args.exactArity(1, "print(value)");
@@ -99,7 +99,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
 
     //**
     // @method printf
-    // @args fmt, [values...]
+    // %args fmt, [values...]
     // Formats its arguments given the *fmt* string, and appends the result
     // to the buffer.  See [[String#topic.formatting]] for the format
     // string syntax.
@@ -113,8 +113,8 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
 
     //**
     // @method println
-    // @args value
-    // @result this
+    // %args value
+    // %result this
     // Adds the value to the buffer, followed by a new line.
     private Object _println(TextBuilder buff, Joe joe, Args args) {
         args.exactArity(1, "println(value)");
@@ -124,7 +124,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
 
     //**
     // @method toString
-    // @result String
+    // %result String
     // Returns the string.
     private Object _toString(TextBuilder buff, Joe joe, Args args) {
         args.exactArity(0, "toString()");

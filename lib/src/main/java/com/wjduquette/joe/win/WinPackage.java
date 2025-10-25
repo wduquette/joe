@@ -31,7 +31,7 @@ public class WinPackage extends NativePackage {
     // It assumes a familiarity with JavaFX.
     //
     // @packageTopic hierarchy
-    // @title Widget Hierarchy
+    // %title Widget Hierarchy
     //
     // The `joe.win` widget type hierarchy is a subset of the JavaFX Java
     // class hierarchy.
@@ -58,7 +58,7 @@ public class WinPackage extends NativePackage {
     //   - [[Tab]]: A tab in a [[TabPane]]
     //
     // @packageTopic css
-    // @title Styling with CSS
+    // %title Styling with CSS
     //
     // Scripts can style widgets using CSS in several different ways.
     //
@@ -203,8 +203,8 @@ public class WinPackage extends NativePackage {
 
         //**
         // @static css
-        // @args css
-        // @result this
+        // %args css
+        // %result this
         // Sets the text of the CSS style sheet for the application as a
         // whole to *css*.  For example,
         //
@@ -234,8 +234,8 @@ public class WinPackage extends NativePackage {
 
         //**
         // @static cssFile
-        // @args filename
-        // @result this
+        // %args filename
+        // %result this
         // Sets the CSS style sheet for the application as a whole given
         // a path to a `.css` file.
         //
@@ -259,7 +259,7 @@ public class WinPackage extends NativePackage {
 
         //**
         // @static root
-        // @result VBox
+        // %result VBox
         // Returns the root window, a [[VBox]].
         private Object _root(Joe joe, Args args) {
             args.exactArity(0, "Win.root()");
@@ -268,8 +268,8 @@ public class WinPackage extends NativePackage {
 
         //**
         // @static setSize
-        // @args width, height
-        // @result this
+        // %args width, height
+        // %result this
         // Sets the preferred size of the root window.  The width and height
         // must be positive.
         private Object _setSize(Joe joe, Args args) {
@@ -286,8 +286,8 @@ public class WinPackage extends NativePackage {
 
         //**
         // @static setTitle
-        // @args title
-        // @result this
+        // %args title
+        // %result this
         // Sets the title of the root window.
         private Object _setTitle(Joe joe, Args args) {
             args.exactArity(1, "Win.setTitle(title)");

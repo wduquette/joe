@@ -9,7 +9,7 @@ class JoeDocPackage extends NativePackage {
 
     //**
     // @package joe.doc
-    // @title JoeDoc Configuration API
+    // %title JoeDoc Configuration API
     // The `joe.doc` package contains the Joe API used in
     // the `joe doc` configuration file, `doc_config.joe`.
     public JoeDocPackage(DocConfig config) {
@@ -24,7 +24,7 @@ class JoeDocPackage extends NativePackage {
 
     //**
     // @function inputFile
-    // @args filename,...
+    // %args filename,...
     // Adds the paths of one or more files to scan for JoeDoc
     // comments.  File paths are relative to the location of the
     // `doc_config.joe` file.
@@ -39,7 +39,7 @@ class JoeDocPackage extends NativePackage {
 
     //**
     // @function inputFolder
-    // @args folder,...
+    // %args folder,...
     // Adds the paths of one or more folders to scan for files
     // containing JoeDoc comments. `joe doc` will scan all
     // `.java` and `.joe` files in the folders, recursing down
@@ -58,7 +58,7 @@ class JoeDocPackage extends NativePackage {
 
     //**
     // @function javadocRoot
-    // @args pkg, root
+    // %args pkg, root
     // Specifies the Javadoc URL *root* for the named package.
     // The *root* may be an HTTP URL, or a file path relative
     // to the mdBook `docs/` folder.
@@ -85,7 +85,7 @@ class JoeDocPackage extends NativePackage {
 
     //**
     // @function outputFolder
-    // @args folder
+    // %args folder
     // Sets the name of the folder to receive the generated outputs.
     // If unset, defaults to the folder containing the `doc_config.joe`
     // file.
