@@ -68,7 +68,7 @@
  
 # Library Reference
 
-- [Library API](library/index.md)
+- [Library API](library.md)
   - [Joe Standard Library (joe)](./library/pkg.joe.md)
     - [AssertError Type](./library/type.joe.AssertError.md)
     - [Boolean Type](./library/type.joe.Boolean.md)
