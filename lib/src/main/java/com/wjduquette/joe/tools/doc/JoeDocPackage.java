@@ -16,10 +16,27 @@ class JoeDocPackage extends NativePackage {
         super("joe.doc");
         this.config = config;
 
+        function("expand",        this::_expand);
         function("inputFile",     this::_inputFile);
         function("inputFolder",   this::_inputFolder);
         function("javadocRoot",   this::_javadocRoot);
         function("outputFolder",  this::_outputFolder);
+    }
+
+    //**
+    // @function expand
+    // %args sourceFile, destFile
+    // Adds the paths of a *sourceFile* to be expanded into a *destFile*
+    // after all input files has been processed.  The paths are relative
+    // to the `<docConfig>/src` folder, where `<docConfig>` is the
+    // location of the `doc_config.joe` file.
+    private Object _expand(Joe joe, Args args) {
+        args.exactArity(2, "expand(sourceFile, destFile)");
+        var srcFolder = Path.of("src").toAbsolutePath();
+        var sourceFile = srcFolder.resolve(joe.toString(args.next()));
+        var destFile = srcFolder.resolve(joe.toString(args.next()));
+        config.filePairs().add(new DocConfig.FilePair(sourceFile, destFile));
+        return null;
     }
 
     //**

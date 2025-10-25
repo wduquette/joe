@@ -34,6 +34,7 @@ public class ConsolePackage extends NativePackage {
 
     //**
     // @package joe.console
+    // %title Console API
     // This package contains an API for use by simple command-line tools.
     //
     // Using it, clients can:

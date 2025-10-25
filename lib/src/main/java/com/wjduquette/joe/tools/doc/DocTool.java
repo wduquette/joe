@@ -136,12 +136,27 @@ public class DocTool implements Tool {
             }
         }
 
+//        docSet.dump();
+
         if (errors > 0) {
             println("*** Errors found in JoeDoc input; terminating.");
             exit(1);
         }
 
-//        docSet.dump();
+        // NEXT, expand any source files into output files.
+        var expander = new Expander(config, docSet, verbose);
+        for (var pair : config.filePairs()) {
+            try {
+                expander.expand(pair.sourceFile(), pair.destFile());
+            } catch (Expander.ParseError ex) {
+                ++errors;
+            }
+        }
+
+        if (errors > 0) {
+            println("*** Errors found in JoeDoc input; terminating.");
+            exit(1);
+        }
 
         // NEXT, generate the doc files
         var generator = new Generator(config, docSet, verbose);

@@ -75,6 +75,10 @@ class ContentWriter extends PrintWriter {
         println("**[" + title + "](#" + id + ")**");
     }
 
+    public void link(String linkText, String url) {
+        print("[" + linkText + "](" + url + ")");
+    }
+
     public void topic(String topic, String text) {
         println("**" + topic + "**: " + text + "<br>");
     }

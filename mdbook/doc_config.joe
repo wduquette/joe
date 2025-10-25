@@ -3,6 +3,8 @@ inputFolder("../lib/src/main/java/com/wjduquette/joe");
 inputFolder("../lib/src/main/resources/com/wjduquette/joe");
 outputFolder("src/library");
 
+expand("SUMMARY-input.md", "SUMMARY.md");
+
 // Javadoc roots
 javadocRoot("com.wjduquette.joe",            "javadoc/");
 javadocRoot("com.wjduquette.joe.console",    "javadoc/");
