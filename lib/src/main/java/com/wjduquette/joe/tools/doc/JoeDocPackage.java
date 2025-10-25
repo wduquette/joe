@@ -16,60 +16,101 @@ class JoeDocPackage extends NativePackage {
         super("joe.doc");
         this.config = config;
 
-        function("expand",        this::_expand);
-        function("inputFile",     this::_inputFile);
-        function("inputFolder",   this::_inputFolder);
-        function("javadocRoot",   this::_javadocRoot);
-        function("outputFolder",  this::_outputFolder);
+        // Soon to be obsolete
+        function("expand",          this::_expand);
+
+        // Configuration functions
+        function("codeFiles",       this::_codeFiles);
+        function("codeFolders",     this::_codeFolders);
+        function("docInputFolder",  this::docInputFolder);
+        function("docOutputFolder", this::docOutputFolder);
+        function("javadocRoot",     this::_javadocRoot);
+        function("libOutputFolder",   this::libOutputFolder);
+        function("siteFolder",      this::_siteFolder);
+
     }
 
     //**
     // @function expand
-    // %args sourceFile, destFile
-    // Adds the paths of a *sourceFile* to be expanded into a *destFile*
+    // %args sourceFiles, destFile
+    // Adds the paths of a *sourceFiles* to be expanded into a *destFile*
     // after all input files has been processed.  The paths are relative
     // to the `<docConfig>/src` folder, where `<docConfig>` is the
     // location of the `doc_config.joe` file.
     private Object _expand(Joe joe, Args args) {
-        args.exactArity(2, "expand(sourceFile, destFile)");
+        args.exactArity(2, "expand(sourceFiles, destFile)");
         var srcFolder = Path.of("src").toAbsolutePath();
-        var sourceFile = srcFolder.resolve(joe.toString(args.next()));
+        var sourceFiles = srcFolder.resolve(joe.toString(args.next()));
         var destFile = srcFolder.resolve(joe.toString(args.next()));
-        config.filePairs().add(new DocConfig.FilePair(sourceFile, destFile));
+        config.filePairs().add(new DocConfig.FilePair(sourceFiles, destFile));
         return null;
     }
 
     //**
-    // @function inputFile
+    // @function codeFiles
     // %args filename,...
-    // Adds the paths of one or more files to scan for JoeDoc
+    // Adds the paths of one or more Java/Joe source files to scan for JoeDoc
     // comments.  File paths are relative to the location of the
     // `doc_config.joe` file.
-    private Object _inputFile(Joe joe, Args args) {
-        args.minArity(1, "inputFile(filename, ...)");
+    private Object _codeFiles(Joe joe, Args args) {
+        args.minArity(1, "codeFiles(filename, ...)");
 
         for (var name : args.asList()) {
-            config.inputFiles().add(Path.of(joe.toString(name)));
+            config.codeFiles().add(Path.of(joe.toString(name)));
         }
         return null;
     }
 
     //**
-    // @function inputFolder
+    // @function codeFolders
     // %args folder,...
-    // Adds the paths of one or more folders to scan for files
+    // Adds the paths of one or more folders to scan for Java/Joe files
     // containing JoeDoc comments. `joe doc` will scan all
     // `.java` and `.joe` files in the folders, recursing down
     // into subfolders.
     //
     // Folder paths are relative to the location of the
     // `doc_config.joe` file.
-    private Object _inputFolder(Joe joe, Args args) {
-        args.minArity(1, "inputFolder(folder, ...)");
+    private Object _codeFolders(Joe joe, Args args) {
+        args.minArity(1, "codeFolders(folder, ...)");
 
         for (var name : args.asList()) {
-            config.inputFolders().add(Path.of(joe.toString(name)));
+            config.codeFolders().add(Path.of(joe.toString(name)));
         }
+        return null;
+    }
+
+    //**
+    // @function docInputFolder
+    // %args folder
+    // Sets the name of the folder in which to find input files for expansion.
+    // `joe doc` will copy all files in the folder to the doc output folder,
+    // recursing down into subfolders, and expanding all `.md` files.
+    //
+    // Output files will have the same name as their input files, and will
+    // appear in an identical folder tree.
+    //
+    // The folder path is relative to the location of the
+    // `doc_config.joe` file.
+    private Object docInputFolder(Joe joe, Args args) {
+        args.exactArity(1, "docInputFolder(folder)");
+
+        config.setDocInputFolder(Path.of(joe.toString(args.next())));
+        return null;
+    }
+
+    //**
+    // @function docOutputFolder
+    // %args folder
+    // Sets the name of the folder to receive the (possibly expanded) files
+    // from the doc input folder.
+    //
+    // The folder path is relative to the location of the
+    // `doc_config.joe` file.
+    private Object docOutputFolder(Joe joe, Args args) {
+        args.exactArity(1, "docOutputFolder(folder)");
+
+        config.setDocOutputFolder(Path.of(joe.toString(args.next())));
         return null;
     }
 
@@ -101,16 +142,33 @@ class JoeDocPackage extends NativePackage {
     }
 
     //**
-    // @function outputFolder
+    // @function libOutputFolder
     // %args folder
     // Sets the name of the folder to receive the generated outputs.
     // If unset, defaults to the folder containing the `doc_config.joe`
     // file.
-    private Object _outputFolder(Joe joe, Args args) {
-        args.exactArity(1, "outputFolder(folder)");
+    private Object libOutputFolder(Joe joe, Args args) {
+        args.exactArity(1, "libOutputFolder(folder)");
 
-        config.setOutputFolder(Path.of(joe.toString(args.next())));
+        config.setLibOutputFolder(Path.of(joe.toString(args.next())));
         return null;
     }
+
+    //**
+    // @function siteFolder
+    // %args folder
+    // Sets the name of the folder that will contain the final output of
+    // the static site generator.
+    //
+    // The folder path is relative to the location of the
+    // `doc_config.joe` file.
+    private Object _siteFolder(Joe joe, Args args) {
+        args.exactArity(1, "siteFolder(folder)");
+
+        config.setSiteFolder(Path.of(joe.toString(args.next())));
+        return null;
+    }
+
+
 }
 

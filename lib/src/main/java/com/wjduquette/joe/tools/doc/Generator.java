@@ -44,7 +44,7 @@ class Generator {
     public void generate() {
         // FIRST, create the output folder (if it doesn't already exist)
         try {
-            Files.createDirectories(config.outputFolder());
+            Files.createDirectories(config.libraryFolder());
         } catch (Exception ex) {
             System.out.println("*** Could not create output folder:\n" +
                 "  " + ex.getMessage());
@@ -65,7 +65,7 @@ class Generator {
         }
 
         // NEXT, generate the index file.
-        write(config.outputFolder().resolve(DOC_SET_INDEX),
+        write(config.libraryFolder().resolve(DOC_SET_INDEX),
             this::writeDocSetIndex);
 
         // NEXT, generate the files for each package, in order.
@@ -75,12 +75,12 @@ class Generator {
             populateShortTable(pkg);
 
             // NEXT, write the package file
-            write(config.outputFolder().resolve(pkg.filename()),
+            write(config.libraryFolder().resolve(pkg.filename()),
                 out -> writePackageFile(out, pkg));
 
             // NEXT, write each type file
             for (var type : sorted(pkg.types(), TypeEntry::name)) {
-                write(config.outputFolder().resolve(type.filename()),
+                write(config.libraryFolder().resolve(type.filename()),
                     out -> writeTypeFile(out, type));
             }
         }

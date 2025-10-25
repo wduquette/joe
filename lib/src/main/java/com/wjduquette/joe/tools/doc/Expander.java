@@ -48,7 +48,7 @@ class Expander {
         // Compute libFolder, for index links
         // TODO: This is butt-ugly.
         var mdbookSrcFolder = Path.of("src").toAbsolutePath();
-        var outputFolder = config.outputFolder().toAbsolutePath();
+        var outputFolder = config.libraryFolder().toAbsolutePath();
         this.libFolder = mdbookSrcFolder.relativize(outputFolder);
     }
 

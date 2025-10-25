@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Configuration data for `joe doc`
+ * Configuration data for `joe doc`.  The configuration can be created
+ * manually
  */
 class DocConfig {
     // A source file to process.
@@ -16,12 +17,26 @@ class DocConfig {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The folders and files to scan for JoeDoc comments
-    private final List<Path> inputFolders = new ArrayList<>();
-    private final List<Path> inputFiles = new ArrayList<>();
+    // The folder containing the `doc_config.joe` file.
+    private final Path docConfigFolder;
 
-    // The library output folder
-    private Path outputFolder;
+    // The folder which will receive the finished HTML document produced
+    // by the static site generator.
+    private Path siteFolder;
+
+    // Folder in which to find input files for expansion.
+    private Path docInputFolder;
+
+    // Folder in which to write the (possibly expanded) input files for
+    // processing by the static site generator
+    private Path docOutputFolder;
+
+    // The folders and files to scan for JoeDoc comments
+    private final List<Path> codeFolders = new ArrayList<>();
+    private final List<Path> codeFiles = new ArrayList<>();
+
+    // The library output folder, to received generated API docs
+    private Path libOutputFolder;
 
     // Markdown files to process.
     private final List<FilePair> filePairs = new ArrayList<>();
@@ -34,27 +49,60 @@ class DocConfig {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public DocConfig() {
-        // Nothing to do
+    /**
+     * Creates the configuration, for population by executing the
+     * doc_config.joe file.
+     * @param docConfigFolder Folder containing the configuration file.
+     */
+    public DocConfig(Path docConfigFolder) {
+        this.docConfigFolder = docConfigFolder;
     }
 
     //-------------------------------------------------------------------------
     // Accessors
 
-    public List<Path> inputFolders() {
-        return inputFolders;
+    public Path docConfigFolder() {
+        return docConfigFolder;
     }
 
-    public List<Path> inputFiles() {
-        return inputFiles;
+    public Path siteFolder() {
+        return siteFolder;
     }
 
-    public Path outputFolder() {
-        return outputFolder;
+    public void setSiteFolder(Path folder) {
+        this.siteFolder = folder;
     }
 
-    public void setOutputFolder(Path outputFolder) {
-        this.outputFolder = outputFolder;
+    public Path docInputFolder() {
+        return docInputFolder;
+    }
+
+    public void setDocInputFolder(Path folder) {
+        this.docInputFolder = folder;
+    }
+
+    public Path docOutputFolder() {
+        return docOutputFolder;
+    }
+
+    public void setDocOutputFolder(Path folder) {
+        this.docOutputFolder = folder;
+    }
+
+    public List<Path> codeFolders() {
+        return codeFolders;
+    }
+
+    public List<Path> codeFiles() {
+        return codeFiles;
+    }
+
+    public Path libraryFolder() {
+        return libOutputFolder;
+    }
+
+    public void setLibOutputFolder(Path folder) {
+        this.libOutputFolder = folder;
     }
 
     public List<FilePair> filePairs() {

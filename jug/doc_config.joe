@@ -1,9 +1,7 @@
-// Configuration for the Joe library docs
-siteFolder("../docs");
-codeFolders(
-    "../lib/src/main/java/com/wjduquette/joe",
-    "../lib/src/main/resources/com/wjduquette/joe");
-libOutputFolder("src/library");
+// JUG `joe doc` configuration
+sourceFolder("../lib/src/main/java/com/wjduquette/joe");
+sourceFolder("../lib/src/main/resources/com/wjduquette/joe");
+libraryFolder("mdbook/src/library");
 
 expand("SUMMARY-input.md", "SUMMARY.md");
 
