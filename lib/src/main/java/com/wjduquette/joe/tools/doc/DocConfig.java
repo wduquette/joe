@@ -61,6 +61,16 @@ class DocConfig {
     //-------------------------------------------------------------------------
     // Accessors
 
+    /**
+     * Resolves the path relative to the location of the doc_config.joe
+     * file.
+     * @param path The relative path.
+     * @return The resolved path.
+     */
+    public Path resolve(String path) {
+        return docConfigFolder.resolve(path);
+    }
+
     public Path docConfigFolder() {
         return docConfigFolder;
     }

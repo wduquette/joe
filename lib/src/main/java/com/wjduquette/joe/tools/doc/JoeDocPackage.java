@@ -56,7 +56,7 @@ class JoeDocPackage extends NativePackage {
         args.minArity(1, "codeFiles(filename, ...)");
 
         for (var name : args.asList()) {
-            config.codeFiles().add(Path.of(joe.toString(name)));
+            config.codeFiles().add(config.resolve(joe.toString(name)));
         }
         return null;
     }
@@ -75,7 +75,7 @@ class JoeDocPackage extends NativePackage {
         args.minArity(1, "codeFolders(folder, ...)");
 
         for (var name : args.asList()) {
-            config.codeFolders().add(Path.of(joe.toString(name)));
+            config.codeFolders().add(config.resolve(joe.toString(name)));
         }
         return null;
     }
@@ -95,7 +95,7 @@ class JoeDocPackage extends NativePackage {
     private Object docInputFolder(Joe joe, Args args) {
         args.exactArity(1, "docInputFolder(folder)");
 
-        config.setDocInputFolder(Path.of(joe.toString(args.next())));
+        config.setDocInputFolder(config.resolve(joe.toString(args.next())));
         return null;
     }
 
@@ -110,7 +110,7 @@ class JoeDocPackage extends NativePackage {
     private Object docOutputFolder(Joe joe, Args args) {
         args.exactArity(1, "docOutputFolder(folder)");
 
-        config.setDocOutputFolder(Path.of(joe.toString(args.next())));
+        config.setDocOutputFolder(config.resolve(joe.toString(args.next())));
         return null;
     }
 
@@ -119,7 +119,7 @@ class JoeDocPackage extends NativePackage {
     // %args pkg, root
     // Specifies the Javadoc URL *root* for the named package.
     // The *root* may be an HTTP URL, or a file path relative
-    // to the mdBook `docs/` folder.
+    // to the configured `siteFolder`.
     //
     // ```joe
     // var jdk = "https://docs.oracle.com/en/java/javase/21/docs/api/";
@@ -150,7 +150,7 @@ class JoeDocPackage extends NativePackage {
     private Object libOutputFolder(Joe joe, Args args) {
         args.exactArity(1, "libOutputFolder(folder)");
 
-        config.setLibOutputFolder(Path.of(joe.toString(args.next())));
+        config.setLibOutputFolder(config.resolve(joe.toString(args.next())));
         return null;
     }
 
@@ -165,7 +165,7 @@ class JoeDocPackage extends NativePackage {
     private Object _siteFolder(Joe joe, Args args) {
         args.exactArity(1, "siteFolder(folder)");
 
-        config.setSiteFolder(Path.of(joe.toString(args.next())));
+        config.setSiteFolder(config.resolve(joe.toString(args.next())));
         return null;
     }
 
