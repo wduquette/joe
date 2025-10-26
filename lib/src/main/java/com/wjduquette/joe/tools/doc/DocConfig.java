@@ -11,9 +11,6 @@ import java.util.Map;
  * manually
  */
 class DocConfig {
-    // A source file to process.
-    public record FilePair(Path sourceFile, Path destFile) {}
-
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -37,9 +34,6 @@ class DocConfig {
 
     // The library output folder, to received generated API docs
     private Path libOutputFolder;
-
-    // Markdown files to process.
-    private final List<FilePair> filePairs = new ArrayList<>();
 
     // Mapping from Java package names to javadoc package tree
     // prefix (an HTTP url or a path relative to the mdbook docs/
@@ -71,10 +65,12 @@ class DocConfig {
         return docConfigFolder.resolve(path);
     }
 
+    @SuppressWarnings("unused")
     public Path docConfigFolder() {
         return docConfigFolder;
     }
 
+    @SuppressWarnings("unused")
     public Path siteFolder() {
         return siteFolder;
     }
@@ -107,16 +103,12 @@ class DocConfig {
         return codeFiles;
     }
 
-    public Path libraryFolder() {
+    public Path libOutputFolder() {
         return libOutputFolder;
     }
 
     public void setLibOutputFolder(Path folder) {
         this.libOutputFolder = folder;
-    }
-
-    public List<FilePair> filePairs() {
-        return filePairs;
     }
 
     public Map<String,String> javadocRoots() {

@@ -144,14 +144,13 @@ public class DocTool implements Tool {
             exit(1);
         }
 
-        // NEXT, expand any source files into output files.
-        var expander = new Expander(config, docSet, verbose);
-        for (var pair : config.filePairs()) {
-            try {
-                expander.expand(pair.sourceFile(), pair.destFile());
-            } catch (Expander.ParseError ex) {
-                ++errors;
-            }
+        // NEXT, process docInput files to docOutput files.
+        var processor = new Processor(config, docSet, verbose);
+
+        try {
+            processor.process();
+        } catch (Processor.ProcessError ex) {
+            ++errors;
         }
 
         if (errors > 0) {
@@ -159,7 +158,7 @@ public class DocTool implements Tool {
             exit(1);
         }
 
-        // NEXT, generate the doc files
+        // NEXT, generate the library doc files
         var generator = new Generator(config, docSet, verbose);
         generator.generate();
     }

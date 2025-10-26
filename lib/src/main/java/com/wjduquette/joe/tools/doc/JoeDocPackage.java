@@ -2,8 +2,6 @@ package com.wjduquette.joe.tools.doc;
 
 import com.wjduquette.joe.*;
 
-import java.nio.file.Path;
-
 class JoeDocPackage extends NativePackage {
     private final DocConfig config;
 
@@ -16,34 +14,15 @@ class JoeDocPackage extends NativePackage {
         super("joe.doc");
         this.config = config;
 
-        // Soon to be obsolete
-        function("expand",          this::_expand);
-
         // Configuration functions
         function("codeFiles",       this::_codeFiles);
         function("codeFolders",     this::_codeFolders);
         function("docInputFolder",  this::docInputFolder);
         function("docOutputFolder", this::docOutputFolder);
         function("javadocRoot",     this::_javadocRoot);
-        function("libOutputFolder",   this::libOutputFolder);
+        function("libOutputFolder", this::libOutputFolder);
         function("siteFolder",      this::_siteFolder);
 
-    }
-
-    //**
-    // @function expand
-    // %args sourceFiles, destFile
-    // Adds the paths of a *sourceFiles* to be expanded into a *destFile*
-    // after all input files has been processed.  The paths are relative
-    // to the `<docConfig>/src` folder, where `<docConfig>` is the
-    // location of the `doc_config.joe` file.
-    private Object _expand(Joe joe, Args args) {
-        args.exactArity(2, "expand(sourceFiles, destFile)");
-        var srcFolder = Path.of("src").toAbsolutePath();
-        var sourceFiles = srcFolder.resolve(joe.toString(args.next()));
-        var destFile = srcFolder.resolve(joe.toString(args.next()));
-        config.filePairs().add(new DocConfig.FilePair(sourceFiles, destFile));
-        return null;
     }
 
     //**

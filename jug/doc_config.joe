@@ -1,9 +1,13 @@
 // JUG `joe doc` configuration
-sourceFolder("../lib/src/main/java/com/wjduquette/joe");
-sourceFolder("../lib/src/main/resources/com/wjduquette/joe");
-libraryFolder("mdbook/src/library");
+siteFolder("../docs");
+docInputFolder("src");
+docOutputFolder("mdbook/src");
+codeFolders(
+    "../lib/src/main/java/com/wjduquette/joe",
+    "../lib/src/main/resources/com/wjduquette/joe");
+libOutputFolder("mdbook/src/library");
 
-expand("SUMMARY-input.md", "SUMMARY.md");
+//expand("SUMMARY-input.md", "SUMMARY.md");
 
 // Javadoc roots
 javadocRoot("com.wjduquette.joe",            "javadoc/");

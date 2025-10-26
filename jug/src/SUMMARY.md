@@ -69,12 +69,12 @@
 # Library Reference
 
 - [Library API](library.md)
-@indent 2
-@package joe
-@package joe.console
-@package joe.win
-@package joe.test
-@package joe.doc
+@:indent 2
+@:packageIndex joe
+@:packageIndex joe.console
+@:packageIndex joe.win
+@:packageIndex joe.test
+@:packageIndex joe.doc
   - [Library API Index](./library/index.md)
 
 ---
