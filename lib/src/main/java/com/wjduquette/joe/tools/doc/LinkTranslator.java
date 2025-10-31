@@ -1,6 +1,8 @@
 package com.wjduquette.joe.tools.doc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -120,69 +122,97 @@ class LinkTranslator {
 
     /**
      * Expands JoeDoc links in the given line, taking the current package
-     * into account.  Links preceded with "\" are left intact
+     * into account.  Links preceded with "\" are left intact.
      * @param line The input line
      * @return The translated line
      */
     public String translateLinks(String line) {
         var buff = new StringBuilder();
-        var head = line;
-        int ndx;
 
-        while ((ndx = head.indexOf("[[")) != -1) {
-            buff.append(head, 0, ndx);
-            head = head.substring(ndx);
-
-            // NEXT, for incomplete link
-            var tail = head.indexOf("]]");
-            if (tail == -1) {
-                buff.append(head);
-                return buff.toString();
-            }
-
-            // NEXT, extract the entire mnemonic.
-            var linkSpec = head.substring(2, tail);
-            head = head.substring(tail + 2);
-
-            // NEXT, look for link text.
-            var tokens = linkSpec.split("\\|");
-            var mnemonic = tokens[0];
-
-            // NEXT, is this a javadoc link?
-            if (mnemonic.startsWith("java:")) {
-                var className = mnemonic.substring(5);
-                var url = javadocUrl(className);
-
-                var linkText = tokens.length > 1
-                    ? tokens[1] : className;
-
-                if (url == null) {
-                    warn("Unknown Java package in '[[" + linkSpec + "]]");
-                    buff.append(linkText);
-                } else {
-                    buff.append(link(linkText, url));
-                }
+        for (var fragment : fragments(line)) {
+            // Escaped links
+            if (fragment.startsWith("\\[[")) {
+                buff.append(fragment.substring(1));
+            } else if (!fragment.startsWith("[[")) {
+                // Plain text
+                buff.append(fragment);
+            } else if (!fragment.endsWith("]]")) {
+                // Unterminated link
+                buff.append(fragment);
             } else {
-                // FIRST, get the entity.  If not found, issue a warning and
-                // leave a placeholder.
-                var entry = lookup(mnemonic);
-                if (entry == null) {
-                    // Leave it in place; it's incorrect.
-                    warn("Unknown mnemonic in link: [[" + mnemonic + "]]");
-                    buff.append("[[").append(linkSpec).append("]]");
+                var linkSpec = fragment.substring(2, fragment.length() - 2);
+
+                if (linkSpec.startsWith("java:")) {
+                    buff.append(translateJavaLink(linkSpec));
                 } else {
-                    var linkText = tokens.length > 1
-                        ? tokens[1]
-                        : inlineLinkText(entry);
-                    buff.append(link(linkText, entry.url()));
+                    buff.append(translateMnemonic(linkSpec));
                 }
             }
         }
 
-        buff.append(head);
         return buff.toString();
     }
 
+    private String translateMnemonic(String linkSpec) {
+        var tokens = linkSpec.split("\\|");
+        var mnemonic = tokens[0];
+
+        var entry = lookup(mnemonic);
+        if (entry == null) {
+            // Leave it in place; it's incorrect.
+            warn("Unknown mnemonic in link: [[" + linkSpec + "]]");
+            return "[[" + linkSpec + "]]";
+        } else {
+            var linkText = tokens.length > 1
+                ? tokens[1]
+                : inlineLinkText(entry);
+            return link(linkText, entry.url());
+        }
+    }
+
+    private String translateJavaLink(String linkSpec) {
+        var tokens = linkSpec.split("\\|");
+        var mnemonic = tokens[0];
+        var className = mnemonic.substring(5);
+        var linkText = tokens.length > 1 ? tokens[1] : mono(className);
+        var url = javadocUrl(className);
+
+        if (url == null) {
+            warn("Unknown Java package in '[[" + linkSpec + "]]");
+            return linkText;
+        } else {
+            return link(linkText, url);
+        }
+    }
+
+    private List<String> fragments(String line) {
+        var fragments = new ArrayList<String>();
+        var head = line;
+        int ndx;
+
+        while ((ndx = head.indexOf("[[")) != -1) {
+            // FIRST, look for an escape
+            if (ndx > 0 && head.charAt(ndx - 1) == '\\') {
+                --ndx;
+            }
+
+            // NEXT, get the plain text leading up to the link
+            fragments.add(head.substring(0, ndx));
+            head = head.substring(ndx);
+
+            // NEXT, find the end.
+            var tail = head.indexOf("]]");
+            if (tail == -1) break;
+            fragments.add(head.substring(0, tail + 2));
+            head = head.substring(tail + 2);
+        }
+
+        if (!head.isEmpty()) {
+            fragments.add(head);
+        }
+
+        return fragments;
+    }
 
     /**
      * Given the fully-qualified name of a Java class, return the
@@ -207,6 +237,10 @@ class LinkTranslator {
      */
     public String javadocUrl(String className) {
         var pkg = getPackageName(className);
+        if (pkg == null) {
+            warn("Unqualified Java class name: '" + className + "'");
+            return null;
+        }
         var root = config.javadocRoots().get(pkg);
         if (root == null) return null;
 
@@ -217,7 +251,7 @@ class LinkTranslator {
     // Given a qualified class name, get the package name.
     private String getPackageName(String className) {
         var ndx = className.lastIndexOf(".");
-        return className.substring(0, ndx);
+        return ndx != -1 ? className.substring(0, ndx) : null;
     }
 
     // Given an entry, get the link text used for in-line links.

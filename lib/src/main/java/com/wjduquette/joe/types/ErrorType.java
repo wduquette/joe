@@ -108,9 +108,8 @@ public class ErrorType extends ProxyType<JoeError> {
     //**
     // @method traces
     // %result List
-    // Returns the list of trace strings.  Clients may add to the list
-    // using [[Error#method.addInfo]].
-    // and rethrow the error.
+    // Returns the list of trace strings.  Clients can add to the list
+    // using [[Error#method.addInfo]] and rethrow the error.
     private Object _traces(JoeError error, Joe joe, Args args) {
         args.exactArity(0, "traces()");
         return new ListValue(error.getTraces().stream()
