@@ -28,6 +28,7 @@ class Processor {
     private final DocConfig config;
     private final DocumentationSet docSet;
     private final boolean verbose;
+    private final LinkTranslator xlator;
 
     //
     // Transients
@@ -52,6 +53,7 @@ class Processor {
         this.config = config;
         this.docSet = docSet;
         this.verbose = verbose;
+        this.xlator = new LinkTranslator(config, docSet, this::warn);
     }
 
     //-------------------------------------------------------------------------
@@ -138,6 +140,8 @@ class Processor {
     private void expandMarkdownFile(Path inputFile) throws Exception {
         var relFile = config.docInputFolder().relativize(inputFile);
         var outputFile = config.docOutputFolder().resolve(relFile);
+        xlator.setLibraryPath(pathToLibrary(outputFile));
+
         Files.createDirectories(outputFile.getParent());
         if (verbose) {
             System.out.println("Expanding: " + inputFile);
@@ -154,6 +158,11 @@ class Processor {
 
         this.indent = 0;
         write(outputFile, this::process);
+    }
+
+    private Path pathToLibrary(Path outputFile) {
+        var folder = outputFile.getParent();
+        return folder.relativize(config.libOutputFolder());
     }
 
     //-------------------------------------------------------------------------
@@ -242,7 +251,7 @@ class Processor {
     private boolean advanceToTag(ContentWriter out) {
         while (!atEnd() && !peek().isTagged()) {
             var line = advance();
-            out.println(line.text());
+            out.println(xlator.translateLinks(line.text()));
         }
 
         if (!atEnd()) {
@@ -277,6 +286,10 @@ class Processor {
     // ProcessError is just a convenient way to break out of the processor.
     // We halt on the first error for now.
     static class ProcessError extends RuntimeException { }
+
+    private void warn(String message) {
+        warn(previous(), message);
+    }
 
     private void warn(Line line, String message) {
         System.out.println("*** Warning in: " + currentInput);

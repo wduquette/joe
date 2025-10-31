@@ -66,8 +66,8 @@ A([x]) :- A(x);
 If allowed, this program would produce the following infinite stream of facts:
 
 - `A([0])`
-- `A([[0]])`
-- `A([[[0]]])`
+- `A(\[[0]])`
+- `A(\[[[0]]])`
 - ...
 
 

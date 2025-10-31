@@ -13,20 +13,20 @@ Joe provides a number of standard data types, as described in the
 [Joe Standard Library](../library/pkg.joe.md) section.  Joe represents these internally
 as their normal Java types.
 
-| Joe Type  | Java Type                                            |
-|-----------|------------------------------------------------------|
-| `Boolean` | `java.lang.Boolean`                                  |
-| `Error`   | `com.wjduquette.joe.JoeError` (a `RuntimeException`) |
-| `Keyword` | `com.wjduquette.joe.Keyword`                         |
-| `List`    | `com.wjduquette.joe.JoeList` (a `List<Object>`)      |
-| `Number`  | `java.lang.Double`                                   |
-| `String`  | `java.lang.String`                                   |
+| Joe Type        | Java Type                                                   |
+|-----------------|-------------------------------------------------------------|
+| [[joe.Boolean]] | [[java:java.lang.Boolean]]                                  |
+| [[joe.Error]]   | [[java:com.wjduquette.joe.JoeError]] (a `RuntimeException`) |
+| [[joe.Keyword]] | [[java:com.wjduquette.joe.Keyword]]                         |
+| [[joe.List]]    | [[java:com.wjduquette.joe.JoeList]] (a `List<Object>`)      |
+| [[joe.Number]]  | [[java:java.lang.Double]]                                   |
+| [[joe.String]]  | [[java:java.lang.String]]                                   |
 
 When a script passes a value into Java, consequently, 
 
-- A Joe `List` is a Java `List<Object>`. 
-- A Joe string is a Java `String`.  
-- A Joe `Number` is a Java `Double`. 
+- A Joe [[joe.List]] is already a Java `List<Object>`. 
+- A Joe [[joe.String]] is already a Java `String`.  
+- A Joe [[joe.Number]] is already a Java `Double`. 
 
 This greatly decreases the amount of work a binding needs to do when working 
 with Joe values, compared to other embedded languages I have used.

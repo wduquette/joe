@@ -207,7 +207,7 @@ In addition, `foreach` can use a [pattern](patterns.md) to do a
 destructuring bind on each list item:
 
 ```joe
-var list = [[#a, 1], [#b, 2], #whoops, [#c, 3]];
+var list = \[[#a, 1], [#b, 2], #whoops, [#c, 3]];
 
 // Prints #a, #b, and #c on successive lines
 foreach ([x, _] : list) {

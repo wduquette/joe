@@ -44,7 +44,7 @@ subject to change without notice):
 
 ```
 $ nero run --debug simple.nero 
-Rule Strata: [[Ancestor]]
+Rule Strata: \[[Ancestor]]
 Iteration 0.1:
   Rule: Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
   Rule: Ancestor(x, y) :- Parent(x, y);

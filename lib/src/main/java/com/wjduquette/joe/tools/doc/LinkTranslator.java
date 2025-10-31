@@ -1,5 +1,6 @@
 package com.wjduquette.joe.tools.doc;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,9 @@ class LinkTranslator {
     // The table of short mnemonics for the current package.
     private PackageEntry currentPackage = null;
     private final Map<String,Entry> pkgTable = new HashMap<>();
+
+    // The relative path from the current file to the library folder.
+    private Path libraryPath = null;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -60,6 +64,22 @@ class LinkTranslator {
         if (pkg != null) {
             pkg.entries().forEach(e -> pkgTable.put(e.shortMnemonic(), e));
         }
+    }
+
+    @SuppressWarnings("unused")
+    public Path getLibraryPath() {
+        return libraryPath;
+    }
+
+    /**
+     * Sets the relative path from the file currently being processed to
+     * the library folder. This is used when translating links for
+     * processed Markdown files; it need not and should be set when
+     * generating the library API.
+     * @param path The path
+     */
+    public void setLibraryPath(Path path) {
+        this.libraryPath = path;
     }
 
     //-------------------------------------------------------------------------
@@ -166,7 +186,16 @@ class LinkTranslator {
             var linkText = tokens.length > 1
                 ? tokens[1]
                 : inlineLinkText(entry);
-            return link(linkText, entry.url());
+
+            // The entry.url() is a file name + "#fragment".
+            // We need to resolve it against the library path.
+            // If the current file is a generated file, the library path
+            // is not needed.
+            var url = libraryPath != null
+                ? libraryPath.resolve(entry.url()).toString()
+                : entry.url();
+
+            return link(linkText, url);
         }
     }
 

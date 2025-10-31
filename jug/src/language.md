@@ -21,7 +21,7 @@ A vanilla `Joe` interpreter:
 The client is free to add bindings in Java that do both, as described
 in the [Extending Joe](extending/extending.md) section, and as 
 the [`joe run`](joe_run.md) and [`joe repl`](joe_repl.md) do by
-adding the [`joe.console` package](library/pkg.joe.console.md).
+adding the [[joe.console]] package.
 
 Joe has its origin in the Lox language from Robert Nystrom's 
 outstanding book and website, 
