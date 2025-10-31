@@ -55,7 +55,7 @@ public class DocTool implements Tool {
     private boolean verbose = false;
 
     // The client's configuration
-    private final DocConfig config = new DocConfig();
+    private final DocConfig config;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -64,7 +64,8 @@ public class DocTool implements Tool {
      * Creates an instance of the DocTool.
      */
     public DocTool() {
-        // Nothing to do
+        var configFolder = DOC_CONFIG.toAbsolutePath().getParent();
+        this.config = new DocConfig(configFolder);
     }
 
     //-------------------------------------------------------------------------
@@ -118,7 +119,7 @@ public class DocTool implements Tool {
         // NEXT, populate the list of files.
         scanInputFolders();
 
-        if (config.inputFiles().isEmpty()) {
+        if (config.codeFiles().isEmpty()) {
             println("*** No files found.");
             exit();
         }
@@ -127,7 +128,7 @@ public class DocTool implements Tool {
         var docSet = new DocumentationSet();
         var parser = new DocCommentParser(docSet, verbose);
         var errors = 0;
-        for (var file : config.inputFiles()) {
+        for (var file : config.codeFiles()) {
             try {
                 parser.parse(file);
             } catch (DocCommentParser.ParseError ex) {
@@ -143,14 +144,13 @@ public class DocTool implements Tool {
             exit(1);
         }
 
-        // NEXT, expand any source files into output files.
-        var expander = new Expander(config, docSet, verbose);
-        for (var pair : config.filePairs()) {
-            try {
-                expander.expand(pair.sourceFile(), pair.destFile());
-            } catch (Expander.ParseError ex) {
-                ++errors;
-            }
+        // NEXT, process docInput files to docOutput files.
+        var processor = new Processor(config, docSet, verbose);
+
+        try {
+            processor.process();
+        } catch (Processor.ProcessError ex) {
+            ++errors;
         }
 
         if (errors > 0) {
@@ -158,14 +158,14 @@ public class DocTool implements Tool {
             exit(1);
         }
 
-        // NEXT, generate the doc files
+        // NEXT, generate the library doc files
         var generator = new Generator(config, docSet, verbose);
         generator.generate();
     }
 
     private void scanInputFolders() {
         println("Scanning folders:");
-        for (var folder : config.inputFolders()) {
+        for (var folder : config.codeFolders()) {
             println("  " + folder);
             scanFolder(folder);
         }
@@ -178,7 +178,7 @@ public class DocTool implements Tool {
         try (var stream = Files.walk(folder)) {
             stream
                 .filter(p -> FILE_TYPES.contains(fileType(p)))
-                .forEach(config.inputFiles()::add);
+                .forEach(config.codeFiles()::add);
         } catch (IOException ex) {
             println("*** Failed to scan '" + folder + "':\n" +
                 ex.getMessage());

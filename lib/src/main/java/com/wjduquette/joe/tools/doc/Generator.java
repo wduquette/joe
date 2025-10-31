@@ -22,7 +22,7 @@ class Generator {
     private final boolean verbose;
 
     // Transient
-    private final transient Map<String,Entry> shortTable = new HashMap<>();
+    private final LinkTranslator xlator;
     private Path outFile = null;
 
     //-------------------------------------------------------------------------
@@ -32,6 +32,7 @@ class Generator {
         this.config = config;
         this.docSet = docSet;
         this.verbose = verbose;
+        this.xlator = new LinkTranslator(config, docSet, this::warn);
     }
 
     //-------------------------------------------------------------------------
@@ -44,7 +45,7 @@ class Generator {
     public void generate() {
         // FIRST, create the output folder (if it doesn't already exist)
         try {
-            Files.createDirectories(config.outputFolder());
+            Files.createDirectories(config.libOutputFolder());
         } catch (Exception ex) {
             System.out.println("*** Could not create output folder:\n" +
                 "  " + ex.getMessage());
@@ -52,11 +53,7 @@ class Generator {
 
         // NEXT, prepare for generation
         for (var pkg : docSet.packages()) {
-            // FIRST, populate the short mnemonic lookup table for this
-            // package
-            populateShortTable(pkg);
-
-            // NEXT, include any mixins.
+            xlator.setCurrentPackage(pkg);
             for (var type : pkg.types()) {
                 if (!type.mixins().isEmpty()) {
                     includeMixins(type);
@@ -65,22 +62,22 @@ class Generator {
         }
 
         // NEXT, generate the index file.
-        write(config.outputFolder().resolve(DOC_SET_INDEX),
+        write(config.libOutputFolder().resolve(DOC_SET_INDEX),
             this::writeDocSetIndex);
 
         // NEXT, generate the files for each package, in order.
         for (var pkg : sorted(docSet.packages(), PackageEntry::name)) {
-            // FIRST, populate the short mnemonic lookup table for this
-            // package
-            populateShortTable(pkg);
+            // FIRST, prepare to do lookups and link translation for this
+            // package.
+            xlator.setCurrentPackage(pkg);
 
             // NEXT, write the package file
-            write(config.outputFolder().resolve(pkg.filename()),
+            write(config.libOutputFolder().resolve(pkg.filename()),
                 out -> writePackageFile(out, pkg));
 
             // NEXT, write each type file
             for (var type : sorted(pkg.types(), TypeEntry::name)) {
-                write(config.outputFolder().resolve(type.filename()),
+                write(config.libOutputFolder().resolve(type.filename()),
                     out -> writeTypeFile(out, type));
             }
         }
@@ -98,11 +95,6 @@ class Generator {
         }
     }
 
-    private void populateShortTable(PackageEntry pkg) {
-        shortTable.clear();
-        pkg.entries().forEach(e -> shortTable.put(e.shortMnemonic(), e));
-    }
-
     //-------------------------------------------------------------------------
     // Documentation Set Index
 
@@ -116,7 +108,7 @@ class Generator {
         out.println();
 
         for (var pkg : sorted(docSet.packages(), PackageEntry::name)) {
-            populateShortTable(pkg);
+            xlator.setCurrentPackage(pkg);
 
             out.println("- [" + packageIndexTitle(pkg) + "](" +
                 pkg.filename() + ")");
@@ -239,26 +231,14 @@ class Generator {
         writeTypeHierarchy(out, type);
 
         if (type.javaType() != null) {
-            var url = javaUrl(type.javaType());
-            var linkText = "`" + type.javaType() + "`";
             out.print("**Java Type**: ");
-            if (url != null) {
-                out.print(link(linkText, url));
-            } else {
-                out.print(linkText);
-            }
+            out.print(xlator.javadocLink(type.javaType()));
             out.println("<br>");
         }
 
         if (type.proxyType() != null) {
-            var url = javaUrl(type.proxyType());
-            var linkText = "`" + type.proxyType() + "`";
             out.print("**Proxy Type**: ");
-            if (url != null) {
-                out.print(link(linkText, url));
-            } else {
-                out.print(linkText);
-            }
+            out.print(xlator.javadocLink(type.proxyType()));
             out.println("<br>");
         }
         out.println();
@@ -288,7 +268,7 @@ class Generator {
                 out.printf("| `%s` | %s | %s |\n",
                     c.name(),
                     c.valueType() != null
-                        ? typeLinkOrName(c.valueType())
+                        ? xlator.typeLinkOrName(c.valueType())
                         : "-",
                     flatLine(c.content())
                 );
@@ -320,7 +300,7 @@ class Generator {
                 out.printf("| `%s` | %s | %s |\n",
                     f.name(),
                     f.valueType() != null
-                        ? typeLinkOrName(f.valueType())
+                        ? xlator.typeLinkOrName(f.valueType())
                         : "-",
                     flatLine(f.content())
                 );
@@ -338,15 +318,15 @@ class Generator {
             while (supertype != null) {
                 for (var p : supertype.properties()) {
                     out.printf("| %s | `#%s` | %s | %s |\n",
-                        typeLinkOrName(supertype.name()),
+                        xlator.typeLinkOrName(supertype.name()),
                         p.name(),
                         p.valueType() != null
-                            ? typeLinkOrName(p.valueType())
+                            ? xlator.typeLinkOrName(p.valueType())
                             : "-",
                         flatLine(p.content())
                     );
                 }
-                supertype = lookupType(supertype.supertypeName());
+                supertype = xlator.lookupType(supertype.supertypeName());
             }
             out.println();
         }
@@ -358,12 +338,12 @@ class Generator {
                 .forEach(m -> writeCallableLink(out, 0, m));
         }
 
-        var supertype = lookupType(type.supertypeName());
+        var supertype = xlator.lookupType(type.supertypeName());
         while (supertype != null) {
-            out.println("- " + typeLinkOrName(supertype.name()) + " methods");
+            out.println("- " + xlator.typeLinkOrName(supertype.name()) + " methods");
             sorted(supertype.methods(), MethodEntry::name)
                 .forEach(m -> writeCallableLink(out, 2, m));
-            supertype = lookupType(supertype.supertypeName());
+            supertype = xlator.lookupType(supertype.supertypeName());
         }
 
         // NEXT, output the remaining content
@@ -412,10 +392,10 @@ class Generator {
 
     private String supertypeLinks(TypeEntry type) {
         var links = new ArrayList<String>();
-        var supertype = lookupType(type.supertypeName());
+        var supertype = xlator.lookupType(type.supertypeName());
         while (supertype != null) {
-            links.add(typeLinkOrName(supertype.name()));
-            supertype = lookupType(supertype.supertypeName());
+            links.add(xlator.typeLinkOrName(supertype.name()));
+            supertype = xlator.lookupType(supertype.supertypeName());
         }
         return String.join(" ← ", links.reversed());
     }
@@ -427,7 +407,7 @@ class Generator {
             .filter(t -> type.shortMnemonic().equals(t.supertypeName()) ||
                 type.fullMnemonic().equals(t.supertypeName()))
             .sorted(Comparator.comparing(TypeEntry::name))
-            .map(t -> typeLinkOrName(t.shortMnemonic()))
+            .map(t -> xlator.typeLinkOrName(t.shortMnemonic()))
             .toList();
         return String.join(", ", subtypes);
     }
@@ -493,7 +473,7 @@ class Generator {
             );
 
             if (callable.result() != null) {
-                out.print(" → " + typeLinkOrName(callable.result()));
+                out.print(" → " + xlator.typeLinkOrName(callable.result()));
             }
             out.println();
         }
@@ -527,7 +507,7 @@ class Generator {
 
         for (var sig : signatures(callable)) {
             result.add(callable.result() != null
-                ? "**" + sig + " → " + typeLinkOrName(callable.result()) + "**"
+                ? "**" + sig + " → " + xlator.typeLinkOrName(callable.result()) + "**"
                 : "**" + sig + "**");
         }
         return String.join("<br>\n", result);
@@ -556,147 +536,16 @@ class Generator {
         return signatures;
     }
 
-    private String typeLinkOrName(String name) {
-        var type = lookupType(name);
-
-        if (type != null) {
-            return "[" + type.name() + "](" + type.filename() + ")";
-        } else {
-            return name;
-        }
-    }
-
-    private TypeEntry lookupType(String name) {
-        if (name == null) {
-            return null;
-        }
-
-        var entry = docSet.lookup(name);
-
-        if (entry == null) {
-            entry = shortTable.get(name);
-        }
-
-        if (entry instanceof TypeEntry type) {
-            return type;
-        } else {
-            return null;
-        }
-    }
-
     //-------------------------------------------------------------------------
     // Mnemonic Links
 
     private List<String> expandMnemonicLinks(List<String> content) {
         var list = new ArrayList<String>();
         content.stream()
-            .map(this::expandLinks)
+            .map(xlator::translateLinks)
             .forEach(list::add);
         return list;
     }
-
-    private String expandLinks(String line) {
-        var buff = new StringBuilder();
-        var head = line;
-        int ndx;
-
-        while ((ndx = head.indexOf("[[")) != -1) {
-//            buff.append(head.substring(0, ndx));
-            buff.append(head, 0, ndx);
-            head = head.substring(ndx);
-
-            // NEXT, for incomplete link
-            var tail = head.indexOf("]]");
-            if (tail == -1) {
-                buff.append(head);
-                return buff.toString();
-            }
-
-            // NEXT, extract the entire mnemonic.
-            var linkSpec = head.substring(2, tail);
-            head = head.substring(tail + 2);
-
-            // NEXT, look for link text.
-            var tokens = linkSpec.split("\\|");
-            var mnemonic = tokens[0];
-
-            // NEXT, is this a javadoc link?
-            if (mnemonic.startsWith("java:")) {
-                var className = mnemonic.substring(5);
-                var url = javaUrl(className);
-
-                var linkText = tokens.length > 1
-                    ? tokens[1] : className;
-
-                if (url == null) {
-                    warn("Unknown Java package in '[[" + linkSpec + "]]");
-                    buff.append(linkText);
-                } else {
-                    buff.append(link(linkText, url));
-                }
-            } else {
-                // FIRST, get the entity.  If not found, issue a warning and
-                // leave a placeholder.
-                var entry = lookupMnemonic(mnemonic);
-                if (entry == null) {
-                    // Leave it in place; it's incorrect.
-                    warn("Unknown mnemonic in link: [[" + mnemonic + "]]");
-                    buff.append("[[").append(linkSpec).append("]]");
-                } else {
-                    var linkText = tokens.length > 1
-                        ? tokens[1]
-                        : inlineLinkText(entry);
-                    buff.append(link(linkText, entry.url()));
-                }
-            }
-        }
-
-        buff.append(head);
-        return buff.toString();
-    }
-
-    private String getPackageName(String className) {
-        var ndx = className.lastIndexOf(".");
-        return className.substring(0, ndx);
-    }
-
-    private String javaUrl(String className) {
-        var pkg = getPackageName(className);
-        var root = config.javadocRoots().get(pkg);
-        if (root == null) return null;
-        var separator = root.endsWith("/") ? "" : "/";
-        return root + separator + className.replace(".", "/") + ".html";
-    }
-
-    private Entry lookupMnemonic(String mnemonic) {
-        var entry = docSet.lookup(mnemonic);
-        if (entry == null) entry = shortTable.get(mnemonic);
-        return entry;
-    }
-
-    private String inlineLinkText(Entry entry) {
-        return switch (entry) {
-            case PackageEntry pkg -> mono(pkg.name());
-            case FunctionEntry fn -> mono(fn.name() + "()");
-            case TypeEntry t -> mono(t.name());
-            case ConstantEntry c
-                -> mono(c.type().name() + "." + c.name());
-            case StaticMethodEntry m
-                -> mono(m.type().name() + "." + m.name() + "()");
-            case InitializerEntry fn
-                -> mono(fn.name() + "()");
-            case FieldEntry f
-                -> mono(f.prefix() + "." + f.name());
-            case PropertyEntry p
-                -> mono("#" + p.name());
-            case MethodEntry m
-                -> mono(m.name() + "()");
-            case TopicEntry t
-                -> t.title();
-            default -> throw new IllegalArgumentException("Unknown entry type!");
-        };
-    }
-
 
     //-------------------------------------------------------------------------
     // Entry Helpers

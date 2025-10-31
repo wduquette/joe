@@ -18,6 +18,7 @@ class ButtonType extends WidgetType<Button> {
     // @widget Button
     // %extends Labeled
     // %javaType javafx.scene.control.Button
+    // %proxyType com.wjduquette.joe.win.ButtonProxy
     // The `Button` type is the base class for JavaFX
     // labels like [[Button]] widgets.
     public ButtonType() {
