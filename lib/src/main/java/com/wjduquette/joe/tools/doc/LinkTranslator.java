@@ -183,9 +183,29 @@ class LinkTranslator {
         return buff.toString();
     }
 
-    // Given the name of a Java class, return the URL to its Javadoc page,
-    // or null if its Javadoc root is unknown.
-    private String javadocUrl(String className) {
+
+    /**
+     * Given the fully-qualified name of a Java class, return the
+     * Markdown link to its Javadoc page, or the monospace class name
+     * if its Javadoc root is unknown.
+     * @param className The Java class name.
+     * @return The URL or null.
+     */
+    public String javadocLink(String className) {
+        var linkText = "`" + className + "`";
+        var url = javadocUrl(className);
+        return url == null
+            ? linkText
+            : link(linkText, url);
+    }
+
+    /**
+     * Given the fully-qualified name of a Java class, return the URL to its
+     * Javadoc page, or null if its Javadoc root is unknown.
+     * @param className The Java class name.
+     * @return The URL or null.
+     */
+    public String javadocUrl(String className) {
         var pkg = getPackageName(className);
         var root = config.javadocRoots().get(pkg);
         if (root == null) return null;

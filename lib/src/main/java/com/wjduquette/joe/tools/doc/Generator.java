@@ -231,26 +231,14 @@ class Generator {
         writeTypeHierarchy(out, type);
 
         if (type.javaType() != null) {
-            var url = javaUrl(type.javaType());
-            var linkText = "`" + type.javaType() + "`";
             out.print("**Java Type**: ");
-            if (url != null) {
-                out.print(link(linkText, url));
-            } else {
-                out.print(linkText);
-            }
+            out.print(xlator.javadocLink(type.javaType()));
             out.println("<br>");
         }
 
         if (type.proxyType() != null) {
-            var url = javaUrl(type.proxyType());
-            var linkText = "`" + type.proxyType() + "`";
             out.print("**Proxy Type**: ");
-            if (url != null) {
-                out.print(link(linkText, url));
-            } else {
-                out.print(linkText);
-            }
+            out.print(xlator.javadocLink(type.proxyType()));
             out.println("<br>");
         }
         out.println();
@@ -557,19 +545,6 @@ class Generator {
             .map(xlator::translateLinks)
             .forEach(list::add);
         return list;
-    }
-
-    private String getPackageName(String className) {
-        var ndx = className.lastIndexOf(".");
-        return className.substring(0, ndx);
-    }
-
-    private String javaUrl(String className) {
-        var pkg = getPackageName(className);
-        var root = config.javadocRoots().get(pkg);
-        if (root == null) return null;
-        var separator = root.endsWith("/") ? "" : "/";
-        return root + separator + className.replace(".", "/") + ".html";
     }
 
     //-------------------------------------------------------------------------
