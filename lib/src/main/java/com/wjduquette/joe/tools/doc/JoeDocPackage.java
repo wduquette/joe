@@ -113,10 +113,17 @@ class JoeDocPackage extends NativePackage {
     // in the *pkg* to JavaDoc links.
     private Object _javadocRoot(Joe joe, Args args) {
         args.minArity(1, "javadocRoot(pkg, prefix)");
-        config.javadocRoots().put(
-            joe.toString(args.next()),
-            joe.toString(args.next())
-        );
+        var pkg = joe.toString(args.next());
+        var root = joe.toString(args.next());
+        if (!root.startsWith("http") && !root.startsWith("/")) {
+            if (config.siteFolder() == null) {
+                throw new JoeError(
+                    "siteFolder() is required for relative javadocRoots, but " +
+                    "is not yet configured.");
+            }
+            root = config.siteFolder().resolve(root).toString();
+        }
+        config.javadocRoots().put(pkg, root);
         return null;
     }
 
