@@ -33,7 +33,7 @@ class ControlType extends WidgetType<Control> {
         // @property tooltipText joe.String
         // The control's tooltip string.
         fxProperty("tooltipText", Control::tooltipProperty,
-            Win::toTooltip, Tooltip::getText);
+            Win::toTooltip, this::unwrapTooltipText);
 
         // Methods
         method("tooltipText", this::_tooltipText);
@@ -51,5 +51,9 @@ class ControlType extends WidgetType<Control> {
         args.exactArity(1, "tooltipText(text)");
         node.setTooltip(new Tooltip(joe.stringify(args.next())));
         return node;
+    }
+
+    private String unwrapTooltipText(Tooltip tooltip) {
+        return tooltip != null ? tooltip.getText() : null;
     }
 }
