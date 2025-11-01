@@ -29,9 +29,9 @@ Joe includes:
 - Classes with single inheritance
 - Immutable record types
 - Rust-like pattern matching
-- A complete, tightly integrated Datalog subsystem called Nero.
+- Nero, a tightly integrated Datalog subsystem.
 - A test runner for scripted testing.
-- An API documentation generator based on "Joe Doc" comments.
+- An API documentation generator based on "JoeDoc" comments.
 - A rich Java API for embedding Joe in Java apps and libraries, and
   for extending Joe's library to support new problem domains.
 - Support for the JavaFX GUI library
@@ -64,13 +64,16 @@ Joe has become that language.
 
 ## Non-Goals
 
+The following were not goals in this development
+
 **High Performance**: Joe is byte-compiled, so it's faster than it could
-be; I'm following the original Tcl/Tk dictum: write the fast code in the host 
-language and glue it together with the scripting language.  (And if I were
-seeking super-high-performance, I wouldn't be working in Java anyway.)
+be.  However, I'm following the original Tcl/Tk dictum: write the fast code 
+in the host language and glue it together with the scripting 
+language. (And if I were seeking super-high-performance I wouldn't be working 
+in Java anyway.)
 
 **Application development**: See above.  Joe is meant to be a partner with
-Java, not a replacement.
+Java, not a replacement.  However, it can be used to write small apps.
 
 **General scripting**: Joe's ecosystem is growing to support general
 scripting, but that isn't the primary use case.
@@ -82,15 +85,17 @@ how to work with mutable state without shooting myself in the foot.
 **Automatic binding to Java classes**: I've used generators like Swig, and
 I understand Java reflection.  I _could_ write the code to let Joe call
 Java code without any help, effectively generating the glue code on the
-fly.  But in my experience, generated code like this produces APIs that
-fail to make good use of the scripting language's features, and when the
-API is used incorrectly usually produce horrible, cryptic error messages.  
+fly.  But in my experience, generated APIs of this kind:
+
+- Produce horrible, cryptic, unhelpful error messages
+- Fail to make good use of the scripting language's strengths
+ 
 Artisanal hand-crafted bindings can do a much better job, and so Joe is 
 designed to make it easy to write custom bindings that are a pleasure to use.
 
 ## Why Java?
 
-I've been using Java professionally, full-time, for the last decade years.  I'm
+I've been using Java professionally, full-time, for over a decade.  I'm
 comfortable with it, I'm getting good results from it, and I like the way the
 language is evolving. I've done lots of both non-GUI and GUI programming in 
 Java (using the JavaFX toolkit), and it's my currently language of choice
@@ -109,23 +114,19 @@ of Lua.
 I like Tcl very much; but Java is innately object-oriented, and Tcl is not a 
 great match for scripting object-oriented APIs. In addition, the JTcl
 implementation is dead, and as it includes a bunch of code I have no need of
-or interest in, I don't really want to fork it and take over maintenance.
+or interest in I don't really want to fork it and take over maintenance.
 
 I used Nashorn for a period of time, back with Java 8; it was easy to get
 started with, but I didn't care for the API I had to use to talk to it, and I 
-had to do a lot of work to provide useful error messages.  And then, of course,
+had to do a lot of work to provide useful error messages.  And then
 the powers that be deprecated it, and announced that the future alternative
 was to switch to the Graal VM and run my embedded Javascript in Node.  Um, 
 no.  The tail on that dog is much too big.
 
-I've used LuaJ quite a bit. It has some nice features, and I know Lua is
-quite popular, especially for video game development; but Lua's syntax and some
-of the language choices are weird from a Java point of view, and LuaJ has
-a host of other problems.  The error messages are frequently unhelpful; the 
-standard library is incomplete; and I kind of hate Lua tables with a 
-passion.  (I've been acquainted with "associative arrays" since I first used 
-Awk in the late 1980's.  But Lua tables are just weird, and the standard table 
-API has some peculiar holes.)
+I've used LuaJ quite a bit. It has some nice features, but it's incomplete,
+unsupported, and has a number of bugs.  The error messages are generally
+unhelpful.  In addition, while Lua is quite popular these days, its syntax
+and some of the other choices are weird from a Java point of view.
 
 And then I ran into Robert Nystrom's Lox (see below), and realized that I
 could build on his example and produce a language that meets my needs and 
@@ -135,7 +136,7 @@ aesthetics.
 
 I know the trend these days is to pick a language with a package manager and
 then construct your app from dozens, if not hundreds, of external packages.
-And sure, you can do that.  Me, I'll be over here not worrying about 
+And sure, you can do that. Go wild. Me, I'll be over here not worrying about 
 supply chain issues.
 
 ## Why Sandboxed?

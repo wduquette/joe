@@ -305,7 +305,7 @@ destructuring binds, including Joe's full pattern syntax.
 ## Throw
 
 The `throw` statement is used to explicitly throw 
-[error exceptions](library/type.joe.Error.md) in a Joe script.
+[[joe.Error|error exceptions]] in a Joe script.
 
 ```joe
 if (x <= 0) {
@@ -323,7 +323,7 @@ if (x <= 0) {
 ```
 
 Thrown errors can be caught using the 
-[catch()](library/pkg.joe.md#function.catch) function; and once caught
+[[function:joe.catch]] function, and once caught
 can be rethrown.
 
 ## Assert

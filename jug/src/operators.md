@@ -18,7 +18,7 @@ The `+`, `-`, `*`, and `/` operators (including unary `-`) are defined as in
 Java, with the usual precedence.
 
 The `+` operator provides string concatenation instead of numeric addition
-if at least one operand is a `String`.
+if at least one operand is a [[joe.String]].
 
 ## Comparison Operators
 
@@ -27,12 +27,12 @@ The `==` and `!=` compare for equality using the logic of Java's
 equality.  As a result, Joe values do not provide an `equals()` method.
 
 The `>`, `<`, `>=`, and `<=` operators compare numbers as they do in Java,
-but also compare `Strings` lexicographically.
+but also compare [[joe.String|Strings]] lexicographically.
 
 ## Membership Operators
 
 The `in` and `ni` ("Not In") operators check for membership of elements in 
-collections, e.g., Joe [`List`](library/type.joe.List.md) values.
+collections, e.g., Joe [[joe.List]] values.
 
 ```joe
 var list = List("A", "B", "C");
@@ -74,9 +74,10 @@ matching and Joe's pattern syntax.
 
 ## Logical Operators
 
-The `&&` and `||` operators provide short-circuit execution of Boolean
-expressions in the usual way.  However, in Joe the values `false` and `null` 
-are considered false in Boolean expressions, and all other values are 
+The `&&` and `||` operators provide short-circuit execution of 
+[[joe.Boolean]] expressions in the usual way.  However, in Joe 
+any value can be used in a Boolean expression.  The values `false` and `null` 
+are considered false, and all other values are 
 considered true.  
 
 Thus, instead of yielding `true` or `false`, `&&` and `||` yield the 
@@ -106,8 +107,8 @@ println(x > 50 ? "big" : "small"); // Prints "big"
 The `=`, `+=`, `-=`, `*=`, and `/=` operators work essentially as they do in 
 Java.
 
-In addition, the `+=` operator concatenates strings if either the left or 
-right-hand side is a string, just as `+` does.
+In addition, the `+=` operator concatenates [[joe.String|strings]] if either 
+the left or right-hand side is a string, just as `+` does.
 
 ```joe
 x = y = 5;  // Assigns 5 to x and y.

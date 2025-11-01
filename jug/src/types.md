@@ -26,7 +26,7 @@ interoperate with Java.
 
 ## Booleans
 
-[Boolean values](library/type.joe.Boolean.md) are represented by the 
+[[joe.Boolean]] values are represented by the 
 familiar constants `true` and `false`, and internally as Java `Booleans`.
 
 In boolean expressions, `false` and `null` count as false; all 
@@ -34,7 +34,7 @@ other values are considered "truthy".
 
 ## Numbers
 
-All [numbers](library/type.joe.Number.md) are represented as IEEE 
+All [[joe.Number|numbers]] are represented as IEEE 
 double precision values, i.e., Java `Doubles`, as in Javascript and Lua.
 
 Syntactically, numeric literals are defined as in Java.
@@ -46,7 +46,7 @@ Syntactically, numeric literals are defined as in Java.
 
 ## Strings
 
-[Joe strings](library/type.joe.String.md) are represented internally 
+Joe [[joe.String|strings]] are represented internally 
 as Java `String` values, and provide much the same range of operations.
 
 String literals are double-quoted, as in Java:
@@ -99,7 +99,7 @@ readable.
 
 ## Keywords
 
-A [Keyword](library/type.joe.Keyword.md) is a symbolic value, implemented internally using
+A [[joe.Keyword]] is a symbolic value, implemented internally using
 Joe's `Keyword` class.  Keywords are frequently used where a Java 
 program would use enumerations.
 
@@ -115,7 +115,7 @@ matches the enum's name (disregarding case).
 
 ## Lists
 
-A [List](library/type.joe.List.md) is a Java `List<Object>` that contains an ordered collection 
+A [[joe.List]] is a Java `List<Object>` that contains an ordered collection 
 of arbitrary Joe values, and has much the same operations as Java 
 lists.  See the link for the full API.
 
@@ -176,7 +176,7 @@ Indices are zero-based, and must refer to an existing item.
 
 ## Sets
 
-A [Set](library/type.joe.Set.md) is a Java `Set<Object>`.  It has much
+A [[joe.Set]] is a Java `Set<Object>`.  It has much
 the same operations as Java sets, along with some advanced methods.
 
 There are several ways to create sets:
@@ -218,7 +218,7 @@ var flag = set.contains(#a);  // true!
 
 ## Maps
 
-A [Map](library/type.joe.Map.md) is a Java `Map<Object,Object>`, 
+A [[joe.Map]] is a Java `Map<Object,Object>`, 
 key/value store.  It has much the same operations as Java maps.
 See the link for the full API.
 
@@ -276,13 +276,12 @@ map[#d] = 4;       // map.put(#d, 4);
 
 ## Errors
 
-An [Error](library/type.joe.Error.md) is a Java `JoeError` exception:
+An [[joe.Error]] is a Java `JoeError` exception:
 a Joe runtime error, an error thrown explicitly by a Joe script, or
 a Joe assertion failure.
 
 Errors are thrown using the `throw` or `assert` statements, and can
-be caught using the [catch()](library/pkg.joe.md#function.catch) 
-function.
+be caught using the [[function:joe.catch]] function.
 
 ## Functions and Methods
 

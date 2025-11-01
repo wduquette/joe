@@ -16,6 +16,10 @@
 - Library
   - Experimental `joe.win` Package
     - Enhancements and cleanup 
+- Tools
+  - Extended `joe doc` to process standalone Markdown files, translating
+    JoeDoc links and inserting content from the scanned JoeDoc comments.
+  - JoeDoc link mnemonics are now more readable.
 
 ## Changes in 0.8.0 (30 August 2025)
 
@@ -126,9 +130,9 @@
       ordered list of immutable fields.
     - Added `JoeType::isRecordType` to support this infrastructure.
 - Standard Library
-  - Added the [`Type`](library/type.joe.Type.md) type as the root of the 
+  - Added the [[joe.Type]] type as the root of the 
     Joe type system.
-  - Added the [`Joe`](library/type.joe.Joe.md) type as the host of Joe's
+  - Added the [[joe.Joe]] type as the host of Joe's
     introspection (aka reflection) API.  Also, moved several global functions
     to be static methods of `Joe`:
     - `Joe.compare()`

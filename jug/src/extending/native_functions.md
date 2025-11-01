@@ -9,7 +9,8 @@ Object _myFunction(Joe joe, Args args) { ... }
 
 - Every native function returns a Joe value, possibly `null`.
 - Every native function receives two arguments: `joe`, a reference to the
-  `Joe` interpreter, and `args`, any arguments passed to the function.
+  [[java:com.wjduquette.joe.Joe|Joe]] interpreter, and 
+  [[java:com.wjduquette.joe.Args|`args`]], any arguments passed to the function.
 
 It is the function's task to do the following:
 
@@ -66,8 +67,8 @@ If *args* contains an incorrect number of arguments,
 
 **Minimum Arity**: the `Args::minArity` method checks that the 
 *args* contains at least a minimum number of arguments.  For example, 
-[`Number.max()`](../library/type.joe.Number.md#static.max) requires at least 1 argument but can take any number of 
-arguments.
+[[static:joe.Number.max]] requires at least 1 argument but can take any 
+number of arguments.
 
 ```java
 args.minArity(1, "Number.max(number,...)");
@@ -75,8 +76,8 @@ args.minArity(1, "Number.max(number,...)");
 
 **Arity Range**: the `Args::arityRange` method checks that the number of 
 arguments false within a certain range.  For example, the 
-[`String`](../library/type.joe.String.md) type's 
-[`substring()`](../library/type.joe.String.md#method.substring) method takes
+[[joe.String]] type's 
+[[method:joe.String.substring]] method takes
 1 or 2 arguments:
 
 ```java
@@ -135,18 +136,6 @@ There are three ways to convert an argument that is to be treated as a String.
 
 Which of these you use will depend on the native function in question.  To
 some extent it's a matter of taste.
-
-### Converting Booleans
-
-Joe allows any value to appear in Boolean expressions.  `false` and `null`
-are interpreted as false; all other values are interpreted as true.  As a result,
-it's best to convert arguments meant to be used as Booleans with the
-`Joe.isTruthy()` function; this guarantees that the native function handles
-boolean values in the same way as Joe does at the script level:
-
-```java
-var flag = Joe.isTruthy(arg);
-```
 
 ## Returning the Result
 

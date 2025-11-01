@@ -25,7 +25,7 @@ export function myExportedFunction() { ... }
 
 To write a function that takes a variable length argument list, use
 the `args` parameter.  `args` will accept zero or more arguments, which
-it will present to the function as a Joe [List](library/type.joe.List.md).
+it will present to the function as a Joe [[joe.List]].
 
 ```joe
 function howdy(greeting, args) {
