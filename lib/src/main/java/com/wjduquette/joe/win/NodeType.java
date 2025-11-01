@@ -52,7 +52,7 @@ class NodeType extends WidgetType<Node> {
 
         //**
         // @property style joe.String
-        // FXCSS style string. See [[joe.win#topic.css]].
+        // FXCSS style string. See [[topic:joe.win.css]].
         fxProperty("style", Node::styleProperty, Joe::toString);
 
         //**
@@ -110,8 +110,8 @@ class NodeType extends WidgetType<Node> {
     // is omitted.
     //
     // This method is equivalent to calling both
-    // [[HBox#static.setHgrow]] and
-    // [[GridPane#static.setHgrow]] for this node.
+    // [[static:HBox.setHgrow]] and
+    // [[static:GridPane.setHgrow]] for this node.
     private Object _hgrow(Node node, Joe joe, Args args) {
         args.arityRange(0, 1, "hgrow([priority])");
         var priority = args.isEmpty()
@@ -166,7 +166,7 @@ class NodeType extends WidgetType<Node> {
     // from resizing when the window is resized.
     //
     // This is equivalent to the
-    // [[SplitPane#static.setResizableWithParent]] method.
+    // [[static:SplitPane.setResizableWithParent]] method.
     private Object _resizeWithSplit(Node node, Joe joe, Args args) {
         args.exactArity(1, "resizeWithSplit(flag)");
         var flag = args.isEmpty() || Joe.isTruthy(args.next());
@@ -181,7 +181,7 @@ class NodeType extends WidgetType<Node> {
     // Adds a style class *name* to the list of the node's FXCSS style class
     // names.  Values must be valid CSS style class names.
     //
-    // See [[joe.win#topic.css]] for more on using CSS.
+    // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styleClass(Node node, Joe joe, Args args) {
         args.exactArity(1, "styleClass(name)");
         node.getStyleClass().add(joe.stringify(args.next()));
@@ -194,7 +194,7 @@ class NodeType extends WidgetType<Node> {
     // Gets the list of the node's FXCSS style class names.  Values must
     // be valid CSS style class names.
     //
-    // See [[joe.win#topic.css]] for more on using CSS.
+    // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styleClasses(Node node, Joe joe, Args args) {
         args.exactArity(0, "styleClasses()");
         return joe.wrapList(node.getStyleClass(), String.class);
@@ -207,7 +207,7 @@ class NodeType extends WidgetType<Node> {
     // Sets the node's FXCSS `#style` property.  The caller can pass
     // multiple style strings, which will be joined with newlines.
     //
-    // See [[joe.win#topic.css]] for more on using CSS.
+    // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styles(Node node, Joe joe, Args args) {
         args.minArity(1, "styles(style, ...)");
         var styles = args.asList().stream()
@@ -226,8 +226,8 @@ class NodeType extends WidgetType<Node> {
     // is omitted.
     //
     // This method is equivalent to calling both
-    // [[VBox#static.setVgrow]] and
-    // [[GridPane#static.setVgrow]] for this node.
+    // [[static:VBox.setVgrow]] and
+    // [[static:GridPane.setVgrow]] for this node.
     private Object _vgrow(Node node, Joe joe, Args args) {
         args.arityRange(0, 1, "vgrow([priority])");
         var priority = args.isEmpty()

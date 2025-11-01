@@ -141,7 +141,7 @@ public class JoeSingleton extends ProxyType<Void> {
     // %args value
     // %result String
     // Converts its value to a string for output.  This function
-    // is functionally equivalent to [[String#init]], or to
+    // is functionally equivalent to [[init:String]], or to
     // `value.toString()` (if the type defines a `toString()` method).
     //
     // It is rare to need to call this function directly, but it is

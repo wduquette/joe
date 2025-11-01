@@ -7,6 +7,8 @@ import java.util.List;
  * An entry for a global function that belongs to a package.
  */
 class StaticMethodEntry extends TypeMember implements Callable {
+    private static final String PREFIX = "static:";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -33,9 +35,9 @@ class StaticMethodEntry extends TypeMember implements Callable {
 
     public String prefix()        { return type().prefix(); }
     public String name()          { return name; }
-    public String id()            { return "static." + name; }
-    public String fullMnemonic()  { return type().fullMnemonic() + "#" + id(); }
-    public String shortMnemonic() { return type().shortMnemonic() + "#" + id(); }
+    public String id()            { return PREFIX + name; }
+    public String fullMnemonic()  { return PREFIX + type().fullMnemonic() + "." + name; }
+    public String shortMnemonic() { return PREFIX + type().shortMnemonic() + "." + name; }
     public String filename()      { return type().filename(); }
     public String result()        { return result; }
 

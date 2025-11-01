@@ -43,7 +43,7 @@ class TabClass extends WidgetType<Tab> {
 
         //**
         // @property style joe.String
-        // FXCSS style string. See [[joe.win#topic.css]].
+        // FXCSS style string. See [[topic:joe.win.css]].
         fxProperty("style",    Tab::styleProperty,   Joe::toString);
 
         // Methods
@@ -149,7 +149,7 @@ class TabClass extends WidgetType<Tab> {
     // Gets the list of the tab's FXCSS style class names.  Values must
     // be valid CSS style class names.
     //
-    // See [[joe.win#topic.css]] for more on using CSS.
+    // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styleClasses(Tab tab, Joe joe, Args args) {
         args.exactArity(0, "styleClasses()");
         return joe.wrapList(tab.getStyleClass(), String.class);
@@ -162,7 +162,7 @@ class TabClass extends WidgetType<Tab> {
     // Sets the tab's FXCSS `#style` property.  The caller can pass
     // multiple style strings, which will be joined with semicolons.
     //
-    // See [[joe.win#topic.css]] for more on using CSS.
+    // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styles(Tab tab, Joe joe, Args args) {
         args.minArity(1, "styles(style, ...)");
         var styles = args.asList().stream()

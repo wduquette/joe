@@ -24,7 +24,7 @@ public class CatchResultType extends ProxyType<CatchResult> {
         //**
         // @package joe
         // @type CatchResult
-        // The result type of the standard [[function.catch]] function.
+        // The result type of the standard [[function:catch]] function.
         // The record has two fields, `result` and `error`.
         proxies(CatchResult.class);
 

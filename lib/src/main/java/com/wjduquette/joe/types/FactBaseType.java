@@ -37,9 +37,9 @@ public class FactBaseType extends ProxyType<FactBase> {
         //
         // Subject to particular constraints, the contents of a FactBase can
         // be output as a Nero script via the
-        // [[FactBase#static.asNero]] and [[FactBase#method.toNero]]
+        // [[static:FactBase.asNero]] and [[method:FactBase.toNero]]
         // methods, and later read back in via the
-        // [[FactBase#static.fromNero]] method.
+        // [[static:FactBase.fromNero]] method.
         //
         // The constraints are (currently) as follows:
         //
@@ -406,8 +406,8 @@ public class FactBaseType extends ProxyType<FactBase> {
     // %args flag
     // %result this
     // Sets the database's debug flag.  If enabled,
-    // [[FactBase#method.update]] and
-    // [[FactBase#method.select]] will output a
+    // [[method:FactBase.update]] and
+    // [[method:FactBase.select]] will output a
     // detailed Nero execution trace.
     private Object _setDebug(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "setDebug(flag)");

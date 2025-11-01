@@ -18,7 +18,7 @@ public class SetType extends ProxyType<JoeSet> {
     // @package joe
     // @type Set
     // A Joe `Set` is a Java `Set`, roughly equivalent to a Java `HashSet`.
-    // Sets created using the [[Set#init]] initializer can contain any kind
+    // Sets created using the [[init:Set]] initializer can contain any kind
     // of Joe value; the set need not be homogeneous.  Sets
     // received from Java code might be read-only or require a specific
     // value type.
@@ -257,7 +257,7 @@ public class SetType extends ProxyType<JoeSet> {
     // no *comparator* is provided, then this set must be a set of
     // strings or numbers.  If a *comparator* is given, it must be a function
     // that takes two arguments and returns -1, 0, 1, like
-    // the standard [[Joe#static.compare]] function.
+    // the standard [[static:Joe.compare]] function.
     //
     // To sort in descending order, provide a *comparator* that reverses
     // the comparison.

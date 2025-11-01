@@ -30,7 +30,7 @@ class MenuItemType extends WidgetType<MenuItem> {
 
         //**
         // @property onAction callable/1
-        // See [[MenuItem#method.onAction]].
+        // See [[method:MenuItem.onAction]].
         fxProperty("onAction", MenuItem::onActionProperty, Win::toAction);
 
         //**
@@ -40,7 +40,7 @@ class MenuItemType extends WidgetType<MenuItem> {
 
         //**
         // @property style joe.String
-        // FXCSS style string. See [[joe.win#topic.css]].
+        // FXCSS style string. See [[topic:joe.win.css]].
         fxProperty("style", MenuItem::styleProperty,   Joe::toString);
 
         // Methods
@@ -122,7 +122,7 @@ class MenuItemType extends WidgetType<MenuItem> {
     // Adds a *callable/1* to the item as its `#onAction` handler;
     // selecting the item will invoke the callable, passing it the JavaFX
     // `ActionEvent`.  Action event handlers rarely need the `ActionEvent`,
-    // so it's often preferable to use [[MenuItem#method.action]], which
+    // so it's often preferable to use [[method:MenuItem.action]], which
     // expects a *callable/0*.
     private Object _onAction(MenuItem btn, Joe joe, Args args) {
         args.exactArity(1, "onAction(callable)");
@@ -136,7 +136,7 @@ class MenuItemType extends WidgetType<MenuItem> {
     // Gets the list of the item's FXCSS style class names.  Values must
     // be valid CSS style class names.
     //
-    // See [[joe.win#topic.css]] for more on using CSS.
+    // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styleClasses(MenuItem item, Joe joe, Args args) {
         args.exactArity(0, "styleClasses()");
         return joe.wrapList(item.getStyleClass(), String.class);
@@ -149,7 +149,7 @@ class MenuItemType extends WidgetType<MenuItem> {
     // Sets the item's FXCSS `#style` property.  The caller can pass
     // multiple style strings, which will be joined with semicolons.
     //
-    // See [[joe.win#topic.css]] for more on using CSS.
+    // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styles(MenuItem item, Joe joe, Args args) {
         args.minArity(1, "styles(style, ...)");
         var styles = args.asList().stream()

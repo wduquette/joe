@@ -4,6 +4,8 @@ package com.wjduquette.joe.tools.doc;
  * An additional documentation topic for its parent entry.
  */
 class TopicEntry extends Entry {
+    private static final String PREFIX = "topic:";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -40,19 +42,19 @@ class TopicEntry extends Entry {
 
     public String name()          { return name; }
     public String title()         { return title; }
-    public String id()            { return "topic." + name; }
+    public String id()            { return PREFIX + name; }
     public String fullMnemonic()  {
         if (parent() == null) {
             throw new UnsupportedOperationException("Mixin topic.");
         }
-        return parent().fullMnemonic() + "#" + id();
+        return PREFIX + parent().fullMnemonic() + "." + name;
     }
 
     public String shortMnemonic() {
         if (parent() == null) {
             throw new UnsupportedOperationException("Mixin topic.");
         }
-        return parent().shortMnemonic() + "#" + id();
+        return PREFIX + parent().shortMnemonic() + "." + name;
     }
 
     public String filename()      {

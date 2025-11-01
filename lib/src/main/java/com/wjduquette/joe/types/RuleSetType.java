@@ -110,7 +110,7 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
     // @method setDebug
     // %args flag
     // Sets the rule set's debug flag.  If enabled,
-    // [[RuleSet#method.infer]] will output a detailed execution trace.
+    // [[method:RuleSet.infer]] will output a detailed execution trace.
 
     private Object _setDebug(RuleSetValue value, Joe joe, Args args) {
         args.exactArity(1, "setDebug(flag)");

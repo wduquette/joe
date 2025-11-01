@@ -79,7 +79,7 @@ class StandardLibrary extends NativePackage {
     // Formats its arguments given the *fmt* string, and prints the result
     // to standard output (which might be redirected by the application).
     //
-    // See [[String#topic.formatting]] for the format
+    // See [[topic:String.formatting]] for the format
     // string syntax.
     private Object _printf(Joe joe, Args args) {
         args.minArity(1, "printf(fmt, [values]...)");
