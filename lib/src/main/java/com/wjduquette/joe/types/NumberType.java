@@ -244,7 +244,7 @@ public class NumberType extends ProxyType<Double> {
     // @static exp
     // %args num
     // %result Number
-    // Returns [[Number#constant.E]] raised the *num* power.
+    // Returns [[constant:Number.E]] raised the *num* power.
     private Object _exp(Joe joe, Args args) {
         args.exactArity(1, "Number.exp(num)");
         return Math.exp(joe.toDouble(args.next(0)));

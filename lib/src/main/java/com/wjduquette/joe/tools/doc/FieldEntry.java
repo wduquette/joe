@@ -4,6 +4,8 @@ package com.wjduquette.joe.tools.doc;
  * An entry for an instance field that belongs to a type.
  */
 class FieldEntry extends TypeMember {
+    private static final String PREFIX = "field:";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -29,9 +31,9 @@ class FieldEntry extends TypeMember {
     public String name()          { return name; }
     public String valueType()     { return valueType; }
     public String prefix()        { return type().valuePrefix(); }
-    public String id()            { return "field." + name; }
-    public String fullMnemonic()  { return type().fullMnemonic() + "#" + id(); }
-    public String shortMnemonic() { return type().shortMnemonic() + "#" + id(); }
+    public String id()            { return PREFIX + name; }
+    public String fullMnemonic()  { return PREFIX + type().fullMnemonic() + "." + name; }
+    public String shortMnemonic() { return PREFIX + type().shortMnemonic() + "." + name; }
     public String filename()      { return type().filename(); }
     public String url()           { return filename() + "#fields"; }
 

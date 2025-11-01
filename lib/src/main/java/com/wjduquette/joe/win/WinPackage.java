@@ -62,9 +62,9 @@ public class WinPackage extends NativePackage {
     //
     // Scripts can style widgets using CSS in several different ways.
     //
-    // - The [[Win#static.css]] method associates a CSS stylesheet, passed
+    // - The [[static:Win.css]] method associates a CSS stylesheet, passed
     //   as a text string, with the application as a whole.
-    // - Each widget has a [[Node#method.styleClasses]] method which returns
+    // - Each [[Node]] subtype has a [[method:Node.styleClasses]] method that returns
     //   a list of the names of the CSS style classes that apply to the widget;
     //   add any desired style class name to this list.
     // - Each widget has a `#style` property which can be set to a string
@@ -214,7 +214,7 @@ public class WinPackage extends NativePackage {
         //     """);
         // ```
         //
-        // See [[joe.win#topic.css]] for more on using CSS in `joe win` scripts.
+        // See [[topic:joe.win.css]] for more on using CSS in `joe win` scripts.
         //
         // **JavaFX:** In particular, this adds the given CSS to the
         // `Scene`'s `stylesheets` property as a `data:` URL containing
@@ -243,7 +243,7 @@ public class WinPackage extends NativePackage {
         // Win.cssFill("my.css");
         // ```
         //
-        // See [[joe.win#topic.css]] for more on using CSS in `joe win` scripts.
+        // See [[topic:joe.win.css]] for more on using CSS in `joe win` scripts.
         //
         // **JavaFX:** In particular, this adds the given CSS file to the
         // `Scene`'s `stylesheets` property as a `file:` URL. The styles are

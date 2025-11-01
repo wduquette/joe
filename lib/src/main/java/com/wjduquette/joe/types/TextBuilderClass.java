@@ -101,7 +101,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // @method printf
     // %args fmt, [values...]
     // Formats its arguments given the *fmt* string, and appends the result
-    // to the buffer.  See [[String#topic.formatting]] for the format
+    // to the buffer.  See [[topic:String.formatting]] for the format
     // string syntax.
     private Object _printf(TextBuilder buff, Joe joe, Args args) {
         args.minArity(1, "printf(fmt, [values]...)");

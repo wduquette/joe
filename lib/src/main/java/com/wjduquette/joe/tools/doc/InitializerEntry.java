@@ -7,6 +7,8 @@ import java.util.List;
  * An entry for a type initializer
  */
 class InitializerEntry extends TypeMember implements Callable {
+    private final String PREFIX = "init:";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -25,8 +27,8 @@ class InitializerEntry extends TypeMember implements Callable {
 
     public String name()          { return type().name(); }
     public String id()            { return "init"; }
-    public String fullMnemonic()  { return type().fullMnemonic() + "#" + id(); }
-    public String shortMnemonic() { return type().shortMnemonic() + "#" + id(); }
+    public String fullMnemonic()  { return PREFIX + type().fullMnemonic(); }
+    public String shortMnemonic() { return PREFIX + type().shortMnemonic(); }
     public String filename()      { return type().filename(); }
     public String result()        { return type().name(); }
 

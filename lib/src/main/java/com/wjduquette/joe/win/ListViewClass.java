@@ -28,13 +28,13 @@ class ListViewClass extends WidgetType<ListViewInstance> {
 
         //**
         // @property formatter callable/1
-        // See [[ListView#method.formatter]]
+        // See [[method:ListView.formatter]]
         fxProperty("formatter", ListViewInstance::formatterProperty,
             Joe::wrapFunction, Joe::unwrapCallable);
 
         //**
         // @property onSelect callable/1
-        // See [[ListView#method.onSelect]]
+        // See [[method:ListView.onSelect]]
         fxProperty("onSelect", ListViewInstance::onSelectProperty,
             Joe::wrapConsumer, Joe::unwrapCallable);
 
@@ -157,7 +157,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // %args node
     // %result this
     // Sets the widget's placeholder graphic, a [[Node]] to display when
-    // the widget's [[ListView#method.items]] list is empty.
+    // the widget's [[method:ListView.items]] list is empty.
     private Object _placeholder(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(1, "placeholder(node)");
         node.setPlaceholder(Win.toNode(joe, args.next()));
@@ -170,7 +170,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // %result this
     // Sets the widget's placeholder graphic to a label displaying
     // the given text. The placeholder is shown when
-    // the widget's [[ListView#method.items]] list is empty.
+    // the widget's [[method:ListView.items]] list is empty.
     private Object _placeholderText(ListViewInstance node, Joe joe, Args args) {
         args.exactArity(1, "placeholderText(text)");
         node.setPlaceholder(new Label(joe.stringify(args.next())));

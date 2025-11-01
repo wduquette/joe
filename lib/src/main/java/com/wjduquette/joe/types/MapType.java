@@ -19,7 +19,7 @@ public class MapType extends ProxyType<JoeMap> {
     // @package joe
     // @type Map
     // A Joe `Map` is a Java `Map`, roughly equivalent to a Java `HashMap`.
-    // Maps created using the [[Map#init]] initializer can contain any kind
+    // Maps created using the [[init:Map]] initializer can contain any kind
     // of Joe keys and values; the map need not be homogeneous.  Maps
     // received from Java code might be read-only or require a specific
     // key/value types.

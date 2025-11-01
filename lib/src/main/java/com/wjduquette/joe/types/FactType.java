@@ -41,10 +41,10 @@ public class FactType extends ProxyType<Fact> {
         // ## Fact Fields and Field Names
         //
         // A `Fact`'s field values are accessible by the
-        // [[Fact#method.fields]] method if the `Fact`
-        // [[Fact#method.isOrdered]], and as a map of field names and
+        // [[method:Fact.fields]] method if the `Fact`
+        // [[method:Fact.isOrdered]], and as a map of field names and
         // values via the
-        // [[Fact#method.fieldMap]] method.
+        // [[method:Fact.fieldMap]] method.
         //
         // In addition, a fact's fields can be access as normal Joe object
         // fields:
@@ -246,7 +246,7 @@ public class FactType extends ProxyType<Fact> {
     // @method fields
     // %result List
     // Returns a read-only list of the field values, if the fact
-    // [[Fact#method.isOrdered]].
+    // [[method:Fact.isOrdered]].
     private Object _fields(Fact value, Joe joe, Args args) {
         args.exactArity(0, "fields()");
         if (value.isOrdered()) {

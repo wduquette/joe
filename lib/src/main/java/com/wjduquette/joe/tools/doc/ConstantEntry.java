@@ -4,6 +4,8 @@ package com.wjduquette.joe.tools.doc;
  * An entry for a constant that belongs to a type.
  */
 class ConstantEntry extends TypeMember {
+    private static final String PREFIX = "constant:";
+
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -30,9 +32,9 @@ class ConstantEntry extends TypeMember {
 
     public String name()          { return name; }
     public String valueType()     { return valueType; }
-    public String id()            { return "constant." + name; }
-    public String fullMnemonic()  { return type().fullMnemonic() + "#" + id(); }
-    public String shortMnemonic() { return type().shortMnemonic() + "#" + id(); }
+    public String id()            { return PREFIX + name; }
+    public String fullMnemonic()  { return PREFIX + type().fullMnemonic() + "." + name; }
+    public String shortMnemonic() { return PREFIX + type().shortMnemonic() + "." + name; }
     public String filename()      { return type().filename(); }
     public String url()           { return filename() + "#constants"; }
 

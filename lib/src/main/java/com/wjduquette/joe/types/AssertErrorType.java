@@ -29,7 +29,7 @@ public class AssertErrorType extends ProxyType<AssertError> {
         // execution of a `Joe` script by the `assert` statement, or
         // created by the `joe.test` package to represent a test value. A
         // script can catch errors thrown during execution using
-        // the [[function.catch]] function.
+        // the [[function:catch]] function.
         proxies(AssertError.class);
         extendsProxy(ErrorType.TYPE);
 

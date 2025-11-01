@@ -31,7 +31,7 @@ class ButtonType extends WidgetType<Button> {
 
         //**
         // @property onAction callable/1
-        // See [[Button#method.onAction]].
+        // See [[method:Button.onAction]].
         fxEvent("onAction", Button::onActionProperty);
 
         // Methods
@@ -76,7 +76,7 @@ class ButtonType extends WidgetType<Button> {
     // Adds a *callable/1* to the button as its `#onAction` handler;
     // pressing the button will invoke the callable, passing it the JavaFX
     // `ActionEvent`.  Action event handlers rarely need the `ActionEvent`,
-    // so it's often preferable to use [[Button#method.action]], which
+    // so it's often preferable to use [[method:Button.action]], which
     // expects a *callable/0*.
     private Object _onAction(Button btn, Joe joe, Args args) {
         args.exactArity(1, "onAction(callable)");

@@ -71,7 +71,7 @@ class PaneType extends WidgetType<Pane> {
     // @method setChildren
     // %args list
     // %result this
-    // Replaces the widget's [[Pane#method.children]] with those from
+    // Replaces the widget's [[method:Pane.children]] with those from
     // the given [[joe.List]].  All children must be [[Node|Nodes]].
     private Object _setChildren(Pane pane, Joe joe, Args args) {
         args.exactArity(1, "setChildren(list)");

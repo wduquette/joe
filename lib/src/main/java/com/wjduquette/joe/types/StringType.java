@@ -68,7 +68,7 @@ public class StringType extends ProxyType<String> {
     //**
     // @typeTopic formatting
     // %title String Formatting
-    // The Joe [[String#static.format]] method formats strings similarly
+    // The Joe [[static:String.format]] method formats strings similarly
     // to the Java method of the same name, supporting a subset of
     // [Java's format string syntax](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Formatter.html#syntax).
     //
@@ -159,7 +159,7 @@ public class StringType extends ProxyType<String> {
     // %args fmt, [values...]
     // %result String
     // Formats the values into a string given the format string. See
-    // [[String#topic.formatting]], below, for the format string syntax.
+    // [[topic:String.formatting]], below, for the format string syntax.
     private Object _format(Joe joe, Args args) {
         args.minArity(1, "format(fmt, [values...])");
         var fmt = joe.toString(args.next());

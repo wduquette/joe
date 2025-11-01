@@ -19,7 +19,7 @@ public class ListType extends ProxyType<JoeList> {
     // @package joe
     // @type List
     // A Joe `List` is a Java `List`, roughly equivalent to a Java `ArrayList`.
-    // Lists created using the [[List#init]] initializer can contain any kind
+    // Lists created using the [[init:List]] initializer can contain any kind
     // of Joe value; the list need not be homogeneous.  Lists received from
     // Java code might be read-only or require a specific item type.
     /** Creates the proxy. */
@@ -477,7 +477,7 @@ public class ListType extends ProxyType<JoeList> {
     // is provided, the list must be a list of strings or a list
     // of numbers.  If a *comparator* is given, it must be a function
     // that takes two arguments and returns -1, 0, 1, like
-    // the standard [[Joe#static.compare]] function.
+    // the standard [[static:Joe.compare]] function.
     //
     // To sort in descending order, provide a *comparator* that reverses
     // the comparison.
