@@ -23,6 +23,12 @@ public class ProxyType<V>
      * @param <V> The proxied type.
      */
     public interface FieldLambda<V> {
+        /**
+         * Gets a field's value from the object.
+         * @param joe The interpreter
+         * @param object the object
+         * @return the field value
+         */
         Object get(Joe joe, V object);
     }
 
@@ -273,6 +279,7 @@ public class ProxyType<V>
     /**
      * Gets the value of the named property.  Throws an
      * "Undefined property" error if there is no such property.
+     * @param joe The interpreter
      * @param value A value of the proxied type
      * @param propertyName The property name
      * @return The property value
@@ -470,6 +477,7 @@ public class ProxyType<V>
 
     /**
      * If this type is iterable, returns the value's items for iteration.
+     * @param joe The interpreter
      * @param value The value
      * @return The items
      */

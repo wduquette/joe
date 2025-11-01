@@ -42,6 +42,7 @@ public class ListValue
 
     /**
      * Creates an empty list with the given capacity.
+     * @param capacity The desired size
      */
     @SuppressWarnings("unused")
     public ListValue(int capacity) {

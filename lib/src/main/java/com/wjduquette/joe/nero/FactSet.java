@@ -196,6 +196,7 @@ public class FactSet {
     /**
      * Gets a read-only set of all facts in the database that have
      * the given relation.
+     * @param relation The relation name
      * @return The set
      */
     public Set<Fact> relation(String relation) {

@@ -16,10 +16,16 @@ public sealed interface Atom permits
      */
     String relation();
 
-    // Gets all terms belonging to the atom.
+    /**
+     * Gets all the terms in the atom.
+     * @return The terms.
+     */
     Collection<Term> getAllTerms();
 
-    // Gets the names of the atom's variables.
+    /**
+     * Gets the names of the atom's variables.
+     * @return the names
+     */
     default Set<String> getVariableNames() {
         var set = new HashSet<String>();
         for (var t : getAllTerms()) set.addAll(Term.getVariableNames(t));

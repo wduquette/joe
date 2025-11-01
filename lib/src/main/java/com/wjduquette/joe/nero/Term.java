@@ -23,6 +23,7 @@ public sealed interface Term permits
     /**
      * Computes the value of the term as used in a rule head or
      * axiom, given the bindings.
+     * @param term The term for which to compute a value.
      * @param bindings The bindings
      * @return The value
      */

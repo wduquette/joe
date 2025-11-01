@@ -27,6 +27,7 @@ public class NeroRuleSet {
      * Creates a new rule set given the schema and the sets of axioms and
      * rules.  Transfers ownership of the two sets to the new instance, and
      * computes the stratification of the rules.
+     * @param schema The schema
      * @param axioms The axiomatic facts
      * @param rules The rules
      */
@@ -44,22 +45,42 @@ public class NeroRuleSet {
     //-------------------------------------------------------------------------
     // Public API
 
+    /**
+     * Whether the rule set is stratifiable or not.
+     * @return true or false
+     */
     public boolean isStratified() {
         return isStratified;
     }
 
+    /**
+     * A list of the relations in each stratum, from lowest to highest.
+     * @return the list
+     */
     public List<List<String>> strata() {
         return strata;
     }
 
+    /**
+     * The rule set's schema
+     * @return the schema
+     */
     public Schema schema() {
         return schema;
     }
 
+    /**
+     * The rule set's axioms
+     * @return the axioms
+     */
     public Set<Atom> axioms() {
         return Collections.unmodifiableSet(axioms);
     }
 
+    /**
+     * The rule set's rules
+     * @return the rules
+     */
     public Set<Rule> rules() {
         return Collections.unmodifiableSet(rules);
     }

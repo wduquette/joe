@@ -6,6 +6,9 @@ import com.wjduquette.joe.parser.Parser;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This class is the primary entry point for the Nero language.
+ */
 public class Nero {
     private Nero() {} // Static Class
 
@@ -89,32 +92,71 @@ public class Nero {
     //-------------------------------------------------------------------------
     // Execution pipeline
 
+    /**
+     * Creates a pipeline for the given Nero script, using a vanilla instance
+     * of Joe.
+     * @param script The script
+     * @return The pipeline
+     */
     public static Pipeline with(String script) {
         return with(new Joe(), script);
     }
 
+    /**
+     * Creates a pipeline for the Nero script in the given SourceBuffer, using
+     * a vanilla instance of Joe.
+     * @param source The SourceBuffer
+     * @return The pipeline
+     */
     public static Pipeline with(SourceBuffer source) {
         return with(new Joe(), source);
     }
 
+    /**
+     * Creates a pipeline for the given Nero rule set using a vanilla instance
+     * of Joe.
+     * @param ruleSet the rule set
+     * @return The pipeline
+     */
     public static Pipeline with(NeroRuleSet ruleSet) {
         return with(new Joe(), ruleSet);
     }
 
+    /**
+     * Creates a pipeline for the given Nero script.
+     * @param joe The Joe interpreter
+     * @param script The script
+     * @return The pipeline
+     */
     public static Pipeline with(Joe joe, String script) {
         var source = new SourceBuffer("*nero*", script);
         return with(joe, source);
     }
 
+    /**
+     * Creates a pipeline for the Nero script in the given SourceBuffer.
+     * @param joe The Joe interpreter
+     * @param source The SourceBuffer
+     * @return The pipeline
+     */
     public static Pipeline with(Joe joe, SourceBuffer source) {
         var ruleset = Nero.compile(source);
         return with(joe, ruleset);
     }
 
+    /**
+     * Creates a pipeline for the given Nero rule set.
+     * @param joe The Joe interpreter
+     * @param ruleSet the rule set
+     * @return The pipeline
+     */
     public static Pipeline with(Joe joe, NeroRuleSet ruleSet) {
         return new Pipeline(joe, ruleSet);
     }
 
+    /**
+     * A Pipeline is a fluent API for using a rule set.
+     */
     public static class Pipeline {
         //---------------------------------------------------------------------
         // Instance Variables
@@ -134,11 +176,20 @@ public class Nero {
         //---------------------------------------------------------------------
         // Pipeline methods
 
+        /**
+         * Sets the Nero debug flag.
+         * @param flag true or false
+         * @return the pipeline
+         */
         public Pipeline debug(boolean flag) {
             this.debug = flag;
             return this;
         }
 
+        /**
+         * Sets the Nero debug flag to true.
+         * @return the pipeline
+         */
         public Pipeline debug() {
             return debug(true);
         }

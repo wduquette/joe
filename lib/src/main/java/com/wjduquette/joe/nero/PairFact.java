@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * A Nero {@link Fact} type providing both ordered and named-field
@@ -26,6 +25,7 @@ public final class PairFact implements Fact {
     // Constructor
 
     /**
+     * Creates a new PairFact
      * @param relation The relation
      * @param fieldNames The field names, in the proper order
      * @param fields The field values
@@ -43,6 +43,7 @@ public final class PairFact implements Fact {
     }
 
     /**
+     * Creates a new PairFact
      * @param relation The relation
      * @param fieldNames The field names, in the proper order
      * @param fieldMap The field map

@@ -31,6 +31,10 @@ public class Stratifier {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates the stratifier.
+     * @param rules The rules to stratify
+     */
     public Stratifier(Collection<Rule> rules) {
         // FIRST, get the list of head predicates, and build the dependency
         // matrix.

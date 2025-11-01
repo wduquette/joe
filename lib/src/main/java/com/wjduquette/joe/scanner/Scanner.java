@@ -6,6 +6,9 @@ import com.wjduquette.joe.SourceBuffer.Span;
 import static com.wjduquette.joe.scanner.TokenType.EOF;
 import static com.wjduquette.joe.scanner.TokenType.ERROR;
 
+/**
+ * The Joe scanner, which is used for scanning tokens for Joe and Nero.
+ */
 public class Scanner {
     /**
      * The scanner's error handler interface.
@@ -54,6 +57,9 @@ public class Scanner {
     //-------------------------------------------------------------------------
     // Public API
 
+    /**
+     * Primes the scanner.  This should be done before beginning the scan.
+     */
     public void prime() {
         // FIRST, scan the very first token.
         next = tokenizer.scanToken();
@@ -94,6 +100,10 @@ public class Scanner {
         }
     }
 
+    /**
+     * Is the scanner at the end of the input?
+     * @return true or false
+     */
     public boolean isAtEnd() {
         return current.type() == EOF;
     }

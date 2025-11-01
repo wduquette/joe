@@ -62,6 +62,7 @@ public class RuleSetValue {
 
     /**
      * Infer facts from the rule set and the database of facts.
+     * @param joe The Joe interpreter
      * @return The new facts.
      */
     public Set<Fact> infer(Joe joe) {
@@ -71,6 +72,8 @@ public class RuleSetValue {
     /**
      * Infer facts from the rule set and the database of facts.
      * Does not update the db in place.
+     * @param joe The Joe interpreter
+     * @param db The input database
      * @return The new facts.
      */
     public Set<Fact> infer(Joe joe, FactBase db) {
@@ -82,6 +85,7 @@ public class RuleSetValue {
 
     /**
      * Infer facts from the rule set and the set of input facts.
+     * @param joe The Joe interpreter
      * @param inputs The input facts
      * @return The new (possibly exported) facts.
      */

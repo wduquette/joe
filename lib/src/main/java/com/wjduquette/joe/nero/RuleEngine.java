@@ -42,8 +42,14 @@ public class RuleEngine {
     ) {}
 
     private static final Map<String,BuiltIn> BUILT_INS = new HashMap<>();
+
+    /** Name of the "member" built-in predicate. */
     public static final String MEMBER = "member";
+
+    /** Name of the "indexedMember" built-in predicate. */
     public static final String INDEXED_MEMBER = "indexedMember";
+
+    /** Name of the "keyedMember" built-in predicate. */
     public static final String KEYED_MEMBER = "keyedMember";
 
     static {
@@ -179,7 +185,7 @@ public class RuleEngine {
 
     /**
      * Executes the inference algorithm, updating the given fact set in place.
-     * Returns the inferred facts.
+     * @return The inferred facts.
      * @throws JoeError if the rule set is not stratified.
      */
     public FactSet infer() {

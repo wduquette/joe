@@ -46,6 +46,7 @@ public class NeroDatabase {
     /**
      * Creates a new database with an empty schema, using an explicit
      * instance of Joe.
+     * @param joe The Joe interpreter
      */
     public NeroDatabase(Joe joe) {
         this(joe, new Schema());
@@ -54,6 +55,7 @@ public class NeroDatabase {
     /**
      * Creates a new database with a pre-defined schema, using an anonymous
      * instance of Joe.
+     * @param schema The schema
      */
     public NeroDatabase(Schema schema) {
         this(new Joe(), schema);
@@ -62,6 +64,8 @@ public class NeroDatabase {
     /**
      * Creates a new database with a pre-defined schema, using an explicit
      * instance of Joe.
+     * @param joe The Joe interpreter
+     * @param schema The schema
      */
     public NeroDatabase(Joe joe, Schema schema) {
         this.joe = joe;
@@ -82,6 +86,7 @@ public class NeroDatabase {
     /**
      * Sets whether debugging output is enabled or not.
      * @param debug true or false
+     * @return The database
      */
     public NeroDatabase setDebug(boolean debug) {
         this.debug = debug;

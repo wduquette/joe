@@ -127,6 +127,11 @@ public class Joe {
     //-------------------------------------------------------------------------
     // Configuration and Embedding
 
+    /**
+     * Whether the named variable exists in the global environment or not.
+     * @param name The variable name
+     * @return true or false
+     */
     @SuppressWarnings("unused")
     public boolean hasVariable(String name) {
         return engine.getEnvironment().hasVariable(name);

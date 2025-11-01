@@ -2,6 +2,9 @@ package com.wjduquette.joe.nero;
 
 import java.util.List;
 
+/**
+ * The shape of Nero facts, for use in a Nero Schema.
+ */
 public sealed interface Shape permits
     Shape.ListShape,
     Shape.MapShape,
@@ -46,7 +49,7 @@ public sealed interface Shape permits
 
     /**
      * The shape of a MapFact having the given relation.
-     * @param relation
+     * @param relation The relation name
      */
     record MapShape(String relation)
         implements Shape

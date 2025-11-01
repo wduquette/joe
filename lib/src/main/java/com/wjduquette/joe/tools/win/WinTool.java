@@ -83,6 +83,10 @@ public class WinTool implements Tool {
     }
 
 
+    /**
+     * Runs the tool given the command-line arguments.
+     * @param args The arguments.
+     */
     public void run(String[] args) {
         // FIRST, prepare to handle uncaught exceptions in the background.
         Thread.currentThread().setUncaughtExceptionHandler(

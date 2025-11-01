@@ -23,20 +23,35 @@ public class CallbackWrapper {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates a new callback wrapper
+     * @param joe The interpreter
+     * @param callable The callable
+     */
     public CallbackWrapper(Joe joe, Object callable) {
         this.joe = joe;
         this.callable = callable;
     }
 
+    /**
+     * Gets the callable.
+     * @return the callable
+     */
     public Object getCallable() {
         return callable;
     }
 
+    /**
+     * Calls the callable, passing it the arguments.
+     * @param args The arguments
+     * @return the callable's return value
+     */
     @SuppressWarnings("UnusedReturnValue")
     public Object callCallable(Object... args) {
         return joe.call(callable, args);
     }
 
+    @Override
     public String toString() {
         return "CallbackWrapper[" + joe.stringify(callable) + "]";
     }

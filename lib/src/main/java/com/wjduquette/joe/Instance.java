@@ -8,6 +8,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The Java representation for instances of Joe classes, including native
+ * classes.  For scripted classes, an instance simply is an instance of
+ * this class.  For native classes extensible by scripts, an instance is
+ * an instance of the native class and of JoeInstance, and is wrapped as
+ * an Instance as needed.
+ */
 public class Instance implements JoeValue {
     private final static String TO_STRING = "toString";
 

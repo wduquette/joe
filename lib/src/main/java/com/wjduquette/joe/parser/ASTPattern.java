@@ -21,6 +21,9 @@ public class ASTPattern {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates the AST object.
+     */
     public ASTPattern() {
         // Nothing to do
     }

@@ -67,6 +67,7 @@ public sealed interface Stmt
     /**
      * A class declaration
      * @param name The class name
+     * @param isExported Is the class exported?
      * @param classSpan The class's span in the source script.
      * @param superclass The superclass variable, or null for none
      * @param staticMethods The class object's static methods
@@ -155,6 +156,7 @@ public sealed interface Stmt
     /**
      * A function, method, etc.
      * @param type The function type
+     * @param isExported Is the function exported?
      * @param name The name
      * @param params The parameter names
      * @param body The body of the function
@@ -230,12 +232,17 @@ public sealed interface Stmt
         Expr guard,
         Stmt statement
     ) {
+        /**
+         * The location of the case in the source.
+         * @return the span
+         */
         public Span location() { return keyword.span(); }
     }
 
     /**
      * A record declaration
      * @param name The type's name
+     * @param isExported Is the record type exported?
      * @param typeSpan The type's span in the source script.
      * @param fields The type's field names.
      * @param staticMethods The class object's static methods
@@ -290,6 +297,10 @@ public sealed interface Stmt
         List<Expr> values,
         Stmt statement
     ) {
+        /**
+         * The location of the case in the source.
+         * @return the span
+         */
         public Span location() { return keyword.span(); }
     }
 
@@ -302,6 +313,10 @@ public sealed interface Stmt
         Token keyword,
         Stmt statement
     ) {
+        /**
+         * The location of the case in the source.
+         * @return the span
+         */
         public Span location() { return keyword.span(); }
     }
 

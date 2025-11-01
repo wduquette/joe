@@ -8,6 +8,7 @@ import java.util.function.Consumer;
  * @param argsig its argument signature
  * @param oneLiner A one-line description
  * @param help Full help text
+ * @param isJavaFX Is JavaFX required by the tool?
  * @param launcher The launch function
  */
 public record ToolInfo(
@@ -18,6 +19,10 @@ public record ToolInfo(
     boolean isJavaFX,
     Consumer<String[]> launcher
 ) {
+    /**
+     * Returns a ToolInfo builder.
+     * @return The builder
+     */
     public static Builder define() {
         return new Builder();
     }
@@ -43,6 +48,9 @@ public record ToolInfo(
         System.out.println();
     }
 
+    /**
+     * The ToolInfo builder.
+     */
     public static class Builder {
         //---------------------------------------------------------------------
         // Instance variables
@@ -57,6 +65,9 @@ public record ToolInfo(
         //---------------------------------------------------------------------
         // Constructor
 
+        /**
+         * Creates the builder.
+         */
         public Builder() {
             // Nothing to do
         }
@@ -124,6 +135,10 @@ public record ToolInfo(
             return this;
         }
 
+        /**
+         * Builds the value given the input.
+         * @return The ToolInfo value
+         */
         public ToolInfo build() {
             return new ToolInfo(
                 name,

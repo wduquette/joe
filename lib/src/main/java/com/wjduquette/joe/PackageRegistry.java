@@ -112,24 +112,49 @@ public class PackageRegistry {
     //-------------------------------------------------------------------------
     // Queries
 
+    /**
+     * Gets the known package names.
+     * @return the names
+     */
     @SuppressWarnings("unused")
     public Set<String> getPackageNames() {
         return registry.keySet();
     }
 
+    /**
+     * Returns true if the package is known, and false otherwise.
+     * @param pkgName the name
+     * @return true or false
+     */
     public boolean hasPackage(String pkgName) {
         return registry.containsKey(pkgName);
     }
 
+    /**
+     * Gets the package by name
+     * @param pkgName the name
+     * @return The package or null
+     */
     @SuppressWarnings("unused")
     public JoePackage getPackage(String pkgName) {
         return registry.get(pkgName);
     }
 
+    /**
+     * Returns true if the named package exists and has been loaded, and
+     * false otherwise.
+     * @param pkgName the package name
+     * @return true or false
+     */
     public boolean isLoaded(String pkgName) {
         return exportsMap.containsKey(pkgName);
     }
 
+    /**
+     * Gets an environment containing the named package's exported symbols.
+     * @param pkgName the package name
+     * @return the environment
+     */
     public Environment getExports(String pkgName) {
         if (!isLoaded(pkgName)) {
             throw new IllegalStateException("Package not yet loaded: '" +

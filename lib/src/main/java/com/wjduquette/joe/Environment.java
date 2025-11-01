@@ -10,7 +10,7 @@ public class Environment {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The map from names to values.
+    /** The map from variable names to values. */
     protected final Map<String, Object> values = new HashMap<>();
 
     //-------------------------------------------------------------------------
@@ -89,6 +89,7 @@ public class Environment {
 
     /**
      * Dump the contents of this environment as a string, for debugging.
+     * @return the string
      */
     public String dump() {
         var buff = new StringBuilder();

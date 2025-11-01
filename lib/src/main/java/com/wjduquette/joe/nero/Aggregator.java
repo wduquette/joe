@@ -60,7 +60,16 @@ public enum Aggregator {
         this.arity = arity;
     }
 
+    /**
+     * The aggregation function's name
+     * @return the name
+     */
     public String function() { return function; }
+
+    /**
+     * The aggregation function's arity
+     * @return The arity
+     */
     public int arity() { return arity; }
 
     /**

@@ -11,7 +11,8 @@ public interface Unwrapper<V> {
     /**
      * Unwraps a value of type V to its Joe representation
      *
-     * @param value The value
+     * @param value The wrapped value
+     * @return The unwrapped value
      */
     Object unwrap(V value);
 }

@@ -16,16 +16,21 @@ public record Constraint(Variable a, Op op, Term b) {
      * A comparison operator, as used in constraints.
      */
     public enum Op {
-        EQ("=="),
-        NE("!="),
-        GT(">"),
-        GE(">="),
-        LT("<"),
-        LE("<=");
+        /** Equals*/                 EQ("=="),
+        /** Not equals */            NE("!="),
+        /** Greater than */          GT(">"),
+        /** Greater than or equal */ GE(">="),
+        /** Less than */             LT("<"),
+        /** Less than or equal */    LE("<=");
 
         private final String lexeme;
 
         Op(String lexeme) { this.lexeme = lexeme; }
+
+        /**
+         * Returns the operator's lexeme
+         * @return The lexeme
+         */
         public String lexeme() { return lexeme; }
     }
 }

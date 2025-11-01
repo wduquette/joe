@@ -7,12 +7,20 @@ import com.wjduquette.joe.scanner.Token;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A class for dumping a Joe abstract syntax tree (AST) as a string.
+ */
 public class ASTDumper {
     private ASTDumper() {}  // Static class
 
     //-------------------------------------------------------------------------
     // Public API
 
+    /**
+     * Dumps a Joe program as a string.
+     * @param list The statements in the program
+     * @return The string representation
+     */
     public static String dump(List<Stmt> list) {
         var buff = new Buffer();
 
@@ -23,6 +31,11 @@ public class ASTDumper {
         return buff.toString();
     }
 
+    /**
+     * Dumps a Joe statement as a string.
+     * @param stmt The statement
+     * @return The string representation
+     */
     public static String dump(Stmt stmt) {
         var buffer = new Buffer();
         buffer.print("Stmt." + stmt.getClass().getSimpleName());
@@ -135,7 +148,7 @@ public class ASTDumper {
         return buffer.toString();
     }
 
-    public static String dump(Stmt.MatchCase stmt) {
+    private static String dump(Stmt.MatchCase stmt) {
         var buff = new Buffer();
         buff.print("Stmt." + stmt.getClass().getSimpleName()).nl()
             .dump("pattern", stmt.pattern());
@@ -144,7 +157,7 @@ public class ASTDumper {
         return buff.toString();
     }
 
-    public static String dump(Stmt.SwitchCase stmt) {
+    private static String dump(Stmt.SwitchCase stmt) {
         var buff = new Buffer();
         buff.print("case Stmt." + stmt.getClass().getSimpleName()).nl();
 
@@ -155,6 +168,11 @@ public class ASTDumper {
         return buff.toString();
     }
 
+    /**
+     * Dumps a Joe expression as a string.
+     * @param expr The expression
+     * @return The string representation.
+     */
     public static String dump(Expr expr) {
         var buffer = new Buffer();
         buffer.print("Expr." + expr.getClass().getSimpleName());

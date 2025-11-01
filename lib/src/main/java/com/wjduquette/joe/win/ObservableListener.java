@@ -16,6 +16,13 @@ public class ObservableListener
     private final Keyword keyword;
     private final Object callable;
 
+    /**
+     * Creates an observable listener.
+     * @param observable The observable
+     * @param joe The Joe interpreter
+     * @param keyword The property's keyword
+     * @param callable The Joe callable
+     */
     public ObservableListener(
         ObservableValue<?> observable,
         Joe joe,

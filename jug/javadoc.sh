@@ -1,4 +1,5 @@
 #!/bin/sh
+echo "Building Joe javadoc"
 rm -rf ../docs/javadoc
 mkdir -p ../docs/javadoc
 javadoc -sourcepath ../lib/src/main/java   \
@@ -10,5 +11,3 @@ javadoc -sourcepath ../lib/src/main/java   \
     -link https://docs.oracle.com/en/java/javase/21/docs/api/ \
     -link https://openjfx.io/javadoc/21/ \
     -quiet
-
-

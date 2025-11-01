@@ -45,10 +45,18 @@ public class FactBase extends FactSet {
     //-------------------------------------------------------------------------
     // Accessors
 
+    /**
+     * Whether the Nero debug flag is set or not.
+     * @return true or false
+     */
     public boolean isDebug() {
         return debug;
     }
 
+    /**
+     * Sets the Nero debug flag.
+     * @param debug true or false
+     */
     public void setDebug(boolean debug) {
         this.debug = debug;
     }

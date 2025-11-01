@@ -19,7 +19,9 @@ import static com.wjduquette.joe.scanner.TokenType.*;
  * list of {@link Stmt} records.
  */
 public class Parser {
+    /** The name of the "varargs" argument. */
     public static final String ARGS = "args";
+
     private static final int MAX_CALL_ARGUMENTS = 255;
 
     //-------------------------------------------------------------------------
@@ -1093,6 +1095,7 @@ public class Parser {
      * with the given Schema. Errors are reported via the
      * parser's error reporter.  If errors were reported, the result of
      * this method should be ignored.
+     * @param schema The schema, which might be empty
      * @return The parsed rule set.
      */
     public NeroRuleSet parseNero(Schema schema) {
