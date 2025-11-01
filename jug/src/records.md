@@ -63,6 +63,5 @@ etc.
 ## Records and Facts
 
 Any record value can be converted into a Nero fact by the
-[`Joe.toFact()` method](library/type.joe.Joe.md#static.toFact).
-The resulting fact will be a "pair" fact.
+[[static:joe.Joe.toFact]] method. The resulting fact will be a "pair" fact.
 

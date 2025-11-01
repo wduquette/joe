@@ -181,6 +181,5 @@ of subclasses.
 ## Class Instances and Facts
 
 Any class instance with field properties can be converted into
-a Nero fact by the 
-[`Joe.toFact()` method](library/type.joe.Joe.md#static.toFact).
-The resulting fact will be a "map" fact.
+a Nero fact by the [[static:joe.Joe.toFact]] method. The resulting fact 
+will be a "map" fact.

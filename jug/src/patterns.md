@@ -134,12 +134,8 @@ var x = isPro(["Joe", "Pro"]);       // Returns true
 var y = isPro(["Joe", "Amateur"]);   // Returns false
 ```
 
-The constant must be a literal 
-[string](types.md#strings),
-[number](types.md#numbers),
-[boolean](types.md#booleans),
-[keyword](types.md#keywords),
-or `null`.
+The constant must be a literal [[joe.String]], [[joe.Number]],
+[[joe.Boolean]], [[joe.Keyword]], or `null`.
 
 
 ## Interpolated Expressions
@@ -191,7 +187,7 @@ if (myEnum ~ [id, $(Flavor.SWEET)]) {
 ```
 
 Second, it can use a 
-[keyword](types.md#keywords) constant
+[[joe.Keyword]] literal
 with the same name as the enum constant, disregarding case:
 
 ```joe
@@ -207,7 +203,7 @@ this way as well.
 ## List Patterns
 
 We've seen many list patterns in the above examples.  Syntactically,
-a list pattern is simply a list of patterns that matches a `List` of
+a list pattern is simply a list of patterns that matches a [[joe.List]] of
 values.  The matched list must have exactly the same number of items 
 as the list pattern, and each subpattern must match the corresponding 
 item.
@@ -236,7 +232,7 @@ will get any remaining items, or the empty list if `list.size() == 2`.
 ## Map Patterns
 
 A map pattern matches objects with keys and values, e.g., 
-[`Map`](library/type.joe.Map.md) values. 
+[[joe.Map]] values. 
 
 - The keys must be [constants](#constants)
 - The values can be any pattern.
@@ -272,11 +268,10 @@ There are a number of special cases.
 - If the target value is a class instance, then the pattern will match given 
   the name of the class or any superclass.
 - If the target value can be converted to a 
-  [`Fact`](library/type.joe.Fact.md) via
-  [`Joe.toFact(value)`](library/type.joe.Joe.md#static.toFact), then 
+  [[joe.Fact]] via [[static:joe.Joe.toFact]], then 
   the pattern will match given either the name or the type or the 
   converted fact's relation name.
-- If the target value simply *is* a [`Fact`](library/type.joe.Fact.md), then
+- If the target value simply *is* a [[joe.Fact]], then
   the given pattern will match given either `Fact` or the fact's
   relation name.
 
@@ -284,7 +279,7 @@ There are a number of special cases.
 
 A named-field pattern matches the type and field values for any 
 Joe value with named fields.  It will also match a 
-[`Fact`](library/type.joe.Fact.md) value based on its relation and fields.
+[[joe.Fact]] value based on its relation and fields.
 
 ```joe
 class Thing {
@@ -315,7 +310,7 @@ See [Unscoped Types](introspection.md#unscoped-types) for more information.
 
 Ordered-field patterns match Joe values with ordered fields, i.e., fields that 
 can be accessed by index as well as by name.  Joe [records](records.md) 
-and most [`Fact` values](library/type.joe.Fact.md) have ordered fields, and 
+and most [[joe.Fact]] have ordered fields, and 
 proxied types can have ordered fields as well.  This allows a stream-lined
 pattern syntax.
 

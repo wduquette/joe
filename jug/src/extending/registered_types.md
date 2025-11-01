@@ -3,7 +3,7 @@
 A *registered type* is a Java data type for which the client has registered
 a *proxy type* with the Joe interpreter.  A proxy type is an object
 that provides information about the instances of the type.
-Most of Joe's standard types, e.g., [`String`](../library/type.joe.String.md), are implemented in just this
+Joe's standard types, e.g., [[joe.String]], are implemented in just this
 way.  This section explains how to define a `ProxyType<V>` and register
 it with Joe for use.
 
@@ -66,11 +66,11 @@ public class StringType extends ProxyType<String> {
 The script-level type name is often the same as the Java class name, but not 
 always. 
 
-- Joe's `Number` type is actually a Java `Double`; it's called `Number` because
-  there's only one kind of number in Joe.
-- Joe's `List` type actually maps to two different `List<Object>` types, both
-  under the umbrella of the `JoeList` interface.  Calling it simply `List` is a
-  kindness to the client.
+- Joe's [[joe.Number]] type is actually a Java `Double`; it's called `Number` 
+  because there's only one kind of number in Joe.
+- Joe's [[joe.List]] type actually maps to two different `List<Object>` types, 
+  both under the umbrella of the Java `JoeList` interface.  Calling it simply 
+ `List` is a kindness to the client.
 
 When the proxy is registered Joe will create a global variable with the 
 same name as the type, e.g., `String`.
@@ -81,7 +81,7 @@ Second, the proxy must explicitly identify the proxied type or types.
 
 Usually a proxy will proxy the single type `V`, but if `V` is an interface or
 a base class then it might be desirable to explicitly identify the concrete
-classes.  For example, a Joe `String` is just exactly a Java `String`.
+classes.  For example, a Joe [[joe.String]] is just exactly a Java `String`.
 
 ```java
 public class StringType extends ProxyType<String> {
@@ -93,7 +93,7 @@ public class StringType extends ProxyType<String> {
 }
 ```
 
-But a Joe `List` could be a Java `ListValue` or `ListWrapper`, both of which
+But a Joe [[joe.List]] could be a Java `ListValue` or `ListWrapper`, both of which
 implement the `JoeList` interface:
 
 ```java
@@ -142,9 +142,12 @@ should be used with great care!
 ## Extending Supertype Proxies
 
 Sometimes it happens that both a Java type and its Java supertype are 
-registered types; this is the case with Joe's `AssertError` and `Error` 
-types, which are represented internally by the Java `AssertError` and 
-`JoeError` types.  In such a case, the subtype's proxy can "inherit" the 
+registered types; this is the case with Joe's 
+[[joe.AssertError]] and [[joe.Error]]
+types, which are represented internally by the Java 
+[[java:com.wjduquette.joe.AssertError]] and 
+[[java:com.wjduquette.joe.JoeError]] types.  In such a case, the 
+subtype's proxy can "inherit" the 
 supertype's methods via the `extendsProxy()` method:
 
 ```java
@@ -212,8 +215,8 @@ The constant is accessible as `Number.PI`.
 ## Static Methods
 
 A proxy may also define any number of static methods, called as properties
-of the type object.  For example, the `String` type defines the 
-[`String.join()`](../library/type.joe.String.md#static.join) method, which
+of the type object.  For example, the [[joe.String]] type defines the 
+[[static:joe.String.join]] method, which
 joins the items in the list into a string with a given delimiter,
 and the `Number` type defines a great many math functions as static methods.
 
@@ -240,8 +243,8 @@ public class StringType extends ProxyType<String> {
 
 A proxy type can be defined as a kind of library of static constants and
 methods.  `JoeSingleton` is just such a proxy type.  There are no 
-instances of `Joe` at the script level, and so there are instance fields or
-methods.
+instances of [[joe.Joe]], just the type itself, and so there are no instance 
+fields or methods.
 
 In this case, the type can be declared to be a *static type*.  Among other
 things, this means that attempts to create an instance using the type's
@@ -264,7 +267,7 @@ Most type proxies will provide an initializer function for creating values of
 the type.  The initializer function is named after the type, returns a value
 of the type, and may take any desired arguments.  
 
-For example, the `List` type provides this 
+For example, the [[joe.List]] type provides this 
 [initializer](../library/type.joe.List.md#init):
 
 ```java
@@ -349,13 +352,13 @@ example.
 ## Instance Methods
 
 Most type proxies will define one or more instance methods for values of the
-type.  For example, [`String`](../library/type.joe.String.md) and 
-[`List`](../library/type.joe.List.md) provide a great many instance methods.
+type.  For example, [[joe.String]] and [[joe.List]] provide a great many 
+instance methods.
 
 An instance method is like a [native function](native_functions.md), but has a different
 signature because it is bound to a value of the proxied type.
 For example, here is the implementation of 
-the `String` type's [`length()`](../library/type.joe.String.md#method.length) method.
+the `String` type's [[method:joe.String.length]] method:
 
 ```java
 public class StringType extends ProxyType<String> {
@@ -381,7 +384,7 @@ in precisely the same way.
 ## Nero Fact Conversion
 
 Scripted values that are to be used as inputs to 
-[Nero rule sets](../nero/nero.md) must first be converted to `Fact` values.
+[Nero rule sets](../nero/nero.md) must first be converted to [[joe.Fact]] values.
 The conversion done automatically, but the type must support the conversion by
 overriding the `ProxyType`'s `isFact(Joe, Object)` and `toFact(Joe, Object)` 
 methods.
