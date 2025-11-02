@@ -308,7 +308,7 @@ class Generator {
             out.println();
         }
 
-        if (!type.properties().isEmpty()) {
+        if (hasProperties(type)) {
             out.hb("properties", "JavaFX Properties");
             out.println();
             out.println("| Widget     | Property | Type | Description |");
@@ -371,6 +371,14 @@ class Generator {
             out.h2("methods","Methods");
             writeCallableBodies(out, type.methods());
         }
+    }
+
+    public boolean hasProperties(TypeEntry type) {
+        while (type != null) {
+            if (!type.properties().isEmpty()) return true;
+            type = xlator.lookupType(type.supertypeName());
+        }
+        return false;
     }
 
     private void writeTypeHierarchy(ContentWriter out, TypeEntry type) {
