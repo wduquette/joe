@@ -6,7 +6,11 @@ import javafx.scene.control.MenuItem;
 
 import java.util.stream.Collectors;
 
-class MenuItemType extends WidgetType<MenuItem> {
+/**
+ * Proxy type for the JavaFX MenuItem widget.
+ */
+public class MenuItemType extends WidgetType<MenuItem> {
+    /** The proxy, for installation into an interpreter. */
     public static final MenuItemType TYPE = new MenuItemType();
 
     //-------------------------------------------------------------------------
@@ -15,8 +19,11 @@ class MenuItemType extends WidgetType<MenuItem> {
     //**
     // @package joe.win
     // @widget MenuItem
+    // %javaType javafx.scene.control.MenuItem
+    // %proxyType com.wjduquette.joe.win.MenuItemType
     // %extends Widget
     // The `MenuItem` widget is an item in a [[Menu]].
+    /** Constructor. */
     public MenuItemType() {
         super("MenuItem");
         proxies(MenuItem.class);

@@ -1,6 +1,7 @@
 package com.wjduquette.joe.win;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.wrappers.Unwrapper;
 import com.wjduquette.joe.wrappers.Wrapper;
 import javafx.beans.property.Property;
@@ -36,6 +37,7 @@ public class WidgetType<W> extends ProxyType<W> {
     //**
     // @package joe.win
     // @widget Widget
+    // %proxyType com.wjduquette.joe.win.WidgetType
     // `Widget` is the base class for JavaFX widgets as represented in Joe:
     // effectively, all JavaFX types that have JavaFX properties.  There is
     // no direct equivalent to this type in the JavaFX class hierarchy.
@@ -44,8 +46,9 @@ public class WidgetType<W> extends ProxyType<W> {
     // %title JavaFX Properties
     //
     // A JavaFX property is a widget attribute implemented in terms of a JavaFX
-    // `Property` object.  A `Property`'s value can be set and retrieved, and
-    // can be listened to for change notifications.  There are as many
+    // [[java:javafx.beans.property.Property]] object.  A `Property`'s value
+    // can be set and retrieved, and clients can register listeners to
+    // receive change notifications. There are as many
     // different subtypes of `Property` as there are widget attribute types.
     //
     // Rather than providing bindings for every `Property` subtype, `joe.win`
@@ -61,11 +64,14 @@ public class WidgetType<W> extends ProxyType<W> {
     public WidgetType(String name) {
         super(name);
 
-        method("get",           this::_get);
-        method("getProperties", this::_getProperties);
-        method("listenTo",      this::_listenTo);
-        method("set",           this::_set);
-        method("toString",      this::_toString);
+        method("get",                 this::_get);
+        method("getProperties",       this::_getProperties);
+        method("getPropertyKeywords", this::_getPropertyKeywords);
+        method("hasProperty",         this::_hasProperty);
+        method("isReadWrite",         this::_isReadWrite);
+        method("listenTo",            this::_listenTo);
+        method("set",                 this::_set);
+        method("toString",            this::_toString);
     }
 
     //-------------------------------------------------------------------------
@@ -280,11 +286,56 @@ public class WidgetType<W> extends ProxyType<W> {
 
     //**
     // @method getProperties
-    // %result joe.Set
-    // Returns a readonly `Set` of the object's property keywords.
+    // %result joe.Map
+    // Returns a `Map` of the object's property keywords.  Modifying the
+    // map will not modify the widget.
     private Object _getProperties(W obj, Joe joe, Args args) {
         args.exactArity(0, "getProperties()");
+        var map = new MapValue();
+        for (var e : properties.entrySet()) {
+            var k = e.getKey();
+            var def = e.getValue();
+            var v = def.getValue(obj);
+            map.put(k, v);
+        }
+        return map;
+    }
+
+    //**
+    // @method getPropertyKeywords
+    // %result joe.Set
+    // Returns a readonly `Set` of the object's property keywords.
+    private Object _getPropertyKeywords(W obj, Joe joe, Args args) {
+        args.exactArity(0, "getPropertyKeywords()");
         return joe.readonlySet(properties.keySet());
+    }
+
+    //**
+    // @method hasProperty
+    // %args keyword
+    // %result joe.Boolean
+    // Returns true if the widget has a property with the given keyword.
+    private Object _hasProperty(W obj, Joe joe, Args args) {
+        args.exactArity(1, "hasProperty(keyword)");
+
+        return toDef(joe, args.next()) != null;
+    }
+
+    //**
+    // @method isReadWrite
+    // %args keyword
+    // %result joe.Boolean
+    // Returns true if the widget has a property with the given keyword and
+    // the property's value can be set.
+    private Object _isReadWrite(W obj, Joe joe, Args args) {
+        args.exactArity(1, "isReadWrite(keyword)");
+
+        var def = toDef(joe, args.next());
+        if (def instanceof WidgetType.RWPropertyDef<W,?> rw) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     //**
@@ -332,7 +383,6 @@ public class WidgetType<W> extends ProxyType<W> {
         }
         return obj;
     }
-
 
     //**
     // @method toString

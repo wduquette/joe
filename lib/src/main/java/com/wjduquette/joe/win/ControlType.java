@@ -5,7 +5,11 @@ import com.wjduquette.joe.Joe;
 import javafx.scene.control.Control;
 import javafx.scene.control.Tooltip;
 
-class ControlType extends WidgetType<Control> {
+/**
+ * Proxy type for the JavaFX Control widget.
+ */
+public class ControlType extends WidgetType<Control> {
+    /** The proxy type, for installation into an interpreter. */
     public static final ControlType TYPE = new ControlType();
 
     //-------------------------------------------------------------------------
@@ -16,6 +20,7 @@ class ControlType extends WidgetType<Control> {
     // @widget Control
     // %extends Region
     // %javaType javafx.scene.control.Control
+    // %proxyType com.wjduquette.joe.win.ControlType
     // The `Control` type is the base class for JavaFX
     // controls like the [[Label]] and [[Button]] widgets.
     //
@@ -24,6 +29,7 @@ class ControlType extends WidgetType<Control> {
     // The JavaFX `Tooltip` is a popup window with many properties.  For the
     // moment `Control` only supports `Tooltips` with a simple text string,
     // and so has a `#tooltipText` property but not a `#tooltip` property.
+    /** Constructor. */
     public ControlType() {
         super("Control");
         extendsProxy(RegionType.TYPE);

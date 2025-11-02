@@ -5,7 +5,11 @@ import com.wjduquette.joe.Joe;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
-class PaneType extends WidgetType<Pane> {
+/**
+ * Proxy type for the JavaFX Pane widget.
+ */
+public class PaneType extends WidgetType<Pane> {
+    /** Proxy type for installation into an interpreter. */
     public static final PaneType TYPE = new PaneType();
 
     //-------------------------------------------------------------------------
@@ -14,9 +18,12 @@ class PaneType extends WidgetType<Pane> {
     //**
     // @package joe.win
     // @widget Pane
+    // %javaType javafx.scene.layout.Pane
+    // %proxyType com.wjduquette.joe.win.PaneType
     // %extends Region
     // The `Pane` type is the base class for JavaFX
     // widgets that manage child [[Node|Nodes]].
+    /** Constructor. */
     public PaneType() {
         super("Pane");
         extendsProxy(RegionType.TYPE);

@@ -7,8 +7,6 @@ codeFolders(
     "../lib/src/main/resources/com/wjduquette/joe");
 libOutputFolder("mdbook/src/library");
 
-//expand("SUMMARY-input.md", "SUMMARY.md");
-
 // Javadoc roots
 javadocRoot("com.wjduquette.joe",            "javadoc/");
 javadocRoot("com.wjduquette.joe.console",    "javadoc/");
@@ -21,7 +19,9 @@ javadocRoot("java.lang", jdk + "java.base/");
 javadocRoot("java.util", jdk + "java.base/");
 
 var jfx = "https://openjfx.io/javadoc/21/";
-javadocRoot("javafx.geometry",      jfx + "javafx.graphics/");
-javadocRoot("javafx.scene.control", jfx + "javafx.controls/");
-javadocRoot("javafx.scene.layout",  jfx + "javafx.graphics/");
-javadocRoot("javafx.scene.text",    jfx + "javafx.graphics/");
+javadocRoot("javafx.beans.property", jfx + "javafx.base/");
+javadocRoot("javafx.geometry",       jfx + "javafx.graphics/");
+javadocRoot("javafx.scene",          jfx + "javafx.graphics/");
+javadocRoot("javafx.scene.control",  jfx + "javafx.controls/");
+javadocRoot("javafx.scene.layout",   jfx + "javafx.graphics/");
+javadocRoot("javafx.scene.text",     jfx + "javafx.graphics/");

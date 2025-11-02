@@ -27,6 +27,7 @@ public class WinPackage extends NativePackage {
 
     //**
     // @package joe.win
+    // %title GUI API
     // This package contains an experimental API for building JavaFX GUIs.
     // It assumes a familiarity with JavaFX.
     //

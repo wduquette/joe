@@ -5,7 +5,11 @@ import com.wjduquette.joe.Joe;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Region;
 
-class RegionType extends WidgetType<Region> {
+/**
+ * Proxy type for the JavaFX Region widget.
+ */
+public class RegionType extends WidgetType<Region> {
+    /** Proxy type for installation into an interpreter. */
     public static final RegionType TYPE = new RegionType();
 
     //-------------------------------------------------------------------------
@@ -14,9 +18,12 @@ class RegionType extends WidgetType<Region> {
     //**
     // @package joe.win
     // @widget Region
+    // %javaType javafx.scene.layout.Region
+    // %proxyType com.wjduquette.joe.win.RegionType
     // %extends Node
     // The `Region` type is the abstract base class for JavaFX
     // [[Node]] widgets that occupy space on the screen.
+    /** Constructor. */
     public RegionType() {
         super("Region");
         extendsProxy(NodeType.TYPE);

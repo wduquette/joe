@@ -11,7 +11,11 @@ import javafx.scene.layout.VBox;
 
 import java.util.stream.Collectors;
 
-class NodeType extends WidgetType<Node> {
+/**
+ * Proxy type for the JavaFX Node widget.
+ */
+public class NodeType extends WidgetType<Node> {
+    /** The proxy type, for installation into an interpreter. */
     public static final NodeType TYPE = new NodeType();
 
     //-------------------------------------------------------------------------
@@ -20,10 +24,13 @@ class NodeType extends WidgetType<Node> {
     //**
     // @package joe.win
     // @widget Node
+    // %javaType javafx.scene.Node
+    // %proxyType com.wjduquette.joe.win.NodeType
     // %extends Widget
     // The `Node` widget is the abstract base class for JavaFX widgets
     // that can be added to [[Pane|Panes]] in the scene graph, and provides
     // services for all such widgets.
+    /** Constructor. */
     public NodeType() {
         super("Node");
         proxies(Node.class);
