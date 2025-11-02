@@ -318,7 +318,8 @@ public class WidgetType<W> extends ProxyType<W> {
     private Object _hasProperty(W obj, Joe joe, Args args) {
         args.exactArity(1, "hasProperty(keyword)");
 
-        return toDef(joe, args.next()) != null;
+        var def = properties.get(joe.toKeyword(args.next()));
+        return def != null;
     }
 
     //**
@@ -330,8 +331,8 @@ public class WidgetType<W> extends ProxyType<W> {
     private Object _isReadWrite(W obj, Joe joe, Args args) {
         args.exactArity(1, "isReadWrite(keyword)");
 
-        var def = toDef(joe, args.next());
-        if (def instanceof WidgetType.RWPropertyDef<W,?> rw) {
+        var def = properties.get(joe.toKeyword(args.next()));
+        if (def instanceof WidgetType.RWPropertyDef<W,?>) {
             return true;
         } else {
             return false;
