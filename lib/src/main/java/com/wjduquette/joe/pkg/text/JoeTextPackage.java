@@ -1,6 +1,8 @@
 package com.wjduquette.joe.pkg.text;
 
 import com.wjduquette.joe.NativePackage;
+import com.wjduquette.joe.types.EnumType;
+import com.wjduquette.joe.types.text.TextAlign;
 
 /**
  * The joe.text package object.
@@ -25,8 +27,18 @@ public class JoeTextPackage extends NativePackage {
         // The `joe.text` package is not included in vanilla Joe interpreters,
         // but is available for import in `joe run`, `joe test`, and so on.
 
+        //**
+        // @enum TextAlign
+        // %javaType com.wjduquette.joe.types.text.TextAlign
+        // %enumConstants
+        // Alignment of text in a [[TextColumn]].
+        type(new EnumType<>("TextAlign", TextAlign.class));
+
+
         type(GlyphSingleton.TYPE);
         type(TextBuilderClass.TYPE);
         type(TextCanvasClass.TYPE);
+        type(TextColumnType.TYPE);
+//        type(TextTableType.TYPE);
     }
 }

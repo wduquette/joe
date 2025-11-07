@@ -1,0 +1,25 @@
+// type.joe.text.TextColumn.joe
+import joe.text.TextAlign;
+import joe.text.TextColumn;
+
+function testAlignment() {
+    var tc = TextColumn();
+    assertEQ(tc.getAlignment(), TextAlign.LEFT);
+    tc.alignment(TextAlign.RIGHT);
+    assertEQ(tc.getAlignment(), TextAlign.RIGHT);
+}
+
+function testGetter() {
+    var tc = TextColumn();
+    var getter = \rec -> "xyz";
+    assertEQ(tc.getGetter(), null);
+    tc.getter(getter);
+    assertEQ(tc.getGetter(), getter);
+}
+
+function testHeader() {
+    var tc = TextColumn();
+    assertEQ(tc.getHeader(), "");
+    tc.header("ABC");
+    assertEQ(tc.getHeader(), "ABC");
+}

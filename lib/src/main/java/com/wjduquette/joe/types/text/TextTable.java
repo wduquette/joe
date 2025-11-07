@@ -107,10 +107,10 @@ public class TextTable<R> {
 
             for (int c = 0; c < columns.size(); c++) {
                 var column = columns.get(c);
-                widths[c] = Math.max(3, column.header().length());
+                widths[c] = Math.max(3, column.getHeader().length());
 
                 for (var row : rows) {
-                    var value = column.valueGetter().apply(row).toString();
+                    var value = column.getValueGetter().apply(row).toString();
                     widths[c] = Math.max(widths[c], value.length());
                 }
             }
@@ -135,7 +135,7 @@ public class TextTable<R> {
             }
 
             for (var c = 0; c < columns.size(); c++) {
-                pad(c, columns.get(c).header());
+                pad(c, columns.get(c).getHeader());
 
                 if (c < columns.size() - 1) {
                     buff.append(" ").append(vLine(mode)).append(" ");
@@ -156,7 +156,7 @@ public class TextTable<R> {
             for (var c = 0; c < columns.size(); c++) {
                 if (mode == Mode.MARKDOWN) {
                     var wid = widths[c];
-                    var sep = switch (columns.get(c).alignment()) {
+                    var sep = switch (columns.get(c).getAlignment()) {
                         case LEFT -> "-".repeat(wid);
                         case CENTER -> ":" + "-".repeat(wid - 2) + ":";
                         case RIGHT -> "-".repeat(wid - 1) + ":";
@@ -168,9 +168,13 @@ public class TextTable<R> {
 
                 if (c < columns.size() - 1) {
                     if (mode == Mode.MARKDOWN) {
-                        buff.append(" ").append(cross(mode)).append(" ");
+                        buff.append(" ")
+                            .append(cross(mode))
+                            .append(" ");
                     } else {
-                        buff.append(hLine(mode)).append(cross(mode)).append(hLine(mode));
+                        buff.append(hLine(mode))
+                            .append(cross(mode))
+                            .append(hLine(mode));
                     }
                 }
             }
@@ -187,7 +191,8 @@ public class TextTable<R> {
             }
 
             for (var c = 0; c < columns.size(); c++) {
-                pad(c, columns.get(c).valueGetter().apply(row).toString());
+                pad(c, columns.get(c).getValueGetter()
+                    .apply(row).toString());
 
                 if (c < columns.size() - 1) {
                     buff.append(" ").append(vLine(mode)).append(" ");
@@ -207,7 +212,7 @@ public class TextTable<R> {
             var left = delta/2;
             var right = delta - left;
 
-            var padded = switch (columns.get(c).alignment()) {
+            var padded = switch (columns.get(c).getAlignment()) {
                 case LEFT -> value + " ".repeat(delta);
                 case CENTER -> " ".repeat(left) + value + " ".repeat(right);
                 case RIGHT -> " ".repeat(delta) + value;
