@@ -49,7 +49,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
 
     @Override
     public Object make(Joe joe, JoeClass joeClass) {
-        return new TextBuilder(joeClass);
+        return new TextBuilderInstance(joeClass);
     }
 
     //-------------------------------------------------------------------------
@@ -60,7 +60,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // Creates an empty `TextBuilder`.
     private Object _init(Joe joe, Args args) {
         args.exactArity(0, "TextBuilder()");
-        return make(null, this);
+        return make(joe, this);
     }
 
     //-------------------------------------------------------------------------
