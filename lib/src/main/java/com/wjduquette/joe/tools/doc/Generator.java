@@ -143,9 +143,9 @@ class Generator {
         // FIRST, output the header
         out.h1line(packageH1Title(pkg));
 
-        // NEXT, output the first paragraph of the content.
+        // NEXT, output the Markdown content.
         var content = expandMnemonicLinks(pkg.content());
-        contentIntro(content).forEach(out::println);
+        content.forEach(out::println);
 
         // NEXT, output the package index.
         out.println();
@@ -174,9 +174,6 @@ class Generator {
                 .forEach(t -> writeTypeLink(out, 0, t));
             out.println();
         }
-
-        // NEXT, output the remaining content
-        content.forEach(out::println);
 
         // NEXT, output the topics
         for (var topic : pkg.topics()) {
@@ -244,10 +241,9 @@ class Generator {
         out.println();
         out.hline();
 
-        // NEXT, output the first paragraph of the content.
+        // NEXT, output the Markdown content.
         var content = expandMnemonicLinks(type.content());
-        var intro = contentIntro(content);
-        intro.forEach(out::println);
+        content.forEach(out::println);
 
         // NEXT, output the type index.
         out.println();
@@ -345,9 +341,6 @@ class Generator {
                 .forEach(m -> writeCallableLink(out, 2, m));
             supertype = xlator.lookupType(supertype.supertypeName());
         }
-
-        // NEXT, output the remaining content
-        content.forEach(out::println);
 
         // NEXT, output the topics
         for (var topic : type.topics()) {
@@ -570,23 +563,6 @@ class Generator {
         return input.stream()
             .sorted(Comparator.comparing(getter))
             .toList();
-    }
-
-    // Extracts and returns the first paragraph of the content.
-    private List<String> contentIntro(List<String> content) {
-        var result = new ArrayList<String>();
-
-        // FIRST, skip blank lines.
-        while (!content.isEmpty() && content.getFirst().isBlank()) {
-            content.removeFirst();
-        }
-
-        // NEXT, get lines until the end or the first blank.
-        while (!content.isEmpty() && !content.getFirst().isBlank()) {
-            result.add(content.removeFirst());
-        }
-
-        return result;
     }
 
     // Extracts and returns the content as a single line.
