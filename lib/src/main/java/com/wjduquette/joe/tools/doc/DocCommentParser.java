@@ -631,7 +631,7 @@ class DocCommentParser {
         }
 
         TopicEntry topic = new TopicEntry(type, topicTag.value());
-
+        if (isType) remember(topic);
         parent.topics().add(topic);
 
         while (!atEnd()) {

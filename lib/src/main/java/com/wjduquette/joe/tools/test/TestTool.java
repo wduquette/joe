@@ -1,6 +1,7 @@
 package com.wjduquette.joe.tools.test;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.pkg.text.JoeTextPackage;
 import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
@@ -154,6 +155,7 @@ public class TestTool implements Tool {
 
         // NEXT, configure the engine.
         var joe = new Joe(engineType);
+        joe.registerPackage(JoeTextPackage.PACKAGE);
         joe.installPackage(new TestPackage(engineType));
         if (finder != null) {
             joe.registerPackages(finder);

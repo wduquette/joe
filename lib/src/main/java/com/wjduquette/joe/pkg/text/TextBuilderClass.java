@@ -1,6 +1,7 @@
-package com.wjduquette.joe.types;
+package com.wjduquette.joe.pkg.text;
 
 import com.wjduquette.joe.*;
+import com.wjduquette.joe.types.text.TextBuilder;
 
 /**
  * A ProxyType for the TextBuilder type.
@@ -15,7 +16,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // Constructor
 
     //**
-    // @package joe
+    // @package joe.text
     // @class TextBuilder
     // `TextBuilder` is a native type similar to a Java `StringBuilder`; it's
     // used for building up text strings a little at a time.
@@ -48,7 +49,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
 
     @Override
     public Object make(Joe joe, JoeClass joeClass) {
-        return new TextBuilder(joeClass);
+        return new TextBuilderInstance(joeClass);
     }
 
     //-------------------------------------------------------------------------
@@ -59,7 +60,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // Creates an empty `TextBuilder`.
     private Object _init(Joe joe, Args args) {
         args.exactArity(0, "TextBuilder()");
-        return make(null, this);
+        return make(joe, this);
     }
 
     //-------------------------------------------------------------------------
@@ -101,7 +102,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // @method printf
     // %args fmt, [values...]
     // Formats its arguments given the *fmt* string, and appends the result
-    // to the buffer.  See [[topic:String.formatting]] for the format
+    // to the buffer.  See [[topic:joe.String.formatting]] for the format
     // string syntax.
     private Object _printf(TextBuilder buff, Joe joe, Args args) {
         args.minArity(1, "printf(fmt, [values]...)");

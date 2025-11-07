@@ -4,6 +4,7 @@ import com.wjduquette.joe.PackageFinder;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
+import com.wjduquette.joe.pkg.text.JoeTextPackage;
 import com.wjduquette.joe.console.ConsolePackage;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
@@ -104,6 +105,7 @@ public class RunTool implements Tool {
         consolePackage.setScript(path);
         consolePackage.getArgs().addAll(argq);
         joe.installPackage(consolePackage);
+        joe.registerPackage(JoeTextPackage.PACKAGE);
         var found = PackageFinder.find(libPath != null
             ? libPath
             : System.getenv(Joe.JOE_LIB_PATH));

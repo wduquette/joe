@@ -1,0 +1,60 @@
+// type.joe.text.TextTable.joe
+
+import joe.text.TextTable;
+import joe.text.TextColumn;
+
+record Thing(name, kind, color) {}
+
+var things = [
+    Thing("Angus", "Black Cow", #black),
+    Thing("Bertram", "Fop",     #white),
+    Thing("Rainbow", "Arc",     #variegated)
+];
+
+var thingTable = TextTable()
+    .column(TextColumn()
+        .header("Name")
+        .getter(\t -> t.name)
+    )
+    .column(TextColumn()
+        .header("Kind")
+        .alignment(#center)
+        .getter(\t -> t.kind)
+    )
+    .column(TextColumn()
+        .header("Color")
+        .alignment(#right)
+        .getter(\t -> t.color)
+    );
+
+function testColumns() {
+    var col1 = TextColumn().header("Col1");
+    var col2 = TextColumn().header("Col2");
+    var table = TextTable();
+
+    assertEQ(table.columns(), []);
+    table.column(col1).column(col2);
+    assertEQ(table.columns(), [col1, col2]);
+}
+
+function testToMarkdown() {
+    println(thingTable.toMarkdown(things));
+    assertEQ(thingTable.toMarkdown(things).lines(), [
+        "| Name    |   Kind    |       Color |",
+        "| ------- | :-------: | ----------: |",
+        "| Angus   | Black Cow |      #black |",
+        "| Bertram |    Fop    |      #white |",
+        "| Rainbow |    Arc    | #variegated |",
+    ]);
+}
+
+function testToTerminal() {
+    println(thingTable.toTerminal(things));
+    assertEQ(thingTable.toTerminal(things).lines(), [
+        "Name    │   Kind    │       Color",
+        "────────┼───────────┼────────────",
+        "Angus   │ Black Cow │      #black",
+        "Bertram │    Fop    │      #white",
+        "Rainbow │    Arc    │ #variegated",
+    ]);
+}

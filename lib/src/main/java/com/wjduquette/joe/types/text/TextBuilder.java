@@ -1,20 +1,11 @@
-package com.wjduquette.joe.types;
-
-import com.wjduquette.joe.*;
-
-import java.util.HashMap;
-import java.util.Map;
+package com.wjduquette.joe.types.text;
 
 /**
  * A Joe replacement for the Java StringBuilder.
  */
-public class TextBuilder implements JoeInstance {
+public class TextBuilder {
     //-------------------------------------------------------------------------
     // Instance Variables
-
-    // The Joe class and field map.
-    private final JoeClass joeClass;
-    private final Map<String,Object> fieldMap = new HashMap<>();
 
     // The buffer
     private StringBuilder buff = new StringBuilder();
@@ -24,17 +15,10 @@ public class TextBuilder implements JoeInstance {
 
     /**
      * Creates a TextBuilder.
-     * @param joeClass The Joe class for which this is the Java instance.
      */
-    public TextBuilder(JoeClass joeClass) {
-        this.joeClass = joeClass;
+    public TextBuilder() {
+        // Nothing to do.
     }
-
-    //-------------------------------------------------------------------------
-    // NativeInstance API
-
-    @Override public JoeClass getJoeClass() { return joeClass; }
-    @Override public Map<String, Object> getInstanceFieldMap() { return fieldMap; }
 
     //-------------------------------------------------------------------------
     // TextBuilder API

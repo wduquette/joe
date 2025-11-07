@@ -1,0 +1,69 @@
+// type.joe.text.TextCanvas.joe
+import joe.text.TextCanvas;
+
+//-----------------------------------------------------------------------------
+// Basic Usage
+
+function testEmpty() {
+    var buff = TextCanvas();
+    assertEQ(buff.asText(), "");
+}
+
+function testFill() {
+    var buff = TextCanvas();
+    buff.fill("x", 1, 1, 3, 2);
+    assertEQ(buff.asText().lines(), [
+        "    ",
+        " xxx",
+        " xxx"
+    ]);
+}
+
+function testGetPut() {
+    var buff = TextCanvas();
+    buff.put(1, 1, "xyz");
+    assertEQ(buff.get(0, 0), " ");
+    assertEQ(buff.get(1, 1), "x");
+    assertEQ(buff.get(2, 1), "y");
+    assertEQ(buff.get(3, 1), "z");
+}
+
+function testWidthHeightSize() {
+    var buff = TextCanvas();
+    buff.fill("x", 1, 1, 3, 2);
+    assertEQ(buff.width(), 4);
+    assertEQ(buff.height(), 3);
+    assertEQ(buff.size(), [4, 3]);
+}
+
+function testPutDown() {
+    var buff = TextCanvas();
+    buff.putDown(1, 1, "abc");
+    assertEQ(buff.asText().lines(), [
+        "  ",
+        " a",
+        " b",
+        " c"
+    ]);
+}
+
+function testPutLeft() {
+    var buff = TextCanvas();
+    buff.putLeft(3, 1, "abc");
+    assertEQ(buff.asText().lines(), [
+        "    ",
+        " abc"
+    ]);
+}
+
+function testPutUp() {
+    var buff = TextCanvas();
+    buff.putUp(1, 3, "abc");
+    assertEQ(buff.asText().lines(), [
+        "  ",
+        " a",
+        " b",
+        " c"
+    ]);
+}
+

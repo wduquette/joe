@@ -1,4 +1,5 @@
 // Joe singleton tests.
+import joe.text.TextBuilder;
 
 //-------------------------------------------------------------------------
 // Helper types

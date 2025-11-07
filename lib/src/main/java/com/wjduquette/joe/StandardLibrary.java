@@ -32,7 +32,6 @@ class StandardLibrary extends NativePackage {
         type(RuleSetType.TYPE);
         type(SetType.TYPE);
         type(StringType.TYPE);
-        type(TextBuilderClass.TYPE);
         type(TypeType.TYPE);
     }
 
