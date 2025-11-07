@@ -26,6 +26,6 @@ public class JoeTextPackage extends NativePackage {
 
         type(GlyphSingleton.TYPE);
         type(TextBuilderClass.TYPE);
-        type(TextCanvasType.TYPE);
+        type(TextCanvasClass.TYPE);
     }
 }

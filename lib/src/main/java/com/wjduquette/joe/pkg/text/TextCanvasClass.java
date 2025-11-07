@@ -2,6 +2,7 @@ package com.wjduquette.joe.pkg.text;
 
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.JoeClass;
 import com.wjduquette.joe.ProxyType;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.text.TextCanvas;
@@ -9,15 +10,15 @@ import com.wjduquette.joe.types.text.TextCanvas;
 /**
  * Binding for the TextCanvas class.
  */
-public class TextCanvasType extends ProxyType<TextCanvas> {
+public class TextCanvasClass extends ProxyType<TextCanvas> {
     /** The type, for installation. */
-    public static final TextCanvasType TYPE = new TextCanvasType();
+    public static final TextCanvasClass TYPE = new TextCanvasClass();
 
     //-------------------------------------------------------------------------
     // Constructor
 
     /** Creates the type. */
-    public TextCanvasType() {
+    public TextCanvasClass() {
         super("TextCanvas");
         proxies(TextCanvas.class);
 
@@ -56,6 +57,20 @@ public class TextCanvasType extends ProxyType<TextCanvas> {
     }
 
     //-------------------------------------------------------------------------
+    // JoeClass API
+
+    @Override
+    public boolean canBeExtended() {
+        return true;
+    }
+
+    @Override
+    public Object make(Joe joe, JoeClass joeClass) {
+        return new TextCanvasInstance(joeClass);
+    }
+
+
+    //-------------------------------------------------------------------------
     // Initializer
 
     //**
@@ -63,7 +78,7 @@ public class TextCanvasType extends ProxyType<TextCanvas> {
     // Creates a new, empty TextCanvas of size [0, 0].
     private Object _init(Joe joe, Args args) {
         args.exactArity(0, "TextCanvas()");
-        return new TextCanvas();
+        return make(joe, this);
     }
 
     //-------------------------------------------------------------------------
