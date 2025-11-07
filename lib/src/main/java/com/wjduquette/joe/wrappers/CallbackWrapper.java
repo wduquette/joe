@@ -17,8 +17,11 @@ public class CallbackWrapper {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final Joe joe;
-    private final Object callable;
+    /** The Joe interpreter. */
+    protected final Joe joe;
+
+    /** The wrapped Joe callable. */
+    protected final Object callable;
 
     //-------------------------------------------------------------------------
     // Constructor

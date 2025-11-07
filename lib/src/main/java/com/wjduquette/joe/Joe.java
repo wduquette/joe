@@ -8,6 +8,7 @@ import com.wjduquette.joe.walker.WalkerEngine;
 import com.wjduquette.joe.wrappers.CallbackWrapper;
 import com.wjduquette.joe.wrappers.ConsumerWrapper;
 import com.wjduquette.joe.wrappers.FunctionWrapper;
+import com.wjduquette.joe.wrappers.StringFunctionWrapper;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -733,6 +734,17 @@ public class Joe {
      */
     public <T> FunctionWrapper<T> wrapFunction(Object callable) {
         return new FunctionWrapper<>(this, toCallable(callable));
+    }
+
+    /**
+     * Wraps a Joe callable/1 as a Function&lt;T,Object&gt; that
+     * returns a stringified value.
+     * @param callable The callable/1
+     * @return The wrapper
+     * @param <T> The Java input type
+     */
+    public <T> StringFunctionWrapper<T> wrapStringFunction(Object callable) {
+        return new StringFunctionWrapper<>(this, toCallable(callable));
     }
 
     /**
