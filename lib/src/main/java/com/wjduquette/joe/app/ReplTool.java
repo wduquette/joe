@@ -4,6 +4,7 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.PackageFinder;
 import com.wjduquette.joe.SyntaxError;
+import com.wjduquette.joe.pkg.text.JoeTextPackage;
 import com.wjduquette.joe.console.ConsolePackage;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
@@ -111,6 +112,7 @@ public class ReplTool implements Tool {
         var consolePackage = new ConsolePackage();
         consolePackage.setScript("<repl>");
         consolePackage.getArgs().addAll(List.of(args));
+        joe.registerPackage(JoeTextPackage.PACKAGE);
         joe.installPackage(consolePackage);
         var found = PackageFinder.find(libPath != null
             ? libPath

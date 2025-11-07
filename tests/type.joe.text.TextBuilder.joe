@@ -1,4 +1,5 @@
 // Tests for the TextBuilder type.
+import joe.text.TextBuilder;
 
 //-----------------------------------------------------------------------------
 // Basic Usage

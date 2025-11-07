@@ -1,4 +1,4 @@
-package com.wjduquette.joe.types;
+package com.wjduquette.joe.types.text;
 
 import com.wjduquette.joe.*;
 

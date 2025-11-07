@@ -74,6 +74,7 @@
 - [Library API](library.md)
 @:indent 2
 @:packageIndex joe
+@:packageIndex joe.text
 @:packageIndex joe.console
 @:packageIndex joe.win
 @:packageIndex joe.test
