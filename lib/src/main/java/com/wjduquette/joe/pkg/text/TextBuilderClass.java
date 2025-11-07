@@ -20,7 +20,6 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // @class TextBuilder
     // `TextBuilder` is a native type similar to a Java `StringBuilder`; it's
     // used for building up text strings a little at a time.
-    //
     // Joe classes can extend the `TextBuilder` type.
 
     /**

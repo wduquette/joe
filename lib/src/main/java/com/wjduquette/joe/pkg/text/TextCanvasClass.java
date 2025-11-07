@@ -24,13 +24,14 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
 
         //**
         // @package joe.text
-        // @type TextCanvas
+        // @class TextCanvas
         // The `TextCanvas` is a canvas for drawing diagrams using monospaced
         // text for output to the terminal.  It can be thought of as a
         // two-dimensional array of character cells, with (0,0) at the
         // top-left with columns extending to the left and rows extending
         // down.  Characters and strings can be inserted at any
         // (*column*, *row*) cell; the canvas will expand automatically.
+        // Joe classes can extend the `TextCanvas` class.
         initializer(this::_init);
 
         method("asText",   this::_asText);

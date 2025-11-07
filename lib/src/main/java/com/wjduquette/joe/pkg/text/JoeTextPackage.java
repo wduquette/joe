@@ -17,6 +17,7 @@ public class JoeTextPackage extends NativePackage {
 
         //**
         // @package joe.text
+        // %title Text Utilities
         // The `joe.text` package contains APIs for advanced text
         // formatting, and particularly for the formatting of
         // monospace text for display in the terminal.
