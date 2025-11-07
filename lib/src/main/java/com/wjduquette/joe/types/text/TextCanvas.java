@@ -169,8 +169,12 @@ public class TextCanvas {
      * @return The string
      */
     public String toString() {
+        var width = rows.stream()
+            .mapToInt(Row::length)
+            .max()
+            .orElse(0);
         return rows.stream()
-            .map(Row::toString)
+            .map(r -> r.paddedTo(width))
             .collect(Collectors.joining("\n"));
     }
 
@@ -199,6 +203,18 @@ public class TextCanvas {
             while (data.size() < c + 1) {
                 data.add(BLANK);
             }
+        }
+
+        public int length() {
+            return data.size();
+        }
+
+        public String paddedTo(int width) {
+            var text = toString();
+            if (text.length() < width) {
+                text = text + " ".repeat(width - text.length());
+            }
+            return text;
         }
 
         public String toString() {
