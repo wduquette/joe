@@ -31,6 +31,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
         // top-left with columns extending to the left and rows extending
         // down.  Characters and strings can be inserted at any
         // (*column*, *row*) cell; the canvas will expand automatically.
+        //
         // Joe classes can extend the `TextCanvas` class.
         initializer(this::_init);
 
