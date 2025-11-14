@@ -86,7 +86,12 @@ public class JarPackage extends JoePackage {
         }
         URL[] urls = {jarUrl};
 
-        try (URLClassLoader loader = new URLClassLoader(urls)) {
+        try {
+            // If we use try-with-resource, it will auto-close the class loader;
+            // and then the NativePackage's code can't load additional classes
+            // from the .jar at a later time.
+            //noinspection resource
+            URLClassLoader loader = new URLClassLoader(urls);
             Class<?> nativePkg = loader.loadClass(className);
             Object obj = nativePkg.getDeclaredConstructor().newInstance();
             if (obj instanceof NativePackage pkg) {
