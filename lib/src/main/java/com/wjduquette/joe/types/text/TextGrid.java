@@ -9,6 +9,10 @@ public class TextGrid {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // The number of columns and rows
+    private int numCols = 0;
+    private int numRows = 0;
+
     // The grid
     private StringBuilder[][] grid = new StringBuilder[0][0];
 
@@ -96,20 +100,23 @@ public class TextGrid {
     // Ensures that grid is a rectangular array big enough to contain the
     // given row and column.
     private void extendTo(int column, int row) {
-        if (grid.length < row + 1) {
-            grid = Arrays.copyOf(grid, row + 1);
+        numCols = Math.max(numCols, column + 1);
+        numRows = Math.max(numRows, row + 1);
+
+        if (grid.length < numRows) {
+            grid = Arrays.copyOf(grid, numRows);
         }
 
-        for (var i = 0; i < grid.length; i++) {
+        for (var i = 0; i < numRows; i++) {
             if (grid[i] == null) {
-                grid[i] = new StringBuilder[column + 1];
-            } else if (grid[i].length < column + 1) {
-                grid[i] = Arrays.copyOf(grid[i], column + 1);
+                grid[i] = new StringBuilder[numCols];
+            } else if (grid[i].length < numCols) {
+                grid[i] = Arrays.copyOf(grid[i], numCols);
             }
         }
 
-        if (alignment.length < column + 1) {
-            alignment = Arrays.copyOf(alignment, column + 1);
+        if (alignment.length < numCols) {
+            alignment = Arrays.copyOf(alignment, numCols);
         }
     }
 
@@ -119,23 +126,26 @@ public class TextGrid {
     @Override
     public String toString() {
         // FIRST, return an empty string if there are no rows or columns
-        if (grid.length == 0) {
+        if (numRows == 0) {
             return "";
         }
 
+        // Check state
+        checkInvariants();
+
         // FIRST, get the width of each column in characters and the
         // height of each row in lines.
-        var widths = new int[grid[0].length];
-        var heights = new int[grid.length];
+        var widths = new int[numCols];
+        var heights = new int[numRows];
         computeWidthsAndHeights(widths, heights);
 
         int gridWidth = Arrays.stream(widths).sum() +
-            columnGap * (widths.length - 1);
+            columnGap * (numCols - 1);
 
         var buff = new StringBuilder();
-        for (var i = 0; i < grid.length; i++) {
-            formatRow(buff, i, widths, heights[i]);
-            if (i < grid.length - 1) {
+        for (var r = 0; r < numRows; r++) {
+            formatRow(buff, r, widths, heights[r]);
+            if (r < numRows - 1) {
                 addRowGap(buff, gridWidth);
             }
         }
@@ -143,26 +153,40 @@ public class TextGrid {
         return buff.toString().stripTrailing();
     }
 
-    private void computeWidthsAndHeights(int[] widths, int[] heights) {
-        for (var i = 0; i < heights.length; i++) {
-            for (var j = 0; j < widths.length; j++) {
-                var text = cellText(i, j);
-                var height = text.lines().count();
-                var width = text.lines().mapToLong(String::length).max().orElse(0);
-
-                widths[j] = Math.max(widths[j], (int)width);
-                heights[i] = Math.max(heights[i], (int)height);
+    private void checkInvariants() {
+        if (grid.length != numRows) {
+            throw new IllegalStateException(
+                "grid.length " + grid.length + " != numRows " + numRows);
+        }
+        for (var r = 0; r < numRows; r++) {
+            if (grid[r].length != numCols) {
+                throw new IllegalStateException(
+                    "For row " + r + ",  row length " + grid[r].length +
+                    " != numCols " + numCols);
             }
         }
     }
 
-    private void formatRow(StringBuilder buff, int i, int[] widths, int height) {
+    private void computeWidthsAndHeights(int[] widths, int[] heights) {
+        for (var r = 0; r < numRows; r++) {
+            for (var c = 0; c < numCols; c++) {
+                var text = cellText(r, c);
+                var height = text.lines().count();
+                var width = text.lines().mapToLong(String::length).max().orElse(0);
+
+                widths[c] = Math.max(widths[c], (int)width);
+                heights[r] = Math.max(heights[r], (int)height);
+            }
+        }
+    }
+
+    private void formatRow(StringBuilder buff, int r, int[] widths, int height) {
         // FIRST, get the individual lines.
         var blocks = new String[widths.length][height];
-        for (var j = 0; j < widths.length; j++) {
-            var list = cellText(i, j).lines().toList();
+        for (var c = 0; c < numCols; c++) {
+            var list = cellText(r, c).lines().toList();
             for (var k = 0; k < height; k++) {
-                blocks[j][k] = k < list.size()
+                blocks[c][k] = k < list.size()
                     ? list.get(k)
                     : "";
             }
@@ -170,10 +194,10 @@ public class TextGrid {
 
         // One line of text
         for (var k = 0; k < height; k++) {
-            for (var j = 0; j < widths.length; j++) {
-                buff.append(pad(blocks[j][k], alignment[j], widths[j]));
+            for (var c = 0; c < numCols; c++) {
+                buff.append(pad(blocks[c][k], alignment[c], widths[c]));
 
-                if (j < widths.length - 1 && columnGap > 0) {
+                if (c < numCols - 1 && columnGap > 0) {
                     buff.append(" ".repeat(columnGap));
                 }
             }
@@ -188,8 +212,8 @@ public class TextGrid {
         }
     }
 
-    private String cellText(int i, int j) {
-        var buff = grid[i][j];
+    private String cellText(int r, int c) {
+        var buff = grid[r][c];
         return buff != null ? buff.toString().stripTrailing() : "";
     }
 
