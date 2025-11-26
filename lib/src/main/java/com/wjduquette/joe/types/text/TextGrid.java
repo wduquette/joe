@@ -16,9 +16,6 @@ public class TextGrid {
     // The grid
     private StringBuilder[][] grid = new StringBuilder[0][0];
 
-    // Column alignment
-    private TextAlign[] alignment = new TextAlign[0];
-
     // The spacing between columns in blank spaces
     private int columnGap = 0;
 
@@ -73,17 +70,6 @@ public class TextGrid {
     }
 
     /**
-     * Sets the alignment for the given column.  The default is
-     * TextAlign.LEFT.
-     * @param column The column index
-     * @param align The alignment
-     */
-    public void setColumnAlignment(int column, TextAlign align) {
-        extendTo(column, 0);
-        alignment[column] = align;
-    }
-
-    /**
      * Puts the given text into the grid at the given row and column.
      * @param column The column
      * @param row The row
@@ -113,10 +99,6 @@ public class TextGrid {
             } else if (grid[i].length < numCols) {
                 grid[i] = Arrays.copyOf(grid[i], numCols);
             }
-        }
-
-        if (alignment.length < numCols) {
-            alignment = Arrays.copyOf(alignment, numCols);
         }
     }
 
@@ -195,7 +177,7 @@ public class TextGrid {
         // One line of text
         for (var k = 0; k < height; k++) {
             for (var c = 0; c < numCols; c++) {
-                buff.append(pad(blocks[c][k], alignment[c], widths[c]));
+                buff.append(pad(blocks[c][k], widths[c]));
 
                 if (c < numCols - 1 && columnGap > 0) {
                     buff.append(" ".repeat(columnGap));
@@ -217,30 +199,10 @@ public class TextGrid {
         return buff != null ? buff.toString().stripTrailing() : "";
     }
 
-    private String pad(String text, TextAlign align, int width) {
-        if (align == null) {
-            align = TextAlign.LEFT;
-        }
-
-        return switch (align) {
-            case LEFT -> {
-                // Preserve leading whitespace when left-justified.
-                text = text.stripTrailing();
-                var pad = width - text.length();
-                yield text + " ".repeat(pad);
-            }
-            case CENTER -> {
-                text = text.strip();
-                var pad = width - text.length();
-                var p1 = pad / 2;
-                var p2 = Math.max(pad - p1, 0);
-                yield " ".repeat(p1) + text + " ".repeat(p2);
-            }
-            case RIGHT -> {
-                text = text.strip();
-                var pad = width - text.length();
-                yield " ".repeat(pad) + text;
-            }
-        };
+    private String pad(String text, int width) {
+        // Preserve leading whitespace when left-justified.
+        text = text.stripTrailing();
+        var pad = width - text.length();
+        return text + " ".repeat(pad);
     }
 }

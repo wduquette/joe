@@ -3,7 +3,6 @@ package com.wjduquette.joe.pkg.text;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.ProxyType;
-import com.wjduquette.joe.types.text.TextAlign;
 import com.wjduquette.joe.types.text.TextGrid;
 
 /**
@@ -29,7 +28,6 @@ public class TextGridType extends ProxyType<TextGrid> {
 
 
         method("put",              this::_put);
-        method("columnAlignment",  this::_columnAlignment);
         method("columnGap",        this::_columnGap);
         method("rowGap",           this::_rowGap);
         method("toString",         this::_toString);
@@ -70,19 +68,6 @@ public class TextGridType extends ProxyType<TextGrid> {
         var r = joe.toCount(args.next());
         var s = joe.stringify(args.next());
         grid.put(c, r, s);
-        return grid;
-    }
-
-    //**
-    // @method columnAlignment
-    // %args column, align
-    // %result this
-    // Sets the *column*'s [[TextAlign]].  The default is left.
-    private Object _columnAlignment(TextGrid grid, Joe joe, Args args) {
-        args.exactArity(2, "columnAlignment(column, align)");
-        var column = joe.toCount(args.next());
-        var align = joe.toEnum(args.next(), TextAlign.class);
-        grid.setColumnAlignment(column, align);
         return grid;
     }
 

@@ -102,34 +102,3 @@ function testRowGap() {
         "123abc");
 }
 
-function testAlignment() {
-    var grid = TextGrid();
-    grid.columnAlignment(1, TextAlign.RIGHT);
-
-    grid.put(0, 0,
-            "123\n" +
-            "12 \n" +
-            "1  \n")
-        .put(1, 0,
-            "abc\n" +
-            "ab \n" +
-            "a  \n")
-        .put(0, 1,
-            "1  \n" +
-            "12 \n" +
-            "123\n")
-        .put(1, 1,
-            "a  \n" +
-            "ab \n" +
-            "abc\n");
-    println("------");
-    println(grid.toString());
-    println("------");
-    assertEQ(grid.toString(),
-        "123abc\n" +
-        "12  ab\n" +
-        "1    a\n" +
-        "1    a\n" +
-        "12  ab\n" +
-        "123abc");
-}
