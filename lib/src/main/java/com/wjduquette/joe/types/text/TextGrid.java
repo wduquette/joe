@@ -68,6 +68,12 @@ public class TextGrid {
         this.rowGap = rowGap;
     }
 
+    /**
+     * Sets the alignment for the given column.  The default is
+     * TextAlign.LEFT.
+     * @param column The column index
+     * @param align The alignment
+     */
     public void setColumnAlignment(int column, TextAlign align) {
         extendTo(column, 0);
         alignment[column] = align;
@@ -166,6 +172,7 @@ public class TextGrid {
         for (var k = 0; k < height; k++) {
             for (var j = 0; j < widths.length; j++) {
                 buff.append(pad(blocks[j][k], alignment[j], widths[j]));
+
                 if (j < widths.length - 1 && columnGap > 0) {
                     buff.append(" ".repeat(columnGap));
                 }
@@ -187,23 +194,29 @@ public class TextGrid {
     }
 
     private String pad(String text, TextAlign align, int width) {
-        if (text.length() == width) {
-            return text;
-        }
-
         if (align == null) {
             align = TextAlign.LEFT;
         }
 
-        var pad = width - text.length();
         return switch (align) {
-            case LEFT -> text + " ".repeat(pad);
+            case LEFT -> {
+                // Preserve leading whitespace when left-justified.
+                text = text.stripTrailing();
+                var pad = width - text.length();
+                yield text + " ".repeat(pad);
+            }
             case CENTER -> {
+                text = text.strip();
+                var pad = width - text.length();
                 var p1 = pad / 2;
                 var p2 = Math.max(pad - p1, 0);
                 yield " ".repeat(p1) + text + " ".repeat(p2);
             }
-            case RIGHT -> " ".repeat(pad) + text;
+            case RIGHT -> {
+                text = text.strip();
+                var pad = width - text.length();
+                yield " ".repeat(pad) + text;
+            }
         };
     }
 }

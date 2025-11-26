@@ -842,6 +842,20 @@ public class Joe {
     }
 
     /**
+     * Returns the argument as a non-negative integer.
+     * @param arg The argument
+     * @return The integer
+     * @throws JoeError on conversion error.
+     */
+    public int toCount(Object arg) {
+        var i = toInteger(arg);
+        if (i < 0) {
+            throw expected("non-negative integer", arg);
+        }
+        return i;
+    }
+
+    /**
      * Requires that the argument is a Double, and returns it as a
      * double for further processing.
      * @param arg The argument

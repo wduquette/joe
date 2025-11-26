@@ -39,6 +39,7 @@ public class JoeTextPackage extends NativePackage {
         type(TextBuilderClass.TYPE);
         type(TextCanvasClass.TYPE);
         type(TextColumnType.TYPE);
+        type(TextGridType.TYPE);
         type(TextTableType.TYPE);
     }
 }
