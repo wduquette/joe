@@ -41,6 +41,16 @@ public class TextBuilder {
     }
 
     /**
+     * Prints a string followed by a newline.
+     * @param value The string
+     * @return this
+     */
+    public TextBuilder println(String value) {
+        buff.append(value).append("\n");
+        return this;
+    }
+
+    /**
      * Gets the accumulated string.
      * @return The string
      */
