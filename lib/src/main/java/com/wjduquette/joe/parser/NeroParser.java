@@ -336,6 +336,7 @@ class NeroParser extends EmbeddedParser {
                 requireBound(token, bodyVars, atom, 1);
             case INDEXED_MEMBER, KEYED_MEMBER ->
                 requireBound(token, bodyVars, atom, 2);
+            case EQUIVALENT -> {} // only shape is checked here.
             default -> throw new IllegalStateException(
                 "Unexpected built-in-predicate: '" + atom.relation() + "'.");
         }
