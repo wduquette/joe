@@ -41,6 +41,7 @@ public class RuleEngine {
         BuiltInFunction function
     ) {}
 
+    private static final Map<String,Shape> BUILT_IN_SHAPES = new HashMap<>();
     private static final Map<String,BuiltIn> BUILT_INS = new HashMap<>();
 
     /** Name of the "member" built-in predicate. */
@@ -69,6 +70,7 @@ public class RuleEngine {
         var shape = new Shape.PairShape(name, fields);
         var builtIn = new BuiltIn(shape, function);
         BUILT_INS.put(shape.relation(), builtIn);
+        BUILT_IN_SHAPES.put(shape.relation(), shape);
     }
 
     /**
@@ -79,7 +81,7 @@ public class RuleEngine {
      * @return true or false
      */
     public static boolean isBuiltIn(String relation) {
-        return BUILT_INS.get(relation) != null;
+        return BUILT_IN_SHAPES.get(relation) != null;
     }
 
     /**
@@ -88,10 +90,8 @@ public class RuleEngine {
      * @return The shape or null.
      */
     public static Shape getBuiltInShape(String relation) {
-        var builtIn = BUILT_INS.get(relation);
-        return builtIn != null ? builtIn.shape() : null;
+        return BUILT_IN_SHAPES.get(relation);
     }
-
 
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -108,6 +108,7 @@ public class RuleEngine {
 
     // Map from head relation to rules with that head.
     private final Map<String,List<Rule>> ruleMap = new HashMap<>();
+
 
     //
     // Configuration Data
