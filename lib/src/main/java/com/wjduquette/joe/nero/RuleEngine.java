@@ -36,13 +36,8 @@ public class RuleEngine {
     private interface BuiltInFunction {
         Set<Fact> compute(BindingContext bc, Atom builtIn);
     }
-    private record BuiltIn(
-        Shape shape,
-        BuiltInFunction function
-    ) {}
 
-    private static final Map<String,Shape> BUILT_IN_SHAPES = new HashMap<>();
-    private static final Map<String,BuiltIn> BUILT_INS = new HashMap<>();
+    private static final Map<String,Shape> BUILT_INS = new HashMap<>();
 
     /** Name of the "member" built-in predicate. */
     public static final String MEMBER = "member";
@@ -54,23 +49,14 @@ public class RuleEngine {
     public static final String KEYED_MEMBER = "keyedMember";
 
     static {
-        builtIn(MEMBER, List.of("item", "collection"),
-            RuleEngine::_member);
-        builtIn(INDEXED_MEMBER, List.of("index", "item", "list"),
-            RuleEngine::_indexedMember);
-        builtIn(KEYED_MEMBER, List.of("key", "value", "map"),
-            RuleEngine::_keyedMember);
+        builtIn(MEMBER, List.of("item", "collection"));
+        builtIn(INDEXED_MEMBER, List.of("index", "item", "list"));
+        builtIn(KEYED_MEMBER, List.of("key", "value", "map"));
     }
 
-    private static void builtIn(
-        String name,
-        List<String> fields,
-        BuiltInFunction function)
-    {
+    private static void builtIn(String name, List<String> fields) {
         var shape = new Shape.PairShape(name, fields);
-        var builtIn = new BuiltIn(shape, function);
-        BUILT_INS.put(shape.relation(), builtIn);
-        BUILT_IN_SHAPES.put(shape.relation(), shape);
+        BUILT_INS.put(shape.relation(), shape);
     }
 
     /**
@@ -81,7 +67,7 @@ public class RuleEngine {
      * @return true or false
      */
     public static boolean isBuiltIn(String relation) {
-        return BUILT_IN_SHAPES.get(relation) != null;
+        return BUILT_INS.get(relation) != null;
     }
 
     /**
@@ -90,7 +76,7 @@ public class RuleEngine {
      * @return The shape or null.
      */
     public static Shape getBuiltInShape(String relation) {
-        return BUILT_IN_SHAPES.get(relation);
+        return BUILT_INS.get(relation);
     }
 
     //-------------------------------------------------------------------------
@@ -109,6 +95,7 @@ public class RuleEngine {
     // Map from head relation to rules with that head.
     private final Map<String,List<Rule>> ruleMap = new HashMap<>();
 
+    private final Map<String,BuiltInFunction> builtIns;
 
     //
     // Configuration Data
@@ -150,6 +137,11 @@ public class RuleEngine {
         this.joe = joe;
         this.ruleset = ruleset;
         this.knownFacts = db;
+        this.builtIns = Map.of(
+            MEMBER,         this::_member,
+            INDEXED_MEMBER, this::_indexedMember,
+            KEYED_MEMBER,   this::_keyedMember
+        );
 
         // NEXT, Categorize the rules by head relation
         for (var rule : ruleset.rules()) {
@@ -329,7 +321,7 @@ public class RuleEngine {
     private Set<Fact> factsForAtom(BindingContext bc, Atom atom) {
         if (isBuiltIn(atom.relation())) {
             // The NeroParser ensures that atom conforms to the built-in's shape.
-            return BUILT_INS.get(atom.relation()).function().compute(bc, atom);
+            return builtIns.get(atom.relation()).compute(bc, atom);
         } else {
             return knownFacts.relation(atom.relation());
         }
@@ -544,7 +536,7 @@ public class RuleEngine {
     // Built-In Predicates
 
     // member/item,collection
-    private static Set<Fact> _member(BindingContext bc, Atom atom) {
+    private Set<Fact> _member(BindingContext bc, Atom atom) {
         var coll = extractVar(bc, atom, 1);
 
         var facts = new HashSet<Fact>();
@@ -558,7 +550,7 @@ public class RuleEngine {
     }
 
     // indexedMember/index,item,list
-    private static Set<Fact> _indexedMember(BindingContext bc, Atom atom) {
+    private Set<Fact> _indexedMember(BindingContext bc, Atom atom) {
         var coll = extractVar(bc, atom, 2);
 
         var facts = new HashSet<Fact>();
@@ -575,7 +567,7 @@ public class RuleEngine {
     }
 
     // keyedMember/key,value,map
-    private static Set<Fact> _keyedMember(BindingContext bc, Atom atom) {
+    private Set<Fact> _keyedMember(BindingContext bc, Atom atom) {
         var coll = extractVar(bc, atom, 2);
         var facts = new HashSet<Fact>();
 
