@@ -1,51 +1,69 @@
 package com.wjduquette.joe.nero;
 
-import java.util.function.Function;
-
 /**
- * An {@link Equivalence} defined by external lambdas {@code a2b} and
- * {@code b2a}.
+ * An equivalence is a bijection between two types A and B, e.g., between a
+ * value type and its string representation.  It is used by the equivalent/3
+ * built-in predicate to check for equivalence and do conversions.
  *
- * <p>Both functions deal with Objects, because that's what Nero expects.</p>
+ * <p>The methods are written in terms of Object since predicate values
+ * are passed in as Objects.</p>
  *
- * <p>Function {@code a2b} expects a value of type A; it should return a value
- * of type B, or null if the input is not an A or if the
- * conversion fails.</p>
+ * <p>Ideally the equivalence will be a strict bijection: every value of A
+ * maps to a unique value of B and <i>vice versa</i>.  However, we allow for
+ * the case where A is the string representation of B and there are
+ * multiple valid strings for each value of B.  Given an Equivalence between
+ * numeric strings and doubles, for example, "1", "1.0", and "1e0" all map to
+ * the double 1.0, while the double 1.0 always maps to "1".
+ * </p>
  *
- * <p>Similarly, function {@code b2a} expects a value of type B; it should
- * return a value of type A, or null if the input is not a B, or if the
- * conversion fails.</p>
+ * <p>A conversion should return null to indicate that the conversion couldn't
+ * be performed rather than throwing an error. The equivalent/3 predicate
+ * will fail to match if a conversion returns null.</p>
  */
-public final class Equivalence extends AbstractEquivalence {
-    //------------------------------------------------------------------------
-    // Instance Variables
-
-    private final Function<Object,Object> a2b;
-    private final Function<Object,Object> b2a;
-
-    //------------------------------------------------------------------------
+public abstract class Equivalence {
+    //-------------------------------------------------------------------------
     // Constructor
 
-    /**
-     * Creates an equivalence given two conversion lambdas.  Lambda
-     * {@code a2b} should convert a value of type A to type B, returning
-     * null on any failure, including being passing something other than a
-     * value of type A.  Similarly, {@code b2a} should return null on
-     * any failure.
-     * @param a2b conversion from type A to type B
-     * @param b2a conversion from type B to type A
-     */
-    public Equivalence(
-        Function<Object,Object> a2b,
-        Function<Object,Object> b2a
-    ) {
-        this.a2b = a2b;
-        this.b2a = b2a;
+    public Equivalence() {
+        // nothing to do
     }
 
-    //------------------------------------------------------------------------
-    // AbstractEquivalence API
+    //-------------------------------------------------------------------------
+    // API
 
-    @Override public Object a2b(Object a) { return a2b.apply(a); }
-    @Override public Object b2a(Object b) { return b2a.apply(b); }
+    /**
+     * Tries to convert a value of type A to a value of type B.  The method
+     * should return null if the input is not a value of type A or cannot be
+     * converted to type B.
+     * @param a the value of type A
+     * @return the value of type B, or null on failure
+     */
+    abstract public Object a2b(Object a);
+
+    /**
+     * Convert a value of type B to a value of type A.  The method should
+     * return null if the input is not a value of type B or cannot be
+     * converted to type A.
+     * @param b the value of type B
+     * @return the value of type A, or null on failure
+     */
+    abstract public Object b2a(Object b);
+
+    /**
+     * Checks whether a and b are equivalent values for this equivalence.
+     * Values a and b are judged to be equivalent if the equivalence converts
+     * a to b or b to a; this allows for the case where multiple strings can
+     * be converted to a single value.  The two values are NOT equivalent if
+     * either conversion returns null.
+     * @param a The value of type A
+     * @param b The value of type B
+     * @return true or false
+     */
+    public boolean isEquivalent(Object a, Object b) {
+        var toB = a2b(a);
+        var toA = b2a(b);
+        return toA != null && toB != null && (
+            toB.equals(b) || toA.equals(a)
+        );
+    }
 }

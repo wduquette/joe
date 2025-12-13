@@ -51,6 +51,9 @@ public class RuleEngine {
     /** Name of the "equivalent" built-in predicate. */
     public static final String EQUIVALENT = "equivalent";
 
+    /** Name of the "str2num" equivalence. */
+    public static final Keyword STR2NUM = new Keyword("str2num");
+
     static {
         builtIn(MEMBER, List.of("item", "collection"));
         builtIn(INDEXED_MEMBER, List.of("index", "item", "list"));
@@ -106,7 +109,8 @@ public class RuleEngine {
     // Configuration Data
     //
 
-    private final Map<String,AbstractEquivalence> equivalences = new HashMap<>();
+    private final Map<Keyword, Equivalence> equivalences =
+        new HashMap<>();
 
     // Debug Flag
     private boolean debug = false;
@@ -152,7 +156,7 @@ public class RuleEngine {
         );
 
         // Define the predefined equivalences.
-        this.equivalences.put("string2number", new Equivalence(
+        this.equivalences.put(STR2NUM, new LambdaEquivalence(
             this::string2number, this::number2string
         ));
 
@@ -308,9 +312,9 @@ public class RuleEngine {
             bc.bindings = new Bindings(givenBindings);
 
             // NEXT, if it doesn't match, go on to the next fact.
-            System.out.println("Checking: " + atom + " matches " + fact);
+//            System.out.println("Checking: " + atom + " matches " + fact);
             if (!matchAtom(atom, fact, bc)) {
-                System.out.println("  No match");
+//                System.out.println("  No match");
                 continue;
             }
 
@@ -603,31 +607,28 @@ public class RuleEngine {
         assert theAtom instanceof OrderedAtom;
         var atom = (OrderedAtom)theAtom;
         var facts = new HashSet<Fact>();
+        if (debug) System.out.println("booyah!");
 
         // FIRST, Get the equivalence.  It is constrained to be a
         // bound variable or a constant.
         var name = term2value(atom.terms().get(0), bc);
-        System.out.println("Equivalence: " + name);
-        var equiv = switch(name) {
-            case String s -> equivalences.get(s);
-            case Keyword k -> equivalences.get(k.name());
-            default -> null;
-        };
-        if (equiv == null) return facts; // no match
-
+//        System.out.println("Equivalence: " + name);
+        Equivalence equiv = null;
+        if (name instanceof Keyword k) equiv = equivalences.get(k);
+        if (equiv == null) return facts; // No match
 
         // NEXT, get the A and B terms.  They will be constants or
         // variables; if variables, bound or unbound.
         var termA = atom.terms().get(1);
         var termB = atom.terms().get(2);
-        System.out.println("termA: " + termA);
-        System.out.println("termB: " + termB);
+//        System.out.println("termA: " + termA);
+//        System.out.println("termB: " + termB);
 
         // CASE 1: both terms have known values.
         if (hasValue(termA, bc) && hasValue(termB, bc)) {
             var a = term2value(termA, bc);
             var b = term2value(termB, bc);
-            System.out.println("Case 1: a=" + a + " b=" + b);
+//            System.out.println("Case 1: a=" + a + " b=" + b);
             if (a == null || b == null) return facts; // null never matches
 
             // If a and b are not equivalent, no match.
@@ -641,7 +642,7 @@ public class RuleEngine {
         if (hasValue(termA, bc)) {
             var a = term2value(termA, bc);
             var b = equiv.a2b(a);
-            System.out.println("Case 2: a=" + a + " b=" + b);
+//            System.out.println("Case 2: a=" + a + " b=" + b);
             if (a == null || b == null) return facts; // null never matches
             facts.add(new ListFact(EQUIVALENT, List.of(name, a, b)));
             return facts;
@@ -651,10 +652,9 @@ public class RuleEngine {
         if (hasValue(termB, bc)) {
             var b = term2value(termB, bc);
             var a = equiv.b2a(b);
-            System.out.println("Case 3: a=" + a + " b=" + b);
+//            System.out.println("Case 3: a=" + a + " b=" + b);
             if (a == null || b == null) return facts; // null never matches
             facts.add(new ListFact(EQUIVALENT, List.of(name, a, b)));
-            System.out.println("facts=" + facts);
             return facts;
         }
 

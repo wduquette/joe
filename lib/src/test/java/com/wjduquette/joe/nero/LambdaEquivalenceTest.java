@@ -5,8 +5,8 @@ import org.junit.Test;
 
 import static com.wjduquette.joe.checker.Checker.check;
 
-public class AbstractEquivalenceTest extends Ted {
-    private final static AbstractEquivalence E = new S2N();
+public class LambdaEquivalenceTest extends Ted {
+    private final LambdaEquivalence E = new LambdaEquivalence(this::s2n, this::n2s);
 
     @Test
     public void testConversions() {
@@ -29,25 +29,20 @@ public class AbstractEquivalenceTest extends Ted {
         check(E.isEquivalent("1", 2.0)).eq(false);
     }
 
-    private static class S2N extends AbstractEquivalence {
-        @Override
-        public Object a2b(Object a) {
-            try {
-                if (a instanceof String s) return Double.parseDouble(s);
-            } catch (Exception ex) {
-                // Nothing to do.
-            }
-            return null;
+    private Object s2n(Object a) {
+        try {
+            if (a instanceof String s) return Double.parseDouble(s);
+        } catch (Exception ex) {
+            // Nothing to do.
         }
+        return null;
+    }
 
-        @Override
-        public Object b2a(Object b) {
-            // NOTE: in real use we'd throw a JoeError.
-            if (b instanceof Double d) {
-                return d.toString();
-            } else {
-                return null;
-            }
+    private Object n2s(Object b) {
+        if (b instanceof Double d) {
+            return d.toString();
+        } else {
+            return null;
         }
     }
 }
