@@ -266,6 +266,8 @@ public class RuleEngine {
                 }
             }
         } while (gotNewFact);
+
+        if (debug) System.out.println("Inference complete");
     }
 
     // Matches the rule against the known facts, adding any new facts and
@@ -293,6 +295,7 @@ public class RuleEngine {
             if (knownFacts.add(newFact)) {
                 inferredFacts.add(newFact);
                 gotNew = true;
+                if (debug) System.out.println("    Fact: " + newFact);
             }
         }
         return gotNew;
@@ -311,10 +314,7 @@ public class RuleEngine {
             // FIRST, Copy the bindings for this fact.
             bc.bindings = new Bindings(givenBindings);
 
-            // NEXT, if it doesn't match, go on to the next fact.
-//            System.out.println("Checking: " + atom + " matches " + fact);
             if (!matchAtom(atom, fact, bc)) {
-//                System.out.println("  No match");
                 continue;
             }
 
@@ -607,7 +607,6 @@ public class RuleEngine {
         assert theAtom instanceof OrderedAtom;
         var atom = (OrderedAtom)theAtom;
         var facts = new HashSet<Fact>();
-        if (debug) System.out.println("booyah!");
 
         // FIRST, Get the equivalence.  It is constrained to be a
         // bound variable or a constant.
@@ -616,20 +615,16 @@ public class RuleEngine {
             var name = term2value(atom.terms().get(0), bc);
             throw joe.expected("keyword of known equivalence", name);
         }
-//        System.out.println("Equivalence: " + name);
 
         // NEXT, get the A and B terms.  They will be constants or
         // variables; if variables, bound or unbound.
         var termA = atom.terms().get(1);
         var termB = atom.terms().get(2);
-//        System.out.println("termA: " + termA);
-//        System.out.println("termB: " + termB);
 
         // CASE 1: both terms have known values.
         if (hasValue(termA, bc) && hasValue(termB, bc)) {
             var a = term2value(termA, bc);
             var b = term2value(termB, bc);
-//            System.out.println("Case 1: a=" + a + " b=" + b);
             if (a == null || b == null) return facts; // null never matches
 
             // If a and b are not equivalent, no match.
@@ -643,7 +638,6 @@ public class RuleEngine {
         if (hasValue(termA, bc)) {
             var a = term2value(termA, bc);
             var b = equiv.a2b(a);
-//            System.out.println("Case 2: a=" + a + " b=" + b);
             if (a == null || b == null) return facts; // null never matches
             facts.add(new ListFact(EQUIVALENT, List.of(equiv.keyword(), a, b)));
             return facts;
@@ -653,7 +647,6 @@ public class RuleEngine {
         if (hasValue(termB, bc)) {
             var b = term2value(termB, bc);
             var a = equiv.b2a(b);
-//            System.out.println("Case 3: a=" + a + " b=" + b);
             if (a == null || b == null) return facts; // null never matches
             facts.add(new ListFact(EQUIVALENT, List.of(equiv.keyword(), a, b)));
             return facts;
