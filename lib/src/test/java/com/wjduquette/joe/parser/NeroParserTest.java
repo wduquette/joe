@@ -376,6 +376,33 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at 'keyedMember', expected bound variable as term 2, got: 'items'.");
     }
 
+    @Test public void testCheckBuiltIn_equivalentUnknownEquivalence() {
+        test("testCheckBuiltIn_equivalentUnknownEquivalence");
+        var source = """
+            Thing(n) :- Foo(s), equivalent(y, s, n);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'equivalent', expected bound variable or constant as term 0, got: 'y'.");
+    }
+
+    @Test public void testCheckBuiltIn_equivalentConstOrVarA() {
+        test("testCheckBuiltIn_equivalentConstOrVarA");
+        var source = """
+            Thing(n) :- Foo(s), equivalent(#equiv, _, n);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'equivalent', expected variable or constant as term 1, got: '_'.");
+    }
+
+    @Test public void testCheckBuiltIn_equivalentConstOrVarB() {
+        test("testCheckBuiltIn_equivalentConstOrVarB");
+        var source = """
+            Thing(n) :- Foo(s), equivalent(#equiv, s, _);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'equivalent', expected variable or constant as term 2, got: '_'.");
+    }
+
     //-------------------------------------------------------------------------
     // constraint()
 

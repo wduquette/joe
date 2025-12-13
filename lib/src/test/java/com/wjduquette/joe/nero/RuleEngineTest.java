@@ -575,6 +575,49 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    @Test public void testBuiltIn_equivalent_AB() {
+        test("testBuiltIn_keyedMember_equivalent_AB");
+        var source = """
+            transient Data;
+            Data("1", 1);    // Equivalent
+            Data("2", 3);    // Not equivalent
+            Data("XYZ", 4);  // Not equivalent
+            Got(s, n) :- Data(s, n), equivalent(#str2num, s, n);
+            """;
+        check(execute(source)).eq("""
+            define Got/2;
+            Got("1", 1);
+            """);
+    }
+
+    @Test public void testBuiltIn_equivalent_A() {
+        test("testBuiltIn_keyedMember_equivalent_A");
+        var source = """
+            transient Data;
+            Data("1");    // Equivalent
+            Data("XYZ");  // Not equivalent
+            Got(s, n) :- Data(s), equivalent(#str2num, s, n);
+            """;
+        check(execute(source)).eq("""
+            define Got/2;
+            Got("1", 1);
+            """);
+    }
+
+    @Test public void testBuiltIn_equivalent_B() {
+        test("testBuiltIn_keyedMember_equivalent_A");
+        var source = """
+            transient Data;
+            Data(1);    // Equivalent
+            Data(#foo); // Not equivalent
+            Got(s, n) :- Data(n), equivalent(#str2num, s, n);
+            """;
+        check(execute(source)).eq("""
+            define Got/2;
+            Got("1", 1);
+            """);
+    }
+
     @Test public void testBuiltIn_negation() {
         test("testBuiltIn_negation");
         var source = """

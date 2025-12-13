@@ -627,8 +627,8 @@ public class RuleEngine {
         if (!gotA && !gotB) return facts;
 
         // NEXT, get values for A and B and ensure they are equivalent.
-        Object a = null;
-        Object b = null;
+        Object a;
+        Object b;
         var isEquivalent = false;
 
         if (gotA && gotB) {
