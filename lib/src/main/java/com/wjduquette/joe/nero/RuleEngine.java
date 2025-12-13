@@ -606,7 +606,6 @@ public class RuleEngine {
     private Set<Fact> _equivalent(BindingContext bc, Atom theAtom) {
         assert theAtom instanceof OrderedAtom;
         var atom = (OrderedAtom)theAtom;
-        var facts = new HashSet<Fact>();
 
         // FIRST, Get the equivalence.  It is constrained to be a
         // bound variable or a constant.
@@ -620,39 +619,38 @@ public class RuleEngine {
         // variables; if variables, bound or unbound.
         var termA = atom.terms().get(1);
         var termB = atom.terms().get(2);
+        var gotA = hasValue(termA, bc);
+        var gotB = hasValue(termB, bc);
 
-        // CASE 1: both terms have known values.
-        if (hasValue(termA, bc) && hasValue(termB, bc)) {
-            var a = term2value(termA, bc);
-            var b = term2value(termB, bc);
-            if (a == null || b == null) return facts; // null never matches
+        // NEXT, we need A or B or both, or there's no match.
+        var facts = new HashSet<Fact>();
+        if (!gotA && !gotB) return facts;
 
-            // If a and b are not equivalent, no match.
-            if (equiv.isEquivalent(a, b)) {
-                facts.add(new ListFact(EQUIVALENT, List.of(equiv.keyword(), a, b)));
-            }
-            return facts;
+        // NEXT, get values for A and B and ensure they are equivalent.
+        Object a = null;
+        Object b = null;
+        var isEquivalent = false;
+
+        if (gotA && gotB) {
+            // Case 1: got A and B, verify equivalence
+            a = term2value(termA, bc);
+            b = term2value(termB, bc);
+            isEquivalent = equiv.isEquivalent(a, b);
+        } else if (gotA) {
+            // Case 2: got A, compute B
+            a = term2value(termA, bc);
+            b = equiv.a2b(a);
+            isEquivalent = a != null && b != null;
+        } else {
+            // Case 3: got B, compute A
+            b = term2value(termB, bc);
+            a = equiv.b2a(b);
+            isEquivalent = a != null && b != null;
         }
 
-        // CASE 2: a has a value but b doesn't.
-        if (hasValue(termA, bc)) {
-            var a = term2value(termA, bc);
-            var b = equiv.a2b(a);
-            if (a == null || b == null) return facts; // null never matches
+        if (isEquivalent) {
             facts.add(new ListFact(EQUIVALENT, List.of(equiv.keyword(), a, b)));
-            return facts;
         }
-
-        // CASE 3: b has a value but a doesn't
-        if (hasValue(termB, bc)) {
-            var b = term2value(termB, bc);
-            var a = equiv.b2a(b);
-            if (a == null || b == null) return facts; // null never matches
-            facts.add(new ListFact(EQUIVALENT, List.of(equiv.keyword(), a, b)));
-            return facts;
-        }
-
-        // CASE 4: neither term has a value; no match.
         return facts;
     }
 
