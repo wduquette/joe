@@ -14,6 +14,7 @@ Nero provides the following built-in predicates.
 - [`member/item, collection`](#memberitem-collection)
 - [`indexedMember/index, item, list`](#indexedmemberindex-item-list)
 - [`keyedMember/key, value, map`](#keyedmemberkey-value-map)
+- [`equivalent/equivalence, a, b`](#equivalentequivalence-a-b)
 
 ## `member/item, collection`
 
@@ -134,3 +135,63 @@ yields these facts:
 [aggregation function](aggregation_functions.md) can reaggregate the items
 back into the original map.
 
+## `equivalent/equivalence, a, b`
+
+Logically, the `equivalent/equivalence, a, b` predicate verifies that a
+value *a* of some type A is equivalent to a value *b* of
+type B given an *equivalence* mapping.  For example, the `#str2num` 
+equivalence maps numeric strings to their equivalent numbers, and numbers
+back to numeric strings.  Under `#str2num`, the values `"123"` and `123`
+are equivalent.
+
+The `equivalent/equivalence, a, b` predicate has three uses.  It can:
+
+- Verify that two values *a* and *b* are equivalent
+- Convert a value *a* of type A into a value of type B
+- Convert a value *b* of type B into a value of type A.
+
+This predicate is typically used to convert string literals in input data
+sets into internal types for further processing, and to convert values of
+internal types back into strings for output.  
+
+For example, given an appropriate equivalence a rule set could convert 
+timestamp strings into Unix seconds, do computations, and then convert 
+computed times back into timestamp strings.
+
+This program verifies that the two values are equivalent:
+
+```nero
+Values("123", 123);
+Values("123", 456);         // Not equivalent
+Values("XYZ", 789);         // "XYZ" is not a numeric string
+Values("123", #nonNumber);  // #nonNumber is not a number
+
+Good(s, n) :- Values(s, n), equivalent(#str2num, s, n);
+```
+
+Of the values listed, only `"123"` and `123` are equivalent under `#str2num`,
+so the program yields the single fact `Good("123", 123)`.
+
+This program converts a string into a number, yielding `Number(123)`:
+
+```nero
+String("123");
+Number(n) :- String(s), equivalent(#str2num, s, n);
+```
+
+This program converts a number into its string representation, yielding
+`String("123")`:
+
+```nero
+Number(123);
+String(s) :- Number(n), equivalent(#str2num, s, n);
+```
+
+### Equivalences
+
+Nero defines the following standard equivalences.  Clients may define
+additional equivalences as needed.
+
+- `equivalent(#str2num, a, b)`
+  - The `#str2num` equivalence maps numeric string *a* to number *b*. and 
+    number *b* back to its standard numeric string representation *a*.
