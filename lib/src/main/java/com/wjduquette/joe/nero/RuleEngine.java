@@ -48,10 +48,14 @@ public class RuleEngine {
     /** Name of the "keyedMember" built-in predicate. */
     public static final String KEYED_MEMBER = "keyedMember";
 
+    /** Name of the "equivalent" built-in predicate. */
+    public static final String EQUIVALENT = "equivalent";
+
     static {
         builtIn(MEMBER, List.of("item", "collection"));
         builtIn(INDEXED_MEMBER, List.of("index", "item", "list"));
         builtIn(KEYED_MEMBER, List.of("key", "value", "map"));
+        builtIn(EQUIVALENT, List.of("equivalence", "a", "b"));
     }
 
     private static void builtIn(String name, List<String> fields) {
@@ -95,11 +99,14 @@ public class RuleEngine {
     // Map from head relation to rules with that head.
     private final Map<String,List<Rule>> ruleMap = new HashMap<>();
 
+    // The built-in predicate functions, by predicate name
     private final Map<String,BuiltInFunction> builtIns;
 
     //
     // Configuration Data
     //
+
+    private final Map<String,AbstractEquivalence> equivalences = new HashMap<>();
 
     // Debug Flag
     private boolean debug = false;
@@ -140,8 +147,14 @@ public class RuleEngine {
         this.builtIns = Map.of(
             MEMBER,         this::_member,
             INDEXED_MEMBER, this::_indexedMember,
-            KEYED_MEMBER,   this::_keyedMember
+            KEYED_MEMBER,   this::_keyedMember,
+            EQUIVALENT,     this::_equivalent
         );
+
+        // Define the predefined equivalences.
+        this.equivalences.put("string2number", new Equivalence(
+            this::string2number, this::number2string
+        ));
 
         // NEXT, Categorize the rules by head relation
         for (var rule : ruleset.rules()) {
@@ -295,7 +308,11 @@ public class RuleEngine {
             bc.bindings = new Bindings(givenBindings);
 
             // NEXT, if it doesn't match, go on to the next fact.
-            if (!matchAtom(atom, fact, bc)) continue;
+            System.out.println("Checking: " + atom + " matches " + fact);
+            if (!matchAtom(atom, fact, bc)) {
+                System.out.println("  No match");
+                continue;
+            }
 
             // NEXT, it matches.  If there's another body atom, check it and
             // then go on to the next fact.
@@ -581,7 +598,78 @@ public class RuleEngine {
         return facts;
     }
 
-    private static Object extractVar(BindingContext bc, Atom atom, int index) {
+    // equivalent/equivalence,a,b
+    private Set<Fact> _equivalent(BindingContext bc, Atom theAtom) {
+        assert theAtom instanceof OrderedAtom;
+        var atom = (OrderedAtom)theAtom;
+        var facts = new HashSet<Fact>();
+
+        // FIRST, Get the equivalence.  It is constrained to be a
+        // bound variable or a constant.
+        var name = term2value(atom.terms().get(0), bc);
+        System.out.println("Equivalence: " + name);
+        var equiv = switch(name) {
+            case String s -> equivalences.get(s);
+            case Keyword k -> equivalences.get(k.name());
+            default -> null;
+        };
+        if (equiv == null) return facts; // no match
+
+
+        // NEXT, get the A and B terms.  They will be constants or
+        // variables; if variables, bound or unbound.
+        var termA = atom.terms().get(1);
+        var termB = atom.terms().get(2);
+        System.out.println("termA: " + termA);
+        System.out.println("termB: " + termB);
+
+        // CASE 1: both terms have known values.
+        if (hasValue(termA, bc) && hasValue(termB, bc)) {
+            var a = term2value(termA, bc);
+            var b = term2value(termB, bc);
+            System.out.println("Case 1: a=" + a + " b=" + b);
+            if (a == null || b == null) return facts; // null never matches
+
+            // If a and b are not equivalent, no match.
+            if (equiv.isEquivalent(a, b)) {
+                facts.add(new ListFact(EQUIVALENT, List.of(name, a, b)));
+            }
+            return facts;
+        }
+
+        // CASE 2: a has a value but b doesn't.
+        if (hasValue(termA, bc)) {
+            var a = term2value(termA, bc);
+            var b = equiv.a2b(a);
+            System.out.println("Case 2: a=" + a + " b=" + b);
+            if (a == null || b == null) return facts; // null never matches
+            facts.add(new ListFact(EQUIVALENT, List.of(name, a, b)));
+            return facts;
+        }
+
+        // CASE 3: b has a value but a doesn't
+        if (hasValue(termB, bc)) {
+            var b = term2value(termB, bc);
+            var a = equiv.b2a(b);
+            System.out.println("Case 3: a=" + a + " b=" + b);
+            if (a == null || b == null) return facts; // null never matches
+            facts.add(new ListFact(EQUIVALENT, List.of(name, a, b)));
+            System.out.println("facts=" + facts);
+            return facts;
+        }
+
+        // CASE 4: neither term has a value; no match.
+        return facts;
+    }
+
+    // Given a term that is either a constant or a variable, checks whether
+    // it has a value.
+    private boolean hasValue(Term term, BindingContext bc) {
+        return term instanceof Constant ||
+            (term instanceof Variable v && bc.bindings.hasBinding(v.name()));
+    }
+
+    private Object extractVar(BindingContext bc, Atom atom, int index) {
         assert atom instanceof OrderedAtom;
         var a = (OrderedAtom)atom;
         var term = a.terms().get(index);
@@ -820,6 +908,23 @@ public class RuleEngine {
 
     //-------------------------------------------------------------------------
     // Helpers
+
+    private Object string2number(Object a) {
+        try {
+            if (a instanceof String s) return Double.parseDouble(s);
+        } catch (Exception ex) {
+            // Nothing to do.
+        }
+        return null;
+    }
+
+    private Object number2string(Object b) {
+        if (b instanceof Double d) {
+            return joe.stringify(d);
+        } else {
+            return null;
+        }
+    }
 
     // The context for the recursive matchBodyAtom method.
     private static class BindingContext {

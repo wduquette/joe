@@ -39,7 +39,6 @@ public class EquivalenceTest extends Ted {
     }
 
     private Object n2s(Object b) {
-        // NOTE: in real use we'd throw a JoeError.
         if (b instanceof Double d) {
             return d.toString();
         } else {
