@@ -1,12 +1,14 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.Ted;
 import org.junit.Test;
 
 import static com.wjduquette.joe.checker.Checker.check;
 
 public class LambdaEquivalenceTest extends Ted {
-    private final LambdaEquivalence E = new LambdaEquivalence(this::s2n, this::n2s);
+    private final LambdaEquivalence E =
+        new LambdaEquivalence(new Keyword("s2n"), this::s2n, this::n2s);
 
     @Test
     public void testConversions() {

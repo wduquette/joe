@@ -157,7 +157,7 @@ public class RuleEngine {
 
         // Define the predefined equivalences.
         this.equivalences.put(STR2NUM, new LambdaEquivalence(
-            this::string2number, this::number2string
+            STR2NUM, this::string2number, this::number2string
         ));
 
         // NEXT, Categorize the rules by head relation
@@ -611,11 +611,9 @@ public class RuleEngine {
 
         // FIRST, Get the equivalence.  It is constrained to be a
         // bound variable or a constant.
-        var name = term2value(atom.terms().get(0), bc);
-//        System.out.println("Equivalence: " + name);
-        Equivalence equiv = null;
-        if (name instanceof Keyword k) equiv = equivalences.get(k);
+        var equiv = extractEquivalence(atom.terms().get(0), bc);
         if (equiv == null) return facts; // No match
+//        System.out.println("Equivalence: " + name);
 
         // NEXT, get the A and B terms.  They will be constants or
         // variables; if variables, bound or unbound.
@@ -633,7 +631,7 @@ public class RuleEngine {
 
             // If a and b are not equivalent, no match.
             if (equiv.isEquivalent(a, b)) {
-                facts.add(new ListFact(EQUIVALENT, List.of(name, a, b)));
+                facts.add(new ListFact(EQUIVALENT, List.of(equiv.keyword(), a, b)));
             }
             return facts;
         }
@@ -644,7 +642,7 @@ public class RuleEngine {
             var b = equiv.a2b(a);
 //            System.out.println("Case 2: a=" + a + " b=" + b);
             if (a == null || b == null) return facts; // null never matches
-            facts.add(new ListFact(EQUIVALENT, List.of(name, a, b)));
+            facts.add(new ListFact(EQUIVALENT, List.of(equiv.keyword(), a, b)));
             return facts;
         }
 
@@ -654,12 +652,22 @@ public class RuleEngine {
             var a = equiv.b2a(b);
 //            System.out.println("Case 3: a=" + a + " b=" + b);
             if (a == null || b == null) return facts; // null never matches
-            facts.add(new ListFact(EQUIVALENT, List.of(name, a, b)));
+            facts.add(new ListFact(EQUIVALENT, List.of(equiv.keyword(), a, b)));
             return facts;
         }
 
         // CASE 4: neither term has a value; no match.
         return facts;
+    }
+
+    // Converts the term into an Equivalence value.
+    private Equivalence extractEquivalence(Term term, BindingContext bc) {
+        var name = term2value(term, bc);
+        if (name instanceof Keyword k) {
+            return equivalences.get(k);
+        } else {
+            return null;
+        }
     }
 
     // Given a term that is either a constant or a variable, checks whether

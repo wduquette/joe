@@ -1,5 +1,7 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.Keyword;
+
 import java.util.function.Function;
 
 /**
@@ -32,13 +34,16 @@ public final class LambdaEquivalence extends Equivalence {
      * null on any failure, including being passing something other than a
      * value of type A.  Similarly, {@code b2a} should return null on
      * any failure.
+     * @param keyword The equivalence's identifying keyword.
      * @param a2b conversion from type A to type B
      * @param b2a conversion from type B to type A
      */
     public LambdaEquivalence(
+        Keyword keyword,
         Function<Object,Object> a2b,
         Function<Object,Object> b2a
     ) {
+        super(keyword);
         this.a2b = a2b;
         this.b2a = b2a;
     }

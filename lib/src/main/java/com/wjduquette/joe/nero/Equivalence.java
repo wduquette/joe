@@ -1,5 +1,7 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.Keyword;
+
 /**
  * An equivalence is a bijection between two types A and B, e.g., between a
  * value type and its string representation.  It is used by the equivalent/3
@@ -22,14 +24,31 @@ package com.wjduquette.joe.nero;
  */
 public abstract class Equivalence {
     //-------------------------------------------------------------------------
+    // Instance Variables
+
+    private final Keyword keyword;
+
+    //-------------------------------------------------------------------------
     // Constructor
 
-    public Equivalence() {
-        // nothing to do
+    /**
+     * Initializes the equivalence with its identifying keyword.
+     * @param keyword The keyword
+     */
+    public Equivalence(Keyword keyword) {
+        this.keyword = keyword;
     }
 
     //-------------------------------------------------------------------------
     // API
+
+    /**
+     * Gets the equivalence's identifying keyword.
+     * @return The keyword
+     */
+    public Keyword keyword() {
+        return keyword;
+    }
 
     /**
      * Tries to convert a value of type A to a value of type B.  The method

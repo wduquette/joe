@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.Ted;
 import org.junit.Test;
 
@@ -30,6 +31,7 @@ public class EquivalenceTest extends Ted {
     }
 
     private static class S2N extends Equivalence {
+        public S2N() { super(new Keyword("s2n")); }
         @Override
         public Object a2b(Object a) {
             try {
