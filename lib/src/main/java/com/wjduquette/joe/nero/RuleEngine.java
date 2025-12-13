@@ -612,7 +612,10 @@ public class RuleEngine {
         // FIRST, Get the equivalence.  It is constrained to be a
         // bound variable or a constant.
         var equiv = extractEquivalence(atom.terms().get(0), bc);
-        if (equiv == null) return facts; // No match
+        if (equiv == null) {
+            var name = term2value(atom.terms().get(0), bc);
+            throw joe.expected("keyword of known equivalence", name);
+        }
 //        System.out.println("Equivalence: " + name);
 
         // NEXT, get the A and B terms.  They will be constants or
