@@ -192,6 +192,28 @@ function testMap() {
 }
 
 //-------------------------------------------------------------------------
+// query
+
+function testSelect_facts() {
+    var db = FactBase([
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ]);
+
+    var results = db.query(ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    });
+
+    var expected = {
+        Fact("Ancestor", #anne, #bert),
+        Fact("Ancestor", #anne, #clark),
+        Fact("Ancestor", #bert, #clark)
+    };
+    assertEQ(results, expected);
+}
+
+//-------------------------------------------------------------------------
 // relation
 
 // Tested in use by other tests
@@ -270,28 +292,6 @@ function testRename() {
     assertEQ(db.all(), {JOE_FACT, newFact, HAT_FACT});
     assertEQ(db.relation("Place"), Set());
     assertEQ(db.relation("Location"), {newFact});
-}
-
-//-------------------------------------------------------------------------
-// select
-
-function testSelect_facts() {
-    var db = FactBase([
-        Parent(#anne, #bert),
-        Parent(#bert, #clark)
-    ]);
-
-    var results = db.select(ruleset {
-        Ancestor(x, y) :- Parent(x, y);
-        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
-    });
-
-    var expected = {
-        Fact("Ancestor", #anne, #bert),
-        Fact("Ancestor", #anne, #clark),
-        Fact("Ancestor", #bert, #clark)
-    };
-    assertEQ(results, expected);
 }
 
 
