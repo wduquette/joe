@@ -34,6 +34,8 @@ public final class LambdaEquivalence extends Equivalence {
      * null on any failure, including being passing something other than a
      * value of type A.  Similarly, {@code b2a} should return null on
      * any failure.
+     *
+     * <p>Lambda exceptions are handled as though the lambda returned null.</p>
      * @param keyword The equivalence's identifying keyword.
      * @param a2b conversion from type A to type B
      * @param b2a conversion from type B to type A
@@ -51,6 +53,11 @@ public final class LambdaEquivalence extends Equivalence {
     //------------------------------------------------------------------------
     // AbstractEquivalence API
 
-    @Override public Object a2b(Object a) { return a2b.apply(a); }
-    @Override public Object b2a(Object b) { return b2a.apply(b); }
+    @Override public Object a2b(Object a) {
+        try { return a2b.apply(a); } catch (Exception ex) { return null; }
+    }
+
+    @Override public Object b2a(Object b) {
+        try { return b2a.apply(b); } catch (Exception ex) { return null; }
+    }
 }
