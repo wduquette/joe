@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Ted;
 import org.junit.Test;
@@ -575,6 +576,81 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    @Test public void testBuiltIn_equivalent_AB() {
+        test("testBuiltIn_keyedMember_equivalent_AB");
+        var source = """
+            transient Data;
+            Data("1", 1);    // Equivalent
+            Data("2", 3);    // Not equivalent
+            Data("XYZ", 4);  // Not equivalent
+            Got(s, n) :- Data(s, n), equivalent(#str2num, s, n);
+            """;
+        check(execute(source)).eq("""
+            define Got/2;
+            Got("1", 1);
+            """);
+    }
+
+    @Test public void testBuiltIn_equivalent_A() {
+        test("testBuiltIn_keyedMember_equivalent_A");
+        var source = """
+            transient Data;
+            Data("1");    // Equivalent
+            Data("XYZ");  // Not equivalent
+            Got(s, n) :- Data(s), equivalent(#str2num, s, n);
+            """;
+        check(execute(source)).eq("""
+            define Got/2;
+            Got("1", 1);
+            """);
+    }
+
+    @Test public void testBuiltIn_equivalent_B() {
+        test("testBuiltIn_keyedMember_equivalent_A");
+        var source = """
+            transient Data;
+            Data(1);    // Equivalent
+            Data(#foo); // Not equivalent
+            Got(s, n) :- Data(n), equivalent(#str2num, s, n);
+            """;
+        check(execute(source)).eq("""
+            define Got/2;
+            Got("1", 1);
+            """);
+    }
+
+    @Test public void testBuiltIn_equivalent_registered() {
+        var equiv = new LambdaEquivalence(new Keyword("upper2lower"),
+            a -> a instanceof String s ? s.toLowerCase() : null,
+            b -> b instanceof String s ? s.toUpperCase() : null
+        );
+
+        var source = """
+            transient Upper;
+            transient Lower;
+            transient Both;
+            Upper("ABC");
+            Upper(123);
+            Lower("xyz");
+            Lower(456);
+            Both("DEF", "def");
+            Both("GHI", "xyz");
+            Both("GHI", 123);
+            
+            Got(u, l) :- Upper(u), equivalent(#upper2lower, u, l);
+            Got(u, l) :- Lower(l), equivalent(#upper2lower, u, l);
+            Got(u, l) :- Both(u, l), equivalent(#upper2lower, u, l);
+            """;
+
+        // Execute with #upper2lower
+        check(execute(source, equiv)).eq("""
+            define Got/2;
+            Got("ABC", "abc");
+            Got("DEF", "def");
+            Got("XYZ", "xyz");
+            """);
+    }
+
     @Test public void testBuiltIn_negation() {
         test("testBuiltIn_negation");
         var source = """
@@ -1054,6 +1130,21 @@ public class RuleEngineTest extends Ted {
     private String execute(String source) {
         try {
             var db = Nero.with(source).debug().infer();
+            return Nero.toNeroScript(db);
+        } catch (SyntaxError ex) {
+            println(ex.getErrorReport());
+            throw ex;
+        }
+    }
+
+    // Execute the source, returning a Nero script of known facts,
+    // given an Equivalence for equivalent/equivalence,a,b
+    private String execute(String source, Equivalence equivalence) {
+        try {
+            var db = Nero.with(source)
+                .debug()
+                .equivalence(equivalence)
+                .infer();
             return Nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());

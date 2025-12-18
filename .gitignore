@@ -5,3 +5,4 @@ lib/build/
 release/
 temp/
 docs/
+mdbook/.DS_Store

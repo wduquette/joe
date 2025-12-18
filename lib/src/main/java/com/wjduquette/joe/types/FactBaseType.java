@@ -64,13 +64,13 @@ public class FactBaseType extends ProxyType<FactBase> {
         method("isDebug",        this::_isDebug);
         method("isEmpty",        this::_isEmpty);
         method("map",            this::_map);
+        method("query",          this::_query);
         method("relation",       this::_relation);
         method("relations",      this::_relations);
         method("remove",         this::_remove);
         method("removeAll",      this::_removeAll);
         method("removeIf",       this::_removeIf);
         method("rename",         this::_rename);
-        method("select",         this::_select);
         method("setDebug",       this::_setDebug);
         method("size",           this::_size);
         method("toNero",         this::_toNero);
@@ -142,8 +142,6 @@ public class FactBaseType extends ProxyType<FactBase> {
         var script = joe.toString(args.next());
         var db = new FactBase();
         Nero.with(script).update(db);
-//        var results = new Nero(joe)
-//            .execute(new SourceBuffer("*fromNero*", script));
         return db;
     }
 
@@ -291,6 +289,20 @@ public class FactBaseType extends ProxyType<FactBase> {
     }
 
     //**
+    // @method query
+    // %args rules
+    // %result Set
+    // Queries the database using the Nero *rules* and returns all inferred
+    // facts. The database itself is not modified.
+    private Object _query(FactBase db, Joe joe, Args args) {
+        args.exactArity(1, "query(rules)");
+        var rsv = joe.toType(RuleSetValue.class, args.next());
+
+        return rsv.infer(joe, db);
+    }
+
+
+    //**
     // @method relation
     // %args relation
     // %result Set
@@ -387,21 +399,6 @@ public class FactBaseType extends ProxyType<FactBase> {
     }
 
     //**
-    // @method select
-    // %args rules
-    // %result Set
-    // Queries the database using the Nero *rules* and returns all inferred
-    // facts.  If the rule set contains `export` directives then the relevant
-    // facts will be exported as domain values.  The database itself
-    // is not modified.
-    private Object _select(FactBase db, Joe joe, Args args) {
-        args.exactArity(1, "select(rules)");
-        var rsv = joe.toType(RuleSetValue.class, args.next());
-
-        return rsv.infer(joe, db);
-    }
-
-    //**
     // @method setDebug
     // %args flag
     // %result this
@@ -449,7 +446,6 @@ public class FactBaseType extends ProxyType<FactBase> {
     // %result this
     // Updates the database using the Nero *rules*.  Inferred facts
     // are added to the database and then returned to the caller.
-    // It is an error if the rule set contains `export` directives.
     private Object _update(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "update(ruleset)");
         var rsv = joe.toType(RuleSetValue.class, args.next());

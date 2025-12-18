@@ -762,6 +762,16 @@ public class Joe {
     // Argument parsing and error handling helpers
 
     /**
+     * Rethrows the exception as a JoeError using the same error message
+     * and retaining the original error as the cause.
+     * @param ex The exception
+     * @return The JoeError
+     */
+    public JoeError rethrow(Exception ex) {
+        return new JoeError(ex.getMessage(), ex);
+    }
+
+    /**
      * Factory, constructs a JoeError to be thrown by the caller.
      * @param what What kind of value the caller expected
      * @param got The value the caller got

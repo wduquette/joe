@@ -3,6 +3,7 @@ package com.wjduquette.joe.types;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.ProxyType;
+import com.wjduquette.joe.nero.Equivalence;
 
 /**
  * A ProxyType for the RuleSetValue type.
@@ -29,11 +30,12 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
         // base facts, and any input facts provided by the script.
         proxies(RuleSetValue.class);
 
-        method("infer",        this::_infer);
-        method("isDebug",      this::_isDebug);
-        method("isStratified", this::_isStratified);
-        method("setDebug",     this::_setDebug);
-        method("toString",     this::_toString);
+        method("addEquivalence", this::_addEquivalence);
+        method("infer",          this::_infer);
+        method("isDebug",        this::_isDebug);
+        method("isStratified",   this::_isStratified);
+        method("setDebug",       this::_setDebug);
+        method("toString",       this::_toString);
     }
 
     //-------------------------------------------------------------------------
@@ -59,6 +61,18 @@ public class RuleSetType extends ProxyType<RuleSetValue> {
 
     //-------------------------------------------------------------------------
     // Instance Method Implementations
+
+    //**
+    // @method addEquivalence
+    // %args equivalence
+    // %result this
+    // Adds an equivalence relation for use with the
+    // `equivalent/equivalence,a,b` built-in predicate.
+    private Object _addEquivalence(RuleSetValue value, Joe joe, Args args) {
+        args.exactArity(1, "addEquivalence(equivalence)");
+        value.addEquivalence(joe.toType(Equivalence.class, args.next()));
+        return value;
+    }
 
     //**
     // @method infer

@@ -336,6 +336,12 @@ class NeroParser extends EmbeddedParser {
                 requireBound(token, bodyVars, atom, 1);
             case INDEXED_MEMBER, KEYED_MEMBER ->
                 requireBound(token, bodyVars, atom, 2);
+            case EQUIVALENT -> {
+                // The equivalence must have a value.
+                requireHasKnownValue(token, bodyVars, atom, 0);
+                requireConstOrVar(token, atom, 1);
+                requireConstOrVar(token, atom, 2);
+            }
             default -> throw new IllegalStateException(
                 "Unexpected built-in-predicate: '" + atom.relation() + "'.");
         }
@@ -356,6 +362,49 @@ class NeroParser extends EmbeddedParser {
         var term = a.terms().get(index);
         if (term instanceof Variable v && bodyVars.contains(v.name())) return;
         error(relation, "expected bound variable as term " + index +
+            ", got: '" + term + "'.");
+    }
+
+    // Checks whether the index'th term in the atom is either a bound variable
+    // or a constant.
+    private void requireHasKnownValue(
+        Token relation,
+        Set<String> bodyVars,
+        Atom atom,
+        int index
+    ) {
+        // We've checked the shape of the atom, and it conforms to a
+        // built-in predicate; therefore it is an OrderedAtom, and it
+        // has the expected number of terms.
+        assert atom instanceof OrderedAtom;
+        var a = (OrderedAtom)atom;
+        var term = a.terms().get(index);
+        if (term instanceof Constant ||
+            (term instanceof Variable v && bodyVars.contains(v.name()))
+        ) {
+            return;
+        }
+        error(relation, "expected bound variable or constant as term " + index +
+            ", got: '" + term + "'.");
+    }
+
+    // Checks whether the index'th term in the atom is either a variable
+    // or a constant.
+    private void requireConstOrVar(
+        Token relation,
+        Atom atom,
+        int index
+    ) {
+        // We've checked the shape of the atom, and it conforms to a
+        // built-in predicate; therefore it is an OrderedAtom, and it
+        // has the expected number of terms.
+        assert atom instanceof OrderedAtom;
+        var a = (OrderedAtom)atom;
+        var term = a.terms().get(index);
+        if (term instanceof Constant || term instanceof Variable) {
+            return;
+        }
+        error(relation, "expected variable or constant as term " + index +
             ", got: '" + term + "'.");
     }
 

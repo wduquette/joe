@@ -164,6 +164,7 @@ public class Nero {
         private final Joe joe;
         private final NeroRuleSet ruleset;
         private boolean debug = false;
+        private final List<Equivalence> equivalences = new ArrayList<>();
 
         //---------------------------------------------------------------------
         // Constructor
@@ -194,6 +195,28 @@ public class Nero {
             return debug(true);
         }
 
+        /**
+         * Adds an equivalence for use with the
+         * {@code equivalent/equivalence,a,b} predicate
+         * @param equivalence The equivalence
+         * @return the pipeline
+         */
+        public Pipeline equivalence(Equivalence equivalence) {
+            equivalences.add(equivalence);
+            return this;
+        }
+
+        /**
+         * Adds equivalences for use with the
+         * {@code equivalent/equivalence,a,b} predicate
+         * @param list The equivalences
+         * @return the pipeline
+         */
+        public Pipeline equivalences(List<Equivalence> list) {
+            list.forEach(this::equivalence);
+            return this;
+        }
+
         //---------------------------------------------------------------------
         // Execution methods
 
@@ -204,6 +227,7 @@ public class Nero {
         public FactSet infer() {
             var engine = new RuleEngine(joe, ruleset, new FactSet());
             engine.setDebug(debug);
+            equivalences.forEach(engine::registerEquivalence);
             return engine.infer();
         }
 
@@ -218,6 +242,7 @@ public class Nero {
         public FactSet update(FactSet facts) {
             var engine = new RuleEngine(joe, ruleset, facts);
             engine.setDebug(debug);
+            equivalences.forEach(engine::registerEquivalence);
             return engine.infer();
         }
 
@@ -233,6 +258,7 @@ public class Nero {
         public FactSet query(FactSet facts) {
             var engine = new RuleEngine(joe, ruleset, new FactSet(facts));
             engine.setDebug(debug);
+            equivalences.forEach(engine::registerEquivalence);
             return engine.infer();
         }
     }

@@ -36,12 +36,8 @@ public class RuleEngine {
     private interface BuiltInFunction {
         Set<Fact> compute(BindingContext bc, Atom builtIn);
     }
-    private record BuiltIn(
-        Shape shape,
-        BuiltInFunction function
-    ) {}
 
-    private static final Map<String,BuiltIn> BUILT_INS = new HashMap<>();
+    private static final Map<String,Shape> BUILT_INS = new HashMap<>();
 
     /** Name of the "member" built-in predicate. */
     public static final String MEMBER = "member";
@@ -52,23 +48,22 @@ public class RuleEngine {
     /** Name of the "keyedMember" built-in predicate. */
     public static final String KEYED_MEMBER = "keyedMember";
 
+    /** Name of the "equivalent" built-in predicate. */
+    public static final String EQUIVALENT = "equivalent";
+
+    /** Name of the "str2num" equivalence. */
+    public static final Keyword STR2NUM = new Keyword("str2num");
+
     static {
-        builtIn(MEMBER, List.of("item", "collection"),
-            RuleEngine::_member);
-        builtIn(INDEXED_MEMBER, List.of("index", "item", "list"),
-            RuleEngine::_indexedMember);
-        builtIn(KEYED_MEMBER, List.of("key", "value", "map"),
-            RuleEngine::_keyedMember);
+        builtIn(MEMBER, List.of("item", "collection"));
+        builtIn(INDEXED_MEMBER, List.of("index", "item", "list"));
+        builtIn(KEYED_MEMBER, List.of("key", "value", "map"));
+        builtIn(EQUIVALENT, List.of("equivalence", "a", "b"));
     }
 
-    private static void builtIn(
-        String name,
-        List<String> fields,
-        BuiltInFunction function)
-    {
+    private static void builtIn(String name, List<String> fields) {
         var shape = new Shape.PairShape(name, fields);
-        var builtIn = new BuiltIn(shape, function);
-        BUILT_INS.put(shape.relation(), builtIn);
+        BUILT_INS.put(shape.relation(), shape);
     }
 
     /**
@@ -88,10 +83,8 @@ public class RuleEngine {
      * @return The shape or null.
      */
     public static Shape getBuiltInShape(String relation) {
-        var builtIn = BUILT_INS.get(relation);
-        return builtIn != null ? builtIn.shape() : null;
+        return BUILT_INS.get(relation);
     }
-
 
     //-------------------------------------------------------------------------
     // Instance Variables
@@ -109,9 +102,15 @@ public class RuleEngine {
     // Map from head relation to rules with that head.
     private final Map<String,List<Rule>> ruleMap = new HashMap<>();
 
+    // The built-in predicate functions, by predicate name
+    private final Map<String,BuiltInFunction> builtIns;
+
     //
     // Configuration Data
     //
+
+    private final Map<Keyword, Equivalence> equivalences =
+        new HashMap<>();
 
     // Debug Flag
     private boolean debug = false;
@@ -149,6 +148,17 @@ public class RuleEngine {
         this.joe = joe;
         this.ruleset = ruleset;
         this.knownFacts = db;
+        this.builtIns = Map.of(
+            MEMBER,         this::_member,
+            INDEXED_MEMBER, this::_indexedMember,
+            KEYED_MEMBER,   this::_keyedMember,
+            EQUIVALENT,     this::_equivalent
+        );
+
+        // Define the predefined equivalences.
+        this.equivalences.put(STR2NUM, new LambdaEquivalence(
+            STR2NUM, this::string2number, this::number2string
+        ));
 
         // NEXT, Categorize the rules by head relation
         for (var rule : ruleset.rules()) {
@@ -178,6 +188,15 @@ public class RuleEngine {
      */
     public void setDebug(boolean debug) {
         this.debug = debug;
+    }
+
+    /**
+     * Registers an Equivalence relation for use with the
+     * {@code equivalent/equivalence,a,b} predicate.
+     * @param equivalence The equivalence
+     */
+    public void registerEquivalence(Equivalence equivalence) {
+        equivalences.put(equivalence.keyword(), equivalence);
     }
 
     //-------------------------------------------------------------------------
@@ -256,6 +275,8 @@ public class RuleEngine {
                 }
             }
         } while (gotNewFact);
+
+        if (debug) System.out.println("Inference complete");
     }
 
     // Matches the rule against the known facts, adding any new facts and
@@ -283,6 +304,7 @@ public class RuleEngine {
             if (knownFacts.add(newFact)) {
                 inferredFacts.add(newFact);
                 gotNew = true;
+                if (debug) System.out.println("    Fact: " + newFact);
             }
         }
         return gotNew;
@@ -301,8 +323,9 @@ public class RuleEngine {
             // FIRST, Copy the bindings for this fact.
             bc.bindings = new Bindings(givenBindings);
 
-            // NEXT, if it doesn't match, go on to the next fact.
-            if (!matchAtom(atom, fact, bc)) continue;
+            if (!matchAtom(atom, fact, bc)) {
+                continue;
+            }
 
             // NEXT, it matches.  If there's another body atom, check it and
             // then go on to the next fact.
@@ -328,7 +351,7 @@ public class RuleEngine {
     private Set<Fact> factsForAtom(BindingContext bc, Atom atom) {
         if (isBuiltIn(atom.relation())) {
             // The NeroParser ensures that atom conforms to the built-in's shape.
-            return BUILT_INS.get(atom.relation()).function().compute(bc, atom);
+            return builtIns.get(atom.relation()).compute(bc, atom);
         } else {
             return knownFacts.relation(atom.relation());
         }
@@ -543,7 +566,7 @@ public class RuleEngine {
     // Built-In Predicates
 
     // member/item,collection
-    private static Set<Fact> _member(BindingContext bc, Atom atom) {
+    private Set<Fact> _member(BindingContext bc, Atom atom) {
         var coll = extractVar(bc, atom, 1);
 
         var facts = new HashSet<Fact>();
@@ -557,7 +580,7 @@ public class RuleEngine {
     }
 
     // indexedMember/index,item,list
-    private static Set<Fact> _indexedMember(BindingContext bc, Atom atom) {
+    private Set<Fact> _indexedMember(BindingContext bc, Atom atom) {
         var coll = extractVar(bc, atom, 2);
 
         var facts = new HashSet<Fact>();
@@ -574,7 +597,7 @@ public class RuleEngine {
     }
 
     // keyedMember/key,value,map
-    private static Set<Fact> _keyedMember(BindingContext bc, Atom atom) {
+    private Set<Fact> _keyedMember(BindingContext bc, Atom atom) {
         var coll = extractVar(bc, atom, 2);
         var facts = new HashSet<Fact>();
 
@@ -588,7 +611,76 @@ public class RuleEngine {
         return facts;
     }
 
-    private static Object extractVar(BindingContext bc, Atom atom, int index) {
+    // equivalent/equivalence,a,b
+    private Set<Fact> _equivalent(BindingContext bc, Atom theAtom) {
+        assert theAtom instanceof OrderedAtom;
+        var atom = (OrderedAtom)theAtom;
+
+        // FIRST, Get the equivalence.  It is constrained to be a
+        // bound variable or a constant.
+        var equiv = extractEquivalence(atom.terms().get(0), bc);
+        if (equiv == null) {
+            var name = term2value(atom.terms().get(0), bc);
+            throw joe.expected("keyword of known equivalence", name);
+        }
+
+        // NEXT, get the A and B terms.  They will be constants or
+        // variables; if variables, bound or unbound.
+        var termA = atom.terms().get(1);
+        var termB = atom.terms().get(2);
+        var gotA = hasValue(termA, bc);
+        var gotB = hasValue(termB, bc);
+
+        // NEXT, we need A or B or both, or there's no match.
+        var facts = new HashSet<Fact>();
+        if (!gotA && !gotB) return facts;
+
+        // NEXT, get values for A and B and ensure they are equivalent.
+        Object a;
+        Object b;
+        var isEquivalent = false;
+
+        if (gotA && gotB) {
+            // Case 1: got A and B, verify equivalence
+            a = term2value(termA, bc);
+            b = term2value(termB, bc);
+            isEquivalent = equiv.isEquivalent(a, b);
+        } else if (gotA) {
+            // Case 2: got A, compute B
+            a = term2value(termA, bc);
+            b = equiv.a2b(a);
+            isEquivalent = a != null && b != null;
+        } else {
+            // Case 3: got B, compute A
+            b = term2value(termB, bc);
+            a = equiv.b2a(b);
+            isEquivalent = a != null && b != null;
+        }
+
+        if (isEquivalent) {
+            facts.add(new ListFact(EQUIVALENT, List.of(equiv.keyword(), a, b)));
+        }
+        return facts;
+    }
+
+    // Converts the term into an Equivalence value.
+    private Equivalence extractEquivalence(Term term, BindingContext bc) {
+        var name = term2value(term, bc);
+        if (name instanceof Keyword k) {
+            return equivalences.get(k);
+        } else {
+            return null;
+        }
+    }
+
+    // Given a term that is either a constant or a variable, checks whether
+    // it has a value.
+    private boolean hasValue(Term term, BindingContext bc) {
+        return term instanceof Constant ||
+            (term instanceof Variable v && bc.bindings.hasBinding(v.name()));
+    }
+
+    private Object extractVar(BindingContext bc, Atom atom, int index) {
         assert atom instanceof OrderedAtom;
         var a = (OrderedAtom)atom;
         var term = a.terms().get(index);
@@ -827,6 +919,23 @@ public class RuleEngine {
 
     //-------------------------------------------------------------------------
     // Helpers
+
+    private Object string2number(Object a) {
+        try {
+            if (a instanceof String s) return Double.parseDouble(s);
+        } catch (Exception ex) {
+            // Nothing to do.
+        }
+        return null;
+    }
+
+    private Object number2string(Object b) {
+        if (b instanceof Double d) {
+            return joe.stringify(d);
+        } else {
+            return null;
+        }
+    }
 
     // The context for the recursive matchBodyAtom method.
     private static class BindingContext {

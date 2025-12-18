@@ -80,7 +80,7 @@ public class NeroRunTool implements Tool {
             var opt = argq.poll();
             switch (opt) {
                 case "--ast", "-a"    -> dumpAST = true;
-                case "--debug", "-d"  -> debug = false;
+                case "--debug", "-d"  -> debug = true;
                 case "--out", "-o"    -> outFile = toOptArg(opt, argq);
                 default -> {
                     System.err.println("Unknown option: '" + opt + "'.");

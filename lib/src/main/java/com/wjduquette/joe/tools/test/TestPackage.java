@@ -46,8 +46,8 @@ public class TestPackage extends NativePackage {
 
         function("assertEQ",     this::_assertEQ);
         function("assertError",  this::_assertError);
-        function("assertF",  this::_assertF);
-        function("assertT",   this::_assertT);
+        function("assertF",      this::_assertF);
+        function("assertT",      this::_assertT);
         function("engine",       this::_engine);
         function("fail",         this::_fail);
         function("skip",         this::_skip);
@@ -217,6 +217,7 @@ public class TestPackage extends NativePackage {
 
     private String testValue(Joe joe, Object value) {
         return switch (value) {
+            case null -> "null";
             case List<?> c -> typedList(joe, c);
             case Set<?> c -> typedSet(joe, c);
             case Map<?,?> m -> typedMap(joe, m);

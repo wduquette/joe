@@ -272,3 +272,24 @@ function testPattern_ordered() {
         "Fact(B, #b, #wagon, #red)"
     ]);
 }
+
+//-----------------------------------------------------------------------------
+// addEquivalence
+
+var S2N = Equivalence(#str2num,
+    \s -> s ~ String() ? Number(s) : null,
+    \n -> n ~ Number() ? Joe.stringify(n) : null
+);
+
+function testAddEquivalence() {
+    var rules = ruleset {
+        transient Num;
+        Num(123);
+        Got(s, n) :- Num(n), equivalent(#str2num, s, n);
+    };
+    var results = rules.addEquivalence(S2N).infer();
+    assertEQ(results, {
+        Fact("Got", "123", 123)
+    });
+}
+
