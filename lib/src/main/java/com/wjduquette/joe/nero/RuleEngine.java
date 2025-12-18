@@ -190,6 +190,15 @@ public class RuleEngine {
         this.debug = debug;
     }
 
+    /**
+     * Registers an Equivalence relation for use with the
+     * {@code equivalent/equivalence,a,b} predicate.
+     * @param equivalence The equivalence
+     */
+    public void registerEquivalence(Equivalence equivalence) {
+        equivalences.put(equivalence.keyword(), equivalence);
+    }
+
     //-------------------------------------------------------------------------
     // Inference
 
