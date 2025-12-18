@@ -206,6 +206,17 @@ public class Nero {
             return this;
         }
 
+        /**
+         * Adds equivalences for use with the
+         * {@code equivalent/equivalence,a,b} predicate
+         * @param list The equivalences
+         * @return the pipeline
+         */
+        public Pipeline equivalences(List<Equivalence> list) {
+            list.forEach(this::equivalence);
+            return this;
+        }
+
         //---------------------------------------------------------------------
         // Execution methods
 

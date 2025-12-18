@@ -1,10 +1,7 @@
 package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.FactSet;
-import com.wjduquette.joe.nero.Nero;
-import com.wjduquette.joe.nero.NeroRuleSet;
+import com.wjduquette.joe.nero.*;
 
 import java.util.*;
 
@@ -20,6 +17,7 @@ public class RuleSetValue {
 
     private final NeroRuleSet ruleset;
     private boolean debug = false;
+    private final List<Equivalence> equivalences = new ArrayList<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -61,12 +59,24 @@ public class RuleSetValue {
     }
 
     /**
+     * Adds an equivalence for use with the
+     * {@code equivalent/equivalence,a,b} predicate
+     * @param equivalence The equivalence
+     */
+    public void addEquivalence(Equivalence equivalence) {
+        equivalences.add(equivalence);
+    }
+
+    /**
      * Infer facts from the rule set and the database of facts.
      * @param joe The Joe interpreter
      * @return The new facts.
      */
     public Set<Fact> infer(Joe joe) {
-        return Nero.with(joe, ruleset).debug(debug).infer().all();
+        return Nero.with(joe, ruleset)
+            .debug(debug)
+            .equivalences(equivalences)
+            .infer().all();
     }
 
     /**
@@ -79,6 +89,7 @@ public class RuleSetValue {
     public Set<Fact> infer(Joe joe, FactBase db) {
         return Nero.with(joe, ruleset)
             .debug(debug)
+            .equivalences(equivalences)
             .update(new FactSet(db))
             .all();
     }
@@ -93,6 +104,7 @@ public class RuleSetValue {
         var db = toFactSet(joe, inputs);
         return Nero.with(joe, ruleset)
             .debug(debug)
+            .equivalences(equivalences)
             .update(new FactSet(db))
             .all();
     }
