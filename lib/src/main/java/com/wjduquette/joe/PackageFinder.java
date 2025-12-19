@@ -129,7 +129,7 @@ public class PackageFinder {
     private void findPackagesInRepository(Path repo, boolean verbose) {
         NeroDatabase db;
         try {
-            db = new NeroDatabase().update("""
+            db = new NeroDatabase(joe).update("""
                     define ScriptedPackage/name, scriptFiles;
                     define JarPackage/name, jarFile, className;
                     """)
