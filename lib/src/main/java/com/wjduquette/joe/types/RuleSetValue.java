@@ -73,9 +73,10 @@ public class RuleSetValue {
      * @return The new facts.
      */
     public Set<Fact> infer(Joe joe) {
-        return new Nero(joe).with(ruleset)
+        var nero = new Nero(joe);
+        nero.addEquivalences(equivalences);
+        return nero.with(ruleset)
             .debug(debug)
-            .equivalences(equivalences)
             .infer().all();
     }
 
@@ -87,9 +88,10 @@ public class RuleSetValue {
      * @return The new facts.
      */
     public Set<Fact> infer(Joe joe, FactBase db) {
-        return new Nero(joe).with(ruleset)
+        var nero = new Nero(joe);
+        nero.addEquivalences(equivalences);
+        return nero.with(ruleset)
             .debug(debug)
-            .equivalences(equivalences)
             .update(new FactSet(db))
             .all();
     }
@@ -101,10 +103,11 @@ public class RuleSetValue {
      * @return The new (possibly exported) facts.
      */
     public Set<Fact> infer(Joe joe, Collection<?> inputs) {
+        var nero = new Nero(joe);
+        nero.addEquivalences(equivalences);
         var db = toFactSet(joe, inputs);
-        return new Nero(joe).with(ruleset)
+        return nero.with(ruleset)
             .debug(debug)
-            .equivalences(equivalences)
             .update(new FactSet(db))
             .all();
     }

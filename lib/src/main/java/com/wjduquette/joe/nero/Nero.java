@@ -16,6 +16,9 @@ public class Nero {
     // The Joe interpreter used when formatting output, etc.
     private final Joe joe;
 
+    // The defined equivalences.
+    private final Map<Keyword,Equivalence> equivalences = new HashMap<>();
+
     //-------------------------------------------------------------------------
     // Constructor
 
@@ -43,6 +46,35 @@ public class Nero {
      */
     public Joe joe() {
         return joe;
+    }
+
+    //-------------------------------------------------------------------------
+    // Configuration
+
+    /**
+     * Adds a single equivalence to Nero, for use with the
+     * `equivalent/equivalence,a,b` predicate.
+     * @param equivalence The equivalence
+     */
+    public void addEquivalence(Equivalence equivalence) {
+        equivalences.put(equivalence.keyword(), equivalence);
+    }
+
+    /**
+     * Adds a multiple equivalences to Nero, for use with the
+     * `equivalent/equivalence,a,b` predicate.
+     * @param list List of equivalences
+     */
+    public void addEquivalences(List<Equivalence> list) {
+        list.forEach(this::addEquivalence);
+    }
+
+    /**
+     * Gets a read-only map of the defined equivalences.
+     * @return the map
+     */
+    public Map<Keyword,Equivalence> getEquivalences() {
+        return Collections.unmodifiableMap(equivalences);
     }
 
     //-------------------------------------------------------------------------
@@ -88,7 +120,6 @@ public class Nero {
         private final Joe joe;
         private final NeroRuleSet ruleset;
         private boolean debug = false;
-        private final List<Equivalence> equivalences = new ArrayList<>();
 
         //---------------------------------------------------------------------
         // Constructor
@@ -120,28 +151,6 @@ public class Nero {
             return debug(true);
         }
 
-        /**
-         * Adds an equivalence for use with the
-         * {@code equivalent/equivalence,a,b} predicate
-         * @param equivalence The equivalence
-         * @return the pipeline
-         */
-        public Pipeline equivalence(Equivalence equivalence) {
-            equivalences.add(equivalence);
-            return this;
-        }
-
-        /**
-         * Adds equivalences for use with the
-         * {@code equivalent/equivalence,a,b} predicate
-         * @param list The equivalences
-         * @return the pipeline
-         */
-        public Pipeline equivalences(List<Equivalence> list) {
-            list.forEach(this::equivalence);
-            return this;
-        }
-
         //---------------------------------------------------------------------
         // Execution methods
 
@@ -152,7 +161,7 @@ public class Nero {
         public FactSet infer() {
             var engine = new RuleEngine(joe, ruleset, new FactSet());
             engine.setDebug(debug);
-            equivalences.forEach(engine::registerEquivalence);
+            nero.getEquivalences().values().forEach(engine::registerEquivalence);
             return engine.infer();
         }
 
@@ -167,7 +176,7 @@ public class Nero {
         public FactSet update(FactSet facts) {
             var engine = new RuleEngine(joe, ruleset, facts);
             engine.setDebug(debug);
-            equivalences.forEach(engine::registerEquivalence);
+            nero.getEquivalences().values().forEach(engine::registerEquivalence);
             return engine.infer();
         }
 
@@ -183,7 +192,7 @@ public class Nero {
         public FactSet query(FactSet facts) {
             var engine = new RuleEngine(joe, ruleset, new FactSet(facts));
             engine.setDebug(debug);
-            equivalences.forEach(engine::registerEquivalence);
+            nero.getEquivalences().values().forEach(engine::registerEquivalence);
             return engine.infer();
         }
     }
