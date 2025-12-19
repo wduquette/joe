@@ -1062,14 +1062,17 @@ public class Joe {
         if (arg instanceof Collection<?> c) {
             var list = new ArrayList<T>();
             for (var item : c) {
-                if (arg != null && cls.isAssignableFrom(item.getClass())) {
+                if (item != null && cls.isAssignableFrom(item.getClass())) {
                     list.add((T)arg);
                 } else {
-                    break;
+                    throw expected("collection of " + classTypeName(cls), arg);
                 }
             }
+
+            return list;
+        } else {
+            throw expected("collection of " + classTypeName(cls), arg);
         }
-        throw expected("collection of " + classTypeName(cls), arg);
     }
 
     /**
