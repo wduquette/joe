@@ -4,6 +4,7 @@ import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.FactSet;
 import com.wjduquette.joe.nero.Nero;
+import com.wjduquette.joe.nero.NeroRuleSet;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -296,9 +297,9 @@ public class FactBaseType extends ProxyType<FactBase> {
     // facts. The database itself is not modified.
     private Object _query(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "query(rules)");
-        var rsv = joe.toType(RuleSetValue.class, args.next());
+        var rules = joe.toType(NeroRuleSet.class, args.next());
 
-        return new SetValue(new Nero(joe).with(rsv.ruleset()).query(db).all());
+        return new SetValue(new Nero(joe).with(rules).query(db).all());
     }
 
 
@@ -448,8 +449,8 @@ public class FactBaseType extends ProxyType<FactBase> {
     // are added to the database and then returned to the caller.
     private Object _update(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "update(ruleset)");
-        var rsv = joe.toType(RuleSetValue.class, args.next());
-        db.addAll(new Nero(joe).with(rsv.ruleset()).query(db));
+        var rules = joe.toType(NeroRuleSet.class, args.next());
+        db.addAll(new Nero(joe).with(rules).query(db));
         return db;
     }
 

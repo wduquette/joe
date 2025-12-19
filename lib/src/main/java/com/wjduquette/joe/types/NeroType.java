@@ -5,6 +5,7 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.ProxyType;
 import com.wjduquette.joe.nero.Equivalence;
 import com.wjduquette.joe.nero.Nero;
+import com.wjduquette.joe.nero.NeroRuleSet;
 
 import java.util.ArrayList;
 
@@ -143,7 +144,7 @@ public class NeroType extends ProxyType<Nero> {
     // of ways.
     private Object _with(Nero nero, Joe joe, Args args) {
         args.exactArity(1, "with(ruleset)");
-        var rsv = joe.toType(RuleSetValue.class, args.next());
-        return nero.with(rsv.ruleset());
+        var rules = joe.toType(NeroRuleSet.class, args.next());
+        return nero.with(rules);
     }
 }

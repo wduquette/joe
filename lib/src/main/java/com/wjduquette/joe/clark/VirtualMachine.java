@@ -8,7 +8,6 @@ import com.wjduquette.joe.patterns.Pattern;
 import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
-import com.wjduquette.joe.types.RuleSetValue;
 import com.wjduquette.joe.types.SetValue;
 
 import java.util.*;
@@ -795,7 +794,7 @@ class VirtualMachine {
                         throw error("Rule set is not stratified.");
                     }
 
-                    push(new RuleSetValue(ruleset));
+                    push(ruleset);
                 }
                 case SETADD -> {
                     var item = pop();
