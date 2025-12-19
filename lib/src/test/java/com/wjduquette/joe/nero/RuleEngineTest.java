@@ -1138,7 +1138,7 @@ public class RuleEngineTest extends Ted {
     private String execute(String source) {
         try {
             var db = nero.with(source).debug().infer();
-            return Nero.toNeroScript(db);
+            return nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;
@@ -1151,7 +1151,7 @@ public class RuleEngineTest extends Ted {
         var db = new FactSet(facts);
         try {
             nero.with(source).debug().update(db);
-            return Nero.toNeroScript(db);
+            return nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;
@@ -1164,7 +1164,7 @@ public class RuleEngineTest extends Ted {
         var db = new FactSet(facts);
         try {
             var inferred = nero.with(source).debug().update(db);
-            return Nero.toNeroScript(inferred);
+            return nero.toNeroScript(inferred);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;

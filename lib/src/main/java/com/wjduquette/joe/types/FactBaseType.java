@@ -121,13 +121,13 @@ public class FactBaseType extends ProxyType<FactBase> {
         var arg = args.next();
 
         if (arg instanceof FactBase db) {
-            return Nero.toNeroScript(joe, db);
+            return new Nero(joe).toNeroScript(db);
         } else {
             var db = new FactBase();
             for (var fact : joe.toCollection(arg)) {
                 db.add(joe.toFact(fact));
             }
-            return Nero.toNeroScript(joe, db);
+            return new Nero(joe).toNeroScript(db);
         }
     }
 
@@ -428,7 +428,7 @@ public class FactBaseType extends ProxyType<FactBase> {
     // Nero axioms.
     private Object _toNero(FactBase db, Joe joe, Args args) {
         args.exactArity(0, "toNero()");
-        return Nero.toNeroScript(joe, db);
+        return new Nero(joe).toNeroScript(db);
     }
 
     //**

@@ -255,6 +255,19 @@ public class NeroDatabase {
     }
 
     /**
+     * Converts the facts into a string in Nero format.
+     * Throws an error if a fact in the database contains a data value that
+     * cannot be represented in Nero syntax.
+     * @param facts The facts
+     * @return The Nero source text
+     * @throws JoeError if constraints are not met.
+     */
+    @SuppressWarnings("unused")
+    public String toNeroScript(Collection<Fact> facts) {
+        return nero.toNeroScript(facts);
+    }
+
+    /**
      * Converts the content of the database to a Nero script.
      * Throws an error if a fact in the database contains a data value that
      * cannot be represented in Nero syntax.
@@ -262,6 +275,30 @@ public class NeroDatabase {
      * @throws JoeError on non-Nero data.
      */
     public String toNeroScript() {
-        return Nero.toNeroScript(db);
+        return nero.toNeroScript(db);
+    }
+
+    /**
+     * Converts the content of the fact set to a Nero script.
+     * Throws an error if a fact in the database contains a data value that
+     * cannot be represented in Nero syntax.
+     * @param facts The fact set
+     * @return The script
+     * @throws JoeError on non-Nero data.
+     */
+    public String toNeroScript(FactSet facts) {
+        return nero.toNeroScript(facts);
+    }
+
+    /**
+     * Converts the given fact to a Nero axiom.
+     * Throws an error if the axiom contains a data value that
+     * cannot be represented in Nero syntax.
+     * @param fact The fact
+     * @return The script
+     * @throws JoeError on non-Nero data.
+     */
+    public String toNeroAxiom(Fact fact) {
+        return nero.toNeroAxiom(fact);
     }
 }

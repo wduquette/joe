@@ -12,7 +12,6 @@ import static com.wjduquette.joe.checker.Checker.*;
  * Tests for the NewNero class.
  */
 public class NeroDatabaseTest extends Ted {
-    private final Joe joe = new Joe();
     private NeroDatabase db;
 
     @Before
@@ -46,8 +45,8 @@ public class NeroDatabaseTest extends Ted {
             A(2);
             """;
         check(db.toNeroScript()).eq(content);
-        check(Nero.toNeroScript(joe, db.all())).eq(content);
-        check(Nero.toNeroScript(joe, db.relation("A"))).eq(content);
+        check(db.toNeroScript(db.all())).eq(content);
+        check(db.toNeroScript(db.relation("A"))).eq(content);
     }
 
     // Verify that we can add data to an empty database via update(), and
@@ -101,7 +100,7 @@ public class NeroDatabaseTest extends Ted {
 
         var inferred = db.query("B(x) :- A(x);");
 
-        check(Nero.toNeroScript(inferred)).eq("""
+        check(db.toNeroScript(inferred)).eq("""
             define B/1;
             B(1);
             B(2);

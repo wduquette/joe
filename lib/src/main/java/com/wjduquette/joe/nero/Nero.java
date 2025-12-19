@@ -197,6 +197,122 @@ public class Nero {
         }
     }
 
+
+    //------------------------------------------------------------------------
+    // Nero String conversions
+
+    /**
+     * Converts the facts into a string in Nero format, if
+     * possible.  All fact terms must be expressible as Nero literal terms.
+     * @param facts The facts
+     * @return The Nero source text
+     * @throws JoeError if constraints are not met.
+     */
+    @SuppressWarnings("unused")
+    public String toNeroScript(Collection<Fact> facts) {
+        return toNeroScript(new FactSet(facts));
+    }
+
+    /**
+     * Converts the contents of the FactSet into a string in Nero format, if
+     * possible.  All fact terms must be expressible as Nero literal terms.
+     * @param db The factSet
+     * @return The Nero source text
+     * @throws JoeError if constraints are not met.
+     */
+    public String toNeroScript(FactSet db) {
+        var schema = Schema.inferSchema(db.all());
+        var buff = new StringBuilder();
+        var relations = db.getRelations().stream().sorted().toList();
+        var gotFirst = false;
+
+        for (var relation : relations) {
+            var shape = schema.get(relation).toSpec();
+            if (gotFirst) buff.append("\n");
+            buff.append("define ").append(shape).append(";\n");
+            gotFirst = true;
+
+            var axioms = db.relation(relation).stream()
+                .map(this::toNeroAxiom)
+                .sorted()
+                .collect(Collectors.joining("\n"));
+            buff.append(axioms).append("\n");
+        }
+
+        return buff.toString();
+    }
+
+    /**
+     * Outputs a Fact as a Nero axiom, if possible.
+     * The fact's terms must be expressible as Nero literal terms.
+     * @param fact The Fact
+     * @return The axiom text
+     * @throws JoeError if constraints are not met.
+     */
+    public String toNeroAxiom(Fact fact) {
+        var buff = new StringBuilder();
+        buff.append(fact.relation()).append("(");
+
+        String terms;
+
+        if (fact.isOrdered()) {
+            terms = fact.getFields().stream()
+                .map(this::toNeroTerm)
+                .collect(Collectors.joining(", "));
+        } else {
+            var map = new TreeMap<>(fact.getFieldMap());
+            terms = map.entrySet().stream()
+                .map(e -> e.getKey() + ": " +
+                    toNeroTerm(e.getValue()))
+                .collect(Collectors.joining(", "));
+        }
+
+        buff.append(terms).append(");");
+        return buff.toString();
+    }
+
+    /**
+     * Outputs a value as a Nero literal term, if possible.
+     * @param term The term
+     * @return The term's literal
+     * @throws JoeError if the term cannot be expressed as a Nero literal.
+     */
+    public String toNeroTerm(Object term) {
+        // This is the easiest way to limit the output to Nero literals.
+        return switch (term) {
+            case null -> "null";
+            case Boolean b -> joe.stringify(b);
+            case Double d -> joe.stringify(d);
+            case Enum<?> e -> "#" + e.name().toLowerCase();
+            case Keyword k -> joe.stringify(k);
+            case String s -> Joe.quote(s);
+            case List<?> t -> {
+                var list = t.stream()
+                    .map(this::toNeroTerm)
+                    .collect(Collectors.joining(", "));
+                yield "[" + list + "]";
+            }
+            case Map<?,?> t -> {
+                if (t.isEmpty()) yield "{:}";
+                var list = t.entrySet().stream()
+                    .map(e -> toNeroTerm(e.getKey()) +
+                        ": " + toNeroTerm(e.getValue()))
+                    .sorted()
+                    .collect(Collectors.joining(", "));
+                yield "{" + list + "}";
+            }
+            case Set<?> t -> {
+                var list = t.stream()
+                    .map(this::toNeroTerm)
+                    .sorted()
+                    .collect(Collectors.joining(", "));
+                yield "{" + list + "}";
+            }
+            default -> throw new JoeError(
+                "Non-Nero term: '" + joe.stringify(term));
+        };
+    }
+
     //-------------------------------------------------------------------------
     // Static API: Parsing and Compiling
 
@@ -269,149 +385,5 @@ public class Nero {
             throw new JoeError("Nero rule set cannot be stratified.");
         }
         return ruleSet;
-    }
-
-    //------------------------------------------------------------------------
-    // Static API: Nero String conversions
-
-    /**
-     * Converts the facts into a string in Nero format, if
-     * possible.  All fact terms must be expressible as Nero literal terms.
-     * Creates a Joe interpreter to do the term conversions.
-     * @param facts The facts
-     * @return The Nero source text
-     * @throws JoeError if constraints are not met.
-     */
-    @SuppressWarnings("unused")
-    public static String toNeroScript(Collection<Fact> facts) {
-        return toNeroScript(new FactSet(facts));
-    }
-
-    /**
-     * Converts the facts into a string in Nero format, if
-     * possible.  All fact terms must be expressible as Nero literal terms.
-     * @param joe The Joe interpreter
-     * @param facts The facts
-     * @return The Nero source text
-     * @throws JoeError if constraints are not met.
-     */
-    public static String toNeroScript(Joe joe, Collection<Fact> facts) {
-        return toNeroScript(joe, new FactSet(facts));
-    }
-
-    /**
-     * Converts the contents of the FactSet into a string in Nero format, if
-     * possible.  All fact terms must be expressible as Nero literal terms.
-     * Creates a Joe interpreter to do the term conversions.
-     * @param db The factSet
-     * @return The Nero source text
-     * @throws JoeError if constraints are not met.
-     */
-    public static String toNeroScript(FactSet db) {
-        return toNeroScript(new Joe(), db);
-    }
-
-    /**
-     * Converts the contents of the FactSet into a string in Nero format, if
-     * possible.  All fact terms must be expressible as Nero literal terms.
-     * Uses the Joe interpreter for the term conversions.
-     * @param joe The Joe interpreter
-     * @param db The factSet
-     * @return The Nero source text
-     * @throws JoeError if constraints are not met.
-     */
-    public static String toNeroScript(Joe joe, FactSet db) {
-        var schema = Schema.inferSchema(db.all());
-        var buff = new StringBuilder();
-        var relations = db.getRelations().stream().sorted().toList();
-        var gotFirst = false;
-
-        for (var relation : relations) {
-            var shape = schema.get(relation).toSpec();
-            if (gotFirst) buff.append("\n");
-            buff.append("define ").append(shape).append(";\n");
-            gotFirst = true;
-
-            var axioms = db.relation(relation).stream()
-                .map(a -> toNeroAxiom(joe, a))
-                .sorted()
-                .collect(Collectors.joining("\n"));
-            buff.append(axioms).append("\n");
-        }
-
-        return buff.toString();
-    }
-
-    /**
-     * Outputs a Fact as a Nero axiom, if possible.
-     * The fact's terms must be expressible as Nero literal terms.
-     * @param joe The Joe interpreter
-     * @param fact The Fact
-     * @return The axiom text
-     * @throws JoeError if constraints are not met.
-     */
-    public static String toNeroAxiom(Joe joe, Fact fact) {
-        var buff = new StringBuilder();
-        buff.append(fact.relation()).append("(");
-
-        String terms;
-
-        if (fact.isOrdered()) {
-            terms = fact.getFields().stream()
-                .map(t -> toNeroTerm(joe, t))
-                .collect(Collectors.joining(", "));
-        } else {
-            var map = new TreeMap<>(fact.getFieldMap());
-            terms = map.entrySet().stream()
-                .map(e -> e.getKey() + ": " +
-                    toNeroTerm(joe, e.getValue()))
-                .collect(Collectors.joining(", "));
-        }
-
-        buff.append(terms).append(");");
-        return buff.toString();
-    }
-
-    /**
-     * Outputs a value as a Nero literal term, if possible.
-     * @param joe The Joe interpreter
-     * @param term The term
-     * @return The term's literal
-     * @throws JoeError if the term cannot be expressed as a Nero literal.
-     */
-    public static String toNeroTerm(Joe joe, Object term) {
-        // This is the easiest way to limit the output to Nero literals.
-        return switch (term) {
-            case null -> "null";
-            case Boolean b -> joe.stringify(b);
-            case Double d -> joe.stringify(d);
-            case Enum<?> e -> "#" + e.name().toLowerCase();
-            case Keyword k -> joe.stringify(k);
-            case String s -> Joe.quote(s);
-            case List<?> t -> {
-                var list = t.stream()
-                    .map(item -> toNeroTerm(joe, item))
-                    .collect(Collectors.joining(", "));
-                yield "[" + list + "]";
-            }
-            case Map<?,?> t -> {
-                if (t.isEmpty()) yield "{:}";
-                var list = t.entrySet().stream()
-                    .map(e -> toNeroTerm(joe, e.getKey()) +
-                        ": " + toNeroTerm(joe, e.getValue()))
-                    .sorted()
-                    .collect(Collectors.joining(", "));
-                yield "{" + list + "}";
-            }
-            case Set<?> t -> {
-                var list = t.stream()
-                    .map(item -> toNeroTerm(joe, item))
-                    .sorted()
-                    .collect(Collectors.joining(", "));
-                yield "{" + list + "}";
-            }
-            default -> throw new JoeError(
-                "Non-Nero term: '" + joe.stringify(term));
-        };
     }
 }

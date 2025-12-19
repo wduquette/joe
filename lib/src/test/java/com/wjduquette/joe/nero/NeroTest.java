@@ -1,6 +1,7 @@
 package com.wjduquette.joe.nero;
 
 import com.wjduquette.joe.*;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -13,6 +14,12 @@ import static com.wjduquette.joe.checker.Checker.*;
  */
 public class NeroTest extends Ted {
     private final Joe joe = new Joe();
+    private Nero nero;
+
+    @Before
+    public void setup() {
+        nero = new Nero(joe);
+    }
 
     //-------------------------------------------------------------------------
     // Parsing
@@ -112,7 +119,7 @@ public class NeroTest extends Ted {
         var script = """
             A(1);
             """;
-        check(Nero.toNeroScript(new Nero().with(script).debug().infer())).eq("""
+        check(nero.toNeroScript(nero.with(script).debug().infer())).eq("""
             define A/1;
             A(1);
             """);
@@ -125,11 +132,11 @@ public class NeroTest extends Ted {
         var script = """
             B(2);
             """;
-        check(Nero.toNeroScript(new Nero().with(script).debug().update(db))).eq("""
+        check(nero.toNeroScript(nero.with(script).debug().update(db))).eq("""
             define B/1;
             B(2);
             """);
-        check(Nero.toNeroScript(db)).eq("""
+        check(nero.toNeroScript(db)).eq("""
             define A/1;
             A(1);
             
@@ -145,11 +152,11 @@ public class NeroTest extends Ted {
         var script = """
             B(2);
             """;
-        check(Nero.toNeroScript(new Nero().with(script).debug().query(db))).eq("""
+        check(nero.toNeroScript(nero.with(script).debug().query(db))).eq("""
             define B/1;
             B(2);
             """);
-        check(Nero.toNeroScript(db)).eq("""
+        check(nero.toNeroScript(db)).eq("""
             define A/1;
             A(1);
             """);
@@ -171,8 +178,8 @@ public class NeroTest extends Ted {
             define Thing/2;
             Thing("hat", "black");
             """;
-        var facts = new Nero().with(script).infer();
-        check(Nero.toNeroScript(facts)).eq("""
+        var facts = nero.with(script).infer();
+        check(nero.toNeroScript(facts)).eq("""
             define Person/name,age;
             Person("Joe", 90);
             
@@ -191,7 +198,7 @@ public class NeroTest extends Ted {
     public void testToNeroAxiom_listFact() {
         test("testToNeroAxiom_listFact");
         var fact = new ListFact("Thing", List.of("car", "red"));
-        check(Nero.toNeroAxiom(joe, fact))
+        check(nero.toNeroAxiom(fact))
             .eq("Thing(\"car\", \"red\");");
     }
 
@@ -199,7 +206,7 @@ public class NeroTest extends Ted {
     public void testToNeroAxiom_mapFact() {
         test("testToNeroAxiom_mapFact");
         var fact = new MapFact("Thing", Map.of("id", "car", "color", "red"));
-        check(Nero.toNeroAxiom(joe, fact))
+        check(nero.toNeroAxiom(fact))
             .eq("Thing(color: \"red\", id: \"car\");");
     }
 
@@ -208,7 +215,7 @@ public class NeroTest extends Ted {
         test("testToNeroAxiom_pairFact");
         var fact = new PairFact("Thing",
             List.of("id", "color"), List.of("car", "red"));
-        check(Nero.toNeroAxiom(joe, fact))
+        check(nero.toNeroAxiom(fact))
             .eq("Thing(\"car\", \"red\");");
     }
 
@@ -218,15 +225,15 @@ public class NeroTest extends Ted {
     @Test
     public void testToNeroTerm() {
         test("testToNeroTerm");
-        check(Nero.toNeroTerm(joe, null)).eq("null");
-        check(Nero.toNeroTerm(joe, true)).eq("true");
-        check(Nero.toNeroTerm(joe, false)).eq("false");
-        check(Nero.toNeroTerm(joe, 5.0)).eq("5");
-        check(Nero.toNeroTerm(joe, 5.1)).eq("5.1");
-        check(Nero.toNeroTerm(joe, new Keyword("id"))).eq("#id");
-        check(Nero.toNeroTerm(joe, "abc")).eq("\"abc\"");
+        check(nero.toNeroTerm(null)).eq("null");
+        check(nero.toNeroTerm(true)).eq("true");
+        check(nero.toNeroTerm(false)).eq("false");
+        check(nero.toNeroTerm(5.0)).eq("5");
+        check(nero.toNeroTerm(5.1)).eq("5.1");
+        check(nero.toNeroTerm(new Keyword("id"))).eq("#id");
+        check(nero.toNeroTerm("abc")).eq("\"abc\"");
 
-        checkThrow(() -> Nero.toNeroTerm(joe, this))
+        checkThrow(() -> nero.toNeroTerm(this))
             .containsString("Non-Nero term:");
     }
 

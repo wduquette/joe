@@ -1,6 +1,5 @@
 package com.wjduquette.joe;
 
-import com.wjduquette.joe.nero.Nero;
 import com.wjduquette.joe.nero.NeroDatabase;
 
 import java.io.IOException;
@@ -147,7 +146,7 @@ public class PackageFinder {
             var map = f.getFieldMap();
             JoePackage pkg = switch (f.relation()) {
                 case "ScriptedPackage" -> {
-                    if (verbose) joe.println("    " + Nero.toNeroAxiom(joe, f));
+                    if (verbose) joe.println("    " + db.toNeroAxiom(f));
                     var pkgName = joe.toPackageName(map.get("name"));
                     var scriptFiles = joe.toList(map.get("scriptFiles"));
                     var paths = scriptFiles.stream()
@@ -156,7 +155,7 @@ public class PackageFinder {
                     yield new ScriptedPackage(pkgName, folder, paths);
                 }
                 case "JarPackage" -> {
-                    if (verbose) joe.println("    " + Nero.toNeroAxiom(joe, f));
+                    if (verbose) joe.println("    " + db.toNeroAxiom(f));
                     var pkgName = joe.toPackageName(map.get("name"));
                     var jarFile = folder.resolve(joe.stringify(map.get("jarFile")));
                     var className = joe.stringify(map.get("className"));
@@ -164,7 +163,7 @@ public class PackageFinder {
                 }
                 default -> {
                     if (verbose) joe.println("    Unexpected fact: " +
-                        Nero.toNeroAxiom(joe, f));
+                        db.toNeroAxiom(f));
                     yield null;
                 }
             };
