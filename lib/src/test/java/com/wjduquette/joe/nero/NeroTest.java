@@ -112,7 +112,7 @@ public class NeroTest extends Ted {
         var script = """
             A(1);
             """;
-        check(Nero.toNeroScript(Nero.with(script).debug().infer())).eq("""
+        check(Nero.toNeroScript(new Nero().with(script).debug().infer())).eq("""
             define A/1;
             A(1);
             """);
@@ -125,7 +125,7 @@ public class NeroTest extends Ted {
         var script = """
             B(2);
             """;
-        check(Nero.toNeroScript(Nero.with(script).debug().update(db))).eq("""
+        check(Nero.toNeroScript(new Nero().with(script).debug().update(db))).eq("""
             define B/1;
             B(2);
             """);
@@ -145,7 +145,7 @@ public class NeroTest extends Ted {
         var script = """
             B(2);
             """;
-        check(Nero.toNeroScript(Nero.with(script).debug().query(db))).eq("""
+        check(Nero.toNeroScript(new Nero().with(script).debug().query(db))).eq("""
             define B/1;
             B(2);
             """);
@@ -171,7 +171,7 @@ public class NeroTest extends Ted {
             define Thing/2;
             Thing("hat", "black");
             """;
-        var facts = Nero.with(script).infer();
+        var facts = new Nero().with(script).infer();
         check(Nero.toNeroScript(facts)).eq("""
             define Person/name,age;
             Person("Joe", 90);

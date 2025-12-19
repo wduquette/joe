@@ -10,148 +10,71 @@ import java.util.stream.Collectors;
  * This class is the primary entry point for the Nero language.
  */
 public class Nero {
-    private Nero() {} // Static Class
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
+    // The Joe interpreter used when formatting output, etc.
+    private final Joe joe;
 
     //-------------------------------------------------------------------------
-    // Parsing
+    // Constructor
 
     /**
-     * Parses the source, checking for syntax errors.
-     * Returns the rule set on success.
-     * @param source The source
-     * @return The rule set
-     * @throws SyntaxError on parse error.
+     * Creates an instance of Nero relative to a specific Joe interpreter.
+     * @param joe The interpreter
      */
-    public static NeroRuleSet parse(SourceBuffer source) {
-        var traces = new ArrayList<Trace>();
-        var parser = new Parser(source, (t, flag) -> traces.add(t));
-        var ruleset = parser.parseNero();
-        if (!traces.isEmpty()) {
-            throw new SyntaxError("Error in Nero input.", traces, false);
-        }
-        return ruleset;
+    public Nero(Joe joe) {
+        this.joe = joe;
     }
 
     /**
-     * Parses the source, checking for syntax errors.
-     * Returns the rule set on success.
-     * @param schema The predefined schema
-     * @param source The source
-     * @return The rule set
-     * @throws SyntaxError on parse error.
+     * Creates an instance of Nero relative to a vanilla Joe interpreter.
      */
-    private static NeroRuleSet parse(Schema schema, SourceBuffer source) {
-        var traces = new ArrayList<Trace>();
-        var parser = new Parser(source, (t, flag) -> traces.add(t));
-        var ruleset = parser.parseNero(schema);
-        if (!traces.isEmpty()) {
-            throw new SyntaxError("Error in Nero input.", traces, false);
-        }
-        return ruleset;
+    public Nero() {
+        this(new Joe());
     }
 
     //-------------------------------------------------------------------------
-    // Compilation
+    // Components
 
     /**
-     * Compiles the source, checking for syntax errors and stratification.
-     * Returns the rule set on success and throws an appropriate error
-     * on error.
-     * @param source The source
-     * @return The engine, which has not yet be run.
-     * @throws SyntaxError on parse error.
-     * @throws JoeError on stratification error.
+     * Nero's instance of Joe.
+     * @return The Joe interpreter.
      */
-    public static NeroRuleSet compile(SourceBuffer source) {
-        var ruleSet = parse(source);
-        if (!ruleSet.isStratified()) {
-            throw new JoeError("Nero rule set cannot be stratified.");
-        }
-        return ruleSet;
-    }
-
-    /**
-     * Compiles the source, checking for syntax errors and stratification.
-     * The source must be compatible with the given pre-defined schema.
-     * Returns the rule set on success and throws an appropriate error
-     * on error.
-     * @param schema The schema
-     * @param source The source
-     * @return The engine, which has not yet be run.
-     * @throws SyntaxError on parse error.
-     * @throws JoeError on stratification error.
-     */
-    public static NeroRuleSet compile(Schema schema, SourceBuffer source) {
-        var ruleSet = parse(schema, source);
-        if (!ruleSet.isStratified()) {
-            throw new JoeError("Nero rule set cannot be stratified.");
-        }
-        return ruleSet;
+    public Joe joe() {
+        return joe;
     }
 
     //-------------------------------------------------------------------------
     // Execution pipeline
 
     /**
-     * Creates a pipeline for the given Nero script, using a vanilla instance
-     * of Joe.
-     * @param script The script
-     * @return The pipeline
-     */
-    public static Pipeline with(String script) {
-        return with(new Joe(), script);
-    }
-
-    /**
-     * Creates a pipeline for the Nero script in the given SourceBuffer, using
-     * a vanilla instance of Joe.
-     * @param source The SourceBuffer
-     * @return The pipeline
-     */
-    public static Pipeline with(SourceBuffer source) {
-        return with(new Joe(), source);
-    }
-
-    /**
-     * Creates a pipeline for the given Nero rule set using a vanilla instance
-     * of Joe.
-     * @param ruleSet the rule set
-     * @return The pipeline
-     */
-    public static Pipeline with(NeroRuleSet ruleSet) {
-        return with(new Joe(), ruleSet);
-    }
-
-    /**
      * Creates a pipeline for the given Nero script.
-     * @param joe The Joe interpreter
      * @param script The script
      * @return The pipeline
      */
-    public static Pipeline with(Joe joe, String script) {
+    public Pipeline with(String script) {
         var source = new SourceBuffer("*nero*", script);
-        return with(joe, source);
+        return with(source);
     }
 
     /**
      * Creates a pipeline for the Nero script in the given SourceBuffer.
-     * @param joe The Joe interpreter
      * @param source The SourceBuffer
      * @return The pipeline
      */
-    public static Pipeline with(Joe joe, SourceBuffer source) {
+    public Pipeline with(SourceBuffer source) {
         var ruleset = Nero.compile(source);
-        return with(joe, ruleset);
+        return with(ruleset);
     }
 
     /**
      * Creates a pipeline for the given Nero rule set.
-     * @param joe The Joe interpreter
      * @param ruleSet the rule set
      * @return The pipeline
      */
-    public static Pipeline with(Joe joe, NeroRuleSet ruleSet) {
-        return new Pipeline(joe, ruleSet);
+    public Pipeline with(NeroRuleSet ruleSet) {
+        return new Pipeline(this, ruleSet);
     }
 
     /**
@@ -161,6 +84,7 @@ public class Nero {
         //---------------------------------------------------------------------
         // Instance Variables
 
+        private final Nero nero;
         private final Joe joe;
         private final NeroRuleSet ruleset;
         private boolean debug = false;
@@ -169,8 +93,9 @@ public class Nero {
         //---------------------------------------------------------------------
         // Constructor
 
-        private Pipeline(Joe joe, NeroRuleSet ruleset) {
-            this.joe = joe;
+        private Pipeline(Nero nero, NeroRuleSet ruleset) {
+            this.nero = nero;
+            this.joe = nero.joe;
             this.ruleset = ruleset;
         }
 
@@ -263,8 +188,82 @@ public class Nero {
         }
     }
 
+    //-------------------------------------------------------------------------
+    // Static API: Parsing and Compiling
+
+    /**
+     * Parses the source, checking for syntax errors.
+     * Returns the rule set on success.
+     * @param source The source
+     * @return The rule set
+     * @throws SyntaxError on parse error.
+     */
+    public static NeroRuleSet parse(SourceBuffer source) {
+        var traces = new ArrayList<Trace>();
+        var parser = new Parser(source, (t, flag) -> traces.add(t));
+        var ruleset = parser.parseNero();
+        if (!traces.isEmpty()) {
+            throw new SyntaxError("Error in Nero input.", traces, false);
+        }
+        return ruleset;
+    }
+
+    /**
+     * Parses the source, checking for syntax errors.
+     * Returns the rule set on success.
+     * @param schema The predefined schema
+     * @param source The source
+     * @return The rule set
+     * @throws SyntaxError on parse error.
+     */
+    private static NeroRuleSet parse(Schema schema, SourceBuffer source) {
+        var traces = new ArrayList<Trace>();
+        var parser = new Parser(source, (t, flag) -> traces.add(t));
+        var ruleset = parser.parseNero(schema);
+        if (!traces.isEmpty()) {
+            throw new SyntaxError("Error in Nero input.", traces, false);
+        }
+        return ruleset;
+    }
+
+    /**
+     * Compiles the source, checking for syntax errors and stratification.
+     * Returns the rule set on success and throws an appropriate error
+     * on error.
+     * @param source The source
+     * @return The engine, which has not yet be run.
+     * @throws SyntaxError on parse error.
+     * @throws JoeError on stratification error.
+     */
+    public static NeroRuleSet compile(SourceBuffer source) {
+        var ruleSet = parse(source);
+        if (!ruleSet.isStratified()) {
+            throw new JoeError("Nero rule set cannot be stratified.");
+        }
+        return ruleSet;
+    }
+
+    /**
+     * Compiles the source, checking for syntax errors and stratification.
+     * The source must be compatible with the given pre-defined schema.
+     * Returns the rule set on success and throws an appropriate error
+     * on error.
+     * @param schema The schema
+     * @param source The source
+     * @return The engine, which has not yet be run.
+     * @throws SyntaxError on parse error.
+     * @throws JoeError on stratification error.
+     */
+    public static NeroRuleSet compile(Schema schema, SourceBuffer source) {
+        var ruleSet = parse(schema, source);
+        if (!ruleSet.isStratified()) {
+            throw new JoeError("Nero rule set cannot be stratified.");
+        }
+        return ruleSet;
+    }
+
     //------------------------------------------------------------------------
-    // Nero-formatting
+    // Static API: Nero String conversions
 
     /**
      * Converts the facts into a string in Nero format, if
@@ -406,5 +405,4 @@ public class Nero {
                 "Non-Nero term: '" + joe.stringify(term));
         };
     }
-
 }

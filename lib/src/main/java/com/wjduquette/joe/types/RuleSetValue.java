@@ -73,7 +73,7 @@ public class RuleSetValue {
      * @return The new facts.
      */
     public Set<Fact> infer(Joe joe) {
-        return Nero.with(joe, ruleset)
+        return new Nero(joe).with(ruleset)
             .debug(debug)
             .equivalences(equivalences)
             .infer().all();
@@ -87,7 +87,7 @@ public class RuleSetValue {
      * @return The new facts.
      */
     public Set<Fact> infer(Joe joe, FactBase db) {
-        return Nero.with(joe, ruleset)
+        return new Nero(joe).with(ruleset)
             .debug(debug)
             .equivalences(equivalences)
             .update(new FactSet(db))
@@ -102,7 +102,7 @@ public class RuleSetValue {
      */
     public Set<Fact> infer(Joe joe, Collection<?> inputs) {
         var db = toFactSet(joe, inputs);
-        return Nero.with(joe, ruleset)
+        return new Nero(joe).with(ruleset)
             .debug(debug)
             .equivalences(equivalences)
             .update(new FactSet(db))

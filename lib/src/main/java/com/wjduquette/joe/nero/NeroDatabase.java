@@ -20,8 +20,8 @@ public class NeroDatabase {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The Joe instance, which is needed for string conversions.
-    private final Joe joe;
+    // The Nero instance
+    private final Nero nero;
 
     // The accumulated schema
     private Schema schema;
@@ -40,7 +40,7 @@ public class NeroDatabase {
      * instance of Joe.
      */
     public NeroDatabase() {
-        this(new Joe(), new Schema());
+        this(new Nero(), new Schema());
     }
 
     /**
@@ -49,7 +49,7 @@ public class NeroDatabase {
      * @param joe The Joe interpreter
      */
     public NeroDatabase(Joe joe) {
-        this(joe, new Schema());
+        this(new Nero(joe), new Schema());
     }
 
     /**
@@ -58,7 +58,7 @@ public class NeroDatabase {
      * @param schema The schema
      */
     public NeroDatabase(Schema schema) {
-        this(new Joe(), schema);
+        this(new Nero(), schema);
     }
 
     /**
@@ -68,7 +68,12 @@ public class NeroDatabase {
      * @param schema The schema
      */
     public NeroDatabase(Joe joe, Schema schema) {
-        this.joe = joe;
+        this.nero = new Nero(joe);
+        this.schema = schema;
+    }
+
+    private NeroDatabase(Nero nero, Schema schema) {
+        this.nero = nero;
         this.schema = schema;
     }
 
@@ -115,7 +120,7 @@ public class NeroDatabase {
      */
     public NeroDatabase update(SourceBuffer source) {
         var ruleset = Nero.compile(schema, source);
-        Nero.with(joe, ruleset).debug(debug).update(db);
+        nero.with(ruleset).debug(debug).update(db);
         schema = ruleset.schema();
 
         return this;
@@ -146,7 +151,7 @@ public class NeroDatabase {
      */
     public FactSet query(String script) {
         var ruleset = Nero.compile(schema, new SourceBuffer("*nero*", script));
-        return Nero.with(joe, ruleset).debug(debug).query(db);
+        return nero.with(ruleset).debug(debug).query(db);
     }
 
     /**

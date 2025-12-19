@@ -1129,7 +1129,7 @@ public class RuleEngineTest extends Ted {
     // Execute the source, returning a Nero script of known facts.
     private String execute(String source) {
         try {
-            var db = Nero.with(source).debug().infer();
+            var db = new Nero().with(source).debug().infer();
             return Nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
@@ -1141,7 +1141,7 @@ public class RuleEngineTest extends Ted {
     // given an Equivalence for equivalent/equivalence,a,b
     private String execute(String source, Equivalence equivalence) {
         try {
-            var db = Nero.with(source)
+            var db = new Nero().with(source)
                 .debug()
                 .equivalence(equivalence)
                 .infer();
@@ -1157,7 +1157,7 @@ public class RuleEngineTest extends Ted {
     private String execute(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         try {
-            Nero.with(source).debug().update(db);
+            new Nero().with(source).debug().update(db);
             return Nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
@@ -1170,10 +1170,7 @@ public class RuleEngineTest extends Ted {
     private String infer(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         try {
-            var inferred = Nero.with(source).debug().update(db);
-//            return NewNero.toNeroScript(db);
-//            var engine = nero.execute(new SourceBuffer("-", source), db);
-//            var factSet = new FactSet(engine.getInferredFacts());
+            var inferred = new Nero().with(source).debug().update(db);
             return Nero.toNeroScript(inferred);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
@@ -1187,7 +1184,7 @@ public class RuleEngineTest extends Ted {
     // from being represented as a Nero script
     private String inferRaw(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
-        var inferred = Nero.with(source).debug().update(db);
+        var inferred = new Nero().with(source).debug().update(db);
         return inferred.all().stream()
             .map(Fact::toString)
             .sorted()
