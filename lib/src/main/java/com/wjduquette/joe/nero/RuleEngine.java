@@ -191,12 +191,12 @@ public class RuleEngine {
     }
 
     /**
-     * Registers an Equivalence relation for use with the
+     * Registers an Equivalences for use with the
      * {@code equivalent/equivalence,a,b} predicate.
-     * @param equivalence The equivalence
+     * @param map The map of equivalences.
      */
-    public void registerEquivalence(Equivalence equivalence) {
-        equivalences.put(equivalence.keyword(), equivalence);
+    public void putEquivalences(Map<Keyword,Equivalence> map) {
+        equivalences.putAll(map);
     }
 
     //-------------------------------------------------------------------------

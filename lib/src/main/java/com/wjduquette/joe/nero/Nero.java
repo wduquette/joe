@@ -161,7 +161,7 @@ public class Nero {
         public FactSet infer() {
             var engine = new RuleEngine(joe, ruleset, new FactSet());
             engine.setDebug(debug);
-            nero.getEquivalences().values().forEach(engine::registerEquivalence);
+            engine.putEquivalences(nero.getEquivalences());
             return engine.infer();
         }
 
@@ -176,7 +176,7 @@ public class Nero {
         public FactSet update(FactSet facts) {
             var engine = new RuleEngine(joe, ruleset, facts);
             engine.setDebug(debug);
-            nero.getEquivalences().values().forEach(engine::registerEquivalence);
+            engine.putEquivalences(nero.getEquivalences());
             return engine.infer();
         }
 
@@ -192,7 +192,7 @@ public class Nero {
         public FactSet query(FactSet facts) {
             var engine = new RuleEngine(joe, ruleset, new FactSet(facts));
             engine.setDebug(debug);
-            nero.getEquivalences().values().forEach(engine::registerEquivalence);
+            engine.putEquivalences(nero.getEquivalences());
             return engine.infer();
         }
     }
