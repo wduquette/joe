@@ -167,7 +167,7 @@ public class Nero {
 
         /**
          * Infers all known facts from the rule set and fact set, updating
-         * the fact set in place.  Returns the inferred facts.  Make an
+         * the fact set in place.  Returns the newly inferred facts.  Make an
          * explicit copy of the fact set to retain it unchanged, or call
          * query() instead.
          * @param facts The input facts
