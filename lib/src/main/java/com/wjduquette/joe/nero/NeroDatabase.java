@@ -1,15 +1,11 @@
 package com.wjduquette.joe.nero;
 
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.SyntaxError;
+import com.wjduquette.joe.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A convenience layer for interacting with collections of Nero facts
@@ -96,6 +92,32 @@ public class NeroDatabase {
     public NeroDatabase setDebug(boolean debug) {
         this.debug = debug;
         return this;
+    }
+
+    /**
+     * Adds a single equivalence to Nero, for use with the
+     * `equivalent/equivalence,a,b` predicate.
+     * @param equivalence The equivalence
+     */
+    public void addEquivalence(Equivalence equivalence) {
+        nero.addEquivalence(equivalence);
+    }
+
+    /**
+     * Adds a multiple equivalences to Nero, for use with the
+     * `equivalent/equivalence,a,b` predicate.
+     * @param list List of equivalences
+     */
+    public void addEquivalences(List<Equivalence> list) {
+        nero.addEquivalences(list);
+    }
+
+    /**
+     * Gets a read-only map of the defined equivalences.
+     * @return the map
+     */
+    public Map<Keyword,Equivalence> getEquivalences() {
+        return nero.getEquivalences();
     }
 
     //------------------------------------------------------------------------
