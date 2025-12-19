@@ -29,6 +29,8 @@ class StandardLibrary extends NativePackage {
         type(KeywordType.TYPE);
         type(ListType.TYPE);
         type(MapType.TYPE);
+        type(NeroType.TYPE);
+        type(NeroPipelineType.TYPE);
         type(NumberType.TYPE);
         type(RuleSetType.TYPE);
         type(SetType.TYPE);

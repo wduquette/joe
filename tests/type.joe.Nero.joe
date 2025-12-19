@@ -1,0 +1,144 @@
+// type.joe.Nero.joe
+
+//-----------------------------------------------------------------------------
+// Pipeline Execution
+
+function testDebug() {
+    var nero = Nero();
+    var rules = ruleset {
+        Parent(#anne, #bert);
+    };
+    
+    // Just verify that the debug flag can be set.
+    nero.with(rules).debug().debug(false);
+}
+
+function testInfer() {
+    var nero = Nero();
+    var rules = ruleset {
+        Parent(#anne, #bert);
+        Parent(#bert, #clark);
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+    var results = nero.toNeroScript(nero.with(rules).infer()).strip();
+    assertEQ(results, """
+        define Ancestor/2;
+        Ancestor(#anne, #bert);
+        Ancestor(#anne, #clark);
+        Ancestor(#bert, #clark);
+        
+        define Parent/2;
+        Parent(#anne, #bert);
+        Parent(#bert, #clark);
+        """);
+}
+
+function testUpdate() {
+    var nero = Nero();
+    var rules1 = ruleset {
+        Parent(#anne, #bert);
+        Parent(#bert, #clark);
+    };
+    var rules2 = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+    var facts = nero.with(rules1).infer();
+    var results = nero.toNeroScript(nero.with(rules2).update(facts)).strip();
+    assertEQ(results, """
+        define Ancestor/2;
+        Ancestor(#anne, #bert);
+        Ancestor(#anne, #clark);
+        Ancestor(#bert, #clark);
+
+        define Parent/2;
+        Parent(#anne, #bert);
+        Parent(#bert, #clark);
+        """);
+}
+
+function testQuery() {
+    var nero = Nero();
+    var rules1 = ruleset {
+        Parent(#anne, #bert);
+        Parent(#bert, #clark);
+    };
+    var rules2 = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+    var facts = nero.with(rules1).infer();
+    var results = nero.toNeroScript(nero.with(rules2).query(facts)).strip();
+    assertEQ(results, """
+        define Ancestor/2;
+        Ancestor(#anne, #bert);
+        Ancestor(#anne, #clark);
+        Ancestor(#bert, #clark);
+        """);
+}
+
+//-----------------------------------------------------------------------------
+// Equivalences
+
+var S2N = Equivalence(#str2num,
+    \s -> s ~ String() ? Number(s) : null,
+    \n -> n ~ Number() ? Joe.stringify(n) : null
+);
+
+function testEquivalence() {
+    var nero = Nero();
+    nero.equivalence(S2N);
+    assertEQ(nero.getEquivalences(), {S2N});
+}
+
+function testEquivalences_individual() {
+    var nero = Nero();
+    nero.equivalences(S2N);
+    assertEQ(nero.getEquivalences(), {S2N});
+}
+
+function testEquivalences_individual() {
+    var nero = Nero();
+    nero.equivalences(S2N);
+    assertEQ(nero.getEquivalences(), {S2N});
+}
+
+function testEquivalences_collection() {
+    var nero = Nero();
+    nero.equivalences([S2N]);
+    assertEQ(nero.getEquivalences(), {S2N});
+}
+
+function testUseEquivalence() {
+    var nero = Nero();
+    var rules = ruleset {
+        transient Str;
+        Str("123");
+        Both(s,n) :- Str(s), equivalent(#str2num, s, n);
+    };
+    var results = nero.toNeroScript(nero.with(rules).infer()).strip();
+    assertEQ(results, """
+        define Both/2;
+        Both("123", 123);
+        """);
+}
+
+//-----------------------------------------------------------------------------
+// toNero*
+
+// toNeroScript is tested in-line above.
+
+function testToNeroAxiom() {
+    var nero = Nero();
+    var rules = ruleset {
+        Parent(#anne, #bert);
+        Parent(#bert, #clark);
+    };
+    var facts = nero.with(rules).infer();
+    var list = facts.map(nero.toNeroAxiom).sorted();
+    assertEQ(list, [
+        "Parent(#anne, #bert);",
+        "Parent(#bert, #clark);",
+    ]);
+}
