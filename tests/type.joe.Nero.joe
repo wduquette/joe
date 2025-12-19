@@ -79,6 +79,241 @@ function testQuery() {
 }
 
 //-----------------------------------------------------------------------------
+// Inputs and Automatic Fact Conversions
+//
+// These tests test the conversion of various non-Fact types into Facts by 
+// the Nero pipeline.  They are tested here rather than in NeroTest because
+// they require scripted Joe types.
+
+// Should throw an error if an input fact has no fields.
+function testWith_noFields() {
+    class Parent {
+        method toString() { return "Parent()"; }
+    }
+
+    var inputs = [
+        Parent()
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+    };
+
+    var nero = Nero();
+    assertError(\-> nero.with(rules).update(inputs),
+        "Expected Nero-compatible fact, got: Parent 'Parent()'.");
+    assertError(\-> nero.with(rules).query(inputs),
+        "Expected Nero-compatible fact, got: Parent 'Parent()'.");
+}
+
+// Should accept proxied values with
+// fields, including the Fact type itself.
+function testWith_proxiedValue_ordered() {
+    var inputs = [
+        Fact("Parent", #anne, #bert),
+        Fact("Parent", #bert, #clark)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+    var nero = Nero();
+    var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
+
+    assertEQ(results, """
+        define Ancestor/2;
+        Ancestor(#anne, #bert);
+        Ancestor(#anne, #clark);
+        Ancestor(#bert, #clark);
+        """);
+}
+
+// Should accept proxied values with
+// fields, including the Fact type itself, using named atoms
+function testWith_proxiedValue_named() {
+    var inputs = [
+        Fact("Parent", #anne, #bert),
+        Fact("Parent", #bert, #clark)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(f0:x, f1:y);
+        Ancestor(x, y) :- Parent(f0:x, f1:z), Ancestor(z, y);
+    };
+
+    var nero = Nero();
+    var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
+
+    assertEQ(results, """
+        define Ancestor/2;
+        Ancestor(#anne, #bert);
+        Ancestor(#anne, #clark);
+        Ancestor(#bert, #clark);
+        """);
+}
+
+// Should accept record instances using
+// ordered-field atoms.
+function testWith_record_ordered() {
+    record Parent(p, c) {}
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+
+    var nero = Nero();
+    var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
+
+    assertEQ(results, """
+        define Ancestor/2;
+        Ancestor(#anne, #bert);
+        Ancestor(#anne, #clark);
+        Ancestor(#bert, #clark);
+        """);
+}
+
+// Should accept record instances using
+// named-field atoms
+function testWith_record_named() {
+    record Parent(p, c) {}
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(p:x, c:y);
+        Ancestor(x, y) :- Parent(p:x, c:z), Ancestor(z, y);
+    };
+
+    var nero = Nero();
+    var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
+
+    assertEQ(results, """
+        define Ancestor/2;
+        Ancestor(#anne, #bert);
+        Ancestor(#anne, #clark);
+        Ancestor(#bert, #clark);
+        """);
+}
+
+// Should accept class instances with fields, provided that 
+// named-field atoms are used to match them.
+function testWith_class_named() {
+    class Parent {
+        method init(p, c) {
+            @p = p;
+            @c = c;
+        }
+        method toString() {
+            return "Parent(" + @p + ", " + @c + ")";
+        }
+    }
+
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(p:x, c:y);
+        Ancestor(x, y) :- Parent(p:x, c:z), Ancestor(z, y);
+    };
+
+    var nero = Nero();
+    var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
+
+    assertEQ(results, """
+        define Ancestor/2;
+        Ancestor(#anne, #bert);
+        Ancestor(#anne, #clark);
+        Ancestor(#bert, #clark);
+        """);
+}
+
+// Should throw an error if an ordered-field atom is used with a 
+// fact that does not have ordered fields.
+function testWith_class_ordered() {
+    class Parent {
+        method init(p, c) {
+            @p = p;
+            @c = c;
+        }
+        method toString() {
+            return "Parent(" + @p + ", " + @c + ")";
+        }
+    }
+
+    var inputs = [
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ];
+
+    var rules = ruleset {
+        Ancestor(x, y) :- Parent(x, y);
+    };
+
+    var nero = Nero();
+    assertError(\-> nero.with(rules).query(inputs),
+        "'Parent' in rule 'Ancestor(x, y) :- Parent(x, y);' requires ordered fields, but a provided fact is not ordered.");
+}
+
+function testWith_namedPattern() {
+    class Thing {
+        method init(id, color) {
+            @id = id;
+            @color = color;
+        }
+    }
+
+    var inputs = [
+        Fact("A", #a, Thing(#hat, #black)),
+        Fact("A", #b, Thing(#wagon, #red))
+    ];
+
+    var rules = ruleset {
+        B(x, y, z) :- A(x, Thing(id: y, color: z));
+    };
+
+    var nero = Nero();
+    var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
+
+    assertEQ(results, """
+        define B/3;
+        B(#a, #hat, #black);
+        B(#b, #wagon, #red);
+        """);
+}
+
+function testPattern_ordered() {
+    record Thing(id, color) {}
+
+    var inputs = [
+        Fact("A", #a, Thing(#hat, #black)),
+        Fact("A", #b, Thing(#wagon, #red))
+    ];
+
+    var rules = ruleset {
+        B(x, y, z) :- A(x, Thing(y, z));
+    };
+
+    var nero = Nero();
+    var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
+
+    assertEQ(results, """
+        define B/3;
+        B(#a, #hat, #black);
+        B(#b, #wagon, #red);
+        """);
+}
+
+//-----------------------------------------------------------------------------
 // Equivalences
 
 var S2N = Equivalence(#str2num,
