@@ -3,6 +3,7 @@ package com.wjduquette.joe;
 import com.wjduquette.joe.types.ListValue;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -240,6 +241,23 @@ public final class Args {
         Collections.addAll(list,
             Arrays.copyOfRange(args, next, args.length));
         return list;
+    }
+
+    /**
+     * If there is a single argument remaining, and it's a collection,
+     * returns the collection's content as a new Args value. Otherwise,
+     * returns the argument list unchanged.
+     * This method allows a Joe method's argument list to end with
+     * a collection of values passed as a single list or as multiple arguments.
+     * @return The args
+     */
+    public Args expandOrRemaining() {
+        if (remaining() == 1 && next(0) instanceof Collection<?> c) {
+            ++next;
+            return new Args(c.toArray());
+        } else {
+            return this;
+        }
     }
 
     //-------------------------------------------------------------------------
