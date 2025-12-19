@@ -838,6 +838,7 @@ public class Joe {
         }
     }
 
+
     /**
      * Converts a Monica comparator callable to a Java comparator.
      * @param arg The callable
@@ -927,6 +928,25 @@ public class Joe {
         if (jv.isFact()) return jv.toFact();
 
         throw expected("Nero-compatible fact", arg);
+    }
+
+    /**
+     * Requires that the argument is a collection of Nero Facts or a
+     * collection of objects that can be converted Nero Facts,
+     * and returns it as a list of Facts.
+     * @param arg The argument
+     * @return The list
+     * @throws JoeError on conversion failure.
+     */
+    public List<Fact> toFacts(Object arg) {
+        var c = toCollection(arg);
+        var list = new ArrayList<Fact>();
+
+        for (var item : c) {
+            list.add(toFact(item));
+        }
+
+        return list;
     }
 
     /**
@@ -1026,6 +1046,30 @@ public class Joe {
         } else {
             throw expected("List", arg);
         }
+    }
+
+    /**
+     * Converts a collection argument into a list of a given type.
+     * @param cls The type
+     * @param arg The argument
+     * @return The comparator
+     * @throws JoeError if the argument isn't a collection of type given type.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> List<T> toList(Class<T> cls, Object arg) {
+        // NOTE: this is marked "unchecked", but the logic does in fact
+        // ensure type safety.
+        if (arg instanceof Collection<?> c) {
+            var list = new ArrayList<T>();
+            for (var item : c) {
+                if (arg != null && cls.isAssignableFrom(item.getClass())) {
+                    list.add((T)arg);
+                } else {
+                    break;
+                }
+            }
+        }
+        throw expected("collection of " + classTypeName(cls), arg);
     }
 
     /**
