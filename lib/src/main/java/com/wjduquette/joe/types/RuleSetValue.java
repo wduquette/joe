@@ -16,8 +16,6 @@ public class RuleSetValue {
     // Instance Variables
 
     private final NeroRuleSet ruleset;
-    private boolean debug = false;
-    private final List<Equivalence> equivalences = new ArrayList<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -40,97 +38,11 @@ public class RuleSetValue {
     public NeroRuleSet ruleset() {
         return ruleset;
     }
-
-    /**
-     * Gets whether the debug flag has been set or not.
-     * @return The flag
-     */
-    public boolean isDebug() {
-        return debug;
-    }
-
-    /**
-     * Sets the debug flag.  If enabled, the Nero engine will output
-     * a detailed trace of its activities.
-     * @param debug The flag
-     */
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
-
-    /**
-     * Adds an equivalence for use with the
-     * {@code equivalent/equivalence,a,b} predicate
-     * @param equivalence The equivalence
-     */
-    public void addEquivalence(Equivalence equivalence) {
-        equivalences.add(equivalence);
-    }
-
-    /**
-     * Infer facts from the rule set and the database of facts.
-     * @param joe The Joe interpreter
-     * @return The new facts.
-     */
-    public Set<Fact> infer(Joe joe) {
-        var nero = new Nero(joe);
-        nero.addEquivalences(equivalences);
-        return nero.with(ruleset)
-            .debug(debug)
-            .infer().all();
-    }
-
-    /**
-     * Infer facts from the rule set and the database of facts.
-     * Does not update the db in place.
-     * @param joe The Joe interpreter
-     * @param db The input database
-     * @return The new facts.
-     */
-    public Set<Fact> infer(Joe joe, FactBase db) {
-        var nero = new Nero(joe);
-        nero.addEquivalences(equivalences);
-        return nero.with(ruleset)
-            .debug(debug)
-            .update(new FactSet(db))
-            .all();
-    }
-
-    /**
-     * Infer facts from the rule set and the set of input facts.
-     * @param joe The Joe interpreter
-     * @param inputs The input facts
-     * @return The new (possibly exported) facts.
-     */
-    public Set<Fact> infer(Joe joe, Collection<?> inputs) {
-        var nero = new Nero(joe);
-        nero.addEquivalences(equivalences);
-        var db = toFactSet(joe, inputs);
-        return nero.with(ruleset)
-            .debug(debug)
-            .update(new FactSet(db))
-            .all();
-    }
-
     /**
      * Gets whether the rule set is stratified or not.
      * @return true or false.
      */
     public boolean isStratified() {
         return ruleset.isStratified();
-    }
-
-    private FactSet toFactSet(Joe joe, Collection<?> inputs) {
-        // FIRST, Build the list of input facts, wrapping values of proxied
-        // types as TypedValues so that they can be used as Facts
-        // by Nero.
-        var factSet = new FactSet();
-
-        for (var input : inputs) {
-            // Throws JoeError if the input cannot be converted to a Fact
-            factSet.add(joe.toFact(input));
-        }
-
-        return factSet;
     }
 }
