@@ -6,3 +6,4 @@ release/
 temp/
 docs/
 mdbook/.DS_Store
+.DS_Store
