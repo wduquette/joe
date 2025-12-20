@@ -365,6 +365,19 @@ public class Nero {
     }
 
     /**
+     * Compiles the script, checking for syntax errors and stratification.
+     * Returns the rule set on success and throws an appropriate error
+     * on error.
+     * @param script The script
+     * @return The engine, which has not yet be run.
+     * @throws SyntaxError on parse error.
+     * @throws JoeError on stratification error.
+     */
+    public static NeroRuleSet compile(String script) {
+        return compile(new SourceBuffer("*nero*", script));
+    }
+
+    /**
      * Compiles the source, checking for syntax errors and stratification.
      * Returns the rule set on success and throws an appropriate error
      * on error.

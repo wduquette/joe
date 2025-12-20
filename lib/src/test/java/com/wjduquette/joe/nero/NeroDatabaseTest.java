@@ -38,6 +38,7 @@ public class NeroDatabaseTest extends Ted {
         test("testUpdate_empty");
         db.update("A(1); A(2);");
         check(db.schema().get("A")).eq(new Shape.ListShape("A", 1));
+        check(db.schema()).eq(Schema.inferSchema(db.all()));
 
         var content = """
             define A/1;
@@ -57,6 +58,7 @@ public class NeroDatabaseTest extends Ted {
         db.update("A(3); B(1);");
         check(db.schema().get("A")).eq(new Shape.ListShape("A", 1));
         check(db.schema().get("B")).eq(new Shape.ListShape("B", 1));
+        check(db.schema()).eq(Schema.inferSchema(db.all()));
 
         check(db.toNeroScript()).eq("""
             define A/1;
@@ -88,6 +90,44 @@ public class NeroDatabaseTest extends Ted {
             A(1);
             A(2);
             """);
+    }
+
+    // Verify that we can update given a NeroRuleSet, and the schema updates
+    // properly.
+    @Test public void testUpdate_NeroRuleSet() {
+        test("testUpdate_nonEmpty");
+        var r1 = Nero.compile("A(1); A(2);");
+        var r2 = Nero.compile("A(3); B(1);");
+        db.update(r1);
+        db.update(r2);
+        check(db.schema()).eq(Schema.inferSchema(db.all()));
+
+        check(db.toNeroScript()).eq("""
+            define A/1;
+            A(1);
+            A(2);
+            A(3);
+            
+            define B/1;
+            B(1);
+            """);
+    }
+
+    // Verify that we can update given a NeroRuleSet, and the schema updates
+    // properly.
+    @Test public void testUpdate_NeroRuleSet2() {
+        test("testUpdate_nonEmpty");
+        var r1 = Nero.compile("A(1); A(2);");
+        var r2 = Nero.compile("A(3, 4); B(1);");
+        db.update(r1);
+
+        try {
+            db.update(r2);
+            fail("Expected error.");
+        } catch (JoeError ex) {
+            check(ex.getMessage())
+                .eq("Shape mismatch for fact: 'ListFact[relation=A, fields=[1.0]]'.");
+        }
     }
 
     //-------------------------------------------------------------------------
