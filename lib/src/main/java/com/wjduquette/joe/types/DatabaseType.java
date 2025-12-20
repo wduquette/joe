@@ -64,7 +64,24 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Stringify
 
     public String stringify(Joe joe, Object value) {
-        return name() + "@" + value.hashCode();
+        assert value instanceof NeroDatabase;
+        var db = (NeroDatabase)value;
+
+        var buff = new StringBuilder();
+        buff.append(name()).append("[").append(db.all().size());
+        for (var relation : db.getRelations().stream().sorted().toList()) {
+            var items = db.relation(relation);
+            if (!items.isEmpty()) {
+                buff.append(", ")
+                    .append(relation)
+                    .append("[")
+                    .append(items.size())
+                    .append("]");
+            }
+        }
+        buff.append("]");
+
+        return buff.toString();
     }
 
     //-------------------------------------------------------------------------
@@ -72,10 +89,22 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
 
     //**
     // @init
-    // Creates a new instance of `Database`.
+    // %args [facts]
+    // Creates `Database`, optionally populating it with the given *facts*.
+    // The *facts* value can be another `Database`, or a collection of values
+    // that are either [[Fact|Facts]] or can be converted to facts.
     private Object _init(Joe joe, Args args) {
-        args.exactArity(0, "Database()");
-        return new NeroDatabase(joe);
+        args.arityRange(0, 1, "Database([facts])");
+        var db = new NeroDatabase(joe);
+        if (args.hasNext()) {
+            var arg = args.next();
+            if (arg instanceof NeroDatabase other) {
+                db.addFacts(other);
+            } else {
+                db.addFacts(joe.toFacts(arg));
+            }
+        }
+        return db;
     }
 
     //-------------------------------------------------------------------------
@@ -86,12 +115,18 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %args facts
     // %result this
     // Adds a collection of values to the database as [[Fact]] values.
-    // The values can be [[Fact|Facts]] or values
-    // to be converted to facts. Throws an [[Error]] if any value cannot
-    // be used as a `Fact`.
+    // The *facts* can be another [[Database]], or a collections of
+    // [[Fact|Facts]] or values to be converted to facts. Throws
+    // an [[Error]] if any value cannot be used as a `Fact`.
     private Object _addFacts(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "add(facts)");
-        db.addFacts(joe.toFacts(args.next()));
+        args.exactArity(1, "addFacts(facts)");
+        var arg = args.next();
+
+        if (arg instanceof NeroDatabase other) {
+            db.addFacts(other);
+        } else {
+            db.addFacts(joe.toFacts(arg));
+        }
         return db;
     }
 
@@ -294,13 +329,17 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // @method removeAll
     // %args facts
     // %result this
-    // Deletes a collection of *facts* from the database.
-    // The *facts* value can be a FactBase or a collection of values
+    // Deletes a collection of *facts* from the database. The *facts* can
+    // be another [[Database]], or a collection of values
     // to be converted to facts.
     private Object _removeAll(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "removeAll(facts)");
-        var facts = joe.toFacts(args.next());
-        db.removeAll(facts);
+        var arg = args.next();
+        if (arg instanceof NeroDatabase other) {
+            db.removeAll(other.all());
+        } else {
+            db.removeAll(joe.toFacts(arg));
+        }
         return db;
     }
 
