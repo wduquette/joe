@@ -20,6 +20,7 @@ class StandardLibrary extends NativePackage {
         type(AssertErrorType.TYPE);
         type(BooleanType.TYPE);
         type(CatchResultType.TYPE);
+        type(DatabaseType.TYPE);
         type(EquivalenceType.TYPE);
         type(ErrorType.TYPE);
         type(FactType.TYPE);

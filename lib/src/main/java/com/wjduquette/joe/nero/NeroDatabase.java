@@ -125,6 +125,16 @@ public class NeroDatabase {
     // Operations
 
     /**
+     * Clears all content from the database.
+     * @return The database
+     */
+    public NeroDatabase clear() {
+        db.clear();
+        schema = new Schema();
+        return this;
+    }
+
+    /**
      * Updates the content of the database given the Nero script, updating
      * the schema.
      * @param script The Nero script
@@ -249,6 +259,48 @@ public class NeroDatabase {
         return this;
     }
 
+    /**
+     * Deletes a single fact from the database.
+     * @param fact the fact
+     * @return this
+     */
+    public NeroDatabase remove(Fact fact) {
+        db.remove(fact);
+        return this;
+    }
+
+    /**
+     * Deletes a collection of facts from the database.
+     * @param collection The facts
+     * @return this
+     */
+    public NeroDatabase removeAll(Collection<Fact> collection) {
+        db.removeAll(collection);
+        return this;
+    }
+
+    /**
+     * Deletes the facts in another FactBase from the database.
+     * @param other The other FactBase
+     * @return this
+     */
+    public NeroDatabase removeAll(FactSet other) {
+        db.removeAll(other);
+        return this;
+    }
+
+    /**
+     * Renames a relation, replacing any existing relation that has the new
+     * name.
+     * @param oldName The old name
+     * @param newName The new name
+     * @return this
+     */
+    public NeroDatabase rename(String oldName, String newName) {
+        db.rename(oldName, newName);
+        return this;
+    }
+
     //------------------------------------------------------------------------
     // Queries
 
@@ -258,6 +310,22 @@ public class NeroDatabase {
      */
     public Schema schema() {
         return new Schema(schema);
+    }
+
+    /**
+     * Gets whether the database is empty or not.
+     * @return true or false
+     */
+    public boolean isEmpty() {
+        return db.isEmpty();
+    }
+
+    /**
+     * Gets the number of facts in the database.
+     * @return the size
+     */
+    public int size() {
+        return db.size();
     }
 
     /**
@@ -276,6 +344,14 @@ public class NeroDatabase {
      */
     public Set<Fact> relation(String name) {
         return db.relation(name);
+    }
+
+    /**
+     * Returns a set of the relations of all facts in the database.
+     * @return the set
+     */
+    public Set<String> getRelations() {
+        return db.getRelations();
     }
 
     /**
