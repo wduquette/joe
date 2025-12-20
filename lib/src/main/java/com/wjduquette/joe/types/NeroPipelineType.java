@@ -88,7 +88,6 @@ public class NeroPipelineType extends ProxyType<Nero.Pipeline> {
     // %result Set
     // Executes the rule set given a collection of facts, and returns
     // the newly inferred facts.
-    // an updated collection.
     private Object _query(Nero.Pipeline pipeline, Joe joe, Args args) {
         args.exactArity(1, "query(facts)");
         var facts = joe.toFacts(args.next());
