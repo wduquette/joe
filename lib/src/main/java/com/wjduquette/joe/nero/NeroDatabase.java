@@ -9,7 +9,8 @@ import java.util.*;
 
 /**
  * A convenience layer for interacting with collections of Nero facts
- * at the Java level.
+ * at the Java level.  NeroDatabase allows the client to work with a
+ * collection of facts, preserving the schema as it goes along.
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class NeroDatabase {
@@ -124,7 +125,8 @@ public class NeroDatabase {
     // Operations
 
     /**
-     * Updates the content of the database given the Nero script.
+     * Updates the content of the database given the Nero script, updating
+     * the schema.
      * @param script The Nero script
      * @return The database
      */
@@ -133,7 +135,8 @@ public class NeroDatabase {
     }
 
     /**
-     * Updates the content of the database given the Nero script.
+     * Updates the content of the database given the Nero script, updating the
+     * schema.
      * @param source The Nero source
      * @return The database
      * @throws SyntaxError on any Nero compilation error, including schema
@@ -141,18 +144,22 @@ public class NeroDatabase {
      * @throws JoeError on any Nero error.
      */
     public NeroDatabase update(SourceBuffer source) {
-        return update(Nero.compile(schema, source));
+        var ruleset = Nero.compile(schema, source);
+        nero.with(ruleset).debug(debug).update(db);
+        schema = ruleset.schema();
+        return this;
     }
 
     /**
-     * Updates the content of the database given the rule set
+     * Updates the content of the database given the rule set, updating
+     * the schema.
      * @param ruleset The rule set
      * @return The database
      * @throws JoeError on any Nero error.
      */
     public NeroDatabase update(NeroRuleSet ruleset) {
         nero.with(ruleset).debug(debug).update(db);
-        schema = ruleset.schema();
+        schema = Schema.inferSchema(db.all());
         return this;
     }
 
