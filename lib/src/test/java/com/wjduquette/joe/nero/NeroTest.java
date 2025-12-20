@@ -4,6 +4,7 @@ import com.wjduquette.joe.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -145,8 +146,8 @@ public class NeroTest extends Ted {
             """);
     }
 
-    @Test public void testWith_query() {
-        test("testWith_query");
+    @Test public void testWith_query_factset() {
+        test("testWith_query_factset");
         var db = new FactSet();
         db.add(new ListFact("A", List.of(1.0)));
         var script = """
@@ -159,6 +160,19 @@ public class NeroTest extends Ted {
         check(nero.toNeroScript(db)).eq("""
             define A/1;
             A(1);
+            """);
+    }
+
+    @Test public void testWith_query_collections() {
+        test("testWith_query_collections");
+        var list = new ArrayList<Fact>();
+        list.add(new ListFact("A", List.of(1.0)));
+        var script = """
+            B(2);
+            """;
+        check(nero.toNeroScript(nero.with(script).debug().query(list))).eq("""
+            define B/1;
+            B(2);
             """);
     }
 

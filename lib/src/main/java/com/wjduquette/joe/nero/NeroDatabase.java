@@ -141,10 +141,18 @@ public class NeroDatabase {
      * @throws JoeError on any Nero error.
      */
     public NeroDatabase update(SourceBuffer source) {
-        var ruleset = Nero.compile(schema, source);
+        return update(Nero.compile(schema, source));
+    }
+
+    /**
+     * Updates the content of the database given the rule set
+     * @param ruleset The rule set
+     * @return The database
+     * @throws JoeError on any Nero error.
+     */
+    public NeroDatabase update(NeroRuleSet ruleset) {
         nero.with(ruleset).debug(debug).update(db);
         schema = ruleset.schema();
-
         return this;
     }
 
@@ -172,9 +180,18 @@ public class NeroDatabase {
      * @return The inferred facts
      */
     public FactSet query(String script) {
-        var ruleset = Nero.compile(schema, new SourceBuffer("*nero*", script));
+        return query(Nero.compile(schema, new SourceBuffer("*nero*", script)));
+    }
+
+    /**
+     * Queries the database given the Nero rule set
+     * @param ruleset The rule set
+     * @return The inferred facts
+     */
+    public FactSet query(NeroRuleSet ruleset) {
         return nero.with(ruleset).debug(debug).query(db);
     }
+
 
     /**
      * Adds all Facts from another NeroDatabase into the database, checking

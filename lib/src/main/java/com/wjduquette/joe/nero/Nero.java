@@ -181,6 +181,19 @@ public class Nero {
         }
 
         /**
+         * Infers all known facts from the rule set and provided facts,
+         * returning the newly inferred facts.
+         * @param facts The input facts
+         * @return The inferred facts.
+         */
+        public FactSet query(Collection<Fact> facts) {
+            var engine = new RuleEngine(joe, ruleset, new FactSet(facts));
+            engine.setDebug(debug);
+            engine.putEquivalences(nero.getEquivalences());
+            return engine.infer();
+        }
+
+        /**
          * Infers all known facts from the rule set and fact set.  Makes
          * a copy of the fact set, ensuring that the input database
          * remains unchanged. Returns the inferred facts.
