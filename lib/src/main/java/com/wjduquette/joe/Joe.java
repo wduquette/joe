@@ -1052,8 +1052,9 @@ public class Joe {
      * Converts a collection argument into a list of a given type.
      * @param cls The type
      * @param arg The argument
+     * @param <T> The item type
      * @return The comparator
-     * @throws JoeError if the argument isn't a collection of type given type.
+     * @throws JoeError if the argument isn't a collection of the given type.
      */
     @SuppressWarnings("unchecked")
     public <T> List<T> toList(Class<T> cls, Object arg) {

@@ -405,7 +405,7 @@ public class FactBaseType extends ProxyType<FactBase> {
     // %result this
     // Sets the database's debug flag.  If enabled,
     // [[method:FactBase.update]] and
-    // [[method:FactBase.select]] will output a
+    // [[method:FactBase.query]] will output a
     // detailed Nero execution trace.
     private Object _setDebug(FactBase db, Joe joe, Args args) {
         args.exactArity(1, "setDebug(flag)");

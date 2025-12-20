@@ -117,7 +117,7 @@ public class NeroType extends ProxyType<Nero> {
     }
 
     //**
-    // @method toNeroScript
+    // @method toNeroAxiom
     // %args fact
     // %result String
     // Returns the *fact* as a Nero axiom string.  The *fact* must either
@@ -138,12 +138,12 @@ public class NeroType extends ProxyType<Nero> {
 
     //**
     // @method with
-    // %args ruleset
+    // %args rules
     // %result NeroPipeline
     // Returns an object allowing the [[RuleSet]] to be executed in a variety
     // of ways.
     private Object _with(Nero nero, Joe joe, Args args) {
-        args.exactArity(1, "with(ruleset)");
+        args.exactArity(1, "with(rules)");
         var rules = joe.toType(NeroRuleSet.class, args.next());
         return nero.with(rules);
     }
