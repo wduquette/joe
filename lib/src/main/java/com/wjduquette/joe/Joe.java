@@ -13,6 +13,7 @@ import com.wjduquette.joe.wrappers.StringFunctionWrapper;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
@@ -767,6 +768,7 @@ public class Joe {
      * @param ex The exception
      * @return The JoeError
      */
+    @SuppressWarnings("unused")
     public JoeError rethrow(Exception ex) {
         return new JoeError(ex.getMessage(), ex);
     }
@@ -1108,6 +1110,31 @@ public class Joe {
         }
 
         throw expected("package name", arg);
+    }
+
+    /**
+     * Given an argument, converts it to a Path.  The argument
+     * may be a Path or a String representing a Path.
+     * @param arg The argument
+     * @return The path
+     * @throws JoeError on failure.
+     */
+    public Path toPath(Object arg) {
+        try {
+            return switch (arg) {
+                case String s -> {
+                    try {
+                        yield Path.of(s);
+                    } catch (Exception ex) {
+                        throw expected("path string", arg);
+                    }
+                }
+                case Path p -> p;
+                default -> throw expected("path", arg);
+            };
+        } catch (IllegalArgumentException ex) {
+            throw new JoeError(ex.getMessage());
+        }
     }
 
     /**

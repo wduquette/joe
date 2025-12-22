@@ -82,8 +82,8 @@ public class PathType extends ProxyType<Path> {
     // than *b* when compared lexicographically.
     private Object _compare(Joe joe, Args args) {
         args.exactArity(2, "Path.compare(a,b)");
-        var a = toPath(joe, args.next());
-        var b = toPath(joe, args.next());
+        var a = joe.toPath(args.next());
+        var b = joe.toPath(args.next());
 
         return (double)a.compareTo(b);
     }
@@ -99,7 +99,7 @@ public class PathType extends ProxyType<Path> {
     // *path* may be specified as a `Path` or a `String`.
     private Object _endsWith(Path path, Joe joe, Args args) {
         args.exactArity(1, "endsWith(path)");
-        return path.endsWith(toPath(joe, args.next()));
+        return path.endsWith(joe.toPath(args.next()));
     }
 
     //**
@@ -169,7 +169,7 @@ public class PathType extends ProxyType<Path> {
     // The *other* path may a `Path` or a `String`.
     private Object _relativize(Path path, Joe joe, Args args) {
         args.exactArity(1, "relativize(other)");
-        return path.relativize(toPath(joe, args.next()));
+        return path.relativize(joe.toPath(args.next()));
     }
 
     //**
@@ -184,7 +184,7 @@ public class PathType extends ProxyType<Path> {
     // The *other* path may a `Path` or a `String`.
     private Object _resolve(Path path, Joe joe, Args args) {
         args.exactArity(1, "resolve(other)");
-        return path.resolve(toPath(joe, args.next()));
+        return path.resolve(joe.toPath(args.next()));
     }
 
     //**
@@ -195,7 +195,7 @@ public class PathType extends ProxyType<Path> {
     // *path* may be specified as a `Path` or a `String`.
     private Object _startsWith(Path path, Joe joe, Args args) {
         args.exactArity(1, "startsWith(path)");
-        return path.startsWith(toPath(joe, args.next()));
+        return path.startsWith(joe.toPath(args.next()));
     }
 
     //**
@@ -242,31 +242,5 @@ public class PathType extends ProxyType<Path> {
         return values.stream()
             .map(s -> "\"" + s + "\"")
             .collect(Collectors.joining(", "));
-    }
-
-    /**
-     * Given an argument, converts it to a Path.  The argument
-     * may be a Path or a String representing a Path.
-     * @param joe The interpreter
-     * @param arg The argument
-     * @return The path
-     * @throws JoeError on failure.
-     */
-    public static Path toPath(Joe joe, Object arg) {
-        try {
-            return switch (arg) {
-                case String s -> {
-                    try {
-                        yield Path.of(s);
-                    } catch (Exception ex) {
-                        throw joe.expected("path string", arg);
-                    }
-                }
-                case Path p -> p;
-                default -> throw joe.expected("path", arg);
-            };
-        } catch (IllegalArgumentException ex) {
-            throw new JoeError(ex.getMessage());
-        }
     }
 }
