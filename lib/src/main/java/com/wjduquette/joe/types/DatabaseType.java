@@ -258,8 +258,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // [[Path]] or string.
     private Object _load(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "load(path)");
-        throw new JoeError("Not implemented yet!");
-//        return db.load(joe.toPath(args.next()));
+        return db.load(joe.toPath(args.next()));
     }
 
     //**
