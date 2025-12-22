@@ -140,11 +140,16 @@ public class NeroType extends ProxyType<Nero> {
     // @method with
     // %args rules
     // %result NeroPipeline
-    // Returns an object allowing the [[RuleSet]] to be executed in a variety
-    // of ways.
+    // Returns an object allowing the *rules* to be executed in a variety
+    // of ways. The *rules* may be passed as a [[RuleSet]] or as a
+    // string to be compiled into a [[RuleSet]].
     private Object _with(Nero nero, Joe joe, Args args) {
         args.exactArity(1, "with(rules)");
-        var rules = joe.toType(NeroRuleSet.class, args.next());
-        return nero.with(rules);
+        var arg = args.next();
+        if (arg instanceof NeroRuleSet rules) {
+            return nero.with(rules);
+        } else {
+            return nero.with(joe.toString(arg));
+        }
     }
 }

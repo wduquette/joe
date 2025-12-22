@@ -78,6 +78,16 @@ function testQuery() {
         """);
 }
 
+function testWith_script() {
+    var nero = Nero();
+    var facts = nero.with("Parent(#anne, #bert);").infer();
+    var results = nero.toNeroScript(facts).strip();
+    assertEQ(results, """
+        define Parent/2;
+        Parent(#anne, #bert);
+        """);
+}
+
 //-----------------------------------------------------------------------------
 // Inputs and Automatic Fact Conversions
 //
