@@ -1,7 +1,7 @@
 package com.wjduquette.joe.tools.test;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.console.PathProxy;
+import com.wjduquette.joe.types.PathType;
 
 import java.util.List;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class TestPackage extends NativePackage {
         scriptResource(getClass(), "pkg.joe.test.joe");
 
         type(new JoeTestType());
-        type(PathProxy.TYPE);
+        type(PathType.TYPE);
     }
 
     //**

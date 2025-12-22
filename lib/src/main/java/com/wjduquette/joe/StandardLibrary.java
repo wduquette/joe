@@ -33,6 +33,7 @@ class StandardLibrary extends NativePackage {
         type(NeroType.TYPE);
         type(NeroPipelineType.TYPE);
         type(NumberType.TYPE);
+        type(PathType.TYPE);
         type(RuleSetType.TYPE);
         type(SetType.TYPE);
         type(StringType.TYPE);

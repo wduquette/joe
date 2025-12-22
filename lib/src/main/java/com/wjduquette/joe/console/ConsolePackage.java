@@ -2,6 +2,7 @@ package com.wjduquette.joe.console;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.types.ListValue;
+import com.wjduquette.joe.types.PathType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,7 +53,6 @@ public class ConsolePackage extends NativePackage {
         super("joe.console");
 
         type(new ConsoleProxy());
-        type(new PathProxy());
     }
 
     //-------------------------------------------------------------------------
@@ -272,7 +272,7 @@ public class ConsolePackage extends NativePackage {
      * @throws JoeError if the argument is not a path.
      */
     public Path toResolvedPath(Joe joe, Object arg) {
-        var path = PathProxy.toPath(joe, arg);
+        var path = PathType.toPath(joe, arg);
         return cwd.resolve(path).toAbsolutePath().normalize();
     }
 }

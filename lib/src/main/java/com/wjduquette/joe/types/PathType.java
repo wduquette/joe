@@ -1,4 +1,4 @@
-package com.wjduquette.joe.console;
+package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.*;
 
@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 /**
  * A ProxyType for Java Paths.
  */
-public class PathProxy extends ProxyType<Path> {
+public class PathType extends ProxyType<Path> {
     /** The proxy, for installation. */
-    public static final PathProxy TYPE = new PathProxy();
+    public static final PathType TYPE = new PathType();
 
     //-----------------------------------------------------------------
     // Constructor
@@ -22,7 +22,7 @@ public class PathProxy extends ProxyType<Path> {
     // @type Path
     // A Java `Path`, i.e, the path to a file or a directory in the
     // host file system.
-    PathProxy() {
+    PathType() {
         super("Path");
         proxies(Path.class);
 
