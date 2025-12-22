@@ -18,7 +18,7 @@ public class PathType extends ProxyType<Path> {
     // Constructor
 
     //**
-    // @package joe.console
+    // @package joe
     // @type Path
     // A Java `Path`, i.e, the path to a file or a directory in the
     // host file system.

@@ -1,7 +1,6 @@
 package com.wjduquette.joe.tools.test;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.types.PathType;
 
 import java.util.List;
 import java.util.Map;
@@ -28,13 +27,6 @@ public class TestPackage extends NativePackage {
     // %title Joe Test Tool API
     // This package defines the test assertions and checkers that are available
     // for use in `joe test` test suites.
-    //
-    // ## Imported Types
-    //
-    // In addition to the APIs documented here, `joe.test` includes types from
-    // other packages so that they can be tested:
-    //
-    // - From [[joe.console]], [[joe.console.Path]]
 
     /**
      * Creates the package.
@@ -56,7 +48,6 @@ public class TestPackage extends NativePackage {
         scriptResource(getClass(), "pkg.joe.test.joe");
 
         type(new JoeTestType());
-        type(PathType.TYPE);
     }
 
     //**
