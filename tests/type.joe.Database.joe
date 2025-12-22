@@ -120,6 +120,54 @@ function testDrop() {
 }
 
 //-------------------------------------------------------------------------
+// Equivalence
+
+var S2N = Equivalence(#s2n,
+    \s -> s ~ String() ? Number(s) : null,
+    \n -> n ~ Number() ? Joe.stringify(n) : null
+);
+
+function testEquivalence() {
+    var db = Database();
+    db.equivalence(S2N);
+    assertEQ(db.getEquivalences(), {S2N});
+}
+
+function testEquivalences_individual() {
+    var db = Database();
+    db.equivalences(S2N);
+    assertEQ(db.getEquivalences(), {S2N});
+}
+
+function testEquivalences_individual() {
+    var db = Database();
+    db.equivalences(S2N);
+    assertEQ(db.getEquivalences(), {S2N});
+}
+
+function testEquivalences_collection() {
+    var db = Database();
+    db.equivalences([S2N]);
+    assertEQ(db.getEquivalences(), {S2N});
+}
+
+function testUseEquivalence() {
+    var db = Database();
+    db.equivalences(S2N);
+    db.update(ruleset {
+        transient Str;
+        Str("123");
+        Both(s,n) :- Str(s), equivalent(#s2n, s, n);
+    });
+    var results = db.toNeroScript().strip();
+    assertEQ(results, """
+        define Both/2;
+        Both("123", 123);
+        """);
+}
+
+
+//-------------------------------------------------------------------------
 // filter
 
 function testFilter() {
@@ -267,6 +315,37 @@ function testRename() {
 // size
 
 // Tested in use by other tests
+
+//-------------------------------------------------------------------------
+// toNeroAxiom
+
+function testToNeroAxiom() {
+    // A record convertible to a fact.
+    var fact = Parent(#anne, #bert);
+    var db = Database();
+    assertEQ(db.toNeroAxiom(fact), "Parent(#anne, #bert);");
+}
+
+//-------------------------------------------------------------------------
+// toNeroScript
+
+function testToNeroScript_noArgs() {
+    var db = Database([Parent(#anne, #bert)]);
+    assertEQ(db.toNeroScript().strip(), """
+        define Parent/parent,child;
+        Parent(#anne, #bert);
+        """);
+}
+
+function testToNeroScript_args() {
+    var db = Database();
+
+    // A record convertible to a fact.
+    assertEQ(db.toNeroScript([Parent(#anne, #bert)]).strip(), """
+        define Parent/parent,child;
+        Parent(#anne, #bert);
+        """);
+}
 
 //-------------------------------------------------------------------------
 // toString

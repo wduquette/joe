@@ -397,8 +397,10 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Throws an error if any fact contains a term that cannot be represented
     // in Nero syntax.
     private Object _toNeroScript(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "toNeroScript(facts)");
-        return db.toNeroScript(joe.toFacts(args.next()));
+        args.arityRange(0, 1, "toNeroScript([facts])");
+        return args.hasNext()
+            ? db.toNeroScript(joe.toFacts(args.next()))
+            : db.toNeroScript();
     }
 
     //**
