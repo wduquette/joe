@@ -124,22 +124,23 @@ public class NeroRunTool implements Tool {
     }
 
     private void execute(List<String> inputs) throws IOException {
+        var nero = new Nero();
         var db = new FactSet();
 
         for (var name : inputs) {
             var source = readSource(name);
-            Nero.with(source).debug(debug).update(db);
+            nero.with(source).debug(debug).update(db);
         }
 
         if (outFile == null) {
-            println(Nero.toNeroScript(db));
+            println(nero.toNeroScript(db));
         } else {
             println("Writing: " + outFile);
             var path = Path.of(outFile);
             if (Files.exists(path)) {
                 Files.copy(path, Path.of(outFile + "~"));
             }
-            Files.writeString(path, Nero.toNeroScript(db));
+            Files.writeString(path, nero.toNeroScript(db));
         }
     }
 

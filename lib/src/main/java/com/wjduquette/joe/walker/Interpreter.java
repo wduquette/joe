@@ -9,7 +9,6 @@ import com.wjduquette.joe.scanner.Token;
 import com.wjduquette.joe.scanner.TokenType;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
-import com.wjduquette.joe.types.RuleSetValue;
 import com.wjduquette.joe.types.SetValue;
 import com.wjduquette.joe.util.Bindings;
 
@@ -779,7 +778,7 @@ class Interpreter {
                         "Nero rule set cannot be stratified.");
                 }
 
-                yield new RuleSetValue(ruleset);
+                yield ruleset;
             }
             // A set literal
             case Expr.SetLiteral expr -> {

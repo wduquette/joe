@@ -191,12 +191,12 @@ public class RuleEngine {
     }
 
     /**
-     * Registers an Equivalence relation for use with the
+     * Registers an Equivalences for use with the
      * {@code equivalent/equivalence,a,b} predicate.
-     * @param equivalence The equivalence
+     * @param map The map of equivalences.
      */
-    public void registerEquivalence(Equivalence equivalence) {
-        equivalences.put(equivalence.keyword(), equivalence);
+    public void putEquivalences(Map<Keyword,Equivalence> map) {
+        equivalences.putAll(map);
     }
 
     //-------------------------------------------------------------------------
@@ -214,13 +214,15 @@ public class RuleEngine {
         }
 
         // NEXT, check for rule/inputs relation collision
-        for (var relation : knownFacts.getRelations()) {
-            if (ruleMap.containsKey(relation)) {
-                throw new JoeError(
-                    "Rule head relation collides with input fact relation: '" +
-                        relation + "'.");
-            }
-        }
+        // TODO: I don't think this really matters.
+        // Leaving it here for a while in case I change my mind.
+//        for (var relation : knownFacts.getRelations()) {
+//            if (ruleMap.containsKey(relation)) {
+//                throw new JoeError(
+//                    "Rule head relation collides with input fact relation: '" +
+//                        relation + "'.");
+//            }
+//        }
 
         // NEXT, only do inference once.
         if (inferenceComplete) return inferredFacts;

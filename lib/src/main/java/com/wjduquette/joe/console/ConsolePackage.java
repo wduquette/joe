@@ -52,7 +52,6 @@ public class ConsolePackage extends NativePackage {
         super("joe.console");
 
         type(new ConsoleProxy());
-        type(new PathProxy());
     }
 
     //-------------------------------------------------------------------------
@@ -272,7 +271,7 @@ public class ConsolePackage extends NativePackage {
      * @throws JoeError if the argument is not a path.
      */
     public Path toResolvedPath(Joe joe, Object arg) {
-        var path = PathProxy.toPath(joe, arg);
+        var path = joe.toPath(arg);
         return cwd.resolve(path).toAbsolutePath().normalize();
     }
 }

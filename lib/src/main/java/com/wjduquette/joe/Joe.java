@@ -13,6 +13,7 @@ import com.wjduquette.joe.wrappers.StringFunctionWrapper;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
@@ -767,6 +768,7 @@ public class Joe {
      * @param ex The exception
      * @return The JoeError
      */
+    @SuppressWarnings("unused")
     public JoeError rethrow(Exception ex) {
         return new JoeError(ex.getMessage(), ex);
     }
@@ -837,6 +839,7 @@ public class Joe {
             throw expected("collection", arg);
         }
     }
+
 
     /**
      * Converts a Monica comparator callable to a Java comparator.
@@ -927,6 +930,25 @@ public class Joe {
         if (jv.isFact()) return jv.toFact();
 
         throw expected("Nero-compatible fact", arg);
+    }
+
+    /**
+     * Requires that the argument is a collection of Nero Facts or a
+     * collection of objects that can be converted Nero Facts,
+     * and returns it as a list of Facts.
+     * @param arg The argument
+     * @return The list
+     * @throws JoeError on conversion failure.
+     */
+    public List<Fact> toFacts(Object arg) {
+        var c = toCollection(arg);
+        var list = new ArrayList<Fact>();
+
+        for (var item : c) {
+            list.add(toFact(item));
+        }
+
+        return list;
     }
 
     /**
@@ -1029,6 +1051,34 @@ public class Joe {
     }
 
     /**
+     * Converts a collection argument into a list of a given type.
+     * @param cls The type
+     * @param arg The argument
+     * @param <T> The item type
+     * @return The comparator
+     * @throws JoeError if the argument isn't a collection of the given type.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> List<T> toList(Class<T> cls, Object arg) {
+        // NOTE: this is marked "unchecked", but the logic does in fact
+        // ensure type safety.
+        if (arg instanceof Collection<?> c) {
+            var list = new ArrayList<T>();
+            for (var item : c) {
+                if (item != null && cls.isAssignableFrom(item.getClass())) {
+                    list.add((T)arg);
+                } else {
+                    throw expected("collection of " + classTypeName(cls), arg);
+                }
+            }
+
+            return list;
+        } else {
+            throw expected("collection of " + classTypeName(cls), arg);
+        }
+    }
+
+    /**
      * Requires that the argument is a JoeMap, and returns it as
      * such.
      * @param arg The argument
@@ -1060,6 +1110,31 @@ public class Joe {
         }
 
         throw expected("package name", arg);
+    }
+
+    /**
+     * Given an argument, converts it to a Path.  The argument
+     * may be a Path or a String representing a Path.
+     * @param arg The argument
+     * @return The path
+     * @throws JoeError on failure.
+     */
+    public Path toPath(Object arg) {
+        try {
+            return switch (arg) {
+                case String s -> {
+                    try {
+                        yield Path.of(s);
+                    } catch (Exception ex) {
+                        throw expected("path string", arg);
+                    }
+                }
+                case Path p -> p;
+                default -> throw expected("path", arg);
+            };
+        } catch (IllegalArgumentException ex) {
+            throw new JoeError(ex.getMessage());
+        }
     }
 
     /**

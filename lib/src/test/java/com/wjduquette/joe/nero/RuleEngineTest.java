@@ -3,6 +3,7 @@ package com.wjduquette.joe.nero;
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Ted;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -16,6 +17,18 @@ import static com.wjduquette.joe.checker.Checker.checkThrow;
 // at compile time and are found by the `NeroParser`; detection is tested
 // by `parser.NeroParserTest`.
 public class RuleEngineTest extends Ted {
+    private final Equivalence upper2lower =
+        new LambdaEquivalence(new Keyword("upper2lower"),
+            a -> a instanceof String s ? s.toLowerCase() : null,
+            b -> b instanceof String s ? s.toUpperCase() : null
+        );
+    private Nero nero;
+
+    @Before
+    public void setup() {
+        nero = new Nero();
+        nero.addEquivalence(upper2lower);
+    }
     //-------------------------------------------------------------------------
     // Stratification Conditions
 
@@ -620,11 +633,6 @@ public class RuleEngineTest extends Ted {
     }
 
     @Test public void testBuiltIn_equivalent_registered() {
-        var equiv = new LambdaEquivalence(new Keyword("upper2lower"),
-            a -> a instanceof String s ? s.toLowerCase() : null,
-            b -> b instanceof String s ? s.toUpperCase() : null
-        );
-
         var source = """
             transient Upper;
             transient Lower;
@@ -643,7 +651,7 @@ public class RuleEngineTest extends Ted {
             """;
 
         // Execute with #upper2lower
-        check(execute(source, equiv)).eq("""
+        check(execute(source)).eq("""
             define Got/2;
             Got("ABC", "abc");
             Got("DEF", "def");
@@ -1129,23 +1137,8 @@ public class RuleEngineTest extends Ted {
     // Execute the source, returning a Nero script of known facts.
     private String execute(String source) {
         try {
-            var db = Nero.with(source).debug().infer();
-            return Nero.toNeroScript(db);
-        } catch (SyntaxError ex) {
-            println(ex.getErrorReport());
-            throw ex;
-        }
-    }
-
-    // Execute the source, returning a Nero script of known facts,
-    // given an Equivalence for equivalent/equivalence,a,b
-    private String execute(String source, Equivalence equivalence) {
-        try {
-            var db = Nero.with(source)
-                .debug()
-                .equivalence(equivalence)
-                .infer();
-            return Nero.toNeroScript(db);
+            var db = nero.with(source).debug().infer();
+            return nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;
@@ -1157,8 +1150,8 @@ public class RuleEngineTest extends Ted {
     private String execute(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         try {
-            Nero.with(source).debug().update(db);
-            return Nero.toNeroScript(db);
+            nero.with(source).debug().update(db);
+            return nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;
@@ -1170,11 +1163,8 @@ public class RuleEngineTest extends Ted {
     private String infer(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         try {
-            var inferred = Nero.with(source).debug().update(db);
-//            return NewNero.toNeroScript(db);
-//            var engine = nero.execute(new SourceBuffer("-", source), db);
-//            var factSet = new FactSet(engine.getInferredFacts());
-            return Nero.toNeroScript(inferred);
+            var inferred = nero.with(source).debug().update(db);
+            return nero.toNeroScript(inferred);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
             throw ex;
@@ -1187,7 +1177,7 @@ public class RuleEngineTest extends Ted {
     // from being represented as a Nero script
     private String inferRaw(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
-        var inferred = Nero.with(source).debug().update(db);
+        var inferred = nero.with(source).debug().update(db);
         return inferred.all().stream()
             .map(Fact::toString)
             .sorted()

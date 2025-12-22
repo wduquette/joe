@@ -1,27 +1,24 @@
 package com.wjduquette.joe.nero;
 
-import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.SourceBuffer;
-import com.wjduquette.joe.SyntaxError;
+import com.wjduquette.joe.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A convenience layer for interacting with collections of Nero facts
- * at the Java level.
+ * at the Java level.  NeroDatabase allows the client to work with a
+ * collection of facts, preserving the schema as it goes along.
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class NeroDatabase {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The Joe instance, which is needed for string conversions.
-    private final Joe joe;
+    // The Nero instance
+    private final Nero nero;
 
     // The accumulated schema
     private Schema schema;
@@ -40,7 +37,7 @@ public class NeroDatabase {
      * instance of Joe.
      */
     public NeroDatabase() {
-        this(new Joe(), new Schema());
+        this(new Nero(), new Schema());
     }
 
     /**
@@ -49,7 +46,7 @@ public class NeroDatabase {
      * @param joe The Joe interpreter
      */
     public NeroDatabase(Joe joe) {
-        this(joe, new Schema());
+        this(new Nero(joe), new Schema());
     }
 
     /**
@@ -58,7 +55,7 @@ public class NeroDatabase {
      * @param schema The schema
      */
     public NeroDatabase(Schema schema) {
-        this(new Joe(), schema);
+        this(new Nero(), schema);
     }
 
     /**
@@ -68,7 +65,12 @@ public class NeroDatabase {
      * @param schema The schema
      */
     public NeroDatabase(Joe joe, Schema schema) {
-        this.joe = joe;
+        this.nero = new Nero(joe);
+        this.schema = schema;
+    }
+
+    private NeroDatabase(Nero nero, Schema schema) {
+        this.nero = nero;
         this.schema = schema;
     }
 
@@ -93,11 +95,48 @@ public class NeroDatabase {
         return this;
     }
 
+    /**
+     * Adds a single equivalence to Nero, for use with the
+     * `equivalent/equivalence,a,b` predicate.
+     * @param equivalence The equivalence
+     */
+    public void addEquivalence(Equivalence equivalence) {
+        nero.addEquivalence(equivalence);
+    }
+
+    /**
+     * Adds a multiple equivalences to Nero, for use with the
+     * `equivalent/equivalence,a,b` predicate.
+     * @param list List of equivalences
+     */
+    public void addEquivalences(List<Equivalence> list) {
+        nero.addEquivalences(list);
+    }
+
+    /**
+     * Gets a read-only map of the defined equivalences.
+     * @return the map
+     */
+    public Map<Keyword,Equivalence> getEquivalences() {
+        return nero.getEquivalences();
+    }
+
     //------------------------------------------------------------------------
     // Operations
 
     /**
-     * Updates the content of the database given the Nero script.
+     * Clears all content from the database.
+     * @return The database
+     */
+    public NeroDatabase clear() {
+        db.clear();
+        schema = new Schema();
+        return this;
+    }
+
+    /**
+     * Updates the content of the database given the Nero script, updating
+     * the schema.
      * @param script The Nero script
      * @return The database
      */
@@ -106,7 +145,8 @@ public class NeroDatabase {
     }
 
     /**
-     * Updates the content of the database given the Nero script.
+     * Updates the content of the database given the Nero script, updating the
+     * schema.
      * @param source The Nero source
      * @return The database
      * @throws SyntaxError on any Nero compilation error, including schema
@@ -115,9 +155,21 @@ public class NeroDatabase {
      */
     public NeroDatabase update(SourceBuffer source) {
         var ruleset = Nero.compile(schema, source);
-        Nero.with(joe, ruleset).debug(debug).update(db);
+        nero.with(ruleset).debug(debug).update(db);
         schema = ruleset.schema();
+        return this;
+    }
 
+    /**
+     * Updates the content of the database given the rule set, updating
+     * the schema.
+     * @param ruleset The rule set
+     * @return The database
+     * @throws JoeError on any Nero error.
+     */
+    public NeroDatabase update(NeroRuleSet ruleset) {
+        nero.with(ruleset).debug(debug).update(db);
+        schema = Schema.inferSchema(db.all());
         return this;
     }
 
@@ -145,9 +197,18 @@ public class NeroDatabase {
      * @return The inferred facts
      */
     public FactSet query(String script) {
-        var ruleset = Nero.compile(schema, new SourceBuffer("*nero*", script));
-        return Nero.with(joe, ruleset).debug(debug).query(db);
+        return query(Nero.compile(schema, new SourceBuffer("*nero*", script)));
     }
+
+    /**
+     * Queries the database given the Nero rule set
+     * @param ruleset The rule set
+     * @return The inferred facts
+     */
+    public FactSet query(NeroRuleSet ruleset) {
+        return nero.with(ruleset).debug(debug).query(db);
+    }
+
 
     /**
      * Adds all Facts from another NeroDatabase into the database, checking
@@ -198,6 +259,48 @@ public class NeroDatabase {
         return this;
     }
 
+    /**
+     * Deletes a single fact from the database.
+     * @param fact the fact
+     * @return this
+     */
+    public NeroDatabase remove(Fact fact) {
+        db.remove(fact);
+        return this;
+    }
+
+    /**
+     * Deletes a collection of facts from the database.
+     * @param collection The facts
+     * @return this
+     */
+    public NeroDatabase removeAll(Collection<Fact> collection) {
+        db.removeAll(collection);
+        return this;
+    }
+
+    /**
+     * Deletes the facts in another FactBase from the database.
+     * @param other The other FactBase
+     * @return this
+     */
+    public NeroDatabase removeAll(FactSet other) {
+        db.removeAll(other);
+        return this;
+    }
+
+    /**
+     * Renames a relation, replacing any existing relation that has the new
+     * name.
+     * @param oldName The old name
+     * @param newName The new name
+     * @return this
+     */
+    public NeroDatabase rename(String oldName, String newName) {
+        db.rename(oldName, newName);
+        return this;
+    }
+
     //------------------------------------------------------------------------
     // Queries
 
@@ -207,6 +310,22 @@ public class NeroDatabase {
      */
     public Schema schema() {
         return new Schema(schema);
+    }
+
+    /**
+     * Gets whether the database is empty or not.
+     * @return true or false
+     */
+    public boolean isEmpty() {
+        return db.isEmpty();
+    }
+
+    /**
+     * Gets the number of facts in the database.
+     * @return the size
+     */
+    public int size() {
+        return db.size();
     }
 
     /**
@@ -228,6 +347,27 @@ public class NeroDatabase {
     }
 
     /**
+     * Returns a set of the relations of all facts in the database.
+     * @return the set
+     */
+    public Set<String> getRelations() {
+        return db.getRelations();
+    }
+
+    /**
+     * Converts the facts into a string in Nero format.
+     * Throws an error if a fact in the database contains a data value that
+     * cannot be represented in Nero syntax.
+     * @param facts The facts
+     * @return The Nero source text
+     * @throws JoeError if constraints are not met.
+     */
+    @SuppressWarnings("unused")
+    public String toNeroScript(Collection<Fact> facts) {
+        return nero.toNeroScript(facts);
+    }
+
+    /**
      * Converts the content of the database to a Nero script.
      * Throws an error if a fact in the database contains a data value that
      * cannot be represented in Nero syntax.
@@ -235,6 +375,30 @@ public class NeroDatabase {
      * @throws JoeError on non-Nero data.
      */
     public String toNeroScript() {
-        return Nero.toNeroScript(db);
+        return nero.toNeroScript(db);
+    }
+
+    /**
+     * Converts the content of the fact set to a Nero script.
+     * Throws an error if a fact in the database contains a data value that
+     * cannot be represented in Nero syntax.
+     * @param facts The fact set
+     * @return The script
+     * @throws JoeError on non-Nero data.
+     */
+    public String toNeroScript(FactSet facts) {
+        return nero.toNeroScript(facts);
+    }
+
+    /**
+     * Converts the given fact to a Nero axiom.
+     * Throws an error if the axiom contains a data value that
+     * cannot be represented in Nero syntax.
+     * @param fact The fact
+     * @return The script
+     * @throws JoeError on non-Nero data.
+     */
+    public String toNeroAxiom(Fact fact) {
+        return nero.toNeroAxiom(fact);
     }
 }

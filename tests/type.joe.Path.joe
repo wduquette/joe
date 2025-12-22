@@ -1,4 +1,4 @@
-// Tests for type.joe.console.Path.
+// Tests for type.joe.Path.
 
 function testInitializer() {
     var p = Path("root/file.txt");

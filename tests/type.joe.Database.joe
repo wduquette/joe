@@ -1,6 +1,6 @@
-// type.joe.FactBase.joe
+// type.joe.Database.joe
 //
-// This script tests the behavior of FactBase objects.
+// This script tests the behavior of Database objects.
 
 //-----------------------------------------------------------------------------
 // Helper types
@@ -22,17 +22,17 @@ var HAT_FACT = Joe.toFact(HAT);
 // Creation
 
 function testCreation_empty() {
-    var db = FactBase();
+    var db = Database();
     assertEmpty(db);
     assertEQ(db.size(), 0);
     assertT(db.all().isEmpty());
     assertT(db.relations().isEmpty());
     assertT(db.relation("Thing").isEmpty());
-    assertEQ(db.toString(), "FactBase[0]");
+    assertEQ(db.toString(), "Database[0]");
 }
 
 function testCreation_collection() {
-    var db = FactBase([JOE, TEXAS, HAT]);
+    var db = Database([JOE, TEXAS, HAT]);
     assertF(db.isEmpty());
     assertEQ(db.size(), 3);
     assertF(db.all().isEmpty());
@@ -40,13 +40,13 @@ function testCreation_collection() {
     assertF(db.relations().isEmpty());
     assertEQ(db.relations(), {"Person", "Place", "Thing"});
     assertEQ(db.relation("Person"), {JOE_FACT});
-    assertEQ(db.toString(), "FactBase[3, Person[1], Place[1], Thing[1]]");
+    assertEQ(db.toString(), "Database[3, Person[1], Place[1], Thing[1]]");
 }
 
-function testCreation_FactBase() {
-    var other = FactBase([JOE, HAT]);
+function testCreation_Database() {
+    var other = Database([JOE, HAT]);
 
-    var db = FactBase(other);
+    var db = Database(other);
     assertF(db.isEmpty());
     assertEQ(db.size(), 2);
     assertF(db.all().isEmpty());
@@ -54,72 +54,40 @@ function testCreation_FactBase() {
     assertF(db.relations().isEmpty());
     assertEQ(db.relations(), other.relations());
     assertEQ(db.relation("Person"), other.relation("Person"));
-    assertEQ(db.toString(), "FactBase[2, Person[1], Thing[1]]");
+    assertEQ(db.toString(), "Database[2, Person[1], Thing[1]]");
 }
 
 function testCreation_badInputs() {
     var inputs = ["abc"];
 
-    assertError(\-> FactBase(inputs),
+    assertError(\-> Database(inputs),
         "Expected Nero-compatible fact, got: String 'abc'.");
 }
 
 //-------------------------------------------------------------------------
-// Can Iterate
+// addFacts
 
-function testIterable() {
-    var db = FactBase([JOE, TEXAS, HAT]);
-
-    var set = Set();
-    foreach(fact : db) set.add(fact);
-    assertEQ(set, db.all());
-}
-
-
-//-------------------------------------------------------------------------
-// add
-
-function testAdd_good() {
-    var db = FactBase();
-
-    db.add(JOE);
-
-    assertEQ(db.all(), {JOE_FACT});
-    assertEQ(db.relation("Person"), {JOE_FACT});
-    assertEQ(db.relations(), {"Person"});
-}
-
-function testAdd_bad() {
-    var db = FactBase();
-
-    assertError(\-> db.add("abc"),
-        "Expected Nero-compatible fact, got: String 'abc'.");
-}
-
-//-------------------------------------------------------------------------
-// addAll
-
-function testAddAll_collection() {
-    var db = FactBase();
-    db.addAll([JOE, HAT]);
+function testAddFacts_collection() {
+    var db = Database();
+    db.addFacts([JOE, HAT]);
     assertEQ(db.all(), {JOE_FACT, HAT_FACT});
     assertEQ(db.relation("Person"), {JOE_FACT});
 }
 
-function testAddAll_FactBase() {
-    var db = FactBase();
-    var other = FactBase([JOE, HAT]);
+function testAddFacts_Database() {
+    var db = Database();
+    var other = Database([JOE, HAT]);
 
-    db.addAll(other);
+    db.addFacts(other);
     assertEQ(db.all(), other.all());
     assertEQ(db.relation("Person"), other.relation("Person"));
 }
 
-function testAddAll_badInputs() {
+function testAddFacts_badInputs() {
     var inputs = ["abc"];
-    var db = FactBase();
+    var db = Database();
 
-    assertError(\-> db.addAll(inputs),
+    assertError(\-> db.addFacts(inputs),
         "Expected Nero-compatible fact, got: String 'abc'.");
 }
 
@@ -132,8 +100,8 @@ function testAddAll_badInputs() {
 // clear
 
 function testClear() {
-    var db = FactBase();
-    db.add(JOE);
+    var db = Database();
+    db.addFacts([JOE]);
     db.clear();
     assertT(db.isEmpty());
     assertEQ(db.size(), 0);
@@ -145,31 +113,79 @@ function testClear() {
 // drop
 
 function testDrop() {
-    var db = FactBase([JOE, TEXAS, HAT]);
+    var db = Database([JOE, TEXAS, HAT]);
     db.drop("Thing");
     assertEQ(db.all(), {JOE_FACT, TEXAS_FACT});
     assertEQ(db.relation("Thing"), Set());
 }
 
 //-------------------------------------------------------------------------
+// Equivalence
+
+var S2N = Equivalence(#s2n,
+    \s -> s ~ String() ? Number(s) : null,
+    \n -> n ~ Number() ? Joe.stringify(n) : null
+);
+
+function testEquivalence() {
+    var db = Database();
+    db.equivalence(S2N);
+    assertEQ(db.getEquivalences(), {S2N});
+}
+
+function testEquivalences_individual() {
+    var db = Database();
+    db.equivalences(S2N);
+    assertEQ(db.getEquivalences(), {S2N});
+}
+
+function testEquivalences_individual() {
+    var db = Database();
+    db.equivalences(S2N);
+    assertEQ(db.getEquivalences(), {S2N});
+}
+
+function testEquivalences_collection() {
+    var db = Database();
+    db.equivalences([S2N]);
+    assertEQ(db.getEquivalences(), {S2N});
+}
+
+function testUseEquivalence() {
+    var db = Database();
+    db.equivalences(S2N);
+    db.update(ruleset {
+        transient Str;
+        Str("123");
+        Both(s,n) :- Str(s), equivalent(#s2n, s, n);
+    });
+    var results = db.toNeroScript().strip();
+    assertEQ(results, """
+        define Both/2;
+        Both("123", 123);
+        """);
+}
+
+
+//-------------------------------------------------------------------------
 // filter
 
 function testFilter() {
-    var db = FactBase([JOE, TEXAS, HAT]);
+    var db = Database([JOE, TEXAS, HAT]);
 
     var set = db.filter(\f -> f ~ Person());
     assertEQ(set, {JOE_FACT});
 }
 
 //-------------------------------------------------------------------------
-// isDebug/setDebug
+// isDebug/debug
 
 function testDebug_setGet() {
-    var db = FactBase();
+    var db = Database();
     assertF(db.isDebug());
-    db.setDebug(true);
+    db.debug();
     assertT(db.isDebug());
-    db.setDebug(false);
+    db.debug(false);
     assertF(db.isDebug());
 }
 
@@ -182,7 +198,7 @@ function testDebug_setGet() {
 // map
 
 function testMap() {
-    var db = FactBase([JOE, TEXAS, HAT]);
+    var db = Database([JOE, TEXAS, HAT]);
     var strings = db.map(Joe.stringify).sorted();
     assertEQ(strings, [
         "Fact(Person, #joe, 90)",
@@ -194,8 +210,8 @@ function testMap() {
 //-------------------------------------------------------------------------
 // query
 
-function testSelect_facts() {
-    var db = FactBase([
+function testQuery() {
+    var db = Database([
         Parent(#anne, #bert),
         Parent(#bert, #clark)
     ]);
@@ -227,7 +243,7 @@ function testSelect_facts() {
 // remove
 
 function testRemove_good() {
-    var db = FactBase([JOE, TEXAS, HAT]);
+    var db = Database([JOE, TEXAS, HAT]);
     db.remove(HAT);
 
     assertEQ(db.all(), {JOE_FACT, TEXAS_FACT});
@@ -239,7 +255,7 @@ function testRemove_bad() {
         Parent(#anne, #bert),
         Parent(#bert, #clark)
     ];
-    var db = FactBase(inputs);
+    var db = Database(inputs);
 
     assertError(\-> db.remove("abc"),
         "Expected Nero-compatible fact, got: String 'abc'.");
@@ -249,16 +265,16 @@ function testRemove_bad() {
 // removeAll
 
 function testRemoveAll_collection() {
-    var db = FactBase([JOE, TEXAS, HAT]);
+    var db = Database([JOE, TEXAS, HAT]);
     db.removeAll([HAT]);
 
     assertEQ(db.all(), {JOE_FACT, TEXAS_FACT});
     assertEQ(db.relation("Thing"), Set());
 }
 
-function testRemoveAll_FactBase() {
-    var db = FactBase([JOE, TEXAS, HAT]);
-    var other = FactBase([HAT]);
+function testRemoveAll_Database() {
+    var db = Database([JOE, TEXAS, HAT]);
+    var other = Database([HAT]);
     db.removeAll(other);
 
     assertEQ(db.all(), {JOE_FACT, TEXAS_FACT});
@@ -266,7 +282,7 @@ function testRemoveAll_FactBase() {
 }
 
 function testRemoveAll_bad() {
-    var db = FactBase();
+    var db = Database();
 
     assertError(\-> db.removeAll(["abc"]),
         "Expected Nero-compatible fact, got: String 'abc'.");
@@ -276,7 +292,7 @@ function testRemoveAll_bad() {
 // removeIf
 
 function testRemoveIf() {
-    var db = FactBase([JOE, TEXAS, HAT]);
+    var db = Database([JOE, TEXAS, HAT]);
     db.removeIf(\f -> f ~ Thing());
     assertEQ(db.all(), {JOE_FACT, TEXAS_FACT});
     assertEQ(db.relation("Thing"), Set());
@@ -286,7 +302,7 @@ function testRemoveIf() {
 // rename
 
 function testRename() {
-    var db = FactBase([JOE, TEXAS, HAT]);
+    var db = Database([JOE, TEXAS, HAT]);
     var newFact = Fact.ofPairs("Location", ["id", #texas]);
     db.rename("Place", "Location");
     assertEQ(db.all(), {JOE_FACT, newFact, HAT_FACT});
@@ -301,6 +317,37 @@ function testRename() {
 // Tested in use by other tests
 
 //-------------------------------------------------------------------------
+// toNeroAxiom
+
+function testToNeroAxiom() {
+    // A record convertible to a fact.
+    var fact = Parent(#anne, #bert);
+    var db = Database();
+    assertEQ(db.toNeroAxiom(fact), "Parent(#anne, #bert);");
+}
+
+//-------------------------------------------------------------------------
+// toNeroScript
+
+function testToNeroScript_noArgs() {
+    var db = Database([Parent(#anne, #bert)]);
+    assertEQ(db.toNeroScript().strip(), """
+        define Parent/parent,child;
+        Parent(#anne, #bert);
+        """);
+}
+
+function testToNeroScript_args() {
+    var db = Database();
+
+    // A record convertible to a fact.
+    assertEQ(db.toNeroScript([Parent(#anne, #bert)]).strip(), """
+        define Parent/parent,child;
+        Parent(#anne, #bert);
+        """);
+}
+
+//-------------------------------------------------------------------------
 // toString
 
 // Test in use by other tests
@@ -309,7 +356,7 @@ function testRename() {
 // update
 
 function testUpdate_good() {
-    var db = FactBase([
+    var db = Database([
         Parent(#anne, #bert),
         Parent(#bert, #clark)
     ]);
