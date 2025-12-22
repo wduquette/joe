@@ -24,7 +24,6 @@ class StandardLibrary extends NativePackage {
         type(EquivalenceType.TYPE);
         type(ErrorType.TYPE);
         type(FactType.TYPE);
-        type(FactBaseType.TYPE);
         type(FunctionType.TYPE);
         type(JoeSingleton.TYPE);
         type(KeywordType.TYPE);
