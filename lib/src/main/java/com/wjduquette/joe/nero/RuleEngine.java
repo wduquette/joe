@@ -699,15 +699,26 @@ public class RuleEngine {
         var term = getAggregate(bc.rule.head());
         if (term == null) return bc.matches;
 
+        // NEXT, remove non-head-vars from the bindings.
+        var headVars = bc.rule.head().getVariableNames();
+        var matches = new ArrayList<Bindings>();
+        for (var match : bc.matches) {
+            var reduced = new Bindings();
+            for (var headVar : headVars) {
+                reduced.bind(headVar, match.get(headVar));
+            }
+            matches.add(reduced);
+        }
+
         // NEXT, aggregate using the function
         return switch (term.aggregator()) {
-            case INDEXED_LIST -> aggregateIndexedList(term.names(), bc.matches);
-            case LIST -> aggregateList(term.names(), bc.matches);
-            case MAP -> aggregateMap(term.names(), bc.matches);
-            case MAX -> aggregateMax(term.names(), bc.matches);
-            case MIN -> aggregateMin(term.names(), bc.matches);
-            case SET -> aggregateSet(term.names(), bc.matches);
-            case SUM -> aggregateSum(term.names(), bc.matches);
+            case INDEXED_LIST -> aggregateIndexedList(term.names(), matches);
+            case LIST -> aggregateList(term.names(), matches);
+            case MAP -> aggregateMap(term.names(), matches);
+            case MAX -> aggregateMax(term.names(), matches);
+            case MIN -> aggregateMin(term.names(), matches);
+            case SET -> aggregateSet(term.names(), matches);
+            case SUM -> aggregateSum(term.names(), matches);
         };
     }
 
