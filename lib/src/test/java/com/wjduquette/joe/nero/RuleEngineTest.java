@@ -975,6 +975,36 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    // Aggregation can fail if the set of bindings includes variables not
+    // in the head of the rule.  In this case the bindings include the
+    // "ids" variable, whose value differs for every match.
+    //
+    // This test case reflects the rule set in which the error was initially
+    // seen; the error can be reproduced without using a built-in-predicate
+    // in the rule's body.
+    @Test public void testAggregation_complex() {
+        test("testAggregate_set");
+        var source = """
+            transient Event;
+            Event({#a,#b}, 1);
+            Event({#a,#c}, 2);
+            Event({#a,#d}, 3);
+            Event({#b,#c}, 4);
+            Event({#b,#d}, 5);
+            Event({#b,#e}, 6);
+
+            Min(id, min(t)) :- Event(ids, t), member(id, ids);
+            """;
+        check(execute(source)).eq("""
+            define Min/2;
+            Min(#a, 1);
+            Min(#b, 1);
+            Min(#c, 2);
+            Min(#d, 3);
+            Min(#e, 6);
+            """);
+    }
+
     //-------------------------------------------------------------------------
     // Pattern Terms
     //
