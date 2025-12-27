@@ -1138,6 +1138,51 @@ public class Joe {
     }
 
     /**
+     * Requires that the argument is a collection, and returns it as a JoeSet.
+     * @param arg The argument
+     * @return The set
+     * @throws JoeError if the argument is not a set
+     */
+    @SuppressWarnings("unused")
+    public JoeSet toSet(Object arg) {
+        if (arg instanceof JoeSet set) {
+            return set;
+        } else if (arg instanceof Collection<?> collection) {
+            return new SetValue(collection);
+        } else {
+            throw expected("Set", arg);
+        }
+    }
+
+    /**
+     * Converts a collection argument into a set of a given type.
+     * @param cls The type
+     * @param arg The argument
+     * @param <T> The item type
+     * @return The comparator
+     * @throws JoeError if the argument isn't a collection of the given type.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> Set<T> toSet(Class<T> cls, Object arg) {
+        // NOTE: this is marked "unchecked", but the logic does in fact
+        // ensure type safety.
+        if (arg instanceof Collection<?> c) {
+            var set = new HashSet<T>();
+            for (var item : c) {
+                if (item != null && cls.isAssignableFrom(item.getClass())) {
+                    set.add((T)arg);
+                } else {
+                    throw expected("collection of " + classTypeName(cls), arg);
+                }
+            }
+
+            return set;
+        } else {
+            throw expected("collection of " + classTypeName(cls), arg);
+        }
+    }
+
+    /**
      * Requires that the argument is a String, and returns it as
      * such. Contrast this with {@code stringify()}, which converts
      * the argument to its String representation.  Which to use is
