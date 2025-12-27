@@ -1170,7 +1170,7 @@ public class Joe {
             var set = new HashSet<T>();
             for (var item : c) {
                 if (item != null && cls.isAssignableFrom(item.getClass())) {
-                    set.add((T)arg);
+                    set.add((T)item);
                 } else {
                     throw expected("collection of " + classTypeName(cls), arg);
                 }
