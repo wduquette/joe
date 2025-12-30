@@ -142,7 +142,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     //**
     // @method clear
     // %result this
-    // Clears the database of all content.
+    // Clears the database of its schema and facts.
     private Object _clear(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(0, "clear()");
         db.clear();
