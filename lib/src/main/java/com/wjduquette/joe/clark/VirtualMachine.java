@@ -831,7 +831,7 @@ class VirtualMachine {
                 case THROW -> {
                     var value = pop();
                     if (value instanceof JoeError err) {
-                        throw err.addInfo("Rethrowing existing error.");
+                        throw err;
                     } else {
                         throw error(joe.stringify(value));
                     }
