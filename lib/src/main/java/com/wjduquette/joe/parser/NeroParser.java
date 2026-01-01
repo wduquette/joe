@@ -127,9 +127,7 @@ class NeroParser extends EmbeddedParser {
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                             schema.get(head.relation()).toSpec() +
-                            "', got: '" +
-                            Shape.inferDefaultShape(head).toSpec() +
-                            "'.");
+                            "', got: '" + head + "'.");
                     }
                     axioms.add(axiom(headToken, head));
                 } else if (scanner.match(COLON_MINUS)) {
@@ -146,9 +144,7 @@ class NeroParser extends EmbeddedParser {
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                                 schema.get(head.relation()).toSpec() +
-                                "', got: '" +
-                                Shape.inferDefaultShape(head).toSpec() +
-                                "'.");
+                                "', got: '" + head + "'.");
                     }
                     rules.add(rule(headToken, head));
                 } else {
@@ -326,8 +322,8 @@ class NeroParser extends EmbeddedParser {
         var shape = RuleEngine.getBuiltInShape(atom.relation());
         assert shape != null;
         if (!Shape.conformsTo(atom, shape)) {
-            error(token, "expected " + shape.toSpec() + ", got: " +
-                Shape.inferDefaultShape(atom).toSpec() + ".");
+            error(token, "expected " + shape.toSpec() + ", got: '" +
+                atom + "'.");
             return;
         }
 

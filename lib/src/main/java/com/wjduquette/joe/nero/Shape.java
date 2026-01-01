@@ -6,7 +6,6 @@ import java.util.List;
  * The shape of Nero facts, for use in a Nero Schema.
  */
 public sealed interface Shape permits
-    Shape.ListShape,
     Shape.MapShape,
     Shape.PairShape
 {
@@ -35,17 +34,6 @@ public sealed interface Shape permits
 
     //-------------------------------------------------------------------------
     // Concrete Shape Types
-
-    /**
-     * The shape of a ListFact having the given relation and arity.
-     * @param relation The relation name
-     * @param arity The arity
-     */
-    record ListShape(String relation, int arity)
-        implements Shape
-    {
-        @Override public String toSpec() { return relation + "/" + arity; }
-    }
 
     /**
      * The shape of a MapFact having the given relation.
@@ -83,7 +71,7 @@ public sealed interface Shape permits
      */
     static Shape inferShape(Fact fact) {
         return switch (fact) {
-            case ListFact f -> new ListShape(f.relation(), f.arity());
+            case ListFact f -> null;
             case MapFact f  -> new MapShape(f.relation());
             case PairFact f -> new PairShape(f.relation(), f.getFieldNames());
         };
@@ -96,8 +84,9 @@ public sealed interface Shape permits
      * @return The inferred shape
      */
     static Shape inferDefaultShape(Atom head) {
+        // TODO: Remove
         return switch (head) {
-            case OrderedAtom a -> new ListShape(a.relation(), a.terms().size());
+            case OrderedAtom a -> null;
             case NamedAtom a -> new MapShape(a.relation());
         };
     }
@@ -111,9 +100,6 @@ public sealed interface Shape permits
      */
     static boolean conformsTo(Atom atom, Shape shape) {
         return switch (shape) {
-            case Shape.ListShape s ->
-                atom instanceof OrderedAtom a &&
-                    s.arity() == a.terms().size();
             case Shape.MapShape ignored ->
                 atom instanceof NamedAtom;
             case Shape.PairShape s ->

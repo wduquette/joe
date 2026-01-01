@@ -235,6 +235,7 @@ public class Schema {
      * @return The new shape or null.
      */
     public static Shape promote(Shape a, Shape b) {
+        // TODO: Remove
         // Safety check
         if (!a.relation().equals(b.relation())) return null;
 
@@ -243,22 +244,12 @@ public class Schema {
 
         // A is a PairShape
         if (a instanceof Shape.PairShape pa) {
-            if (b instanceof Shape.ListShape lb) {
-                // B is compatible ListShape
-                return pa.arity() == lb.arity() ? pa : null;
-            } else if (b instanceof Shape.PairShape pb) {
+            if (b instanceof Shape.PairShape pb) {
                 // B is compatible PairShape
                 return pa.arity() == pb.arity() ? pa : null;
             } else {
                 return null;
             }
-        }
-
-        if (a instanceof Shape.ListShape la &&
-            b instanceof Shape.PairShape pb)
-        {
-            // A is ListShape and B is compatible PairShape.
-            return la.arity() == pb.arity() ? pb : null;
         }
 
         return null;

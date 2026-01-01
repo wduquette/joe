@@ -63,174 +63,22 @@ public class SchemaTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
-    // checkAndAdd(shape)
-
-    // A shape is always accepted if the relation isn't previously known.
-    @Test public void testCheckAndAdd_shape_new() {
-        test("testCheckAndAdd_shape_new");
-
-        var shape = new Shape.ListShape("Person", 2);
-        check(schema.checkAndAdd(shape)).eq(true);
-
-        check(schema.getRelations()).eq(Set.of("Person"));
-        check(schema.hasRelation("Person")).eq(true);
-        check(schema.get("Person")).eq(shape);
-    }
-
-    // A shape is accepted if it matches the defined shape for the relation
-    @Test public void testCheckAndAdd_shape_match() {
-        test("testCheckAndAdd_shape_match");
-
-        var shape = new Shape.ListShape("Person", 2);
-        check(schema.checkAndAdd(shape)).eq(true);
-        check(schema.checkAndAdd(shape)).eq(true);
-
-        check(schema.getRelations()).eq(Set.of("Person"));
-        check(schema.hasRelation("Person")).eq(true);
-        check(schema.get("Person")).eq(shape);
-    }
-
-    // A shape is rejected if it doesn't match the defined shape for the
-    // relation.
-    @Test public void testCheckAndAdd_shape_reject() {
-        test("testCheckAndAdd_shape_reject");
-
-        var shape = new Shape.ListShape("Person", 2);
-        check(schema.checkAndAdd(shape)).eq(true);
-
-        var shape2 = new Shape.MapShape("Person");
-        check(schema.checkAndAdd(shape2)).eq(false);
-
-        // Previous definition is unchanged.
-        check(schema.getRelations()).eq(Set.of("Person"));
-        check(schema.hasRelation("Person")).eq(true);
-        check(schema.get("Person")).eq(shape);
-    }
-
-    //-------------------------------------------------------------------------
-    // checkAndAdd(Fact)
-
-    // A fact's shape is always accepted if the relation isn't previously known.
-    @Test public void testCheckAndAdd_fact_new() {
-        test("testCheckAndAdd_fact_new");
-
-        var fact = new ListFact("Person", List.of("Joe", 90));
-        var shape = Shape.inferShape(fact);
-        check(schema.checkAndAdd(fact)).eq(true);
-
-        check(schema.getRelations()).eq(Set.of("Person"));
-        check(schema.hasRelation("Person")).eq(true);
-        check(schema.get("Person")).eq(shape);
-    }
-
-    // A fact's shape is accepted if it matches the defined shape for the
-    // relation
-    @Test public void testCheckAndAdd_fact_match() {
-        test("testCheckAndAdd_fact_match");
-
-        var shape = new Shape.ListShape("Person", 2);
-        check(schema.checkAndAdd(shape)).eq(true);
-
-        var fact = new ListFact("Person", List.of("Joe", 90));
-        check(schema.checkAndAdd(fact)).eq(true);
-
-        check(schema.getRelations()).eq(Set.of("Person"));
-        check(schema.hasRelation("Person")).eq(true);
-        check(schema.get("Person")).eq(shape);
-    }
-
-    // A fact's shape is rejected if it doesn't match the defined shape for
-    // the relation.
-    @Test public void testCheckAndAdd_fact_reject() {
-        test("testCheckAndAdd_fact_reject");
-
-        var shape = new Shape.MapShape("Person");
-        check(schema.checkAndAdd(shape)).eq(true);
-
-        var fact = new ListFact("Person", List.of("Joe", 90));
-        check(schema.checkAndAdd(fact)).eq(false);
-
-        // Previous definition is unchanged.
-        check(schema.getRelations()).eq(Set.of("Person"));
-        check(schema.hasRelation("Person")).eq(true);
-        check(schema.get("Person")).eq(shape);
-    }
-
-    //-------------------------------------------------------------------------
     // inferSchema
 
     @Test public void testInfer_schema_ok() {
         test("testInfer_schema_ok");
         List<Fact> facts = List.of(
-            new ListFact("Person", List.of("a", "b")),
-            new ListFact("Place", List.of("c")),
-            new ListFact("Thing", List.of("d", "e", "f"))
+            new PairFact("Person", List.of("x", "y"), List.of("a", "b")),
+            new PairFact("Place", List.of("x"), List.of("c")),
+            new PairFact("Thing", List.of("x", "y", "z"), List.of("d", "e", "f"))
         );
 
         schema = Schema.inferSchema(facts);
 
         check(schema.getRelations()).eq(Set.of("Person", "Place", "Thing"));
-        check(schema.get("Person")).eq(new Shape.ListShape("Person", 2));
-        check(schema.get("Place")).eq(new Shape.ListShape("Place", 1));
-        check(schema.get("Thing")).eq(new Shape.ListShape("Thing", 3));
-    }
-
-    @Test public void testInfer_schema_mismatch() {
-        test("testInfer_schema_mismatch");
-        List<Fact> facts = List.of(
-            new ListFact("Person", List.of("a", "b")),
-            new ListFact("Place", List.of("c")),
-            new ListFact("Person", List.of("d", "e", "f"))
-        );
-
-        checkThrow(() -> Schema.inferSchema(facts))
-            .containsString("Shape mismatch for fact:");
-    }
-
-    //-------------------------------------------------------------------------
-    // promote()
-
-    @Test
-    public void testPromote() {
-        test("testPromote");
-        var listX1 = new Shape.ListShape("X", 1);
-        var listY1 = new Shape.ListShape("Y", 1);
-        var listX1a = new Shape.ListShape("X", 1);
-        var listX1b = new Shape.ListShape("X", 1);
-        var pairX1 = new Shape.PairShape("X", List.of("a"));
-        var pairX2a = new Shape.PairShape("X", List.of("a", "b"));
-        var pairX2b = new Shape.PairShape("X", List.of("c", "d"));
-        var mapX = new Shape.MapShape("X");
-
-        // Distinct names.
-        check(Schema.promote(listX1, listY1)).eq(null);
-
-        // Equal shapes
-        check(Schema.promote(listX1a, listX1b)).eq(listX1);
-
-        // PairShape, ListShape of same arity
-        check(Schema.promote(pairX1, listX1)).eq(pairX1);
-
-        // PairShape, ListShape of different arity
-        check(Schema.promote(pairX2a, listX1)).eq(null);
-
-        // PairShape, PairShape of same arity
-        check(Schema.promote(pairX2a, pairX2b)).eq(pairX2a);
-
-        // PairShape, PairShape of different arity
-        check(Schema.promote(pairX1, pairX2a)).eq(null);
-
-        // PairShape, MapShape
-        check(Schema.promote(pairX1, mapX)).eq(null);
-
-        // ListShape, PairShape of same arity
-        check(Schema.promote(listX1, pairX1)).eq(pairX1);
-
-        // ListShape, PairShape of different arity
-        check(Schema.promote(listX1, pairX2a)).eq(null);
-
-        // All other pairings
-        check(Schema.promote(listX1, mapX)).eq(null);
+        check(schema.get("Person")).eq(new Shape.PairShape("Person", List.of("x", "y")));
+        check(schema.get("Place")).eq(new Shape.PairShape("Place", List.of("x")));
+        check(schema.get("Thing")).eq(new Shape.PairShape("Thing", List.of("x", "y", "z")));
     }
 
     //-------------------------------------------------------------------------
@@ -240,12 +88,10 @@ public class SchemaTest extends Ted {
     public void testMerge_good() {
         var pairX2a = new Shape.PairShape("X", List.of("a", "b"));
         var pairX2b = new Shape.PairShape("X", List.of("c", "d"));
-        var listY1 = new Shape.ListShape("Y", 1);
         var mapZ = new Shape.MapShape("Z");
 
         var s1 = new Schema();
         s1.checkAndAdd(pairX2a);
-        s1.checkAndAdd(listY1);
 
         var s2 = new Schema();
         s2.checkAndAdd(pairX2b);
@@ -254,7 +100,6 @@ public class SchemaTest extends Ted {
         // NOTE: This test presumes that promote() is working properly.
         s1.merge(s2);
         check(s1.get("X")).eq(pairX2a); // promoted
-        check(s1.get("Y")).eq(listY1);  // Retained from s1.
         check(s1.get("Z")).eq(mapZ);  // Retained from s2.
     }
 

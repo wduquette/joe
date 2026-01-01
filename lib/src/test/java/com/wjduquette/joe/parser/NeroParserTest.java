@@ -54,7 +54,7 @@ public class NeroParserTest extends Ted {
             Person(#joe, 90);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'Person', schema mismatch, expected shape compatible with 'Person/id', got: 'Person/2'.");
+            .eq("[line 2] error at 'Person', schema mismatch, expected shape compatible with 'Person/id', got: 'Person(#joe, 90.0)'.");
     }
 
     @Test public void testParse_headBuiltIn() {
@@ -85,7 +85,7 @@ public class NeroParserTest extends Ted {
             Result(x, y) :- Person(x, y);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'Result', schema mismatch, expected shape compatible with 'Result/value', got: 'Result/2'.");
+            .eq("[line 2] error at 'Result', schema mismatch, expected shape compatible with 'Result/value', got: 'Result(x, y)'.");
     }
 
     @Test public void testParse_expectedAxiomOrRule() {
@@ -358,7 +358,7 @@ public class NeroParserTest extends Ted {
             Thing(x) :- Foo(list), member(x, list, y);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'member', expected member/item,collection, got: member/3.");
+            .eq("[line 2] error at 'member', expected member/item,collection, got: 'member(x, list, y)'.");
     }
 
     @Test public void testCheckBuiltIn_memberUnbound() {
