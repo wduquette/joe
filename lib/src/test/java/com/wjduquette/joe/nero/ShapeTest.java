@@ -15,22 +15,22 @@ public class ShapeTest extends Ted {
         new PairFact("Pair", List.of("a", "b"), List.of("x", "y"));
 
     @Test
-    public void testInfer_fact_map() {
-        test("testInfer_fact_map");
-        var shape = (Shape.MapShape)Shape.inferShape(MAP_FACT);
+    public void testInfer_unordered() {
+        test("testInfer_unordered");
+        var shape = Shape.inferShape(MAP_FACT);
         check(shape.relation()).eq("Map");
-        check(shape.arity()).eq(-1);
-        check(shape.toString()).eq("MapShape[relation=Map]");
+        check(shape.arity()).eq(0);
+        check(shape.toString()).eq("Map/...");
         check(shape.toSpec()).eq("Map/...");
     }
 
     @Test
-    public void testInfer_fact_pair() {
-        test("testInfer_fact_pair");
-        var shape = (Shape.PairShape)Shape.inferShape(PAIR_FACT);
+    public void testInfer_ordered() {
+        test("testInfer_ordered");
+        var shape = Shape.inferShape(PAIR_FACT);
         check(shape.relation()).eq("Pair");
         check(shape.arity()).eq(2);
-        check(shape.toString()).eq("PairShape[relation=Pair, fieldNames=[a, b]]");
+        check(shape.toString()).eq("Pair/a,b");
         check(shape.toSpec()).eq("Pair/a,b");
     }
 }

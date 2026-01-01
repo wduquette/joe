@@ -16,7 +16,7 @@ public class Schema {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The relation shapes, by relation name.
+    // The shape of each relation, by relation name.
     private final Map<String,Shape> shapeMap = new HashMap<>();
 
     // The set of transient relations.  Transient relations are dropped after
@@ -197,7 +197,7 @@ public class Schema {
 
     /**
      * Merges the other schema into this one, provided that the shapes
-     * for matching relations are merge-compatible.
+     * for matching relations are identical.
      * @param other The other schema.
      */
     public void merge(Schema other) {
@@ -208,16 +208,11 @@ public class Schema {
             var a = get(e.getKey());
             if (a == null) {
                 retained.add(b);
-            } else {
-                var keeper = promote(a, b);
-                if (keeper != null) {
-                    retained.add(keeper);
-                } else {
-                    throw new JoeError(
-                        "Schema mismatch for '" + a.relation() +
-                        "', expected shape compatible with '" +
-                        a.toSpec() + "', got: '" + b.toSpec() + "'.");
-                }
+            } else if (!a.equals(b)) {
+                throw new JoeError(
+                    "Schema mismatch for '" + a.relation() +
+                    "', expected shape compatible with '" +
+                    a.toSpec() + "', got: '" + b.toSpec() + "'.");
             }
         }
 
@@ -225,34 +220,6 @@ public class Schema {
         for (var shape : retained) {
             shapeMap.put(shape.relation(), shape);
         }
-    }
-
-    /**
-     * Checks the two shapes for merge compatibility, returning the
-     * shape to retain.  Returns null if incompatible.
-     * @param a The first shape
-     * @param b The second shape.
-     * @return The new shape or null.
-     */
-    public static Shape promote(Shape a, Shape b) {
-        // TODO: Remove
-        // Safety check
-        if (!a.relation().equals(b.relation())) return null;
-
-        // Handles pairs of MapShapes and pairs of ListShapes.
-        if (a.equals(b)) return a;
-
-        // A is a PairShape
-        if (a instanceof Shape.PairShape pa) {
-            if (b instanceof Shape.PairShape pb) {
-                // B is compatible PairShape
-                return pa.arity() == pb.arity() ? pa : null;
-            } else {
-                return null;
-            }
-        }
-
-        return null;
     }
 
     //-------------------------------------------------------------------------

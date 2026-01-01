@@ -56,7 +56,7 @@ public class SchemaTest extends Ted {
     @Test public void testCheck_head_mismatch() {
         test("testCheck_head_mismatch");
 
-        var shape = new Shape.PairShape("Person", List.of("id", "name"));
+        var shape = new Shape("Person", List.of("id", "name"));
         var head = new OrderedAtom("Person", List.of(new Constant("abc")));
         schema.add(shape);
         check(schema.check(head)).eq(false);
@@ -76,9 +76,9 @@ public class SchemaTest extends Ted {
         schema = Schema.inferSchema(facts);
 
         check(schema.getRelations()).eq(Set.of("Person", "Place", "Thing"));
-        check(schema.get("Person")).eq(new Shape.PairShape("Person", List.of("x", "y")));
-        check(schema.get("Place")).eq(new Shape.PairShape("Place", List.of("x")));
-        check(schema.get("Thing")).eq(new Shape.PairShape("Thing", List.of("x", "y", "z")));
+        check(schema.get("Person")).eq(new Shape("Person", List.of("x", "y")));
+        check(schema.get("Place")).eq(new Shape("Place", List.of("x")));
+        check(schema.get("Thing")).eq(new Shape("Thing", List.of("x", "y", "z")));
     }
 
     //-------------------------------------------------------------------------
@@ -86,9 +86,9 @@ public class SchemaTest extends Ted {
 
     @Test
     public void testMerge_good() {
-        var pairX2a = new Shape.PairShape("X", List.of("a", "b"));
-        var pairX2b = new Shape.PairShape("X", List.of("c", "d"));
-        var mapZ = new Shape.MapShape("Z");
+        var pairX2a = new Shape("X", List.of("a", "b"));
+        var pairX2b = new Shape("X", List.of("a", "b"));
+        var mapZ = new Shape("Z");
 
         var s1 = new Schema();
         s1.checkAndAdd(pairX2a);
@@ -97,16 +97,15 @@ public class SchemaTest extends Ted {
         s2.checkAndAdd(pairX2b);
         s2.checkAndAdd(mapZ);
 
-        // NOTE: This test presumes that promote() is working properly.
         s1.merge(s2);
-        check(s1.get("X")).eq(pairX2a); // promoted
+        check(s1.get("X")).eq(pairX2a);
         check(s1.get("Z")).eq(mapZ);  // Retained from s2.
     }
 
     @Test
     public void testMerge_bad() {
-        var pairX = new Shape.PairShape("X", List.of("a"));
-        var mapX = new Shape.MapShape("X");
+        var pairX = new Shape("X", List.of("a"));
+        var mapX = new Shape("X");
 
         var s1 = new Schema();
         s1.checkAndAdd(pairX);

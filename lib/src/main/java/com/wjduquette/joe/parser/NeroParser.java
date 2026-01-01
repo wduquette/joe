@@ -187,7 +187,7 @@ class NeroParser extends EmbeddedParser {
         Shape shape;
 
         if (scanner.match(DOT_DOT_DOT)) {
-            shape = new Shape.MapShape(relation.name());
+            shape = new Shape(relation.name());
         } else if (scanner.check(IDENTIFIER)) {
             var names = new ArrayList<String>();
             do {
@@ -199,7 +199,7 @@ class NeroParser extends EmbeddedParser {
                 names.add(name);
             } while (scanner.match(COMMA));
 
-            shape = new Shape.PairShape(relation.name(), names);
+            shape = new Shape(relation.name(), names);
         } else {
             scanner.advance();
             throw errorSync(scanner.previous(),

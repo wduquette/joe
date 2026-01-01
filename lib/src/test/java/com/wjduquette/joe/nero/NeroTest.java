@@ -81,7 +81,7 @@ public class NeroTest extends Ted {
     // Verify that we can supply a schema.
     @Test public void testCompile_withSchema_good() {
         test("testCompile_withSchema_good");
-        var shape = new Shape.PairShape("A", List.of("a"));
+        var shape = new Shape("A", List.of("a"));
         var schema = new Schema();
         schema.checkAndAdd(shape);
 
@@ -95,7 +95,7 @@ public class NeroTest extends Ted {
     // Verify we detect mismatches with the predefined schema.
     @Test public void testCompile_withSchema_mismatch() {
         test("testCompile_withSchema_mismatch");
-        var shape = new Shape.PairShape("A", List.of("a"));
+        var shape = new Shape("A", List.of("a"));
         var schema = new Schema();
         schema.checkAndAdd(shape);
 
@@ -106,7 +106,7 @@ public class NeroTest extends Ted {
     // Verify that equivalent `defines` are OK.
     @Test public void testCompile_withSchema_duplicate() {
         test("testCompile_withSchema_duplicate");
-        var shape = new Shape.PairShape("A", List.of("a"));
+        var shape = new Shape("A", List.of("a"));
         var schema = new Schema();
         schema.checkAndAdd(shape);
 

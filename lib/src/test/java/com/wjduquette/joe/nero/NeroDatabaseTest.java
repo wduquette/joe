@@ -42,7 +42,7 @@ public class NeroDatabaseTest extends Ted {
             A(1);
             A(2);
             """);
-        check(db.schema().get("A")).eq(new Shape.PairShape("A", List.of("x")));
+        check(db.schema().get("A")).eq(new Shape("A", List.of("x")));
         check(db.schema()).eq(Schema.inferSchema(db.all()));
 
         var content = """
@@ -70,8 +70,8 @@ public class NeroDatabaseTest extends Ted {
             A(3);
             B(1);
             """);
-        check(db.schema().get("A")).eq(new Shape.PairShape("A", List.of("x")));
-        check(db.schema().get("B")).eq(new Shape.PairShape("B", List.of("x")));
+        check(db.schema().get("A")).eq(new Shape("A", List.of("x")));
+        check(db.schema().get("B")).eq(new Shape("B", List.of("x")));
         check(db.schema()).eq(Schema.inferSchema(db.all()));
 
         check(db.toNeroScript()).eq("""
@@ -255,7 +255,7 @@ public class NeroDatabaseTest extends Ted {
             define B/x;
             B(1);
             """);
-        check(db.schema().get("B")).eq(new Shape.PairShape("B", List.of("x")));
+        check(db.schema().get("B")).eq(new Shape("B", List.of("x")));
     }
 
     // Verify that we check the schema while adding an arbitrary collection of
@@ -313,7 +313,7 @@ public class NeroDatabaseTest extends Ted {
             define B/x;
             B(1);
             """);
-        check(db.schema().get("B")).eq(new Shape.PairShape("B", List.of("x")));
+        check(db.schema().get("B")).eq(new Shape("B", List.of("x")));
     }
 
     // Verify that we check the schema while adding the contents of another
@@ -357,11 +357,11 @@ public class NeroDatabaseTest extends Ted {
             A(1); B(2);
             """);
 
-        check(db.schema().get("A")).eq(new Shape.PairShape("A", List.of("x")));
-        check(db.schema().get("B")).eq(new Shape.PairShape("B", List.of("x")));
+        check(db.schema().get("A")).eq(new Shape("A", List.of("x")));
+        check(db.schema().get("B")).eq(new Shape("B", List.of("x")));
 
         db.drop("B");
-        check(db.schema().get("A")).eq(new Shape.PairShape("A", List.of("x")));
+        check(db.schema().get("A")).eq(new Shape("A", List.of("x")));
         check(db.schema().get("B")).eq(null);
         check(db.toNeroScript()).eq("""
             define A/x;
