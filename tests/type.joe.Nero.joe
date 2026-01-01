@@ -118,8 +118,8 @@ function testWith_noFields() {
 // fields, including the Fact type itself.
 function testWith_proxiedValue_ordered() {
     var inputs = [
-        Fact("Parent", #anne, #bert),
-        Fact("Parent", #bert, #clark)
+        Fact.ofPairs("Parent", ["p", #anne, "c", #bert]),
+        Fact.ofPairs("Parent", ["p", #bert, "c", #clark])
     ];
 
     var rules = ruleset {
@@ -142,14 +142,14 @@ function testWith_proxiedValue_ordered() {
 // fields, including the Fact type itself, using named atoms
 function testWith_proxiedValue_named() {
     var inputs = [
-        Fact("Parent", #anne, #bert),
-        Fact("Parent", #bert, #clark)
+        Fact.ofPairs("Parent", ["p", #anne, "c", #bert]),
+        Fact.ofPairs("Parent", ["p", #bert, "c", #clark])
     ];
 
     var rules = ruleset {
         define Ancestor/a,d;
-        Ancestor(x, y) :- Parent(f0:x, f1:y);
-        Ancestor(x, y) :- Parent(f0:x, f1:z), Ancestor(z, y);
+        Ancestor(x, y) :- Parent(p:x, c:y);
+        Ancestor(x, y) :- Parent(p:x, c:z), Ancestor(z, y);
     };
 
     var nero = Nero();
@@ -287,8 +287,8 @@ function testWith_namedPattern() {
     }
 
     var inputs = [
-        Fact("A", #a, Thing(#hat, #black)),
-        Fact("A", #b, Thing(#wagon, #red))
+        Fact.ofPairs("A", ["id", #a, "color", Thing(#hat, #black)]),
+        Fact.ofPairs("A", ["id", #b, "color", Thing(#wagon, #red)])
     ];
 
     var rules = ruleset {
@@ -311,8 +311,8 @@ function testPattern_ordered() {
     record Thing(id, color) {}
 
     var inputs = [
-        Fact("A", #a, Thing(#hat, #black)),
-        Fact("A", #b, Thing(#wagon, #red))
+        Fact.ofPairs("A", ["id", #a, "color", Thing(#hat, #black)]),
+        Fact.ofPairs("A", ["id", #b, "color", Thing(#wagon, #red)])
     ];
 
     var rules = ruleset {

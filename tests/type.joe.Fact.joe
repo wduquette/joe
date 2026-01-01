@@ -2,38 +2,6 @@
 //
 // Tests for the `Fact` type
 
-function testInitializer_good() {
-    var fact = Fact("Thing", #car, #red);
-    assertEQ(fact.relation(), "Thing");
-    assertT(fact.isOrdered());
-    assertEQ(fact.fields(), [#car, #red]);
-    assertEQ(fact.fieldMap(), {"f0": #car, "f1": #red});
-    assertEQ(fact.f0, #car);
-    assertEQ(fact.f1, #red);
-    assertEQ(fact.toString(), "Fact(Thing, #car, #red)");
-}
-
-function testInitializer_badRelation() {
-    assertError(\-> Fact("@Thing", #car, #red),
-        "Expected identifier, got: String '@Thing'.");
-}
-
-function testOf() {
-    var fact = Fact.of("Thing", [#car, #red]);
-    assertEQ(fact.relation(), "Thing");
-    assertT(fact.isOrdered());
-    assertEQ(fact.fields(), [#car, #red]);
-    assertEQ(fact.fieldMap(), {"f0": #car, "f1": #red});
-    assertEQ(fact.f0, #car);
-    assertEQ(fact.f1, #red);
-    assertEQ(fact.toString(), "Fact(Thing, #car, #red)");
-}
-
-function testOf_badRelation() {
-    assertError(\-> Fact.of("@Thing", [#car, #red]),
-        "Expected identifier, got: String '@Thing'.");
-}
-
 function testOfMap() {
     var fact = Fact.ofMap("Thing", {"id": #car, "color": #red});
     assertEQ(fact.relation(), "Thing");
@@ -75,15 +43,9 @@ function testOfPairs_badFieldName() {
 }
 
 function testBadField() {
-    var fact = Fact("Thing", [#car, #red]);
-    assertError(\-> fact.f2,
-        "Undefined property 'f2'.");
-}
-
-function testMatch_listFact() {
-    var fact = Fact("Thing", #car, #red);
-    assertT(fact ~ Thing(#car, _));
-    assertF(fact ~ Thing(#bus, _));
+    var fact = Fact.ofPairs("Thing", ["id", #car, "color", #red]);
+    assertError(\-> fact.size,
+        "Undefined property 'size'.");
 }
 
 function testMatch_mapFact() {
