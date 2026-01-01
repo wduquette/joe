@@ -77,20 +77,6 @@ public sealed interface Shape permits
     }
 
     /**
-     * Infer the default shape of a fact from a rule or axiom head atom.  Infers the
-     * list shape for ordered atoms and the map shape for named atoms.
-     * @param head The head atom
-     * @return The inferred shape
-     */
-    static Shape inferDefaultShape(Atom head) {
-        // TODO: Remove
-        return switch (head) {
-            case OrderedAtom a -> null;
-            case NamedAtom a -> new MapShape(a.relation());
-        };
-    }
-
-    /**
      * Returns true if the atom conforms to the given Shape, and false
      * otherwise.
      * @param atom The atom

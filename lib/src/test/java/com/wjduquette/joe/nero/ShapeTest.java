@@ -1,10 +1,8 @@
 package com.wjduquette.joe.nero;
 
-import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.Ted;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,25 +32,5 @@ public class ShapeTest extends Ted {
         check(shape.arity()).eq(2);
         check(shape.toString()).eq("PairShape[relation=Pair, fieldNames=[a, b]]");
         check(shape.toSpec()).eq("Pair/a,b");
-    }
-
-    @Test
-    public void testInfer_head_map() {
-        test("testInfer_head_map");
-
-        var ast = parse("""
-            define Map/...;
-            Map(x: #a, y: #b);
-            """);
-        var axioms = new ArrayList<>(ast.axioms());
-        var shape = (Shape.MapShape)Shape.inferDefaultShape(axioms.getFirst());
-
-        check(shape.relation()).eq("Map");
-        check(shape.toString()).eq("MapShape[relation=Map]");
-    }
-
-    private NeroRuleSet parse(String text) {
-        var source = new SourceBuffer("*test*", text);
-        return Nero.parse(source);
     }
 }
