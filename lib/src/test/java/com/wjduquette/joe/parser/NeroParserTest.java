@@ -164,26 +164,6 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at ':', expected '/' after relation.");
     }
 
-    @Test public void testDefineDeclaration_expectedIntegerArity() {
-        test("testDefineDeclaration_expectedIntegerArity");
-
-        var source = """
-            define Person/2.5;
-            """;
-        check(parseNero(source))
-            .eq("[line 1] error at '2.5', expected integer arity.");
-    }
-
-    @Test public void testDefineDeclaration_expectedPositiveArity() {
-        test("testDefineDeclaration_expectedPositiveArity");
-
-        var source = """
-            define Person/0;
-            """;
-        check(parseNero(source))
-            .eq("[line 1] error at '0', expected positive arity.");
-    }
-
     @Test public void testDefineDeclaration_expectedFieldName() {
         test("testDefineDeclaration_expectedFieldName");
 
@@ -218,8 +198,8 @@ public class NeroParserTest extends Ted {
         test("testDefineDeclaration_expectedSemicolon");
 
         var source = """
-            define Thing/2
-            define Place/2;
+            define Thing/x
+            define Place/x;
             """;
         check(parseNero(source))
             .eq("[line 2] error at 'define', expected ';' after definition.");

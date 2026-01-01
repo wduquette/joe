@@ -190,16 +190,7 @@ class NeroParser extends EmbeddedParser {
 
         Shape shape;
 
-        if (scanner.match(NUMBER)) {
-            var arity = (Double)scanner.previous().literal();
-            if (arity - arity.intValue() != 0.0) {
-                error(scanner.previous(), "expected integer arity.");
-            }
-            if (arity <= 0) {
-                error(scanner.previous(), "expected positive arity.");
-            }
-            shape = new Shape.ListShape(relation.name(), arity.intValue());
-        } else if (scanner.match(DOT_DOT_DOT)) {
+        if (scanner.match(DOT_DOT_DOT)) {
             shape = new Shape.MapShape(relation.name());
         } else if (scanner.check(IDENTIFIER)) {
             var names = new ArrayList<String>();
