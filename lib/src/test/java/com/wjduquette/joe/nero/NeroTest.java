@@ -28,7 +28,10 @@ public class NeroTest extends Ted {
     // Verify that we get a rule set.
     @Test public void testParse_good() {
         test("testParse_good");
-        var ruleset = Nero.parse(buffer("A(1);"));
+        var ruleset = Nero.parse(buffer("""
+            define A/x;
+            A(1);
+            """));
 
         check(ruleset.rules().isEmpty()).eq(true);
         check(ruleset.axioms().size()).eq(1);
@@ -47,7 +50,10 @@ public class NeroTest extends Ted {
     // Verify that we get a rule set.
     @Test public void testCompile_good() {
         test("testCompile_good");
-        var ruleset = Nero.compile(buffer("A(1);"));
+        var ruleset = Nero.parse(buffer("""
+            define A/x;
+            A(1);
+            """));
 
         check(ruleset.rules().isEmpty()).eq(true);
         check(ruleset.axioms().size()).eq(1);
@@ -56,14 +62,16 @@ public class NeroTest extends Ted {
     // Verify that we get errors.
     @Test public void testCompile_syntax() {
         test("testCompile_syntax");
-        checkThrow(() -> Nero.compile(buffer("A(1;")))
+        checkThrow(() -> Nero.compile(buffer("A(1);")))
             .containsString("Error in Nero input");
     }
 
-    // Verify that we get compilation errors.
+    // Verify that we get stratification errors.
     @Test public void testCompile_unstratifiable() {
         test("testCompile_unstratifiable");
         checkThrow(() -> Nero.compile(buffer("""
+            define A/x;
+            define C/x;
             A(x) :- B(x), not C(x);
             C(x) :- A(x);
             """)))
@@ -78,6 +86,7 @@ public class NeroTest extends Ted {
         schema.checkAndAdd(shape);
 
         var ruleset = Nero.compile(schema, buffer("""
+            define A/a;
             A(1);
         """));
         check(ruleset.schema()).eq(schema);
@@ -90,8 +99,8 @@ public class NeroTest extends Ted {
         var schema = new Schema();
         schema.checkAndAdd(shape);
 
-        check(compileError(schema, "A(1, 2);"))
-            .eq("error at 'A', schema mismatch, expected shape compatible with 'A/a', got: 'A/2'.");
+        check(compileError(schema, "define A/x,y; A(1, 2);"))
+            .eq("error at 'A', definition clashes with earlier entry.");
     }
 
     // Verify that equivalent `defines` are OK.
@@ -118,10 +127,11 @@ public class NeroTest extends Ted {
     @Test public void testWith_noInputs() {
         test("testWith_noInputs");
         var script = """
+            define A/x;
             A(1);
             """;
         check(nero.toNeroScript(nero.with(script).debug().infer())).eq("""
-            define A/1;
+            define A/x;
             A(1);
             """);
     }
@@ -129,19 +139,20 @@ public class NeroTest extends Ted {
     @Test public void testWith_update() {
         test("testWith_update");
         var db = new FactSet();
-        db.add(new ListFact("A", List.of(1.0)));
+        db.add(new PairFact("A", List.of("x"), List.of(1.0)));
         var script = """
+            define B/x;
             B(2);
             """;
         check(nero.toNeroScript(nero.with(script).debug().update(db))).eq("""
-            define B/1;
+            define B/x;
             B(2);
             """);
         check(nero.toNeroScript(db)).eq("""
-            define A/1;
+            define A/x;
             A(1);
             
-            define B/1;
+            define B/x;
             B(2);
             """);
     }
@@ -149,16 +160,17 @@ public class NeroTest extends Ted {
     @Test public void testWith_query_factset() {
         test("testWith_query_factset");
         var db = new FactSet();
-        db.add(new ListFact("A", List.of(1.0)));
+        db.add(new PairFact("A", List.of("x"), List.of(1.0)));
         var script = """
+            define B/x;
             B(2);
             """;
         check(nero.toNeroScript(nero.with(script).debug().query(db))).eq("""
-            define B/1;
+            define B/x;
             B(2);
             """);
         check(nero.toNeroScript(db)).eq("""
-            define A/1;
+            define A/x;
             A(1);
             """);
     }
@@ -166,12 +178,13 @@ public class NeroTest extends Ted {
     @Test public void testWith_query_collections() {
         test("testWith_query_collections");
         var list = new ArrayList<Fact>();
-        list.add(new ListFact("A", List.of(1.0)));
+        list.add(new PairFact("A", List.of("a"), List.of(1.0)));
         var script = """
+            define B/x;
             B(2);
             """;
         check(nero.toNeroScript(nero.with(script).debug().query(list))).eq("""
-            define B/1;
+            define B/x;
             B(2);
             """);
     }
@@ -189,7 +202,7 @@ public class NeroTest extends Ted {
             define Place/...;
             Place(attire: "Stetson", name: "Texas");
             
-            define Thing/2;
+            define Thing/thing,color;
             Thing("hat", "black");
             """;
         var facts = nero.with(script).infer();
@@ -200,7 +213,7 @@ public class NeroTest extends Ted {
             define Place/...;
             Place(attire: "Stetson", name: "Texas");
             
-            define Thing/2;
+            define Thing/thing,color;
             Thing("hat", "black");
             """);
     }

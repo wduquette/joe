@@ -119,7 +119,11 @@ class NeroParser extends EmbeddedParser {
                         throw errorSync(headToken,
                             "found built-in predicate in axiom.");
                     }
-                    if (!schema.checkAndAdd(head)) {
+                    if (!schema.hasRelation(head.relation())) {
+                        throw errorSync(headToken, "undefined relation in axiom.");
+                    }
+                    if (!schema.check(head)) {
+                        // TODO: just display the head, not its inferred shape?
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                             schema.get(head.relation()).toSpec() +
@@ -133,7 +137,12 @@ class NeroParser extends EmbeddedParser {
                         throw errorSync(headToken,
                             "found built-in predicate in rule head.");
                     }
-                    if (!schema.checkAndAdd(head)) {
+                    if (!schema.hasRelation(head.relation())) {
+                        throw errorSync(headToken,
+                            "undefined relation in rule head.");
+                    }
+                    if (!schema.check(head)) {
+                        // TODO: just display the head, not its inferred shape?
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                                 schema.get(head.relation()).toSpec() +
@@ -211,11 +220,15 @@ class NeroParser extends EmbeddedParser {
         }
         scanner.consume(SEMICOLON, "expected ';' after definition.");
 
-        if (schema.checkAndAdd(shape)) {
-            if (transience) schema.setTransient(relation.name(), true);
+        if (schema.hasRelation(shape.relation())) {
+            if (!schema.check(shape)) {
+                error(relation.token(), "definition clashes with earlier entry.");
+            }
         } else {
-            error(relation.token(), "definition clashes with earlier entry.");
+            schema.add(shape);
         }
+
+        if (transience) schema.setTransient(relation.name(), true);
     }
 
     private void transientDeclaration(Schema schema) {
@@ -259,10 +272,6 @@ class NeroParser extends EmbeddedParser {
             }
 
             if (negated) {
-//                if (RuleEngine.isBuiltIn(atom.relation())) {
-//                    throw errorSync(token,
-//                        "found built-in predicate in negated body atom.");
-//                }
                 for (var name : atom.getVariableNames()) {
                     if (!bodyVars.contains(name)) {
                         error(token,

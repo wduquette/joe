@@ -110,6 +110,53 @@ public class Schema {
     }
 
     /**
+     * Verifies whether the shape is consistent with a shape of the same
+     * name in the schema.  Returns false if there is a mismatch or if
+     * there is no shape with the same relation name.
+     * @param shape The shape to add
+     * @return true or false
+     */
+    public boolean check(Shape shape) {
+        return Objects.equals(shape, get(shape.relation()));
+    }
+
+    /**
+     * Verifies that the head atom's shape matches the relation's shape
+     * in the schema.
+     * @param head The atom
+     * @return true or false
+     */
+    public boolean check(Atom head) {
+        var relation = head.relation();
+        var defined = get(relation);
+        return defined != null && Shape.conformsTo(head, defined);
+    }
+
+    /**
+     * Verifies that the fact's shape is consistent with the schema.
+     * Returns true if the relation is known and has the same shape, and
+     * false otherwise.
+     * @param fact The fact
+     * @return true or false
+     */
+    public boolean check(Fact fact) {
+        return check(Shape.inferShape(fact));
+    }
+
+    /**
+     * Adds the shape to the schema.
+     * @param shape The shape
+     * @throws IllegalArgumentException if the shape is already defined.
+     */
+    public void add(Shape shape) {
+        if (get(shape.relation()) != null) {
+            throw new IllegalArgumentException(
+                "adding shape for existing relation.");
+        }
+        shapeMap.put(shape.relation(), shape);
+    }
+
+    /**
      * Adds the shape to the schema if no shape is defined for the
      * shape's relation.  Otherwise, verifies that the given shape is
      * identical to the defined shape.  Returns false if there is a mismatch
@@ -137,37 +184,6 @@ public class Schema {
     public boolean checkAndAdd(Fact fact) {
         var shape = Shape.inferShape(fact);
         return checkAndAdd(shape);
-    }
-
-    /**
-     * Adds the shape inferred from the head atom to the schema if no shape is
-     * defined for the atom's relation.  Otherwise, verifies that the defined
-     * shape is compatible with the atom. Returns false if there is a mismatch
-     * and true otherwise.
-     *
-     * <p>If a shape is defined, compatibility is determined as follows:</p>
-     * <ul>
-     * <li>For a ListShape, the atom must be an ordered atom of the correct
-     *     arity.</li>
-     * <li>For a MapShape, the atom must be a named atom.</li>
-     * <li>For a PairShape, the atom must be an ordered atom of the correct
-     *     arity.</li>
-     * </ul>
-     * @param head The head atom whose shape is to be added.
-     * @return true or false
-     */
-    public boolean checkAndAdd(Atom head) {
-        var relation = head.relation();
-        var defined = get(relation);
-
-        // FIRST, save the inferred shape if there's no shape already defined.
-        if (defined == null) {
-            shapeMap.put(relation, Shape.inferDefaultShape(head));
-            return true;
-        }
-
-        // NEXT, make sure the atom is compatible with the defined shape.
-        return Shape.conformsTo(head, defined);
     }
 
     /**

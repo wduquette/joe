@@ -36,8 +36,29 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at 'member', found built-in predicate in axiom.");
     }
 
-    @Test public void testParse_ruleHeadBuiltIn() {
-        test("testParse_axiomBuiltIn");
+    @Test public void testParse_axiomUndefined() {
+        test("testParse_axiomUndefined");
+
+        var source = """
+            Person(#joe);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at 'Person', undefined relation in axiom.");
+    }
+
+    @Test public void testParse_axiomMismatch() {
+        test("testParse_axiomMismatch");
+
+        var source = """
+            define Person/id;
+            Person(#joe, 90);
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at 'Person', schema mismatch, expected shape compatible with 'Person/id', got: 'Person/2'.");
+    }
+
+    @Test public void testParse_headBuiltIn() {
+        test("testParse_headBuiltIn");
 
         var source = """
             member(x, y) :- Foo(x, y);
@@ -46,26 +67,25 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at 'member', found built-in predicate in rule head.");
     }
 
-    @Test public void testParse_axiomMismatch() {
-        test("testParse_axiomMismatch");
+    @Test public void testParse_headUndefined() {
+        test("testParse_headUndefined");
 
         var source = """
-            Person(#joe);
-            Person(#joe, 90);
+            Person(x) :- Someone(x);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'Person', schema mismatch, expected shape compatible with 'Person/1', got: 'Person/2'.");
+            .eq("[line 1] error at 'Person', undefined relation in rule head.");
     }
 
     @Test public void testParse_headMismatch() {
         test("testParse_headMismatch");
 
         var source = """
-            Result(x) :- Person(x, _);
+            define Result/value;
             Result(x, y) :- Person(x, y);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'Result', schema mismatch, expected shape compatible with 'Result/1', got: 'Result/2'.");
+            .eq("[line 2] error at 'Result', schema mismatch, expected shape compatible with 'Result/value', got: 'Result/2'.");
     }
 
     @Test public void testParse_expectedAxiomOrRule() {
@@ -209,11 +229,12 @@ public class NeroParserTest extends Ted {
         test("testDefineDeclaration_definitionClashes");
 
         var source = """
+            define Thing/a,b;
             Thing(#a, #b);
-            define Thing/1;
+            define Thing/a;
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'Thing', definition clashes with earlier entry.");
+            .eq("[line 3] error at 'Thing', definition clashes with earlier entry.");
     }
 
     //-------------------------------------------------------------------------
@@ -246,20 +267,22 @@ public class NeroParserTest extends Ted {
         test("testAxiom_aggregate");
 
         var source = """
+            define Thing/a;
             Thing(sum(x));
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Thing', found aggregation function in axiom.");
+            .eq("[line 2] error at 'Thing', found aggregation function in axiom.");
     }
 
     @Test public void testAxiom_variable() {
         test("testAxiom_variable");
 
         var source = """
+            define Thing/a;
             Thing(x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Thing', found variable in axiom.");
+            .eq("[line 2] error at 'Thing', found variable in axiom.");
     }
 
     //-------------------------------------------------------------------------
@@ -269,51 +292,57 @@ public class NeroParserTest extends Ted {
         test("testRule_foundUpdateMarker");
 
         var source = """
+            define Thing/a;
             Thing(x) :- Bar!(x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Bar', found update marker '!' in body atom of non-updating rule.");
+            .eq("[line 2] error at 'Bar', found update marker '!' in body atom of non-updating rule.");
     }
 
     @Test public void testRule_negatedUnbound() {
         test("testRule_negatedUnbound");
 
         var source = """
+            define Thing/a;
             Thing(x) :- not Attribute(y);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Attribute', negated body atom contains unbound variable: 'y'.");
+            .eq("[line 2] error at 'Attribute', negated body atom contains unbound variable: 'y'.");
     }
 
     @Test public void testRule_expectedSemicolon() {
         test("testRule_expectedSemicolon");
 
         var source = """
+            define A/x;
+            define C/x;
             A(x) :- B(x)
             C(#x);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'C', expected ';' after rule body.");
+            .eq("[line 4] error at 'C', expected ';' after rule body.");
     }
 
     @Test public void testRule_headUnbound() {
         test("testRule_headUnbound");
 
         var source = """
+            define Thing/a;
             Thing(x) :- Attribute(y);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Thing', found unbound variable(s) in rule head.");
+            .eq("[line 2] error at 'Thing', found unbound variable(s) in rule head.");
     }
 
     @Test public void testRule_headWildcard() {
         test("testRule_headWildcard");
 
         var source = """
+            define Thing/a;
             Thing(_) :- Attribute(y);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '_', found wildcard in axiom or head atom.");
+            .eq("[line 2] error at '_', found wildcard in axiom or head atom.");
     }
 
     //-------------------------------------------------------------------------
@@ -322,19 +351,21 @@ public class NeroParserTest extends Ted {
     @Test public void testCheckAggregates_count() {
         test("testCheckAggregates_count");
         var source = """
+            define A/x,y;
             A(sum(x), sum(y)) :- B(x, y);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'A', rule head contains more than one aggregation function.");
+            .eq("[line 2] error at 'A', rule head contains more than one aggregation function.");
     }
 
     @Test public void testCheckAggregates_duplicates() {
         test("testCheckAggregates_duplicates");
         var source = """
+            define A/x,y;
             A(x, sum(x)) :- B(x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'A', aggregated variable(s) found elsewhere in rule head.");
+            .eq("[line 2] error at 'A', aggregated variable(s) found elsewhere in rule head.");
     }
 
     //-------------------------------------------------------------------------
@@ -343,64 +374,71 @@ public class NeroParserTest extends Ted {
     @Test public void testCheckBuiltIn_shape() {
         test("testCheckBuiltIn_shape");
         var source = """
+            define Thing/x;
             Thing(x) :- Foo(list), member(x, list, y);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'member', expected member/item,collection, got: member/3.");
+            .eq("[line 2] error at 'member', expected member/item,collection, got: member/3.");
     }
 
     @Test public void testCheckBuiltIn_memberUnbound() {
         test("testCheckBuiltIn_memberUnbound");
         var source = """
+            define Thing/x;
             Thing(x) :- Foo(list), member(x, items);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'member', expected bound variable as term 1, got: 'items'.");
+            .eq("[line 2] error at 'member', expected bound variable as term 1, got: 'items'.");
     }
 
     @Test public void testCheckBuiltIn_indexedMemberUnbound() {
         test("testCheckBuiltIn_indexedMemberUnbound");
         var source = """
+            define Thing/x;
             Thing(x) :- Foo(list), indexedMember(i, x, items);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'indexedMember', expected bound variable as term 2, got: 'items'.");
+            .eq("[line 2] error at 'indexedMember', expected bound variable as term 2, got: 'items'.");
     }
 
     @Test public void testCheckBuiltIn_keyedMemberUnbound() {
         test("testCheckBuiltIn_keyedMemberUnbound");
         var source = """
+            define Thing/x;
             Thing(x) :- Foo(map), keyedMember(k, v, items);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'keyedMember', expected bound variable as term 2, got: 'items'.");
+            .eq("[line 2] error at 'keyedMember', expected bound variable as term 2, got: 'items'.");
     }
 
     @Test public void testCheckBuiltIn_equivalentUnknownEquivalence() {
         test("testCheckBuiltIn_equivalentUnknownEquivalence");
         var source = """
+            define Thing/x;
             Thing(n) :- Foo(s), equivalent(y, s, n);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'equivalent', expected bound variable or constant as term 0, got: 'y'.");
+            .eq("[line 2] error at 'equivalent', expected bound variable or constant as term 0, got: 'y'.");
     }
 
     @Test public void testCheckBuiltIn_equivalentConstOrVarA() {
         test("testCheckBuiltIn_equivalentConstOrVarA");
         var source = """
+            define Thing/x;
             Thing(n) :- Foo(s), equivalent(#equiv, _, n);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'equivalent', expected variable or constant as term 1, got: '_'.");
+            .eq("[line 2] error at 'equivalent', expected variable or constant as term 1, got: '_'.");
     }
 
     @Test public void testCheckBuiltIn_equivalentConstOrVarB() {
         test("testCheckBuiltIn_equivalentConstOrVarB");
         var source = """
+            define Thing/x;
             Thing(n) :- Foo(s), equivalent(#equiv, s, _);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'equivalent', expected variable or constant as term 2, got: '_'.");
+            .eq("[line 2] error at 'equivalent', expected variable or constant as term 2, got: '_'.");
     }
 
     //-------------------------------------------------------------------------
@@ -410,60 +448,66 @@ public class NeroParserTest extends Ted {
         test("testConstraint_expectedBound1");
 
         var source = """
+            define Thing/x;
             Thing(x) :- Attribute(x) where 1 == x;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '1', expected bound variable.");
+            .eq("[line 2] error at '1', expected bound variable.");
     }
 
     @Test public void testConstraint_expectedBound2() {
         test("testConstraint_expectedBound2");
 
         var source = """
+            define Thing/x;
             Thing(x) :- Attribute(x) where y == x;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'y', expected bound variable.");
+            .eq("[line 2] error at 'y', expected bound variable.");
     }
 
     @Test public void testConstraint_wildcard_a() {
         test("testConstraint_wildcard_a");
 
         var source = """
+            define Thing/x;
             Thing(x) :- Attribute(x) where _ == x;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '_', found wildcard in constraint.");
+            .eq("[line 2] error at '_', found wildcard in constraint.");
     }
 
     @Test public void testConstraint_expectedComparison() {
         test("testConstraint_expectedComparison");
 
         var source = """
+            define Thing/x;
             Thing(x) :- Attribute(x) where x = 1;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '=', expected comparison operator.");
+            .eq("[line 2] error at '=', expected comparison operator.");
     }
 
     @Test public void testConstraint_expectedBoundOrConstant1() {
         test("testConstraint_expectedBoundOrConstant1");
 
         var source = """
+            define Thing/x;
             Thing(x) :- Attribute(x) where x == y;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'y', expected bound variable or constant.");
+            .eq("[line 2] error at 'y', expected bound variable or constant.");
     }
 
     @Test public void testConstraint_expectedBoundOrConstant2() {
         test("testConstraint_expectedBoundOrConstant2");
 
         var source = """
+            define Thing/x;
             Thing(x) :- Attribute(x) where x == _;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '_', found wildcard in constraint.");
+            .eq("[line 2] error at '_', found wildcard in constraint.");
     }
 
     //-------------------------------------------------------------------------
@@ -473,20 +517,22 @@ public class NeroParserTest extends Ted {
         test("testAtom_expectedRelation");
 
         var source = """
+            define A/x;
             A(x) :- ;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at ';', expected relation.");
+            .eq("[line 2] error at ';', expected relation.");
     }
 
     @Test public void testAtom_expectedLeftParen() {
         test("testBodyAtom_expectedLeftParen");
 
         var source = """
+            define A/x;
             A(X) :- B x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'x', expected '(' after relation.");
+            .eq("[line 2] error at 'x', expected '(' after relation.");
     }
 
     //-------------------------------------------------------------------------
@@ -496,10 +542,11 @@ public class NeroParserTest extends Ted {
         test("testOrderedAtom_expectedRightParen");
 
         var source = """
+            define A/x;
             A(x) :- B(x;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at ';', expected ')' after terms.");
+            .eq("[line 2] error at ';', expected ')' after terms.");
     }
 
     //-------------------------------------------------------------------------
@@ -509,20 +556,22 @@ public class NeroParserTest extends Ted {
         test("testNamedAtom_expectedFieldName");
 
         var source = """
+            define A/x,y;
             A(x, y) :- B(f0: x, #a);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '#a', expected field name.");
+            .eq("[line 2] error at '#a', expected field name.");
     }
 
     @Test public void testNamedAtom_expectedColon() {
         test("testNamedAtom_expectedColon");
 
         var source = """
+            define A/x,y;
             A(x, y) :- B(f0: x, f1 #a);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '#a', expected ':' after field name.");
+            .eq("[line 2] error at '#a', expected ':' after field name.");
     }
 
 
@@ -530,10 +579,11 @@ public class NeroParserTest extends Ted {
         test("testNamedAtom_expectedRightParen");
 
         var source = """
+            define A/x;
             A(x) :- B(f0: x;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at ';', expected ')' after terms.");
+            .eq("[line 2] error at ';', expected ')' after terms.");
     }
 
     //-------------------------------------------------------------------------
@@ -622,10 +672,11 @@ public class NeroParserTest extends Ted {
         test("testPatternTerm_foundExpression");
 
         var source = """
+            define A/x;
             A(x) :- B([x,$(y)]);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '$', found interpolated expression in Nero pattern term.");
+            .eq("[line 2] error at '$', found interpolated expression in Nero pattern term.");
     }
 
     //-------------------------------------------------------------------------

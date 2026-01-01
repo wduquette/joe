@@ -52,7 +52,10 @@ public class ShapeTest extends Ted {
     public void testInfer_head_list() {
         test("testInfer_head_list");
 
-        var ast = parse("List(#a, #b);");
+        var ast = parse("""
+            define List/a,b;
+            List(#a, #b);
+            """);
         var axioms = new ArrayList<>(ast.axioms());
         var shape = (Shape.ListShape)Shape.inferDefaultShape(axioms.getFirst());
 
@@ -65,7 +68,10 @@ public class ShapeTest extends Ted {
     public void testInfer_head_map() {
         test("testInfer_head_map");
 
-        var ast = parse("Map(x: #a, y: #b);");
+        var ast = parse("""
+            define Map/...;
+            Map(x: #a, y: #b);
+            """);
         var axioms = new ArrayList<>(ast.axioms());
         var shape = (Shape.MapShape)Shape.inferDefaultShape(axioms.getFirst());
 

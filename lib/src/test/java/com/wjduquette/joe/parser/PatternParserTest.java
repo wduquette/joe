@@ -56,11 +56,12 @@ public class PatternParserTest extends Ted {
 
         var source = """
             var rules = ruleset {
+                define A/x;
                 A(x) :- B(x, [$y]);
             };
             """;
         check(parse(source))
-            .eq("[line 2] error at '$', found interpolated expression in Nero pattern term.");
+            .eq("[line 3] error at '$', found interpolated expression in Nero pattern term.");
     }
 
     @Test public void testConstantPattern_expectedExprAfterDollar() {

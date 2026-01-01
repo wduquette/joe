@@ -37,6 +37,8 @@ public class RuleEngineTest extends Ted {
         test("testUnstratified_negation");
 
         var source = """
+            define A/x;
+            define C/x;
             A(x) :- B(x), not C(x);
             C(x) :- A(x);
             """;
@@ -48,6 +50,8 @@ public class RuleEngineTest extends Ted {
         test("testUnstratified_list_literal");
 
         var source = """
+            define A/x;
+            define B/x;
             A([x]) :- B(x);
             B(x) :- A(x);
             """;
@@ -59,6 +63,8 @@ public class RuleEngineTest extends Ted {
         test("testUnstratified_map_literal");
 
         var source = """
+            define A/x;
+            define B/x;
             A({#id: x}) :- B(x);
             B(x) :- A(x);
             """;
@@ -70,6 +76,8 @@ public class RuleEngineTest extends Ted {
         test("testUnstratified_set_literal");
 
         var source = """
+            define A/x;
+            define B/x;
             A({x}) :- B(x);
             B(x) :- A(x);
             """;
@@ -81,6 +89,8 @@ public class RuleEngineTest extends Ted {
         test("testUnstratified_aggregator");
 
         var source = """
+            define A/x;
+            define B/x;
             A(sum(x)) :- B(x);
             B(x) :- A(x);
             """;
@@ -95,18 +105,20 @@ public class RuleEngineTest extends Ted {
     @Test public void testSimple() {
         test("testSimple_orderedAtoms");
         var source = """
+            define Parent/p,c;
+            define Ancestor/a,d;
             Parent(#walker, #bert);
             Parent(#bert, #clark);
             Ancestor(x, y) :- Parent(x, y);
             Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
             """;
         check(execute(source)).eq("""
-            define Ancestor/2;
+            define Ancestor/a,d;
             Ancestor(#bert, #clark);
             Ancestor(#walker, #bert);
             Ancestor(#walker, #clark);
             
-            define Parent/2;
+            define Parent/p,c;
             Parent(#bert, #clark);
             Parent(#walker, #bert);
             """);
@@ -117,6 +129,8 @@ public class RuleEngineTest extends Ted {
     @Test public void testSimple_namedAtoms() {
         test("testSimple_named");
         var source = """
+            define Parent/...;
+            define Ancestor/...;
             Parent(p: #walker, c: #bert);
             Parent(p: #bert, c: #clark);
             Ancestor(a: x, d: y) :- Parent(p: x, c: y);
@@ -141,19 +155,22 @@ public class RuleEngineTest extends Ted {
     @Test public void testNegation() {
         test("testNegation");
         var source = """
+            define Thing/id;
+            define Location/thing,place;
+            define Homeless/thing;
             Thing(#desk);
             Thing(#pen);
             Location(#desk, #office);
             Homeless(x) :- Thing(x), not Location(x, _);
             """;
         check(execute(source)).eq("""
-            define Homeless/1;
+            define Homeless/thing;
             Homeless(#pen);
             
-            define Location/2;
+            define Location/thing,place;
             Location(#desk, #office);
             
-            define Thing/1;
+            define Thing/id;
             Thing(#desk);
             Thing(#pen);
             """);
@@ -166,22 +183,25 @@ public class RuleEngineTest extends Ted {
     @Test public void testConstraint_single() {
         test("testConstraint_single");
         var source = """
+            define Thing/id,size;
             Thing(#pen,     1);
             Thing(#desk,    10);
             Thing(#whatsit, #unknown);
             
             // #whatsit is neither large nor small
+            define Small/id;
             Small(x) :- Thing(x, size) where size < 5;
+            define Large/id;
             Large(x) :- Thing(x, size) where size > 5;
             """;
         check(execute(source)).eq("""
-            define Large/1;
+            define Large/id;
             Large(#desk);
             
-            define Small/1;
+            define Small/id;
             Small(#pen);
             
-            define Thing/2;
+            define Thing/id,size;
             Thing(#desk, 10);
             Thing(#pen, 1);
             Thing(#whatsit, #unknown);
@@ -192,23 +212,30 @@ public class RuleEngineTest extends Ted {
     @Test public void testConstraint_double() {
         test("testConstraint_double");
         var source = """
+            define Thing/id,size;
+            Thing(#pen,     1);
+            Thing(#desk,    10);
+            Thing(#whatsit, #unknown);
+            
+            // #whatsit is neither large nor small
             Thing(#pen,     1);
             Thing(#table,   10);
             Thing(#desk,    10);
             Thing(#whatsit, #unknown);
             
             // #whatsit is neither large nor small
+            define AsBigAs/thing1,thing2;
             AsBigAs(x, y) :- Thing(x, xs), Thing(y, ys)
                 where xs >= ys, x != y;
             """;
         check(execute(source)).eq("""
-            define AsBigAs/2;
+            define AsBigAs/thing1,thing2;
             AsBigAs(#desk, #pen);
             AsBigAs(#desk, #table);
             AsBigAs(#table, #desk);
             AsBigAs(#table, #pen);
             
-            define Thing/2;
+            define Thing/id,size;
             Thing(#desk, 10);
             Thing(#pen, 1);
             Thing(#table, 10);
@@ -219,40 +246,51 @@ public class RuleEngineTest extends Ted {
     @Test public void testConstraint_operators() {
         test("testConstraint_operators");
         var source = """
-            transient A;
+            define transient A/x;
             A(2);
             
-            transient B;
+            define transient B/x;
             B(1);
             B(2);
             B(3);
             
+            define EQ/x,y;
             EQ(x,y) :- A(x), B(y) where x == y;
+            
+            define NE/x,y;
             NE(x,y) :- A(x), B(y) where x != y;
+            
+            define GT/x,y;
             GT(x,y) :- A(x), B(y) where x > y;
+            
+            define GE/x,y;
             GE(x,y) :- A(x), B(y) where x >= y;
+            
+            define LT/x,y;
             LT(x,y) :- A(x), B(y) where x < y;
+            
+            define LE/x,y;
             LE(x,y) :- A(x), B(y) where x <= y;
             """;
         check(execute(source)).eq("""
-            define EQ/2;
+            define EQ/x,y;
             EQ(2, 2);
             
-            define GE/2;
+            define GE/x,y;
             GE(2, 1);
             GE(2, 2);
             
-            define GT/2;
+            define GT/x,y;
             GT(2, 1);
             
-            define LE/2;
+            define LE/x,y;
             LE(2, 2);
             LE(2, 3);
             
-            define LT/2;
+            define LT/x,y;
             LT(2, 3);
             
-            define NE/2;
+            define NE/x,y;
             NE(2, 1);
             NE(2, 3);
             """);
@@ -266,16 +304,18 @@ public class RuleEngineTest extends Ted {
     @Test public void testBindAndMatch() {
         test("testBindAndMatch");
         var source = """
+            define Pair/x,y;
+            define Twin/x;
             Pair(#a, #b);
             Pair(#c, #c);
             Twin(x) :- Pair(x, x);
             """;
         check(execute(source)).eq("""
-            define Pair/2;
+            define Pair/x,y;
             Pair(#a, #b);
             Pair(#c, #c);
             
-            define Twin/1;
+            define Twin/x;
             Twin(#c);
             """);
     }
@@ -288,67 +328,16 @@ public class RuleEngineTest extends Ted {
             new ListFact("Topic", List.of(Topic.THAT, "def"))
         );
         var source = """
+            define Match/x;
             Match(x) :- Topic(#this, x);
             """;
         check(inferRaw(source, facts)).eq("""
-            ListFact[relation=Match, fields=[abc]]
+            PairFact[relation=Match, fieldNames=[x], fields=[abc]]
             """);
     }
 
     //-------------------------------------------------------------------------
     // Fact Creation and `define` declarations
-
-    // Ordered atoms produce ListFacts by default.
-    @Test public void testDefine_list_implicit() {
-        test("testDefine_list_implicit");
-        var source = """
-            Pair(#c, #c);
-            Twin(x) :- Pair(x, x);
-            """;
-        check(execute(source)).eq("""
-            define Pair/2;
-            Pair(#c, #c);
-            
-            define Twin/1;
-            Twin(#c);
-            """);
-    }
-
-    // Ordered atoms produce ListFacts given the define relation/n
-    @Test public void testDefine_list_explicit() {
-        test("testDefine_list_explicit");
-        var source = """
-            define Pair/2;
-            Pair(#c, #c);
-            
-            define Twin/1;
-            Twin(x) :- Pair(x, x);
-            """;
-        check(execute(source)).eq("""
-            define Pair/2;
-            Pair(#c, #c);
-            
-            define Twin/1;
-            Twin(#c);
-            """);
-    }
-
-    // Named atoms produce MapFacts by default.
-    @Test public void testDefine_map_implicit() {
-        test("testDefine_map_implicit");
-        var source = """
-            Pair(first: #c, second: #c);
-            Twin(id: x) :- Pair(first: x, second: x);
-            """;
-        check(execute(source)).eq("""
-            define Pair/...;
-            Pair(first: #c, second: #c);
-            
-            define Twin/...;
-            Twin(id: #c);
-            """);
-    }
-
 
     // Named atoms produce MapFacts given define relation/...;
     @Test public void testDefine_map_explicit() {
@@ -395,12 +384,14 @@ public class RuleEngineTest extends Ted {
         test("testTransient_axiom");
 
         var source = """
+            define A/x;
+            define B/x;
             transient A;
             A(#a);
             B(#b);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/x;
             B(#b);
             """);
     }
@@ -410,16 +401,19 @@ public class RuleEngineTest extends Ted {
         test("testTransient_rule");
 
         var source = """
+            define A/x;
+            define B/x;
+            define C/x;
             transient B;
             A(#a);
             B(x) :- A(x);
             C(x) :- B(x);
             """;
         check(execute(source)).eq("""
-            define A/1;
+            define A/x;
             A(#a);
             
-            define C/1;
+            define C/x;
             C(#a);
             """);
     }
@@ -429,14 +423,15 @@ public class RuleEngineTest extends Ted {
         test("testTransient_define");
 
         var source = """
-            define transient A/1;
-            define transient B/1;
+            define transient A/x;
+            define transient B/x;
+            define C/x;
             A(#a);
             B(x) :- A(x);
             C(x) :- B(x);
             """;
         check(execute(source)).eq("""
-            define C/1;
+            define C/x;
             C(#a);
             """);
     }
@@ -447,11 +442,13 @@ public class RuleEngineTest extends Ted {
     @Test public void testUpdating_axioms() {
         test("testUpdating_axioms");
         var source = """
+            define A/x;
             A(#a);
+            define A!/x,y;
             A!(#b, #c);
             """;
         check(execute(source)).eq("""
-            define A/2;
+            define A/x,y;
             A(#b, #c);
             """);
     }
@@ -459,12 +456,15 @@ public class RuleEngineTest extends Ted {
     @Test public void testUpdating_rules() {
         test("testUpdating_rules");
         var source = """
+            define A/x,y;
             A(#a, 5);
             A(#b, 7);
+            
+            define A!/x;
             A!(x) :- A(x, _);
             """;
         check(execute(source)).eq("""
-            define A/1;
+            define A/x;
             A(#a);
             A(#b);
             """);
@@ -476,12 +476,13 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_member_disaggregate() {
         test("testBuiltIn_member_disaggregate");
         var source = """
-            transient Owner;
+            define transient Owner/id,list;
+            define Owns/id,item;
             Owner(#joe, [#hat, #boots, #truck]);
             Owns(id, item) :- Owner(id, list), member(item, list);
             """;
         check(execute(source)).eq("""
-            define Owns/2;
+            define Owns/id,item;
             Owns(#joe, #boots);
             Owns(#joe, #hat);
             Owns(#joe, #truck);
@@ -491,12 +492,13 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_member_match() {
         test("testBuiltIn_member_match");
         var source = """
-            transient Owner;
+            define transient Owner/id,list;
+            define OwnsHat/id;
             Owner(#joe, [#hat, #boots, #truck]);
             OwnsHat(id) :- Owner(id, list), member(#hat, list);
             """;
         check(execute(source)).eq("""
-            define OwnsHat/1;
+            define OwnsHat/id;
             OwnsHat(#joe);
             """);
     }
@@ -504,7 +506,8 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_member_noCollection() {
         test("testBuiltIn_member_noCollection");
         var source = """
-            transient Owner;
+            define transient Owner/id,list;
+            define Owns/id,item;
             Owner(#joe, #notCollection);
             Owns(id, item) :- Owner(id, list), member(item, list);
             """;
@@ -515,12 +518,13 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_indexedMember_disaggregate() {
         test("testBuiltIn_indexedMember_disaggregate");
         var source = """
-            transient Owner;
+            define transient Owner/id,list;
+            define Owns/id,index,item;
             Owner(#joe, [#hat, #boots, #truck]);
             Owns(id, i, item) :- Owner(id, list), indexedMember(i, item, list);
             """;
         check(execute(source)).eq("""
-            define Owns/3;
+            define Owns/id,index,item;
             Owns(#joe, 0, #hat);
             Owns(#joe, 1, #boots);
             Owns(#joe, 2, #truck);
@@ -530,12 +534,13 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_indexedMember_match() {
         test("testBuiltIn_indexedMember_match");
         var source = """
-            transient Owner;
+            define transient Owner/id,list;
+            define OwnsHat/id,index;
             Owner(#joe, [#hat, #boots, #truck]);
             OwnsHat(id, i) :- Owner(id, list), indexedMember(i, #hat, list);
             """;
         check(execute(source)).eq("""
-            define OwnsHat/2;
+            define OwnsHat/id,index;
             OwnsHat(#joe, 0);
             """);
     }
@@ -543,7 +548,8 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_indexedMember_noCollection() {
         test("testBuiltIn_indexedMember_noCollection");
         var source = """
-            transient Owner;
+            define transient Owner/id,list;
+            define Owns/id,index,item;
             Owner(#joe, #notCollection);
             Owns(id, i, item) :- Owner(id, list), indexedMember(i, item, list);
             """;
@@ -554,12 +560,13 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_keyedMember_disaggregate() {
         test("testBuiltIn_keyedMember_disaggregate");
         var source = """
-            transient Owner;
+            define transient Owner/id,map;
+            define Wears/id,k,v;
             Owner(#joe, {#head: #hat, #feet: #boots});
             Wears(id, k, v) :- Owner(id, map), keyedMember(k, v, map);
             """;
         check(execute(source)).eq("""
-            define Wears/3;
+            define Wears/id,k,v;
             Wears(#joe, #feet, #boots);
             Wears(#joe, #head, #hat);
             """);
@@ -568,12 +575,13 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_keyedMember_match() {
         test("testBuiltIn_keyedMember_match");
         var source = """
-            transient Owner;
+            define transient Owner/id,map;
+            define WearsHat/id,k;
             Owner(#joe, {#head: #hat, #feet: #boots});
             WearsHat(id, k) :- Owner(id, map), keyedMember(k, #hat, map);
             """;
         check(execute(source)).eq("""
-            define WearsHat/2;
+            define WearsHat/id,k;
             WearsHat(#joe, #head);
             """);
     }
@@ -581,7 +589,8 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_keyedMember_noCollection() {
         test("testBuiltIn_keyedMember_noCollection");
         var source = """
-            transient Owner;
+            define transient Owner/id,map;
+            define Wears/id,k,v;
             Owner(#joe, #notCollection);
             Wears(id, k, v) :- Owner(id, map), keyedMember(k, v, map);
             """;
@@ -592,14 +601,15 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_equivalent_AB() {
         test("testBuiltIn_keyedMember_equivalent_AB");
         var source = """
-            transient Data;
+            define transient Data/s,n;
+            define Got/s,n;
             Data("1", 1);    // Equivalent
             Data("2", 3);    // Not equivalent
             Data("XYZ", 4);  // Not equivalent
             Got(s, n) :- Data(s, n), equivalent(#str2num, s, n);
             """;
         check(execute(source)).eq("""
-            define Got/2;
+            define Got/s,n;
             Got("1", 1);
             """);
     }
@@ -607,13 +617,14 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_equivalent_A() {
         test("testBuiltIn_keyedMember_equivalent_A");
         var source = """
-            transient Data;
+            define transient Data/s;
+            define Got/s,n;
             Data("1");    // Equivalent
             Data("XYZ");  // Not equivalent
             Got(s, n) :- Data(s), equivalent(#str2num, s, n);
             """;
         check(execute(source)).eq("""
-            define Got/2;
+            define Got/s,n;
             Got("1", 1);
             """);
     }
@@ -621,22 +632,24 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_equivalent_B() {
         test("testBuiltIn_keyedMember_equivalent_A");
         var source = """
-            transient Data;
+            define transient Data/n;
+            define Got/s,n;
             Data(1);    // Equivalent
             Data(#foo); // Not equivalent
             Got(s, n) :- Data(n), equivalent(#str2num, s, n);
             """;
         check(execute(source)).eq("""
-            define Got/2;
+            define Got/s,n;
             Got("1", 1);
             """);
     }
 
     @Test public void testBuiltIn_equivalent_registered() {
         var source = """
-            transient Upper;
-            transient Lower;
-            transient Both;
+            define transient Upper/x;
+            define transient Lower/x;
+            define transient Both/x,y;
+            define Got/upper,lower;
             Upper("ABC");
             Upper(123);
             Lower("xyz");
@@ -652,7 +665,7 @@ public class RuleEngineTest extends Ted {
 
         // Execute with #upper2lower
         check(execute(source)).eq("""
-            define Got/2;
+            define Got/upper,lower;
             Got("ABC", "abc");
             Got("DEF", "def");
             Got("XYZ", "xyz");
@@ -662,17 +675,19 @@ public class RuleEngineTest extends Ted {
     @Test public void testBuiltIn_negation() {
         test("testBuiltIn_negation");
         var source = """
-            transient Item;
+            define transient Item/id;
             Item(#hat);
             Item(#boots);
             Item(#truck);
             Item(#car);
-            transient Owner;
+            define transient Owner/id,list;
             Owner(#joe, [#hat, #boots, #truck]);
+            
+            define NotOwns/owner,item;
             NotOwns(id, item) :- Owner(id, list), Item(item), not member(item, list);
             """;
         check(execute(source)).eq("""
-            define NotOwns/2;
+            define NotOwns/owner,item;
             NotOwns(#joe, #car);
             """);
     }
@@ -684,11 +699,12 @@ public class RuleEngineTest extends Ted {
     @Test public void testListLiteral_axioms() {
         test("testListLiteral_axioms");
         var source = """
+            define A/list;
             A([]);
             A([#a, 5]);
             """;
         check(execute(source)).eq("""
-            define A/1;
+            define A/list;
             A([#a, 5]);
             A([]);
             """);
@@ -698,16 +714,18 @@ public class RuleEngineTest extends Ted {
     @Test public void testListLiteral_rules() {
         test("testListLiteral_rules");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/x;
+            define C/x, y;
             A(#a, 5);
             B([x, y]) :- A(x, y);
             C(x, []) :- A(x, _);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/x;
             B([#a, 5]);
             
-            define C/2;
+            define C/x,y;
             C(#a, []);
             """);
     }
@@ -716,11 +734,12 @@ public class RuleEngineTest extends Ted {
     @Test public void testMapLiteral_axioms() {
         test("testMapLiteral_axioms");
         var source = """
+            define A/map;
             A({:});
             A({#a: 5});
             """;
         check(execute(source)).eq("""
-            define A/1;
+            define A/map;
             A({#a: 5});
             A({:});
             """);
@@ -730,16 +749,18 @@ public class RuleEngineTest extends Ted {
     @Test public void testMapLiteral_rules() {
         test("testMapLiteral_rules");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/x;
+            define C/x,y;
             A(#a, 5);
             B({x: y}) :- A(x, y);
             C(x, {:}) :- A(x, _);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/x;
             B({#a: 5});
             
-            define C/2;
+            define C/x,y;
             C(#a, {:});
             """);
     }
@@ -748,11 +769,12 @@ public class RuleEngineTest extends Ted {
     @Test public void testSetLiteral_axioms() {
         test("testSetLiteral_axioms");
         var source = """
+            define A/set;
             A({});
             A({#a, 5});
             """;
         check(execute(source)).eq("""
-            define A/1;
+            define A/set;
             A({#a, 5});
             A({});
             """);
@@ -762,16 +784,18 @@ public class RuleEngineTest extends Ted {
     @Test public void testSetLiteral_rules() {
         test("testSetLiteral_rules");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/x;
+            define C/x,y;
             A(#a, 5);
             B({x, y}) :- A(x, y);
             C(x, {}) :- A(x, _);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/x;
             B({#a, 5});
             
-            define C/2;
+            define C/x,y;
             C(#a, {});
             """);
     }
@@ -783,7 +807,8 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregate_indexedList_numbers() {
         test("testAggregate_indexedList_numbers");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/list;
             A(#a, 2);
             A(#b, 1);
             A(#c, 4);
@@ -791,7 +816,7 @@ public class RuleEngineTest extends Ted {
             B(indexedList(i, item)) :- A(item, i);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/list;
             B([#b, #a, #d, #c]);
             """);
     }
@@ -800,7 +825,8 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregate_indexedList_strings() {
         test("testAggregate_indexedList_strings");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/list;
             A(#a, "2");
             A(#b, "1");
             A(#c, "4");
@@ -808,7 +834,7 @@ public class RuleEngineTest extends Ted {
             B(indexedList(i, item)) :- A(item, i);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/list;
             B([#b, #a, #d, #c]);
             """);
     }
@@ -817,7 +843,8 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregate_indexedList_mixed() {
         test("testAggregate_indexedList_strings");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/list;
             A(#a, "2");
             A(#b, "1");
             A(#c, #one);
@@ -826,7 +853,7 @@ public class RuleEngineTest extends Ted {
             """;
         // The order is unpredictable, but should be stable over time.
         check(execute(source)).eq("""
-            define B/1;
+            define B/list;
             B([#b, #a, #c, #d]);
             """);
     }
@@ -835,13 +862,14 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregate_list() {
         test("testAggregate_set");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/list;
             A(#a, 1);
             A(#b, 1);
             B(list(x)) :- A(_, x);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/list;
             B([1, 1]);
             """);
     }
@@ -851,7 +879,8 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregate_map() {
         test("testAggregate_set");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/map;
             A(#a, 1);
             A(#a, 2);
             A(#b, 2);
@@ -859,7 +888,7 @@ public class RuleEngineTest extends Ted {
             B(map(k,v)) :- A(k, v);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/map;
             B({#a: #duplicateKey, #b: 2, #c: 3});
             """);
     }
@@ -870,11 +899,13 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregate_max_noNumericMatches() {
         test("testAggregate_max_noNumericMatches");
         var source = """
+            define A/x;
+            define B/max;
             A(#a);
             B(max(x)) :- A(x);
             """;
         check(execute(source)).eq("""
-            define A/1;
+            define A/x;
             A(#a);
             """);
     }
@@ -883,14 +914,15 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregate_max_numericMatches() {
         test("testAggregate_max_numericMatches");
         var source = """
-            transient A;
+            define transient A/x;
+            define B/x;
             A(1);
             A(2);
             A(3);
             B(max(x)) :- A(x);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/x;
             B(3);
             """);
     }
@@ -901,11 +933,13 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregate_min_noNumericMatches() {
         test("testAggregate_min_noNumericMatches");
         var source = """
+            define A/x;
+            define B/x;
             A(#a);
             B(min(x)) :- A(x);
             """;
         check(execute(source)).eq("""
-            define A/1;
+            define A/x;
             A(#a);
             """);
     }
@@ -914,14 +948,15 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregate_min_numericMatches() {
         test("testAggregate_min_numericMatches");
         var source = """
-            transient A;
+            define transient A/x;
+            define B/x;
             A(1);
             A(2);
             A(3);
             B(min(x)) :- A(x);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/x;
             B(1);
             """);
     }
@@ -931,12 +966,13 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregate_sum_noNumericMatches() {
         test("testAggregate_sum_noNumericMatches");
         var source = """
-            transient A;
+            define transient A/x;
+            define B/x;
             A(#a);
             B(sum(x)) :- A(x);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/x;
             B(0);
             """);
     }
@@ -945,7 +981,8 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregate_sum_numericMatches() {
         test("testAggregate_sum_numericMatches");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/x;
             A(#a, #foo);
             A(#a, 1);
             A(#b, 1);
@@ -953,7 +990,7 @@ public class RuleEngineTest extends Ted {
             B(sum(x)) :- A(_, x);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/x;
             B(5);
             """);
     }
@@ -962,7 +999,8 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregate_set() {
         test("testAggregate_set");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/x;
             A(#a, 1);
             A(#a, 2);
             A(#b, 1);
@@ -970,7 +1008,7 @@ public class RuleEngineTest extends Ted {
             B(set(x)) :- A(x, _);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/x;
             B({#a, #b, #c});
             """);
     }
@@ -985,7 +1023,7 @@ public class RuleEngineTest extends Ted {
     @Test public void testAggregation_complex() {
         test("testAggregate_set");
         var source = """
-            transient Event;
+            define transient Event/ids,t;
             Event({#a,#b}, 1);
             Event({#a,#c}, 2);
             Event({#a,#d}, 3);
@@ -993,10 +1031,11 @@ public class RuleEngineTest extends Ted {
             Event({#b,#d}, 5);
             Event({#b,#e}, 6);
 
+            define Min/id,t;
             Min(id, min(t)) :- Event(ids, t), member(id, ids);
             """;
         check(execute(source)).eq("""
-            define Min/2;
+            define Min/id,t;
             Min(#a, 1);
             Min(#b, 1);
             Min(#c, 2);
@@ -1015,13 +1054,14 @@ public class RuleEngineTest extends Ted {
     @Test public void testPattern_list() {
         test("testPattern_list");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/x,y,z;
             A(#a, [1, 2]);
             A(#b, [3, 4]);
             B(x, y, z) :- A(x, [y, z]);
             """;
         check(execute(source)).eq("""
-            define B/3;
+            define B/x,y,z;
             B(#a, 1, 2);
             B(#b, 3, 4);
             """);
@@ -1030,13 +1070,14 @@ public class RuleEngineTest extends Ted {
     @Test public void testPattern_map() {
         test("testPattern_map");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/x,y,z;
             A(#a, {#a: 1, #b: 2});
             A(#b, {#a: 3, #b: 4});
             B(x, y, z) :- A(x, {#a: y, #b: z});
             """;
         check(execute(source)).eq("""
-            define B/3;
+            define B/x,y,z;
             B(#a, 1, 2);
             B(#b, 3, 4);
             """);
@@ -1045,14 +1086,15 @@ public class RuleEngineTest extends Ted {
     @Test public void testPattern_typeName() {
         test("testPattern_typeName");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/x;
             A(#a, [1, 2]);
             A(#b, [3, 4]);
             A(#c, 5);
             B(x) :- A(x, List());
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/x;
             B(#a);
             B(#b);
             """);
@@ -1061,14 +1103,15 @@ public class RuleEngineTest extends Ted {
     @Test public void testPattern_subpattern_free() {
         test("testPattern_typeName");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/x,y;
             A(#a, [1, 2]);
             A(#b, [3, 4]);
             A(#c, 5);
             B(x, y) :- A(x, y@[_,_]);
             """;
         check(execute(source)).eq("""
-            define B/2;
+            define B/x,y;
             B(#a, [1, 2]);
             B(#b, [3, 4]);
             """);
@@ -1079,14 +1122,15 @@ public class RuleEngineTest extends Ted {
     @Test public void testPattern_subpattern_bound() {
         test("testPattern_typeName");
         var source = """
-            transient A;
+            define transient A/x,y;
+            define B/x;
             A([1, 2], [1, 2]);
             A([3, 4], [3, 4]);
             A([5, 6], [7, 8]);
             B(x) :- A(x, x@[_,_]);
             """;
         check(execute(source)).eq("""
-            define B/1;
+            define B/x;
             B([1, 2]);
             B([3, 4]);
             """);
@@ -1101,34 +1145,36 @@ public class RuleEngineTest extends Ted {
         test("testKnownVsInferred");
 
         Set<Fact> facts = Set.of(
-            new ListFact("Owns", List.of("joe", "car")),
-            new ListFact("Owns", List.of("joe", "truck"))
+            new PairFact("Owns", List.of("owner", "thing"), List.of("joe", "car")),
+            new PairFact("Owns", List.of("owner", "thing"), List.of("joe", "truck"))
         );
         var source = """
+            define Owner/owner;
+            define Thing/thing;
             Owner("joe");
             Thing(x) :- Owns(_, x);
             """;
 
         // Show all known facts
         check(execute(source, facts)).eq("""
-            define Owner/1;
+            define Owner/owner;
             Owner("joe");
             
-            define Owns/2;
+            define Owns/owner,thing;
             Owns("joe", "car");
             Owns("joe", "truck");
             
-            define Thing/1;
+            define Thing/thing;
             Thing("car");
             Thing("truck");
             """);
 
         // Omit `Owns` facts, which were provided as inputs.
         check(infer(source, facts)).eq("""
-            define Owner/1;
+            define Owner/owner;
             Owner("joe");
             
-            define Thing/1;
+            define Thing/thing;
             Thing("car");
             Thing("truck");
             """);
@@ -1148,13 +1194,15 @@ public class RuleEngineTest extends Ted {
         test("testBug_asNeroScript_20250809");
 
         var source = """
+            define Owner/owner;
+            define Thing/thing;
             Owner("joe");
             Thing(x) :- Owns(_, x);
             """;
 
         // Show all known facts
         check(execute(source)).eq("""
-            define Owner/1;
+            define Owner/owner;
             Owner("joe");
             """);
     }

@@ -5,7 +5,6 @@ import com.wjduquette.joe.Ted;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -44,6 +43,24 @@ public class SchemaTest extends Ted {
         check(schema.isTransient("Foo")).eq(false);
     }
 
+    //-------------------------------------------------------------------------
+    // check(atom)
+
+    @Test public void testCheck_head_undefined() {
+        test("testCheck_head_undefined");
+
+        var head = new OrderedAtom("Person", List.of(new Constant("abc")));
+        check(schema.check(head)).eq(false);
+    }
+
+    @Test public void testCheck_head_mismatch() {
+        test("testCheck_head_mismatch");
+
+        var shape = new Shape.PairShape("Person", List.of("id", "name"));
+        var head = new OrderedAtom("Person", List.of(new Constant("abc")));
+        schema.add(shape);
+        check(schema.check(head)).eq(false);
+    }
 
     //-------------------------------------------------------------------------
     // checkAndAdd(shape)
@@ -134,124 +151,6 @@ public class SchemaTest extends Ted {
         check(schema.checkAndAdd(fact)).eq(false);
 
         // Previous definition is unchanged.
-        check(schema.getRelations()).eq(Set.of("Person"));
-        check(schema.hasRelation("Person")).eq(true);
-        check(schema.get("Person")).eq(shape);
-    }
-
-    //-------------------------------------------------------------------------
-    // checkAndAdd(ASTATom)
-
-    // A head atom's shape is always accepted if the relation isn't previously
-    // known.
-    @Test public void testCheckAndAdd_head_new() {
-        test("testCheckAndAdd_head_new");
-
-        var ast = parse("Person(#a, #b);");
-        var head = new ArrayList<>(ast.axioms()).getFirst();
-        var shape = Shape.inferDefaultShape(head);
-        check(schema.checkAndAdd(head)).eq(true);
-
-        check(schema.getRelations()).eq(Set.of("Person"));
-        check(schema.hasRelation("Person")).eq(true);
-        check(schema.get("Person")).eq(shape);
-    }
-
-    // For a known list shape, a head atom must be ordered with the correct
-    // arity.
-    @Test public void testCheckAndAdd_head_list_ok() {
-        test("testCheckAndAdd_head_list_ok");
-
-        var shape = new Shape.ListShape("Person", 2);
-        schema.checkAndAdd(shape);
-
-        var ast = parse("Person(#a, #b);");
-        var head = new ArrayList<>(ast.axioms()).getFirst();
-        check(schema.checkAndAdd(head)).eq(true);
-
-        check(schema.getRelations()).eq(Set.of("Person"));
-        check(schema.hasRelation("Person")).eq(true);
-        check(schema.get("Person")).eq(shape);
-    }
-
-    // For a known list shape, a head atom must be ordered with the correct
-    // arity.
-    @Test public void testCheckAndAdd_head_list_mismatch() {
-        test("testCheckAndAdd_head_list_mismatch");
-
-        var shape = new Shape.ListShape("Person", 2);
-        schema.checkAndAdd(shape);
-
-        var ast = parse("Person(#a, #b, #c);");
-        var head = new ArrayList<>(ast.axioms()).getFirst();
-        check(schema.checkAndAdd(head)).eq(false);
-
-        check(schema.getRelations()).eq(Set.of("Person"));
-        check(schema.hasRelation("Person")).eq(true);
-        check(schema.get("Person")).eq(shape);
-    }
-
-    // For a known map shape, a head atom must be named.
-    @Test public void testCheckAndAdd_head_map_ok() {
-        test("testCheckAndAdd_head_map_ok");
-
-        var shape = new Shape.MapShape("Thing");
-        schema.checkAndAdd(shape);
-
-        var ast = parse("Thing(a: #a, b: #b);");
-        var head = new ArrayList<>(ast.axioms()).getFirst();
-        check(schema.checkAndAdd(head)).eq(true);
-
-        check(schema.getRelations()).eq(Set.of("Thing"));
-        check(schema.hasRelation("Thing")).eq(true);
-        check(schema.get("Thing")).eq(shape);
-    }
-
-    // For a known map shape, a head atom must be named.
-    @Test public void testCheckAndAdd_head_map_mismatch() {
-        test("testCheckAndAdd_head_map_mismatch");
-
-        var shape = new Shape.MapShape("Thing");
-        schema.checkAndAdd(shape);
-
-        var ast = parse("Thing(#a, #b);");
-        var head = new ArrayList<>(ast.axioms()).getFirst();
-        check(schema.checkAndAdd(head)).eq(false);
-
-        check(schema.getRelations()).eq(Set.of("Thing"));
-        check(schema.hasRelation("Thing")).eq(true);
-        check(schema.get("Thing")).eq(shape);
-    }
-
-    // For a known pair shape, a head atom must be ordered with the correct
-    // arity.
-    @Test public void testCheckAndAdd_head_pair_ok() {
-        test("testCheckAndAdd_head_pair_ok");
-
-        var shape = new Shape.PairShape("Person", List.of("a", "b"));
-        schema.checkAndAdd(shape);
-
-        var ast = parse("Person(#a, #b);");
-        var head = new ArrayList<>(ast.axioms()).getFirst();
-        check(schema.checkAndAdd(head)).eq(true);
-
-        check(schema.getRelations()).eq(Set.of("Person"));
-        check(schema.hasRelation("Person")).eq(true);
-        check(schema.get("Person")).eq(shape);
-    }
-
-    // For a known list shape, a head atom must be ordered with the correct
-    // arity.
-    @Test public void testCheckAndAdd_head_pair_mismatch() {
-        test("testCheckAndAdd_head_pair_mismatch");
-
-        var shape = new Shape.PairShape("Person", List.of("a", "b"));
-        schema.checkAndAdd(shape);
-
-        var ast = parse("Person(#a, #b, #c);");
-        var head = new ArrayList<>(ast.axioms()).getFirst();
-        check(schema.checkAndAdd(head)).eq(false);
-
         check(schema.getRelations()).eq(Set.of("Person"));
         check(schema.hasRelation("Person")).eq(true);
         check(schema.get("Person")).eq(shape);
