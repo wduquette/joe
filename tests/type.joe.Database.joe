@@ -155,13 +155,14 @@ function testUseEquivalence() {
     var db = Database();
     db.equivalences(S2N);
     db.update(ruleset {
-        transient Str;
+        define transient Str/s;
+        define Both/s,n;
         Str("123");
         Both(s,n) :- Str(s), equivalent(#s2n, s, n);
     });
     var results = db.toNeroScript().strip();
     assertEQ(results, """
-        define Both/2;
+        define Both/s,n;
         Both("123", 123);
         """);
 }
@@ -217,14 +218,15 @@ function testQuery() {
     ]);
 
     var results = db.query(ruleset {
+        define Ancestor/a,d;
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     });
 
     var expected = {
-        Fact("Ancestor", #anne, #bert),
-        Fact("Ancestor", #anne, #clark),
-        Fact("Ancestor", #bert, #clark)
+        Fact.ofPairs("Ancestor", ["a", #anne, "d", #bert]),
+        Fact.ofPairs("Ancestor", ["a", #anne, "d", #clark]),
+        Fact.ofPairs("Ancestor", ["a", #bert, "d", #clark])
     };
     assertEQ(results, expected);
 }
@@ -362,14 +364,15 @@ function testUpdate_good() {
     ]);
 
     db.update(ruleset {
+        define Ancestor/a,d;
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     });
 
     var expected = {
-        Fact("Ancestor", #anne, #bert),
-        Fact("Ancestor", #anne, #clark),
-        Fact("Ancestor", #bert, #clark)
+        Fact.ofPairs("Ancestor", ["a", #anne, "d", #bert]),
+        Fact.ofPairs("Ancestor", ["a", #anne, "d", #clark]),
+        Fact.ofPairs("Ancestor", ["a", #bert, "d", #clark])
     };
 
     // The relation's set was updated.

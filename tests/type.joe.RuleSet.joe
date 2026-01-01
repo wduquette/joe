@@ -5,6 +5,7 @@
 
 function testToString() {
     var rules = ruleset {
+        define Ancestor/a,d;
         Ancestor(x, y) :- Parent(x, y);
     };
     assertEQ(rules.toString(), """
@@ -18,6 +19,7 @@ function testToString() {
 // rule sets are rejected on creation.
 function testIsStratified_true() {
     var rules = ruleset {
+        define Ancestor/a,d;
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     };
