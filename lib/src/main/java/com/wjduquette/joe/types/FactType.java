@@ -5,7 +5,6 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.ProxyType;
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.ListFact;
 import com.wjduquette.joe.nero.MapFact;
 import com.wjduquette.joe.nero.PairFact;
 
@@ -64,7 +63,6 @@ public class FactType extends ProxyType<Fact> {
         // ```
         proxies(Fact.class);
 
-        staticMethod("of",      this::_of);
         staticMethod("ofMap",   this::_ofMap);
         staticMethod("ofPairs", this::_ofPairs);
 
@@ -154,20 +152,6 @@ public class FactType extends ProxyType<Fact> {
     // Static Methods
 
     //**
-    // @static of
-    // %args relation, fields
-    // Creates a new ordered `Fact` given the relation and a list of
-    // field values. Its fields will be named `f0`, `f1`, etc.
-    //
-    // The `Fact` will be an instance of the Java `ListFact` class.
-    private Object _of(Joe joe, Args args) {
-        args.exactArity(2, "Fact.of(relation, fields)");
-        var relation = joe.toIdentifier(args.next());
-        var fields = joe.toList(args.next());
-        return new ListFact(relation, fields);
-    }
-
-    //**
     // @static ofMap
     // %args relation, fieldMap
     // Creates a new unordered `Fact` given the relation and the field map.
@@ -225,9 +209,8 @@ public class FactType extends ProxyType<Fact> {
     // The `Fact` will be an instance of the Java `ListFact` class.
     private Object _init(Joe joe, Args args) {
         args.minArity(2, "Fact(relation, field, ...)");
-        var relation = joe.toIdentifier(args.next());
-        var fields = args.remainderAsList();
-        return new ListFact(relation, fields);
+        // TODO
+        throw new JoeError("Fact(...) is currently unsupported.");
     }
 
     //-------------------------------------------------------------------------

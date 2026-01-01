@@ -2,7 +2,6 @@ package com.wjduquette.joe.patterns;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.ListFact;
 import com.wjduquette.joe.nero.PairFact;
 import com.wjduquette.joe.util.Bindings;
 import org.junit.Before;
@@ -578,7 +577,7 @@ public class MatcherTest extends Ted {
 
         var p1 = new Pattern.TypeName("Thing");
         var p2 = new Pattern.TypeName("Fact");
-        var value = new ListFact("Thing", List.of("hat"));
+        var value = new PairFact("Thing", List.of("x"), List.of("hat"));
 
         check(bind(p1, value)).ne(null);
         check(bind(p2, value)).ne(null);

@@ -14,7 +14,7 @@ import java.util.Map;
  * names "f0", "f1", etc.</p>
  */
 public sealed interface Fact
-    permits ListFact, MapFact, PairFact
+    permits MapFact, PairFact
 {
     /**
      * The fact's relation name.

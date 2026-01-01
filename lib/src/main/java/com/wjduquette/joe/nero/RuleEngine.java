@@ -37,7 +37,7 @@ public class RuleEngine {
         Set<Fact> compute(BindingContext bc, Atom builtIn);
     }
 
-    private static final Map<String,Shape> BUILT_INS = new HashMap<>();
+    private static final Map<String,Shape.PairShape> BUILT_INS = new HashMap<>();
 
     /** Name of the "member" built-in predicate. */
     public static final String MEMBER = "member";
@@ -479,7 +479,7 @@ public class RuleEngine {
                 if (shape instanceof Shape.PairShape ps) {
                     yield new PairFact(atom.relation(), ps.fieldNames(), terms);
                 } else {
-                    yield new ListFact(atom.relation(), terms);
+                    throw new IllegalStateException("Ordered atom but not pair shape.");
                 }
             }
         };
@@ -505,7 +505,7 @@ public class RuleEngine {
                 if (bc.shape instanceof Shape.PairShape ps) {
                     yield new PairFact(atom.relation(), ps.fieldNames(), terms);
                 } else {
-                    yield new ListFact(atom.relation(), terms);
+                    throw new IllegalStateException("Ordered atom but not pair shape.");
                 }
             }
         };
@@ -574,7 +574,9 @@ public class RuleEngine {
         var facts = new HashSet<Fact>();
         if (coll instanceof Collection<?> c) {
             for (var item : c) {
-                facts.add(new ListFact(MEMBER, List.of(item, c)));
+                facts.add(new PairFact(MEMBER,
+                    BUILT_INS.get(MEMBER).fieldNames(),
+                    List.of(item, c)));
             }
         }
 
@@ -589,7 +591,8 @@ public class RuleEngine {
         if (coll instanceof List<?> list) {
             int index = 0;
             for (var item : list) {
-                facts.add(new ListFact(INDEXED_MEMBER,
+                facts.add(new PairFact(INDEXED_MEMBER,
+                    BUILT_INS.get(INDEXED_MEMBER).fieldNames(),
                     List.of((double)index, item, list)));
                 ++index;
             }
@@ -605,7 +608,8 @@ public class RuleEngine {
 
         if (coll instanceof Map<?,?> map) {
             for (var e : map.entrySet()) {
-                facts.add(new ListFact(KEYED_MEMBER,
+                facts.add(new PairFact(KEYED_MEMBER,
+                    BUILT_INS.get(KEYED_MEMBER).fieldNames(),
                     List.of(e.getKey(), e.getValue(), map)));
             }
         }
@@ -660,7 +664,9 @@ public class RuleEngine {
         }
 
         if (isEquivalent) {
-            facts.add(new ListFact(EQUIVALENT, List.of(equiv.keyword(), a, b)));
+            facts.add(new PairFact(EQUIVALENT,
+                BUILT_INS.get(EQUIVALENT).fieldNames(),
+                List.of(equiv.keyword(), a, b)));
         }
         return facts;
     }

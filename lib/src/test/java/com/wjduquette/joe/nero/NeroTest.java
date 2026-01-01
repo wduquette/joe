@@ -222,14 +222,6 @@ public class NeroTest extends Ted {
     // toNeroAxiom
 
     @Test
-    public void testToNeroAxiom_listFact() {
-        test("testToNeroAxiom_listFact");
-        var fact = new ListFact("Thing", List.of("car", "red"));
-        check(nero.toNeroAxiom(fact))
-            .eq("Thing(\"car\", \"red\");");
-    }
-
-    @Test
     public void testToNeroAxiom_mapFact() {
         test("testToNeroAxiom_mapFact");
         var fact = new MapFact("Thing", Map.of("id", "car", "color", "red"));

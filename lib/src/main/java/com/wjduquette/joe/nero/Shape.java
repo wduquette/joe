@@ -71,7 +71,6 @@ public sealed interface Shape permits
      */
     static Shape inferShape(Fact fact) {
         return switch (fact) {
-            case ListFact f -> null;
             case MapFact f  -> new MapShape(f.relation());
             case PairFact f -> new PairShape(f.relation(), f.getFieldNames());
         };
