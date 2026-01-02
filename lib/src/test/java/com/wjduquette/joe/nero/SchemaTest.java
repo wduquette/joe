@@ -119,6 +119,19 @@ public class SchemaTest extends Ted {
         check(s1.get("X")).eq(pairX);  // Unchanged
     }
 
+    @Test
+    public void testToStaticSchema() {
+        var schema = new Schema();
+        schema.add(new Shape("X"));
+        schema.add(new Shape("Y"));
+        schema.setTransient("Y", true);
+        schema.add(new Shape("X!"));
+
+        var schema2 = schema.toStaticSchema();
+        check(schema2.getTransients().isEmpty()).eq(true);
+        check(schema2.getRelations()).eq(Set.of("X"));
+    }
+
     //-------------------------------------------------------------------------
     // Helpers
 

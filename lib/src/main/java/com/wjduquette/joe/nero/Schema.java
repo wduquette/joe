@@ -221,6 +221,22 @@ public class Schema {
         }
     }
 
+    /**
+     * Return an equivalent schema with no transient or update relations,
+     * e.g., a schema that represents the static state of a set of facts
+     * after rule set execution.
+     * @return the static schema
+     */
+    public Schema toStaticSchema() {
+        var schema = new Schema();
+        for (var e : shapeMap.entrySet()) {
+            if (!e.getKey().endsWith("!") && !transients.contains(e.getKey())) {
+                schema.add(e.getValue());
+            }
+        }
+        return schema;
+    }
+
     //-------------------------------------------------------------------------
     // Object API
 
