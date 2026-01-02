@@ -459,6 +459,7 @@ public class RuleEngine {
     }
 
     private Fact axiom2fact(Atom axiom) {
+        var shape = ruleset.schema().get(axiom.relation());
         return switch (axiom) {
             case NamedAtom atom -> {
                 var termMap = new HashMap<String,Object>();
@@ -467,10 +468,11 @@ public class RuleEngine {
                     termMap.put(e.getKey(), Term.toValue(e.getValue(), null));
                 }
 
-                yield new Fact(atom.relation(), termMap);
+                // Creates an ordered or unordered atom based on the shape.
+                yield new Fact(atom.relation(), shape.names(), termMap);
             }
             case OrderedAtom atom -> {
-                var shape = ruleset.schema().get(atom.relation());
+                assert shape.isOrdered();  // Guaranteed by parser.
                 var terms = new ArrayList<>();
 
                 for (var term : atom.terms()) {
@@ -490,7 +492,7 @@ public class RuleEngine {
                     terms.put(e.getKey(), term2value(e.getValue(), bc));
                 }
 
-                yield new Fact(atom.relation(), terms);
+                yield new Fact(atom.relation(), bc.shape.names(), terms);
             }
             case OrderedAtom atom -> {
                 var terms = new ArrayList<>();

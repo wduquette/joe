@@ -123,7 +123,7 @@ class NeroParser extends EmbeddedParser {
                         throw errorSync(headToken, "undefined relation in axiom.");
                     }
                     if (!schema.check(head)) {
-                        // TODO: just display the head, not its inferred shape?
+                        // TODO: display head with stringified terms.
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                             schema.get(head.relation()).toSpec() +
@@ -140,7 +140,7 @@ class NeroParser extends EmbeddedParser {
                             "undefined relation in rule head.");
                     }
                     if (!schema.check(head)) {
-                        // TODO: just display the head, not its inferred shape?
+                        // TODO: display head with stringified terms.
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                                 schema.get(head.relation()).toSpec() +

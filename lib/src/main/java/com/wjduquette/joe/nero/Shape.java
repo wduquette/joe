@@ -124,9 +124,14 @@ public class Shape {
      * @return true or false
      */
     public static boolean conformsTo(Atom atom, Shape shape) {
-        // TODO Ultimately, a NamedAtom will conform if it only uses known field names.
         return switch (atom) {
-            case NamedAtom ignored -> shape.isUnordered();
+            case NamedAtom a -> {
+                if (shape.isUnordered()) yield true;
+                for (var name : a.termMap().keySet()) {
+                    if (!shape.names().contains(name)) yield false;
+                }
+                yield true;
+            }
             case OrderedAtom a -> shape.arity() == a.terms().size();
         };
     }

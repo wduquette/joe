@@ -36,6 +36,29 @@ public final class Fact {
     }
 
     /**
+     * Creates a new fact given the inputs.  The fact will be ordered
+     * if names is not empty, and unordered otherwise.  The field map
+     * need not contain a value for every name.
+     * @param relation The relation
+     * @param names The field names
+     * @param fieldMap The field map
+     */
+    public Fact(String relation, List<String> names, Map<String,Object> fieldMap) {
+        this.shape = new Shape(relation, names);
+        this.fieldMap = Map.copyOf(fieldMap);
+
+        if (!names.isEmpty()) {
+            var list = new ArrayList<>();
+            for (var name : names) {
+                list.add(fieldMap.get(name));
+            }
+            this.fields = Collections.unmodifiableList(list);
+        } else {
+            this.fields = null;
+        }
+    }
+
+    /**
      * Creates a new unordered fact given inputs.
      * @param relation The relation
      * @param fieldMap The map of field names and values.

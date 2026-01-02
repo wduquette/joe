@@ -148,6 +148,36 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    // Verify that a named atom can be used in an axiom to create an
+    // ordered fact.
+    @Test public void testSimple_namedAxiom_ordered() {
+        test("testSimple_namedAxiom_ordered");
+        var source = """
+            define Foo/a, b, c;
+            Foo(c: #c, a: #a);
+            """;
+        check(execute(source)).eq("""
+            define Foo/a,b,c;
+            Foo(#a, null, #c);
+            """);
+    }
+
+    // Verify that a named atom can be used in a rule head to create an
+    // ordered fact.
+    @Test public void testSimple_namedRule_ordered() {
+        test("testSimple_namedRule_ordered");
+        var source = """
+            define transient Bar/a,c;
+            define Foo/a,b,c;
+            Bar(#a, #c);
+            Foo(c: y, a: x) :- Bar(x, y);
+            """;
+        check(execute(source)).eq("""
+            define Foo/a,b,c;
+            Foo(#a, null, #c);
+            """);
+    }
+
     //-------------------------------------------------------------------------
     // Negation
 
