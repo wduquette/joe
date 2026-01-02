@@ -6,7 +6,6 @@ import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.ProxyType;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.NewFact;
-import com.wjduquette.joe.nero.PairFact;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -188,13 +187,13 @@ public class FactType extends ProxyType<Fact> {
         }
 
         var names = new ArrayList<String>();
-        var fieldMap = new HashMap<String, Object>();
+        var fields = new ArrayList<>();
         for (var i = 0; i < pairs.size(); i += 2) {
             var name = joe.toIdentifier(pairs.get(i).toString());
             names.add(name);
-            fieldMap.put(name, pairs.get(i+1));
+            fields.add(pairs.get(i+1));
         }
-        return new PairFact(relation, names, fieldMap);
+        return new NewFact(relation, names, fields);
     }
 
     //-------------------------------------------------------------------------

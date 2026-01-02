@@ -123,9 +123,9 @@ public class Shape {
      * @return The shape
      */
     public static Shape inferShape(Fact fact) {
+        // TODO: Remove!
         return switch (fact) {
             case NewFact f  -> f.shape();
-            case PairFact f -> new Shape(f.relation(), f.getFieldNames());
         };
     }
 

@@ -476,7 +476,7 @@ public class RuleEngine {
                 for (var term : atom.terms()) {
                     terms.add(Term.toValue(term, null));
                 }
-                yield new PairFact(atom.relation(), shape.names(), terms);
+                yield new NewFact(atom.relation(), shape.names(), terms);
             }
         };
     }
@@ -498,7 +498,7 @@ public class RuleEngine {
                 for (var term : atom.terms()) {
                     terms.add(term2value(term, bc));
                 }
-                yield new PairFact(atom.relation(), bc.shape.names(), terms);
+                yield new NewFact(atom.relation(), bc.shape.names(), terms);
             }
         };
     }
@@ -566,7 +566,7 @@ public class RuleEngine {
         var facts = new HashSet<Fact>();
         if (coll instanceof Collection<?> c) {
             for (var item : c) {
-                facts.add(new PairFact(MEMBER,
+                facts.add(new NewFact(MEMBER,
                     BUILT_INS.get(MEMBER).names(),
                     List.of(item, c)));
             }
@@ -583,7 +583,7 @@ public class RuleEngine {
         if (coll instanceof List<?> list) {
             int index = 0;
             for (var item : list) {
-                facts.add(new PairFact(INDEXED_MEMBER,
+                facts.add(new NewFact(INDEXED_MEMBER,
                     BUILT_INS.get(INDEXED_MEMBER).names(),
                     List.of((double)index, item, list)));
                 ++index;
@@ -600,7 +600,7 @@ public class RuleEngine {
 
         if (coll instanceof Map<?,?> map) {
             for (var e : map.entrySet()) {
-                facts.add(new PairFact(KEYED_MEMBER,
+                facts.add(new NewFact(KEYED_MEMBER,
                     BUILT_INS.get(KEYED_MEMBER).names(),
                     List.of(e.getKey(), e.getValue(), map)));
             }
@@ -656,7 +656,7 @@ public class RuleEngine {
         }
 
         if (isEquivalent) {
-            facts.add(new PairFact(EQUIVALENT,
+            facts.add(new NewFact(EQUIVALENT,
                 BUILT_INS.get(EQUIVALENT).names(),
                 List.of(equiv.keyword(), a, b)));
         }

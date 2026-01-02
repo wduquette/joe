@@ -139,7 +139,7 @@ public class NeroTest extends Ted {
     @Test public void testWith_update() {
         test("testWith_update");
         var db = new FactSet();
-        db.add(new PairFact("A", List.of("x"), List.of(1.0)));
+        db.add(new NewFact("A", List.of("x"), List.of(1.0)));
         var script = """
             define B/x;
             B(2);
@@ -160,7 +160,7 @@ public class NeroTest extends Ted {
     @Test public void testWith_query_factset() {
         test("testWith_query_factset");
         var db = new FactSet();
-        db.add(new PairFact("A", List.of("x"), List.of(1.0)));
+        db.add(new NewFact("A", List.of("x"), List.of(1.0)));
         var script = """
             define B/x;
             B(2);
@@ -178,7 +178,7 @@ public class NeroTest extends Ted {
     @Test public void testWith_query_collections() {
         test("testWith_query_collections");
         var list = new ArrayList<Fact>();
-        list.add(new PairFact("A", List.of("a"), List.of(1.0)));
+        list.add(new NewFact("A", List.of("a"), List.of(1.0)));
         var script = """
             define B/x;
             B(2);

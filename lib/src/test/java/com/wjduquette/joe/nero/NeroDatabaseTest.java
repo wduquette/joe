@@ -165,7 +165,7 @@ public class NeroDatabaseTest extends Ted {
             fail("Expected error.");
         } catch (JoeError ex) {
             check(ex.getMessage())
-                .eq("Shape mismatch for fact: 'PairFact[relation=A, fieldNames=[x, y], fields=[3.0, 4.0]]'.");
+                .eq("Shape mismatch for fact: 'Fact[A/x,y, {x=3.0, y=4.0}]'.");
         }
     }
 

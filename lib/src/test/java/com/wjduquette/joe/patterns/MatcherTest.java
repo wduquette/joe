@@ -2,7 +2,7 @@ package com.wjduquette.joe.patterns;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.PairFact;
+import com.wjduquette.joe.nero.NewFact;
 import com.wjduquette.joe.util.Bindings;
 import org.junit.Before;
 import org.junit.Test;
@@ -577,7 +577,7 @@ public class MatcherTest extends Ted {
 
         var p1 = new Pattern.TypeName("Thing");
         var p2 = new Pattern.TypeName("Fact");
-        var value = new PairFact("Thing", List.of("x"), List.of("hat"));
+        var value = new NewFact("Thing", List.of("x"), List.of("hat"));
 
         check(bind(p1, value)).ne(null);
         check(bind(p2, value)).ne(null);
@@ -704,7 +704,8 @@ public class MatcherTest extends Ted {
         @Override public void set(String name, Object value) { }
         @Override public boolean isFact() { return true; }
         @Override public Fact toFact() {
-            return new PairFact(typeName, List.of("id", "color"), fields);
+            return new NewFact(typeName, List.of("id", "color"),
+                List.of(fields.get("id"),fields.get("color")));
         }
     }
 

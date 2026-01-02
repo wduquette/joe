@@ -324,15 +324,15 @@ public class RuleEngineTest extends Ted {
     public void testKeywordMatchesEnum() {
         test("testKeywordMatchesEnum");
         Set<Fact> facts = Set.of(
-            new PairFact("Topic", List.of("x", "y"), List.of(Topic.THIS, "abc")),
-            new PairFact("Topic", List.of("x", "y"), List.of(Topic.THAT, "def"))
+            new NewFact("Topic", List.of("x", "y"), List.of(Topic.THIS, "abc")),
+            new NewFact("Topic", List.of("x", "y"), List.of(Topic.THAT, "def"))
         );
         var source = """
             define Match/x;
             Match(x) :- Topic(#this, x);
             """;
         check(inferRaw(source, facts)).eq("""
-            PairFact[relation=Match, fieldNames=[x], fields=[abc]]
+            Fact[Match/x, {x=abc}]
             """);
     }
 
@@ -1145,8 +1145,8 @@ public class RuleEngineTest extends Ted {
         test("testKnownVsInferred");
 
         Set<Fact> facts = Set.of(
-            new PairFact("Owns", List.of("owner", "thing"), List.of("joe", "car")),
-            new PairFact("Owns", List.of("owner", "thing"), List.of("joe", "truck"))
+            new NewFact("Owns", List.of("owner", "thing"), List.of("joe", "car")),
+            new NewFact("Owns", List.of("owner", "thing"), List.of("joe", "truck"))
         );
         var source = """
             define Owner/owner;
