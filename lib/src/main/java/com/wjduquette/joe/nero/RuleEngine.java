@@ -467,7 +467,7 @@ public class RuleEngine {
                     termMap.put(e.getKey(), Term.toValue(e.getValue(), null));
                 }
 
-                yield new MapFact(atom.relation(), termMap);
+                yield new NewFact(atom.relation(), termMap);
             }
             case OrderedAtom atom -> {
                 var shape = ruleset.schema().get(atom.relation());
@@ -490,7 +490,7 @@ public class RuleEngine {
                     terms.put(e.getKey(), term2value(e.getValue(), bc));
                 }
 
-                yield new MapFact(atom.relation(), terms);
+                yield new NewFact(atom.relation(), terms);
             }
             case OrderedAtom atom -> {
                 var terms = new ArrayList<>();

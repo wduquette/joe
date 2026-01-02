@@ -5,7 +5,7 @@ import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.JoeError;
 import com.wjduquette.joe.ProxyType;
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.MapFact;
+import com.wjduquette.joe.nero.NewFact;
 import com.wjduquette.joe.nero.PairFact;
 
 import java.util.ArrayList;
@@ -167,7 +167,7 @@ public class FactType extends ProxyType<Fact> {
             var name = joe.toIdentifier(e.getKey().toString());
             fieldMap.put(name, e.getValue());
         }
-        return new MapFact(relation, fieldMap);
+        return new NewFact(relation, fieldMap);
     }
 
     //**

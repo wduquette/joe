@@ -1,17 +1,14 @@
 package com.wjduquette.joe.nero;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public final class NewFact {
+public final class NewFact implements Fact {
     //------------------------------------------------------------------------
     // Instance Variables
 
     private final Shape shape;
     private final List<Object> fields;
-    private Map<String,Object> fieldMap;
+    private final Map<String,Object> fieldMap;
 
 
     //------------------------------------------------------------------------
@@ -25,12 +22,17 @@ public final class NewFact {
      */
     public NewFact(String relation, List<String> names, List<Object> fields) {
         this.shape = new Shape(relation, names);
-        this.fieldMap = null;
         this.fields = List.copyOf(fields);
 
         if (names.size() != fields.size()) {
             throw new IllegalArgumentException("names.size != fields.size");
         }
+
+        var map = new HashMap<String,Object>();
+        for (var i = 0; i < fields.size(); i++) {
+            map.put(shape.names().get(i), fields.get(i));
+        }
+        this.fieldMap = Collections.unmodifiableMap(map);
     }
 
     /**
@@ -42,6 +44,17 @@ public final class NewFact {
         this.shape = new Shape(relation);
         this.fieldMap = Map.copyOf(fieldMap);
         this.fields = null;
+    }
+
+    /**
+     * Creates a copy of another fact with a new relation name.
+     * @param relation The new relation
+     * @param other The other fact.
+     */
+    public NewFact(String relation, NewFact other) {
+        this.shape = new Shape(relation, other.shape.names());
+        this.fieldMap = other.fieldMap;
+        this.fields = other.fields;
     }
 
     //------------------------------------------------------------------------
@@ -97,14 +110,7 @@ public final class NewFact {
      * @return The field map
      */
     public Map<String,Object> getFieldMap() {
-        if (fieldMap == null) {
-
-            fieldMap = new HashMap<>();
-            for (var i = 0; i < fields.size(); i++) {
-                fieldMap.put(shape.names().get(i), fields.get(i));
-            }
-        }
-        return Collections.unmodifiableMap(fieldMap);
+        return fieldMap;
     }
 
     /**
@@ -114,5 +120,32 @@ public final class NewFact {
      */
     public Object get(String name) {
         return getFieldMap().get(name);
+    }
+
+    //------------------------------------------------------------------------
+    // Object API
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NewFact newFact = (NewFact) o;
+        return shape.equals(newFact.shape) &&
+            Objects.equals(fields, newFact.fields) &&
+            fieldMap.equals(newFact.fieldMap);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = shape.hashCode();
+        result = 31 * result + Objects.hashCode(fields);
+        result = 31 * result + fieldMap.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Fact[" + shape + ", " + fieldMap + "]";
     }
 }
