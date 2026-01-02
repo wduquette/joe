@@ -132,6 +132,26 @@ public class SchemaTest extends Ted {
         check(schema2.getRelations()).eq(Set.of("X"));
     }
 
+    @Test
+    public void testIsCompatible() {
+        var s1 = new Schema();
+        s1.add(new Shape("X", List.of("x")));
+        s1.add(new Shape("Y", List.of("x", "y")));
+
+        var s2 = new Schema();
+        s2.add(new Shape("X", List.of("x")));
+        s2.add(new Shape("Z", List.of("z")));
+
+        var s3 = new Schema();
+        s3.add(new Shape("X", List.of("x")));
+        s3.add(new Shape("Y", List.of("y")));
+
+        check(s1.isCompatible(s1)).eq(true);
+        check(s1.isCompatible(s2)).eq(true);
+        check(s1.isCompatible(s3)).eq(false);
+        check(s2.isCompatible(s3)).eq(true);
+    }
+
     //-------------------------------------------------------------------------
     // Helpers
 

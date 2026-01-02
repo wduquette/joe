@@ -223,7 +223,7 @@ public class Schema {
 
     /**
      * Return an equivalent schema with no transient or update relations,
-     * e.g., a schema that represents the static state of a set of facts
+     * i.e, a schema that represents the static state of a set of facts
      * after rule set execution.
      * @return the static schema
      */
@@ -237,10 +237,30 @@ public class Schema {
         return schema;
     }
 
+    /**
+     * Checks whether this schema is a static schema, i.e., one with no
+     * transient or update relations that can represent the static state
+     * of a set of facts after rule set execution.
+     * @return true or false
+     */
     public boolean isStatic() {
         if (!transients.isEmpty()) return false;
         for (var name : shapeMap.keySet()) {
             if (name.endsWith("!")) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Gets whether this schema is compatible with the other schema.  Two
+     * schemas are compatible if their shared relations are equal.
+     * @param other The other schema
+     * @return true or false
+     */
+    public boolean isCompatible(Schema other) {
+        for (var shape : shapeMap.values()) {
+            var otherShape = other.get(shape.relation());
+            if (otherShape != null && !shape.equals(otherShape)) return false;
         }
         return true;
     }
