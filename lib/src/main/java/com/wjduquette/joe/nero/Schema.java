@@ -140,7 +140,7 @@ public class Schema {
      * @return true or false
      */
     public boolean check(Fact fact) {
-        return check(Shape.inferShape(fact));
+        return check(fact.shape());
     }
 
     /**
@@ -182,8 +182,7 @@ public class Schema {
      * @return true or false
      */
     public boolean checkAndAdd(Fact fact) {
-        var shape = Shape.inferShape(fact);
-        return checkAndAdd(shape);
+        return checkAndAdd(fact.shape());
     }
 
     /**

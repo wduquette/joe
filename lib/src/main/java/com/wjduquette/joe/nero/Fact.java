@@ -90,6 +90,7 @@ public final class Fact {
      * fact is unordered.
      * @return The number.
      */
+    @SuppressWarnings("unused")
     public int arity() {
         return shape.arity();
     }

@@ -156,12 +156,7 @@ public class FactSet {
     public void rename(String oldName, String newName) {
         var newFacts = new HashSet<Fact>();
         for (var fact : indexSet(oldName)) {
-            // TODO: Simplify
-            var newFact = switch (fact) {
-                case Fact f ->
-                    new Fact(newName, f);
-            };
-            newFacts.add(newFact);
+            newFacts.add(new Fact(newName, fact));
         }
 
         drop(oldName);

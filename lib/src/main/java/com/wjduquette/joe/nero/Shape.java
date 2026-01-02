@@ -117,19 +117,6 @@ public class Shape {
     // Static API
 
     /**
-     * Infer the shape of a fact from the fact.  List, map, and pair facts have
-     * the list, map, and pair shapes.
-     * @param fact The fact
-     * @return The shape
-     */
-    public static Shape inferShape(Fact fact) {
-        // TODO: Remove!
-        return switch (fact) {
-            case Fact f  -> f.shape();
-        };
-    }
-
-    /**
      * Returns true if the atom conforms to the given Shape, and false
      * otherwise.
      * @param atom The atom
