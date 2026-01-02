@@ -324,8 +324,8 @@ public class RuleEngineTest extends Ted {
     public void testKeywordMatchesEnum() {
         test("testKeywordMatchesEnum");
         Set<Fact> facts = Set.of(
-            new NewFact("Topic", List.of("x", "y"), List.of(Topic.THIS, "abc")),
-            new NewFact("Topic", List.of("x", "y"), List.of(Topic.THAT, "def"))
+            new ConcreteFact("Topic", List.of("x", "y"), List.of(Topic.THIS, "abc")),
+            new ConcreteFact("Topic", List.of("x", "y"), List.of(Topic.THAT, "def"))
         );
         var source = """
             define Match/x;
@@ -1145,8 +1145,8 @@ public class RuleEngineTest extends Ted {
         test("testKnownVsInferred");
 
         Set<Fact> facts = Set.of(
-            new NewFact("Owns", List.of("owner", "thing"), List.of("joe", "car")),
-            new NewFact("Owns", List.of("owner", "thing"), List.of("joe", "truck"))
+            new ConcreteFact("Owns", List.of("owner", "thing"), List.of("joe", "car")),
+            new ConcreteFact("Owns", List.of("owner", "thing"), List.of("joe", "truck"))
         );
         var source = """
             define Owner/owner;

@@ -467,7 +467,7 @@ public class RuleEngine {
                     termMap.put(e.getKey(), Term.toValue(e.getValue(), null));
                 }
 
-                yield new NewFact(atom.relation(), termMap);
+                yield new ConcreteFact(atom.relation(), termMap);
             }
             case OrderedAtom atom -> {
                 var shape = ruleset.schema().get(atom.relation());
@@ -476,7 +476,7 @@ public class RuleEngine {
                 for (var term : atom.terms()) {
                     terms.add(Term.toValue(term, null));
                 }
-                yield new NewFact(atom.relation(), shape.names(), terms);
+                yield new ConcreteFact(atom.relation(), shape.names(), terms);
             }
         };
     }
@@ -490,7 +490,7 @@ public class RuleEngine {
                     terms.put(e.getKey(), term2value(e.getValue(), bc));
                 }
 
-                yield new NewFact(atom.relation(), terms);
+                yield new ConcreteFact(atom.relation(), terms);
             }
             case OrderedAtom atom -> {
                 var terms = new ArrayList<>();
@@ -498,7 +498,7 @@ public class RuleEngine {
                 for (var term : atom.terms()) {
                     terms.add(term2value(term, bc));
                 }
-                yield new NewFact(atom.relation(), bc.shape.names(), terms);
+                yield new ConcreteFact(atom.relation(), bc.shape.names(), terms);
             }
         };
     }
@@ -566,7 +566,7 @@ public class RuleEngine {
         var facts = new HashSet<Fact>();
         if (coll instanceof Collection<?> c) {
             for (var item : c) {
-                facts.add(new NewFact(MEMBER,
+                facts.add(new ConcreteFact(MEMBER,
                     BUILT_INS.get(MEMBER).names(),
                     List.of(item, c)));
             }
@@ -583,7 +583,7 @@ public class RuleEngine {
         if (coll instanceof List<?> list) {
             int index = 0;
             for (var item : list) {
-                facts.add(new NewFact(INDEXED_MEMBER,
+                facts.add(new ConcreteFact(INDEXED_MEMBER,
                     BUILT_INS.get(INDEXED_MEMBER).names(),
                     List.of((double)index, item, list)));
                 ++index;
@@ -600,7 +600,7 @@ public class RuleEngine {
 
         if (coll instanceof Map<?,?> map) {
             for (var e : map.entrySet()) {
-                facts.add(new NewFact(KEYED_MEMBER,
+                facts.add(new ConcreteFact(KEYED_MEMBER,
                     BUILT_INS.get(KEYED_MEMBER).names(),
                     List.of(e.getKey(), e.getValue(), map)));
             }
@@ -656,7 +656,7 @@ public class RuleEngine {
         }
 
         if (isEquivalent) {
-            facts.add(new NewFact(EQUIVALENT,
+            facts.add(new ConcreteFact(EQUIVALENT,
                 BUILT_INS.get(EQUIVALENT).names(),
                 List.of(equiv.keyword(), a, b)));
         }

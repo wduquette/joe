@@ -2,7 +2,7 @@ package com.wjduquette.joe.nero;
 
 import java.util.*;
 
-public final class NewFact implements Fact {
+public final class ConcreteFact implements Fact {
     //------------------------------------------------------------------------
     // Instance Variables
 
@@ -20,7 +20,7 @@ public final class NewFact implements Fact {
      * @param names The field names
      * @param fields The field values
      */
-    public NewFact(String relation, List<String> names, List<Object> fields) {
+    public ConcreteFact(String relation, List<String> names, List<Object> fields) {
         this.shape = new Shape(relation, names);
         this.fields = List.copyOf(fields);
 
@@ -40,7 +40,7 @@ public final class NewFact implements Fact {
      * @param relation The relation
      * @param fieldMap The map of field names and values.
      */
-    public NewFact(String relation, Map<String,Object> fieldMap) {
+    public ConcreteFact(String relation, Map<String,Object> fieldMap) {
         this.shape = new Shape(relation);
         this.fieldMap = Map.copyOf(fieldMap);
         this.fields = null;
@@ -51,7 +51,7 @@ public final class NewFact implements Fact {
      * @param relation The new relation
      * @param other The other fact.
      */
-    public NewFact(String relation, NewFact other) {
+    public ConcreteFact(String relation, ConcreteFact other) {
         this.shape = new Shape(relation, other.shape.names());
         this.fieldMap = other.fieldMap;
         this.fields = other.fields;
@@ -130,10 +130,10 @@ public final class NewFact implements Fact {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        NewFact newFact = (NewFact) o;
-        return shape.equals(newFact.shape) &&
-            Objects.equals(fields, newFact.fields) &&
-            fieldMap.equals(newFact.fieldMap);
+        ConcreteFact other = (ConcreteFact) o;
+        return shape.equals(other.shape) &&
+            Objects.equals(fields, other.fields) &&
+            fieldMap.equals(other.fieldMap);
     }
 
     @Override
