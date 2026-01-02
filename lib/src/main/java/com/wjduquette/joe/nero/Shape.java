@@ -125,7 +125,7 @@ public class Shape {
     public static Shape inferShape(Fact fact) {
         // TODO: Remove!
         return switch (fact) {
-            case ConcreteFact f  -> f.shape();
+            case Fact f  -> f.shape();
         };
     }
 

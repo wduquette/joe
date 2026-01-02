@@ -158,8 +158,8 @@ public class FactSet {
         for (var fact : indexSet(oldName)) {
             // TODO: Simplify
             var newFact = switch (fact) {
-                case ConcreteFact f ->
-                    new ConcreteFact(newName, f);
+                case Fact f ->
+                    new Fact(newName, f);
             };
             newFacts.add(newFact);
         }

@@ -2,7 +2,6 @@ package com.wjduquette.joe.patterns;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.ConcreteFact;
 import com.wjduquette.joe.util.Bindings;
 import org.junit.Before;
 import org.junit.Test;
@@ -577,7 +576,7 @@ public class MatcherTest extends Ted {
 
         var p1 = new Pattern.TypeName("Thing");
         var p2 = new Pattern.TypeName("Fact");
-        var value = new ConcreteFact("Thing", List.of("x"), List.of("hat"));
+        var value = new Fact("Thing", List.of("x"), List.of("hat"));
 
         check(bind(p1, value)).ne(null);
         check(bind(p2, value)).ne(null);
@@ -704,7 +703,7 @@ public class MatcherTest extends Ted {
         @Override public void set(String name, Object value) { }
         @Override public boolean isFact() { return true; }
         @Override public Fact toFact() {
-            return new ConcreteFact(typeName, List.of("id", "color"),
+            return new Fact(typeName, List.of("id", "color"),
                 List.of(fields.get("id"),fields.get("color")));
         }
     }

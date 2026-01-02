@@ -319,6 +319,6 @@ public class FactSetTest extends Ted {
     // Helpers
 
     private Fact fact(String relation, double value) {
-        return new ConcreteFact(relation, List.of("x"), List.of(value));
+        return new Fact(relation, List.of("x"), List.of(value));
     }
 }

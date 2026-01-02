@@ -68,9 +68,9 @@ public class SchemaTest extends Ted {
     @Test public void testInfer_schema_ok() {
         test("testInfer_schema_ok");
         List<Fact> facts = List.of(
-            new ConcreteFact("Person", List.of("x", "y"), List.of("a", "b")),
-            new ConcreteFact("Place", List.of("x"), List.of("c")),
-            new ConcreteFact("Thing", List.of("x", "y", "z"), List.of("d", "e", "f"))
+            new Fact("Person", List.of("x", "y"), List.of("a", "b")),
+            new Fact("Place", List.of("x"), List.of("c")),
+            new Fact("Thing", List.of("x", "y", "z"), List.of("d", "e", "f"))
         );
 
         schema = Schema.inferSchema(facts);

@@ -139,7 +139,7 @@ public class NeroTest extends Ted {
     @Test public void testWith_update() {
         test("testWith_update");
         var db = new FactSet();
-        db.add(new ConcreteFact("A", List.of("x"), List.of(1.0)));
+        db.add(new Fact("A", List.of("x"), List.of(1.0)));
         var script = """
             define B/x;
             B(2);
@@ -160,7 +160,7 @@ public class NeroTest extends Ted {
     @Test public void testWith_query_factset() {
         test("testWith_query_factset");
         var db = new FactSet();
-        db.add(new ConcreteFact("A", List.of("x"), List.of(1.0)));
+        db.add(new Fact("A", List.of("x"), List.of(1.0)));
         var script = """
             define B/x;
             B(2);
@@ -178,7 +178,7 @@ public class NeroTest extends Ted {
     @Test public void testWith_query_collections() {
         test("testWith_query_collections");
         var list = new ArrayList<Fact>();
-        list.add(new ConcreteFact("A", List.of("a"), List.of(1.0)));
+        list.add(new Fact("A", List.of("a"), List.of(1.0)));
         var script = """
             define B/x;
             B(2);
@@ -224,7 +224,7 @@ public class NeroTest extends Ted {
     @Test
     public void testToNeroAxiom_unorderedFact() {
         test("testToNeroAxiom_unorderedFact");
-        var fact = new ConcreteFact("Thing", Map.of("id", "car", "color", "red"));
+        var fact = new Fact("Thing", Map.of("id", "car", "color", "red"));
         check(nero.toNeroAxiom(fact))
             .eq("Thing(color: \"red\", id: \"car\");");
     }
@@ -232,7 +232,7 @@ public class NeroTest extends Ted {
     @Test
     public void testToNeroAxiom_orderedFact() {
         test("testToNeroAxiom_orderedFact");
-        var fact = new ConcreteFact("Thing",
+        var fact = new Fact("Thing",
             List.of("id", "color"), List.of("car", "red"));
         check(nero.toNeroAxiom(fact))
             .eq("Thing(\"car\", \"red\");");
