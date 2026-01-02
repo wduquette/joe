@@ -117,6 +117,56 @@ public class NeroTest extends Ted {
         check(ruleset.schema()).eq(schema);
     }
 
+    //-------------------------------------------------------------------------
+    // Schema
+
+    @Test public void testSchema_static() {
+        test("testSchema_static");
+        var schema = Nero.schema("""
+            define Foo/a,b;
+            """);
+        check(schema.isStatic()).eq(true);
+    }
+
+    @Test public void testSchema_nonStatic_axiom() {
+        test("testSchema_nonStatic_axiom");
+        var script = """
+            define Foo/a,b;
+            Foo(1,2);
+            """;
+        checkThrow(() -> Nero.schema(script))
+            .containsString("Expected a static schema.");
+    }
+
+    @Test public void testSchema_nonStatic_rule() {
+        test("testSchema_nonStatic_rule");
+        var script = """
+            define Foo/a,b;
+            Foo(x,y) :- Bar(x,y);
+            """;
+        checkThrow(() -> Nero.schema(script))
+            .containsString("Expected a static schema.");
+    }
+
+    @Test public void testSchema_nonStatic_transient() {
+        test("testSchema_nonStatic_transient");
+        var script = """
+            define Foo/a,b;
+            define transient Bar/a,b;
+            """;
+        checkThrow(() -> Nero.schema(script))
+            .containsString("Expected a static schema.");
+    }
+
+    @Test public void testSchema_nonStatic_update() {
+        test("testSchema_nonStatic_update");
+        var script = """
+            define Foo!/a,b;
+            """;
+        checkThrow(() -> Nero.schema(script))
+            .containsString("Expected a static schema.");
+    }
+
     //------------------------------------------------------------------------
     // with(): execution pipeline
     //

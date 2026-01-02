@@ -237,6 +237,14 @@ public class Schema {
         return schema;
     }
 
+    public boolean isStatic() {
+        if (!transients.isEmpty()) return false;
+        for (var name : shapeMap.keySet()) {
+            if (name.endsWith("!")) return false;
+        }
+        return true;
+    }
+
     //-------------------------------------------------------------------------
     // Object API
 

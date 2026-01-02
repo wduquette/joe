@@ -412,4 +412,31 @@ public class Nero {
         }
         return ruleSet;
     }
+
+    /**
+     * Gets a static schema from a Nero script.  Throws an error if the
+     * script contains anything but static schema definitions.
+     * @param script The script
+     * @return The schema
+     */
+    public static Schema schema(String script) {
+        var ruleset = parse(new SourceBuffer("*script*", script));
+        return schema(ruleset);
+    }
+
+    /**
+     * Gets a static schema from a rule set.  Throws an error if the rule set
+     * contains anything but static schema definitions.
+     * @param ruleset The rule set
+     * @return The schema
+     */
+    public static Schema schema(NeroRuleSet ruleset) {
+        if (ruleset.rules().isEmpty() &&
+            ruleset.axioms().isEmpty() &&
+            ruleset.schema().isStatic()
+        ) {
+            return ruleset.schema();
+        }
+        throw new JoeError("Expected a static schema.");
+    }
 }
