@@ -112,7 +112,9 @@ class NeroParser extends EmbeddedParser {
 
                 // Axiom or Rule
                 var headToken = scanner.peek();
+                var headStart = headToken.span().start();
                 var head = atom(Context.HEAD);
+                var headEnd = scanner.previous().span().end();
 
                 if (scanner.match(SEMICOLON)) {
                     if (RuleEngine.isBuiltIn(head.relation())) {
@@ -123,11 +125,12 @@ class NeroParser extends EmbeddedParser {
                         throw errorSync(headToken, "undefined relation in axiom.");
                     }
                     if (!schema.check(head)) {
-                        // TODO: display head with stringified terms.
+                        var headString = headToken.span().buffer()
+                            .span(headStart, headEnd).text();
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                             schema.get(head.relation()).toSpec() +
-                            "', got: '" + head + "'.");
+                            "', got: '" + headString + "'.");
                     }
                     axioms.add(axiom(headToken, head));
                 } else if (scanner.match(COLON_MINUS)) {
@@ -140,11 +143,12 @@ class NeroParser extends EmbeddedParser {
                             "undefined relation in rule head.");
                     }
                     if (!schema.check(head)) {
-                        // TODO: display head with stringified terms.
+                        var headString = headToken.span().buffer()
+                            .span(headStart, headEnd).text();
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                                 schema.get(head.relation()).toSpec() +
-                                "', got: '" + head + "'.");
+                                "', got: '" + headString + "'.");
                     }
                     rules.add(rule(headToken, head));
                 } else {

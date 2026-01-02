@@ -54,7 +54,7 @@ public class NeroParserTest extends Ted {
             Person(#joe, 90);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'Person', schema mismatch, expected shape compatible with 'Person/id', got: 'Person(#joe, 90.0)'.");
+            .eq("[line 2] error at 'Person', schema mismatch, expected shape compatible with 'Person/id', got: 'Person(#joe, 90)'.");
     }
 
     @Test public void testParse_headBuiltIn() {
