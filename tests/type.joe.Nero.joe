@@ -6,6 +6,7 @@
 function testDebug() {
     var nero = Nero();
     var rules = ruleset {
+        define Parent/p,c;
         Parent(#anne, #bert);
     };
     
@@ -16,6 +17,8 @@ function testDebug() {
 function testInfer() {
     var nero = Nero();
     var rules = ruleset {
+        define Parent/p,c;
+        define Ancestor/a,d;
         Parent(#anne, #bert);
         Parent(#bert, #clark);
         Ancestor(x, y) :- Parent(x, y);
@@ -23,12 +26,12 @@ function testInfer() {
     };
     var results = nero.toNeroScript(nero.with(rules).infer()).strip();
     assertEQ(results, """
-        define Ancestor/2;
+        define Ancestor/a,d;
         Ancestor(#anne, #bert);
         Ancestor(#anne, #clark);
         Ancestor(#bert, #clark);
         
-        define Parent/2;
+        define Parent/p,c;
         Parent(#anne, #bert);
         Parent(#bert, #clark);
         """);
@@ -37,22 +40,24 @@ function testInfer() {
 function testUpdate() {
     var nero = Nero();
     var rules1 = ruleset {
+        define Parent/p,c;
         Parent(#anne, #bert);
         Parent(#bert, #clark);
     };
     var rules2 = ruleset {
+        define Ancestor/a,d;
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     };
     var facts = nero.with(rules1).infer();
     var results = nero.toNeroScript(nero.with(rules2).update(facts)).strip();
     assertEQ(results, """
-        define Ancestor/2;
+        define Ancestor/a,d;
         Ancestor(#anne, #bert);
         Ancestor(#anne, #clark);
         Ancestor(#bert, #clark);
 
-        define Parent/2;
+        define Parent/p,c;
         Parent(#anne, #bert);
         Parent(#bert, #clark);
         """);
@@ -61,17 +66,19 @@ function testUpdate() {
 function testQuery() {
     var nero = Nero();
     var rules1 = ruleset {
+        define Parent/p,c;
         Parent(#anne, #bert);
         Parent(#bert, #clark);
     };
     var rules2 = ruleset {
+        define Ancestor/a,d;
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     };
     var facts = nero.with(rules1).infer();
     var results = nero.toNeroScript(nero.with(rules2).query(facts)).strip();
     assertEQ(results, """
-        define Ancestor/2;
+        define Ancestor/a,d;
         Ancestor(#anne, #bert);
         Ancestor(#anne, #clark);
         Ancestor(#bert, #clark);
@@ -96,6 +103,7 @@ function testWith_noFields() {
     ];
 
     var rules = ruleset {
+        define Ancestor/a,d;
         Ancestor(x, y) :- Parent(x, y);
     };
 
@@ -110,11 +118,12 @@ function testWith_noFields() {
 // fields, including the Fact type itself.
 function testWith_proxiedValue_ordered() {
     var inputs = [
-        Fact("Parent", #anne, #bert),
-        Fact("Parent", #bert, #clark)
+        Fact("Parent", ["p", #anne, "c", #bert]),
+        Fact("Parent", ["p", #bert, "c", #clark])
     ];
 
     var rules = ruleset {
+        define Ancestor/a,d;
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     };
@@ -122,7 +131,7 @@ function testWith_proxiedValue_ordered() {
     var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
 
     assertEQ(results, """
-        define Ancestor/2;
+        define Ancestor/a,d;
         Ancestor(#anne, #bert);
         Ancestor(#anne, #clark);
         Ancestor(#bert, #clark);
@@ -133,20 +142,21 @@ function testWith_proxiedValue_ordered() {
 // fields, including the Fact type itself, using named atoms
 function testWith_proxiedValue_named() {
     var inputs = [
-        Fact("Parent", #anne, #bert),
-        Fact("Parent", #bert, #clark)
+        Fact("Parent", ["p", #anne, "c", #bert]),
+        Fact("Parent", ["p", #bert, "c", #clark])
     ];
 
     var rules = ruleset {
-        Ancestor(x, y) :- Parent(f0:x, f1:y);
-        Ancestor(x, y) :- Parent(f0:x, f1:z), Ancestor(z, y);
+        define Ancestor/a,d;
+        Ancestor(x, y) :- Parent(p:x, c:y);
+        Ancestor(x, y) :- Parent(p:x, c:z), Ancestor(z, y);
     };
 
     var nero = Nero();
     var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
 
     assertEQ(results, """
-        define Ancestor/2;
+        define Ancestor/a,d;
         Ancestor(#anne, #bert);
         Ancestor(#anne, #clark);
         Ancestor(#bert, #clark);
@@ -163,6 +173,7 @@ function testWith_record_ordered() {
     ];
 
     var rules = ruleset {
+        define Ancestor/a,d;
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
     };
@@ -171,7 +182,7 @@ function testWith_record_ordered() {
     var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
 
     assertEQ(results, """
-        define Ancestor/2;
+        define Ancestor/a,d;
         Ancestor(#anne, #bert);
         Ancestor(#anne, #clark);
         Ancestor(#bert, #clark);
@@ -188,6 +199,7 @@ function testWith_record_named() {
     ];
 
     var rules = ruleset {
+        define Ancestor/a,d;
         Ancestor(x, y) :- Parent(p:x, c:y);
         Ancestor(x, y) :- Parent(p:x, c:z), Ancestor(z, y);
     };
@@ -196,7 +208,7 @@ function testWith_record_named() {
     var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
 
     assertEQ(results, """
-        define Ancestor/2;
+        define Ancestor/a,d;
         Ancestor(#anne, #bert);
         Ancestor(#anne, #clark);
         Ancestor(#bert, #clark);
@@ -222,6 +234,7 @@ function testWith_class_named() {
     ];
 
     var rules = ruleset {
+        define Ancestor/a,d;
         Ancestor(x, y) :- Parent(p:x, c:y);
         Ancestor(x, y) :- Parent(p:x, c:z), Ancestor(z, y);
     };
@@ -230,7 +243,7 @@ function testWith_class_named() {
     var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
 
     assertEQ(results, """
-        define Ancestor/2;
+        define Ancestor/a,d;
         Ancestor(#anne, #bert);
         Ancestor(#anne, #clark);
         Ancestor(#bert, #clark);
@@ -256,6 +269,7 @@ function testWith_class_ordered() {
     ];
 
     var rules = ruleset {
+        define Ancestor/a,d;
         Ancestor(x, y) :- Parent(x, y);
     };
 
@@ -273,11 +287,13 @@ function testWith_namedPattern() {
     }
 
     var inputs = [
-        Fact("A", #a, Thing(#hat, #black)),
-        Fact("A", #b, Thing(#wagon, #red))
+        Fact("A", ["id", #a, "color", Thing(#hat, #black)]),
+        Fact("A", ["id", #b, "color", Thing(#wagon, #red)])
     ];
 
     var rules = ruleset {
+        define B/x,y,z;
+
         B(x, y, z) :- A(x, Thing(id: y, color: z));
     };
 
@@ -285,7 +301,7 @@ function testWith_namedPattern() {
     var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
 
     assertEQ(results, """
-        define B/3;
+        define B/x,y,z;
         B(#a, #hat, #black);
         B(#b, #wagon, #red);
         """);
@@ -295,11 +311,12 @@ function testPattern_ordered() {
     record Thing(id, color) {}
 
     var inputs = [
-        Fact("A", #a, Thing(#hat, #black)),
-        Fact("A", #b, Thing(#wagon, #red))
+        Fact("A", ["id", #a, "color", Thing(#hat, #black)]),
+        Fact("A", ["id", #b, "color", Thing(#wagon, #red)])
     ];
 
     var rules = ruleset {
+        define B/x,y,z;
         B(x, y, z) :- A(x, Thing(y, z));
     };
 
@@ -307,7 +324,7 @@ function testPattern_ordered() {
     var results = nero.toNeroScript(nero.with(rules).query(inputs)).strip();
 
     assertEQ(results, """
-        define B/3;
+        define B/x,y,z;
         B(#a, #hat, #black);
         B(#b, #wagon, #red);
         """);
@@ -348,13 +365,15 @@ function testEquivalences_collection() {
 function testUseEquivalence() {
     var nero = Nero();
     var rules = ruleset {
-        transient Str;
+        define transient Str/s;
+        define Both/s,n;
+
         Str("123");
         Both(s,n) :- Str(s), equivalent(#str2num, s, n);
     };
     var results = nero.toNeroScript(nero.with(rules).infer()).strip();
     assertEQ(results, """
-        define Both/2;
+        define Both/s,n;
         Both("123", 123);
         """);
 }
@@ -367,6 +386,7 @@ function testUseEquivalence() {
 function testToNeroAxiom() {
     var nero = Nero();
     var rules = ruleset {
+        define Parent/p,c;
         Parent(#anne, #bert);
         Parent(#bert, #clark);
     };

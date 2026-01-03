@@ -2,7 +2,6 @@ package com.wjduquette.joe.walker;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.PairFact;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,7 +108,8 @@ class WalkerRecord implements JoeValue {
 
     @Override
     public Fact toFact() {
-        return new PairFact(type.name(), type.getRecordFields(), fieldMap);
+        return new Fact(type.name(), type.getRecordFields(),
+            getMatchableFieldValues());
     }
 
     @Override

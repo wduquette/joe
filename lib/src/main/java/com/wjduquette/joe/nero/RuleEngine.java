@@ -62,7 +62,7 @@ public class RuleEngine {
     }
 
     private static void builtIn(String name, List<String> fields) {
-        var shape = new Shape.PairShape(name, fields);
+        var shape = new Shape(name, fields);
         BUILT_INS.put(shape.relation(), shape);
     }
 
@@ -459,6 +459,7 @@ public class RuleEngine {
     }
 
     private Fact axiom2fact(Atom axiom) {
+        var shape = ruleset.schema().get(axiom.relation());
         return switch (axiom) {
             case NamedAtom atom -> {
                 var termMap = new HashMap<String,Object>();
@@ -467,20 +468,17 @@ public class RuleEngine {
                     termMap.put(e.getKey(), Term.toValue(e.getValue(), null));
                 }
 
-                yield new MapFact(atom.relation(), termMap);
+                // Creates an ordered or unordered atom based on the shape.
+                yield new Fact(atom.relation(), shape.names(), termMap);
             }
             case OrderedAtom atom -> {
-                var shape = ruleset.schema().get(atom.relation());
+                assert shape.isOrdered();  // Guaranteed by parser.
                 var terms = new ArrayList<>();
 
                 for (var term : atom.terms()) {
                     terms.add(Term.toValue(term, null));
                 }
-                if (shape instanceof Shape.PairShape ps) {
-                    yield new PairFact(atom.relation(), ps.fieldNames(), terms);
-                } else {
-                    yield new ListFact(atom.relation(), terms);
-                }
+                yield new Fact(atom.relation(), shape.names(), terms);
             }
         };
     }
@@ -494,7 +492,7 @@ public class RuleEngine {
                     terms.put(e.getKey(), term2value(e.getValue(), bc));
                 }
 
-                yield new MapFact(atom.relation(), terms);
+                yield new Fact(atom.relation(), bc.shape.names(), terms);
             }
             case OrderedAtom atom -> {
                 var terms = new ArrayList<>();
@@ -502,11 +500,7 @@ public class RuleEngine {
                 for (var term : atom.terms()) {
                     terms.add(term2value(term, bc));
                 }
-                if (bc.shape instanceof Shape.PairShape ps) {
-                    yield new PairFact(atom.relation(), ps.fieldNames(), terms);
-                } else {
-                    yield new ListFact(atom.relation(), terms);
-                }
+                yield new Fact(atom.relation(), bc.shape.names(), terms);
             }
         };
     }
@@ -574,7 +568,9 @@ public class RuleEngine {
         var facts = new HashSet<Fact>();
         if (coll instanceof Collection<?> c) {
             for (var item : c) {
-                facts.add(new ListFact(MEMBER, List.of(item, c)));
+                facts.add(new Fact(MEMBER,
+                    BUILT_INS.get(MEMBER).names(),
+                    List.of(item, c)));
             }
         }
 
@@ -589,7 +585,8 @@ public class RuleEngine {
         if (coll instanceof List<?> list) {
             int index = 0;
             for (var item : list) {
-                facts.add(new ListFact(INDEXED_MEMBER,
+                facts.add(new Fact(INDEXED_MEMBER,
+                    BUILT_INS.get(INDEXED_MEMBER).names(),
                     List.of((double)index, item, list)));
                 ++index;
             }
@@ -605,7 +602,8 @@ public class RuleEngine {
 
         if (coll instanceof Map<?,?> map) {
             for (var e : map.entrySet()) {
-                facts.add(new ListFact(KEYED_MEMBER,
+                facts.add(new Fact(KEYED_MEMBER,
+                    BUILT_INS.get(KEYED_MEMBER).names(),
                     List.of(e.getKey(), e.getValue(), map)));
             }
         }
@@ -660,7 +658,9 @@ public class RuleEngine {
         }
 
         if (isEquivalent) {
-            facts.add(new ListFact(EQUIVALENT, List.of(equiv.keyword(), a, b)));
+            facts.add(new Fact(EQUIVALENT,
+                BUILT_INS.get(EQUIVALENT).names(),
+                List.of(equiv.keyword(), a, b)));
         }
         return facts;
     }

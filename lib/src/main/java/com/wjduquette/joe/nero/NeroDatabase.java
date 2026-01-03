@@ -20,9 +20,6 @@ public class NeroDatabase {
     // The Nero instance
     private final Nero nero;
 
-    // The accumulated schema
-    private Schema schema;
-
     // The accumulated facts
     private final FactSet db = new FactSet();
 
@@ -33,45 +30,24 @@ public class NeroDatabase {
     // Constructor
 
     /**
-     * Creates a new database with an empty schema, using an anonymous
+     * Creates a new database using an anonymous
      * instance of Joe.
      */
     public NeroDatabase() {
-        this(new Nero(), new Schema());
+        this(new Nero());
     }
 
     /**
-     * Creates a new database with an empty schema, using an explicit
+     * Creates a new database using an explicit
      * instance of Joe.
      * @param joe The Joe interpreter
      */
     public NeroDatabase(Joe joe) {
-        this(new Nero(joe), new Schema());
+        this(new Nero(joe));
     }
 
-    /**
-     * Creates a new database with a pre-defined schema, using an anonymous
-     * instance of Joe.
-     * @param schema The schema
-     */
-    public NeroDatabase(Schema schema) {
-        this(new Nero(), schema);
-    }
-
-    /**
-     * Creates a new database with a pre-defined schema, using an explicit
-     * instance of Joe.
-     * @param joe The Joe interpreter
-     * @param schema The schema
-     */
-    public NeroDatabase(Joe joe, Schema schema) {
-        this.nero = new Nero(joe);
-        this.schema = schema;
-    }
-
-    private NeroDatabase(Nero nero, Schema schema) {
+    private NeroDatabase(Nero nero) {
         this.nero = nero;
-        this.schema = schema;
     }
 
     //------------------------------------------------------------------------
@@ -130,23 +106,59 @@ public class NeroDatabase {
      */
     public NeroDatabase clear() {
         db.clear();
-        schema = new Schema();
         return this;
     }
 
     /**
-     * Updates the content of the database given the Nero script, updating
-     * the schema.
-     * @param script The Nero script
+     * Updates the content of the database given the rule set,
+     * verifying that the rule set's schema is compatible with the given schema
+     * and with the current content.
+     * @param ruleset The rule set
+     * @param schema A static schema
      * @return The database
+     * @throws JoeError on any Nero error.
      */
-    public NeroDatabase update(String script) {
-        return update(new SourceBuffer("*java*", script));
+    public NeroDatabase update(NeroRuleSet ruleset, Schema schema) {
+        if (schema != null) {
+            checkCompatibility("given schema", schema, ruleset.schema());
+        }
+        checkCompatibility("current content", schema(), ruleset.schema());
+        nero.with(ruleset).debug(debug).update(db);
+        return this;
     }
 
     /**
-     * Updates the content of the database given the Nero script, updating the
-     * schema.
+     * Updates the content of the database given the rule set,
+     * verifying that the rule set's schema is compatible with the
+     * current content.
+     * @param ruleset The rule set
+     * @return The database
+     * @throws JoeError on any Nero error.
+     */
+    public NeroDatabase update(NeroRuleSet ruleset) {
+        return update(ruleset, null);
+    }
+
+    /**
+     * Updates the content of the database given the Nero script,
+     * verifying that the script's schema is compatible with the given schema
+     * and with the current content
+     * @param source The Nero source
+     * @param schema A static schema
+     * @return The database
+     * @throws SyntaxError on any Nero compilation error, including schema
+     *         mismatch
+     * @throws JoeError on any Nero error.
+     */
+    public NeroDatabase update(SourceBuffer source, Schema schema) {
+        var ruleset = Nero.compile(source);
+        return update(ruleset, schema);
+    }
+
+    /**
+     * Updates the content of the database given the Nero script,
+     * verifying that the script's schema is compatible with the
+     * current content.
      * @param source The Nero source
      * @return The database
      * @throws SyntaxError on any Nero compilation error, including schema
@@ -154,27 +166,58 @@ public class NeroDatabase {
      * @throws JoeError on any Nero error.
      */
     public NeroDatabase update(SourceBuffer source) {
-        var ruleset = Nero.compile(schema, source);
-        nero.with(ruleset).debug(debug).update(db);
-        schema = ruleset.schema();
-        return this;
+        return update(source, null);
     }
 
     /**
-     * Updates the content of the database given the rule set, updating
-     * the schema.
-     * @param ruleset The rule set
+     * Updates the content of the database given the Nero script,
+     * verifying that the script's schema is compatible with the given schema
+     * and with the current content.
+     * @param script The Nero script
+     * @param schema The given schema
      * @return The database
-     * @throws JoeError on any Nero error.
      */
-    public NeroDatabase update(NeroRuleSet ruleset) {
-        nero.with(ruleset).debug(debug).update(db);
-        schema = Schema.inferSchema(db.all());
-        return this;
+    public NeroDatabase update(String script, Schema schema) {
+        return update(new SourceBuffer("*java*", script), schema);
+    }
+
+
+    /**
+     * Updates the content of the database given the Nero script,
+     * verifying that the script's schema is compatible with the
+     * current content.
+     * @param script The Nero script
+     * @return The database
+     */
+    public NeroDatabase update(String script) {
+        return update(new SourceBuffer("*java*", script), null);
     }
 
     /**
-     * Updates the content of the database given the Nero file.
+     * Updates the content of the database given the Nero file,
+     * verifying that the script's schema is compatible with the given schema
+     * and with the current content.
+     * @param scriptFile The Nero file
+     * @param schema The given schema
+     * @return The database
+     */
+    public NeroDatabase load(Path scriptFile, Schema schema) {
+        String script;
+        try {
+            script = Files.readString(scriptFile);
+        } catch (IOException ex) {
+            throw new JoeError(
+                "Could not read Nero script file from disk:" + ex.getMessage());
+        }
+        var sourceBuffer =
+            new SourceBuffer(scriptFile.getFileName().toString(), script);
+        return update(sourceBuffer, schema);
+    }
+
+    /**
+     * Updates the content of the database given the Nero file,
+     * verifying that the script's schema is compatible with the
+     * current content.
      * @param scriptFile The Nero file
      * @return The database
      */
@@ -192,20 +235,23 @@ public class NeroDatabase {
     }
 
     /**
-     * Queries the database given the Nero script.
+     * Queries the database given the Nero script, verifying that the
+     * query is compatible with the database's current content.
      * @param script The Nero script
      * @return The inferred facts
      */
     public FactSet query(String script) {
-        return query(Nero.compile(schema, new SourceBuffer("*nero*", script)));
+        return query(Nero.compile(new SourceBuffer("*nero*", script)));
     }
 
     /**
-     * Queries the database given the Nero rule set
+     * Queries the database given the Nero rule set, verifying that the
+     * query is compatible with the database's current content.
      * @param ruleset The rule set
      * @return The inferred facts
      */
     public FactSet query(NeroRuleSet ruleset) {
+        checkCompatibility("current content", schema(), ruleset.schema());
         return nero.with(ruleset).debug(debug).query(db);
     }
 
@@ -218,7 +264,7 @@ public class NeroDatabase {
      * @throws JoeError if there is a schema mismatch
      */
     public NeroDatabase addFacts(NeroDatabase other) {
-        schema.merge(other.schema);
+        checkNewFacts(other.db.all());
         addFacts(other.db);
         return this;
     }
@@ -242,10 +288,26 @@ public class NeroDatabase {
      * @throws JoeError if there is a schema mismatch
      */
     public NeroDatabase addFacts(Collection<Fact> facts) {
-        // Throws error
-        schema.merge(Schema.inferSchema(facts));
+        checkNewFacts(facts);
         db.addAll(facts);
         return this;
+    }
+
+    // Verifies that all incoming facts are compatible with the existing
+    // facts and with each other, i.e., all incoming facts with a given
+    // relation have the same shape.
+    private void checkNewFacts(Collection<Fact> facts) {
+        var schema = schema();
+
+        for (var fact : facts) {
+            // Throws an error for an incompatible fact.
+            if (!schema.checkAndAdd(fact)) {
+                throw new JoeError(
+                    "Added fact is incompatible with current content, " +
+                    "expected shape '" + schema.get(fact.relation()) +
+                    "', got fact: '" + fact +  "'.");
+            }
+        }
     }
 
     /**
@@ -255,7 +317,6 @@ public class NeroDatabase {
      */
     public NeroDatabase drop(String relation) {
         db.drop(relation);
-        schema.drop(relation);
         return this;
     }
 
@@ -309,7 +370,7 @@ public class NeroDatabase {
      * @return The schema
      */
     public Schema schema() {
-        return new Schema(schema);
+        return Schema.inferSchema(db.all());
     }
 
     /**
@@ -400,5 +461,22 @@ public class NeroDatabase {
      */
     public String toNeroAxiom(Fact fact) {
         return nero.toNeroAxiom(fact);
+    }
+
+    //------------------------------------------------------------------------
+    // Utilities
+
+    private void checkCompatibility(String text, Schema expected, Schema got) {
+        for (var name : expected.getRelations()) {
+            if (expected.hasRelation(name)) {
+                var e = expected.get(name);
+                var s = got.get(name);
+                if (s != null && !e.equals(s)) {
+                    throw new JoeError(
+                        "Rule set is incompatible with " + text + ", expected '" +
+                        e + "', got: '" + s + "'.");
+                }
+            }
+        }
     }
 }

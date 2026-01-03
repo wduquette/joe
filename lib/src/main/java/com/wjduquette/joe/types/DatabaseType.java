@@ -29,6 +29,22 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
         // %proxyType com.wjduquette.joe.types.DatabaseType
         // The `Database` object allows Joe code to work with a collection
         // of Nero [[Fact|Facts]] over a series of transactions.
+        //
+        // ## Schema Checking
+        //
+        // All [[Fact|Facts]] added to the database by
+        // [[method:Database.addFacts]], [[method:Database.load]], or
+        // [[method:Database.update]] must be compatible with the current
+        // content of the database.  Specifically, if an update produces
+        // facts belonging to a relation already present in the database,
+        // the new facts must have the same shape as the existing facts.
+        //
+        // [[method:Database.load]] and [[method:Database.update]] take an
+        // optional *schema* argument.  If given, all facts produced by the
+        // script or rule set whose relations appear in the *schema*
+        // must be compatible with the schema.  This feature is typically used
+        // when loading arbitrary scripts or rule sets into an empty database,
+        // to ensure that the incoming data has the desired form.
         proxies(NeroDatabase.class);
 
         initializer(this::_init);
@@ -251,14 +267,24 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
 
     //**
     // @method load
-    // %args path
+    // %args path, [schema]
     // %result this
     // Loads the Nero script at the given *path* and uses it to update the
-    // database.  The *path* may be passed as a
-    // [[Path]] or string.
+    // database.  The *path* may be passed as a [[Path]] or string.
+    // The facts produced by the script must be compatible with the database's
+    // current content.
+    //
+    // If *schema* is given, it must be a [[RuleSet]] or string defining a
+    // static schema.  The facts produced by the script must be also
+    // be compatible with the *schema*.
     private Object _load(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "load(path)");
-        return db.load(joe.toPath(args.next()));
+        args.arityRange(1, 2, "load(path, [schema])");
+        var path = joe.toPath(args.next());
+        if (args.hasNext()) {
+            return db.load(path, toStaticSchema(joe, args.next()));
+        } else {
+            return db.load(path);
+        }
     }
 
     //**
@@ -283,12 +309,12 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %args rules
     // %result Set
     // Queries the database given the *rules*, returning a set of
-    // [[Fact|Facts]].  The *rules* may be passed
-    // as a [[RuleSet]] or as a Nero script for compilation.  Does not
-    // modify the database.
+    // [[Fact|Facts]].  The *rules* must be compatible with the current
+    // content of the database, and may be passed as a [[RuleSet]] or as a
+    // Nero script for compilation.  Does not modify the database.
     private Object _query(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "query(rules)");
-        return new SetValue(db.query(toRules(db, joe, args.next())).all());
+        return new SetValue(db.query(toRules(joe, args.next())).all());
     }
 
     //**
@@ -428,20 +454,40 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
 
     //**
     // @method update
-    // %args rules
+    // %args rules, [schema]
     // %result this
     // Updates the database given the *rules*.  The *rules* may be passed
-    // as a [[RuleSet]] or as a Nero script for compilation.
+    // as a [[RuleSet]] or as a Nero script for compilation. The facts
+    // produced by the *rules* must be compatible with the database's
+    // current content.
+    //
+    // If *schema* is given, it must be a [[RuleSet]] or string defining a
+    // static schema, and the facts produced by the *rules* must also
+    // be compatible with the *schema*.
     private Object _update(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "update(rules)");
-        return db.update(toRules(db, joe, args.next()));
+        args.arityRange(1, 2, "update(rules, [schema])");
+        var rules = toRules(joe, args.next());
+        if (args.hasNext()) {
+            return db.update(rules, toStaticSchema(joe, args.next()));
+
+        } else {
+            return db.update(rules);
+        }
     }
 
-    private NeroRuleSet toRules(NeroDatabase db, Joe joe, Object arg) {
+    private NeroRuleSet toRules(Joe joe, Object arg) {
         if (arg instanceof NeroRuleSet rs) return rs;
         if (arg instanceof String s) {
-            return Nero.compile(db.schema(), new SourceBuffer("*joe*", s));
+            return Nero.compile(new SourceBuffer("*joe*", s));
         }
         throw joe.expected("ruleset or script", arg);
+    }
+
+    private Schema toStaticSchema(Joe joe, Object arg) {
+        var schema = toRules(joe, arg).schema();
+        if (!schema.isStatic()) {
+            throw joe.expected("static schema", arg);
+        }
+        return schema;
     }
 }

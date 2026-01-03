@@ -28,7 +28,10 @@ public class NeroTest extends Ted {
     // Verify that we get a rule set.
     @Test public void testParse_good() {
         test("testParse_good");
-        var ruleset = Nero.parse(buffer("A(1);"));
+        var ruleset = Nero.parse(buffer("""
+            define A/x;
+            A(1);
+            """));
 
         check(ruleset.rules().isEmpty()).eq(true);
         check(ruleset.axioms().size()).eq(1);
@@ -47,7 +50,10 @@ public class NeroTest extends Ted {
     // Verify that we get a rule set.
     @Test public void testCompile_good() {
         test("testCompile_good");
-        var ruleset = Nero.compile(buffer("A(1);"));
+        var ruleset = Nero.parse(buffer("""
+            define A/x;
+            A(1);
+            """));
 
         check(ruleset.rules().isEmpty()).eq(true);
         check(ruleset.axioms().size()).eq(1);
@@ -56,56 +62,71 @@ public class NeroTest extends Ted {
     // Verify that we get errors.
     @Test public void testCompile_syntax() {
         test("testCompile_syntax");
-        checkThrow(() -> Nero.compile(buffer("A(1;")))
+        checkThrow(() -> Nero.compile(buffer("A(1);")))
             .containsString("Error in Nero input");
     }
 
-    // Verify that we get compilation errors.
+    // Verify that we get stratification errors.
     @Test public void testCompile_unstratifiable() {
         test("testCompile_unstratifiable");
         checkThrow(() -> Nero.compile(buffer("""
+            define A/x;
+            define C/x;
             A(x) :- B(x), not C(x);
             C(x) :- A(x);
             """)))
             .containsString("Nero rule set cannot be stratified.");
     }
 
-    // Verify that we can supply a schema.
-    @Test public void testCompile_withSchema_good() {
-        test("testCompile_withSchema_good");
-        var shape = new Shape.PairShape("A", List.of("a"));
-        var schema = new Schema();
-        schema.checkAndAdd(shape);
 
-        var ruleset = Nero.compile(schema, buffer("""
-            A(1);
-        """));
-        check(ruleset.schema()).eq(schema);
+    //-------------------------------------------------------------------------
+    // Schema
+
+    @Test public void testSchema_static() {
+        test("testSchema_static");
+        var schema = Nero.schema("""
+            define Foo/a,b;
+            """);
+        check(schema.isStatic()).eq(true);
     }
 
-    // Verify we detect mismatches with the predefined schema.
-    @Test public void testCompile_withSchema_mismatch() {
-        test("testCompile_withSchema_mismatch");
-        var shape = new Shape.PairShape("A", List.of("a"));
-        var schema = new Schema();
-        schema.checkAndAdd(shape);
-
-        check(compileError(schema, "A(1, 2);"))
-            .eq("error at 'A', schema mismatch, expected shape compatible with 'A/a', got: 'A/2'.");
+    @Test public void testSchema_nonStatic_axiom() {
+        test("testSchema_nonStatic_axiom");
+        var script = """
+            define Foo/a,b;
+            Foo(1,2);
+            """;
+        checkThrow(() -> Nero.schema(script))
+            .containsString("Expected a static schema.");
     }
 
-    // Verify that equivalent `defines` are OK.
-    @Test public void testCompile_withSchema_duplicate() {
-        test("testCompile_withSchema_duplicate");
-        var shape = new Shape.PairShape("A", List.of("a"));
-        var schema = new Schema();
-        schema.checkAndAdd(shape);
+    @Test public void testSchema_nonStatic_rule() {
+        test("testSchema_nonStatic_rule");
+        var script = """
+            define Foo/a,b;
+            Foo(x,y) :- Bar(x,y);
+            """;
+        checkThrow(() -> Nero.schema(script))
+            .containsString("Expected a static schema.");
+    }
 
-        var ruleset = Nero.compile(schema, buffer("""
-            define A/a;
-            A(1);
-            """));
-        check(ruleset.schema()).eq(schema);
+    @Test public void testSchema_nonStatic_transient() {
+        test("testSchema_nonStatic_transient");
+        var script = """
+            define Foo/a,b;
+            define transient Bar/a,b;
+            """;
+        checkThrow(() -> Nero.schema(script))
+            .containsString("Expected a static schema.");
+    }
+
+    @Test public void testSchema_nonStatic_update() {
+        test("testSchema_nonStatic_update");
+        var script = """
+            define Foo!/a,b;
+            """;
+        checkThrow(() -> Nero.schema(script))
+            .containsString("Expected a static schema.");
     }
 
     //------------------------------------------------------------------------
@@ -118,10 +139,11 @@ public class NeroTest extends Ted {
     @Test public void testWith_noInputs() {
         test("testWith_noInputs");
         var script = """
+            define A/x;
             A(1);
             """;
         check(nero.toNeroScript(nero.with(script).debug().infer())).eq("""
-            define A/1;
+            define A/x;
             A(1);
             """);
     }
@@ -129,19 +151,20 @@ public class NeroTest extends Ted {
     @Test public void testWith_update() {
         test("testWith_update");
         var db = new FactSet();
-        db.add(new ListFact("A", List.of(1.0)));
+        db.add(new Fact("A", List.of("x"), List.of(1.0)));
         var script = """
+            define B/x;
             B(2);
             """;
         check(nero.toNeroScript(nero.with(script).debug().update(db))).eq("""
-            define B/1;
+            define B/x;
             B(2);
             """);
         check(nero.toNeroScript(db)).eq("""
-            define A/1;
+            define A/x;
             A(1);
             
-            define B/1;
+            define B/x;
             B(2);
             """);
     }
@@ -149,16 +172,17 @@ public class NeroTest extends Ted {
     @Test public void testWith_query_factset() {
         test("testWith_query_factset");
         var db = new FactSet();
-        db.add(new ListFact("A", List.of(1.0)));
+        db.add(new Fact("A", List.of("x"), List.of(1.0)));
         var script = """
+            define B/x;
             B(2);
             """;
         check(nero.toNeroScript(nero.with(script).debug().query(db))).eq("""
-            define B/1;
+            define B/x;
             B(2);
             """);
         check(nero.toNeroScript(db)).eq("""
-            define A/1;
+            define A/x;
             A(1);
             """);
     }
@@ -166,12 +190,13 @@ public class NeroTest extends Ted {
     @Test public void testWith_query_collections() {
         test("testWith_query_collections");
         var list = new ArrayList<Fact>();
-        list.add(new ListFact("A", List.of(1.0)));
+        list.add(new Fact("A", List.of("a"), List.of(1.0)));
         var script = """
+            define B/x;
             B(2);
             """;
         check(nero.toNeroScript(nero.with(script).debug().query(list))).eq("""
-            define B/1;
+            define B/x;
             B(2);
             """);
     }
@@ -189,7 +214,7 @@ public class NeroTest extends Ted {
             define Place/...;
             Place(attire: "Stetson", name: "Texas");
             
-            define Thing/2;
+            define Thing/thing,color;
             Thing("hat", "black");
             """;
         var facts = nero.with(script).infer();
@@ -200,7 +225,7 @@ public class NeroTest extends Ted {
             define Place/...;
             Place(attire: "Stetson", name: "Texas");
             
-            define Thing/2;
+            define Thing/thing,color;
             Thing("hat", "black");
             """);
     }
@@ -209,25 +234,17 @@ public class NeroTest extends Ted {
     // toNeroAxiom
 
     @Test
-    public void testToNeroAxiom_listFact() {
-        test("testToNeroAxiom_listFact");
-        var fact = new ListFact("Thing", List.of("car", "red"));
-        check(nero.toNeroAxiom(fact))
-            .eq("Thing(\"car\", \"red\");");
-    }
-
-    @Test
-    public void testToNeroAxiom_mapFact() {
-        test("testToNeroAxiom_mapFact");
-        var fact = new MapFact("Thing", Map.of("id", "car", "color", "red"));
+    public void testToNeroAxiom_unorderedFact() {
+        test("testToNeroAxiom_unorderedFact");
+        var fact = new Fact("Thing", Map.of("id", "car", "color", "red"));
         check(nero.toNeroAxiom(fact))
             .eq("Thing(color: \"red\", id: \"car\");");
     }
 
     @Test
-    public void testToNeroAxiom_pairFact() {
-        test("testToNeroAxiom_pairFact");
-        var fact = new PairFact("Thing",
+    public void testToNeroAxiom_orderedFact() {
+        test("testToNeroAxiom_orderedFact");
+        var fact = new Fact("Thing",
             List.of("id", "color"), List.of("car", "red"));
         check(nero.toNeroAxiom(fact))
             .eq("Thing(\"car\", \"red\");");
@@ -257,16 +274,5 @@ public class NeroTest extends Ted {
 
     private SourceBuffer buffer(String script) {
         return new SourceBuffer("*test*", script);
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private String compileError(Schema schema, String script) {
-        try {
-            Nero.compile(schema, buffer(script));
-            fail("Expected error.");
-            return null;
-        } catch (SyntaxError ex) {
-            return ex.getTraces().getFirst().message();
-        }
     }
 }

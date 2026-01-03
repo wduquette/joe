@@ -347,24 +347,6 @@ public class Nero {
     }
 
     /**
-     * Parses the source, checking for syntax errors.
-     * Returns the rule set on success.
-     * @param schema The predefined schema
-     * @param source The source
-     * @return The rule set
-     * @throws SyntaxError on parse error.
-     */
-    private static NeroRuleSet parse(Schema schema, SourceBuffer source) {
-        var traces = new ArrayList<Trace>();
-        var parser = new Parser(source, (t, flag) -> traces.add(t));
-        var ruleset = parser.parseNero(schema);
-        if (!traces.isEmpty()) {
-            throw new SyntaxError("Error in Nero input.", traces, false);
-        }
-        return ruleset;
-    }
-
-    /**
      * Compiles the script, checking for syntax errors and stratification.
      * Returns the rule set on success and throws an appropriate error
      * on error.
@@ -373,6 +355,7 @@ public class Nero {
      * @throws SyntaxError on parse error.
      * @throws JoeError on stratification error.
      */
+    @SuppressWarnings("unused")
     public static NeroRuleSet compile(String script) {
         return compile(new SourceBuffer("*nero*", script));
     }
@@ -395,21 +378,29 @@ public class Nero {
     }
 
     /**
-     * Compiles the source, checking for syntax errors and stratification.
-     * The source must be compatible with the given pre-defined schema.
-     * Returns the rule set on success and throws an appropriate error
-     * on error.
-     * @param schema The schema
-     * @param source The source
-     * @return The engine, which has not yet be run.
-     * @throws SyntaxError on parse error.
-     * @throws JoeError on stratification error.
+     * Gets a static schema from a Nero script.  Throws an error if the
+     * script contains anything but static schema definitions.
+     * @param script The script
+     * @return The schema
      */
-    public static NeroRuleSet compile(Schema schema, SourceBuffer source) {
-        var ruleSet = parse(schema, source);
-        if (!ruleSet.isStratified()) {
-            throw new JoeError("Nero rule set cannot be stratified.");
+    public static Schema schema(String script) {
+        var ruleset = parse(new SourceBuffer("*script*", script));
+        return schema(ruleset);
+    }
+
+    /**
+     * Gets a static schema from a rule set.  Throws an error if the rule set
+     * contains anything but static schema definitions.
+     * @param ruleset The rule set
+     * @return The schema
+     */
+    public static Schema schema(NeroRuleSet ruleset) {
+        if (ruleset.rules().isEmpty() &&
+            ruleset.axioms().isEmpty() &&
+            ruleset.schema().isStatic()
+        ) {
+            return ruleset.schema();
         }
-        return ruleSet;
+        throw new JoeError("Expected a static schema.");
     }
 }

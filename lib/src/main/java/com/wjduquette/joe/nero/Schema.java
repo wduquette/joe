@@ -16,7 +16,7 @@ public class Schema {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    // The relation shapes, by relation name.
+    // The shape of each relation, by relation name.
     private final Map<String,Shape> shapeMap = new HashMap<>();
 
     // The set of transient relations.  Transient relations are dropped after
@@ -110,6 +110,53 @@ public class Schema {
     }
 
     /**
+     * Verifies whether the shape is consistent with a shape of the same
+     * name in the schema.  Returns false if there is a mismatch or if
+     * there is no shape with the same relation name.
+     * @param shape The shape to add
+     * @return true or false
+     */
+    public boolean check(Shape shape) {
+        return Objects.equals(shape, get(shape.relation()));
+    }
+
+    /**
+     * Verifies that the head atom's shape matches the relation's shape
+     * in the schema.
+     * @param head The atom
+     * @return true or false
+     */
+    public boolean check(Atom head) {
+        var relation = head.relation();
+        var defined = get(relation);
+        return defined != null && Shape.conformsTo(head, defined);
+    }
+
+    /**
+     * Verifies that the fact's shape is consistent with the schema.
+     * Returns true if the relation is known and has the same shape, and
+     * false otherwise.
+     * @param fact The fact
+     * @return true or false
+     */
+    public boolean check(Fact fact) {
+        return check(fact.shape());
+    }
+
+    /**
+     * Adds the shape to the schema.
+     * @param shape The shape
+     * @throws IllegalArgumentException if the shape is already defined.
+     */
+    public void add(Shape shape) {
+        if (get(shape.relation()) != null) {
+            throw new IllegalArgumentException(
+                "adding shape for existing relation.");
+        }
+        shapeMap.put(shape.relation(), shape);
+    }
+
+    /**
      * Adds the shape to the schema if no shape is defined for the
      * shape's relation.  Otherwise, verifies that the given shape is
      * identical to the defined shape.  Returns false if there is a mismatch
@@ -135,39 +182,7 @@ public class Schema {
      * @return true or false
      */
     public boolean checkAndAdd(Fact fact) {
-        var shape = Shape.inferShape(fact);
-        return checkAndAdd(shape);
-    }
-
-    /**
-     * Adds the shape inferred from the head atom to the schema if no shape is
-     * defined for the atom's relation.  Otherwise, verifies that the defined
-     * shape is compatible with the atom. Returns false if there is a mismatch
-     * and true otherwise.
-     *
-     * <p>If a shape is defined, compatibility is determined as follows:</p>
-     * <ul>
-     * <li>For a ListShape, the atom must be an ordered atom of the correct
-     *     arity.</li>
-     * <li>For a MapShape, the atom must be a named atom.</li>
-     * <li>For a PairShape, the atom must be an ordered atom of the correct
-     *     arity.</li>
-     * </ul>
-     * @param head The head atom whose shape is to be added.
-     * @return true or false
-     */
-    public boolean checkAndAdd(Atom head) {
-        var relation = head.relation();
-        var defined = get(relation);
-
-        // FIRST, save the inferred shape if there's no shape already defined.
-        if (defined == null) {
-            shapeMap.put(relation, Shape.inferDefaultShape(head));
-            return true;
-        }
-
-        // NEXT, make sure the atom is compatible with the defined shape.
-        return Shape.conformsTo(head, defined);
+        return checkAndAdd(fact.shape());
     }
 
     /**
@@ -181,7 +196,7 @@ public class Schema {
 
     /**
      * Merges the other schema into this one, provided that the shapes
-     * for matching relations are merge-compatible.
+     * for matching relations are identical.
      * @param other The other schema.
      */
     public void merge(Schema other) {
@@ -192,16 +207,11 @@ public class Schema {
             var a = get(e.getKey());
             if (a == null) {
                 retained.add(b);
-            } else {
-                var keeper = promote(a, b);
-                if (keeper != null) {
-                    retained.add(keeper);
-                } else {
-                    throw new JoeError(
-                        "Schema mismatch for '" + a.relation() +
-                        "', expected shape compatible with '" +
-                        a.toSpec() + "', got: '" + b.toSpec() + "'.");
-                }
+            } else if (!a.equals(b)) {
+                throw new JoeError(
+                    "Schema mismatch for '" + a.relation() +
+                    "', expected shape compatible with '" +
+                    a.toSpec() + "', got: '" + b.toSpec() + "'.");
             }
         }
 
@@ -212,40 +222,47 @@ public class Schema {
     }
 
     /**
-     * Checks the two shapes for merge compatibility, returning the
-     * shape to retain.  Returns null if incompatible.
-     * @param a The first shape
-     * @param b The second shape.
-     * @return The new shape or null.
+     * Return an equivalent schema with no transient or update relations,
+     * i.e, a schema that represents the static state of a set of facts
+     * after rule set execution.
+     * @return the static schema
      */
-    public static Shape promote(Shape a, Shape b) {
-        // Safety check
-        if (!a.relation().equals(b.relation())) return null;
-
-        // Handles pairs of MapShapes and pairs of ListShapes.
-        if (a.equals(b)) return a;
-
-        // A is a PairShape
-        if (a instanceof Shape.PairShape pa) {
-            if (b instanceof Shape.ListShape lb) {
-                // B is compatible ListShape
-                return pa.arity() == lb.arity() ? pa : null;
-            } else if (b instanceof Shape.PairShape pb) {
-                // B is compatible PairShape
-                return pa.arity() == pb.arity() ? pa : null;
-            } else {
-                return null;
+    public Schema toStaticSchema() {
+        var schema = new Schema();
+        for (var e : shapeMap.entrySet()) {
+            if (!e.getKey().endsWith("!") && !transients.contains(e.getKey())) {
+                schema.add(e.getValue());
             }
         }
+        return schema;
+    }
 
-        if (a instanceof Shape.ListShape la &&
-            b instanceof Shape.PairShape pb)
-        {
-            // A is ListShape and B is compatible PairShape.
-            return la.arity() == pb.arity() ? pb : null;
+    /**
+     * Checks whether this schema is a static schema, i.e., one with no
+     * transient or update relations that can represent the static state
+     * of a set of facts after rule set execution.
+     * @return true or false
+     */
+    public boolean isStatic() {
+        if (!transients.isEmpty()) return false;
+        for (var name : shapeMap.keySet()) {
+            if (name.endsWith("!")) return false;
         }
+        return true;
+    }
 
-        return null;
+    /**
+     * Gets whether this schema is compatible with the other schema.  Two
+     * schemas are compatible if their shared relations are equal.
+     * @param other The other schema
+     * @return true or false
+     */
+    public boolean isCompatible(Schema other) {
+        for (var shape : shapeMap.values()) {
+            var otherShape = other.get(shape.relation());
+            if (otherShape != null && !shape.equals(otherShape)) return false;
+        }
+        return true;
     }
 
     //-------------------------------------------------------------------------

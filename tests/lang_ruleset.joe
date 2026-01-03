@@ -7,6 +7,8 @@
 
 function testValid() {
     var rules = ruleset {
+        define Parent/p,c;
+        define Ancestor/a,d;
         Parent(#walker, #bert);
         Parent(#bert, #clark);
         Ancestor(x, y) :- Parent(x, y);

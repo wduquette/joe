@@ -3,104 +3,118 @@ package com.wjduquette.joe.nero;
 import java.util.List;
 
 /**
- * The shape of Nero facts, for use in a Nero Schema.
+ * The shape of a Nero relation, for use in a Nero Schema.
  */
-public sealed interface Shape permits
-    Shape.ListShape,
-    Shape.MapShape,
-    Shape.PairShape
-{
+@SuppressWarnings("ClassCanBeRecord")
+public class Shape {
     //-------------------------------------------------------------------------
-    // Interface API
+    // Instance Variables
+
+    // The relation name
+    private final String relation;
+
+    // The field names, or empty if none.
+    private final List<String> names;
+
+    //-------------------------------------------------------------------------
+    // Constructor
+
+    /**
+     * Creates a new shape.  If names is non-empty it will be ordered.
+     * @param relation The relation
+     * @param names the names.
+     */
+    public Shape(String relation, List<String> names) {
+        this.relation = relation;
+        this.names = List.copyOf(names);
+    }
+
+    /**
+     * Creates a new shape.  If names are provided it will be ordered.
+     * @param relation The relation
+     * @param names the names, if any.
+     */
+    public Shape(String relation, String... names) {
+        this.relation = relation;
+        this.names = List.of(names);
+    }
 
     /**
      * The shape's relation name.
      * @return The name
      */
-    String relation();
+    public String relation() {
+        return relation;
+    }
+
+    /**
+     * The shape's field names; the list will be empty for unordered relations.
+     * @return The list
+     */
+    public List<String> names() {
+        return names;
+    }
 
     /**
      * The arity of facts having this shape.  Returns -1 if the arity can
      * vary for different facts of this shape.
      * @return The arity
      */
-    int arity();
+    public int arity() {
+        return names.size();
+    }
+
+    /**
+     * Whether facts having this shape are ordered or not.
+     * @return true or false
+     */
+    public boolean isOrdered() {
+        return !names.isEmpty();
+    }
+
+    /**
+     * Whether facts having this shape are unordered or not.
+     * @return true or false
+     */
+    public boolean isUnordered() {
+        return names.isEmpty();
+    }
 
     /**
      * Gets the string representation of the shape, as it appears
      * in `define` declarations.
      * @return The string representation.
      */
-    String toSpec();
-
-    //-------------------------------------------------------------------------
-    // Concrete Shape Types
-
-    /**
-     * The shape of a ListFact having the given relation and arity.
-     * @param relation The relation name
-     * @param arity The arity
-     */
-    record ListShape(String relation, int arity)
-        implements Shape
-    {
-        @Override public String toSpec() { return relation + "/" + arity; }
-    }
-
-    /**
-     * The shape of a MapFact having the given relation.
-     * @param relation The relation name
-     */
-    record MapShape(String relation)
-        implements Shape
-    {
-        @Override public int arity() { return -1; }
-        @Override public String toSpec() { return relation + "/..."; }
-    }
-
-    /**
-     * The shape of a PairFact having the given relation and field names.
-     * @param relation The relation
-     * @param fieldNames The field names.
-     */
-    record PairShape(String relation, List<String> fieldNames)
-        implements Shape
-    {
-        @Override public int arity() { return fieldNames.size(); }
-        @Override public String toSpec() {
-            return relation + "/" + String.join(",", fieldNames);
+    public String toSpec() {
+        if (isOrdered()) {
+            return relation + "/" + String.join(",", names);
+        } else {
+            return relation + "/...";
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Shape shape = (Shape) o;
+        return relation.equals(shape.relation) && names.equals(shape.names);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = relation.hashCode();
+        result = 31 * result + names.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return toSpec();
     }
 
     //-------------------------------------------------------------------------
     // Static API
-
-    /**
-     * Infer the shape of a fact from the fact.  List, map, and pair facts have
-     * the list, map, and pair shapes.
-     * @param fact The fact
-     * @return The shape
-     */
-    static Shape inferShape(Fact fact) {
-        return switch (fact) {
-            case ListFact f -> new ListShape(f.relation(), f.arity());
-            case MapFact f  -> new MapShape(f.relation());
-            case PairFact f -> new PairShape(f.relation(), f.getFieldNames());
-        };
-    }
-
-    /**
-     * Infer the default shape of a fact from a rule or axiom head atom.  Infers the
-     * list shape for ordered atoms and the map shape for named atoms.
-     * @param head The head atom
-     * @return The inferred shape
-     */
-    static Shape inferDefaultShape(Atom head) {
-        return switch (head) {
-            case OrderedAtom a -> new ListShape(a.relation(), a.terms().size());
-            case NamedAtom a -> new MapShape(a.relation());
-        };
-    }
 
     /**
      * Returns true if the atom conforms to the given Shape, and false
@@ -109,16 +123,16 @@ public sealed interface Shape permits
      * @param shape The shape
      * @return true or false
      */
-    static boolean conformsTo(Atom atom, Shape shape) {
-        return switch (shape) {
-            case Shape.ListShape s ->
-                atom instanceof OrderedAtom a &&
-                    s.arity() == a.terms().size();
-            case Shape.MapShape ignored ->
-                atom instanceof NamedAtom;
-            case Shape.PairShape s ->
-                atom instanceof OrderedAtom a &&
-                    s.arity() == a.terms().size();
+    public static boolean conformsTo(Atom atom, Shape shape) {
+        return switch (atom) {
+            case NamedAtom a -> {
+                if (shape.isUnordered()) yield true;
+                for (var name : a.termMap().keySet()) {
+                    if (!shape.names().contains(name)) yield false;
+                }
+                yield true;
+            }
+            case OrderedAtom a -> shape.arity() == a.terms().size();
         };
     }
 }

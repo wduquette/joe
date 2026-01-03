@@ -74,17 +74,6 @@ class NeroParser extends EmbeddedParser {
         return doParse(new Schema());
     }
 
-    /**
-     * Parses Nero code, using an appropriate condition for returning control
-     * to the client.  The Nero code must be compatible with the given
-     * Schema.
-     * @param schema A pre-defined schema
-     * @return The rule set
-     */
-    public NeroRuleSet parse(Schema schema) {
-        return doParse(new Schema(schema));
-    }
-
     //-------------------------------------------------------------------------
     // The Parser
 
@@ -112,20 +101,25 @@ class NeroParser extends EmbeddedParser {
 
                 // Axiom or Rule
                 var headToken = scanner.peek();
+                var headStart = headToken.span().start();
                 var head = atom(Context.HEAD);
+                var headEnd = scanner.previous().span().end();
 
                 if (scanner.match(SEMICOLON)) {
                     if (RuleEngine.isBuiltIn(head.relation())) {
                         throw errorSync(headToken,
                             "found built-in predicate in axiom.");
                     }
-                    if (!schema.checkAndAdd(head)) {
+                    if (!schema.hasRelation(head.relation())) {
+                        throw errorSync(headToken, "undefined relation in axiom.");
+                    }
+                    if (!schema.check(head)) {
+                        var headString = headToken.span().buffer()
+                            .span(headStart, headEnd).text();
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                             schema.get(head.relation()).toSpec() +
-                            "', got: '" +
-                            Shape.inferDefaultShape(head).toSpec() +
-                            "'.");
+                            "', got: '" + headString + "'.");
                     }
                     axioms.add(axiom(headToken, head));
                 } else if (scanner.match(COLON_MINUS)) {
@@ -133,13 +127,17 @@ class NeroParser extends EmbeddedParser {
                         throw errorSync(headToken,
                             "found built-in predicate in rule head.");
                     }
-                    if (!schema.checkAndAdd(head)) {
+                    if (!schema.hasRelation(head.relation())) {
+                        throw errorSync(headToken,
+                            "undefined relation in rule head.");
+                    }
+                    if (!schema.check(head)) {
+                        var headString = headToken.span().buffer()
+                            .span(headStart, headEnd).text();
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                                 schema.get(head.relation()).toSpec() +
-                                "', got: '" +
-                                Shape.inferDefaultShape(head).toSpec() +
-                                "'.");
+                                "', got: '" + headString + "'.");
                     }
                     rules.add(rule(headToken, head));
                 } else {
@@ -181,17 +179,8 @@ class NeroParser extends EmbeddedParser {
 
         Shape shape;
 
-        if (scanner.match(NUMBER)) {
-            var arity = (Double)scanner.previous().literal();
-            if (arity - arity.intValue() != 0.0) {
-                error(scanner.previous(), "expected integer arity.");
-            }
-            if (arity <= 0) {
-                error(scanner.previous(), "expected positive arity.");
-            }
-            shape = new Shape.ListShape(relation.name(), arity.intValue());
-        } else if (scanner.match(DOT_DOT_DOT)) {
-            shape = new Shape.MapShape(relation.name());
+        if (scanner.match(DOT_DOT_DOT)) {
+            shape = new Shape(relation.name());
         } else if (scanner.check(IDENTIFIER)) {
             var names = new ArrayList<String>();
             do {
@@ -203,7 +192,7 @@ class NeroParser extends EmbeddedParser {
                 names.add(name);
             } while (scanner.match(COMMA));
 
-            shape = new Shape.PairShape(relation.name(), names);
+            shape = new Shape(relation.name(), names);
         } else {
             scanner.advance();
             throw errorSync(scanner.previous(),
@@ -211,11 +200,15 @@ class NeroParser extends EmbeddedParser {
         }
         scanner.consume(SEMICOLON, "expected ';' after definition.");
 
-        if (schema.checkAndAdd(shape)) {
-            if (transience) schema.setTransient(relation.name(), true);
+        if (schema.hasRelation(shape.relation())) {
+            if (!schema.check(shape)) {
+                error(relation.token(), "definition clashes with earlier entry.");
+            }
         } else {
-            error(relation.token(), "definition clashes with earlier entry.");
+            schema.add(shape);
         }
+
+        if (transience) schema.setTransient(relation.name(), true);
     }
 
     private void transientDeclaration(Schema schema) {
@@ -259,10 +252,6 @@ class NeroParser extends EmbeddedParser {
             }
 
             if (negated) {
-//                if (RuleEngine.isBuiltIn(atom.relation())) {
-//                    throw errorSync(token,
-//                        "found built-in predicate in negated body atom.");
-//                }
                 for (var name : atom.getVariableNames()) {
                     if (!bodyVars.contains(name)) {
                         error(token,
@@ -326,8 +315,8 @@ class NeroParser extends EmbeddedParser {
         var shape = RuleEngine.getBuiltInShape(atom.relation());
         assert shape != null;
         if (!Shape.conformsTo(atom, shape)) {
-            error(token, "expected " + shape.toSpec() + ", got: " +
-                Shape.inferDefaultShape(atom).toSpec() + ".");
+            error(token, "expected " + shape.toSpec() + ", got: '" +
+                atom + "'.");
             return;
         }
 

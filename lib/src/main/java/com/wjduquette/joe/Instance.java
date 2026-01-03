@@ -1,7 +1,6 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.nero.Fact;
-import com.wjduquette.joe.nero.MapFact;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,7 +107,7 @@ public class Instance implements JoeValue {
 
     @Override
     public Fact toFact() {
-        return new MapFact(joeClass.name(), fieldMap);
+        return new Fact(joeClass.name(), fieldMap);
     }
 
     @Override
