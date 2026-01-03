@@ -382,3 +382,50 @@ function testUpdate_good() {
     assertT(db.all().containsAll(expected));
 }
 
+function testUpdate_mismatch() {
+    var db = Database([
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ]);
+
+    assertError(\-> db.update(ruleset {
+        define Parent/x,y,z;
+        Parent(#alice, #bob, #charles);
+    }), "Rule set is incompatible with current content, expected 'Parent/parent,child', got: 'Parent/x,y,z'.");
+}
+
+function testUpdate_withSchema_good() {
+    var schema = ruleset {
+        define Parent/p,c;
+    };
+
+    var db = Database()
+        .update(ruleset {
+            define Parent/p,c;
+            Parent(#anne, #bert);
+        }, schema);
+
+    var expected = {
+        Fact("Parent", ["p", #anne, "c", #bert]),
+    };
+
+    // The relation's set was updated.
+    assertEQ(db.relation("Parent"), expected);
+
+    // The set of all facts was updated.
+    assertT(db.all().containsAll(expected));
+}
+
+function testUpdate_withSchema_mismatch() {
+    var schema = ruleset {
+        define Parent/p,c;
+    };
+    var badRules = ruleset {
+        define Parent/x,y,z;
+        Parent(#alice, #bob, #charles);
+    };
+
+    var db = Database();
+    assertError(\-> db.update(badRules, schema),
+        "Rule set is incompatible with given schema, expected 'Parent/p,c', got: 'Parent/x,y,z'.");
+}
