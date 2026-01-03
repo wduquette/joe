@@ -29,6 +29,22 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
         // %proxyType com.wjduquette.joe.types.DatabaseType
         // The `Database` object allows Joe code to work with a collection
         // of Nero [[Fact|Facts]] over a series of transactions.
+        //
+        // ## Schema Checking
+        //
+        // All [[Fact|Facts]] added to the database by
+        // [[method:Database.addFacts]], [[method:Database.load]], or
+        // [[method:Database.update]] must be compatible with the current
+        // content of the database.  Specifically, if an update produces
+        // facts belonging to a relation already present in the database,
+        // the new facts must have the same shape as the existing facts.
+        //
+        // [[method:Database.load]] and [[method:Database.update]] take an
+        // optional *schema* argument.  If given, all facts produced by the
+        // script or rule set whose relations appear in the *schema*
+        // must be compatible with the schema.  This feature is typically used
+        // when loading arbitrary scripts or rule sets into an empty database,
+        // to ensure that the incoming data has the desired form.
         proxies(NeroDatabase.class);
 
         initializer(this::_init);
@@ -255,11 +271,12 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %result this
     // Loads the Nero script at the given *path* and uses it to update the
     // database.  The *path* may be passed as a [[Path]] or string.
-    // The script's schema must be compatible with the database's current
-    // content.
+    // The facts produced by the script must be compatible with the database's
+    // current content.
     //
     // If *schema* is given, it must be a [[RuleSet]] or string defining a
-    // static schema, and the *script* must be compatible with the *schema*.
+    // static schema.  The facts produced by the script must be also
+    // be compatible with the *schema*.
     private Object _load(NeroDatabase db, Joe joe, Args args) {
         args.arityRange(1, 2, "load(path, [schema])");
         var path = joe.toPath(args.next());
@@ -440,11 +457,13 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %args rules, [schema]
     // %result this
     // Updates the database given the *rules*.  The *rules* may be passed
-    // as a [[RuleSet]] or as a Nero script for compilation. The *rules*
-    // must be compatible with the database's current content.
+    // as a [[RuleSet]] or as a Nero script for compilation. The facts
+    // produced by the *rules* must be compatible with the database's
+    // current content.
     //
     // If *schema* is given, it must be a [[RuleSet]] or string defining a
-    // static schema, and the *rules* must be compatible with the *schema*.
+    // static schema, and the facts produced by the *rules* must also
+    // be compatible with the *schema*.
     private Object _update(NeroDatabase db, Joe joe, Args args) {
         args.arityRange(1, 2, "update(rules, [schema])");
         var rules = toRules(joe, args.next());

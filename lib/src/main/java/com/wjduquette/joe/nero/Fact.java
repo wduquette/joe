@@ -2,6 +2,11 @@ package com.wjduquette.joe.nero;
 
 import java.util.*;
 
+/**
+ * A Nero Datalog fact.  Facts can be ordered, having a specific set of
+ * fields with specific names, or unordered, having a map containing
+ * an arbitrary set of names.  Facts are immutable.
+ */
 public final class Fact {
     //------------------------------------------------------------------------
     // Instance Variables

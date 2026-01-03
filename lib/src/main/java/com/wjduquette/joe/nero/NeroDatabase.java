@@ -174,6 +174,7 @@ public class NeroDatabase {
      * verifying that the script's schema is compatible with the given schema
      * and with the current content.
      * @param script The Nero script
+     * @param schema The given schema
      * @return The database
      */
     public NeroDatabase update(String script, Schema schema) {
@@ -197,6 +198,7 @@ public class NeroDatabase {
      * verifying that the script's schema is compatible with the given schema
      * and with the current content.
      * @param scriptFile The Nero file
+     * @param schema The given schema
      * @return The database
      */
     public NeroDatabase load(Path scriptFile, Schema schema) {

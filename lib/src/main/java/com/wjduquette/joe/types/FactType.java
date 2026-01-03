@@ -31,8 +31,23 @@ public class FactType extends ProxyType<Fact> {
         //**
         // @package joe
         // @type Fact
-        // An ad hoc type for [[Nero]] and [[NeroDatabase]] facts, consisting
-        // of a `relation` name and ordered or named fields.
+        // A [[Nero]] fact, as used by [[Nero]] and [[Database]].  A fact
+        // consists of a `relation` name and ordered or unordered fields.
+        //
+        // ## Records, Classes, and Facts
+        //
+        // The [[static:Joe.toFact]] method converts instances of
+        // scripted records and classes to `Facts` for use with [[Nero]].
+        //
+        // - Record instances are converted to ordered `Facts`
+        // - Class instances are converted to unordered `Facts`
+        //
+        // In each case, the fields of the record or class instance become
+        // the fact's fields.
+        //
+        // Note: both [[Nero]] and [[Database]] perform this conversion
+        // automatically; it is rarely necessary to call
+        // [[static:Joe.toFact]] explicitly.
         //
         // ## Fact Fields and Field Names
         //
