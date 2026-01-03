@@ -3,59 +3,61 @@
 // Tests for the `Fact` type
 
 function testOfMap() {
-    var fact = Fact.ofMap("Thing", {"id": #car, "color": #red});
+    var fact = Fact("Thing", {"id": #car, "color": #red});
     assertEQ(fact.relation(), "Thing");
     assertF(fact.isOrdered());
     assertEQ(fact.fieldMap(), {"id": #car, "color": #red});
+    assertEQ(fact.fieldNames().sorted(), ["color", "id"]);
     assertEQ(fact.id, #car);
     assertEQ(fact.color, #red);
 }
 
 function testOfMap_badRelation() {
-    assertError(\-> Fact.ofMap("@Thing", {"type": #car}),
+    assertError(\-> Fact("@Thing", {"type": #car}),
         "Expected identifier, got: String '@Thing'.");
 }
 
 function testOfMap_badFieldName() {
-    assertError(\-> Fact.ofMap("Thing", {"@type": #car}),
+    assertError(\-> Fact("Thing", {"@type": #car}),
         "Expected identifier, got: String '@type'.");
 }
 
 function testOfPairs() {
-    var fact = Fact.ofPairs("Thing", ["id", #car, "color", #red]);
+    var fact = Fact("Thing", ["id", #car, "color", #red]);
     assertEQ(fact.relation(), "Thing");
     assertT(fact.isOrdered());
     assertEQ(fact.fields(), [#car, #red]);
     assertEQ(fact.fieldMap(), {"id": #car, "color": #red});
+    assertEQ(fact.fieldNames(), ["id", "color"]);
     assertEQ(fact.id, #car);
     assertEQ(fact.color, #red);
     assertEQ(fact.toString(), "Fact(Thing, #car, #red)");
 }
 
 function testOfPairs_badRelation() {
-    assertError(\-> Fact.ofPairs("@Thing", ["type", #car]),
+    assertError(\-> Fact("@Thing", ["type", #car]),
         "Expected identifier, got: String '@Thing'.");
 }
 
 function testOfPairs_badFieldName() {
-    assertError(\-> Fact.ofPairs("Thing", ["@type", #car]),
+    assertError(\-> Fact("Thing", ["@type", #car]),
         "Expected identifier, got: String '@type'.");
 }
 
 function testBadField() {
-    var fact = Fact.ofPairs("Thing", ["id", #car, "color", #red]);
+    var fact = Fact("Thing", ["id", #car, "color", #red]);
     assertError(\-> fact.size,
         "Undefined property 'size'.");
 }
 
 function testMatch_mapFact() {
-    var fact = Fact.ofMap("Thing", {"id": #car, "color": #red});
+    var fact = Fact("Thing", {"id": #car, "color": #red});
     assertF(fact ~ Thing(#car, _));
     assertT(fact ~ Thing(id: #car));
 }
 
 function testMatch_recordFact() {
-    var fact = Fact.ofPairs("Thing", ["id", #car, "color", #red]);
+    var fact = Fact("Thing", ["id", #car, "color", #red]);
     assertT(fact ~ Thing(#car, _));
     assertT(fact ~ Thing(id: #car));
     assertF(fact ~ Thing(#bus, _));

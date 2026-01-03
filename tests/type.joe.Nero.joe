@@ -118,8 +118,8 @@ function testWith_noFields() {
 // fields, including the Fact type itself.
 function testWith_proxiedValue_ordered() {
     var inputs = [
-        Fact.ofPairs("Parent", ["p", #anne, "c", #bert]),
-        Fact.ofPairs("Parent", ["p", #bert, "c", #clark])
+        Fact("Parent", ["p", #anne, "c", #bert]),
+        Fact("Parent", ["p", #bert, "c", #clark])
     ];
 
     var rules = ruleset {
@@ -142,8 +142,8 @@ function testWith_proxiedValue_ordered() {
 // fields, including the Fact type itself, using named atoms
 function testWith_proxiedValue_named() {
     var inputs = [
-        Fact.ofPairs("Parent", ["p", #anne, "c", #bert]),
-        Fact.ofPairs("Parent", ["p", #bert, "c", #clark])
+        Fact("Parent", ["p", #anne, "c", #bert]),
+        Fact("Parent", ["p", #bert, "c", #clark])
     ];
 
     var rules = ruleset {
@@ -287,8 +287,8 @@ function testWith_namedPattern() {
     }
 
     var inputs = [
-        Fact.ofPairs("A", ["id", #a, "color", Thing(#hat, #black)]),
-        Fact.ofPairs("A", ["id", #b, "color", Thing(#wagon, #red)])
+        Fact("A", ["id", #a, "color", Thing(#hat, #black)]),
+        Fact("A", ["id", #b, "color", Thing(#wagon, #red)])
     ];
 
     var rules = ruleset {
@@ -311,8 +311,8 @@ function testPattern_ordered() {
     record Thing(id, color) {}
 
     var inputs = [
-        Fact.ofPairs("A", ["id", #a, "color", Thing(#hat, #black)]),
-        Fact.ofPairs("A", ["id", #b, "color", Thing(#wagon, #red)])
+        Fact("A", ["id", #a, "color", Thing(#hat, #black)]),
+        Fact("A", ["id", #b, "color", Thing(#wagon, #red)])
     ];
 
     var rules = ruleset {

@@ -959,9 +959,7 @@ public class Joe {
      * @throws JoeError if the argument is not a valid identifier string
      */
     public String toIdentifier(Object arg) {
-        if (arg instanceof String string &&
-            Joe.isIdentifier(string)
-        ) {
+        if (arg instanceof String string && Joe.isIdentifier(string)) {
             return string;
         }
 
@@ -1162,7 +1160,7 @@ public class Joe {
      * @return The comparator
      * @throws JoeError if the argument isn't a collection of the given type.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "unused"})
     public <T> Set<T> toSet(Class<T> cls, Object arg) {
         // NOTE: this is marked "unchecked", but the logic does in fact
         // ensure type safety.

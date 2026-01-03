@@ -153,7 +153,7 @@ function testNamedField_supertype_good() {
 
 // Can match a Fact by its relation
 function testNamedField_fact_byRelation() {
-    var person = Fact.ofPairs("Person", ["n", "Joe", "a", 80]);
+    var person = Fact("Person", ["n", "Joe", "a", 80]);
     assertT(person ~ Person(n: name, a: age));
     assertEQ(name, person.n);
     assertEQ(age, person.a);
@@ -161,7 +161,7 @@ function testNamedField_fact_byRelation() {
 
 // Can match a Fact as a Fact
 function testNamedField_fact_asFact() {
-    var person = Fact.ofPairs("Person", ["n", "Joe", "a", 80]);
+    var person = Fact("Person", ["n", "Joe", "a", 80]);
     assertT(person ~ Fact(relation: "Person", fields: {"n": name, "a": age}));
     assertEQ(name, person.n);
     assertEQ(age, person.a);
@@ -193,7 +193,7 @@ function testOrderedField_good() {
 
 // Can match a Fact by its relation provided that it has ordered fields.
 function testOrderedField_fact_byRelation() {
-    var person = Fact.ofPairs("Person", ["n", "Joe", "a", 80]);
+    var person = Fact("Person", ["n", "Joe", "a", 80]);
     assertT(person ~ Person(name, age));
     assertEQ(name, person.n);
     assertEQ(age, person.a);
@@ -201,7 +201,7 @@ function testOrderedField_fact_byRelation() {
 
 // Can match a Fact by its relation provided that it has ordered fields.
 function testOrderedField_fact_asFact() {
-    var person = Fact.ofPairs("Person", ["n", "Joe", "a", 80]);
+    var person = Fact("Person", ["n", "Joe", "a", 80]);
     assertT(person ~ Fact("Person", [name, age]));
     assertEQ(name, person.n);
     assertEQ(age, person.a);
@@ -241,7 +241,7 @@ function testTypeName_joeValue() {
 
 // For facts, matches on `Fact` or the relation.
 function testTypeName() {
-    var fact = Fact.ofPairs("Thing", ["n", #a]);
+    var fact = Fact("Thing", ["n", #a]);
     assertT(fact ~ Fact());
     assertT(fact ~ Thing());
     assertF(fact ~ String());

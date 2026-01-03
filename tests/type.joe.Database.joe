@@ -224,9 +224,9 @@ function testQuery() {
     });
 
     var expected = {
-        Fact.ofPairs("Ancestor", ["a", #anne, "d", #bert]),
-        Fact.ofPairs("Ancestor", ["a", #anne, "d", #clark]),
-        Fact.ofPairs("Ancestor", ["a", #bert, "d", #clark])
+        Fact("Ancestor", ["a", #anne, "d", #bert]),
+        Fact("Ancestor", ["a", #anne, "d", #clark]),
+        Fact("Ancestor", ["a", #bert, "d", #clark])
     };
     assertEQ(results, expected);
 }
@@ -305,7 +305,7 @@ function testRemoveIf() {
 
 function testRename() {
     var db = Database([JOE, TEXAS, HAT]);
-    var newFact = Fact.ofPairs("Location", ["id", #texas]);
+    var newFact = Fact("Location", ["id", #texas]);
     db.rename("Place", "Location");
     assertEQ(db.all(), {JOE_FACT, newFact, HAT_FACT});
     assertEQ(db.relation("Place"), Set());
@@ -370,9 +370,9 @@ function testUpdate_good() {
     });
 
     var expected = {
-        Fact.ofPairs("Ancestor", ["a", #anne, "d", #bert]),
-        Fact.ofPairs("Ancestor", ["a", #anne, "d", #clark]),
-        Fact.ofPairs("Ancestor", ["a", #bert, "d", #clark])
+        Fact("Ancestor", ["a", #anne, "d", #bert]),
+        Fact("Ancestor", ["a", #anne, "d", #clark]),
+        Fact("Ancestor", ["a", #bert, "d", #clark])
     };
 
     // The relation's set was updated.
