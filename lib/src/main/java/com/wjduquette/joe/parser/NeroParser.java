@@ -74,17 +74,6 @@ class NeroParser extends EmbeddedParser {
         return doParse(new Schema());
     }
 
-    /**
-     * Parses Nero code, using an appropriate condition for returning control
-     * to the client.  The Nero code must be compatible with the given
-     * Schema.
-     * @param schema A pre-defined schema
-     * @return The rule set
-     */
-    public NeroRuleSet parse(Schema schema) {
-        return doParse(new Schema(schema));
-    }
-
     //-------------------------------------------------------------------------
     // The Parser
 

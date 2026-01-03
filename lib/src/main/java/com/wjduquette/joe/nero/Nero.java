@@ -347,24 +347,6 @@ public class Nero {
     }
 
     /**
-     * Parses the source, checking for syntax errors.
-     * Returns the rule set on success.
-     * @param schema The predefined schema
-     * @param source The source
-     * @return The rule set
-     * @throws SyntaxError on parse error.
-     */
-    private static NeroRuleSet parse(Schema schema, SourceBuffer source) {
-        var traces = new ArrayList<Trace>();
-        var parser = new Parser(source, (t, flag) -> traces.add(t));
-        var ruleset = parser.parseNero(schema);
-        if (!traces.isEmpty()) {
-            throw new SyntaxError("Error in Nero input.", traces, false);
-        }
-        return ruleset;
-    }
-
-    /**
      * Compiles the script, checking for syntax errors and stratification.
      * Returns the rule set on success and throws an appropriate error
      * on error.
@@ -373,6 +355,7 @@ public class Nero {
      * @throws SyntaxError on parse error.
      * @throws JoeError on stratification error.
      */
+    @SuppressWarnings("unused")
     public static NeroRuleSet compile(String script) {
         return compile(new SourceBuffer("*nero*", script));
     }
@@ -388,25 +371,6 @@ public class Nero {
      */
     public static NeroRuleSet compile(SourceBuffer source) {
         var ruleSet = parse(source);
-        if (!ruleSet.isStratified()) {
-            throw new JoeError("Nero rule set cannot be stratified.");
-        }
-        return ruleSet;
-    }
-
-    /**
-     * Compiles the source, checking for syntax errors and stratification.
-     * The source must be compatible with the given pre-defined schema.
-     * Returns the rule set on success and throws an appropriate error
-     * on error.
-     * @param schema The schema
-     * @param source The source
-     * @return The engine, which has not yet be run.
-     * @throws SyntaxError on parse error.
-     * @throws JoeError on stratification error.
-     */
-    public static NeroRuleSet compile(Schema schema, SourceBuffer source) {
-        var ruleSet = parse(schema, source);
         if (!ruleSet.isStratified()) {
             throw new JoeError("Nero rule set cannot be stratified.");
         }

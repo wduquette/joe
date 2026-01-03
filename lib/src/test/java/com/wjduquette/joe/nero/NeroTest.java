@@ -78,44 +78,6 @@ public class NeroTest extends Ted {
             .containsString("Nero rule set cannot be stratified.");
     }
 
-    // Verify that we can supply a schema.
-    @Test public void testCompile_withSchema_good() {
-        test("testCompile_withSchema_good");
-        var shape = new Shape("A", List.of("a"));
-        var schema = new Schema();
-        schema.checkAndAdd(shape);
-
-        var ruleset = Nero.compile(schema, buffer("""
-            define A/a;
-            A(1);
-        """));
-        check(ruleset.schema()).eq(schema);
-    }
-
-    // Verify we detect mismatches with the predefined schema.
-    @Test public void testCompile_withSchema_mismatch() {
-        test("testCompile_withSchema_mismatch");
-        var shape = new Shape("A", List.of("a"));
-        var schema = new Schema();
-        schema.checkAndAdd(shape);
-
-        check(compileError(schema, "define A/x,y; A(1, 2);"))
-            .eq("error at 'A', definition clashes with earlier entry.");
-    }
-
-    // Verify that equivalent `defines` are OK.
-    @Test public void testCompile_withSchema_duplicate() {
-        test("testCompile_withSchema_duplicate");
-        var shape = new Shape("A", List.of("a"));
-        var schema = new Schema();
-        schema.checkAndAdd(shape);
-
-        var ruleset = Nero.compile(schema, buffer("""
-            define A/a;
-            A(1);
-            """));
-        check(ruleset.schema()).eq(schema);
-    }
 
     //-------------------------------------------------------------------------
     // Schema
@@ -312,16 +274,5 @@ public class NeroTest extends Ted {
 
     private SourceBuffer buffer(String script) {
         return new SourceBuffer("*test*", script);
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private String compileError(Schema schema, String script) {
-        try {
-            Nero.compile(schema, buffer(script));
-            fail("Expected error.");
-            return null;
-        } catch (SyntaxError ex) {
-            return ex.getTraces().getFirst().message();
-        }
     }
 }
