@@ -92,15 +92,26 @@ public class FactType extends ProxyType<Fact> {
     public String stringify(Joe joe, Object value) {
         assert value instanceof Fact;
         var fact = (Fact)value;
-        String fields = fact.isOrdered()
-            ? fact.getFields().stream()
-                .map(joe::stringify)
-                .collect(Collectors.joining(", "))
-            : fact.getFieldMap().entrySet().stream()
+
+        String fieldString;
+
+        if (fact.isOrdered()) {
+            var fields = fact.getFields();
+
+            var list = new ArrayList<String>();
+            for (var i = 0; i < fields.size(); i++) {
+                list.add(joe.quotify(fact.shape().names().get(i)));
+                list.add(joe.quotify(fields.get(i)));
+            }
+            fieldString = "[" + String.join(", ", list) + "]";
+        } else {
+            var text = fact.getFieldMap().entrySet().stream()
                 .map(e -> e.getKey() + ": " + joe.stringify(e.getValue()))
                 .collect(Collectors.joining(", "));
+            fieldString = "{" + text + "}";
+        }
 
-        return "Fact(" + fact.relation() + ", " + fields + ")";
+        return "Fact(" + fact.relation() + ", " + fieldString + ")";
     }
 
     //-------------------------------------------------------------------------
