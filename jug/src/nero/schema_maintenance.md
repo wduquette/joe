@@ -39,7 +39,7 @@ purpose.
 
 Suppose the `Thing` relation has the shape `Thing/id, color, size` and
 one wanted to drop the `color` attribute in favor of a separate
-`Color/id, color` relation.  One could write this script:
+`Color/id, color` relation.  The following script makes this change:
 
 ```nero
 define Thing/id, color, size;
@@ -82,27 +82,9 @@ Thus, once this program completes the set of facts will be this:
 - `Color(#truck, #black)`
 - `Color(#boots, #black)`
 
-A Nero program can update any number of relations; there is one important
-condition, which is checked when the program is compiled:
+A Nero program can update any number of relations. There is one important
+condition, required to prevent non-termination, that is checked when the 
+program is compiled:
 
 - An updated relation can only appear in a rule's body atom if an 
   updated relation appears in the rule's head atom.
-
-For this reason it would be more typical to write the above script in this 
-way:
-
-```nero
-define Thing/id, color, size;
-Thing(#hat, #black, #medium);
-Thing(#truck, #black, #heavy);
-Thing(#boots, #black, #mens12);
-
-define Color!/id, color;
-Color!(id, c) :- Thing(id, c, _);   // 1
-
-define Thing!/id, size;
-Thing!(id, s) :- Thing(id, _, s);  // 2
-```
-
-Now all the new facts are produced by updating rules, and the original
-relations (just `Thing` in this case) will be dropped automatically.

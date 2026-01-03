@@ -2,20 +2,34 @@
 
 ## Changes in 0.9.0 (in development)
 
+Most changes in this release involve the experimental `joe.win` package
+and the Nero language, and have been driven by use in applications and
+scripts.
+
 - Fixed bug: scripted class `toString()` methods corrupted the call stack.
-  - Since v0.5.0. 
+  - Error existed since Joe v0.5.0. 
   - When a class or record instance has a scripted `toString()` method, it
     can be called implicitly by `Joe::stringify`, e.g., by the expression
     `"Instance: " + myInstance`.
   - In the Clark engine this corrupted the call stack so that execution 
     terminated early and mysteriously.
   - The corruption has been fixed, and such methods work properly.
-- Language
+- Joe Language
     - Restored `@` as the property reference operator in instance
       methods, replacing `.`, which proved to be highly confusing in practice.
+- Nero Language
+    - Facts are now simply ordered or unordered.
+    - All relations used in axioms and rule heads must be defined as
+      unordered or as ordered with field names.
+    - Named atoms used in axioms and rule heads can create ordered facts.
 - Library
   - Experimental `joe.win` Package
     - Enhancements and cleanup 
+  - Nero API
+    - Simplified the `Fact`, `Schema`, and `Shape` classes accordingly.
+    - Revamped the Java `Nero` and `NeroDatabase` APIs
+    - Revamped the Joe `Fact` and `RuleSet` APIs, and replaced the
+      `FactBase` API with a new `Database` API.
 - Tools
   - Extended `joe doc` to process standalone Markdown files, translating
     JoeDoc links and inserting content from the scanned JoeDoc comments.

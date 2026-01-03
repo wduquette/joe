@@ -42,6 +42,7 @@ boots, and his truck.
 We want to write a rule that flags whether a person has a hat or not:
 
 ```nero
+define WearsHat/owner;
 WearsHat(id) :- Owner(id, stuff), member(#hat, stuff);
 ```
 
@@ -60,6 +61,7 @@ Alternatively, we might want to disaggregate a person's belongings into
 a new relation, `Owns/id,item`.  We can do that in this way:
 
 ```nero
+define Owns/owner,item;
 Owns(id, item) :- Owner(id, stuff), member(item, stuff);
 ```
 
@@ -92,6 +94,7 @@ For example, this program
 define Owner/id, belongings;
 Owner(#joe, [#hat, #boots, #truck]);
 
+define Owns/owner,index,item;
 Owns(id, index, item) :- Owner(id, stuff), indexedMember(index, item, stuff);
 ```
 
@@ -122,6 +125,7 @@ For example, this program
 define Owner/id, belongings;
 Owner(#joe, {#head: #hat, #feet: #boots, #body: #duster});
 
+define Owns/owner,place,item;
 Owns(id, place, item) :- Owner(id, stuff), keyedMember(place, item, stuff);
 ```
 
@@ -161,11 +165,13 @@ computed times back into timestamp strings.
 This program verifies that the two values are equivalent:
 
 ```nero
+define Values/s,n;
 Values("123", 123);
 Values("123", 456);         // Not equivalent
 Values("XYZ", 789);         // "XYZ" is not a numeric string
 Values("123", #nonNumber);  // #nonNumber is not a number
 
+define Good/s,n;
 Good(s, n) :- Values(s, n), equivalent(#str2num, s, n);
 ```
 
@@ -175,7 +181,10 @@ so the program yields the single fact `Good("123", 123)`.
 This program converts a string into a number, yielding `Number(123)`:
 
 ```nero
+define String/s;
 String("123");
+
+define Number/n;
 Number(n) :- String(s), equivalent(#str2num, s, n);
 ```
 
@@ -183,7 +192,10 @@ This program converts a number into its string representation, yielding
 `String("123")`:
 
 ```nero
+define Number/n;
 Number(123);
+
+define String/s;
 String(s) :- Number(n), equivalent(#str2num, s, n);
 ```
 

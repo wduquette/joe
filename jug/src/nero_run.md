@@ -8,20 +8,23 @@ line. See `nero help run` for the complete command line syntax.
 Given `simple.nero`:
 
 ```nero
+define Parent/p,c;
 Parent(#anne, #bert);
 Parent(#bert, #clark);
+
+define Ancestor/a,d;
 Ancestor(x, y) :- Parent(x, y);
 Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
 ```
 
 ```
 $ nero run simple.nero
-define Ancestor/2;
+define Ancestor/a,d;
 Ancestor(#anne, #bert);
 Ancestor(#anne, #clark);
 Ancestor(#bert, #clark);
 
-define Parent/2;
+define Parent/p,c;
 Parent(#anne, #bert);
 Parent(#bert, #clark);
 ```
@@ -54,12 +57,12 @@ Iteration 0.2:
 Iteration 0.3:
   Rule: Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
   Rule: Ancestor(x, y) :- Parent(x, y);
-define Ancestor/2;
+define Ancestor/a,d;
 Ancestor(#anne, #bert);
 Ancestor(#anne, #clark);
 Ancestor(#bert, #clark);
 
-define Parent/2;
+define Parent/p,c;
 Parent(#anne, #bert);
 Parent(#bert, #clark);
 ```

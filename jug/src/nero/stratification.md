@@ -32,9 +32,13 @@ of many rules) on a body atom with relation A.
 Here's a simple example of a program that breaks this condition:
 
 ```nero
-C(0);                     // 1
-A(x) :- C(x), not B(x);   // 2 
-B(x) :- A(x);             // 3
+define A/x;
+define B/x;
+define C/x;
+
+C(0);                     // Axiom (1)
+A(x) :- C(x), not B(x);   // Rule (2)
+B(x) :- A(x);             // Rule (3)
 ```
 
 Here's why this program would be a problem:
@@ -59,6 +63,7 @@ If this condition is broken then the rule set might not terminate.  Here's
 an extreme example in which A depends on itself:
 
 ```nero
+define A/x;
 A(0);
 A([x]) :- A(x);
 ```
@@ -82,6 +87,7 @@ If this condition is broken then the rule set might not terminate.  Here's
 an extreme example in which A depends on itself:
 
 ```nero
+define A/x;
 A(1);
 A(2);
 A(sum(x)) :- A(x);

@@ -8,6 +8,7 @@ aggregate over a set of `x` values, inferring a single fact with the sum
 of the values.  
 
 ```nero
+define Item/id,x;
 Item(#a, 1);
 Item(#a, 2);
 Item(#a, 3);
@@ -15,6 +16,7 @@ Item(#b, 4);
 Item(#b, 5);
 Item(#b, 6);
 
+define Total/id,sum;
 Total(id, sum(x)) :- Item(id, x);
 ```
 
@@ -49,11 +51,13 @@ consistent from run to run regardless of the types of the index values.
 For example,
 
 ```nero
+define Item/owner,i,item;
 Item(#a, 1, #hat);
 Item(#a, 2, #duster);
 Item(#b, 10, #boots);
 Item(#b, 11, #truck);
 
+define Collect/owner,list;
 Collect(id, indexedList(i, item)) :- Item(id, i, item);
 ```
 
@@ -70,11 +74,13 @@ particular order.
 For example,
 
 ```nero
+define Item/owner,i,item;
 Item(#a, 1, #hat);
 Item(#a, 2, #duster);
 Item(#a, 3, #boots);
 Item(#a, 4, #boots);
 
+define Collect/owner,list;
 Collect(id, list(item)) :- Item(id, item);
 ```
 
@@ -92,11 +98,13 @@ key's value will be set to the sentinel value `#duplicateKey`.
 For example,
 
 ```nero
+define Item/owner,place,item;
 Item(#joe, #head, #hat);
 Item(#joe, #body, #duster);
 Item(#joe, #feet, #boots);
 Item(#joe, #feet, #shoes);
 
+define Equip/owner,map;
 Equip(id, map(place, item)) :- Item(id, place, item);
 ```
 
@@ -113,15 +121,17 @@ This function computes the maximum numeric value among the aggregated
 For example,
 
 ```nero
+define Item/owner,num;
 Item(#a, 1);
 Item(#a, 2);
 Item(#a, 3);
 Item(#b, #NaN);
 
+define MaxValue/owner,max;
 MaxValue(id, max(x)) :- Item(id, x);
 ```
 
-yields this fact, but no fact for `id == #b`.
+yields this fact.
 
 - `MaxValue(#a, 3)`
 
@@ -134,17 +144,19 @@ This function computes the minimum numeric value among the aggregated
 For example,
 
 ```nero
+define Item/owner,num
 Item(#a, 1);
 Item(#a, 2);
 Item(#a, 3);
 Item(#b, #NaN);
 
-MaxValue(id, max(x)) :- Item(id, x);
+define MinValue/owner,min;
+MinValue(id, min(x)) :- Item(id, x);
 ```
 
-yields this fact, but no fact for `id == #b`.
+yields this fact:
 
-- `MaxValue(#a, 1)`
+- `MinValue(#a, 1)`
 
 ## `set(item)`
 
@@ -154,11 +166,13 @@ particular order.
 For example,
 
 ```nero
+define Item/owner,i,item;
 Item(#a, 1, #hat);
 Item(#a, 2, #duster);
 Item(#a, 3, #boots);
 Item(#a, 4, #boots);
 
+define Collect/owner,set;
 Collect(id, list(item)) :- Item(id, item);
 ```
 
@@ -175,11 +189,13 @@ numeric values for `x`, the function yields `0`.
 For example,
 
 ```nero
+define Item/owner,num;
 Item(#a, 1);
 Item(#a, 2);
 Item(#a, 3);
 Item(#a, #whoops);
 
+define Total/owner,sum;
 Total(id, sum(x)) :- Item(id, x);
 ```
 

@@ -1,85 +1,80 @@
 # Schema Declarations
 
-Nero supports three kinds of fact:
+Nero supports two kinds of relation:
 
-- "List" facts, having a relation and a list of unnamed fields.
-- "Map" facts, having a relation and a map of field names and values.
-- "Pair" facts, having a relation and a list of field name/value pairs.
+- Ordered relations, having a relation name and a fixed list of ordered fields 
+  with specific names.
+- Unordered relations, having a relation name and a map of any number of 
+  unordered fields with arbitrary names.
 
-Taken together, the kind of the fact and its arity are called the fact's
-*shape*.  Nero expects that all facts with a given relation and all
-uses of that relation in axioms and rules will have the same shapes.
+Taken together, the relation's name, kind, and (for ordered relations) the field 
+names constitute the fact's *shape*.  Nero requires that a relation has the 
+same shape in all axioms, and rules, and facts having that relation.
 
-In particular, the Nero parser will reject a Nero program that has more
-than one shape for a single relation.
+- [`define` Declarations](#define-declarations)
+  - [Ordered Relations](#ordered-relations) 
+  - [Unordered Relations](#unordered-relations)
+- [Static Schemas](#static-schemas)
+
+## `define` Declarations
+
+A Nero program must `define` the shape of each relation appearing in 
+an axiom or rule head; the Nero parser will reject any axiom or rule
+that lacks a definition or that is incompatible with the definition.
 
 The collection of relations and their expected shapes is called the 
-programs or database's *schema*.
+program's *schema*.
 
-Schemas can be inferred from a set of facts or from a Nero program's
-axioms and rules; alternatively, a Nero program can declare the schema
-explicitly using the `define` declaration.
-
-The `define` declaration has three forms, one for each kind of fact.
+The `define` declaration has two forms, one for each kind of relation.
 Each form has an optional `transient` keyword, which is used to
 mark intermediate values; see 
-[Schema Maintenance](schema_maintenance.md) for more.
+[Schema Maintenance](schema_maintenance.md).
 
-While `define` declarations are never required, it's a good practice to
-include them.
-
-## List Shape
-
-**define \[transient] *relation*/*arity*;**
-
-This form states that the *relation* has a list shape with the given
-*arity*, i.e., the given number of terms or fields.  The *arity* must be
-an integer greater than or equal to 1.
-
-For example,
-
-`define Parent/2;`
-
-Relations having this shape can be matched by body atoms using either 
-ordered-field or named-field notation, and can be created by axioms and
-rule heads using ordered-field notation.  When named-field notation
-is used, the field names are `f0`, `f1`, `f2`, and so on.
-
-## Map Shape
-
-**define \[transient] *relation*/...;**
-
-This form states that the *relation* has a map shape; it can have any 
-number of named but unordered fields.
-
-For example,
-
-`define Person/...;`
-
-Relations having this shape can only be matched by body atoms using 
-named-field notation, and can only be created by axioms and
-rule heads using named-field notation.
-
-## Pair Shape
+### Ordered Relations
 
 **define \[transient] *relation*/*name* \[, *name*]...;**
 
-This form states that the *relation* has a pair shape: it has ordered
-fields with the given names.
-
-For example,
+This form states that the *relation* has a fixed number of ordered
+fields with the given names. For example,
 
 `define Person/parent, child;`
 
-Relations having this shape can be matched by body atoms using either
-ordered-field or named-field notation, and can be created by axioms and
-rule heads using ordered-field notation. 
+Facts having this shape can be matched by body atoms using either
+ordered-field or named-field notation.
 
-## Default Shapes
+### Unordered Relations
 
-If no shape is known for a relation used in an axiom or rule head, Nero
-will assume list shape for ordered-field notation and map shape for
-named-field notation.
+**define \[transient] *relation*/...;**
+
+This form states that the *relation* is unordered: it can have any 
+number of named but unordered fields. For example,
+
+`define Person/...;`
+
+Facts having this shape can only be matched by body atoms using 
+named-field notation, and can only be created by axioms and
+rule heads using named-field notation.
+
+## Static Schemas
+
+As described above, a rule set's schema is collection of shapes of the relations 
+`define`'d by the rule set.  A collection of [[joe.Fact|Facts]] also has
+a schema: the shapes of all relations appearing in the collection.
+
+As described in [Schema Maintenance](schema_maintenance.md), a rule set's
+schema can include `transient` keywords and the shapes of relations defined 
+using *update syntax*; these reflect actions taken by Nero's rule engine
+while executing the rule set.  
+
+A [[joe.Fact]] collection's schema, on the other hand, reflects the "static"
+state of the collection, and so can't contain either of these things.
+
+Certain [[joe.Database]] methods take an optional *schema* parameter, which
+is used to validate an input rule set; this schema must be static.
+
+A rule set used to define a static schema is called a *static ruleset*; it
+must contain only `define` directives, and must not use `transient` or 
+update syntax.
 
 
 

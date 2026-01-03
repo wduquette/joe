@@ -10,10 +10,12 @@ For example, suppose we are comparing the weight of different things. The
 both these conditions must be met for the rule to fire.
 
 ```nero
+define Thing/thing,weight;
 Thing(#pen, 0.2);
 Thing(#desk, 40);
 Thing(#car, 3000);
 
+define Heavier/a,b;
 Heavier(x, y) :- Thing(x, wx), Thing(y, wy) where x != y, wx >= wy;
 ```
 

@@ -10,6 +10,7 @@ libOutputFolder("mdbook/src/library");
 // Javadoc roots
 javadocRoot("com.wjduquette.joe",            "javadoc/");
 javadocRoot("com.wjduquette.joe.console",    "javadoc/");
+javadocRoot("com.wjduquette.joe.nero",       "javadoc/");
 javadocRoot("com.wjduquette.joe.tools.test", "javadoc/");
 javadocRoot("com.wjduquette.joe.types",      "javadoc/");
 javadocRoot("com.wjduquette.joe.win",        "javadoc/");

@@ -7,14 +7,20 @@ Suppose we have a set of `Parent` facts, and we want to identify the
 individuals with no known parent and the individuals with no known children:
 
 ```nero
+define Person/name;
 Person(#anne);
 Person(#bert);
 Person(#clark);
 Person(#douglas);
+
+define Parent/parent,child;
 Parent(#anne, #bert);
 Parent(#bert, #clark);
 
+define Orphan/name;
 Orphan(x) :- Person(x), not Parent(_, x);       // (1)
+
+define Childless/name;
 Childless(x) :- Person(x), not Parent(x, _);    // (2)
 ```
 

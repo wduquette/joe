@@ -10,14 +10,15 @@ At base, Nero is an implementation of standard Datalog implemented
 using fixpoint semantics and the "naive" solution algorithm, augmented
 with:
 
+- Unordered relations
 - The ability to reference fact fields by name as well as by position.
+- Schema declarations
 - Stratified negation
 - Constraints
 - Built-in predicates
 - Aggregation functions
 - Collection literals
 - Destructuring patterns
-- Schema declarations
 - Update syntax
 
 Nero's syntax and conventions have been modified from standard Datalog to 
@@ -47,6 +48,8 @@ of `x` IFF `B` is true of `x`.
 
 ```nero
 // OK
+define A/x;
+define B/x;
 A(x) :- B(x);
 B(x) :- A(x);
 ```
@@ -55,6 +58,8 @@ But when negation is added, this changes.  Consider this program:
 
 ```nero
 // BAD
+define A/x;
+define B/x;
 B(#anne);
 A(x) :- C(x), not B(x);
 B(x) : A(x);

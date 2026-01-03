@@ -15,50 +15,64 @@ The following is a simple Datalog programming for computing
 ancestor/descendant relationships from parent/child relationships.
 
 ```nero
-Parent(#anne, #bert);                           // (1)
-Parent(#bert, #clark);                          // (2)
-Ancestor(x, y) :- Parent(x, y);                 // (3)
-Ancestor(x, y) :- Parent(x, z), Ancestor(z, y); // (4)
+define Parent/p,c;                              // (1)
+Parent(#anne, #bert);                           // (2)
+Parent(#bert, #clark);                          // (3)
+
+define Ancestor/a,d;                            // (4)
+Ancestor(x, y) :- Parent(x, y);                 // (5)
+Ancestor(x, y) :- Parent(x, z), Ancestor(z, y); // (6)
 ```
 
-Statements (1) and (2) are *axioms*; statements (3) and (4) are
-*rules*.
+- Statements (1) and (4) are *schema definitions*; they define the 
+  shape of the facts created by the program. 
+- Statements (2) and (3) are *axioms*; they assert specific *facts*.
+- Statements (5) and (6) are *rules*; they declare that specific
+  facts exist under certain conditions.
 
 When executed, this program infers the following facts from these 
 axioms and rules:
 
-- `Parent(#anne, #bert)` from (1)
-- `Parent(#bert, #clark)` from (2)
-- `Ancestor(#anne, #bert)` from (3)
-- `Ancestor(#bert, #clark)` from (3)
-- `Ancestor(#anne, #clark)` from (4)
+- `Parent(#anne, #bert)` from (2)
+- `Parent(#bert, #clark)` from (3)
+- `Ancestor(#anne, #bert)` from (4)
+- `Ancestor(#bert, #clark)` from (4)
+- `Ancestor(#anne, #clark)` from (5)
 
 ## Axioms and Rules
 
 In the example,
 
 ```nero
-Parent(#anne, #bert);                           // (1)
-Parent(#bert, #clark);                          // (2)
-Ancestor(x, y) :- Parent(x, y);                 // (3)
-Ancestor(x, y) :- Parent(x, z), Ancestor(z, y); // (4)
+define Parent/p,c;                              // (1)
+Parent(#anne, #bert);                           // (2)
+Parent(#bert, #clark);                          // (3)
+
+define Ancestor/a,d;                            // (4)
+Ancestor(x, y) :- Parent(x, y);                 // (5)
+Ancestor(x, y) :- Parent(x, z), Ancestor(z, y); // (6)
 ```
 
-- (1) is an *axiom* asserting that `#anne` is the `Parent` of `#bert`.
+- (1) says that `Parent` is an *ordered relation* having two fields named `p`
+  and `c`, meaning "parent" and "child".
 
-- (2) is an axiom asserting that `#bert` is the `Parent` of `#clark`.
+- (2) is an *axiom* asserting that `#anne` is the `Parent` of `#bert`.
 
-- (3) is a *rule* stating that `x` is an `Ancestor` of `y` if
+- (3) is an axiom asserting that `#bert` is the `Parent` of `#clark`.
+ 
+- (4) says that `Ancestor` is an *ordered relation* having two fields named `a`
+  and `d`, meaning "ancestor" and "descendant".
+
+- (5) is a *rule* stating that `x` is an `Ancestor` of `y` if
   `x` is a `Parent` of `y`.
 
-- (4) is a rule stating that `x` is an `Ancestor` of `y` if
+- (6) is a rule stating that `x` is an `Ancestor` of `y` if
   `x` is a `Parent` of `z` and `z` is an `Ancestor` of `y`.
 
 ## Axioms vs. Facts
 
 An axiom is not a fact; it is a statement in a Nero program that unilaterally
-asserts a fact, while a fact is a data record in the set of known facts or
-in an external database.
+asserts a fact, while a fact is a data record in the set of known facts.
 
 A Nero program infers new facts from known facts via its rules, where
 the set of known facts comes from the program's axioms, an external
@@ -87,7 +101,7 @@ terms, e.g., `#anne` and `#bert` are related as parent and child.  A
 relation is similar to the name of a table in an SQL database, where the
 set of facts having that relation are like the rows of the table.
 
-By convention, Nero relations begin with an uppercase letter.
+By convention, the names of Nero relations begin with an uppercase letter.
 
 Nero supports several [kinds of term](terms.md); this example includes
 two of them.  `#anne`, `#bert`, and `#clark` are constant terms, and `x`, 
@@ -113,17 +127,20 @@ to the values in the matched facts.
 Consider our example:
 
 ```nero
-Parent(#anne, #bert);                           // (1)
-Parent(#bert, #clark);                          // (2)
-Ancestor(x, y) :- Parent(x, y);                 // (3)
-Ancestor(x, y) :- Parent(x, z), Ancestor(z, y); // (4)
+define Parent/p,c;                              // (1)
+Parent(#anne, #bert);                           // (2)
+Parent(#bert, #clark);                          // (3)
+
+define Ancestor/a,d;                            // (4)
+Ancestor(x, y) :- Parent(x, y);                 // (5)
+Ancestor(x, y) :- Parent(x, z), Ancestor(z, y); // (6)
 ```
 
-- Axioms (1) and (2) contain no variables, because there is no rule body 
-  to bind them to values.
-- Rule (3) will match each `Parent` fact, binding `x` to the parent and `y`
+- Axioms (2) and (3) contain no variables; an axiom has no rule body 
+  to bind variables to values.
+- Rule (5) will match each `Parent` fact, binding `x` to the parent and `y`
   to the child, and will produce an `Ancestor` fact for each match.
-- Rule (4) will match each`Parent` fact, binding `x` and `z`; and then will
+- Rule (6) will match each`Parent` fact, binding `x` and `z`; and then will
   match any `Ancestor` fact whose first term has the value of `z`, binding
   `y` to the fact's second term and ultimately yielding a new `Ancestor` fact.
 

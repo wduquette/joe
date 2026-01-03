@@ -605,6 +605,19 @@ public class Joe {
     }
 
     /**
+     * Stringifies the object, quoting it if it's a string.
+     * @param object The object
+     * @return The string
+     */
+    public String quotify(Object object) {
+        if (object instanceof String s) {
+            return Joe.quote(s);
+        } else {
+            return stringify(object);
+        }
+    }
+
+    /**
      * Quotes a Java string, escaping any special characters it contains.
      * @param string The string
      * @return The quoted string.
