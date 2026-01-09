@@ -105,48 +105,13 @@ public class NeroDatabase {
     /**
      * Updates the content of the database given the rule set,
      * verifying that the rule set's schema is compatible with the
-     * validation schema and with the current content.
-     * @param ruleset The rule set
-     * @param validationSchema A static validation schema
-     * @return The database
-     * @throws JoeError on any Nero error.
-     */
-    public NeroDatabase update(NeroRuleSet ruleset, Schema validationSchema) {
-        var outputSchema = ruleset.outputSchema();
-        if (validationSchema != null) {
-            checkCompatibility("given schema", validationSchema, outputSchema);
-        }
-        checkCompatibility("current content", currentSchema(), outputSchema);
-        nero.withRules(ruleset).debug(debug).update(db);
-        return this;
-    }
-
-    /**
-     * Updates the content of the database given the rule set,
-     * verifying that the rule set's schema is compatible with the
      * current content.
      * @param ruleset The rule set
      * @return The database
      * @throws JoeError on any Nero error.
      */
     public NeroDatabase update(NeroRuleSet ruleset) {
-        return update(ruleset, null);
-    }
-
-    /**
-     * Updates the content of the database given the Nero script,
-     * verifying that the script's schema is compatible with the
-     * validation schema and with the current content
-     * @param source The Nero source
-     * @param validationSchema A static validation schema
-     * @return The database
-     * @throws SyntaxError on any Nero compilation error, including schema
-     *         mismatch
-     * @throws JoeError on any Nero error.
-     */
-    public NeroDatabase update(SourceBuffer source, Schema validationSchema) {
-        var ruleset = Nero.compile(source);
-        return update(ruleset, validationSchema);
+        return withRules(ruleset).update();
     }
 
     /**
@@ -160,19 +125,7 @@ public class NeroDatabase {
      * @throws JoeError on any Nero error.
      */
     public NeroDatabase update(SourceBuffer source) {
-        return update(source, null);
-    }
-
-    /**
-     * Updates the content of the database given the Nero script,
-     * verifying that the script's schema is compatible with the
-     * validation schema and with the current content.
-     * @param script The Nero script
-     * @param validationSchema The static validation schema
-     * @return The database
-     */
-    public NeroDatabase update(String script, Schema validationSchema) {
-        return update(new SourceBuffer("*java*", script), validationSchema);
+        return withScript(source).update();
     }
 
     /**
@@ -183,28 +136,7 @@ public class NeroDatabase {
      * @return The database
      */
     public NeroDatabase update(String script) {
-        return update(new SourceBuffer("*java*", script), null);
-    }
-
-    /**
-     * Updates the content of the database given the Nero file,
-     * verifying that the script's schema is compatible with the
-     * validation schema and with the current content.
-     * @param scriptFile The Nero file
-     * @param validationSchema The static validation schema
-     * @return The database
-     */
-    public NeroDatabase load(Path scriptFile, Schema validationSchema) {
-        String script;
-        try {
-            script = Files.readString(scriptFile);
-        } catch (IOException ex) {
-            throw new JoeError(
-                "Could not read Nero script file from disk:" + ex.getMessage());
-        }
-        var sourceBuffer =
-            new SourceBuffer(scriptFile.getFileName().toString(), script);
-        return update(sourceBuffer, validationSchema);
+        return withScript(script).update();
     }
 
     /**
@@ -215,16 +147,7 @@ public class NeroDatabase {
      * @return The database
      */
     public NeroDatabase load(Path scriptFile) {
-        String script;
-        try {
-            script = Files.readString(scriptFile);
-        } catch (IOException ex) {
-            throw new JoeError(
-                "Could not read Nero script file from disk:" + ex.getMessage());
-        }
-        var sourceBuffer =
-            new SourceBuffer(scriptFile.getFileName().toString(), script);
-        return update(sourceBuffer);
+        return withFile(scriptFile).update();
     }
 
     /**
@@ -234,7 +157,7 @@ public class NeroDatabase {
      * @return The inferred facts
      */
     public FactSet query(String script) {
-        return query(Nero.compile(new SourceBuffer("*nero*", script)));
+        return withScript(script).query();
     }
 
     /**
@@ -244,10 +167,60 @@ public class NeroDatabase {
      * @return The inferred facts
      */
     public FactSet query(NeroRuleSet ruleset) {
-        checkCompatibility("current content", currentSchema(), ruleset.outputSchema());
-        return nero.withRules(ruleset).debug(debug).query(db);
+        return withRules(ruleset).query();
     }
 
+    /**
+     * Returns a pipeline for processing the Nero rule set found in the
+     * script file.  Checks the rule set for compatibility with the
+     * current database content.
+     * @param scriptFile The path
+     * @return The pipeline
+     */
+    public Pipeline withFile(Path scriptFile) {
+        String script;
+        try {
+            script = Files.readString(scriptFile);
+        } catch (IOException ex) {
+            throw new JoeError(
+                "Could not read Nero script file from disk:" + ex.getMessage());
+        }
+        return withScript(
+            new SourceBuffer(scriptFile.getFileName().toString(), script));
+    }
+
+    /**
+     * Returns a pipeline for processing the Nero rule set found in the
+     * script.  Checks the rule set for compatibility with the
+     * current database content.
+     * @param script The script
+     * @return The pipeline
+     */
+    public Pipeline withScript(String script) {
+        return withScript(new SourceBuffer("*script", script));
+    }
+
+    /**
+     * Returns a pipeline for processing the Nero rule set found in the
+     * buffer.  Checks the rule set for compatibility with the
+     * current database content.
+     * @param source The buffer
+     * @return The pipeline
+     */
+    public Pipeline withScript(SourceBuffer source) {
+        return withRules(Nero.compile(source));
+    }
+
+    /**
+     * Returns a pipeline for processing the Nero rule set.
+     * Checks the rule set for compatibility with the
+     * current database content.
+     * @param rules The rule set
+     * @return The pipeline
+     */
+    public Pipeline withRules(NeroRuleSet rules) {
+        return new Pipeline(this, rules);
+    }
 
     /**
      * Adds all Facts from another NeroDatabase into the database, checking
@@ -464,6 +437,90 @@ public class NeroDatabase {
     public String toNeroAxiom(Fact fact) {
         return nero.toNeroAxiom(fact);
     }
+
+    //------------------------------------------------------------------------
+    // Pipeline
+
+    /**
+     * A Pipeline is a fluent API for working with the database.
+     */
+    public static class Pipeline {
+        //---------------------------------------------------------------------
+        // Instance Variables
+
+        private final NeroDatabase database;
+        private final NeroRuleSet ruleset;
+        private boolean debug;
+
+        //---------------------------------------------------------------------
+        // Constructor
+
+        private Pipeline(NeroDatabase database, NeroRuleSet ruleset) {
+            this.database = database;
+            this.ruleset = ruleset;
+            this.debug = database.debug;
+            database.checkCompatibility("current content",
+                database.currentSchema(),
+                ruleset.outputSchema());
+        }
+
+        //---------------------------------------------------------------------
+        // Pipeline methods
+
+        public Pipeline check(Schema validationSchema) {
+            database.checkCompatibility(
+                "given schema",
+                validationSchema,
+                ruleset.outputSchema());
+            return this;
+        }
+
+        /**
+         * Sets the Nero debug flag.
+         * @param flag true or false
+         * @return the pipeline
+         */
+        public Pipeline debug(boolean flag) {
+            this.debug = flag;
+            return this;
+        }
+
+        /**
+         * Sets the Nero debug flag to true.
+         * @return the pipeline
+         */
+        public Pipeline debug() {
+            return debug(true);
+        }
+
+        //---------------------------------------------------------------------
+        // Execution methods
+
+        /**
+         * Updates the content of the database given the rule set,
+         * verifying that the script's schema is compatible with the
+         * current content.
+         * @return The database
+         */
+        public NeroDatabase update() {
+            database.nero.withRules(ruleset)
+                .debug(debug)
+                .update(database.db);
+            return database;
+        }
+
+        /**
+         * Infers all known facts from the rule set and database content,
+         * returning the newly inferred facts.
+         * @return The inferred facts.
+         */
+        public FactSet query() {
+            return database.nero.withRules(ruleset)
+                .debug(debug)
+                .query(database.db);
+        }
+    }
+
 
     //------------------------------------------------------------------------
     // Utilities

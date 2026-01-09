@@ -106,60 +106,6 @@ public class NeroDatabaseTest extends Ted {
         check(db.toNeroScript()).eq(inputs);
     }
 
-    // Verify that we can add data to a non-empty database via update(String)
-    // provided that there are no schema mismatches with the current
-    // content.
-    @Test public void testUpdate_givenSchema_good() {
-        test("testUpdate_givenSchema_good");
-        var schema = Nero.schema("""
-            define B/x;
-            """);
-        var script = """
-            define A/x;
-            A(1);
-            A(2);
-            """;
-        db.update(script);
-        db.update("""
-            define B/x;
-            B(3);
-            """, schema);
-
-        var content = """
-            define A/x;
-            A(1);
-            A(2);
-            
-            define B/x;
-            B(3);
-            """;
-        check(db.toNeroScript()).eq(content);
-        check(db.toNeroScript(db.all())).eq(content);
-    }
-
-    // Verify that we can add data to a non-empty database via update(String)
-    // provided that there are no schema mismatches with the current
-    // content.
-    @Test public void testUpdate_givenSchema_bad() {
-        test("testUpdate_givenSchema_bad");
-        var schema = Nero.schema("""
-            define B/x;
-            """);
-        var script = """
-            define A/x;
-            A(1);
-            A(2);
-            """;
-        db.update(script);
-        var badScript = """
-            define B/x,y;
-            B(3,4);
-            """;
-        checkThrow(() -> db.update(badScript, schema))
-            .containsString("Rule set is incompatible with given schema, " +
-                "expected 'B/x', got: 'B/x,y'.");
-    }
-
     //-------------------------------------------------------------------------
     // query()
 
@@ -205,6 +151,45 @@ public class NeroDatabaseTest extends Ted {
         checkThrow(() -> db.query(badScript))
             .containsString("Rule set is incompatible with current content, " +
                 "expected 'A/x', got: 'A/x,y'.");
+    }
+
+    //------------------------------------------------------------------------
+    // withScript
+    //
+    // Note: the simple update() and query() calls use this pipeline;
+    // here we're checking optional behavior.
+
+    @Test public void testWithScript_check_ok() {
+        test("testWithScript_check_ok");
+        var script = """
+            define A/x;
+            A(1);
+            A(2);
+            """;
+        var schema = new Schema();
+        schema.add(new Shape("A", List.of("x")));
+        db.withScript(script)
+            .check(schema)
+            .update();
+        var content = """
+            define A/x;
+            A(1);
+            A(2);
+            """;
+        check(db.toNeroScript()).eq(content);
+    }
+
+    @Test public void testWithScript_check_failed() {
+        test("testWithScript_check_failed");
+        var script = """
+            define A/x;
+            A(1);
+            A(2);
+            """;
+        var schema = new Schema();
+        schema.add(new Shape("A", List.of("x", "y")));
+        checkThrow(() -> db.withScript(script).check(schema).update())
+            .containsString("Rule set is incompatible with given schema, expected 'A/x,y', got: 'A/x'.");
     }
 
     //------------------------------------------------------------------------

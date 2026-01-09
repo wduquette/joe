@@ -263,24 +263,16 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
 
     //**
     // @method load
-    // %args path, [schema]
+    // %args path
     // %result this
     // Loads the Nero script at the given *path* and uses it to update the
     // database.  The *path* may be passed as a [[Path]] or string.
     // The facts produced by the script must be compatible with the database's
     // current content.
-    //
-    // If *schema* is given, it must be a [[RuleSet]] or string defining a
-    // static schema.  The facts produced by the script must be also
-    // be compatible with the *schema*.
     private Object _load(NeroDatabase db, Joe joe, Args args) {
-        args.arityRange(1, 2, "load(path, [schema])");
+        args.exactArity(1, "load(path)");
         var path = joe.toPath(args.next());
-        if (args.hasNext()) {
-            return db.load(path, toStaticSchema(joe, args.next()));
-        } else {
-            return db.load(path);
-        }
+        return db.load(path);
     }
 
     //**
@@ -450,25 +442,16 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
 
     //**
     // @method update
-    // %args rules, [schema]
+    // %args rules
     // %result this
     // Updates the database given the *rules*.  The *rules* may be passed
     // as a [[RuleSet]] or as a Nero script for compilation. The facts
     // produced by the *rules* must be compatible with the database's
     // current content.
-    //
-    // If *schema* is given, it must be a [[RuleSet]] or string defining a
-    // static schema, and the facts produced by the *rules* must also
-    // be compatible with the *schema*.
     private Object _update(NeroDatabase db, Joe joe, Args args) {
-        args.arityRange(1, 2, "update(rules, [schema])");
+        args.exactArity(1, "update(rules)");
         var rules = toRules(joe, args.next());
-        if (args.hasNext()) {
-            return db.update(rules, toStaticSchema(joe, args.next()));
-
-        } else {
-            return db.update(rules);
-        }
+        return db.update(rules);
     }
 
     private NeroRuleSet toRules(Joe joe, Object arg) {
