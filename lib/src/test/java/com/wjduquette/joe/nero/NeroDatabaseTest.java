@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.wjduquette.joe.checker.Checker.*;
@@ -190,6 +191,33 @@ public class NeroDatabaseTest extends Ted {
         schema.add(new Shape("A", List.of("x", "y")));
         checkThrow(() -> db.withScript(script).check(schema).update())
             .containsString("Rule set is incompatible with given schema, expected 'A/x,y', got: 'A/x'.");
+    }
+
+    @Test public void testWithScript_update_parm() {
+        test("testWithScript_update_parm");
+        var script = """
+            define A/x;
+            A(x) :- query(parm: x);
+            """;
+        db.withScript(script).queryParm("parm", 1.0).update();
+        check(db.toNeroScript()).eq("""
+            define A/x;
+            A(1);
+            """);
+    }
+
+    @Test public void testWithScript_update_parms() {
+        test("testWithScript_update_parms");
+        var script = """
+            define A/x;
+            A(x) :- query(parm: x);
+            """;
+        db.withScript(script)
+            .queryParms(Map.of("parm", 1.0)).update();
+        check(db.toNeroScript()).eq("""
+            define A/x;
+            A(1);
+            """);
     }
 
     //------------------------------------------------------------------------

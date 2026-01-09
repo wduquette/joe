@@ -451,6 +451,7 @@ public class NeroDatabase {
         private final NeroDatabase database;
         private final NeroRuleSet ruleset;
         private boolean debug;
+        private final Map<String, Object> parms = new HashMap<>();
 
         //---------------------------------------------------------------------
         // Constructor
@@ -501,6 +502,46 @@ public class NeroDatabase {
             return debug(true);
         }
 
+        /**
+         * Defines a query parameter for use by the rule set.  The name
+         * must be a valid identifier string.  The accumulated query
+         * parameters will appear as the fields of {@code query/...} fact
+         * that the rule set can access.  The {@code query/...} fact will
+         * not appear in the output.
+         * @param name the parameter name
+         * @param value the parameter value
+         * @return The pipeline
+         */
+        public Pipeline queryParm(String name, Object value) {
+            if (!Joe.isIdentifier(name)) {
+                throw new IllegalArgumentException(
+                    "Not an identifier string: '" + name + "'.");
+            }
+            parms.put(name, value);
+            return this;
+        }
+
+        /**
+         * Defines a collection of query parameters for use by the rule
+         * set as a map from parameter name to parameter value.
+         * The names must be valid identifier strings.
+         * The accumulated query parameters will appear as the fields of
+         * a {@code query/...} fact that the rule set can access.  The
+         * {@code query/...} fact will not appear in the output.
+         * @param parms the parameter map
+         * @return The pipeline
+         */
+        public Pipeline queryParms(Map<String,Object> parms) {
+            for (var name : parms.keySet()) {
+                if (!Joe.isIdentifier(name)) {
+                    throw new IllegalArgumentException(
+                        "Not an identifier string: '" + name + "'.");
+                }
+            }
+            this.parms.putAll(parms);
+            return this;
+        }
+
         //---------------------------------------------------------------------
         // Execution methods
 
@@ -513,6 +554,7 @@ public class NeroDatabase {
         public NeroDatabase update() {
             database.nero.withRules(ruleset)
                 .debug(debug)
+                .queryParms(parms)
                 .update(database.db);
             return database;
         }
@@ -525,6 +567,7 @@ public class NeroDatabase {
         public FactSet query() {
             return database.nero.withRules(ruleset)
                 .debug(debug)
+                .queryParms(parms)
                 .query(database.db);
         }
     }

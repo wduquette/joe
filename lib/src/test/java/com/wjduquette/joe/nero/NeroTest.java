@@ -188,7 +188,7 @@ public class NeroTest extends Ted {
     }
 
     @Test public void testWith_Script_query_collections() {
-        test("testWith_query_collections");
+        test("testWith_Script_query_collections");
         var list = new ArrayList<Fact>();
         list.add(new Fact("A", List.of("a"), List.of(1.0)));
         var script = """
@@ -198,6 +198,33 @@ public class NeroTest extends Ted {
         check(nero.toNeroScript(nero.withScript(script).debug().query(list))).eq("""
             define B/x;
             B(2);
+            """);
+    }
+
+    @Test public void testWith_Script_infer_parm() {
+        test("testWith_Script_infer_parm");
+        var script = """
+            define A/x;
+            A(x) :- query(parm: x);
+            """;
+        var results = nero.withScript(script).queryParm("parm", 1.0).infer();
+        check(nero.toNeroScript(results)).eq("""
+            define A/x;
+            A(1);
+            """);
+    }
+
+    @Test public void testWith_Script_infer_parms() {
+        test("testWith_Script_infer_parms");
+        var script = """
+            define A/x;
+            A(x) :- query(parm: x);
+            """;
+        var results = nero.withScript(script)
+            .queryParms(Map.of("parm", 1.0)).infer();
+        check(nero.toNeroScript(results)).eq("""
+            define A/x;
+            A(1);
             """);
     }
 
