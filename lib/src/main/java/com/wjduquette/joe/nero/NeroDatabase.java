@@ -72,29 +72,22 @@ public class NeroDatabase {
     }
 
     /**
-     * Adds a single equivalence to Nero, for use with the
-     * `equivalent/equivalence,a,b` predicate.
-     * @param equivalence The equivalence
+     * Adds a single mapsTo/f,a,b mapper function to NeroDatabase. The name
+     * must be a valid identifier, which will be exposed in Nero
+     * scripts as a keyword.
+     * @param name The name
+     * @param mapper The mapper
      */
-    public void addEquivalence(Equivalence equivalence) {
-        nero.addEquivalence(equivalence);
+    public void addMapper(String name, Mapper mapper) {
+        nero.addMapper(name, mapper);
     }
 
     /**
-     * Adds a multiple equivalences to Nero, for use with the
-     * `equivalent/equivalence,a,b` predicate.
-     * @param list List of equivalences
-     */
-    public void addEquivalences(List<Equivalence> list) {
-        nero.addEquivalences(list);
-    }
-
-    /**
-     * Gets a read-only map of the defined equivalences.
+     * Gets a read-only map of the defined mapsTo/f,a,b mappers.
      * @return the map
      */
-    public Map<Keyword,Equivalence> getEquivalences() {
-        return nero.getEquivalences();
+    public Map<Keyword,Mapper> getMappers() {
+        return nero.getMappers();
     }
 
     //------------------------------------------------------------------------

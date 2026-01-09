@@ -16,8 +16,8 @@ public class Nero {
     // The Joe interpreter used when formatting output, etc.
     private final Joe joe;
 
-    // The defined equivalences.
-    private final Map<Keyword,Equivalence> equivalences = new HashMap<>();
+    // The client-defined mapsTo/f,a,b mapping functions.
+    private final Map<Keyword,Mapper> mappers = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -52,29 +52,26 @@ public class Nero {
     // Configuration
 
     /**
-     * Adds a single equivalence to Nero, for use with the
-     * `equivalent/equivalence,a,b` predicate.
-     * @param equivalence The equivalence
+     * Adds a single mapsTo/f,a,b mapper function to Nero. The name
+     * must be a valid identifier, which will be exposed in Nero
+     * scripts as a keyword.
+     * @param name The name
+     * @param mapper The mapper
      */
-    public void addEquivalence(Equivalence equivalence) {
-        equivalences.put(equivalence.keyword(), equivalence);
+    public void addMapper(String name, Mapper mapper) {
+        if (!Joe.isIdentifier(name)) {
+            throw new IllegalArgumentException(
+                "not an identifier: '" + name + "'.");
+        }
+        mappers.put(new Keyword(name), mapper);
     }
 
     /**
-     * Adds a multiple equivalences to Nero, for use with the
-     * `equivalent/equivalence,a,b` predicate.
-     * @param list List of equivalences
-     */
-    public void addEquivalences(List<Equivalence> list) {
-        list.forEach(this::addEquivalence);
-    }
-
-    /**
-     * Gets a read-only map of the defined equivalences.
+     * Gets a read-only map of the defined mapsTo/f,a,b mappers.
      * @return the map
      */
-    public Map<Keyword,Equivalence> getEquivalences() {
-        return Collections.unmodifiableMap(equivalences);
+    public Map<Keyword,Mapper> getMappers() {
+        return Collections.unmodifiableMap(mappers);
     }
 
     //-------------------------------------------------------------------------
@@ -161,7 +158,7 @@ public class Nero {
         public FactSet infer() {
             var engine = new RuleEngine(joe, ruleset, new FactSet());
             engine.setDebug(debug);
-            engine.putEquivalences(nero.getEquivalences());
+            engine.addMappers(nero.getMappers());
             return engine.infer();
         }
 
@@ -176,7 +173,7 @@ public class Nero {
         public FactSet update(FactSet facts) {
             var engine = new RuleEngine(joe, ruleset, facts);
             engine.setDebug(debug);
-            engine.putEquivalences(nero.getEquivalences());
+            engine.addMappers(nero.getMappers());
             return engine.infer();
         }
 
@@ -189,7 +186,7 @@ public class Nero {
         public FactSet query(Collection<Fact> facts) {
             var engine = new RuleEngine(joe, ruleset, new FactSet(facts));
             engine.setDebug(debug);
-            engine.putEquivalences(nero.getEquivalences());
+            engine.addMappers(nero.getMappers());
             return engine.infer();
         }
 
@@ -205,7 +202,7 @@ public class Nero {
         public FactSet query(FactSet facts) {
             var engine = new RuleEngine(joe, ruleset, new FactSet(facts));
             engine.setDebug(debug);
-            engine.putEquivalences(nero.getEquivalences());
+            engine.addMappers(nero.getMappers());
             return engine.infer();
         }
     }

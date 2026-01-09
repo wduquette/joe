@@ -120,53 +120,43 @@ function testDrop() {
 }
 
 //-------------------------------------------------------------------------
-// Equivalence
+// mappers
 
-var S2N = Equivalence(#s2n,
-    \s -> s ~ String() ? Number(s) : null,
-    \n -> n ~ Number() ? Joe.stringify(n) : null
-);
-
-function testEquivalence() {
-    var db = Database();
-    db.equivalence(S2N);
-    assertEQ(db.getEquivalences(), {S2N});
+function s2n(s) {
+    return (s ~ String())? Number(s) : null;
 }
 
-function testEquivalences_individual() {
+function testAddMapper() {
     var db = Database();
-    db.equivalences(S2N);
-    assertEQ(db.getEquivalences(), {S2N});
-}
-
-function testEquivalences_individual() {
-    var db = Database();
-    db.equivalences(S2N);
-    assertEQ(db.getEquivalences(), {S2N});
-}
-
-function testEquivalences_collection() {
-    var db = Database();
-    db.equivalences([S2N]);
-    assertEQ(db.getEquivalences(), {S2N});
-}
-
-function testUseEquivalence() {
-    var db = Database();
-    db.equivalences(S2N);
+    db.addMapper(#s2n, s2n);
     db.update(ruleset {
         define transient Str/s;
-        define Both/s,n;
+        define Num/n;
         Str("123");
-        Both(s,n) :- Str(s), equivalent(#s2n, s, n);
+        Num(n) :- Str(s), mapsTo(#s2n, s, n);
     });
     var results = db.toNeroScript().strip();
     assertEQ(results, """
-        define Both/s,n;
-        Both("123", 123);
+        define Num/n;
+        Num(123);
         """);
 }
 
+function testAddMappers() {
+    var db = Database();
+    db.addMappers({#s2n: s2n});
+    db.update(ruleset {
+        define transient Str/s;
+        define Num/n;
+        Str("123");
+        Num(n) :- Str(s), mapsTo(#s2n, s, n);
+    });
+    var results = db.toNeroScript().strip();
+    assertEQ(results, """
+        define Num/n;
+        Num(123);
+        """);
+}
 
 //-------------------------------------------------------------------------
 // filter

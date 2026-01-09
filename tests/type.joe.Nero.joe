@@ -331,50 +331,41 @@ function testPattern_ordered() {
 }
 
 //-----------------------------------------------------------------------------
-// Equivalences
+// mappers
 
-var S2N = Equivalence(#str2num,
-    \s -> s ~ String() ? Number(s) : null,
-    \n -> n ~ Number() ? Joe.stringify(n) : null
-);
-
-function testEquivalence() {
-    var nero = Nero();
-    nero.equivalence(S2N);
-    assertEQ(nero.getEquivalences(), {S2N});
+function s2n(s) {
+    return (s ~ String())? Number(s) : null;
 }
 
-function testEquivalences_individual() {
+function testAddMapper() {
     var nero = Nero();
-    nero.equivalences(S2N);
-    assertEQ(nero.getEquivalences(), {S2N});
-}
-
-function testEquivalences_individual() {
-    var nero = Nero();
-    nero.equivalences(S2N);
-    assertEQ(nero.getEquivalences(), {S2N});
-}
-
-function testEquivalences_collection() {
-    var nero = Nero();
-    nero.equivalences([S2N]);
-    assertEQ(nero.getEquivalences(), {S2N});
-}
-
-function testUseEquivalence() {
-    var nero = Nero();
-    var rules = ruleset {
+    nero.addMapper(#s2n, s2n);
+    var results = nero.with(ruleset {
         define transient Str/s;
-        define Both/s,n;
-
+        define Num/n;
         Str("123");
-        Both(s,n) :- Str(s), equivalent(#str2num, s, n);
-    };
-    var results = nero.toNeroScript(nero.with(rules).infer()).strip();
-    assertEQ(results, """
-        define Both/s,n;
-        Both("123", 123);
+        Num(n) :- Str(s), mapsTo(#s2n, s, n);
+    }).infer();
+
+    assertEQ(nero.toNeroScript(results).strip(), """
+        define Num/n;
+        Num(123);
+        """);
+}
+
+function testAddMappers() {
+    var nero = Nero();
+    nero.addMappers({#s2n: s2n});
+    var results = nero.with(ruleset {
+        define transient Str/s;
+        define Num/n;
+        Str("123");
+        Num(n) :- Str(s), mapsTo(#s2n, s, n);
+    }).infer();
+
+    assertEQ(nero.toNeroScript(results).strip(), """
+        define Num/n;
+        Num(123);
         """);
 }
 

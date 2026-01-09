@@ -391,34 +391,24 @@ public class NeroParserTest extends Ted {
             .eq("[line 2] error at 'keyedMember', expected bound variable as term 2, got: 'items'.");
     }
 
-    @Test public void testCheckBuiltIn_equivalentUnknownEquivalence() {
-        test("testCheckBuiltIn_equivalentUnknownEquivalence");
+    @Test public void testCheckBuiltIn_mapsTo_unknownF() {
+        test("testCheckBuiltIn_mapsTo_unknownF");
         var source = """
             define Thing/x;
-            Thing(n) :- Foo(s), equivalent(y, s, n);
+            Thing(n) :- Foo(s), mapsTo(y, s, n);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'equivalent', expected bound variable or constant as term 0, got: 'y'.");
+            .eq("[line 2] error at 'mapsTo', expected bound variable or constant as term 0, got: 'y'.");
     }
 
-    @Test public void testCheckBuiltIn_equivalentConstOrVarA() {
-        test("testCheckBuiltIn_equivalentConstOrVarA");
+    @Test public void testCheckBuiltIn_mapsTo_unknownA() {
+        test("testCheckBuiltIn_mapsTo_unknownA");
         var source = """
             define Thing/x;
-            Thing(n) :- Foo(s), equivalent(#equiv, _, n);
+            Thing(n) :- Foo(s), mapsTo(#str2num, a, n);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'equivalent', expected variable or constant as term 1, got: '_'.");
-    }
-
-    @Test public void testCheckBuiltIn_equivalentConstOrVarB() {
-        test("testCheckBuiltIn_equivalentConstOrVarB");
-        var source = """
-            define Thing/x;
-            Thing(n) :- Foo(s), equivalent(#equiv, s, _);
-            """;
-        check(parseNero(source))
-            .eq("[line 2] error at 'equivalent', expected variable or constant as term 2, got: '_'.");
+            .eq("[line 2] error at 'mapsTo', expected bound variable or constant as term 1, got: 'a'.");
     }
 
     //-------------------------------------------------------------------------

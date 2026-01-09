@@ -1,6 +1,5 @@
 package com.wjduquette.joe.nero;
 
-import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Ted;
 import org.junit.Before;
@@ -17,18 +16,23 @@ import static com.wjduquette.joe.checker.Checker.checkThrow;
 // at compile time and are found by the `NeroParser`; detection is tested
 // by `parser.NeroParserTest`.
 public class RuleEngineTest extends Ted {
-    private final Equivalence upper2lower =
-        new LambdaEquivalence(new Keyword("upper2lower"),
-            a -> a instanceof String s ? s.toLowerCase() : null,
-            b -> b instanceof String s ? s.toUpperCase() : null
-        );
+    private static final String UPPER2LOWER = "upper2lower";
     private Nero nero;
 
     @Before
     public void setup() {
         nero = new Nero();
-        nero.addEquivalence(upper2lower);
+        nero.addMapper(UPPER2LOWER, this::upper2lower);
     }
+
+    private Object upper2lower(Object a) {
+        if (a instanceof String s) {
+            return s.toLowerCase();
+        } else {
+            return null;
+        }
+    }
+
     //-------------------------------------------------------------------------
     // Stratification Conditions
 
@@ -628,77 +632,51 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
-    @Test public void testBuiltIn_equivalent_AB() {
-        test("testBuiltIn_keyedMember_equivalent_AB");
+    @Test public void testBuiltIn_mapsTo_generate() {
+        test("testBuiltIn_mapsTo_generate");
         var source = """
-            define transient Data/s,n;
-            define Got/s,n;
-            Data("1", 1);    // Equivalent
-            Data("2", 3);    // Not equivalent
-            Data("XYZ", 4);  // Not equivalent
-            Got(s, n) :- Data(s, n), equivalent(#str2num, s, n);
+            define transient NumStr/s;
+            define Number/n;
+            NumStr("123");
+            NumStr("abc");
+            NumStr(#xyz);
+            Number(n) :- NumStr(s), mapsTo(#str2num, s, n);
             """;
         check(execute(source)).eq("""
-            define Got/s,n;
-            Got("1", 1);
+            define Number/n;
+            Number(123);
             """);
     }
 
-    @Test public void testBuiltIn_equivalent_A() {
-        test("testBuiltIn_keyedMember_equivalent_A");
+    @Test public void testBuiltIn_mapsTo_test() {
+        test("testBuiltIn_mapsTo_test");
         var source = """
-            define transient Data/s;
-            define Got/s,n;
-            Data("1");    // Equivalent
-            Data("XYZ");  // Not equivalent
-            Got(s, n) :- Data(s), equivalent(#str2num, s, n);
+            define transient Input/s,n;
+            define Output/s,n;
+            Input("123", 123);
+            Input("123", 456);
+            Input("abc", #abc);
+            Output(s, n) :- Input(s, n), mapsTo(#str2num, s, n);
             """;
         check(execute(source)).eq("""
-            define Got/s,n;
-            Got("1", 1);
+            define Output/s,n;
+            Output("123", 123);
             """);
     }
 
-    @Test public void testBuiltIn_equivalent_B() {
-        test("testBuiltIn_keyedMember_equivalent_A");
-        var source = """
-            define transient Data/n;
-            define Got/s,n;
-            Data(1);    // Equivalent
-            Data(#foo); // Not equivalent
-            Got(s, n) :- Data(n), equivalent(#str2num, s, n);
-            """;
-        check(execute(source)).eq("""
-            define Got/s,n;
-            Got("1", 1);
-            """);
-    }
-
-    @Test public void testBuiltIn_equivalent_registered() {
+    @Test public void testBuiltIn_mapsTo_registered() {
         var source = """
             define transient Upper/x;
-            define transient Lower/x;
-            define transient Both/x,y;
-            define Got/upper,lower;
+            define Lower/x;
             Upper("ABC");
             Upper(123);
-            Lower("xyz");
-            Lower(456);
-            Both("DEF", "def");
-            Both("GHI", "xyz");
-            Both("GHI", 123);
-            
-            Got(u, l) :- Upper(u), equivalent(#upper2lower, u, l);
-            Got(u, l) :- Lower(l), equivalent(#upper2lower, u, l);
-            Got(u, l) :- Both(u, l), equivalent(#upper2lower, u, l);
+            Lower(l) :- Upper(u), mapsTo(#upper2lower, u, l);
             """;
 
         // Execute with #upper2lower
         check(execute(source)).eq("""
-            define Got/upper,lower;
-            Got("ABC", "abc");
-            Got("DEF", "def");
-            Got("XYZ", "xyz");
+            define Lower/x;
+            Lower("abc");
             """);
     }
 

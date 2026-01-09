@@ -3,7 +3,7 @@ package com.wjduquette.joe.types;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.nero.*;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -50,14 +50,13 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
         initializer(this::_init);
 
         method("addFacts",        this::_addFacts);
+        method("addMapper",       this::_addMapper);
+        method("addMappers",      this::_addMappers);
         method("all",             this::_all);
         method("clear",           this::_clear);
         method("debug",           this::_debug);
         method("drop",            this::_drop);
-        method("equivalence",     this::_equivalence);
-        method("equivalences",    this::_equivalences);
         method("filter",          this::_filter);
-        method("getEquivalences", this::_getEquivalences);
         method("isDebug",         this::_isDebug);
         method("isEmpty",         this::_isEmpty);
         method("load",            this::_load);
@@ -147,6 +146,41 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     }
 
     //**
+    // @method addMapper
+    // %args keyword, mapper
+    // %result this
+    // Adds a `mapsTo/f,a,b` mapper function named by the *keyword*.  The
+    // *mapper* should a `callable/1` taking a value of some type A and
+    // returning a value of some type B.  If the conversion fails, the
+    // *mapper* should return null or throw an error.
+    private Object _addMapper(NeroDatabase db, Joe joe, Args args) {
+        args.exactArity(2, "addMapper(keyword, mapper)");
+        var k = joe.toKeyword(args.next());
+        var f = joe.toCallable(args.next());
+        db.addMapper(k.name(), a -> joe.call(f, a));
+        return db;
+    }
+
+    //**
+    // @method addMappers
+    // %args map
+    // %result this
+    // Adds a collection of `mapsTo/f,a,b` functions, where *map* is a map from
+    // keyword to `callable/1`.  See [[method:Database.addMapper]].
+    private Object _addMappers(NeroDatabase db, Joe joe, Args args) {
+        args.exactArity(1, "addMappers(map)");
+        var input = joe.toMap(args.next());
+        var map = new HashMap<Keyword, Mapper>();
+        for (var e : input.entrySet()) {
+            var k = joe.toKeyword(e.getKey());
+            var f = joe.toCallable(e.getValue());
+            map.put(k, a -> joe.call(f, a));
+        }
+        map.forEach((k, f) -> db.addMapper(k.name(), f));
+        return db;
+    }
+
+    //**
     // @method all
     // %result Set
     // Returns a read-only [[Set]] of all facts in the database.
@@ -189,35 +223,6 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     }
 
 
-    //**
-    // @method equivalence
-    // %args equivalence
-    // %result this
-    // Adds an equivalence relation for use with the
-    // `equivalent/equivalence,a,b` built-in predicate.
-    private Object _equivalence(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "equivalence(equivalence)");
-        db.addEquivalence(joe.toType(Equivalence.class, args.next()));
-        return db;
-    }
-
-    //**
-    // @method equivalences
-    // %args equivalence, ...
-    // %args list
-    // %result this
-    // Adds equivalences relation for use with the
-    // `equivalent/equivalence,a,b` built-in predicate.  The equivalences
-    // can be passed as individual arguments or as a single list.
-    private Object _equivalences(NeroDatabase db, Joe joe, Args args) {
-        args = args.expandOrRemaining();
-        var list = new ArrayList<Equivalence>();
-        while (args.hasNext()) {
-            list.add(joe.toType(Equivalence.class, args.next()));
-        }
-        db.addEquivalences(list);
-        return db;
-    }
 
     //**
     // @method filter
@@ -236,15 +241,6 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
             }
         }
         return result;
-    }
-
-    //**
-    // @method getEquivalences
-    // %result Set
-    // Returns a set of all client-defined equivalences.
-    private Object _getEquivalences(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(0, "getEquivalences()");
-        return new SetValue(db.getEquivalences().values());
     }
 
     //**

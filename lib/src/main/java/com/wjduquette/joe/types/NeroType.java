@@ -2,12 +2,13 @@ package com.wjduquette.joe.types;
 
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
+import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.ProxyType;
-import com.wjduquette.joe.nero.Equivalence;
+import com.wjduquette.joe.nero.Mapper;
 import com.wjduquette.joe.nero.Nero;
 import com.wjduquette.joe.nero.NeroRuleSet;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * A ProxyType for the Nero type.
@@ -35,9 +36,8 @@ public class NeroType extends ProxyType<Nero> {
 
         initializer(this::_init);
 
-        method("equivalence",     this::_equivalence);
-        method("equivalences",    this::_equivalences);
-        method("getEquivalences", this::_getEquivalences);
+        method("addMapper",       this::_addMapper);
+        method("addMappers",      this::_addMappers);
         method("toNeroScript",    this::_toNeroScript);
         method("toNeroAxiom",     this::_toNeroAxiom);
         method("toString",        this::_toString);
@@ -66,42 +66,38 @@ public class NeroType extends ProxyType<Nero> {
     // Instance Method Implementations
 
     //**
-    // @method equivalence
-    // %args equivalence
+    // @method addMapper
+    // %args keyword, mapper
     // %result this
-    // Adds an equivalence relation for use with the
-    // `equivalent/equivalence,a,b` built-in predicate.
-    private Object _equivalence(Nero nero, Joe joe, Args args) {
-        args.exactArity(1, "equivalence(equivalence)");
-        nero.addEquivalence(joe.toType(Equivalence.class, args.next()));
+    // Adds a `mapsTo/f,a,b` mapper function named by the *keyword*.  The
+    // *mapper* should a `callable/1` taking a value of some type A and
+    // returning a value of some type B.  If the conversion fails, the
+    // *mapper* should return null or throw an error.
+    private Object _addMapper(Nero nero, Joe joe, Args args) {
+        args.exactArity(2, "addMapper(keyword, mapper)");
+        var k = joe.toKeyword(args.next());
+        var f = joe.toCallable(args.next());
+        nero.addMapper(k.name(), a -> joe.call(f, a));
         return nero;
     }
 
     //**
-    // @method equivalences
-    // %args equivalence, ...
-    // %args list
+    // @method addMappers
+    // %args map
     // %result this
-    // Adds equivalences relation for use with the
-    // `equivalent/equivalence,a,b` built-in predicate.  The equivalences
-    // can be passed as individual arguments or as a single list.
-    private Object _equivalences(Nero nero, Joe joe, Args args) {
-        args = args.expandOrRemaining();
-        var list = new ArrayList<Equivalence>();
-        while (args.hasNext()) {
-            list.add(joe.toType(Equivalence.class, args.next()));
+    // Adds a collection of `mapsTo/f,a,b` functions, where *map* is a map from
+    // keyword to `callable/1`.  See [[method:Nero.addMapper]].
+    private Object _addMappers(Nero nero, Joe joe, Args args) {
+        args.exactArity(1, "addMappers(map)");
+        var input = joe.toMap(args.next());
+        var map = new HashMap<Keyword, Mapper>();
+        for (var e : input.entrySet()) {
+            var k = joe.toKeyword(e.getKey());
+            var f = joe.toCallable(e.getValue());
+            map.put(k, a -> joe.call(f, a));
         }
-        nero.addEquivalences(list);
+        map.forEach((k, f) -> nero.addMapper(k.name(), f));
         return nero;
-    }
-
-    //**
-    // @method getEquivalences
-    // %result Set
-    // Returns a set of all client-defined equivalences.
-    private Object _getEquivalences(Nero nero, Joe joe, Args args) {
-        args.exactArity(0, "getEquivalences()");
-        return new SetValue(nero.getEquivalences().values());
     }
 
     //**
