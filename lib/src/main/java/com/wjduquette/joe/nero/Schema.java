@@ -222,18 +222,35 @@ public class Schema {
     }
 
     /**
-     * Return an equivalent schema with no transient or update relations,
-     * i.e, a schema that represents the static state of a set of facts
-     * after rule set execution.
+     * Return a schema representing the non-transient output
+     * of a rule set with this schema, * i.e, a schema that represents the
+     * static state of a set of facts after rule set execution.  That is,
+     * all transient relations are removed and updated relations are retained
+     * without "!".
      * @return the static schema
      */
-    public Schema toStaticSchema() {
+    public Schema toOutputSchema() {
         var schema = new Schema();
-        for (var e : shapeMap.entrySet()) {
-            if (!e.getKey().endsWith("!") && !transients.contains(e.getKey())) {
-                schema.add(e.getValue());
+
+        for (var shape : shapeMap.values()) {
+            var name = shape.relation();
+
+            // FIRST, ignore transient relations
+            if (transients.contains(name)) continue;
+
+            // NEXT, retain updated relations, sans "!"
+            if (name.endsWith("!")) {
+                var newName = name.substring(0, name.length() - 1);
+                schema.drop(newName);
+                schema.add(new Shape(newName, shape.names()));
+                continue;
             }
+
+            // NEXT, retain non-updated relations, provided we haven't
+            // already seen an updated relation with the same name.
+            if (!schema.hasRelation(name)) schema.add(shape);
         }
+
         return schema;
     }
 

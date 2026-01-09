@@ -27,7 +27,7 @@ public class NeroDatabaseTest extends Ted {
     @Test public void testCreation() {
         test("testCreation");
         check(db.isDebug()).eq(false);
-        check(db.schema().isEmpty()).eq(true);
+        check(db.currentSchema().isEmpty()).eq(true);
         check(db.all()).eq(Set.of());
     }
 
@@ -338,12 +338,12 @@ public class NeroDatabaseTest extends Ted {
             A(1); B(2);
             """);
 
-        check(db.schema().get("A")).eq(new Shape("A", List.of("x")));
-        check(db.schema().get("B")).eq(new Shape("B", List.of("x")));
+        check(db.currentSchema().get("A")).eq(new Shape("A", List.of("x")));
+        check(db.currentSchema().get("B")).eq(new Shape("B", List.of("x")));
 
         db.drop("B");
-        check(db.schema().get("A")).eq(new Shape("A", List.of("x")));
-        check(db.schema().get("B")).eq(null);
+        check(db.currentSchema().get("A")).eq(new Shape("A", List.of("x")));
+        check(db.currentSchema().get("B")).eq(null);
         check(db.toNeroScript()).eq("""
             define A/x;
             A(1);

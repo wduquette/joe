@@ -111,18 +111,19 @@ public class NeroDatabase {
 
     /**
      * Updates the content of the database given the rule set,
-     * verifying that the rule set's schema is compatible with the given schema
-     * and with the current content.
+     * verifying that the rule set's schema is compatible with the
+     * validation schema and with the current content.
      * @param ruleset The rule set
-     * @param schema A static schema
+     * @param validationSchema A static validation schema
      * @return The database
      * @throws JoeError on any Nero error.
      */
-    public NeroDatabase update(NeroRuleSet ruleset, Schema schema) {
-        if (schema != null) {
-            checkCompatibility("given schema", schema, ruleset.schema());
+    public NeroDatabase update(NeroRuleSet ruleset, Schema validationSchema) {
+        var outputSchema = ruleset.outputSchema();
+        if (validationSchema != null) {
+            checkCompatibility("given schema", validationSchema, outputSchema);
         }
-        checkCompatibility("current content", schema(), ruleset.schema());
+        checkCompatibility("current content", currentSchema(), outputSchema);
         nero.with(ruleset).debug(debug).update(db);
         return this;
     }
@@ -141,18 +142,18 @@ public class NeroDatabase {
 
     /**
      * Updates the content of the database given the Nero script,
-     * verifying that the script's schema is compatible with the given schema
-     * and with the current content
+     * verifying that the script's schema is compatible with the
+     * validation schema and with the current content
      * @param source The Nero source
-     * @param schema A static schema
+     * @param validationSchema A static validation schema
      * @return The database
      * @throws SyntaxError on any Nero compilation error, including schema
      *         mismatch
      * @throws JoeError on any Nero error.
      */
-    public NeroDatabase update(SourceBuffer source, Schema schema) {
+    public NeroDatabase update(SourceBuffer source, Schema validationSchema) {
         var ruleset = Nero.compile(source);
-        return update(ruleset, schema);
+        return update(ruleset, validationSchema);
     }
 
     /**
@@ -171,16 +172,15 @@ public class NeroDatabase {
 
     /**
      * Updates the content of the database given the Nero script,
-     * verifying that the script's schema is compatible with the given schema
-     * and with the current content.
+     * verifying that the script's schema is compatible with the
+     * validation schema and with the current content.
      * @param script The Nero script
-     * @param schema The given schema
+     * @param validationSchema The static validation schema
      * @return The database
      */
-    public NeroDatabase update(String script, Schema schema) {
-        return update(new SourceBuffer("*java*", script), schema);
+    public NeroDatabase update(String script, Schema validationSchema) {
+        return update(new SourceBuffer("*java*", script), validationSchema);
     }
-
 
     /**
      * Updates the content of the database given the Nero script,
@@ -195,13 +195,13 @@ public class NeroDatabase {
 
     /**
      * Updates the content of the database given the Nero file,
-     * verifying that the script's schema is compatible with the given schema
-     * and with the current content.
+     * verifying that the script's schema is compatible with the
+     * validation schema and with the current content.
      * @param scriptFile The Nero file
-     * @param schema The given schema
+     * @param validationSchema The static validation schema
      * @return The database
      */
-    public NeroDatabase load(Path scriptFile, Schema schema) {
+    public NeroDatabase load(Path scriptFile, Schema validationSchema) {
         String script;
         try {
             script = Files.readString(scriptFile);
@@ -211,7 +211,7 @@ public class NeroDatabase {
         }
         var sourceBuffer =
             new SourceBuffer(scriptFile.getFileName().toString(), script);
-        return update(sourceBuffer, schema);
+        return update(sourceBuffer, validationSchema);
     }
 
     /**
@@ -251,7 +251,7 @@ public class NeroDatabase {
      * @return The inferred facts
      */
     public FactSet query(NeroRuleSet ruleset) {
-        checkCompatibility("current content", schema(), ruleset.schema());
+        checkCompatibility("current content", currentSchema(), ruleset.outputSchema());
         return nero.with(ruleset).debug(debug).query(db);
     }
 
@@ -297,7 +297,7 @@ public class NeroDatabase {
     // facts and with each other, i.e., all incoming facts with a given
     // relation have the same shape.
     private void checkNewFacts(Collection<Fact> facts) {
-        var schema = schema();
+        var schema = currentSchema();
 
         for (var fact : facts) {
             // Throws an error for an incompatible fact.
@@ -366,12 +366,21 @@ public class NeroDatabase {
     // Queries
 
     /**
-     * Gets a copy of the database's schema
+     * Computes a schema that reflects the current content of the database.
      * @return The schema
      */
-    public Schema schema() {
-        return Schema.inferSchema(db.all());
+    public Schema currentSchema() {
+        // Assumes that each relation is homogeneous, and just get the shape
+        // from one fact of each relation.
+        var schema = new Schema();
+        for (var name : getRelations()) {
+            relation(name).stream()
+                .findAny().map(Fact::shape)
+                .ifPresent(schema::add);
+        }
+        return schema;
     }
+
 
     /**
      * Gets whether the database is empty or not.

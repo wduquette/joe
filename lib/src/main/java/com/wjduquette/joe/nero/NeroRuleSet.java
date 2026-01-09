@@ -62,11 +62,19 @@ public class NeroRuleSet {
     }
 
     /**
-     * The rule set's schema
+     * The rule set's dynamic schema
      * @return the schema
      */
     public Schema schema() {
         return schema;
+    }
+
+    /**
+     * The rule set's static output schema.
+     * @return The output schema
+     */
+    public Schema outputSchema() {
+        return schema.toOutputSchema();
     }
 
     /**

@@ -202,9 +202,9 @@ function testMap() {
     var db = Database([JOE, TEXAS, HAT]);
     var strings = db.map(Joe.stringify).sorted();
     assertEQ(strings, [
-        "Fact(Person, #joe, 90)",
-        "Fact(Place, #texas)",
-        "Fact(Thing, #hat, #black)"
+        "Fact(Person, [\"name\", #joe, \"age\", 90])",
+        "Fact(Place, [\"id\", #texas])",
+        "Fact(Thing, [\"id\", #hat, \"color\", #black])"
     ]);
 }
 

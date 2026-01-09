@@ -2,7 +2,7 @@
 //
 // Tests for the `Fact` type
 
-function testOfMap() {
+function testInit_map_good() {
     var fact = Fact("Thing", {"id": #car, "color": #red});
     assertEQ(fact.relation(), "Thing");
     assertF(fact.isOrdered());
@@ -12,17 +12,17 @@ function testOfMap() {
     assertEQ(fact.color, #red);
 }
 
-function testOfMap_badRelation() {
+function testInit_map_badRelation() {
     assertError(\-> Fact("@Thing", {"type": #car}),
         "Expected identifier, got: String '@Thing'.");
 }
 
-function testOfMap_badFieldName() {
+function testInit_map_badFieldName() {
     assertError(\-> Fact("Thing", {"@type": #car}),
         "Expected identifier, got: String '@type'.");
 }
 
-function testOfPairs() {
+function testInit_list_good() {
     var fact = Fact("Thing", ["id", #car, "color", #red]);
     assertEQ(fact.relation(), "Thing");
     assertT(fact.isOrdered());
@@ -31,15 +31,15 @@ function testOfPairs() {
     assertEQ(fact.fieldNames(), ["id", "color"]);
     assertEQ(fact.id, #car);
     assertEQ(fact.color, #red);
-    assertEQ(fact.toString(), "Fact(Thing, #car, #red)");
+    assertEQ(fact.toString(), "Fact(Thing, [\"id\", #car, \"color\", #red])");
 }
 
-function testOfPairs_badRelation() {
+function testInit_list_badRelation() {
     assertError(\-> Fact("@Thing", ["type", #car]),
         "Expected identifier, got: String '@Thing'.");
 }
 
-function testOfPairs_badFieldName() {
+function testInit_list_badFieldName() {
     assertError(\-> Fact("Thing", ["@type", #car]),
         "Expected identifier, got: String '@type'.");
 }
