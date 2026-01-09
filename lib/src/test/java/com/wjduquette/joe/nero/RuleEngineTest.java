@@ -1223,7 +1223,7 @@ public class RuleEngineTest extends Ted {
     // Execute the source, returning a Nero script of known facts.
     private String execute(String source) {
         try {
-            var db = nero.with(source).debug().infer();
+            var db = nero.withScript(source).debug().infer();
             return nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
@@ -1236,7 +1236,7 @@ public class RuleEngineTest extends Ted {
     private String execute(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         try {
-            nero.with(source).debug().update(db);
+            nero.withScript(source).debug().update(db);
             return nero.toNeroScript(db);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
@@ -1249,7 +1249,7 @@ public class RuleEngineTest extends Ted {
     private String infer(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
         try {
-            var inferred = nero.with(source).debug().update(db);
+            var inferred = nero.withScript(source).debug().update(db);
             return nero.toNeroScript(inferred);
         } catch (SyntaxError ex) {
             println(ex.getErrorReport());
@@ -1263,7 +1263,7 @@ public class RuleEngineTest extends Ted {
     // from being represented as a Nero script
     private String inferRaw(String source, Set<Fact> facts) {
         var db = new FactSet(facts);
-        var inferred = nero.with(source).debug().update(db);
+        var inferred = nero.withScript(source).debug().update(db);
         return inferred.all().stream()
             .map(Fact::toString)
             .sorted()

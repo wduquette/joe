@@ -129,7 +129,7 @@ public class NeroRunTool implements Tool {
 
         for (var name : inputs) {
             var source = readSource(name);
-            nero.with(source).debug(debug).update(db);
+            nero.withScript(source).debug(debug).update(db);
         }
 
         if (outFile == null) {

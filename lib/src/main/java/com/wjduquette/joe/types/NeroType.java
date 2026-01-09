@@ -41,7 +41,9 @@ public class NeroType extends ProxyType<Nero> {
         method("toNeroScript",    this::_toNeroScript);
         method("toNeroAxiom",     this::_toNeroAxiom);
         method("toString",        this::_toString);
-        method("with",            this::_with);
+        method("withFile",        this::_withFile);
+        method("withRules",       this::_withRules);
+        method("withScript",      this::_withScript);
     }
 
     //-------------------------------------------------------------------------
@@ -133,14 +135,38 @@ public class NeroType extends ProxyType<Nero> {
     }
 
     //**
-    // @method with
+    // @method withFile
+    // %args scriptFile
+    // %result NeroPipeline
+    // Returns an object allowing the Nero *scriptFile* to be executed in a
+    // variety of ways. The *scriptFile* must be the file's [[Path]].
+    private Object _withFile(Nero nero, Joe joe, Args args) {
+        args.exactArity(1, "withFile(scriptFile)");
+        var path = joe.toPath(args.next());
+        return nero.withFile(path);
+    }
+
+    //**
+    // @method withRules
     // %args rules
     // %result NeroPipeline
     // Returns an object allowing the [[RuleSet]] to be executed in a variety
     // of ways.
-    private Object _with(Nero nero, Joe joe, Args args) {
-        args.exactArity(1, "with(rules)");
+    private Object _withRules(Nero nero, Joe joe, Args args) {
+        args.exactArity(1, "withRules(rules)");
         var rules = joe.toType(NeroRuleSet.class, args.next());
-        return nero.with(rules);
+        return nero.withRules(rules);
+    }
+
+    //**
+    // @method withScript
+    // %args script
+    // %result NeroPipeline
+    // Returns an object allowing the Nero *script* to be executed in a variety
+    // of ways.
+    private Object _withScript(Nero nero, Joe joe, Args args) {
+        args.exactArity(1, "withScript(script)");
+        var script = joe.toString(args.next());
+        return nero.withScript(script);
     }
 }

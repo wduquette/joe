@@ -136,19 +136,19 @@ public class NeroTest extends Ted {
     // invokes `with(Joe, NeroRuleSet`).  The other `with()` flavors are
     // trivial.
 
-    @Test public void testWith_noInputs() {
+    @Test public void testWith_Script_noInputs() {
         test("testWith_noInputs");
         var script = """
             define A/x;
             A(1);
             """;
-        check(nero.toNeroScript(nero.with(script).debug().infer())).eq("""
+        check(nero.toNeroScript(nero.withScript(script).debug().infer())).eq("""
             define A/x;
             A(1);
             """);
     }
 
-    @Test public void testWith_update() {
+    @Test public void testWith_Script_update() {
         test("testWith_update");
         var db = new FactSet();
         db.add(new Fact("A", List.of("x"), List.of(1.0)));
@@ -156,7 +156,7 @@ public class NeroTest extends Ted {
             define B/x;
             B(2);
             """;
-        check(nero.toNeroScript(nero.with(script).debug().update(db))).eq("""
+        check(nero.toNeroScript(nero.withScript(script).debug().update(db))).eq("""
             define B/x;
             B(2);
             """);
@@ -169,7 +169,7 @@ public class NeroTest extends Ted {
             """);
     }
 
-    @Test public void testWith_query_factset() {
+    @Test public void testWith_Script_query_factset() {
         test("testWith_query_factset");
         var db = new FactSet();
         db.add(new Fact("A", List.of("x"), List.of(1.0)));
@@ -177,7 +177,7 @@ public class NeroTest extends Ted {
             define B/x;
             B(2);
             """;
-        check(nero.toNeroScript(nero.with(script).debug().query(db))).eq("""
+        check(nero.toNeroScript(nero.withScript(script).debug().query(db))).eq("""
             define B/x;
             B(2);
             """);
@@ -187,7 +187,7 @@ public class NeroTest extends Ted {
             """);
     }
 
-    @Test public void testWith_query_collections() {
+    @Test public void testWith_Script_query_collections() {
         test("testWith_query_collections");
         var list = new ArrayList<Fact>();
         list.add(new Fact("A", List.of("a"), List.of(1.0)));
@@ -195,7 +195,7 @@ public class NeroTest extends Ted {
             define B/x;
             B(2);
             """;
-        check(nero.toNeroScript(nero.with(script).debug().query(list))).eq("""
+        check(nero.toNeroScript(nero.withScript(script).debug().query(list))).eq("""
             define B/x;
             B(2);
             """);
@@ -217,7 +217,7 @@ public class NeroTest extends Ted {
             define Thing/thing,color;
             Thing("hat", "black");
             """;
-        var facts = nero.with(script).infer();
+        var facts = nero.withScript(script).infer();
         check(nero.toNeroScript(facts)).eq("""
             define Person/name,age;
             Person("Joe", 90);

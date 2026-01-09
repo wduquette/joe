@@ -117,7 +117,7 @@ public class NeroDatabase {
             checkCompatibility("given schema", validationSchema, outputSchema);
         }
         checkCompatibility("current content", currentSchema(), outputSchema);
-        nero.with(ruleset).debug(debug).update(db);
+        nero.withRules(ruleset).debug(debug).update(db);
         return this;
     }
 
@@ -245,7 +245,7 @@ public class NeroDatabase {
      */
     public FactSet query(NeroRuleSet ruleset) {
         checkCompatibility("current content", currentSchema(), ruleset.outputSchema());
-        return nero.with(ruleset).debug(debug).query(db);
+        return nero.withRules(ruleset).debug(debug).query(db);
     }
 
 

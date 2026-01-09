@@ -3,6 +3,9 @@ package com.wjduquette.joe.nero;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.parser.Parser;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,13 +81,32 @@ public class Nero {
     // Execution pipeline
 
     /**
+     * Creates a pipeline for the Nero file.
+     * @param scriptFile The file's path
+     * @return The pipeline
+     */
+    @SuppressWarnings("unused")
+    public Pipeline withFile(Path scriptFile) {
+        String script;
+        try {
+            script = Files.readString(scriptFile);
+        } catch (IOException ex) {
+            throw new JoeError(
+                "Could not read Nero script file from disk:" + ex.getMessage());
+        }
+        var sourceBuffer =
+            new SourceBuffer(scriptFile.getFileName().toString(), script);
+        return withScript(sourceBuffer);
+    }
+
+    /**
      * Creates a pipeline for the given Nero script.
      * @param script The script
      * @return The pipeline
      */
-    public Pipeline with(String script) {
+    public Pipeline withScript(String script) {
         var source = new SourceBuffer("*nero*", script);
-        return with(source);
+        return withScript(source);
     }
 
     /**
@@ -92,9 +114,9 @@ public class Nero {
      * @param source The SourceBuffer
      * @return The pipeline
      */
-    public Pipeline with(SourceBuffer source) {
+    public Pipeline withScript(SourceBuffer source) {
         var ruleset = Nero.compile(source);
-        return with(ruleset);
+        return withRules(ruleset);
     }
 
     /**
@@ -102,7 +124,7 @@ public class Nero {
      * @param ruleSet the rule set
      * @return The pipeline
      */
-    public Pipeline with(NeroRuleSet ruleSet) {
+    public Pipeline withRules(NeroRuleSet ruleSet) {
         return new Pipeline(this, ruleSet);
     }
 
