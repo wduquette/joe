@@ -384,3 +384,74 @@ function testUpdate_mismatch() {
     }), "Rule set is incompatible with current content, expected 'Parent/parent,child', got: 'Parent/x,y,z'.");
 }
 
+function testWithRules_ruleset_check_ok() {
+    var db = Database([
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ]);
+
+    db.withRules(ruleset {
+        define Ancestor/a,d;
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    }).check(ruleset {
+        define Ancestor/a,d;
+    }).update();
+
+    assertEQ(db.toNeroScript().strip(), """
+        define Ancestor/a,d;
+        Ancestor(#anne, #bert);
+        Ancestor(#anne, #clark);
+        Ancestor(#bert, #clark);
+
+        define Parent/parent,child;
+        Parent(#anne, #bert);
+        Parent(#bert, #clark);
+        """);
+}
+
+function testWithRules_script_check_ok() {
+    var db = Database([
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ]);
+
+    db.withRules("""
+        define Ancestor/a,d;
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    """).check("""
+        define Ancestor/a,d;
+    """).update();
+
+    assertEQ(db.toNeroScript().strip(), """
+        define Ancestor/a,d;
+        Ancestor(#anne, #bert);
+        Ancestor(#anne, #clark);
+        Ancestor(#bert, #clark);
+
+        define Parent/parent,child;
+        Parent(#anne, #bert);
+        Parent(#bert, #clark);
+        """);
+}
+
+function testWithRules_check_failed() {
+    var db = Database([
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ]);
+
+    var rules = ruleset {
+        define Ancestor/a,d;
+        Ancestor(x, y) :- Parent(x, y);
+        Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
+    };
+    var schema = ruleset {
+        define Ancestor/x, y;
+    };
+
+    assertError(\-> db.withRules(rules).check(schema),
+        "Rule set is incompatible with given schema, expected 'Ancestor/x,y', got: 'Ancestor/a,d'.");
+}
+

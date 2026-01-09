@@ -2,6 +2,8 @@ package com.wjduquette.joe;
 
 import com.wjduquette.joe.clark.ClarkEngine;
 import com.wjduquette.joe.nero.Fact;
+import com.wjduquette.joe.nero.Nero;
+import com.wjduquette.joe.nero.NeroRuleSet;
 import com.wjduquette.joe.parser.Parser;
 import com.wjduquette.joe.types.*;
 import com.wjduquette.joe.walker.WalkerEngine;
@@ -1146,6 +1148,22 @@ public class Joe {
         } catch (IllegalArgumentException ex) {
             throw new JoeError(ex.getMessage());
         }
+    }
+
+
+    /**
+     * Given an argument, returns it as a NeroRuleSet.  The argument may
+     * be a NeroRuleSet or a script to compile to a NeroRuleSet.
+     * @param arg The argument
+     * @return The rule set.
+     * @throws JoeError on failure.
+     */
+    public NeroRuleSet toRules(Object arg) {
+        if (arg instanceof NeroRuleSet rs) return rs;
+        if (arg instanceof String s) {
+            return Nero.compile(new SourceBuffer("*joe*", s));
+        }
+        throw expected("ruleset or script", arg);
     }
 
     /**

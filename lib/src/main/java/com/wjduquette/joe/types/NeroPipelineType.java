@@ -7,7 +7,7 @@ import com.wjduquette.joe.nero.FactSet;
 import com.wjduquette.joe.nero.Nero;
 
 /**
- * A ProxyType for the Nero type.
+ * A ProxyType for the Nero.Pipeline type.
  */
 public class NeroPipelineType extends ProxyType<Nero.Pipeline> {
     /** The type, ready for installation. */
@@ -25,10 +25,10 @@ public class NeroPipelineType extends ProxyType<Nero.Pipeline> {
         //**
         // @package joe
         // @type NeroPipeline
-        // The `NeroPipeline` object allows Joe code to execute a
+        // The `NeroPipeline` object allows Joe code to execute
         // [Nero Datalog](../nero/nero.md) [[RuleSet|RuleSets]] in a
         // variety of ways.  `NeroPipelines` are created using
-        // The [[Nero]] [[method:Nero.with]] method.
+        // The [[Nero]] `with*` methods.
         proxies(Nero.Pipeline.class);
 
         method("debug",   this::_debug);

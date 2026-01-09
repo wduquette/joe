@@ -73,6 +73,8 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
         method("toNeroAxiom",     this::_toNeroAxiom);
         method("toString",        this::_toString);
         method("update",          this::_update);
+        method("withFile",        this::_withFile);
+        method("withRules",       this::_withRules);
     }
 
     //-------------------------------------------------------------------------
@@ -302,7 +304,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Nero script for compilation.  Does not modify the database.
     private Object _query(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "query(rules)");
-        return new SetValue(db.query(toRules(joe, args.next())).all());
+        return new SetValue(db.query(joe.toRules(args.next())).all());
     }
 
     //**
@@ -450,23 +452,38 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // current content.
     private Object _update(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "update(rules)");
-        var rules = toRules(joe, args.next());
+        var rules = joe.toRules(args.next());
         return db.update(rules);
     }
 
-    private NeroRuleSet toRules(Joe joe, Object arg) {
-        if (arg instanceof NeroRuleSet rs) return rs;
-        if (arg instanceof String s) {
-            return Nero.compile(new SourceBuffer("*joe*", s));
-        }
-        throw joe.expected("ruleset or script", arg);
+    //**
+    // @method withFile
+    // %args scriptFile
+    // %result DatabasePipeline
+    // Returns an object allowing the Nero *scriptFile* to be executed
+    // on the database content in a variety of ways. The *scriptFile* must be
+    // the file's [[Path]].
+    //
+    // The facts produced by the ruleset must be compatible with the
+    // database's current content.
+    private Object _withFile(NeroDatabase db, Joe joe, Args args) {
+        args.exactArity(1, "withFile(scriptFile)");
+        var path = joe.toPath(args.next());
+        return db.withFile(path);
     }
 
-    private Schema toStaticSchema(Joe joe, Object arg) {
-        var schema = toRules(joe, arg).schema();
-        if (!schema.isStatic()) {
-            throw joe.expected("static schema", arg);
-        }
-        return schema;
+    //**
+    // @method withRules
+    // %args rules
+    // %result NeroPipeline
+    // Returns an object allowing the *rules* to be executed
+    // on the database content in a variety of ways.  The
+    // *rules* may be passed as a [[RuleSet]] or as a Nero script for
+    // compilation. The facts produced by the ruleset must be compatible
+    // with the database's current content.
+    private Object _withRules(NeroDatabase db, Joe joe, Args args) {
+        args.exactArity(1, "withRules(rules)");
+        var rules = joe.toRules(args.next());
+        return db.withRules(rules);
     }
 }

@@ -21,6 +21,7 @@ class StandardLibrary extends NativePackage {
         type(BooleanType.TYPE);
         type(CatchResultType.TYPE);
         type(DatabaseType.TYPE);
+        type(DatabasePipelineType.TYPE);
         type(ErrorType.TYPE);
         type(FactType.TYPE);
         type(FunctionType.TYPE);

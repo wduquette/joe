@@ -464,6 +464,14 @@ public class NeroDatabase {
                 ruleset.outputSchema());
         }
 
+        /**
+         * Returns the pipeline's underlying database.
+         * @return the database.
+         */
+        public NeroDatabase database() {
+            return database;
+        }
+
         //---------------------------------------------------------------------
         // Pipeline methods
 

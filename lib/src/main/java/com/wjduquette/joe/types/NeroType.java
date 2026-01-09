@@ -6,7 +6,6 @@ import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.ProxyType;
 import com.wjduquette.joe.nero.Mapper;
 import com.wjduquette.joe.nero.Nero;
-import com.wjduquette.joe.nero.NeroRuleSet;
 
 import java.util.HashMap;
 
@@ -43,7 +42,6 @@ public class NeroType extends ProxyType<Nero> {
         method("toString",        this::_toString);
         method("withFile",        this::_withFile);
         method("withRules",       this::_withRules);
-        method("withScript",      this::_withScript);
     }
 
     //-------------------------------------------------------------------------
@@ -150,23 +148,12 @@ public class NeroType extends ProxyType<Nero> {
     // @method withRules
     // %args rules
     // %result NeroPipeline
-    // Returns an object allowing the [[RuleSet]] to be executed in a variety
-    // of ways.
+    // Returns an object allowing the *rules* to be executed in a variety
+    // of ways.  The *rules* can be passed as a [[RuleSet]] or as a
+    // string for compilation.
     private Object _withRules(Nero nero, Joe joe, Args args) {
         args.exactArity(1, "withRules(rules)");
-        var rules = joe.toType(NeroRuleSet.class, args.next());
+        var rules = joe.toRules(args.next());
         return nero.withRules(rules);
-    }
-
-    //**
-    // @method withScript
-    // %args script
-    // %result NeroPipeline
-    // Returns an object allowing the Nero *script* to be executed in a variety
-    // of ways.
-    private Object _withScript(Nero nero, Joe joe, Args args) {
-        args.exactArity(1, "withScript(script)");
-        var script = joe.toString(args.next());
-        return nero.withScript(script);
     }
 }

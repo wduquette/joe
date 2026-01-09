@@ -37,7 +37,7 @@ function testInfer() {
         """);
 }
 
-function testWithScript() {
+function testWithRules_script() {
     var nero = Nero();
     var script = """
         define Parent/p,c;
@@ -47,7 +47,7 @@ function testWithScript() {
         Ancestor(x, y) :- Parent(x, y);
         Ancestor(x, y) :- Parent(x, z), Ancestor(z, y);
         """;
-    var results = nero.toNeroScript(nero.withScript(script).infer()).strip();
+    var results = nero.toNeroScript(nero.withRules(script).infer()).strip();
     assertEQ(results, """
         define Ancestor/a,d;
         Ancestor(#anne, #bert);
