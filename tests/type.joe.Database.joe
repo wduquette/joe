@@ -384,6 +384,28 @@ function testUpdate_mismatch() {
     }), "Rule set is incompatible with current content, expected 'Parent/parent,child', got: 'Parent/x,y,z'.");
 }
 
+function testWithRules_load_ok() {
+    var db = Database([
+        Parent(#anne, #bert),
+        Parent(#bert, #clark)
+    ]);
+
+    db.withRules(ruleset {
+        define Parent/x,y,z;
+        Parent(#alice, #bob, #charles);
+
+        define Parent!/parent,child;
+        Parent!(x, y) :- Parent(x, y, z);
+    }).load();
+
+    assertEQ(db.toNeroScript().strip(), """
+        define Parent/parent,child;
+        Parent(#alice, #bob);
+        Parent(#anne, #bert);
+        Parent(#bert, #clark);
+        """);
+}
+
 function testWithRules_ruleset_check_ok() {
     var db = Database([
         Parent(#anne, #bert),

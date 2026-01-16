@@ -34,6 +34,7 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
 
         method("check",   this::_check);
         method("debug",   this::_debug);
+        method("load",    this::_load);
         method("update",  this::_update);
         method("query",   this::_query);
     }
@@ -76,9 +77,23 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
     }
 
     //**
+    // @method load
+    // %result Database
+    // Executes the rule set, adding all results to the database. Throws an
+    // error if the facts produced by the rule set are not compatible
+    // with the database's current content.
+    private Object _load(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
+        args.exactArity(0, "load()");
+        pipeline.load();
+        return pipeline.database();
+    }
+
+    //**
     // @method update
     // %result Database
     // Updates the database using the rule set, returning the database.
+    // Throws an error if the rule set is not compatible with the current
+    // content of the database.
     private Object _update(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
         args.exactArity(0, "update()");
         pipeline.update();

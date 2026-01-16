@@ -103,56 +103,53 @@ public class NeroDatabase {
     }
 
     /**
-     * Updates the content of the database given the rule set,
-     * verifying that the rule set's schema is compatible with the
-     * current content.
+     * Executes the script in the Nero file, adding all computed facts
+     * to the database.
+     * @param scriptFile The Nero file
+     * @return The database
+     * @throws JoeError if the computed facts are incompatible with the
+     * current database content.
+     */
+    public NeroDatabase load(Path scriptFile) {
+        return withFile(scriptFile).load();
+    }
+
+    /**
+     * Updates the content of the database given the rule set.
      * @param ruleset The rule set
      * @return The database
-     * @throws JoeError on any Nero error.
+     * @throws JoeError if the rule set is incompatible with the
+     * current database content.
      */
     public NeroDatabase update(NeroRuleSet ruleset) {
         return withRules(ruleset).update();
     }
 
     /**
-     * Updates the content of the database given the Nero script,
-     * verifying that the script's schema is compatible with the
-     * current content.
+     * Updates the content of the database given the Nero script.
      * @param source The Nero source
      * @return The database
-     * @throws SyntaxError on any Nero compilation error, including schema
-     *         mismatch
-     * @throws JoeError on any Nero error.
+     * @throws JoeError if the rule set is incompatible with the
+     * current database content.
      */
     public NeroDatabase update(SourceBuffer source) {
         return withScript(source).update();
     }
 
     /**
-     * Updates the content of the database given the Nero script,
-     * verifying that the script's schema is compatible with the
-     * current content.
+     * Updates the content of the database given the Nero script.
      * @param script The Nero script
      * @return The database
+     * @throws JoeError if the rule set is incompatible with the
+     * current database content.
      */
     public NeroDatabase update(String script) {
         return withScript(script).update();
     }
 
     /**
-     * Updates the content of the database given the Nero file,
-     * verifying that the script's schema is compatible with the
-     * current content.
-     * @param scriptFile The Nero file
-     * @return The database
-     */
-    public NeroDatabase load(Path scriptFile) {
-        return withFile(scriptFile).update();
-    }
-
-    /**
-     * Queries the database given the Nero script, verifying that the
-     * query is compatible with the database's current content.
+     * Queries the database given the Nero script, returning the newly
+     * inferred facts.
      * @param script The Nero script
      * @return The inferred facts
      */
@@ -161,8 +158,8 @@ public class NeroDatabase {
     }
 
     /**
-     * Queries the database given the Nero rule set, verifying that the
-     * query is compatible with the database's current content.
+     * Queries the database given the Nero rule set, returning the newly
+     * inferred facts.
      * @param ruleset The rule set
      * @return The inferred facts
      */
@@ -172,8 +169,7 @@ public class NeroDatabase {
 
     /**
      * Returns a pipeline for processing the Nero rule set found in the
-     * script file.  Checks the rule set for compatibility with the
-     * current database content.
+     * script file.
      * @param scriptFile The path
      * @return The pipeline
      */
@@ -191,8 +187,7 @@ public class NeroDatabase {
 
     /**
      * Returns a pipeline for processing the Nero rule set found in the
-     * script.  Checks the rule set for compatibility with the
-     * current database content.
+     * script.
      * @param script The script
      * @return The pipeline
      */
@@ -202,8 +197,7 @@ public class NeroDatabase {
 
     /**
      * Returns a pipeline for processing the Nero rule set found in the
-     * buffer.  Checks the rule set for compatibility with the
-     * current database content.
+     * buffer.
      * @param source The buffer
      * @return The pipeline
      */
@@ -213,8 +207,6 @@ public class NeroDatabase {
 
     /**
      * Returns a pipeline for processing the Nero rule set.
-     * Checks the rule set for compatibility with the
-     * current database content.
      * @param rules The rule set
      * @return The pipeline
      */
@@ -223,8 +215,9 @@ public class NeroDatabase {
     }
 
     /**
-     * Adds all Facts from another NeroDatabase into the database, checking
-     * for schema mismatches.
+     * Adds all Facts from another NeroDatabase into the database, ensuring
+     * that the added facts are compatible with the current content
+     * of the database.
      * @param other The other database
      * @return this
      * @throws JoeError if there is a schema mismatch
@@ -236,8 +229,9 @@ public class NeroDatabase {
     }
 
     /**
-     * Adds all Facts from a FactSet into the database, checking for schema
-     * mismatches.
+     * Adds all Facts from a FactSet into the database, ensuring
+     * that the added facts are compatible with the current content
+     * of the database.
      * @param factSet The fact set
      * @return this
      * @throws JoeError if there is a schema mismatch
@@ -247,8 +241,9 @@ public class NeroDatabase {
     }
 
     /**
-     * Adds a collection of Facts into the database, checking for schema
-     * mismatches.
+     * Adds a collection of Facts into the database, ensuring
+     * that the added facts are compatible with the current content
+     * of the database.
      * @param facts The facts
      * @return this
      * @throws JoeError if there is a schema mismatch
@@ -460,9 +455,6 @@ public class NeroDatabase {
             this.database = database;
             this.ruleset = ruleset;
             this.debug = database.debug;
-            database.checkCompatibility("current content",
-                database.currentSchema(),
-                ruleset.outputSchema());
         }
 
         /**
@@ -476,6 +468,12 @@ public class NeroDatabase {
         //---------------------------------------------------------------------
         // Pipeline methods
 
+        /**
+         * Checks that the given ruleset's output is compatible with the
+         * validation schema, and throws an error if it is not.
+         * @param validationSchema The validation schema
+         * @return the pipeline
+         */
         public Pipeline check(Schema validationSchema) {
             database.checkCompatibility(
                 "given schema",
@@ -546,12 +544,39 @@ public class NeroDatabase {
         // Execution methods
 
         /**
+         * Executes the pipeline's rule set and adds all resulting facts to
+         * the database.  Ensures that the rule set's output is
+         * compatible with the current content, throwing an error if not.
+         * @return The database
+         */
+        public NeroDatabase load() {
+            database.checkCompatibility("current content",
+                database.currentSchema(),
+                ruleset.outputSchema());
+            // Compute the new facts and add them to the database; the rule set
+            // does NOT have access to the database's content.
+            var newFacts = database.nero.withRules(ruleset)
+                .debug(debug)
+                .queryParms(parms)
+                .infer();
+            database.db.addAll(newFacts);
+            return database;
+        }
+
+        /**
          * Updates the content of the database given the rule set,
          * verifying that the script's schema is compatible with the
          * current content.
          * @return The database
          */
         public NeroDatabase update() {
+            // We validate against the rule set's input schema, because any
+            // creates facts that don't involved "Updated!" relations
+            // have to adhere to it.  Once the update is complete, the
+            // database will adhere to the rule sets output schema.
+            database.checkCompatibility("current content",
+                database.currentSchema(),
+                ruleset.schema());
             database.nero.withRules(ruleset)
                 .debug(debug)
                 .queryParms(parms)
@@ -565,6 +590,8 @@ public class NeroDatabase {
          * @return The inferred facts.
          */
         public FactSet query() {
+            // No schema validation step, as we don't need to protect
+            // the integrity of the database.
             return database.nero.withRules(ruleset)
                 .debug(debug)
                 .queryParms(parms)

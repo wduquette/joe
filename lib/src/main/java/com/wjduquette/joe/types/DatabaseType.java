@@ -135,6 +135,8 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // The *facts* can be another [[Database]], or a collections of
     // [[Fact|Facts]] or values to be converted to facts. Throws
     // an [[Error]] if any value cannot be used as a `Fact`.
+    // Verifies that the relations being added are compatible with the
+    // facts already in the database.
     private Object _addFacts(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "addFacts(facts)");
         var arg = args.next();
@@ -267,10 +269,10 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // @method load
     // %args path
     // %result this
-    // Loads the Nero script at the given *path* and uses it to update the
-    // database.  The *path* may be passed as a [[Path]] or string.
-    // The facts produced by the script must be compatible with the database's
-    // current content.
+    // Loads and executes Nero script at the given *path*, adding all results
+    // to the database. The *path* may be passed as a [[Path]] or string.
+    // Throws an error if the facts produced by the script are not compatible
+    // with the database's current content.
     private Object _load(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "load(path)");
         var path = joe.toPath(args.next());
@@ -299,9 +301,8 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %args rules
     // %result Set
     // Queries the database given the *rules*, returning a set of
-    // [[Fact|Facts]].  The *rules* must be compatible with the current
-    // content of the database, and may be passed as a [[RuleSet]] or as a
-    // Nero script for compilation.  Does not modify the database.
+    // [[Fact|Facts]].  The *rules* may be passed as a [[RuleSet]] or as a
+    // Nero script.  Does not modify the database.
     private Object _query(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "query(rules)");
         return new SetValue(db.query(joe.toRules(args.next())).all());
@@ -446,10 +447,9 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // @method update
     // %args rules
     // %result this
-    // Updates the database given the *rules*.  The *rules* may be passed
-    // as a [[RuleSet]] or as a Nero script for compilation. The facts
-    // produced by the *rules* must be compatible with the database's
-    // current content.
+    // Updates the database given the *rules*, which may be passed
+    // as a [[RuleSet]] or as a Nero script. Throws an error if the *rules*
+    // are not compatible with the current content of the database.
     private Object _update(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "update(rules)");
         var rules = joe.toRules(args.next());
@@ -463,9 +463,6 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Returns an object allowing the Nero *scriptFile* to be executed
     // on the database content in a variety of ways. The *scriptFile* must be
     // the file's [[Path]].
-    //
-    // The facts produced by the ruleset must be compatible with the
-    // database's current content.
     private Object _withFile(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "withFile(scriptFile)");
         var path = joe.toPath(args.next());
@@ -478,9 +475,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %result NeroPipeline
     // Returns an object allowing the *rules* to be executed
     // on the database content in a variety of ways.  The
-    // *rules* may be passed as a [[RuleSet]] or as a Nero script for
-    // compilation. The facts produced by the ruleset must be compatible
-    // with the database's current content.
+    // *rules* may be passed as a [[RuleSet]] or as a Nero script.
     private Object _withRules(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "withRules(rules)");
         var rules = joe.toRules(args.next());

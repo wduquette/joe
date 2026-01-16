@@ -136,29 +136,77 @@ public class NeroDatabaseTest extends Ted {
             """);
     }
 
-    // Verify that queries must be compatible with the current content.
-    @Test public void testQuery_mismatch() {
-        test("testQuery_mismatch");
-        db.update("""
-            define A/x;
-            A(1);
-            A(2);
-            """);
-
-        var badScript = """
-            define A/x,y;
-            A(3, 4);
-            """;
-        checkThrow(() -> db.query(badScript))
-            .containsString("Rule set is incompatible with current content, " +
-                "expected 'A/x', got: 'A/x,y'.");
-    }
-
     //------------------------------------------------------------------------
     // withScript
     //
-    // Note: the simple update() and query() calls use this pipeline;
-    // here we're checking optional behavior.
+    // Note: the simple load(), update() and query() calls use this pipeline.
+    // Most complex tests are done here.
+
+    // Verify that the loaded ruleset's output schema is compatible with the
+    // current content.
+    @Test public void testWith_load_badOutputSchema() {
+        test("testWith_load_badOutputSchema");
+        db.addFacts(List.of(
+            new Fact("A", List.of("x"), List.of(1.0))  // A/x
+        ));
+
+        // Use updating notation to show that we are checking the
+        // *output* schema
+        var script = """
+            define A/x;
+            A(2);
+            
+            define A!/x, y;
+            A!(x, #extra) :- A(x);
+            """;
+        checkThrow(() -> db.withScript(script).load())
+            .containsString("Rule set is incompatible with current content, expected 'A/x', got: 'A/x,y'.");
+    }
+
+    // Verify that the update ruleset's input schema is compatible with the
+    // current content.
+    @Test public void testWith_update_goodInputSchema() {
+        test("testWith_update_goodInputSchema");
+        db.addFacts(List.of(
+            new Fact("A", List.of("x"), List.of(1.0))  // A/x
+        ));
+
+        // Use updating notation to show that we are checking the
+        // *output* schema
+        var script = """
+            define A/x;
+            A(2);
+            
+            define A!/x, y;
+            A!(x, #extra) :- A(x);
+            """;
+        check(db.withScript(script).update().toNeroScript()).eq("""
+            define A/x,y;
+            A(1, #extra);
+            A(2, #extra);
+            """);
+    }
+
+    // Verify that the loaded ruleset's output schema is compatible with the
+    // current content.
+    @Test public void testWith_update_badInputSchema() {
+        test("testWith_update_badInputSchema");
+        db.addFacts(List.of(
+            new Fact("A", List.of("x"), List.of(1.0))  // A/x
+        ));
+
+        // Use updating notation to show that we are checking the
+        // *output* schema
+        var script = """
+            define A/x, y;
+            A(2, 3);
+            
+            define A!/x;
+            A!(x) :- A(x, _);
+            """;
+        checkThrow(() -> db.withScript(script).update())
+            .containsString("Rule set is incompatible with current content, expected 'A/x', got: 'A/x,y'.");
+    }
 
     @Test public void testWithScript_check_ok() {
         test("testWithScript_check_ok");
