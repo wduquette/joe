@@ -109,7 +109,7 @@ function testQuery() {
 }
 
 // Verify that pipelines can use .queryParm()
-function testQueryParm1() {
+function testQueryParms() {
     var nero = Nero();
     var rules1 = ruleset {
         define A/x;
@@ -125,17 +125,16 @@ function testQueryParm1() {
         """);
 }
 
-function testQueryParm2() {
+function testQueryParms() {
     var nero = Nero();
     var rules1 = ruleset {
         define A/x;
         A(x) :- query(myParm: x);
     };
-    var facts = [];
     var results = nero.withRules(rules1)
         .debug()
-        .queryParm("myParm", #xyz)
-        .query([]);
+        .queryParms({"myParm": #xyz})
+        .infer();
     assertEQ(nero.toNeroScript(results).strip(), """
         define A/x;
         A(#xyz);

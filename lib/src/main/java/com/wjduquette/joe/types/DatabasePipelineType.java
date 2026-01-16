@@ -3,7 +3,6 @@ package com.wjduquette.joe.types;
 import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.ProxyType;
-import com.wjduquette.joe.SourceBuffer;
 import com.wjduquette.joe.nero.*;
 
 /**
@@ -32,11 +31,13 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
         // `with*` methods.
         proxies(NeroDatabase.Pipeline.class);
 
-        method("check",   this::_check);
-        method("debug",   this::_debug);
-        method("load",    this::_load);
-        method("update",  this::_update);
-        method("query",   this::_query);
+        method("check",      this::_check);
+        method("debug",      this::_debug);
+        method("load",       this::_load);
+        method("query",      this::_query);
+        method("queryParm",  this::_queryParm);
+        method("queryParms", this::_queryParms);
+        method("update",     this::_update);
     }
 
     //-------------------------------------------------------------------------
@@ -58,7 +59,7 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
     // script that contains only non-transient `define` declarations.
     private Object _check(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
         args.exactArity(1, "check(*schema*)");
-        var rules = toRules(joe, args.next());
+        var rules = joe.toRules(args.next());
         var schema = rules.outputSchema();
         pipeline.check(schema);
         return pipeline;
@@ -89,15 +90,38 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
     }
 
     //**
-    // @method update
-    // %result Database
-    // Updates the database using the rule set, returning the database.
-    // Throws an error if the rule set is not compatible with the current
-    // content of the database.
-    private Object _update(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(0, "update()");
-        pipeline.update();
-        return pipeline.database();
+    // @method queryParm
+    // %args name, value
+    // %result this
+    // Defines a query parameter for use by the rule set.  The *name*
+    // must be a valid identifier string.
+    //
+    // All accumulated query parameters will be visible in the rule set
+    // as the fields of a `query/...` fact. The `query/...` fact
+    // will not appear in the output.
+    private Object _queryParm(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
+        args.exactArity(2, "queryParm(name, value)");
+        return pipeline.queryParm(joe.toIdentifier(args.next()), args.next());
+    }
+
+    //**
+    // @method queryParms
+    // %args map
+    // %result this
+    // Defines some number of query parameters for use by the rule set given
+    // a *map* from parameter names to values.  The names must all be valid
+    // Nero identifiers.
+    //
+    // All accumulated query parameters will be visible in the rule set
+    // as the fields of a `query/...` fact. The `query/...` fact
+    // will not appear in the output.
+    private Object _queryParms(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
+        args.exactArity(1, "queryParms(map)");
+        var map = joe.toMap(args.next());
+        for (var e : map.entrySet()) {
+            pipeline.queryParm(joe.toIdentifier(e.getKey()), e.getValue());
+        }
+        return pipeline;
     }
 
     //**
@@ -111,11 +135,15 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
         return new SetValue(result.all());
     }
 
-    private NeroRuleSet toRules(Joe joe, Object arg) {
-        if (arg instanceof NeroRuleSet rs) return rs;
-        if (arg instanceof String s) {
-            return Nero.compile(new SourceBuffer("*joe*", s));
-        }
-        throw joe.expected("ruleset or script", arg);
+    //**
+    // @method update
+    // %result Database
+    // Updates the database using the rule set, returning the database.
+    // Throws an error if the rule set is not compatible with the current
+    // content of the database.
+    private Object _update(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
+        args.exactArity(0, "update()");
+        pipeline.update();
+        return pipeline.database();
     }
 }

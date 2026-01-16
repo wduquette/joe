@@ -477,3 +477,34 @@ function testWithRules_check_failed() {
         "Rule set is incompatible with given schema, expected 'Ancestor/x,y', got: 'Ancestor/a,d'.");
 }
 
+function testWithRules_queryParm() {
+    var db = Database();
+    var rules = ruleset {
+        define A/x;
+        A(x) :- query(myParm: x);
+    };
+    var result = db.withRules(rules)
+        .queryParm("myParm", #xyz)
+        .query();
+
+    assertEQ(db.toNeroScript(result).strip(), """
+        define A/x;
+        A(#xyz);
+        """);
+}
+
+function testWithRules_queryParms() {
+    var db = Database();
+    var rules = ruleset {
+        define A/x;
+        A(x) :- query(myParm: x);
+    };
+    var result = db.withRules(rules)
+        .queryParms({"myParm": #xyz})
+        .query();
+
+    assertEQ(db.toNeroScript(result).strip(), """
+        define A/x;
+        A(#xyz);
+        """);
+}
