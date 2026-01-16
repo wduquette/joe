@@ -27,7 +27,7 @@ public final class Fact {
      */
     public Fact(String relation, List<String> names, List<Object> fields) {
         this.shape = new Shape(relation, names);
-        this.fields = List.copyOf(fields);
+        this.fields = Collections.unmodifiableList(new ArrayList<>(fields));
 
         if (names.size() != fields.size()) {
             throw new IllegalArgumentException("names.size != fields.size");
@@ -50,7 +50,7 @@ public final class Fact {
      */
     public Fact(String relation, List<String> names, Map<String,Object> fieldMap) {
         this.shape = new Shape(relation, names);
-        this.fieldMap = Map.copyOf(fieldMap);
+        this.fieldMap = Collections.unmodifiableMap(new HashMap<>(fieldMap));
 
         if (!names.isEmpty()) {
             var list = new ArrayList<>();

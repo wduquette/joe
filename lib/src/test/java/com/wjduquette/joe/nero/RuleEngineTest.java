@@ -1215,6 +1215,37 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    // Nulls as field values in head atoms cause NullPointerExceptions.
+    @Test public void testBug_nullsInHeads_20260116() {
+        test("testBug_nullsInHeads_20260116");
+
+        // The following scripts should execute without error.
+        execute("""
+            define A/x;
+            A(null);
+            """);
+
+        execute("""
+            define A/...;
+            A(f: null);
+            """);
+
+        execute("""
+            define A/x;
+            define B/x, y;
+            A(1);
+            B(x, null) :- A(x);
+            """);
+
+        execute("""
+            define A/x;
+            define B/...;
+            A(1);
+            B(f1: x, f2: null) :- A(x);
+            """);
+    }
+
+
     //-------------------------------------------------------------------------
     // Helpers
 
