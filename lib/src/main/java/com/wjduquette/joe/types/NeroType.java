@@ -28,9 +28,18 @@ public class NeroType extends ProxyType<Nero> {
         //**
         // @package joe
         // @type Nero
-        // The `Nero` object allows Joe code to make use of
+        // The `Nero` type allows Joe code to execute of
         // [Nero Datalog](../nero/nero.md) [[RuleSet|RuleSets]],
-        // as created by the `ruleset` expression.
+        // as created by the `ruleset` expression.  The process is as follows:
+        //
+        // - Create and configure an instance of `Nero`.
+        // - Create a [[NeroPipeline]] using [[method:Nero.withFile]] or
+        //   [[method:Nero.withRules]].
+        // - Use the pipeline's methods to configure optional execution
+        //   settings.
+        // - Invoke one of the pipeline's execution methods.
+        //
+        // See [[NeroPipeline]] for more.
         proxies(Nero.class);
 
         initializer(this::_init);

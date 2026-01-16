@@ -30,21 +30,32 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
         // The `Database` object allows Joe code to work with a collection
         // of Nero [[Fact|Facts]] over a series of transactions.
         //
-        // ## Schema Checking
+        // The `Database` [[method:Database.load]], [[method:Database.update]],
+        // and [[method:Database.query]] methods execute rule sets in the
+        // context of the database with default execution settings.  For
+        // more complex needs, use [[method:Database.withFile]] or
+        // [[method:Database.withRules]] to create a [[DatabasePipeline]];
+        // the use its methods to configure execution settings and then
+        // execute the rule set as appropriate.
+        //
+        // @typeTopic checking
+        // %title Schema Checking
         //
         // All [[Fact|Facts]] added to the database by
         // [[method:Database.addFacts]], [[method:Database.load]], or
         // [[method:Database.update]] must be compatible with the current
-        // content of the database.  Specifically, if an update produces
-        // facts belonging to a relation already present in the database,
+        // content of the database.  Specifically, if an operation produces
+        // new facts belonging to a relation already present in the database,
         // the new facts must have the same shape as the existing facts.
         //
-        // [[method:Database.load]] and [[method:Database.update]] take an
-        // optional *schema* argument.  If given, all facts produced by the
-        // script or rule set whose relations appear in the *schema*
-        // must be compatible with the schema.  This feature is typically used
-        // when loading arbitrary scripts or rule sets into an empty database,
-        // to ensure that the incoming data has the desired form.
+        // All `Database` operations that add facts to the database perform
+        // this check automatically and throw an error if necessary.
+        //
+        // When loading new facts from a script into an empty database
+        // it can be useful to validate the facts by providing the
+        // appropriate schema.  Use
+        // [[method:Database.withFile]] and the [[DatabasePipeline]]'s
+        // [[method:DatabasePipeline.check]] method to do so.
         proxies(NeroDatabase.class);
 
         initializer(this::_init);
@@ -135,8 +146,8 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // The *facts* can be another [[Database]], or a collections of
     // [[Fact|Facts]] or values to be converted to facts. Throws
     // an [[Error]] if any value cannot be used as a `Fact`.
-    // Verifies that the relations being added are compatible with the
-    // facts already in the database.
+    // Throws an error if the relations being added are incompatible with the
+    // current contents of the database.
     private Object _addFacts(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "addFacts(facts)");
         var arg = args.next();
@@ -273,6 +284,8 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // to the database. The *path* may be passed as a [[Path]] or string.
     // Throws an error if the facts produced by the script are not compatible
     // with the database's current content.
+    //
+    // Note: `db.load(path)` is equivalent to `db.withFile(path).load()`.
     private Object _load(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "load(path)");
         var path = joe.toPath(args.next());
@@ -303,6 +316,8 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Queries the database given the *rules*, returning a set of
     // [[Fact|Facts]].  The *rules* may be passed as a [[RuleSet]] or as a
     // Nero script.  Does not modify the database.
+    //
+    // Note: `db.query(rules)` is equivalent to `db.withRules(rules).query()`.
     private Object _query(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "query(rules)");
         return new SetValue(db.query(joe.toRules(args.next())).all());
@@ -450,6 +465,8 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Updates the database given the *rules*, which may be passed
     // as a [[RuleSet]] or as a Nero script. Throws an error if the *rules*
     // are not compatible with the current content of the database.
+    //
+    // Note: `db.update(rules)` is equivalent to `db.withRules(rules).update()`.
     private Object _update(NeroDatabase db, Joe joe, Args args) {
         args.exactArity(1, "update(rules)");
         var rules = joe.toRules(args.next());

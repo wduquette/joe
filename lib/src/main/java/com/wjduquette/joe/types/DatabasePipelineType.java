@@ -27,7 +27,7 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
         // The `DatabasePipeline` object allows Joe code to execute
         // [Nero Datalog](../nero/nero.md) [[RuleSet|RuleSets]] on
         // the content of a [[Database]] in a variety of ways.
-        // `DatabasePipelines` are created using The [[Database]]
+        // `DatabasePipelines` are created using the [[Database]]
         // `with*` methods.
         proxies(NeroDatabase.Pipeline.class);
 
@@ -52,13 +52,14 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
 
     //**
     // @method check
-    // %args *schema*
+    // %args validationSchema
     // %result this
-    // Verifies that the rule set to execute is compatible with the validation
-    // *schema*.  The *schema* should be passed as a [[RuleSet]] or Nero
-    // script that contains only non-transient `define` declarations.
+    // Verifies that the rule set to execute is compatible with the
+    // *validationSchema*, throwing an error if it is not. The schema should
+    // be passed as a [[RuleSet]] or Nero script that contains only
+    // non-transient `define` declarations.
     private Object _check(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(1, "check(*schema*)");
+        args.exactArity(1, "check(validateSchema)");
         var rules = joe.toRules(args.next());
         var schema = rules.outputSchema();
         pipeline.check(schema);
