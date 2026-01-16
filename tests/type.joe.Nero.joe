@@ -108,6 +108,40 @@ function testQuery() {
         """);
 }
 
+// Verify that pipelines can use .queryParm()
+function testQueryParm1() {
+    var nero = Nero();
+    var rules1 = ruleset {
+        define A/x;
+        A(x) :- query(myParm: x);
+    };
+    var results = nero.withRules(rules1)
+        .debug()
+        .queryParm("myParm", #xyz)
+        .infer();
+    assertEQ(nero.toNeroScript(results).strip(), """
+        define A/x;
+        A(#xyz);
+        """);
+}
+
+function testQueryParm2() {
+    var nero = Nero();
+    var rules1 = ruleset {
+        define A/x;
+        A(x) :- query(myParm: x);
+    };
+    var facts = [];
+    var results = nero.withRules(rules1)
+        .debug()
+        .queryParm("myParm", #xyz)
+        .query([]);
+    assertEQ(nero.toNeroScript(results).strip(), """
+        define A/x;
+        A(#xyz);
+        """);
+}
+
 //-----------------------------------------------------------------------------
 // Inputs and Automatic Fact Conversions
 //

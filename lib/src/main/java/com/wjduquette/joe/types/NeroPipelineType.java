@@ -31,10 +31,12 @@ public class NeroPipelineType extends ProxyType<Nero.Pipeline> {
         // The [[Nero]] `with*` methods.
         proxies(Nero.Pipeline.class);
 
-        method("debug",   this::_debug);
-        method("infer",   this::_infer);
-        method("update",  this::_update);
-        method("query",   this::_query);
+        method("debug",      this::_debug);
+        method("infer",      this::_infer);
+        method("query",      this::_query);
+        method("queryParm",  this::_queryParm);
+        method("queryParms", this::_queryParms);
+        method("update",     this::_update);
     }
 
     //-------------------------------------------------------------------------
@@ -56,6 +58,54 @@ public class NeroPipelineType extends ProxyType<Nero.Pipeline> {
     private Object _debug(Nero.Pipeline pipeline, Joe joe, Args args) {
         args.arityRange(0, 1, "debug([flag])");
         pipeline.debug(!args.hasNext() || joe.toBoolean(args.next()));
+        return pipeline;
+    }
+
+    //**
+    // @method query
+    // %args facts
+    // %result Set
+    // Executes the rule set given a collection of facts, and returns
+    // the newly inferred facts.
+    private Object _query(Nero.Pipeline pipeline, Joe joe, Args args) {
+        args.exactArity(1, "query(facts)");
+        var facts = joe.toFacts(args.next());
+        var result = pipeline.query(new FactSet(facts));
+        return new SetValue(result.all());
+    }
+
+    //**
+    // @method queryParm
+    // %args name, value
+    // %result this
+    // Defines a query parameter for use by the rule set.  The *name*
+    // must be a valid identifier string.
+    //
+    // All accumulated query parameters will be visible in the rule set
+    // as the fields of a `query/...` fact. The `query/...` fact
+    // will not appear in the output.
+    private Object _queryParm(Nero.Pipeline pipeline, Joe joe, Args args) {
+        args.exactArity(2, "queryParm(name, value)");
+        return pipeline.queryParm(joe.toIdentifier(args.next()), args.next());
+    }
+
+    //**
+    // @method queryParms
+    // %args map
+    // %result this
+    // Defines some number of query parameters for use by the rule set given
+    // a *map* from parameter names to values.  The names must all be valid
+    // Nero identifiers.
+    //
+    // All accumulated query parameters will be visible in the rule set
+    // as the fields of a `query/...` fact. The `query/...` fact
+    // will not appear in the output.
+    private Object _queryParms(Nero.Pipeline pipeline, Joe joe, Args args) {
+        args.exactArity(1, "queryParms(map)");
+        var map = joe.toMap(args.next());
+        for (var e : map.entrySet()) {
+            pipeline.queryParm(joe.toIdentifier(e.getKey()), e.getValue());
+        }
         return pipeline;
     }
 
@@ -82,16 +132,4 @@ public class NeroPipelineType extends ProxyType<Nero.Pipeline> {
         return new SetValue(facts.all());
     }
 
-    //**
-    // @method query
-    // %args facts
-    // %result Set
-    // Executes the rule set given a collection of facts, and returns
-    // the newly inferred facts.
-    private Object _query(Nero.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(1, "query(facts)");
-        var facts = joe.toFacts(args.next());
-        var result = pipeline.query(new FactSet(facts));
-        return new SetValue(result.all());
-    }
 }

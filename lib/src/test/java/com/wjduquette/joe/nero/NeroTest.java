@@ -177,7 +177,8 @@ public class NeroTest extends Ted {
             define B/x;
             B(2);
             """;
-        check(nero.toNeroScript(nero.withScript(script).debug().query(db))).eq("""
+        check(nero.toNeroScript(nero.withScript(script).debug()
+            .query(db))).eq("""
             define B/x;
             B(2);
             """);
@@ -208,6 +209,21 @@ public class NeroTest extends Ted {
             A(x) :- query(parm: x);
             """;
         var results = nero.withScript(script).queryParm("parm", 1.0).infer();
+        check(nero.toNeroScript(results)).eq("""
+            define A/x;
+            A(1);
+            """);
+    }
+
+    @Test public void testWith_Script_query_parm() {
+        test("testWith_Script_query_parm");
+        var script = """
+            define A/x;
+            A(x) :- query(parm: x);
+            """;
+        var inputs = new FactSet();
+        var results = nero.withScript(script)
+            .queryParm("parm", 1.0).query(inputs);
         check(nero.toNeroScript(results)).eq("""
             define A/x;
             A(1);

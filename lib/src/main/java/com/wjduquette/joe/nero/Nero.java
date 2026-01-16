@@ -176,10 +176,10 @@ public class Nero {
 
         /**
          * Defines a query parameter for use by the rule set.  The name
-         * must be a valid identifier string.  The accumulated query
-         * parameters will appear as the fields of {@code query/...} fact
-         * that the rule set can access.  The {@code query/...} fact will
-         * not appear in the output.
+         * must be a valid identifier string.
+         * All accumulated query parameters will be visible in the rule set
+         * as the fields of a {@code query/...} fact. The {@code query/...} fact
+         * will not appear in the output.
          * @param name the parameter name
          * @param value the parameter value
          * @return The pipeline
@@ -197,9 +197,9 @@ public class Nero {
          * Defines a collection of query parameters for use by the rule
          * set as a map from parameter name to parameter value.
          * The names must be valid identifier strings.
-         * The accumulated query parameters will appear as the fields of
-         * a {@code query/...} fact that the rule set can access.  The
-         * {@code query/...} fact will not appear in the output.
+         * All accumulated query parameters will be visible in the rule set
+         * as the fields of a {@code query/...} fact. The {@code query/...} fact
+         * will not appear in the output.
          * @param parms the parameter map
          * @return The pipeline
          */
@@ -226,7 +226,11 @@ public class Nero {
             var engine = new RuleEngine(joe, ruleset, db);
             engine.setDebug(debug);
             engine.addMappers(nero.getMappers());
-            db.add(new Fact(QUERY, parms));
+
+            var query = new Fact(QUERY, parms);
+            if (debug) joe.println("Query Parameters: " + query);
+            db.add(query);
+
             return engine.infer();
         }
 
@@ -243,7 +247,9 @@ public class Nero {
             engine.setDebug(debug);
             engine.addMappers(nero.getMappers());
             try {
-                facts.add(new Fact(QUERY, parms));
+                var query = new Fact(QUERY, parms);
+                if (debug) joe.println("Query Parameters: " + query);
+                facts.add(query);
                 return engine.infer();
             } finally {
                 facts.drop(QUERY);
@@ -253,14 +259,11 @@ public class Nero {
         /**
          * Infers all known facts from the rule set and provided facts,
          * returning the newly inferred facts.
-         * @param facts The input facts
+         * @param inputs The input facts
          * @return The inferred facts.
          */
-        public FactSet query(Collection<Fact> facts) {
-            var engine = new RuleEngine(joe, ruleset, new FactSet(facts));
-            engine.setDebug(debug);
-            engine.addMappers(nero.getMappers());
-            return engine.infer();
+        public FactSet query(Collection<Fact> inputs) {
+            return doQuery(new FactSet(inputs));
         }
 
         /**
@@ -269,13 +272,22 @@ public class Nero {
          * remains unchanged. Returns the inferred facts.
          * If the input fact set should be updated, or if it doesn't matter,
          * call update() instead.
-         * @param facts The input facts
+         * @param inputs The input facts
          * @return The inferred facts.
          */
-        public FactSet query(FactSet facts) {
-            var engine = new RuleEngine(joe, ruleset, new FactSet(facts));
+        public FactSet query(FactSet inputs) {
+            return doQuery(new FactSet(inputs));
+        }
+
+        private FactSet doQuery(FactSet facts) {
+            var engine = new RuleEngine(joe, ruleset, facts);
             engine.setDebug(debug);
             engine.addMappers(nero.getMappers());
+
+            var query = new Fact(QUERY, parms);
+            if (debug) joe.println("Query Parameters: " + query);
+            facts.add(query);
+
             return engine.infer();
         }
     }
