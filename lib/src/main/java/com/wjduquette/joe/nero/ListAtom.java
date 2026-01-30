@@ -1,19 +1,44 @@
 package com.wjduquette.joe.nero;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * A ListAtom is a {@link Atom} consisting of a relation name and a
  * list of {@link Term Terms}.  A ListAtom matches fact fields by
  * position.
- * @param relation The relation name
- * @param terms The terms
  */
-public record ListAtom(String relation, List<Term> terms)
-    implements Atom
-{
+public final class ListAtom implements Atom {
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
+    private final String relation;
+    private final List<Term> terms = new ArrayList<>();
+
+    //-------------------------------------------------------------------------
+    // Constructor
+
+    public ListAtom(String relation, List<Term> terms) {
+        this.relation = relation;
+        this.terms.addAll(terms);
+    }
+
+    //-------------------------------------------------------------------------
+    // Methods
+
+    @Override
+    public String relation() {
+        return relation;
+    }
+
+    /**
+     * Returns the ListAtom's terms.
+     * @return the terms
+     */
+    public List<Term> terms() {
+        return Collections.unmodifiableList(terms);
+    }
+
     @Override public Collection<Term> getAllTerms() {
         return terms;
     }
