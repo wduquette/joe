@@ -1,20 +1,47 @@
 package com.wjduquette.joe.nero;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * An NamedAtom is a {@link Atom} consisting of a relation name and a
- * map of field names and {@link Term Terms}, which may be variables,
- * wildcards, or constants. A NamedAtom can match any {@link Fact},
- * identifying fields by name.
- * @param relation The relation name
- * @param termMap The terms
+ * map of field names and {@link Term Terms}. A NamedAtom matches
+ * {@link Fact} fields by name.
  */
-public record NamedAtom(String relation, Map<String,Term> termMap)
-    implements Atom
-{
+public final class NamedAtom implements Atom {
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
+    private final String relation;
+    private final Map<String,Term> termMap = new HashMap<>();
+
+    //-------------------------------------------------------------------------
+    // Constructor
+
+    public NamedAtom(String relation, Map<String,Term> termMap) {
+        this.relation = relation;
+        this.termMap.putAll(termMap);
+    }
+
+    //-------------------------------------------------------------------------
+    // Methods
+
+    @Override
+    public String relation() {
+        return relation;
+    }
+
+    /**
+     * Gets an unmodifiable term map.
+     * @return The map
+     */
+    public Map<String,Term> termMap() {
+        return Collections.unmodifiableMap(termMap);
+    }
+
     @Override public Collection<Term> getAllTerms() {
         return termMap.values();
     }
@@ -22,6 +49,7 @@ public record NamedAtom(String relation, Map<String,Term> termMap)
     @Override public String toString() {
         var termString = termMap.entrySet().stream()
             .map(e -> e.getKey() + ": " + e.getValue())
+            .sorted()
             .collect(Collectors.joining(", "));
         return relation + "(" + termString + ")";
     }
