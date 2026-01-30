@@ -8,7 +8,7 @@ import java.util.Map;
 
 import static com.wjduquette.joe.checker.Checker.check;
 
-public class NamedAtomTest extends Ted {
+public class MapAtomTest extends Ted {
     private final Variable X = new Variable("x");
     private final Constant ABC = new Constant("abc");
     private final Wildcard W = new Wildcard("_");
@@ -20,7 +20,7 @@ public class NamedAtomTest extends Ted {
         map.put("f0", X);
         map.put("f1", ABC);
         map.put("f2", W);
-        var atom = new NamedAtom("Thing", map);
+        var atom = new MapAtom("Thing", map);
         check(atom.relation()).eq("Thing");
         check(atom.termMap()).eq(Map.of("f0", X, "f1", ABC, "f2", W));
     }
@@ -32,7 +32,7 @@ public class NamedAtomTest extends Ted {
         map.put("f0", X);
         map.put("f1", ABC);
         map.put("f2", W);
-        var atom = new NamedAtom("Thing", map);
+        var atom = new MapAtom("Thing", map);
         check(atom.toString()).eq("Thing(f0: x, f1: \"abc\", f2: _)");
     }
 }

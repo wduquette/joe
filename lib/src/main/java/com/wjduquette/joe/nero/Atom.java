@@ -8,7 +8,7 @@ import java.util.Set;
  * A Nero atom, i.e., a relation with its terms.
  */
 public sealed interface Atom permits
-    NamedAtom, OrderedAtom
+    MapAtom, OrderedAtom
 {
     /**
      * Gets the atom's relation string.

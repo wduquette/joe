@@ -449,7 +449,7 @@ class NeroParser extends EmbeddedParser {
         return new OrderedAtom(relation, terms);
     }
 
-    private NamedAtom namedAtom(Context ctx, String relation) {
+    private MapAtom namedAtom(Context ctx, String relation) {
         var terms = new LinkedHashMap<String,Term>();
 
         do {
@@ -461,7 +461,7 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new NamedAtom(relation, terms);
+        return new MapAtom(relation, terms);
     }
 
     private Term term(Context ctx) {

@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * An NamedAtom is a {@link Atom} consisting of a relation name and a
- * map of field names and {@link Term Terms}. A NamedAtom matches
+ * A MapAtom is a {@link Atom} consisting of a relation name and a
+ * map of field names and {@link Term Terms}. A MapAtom matches
  * {@link Fact} fields by name.
  */
-public final class NamedAtom implements Atom {
+public final class MapAtom implements Atom {
     //-------------------------------------------------------------------------
     // Instance Variables
 
@@ -21,7 +21,7 @@ public final class NamedAtom implements Atom {
     //-------------------------------------------------------------------------
     // Constructor
 
-    public NamedAtom(String relation, Map<String,Term> termMap) {
+    public MapAtom(String relation, Map<String,Term> termMap) {
         this.relation = relation;
         this.termMap.putAll(termMap);
     }
@@ -58,8 +58,8 @@ public final class NamedAtom implements Atom {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        NamedAtom namedAtom = (NamedAtom) o;
-        return relation.equals(namedAtom.relation) && termMap.equals(namedAtom.termMap);
+        MapAtom mapAtom = (MapAtom) o;
+        return relation.equals(mapAtom.relation) && termMap.equals(mapAtom.termMap);
     }
 
     @Override

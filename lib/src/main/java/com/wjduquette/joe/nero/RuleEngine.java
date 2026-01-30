@@ -366,7 +366,7 @@ public class RuleEngine {
         BindingContext bc
     ) {
          switch (bodyAtom) {
-             case NamedAtom atom -> {
+             case MapAtom atom -> {
                  for (var e : atom.termMap().entrySet()) {
                      var name = e.getKey();
 
@@ -459,7 +459,7 @@ public class RuleEngine {
     private Fact axiom2fact(Atom axiom) {
         var shape = ruleset.schema().get(axiom.relation());
         return switch (axiom) {
-            case NamedAtom atom -> {
+            case MapAtom atom -> {
                 var termMap = new HashMap<String,Object>();
 
                 for (var e : atom.termMap().entrySet()) {
@@ -483,7 +483,7 @@ public class RuleEngine {
 
     private Fact createFact(BindingContext bc) {
         return switch (bc.rule.head()) {
-            case NamedAtom atom -> {
+            case MapAtom atom -> {
                 var terms = new HashMap<String,Object>();
 
                 for (var e : atom.termMap().entrySet()) {
