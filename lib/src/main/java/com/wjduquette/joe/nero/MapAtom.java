@@ -11,28 +11,22 @@ import java.util.stream.Collectors;
  * map of field names and {@link Term Terms}. A MapAtom matches
  * {@link Fact} fields by name.
  */
-public final class MapAtom implements Atom {
+public final class MapAtom extends Atom {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final String relation;
     private final Map<String,Term> termMap = new HashMap<>();
 
     //-------------------------------------------------------------------------
     // Constructor
 
     public MapAtom(String relation, Map<String,Term> termMap) {
-        this.relation = relation;
+        super(relation);
         this.termMap.putAll(termMap);
     }
 
     //-------------------------------------------------------------------------
     // Methods
-
-    @Override
-    public String relation() {
-        return relation;
-    }
 
     /**
      * Gets an unmodifiable term map.
@@ -51,7 +45,7 @@ public final class MapAtom implements Atom {
             .map(e -> e.getKey() + ": " + e.getValue())
             .sorted()
             .collect(Collectors.joining(", "));
-        return relation + "(" + termString + ")";
+        return relation() + "(" + termString + ")";
     }
 
     @Override
@@ -59,12 +53,12 @@ public final class MapAtom implements Atom {
         if (o == null || getClass() != o.getClass()) return false;
 
         MapAtom mapAtom = (MapAtom) o;
-        return relation.equals(mapAtom.relation) && termMap.equals(mapAtom.termMap);
+        return super.equals(mapAtom) && termMap.equals(mapAtom.termMap);
     }
 
     @Override
     public int hashCode() {
-        int result = relation.hashCode();
+        int result = super.hashCode();
         result = 31 * result + termMap.hashCode();
         return result;
     }

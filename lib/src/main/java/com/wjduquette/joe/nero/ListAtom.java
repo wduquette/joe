@@ -8,28 +8,22 @@ import java.util.stream.Collectors;
  * list of {@link Term Terms}.  A ListAtom matches fact fields by
  * position.
  */
-public final class ListAtom implements Atom {
+public final class ListAtom extends Atom {
     //-------------------------------------------------------------------------
     // Instance Variables
 
-    private final String relation;
     private final List<Term> terms = new ArrayList<>();
 
     //-------------------------------------------------------------------------
     // Constructor
 
     public ListAtom(String relation, List<Term> terms) {
-        this.relation = relation;
+        super(relation);
         this.terms.addAll(terms);
     }
 
     //-------------------------------------------------------------------------
     // Methods
-
-    @Override
-    public String relation() {
-        return relation;
-    }
 
     /**
      * Returns the ListAtom's terms.
@@ -46,7 +40,7 @@ public final class ListAtom implements Atom {
     @Override public String toString() {
         var termString = terms.stream().map(Term::toString)
             .collect(Collectors.joining(", "));
-        return relation + "(" + termString + ")";
+        return relation() + "(" + termString + ")";
     }
 
     @Override
@@ -54,12 +48,12 @@ public final class ListAtom implements Atom {
         if (o == null || getClass() != o.getClass()) return false;
 
         ListAtom atom = (ListAtom) o;
-        return relation.equals(atom.relation) && terms.equals(atom.terms);
+        return super.equals(atom) && terms.equals(atom.terms);
     }
 
     @Override
     public int hashCode() {
-        int result = relation.hashCode();
+        int result = super.hashCode();
         result = 31 * result + terms.hashCode();
         return result;
     }
