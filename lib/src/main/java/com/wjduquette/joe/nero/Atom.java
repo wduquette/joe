@@ -11,17 +11,32 @@ public sealed abstract class Atom permits MapAtom, ListAtom {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    private final boolean negated;
     private final String relation;
 
     //-------------------------------------------------------------------------
     // Constructor
 
-    protected Atom(String relation) {
+    /**
+     * Initializes the atom's shared properties.
+     * @param negated true or false
+     * @param relation the name
+     */
+    protected Atom(boolean negated, String relation) {
+        this.negated = negated;
         this.relation = relation;
     }
 
     //-------------------------------------------------------------------------
     // Instance Methods
+
+    /**
+     * Whether the atom is negated or not.  Head atoms are never negated.
+     * @return true or false
+     */
+    public final boolean isNegated() {
+        return negated;
+    }
 
     /**
      * Gets the atom's relation string.

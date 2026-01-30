@@ -17,8 +17,23 @@ public final class ListAtom extends Atom {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates a normal ListAtom with the given inputs.
+     * @param relation The relation name
+     * @param terms The list of terms.
+     */
     public ListAtom(String relation, List<Term> terms) {
-        super(relation);
+        this(false, relation, terms);
+    }
+
+    /**
+     * Creates a possibly-negated ListAtom with the given inputs.
+     * @param negated true or false
+     * @param relation The relation name
+     * @param terms The list of terms.
+     */
+    public ListAtom(boolean negated, String relation, List<Term> terms) {
+        super(negated, relation);
         this.terms.addAll(terms);
     }
 

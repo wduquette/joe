@@ -20,8 +20,23 @@ public final class MapAtom extends Atom {
     //-------------------------------------------------------------------------
     // Constructor
 
+    /**
+     * Creates a normal MapAtom with the given inputs.
+     * @param relation The relation name
+     * @param termMap The map of field names and terms
+     */
     public MapAtom(String relation, Map<String,Term> termMap) {
-        super(relation);
+        this(false, relation, termMap);
+    }
+
+    /**
+     * Creates a possibly-negated MapAtom with the given inputs.
+     * @param negated true or false
+     * @param relation The relation name
+     * @param termMap The map of field names and terms
+     */
+    public MapAtom(boolean negated, String relation, Map<String,Term> termMap) {
+        super(negated, relation);
         this.termMap.putAll(termMap);
     }
 
