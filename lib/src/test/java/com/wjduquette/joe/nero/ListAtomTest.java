@@ -7,7 +7,7 @@ import java.util.List;
 
 import static com.wjduquette.joe.checker.Checker.check;
 
-public class OrderedAtomTest extends Ted {
+public class ListAtomTest extends Ted {
     private final Variable X = new Variable("x");
     private final Constant ABC = new Constant("abc");
     private final Wildcard W = new Wildcard("_");
@@ -15,7 +15,7 @@ public class OrderedAtomTest extends Ted {
     @Test
     public void testCreation() {
         test("testCreation");
-        var atom = new OrderedAtom("Thing", List.of(X, ABC, W));
+        var atom = new ListAtom("Thing", List.of(X, ABC, W));
         check(atom.relation()).eq("Thing");
         check(atom.terms()).eq(List.of(X, ABC, W));
     }
@@ -23,7 +23,7 @@ public class OrderedAtomTest extends Ted {
     @Test
     public void testToString() {
         test("testToString()");
-        var atom = new OrderedAtom("Thing", List.of(X, ABC, W));
+        var atom = new ListAtom("Thing", List.of(X, ABC, W));
         check(atom.toString()).eq("Thing(x, \"abc\", _)");
     }
 }

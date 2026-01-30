@@ -132,7 +132,7 @@ public class Shape {
                 }
                 yield true;
             }
-            case OrderedAtom a -> shape.arity() == a.terms().size();
+            case ListAtom a -> shape.arity() == a.terms().size();
         };
     }
 }

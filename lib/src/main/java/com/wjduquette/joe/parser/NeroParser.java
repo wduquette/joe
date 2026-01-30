@@ -344,8 +344,8 @@ class NeroParser extends EmbeddedParser {
         // We've checked the shape of the atom, and it conforms to a
         // built-in predicate; therefore it is an OrderedAtom, and it
         // has the expected number of terms.
-        assert atom instanceof OrderedAtom;
-        var a = (OrderedAtom)atom;
+        assert atom instanceof ListAtom;
+        var a = (ListAtom)atom;
         var term = a.terms().get(index);
         if (term instanceof Variable v && bodyVars.contains(v.name())) return;
         error(relation, "expected bound variable as term " + index +
@@ -363,8 +363,8 @@ class NeroParser extends EmbeddedParser {
         // We've checked the shape of the atom, and it conforms to a
         // built-in predicate; therefore it is an OrderedAtom, and it
         // has the expected number of terms.
-        assert atom instanceof OrderedAtom;
-        var a = (OrderedAtom)atom;
+        assert atom instanceof ListAtom;
+        var a = (ListAtom)atom;
         var term = a.terms().get(index);
         if (term instanceof Constant ||
             (term instanceof Variable v && bodyVars.contains(v.name()))
@@ -446,7 +446,7 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new OrderedAtom(relation, terms);
+        return new ListAtom(relation, terms);
     }
 
     private MapAtom namedAtom(Context ctx, String relation) {

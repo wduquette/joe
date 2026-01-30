@@ -379,7 +379,7 @@ public class RuleEngine {
                  }
                  return true;
              }
-             case OrderedAtom atom -> {
+             case ListAtom atom -> {
                  if (!fact.isOrdered()) {
                      throw new JoeError(
                          "'" + atom.relation() +
@@ -469,7 +469,7 @@ public class RuleEngine {
                 // Creates an ordered or unordered atom based on the shape.
                 yield new Fact(atom.relation(), shape.names(), termMap);
             }
-            case OrderedAtom atom -> {
+            case ListAtom atom -> {
                 assert shape.isOrdered();  // Guaranteed by parser.
                 var terms = new ArrayList<>();
 
@@ -492,7 +492,7 @@ public class RuleEngine {
 
                 yield new Fact(atom.relation(), bc.shape.names(), terms);
             }
-            case OrderedAtom atom -> {
+            case ListAtom atom -> {
                 var terms = new ArrayList<>();
 
                 for (var term : atom.terms()) {
@@ -611,8 +611,8 @@ public class RuleEngine {
 
     // mapsTo/f,a,b
     private Set<Fact> _mapsTo(BindingContext bc, Atom theAtom) {
-        assert theAtom instanceof OrderedAtom;
-        var atom = (OrderedAtom)theAtom;
+        assert theAtom instanceof ListAtom;
+        var atom = (ListAtom)theAtom;
         var facts = new HashSet<Fact>();
 
         // FIRST, get the mapper function.
@@ -645,8 +645,8 @@ public class RuleEngine {
     }
 
     private Object extractVar(BindingContext bc, Atom atom, int index) {
-        assert atom instanceof OrderedAtom;
-        var a = (OrderedAtom)atom;
+        assert atom instanceof ListAtom;
+        var a = (ListAtom)atom;
         var term = a.terms().get(index);
         assert term instanceof Variable;
         var theVar = (Variable)term;

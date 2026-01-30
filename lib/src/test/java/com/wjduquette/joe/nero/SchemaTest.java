@@ -49,7 +49,7 @@ public class SchemaTest extends Ted {
     @Test public void testCheck_head_undefined() {
         test("testCheck_head_undefined");
 
-        var head = new OrderedAtom("Person", List.of(new Constant("abc")));
+        var head = new ListAtom("Person", List.of(new Constant("abc")));
         check(schema.check(head)).eq(false);
     }
 
@@ -57,7 +57,7 @@ public class SchemaTest extends Ted {
         test("testCheck_head_mismatch");
 
         var shape = new Shape("Person", List.of("id", "name"));
-        var head = new OrderedAtom("Person", List.of(new Constant("abc")));
+        var head = new ListAtom("Person", List.of(new Constant("abc")));
         schema.add(shape);
         check(schema.check(head)).eq(false);
     }
