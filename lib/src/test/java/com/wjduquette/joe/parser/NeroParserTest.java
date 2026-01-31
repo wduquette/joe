@@ -290,6 +290,17 @@ public class NeroParserTest extends Ted {
             .eq("[line 2] error at 'Attribute', negated body atom contains unbound variable: 'y'.");
     }
 
+    @Test public void testRule_headUnbound() {
+        test("testRule_headUnbound");
+
+        var source = """
+            define Thing/a;
+            Thing(x) :- Attribute(y);
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at 'Thing', found unbound variable(s) in rule head.");
+    }
+
     @Test public void testRule_expectedSemicolon() {
         test("testRule_expectedSemicolon");
 
@@ -301,17 +312,6 @@ public class NeroParserTest extends Ted {
             """;
         check(parseNero(source))
             .eq("[line 4] error at 'C', expected ';' after rule body.");
-    }
-
-    @Test public void testRule_headUnbound() {
-        test("testRule_headUnbound");
-
-        var source = """
-            define Thing/a;
-            Thing(x) :- Attribute(y);
-            """;
-        check(parseNero(source))
-            .eq("[line 2] error at 'Thing', found unbound variable(s) in rule head.");
     }
 
     @Test public void testRule_headWildcard() {

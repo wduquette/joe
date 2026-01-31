@@ -32,6 +32,12 @@ class NeroParser extends EmbeddedParser {
     // name, which might include a '!'.
     private record Relation(Token token, String name) { }
 
+    // An atom together with its relation token.
+    private record AtomPair(Token token, Atom atom) {
+        String relation() { return atom.relation(); }
+        Set<String> getVariableNames() { return atom.getVariableNames(); }
+    }
+
     // The context in which atoms and terms are being parsed.  HEAD indicates
     // either an axiom or a rule head; we don't know which it will be
     // until after the atom is fully parsed.
@@ -102,7 +108,7 @@ class NeroParser extends EmbeddedParser {
                 // Axiom or Rule
                 var headToken = scanner.peek();
                 var headStart = headToken.span().start();
-                var head = atom(Context.HEAD, false);
+                var head = new AtomPair(headToken, atom(Context.HEAD, false));
                 var headEnd = scanner.previous().span().end();
 
                 if (scanner.match(SEMICOLON)) {
@@ -113,7 +119,7 @@ class NeroParser extends EmbeddedParser {
                     if (!schema.hasRelation(head.relation())) {
                         throw errorSync(headToken, "undefined relation in axiom.");
                     }
-                    if (!schema.check(head)) {
+                    if (!schema.check(head.atom())) {
                         var headString = headToken.span().buffer()
                             .span(headStart, headEnd).text();
                         error(headToken,
@@ -121,25 +127,25 @@ class NeroParser extends EmbeddedParser {
                             schema.get(head.relation()).toSpec() +
                             "', got: '" + headString + "'.");
                     }
-                    axioms.add(axiom(headToken, head));
+                    axioms.add(axiom(head));
                 } else if (scanner.match(COLON_MINUS)) {
                     if (RuleEngine.isBuiltIn(head.relation())) {
                         throw errorSync(headToken,
                             "found built-in predicate in rule head.");
                     }
                     if (!schema.hasRelation(head.relation())) {
-                        throw errorSync(headToken,
+                        throw errorSync(head.token(),
                             "undefined relation in rule head.");
                     }
-                    if (!schema.check(head)) {
-                        var headString = headToken.span().buffer()
+                    if (!schema.check(head.atom())) {
+                        var headString = head.token().span().buffer()
                             .span(headStart, headEnd).text();
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                                 schema.get(head.relation()).toSpec() +
                                 "', got: '" + headString + "'.");
                     }
-                    rules.add(rule(headToken, head));
+                    rules.add(rule(head));
                 } else {
                     scanner.advance();
                     throw errorSync(scanner.previous(),
@@ -224,27 +230,29 @@ class NeroParser extends EmbeddedParser {
         schema.setTransient(relation.name(), true);
     }
 
-    private Atom axiom(Token token, Atom head) {
-        if (head.getAllTerms().stream().anyMatch(t -> t instanceof Aggregate)) {
-            error(token, "found aggregation function in axiom.");
+    private Atom axiom(AtomPair head) {
+        if (head.atom().getAllTerms().stream().anyMatch(t -> t instanceof Aggregate)) {
+            error(head.token(), "found aggregation function in axiom.");
         } else if (!head.getVariableNames().isEmpty()) {
-            error(token, "found variable in axiom.");
+            error(head.token(), "found variable in axiom.");
         }
-        return head;
+        return head.atom();
     }
 
-    private Rule rule(Token headToken, Atom head) {
+    private Rule rule(AtomPair head) {
+        var pairs = new ArrayList<AtomPair>();
         var bodyAtoms = new ArrayList<Atom>();
         var constraints = new ArrayList<Constraint>();
         var bodyVars = new HashSet<String>();
 
-        checkAggregates(headToken, head);
 
+        // FIRST, parse the rule's body atoms.
         do {
             var negated = scanner.match(NOT);
-
             var token = scanner.peek();
             var atom = atom(Context.BODY, negated);
+
+            pairs.add(new AtomPair(token, atom));
 
             if (hasBang(atom.relation()) && !hasBang(head.relation())) {
                 error(token, "found update marker '!' in body atom of non-updating rule.");
@@ -267,6 +275,18 @@ class NeroParser extends EmbeddedParser {
             bodyAtoms.add(atom);
         } while (scanner.match(COMMA));
 
+        // NEXT, do global checks on the body atoms and head.
+        // TODO
+
+        // Verify that all head variables are bound in the body.
+        if (!bodyVars.containsAll(head.getVariableNames())) {
+            error(head.token(), "found unbound variable(s) in rule head.");
+        }
+
+        // Check any aggregators in the rule's head.
+        checkAggregates(head);
+
+        // NEXT, parse and check the constraints.
         if (scanner.match(WHERE)) {
             do {
                 constraints.add(constraint(bodyVars));
@@ -275,21 +295,17 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(SEMICOLON, "expected ';' after rule body.");
 
-        // Verify that all variables are bound.
-        if (!bodyVars.containsAll(head.getVariableNames())) {
-            error(headToken, "found unbound variable(s) in rule head.");
-        }
-
-        return new Rule(head, bodyAtoms, constraints);
+        // FINALLY, return the parsed rule.
+        return new Rule(head.atom(), bodyAtoms, constraints);
     }
 
     // Verify that there is at most one aggregate, and that it shares no
     // variable names with other head atoms.
-    private void checkAggregates(Token token, Atom head) {
+    private void checkAggregates(AtomPair head) {
         var aggVars = new HashSet<String>();
         var others = new HashSet<String>();
         var count = 0;
-        for (var term : head.getAllTerms()) {
+        for (var term : head.atom().getAllTerms()) {
             if (term instanceof Aggregate a) {
                 ++count;
                 aggVars.addAll(a.names());
@@ -299,11 +315,11 @@ class NeroParser extends EmbeddedParser {
         }
 
         if (count > 1) {
-            error(token, "rule head contains more than one aggregation function.");
+            error(head.token(), "rule head contains more than one aggregation function.");
         } else if (count == 1) {
             aggVars.retainAll(others);
             if (!aggVars.isEmpty()) {
-                error(token, "aggregated variable(s) found elsewhere in rule head.");
+                error(head.token(), "aggregated variable(s) found elsewhere in rule head.");
             }
         }
     }
