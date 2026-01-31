@@ -59,6 +59,7 @@ class NeroParser extends EmbeddedParser {
 
     // Standalone or embedded
     private final Mode mode;
+    private Schema schema = null;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -77,14 +78,15 @@ class NeroParser extends EmbeddedParser {
      * @return The rule set
      */
     public NeroRuleSet parse() {
-        return doParse(new Schema());
+        this.schema = new Schema();
+        return doParse();
     }
 
     //-------------------------------------------------------------------------
     // The Parser
 
     @SuppressWarnings("Convert2MethodRef")
-    private NeroRuleSet doParse(Schema schema) {
+    private NeroRuleSet doParse() {
         Supplier<Boolean> endCondition = mode == Mode.STANDALONE
             ? () -> scanner.isAtEnd()
             : () -> scanner.match(RIGHT_BRACE);
@@ -95,13 +97,13 @@ class NeroParser extends EmbeddedParser {
             try {
                 // define
                 if (scanner.matchIdentifier(DEFINE)) {
-                    defineDeclaration(schema);
+                    defineDeclaration();
                     continue;
                 }
 
                 // transient
                 if (scanner.matchIdentifier(TRANSIENT)) {
-                    transientDeclaration(schema);
+                    transientDeclaration();
                     continue;
                 }
 
@@ -162,7 +164,7 @@ class NeroParser extends EmbeddedParser {
         return name.endsWith("!");
     }
 
-    private void defineDeclaration(Schema schema) {
+    private void defineDeclaration() {
         var transience = scanner.matchIdentifier(TRANSIENT);
 
         var relation = relation("expected relation after 'define [transient]'.");
@@ -209,7 +211,7 @@ class NeroParser extends EmbeddedParser {
         if (transience) schema.setTransient(relation.name(), true);
     }
 
-    private void transientDeclaration(Schema schema) {
+    private void transientDeclaration() {
         var relation = relation("expected relation after 'transient'.");
 
         if (RuleEngine.isBuiltIn(relation.token().lexeme())) {
@@ -223,6 +225,7 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Atom axiom(AtomPair head) {
+
         if (head.atom().getAllTerms().stream().anyMatch(t -> t instanceof Aggregate)) {
             error(head.token(), "found aggregation function in axiom.");
         } else if (!head.getVariableNames().isEmpty()) {
