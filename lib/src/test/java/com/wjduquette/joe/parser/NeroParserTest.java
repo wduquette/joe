@@ -95,7 +95,7 @@ public class NeroParserTest extends Ted {
             Head(x), Body(x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at ',', expected axiom or rule.");
+            .eq("[line 1] error at ',', expected declaration, axiom, or rule.");
     }
 
     //-------------------------------------------------------------------------
@@ -290,6 +290,17 @@ public class NeroParserTest extends Ted {
             .eq("[line 2] error at 'Attribute', negated body atom contains unbound variable: 'y'.");
     }
 
+    @Test public void testRule_headUnbound() {
+        test("testRule_headUnbound");
+
+        var source = """
+            define Thing/a;
+            Thing(x) :- Attribute(y);
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at 'Thing', found unbound variable(s) in rule head.");
+    }
+
     @Test public void testRule_expectedSemicolon() {
         test("testRule_expectedSemicolon");
 
@@ -301,17 +312,6 @@ public class NeroParserTest extends Ted {
             """;
         check(parseNero(source))
             .eq("[line 4] error at 'C', expected ';' after rule body.");
-    }
-
-    @Test public void testRule_headUnbound() {
-        test("testRule_headUnbound");
-
-        var source = """
-            define Thing/a;
-            Thing(x) :- Attribute(y);
-            """;
-        check(parseNero(source))
-            .eq("[line 2] error at 'Thing', found unbound variable(s) in rule head.");
     }
 
     @Test public void testRule_headWildcard() {
@@ -508,7 +508,7 @@ public class NeroParserTest extends Ted {
     //-------------------------------------------------------------------------
     // orderedAtom()
 
-    @Test public void testOrderedAtom_expectedRightParen() {
+    @Test public void testListAtom_expectedRightParen() {
         test("testOrderedAtom_expectedRightParen");
 
         var source = """
@@ -522,7 +522,7 @@ public class NeroParserTest extends Ted {
     //-------------------------------------------------------------------------
     // namedAtom()
 
-    @Test public void testNamedAtom_expectedFieldName() {
+    @Test public void testMapAtom_expectedFieldName() {
         test("testNamedAtom_expectedFieldName");
 
         var source = """
@@ -533,7 +533,7 @@ public class NeroParserTest extends Ted {
             .eq("[line 2] error at '#a', expected field name.");
     }
 
-    @Test public void testNamedAtom_expectedColon() {
+    @Test public void testMapAtom_expectedColon() {
         test("testNamedAtom_expectedColon");
 
         var source = """
@@ -545,7 +545,7 @@ public class NeroParserTest extends Ted {
     }
 
 
-    @Test public void testNamedAtom_expectedRightParen() {
+    @Test public void testMapAtom_expectedRightParen() {
         test("testNamedAtom_expectedRightParen");
 
         var source = """

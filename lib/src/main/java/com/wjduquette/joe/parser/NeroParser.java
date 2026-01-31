@@ -32,6 +32,12 @@ class NeroParser extends EmbeddedParser {
     // name, which might include a '!'.
     private record Relation(Token token, String name) { }
 
+    // An atom together with its relation token.
+    private record AtomPair(Token token, Atom atom, String text) {
+        String relation() { return atom.relation(); }
+        Set<String> getVariableNames() { return atom.getVariableNames(); }
+    }
+
     // The context in which atoms and terms are being parsed.  HEAD indicates
     // either an axiom or a rule head; we don't know which it will be
     // until after the atom is fully parsed.
@@ -53,6 +59,7 @@ class NeroParser extends EmbeddedParser {
 
     // Standalone or embedded
     private final Mode mode;
+    private Schema schema = null;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -71,14 +78,15 @@ class NeroParser extends EmbeddedParser {
      * @return The rule set
      */
     public NeroRuleSet parse() {
-        return doParse(new Schema());
+        this.schema = new Schema();
+        return doParse();
     }
 
     //-------------------------------------------------------------------------
     // The Parser
 
     @SuppressWarnings("Convert2MethodRef")
-    private NeroRuleSet doParse(Schema schema) {
+    private NeroRuleSet doParse() {
         Supplier<Boolean> endCondition = mode == Mode.STANDALONE
             ? () -> scanner.isAtEnd()
             : () -> scanner.match(RIGHT_BRACE);
@@ -89,61 +97,26 @@ class NeroParser extends EmbeddedParser {
             try {
                 // define
                 if (scanner.matchIdentifier(DEFINE)) {
-                    defineDeclaration(schema);
+                    defineDeclaration();
                     continue;
                 }
 
                 // transient
                 if (scanner.matchIdentifier(TRANSIENT)) {
-                    transientDeclaration(schema);
+                    transientDeclaration();
                     continue;
                 }
 
-                // Axiom or Rule
-                var headToken = scanner.peek();
-                var headStart = headToken.span().start();
-                var head = atom(Context.HEAD);
-                var headEnd = scanner.previous().span().end();
+                var head = atom(Context.HEAD, false);
 
                 if (scanner.match(SEMICOLON)) {
-                    if (RuleEngine.isBuiltIn(head.relation())) {
-                        throw errorSync(headToken,
-                            "found built-in predicate in axiom.");
-                    }
-                    if (!schema.hasRelation(head.relation())) {
-                        throw errorSync(headToken, "undefined relation in axiom.");
-                    }
-                    if (!schema.check(head)) {
-                        var headString = headToken.span().buffer()
-                            .span(headStart, headEnd).text();
-                        error(headToken,
-                            "schema mismatch, expected shape compatible with '" +
-                            schema.get(head.relation()).toSpec() +
-                            "', got: '" + headString + "'.");
-                    }
-                    axioms.add(axiom(headToken, head));
+                    axioms.add(axiom(head));
                 } else if (scanner.match(COLON_MINUS)) {
-                    if (RuleEngine.isBuiltIn(head.relation())) {
-                        throw errorSync(headToken,
-                            "found built-in predicate in rule head.");
-                    }
-                    if (!schema.hasRelation(head.relation())) {
-                        throw errorSync(headToken,
-                            "undefined relation in rule head.");
-                    }
-                    if (!schema.check(head)) {
-                        var headString = headToken.span().buffer()
-                            .span(headStart, headEnd).text();
-                        error(headToken,
-                            "schema mismatch, expected shape compatible with '" +
-                                schema.get(head.relation()).toSpec() +
-                                "', got: '" + headString + "'.");
-                    }
-                    rules.add(rule(headToken, head));
+                    rules.add(rule(head));
                 } else {
                     scanner.advance();
                     throw errorSync(scanner.previous(),
-                        "expected axiom or rule.");
+                        "expected declaration, axiom, or rule.");
                 }
             } catch (Parser.ErrorSync error) {
                 synchronize();
@@ -152,6 +125,7 @@ class NeroParser extends EmbeddedParser {
 
         return new NeroRuleSet(schema, axioms, rules);
     }
+
 
     private Relation relation(String message) {
         scanner.consume(IDENTIFIER, message);
@@ -164,7 +138,7 @@ class NeroParser extends EmbeddedParser {
         return name.endsWith("!");
     }
 
-    private void defineDeclaration(Schema schema) {
+    private void defineDeclaration() {
         var transience = scanner.matchIdentifier(TRANSIENT);
 
         var relation = relation("expected relation after 'define [transient]'.");
@@ -211,7 +185,7 @@ class NeroParser extends EmbeddedParser {
         if (transience) schema.setTransient(relation.name(), true);
     }
 
-    private void transientDeclaration(Schema schema) {
+    private void transientDeclaration() {
         var relation = relation("expected relation after 'transient'.");
 
         if (RuleEngine.isBuiltIn(relation.token().lexeme())) {
@@ -224,51 +198,55 @@ class NeroParser extends EmbeddedParser {
         schema.setTransient(relation.name(), true);
     }
 
-    private Atom axiom(Token token, Atom head) {
-        if (head.getAllTerms().stream().anyMatch(t -> t instanceof Aggregate)) {
-            error(token, "found aggregation function in axiom.");
-        } else if (!head.getVariableNames().isEmpty()) {
-            error(token, "found variable in axiom.");
+    private Atom axiom(AtomPair head) {
+        // FIRST, do checks that apply to both axioms and rule heads.
+        checkAxiomOrHead(head, "axiom");
+
+        // An axiom relation must be a normal relation.
+        if (RuleEngine.isBuiltIn(head.relation())) {
+            throw errorSync(head.token(),
+                "found built-in predicate in axiom.");
         }
-        return head;
+
+        // The relation must have a known shape.
+        if (!schema.hasRelation(head.relation())) {
+            throw errorSync(head.token(), "undefined relation in axiom.");
+        }
+
+        // The atom must be compatible with the defined shape.
+        if (!schema.check(head.atom())) {
+            error(head.token(),
+                "schema mismatch, expected shape compatible with '" +
+                    schema.get(head.relation()).toSpec() +
+                    "', got: '" + head.text() + "'.");
+        }
+
+        // Axioms may not contain aggregation functions or variables.
+        if (head.atom().getAllTerms().stream().anyMatch(t -> t instanceof Aggregate)) {
+            error(head.token(), "found aggregation function in axiom.");
+        } else if (!head.getVariableNames().isEmpty()) {
+            error(head.token(), "found variable in axiom.");
+        }
+
+        // Return the atom.
+        return head.atom();
     }
 
-    private Rule rule(Token headToken, Atom head) {
-        var body = new ArrayList<Atom>();
-        var negations = new ArrayList<Atom>();
-        var constraints = new ArrayList<Constraint>();
-        var bodyVars = new HashSet<String>();
+    private Rule rule(AtomPair head) {
+        // FIRST, check the rule head, insofar as we can at this point.
+        checkRuleHead(head);
 
-        checkAggregates(headToken, head);
-
+        // NEXT, parse the rule's body atoms.
+        var pairs = new ArrayList<AtomPair>();
         do {
-            var negated = scanner.match(NOT);
-
-            var token = scanner.peek();
-            var atom = atom(Context.BODY);
-
-            if (hasBang(atom.relation()) && !hasBang(head.relation())) {
-                error(token, "found update marker '!' in body atom of non-updating rule.");
-            }
-
-            if (negated) {
-                for (var name : atom.getVariableNames()) {
-                    if (!bodyVars.contains(name)) {
-                        error(token,
-                            "negated body atom contains unbound variable: '" +
-                            name + "'.");
-                    }
-                }
-                negations.add(atom);
-            } else {
-                if (RuleEngine.isBuiltIn(atom.relation())) {
-                    checkBuiltIn(token, bodyVars, atom);
-                }
-                body.add(atom);
-                bodyVars.addAll(atom.getVariableNames());
-            }
+            pairs.add(atom(Context.BODY, scanner.match(NOT)));
         } while (scanner.match(COMMA));
 
+        // NEXT, do global checks on the body atoms and head.
+        var bodyVars = checkBodyAtoms(head, pairs);
+
+        // NEXT, parse and check the constraints.
+        var constraints = new ArrayList<Constraint>();
         if (scanner.match(WHERE)) {
             do {
                 constraints.add(constraint(bodyVars));
@@ -277,21 +255,44 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(SEMICOLON, "expected ';' after rule body.");
 
-        // Verify that all variables are bound.
-        if (!bodyVars.containsAll(head.getVariableNames())) {
-            error(headToken, "found unbound variable(s) in rule head.");
-        }
-
-        return new Rule(head, body, negations, constraints);
+        // FINALLY, return the parsed rule.
+        return new Rule(
+            head.atom(),
+            pairs.stream().map(AtomPair::atom).toList(),
+            constraints);
     }
+
+    // Performs checks for both axioms and rule heads
+    private void checkAxiomOrHead(AtomPair head, String where) {
+        if (RuleEngine.isBuiltIn(head.relation())) {
+            throw errorSync(head.token(),
+                "found built-in predicate in " + where + ".");
+        }
+        if (!schema.hasRelation(head.relation())) {
+            throw errorSync(head.token(),
+                "undefined relation in " + where + ".");
+        }
+        if (!schema.check(head.atom())) {
+            error(head.token(),
+                "schema mismatch, expected shape compatible with '" +
+                    schema.get(head.relation()).toSpec() +
+                    "', got: '" + head.text() + "'.");
+        }
+    }
+
 
     // Verify that there is at most one aggregate, and that it shares no
     // variable names with other head atoms.
-    private void checkAggregates(Token token, Atom head) {
+    private void checkRuleHead(AtomPair head) {
+        // FIRST, do checks that apply to both axioms and rule heads.
+        checkAxiomOrHead(head, "rule head");
+
+        // NEXT, check any aggregation functions in the head: no more than one,
+        // and an aggregated variable can appear only in the function.
         var aggVars = new HashSet<String>();
         var others = new HashSet<String>();
         var count = 0;
-        for (var term : head.getAllTerms()) {
+        for (var term : head.atom().getAllTerms()) {
             if (term instanceof Aggregate a) {
                 ++count;
                 aggVars.addAll(a.names());
@@ -301,13 +302,51 @@ class NeroParser extends EmbeddedParser {
         }
 
         if (count > 1) {
-            error(token, "rule head contains more than one aggregation function.");
+            error(head.token(), "rule head contains more than one aggregation function.");
         } else if (count == 1) {
             aggVars.retainAll(others);
             if (!aggVars.isEmpty()) {
-                error(token, "aggregated variable(s) found elsewhere in rule head.");
+                error(head.token(), "aggregated variable(s) found elsewhere in rule head.");
             }
         }
+    }
+
+    private Set<String> checkBodyAtoms(AtomPair head, List<AtomPair> pairs) {
+        // FIRST, loop over the atoms, checking left-to-right binding.
+        var bodyVars = new HashSet<String>();
+        for (var pair : pairs) {
+            // No update atoms in body of non-updating rule
+            if (hasBang(pair.relation()) && !hasBang(head.relation())) {
+                error(pair.token(),
+                    "found update marker '!' in body atom of non-updating rule.");
+            }
+
+            // No unbound variables in negated atoms.
+            if (pair.atom().isNegated()) {
+                for (var name : pair.getVariableNames()) {
+                    if (!bodyVars.contains(name)) {
+                        error(pair.token(),
+                            "negated body atom contains unbound variable: '" +
+                            name + "'.");
+                    }
+                }
+            }
+
+            // Check built-in predicate term modes.
+            if (RuleEngine.isBuiltIn(pair.relation())) {
+                checkBuiltIn(pair.token(), bodyVars, pair.atom());
+            }
+
+            // Save this atom's variables.
+            bodyVars.addAll(pair.getVariableNames());
+        }
+
+        // NEXT, Verify that all head variables are bound in the body.
+        if (!bodyVars.containsAll(head.getVariableNames())) {
+            error(head.token(), "found unbound variable(s) in rule head.");
+        }
+
+        return bodyVars;
     }
 
     // Verify that this is a valid built-in.
@@ -344,8 +383,8 @@ class NeroParser extends EmbeddedParser {
         // We've checked the shape of the atom, and it conforms to a
         // built-in predicate; therefore it is an OrderedAtom, and it
         // has the expected number of terms.
-        assert atom instanceof OrderedAtom;
-        var a = (OrderedAtom)atom;
+        assert atom instanceof ListAtom;
+        var a = (ListAtom)atom;
         var term = a.terms().get(index);
         if (term instanceof Variable v && bodyVars.contains(v.name())) return;
         error(relation, "expected bound variable as term " + index +
@@ -363,8 +402,8 @@ class NeroParser extends EmbeddedParser {
         // We've checked the shape of the atom, and it conforms to a
         // built-in predicate; therefore it is an OrderedAtom, and it
         // has the expected number of terms.
-        assert atom instanceof OrderedAtom;
-        var a = (OrderedAtom)atom;
+        assert atom instanceof ListAtom;
+        var a = (ListAtom)atom;
         var term = a.terms().get(index);
         if (term instanceof Constant ||
             (term instanceof Variable v && bodyVars.contains(v.name()))
@@ -425,19 +464,22 @@ class NeroParser extends EmbeddedParser {
         return new Constraint(a, op, b);
     }
 
-    private Atom atom(Context ctx) {
+    private AtomPair atom(Context ctx, boolean negated) {
         // NEXT, parse the atom.
+        var token = scanner.peek();
+        var start = token.span().start();
         var relation = relation("expected relation.");
         scanner.consume(LEFT_PAREN, "expected '(' after relation.");
 
-        if (scanner.checkTwo(IDENTIFIER, COLON)) {
-            return namedAtom(ctx, relation.name());
-        } else {
-            return orderedAtom(ctx, relation.name());
-        }
+        var atom = scanner.checkTwo(IDENTIFIER, COLON)
+            ? mapAtom(ctx, negated, relation.name())
+            : listAtom(ctx, negated, relation.name());
+        var end = scanner.previous().span().end();
+        var text = parent.source().span(start, end).text();
+        return new AtomPair(token, atom, text);
     }
 
-    private Atom orderedAtom(Context ctx, String relation) {
+    private Atom listAtom(Context ctx, boolean negated, String relation) {
         var terms = new ArrayList<Term>();
 
         do {
@@ -446,10 +488,10 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new OrderedAtom(relation, terms);
+        return new ListAtom(negated, relation, terms);
     }
 
-    private NamedAtom namedAtom(Context ctx, String relation) {
+    private MapAtom mapAtom(Context ctx, boolean negated, String relation) {
         var terms = new LinkedHashMap<String,Term>();
 
         do {
@@ -461,7 +503,7 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new NamedAtom(relation, terms);
+        return new MapAtom(negated, relation, terms);
     }
 
     private Term term(Context ctx) {

@@ -125,14 +125,14 @@ public class Shape {
      */
     public static boolean conformsTo(Atom atom, Shape shape) {
         return switch (atom) {
-            case NamedAtom a -> {
+            case MapAtom a -> {
                 if (shape.isUnordered()) yield true;
                 for (var name : a.termMap().keySet()) {
                     if (!shape.names().contains(name)) yield false;
                 }
                 yield true;
             }
-            case OrderedAtom a -> shape.arity() == a.terms().size();
+            case ListAtom a -> shape.arity() == a.terms().size();
         };
     }
 }

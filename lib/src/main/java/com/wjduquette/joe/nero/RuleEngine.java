@@ -312,7 +312,7 @@ public class RuleEngine {
 
     // Matches the rule's index-th body atom against the relevant facts.
     private void matchNextBodyAtom(BindingContext bc, int index) {
-        var atom = bc.rule.body().get(index);
+        var atom = bc.rule.normal().get(index);
         Set<Fact> facts = factsForAtom(bc, atom);
 
         // FIRST, Save the current bindings, as we will begin with them for each
@@ -329,7 +329,7 @@ public class RuleEngine {
 
             // NEXT, it matches.  If there's another body atom, check it and
             // then go on to the next fact.
-            if (index + 1 < bc.rule.body().size()) {
+            if (index + 1 < bc.rule.normal().size()) {
                 matchNextBodyAtom(bc, index + 1);
                 continue;
             }
@@ -366,7 +366,7 @@ public class RuleEngine {
         BindingContext bc
     ) {
          switch (bodyAtom) {
-             case NamedAtom atom -> {
+             case MapAtom atom -> {
                  for (var e : atom.termMap().entrySet()) {
                      var name = e.getKey();
 
@@ -379,7 +379,7 @@ public class RuleEngine {
                  }
                  return true;
              }
-             case OrderedAtom atom -> {
+             case ListAtom atom -> {
                  if (!fact.isOrdered()) {
                      throw new JoeError(
                          "'" + atom.relation() +
@@ -446,7 +446,7 @@ public class RuleEngine {
     }
 
     private boolean checkNegations(BindingContext bc) {
-        for (var atom : bc.rule.negations()) {
+        for (var atom : bc.rule.negated()) {
             for (var fact : factsForAtom(bc, atom)) {
                 if (matchAtom(atom, fact, bc)) {
                     return false;
@@ -459,7 +459,7 @@ public class RuleEngine {
     private Fact axiom2fact(Atom axiom) {
         var shape = ruleset.schema().get(axiom.relation());
         return switch (axiom) {
-            case NamedAtom atom -> {
+            case MapAtom atom -> {
                 var termMap = new HashMap<String,Object>();
 
                 for (var e : atom.termMap().entrySet()) {
@@ -469,7 +469,7 @@ public class RuleEngine {
                 // Creates an ordered or unordered atom based on the shape.
                 yield new Fact(atom.relation(), shape.names(), termMap);
             }
-            case OrderedAtom atom -> {
+            case ListAtom atom -> {
                 assert shape.isOrdered();  // Guaranteed by parser.
                 var terms = new ArrayList<>();
 
@@ -483,7 +483,7 @@ public class RuleEngine {
 
     private Fact createFact(BindingContext bc) {
         return switch (bc.rule.head()) {
-            case NamedAtom atom -> {
+            case MapAtom atom -> {
                 var terms = new HashMap<String,Object>();
 
                 for (var e : atom.termMap().entrySet()) {
@@ -492,7 +492,7 @@ public class RuleEngine {
 
                 yield new Fact(atom.relation(), bc.shape.names(), terms);
             }
-            case OrderedAtom atom -> {
+            case ListAtom atom -> {
                 var terms = new ArrayList<>();
 
                 for (var term : atom.terms()) {
@@ -611,8 +611,8 @@ public class RuleEngine {
 
     // mapsTo/f,a,b
     private Set<Fact> _mapsTo(BindingContext bc, Atom theAtom) {
-        assert theAtom instanceof OrderedAtom;
-        var atom = (OrderedAtom)theAtom;
+        assert theAtom instanceof ListAtom;
+        var atom = (ListAtom)theAtom;
         var facts = new HashSet<Fact>();
 
         // FIRST, get the mapper function.
@@ -645,8 +645,8 @@ public class RuleEngine {
     }
 
     private Object extractVar(BindingContext bc, Atom atom, int index) {
-        assert atom instanceof OrderedAtom;
-        var a = (OrderedAtom)atom;
+        assert atom instanceof ListAtom;
+        var a = (ListAtom)atom;
         var term = a.terms().get(index);
         assert term instanceof Variable;
         var theVar = (Variable)term;
