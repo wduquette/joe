@@ -508,7 +508,7 @@ public class NeroParserTest extends Ted {
     //-------------------------------------------------------------------------
     // orderedAtom()
 
-    @Test public void testOrderedAtom_expectedRightParen() {
+    @Test public void testListAtom_expectedRightParen() {
         test("testOrderedAtom_expectedRightParen");
 
         var source = """
@@ -522,7 +522,7 @@ public class NeroParserTest extends Ted {
     //-------------------------------------------------------------------------
     // namedAtom()
 
-    @Test public void testNamedAtom_expectedFieldName() {
+    @Test public void testMapAtom_expectedFieldName() {
         test("testNamedAtom_expectedFieldName");
 
         var source = """
@@ -533,7 +533,7 @@ public class NeroParserTest extends Ted {
             .eq("[line 2] error at '#a', expected field name.");
     }
 
-    @Test public void testNamedAtom_expectedColon() {
+    @Test public void testMapAtom_expectedColon() {
         test("testNamedAtom_expectedColon");
 
         var source = """
@@ -545,7 +545,7 @@ public class NeroParserTest extends Ted {
     }
 
 
-    @Test public void testNamedAtom_expectedRightParen() {
+    @Test public void testMapAtom_expectedRightParen() {
         test("testNamedAtom_expectedRightParen");
 
         var source = """

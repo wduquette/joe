@@ -312,7 +312,7 @@ public class RuleEngine {
 
     // Matches the rule's index-th body atom against the relevant facts.
     private void matchNextBodyAtom(BindingContext bc, int index) {
-        var atom = bc.rule.body().get(index);
+        var atom = bc.rule.normal().get(index);
         Set<Fact> facts = factsForAtom(bc, atom);
 
         // FIRST, Save the current bindings, as we will begin with them for each
@@ -329,7 +329,7 @@ public class RuleEngine {
 
             // NEXT, it matches.  If there's another body atom, check it and
             // then go on to the next fact.
-            if (index + 1 < bc.rule.body().size()) {
+            if (index + 1 < bc.rule.normal().size()) {
                 matchNextBodyAtom(bc, index + 1);
                 continue;
             }
@@ -446,7 +446,7 @@ public class RuleEngine {
     }
 
     private boolean checkNegations(BindingContext bc) {
-        for (var atom : bc.rule.negations()) {
+        for (var atom : bc.rule.negated()) {
             for (var fact : factsForAtom(bc, atom)) {
                 if (matchAtom(atom, fact, bc)) {
                     return false;

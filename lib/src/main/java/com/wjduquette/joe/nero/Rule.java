@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,27 +20,87 @@ import java.util.stream.Collectors;
  * <li>Every {@link Variable} in the head atom, the negated body atoms, and
  *     the constraints must be bound in a normal body atom.</li>
  * </ul>
- * @param head The rule's head
- * @param body The normal body atoms
- * @param negations The negated body atoms
- * @param constraints The constraint expressions
  */
-public record Rule(
-    Atom head,
-    List<Atom> body,
-    List<Atom> negations,
-    List<Constraint> constraints
-) {
+public class Rule {
+    //-------------------------------------------------------------------------
+    // Instance Variables
+
+    private final Atom head;
+    private final List<Atom> body;
+    private final List<Atom> normal;
+    private final List<Atom> negated;
+    private final List<Constraint> constraints;
+
+    //-------------------------------------------------------------------------
+    // Constructor
+
+    /**
+     * Creates a rule
+     * @param head The rule's head
+     * @param bodyAtoms The rule's body atoms
+     * @param constraints The constraint expressions
+     */
+    public Rule(
+        Atom head,
+        List<Atom> bodyAtoms,
+        List<Constraint> constraints
+    ) {
+        this.head = head;
+        this.body = bodyAtoms;
+        this.constraints = constraints;
+        this.normal = bodyAtoms.stream().filter(a -> !a.isNegated()).toList();
+        this.negated = bodyAtoms.stream().filter(Atom::isNegated).toList();
+    }
+
+    /**
+     * Returns the rule's head.
+     * @return The head
+     */
+    public Atom head() {
+        return head;
+    }
+
+    /**
+     * Returns the rule's body atoms in order of definition.
+     * @return The atoms
+     */
+    @SuppressWarnings("unused")
+    public List<Atom> bodyAtoms() {
+        return Collections.unmodifiableList(body);
+    }
+
+    /**
+     * Returns the rule's normal (i.e., non-negated) body atoms in order of
+     * definition.
+     * @return The atoms
+     */
+    public List<Atom> normal() {
+        return normal;
+    }
+
+    /**
+     * Returns the rule's negated body atoms in order of definition.
+     * @return The atoms
+     */
+    public List<Atom> negated() {
+        return negated;
+    }
+
+    /**
+     * Returns the rule's constraints in order of definition.
+     * @return The atoms
+     */
+    public List<Constraint> constraints() {
+        return Collections.unmodifiableList(constraints);
+    }
+
     @Override
     public String toString() {
         var bodyString = body.stream().map(Atom::toString)
             .collect(Collectors.joining(", "));
-        var negString = "not " + negations.stream().map(Atom::toString)
-            .collect(Collectors.joining(", not "));
         var constraintString = constraints.stream().map(Constraint::toString)
             .collect(Collectors.joining(", "));
         return head + " :- " + bodyString
-            + (negations.isEmpty() ? "" : ", " + negString)
             + (constraints.isEmpty() ? "" : " where " + constraintString)
             + ";";
     }
@@ -51,7 +112,6 @@ public record Rule(
         Rule rule = (Rule) o;
         return head.equals(rule.head)
             && body.equals(rule.body)
-            && negations.equals(rule.negations)
             && constraints.equals(rule.constraints);
     }
 
@@ -59,7 +119,6 @@ public record Rule(
     public int hashCode() {
         int result = head.hashCode();
         result = 31 * result + body.hashCode();
-        result = 31 * result + negations.hashCode();
         result = 31 * result + constraints.hashCode();
         return result;
     }

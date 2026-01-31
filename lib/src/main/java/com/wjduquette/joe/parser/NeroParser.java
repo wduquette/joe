@@ -102,7 +102,7 @@ class NeroParser extends EmbeddedParser {
                 // Axiom or Rule
                 var headToken = scanner.peek();
                 var headStart = headToken.span().start();
-                var head = atom(Context.HEAD);
+                var head = atom(Context.HEAD, false);
                 var headEnd = scanner.previous().span().end();
 
                 if (scanner.match(SEMICOLON)) {
@@ -234,8 +234,7 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Rule rule(Token headToken, Atom head) {
-        var body = new ArrayList<Atom>();
-        var negations = new ArrayList<Atom>();
+        var bodyAtoms = new ArrayList<Atom>();
         var constraints = new ArrayList<Constraint>();
         var bodyVars = new HashSet<String>();
 
@@ -245,7 +244,7 @@ class NeroParser extends EmbeddedParser {
             var negated = scanner.match(NOT);
 
             var token = scanner.peek();
-            var atom = atom(Context.BODY);
+            var atom = atom(Context.BODY, negated);
 
             if (hasBang(atom.relation()) && !hasBang(head.relation())) {
                 error(token, "found update marker '!' in body atom of non-updating rule.");
@@ -259,14 +258,13 @@ class NeroParser extends EmbeddedParser {
                             name + "'.");
                     }
                 }
-                negations.add(atom);
             } else {
                 if (RuleEngine.isBuiltIn(atom.relation())) {
                     checkBuiltIn(token, bodyVars, atom);
                 }
-                body.add(atom);
                 bodyVars.addAll(atom.getVariableNames());
             }
+            bodyAtoms.add(atom);
         } while (scanner.match(COMMA));
 
         if (scanner.match(WHERE)) {
@@ -282,7 +280,7 @@ class NeroParser extends EmbeddedParser {
             error(headToken, "found unbound variable(s) in rule head.");
         }
 
-        return new Rule(head, body, negations, constraints);
+        return new Rule(head, bodyAtoms, constraints);
     }
 
     // Verify that there is at most one aggregate, and that it shares no
@@ -425,19 +423,19 @@ class NeroParser extends EmbeddedParser {
         return new Constraint(a, op, b);
     }
 
-    private Atom atom(Context ctx) {
+    private Atom atom(Context ctx, boolean negated) {
         // NEXT, parse the atom.
         var relation = relation("expected relation.");
         scanner.consume(LEFT_PAREN, "expected '(' after relation.");
 
         if (scanner.checkTwo(IDENTIFIER, COLON)) {
-            return namedAtom(ctx, relation.name());
+            return mapAtom(ctx, negated, relation.name());
         } else {
-            return orderedAtom(ctx, relation.name());
+            return listAtom(ctx, negated, relation.name());
         }
     }
 
-    private Atom orderedAtom(Context ctx, String relation) {
+    private Atom listAtom(Context ctx, boolean negated, String relation) {
         var terms = new ArrayList<Term>();
 
         do {
@@ -446,10 +444,10 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new ListAtom(relation, terms);
+        return new ListAtom(negated, relation, terms);
     }
 
-    private MapAtom namedAtom(Context ctx, String relation) {
+    private MapAtom mapAtom(Context ctx, boolean negated, String relation) {
         var terms = new LinkedHashMap<String,Term>();
 
         do {
@@ -461,7 +459,7 @@ class NeroParser extends EmbeddedParser {
 
         scanner.consume(RIGHT_PAREN, "expected ')' after terms.");
 
-        return new MapAtom(relation, terms);
+        return new MapAtom(negated, relation, terms);
     }
 
     private Term term(Context ctx) {
