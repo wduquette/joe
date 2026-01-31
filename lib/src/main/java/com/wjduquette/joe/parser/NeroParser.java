@@ -233,12 +233,12 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Rule rule(AtomPair head) {
-        // FIRST, do checks that apply to both axioms and rule heads.
-        checkAxiomOrHead(head, "rule head");
+        // FIRST, check the rule head, insofar as we can at this point.
+        checkRuleHead(head);
 
+        // NEXT, parse the rule's body atoms.
         var pairs = new ArrayList<AtomPair>();
         var bodyAtoms = new ArrayList<Atom>();
-        var constraints = new ArrayList<Constraint>();
         var bodyVars = new HashSet<String>();
 
         // FIRST, parse the rule's body atoms.
@@ -277,10 +277,8 @@ class NeroParser extends EmbeddedParser {
             error(head.token(), "found unbound variable(s) in rule head.");
         }
 
-        // Check any aggregators in the rule's head.
-        checkAggregates(head);
-
         // NEXT, parse and check the constraints.
+        var constraints = new ArrayList<Constraint>();
         if (scanner.match(WHERE)) {
             do {
                 constraints.add(constraint(bodyVars));
@@ -314,7 +312,12 @@ class NeroParser extends EmbeddedParser {
 
     // Verify that there is at most one aggregate, and that it shares no
     // variable names with other head atoms.
-    private void checkAggregates(AtomPair head) {
+    private void checkRuleHead(AtomPair head) {
+        // FIRST, do checks that apply to both axioms and rule heads.
+        checkAxiomOrHead(head, "rule head");
+
+        // NEXT, check any aggregation functions in the head: no more than one,
+        // and an aggregated variable can appear only in the function.
         var aggVars = new HashSet<String>();
         var others = new HashSet<String>();
         var count = 0;
