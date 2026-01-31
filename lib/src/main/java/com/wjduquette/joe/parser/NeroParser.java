@@ -105,32 +105,26 @@ class NeroParser extends EmbeddedParser {
                     continue;
                 }
 
-                // Axiom or Rule
-                var headToken = scanner.peek();
-                var headStart = headToken.span().start();
-                var atom = atom(Context.HEAD, false);
-                var headEnd = scanner.previous().span().end();
-                var headString = parent.source().span(headStart, headEnd).text();
-                var head = new AtomPair(headToken, atom, headString);
+               var head = atom(Context.HEAD, false);
 
                 if (scanner.match(SEMICOLON)) {
                     if (RuleEngine.isBuiltIn(head.relation())) {
-                        throw errorSync(headToken,
+                        throw errorSync(head.token(),
                             "found built-in predicate in axiom.");
                     }
                     if (!schema.hasRelation(head.relation())) {
-                        throw errorSync(headToken, "undefined relation in axiom.");
+                        throw errorSync(head.token(), "undefined relation in axiom.");
                     }
                     if (!schema.check(head.atom())) {
-                        error(headToken,
+                        error(head.token(),
                             "schema mismatch, expected shape compatible with '" +
                             schema.get(head.relation()).toSpec() +
-                            "', got: '" + headString + "'.");
+                            "', got: '" + head.text() + "'.");
                     }
                     axioms.add(axiom(head));
                 } else if (scanner.match(COLON_MINUS)) {
                     if (RuleEngine.isBuiltIn(head.relation())) {
-                        throw errorSync(headToken,
+                        throw errorSync(head.token(),
                             "found built-in predicate in rule head.");
                     }
                     if (!schema.hasRelation(head.relation())) {
@@ -138,10 +132,10 @@ class NeroParser extends EmbeddedParser {
                             "undefined relation in rule head.");
                     }
                     if (!schema.check(head.atom())) {
-                        error(headToken,
+                        error(head.token(),
                             "schema mismatch, expected shape compatible with '" +
                                 schema.get(head.relation()).toSpec() +
-                                "', got: '" + headString + "'.");
+                                "', got: '" + head.text() + "'.");
                     }
                     rules.add(rule(head));
                 } else {
@@ -243,21 +237,19 @@ class NeroParser extends EmbeddedParser {
         var constraints = new ArrayList<Constraint>();
         var bodyVars = new HashSet<String>();
 
-
         // FIRST, parse the rule's body atoms.
         do {
             var negated = scanner.match(NOT);
             var token = scanner.peek();
-            var atom = atom(Context.BODY, negated);
+            var pair = atom(Context.BODY, negated);
+            pairs.add(pair);
 
-            pairs.add(new AtomPair(token, atom, null));
-
-            if (hasBang(atom.relation()) && !hasBang(head.relation())) {
+            if (hasBang(pair.relation()) && !hasBang(head.relation())) {
                 error(token, "found update marker '!' in body atom of non-updating rule.");
             }
 
             if (negated) {
-                for (var name : atom.getVariableNames()) {
+                for (var name : pair.getVariableNames()) {
                     if (!bodyVars.contains(name)) {
                         error(token,
                             "negated body atom contains unbound variable: '" +
@@ -265,12 +257,12 @@ class NeroParser extends EmbeddedParser {
                     }
                 }
             } else {
-                if (RuleEngine.isBuiltIn(atom.relation())) {
-                    checkBuiltIn(token, bodyVars, atom);
+                if (RuleEngine.isBuiltIn(pair.relation())) {
+                    checkBuiltIn(token, bodyVars, pair.atom());
                 }
-                bodyVars.addAll(atom.getVariableNames());
+                bodyVars.addAll(pair.getVariableNames());
             }
-            bodyAtoms.add(atom);
+            bodyAtoms.add(pair.atom());
         } while (scanner.match(COMMA));
 
         // NEXT, do global checks on the body atoms and head.
@@ -437,16 +429,19 @@ class NeroParser extends EmbeddedParser {
         return new Constraint(a, op, b);
     }
 
-    private Atom atom(Context ctx, boolean negated) {
+    private AtomPair atom(Context ctx, boolean negated) {
         // NEXT, parse the atom.
+        var token = scanner.peek();
+        var start = token.span().start();
         var relation = relation("expected relation.");
         scanner.consume(LEFT_PAREN, "expected '(' after relation.");
 
-        if (scanner.checkTwo(IDENTIFIER, COLON)) {
-            return mapAtom(ctx, negated, relation.name());
-        } else {
-            return listAtom(ctx, negated, relation.name());
-        }
+        var atom = scanner.checkTwo(IDENTIFIER, COLON)
+            ? mapAtom(ctx, negated, relation.name())
+            : listAtom(ctx, negated, relation.name());
+        var end = scanner.previous().span().end();
+        var text = parent.source().span(start, end).text();
+        return new AtomPair(token, atom, text);
     }
 
     private Atom listAtom(Context ctx, boolean negated, String relation) {
