@@ -98,6 +98,14 @@ public class Parser {
     // Public API
 
     /**
+     * Gets a reference to the source buffer.
+     * @return The source.
+     */
+    public SourceBuffer source() {
+        return source;
+    }
+
+    /**
      * Parses the source as Joe source code, attempting to detect as many
      * meaningful errors as possible.  Errors are reported via the parser's
      * error reporter.  If errors are reported then the result of this method

@@ -33,7 +33,7 @@ class NeroParser extends EmbeddedParser {
     private record Relation(Token token, String name) { }
 
     // An atom together with its relation token.
-    private record AtomPair(Token token, Atom atom) {
+    private record AtomPair(Token token, Atom atom, String text) {
         String relation() { return atom.relation(); }
         Set<String> getVariableNames() { return atom.getVariableNames(); }
     }
@@ -108,8 +108,10 @@ class NeroParser extends EmbeddedParser {
                 // Axiom or Rule
                 var headToken = scanner.peek();
                 var headStart = headToken.span().start();
-                var head = new AtomPair(headToken, atom(Context.HEAD, false));
+                var atom = atom(Context.HEAD, false);
                 var headEnd = scanner.previous().span().end();
+                var headString = parent.source().span(headStart, headEnd).text();
+                var head = new AtomPair(headToken, atom, headString);
 
                 if (scanner.match(SEMICOLON)) {
                     if (RuleEngine.isBuiltIn(head.relation())) {
@@ -120,8 +122,6 @@ class NeroParser extends EmbeddedParser {
                         throw errorSync(headToken, "undefined relation in axiom.");
                     }
                     if (!schema.check(head.atom())) {
-                        var headString = headToken.span().buffer()
-                            .span(headStart, headEnd).text();
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                             schema.get(head.relation()).toSpec() +
@@ -138,8 +138,6 @@ class NeroParser extends EmbeddedParser {
                             "undefined relation in rule head.");
                     }
                     if (!schema.check(head.atom())) {
-                        var headString = head.token().span().buffer()
-                            .span(headStart, headEnd).text();
                         error(headToken,
                             "schema mismatch, expected shape compatible with '" +
                                 schema.get(head.relation()).toSpec() +
@@ -252,7 +250,7 @@ class NeroParser extends EmbeddedParser {
             var token = scanner.peek();
             var atom = atom(Context.BODY, negated);
 
-            pairs.add(new AtomPair(token, atom));
+            pairs.add(new AtomPair(token, atom, null));
 
             if (hasBang(atom.relation()) && !hasBang(head.relation())) {
                 error(token, "found update marker '!' in body atom of non-updating rule.");
