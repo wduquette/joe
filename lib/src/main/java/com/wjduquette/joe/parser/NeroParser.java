@@ -107,30 +107,16 @@ class NeroParser extends EmbeddedParser {
                     continue;
                 }
 
-               var head = atom(Context.HEAD, false);
+                var head = atom(Context.HEAD, false);
 
                 if (scanner.match(SEMICOLON)) {
                     axioms.add(axiom(head));
                 } else if (scanner.match(COLON_MINUS)) {
-                    if (RuleEngine.isBuiltIn(head.relation())) {
-                        throw errorSync(head.token(),
-                            "found built-in predicate in rule head.");
-                    }
-                    if (!schema.hasRelation(head.relation())) {
-                        throw errorSync(head.token(),
-                            "undefined relation in rule head.");
-                    }
-                    if (!schema.check(head.atom())) {
-                        error(head.token(),
-                            "schema mismatch, expected shape compatible with '" +
-                                schema.get(head.relation()).toSpec() +
-                                "', got: '" + head.text() + "'.");
-                    }
                     rules.add(rule(head));
                 } else {
                     scanner.advance();
                     throw errorSync(scanner.previous(),
-                        "expected axiom or rule.");
+                        "expected declaration, axiom, or rule.");
                 }
             } catch (Parser.ErrorSync error) {
                 synchronize();
@@ -139,6 +125,7 @@ class NeroParser extends EmbeddedParser {
 
         return new NeroRuleSet(schema, axioms, rules);
     }
+
 
     private Relation relation(String message) {
         scanner.consume(IDENTIFIER, message);
@@ -212,6 +199,9 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Atom axiom(AtomPair head) {
+        // FIRST, do checks that apply to both axioms and rule heads.
+        checkAxiomOrHead(head, "axiom");
+
         // An axiom relation must be a normal relation.
         if (RuleEngine.isBuiltIn(head.relation())) {
             throw errorSync(head.token(),
@@ -243,6 +233,9 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Rule rule(AtomPair head) {
+        // FIRST, do checks that apply to both axioms and rule heads.
+        checkAxiomOrHead(head, "rule head");
+
         var pairs = new ArrayList<AtomPair>();
         var bodyAtoms = new ArrayList<Atom>();
         var constraints = new ArrayList<Constraint>();
@@ -299,6 +292,25 @@ class NeroParser extends EmbeddedParser {
         // FINALLY, return the parsed rule.
         return new Rule(head.atom(), bodyAtoms, constraints);
     }
+
+    // Performs checks for both axioms and rule heads
+    private void checkAxiomOrHead(AtomPair head, String where) {
+        if (RuleEngine.isBuiltIn(head.relation())) {
+            throw errorSync(head.token(),
+                "found built-in predicate in " + where + ".");
+        }
+        if (!schema.hasRelation(head.relation())) {
+            throw errorSync(head.token(),
+                "undefined relation in " + where + ".");
+        }
+        if (!schema.check(head.atom())) {
+            error(head.token(),
+                "schema mismatch, expected shape compatible with '" +
+                    schema.get(head.relation()).toSpec() +
+                    "', got: '" + head.text() + "'.");
+        }
+    }
+
 
     // Verify that there is at most one aggregate, and that it shares no
     // variable names with other head atoms.

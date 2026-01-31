@@ -95,7 +95,7 @@ public class NeroParserTest extends Ted {
             Head(x), Body(x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at ',', expected axiom or rule.");
+            .eq("[line 1] error at ',', expected declaration, axiom, or rule.");
     }
 
     //-------------------------------------------------------------------------
