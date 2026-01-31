@@ -110,19 +110,6 @@ class NeroParser extends EmbeddedParser {
                var head = atom(Context.HEAD, false);
 
                 if (scanner.match(SEMICOLON)) {
-                    if (RuleEngine.isBuiltIn(head.relation())) {
-                        throw errorSync(head.token(),
-                            "found built-in predicate in axiom.");
-                    }
-                    if (!schema.hasRelation(head.relation())) {
-                        throw errorSync(head.token(), "undefined relation in axiom.");
-                    }
-                    if (!schema.check(head.atom())) {
-                        error(head.token(),
-                            "schema mismatch, expected shape compatible with '" +
-                            schema.get(head.relation()).toSpec() +
-                            "', got: '" + head.text() + "'.");
-                    }
                     axioms.add(axiom(head));
                 } else if (scanner.match(COLON_MINUS)) {
                     if (RuleEngine.isBuiltIn(head.relation())) {
@@ -225,12 +212,33 @@ class NeroParser extends EmbeddedParser {
     }
 
     private Atom axiom(AtomPair head) {
+        // An axiom relation must be a normal relation.
+        if (RuleEngine.isBuiltIn(head.relation())) {
+            throw errorSync(head.token(),
+                "found built-in predicate in axiom.");
+        }
 
+        // The relation must have a known shape.
+        if (!schema.hasRelation(head.relation())) {
+            throw errorSync(head.token(), "undefined relation in axiom.");
+        }
+
+        // The atom must be compatible with the defined shape.
+        if (!schema.check(head.atom())) {
+            error(head.token(),
+                "schema mismatch, expected shape compatible with '" +
+                    schema.get(head.relation()).toSpec() +
+                    "', got: '" + head.text() + "'.");
+        }
+
+        // Axioms may not contain aggregation functions or variables.
         if (head.atom().getAllTerms().stream().anyMatch(t -> t instanceof Aggregate)) {
             error(head.token(), "found aggregation function in axiom.");
         } else if (!head.getVariableNames().isEmpty()) {
             error(head.token(), "found variable in axiom.");
         }
+
+        // Return the atom.
         return head.atom();
     }
 
