@@ -238,44 +238,12 @@ class NeroParser extends EmbeddedParser {
 
         // NEXT, parse the rule's body atoms.
         var pairs = new ArrayList<AtomPair>();
-        var bodyAtoms = new ArrayList<Atom>();
-        var bodyVars = new HashSet<String>();
-
-        // FIRST, parse the rule's body atoms.
         do {
-            var negated = scanner.match(NOT);
-            var token = scanner.peek();
-            var pair = atom(Context.BODY, negated);
-            pairs.add(pair);
-
-            if (hasBang(pair.relation()) && !hasBang(head.relation())) {
-                error(token, "found update marker '!' in body atom of non-updating rule.");
-            }
-
-            if (negated) {
-                for (var name : pair.getVariableNames()) {
-                    if (!bodyVars.contains(name)) {
-                        error(token,
-                            "negated body atom contains unbound variable: '" +
-                            name + "'.");
-                    }
-                }
-            } else {
-                if (RuleEngine.isBuiltIn(pair.relation())) {
-                    checkBuiltIn(token, bodyVars, pair.atom());
-                }
-                bodyVars.addAll(pair.getVariableNames());
-            }
-            bodyAtoms.add(pair.atom());
+            pairs.add(atom(Context.BODY, scanner.match(NOT)));
         } while (scanner.match(COMMA));
 
         // NEXT, do global checks on the body atoms and head.
-        // TODO
-
-        // Verify that all head variables are bound in the body.
-        if (!bodyVars.containsAll(head.getVariableNames())) {
-            error(head.token(), "found unbound variable(s) in rule head.");
-        }
+        var bodyVars = checkBodyAtoms(head, pairs);
 
         // NEXT, parse and check the constraints.
         var constraints = new ArrayList<Constraint>();
@@ -288,7 +256,10 @@ class NeroParser extends EmbeddedParser {
         scanner.consume(SEMICOLON, "expected ';' after rule body.");
 
         // FINALLY, return the parsed rule.
-        return new Rule(head.atom(), bodyAtoms, constraints);
+        return new Rule(
+            head.atom(),
+            pairs.stream().map(AtomPair::atom).toList(),
+            constraints);
     }
 
     // Performs checks for both axioms and rule heads
@@ -338,6 +309,44 @@ class NeroParser extends EmbeddedParser {
                 error(head.token(), "aggregated variable(s) found elsewhere in rule head.");
             }
         }
+    }
+
+    private Set<String> checkBodyAtoms(AtomPair head, List<AtomPair> pairs) {
+        // FIRST, loop over the atoms, checking left-to-right binding.
+        var bodyVars = new HashSet<String>();
+        for (var pair : pairs) {
+            // No update atoms in body of non-updating rule
+            if (hasBang(pair.relation()) && !hasBang(head.relation())) {
+                error(pair.token(),
+                    "found update marker '!' in body atom of non-updating rule.");
+            }
+
+            // No unbound variables in negated atoms.
+            if (pair.atom().isNegated()) {
+                for (var name : pair.getVariableNames()) {
+                    if (!bodyVars.contains(name)) {
+                        error(pair.token(),
+                            "negated body atom contains unbound variable: '" +
+                            name + "'.");
+                    }
+                }
+            }
+
+            // Check built-in predicate term modes.
+            if (RuleEngine.isBuiltIn(pair.relation())) {
+                checkBuiltIn(pair.token(), bodyVars, pair.atom());
+            }
+
+            // Save this atom's variables.
+            bodyVars.addAll(pair.getVariableNames());
+        }
+
+        // NEXT, Verify that all head variables are bound in the body.
+        if (!bodyVars.containsAll(head.getVariableNames())) {
+            error(head.token(), "found unbound variable(s) in rule head.");
+        }
+
+        return bodyVars;
     }
 
     // Verify that this is a valid built-in.
