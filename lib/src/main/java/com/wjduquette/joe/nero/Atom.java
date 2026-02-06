@@ -61,8 +61,8 @@ public sealed abstract class Atom permits MapAtom, ListAtom {
      * @return true or false.
      */
     public final boolean hasDefaults() {
-        // TODO: Update when we have VariableWithDefault
-        return false;
+        return getAllTerms().stream()
+            .anyMatch(t -> t instanceof VariableWithDefault);
     }
 
     //-------------------------------------------------------------------------
