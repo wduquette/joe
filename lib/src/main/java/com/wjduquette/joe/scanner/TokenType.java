@@ -37,6 +37,7 @@ public enum TokenType {
     /** "--" */  MINUS_MINUS,
     /** "&lt;" */   LESS,
     /** "&lt;=" */  LESS_EQUAL,
+    /** "|" */   PIPE,
     /** "||" */  OR,
     /** "+" */   PLUS,
     /** "+=" */  PLUS_EQUAL,
