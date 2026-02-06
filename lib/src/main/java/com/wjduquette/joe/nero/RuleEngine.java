@@ -324,7 +324,15 @@ public class RuleEngine {
             bc.bindings = new Bindings(givenBindings);
 
             if (!matchAtom(atom, fact, bc)) {
-                continue;
+                if (!atom.hasDefaults()) continue;
+
+                // Bind defaults and go on to the next atom.
+                for (var t : atom.getAllTerms()) {
+                    if (t instanceof VariableWithDefault vwd) {
+                        bc.bindings.bind(vwd.variable().name(),
+                            getDefaultValue(bc.bindings, vwd.value()));
+                    }
+                }
             }
 
             // NEXT, it matches.  If there's another body atom, check it and
@@ -346,6 +354,15 @@ public class RuleEngine {
             // if it's actually new.
             bc.matches.add(bc.bindings);
         }
+    }
+
+    private Object getDefaultValue(Bindings bindings, Term value) {
+        return switch (value) {
+            case Constant c -> c.value();
+            case Variable v -> bindings.get(v.name());
+            default -> throw new IllegalStateException(
+                "Unexpected term as default value: " + value);
+        };
     }
 
     private Set<Fact> factsForAtom(BindingContext bc, Atom atom) {
@@ -421,6 +438,17 @@ public class RuleEngine {
             case PatternTerm pt ->
                 Matcher.matchWith(joe, pt.pattern(), value, null, bc.bindings);
             case Variable v -> {
+                var bound = bc.bindings.get(v.name());
+
+                if (bound == null) {
+                    bc.bindings.bind(v.name(), value);
+                    yield true;
+                } else {
+                    yield Objects.equals(bound, value);
+                }
+            }
+            case VariableWithDefault vwd -> {
+                var v = vwd.variable();
                 var bound = bc.bindings.get(v.name());
 
                 if (bound == null) {
