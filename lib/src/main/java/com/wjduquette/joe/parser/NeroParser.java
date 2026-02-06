@@ -314,6 +314,8 @@ class NeroParser extends EmbeddedParser {
     private Set<String> checkBodyAtoms(AtomPair head, List<AtomPair> pairs) {
         // FIRST, loop over the atoms, checking left-to-right binding.
         var bodyVars = new HashSet<String>();
+        var defaultedVars = new HashSet<String>();
+
         for (var pair : pairs) {
             // No update atoms in body of non-updating rule
             if (hasBang(pair.relation()) && !hasBang(head.relation())) {
@@ -321,12 +323,36 @@ class NeroParser extends EmbeddedParser {
                     "found update marker '!' in body atom of non-updating rule.");
             }
 
+            if (pair.atom().hasDefaults()) {
+                if (RuleEngine.isBuiltIn(pair.relation())) {
+                    error(pair.token(),
+                        "found variable with default value in built-in predicate.");
+                } else if (pair.atom().isNegated()) {
+                    error(pair.token(),
+                        "found variable with default value in negated atom.");
+                } else {
+                    for (var t1 : pair.atom().getAllTerms()) {
+                        if (t1 instanceof VariableWithDefault vwd) {
+                            defaultedVars.add(vwd.variable().name());
+
+                            if (vwd.value() instanceof Variable v) {
+                                if (!bodyVars.contains(v.name())) {
+                                    error(pair.token(),
+                                        "default value has unbound variable: '" +
+                                            v.name() + "'.");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // No unbound variables in negated atoms.
             if (pair.atom().isNegated()) {
                 for (var name : pair.getVariableNames()) {
                     if (!bodyVars.contains(name)) {
                         error(pair.token(),
-                            "negated body atom contains unbound variable: '" +
+                            "negated atom contains unbound variable: '" +
                             name + "'.");
                     }
                 }
@@ -339,6 +365,32 @@ class NeroParser extends EmbeddedParser {
 
             // Save this atom's variables.
             bodyVars.addAll(pair.getVariableNames());
+        }
+
+        // NEXT, verify that defaulted variables appear only once in the
+        // body atoms, at the point of definition.
+        var seen = new HashSet<String>();
+        for (var pair : pairs) {
+            for (var t : pair.atom().getAllTerms()) {
+                if (t instanceof VariableWithDefault vwd) {
+                    var name = vwd.variable().name();
+                    if (seen.contains(name)) {
+                        error(pair.token(),
+                            "variable has multiple default values: '"
+                                + name + "'.");
+                    }
+                    seen.add(name);
+                    t = vwd.value();
+                }
+
+                for (var v : Term.getVariableNames(t)) {
+                    if (defaultedVars.contains(v)) {
+                        error(pair.token(),
+                            "defaulted variable is referenced in body atom(s): '" +
+                            v + "'.");
+                    }
+                }
+            }
         }
 
         // NEXT, Verify that all head variables are bound in the body.
@@ -517,7 +569,27 @@ class NeroParser extends EmbeddedParser {
             var name = scanner.previous();
 
             if (!name.lexeme().startsWith("_")) {
-                return new Variable(name.lexeme());
+                var variable = new Variable(name.lexeme());
+
+                if (scanner.match(PIPE)) {
+                    var pipe = scanner.previous();
+                    if (ctx == Context.BODY) {
+                        var token = scanner.peek();
+                        var value = term(ctx);
+
+                        if (!(value instanceof Variable) &&
+                            !(value instanceof Constant)
+                        ) {
+                            error(token, "expected variable or constant as default value.");
+                        }
+                        return new VariableWithDefault(variable, value);
+                    } else {
+                        throw errorSync(pipe,
+                            "found default variable syntax in " + ctx.place() + ".");
+                    }
+                }
+
+                return variable;
             } else {
                 if (ctx != Context.BODY) {
                     error(name, "found wildcard in " + ctx.place() + ".");

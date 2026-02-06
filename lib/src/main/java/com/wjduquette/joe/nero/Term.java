@@ -75,7 +75,7 @@ public sealed interface Term permits
             case PatternTerm p -> Pattern.getVariableNames(p.pattern());
             case Variable v -> Set.of(v.name());
             case VariableWithDefault v -> {
-                var result = Term.getVariableNames(v.value());
+                var result = new HashSet<>(Term.getVariableNames(v.value()));
                 result.add(v.variable().name());
                 yield result;
             }
