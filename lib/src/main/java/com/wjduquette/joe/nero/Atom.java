@@ -56,6 +56,15 @@ public sealed abstract class Atom permits MapAtom, ListAtom {
         return set;
     }
 
+    /**
+     * Whether the atom has any terms with defaulted variables.
+     * @return true or false.
+     */
+    public final boolean hasDefaults() {
+        // TODO: Update when we have VariableWithDefault
+        return false;
+    }
+
     //-------------------------------------------------------------------------
     // Abstract API
 
