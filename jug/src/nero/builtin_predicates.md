@@ -6,23 +6,26 @@ pseudo-relation that instead of matching known facts, computes a set of
 facts from its terms and matches against those.  A variety of interesting
 capabilities can be provided in this manner.
 
+Terms in built-in predicates may be either 
+[`INOUT` or `IN`](datalog_basics.md#term-modes-inout-in-and-def), 
+depending on the built-in predicate.
+
 Normal relation names conventionally start with an uppercase letter; the names
 of Nero's built-in predicates start with a lowercase letter.
 
 Nero provides the following built-in predicates.
 
-- [`member/item, collection`](#memberitem-collection)
-- [`indexedMember/index, item, list`](#indexedmemberindex-item-list)
-- [`keyedMember/key, value, map`](#keyedmemberkey-value-map)
-- [`mapsTo/f, a, b`](#mapstof-a-b)
+- [`member/item, collection`](#memberitem-collection) (`INOUT`, `IN`)
+- [`indexedMember/index, item, list`](#indexedmemberindex-item-list) (`INOUT`, `INOUT`, `IN`)
+- [`keyedMember/key, value, map`](#keyedmemberkey-value-map) (`INOUT`, `INOUT`, `IN`)
+- [`mapsTo/f, a, b`](#mapstof-a-b) (`IN`, `IN`, `INOUT`)
 
 ## `member/item, collection`
 
-The `member/item, collection` predicate matches an *item* in a *collection*, 
-where the *collection* is a variable bound in an earlier body atom, and 
-presumably to a value of a list or a set.  It is a compilation error if 
-the *collection* variable is not already bound to a value.  If it is
-bound to something other than a collection, the rule will not trigger.
+The `member/item, collection` predicate matches an *item* (`INOUT`) 
+in a *collection* (`IN`), where the *collection* is presumably
+a list or a set. If the *collection* is not a list or set then
+the predicate will not match.
 
 The predicate has two uses:
 
@@ -77,11 +80,10 @@ In database terms, we have just put Joe's belongings into *normal form*.
 
 ## `indexedMember/index, item, list`
 
-The `indexedMember/index, item, list` predicate matches an *item* and its 
-*index* within a *list*, where the *list* is a Nero variable bound to
-a `List` value in an earlier body atom. It is a compilation error if
-the *list* variable is not already bound to a value.  If it is
-bound to something other than a `List` then the rule will not trigger.
+The `indexedMember/index, item, list` predicate matches an *item* (`INOUT`)
+and its *index* (`INOUT`) within a *list* (`IN`).
+If the *list* is something other than a `List` then the predicate
+will not match.
 
 Like `member/item, collection`, the predicate can test for membership
 or disaggregate the list into individual facts.  When used for the
@@ -110,11 +112,10 @@ back into the original list.
 
 ## `keyedMember/key, value, map`
 
-The `keyedMember/key, value, map` predicate matches a *key*, *value* 
-pair within a *map*, where the *map* is a Nero variable bound to
-a `Map` value in an earlier body atom. It is a compilation error if
-the *map* variable is not already bound to a value.  If it is
-bound to something other than a `Map` then the rule will not trigger.
+The `keyedMember/key, value, map` predicate matches a 
+*key* (`INOUT`), *value* (`INOUT`) pair within a *map* (`IN`).
+If the *map* is something other than a `Map` value the predicate will
+not match.
 
 Like `member/item, collection`, the predicate can test for membership
 or disaggregate the map into individual facts.  
@@ -141,15 +142,15 @@ back into the original map.
 
 ## `mapsTo/f, a, b`
 
-Logically, the `mapsTo/f, a, b` predicate verifies that the function *f*
-maps *a*, a value of some type A, to *b*, a value of some type *b.
+Logically, the `mapsTo/f, a, b` predicate verifies that the 
+function *f* (`IN`) maps *a* (`IN`), a value of some type A, 
+to *b* (`INOUT`), a value of some type *b.
 Practically, the predicate can be used to either verify that a given 
 *a* maps to a given *b*, or to compute *b* given *a*.
 
-For example, Nero provides the `#str2num` mapping function, which maps numeric 
-strings to their equivalent numbers.  Clients can define additional mapping
-functions using the [[joe.Nero]] and [[joe.Database]] APIs, or the equivalent
-Java APIs.
+Nero defines the mapping function `#str2num`, and clients can 
+define additional mapping functions using Nero's Joe and Java 
+API.  More standard mapping functions are likely to be added over time.
 
 This program verifies that the two values are equivalent:
 
@@ -181,8 +182,7 @@ Number(n) :- String(s), mapsTo(#str2num, s, n);
 
 Nero defines the following standard mapping functions for use with
 `mapsTo/f,a,b`.  Clients can define additional mapping
-functions using the [[joe.Nero]] and [[joe.Database]] APIs, or the 
-equivalent Java APIs.
+functions using Nero's Joe and Java APIs.
 
 - `#str2num`
   - Maps numeric string *a* to number *b*.

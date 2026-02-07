@@ -13,7 +13,9 @@ with:
 - Unordered relations
 - The ability to reference fact fields by name as well as by position.
 - Schema declarations
+- Left-to-right binding
 - Stratified negation
+- Variable defaults
 - Constraints
 - Built-in predicates
 - Aggregation functions
@@ -37,6 +39,42 @@ better support integration into Joe scripts.
 - Rule constraints appear at the end of the rule, prefixed with `where`.
 - Named atoms can match named fields in the manner of Joe's
   named-field patterns.
+
+## Left-to-Right Binding
+
+In standard Datalog, a rule's body atoms can appear in any order without 
+changing the meaning of the rule.  The execution engine must match them 
+against facts in _some_ order, but the order genuinely doesn't matter.
+
+Advanced features, e.g., [Negation](negation.md), put constraints on 
+the execution order.  A negated atom cannot match known facts by definition,
+and therefore cannot bind values to variables; any variables in a negated 
+atom _must_ be bound before the atom is executed.
+
+[Built-in predicates](builtin_predicates.md) complicate the picture
+further, as a built-in predicate usually has both 
+[IN terms and INOUT terms](datalog_basics.md#term-modes-inout-in-and-def).  This 
+enables pathological recursive variable binds:
+
+```nero
+A(x,y) :- mapsTo(#f, x, y), mapsTo(#g, y, x);
+```
+
+Here, the first atom requires `x`, which is defined by the second atom, and
+computes `y`, which is required by the second atom.  There is no way to
+order these atoms that allows the rule to be executed.
+
+This is an error, and ideally should be detected by the Nero parser.
+
+Nero handles this by enforcing left-to-right binding:  any IN variable must
+be bound in some atom to the left.  Rather than providing a complex algorithm
+to put the atoms in execution order, detecting pathological cycles, Nero
+requires the programmer to _prove_ that the rule is executable by writing
+it in an executable order.
+
+The left-to-right rule is simple to remember, easy to follow, and efficient
+to check, and results in no loss of generality.
+
 
 ## Stratified Negation
 

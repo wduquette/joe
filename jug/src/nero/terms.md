@@ -1,4 +1,4 @@
-# Nero Terms
+# Kinds of Term
 
 Nero atoms can contain the following kinds of term:
 

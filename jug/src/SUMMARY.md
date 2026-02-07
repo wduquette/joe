@@ -35,10 +35,11 @@
 # Nero Datalog
 
 - [Nero Datalog](nero/nero.md)
-  - [Datalog Basics](nero/datalog_basics.md) 
-  - [Nero Terms](nero/terms.md)
+  - [Nero Basics](nero/datalog_basics.md) 
+  - [Kinds of Term](nero/terms.md)
   - [Negation](nero/negation.md)
   - [Constraints](nero/constraints.md)
+  - [Variable Defaults](nero/variable_defaults.md)
   - [Named-Field Notation](nero/named_fields.md)
   - [Schema Declarations](nero/schema.md)
   - [Schema Maintenance](nero/schema_maintenance.md)
