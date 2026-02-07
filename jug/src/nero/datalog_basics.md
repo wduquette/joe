@@ -1,13 +1,7 @@
-# Datalog Basics
+# Nero Basics
 
 This section explains the basics of Datalog terminology and the Datalog
 programming model.
-
-- [Simple Example](#simple-example)
-- [Axioms and Rules](#axioms-and-rules)
-- [Axioms vs. Facts](#axioms-vs-facts)
-- [Atoms and Terms](#atoms-and-terms)
-- [Variables and Rule Execution](#variables-and-rule-execution)
 
 ## Simple Example
 
@@ -119,6 +113,8 @@ to the values in the matched facts.
 
 - A variable is *bound* on first appearance in the rule's body, reading from
   left to right.
+  - Left-to-right binding is unusual in Datalog implementations; see
+    [Technical Details](technical_details.md) for more information.
 - On all subsequent appearances, the value in the matched fact must be equal
   to the variable's bound value.
 - Then, the bound values are substituted into the rule's head atom to produce
@@ -143,6 +139,25 @@ Ancestor(x, y) :- Parent(x, z), Ancestor(z, y); // (6)
 - Rule (6) will match each`Parent` fact, binding `x` and `z`; and then will
   match any `Ancestor` fact whose first term has the value of `z`, binding
   `y` to the fact's second term and ultimately yielding a new `Ancestor` fact.
+
+## Term Modes: INOUT, IN, and DEF
+
+Every term in a body atom has a mode, `INOUT`, `IN`, or `DEF`, which governs 
+left-to-right variable binding.
+
+All of the terms in the above examples have mode `INOUT`. A variable in an
+`INOUT` term can be bound in a body atom to the left, _or_ it can bind to a value
+from a matched fact.
+
+Certain kinds of atom (e.g., [negated atoms](negation.md)) have `IN` terms.
+Variables in `IN` terms _must_ be bound in a body atom to the left.
+
+`DEF` is a special mode that applies to 
+[variables with default values](variable_defaults.md); such a variable can
+appear only once in the rule's body, at the point of binding.
+
+Terms appearing in rule heads and constraints effectively have mode `IN`, in
+that all variable terms must be bound in a body atom.
 
 ## The Fixed-Point Algorithm
 

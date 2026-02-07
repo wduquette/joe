@@ -299,13 +299,6 @@ public class TokenizerTest extends Ted {
     }
 
     @Test
-    public void testError_incompleteOr() {
-        test("testError_incompleteOr");
-        check(scanError("|-"))
-            .hasString("At '|', unexpected character.");
-    }
-
-    @Test
     public void testError_unexpectedChar() {
         test("testError_unexpectedChar");
         check(scanError("^1"))

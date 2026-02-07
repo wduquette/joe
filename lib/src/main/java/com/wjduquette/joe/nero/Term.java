@@ -18,6 +18,7 @@ public sealed interface Term permits
     PatternTerm,
     SetTerm,
     Variable,
+    VariableWithDefault,
     Wildcard
 {
     /**
@@ -73,6 +74,11 @@ public sealed interface Term permits
             case Aggregate a -> new HashSet<>(a.names());
             case PatternTerm p -> Pattern.getVariableNames(p.pattern());
             case Variable v -> Set.of(v.name());
+            case VariableWithDefault v -> {
+                var result = new HashSet<>(Term.getVariableNames(v.value()));
+                result.add(v.variable().name());
+                yield result;
+            }
             default -> Set.of();
         };
     }

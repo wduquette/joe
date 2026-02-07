@@ -167,13 +167,7 @@ public class Tokenizer {
                     yield errorToken("unexpected character.");
                 }
             }
-            case '|' -> {
-                if (match('|')) {
-                    yield makeToken(OR);
-                } else {
-                    yield errorToken("unexpected character.");
-                }
-            }
+            case '|' -> makeToken(match('|') ? OR : PIPE);
             case '"' -> string();
             case '\'' -> rawString();
             case '#' -> keyword();

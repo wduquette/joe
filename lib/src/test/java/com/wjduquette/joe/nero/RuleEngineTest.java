@@ -183,6 +183,49 @@ public class RuleEngineTest extends Ted {
     }
 
     //-------------------------------------------------------------------------
+    // Variables with Defaults
+
+    // Test that variables can be defaulted with constants.
+    @Test public void testDefaults_constants() {
+        test("testDefaults_constants");
+        var source = """
+            define transient Id/id;
+            define transient B/id,x;
+            define A/id,x;
+            Id(1);
+            Id(2);
+            B(1, #abc);
+            A(id, x) :- Id(id), B(id, x | #xyz);
+            """;
+        check(execute(source)).eq("""
+            define A/id,x;
+            A(1, #abc);
+            A(2, #xyz);
+            """);
+    }
+
+    // Test that variables can be defaulted with variables.
+    @Test public void testDefaults_variables() {
+        test("testDefaults_variables");
+        var source = """
+            define transient Id/id;
+            define transient B/x;
+            define transient C/id, x;
+            define A/id,x;
+            Id(1);
+            Id(2);
+            B(#xyz);
+            C(1, #abc);
+            A(id, x) :- Id(id), B(y), C(id, x | y);
+            """;
+        check(execute(source)).eq("""
+            define A/id,x;
+            A(1, #abc);
+            A(2, #xyz);
+            """);
+    }
+
+    //-------------------------------------------------------------------------
     // Negation
 
     // Test that body atoms can be negated.

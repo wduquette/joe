@@ -279,6 +279,39 @@ public class NeroParserTest extends Ted {
             .eq("[line 2] error at 'Bar', found update marker '!' in body atom of non-updating rule.");
     }
 
+    @Test public void testRule_defaultInBuiltIn() {
+        test("testRule_defaultInBuiltIn");
+
+        var source = """
+            define Thing/a;
+            Thing(x) :- mapsTo(#f,#a, x | null);
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at 'mapsTo', found variable with default value in built-in predicate.");
+    }
+
+    @Test public void testRule_defaultInNegated() {
+        test("testRule_defaultInNegated");
+
+        var source = """
+            define Thing/a;
+            Thing(x) :- not A(x | null);
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at 'A', found variable with default value in negated atom.");
+    }
+
+    @Test public void testRule_defaultInUnbound() {
+        test("testRule_defaultUnbound");
+
+        var source = """
+            define Thing/a;
+            Thing(x) :- A(x | y);
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at 'A', default value has unbound variable: 'y'.");
+    }
+
     @Test public void testRule_negatedUnbound() {
         test("testRule_negatedUnbound");
 
@@ -287,8 +320,31 @@ public class NeroParserTest extends Ted {
             Thing(x) :- not Attribute(y);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'Attribute', negated body atom contains unbound variable: 'y'.");
+            .eq("[line 2] error at 'Attribute', negated atom contains unbound variable: 'y'.");
     }
+
+    @Test public void testRule_duplicateDefaults() {
+        test("testRule_duplicateDefaults");
+
+        var source = """
+            define Thing/a;
+            Thing(x) :- A(x | null), B(x | null);
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at 'B', variable has multiple default values: 'x'.");
+    }
+
+    @Test public void testRule_referencedDefault() {
+        test("testRule_duplicateDefaults");
+
+        var source = """
+            define Thing/a;
+            Thing(x) :- A(x), B(x | null);
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at 'A', defaulted variable is referenced in body atom(s): 'x'.");
+    }
+
 
     @Test public void testRule_headUnbound() {
         test("testRule_headUnbound");
@@ -368,7 +424,7 @@ public class NeroParserTest extends Ted {
             Thing(x) :- Foo(list), member(x, items);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'member', expected bound variable as term 1, got: 'items'.");
+            .eq("[line 2] error at 'member', expected bound variable or constant for term 'collection', got: 'items'.");
     }
 
     @Test public void testCheckBuiltIn_indexedMemberUnbound() {
@@ -378,7 +434,7 @@ public class NeroParserTest extends Ted {
             Thing(x) :- Foo(list), indexedMember(i, x, items);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'indexedMember', expected bound variable as term 2, got: 'items'.");
+            .eq("[line 2] error at 'indexedMember', expected bound variable or constant for term 'list', got: 'items'.");
     }
 
     @Test public void testCheckBuiltIn_keyedMemberUnbound() {
@@ -388,7 +444,7 @@ public class NeroParserTest extends Ted {
             Thing(x) :- Foo(map), keyedMember(k, v, items);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'keyedMember', expected bound variable as term 2, got: 'items'.");
+            .eq("[line 2] error at 'keyedMember', expected bound variable or constant for term 'map', got: 'items'.");
     }
 
     @Test public void testCheckBuiltIn_mapsTo_unknownF() {
@@ -398,7 +454,7 @@ public class NeroParserTest extends Ted {
             Thing(n) :- Foo(s), mapsTo(y, s, n);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'mapsTo', expected bound variable or constant as term 0, got: 'y'.");
+            .eq("[line 2] error at 'mapsTo', expected bound variable or constant for term 'f', got: 'y'.");
     }
 
     @Test public void testCheckBuiltIn_mapsTo_unknownA() {
@@ -408,7 +464,7 @@ public class NeroParserTest extends Ted {
             Thing(n) :- Foo(s), mapsTo(#str2num, a, n);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'mapsTo', expected bound variable or constant as term 1, got: 'a'.");
+            .eq("[line 2] error at 'mapsTo', expected bound variable or constant for term 'a', got: 'a'.");
     }
 
     //-------------------------------------------------------------------------
@@ -558,6 +614,38 @@ public class NeroParserTest extends Ted {
 
     //-------------------------------------------------------------------------
     // term()
+
+    @Test public void testTerm_defaultValueInHead() {
+        test("testTerm_defaultValueInHead");
+
+        var source = """
+            A(a | 5);
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '|', found default variable syntax in axiom or head atom.");
+    }
+
+    @Test public void testTerm_defaultValueInConstraint() {
+        test("testTerm_defaultValueInConstraint");
+
+        var source = """
+            define A/x;
+            A(x) :- B(x,y) where x == y | null;
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at '|', found default variable syntax in constraint.");
+    }
+
+    @Test public void testTerm_invalidDefaultValue() {
+        test("testTerm_invalidDefaultValue");
+
+        var source = """
+            define A/x;
+            A(x) :- B(id), C(id, x | _);
+            """;
+        check(parseNero(source))
+            .eq("[line 2] error at '_', expected variable or constant as default value.");
+    }
 
     @Test public void testTerm_expectedNumberAfterMinus() {
         test("testTerm_expectedNumberAfterMinus");
