@@ -6,7 +6,6 @@ import com.wjduquette.joe.scanner.Token;
 import java.util.*;
 import java.util.function.Supplier;
 
-import static com.wjduquette.joe.nero.RuleEngine.*;
 import static com.wjduquette.joe.scanner.TokenType.*;
 
 /**
@@ -402,68 +401,36 @@ class NeroParser extends EmbeddedParser {
     }
 
     // Verify that this is a valid built-in.
-    private void checkBuiltIn(Token token, Set<String> bodyVars, Atom atom) {
-        var shape = RuleEngine.getBuiltInShape(atom.relation());
-        assert shape != null;
-        if (!Shape.conformsTo(atom, shape)) {
-            error(token, "expected " + shape.toSpec() + ", got: '" +
+    private void checkBuiltIn(Token token, Set<String> bodyVars, Atom predicate) {
+        assert predicate instanceof ListAtom;
+        var atom = (ListAtom)predicate;
+
+        var builtIn = RuleEngine.getBuiltIn(atom.relation());
+        if (builtIn == null) {
+            throw new IllegalStateException(
+                "Unexpected built-in-predicate: '" + atom.relation() + "'.");
+        }
+
+        // Check shape
+        if (!Shape.conformsTo(atom, builtIn.shape())) {
+            error(token, "expected " + builtIn.shape().toSpec() + ", got: '" +
                 atom + "'.");
             return;
         }
 
-        switch (atom.relation()) {
-            case MEMBER ->
-                requireBound(token, bodyVars, atom, 1);
-            case INDEXED_MEMBER, KEYED_MEMBER ->
-                requireBound(token, bodyVars, atom, 2);
-            case MAPS_TO -> {
-                requireHasKnownValue(token, bodyVars, atom, 0);
-                requireHasKnownValue(token, bodyVars, atom, 1);
+        // Check TermModes
+        var modes = builtIn.modes();
+        for (var i = 0; i < modes.size(); i++) {
+            if (modes.get(i) == TermMode.IN) {
+                var term = atom.terms().get(i);
+                if (term instanceof Constant) continue;
+                if (term instanceof Variable v && bodyVars.contains(v.name())) continue;
+                error(token,
+                    "expected bound variable or constant for term '" +
+                    builtIn.shape().names().get(i) +
+                    "', got: '" + term + "'.");
             }
-            default -> throw new IllegalStateException(
-                "Unexpected built-in-predicate: '" + atom.relation() + "'.");
         }
-    }
-
-    // Checks whether the index'th term in the atom is a bound variable.
-    private void requireBound(
-        Token relation,
-        Set<String> bodyVars,
-        Atom atom,
-        int index
-    ) {
-        // We've checked the shape of the atom, and it conforms to a
-        // built-in predicate; therefore it is an OrderedAtom, and it
-        // has the expected number of terms.
-        assert atom instanceof ListAtom;
-        var a = (ListAtom)atom;
-        var term = a.terms().get(index);
-        if (term instanceof Variable v && bodyVars.contains(v.name())) return;
-        error(relation, "expected bound variable as term " + index +
-            ", got: '" + term + "'.");
-    }
-
-    // Checks whether the index'th term in the atom is either a bound variable
-    // or a constant.
-    private void requireHasKnownValue(
-        Token relation,
-        Set<String> bodyVars,
-        Atom atom,
-        int index
-    ) {
-        // We've checked the shape of the atom, and it conforms to a
-        // built-in predicate; therefore it is an OrderedAtom, and it
-        // has the expected number of terms.
-        assert atom instanceof ListAtom;
-        var a = (ListAtom)atom;
-        var term = a.terms().get(index);
-        if (term instanceof Constant ||
-            (term instanceof Variable v && bodyVars.contains(v.name()))
-        ) {
-            return;
-        }
-        error(relation, "expected bound variable or constant as term " + index +
-            ", got: '" + term + "'.");
     }
 
     private Constraint constraint(Set<String> bodyVar) {

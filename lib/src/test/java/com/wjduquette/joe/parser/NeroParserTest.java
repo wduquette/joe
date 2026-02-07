@@ -424,7 +424,7 @@ public class NeroParserTest extends Ted {
             Thing(x) :- Foo(list), member(x, items);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'member', expected bound variable as term 1, got: 'items'.");
+            .eq("[line 2] error at 'member', expected bound variable or constant for term 'collection', got: 'items'.");
     }
 
     @Test public void testCheckBuiltIn_indexedMemberUnbound() {
@@ -434,7 +434,7 @@ public class NeroParserTest extends Ted {
             Thing(x) :- Foo(list), indexedMember(i, x, items);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'indexedMember', expected bound variable as term 2, got: 'items'.");
+            .eq("[line 2] error at 'indexedMember', expected bound variable or constant for term 'list', got: 'items'.");
     }
 
     @Test public void testCheckBuiltIn_keyedMemberUnbound() {
@@ -444,7 +444,7 @@ public class NeroParserTest extends Ted {
             Thing(x) :- Foo(map), keyedMember(k, v, items);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'keyedMember', expected bound variable as term 2, got: 'items'.");
+            .eq("[line 2] error at 'keyedMember', expected bound variable or constant for term 'map', got: 'items'.");
     }
 
     @Test public void testCheckBuiltIn_mapsTo_unknownF() {
@@ -454,7 +454,7 @@ public class NeroParserTest extends Ted {
             Thing(n) :- Foo(s), mapsTo(y, s, n);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'mapsTo', expected bound variable or constant as term 0, got: 'y'.");
+            .eq("[line 2] error at 'mapsTo', expected bound variable or constant for term 'f', got: 'y'.");
     }
 
     @Test public void testCheckBuiltIn_mapsTo_unknownA() {
@@ -464,7 +464,7 @@ public class NeroParserTest extends Ted {
             Thing(n) :- Foo(s), mapsTo(#str2num, a, n);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'mapsTo', expected bound variable or constant as term 1, got: 'a'.");
+            .eq("[line 2] error at 'mapsTo', expected bound variable or constant for term 'a', got: 'a'.");
     }
 
     //-------------------------------------------------------------------------

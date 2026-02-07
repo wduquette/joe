@@ -11,6 +11,7 @@ import com.wjduquette.joe.util.Bindings;
 
 import java.util.*;
 import java.util.function.Function;
+import static com.wjduquette.joe.nero.TermMode.*;
 
 /**
  * The Nero inference engine.  Given a {@link NeroRuleSet} and a set of
@@ -37,7 +38,14 @@ public class RuleEngine {
         Set<Fact> compute(BindingContext bc, Atom builtIn);
     }
 
-    private static final Map<String,Shape> BUILT_INS = new HashMap<>();
+    /**
+     * Information about a built-in, as required by the NeroParser
+     * @param shape The shape
+     * @param modes The mode for each term.
+     */
+    public record BuiltIn(Shape shape, List<TermMode> modes) {}
+
+    private static final Map<String,BuiltIn> BUILT_INS = new HashMap<>();
 
     /** Name of the "member" built-in predicate. */
     public static final String MEMBER = "member";
@@ -55,15 +63,24 @@ public class RuleEngine {
     public static final Keyword STR2NUM = new Keyword("str2num");
 
     static {
-        builtIn(MEMBER, List.of("item", "collection"));
-        builtIn(INDEXED_MEMBER, List.of("index", "item", "list"));
-        builtIn(KEYED_MEMBER, List.of("key", "value", "map"));
-        builtIn(MAPS_TO, List.of("f", "a", "b"));
+        builtIn(MEMBER,
+            List.of(INOUT, IN), List.of("item", "collection"));
+        builtIn(INDEXED_MEMBER,
+            List.of(INOUT, INOUT, IN), List.of("index", "item", "list"));
+        builtIn(KEYED_MEMBER,
+            List.of(INOUT, INOUT, IN), List.of("key", "value", "map"));
+        builtIn(MAPS_TO,
+            List.of(IN, IN, INOUT), List.of("f", "a", "b"));
     }
 
-    private static void builtIn(String name, List<String> fields) {
+    private static void builtIn(
+        String name,
+        List<TermMode> modes,
+        List<String> fields
+    ) {
         var shape = new Shape(name, fields);
-        BUILT_INS.put(shape.relation(), shape);
+        var builtIn = new BuiltIn(shape, modes);
+        BUILT_INS.put(shape.relation(), builtIn);
     }
 
     /**
@@ -78,11 +95,11 @@ public class RuleEngine {
     }
 
     /**
-     * Gets the relation's shape from the built-in predicate's schema.
+     * Gets the built-in predicate's validation data.
      * @param relation The relation
      * @return The shape or null.
      */
-    public static Shape getBuiltInShape(String relation) {
+    public static BuiltIn getBuiltIn(String relation) {
         return BUILT_INS.get(relation);
     }
 
@@ -589,14 +606,13 @@ public class RuleEngine {
 
     // member/item,collection
     private Set<Fact> _member(BindingContext bc, Atom atom) {
+        var names = BUILT_INS.get(MEMBER).shape().names();
         var coll = extractVar(bc, atom, 1);
-
         var facts = new HashSet<Fact>();
+
         if (coll instanceof Collection<?> c) {
             for (var item : c) {
-                facts.add(new Fact(MEMBER,
-                    BUILT_INS.get(MEMBER).names(),
-                    List.of(item, c)));
+                facts.add(new Fact(MEMBER, names, List.of(item, c)));
             }
         }
 
@@ -605,14 +621,14 @@ public class RuleEngine {
 
     // indexedMember/index,item,list
     private Set<Fact> _indexedMember(BindingContext bc, Atom atom) {
+        var names = BUILT_INS.get(INDEXED_MEMBER).shape().names();
         var coll = extractVar(bc, atom, 2);
-
         var facts = new HashSet<Fact>();
+
         if (coll instanceof List<?> list) {
             int index = 0;
             for (var item : list) {
-                facts.add(new Fact(INDEXED_MEMBER,
-                    BUILT_INS.get(INDEXED_MEMBER).names(),
+                facts.add(new Fact(INDEXED_MEMBER, names,
                     List.of((double)index, item, list)));
                 ++index;
             }
@@ -623,13 +639,13 @@ public class RuleEngine {
 
     // keyedMember/key,value,map
     private Set<Fact> _keyedMember(BindingContext bc, Atom atom) {
+        var names = BUILT_INS.get(KEYED_MEMBER).shape().names();
         var coll = extractVar(bc, atom, 2);
         var facts = new HashSet<Fact>();
 
         if (coll instanceof Map<?,?> map) {
             for (var e : map.entrySet()) {
-                facts.add(new Fact(KEYED_MEMBER,
-                    BUILT_INS.get(KEYED_MEMBER).names(),
+                facts.add(new Fact(KEYED_MEMBER, names,
                     List.of(e.getKey(), e.getValue(), map)));
             }
         }
@@ -667,7 +683,7 @@ public class RuleEngine {
         if (b == null) return facts;
 
         facts.add(new Fact(MAPS_TO,
-            BUILT_INS.get(MAPS_TO).names(),
+            BUILT_INS.get(MAPS_TO).shape().names(),
             List.of(f, a, b)));
         return facts;
     }
