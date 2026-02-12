@@ -466,6 +466,30 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    // Infer ordered relation
+    @Test public void testInfer_ordered() {
+        test("testInfer_ordered");
+        var source = """
+            Triple(#a, #b, #c);
+            """;
+        check(execute(source)).eq("""
+            define Triple/a,b,c;
+            Triple(#a, #b, #c);
+            """);
+    }
+
+    // Infer unordered relation
+    @Test public void testInfer_unordered() {
+        test("testInfer_unordered");
+        var source = """
+            Result(a: #x, b: #y);
+            """;
+        check(execute(source)).eq("""
+            define Result/...;
+            Result(a: #x, b: #y);
+            """);
+    }
+
     //-------------------------------------------------------------------------
     // Transience
 

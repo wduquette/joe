@@ -36,14 +36,14 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at 'member', found built-in predicate in axiom.");
     }
 
-    @Test public void testParse_axiomUndefined() {
+    @Test public void testParse_axiomUndefined_tooBig() {
         test("testParse_axiomUndefined");
 
         var source = """
-            Person(#joe);
+            Person(1,2,3,4,5,6,7,8,9,10);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Person', undefined relation in axiom.");
+            .eq("[line 1] error at 'Person', cannot infer shape, atom with undefined relation has too many fields.");
     }
 
     @Test public void testParse_axiomMismatch() {
@@ -67,14 +67,14 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at 'member', found built-in predicate in rule head.");
     }
 
-    @Test public void testParse_headUndefined() {
-        test("testParse_headUndefined");
+    @Test public void testParse_headUndefinedTooBig() {
+        test("testParse_headUndefinedTooBig");
 
         var source = """
-            Person(x) :- Someone(x);
+            Person(a,b,c,d,e,f,g,h,i,j) :- Someone(a,b,c,d,e,f,g,h,i,j);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Person', undefined relation in rule head.");
+            .eq("[line 1] error at 'Person', cannot infer shape, atom with undefined relation has too many fields.");
     }
 
     @Test public void testParse_headMismatch() {

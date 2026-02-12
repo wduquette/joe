@@ -219,19 +219,6 @@ class NeroParser extends EmbeddedParser {
                 "found built-in predicate in axiom.");
         }
 
-        // The relation must have a known shape.
-        if (!schema.hasRelation(head.relation())) {
-            throw errorSync(head.token(), "undefined relation in axiom.");
-        }
-
-        // The atom must be compatible with the defined shape.
-        if (!schema.check(head.atom())) {
-            error(head.token(),
-                "schema mismatch, expected shape compatible with '" +
-                    schema.get(head.relation()).toSpec() +
-                    "', got: '" + head.text() + "'.");
-        }
-
         // Axioms may not contain aggregation functions or variables.
         if (head.atom().getAllTerms().stream().anyMatch(t -> t instanceof Aggregate)) {
             error(head.token(), "found aggregation function in axiom.");
@@ -279,10 +266,25 @@ class NeroParser extends EmbeddedParser {
             throw errorSync(head.token(),
                 "found built-in predicate in " + where + ".");
         }
+
         if (!schema.hasRelation(head.relation())) {
-            throw errorSync(head.token(),
-                "undefined relation in " + where + ".");
+            switch (head.atom()) {
+                case ListAtom a -> {
+                    if (a.terms().size() > DEFAULT_FIELD_NAMES.size()) {
+                        throw errorSync(head.token(),
+                            "cannot infer shape, atom with undefined relation has too many fields.");
+                    }
+
+                    schema.add(new Shape(head.relation(),
+                        DEFAULT_FIELD_NAMES.subList(0, a.terms().size())));
+                }
+                case MapAtom a -> {
+                    schema.add(new Shape(head.relation()));
+                }
+            }
+            return;
         }
+
         if (!schema.check(head.atom())) {
             error(head.token(),
                 "schema mismatch, expected shape compatible with '" +
@@ -290,7 +292,6 @@ class NeroParser extends EmbeddedParser {
                     "', got: '" + head.text() + "'.");
         }
     }
-
 
     // Verify that there is at most one aggregate, and that it shares no
     // variable names with other head atoms.
