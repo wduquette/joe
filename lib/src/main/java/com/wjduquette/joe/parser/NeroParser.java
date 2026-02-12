@@ -278,9 +278,7 @@ class NeroParser extends EmbeddedParser {
                     schema.add(new Shape(head.relation(),
                         DEFAULT_FIELD_NAMES.subList(0, a.terms().size())));
                 }
-                case MapAtom a -> {
-                    schema.add(new Shape(head.relation()));
-                }
+                case MapAtom ignored -> schema.add(new Shape(head.relation()));
             }
             return;
         }

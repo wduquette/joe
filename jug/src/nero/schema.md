@@ -9,21 +9,19 @@ Nero supports two kinds of relation:
 
 Taken together, the relation's name, kind, and (for ordered relations) the field 
 names constitute the fact's *shape*.  Nero requires that a relation has the 
-same shape in all axioms, and rules, and facts having that relation.
+same shape in all axioms, rules, and facts having that relation.
 
 - [`define` Declarations](#define-declarations)
   - [Ordered Relations](#ordered-relations) 
   - [Unordered Relations](#unordered-relations)
+- [Shape Inference](#shape-inference)
 - [Static Schemas](#static-schemas)
 
 ## `define` Declarations
 
-A Nero program must `define` the shape of each relation appearing in 
-an axiom or rule head; the Nero parser will reject any axiom or rule
-that lacks a definition or that is incompatible with the definition.
-
-The collection of relations and their expected shapes is called the 
-program's *schema*.
+A Nero program defines the shape of relations using the `define` 
+declaration. The collection of relations and their expected shapes is called 
+the program's *schema*.
 
 The `define` declaration has two forms, one for each kind of relation.
 Each form has an optional `transient` keyword, which is used to
@@ -60,6 +58,34 @@ number of named but unordered fields. For example,
 Facts having this shape can only be matched by body atoms using 
 named-field notation, and can only be created by axioms and
 rule heads using named-field notation.
+
+### Shape Inference
+
+It is considered a best practice for a Nero script to explicitly define the 
+shape of all relations appearing in axioms and rule heads.  As this is a
+nuisance when entering Nero query scripts interactively, Nero can also infer
+the shape of a relation from its first appearance in the script.
+
+When the parser finds an undefined relation, it infers a shape as follows:
+
+- For an atom using named-field notation, infer an unordered relation.
+- For an atom using positional notation, infer an ordered relation with
+  field names `a`, `b`, `c`, ..., up to 9 fields.
+
+Ordered relations with more than 9 fields _must_ be explicitly defined.
+
+For example,
+
+```nero
+// Infers: define Triple/a,b,c;
+Triple(1, 2, 3);
+
+// Error, too many terms.
+Triple(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+// Infers: define Result/...;
+Result(a: 1, b: 2);
+```
 
 ## Static Schemas
 
