@@ -15,6 +15,9 @@ import static com.wjduquette.joe.scanner.TokenType.*;
 class NeroParser extends EmbeddedParser {
     private static final String DEFINE = "define";
     private static final String TRANSIENT = "transient";
+    private static final List<String> DEFAULT_FIELD_NAMES = List.of(
+        "a", "b", "c", "d", "e", "f", "g", "h", "i"
+    );
 
     //-------------------------------------------------------------------------
     // Types
@@ -147,7 +150,6 @@ class NeroParser extends EmbeddedParser {
                 "found built-in predicate in 'define' declaration.");
         }
 
-
         scanner.consume(SLASH, "expected '/' after relation.");
 
         Shape shape;
@@ -165,6 +167,16 @@ class NeroParser extends EmbeddedParser {
                 names.add(name);
             } while (scanner.match(COMMA));
 
+            shape = new Shape(relation.name(), names);
+        } else if (scanner.match(NUMBER)) {
+            var token = scanner.previous();
+            var max = DEFAULT_FIELD_NAMES.size();
+            var num = (Double)token.literal();
+            if (token.lexeme().contains(".") || num < 1 || num > max) {
+                throw errorSync(scanner.previous(),
+                    "expected integer arity in range 1..." + max + ".");
+            }
+            var names = DEFAULT_FIELD_NAMES.subList(0, num.intValue());
             shape = new Shape(relation.name(), names);
         } else {
             scanner.advance();

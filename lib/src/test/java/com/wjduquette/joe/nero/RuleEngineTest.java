@@ -416,9 +416,9 @@ public class RuleEngineTest extends Ted {
     //-------------------------------------------------------------------------
     // Fact Creation and `define` declarations
 
-    // Named atoms produce MapFacts given define relation/...;
-    @Test public void testDefine_map_explicit() {
-        test("testDefine_map_explicit");
+    // Defining unordered relation
+    @Test public void testDefine_unordered() {
+        test("testDefine_unordered");
         var source = """
             define Pair/...;
             Pair(first: #c, second: #c);
@@ -435,9 +435,9 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
-    // Given defines with field names, ordered atoms produce PairFacts.
-    @Test public void testDefine_pair_explicit() {
-        test("testPairFactCreation");
+    // Defining ordered relation with field names.
+    @Test public void testDefine_ordered_fields() {
+        test("testDefine_ordered_fields");
         var source = """
             define Pair/left, right;
             Pair(#c, #c);
@@ -450,6 +450,19 @@ public class RuleEngineTest extends Ted {
             
             define Twin/id;
             Twin(#c);
+            """);
+    }
+
+    // Defining ordered relation with arity.
+    @Test public void testDefine_ordered_arity() {
+        test("testDefine_ordered_arity");
+        var source = """
+            define Triple/3;
+            Triple(#a, #b, #c);
+            """;
+        check(execute(source)).eq("""
+            define Triple/a,b,c;
+            Triple(#a, #b, #c);
             """);
     }
 

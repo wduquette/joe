@@ -19,9 +19,12 @@ scripts.
       methods, replacing `.`, which proved to be highly confusing in practice.
 - Nero Language
     - Facts are now simply ordered or unordered.
-    - All relations used in axioms and rule heads must be defined as
-      unordered or as ordered with field names.
-    - Named atoms used in axioms and rule heads can create ordered facts.
+    - Named atoms used in axioms and rule heads can create ordered facts
+      if the relation has been `define`'d to be ordered.
+    - Added the `mapsTo/f,a,b` built-in predicate.
+    - Nero variables can have default values, with certain restrictions.
+    - The `define relation/arity;` syntax now defines an ordered relation with
+      field names `a`, `b`, `c`, ...; the arity must be from 1 to 9.
 - Library
   - Experimental `joe.win` Package
     - Enhancements and cleanup 

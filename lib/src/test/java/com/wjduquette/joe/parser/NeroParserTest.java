@@ -184,6 +184,36 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at 'id', duplicate field name.");
     }
 
+    @Test public void testDefineDeclaration_arityWithDecimal() {
+        test("testDefineDeclaration_arityWithDecimal");
+
+        var source = """
+            define Thing/1.5;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '1.5', expected integer arity in range 1...9.");
+    }
+
+    @Test public void testDefineDeclaration_arityTooSmall() {
+        test("testDefineDeclaration_arityTooSmall");
+
+        var source = """
+            define Thing/0;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '0', expected integer arity in range 1...9.");
+    }
+
+    @Test public void testDefineDeclaration_arityTooBig() {
+        test("testDefineDeclaration_arityTooBag");
+
+        var source = """
+            define Thing/10;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '10', expected integer arity in range 1...9.");
+    }
+
     @Test public void testDefineDeclaration_expectedValidShape() {
         test("testDefineDeclaration_expectedValidShape");
 

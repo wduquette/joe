@@ -32,12 +32,18 @@ mark intermediate values; see
 
 ### Ordered Relations
 
-**define \[transient] *relation*/*name* \[, *name*]...;**
+**define \[transient] *relation*/*name* \[, *name*...];**
 
 This form states that the *relation* has a fixed number of ordered
 fields with the given names. For example,
 
 `define Person/parent, child;`
+
+**define \[transient] *relation*/*n*;**
+
+This form states that the *relation* has *n* ordered fields, where
+*n* is an integer from 1 to 9.  The fields are assigned the first
+*n* names from the list `a`, `b`, `c`, `d`, `e`, `f`, `g`, `h`, `i`.
 
 Facts having this shape can be matched by body atoms using either
 ordered-field or named-field notation.
