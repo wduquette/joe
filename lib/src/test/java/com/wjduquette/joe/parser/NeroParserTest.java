@@ -36,14 +36,14 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at 'member', found built-in predicate in axiom.");
     }
 
-    @Test public void testParse_axiomUndefined() {
+    @Test public void testParse_axiomUndefined_tooBig() {
         test("testParse_axiomUndefined");
 
         var source = """
-            Person(#joe);
+            Person(1,2,3,4,5,6,7,8,9,10);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Person', undefined relation in axiom.");
+            .eq("[line 1] error at 'Person', cannot infer shape, atom with undefined relation has too many fields.");
     }
 
     @Test public void testParse_axiomMismatch() {
@@ -67,14 +67,14 @@ public class NeroParserTest extends Ted {
             .eq("[line 1] error at 'member', found built-in predicate in rule head.");
     }
 
-    @Test public void testParse_headUndefined() {
-        test("testParse_headUndefined");
+    @Test public void testParse_headUndefinedTooBig() {
+        test("testParse_headUndefinedTooBig");
 
         var source = """
-            Person(x) :- Someone(x);
+            Person(a,b,c,d,e,f,g,h,i,j) :- Someone(a,b,c,d,e,f,g,h,i,j);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'Person', undefined relation in rule head.");
+            .eq("[line 1] error at 'Person', cannot infer shape, atom with undefined relation has too many fields.");
     }
 
     @Test public void testParse_headMismatch() {
@@ -182,6 +182,36 @@ public class NeroParserTest extends Ted {
             """;
         check(parseNero(source))
             .eq("[line 1] error at 'id', duplicate field name.");
+    }
+
+    @Test public void testDefineDeclaration_arityWithDecimal() {
+        test("testDefineDeclaration_arityWithDecimal");
+
+        var source = """
+            define Thing/1.5;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '1.5', expected integer arity in range 1...9.");
+    }
+
+    @Test public void testDefineDeclaration_arityTooSmall() {
+        test("testDefineDeclaration_arityTooSmall");
+
+        var source = """
+            define Thing/0;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '0', expected integer arity in range 1...9.");
+    }
+
+    @Test public void testDefineDeclaration_arityTooBig() {
+        test("testDefineDeclaration_arityTooBag");
+
+        var source = """
+            define Thing/10;
+            """;
+        check(parseNero(source))
+            .eq("[line 1] error at '10', expected integer arity in range 1...9.");
     }
 
     @Test public void testDefineDeclaration_expectedValidShape() {

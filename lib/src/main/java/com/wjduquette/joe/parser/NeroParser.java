@@ -15,6 +15,9 @@ import static com.wjduquette.joe.scanner.TokenType.*;
 class NeroParser extends EmbeddedParser {
     private static final String DEFINE = "define";
     private static final String TRANSIENT = "transient";
+    private static final List<String> DEFAULT_FIELD_NAMES = List.of(
+        "a", "b", "c", "d", "e", "f", "g", "h", "i"
+    );
 
     //-------------------------------------------------------------------------
     // Types
@@ -147,7 +150,6 @@ class NeroParser extends EmbeddedParser {
                 "found built-in predicate in 'define' declaration.");
         }
 
-
         scanner.consume(SLASH, "expected '/' after relation.");
 
         Shape shape;
@@ -165,6 +167,16 @@ class NeroParser extends EmbeddedParser {
                 names.add(name);
             } while (scanner.match(COMMA));
 
+            shape = new Shape(relation.name(), names);
+        } else if (scanner.match(NUMBER)) {
+            var token = scanner.previous();
+            var max = DEFAULT_FIELD_NAMES.size();
+            var num = (Double)token.literal();
+            if (token.lexeme().contains(".") || num < 1 || num > max) {
+                throw errorSync(scanner.previous(),
+                    "expected integer arity in range 1..." + max + ".");
+            }
+            var names = DEFAULT_FIELD_NAMES.subList(0, num.intValue());
             shape = new Shape(relation.name(), names);
         } else {
             scanner.advance();
@@ -205,19 +217,6 @@ class NeroParser extends EmbeddedParser {
         if (RuleEngine.isBuiltIn(head.relation())) {
             throw errorSync(head.token(),
                 "found built-in predicate in axiom.");
-        }
-
-        // The relation must have a known shape.
-        if (!schema.hasRelation(head.relation())) {
-            throw errorSync(head.token(), "undefined relation in axiom.");
-        }
-
-        // The atom must be compatible with the defined shape.
-        if (!schema.check(head.atom())) {
-            error(head.token(),
-                "schema mismatch, expected shape compatible with '" +
-                    schema.get(head.relation()).toSpec() +
-                    "', got: '" + head.text() + "'.");
         }
 
         // Axioms may not contain aggregation functions or variables.
@@ -267,10 +266,23 @@ class NeroParser extends EmbeddedParser {
             throw errorSync(head.token(),
                 "found built-in predicate in " + where + ".");
         }
+
         if (!schema.hasRelation(head.relation())) {
-            throw errorSync(head.token(),
-                "undefined relation in " + where + ".");
+            switch (head.atom()) {
+                case ListAtom a -> {
+                    if (a.terms().size() > DEFAULT_FIELD_NAMES.size()) {
+                        throw errorSync(head.token(),
+                            "cannot infer shape, atom with undefined relation has too many fields.");
+                    }
+
+                    schema.add(new Shape(head.relation(),
+                        DEFAULT_FIELD_NAMES.subList(0, a.terms().size())));
+                }
+                case MapAtom ignored -> schema.add(new Shape(head.relation()));
+            }
+            return;
         }
+
         if (!schema.check(head.atom())) {
             error(head.token(),
                 "schema mismatch, expected shape compatible with '" +
@@ -278,7 +290,6 @@ class NeroParser extends EmbeddedParser {
                     "', got: '" + head.text() + "'.");
         }
     }
-
 
     // Verify that there is at most one aggregate, and that it shares no
     // variable names with other head atoms.
