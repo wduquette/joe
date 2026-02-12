@@ -62,7 +62,7 @@ public class NeroTest extends Ted {
     // Verify that we get errors.
     @Test public void testCompile_syntax() {
         test("testCompile_syntax");
-        checkThrow(() -> Nero.compile(buffer("A(1);")))
+        checkThrow(() -> Nero.compile(buffer("A(1;")))
             .containsString("Error in Nero input");
     }
 
