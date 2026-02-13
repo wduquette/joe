@@ -336,55 +336,43 @@ public class RuleEngine {
         // fact.
         var givenBindings = bc.bindings;
 
+        // Keep track of whether we've gotten any matches for this atom.
         var gotMatch = false;
+
         for (var fact : facts) {
             // FIRST, Copy the bindings for this fact.
             bc.bindings = new Bindings(givenBindings);
 
-            if (!matchAtom(atom, fact, bc)) continue;
-            gotMatch = true;
-//            if (!matchAtom(atom, fact, bc)) {
-//                if (!atom.hasDefaults()) continue;
-//
-//                // Bind defaults and go on to the next atom.
-//                for (var t : atom.getAllTerms()) {
-//                    if (t instanceof VariableWithDefault vwd) {
-//                        bc.bindings.bind(vwd.variable().name(),
-//                            getDefaultValue(bc.bindings, vwd.value()));
-//                    }
-//                }
-//            }
-
-            // NEXT, it matches.  If there's another body atom, check it and
-            // then go on to the next fact.
-            if (index + 1 < bc.rule.normal().size()) {
-                matchNextBodyAtom(bc, index + 1);
-            } else {
-                completeMatch(bc);
+            if (matchAtom(atom, fact, bc)) {
+                gotMatch = true;
+                continueWithMatch(bc, index);
             }
         }
 
         if (!gotMatch && atom.hasDefaults()) {
-            // FIRST, bind defaults
-            for (var t : atom.getAllTerms()) {
-                if (t instanceof VariableWithDefault vwd) {
-                    bc.bindings.bind(vwd.variable().name(),
-                        getDefaultValue(bc.bindings, vwd.value()));
-                }
-            }
+            bindDefaults(bc, atom);
+            continueWithMatch(bc, index);
+        }
+    }
 
-            // NEXT, it matches.  If there's another body atom, check it and
-            // then go on to the next fact.
-            if (index + 1 < bc.rule.normal().size()) {
-                matchNextBodyAtom(bc, index + 1);
-            } else {
-                completeMatch(bc);
+    // Bind the defaulted variables to their default values.
+    private void bindDefaults(BindingContext bc, Atom atom) {
+        for (var t : atom.getAllTerms()) {
+            if (t instanceof VariableWithDefault vwd) {
+                bc.bindings.bind(vwd.variable().name(),
+                    getDefaultValue(bc.bindings, vwd.value()));
             }
         }
     }
 
-    private void completeMatch(BindingContext bc) {
-        // FIRST, we've matched all body atoms.  Check the bindings against
+    private void continueWithMatch(BindingContext bc, int index) {
+        // FIRST, match the next atom, if any.
+        if (index + 1 < bc.rule.normal().size()) {
+            matchNextBodyAtom(bc, index + 1);
+            return;
+        }
+
+        // NEXT, we've matched all body atoms.  Check the bindings against
         // the constraints.  If they are not met, continue with the
         // next fact.
         if (!constraintsMet(bc)) return;
