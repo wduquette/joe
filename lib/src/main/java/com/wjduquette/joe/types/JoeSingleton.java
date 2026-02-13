@@ -36,6 +36,7 @@ public class JoeSingleton extends ProxyType<Void> {
         staticMethod("isFact",            this::_isFact);
         staticMethod("isType",            this::_isType);
         staticMethod("javaTypeOf",        this::_javaTypeOf);
+        staticMethod("quotify",           this::_quotify);
         staticMethod("stringify",         this::_stringify);
         staticMethod("supertypeOf",       this::_supertypeOf);
         staticMethod("toFact",            this::_toFact);
@@ -134,6 +135,20 @@ public class JoeSingleton extends ProxyType<Void> {
     private Object _javaTypeOf(Joe joe, Args args) {
         args.exactArity(1, "javaTypeOf(value)");
         return args.next().getClass().getName();
+    }
+
+    //**
+    // @static quotify
+    // %args value
+    // %result String
+    // Converts its value to a string for output.  If the value is a string,
+    // it is properly quoted as a string; otherwise it is passed to
+    // [[static:Joe.stringify]].  This is useful in test output, to
+    // distinguish between, e.g., numeric strings and actual numbers.
+    private Object _quotify(Joe joe, Args args) {
+        args.exactArity(1, "quotify(value)");
+
+        return joe.quotify(args.next(0));
     }
 
     //**

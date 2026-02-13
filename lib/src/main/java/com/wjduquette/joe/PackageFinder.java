@@ -18,6 +18,8 @@ public class PackageFinder {
      * A Nero file containing local package information.
      */
     public static final String REPOSITORY_FILE = "repository.nero";
+
+    /** The Nero schema for repository.nero files. */
     public static final Schema SCHEMA = new Schema();
     static {
         SCHEMA.add(new Shape("ScriptedPackage", List.of("name", "scriptFiles")));
