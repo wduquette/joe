@@ -97,6 +97,12 @@ public class TestPackage extends NativePackage {
                 joe.typedValue(result) + ".");
         }
 
+        // NEXT, output the error we received.
+        joe.println("AssertError: " + error.getMessage());
+        if (!error.getTraces().isEmpty()) {
+            joe.println(error.getTraceReport().indent(4));
+        }
+
         // NEXT, fail if the error message isn't as expected.
         if (args.hasNext()) {
             var message = joe.stringify(args.next());
