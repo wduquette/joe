@@ -225,6 +225,21 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    // Test that defaults work when the relevant relation has no facts.
+    @Test public void testDefaults_emptyRelation() {
+        test("testDefaults_emptyRelation");
+        var source = """
+            define transient Id/id;
+            define A/id,x;
+            Id(1);
+            A(id, x) :- Id(id), B(id, x | #xyz);
+            """;
+        check(execute(source)).eq("""
+            define A/id,x;
+            A(1, #xyz);
+            """);
+    }
+
     //-------------------------------------------------------------------------
     // Negation
 

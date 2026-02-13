@@ -1,6 +1,8 @@
 package com.wjduquette.joe;
 
 import com.wjduquette.joe.nero.NeroDatabase;
+import com.wjduquette.joe.nero.Schema;
+import com.wjduquette.joe.nero.Shape;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,6 +18,11 @@ public class PackageFinder {
      * A Nero file containing local package information.
      */
     public static final String REPOSITORY_FILE = "repository.nero";
+    public static final Schema SCHEMA = new Schema();
+    static {
+        SCHEMA.add(new Shape("ScriptedPackage", List.of("name", "scriptFiles")));
+        SCHEMA.add(new Shape("JarPackage", List.of("name", "jarFile", "className")));
+    }
 
     //-------------------------------------------------------------------------
     // Static API
@@ -128,14 +135,13 @@ public class PackageFinder {
     private void findPackagesInRepository(Path repo, boolean verbose) {
         NeroDatabase db;
         try {
-            db = new NeroDatabase(joe).update("""
-                    define ScriptedPackage/name, scriptFiles;
-                    define JarPackage/name, jarFile, className;
-                    """)
-                .load(repo);
+            db = new NeroDatabase(joe).withFile(repo)
+                .check(SCHEMA)
+                .load();
         } catch (JoeError ex) {
             if (verbose) {
                 joe.println("    Error initializing package registry");
+                joe.println(ex.getMessage().indent(6));
                 joe.println(ex.getTraceReport().indent(6));
             }
             return;
