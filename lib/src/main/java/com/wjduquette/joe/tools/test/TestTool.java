@@ -31,14 +31,16 @@ public class TestTool implements Tool {
         
         Options:
         
+        --test name, -t name
+            Executes tests whose name contains the given value
+        --verbose, -v
+            Enable verbose output.
         --libpath path, --l path
            Sets the library path to the given path.
         --clark, -c
             Use the "Clark" byte-engine (default)
         --walker, -w
             Use the "Walker" AST-walker engine.
-        --verbose, -v
-            Enable verbose output.
         
         Test Scripts
         
@@ -64,6 +66,7 @@ public class TestTool implements Tool {
     // Instance Variables
 
     private String engineType = Joe.CLARK;
+    private String testName = null;
     private String libPath = null;
     private PackageFinder finder = null;
     private boolean verbose = false;
@@ -104,6 +107,7 @@ public class TestTool implements Tool {
             var arg = argq.poll();
 
             switch (arg) {
+                case "--test", "-t" -> testName = toOptArg(arg, argq);
                 case "--libpath", "-l" -> libPath = toOptArg(arg, argq);
                 case "--clark", "-c" -> engineType = Joe.CLARK;
                 case "--walker", "-w" -> engineType = Joe.WALKER;
@@ -184,6 +188,7 @@ public class TestTool implements Tool {
         // NEXT, execute its tests.
         var tests = joe.getVariableNames().stream()
             .filter(name -> name.startsWith("test"))
+            .filter(name -> testName == null || name.contains(testName))
             .toList();
 
         if (tests.isEmpty()) {
