@@ -336,19 +336,40 @@ public class RuleEngine {
         // fact.
         var givenBindings = bc.bindings;
 
+        var gotMatch = false;
         for (var fact : facts) {
             // FIRST, Copy the bindings for this fact.
             bc.bindings = new Bindings(givenBindings);
 
-            if (!matchAtom(atom, fact, bc)) {
-                if (!atom.hasDefaults()) continue;
+            if (!matchAtom(atom, fact, bc)) continue;
+            gotMatch = true;
+//            if (!matchAtom(atom, fact, bc)) {
+//                if (!atom.hasDefaults()) continue;
+//
+//                // Bind defaults and go on to the next atom.
+//                for (var t : atom.getAllTerms()) {
+//                    if (t instanceof VariableWithDefault vwd) {
+//                        bc.bindings.bind(vwd.variable().name(),
+//                            getDefaultValue(bc.bindings, vwd.value()));
+//                    }
+//                }
+//            }
 
-                // Bind defaults and go on to the next atom.
-                for (var t : atom.getAllTerms()) {
-                    if (t instanceof VariableWithDefault vwd) {
-                        bc.bindings.bind(vwd.variable().name(),
-                            getDefaultValue(bc.bindings, vwd.value()));
-                    }
+            // NEXT, it matches.  If there's another body atom, check it and
+            // then go on to the next fact.
+            if (index + 1 < bc.rule.normal().size()) {
+                matchNextBodyAtom(bc, index + 1);
+            } else {
+                completeMatch(bc);
+            }
+        }
+
+        if (!gotMatch && atom.hasDefaults()) {
+            // FIRST, bind defaults
+            for (var t : atom.getAllTerms()) {
+                if (t instanceof VariableWithDefault vwd) {
+                    bc.bindings.bind(vwd.variable().name(),
+                        getDefaultValue(bc.bindings, vwd.value()));
                 }
             }
 
@@ -356,21 +377,24 @@ public class RuleEngine {
             // then go on to the next fact.
             if (index + 1 < bc.rule.normal().size()) {
                 matchNextBodyAtom(bc, index + 1);
-                continue;
+            } else {
+                completeMatch(bc);
             }
-
-            // NEXT, we've matched all body atoms.  Check the bindings against
-            // the constraints.  If they are not met, continue with the
-            // next fact.
-            if (!constraintsMet(bc)) continue;
-
-            // NEXT, check each negation.
-            if (!checkNegations(bc)) continue;
-
-            // NEXT, the rule has matched.  Build the inferred fact, and see
-            // if it's actually new.
-            bc.matches.add(bc.bindings);
         }
+    }
+
+    private void completeMatch(BindingContext bc) {
+        // FIRST, we've matched all body atoms.  Check the bindings against
+        // the constraints.  If they are not met, continue with the
+        // next fact.
+        if (!constraintsMet(bc)) return;
+
+        // NEXT, check each negation.
+        if (!checkNegations(bc)) return;
+
+        // NEXT, the rule has matched.  Build the inferred fact, and see
+        // if it's actually new.
+        bc.matches.add(bc.bindings);
     }
 
     private Object getDefaultValue(Bindings bindings, Term value) {
