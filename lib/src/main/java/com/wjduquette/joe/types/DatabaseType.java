@@ -489,7 +489,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     //**
     // @method withRules
     // %args rules
-    // %result NeroPipeline
+    // %result DatabasePipeline
     // Returns an object allowing the *rules* to be executed
     // on the database content in a variety of ways.  The
     // *rules* may be passed as a [[RuleSet]] or as a Nero script.
