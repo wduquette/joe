@@ -3,21 +3,24 @@ package com.wjduquette.joe.runner;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.console.ConsolePackage;
 import com.wjduquette.joe.pkg.text.JoeTextPackage;
+import com.wjduquette.joe.win.WinPackage;
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * JoeRunner is a framework for writing non-GUI script execution tools like
- * {@code joe run}.  It does not presume the client is
+ * JoeWinRunner is a framework for writing GUI script execution tools like
+ * {@code joe win}.  It does not presume the client is
  * using the {@link com.wjduquette.joe.tools.Tool} framework.
  */
-public class JoeRunner {
+public class JoeWinRunner {
     //------------------------------------------------------------------------
     // Static API
 
@@ -43,14 +46,14 @@ public class JoeRunner {
     private final List<JoePackage> registered;
     private final Consumer<Joe> onConfigure;
 
-    // Execution
-    private Joe joe;
-    private Duration runTime = null;
+    // TODO: This is a bad design: `joe.win` should let you manage this.
+    private final VBox root = new VBox();
+    private final Stage stage = new Stage();
 
     //------------------------------------------------------------------------
     // Constructor
 
-    private JoeRunner(Builder builder) {
+    private JoeWinRunner(Builder builder) {
         this.appName = builder.appName;
         this.engineType = builder.engineType;
         this.debug = builder.debug;
@@ -74,8 +77,14 @@ public class JoeRunner {
      */
     public void execute() {
         // FIRST, create the interpreter
-        joe = new Joe(engineType);
+        var joe = new Joe(engineType);
         joe.setDebug(debug);
+
+        // NEXT, create the stage and scene
+        stage.setTitle(appName);
+        var scene = new Scene(root, 400, 300);
+        stage.setScene(scene);
+        Platform.setImplicitExit(true);
 
         // NEXT, install and register the default packages.
         var consolePackage = new ConsolePackage();
@@ -83,6 +92,7 @@ public class JoeRunner {
         consolePackage.getArgs().addAll(scriptArgs);
         joe.installPackage(consolePackage);
         joe.registerPackage(JoeTextPackage.PACKAGE);
+        joe.installPackage(new WinPackage(stage, root));
 
         // NEXT, install and register packages requested by the client.
         installed.forEach(joe::installPackage);
@@ -103,10 +113,7 @@ public class JoeRunner {
                 System.out.println(appName + " (Joe " +
                     joe.engineName() + " engine)");
             }
-            var startTime = Instant.now();
             joe.runFile(scriptPath);
-            var endTime = Instant.now();
-            runTime = Duration.between(startTime, endTime);
         } catch (IOException ex) {
             System.err.println("Could not read script: " + scriptPath +
                 "\n*** " + ex.getMessage());
@@ -120,23 +127,9 @@ public class JoeRunner {
             System.err.println(ex.getJoeStackTrace());
             System.exit(70);
         }
-    }
 
-    /**
-     * After a successful run, get the Joe interpreter.
-     * @return The interpreter
-     */
-    public Joe getJoe() {
-        return joe;
-    }
-
-    /**
-     * After a successful run, this method returns the duration of script
-     * execution.
-     * @return The runtime.
-     */
-    public Duration getRunTime() {
-        return runTime;
+        // NEXT, pop up the window
+        stage.show();
     }
 
     //------------------------------------------------------------------------
@@ -176,8 +169,8 @@ public class JoeRunner {
          * Builds the runner given the options.
          * @return The runner
          */
-        public JoeRunner build() {
-            return new JoeRunner(this);
+        public JoeWinRunner build() {
+            return new JoeWinRunner(this);
         }
 
         /**

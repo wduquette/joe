@@ -1,19 +1,10 @@
 package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.PackageFinder;
-import com.wjduquette.joe.SyntaxError;
-import com.wjduquette.joe.console.ConsolePackage;
+import com.wjduquette.joe.runner.JoeWinRunner;
 import com.wjduquette.joe.tools.Tool;
-import com.wjduquette.joe.win.WinPackage;
 import com.wjduquette.joe.tools.ToolInfo;
-import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.List;
 
@@ -52,13 +43,6 @@ public class WinTool implements Tool {
             the Joe maintainer.
         """)
         .build();
-
-    //------------------------------------------------------------------------
-    // Instance Variables
-
-    // Keeps joe from being collected.
-    private final Stage stage = new Stage();
-    private final VBox root = new VBox();
 
     //------------------------------------------------------------------------
     // Constructor
@@ -117,54 +101,15 @@ public class WinTool implements Tool {
             }
         }
 
-        var joe = new Joe(engineType);
-        joe.setDebug(debug);
-
-        if (debug) {
-            System.out.println("Joe " + App.getVersion() + " (" +
-                joe.engineName() + " engine)");
-        }
-
-        // NEXT, create the scene with default settings.
-        stage.setTitle("joe win");
-        Scene scene = new Scene(root, 400, 300);
-//        scene.getStylesheets().add("file:foo.css");
-        stage.setScene(scene);
-        Platform.setImplicitExit(true);
-
-        // NEXT, load the required packages
-        var path = argq.poll();
-        var consolePackage = new ConsolePackage();
-        consolePackage.setScript(path);
-        consolePackage.getArgs().addAll(argq);
-        joe.installPackage(consolePackage);
-
-        var guiPackage = new WinPackage(stage, root);
-        joe.installPackage(guiPackage);
-        var found = PackageFinder.find(libPath != null
-            ? libPath
-            : System.getenv(Joe.JOE_LIB_PATH));
-        joe.registerPackages(found);
-
-        // NEXT, execute the script.
-        try {
-            joe.runFile(path);
-        } catch (IOException ex) {
-            System.err.println("Could not read script: " + path +
-                "\n*** " + ex.getMessage());
-            System.exit(1);
-        } catch (SyntaxError ex) {
-            System.err.println(ex.getErrorReport());
-            System.err.println(ex.getMessage());
-            System.exit(65);
-        } catch (JoeError ex) {
-            System.err.print("*** Error in script: ");
-            System.err.println(ex.getJoeStackTrace());
-            System.exit(70);
-        }
-
-        // NEXT, pop up the window
-        stage.show();
+        var runner = JoeWinRunner.define()
+            .appName("joe win " + App.getVersion())
+            .engineType(engineType)
+            .debug(debug)
+            .scriptPath(argq.poll())
+            .scriptArgs(argq)
+            .libPath(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH))
+            .build();
+        runner.execute();
     }
 
     //------------------------------------------------------------------------

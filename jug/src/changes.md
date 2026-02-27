@@ -39,6 +39,8 @@ scripts.
       - JoeDoc link mnemonics are now more readable.
   - Added `JoeRunner` to make it easier to write domain-specific `joe run`
     applications.
+  - Added `JoeWinRunner` to make it easier to write domain-specific `joe win`
+    applications.
 
 ## Changes in 0.8.0 (30 August 2025)
 
