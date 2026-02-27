@@ -78,7 +78,7 @@ public class ToolLauncher {
             println("Usage: " + appName + " <tool> [<arguments...>]");
             println("");
             println("Run '" + appName + " help' for a list of tools.");
-            System.exit(1);
+            System.exit(0);
         }
 
         var subcommand = argq.poll();
