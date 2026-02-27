@@ -2,7 +2,6 @@ package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.tools.doc.DocTool;
 import com.wjduquette.joe.tools.test.TestWinTool;
-import com.wjduquette.joe.tools.win.WinTool;
 import com.wjduquette.joe.tools.test.TestTool;
 import com.wjduquette.joe.tools.ToolLauncher;
 
