@@ -36,7 +36,9 @@ scripts.
 - Tools
   - Extended `joe doc` to process standalone Markdown files, translating
     JoeDoc links and inserting content from the scanned JoeDoc comments.
-  - JoeDoc link mnemonics are now more readable.
+      - JoeDoc link mnemonics are now more readable.
+  - Added `JoeRunner` to make it easier to write domain-specific `joe run`
+    applications.
 
 ## Changes in 0.8.0 (30 August 2025)
 

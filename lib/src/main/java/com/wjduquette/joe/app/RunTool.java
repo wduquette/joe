@@ -1,17 +1,10 @@
 package com.wjduquette.joe.app;
 
-import com.wjduquette.joe.PackageFinder;
-import com.wjduquette.joe.SyntaxError;
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.JoeError;
-import com.wjduquette.joe.pkg.text.JoeTextPackage;
-import com.wjduquette.joe.console.ConsolePackage;
+import com.wjduquette.joe.runner.JoeRunner;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.List;
 
@@ -97,45 +90,19 @@ public class RunTool implements Tool {
             }
         }
 
-        var joe = new Joe(engineType);
-        joe.setDebug(debug);
-        var path = argq.poll();
+        var runner = JoeRunner.define()
+            .appName("Joe " + App.getVersion())
+            .engineType(engineType)
+            .debug(debug)
+            .scriptPath(argq.poll())
+            .scriptArgs(argq)
+            .libPath(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH))
+            .build();
+        runner.execute();
 
-        var consolePackage = new ConsolePackage();
-        consolePackage.setScript(path);
-        consolePackage.getArgs().addAll(argq);
-        joe.installPackage(consolePackage);
-        joe.registerPackage(JoeTextPackage.PACKAGE);
-        var found = PackageFinder.find(libPath != null
-            ? libPath
-            : System.getenv(Joe.JOE_LIB_PATH));
-        joe.registerPackages(found);
-
-        try {
-            if (debug) {
-                System.out.println("Joe " + App.getVersion() + " (" +
-                    joe.engineName() + " engine)");
-            }
-            var startTime = Instant.now();
-            joe.runFile(path);
-            var endTime = Instant.now();
-
-            if (measureRuntime) {
-                var duration = Duration.between(startTime, endTime).toMillis() / 1000.0;
-                System.out.printf("Run-time: %.3f seconds\n", duration);
-            }
-        } catch (IOException ex) {
-            System.err.println("Could not read script: " + path +
-                "\n*** " + ex.getMessage());
-            System.exit(1);
-        } catch (SyntaxError ex) {
-            System.err.println(ex.getErrorReport());
-            System.err.println("*** " + ex.getMessage());
-            System.exit(65);
-        } catch (JoeError ex) {
-            System.err.print("*** Error in script: ");
-            System.err.println(ex.getJoeStackTrace());
-            System.exit(70);
+        if (measureRuntime) {
+            var runTime = runner.getRunTime().toMillis() / 1000.0;
+            System.out.printf("Run-time: %.3f seconds\n", runTime);
         }
     }
 
