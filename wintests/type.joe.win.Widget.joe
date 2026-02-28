@@ -19,7 +19,7 @@ function testSetGet() {
 // Verify that we can retrieve a widget's set of properties.
 function testGetProperties() {
     var widget = Pane();
-    var list = widget.getProperties()
+    var list = widget.getProperties().keySet()
         .sorted(\a,b-> Joe.compare(a.toString(), b.toString()));
     assertEQ(list, [
         #disable,

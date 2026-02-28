@@ -1,16 +1,13 @@
 package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.runner.TestPackage;
+import com.wjduquette.joe.runner.TestRunner;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 import com.wjduquette.joe.win.WinPackage;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,14 +68,8 @@ public class TestWinTool implements Tool {
     private String engineType = Joe.CLARK;
     private String testName = null;
     private String libPath = null;
-    private PackageFinder finder = null;
     private boolean verbose = false;
     private final List<String> testScripts = new ArrayList<>();
-    private int loadErrorCount = 0;
-    private int successCount = 0;
-    private int skipCount = 0;
-    private int failureCount = 0;
-    private int errorCount = 0;
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -119,174 +110,20 @@ public class TestWinTool implements Tool {
             }
         }
 
-        // FIRST, find any local packages
-        if (libPath != null) {
-            finder = PackageFinder.find(libPath);
-        }
+        // NEXT, run the tests.  Note: we are already on the JavaFX thread.
+        var runner = TestRunner.define()
+            .appName("joe test " + App.getVersion())
+            .engineType(engineType)
+            .install(new WinPackage(new Stage(), new VBox()))
+            .libPath(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH))
+            .testScripts(testScripts)
+            .verbose(verbose)
+            .testName(testName)
+            .build();
+        runner.run();
 
-        // NEXT, run the tests.
-        var startTime = Instant.now();
-        System.out.println("Joe " + App.getVersion() + " (" +
-            engineType + " engine)");
-        for (var path : testScripts) {
-            runTest(path);
-        }
-        var endTime = Instant.now();
-        var duration = Duration.between(startTime, endTime).toMillis() / 1000.0;
-
-        System.out.printf("Run-time: %.3f seconds\n", duration);
-
-        // NEXT, print the final results
-        var total = successCount + skipCount + failureCount + errorCount;
-        println();
-        System.out.printf("Successes  %5d\n", successCount);
-        System.out.printf("Skipped    %5d\n", skipCount);
-        System.out.printf("Failures   %5d\n", failureCount);
-        System.out.printf("Errors     %5d\n", errorCount);
-        System.out.println("---------- -----");
-        System.out.printf("Total      %5d\n", total);
-
-        if (loadErrorCount != 0) {
-            println("\n*** " + loadErrorCount + " test file(s) failed to load.");
-        }
-
-        if (successCount == total && loadErrorCount == 0) {
-            println("\nALL TESTS PASS");
-        }
+        // NEXT, be sure we exit, even if there's a window hanging around.
         System.exit(0);
-    }
-
-    private void runTest(String scriptPath) {
-        if (verbose) {
-            println("\nRunning: " + scriptPath);
-        }
-
-        // NEXT, configure the engine.
-        var joe = new Joe(engineType);
-        joe.installPackage(new TestPackage(engineType));
-        joe.installPackage(new WinPackage(new Stage(), new VBox()));
-        if (finder != null) {
-            joe.registerPackages(finder);
-        }
-
-        // Only print script output if the verbose flag is set.
-        joe.setOutputHandler(this::testPrinter);
-
-        // FIRST, load the script.
-        try {
-            joe.runFile(scriptPath);
-        } catch (IOException ex) {
-            println("Could not read script: " + scriptPath +
-                "\n*** " + ex.getMessage());
-            ++loadErrorCount;
-        } catch (SyntaxError ex) {
-            System.out.println(ex.getErrorReport());
-            System.out.println(ex.getMessage());
-            ++loadErrorCount;
-        } catch (JoeError ex) {
-            System.out.print("*** Error in script: ");
-            println(ex.getJoeStackTrace());
-            ++loadErrorCount;
-        }
-
-        // NEXT, execute its tests.
-        var tests = joe.getVariableNames().stream()
-            .filter(name -> name.startsWith("test"))
-            .filter(name -> testName == null || name.contains(testName))
-            .toList();
-
-        if (tests.isEmpty()) {
-            println("***  No tests in: " + scriptPath);
-            return;
-        }
-
-        if (verbose) {
-            println();
-            runVerbosely(joe, tests);
-        } else {
-            runQuietly(joe, scriptPath, tests);
-        }
-    }
-
-    private void testPrinter(String message) {
-        if (verbose) {
-            System.out.print(message);
-        }
-    }
-
-    private void runVerbosely(Joe joe, List<String> tests) {
-        for (var test : tests) {
-            var callable = joe.getVariable(test);
-            if (!joe.isCallable(callable)) {
-                continue;
-            }
-
-            println("+++ " + test);
-
-            try {
-                joe.call(callable);
-                ++successCount;
-            } catch (SkipError ex) {
-                println("  SKIPPED: " + ex.getMessage());
-                ++skipCount;
-            } catch (AssertError ex) {
-                println("  FAILED:\n" + ex.getJoeStackTrace().indent(4));
-                ++failureCount;
-            } catch (JoeError ex) {
-                println("  ERROR:\n" + ex.getJoeStackTrace().indent(4));
-                ++errorCount;
-            }
-        }
-    }
-
-    private void runQuietly(Joe joe, String scriptPath, List<String> tests) {
-        for (var test : tests) {
-            var callable = joe.getVariable(test);
-            if (!joe.isCallable(callable)) {
-                continue;
-            }
-
-            String result;
-            Exception error;
-
-            try {
-                joe.call(callable);
-                ++successCount;
-                result = null;
-                error = null;
-            } catch (SkipError ex) {
-                ++skipCount;
-                result = "SKIPPED";
-                error = ex;
-            } catch (AssertError ex) {
-                ++failureCount;
-                result = "FAILED";
-                error = ex;
-            } catch (JoeError ex) {
-                ++errorCount;
-                result = "ERROR";
-                error = ex;
-            }
-
-            if (error != null) {
-                System.out.printf("%-8s %s %s\n%s\n", result + ":", scriptPath,
-                    test, error.getMessage().indent(4));
-            }
-        }
-    }
-
-    //-------------------------------------------------------------------------
-    // SkipException
-
-    /**
-     * An exception used by the test API's "skip()" function.
-     */
-    public static class SkipError extends JoeError {
-        /**
-         * Creates the exception.
-         * @param message The skip message.
-         */
-        public SkipError(String message) { super(message); }
     }
 
     //-------------------------------------------------------------------------
