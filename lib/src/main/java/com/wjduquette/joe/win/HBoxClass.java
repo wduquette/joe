@@ -71,7 +71,7 @@ class HBoxClass extends WidgetType<HBox> {
     // its parent `HBox`.
     private Object _getHgrow(Joe joe, Args args) {
         args.exactArity(1, "HBox.getHgrow(node)");
-        return HBox.getHgrow(joe.toClass(args.next(), Node.class));
+        return HBox.getHgrow(joe.toClass(Node.class, args.next()));
     }
 
     //**
@@ -81,7 +81,7 @@ class HBoxClass extends WidgetType<HBox> {
     // Gets the [[Node]]'s margin in its parent `HBox`.
     private Object _getMargin(Joe joe, Args args) {
         args.exactArity(1, "HBox.getMargin(node)");
-        return HBox.getMargin(joe.toClass(args.next(), Node.class));
+        return HBox.getMargin(joe.toClass(Node.class, args.next()));
     }
 
     //**
@@ -92,8 +92,8 @@ class HBoxClass extends WidgetType<HBox> {
     private Object _setHgrow(Joe joe, Args args) {
         args.exactArity(2, "HBox.setHgrow(node, priority)");
         HBox.setHgrow(
-            joe.toClass(args.next(), Node.class),
-            joe.toClass(args.next(), Priority.class)
+            joe.toClass(Node.class, args.next()),
+            joe.toClass(Priority.class, args.next())
         );
         return null;
     }
@@ -106,8 +106,8 @@ class HBoxClass extends WidgetType<HBox> {
     private Object _setMargin(Joe joe, Args args) {
         args.exactArity(2, "HBox.setMargin(node, insets)");
         HBox.setMargin(
-            joe.toClass(args.next(), Node.class),
-            joe.toClass(args.next(), Insets.class)
+            joe.toClass(Node.class, args.next()),
+            joe.toClass(Insets.class, args.next())
         );
         return null;
     }

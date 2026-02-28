@@ -94,7 +94,7 @@ class TabClass extends WidgetType<Tab> {
     // Sets the tab's `#content` property to *node*.
     private Object _content(Tab tab, Joe joe, Args args) {
         args.exactArity(1, "content(node)");
-        var node = joe.toClass(args.next(), Node.class);
+        var node = joe.toClass(Node.class, args.next());
         tab.setContent(node);
         return tab;
     }

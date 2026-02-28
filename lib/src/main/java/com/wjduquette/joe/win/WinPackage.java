@@ -5,22 +5,16 @@ import com.wjduquette.joe.types.EnumType;
 import javafx.geometry.*;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Stage;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 
 /**
  * An experimental Joe package for building JavaFX GUIs
  */
 public class WinPackage extends NativePackage {
-    //-------------------------------------------------------------------------
-    // Instance Variables
-
-    private final Stage stage;
-    private final VBox root;
+    /** The package, for registration and installation. */
+    public static final WinPackage PACKAGE = new WinPackage();
 
     //-------------------------------------------------------------------------
     // Constructor
@@ -41,22 +35,26 @@ public class WinPackage extends NativePackage {
     //   - [[MenuItem]]
     //     - [[Menu]]
     //   - [[Node]]: (base type)
-    //     - [[Region]]: (base type)
-    //       - [[Control]]: (base type)
-    //         - [[Labeled]]: (base type)
-    //           - [[Button]]
-    //           - [[Label]]
-    //         - [[ListView]]
-    //         - [[MenuBar]]
-    //         - [[Separator]]
-    //         - [[SplitPane]]
-    //         - [[TabPane]]
-    //       - [[Pane]]
-    //         - [[GridPane]]
-    //         - [[HBox]]
-    //         - [[StackPane]]
-    //         - [[VBox]]
+    //     - [[Parent]]: (base type)
+    //         - [[Region]]: (base type)
+    //           - [[Control]]: (base type)
+    //             - [[Labeled]]: (base type)
+    //               - [[Button]]
+    //               - [[Label]]
+    //             - [[ListView]]
+    //             - [[MenuBar]]
+    //             - [[Separator]]
+    //             - [[SplitPane]]
+    //             - [[TabPane]]
+    //           - [[Pane]]
+    //             - [[GridPane]]
+    //             - [[HBox]]
+    //             - [[StackPane]]
+    //             - [[VBox]]
+    //   - [[Scene]]: A JavaFX scene graph
     //   - [[Tab]]: A tab in a [[TabPane]]
+    //   - [[Window]]: (base type)
+    //     - [[Stage]]: Application window type
     //
     // @packageTopic css
     // %title Styling with CSS
@@ -79,16 +77,9 @@ public class WinPackage extends NativePackage {
 
     /**
      * Creates an instance of the package.
-     * @param stage The root stage window
-     * @param root The root widget in the scene graph
      */
-    public WinPackage(Stage stage, VBox root) {
+    public WinPackage() {
         super("joe.win");
-        this.stage = stage;
-        this.root = root;
-
-        // Main Singleton
-        type(new WinProxy());
 
         // Widget classes, indented according to hierarchy
         type(MenuItemType.TYPE);
@@ -109,11 +100,15 @@ public class WinPackage extends NativePackage {
                     type(StackPaneClass.TYPE);
                     type(VBoxClass.TYPE);
                     type(HBoxClass.TYPE);
+        type(SceneType.TYPE);
         type(TabClass.TYPE);
+        type(WindowType.TYPE);
+           type(StageType.TYPE);
 
         // Miscellaneous Types
         type(InsetsType.TYPE);
         type(ListenerType.TYPE);
+        type(WinSingleton.TYPE);
 
         // Enums
 
@@ -128,6 +123,12 @@ public class WinPackage extends NativePackage {
         // %javaType javafx.scene.control.ContentDisplay
         // %enumConstants
         type(new EnumType<>("ContentDisplay", ContentDisplay.class));
+
+        //**
+        // @enum Modality
+        // %javaType javafx.stage.Modality
+        // %enumConstants
+        type(new EnumType<>("Modality", Modality.class));
 
         //**
         // @enum Orientation
@@ -160,6 +161,12 @@ public class WinPackage extends NativePackage {
         type(new EnumType<>("Side", Side.class));
 
         //**
+        // @enum StageStyle
+        // %javaType javafx.stage.StageStyle
+        // %enumConstants
+        type(new EnumType<>("StageStyle", StageStyle.class));
+
+        //**
         // @enum TextAlignment
         // %javaType javafx.scene.text.TextAlignment
         // %enumConstants
@@ -170,131 +177,5 @@ public class WinPackage extends NativePackage {
         // %javaType javafx.geometry.VPos
         // %enumConstants
         type(new EnumType<>("VPos", VPos.class));
-    }
-
-
-    //-------------------------------------------------------------------------
-    // Configuration
-
-    // None Yet
-
-
-    //-------------------------------------------------------------------------
-    // The Gui Type
-
-    private class WinProxy extends ProxyType<Void> {
-        //---------------------------------------------------------------------
-        // Constructor
-
-        //**
-        // @singleton Win
-        // This static type provides access to the application window.
-        WinProxy() {
-            super("Win");
-            staticType();
-            staticMethod("css",      this::_css);
-            staticMethod("cssFile",  this::_cssFile);
-            staticMethod("root",     this::_root);
-            staticMethod("setSize",  this::_setSize);
-            staticMethod("setTitle", this::_setTitle);
-        }
-
-        //---------------------------------------------------------------------
-        // Static Methods
-
-        //**
-        // @static css
-        // %args css
-        // %result this
-        // Sets the text of the CSS style sheet for the application as a
-        // whole to *css*.  For example,
-        //
-        // ```joe
-        // Win.css("""
-        //     .label { -fx-text-fill: pink; }
-        //     """);
-        // ```
-        //
-        // See [[topic:joe.win.css]] for more on using CSS in `joe win` scripts.
-        //
-        // **JavaFX:** In particular, this adds the given CSS to the
-        // `Scene`'s `stylesheets` property as a `data:` URL containing
-        // the given *css* text. The styles are therefore accessible to
-        // the entire scene.
-        private Object _css(Joe joe, Args args) {
-            args.exactArity(1, "css(css)");
-            var css = joe.toString(args.next());
-
-            // %-encode for inclusion in a URL
-            var encoded = Base64.getEncoder()
-                .encodeToString(css.getBytes(StandardCharsets.UTF_8));
-            stage.getScene().getStylesheets()
-                .add("data:text/css;base64," + encoded);
-            return this;
-        }
-
-        //**
-        // @static cssFile
-        // %args filename
-        // %result this
-        // Sets the CSS style sheet for the application as a whole given
-        // a path to a `.css` file.
-        //
-        // ```joe
-        // Win.cssFill("my.css");
-        // ```
-        //
-        // See [[topic:joe.win.css]] for more on using CSS in `joe win` scripts.
-        //
-        // **JavaFX:** In particular, this adds the given CSS file to the
-        // `Scene`'s `stylesheets` property as a `file:` URL. The styles are
-        // therefore accessible to // the entire scene.
-        private Object _cssFile(Joe joe, Args args) {
-            args.exactArity(1, "cssFile(filename)");
-            var filename = joe.toString(args.next());
-
-            stage.getScene().getStylesheets()
-                .add("file:" + filename);
-            return this;
-        }
-
-        //**
-        // @static root
-        // %result VBox
-        // Returns the root window, a [[VBox]].
-        private Object _root(Joe joe, Args args) {
-            args.exactArity(0, "Win.root()");
-            return root;
-        }
-
-        //**
-        // @static setSize
-        // %args width, height
-        // %result this
-        // Sets the preferred size of the root window.  The width and height
-        // must be positive.
-        private Object _setSize(Joe joe, Args args) {
-            args.exactArity(2, "Win.setSize(width, title)");
-            var width = joe.toDouble(args.next());
-            var height = joe.toDouble(args.next());
-            if (width <= 0 || height <= 0) {
-                throw new JoeError("Expected positive width and height.");
-            }
-            stage.setWidth(width);
-            stage.setHeight(height);
-            return this;
-        }
-
-        //**
-        // @static setTitle
-        // %args title
-        // %result this
-        // Sets the title of the root window.
-        private Object _setTitle(Joe joe, Args args) {
-            args.exactArity(1, "Win.setTitle(title)");
-            var title = joe.toString(args.next());
-            stage.setTitle(title);
-            return this;
-        }
     }
 }

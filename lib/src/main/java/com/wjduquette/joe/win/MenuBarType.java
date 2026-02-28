@@ -56,7 +56,7 @@ class MenuBarType extends WidgetType<MenuBar> {
     // Adds a [[Menu]] to the menu bar.
     private Object _menu(MenuBar bar, Joe joe, Args args) {
         args.exactArity(1, "menu(menu)");
-        var menu = joe.toClass(args.next(), Menu.class);
+        var menu = joe.toClass(Menu.class, args.next());
         bar.getMenus().add(menu);
         return bar;
     }

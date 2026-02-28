@@ -26,9 +26,8 @@ public class RegionType extends WidgetType<Region> {
     /** Constructor. */
     public RegionType() {
         super("Region");
-        extendsProxy(NodeType.TYPE);
+        extendsProxy(ParentType.TYPE);
         proxies(Region.class);
-
 
         // Constants
 

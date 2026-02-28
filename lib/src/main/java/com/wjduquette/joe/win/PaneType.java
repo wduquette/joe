@@ -60,7 +60,7 @@ public class PaneType extends WidgetType<Pane> {
     // Adds a [[Node]] to the end of the pane's *children* list.
     private Object _child(Pane pane, Joe joe, Args args) {
         args.exactArity(1, "child(node)");
-        pane.getChildren().add(joe.toClass(args.next(), Node.class));
+        pane.getChildren().add(joe.toClass(Node.class, args.next()));
         return pane;
     }
 
@@ -84,7 +84,7 @@ public class PaneType extends WidgetType<Pane> {
         args.exactArity(1, "setChildren(list)");
         pane.getChildren().clear();
         for (var child : joe.toList(args.next())) {
-            pane.getChildren().add(joe.toClass(child, Node.class));
+            pane.getChildren().add(joe.toClass(Node.class, child));
         }
         return pane;
     }

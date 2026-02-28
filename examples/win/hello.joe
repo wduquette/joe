@@ -1,11 +1,8 @@
 // hello.joe: GUI hello world
-Win.setTitle("joe win: Hello")
-   .setSize(300, 150);
-
 var name = Console.args().isEmpty()
     ? "world" : Console.args().get(0);
 
-Win.root()
+var root = VBox()
     .set(#alignment, #center)
     .spacing(10)
     .child(Label("Hello, " + name + "!"))
@@ -13,4 +10,10 @@ Win.root()
         .action(\-> Console.exit(0))
     )
     ;
+
+var scene = Scene(root, 300, 150);
+var stage = Stage()
+    .scene(scene)
+    .title("joe win: Hello")
+    .show();
 

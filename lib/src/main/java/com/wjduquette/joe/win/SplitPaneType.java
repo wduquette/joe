@@ -65,7 +65,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     // its parent `SplitPane`.
     private Object _isResizableWithParent(Joe joe, Args args) {
         args.exactArity(1, "SplitPane.isResizableWithParent(node)");
-        return SplitPane.isResizableWithParent(joe.toClass(args.next(), Node.class));
+        return SplitPane.isResizableWithParent(joe.toClass(Node.class, args.next()));
     }
 
     //**
@@ -76,7 +76,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     private Object _setResizableWithParent(Joe joe, Args args) {
         args.exactArity(2, "SplitPane.setResizableWithParent(node, flag)");
         SplitPane.setResizableWithParent(
-            joe.toClass(args.next(), Node.class),
+            joe.toClass(Node.class, args.next()),
             joe.toBoolean(args.next()));
         return null;
     }

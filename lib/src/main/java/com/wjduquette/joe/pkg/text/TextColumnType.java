@@ -65,7 +65,7 @@ public class TextColumnType extends ProxyType<TextColumnValue> {
     // Sets the column's alignment.
     private Object _alignment(TextColumnValue tc, Joe joe, Args args) {
         args.exactArity(1, "alignment(alignment)");
-        tc.setAlignment(joe.toEnum(args.next(), TextAlign.class));
+        tc.setAlignment(joe.toEnum(TextAlign.class, args.next()));
         return tc;
     }
 

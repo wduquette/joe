@@ -67,7 +67,7 @@ class StackPaneClass extends WidgetType<StackPane> {
     // Gets the [[Node]]'s alignment in its parent [[StackPane]].
     private Object _getAlignment(Joe joe, Args args) {
         args.exactArity(1, "StackPane.getAlignment(node)");
-        return StackPane.getAlignment(joe.toClass(args.next(), Node.class));
+        return StackPane.getAlignment(joe.toClass(Node.class, args.next()));
     }
 
     //**
@@ -77,7 +77,7 @@ class StackPaneClass extends WidgetType<StackPane> {
     // Gets the [[Node]]'s margin in its parent [[StackPane]].
     private Object _getMargin(Joe joe, Args args) {
         args.exactArity(1, "StackPane.getMargin(node)");
-        return StackPane.getMargin(joe.toClass(args.next(), Node.class));
+        return StackPane.getMargin(joe.toClass(Node.class, args.next()));
     }
 
     //**
@@ -88,8 +88,8 @@ class StackPaneClass extends WidgetType<StackPane> {
     private Object _setAlignment(Joe joe, Args args) {
         args.exactArity(2, "StackPane.setAlignment(node, pos)");
         StackPane.setAlignment(
-            joe.toClass(args.next(), Node.class),
-            joe.toClass(args.next(), Pos.class)
+            joe.toClass(Node.class, args.next()),
+            joe.toClass(Pos.class, args.next())
         );
         return null;
     }
@@ -102,8 +102,8 @@ class StackPaneClass extends WidgetType<StackPane> {
     private Object _setMargin(Joe joe, Args args) {
         args.exactArity(2, "StackPane.setMargin(node, insets)");
         StackPane.setMargin(
-            joe.toClass(args.next(), Node.class),
-            joe.toClass(args.next(), Insets.class)
+            joe.toClass(Node.class, args.next()),
+            joe.toClass(Insets.class, args.next())
         );
         return null;
     }

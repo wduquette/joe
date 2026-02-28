@@ -74,7 +74,7 @@ public class EnumType<E extends Enum<E>> extends ProxyType<E> {
 
     private Object _initializer(Joe joe, Args args) {
         args.exactArity(1, name() + "(value)");
-        return joe.toEnum(args.next(), cls);
+        return joe.toEnum(cls, args.next());
     }
 
     //-------------------------------------------------------------------------

@@ -3,10 +3,6 @@ package com.wjduquette.joe.runner;
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.console.ConsolePackage;
 import com.wjduquette.joe.win.WinPackage;
-import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,10 +41,6 @@ public class JoeWinRunner {
     private final List<JoePackage> registered;
     private final Consumer<Joe> onConfigure;
 
-    // TODO: This is a bad design: `joe.win` should let you manage this.
-    private final VBox root = new VBox();
-    private final Stage stage = new Stage();
-
     //------------------------------------------------------------------------
     // Constructor
 
@@ -79,18 +71,12 @@ public class JoeWinRunner {
         var joe = new Joe(engineType);
         joe.setDebug(debug);
 
-        // NEXT, create the stage and scene
-        stage.setTitle(appName);
-        var scene = new Scene(root, 400, 300);
-        stage.setScene(scene);
-        Platform.setImplicitExit(true);
-
         // NEXT, install and register the default packages.
         var consolePackage = new ConsolePackage();
         consolePackage.setScript(scriptPath);
         consolePackage.getArgs().addAll(scriptArgs);
         joe.installPackage(consolePackage);
-        joe.installPackage(new WinPackage(stage, root));
+        joe.installPackage(WinPackage.PACKAGE);
 
         // NEXT, install and register packages requested by the client.
         installed.forEach(joe::installPackage);
@@ -125,9 +111,6 @@ public class JoeWinRunner {
             System.err.println(ex.getJoeStackTrace());
             System.exit(70);
         }
-
-        // NEXT, pop up the window
-        stage.show();
     }
 
     //------------------------------------------------------------------------

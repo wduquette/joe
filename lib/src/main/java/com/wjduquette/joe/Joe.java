@@ -825,14 +825,15 @@ public class Joe {
 
     /**
      * Requires that the argument is a value of type T.
-     * @param arg The argument
-     * @param cls The desired class T
-     * @return The value, cast to class T
+     *
      * @param <T> The desired value type
+     * @param cls The desired class T
+     * @param arg The argument
+     * @return The value, cast to class T
      * @throws JoeError if the argument is incompatible with the desired class.
      */
     @SuppressWarnings({"unused", "unchecked"})
-    public <T> T toClass(Object arg, Class<T> cls) {
+    public <T> T toClass(Class<T> cls, Object arg) {
         if (cls.isAssignableFrom(arg.getClass())) {
             return (T)arg;
         } else {
@@ -903,14 +904,15 @@ public class Joe {
      * desired type, a keyword whose name matches an enum
      * constant of the desired type, or a string ditto, and returns the
      * enum constant.
-     * @param arg The argument
-     * @param cls The enum class
-     * @return The constant
+     *
      * @param <E> The enum type
+     * @param cls The enum class
+     * @param arg The argument
+     * @return The constant
      * @throws JoeError if the no enum constant is found.
      */
     @SuppressWarnings({"unused", "unchecked"})
-    public <E extends Enum<E>> E toEnum(Object arg, Class<E> cls) {
+    public <E extends Enum<E>> E toEnum(Class<E> cls, Object arg) {
         if (cls.isAssignableFrom(arg.getClass())) {
             return (E)arg;
         }

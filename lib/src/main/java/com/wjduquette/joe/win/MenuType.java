@@ -58,7 +58,7 @@ public class MenuType extends WidgetType<Menu> {
     private Object _item(Menu bar, Joe joe, Args args) {
         args.exactArity(1, "item(item)");
         // Note: All Menus are also MenuItems.
-        var item = joe.toClass(args.next(), MenuItem.class);
+        var item = joe.toClass(MenuItem.class, args.next());
         bar.getItems().add(item);
         return bar;
     }
