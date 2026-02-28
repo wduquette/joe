@@ -67,7 +67,7 @@ public class NeroType extends ProxyType<Nero> {
     // @init
     // Creates a new instance of `Nero`.
     private Object _init(Joe joe, Args args) {
-        args.exactArity(0, "Nero()");
+        args.arity(0, "Nero()");
         return new Nero(joe);
     }
 
@@ -83,7 +83,7 @@ public class NeroType extends ProxyType<Nero> {
     // returning a value of some type B.  If the conversion fails, the
     // *mapper* should return null or throw an error.
     private Object _addMapper(Nero nero, Joe joe, Args args) {
-        args.exactArity(2, "addMapper(keyword, mapper)");
+        args.arity(2, "addMapper(keyword, mapper)");
         var k = joe.toKeyword(args.next());
         var f = joe.toCallable(args.next());
         nero.addMapper(k.name(), a -> joe.call(f, a));
@@ -97,7 +97,7 @@ public class NeroType extends ProxyType<Nero> {
     // Adds a collection of `mapsTo/f,a,b` functions, where *map* is a map from
     // keyword to `callable/1`.  See [[method:Nero.addMapper]].
     private Object _addMappers(Nero nero, Joe joe, Args args) {
-        args.exactArity(1, "addMappers(map)");
+        args.arity(1, "addMappers(map)");
         var input = joe.toMap(args.next());
         var map = new HashMap<Keyword, Mapper>();
         for (var e : input.entrySet()) {
@@ -117,7 +117,7 @@ public class NeroType extends ProxyType<Nero> {
     // Nero axioms.  Every value in the collection must either be a
     // [[Fact]] or a value that can be converted into a [[Fact]].
     private Object _toNeroScript(Nero nero, Joe joe, Args args) {
-        args.exactArity(1, "toNeroScript(facts)");
+        args.arity(1, "toNeroScript(facts)");
         return nero.toNeroScript(joe.toFacts(args.next()));
     }
 
@@ -128,7 +128,7 @@ public class NeroType extends ProxyType<Nero> {
     // Returns the *fact* as a Nero axiom string.  The *fact* must either
     // be a [[Fact]] or an object that can be converted into a [[Fact]].
     private Object _toNeroAxiom(Nero nero, Joe joe, Args args) {
-        args.exactArity(1, "toNeroAxiom(fact)");
+        args.arity(1, "toNeroAxiom(fact)");
         return nero.toNeroAxiom(joe.toFact(args.next()));
     }
 
@@ -137,7 +137,7 @@ public class NeroType extends ProxyType<Nero> {
     // %result String
     // Returns the value's string representation.
     private Object _toString(Nero nero, Joe joe, Args args) {
-        args.exactArity(0, "toString()");
+        args.arity(0, "toString()");
         return stringify(joe, nero);
     }
 
@@ -148,7 +148,7 @@ public class NeroType extends ProxyType<Nero> {
     // Returns an object allowing the Nero *scriptFile* to be executed in a
     // variety of ways. The *scriptFile* must be the file's [[Path]].
     private Object _withFile(Nero nero, Joe joe, Args args) {
-        args.exactArity(1, "withFile(scriptFile)");
+        args.arity(1, "withFile(scriptFile)");
         var path = joe.toPath(args.next());
         return nero.withFile(path);
     }
@@ -161,7 +161,7 @@ public class NeroType extends ProxyType<Nero> {
     // of ways.  The *rules* can be passed as a [[RuleSet]] or as a
     // string for compilation.
     private Object _withRules(Nero nero, Joe joe, Args args) {
-        args.exactArity(1, "withRules(rules)");
+        args.arity(1, "withRules(rules)");
         var rules = joe.toRules(args.next());
         return nero.withRules(rules);
     }

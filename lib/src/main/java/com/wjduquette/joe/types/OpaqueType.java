@@ -73,12 +73,12 @@ public class OpaqueType extends ProxyType<Object> {
     // Static Methods
 
     private Object _name(Joe joe, Args args) {
-        args.exactArity(0, "name()");
+        args.arity(0, "name()");
         return name();
     }
 
     private Object _javaName(Joe joe, Args args) {
-        args.exactArity(0, "javaName()");
+        args.arity(0, "javaName()");
         return javaClass.getName();
     }
 
@@ -86,7 +86,7 @@ public class OpaqueType extends ProxyType<Object> {
     // Instance Methods
 
     private Object _toString(Object value, Joe joe, Args args) {
-        args.exactArity(0, "toString()");
+        args.arity(0, "toString()");
         return javaClass.getName();
     }
 }

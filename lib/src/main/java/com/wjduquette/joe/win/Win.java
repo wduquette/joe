@@ -6,10 +6,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.*;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.WindowEvent;
 
 /**
  * This static class defines a variety of services for widget types.
@@ -46,7 +48,7 @@ public class Win {
      */
     @SuppressWarnings("unused")
     public static ContentDisplay toContentDisplay(Joe joe, Object arg) {
-        return joe.toEnum(arg, ContentDisplay.class);
+        return joe.toEnum(ContentDisplay.class, arg);
     }
 
     /**
@@ -58,7 +60,7 @@ public class Win {
      */
     @SuppressWarnings("unused")
     public static HPos toHPos(Joe joe, Object arg) {
-        return joe.toEnum(arg, HPos.class);
+        return joe.toEnum(HPos.class, arg);
     }
 
     /**
@@ -70,7 +72,7 @@ public class Win {
      */
     @SuppressWarnings("unused")
     public static Insets toInsets(Joe joe, Object arg) {
-        return joe.toClass(arg, Insets.class);
+        return joe.toClass(Insets.class, arg);
     }
 
     /**
@@ -81,7 +83,7 @@ public class Win {
      * @throws JoeError on conversion failure.
      */
     public static Node toNode(Joe joe, Object arg) {
-        return joe.toClass(arg, Node.class);
+        return joe.toClass(Node.class, arg);
     }
 
     /**
@@ -93,7 +95,18 @@ public class Win {
      */
     @SuppressWarnings("unused")
     public static Orientation toOrientation(Joe joe, Object arg) {
-        return joe.toEnum(arg, Orientation.class);
+        return joe.toEnum(Orientation.class, arg);
+    }
+
+    /**
+     * Converts an argument to a Parent value.
+     * @param joe The interpreter
+     * @param arg the argument
+     * @return The node
+     * @throws JoeError on conversion failure.
+     */
+    public static Parent toParent(Joe joe, Object arg) {
+        return joe.toClass(Parent.class, arg);
     }
 
 
@@ -105,7 +118,7 @@ public class Win {
      * @throws JoeError on conversion failure.
      */
     public static Pos toPos(Joe joe, Object arg) {
-        return joe.toEnum(arg, Pos.class);
+        return joe.toEnum(Pos.class, arg);
     }
 
     /**
@@ -116,7 +129,7 @@ public class Win {
      * @throws JoeError on conversion failure.
      */
     public static Priority toPriority(Joe joe, Object arg) {
-        return joe.toEnum(arg, Priority.class);
+        return joe.toEnum(Priority.class, arg);
     }
 
     /**
@@ -145,7 +158,7 @@ public class Win {
      */
     @SuppressWarnings("unused")
     public static TextAlignment toTextAlignment(Joe joe, Object arg) {
-        return joe.toEnum(arg, TextAlignment.class);
+        return joe.toEnum(TextAlignment.class, arg);
     }
 
     /**
@@ -171,6 +184,16 @@ public class Win {
      */
     @SuppressWarnings("unused")
     public static VPos toVPos(Joe joe, Object arg) {
-        return joe.toEnum(arg, VPos.class);
+        return joe.toEnum(VPos.class, arg);
+    }
+
+    /**
+     * Converts a callable/1 argument to a wrapped WindowEvent handler.
+     * @param joe The interpreter
+     * @param arg The callable
+     * @return the wrapped handler
+     */
+    public static EventHandler<WindowEvent> toWindowEvent(Joe joe, Object arg) {
+        return new JoeEventHandler<>(joe, arg);
     }
 }

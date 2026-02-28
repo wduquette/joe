@@ -41,7 +41,7 @@ class SeparatorType extends WidgetType<Separator> {
     // @init
     // Returns a `Separator`, which is horizontal by default.
     private Object _initializer(Joe joe, Args args) {
-        args.exactArity(0, "Separator()");
+        args.arity(0, "Separator()");
         return new Separator();
     }
 
@@ -53,7 +53,7 @@ class SeparatorType extends WidgetType<Separator> {
     // %result this
     // Sets the orientation to horizontal
     private Object _horizontal(Separator node, Joe joe, Args args) {
-        args.exactArity(0, "horizontal()");
+        args.arity(0, "horizontal()");
         node.setOrientation(Orientation.HORIZONTAL);
         return node;
     }
@@ -63,7 +63,7 @@ class SeparatorType extends WidgetType<Separator> {
     // %result this
     // Sets the orientation to vertical
     private Object _vertical(Separator node, Joe joe, Args args) {
-        args.exactArity(0, "vertical()");
+        args.arity(0, "vertical()");
         node.setOrientation(Orientation.VERTICAL);
         return node;
     }

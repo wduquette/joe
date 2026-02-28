@@ -56,7 +56,7 @@ public class TestPackage extends NativePackage {
     // Verifies that *got* equals the *expected* value, producing an
     // informative assertion error if not.
     private Object _assertEQ(Joe joe, Args args) {
-        args.exactArity(2, "assertEQ(got, expected)");
+        args.arity(2, "assertEQ(got, expected)");
         var got      = args.next();
         var expected = args.next();
 
@@ -80,7 +80,7 @@ public class TestPackage extends NativePackage {
     // least the provided number of frame strings, and those strings
     // must match.
     private Object _assertError(Joe joe, Args args) {
-        args.minArity(1, "assertError(callable,[message],[frames...])");
+        args.arityMin(1, "assertError(callable,[message],[frames...])");
 
         // FIRST, execute the callable and get the result or the error.
         Object result = null;
@@ -140,7 +140,7 @@ public class TestPackage extends NativePackage {
     // Verifies that *condition* is falsey, producing an
     // informative assertion error if not.
     private Object _assertF(Joe joe, Args args) {
-        args.exactArity(1, "assertF(condition)");
+        args.arity(1, "assertF(condition)");
         var condition = args.next();
 
         if (Joe.isTruthy(condition)) {
@@ -157,7 +157,7 @@ public class TestPackage extends NativePackage {
     // Verifies that *condition* is truthy, producing an
     // informative assertion error if not.
     private Object _assertT(Joe joe, Args args) {
-        args.exactArity(1, "assertT(condition)");
+        args.arity(1, "assertT(condition)");
         var condition = args.next();
 
         if (!Joe.isTruthy(condition)) {
@@ -173,7 +173,7 @@ public class TestPackage extends NativePackage {
     // %result String
     // Returns the name of the engine in use, "walker" or "bert".
     private Object _engine(Joe joe, Args args) {
-        args.exactArity(0, "engine()");
+        args.arity(0, "engine()");
         return engine;
     }
 
@@ -183,7 +183,7 @@ public class TestPackage extends NativePackage {
     // Throws an assertion error with the given *message*, failing the
     // test immediately.
     private Object _fail(Joe joe, Args args) {
-        args.exactArity(1, "fail(message)");
+        args.arity(1, "fail(message)");
         throw new AssertError(joe.stringify(args.next()));
     }
 
@@ -194,7 +194,7 @@ public class TestPackage extends NativePackage {
     // further.  The test will be counted as "Skipped" in the final test
     // results.
     private Object _skip(Joe joe, Args args) {
-        args.exactArity(1, "skip(message)");
+        args.arity(1, "skip(message)");
         throw new TestRunner.SkipError(joe.stringify(args.next()));
     }
 
@@ -204,7 +204,7 @@ public class TestPackage extends NativePackage {
     // Outputs the value's type and value for display.  Collections are output in
     // readable format.
     private Object _typedValue(Joe joe, Args args) {
-        args.exactArity(1, "typedValue(value)");
+        args.arity(1, "typedValue(value)");
         return testValue(joe, args.next());
     }
 

@@ -721,7 +721,7 @@ public class MatcherTest extends Ted {
         }
 
         private Object _init(Joe joe, Args args) {
-            args.exactArity(2, "Pair(first,second)");
+            args.arity(2, "Pair(first,second)");
             return new Pair(args.next(), args.next());
         }
 

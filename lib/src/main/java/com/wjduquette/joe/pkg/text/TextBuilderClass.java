@@ -59,7 +59,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // @init
     // Creates an empty `TextBuilder`.
     private Object _init(Joe joe, Args args) {
-        args.exactArity(0, "TextBuilder()");
+        args.arity(0, "TextBuilder()");
         return make(joe, this);
     }
 
@@ -72,7 +72,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // %result this
     // Adds the value to the buffer.
     private Object _append(TextBuilder buff, Joe joe, Args args) {
-        args.exactArity(1, "append(value)");
+        args.arity(1, "append(value)");
         buff.append(joe.stringify(args.next()));
         return buff;
     }
@@ -82,7 +82,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // %result this
     // Clears the buffer.
     private Object _clear(TextBuilder buff, Joe joe, Args args) {
-        args.exactArity(0, "clear()");
+        args.arity(0, "clear()");
         buff.clear();
         return buff;
     }
@@ -93,7 +93,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // %result this
     // Adds the value to the buffer.
     private Object _print(TextBuilder buff, Joe joe, Args args) {
-        args.exactArity(1, "print(value)");
+        args.arity(1, "print(value)");
         buff.append(joe.stringify(args.next()));
         return buff;
     }
@@ -105,7 +105,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // to the buffer.  See [[topic:joe.String.formatting]] for the format
     // string syntax.
     private Object _printf(TextBuilder buff, Joe joe, Args args) {
-        args.minArity(1, "printf(fmt, [values]...)");
+        args.arityMin(1, "printf(fmt, [values]...)");
         var fmt = joe.toString(args.next());
 
         buff.append(StringFormatter.format(joe, fmt, args.remainderAsList()));
@@ -118,7 +118,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // %result this
     // Adds the value to the buffer, followed by a new line.
     private Object _println(TextBuilder buff, Joe joe, Args args) {
-        args.exactArity(1, "println(value)");
+        args.arity(1, "println(value)");
         buff.append(joe.stringify(args.next())).append("\n");
         return buff;
     }
@@ -128,7 +128,7 @@ public class TextBuilderClass extends ProxyType<TextBuilder> {
     // %result String
     // Returns the string.
     private Object _toString(TextBuilder buff, Joe joe, Args args) {
-        args.exactArity(0, "toString()");
+        args.arity(0, "toString()");
         return buff.toString();
     }
 }

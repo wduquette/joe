@@ -70,8 +70,8 @@ class VBoxClass extends WidgetType<VBox> {
     // %result Insets
     // Gets the [[Node]]'s margin in its parent `VBox`.
     private Object _getMargin(Joe joe, Args args) {
-        args.exactArity(1, "VBox.getMargin(node)");
-        return VBox.getMargin(joe.toClass(args.next(), Node.class));
+        args.arity(1, "VBox.getMargin(node)");
+        return VBox.getMargin(joe.toClass(Node.class, args.next()));
     }
 
     //**
@@ -81,8 +81,8 @@ class VBoxClass extends WidgetType<VBox> {
     // Gets how the [[Node]] will resize itself to the height of
     // its parent `VBox`.
     private Object _getVgrow(Joe joe, Args args) {
-        args.exactArity(1, "VBox.getVgrow(node)");
-        return VBox.getVgrow(joe.toClass(args.next(), Node.class));
+        args.arity(1, "VBox.getVgrow(node)");
+        return VBox.getVgrow(joe.toClass(Node.class, args.next()));
     }
 
     //**
@@ -91,10 +91,10 @@ class VBoxClass extends WidgetType<VBox> {
     // Gets the [[Node]]'s margin in its parent `VBox` given an
     // [[Insets]] object.
     private Object _setMargin(Joe joe, Args args) {
-        args.exactArity(2, "VBox.setMargin(node, insets)");
+        args.arity(2, "VBox.setMargin(node, insets)");
         VBox.setMargin(
-            joe.toClass(args.next(), Node.class),
-            joe.toClass(args.next(), Insets.class)
+            joe.toClass(Node.class, args.next()),
+            joe.toClass(Insets.class, args.next())
         );
         return null;
     }
@@ -105,10 +105,10 @@ class VBoxClass extends WidgetType<VBox> {
     // Sets how the [[Node]] will resize itself to the height of
     // its parent `VBox`, given a [[Priority]] value.
     private Object _setVgrow(Joe joe, Args args) {
-        args.exactArity(2, "VBox.setVgrow(node, priority)");
+        args.arity(2, "VBox.setVgrow(node, priority)");
         VBox.setVgrow(
-            joe.toClass(args.next(), Node.class),
-            joe.toClass(args.next(), Priority.class)
+            joe.toClass(Node.class, args.next()),
+            joe.toClass(Priority.class, args.next())
         );
         return null;
     }
@@ -120,7 +120,7 @@ class VBoxClass extends WidgetType<VBox> {
     // @init
     // Returns a `VBox`.
     private Object _initializer(Joe joe, Args args) {
-        args.exactArity(0, "VBox()");
+        args.arity(0, "VBox()");
         return make(joe, this);
     }
 
@@ -133,7 +133,7 @@ class VBoxClass extends WidgetType<VBox> {
     // %result this
     // Sets the vertical space in *pixels* between each child.
     private Object _spacing(VBox node, Joe joe, Args args) {
-        args.exactArity(1, "spacing(pixels)");
+        args.arity(1, "spacing(pixels)");
         node.setSpacing(joe.toDouble(args.next()));
         return node;
     }

@@ -5,8 +5,6 @@ import com.wjduquette.joe.runner.TestRunner;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 import com.wjduquette.joe.win.WinPackage;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -114,7 +112,7 @@ public class TestWinTool implements Tool {
         var runner = TestRunner.define()
             .appName("joe test " + App.getVersion())
             .engineType(engineType)
-            .install(new WinPackage(new Stage(), new VBox()))
+            .install(WinPackage.PACKAGE)
             .libPath(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH))
             .testScripts(testScripts)
             .verbose(verbose)

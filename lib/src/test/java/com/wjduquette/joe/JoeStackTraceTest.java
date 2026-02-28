@@ -374,7 +374,7 @@ public class JoeStackTraceTest extends Ted {
     }
 
     private Object _passThrough(Joe joe, Args args) {
-        args.exactArity(1, "passThrough(callable)");
+        args.arity(1, "passThrough(callable)");
         var callee = args.next();
         if (!joe.isCallable(callee)) {
             throw joe.expected("callable", callee);

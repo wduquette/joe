@@ -26,9 +26,8 @@ public class RegionType extends WidgetType<Region> {
     /** Constructor. */
     public RegionType() {
         super("Region");
-        extendsProxy(NodeType.TYPE);
+        extendsProxy(ParentType.TYPE);
         proxies(Region.class);
-
 
         // Constants
 
@@ -120,7 +119,7 @@ public class RegionType extends WidgetType<Region> {
     // %result joe.Number
     // Gets the node's `#height` in pixels.
     private Object _getHeight(Region node, Joe joe, Args args) {
-        args.exactArity(0, "getHeight()");
+        args.arity(0, "getHeight()");
         return node.getHeight();
     }
 
@@ -129,7 +128,7 @@ public class RegionType extends WidgetType<Region> {
     // %result joe.Number
     // Gets the node's `#width` in pixels.
     private Object _getWidth(Region node, Joe joe, Args args) {
-        args.exactArity(0, "getWidth()");
+        args.arity(0, "getWidth()");
         return node.getWidth();
     }
 
@@ -139,7 +138,7 @@ public class RegionType extends WidgetType<Region> {
     // %result this
     // Sets the node's preferred, minimum, and maximum height in pixels.
     private Object _height(Region node, Joe joe, Args args) {
-        args.exactArity(1, "height(height)");
+        args.arity(1, "height(height)");
         var pixels = joe.toDouble(args.next());
         node.setMinHeight(pixels);
         node.setMaxHeight(pixels);
@@ -177,7 +176,7 @@ public class RegionType extends WidgetType<Region> {
     // %result this
     // Sets the node's maximum height in pixels.
     private Object _maxHeight(Region node, Joe joe, Args args) {
-        args.exactArity(1, "maxHeight(height)");
+        args.arity(1, "maxHeight(height)");
         node.setMaxHeight(joe.toDouble(args.next()));
         return node;
     }
@@ -188,7 +187,7 @@ public class RegionType extends WidgetType<Region> {
     // %result this
     // Sets the node's maximum width in pixels.
     private Object _maxWidth(Region node, Joe joe, Args args) {
-        args.exactArity(1, "maxWidth(width)");
+        args.arity(1, "maxWidth(width)");
         node.setMaxWidth(joe.toDouble(args.next()));
         return node;
     }
@@ -199,7 +198,7 @@ public class RegionType extends WidgetType<Region> {
     // %result this
     // Sets the node's minimum height in pixels.
     private Object _minHeight(Region node, Joe joe, Args args) {
-        args.exactArity(1, "minHeight(height)");
+        args.arity(1, "minHeight(height)");
         node.setMinHeight(joe.toDouble(args.next()));
         return node;
     }
@@ -210,7 +209,7 @@ public class RegionType extends WidgetType<Region> {
     // %result this
     // Sets the node's minimum width in pixels.
     private Object _minWidth(Region node, Joe joe, Args args) {
-        args.exactArity(1, "minWidth(width)");
+        args.arity(1, "minWidth(width)");
         node.setMinWidth(joe.toDouble(args.next()));
         return node;
     }
@@ -221,7 +220,7 @@ public class RegionType extends WidgetType<Region> {
     // %result this
     // Sets the node's preferred height in pixels.
     private Object _prefHeight(Region node, Joe joe, Args args) {
-        args.exactArity(1, "prefHeight(height)");
+        args.arity(1, "prefHeight(height)");
         node.setPrefHeight(joe.toDouble(args.next()));
         return node;
     }
@@ -232,7 +231,7 @@ public class RegionType extends WidgetType<Region> {
     // %result this
     // Sets the node's preferred width in pixels.
     private Object _prefWidth(Region node, Joe joe, Args args) {
-        args.exactArity(1, "prefWidth(width)");
+        args.arity(1, "prefWidth(width)");
         node.setPrefWidth(joe.toDouble(args.next()));
         return node;
     }
@@ -243,7 +242,7 @@ public class RegionType extends WidgetType<Region> {
     // %result this
     // Sets the node's preferred, minimum, and maximum width in pixels.
     private Object _width(Region node, Joe joe, Args args) {
-        args.exactArity(1, "width(width)");
+        args.arity(1, "width(width)");
         var pixels = joe.toDouble(args.next());
         node.setMinWidth(pixels);
         node.setMaxWidth(pixels);

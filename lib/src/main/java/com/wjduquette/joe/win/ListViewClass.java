@@ -78,7 +78,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // @init
     // Returns a `ListView`.
     private Object _initializer(Joe joe, Args args) {
-        args.exactArity(0, "ListView()");
+        args.arity(0, "ListView()");
         return make(joe, this);
     }
 
@@ -94,7 +94,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // representation for that item.  The returned string will be displayed
     // in the `ListView` for the given item.
     private Object _formatter(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(1, "formatter(callable)");
+        args.arity(1, "formatter(callable)");
 
         node.setFormatter(joe.wrapFunction(args.next()));
         return node;
@@ -105,7 +105,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // %result joe.Number
     // Gets the index of the selected item, or -1 if there is no selection.
     private Object _getSelectedIndex(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(0, "getSelectedIndex()");
+        args.arity(0, "getSelectedIndex()");
         return (double)node.getSelectionModel().getSelectedIndex();
     }
 
@@ -114,7 +114,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // %result item
     // Gets the selected item, or `null` if there is no selection.
     private Object _getSelectedItem(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(0, "getSelectedItem()");
+        args.arity(0, "getSelectedItem()");
         return node.getSelectionModel().getSelectedItem();
     }
 
@@ -124,7 +124,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // %result this
     // Adds a value to the widget's list of items.
     private Object _item(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(1, "item(item)");
+        args.arity(1, "item(item)");
         node.getItems().add(args.next());
         return node;
     }
@@ -134,7 +134,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // %result joe.List
     // Gets the list of the widget's items, which can be updated freely.
     private Object _items(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(0, "items()");
+        args.arity(0, "items()");
         return joe.wrapList(node.getItems(), Object.class);
     }
 
@@ -147,7 +147,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // passed one argument, the selected item, or null if there is no
     // selected item.
     private Object _onSelect(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(1, "onSelect(callable)");
+        args.arity(1, "onSelect(callable)");
         node.setOnSelect(joe.wrapConsumer(args.next()));
         return node;
     }
@@ -159,7 +159,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // Sets the widget's placeholder graphic, a [[Node]] to display when
     // the widget's [[method:ListView.items]] list is empty.
     private Object _placeholder(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(1, "placeholder(node)");
+        args.arity(1, "placeholder(node)");
         node.setPlaceholder(Win.toNode(joe, args.next()));
         return node;
     }
@@ -172,7 +172,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // the given text. The placeholder is shown when
     // the widget's [[method:ListView.items]] list is empty.
     private Object _placeholderText(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(1, "placeholderText(text)");
+        args.arity(1, "placeholderText(text)");
         node.setPlaceholder(new Label(joe.stringify(args.next())));
         return node;
     }
@@ -184,7 +184,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // Selects the item at the given *index*.  Throws an error if the
     // index is not in range.
     private Object _selectIndex(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(1, "selectIndex(index)");
+        args.arity(1, "selectIndex(index)");
         var index = joe.toIndex(args.next(), node.getItems().size());
         node.selectIndex(index);
         return node;
@@ -197,7 +197,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // Selects the given *item*.  The call is a no-op if the *item*
     // isn't contained in the widget's list of items.
     private Object _selectItem(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(1, "selectItem(item)");
+        args.arity(1, "selectItem(item)");
         node.selectItem(args.next());
         return node;
     }
@@ -208,7 +208,7 @@ class ListViewClass extends WidgetType<ListViewInstance> {
     // %result this
     // Replaces the `ListView`'s items with the contents of the *list*.
     private Object _setItems(ListViewInstance node, Joe joe, Args args) {
-        args.exactArity(1, "setItems(list)");
+        args.arity(1, "setItems(list)");
         var list = joe.toList(args.next());
         node.getItems().clear();
         node.getItems().addAll(list);

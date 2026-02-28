@@ -102,7 +102,7 @@ public class ProxyType<V>
 
     // TODO: Make sure this gets into the docs for each type.
     private Object _name(Joe joe, Args args) {
-        args.exactArity(0, "name()");
+        args.arity(0, "name()");
         return name();
     }
 

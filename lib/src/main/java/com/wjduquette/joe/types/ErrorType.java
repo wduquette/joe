@@ -53,7 +53,7 @@ public class ErrorType extends ProxyType<JoeError> {
     // Creates an `Error` with the given *message* and optional information
     // trace messages.
     private Object _initializer(Joe joe, Args args) {
-        args.minArity(1, "Error(message, [trace, ...])");
+        args.arityMin(1, "Error(message, [trace, ...])");
         var error = new JoeError(joe.stringify(args.next()));
 
         while (args.hasNext()) {
@@ -72,7 +72,7 @@ public class ErrorType extends ProxyType<JoeError> {
     // %result this
     // Adds an information message to the list of traces.
     private Object _addInfo(JoeError error, Joe joe, Args args) {
-        args.exactArity(1, "addInfo(message)");
+        args.arity(1, "addInfo(message)");
         return error.addInfo(joe.stringify(args.next()));
     }
 
@@ -82,7 +82,7 @@ public class ErrorType extends ProxyType<JoeError> {
     // Returns the complete error, including the initial error messages
     // and all stack frames.
     private Object _javaStackTrace(JoeError error, Joe joe, Args args) {
-        args.exactArity(0, "javaStackTrace()");
+        args.arity(0, "javaStackTrace()");
         return error.getJavaStackTrace();
     }
 
@@ -91,7 +91,7 @@ public class ErrorType extends ProxyType<JoeError> {
     // %result text
     // Gets the actual error message
     private Object _message(JoeError error, Joe joe, Args args) {
-        args.exactArity(0, "message()");
+        args.arity(0, "message()");
         return error.getMessage();
     }
 
@@ -101,7 +101,7 @@ public class ErrorType extends ProxyType<JoeError> {
     // Returns the complete error, including the initial error messages
     // and all stack frames.
     private Object _stackTrace(JoeError error, Joe joe, Args args) {
-        args.exactArity(0, "stackTrace()");
+        args.arity(0, "stackTrace()");
         return error.getJoeStackTrace();
     }
 
@@ -111,7 +111,7 @@ public class ErrorType extends ProxyType<JoeError> {
     // Returns the list of trace strings.  Clients can add to the list
     // using [[method:Error.addInfo]] and rethrow the error.
     private Object _traces(JoeError error, Joe joe, Args args) {
-        args.exactArity(0, "traces()");
+        args.arity(0, "traces()");
         return new ListValue(error.getTraces().stream()
             .map(Trace::message)
             .toList());
@@ -123,7 +123,7 @@ public class ErrorType extends ProxyType<JoeError> {
     // %result name
     // Gets the name of the concrete error type.
     private Object _type(JoeError error, Joe joe, Args args) {
-        args.exactArity(0, "type()");
+        args.arity(0, "type()");
         return error.getClass().getSimpleName();
     }
 }

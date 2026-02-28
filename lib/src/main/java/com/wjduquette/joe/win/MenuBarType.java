@@ -42,7 +42,7 @@ class MenuBarType extends WidgetType<MenuBar> {
     // %args [text]
     // Returns a `MenuBar`.
     private Object _initializer(Joe joe, Args args) {
-        args.exactArity(0, "MenuBar()");
+        args.arity(0, "MenuBar()");
         return new MenuBar();
     }
 
@@ -55,8 +55,8 @@ class MenuBarType extends WidgetType<MenuBar> {
     // %result this
     // Adds a [[Menu]] to the menu bar.
     private Object _menu(MenuBar bar, Joe joe, Args args) {
-        args.exactArity(1, "menu(menu)");
-        var menu = joe.toClass(args.next(), Menu.class);
+        args.arity(1, "menu(menu)");
+        var menu = joe.toClass(Menu.class, args.next());
         bar.getMenus().add(menu);
         return bar;
     }
@@ -67,7 +67,7 @@ class MenuBarType extends WidgetType<MenuBar> {
     // Gets the list of the menu bar's menus, which can be updated freely.
     // All items must be instances of [[Menu]].
     private Object _menus(MenuBar bar, Joe joe, Args args) {
-        args.exactArity(0, "menus()");
+        args.arity(0, "menus()");
         return joe.wrapList(bar.getMenus(), Menu.class);
     }
 }

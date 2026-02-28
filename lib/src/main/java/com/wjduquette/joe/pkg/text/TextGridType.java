@@ -50,7 +50,7 @@ public class TextGridType extends ProxyType<TextGrid> {
     // @init
     // Creates a new TextGrid.
     private Object _init(Joe joe, Args args) {
-        args.exactArity(0, "TextGrid()");
+        args.arity(0, "TextGrid()");
         return new TextGrid();
     }
 
@@ -63,7 +63,7 @@ public class TextGridType extends ProxyType<TextGrid> {
     // %result this
     // Puts the *text* into the grid cell, replacing any previous content.
     private Object _put(TextGrid grid, Joe joe, Args args) {
-        args.exactArity(3, "put(column, row, text");
+        args.arity(3, "put(column, row, text");
         var c = joe.toCount(args.next());
         var r = joe.toCount(args.next());
         var s = joe.stringify(args.next());
@@ -77,7 +77,7 @@ public class TextGridType extends ProxyType<TextGrid> {
     // %result this
     // Sets the column gap in characters.  The default is 0.
     private Object _columnGap(TextGrid grid, Joe joe, Args args) {
-        args.exactArity(1, "columnGap(gap)");
+        args.arity(1, "columnGap(gap)");
         grid.setColumnGap(joe.toCount(args.next()));
         return grid;
     }
@@ -88,7 +88,7 @@ public class TextGridType extends ProxyType<TextGrid> {
     // %result this
     // Sets the row gap in characters.  The default is 0.
     private Object _rowGap(TextGrid grid, Joe joe, Args args) {
-        args.exactArity(1, "rowGap(gap)");
+        args.arity(1, "rowGap(gap)");
         grid.setRowGap(joe.toCount(args.next()));
         return grid;
     }
@@ -98,7 +98,7 @@ public class TextGridType extends ProxyType<TextGrid> {
     // %result joe.String
     // Returns the formatted grid.
     private Object _toString(TextGrid grid, Joe joe, Args args) {
-        args.exactArity(0, "toString");
+        args.arity(0, "toString");
         return grid.toString();
     }
 

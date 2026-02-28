@@ -43,7 +43,7 @@ public class MenuType extends WidgetType<Menu> {
     // @init
     // Returns a `Menu`.
     private Object _initializer(Joe joe, Args args) {
-        args.exactArity(0, "Menu()");
+        args.arity(0, "Menu()");
         return new Menu();
     }
 
@@ -56,9 +56,9 @@ public class MenuType extends WidgetType<Menu> {
     // %result this
     // Adds a [[MenuItem]] or [[Menu]] to the menu.
     private Object _item(Menu bar, Joe joe, Args args) {
-        args.exactArity(1, "item(item)");
+        args.arity(1, "item(item)");
         // Note: All Menus are also MenuItems.
-        var item = joe.toClass(args.next(), MenuItem.class);
+        var item = joe.toClass(MenuItem.class, args.next());
         bar.getItems().add(item);
         return bar;
     }
@@ -69,7 +69,7 @@ public class MenuType extends WidgetType<Menu> {
     // Gets the list of the menu's items, which can be updated freely.
     // All items must be instances of [[MenuItem]] or [[Menu]].
     private Object _items(Menu bar, Joe joe, Args args) {
-        args.exactArity(0, "items()");
+        args.arity(0, "items()");
         // Note: All Menus are also MenuItems.
         return joe.wrapList(bar.getItems(), MenuItem.class);
     }

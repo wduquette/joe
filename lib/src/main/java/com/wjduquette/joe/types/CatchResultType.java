@@ -49,7 +49,7 @@ public class CatchResultType extends ProxyType<CatchResult> {
     // The *result* is the `result` value; the `error` field will
     // be null.
     private Object _ok(Joe joe, Args args) {
-        args.exactArity(1, "CatchResult.ok(result)");
+        args.arity(1, "CatchResult.ok(result)");
         return CatchResult.ok(args.next());
     }
 
@@ -62,7 +62,7 @@ public class CatchResultType extends ProxyType<CatchResult> {
     // an [[Error]].  The `CatchResult`'s `error` field will be
     // set to the *error*, and its `result` field will be null.
     private Object _error(Joe joe, Args args) {
-        args.exactArity(1, "CatchResult.error(error)");
+        args.arity(1, "CatchResult.error(error)");
         var arg = args.next();
         if (arg instanceof String s) {
             return CatchResult.error(new JoeError(s));

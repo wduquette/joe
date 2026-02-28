@@ -1,9 +1,10 @@
 package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.Joe;
-import com.wjduquette.joe.runner.JoeWinRunner;
+import com.wjduquette.joe.runner.JoeRunner;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
+import com.wjduquette.joe.win.WinPackage;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -101,13 +102,14 @@ public class WinTool implements Tool {
             }
         }
 
-        var runner = JoeWinRunner.define()
+        var runner = JoeRunner.define()
             .appName("joe win " + App.getVersion())
             .engineType(engineType)
             .debug(debug)
+            .install(WinPackage.PACKAGE)
+            .libPath(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH))
             .scriptPath(argq.poll())
             .scriptArgs(argq)
-            .libPath(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH))
             .build();
         runner.run();
     }

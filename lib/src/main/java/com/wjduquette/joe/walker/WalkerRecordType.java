@@ -68,7 +68,7 @@ class WalkerRecordType implements JoeClass, JoeValue, NativeCallable {
     }
 
     public Object call(Joe joe, Args args) {
-        args.exactArity(recordFields.size(), signature);
+        args.arity(recordFields.size(), signature);
         var map = new HashMap<String,Object>();
         for (var i = 0; i < recordFields.size(); i++) {
             map.put(recordFields.get(i), args.get(i));

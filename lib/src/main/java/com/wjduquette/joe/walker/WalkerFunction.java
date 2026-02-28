@@ -90,9 +90,9 @@ final class WalkerFunction implements NativeCallable {
             ? declaration.params().size() - 1
             : declaration.params().size();
         if (isVarArgs) {
-            args.minArity(expected, signature);
+            args.arityMin(expected, signature);
         } else {
-            args.exactArity(expected, signature);
+            args.arity(expected, signature);
         }
 
         // NEXT, create the environment for the arguments.

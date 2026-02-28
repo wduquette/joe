@@ -32,7 +32,7 @@ class JoeDocPackage extends NativePackage {
     // comments.  File paths are relative to the location of the
     // `doc_config.joe` file.
     private Object _codeFiles(Joe joe, Args args) {
-        args.minArity(1, "codeFiles(filename, ...)");
+        args.arityMin(1, "codeFiles(filename, ...)");
 
         for (var name : args.asList()) {
             config.codeFiles().add(config.resolve(joe.toString(name)));
@@ -51,7 +51,7 @@ class JoeDocPackage extends NativePackage {
     // Folder paths are relative to the location of the
     // `doc_config.joe` file.
     private Object _codeFolders(Joe joe, Args args) {
-        args.minArity(1, "codeFolders(folder, ...)");
+        args.arityMin(1, "codeFolders(folder, ...)");
 
         for (var name : args.asList()) {
             config.codeFolders().add(config.resolve(joe.toString(name)));
@@ -72,7 +72,7 @@ class JoeDocPackage extends NativePackage {
     // The folder path is relative to the location of the
     // `doc_config.joe` file.
     private Object docInputFolder(Joe joe, Args args) {
-        args.exactArity(1, "docInputFolder(folder)");
+        args.arity(1, "docInputFolder(folder)");
 
         config.setDocInputFolder(config.resolve(joe.toString(args.next())));
         return null;
@@ -87,7 +87,7 @@ class JoeDocPackage extends NativePackage {
     // The folder path is relative to the location of the
     // `doc_config.joe` file.
     private Object docOutputFolder(Joe joe, Args args) {
-        args.exactArity(1, "docOutputFolder(folder)");
+        args.arity(1, "docOutputFolder(folder)");
 
         config.setDocOutputFolder(config.resolve(joe.toString(args.next())));
         return null;
@@ -112,7 +112,7 @@ class JoeDocPackage extends NativePackage {
     // Given this prefix, `joe doc` can convert class names
     // in the *pkg* to JavaDoc links.
     private Object _javadocRoot(Joe joe, Args args) {
-        args.minArity(1, "javadocRoot(pkg, prefix)");
+        args.arityMin(1, "javadocRoot(pkg, prefix)");
         var pkg = joe.toString(args.next());
         var root = joe.toString(args.next());
         if (!root.startsWith("http") && !root.startsWith("/")) {
@@ -134,7 +134,7 @@ class JoeDocPackage extends NativePackage {
     // If unset, defaults to the folder containing the `doc_config.joe`
     // file.
     private Object libOutputFolder(Joe joe, Args args) {
-        args.exactArity(1, "libOutputFolder(folder)");
+        args.arity(1, "libOutputFolder(folder)");
 
         config.setLibOutputFolder(config.resolve(joe.toString(args.next())));
         return null;
@@ -149,7 +149,7 @@ class JoeDocPackage extends NativePackage {
     // The folder path is relative to the location of the
     // `doc_config.joe` file.
     private Object _siteFolder(Joe joe, Args args) {
-        args.exactArity(1, "siteFolder(folder)");
+        args.arity(1, "siteFolder(folder)");
 
         config.setSiteFolder(config.resolve(joe.toString(args.next())));
         return null;

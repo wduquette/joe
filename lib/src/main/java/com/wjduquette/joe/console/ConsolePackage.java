@@ -129,7 +129,7 @@ public class ConsolePackage extends NativePackage {
         // Returns a list of the arguments passed to the command line, as
         // filtered by the application.
         private Object _args(Joe joe, Args args) {
-            args.exactArity(0, "Console.args()");
+            args.arity(0, "Console.args()");
             return joe.readonlyList(argList);
         }
 
@@ -141,7 +141,7 @@ public class ConsolePackage extends NativePackage {
         // the path is relative, it is treated as relative to the
         // current working directory.
         private Object _cd(Joe joe, Args args) {
-            args.exactArity(1, "Console.cd(path)");
+            args.arity(1, "Console.cd(path)");
             cwd = toResolvedPath(joe, args.next());
             return cwd;
         }
@@ -168,7 +168,7 @@ public class ConsolePackage extends NativePackage {
         // parent directories.  If the path is relative, it is treated as
         // relative to the current working directory.
         private Object _mkdir(Joe joe, Args args) {
-            args.exactArity(1, "Console.mkdir(path)");
+            args.arity(1, "Console.mkdir(path)");
             var path = toResolvedPath(joe, args.next());
             try {
                 Files.createDirectories(path);
@@ -185,7 +185,7 @@ public class ConsolePackage extends NativePackage {
         // %result Path
         // Returns the current working directory.
         private Object _pwd(Joe joe, Args args) {
-            args.exactArity(0, "Console.pwd()");
+            args.arity(0, "Console.pwd()");
             return cwd;
         }
 
@@ -194,7 +194,7 @@ public class ConsolePackage extends NativePackage {
         // %result String
         // Returns a string from standard input, or null at EOF.
         private Object _read(Joe joe, Args args) {
-            args.exactArity(0, "Console.read()");
+            args.arity(0, "Console.read()");
             if (inputReader == null) {
                 inputReader = new BufferedReader(new InputStreamReader(System.in));
             }
@@ -212,7 +212,7 @@ public class ConsolePackage extends NativePackage {
         // %args filePath, text
         // Writes the *text* as a file at the given *filePath*.
         private Object _writeFile(Joe joe, Args args) {
-            args.exactArity(2, "Console.writeFile(filePath, text)");
+            args.arity(2, "Console.writeFile(filePath, text)");
             var filePath = toResolvedPath(joe, args.next());
             var text = joe.toString(args.next());
             try {
@@ -230,7 +230,7 @@ public class ConsolePackage extends NativePackage {
         // Reads the contents of the file at the given *filePath* and
         // returns it as a string.
         private Object _readFile(Joe joe, Args args) {
-            args.exactArity(1, "Console.readFile(filePath)");
+            args.arity(1, "Console.readFile(filePath)");
             var filePath = toResolvedPath(joe, args.next());
             try {
                 return Files.readString(filePath);
@@ -246,7 +246,7 @@ public class ConsolePackage extends NativePackage {
         // Reads the contents of the file at the given *filePath* and
         // returns it as a list of line strings
         private Object _readLines(Joe joe, Args args) {
-            args.exactArity(1, "Console.readLines(filePath)");
+            args.arity(1, "Console.readLines(filePath)");
             var filePath = toResolvedPath(joe, args.next());
             var result = new ListValue();
             try {

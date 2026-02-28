@@ -76,7 +76,7 @@ public class ClarkEngineTest extends Ted {
     // Helpers
 
     private Object _unexpected(Joe joe, Args args) {
-        args.exactArity(1, "unexpected(message)");
+        args.arity(1, "unexpected(message)");
         throw new UnsupportedOperationException(joe.stringify(args.next()));
     }
 }

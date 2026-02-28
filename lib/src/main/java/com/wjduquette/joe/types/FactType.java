@@ -186,7 +186,7 @@ public class FactType extends ProxyType<Fact> {
     // - If a map is provided, the fact will be unordered.
     // - All names must be valid Joe identifiers.
     private Object _init(Joe joe, Args args) {
-        args.exactArity(2, "Fact(relation, pairs) or Fact(relation, map)");
+        args.arity(2, "Fact(relation, pairs) or Fact(relation, map)");
         var relation = joe.toIdentifier(args.next());
         var data = args.next();
         if (data instanceof List<?> pairs) {
@@ -222,7 +222,7 @@ public class FactType extends ProxyType<Fact> {
     // %result Map
     // Returns a read-only map of the field values.
     private Object _fieldMap(Fact value, Joe joe, Args args) {
-        args.exactArity(0, "fieldMap()");
+        args.arity(0, "fieldMap()");
         return joe.readonlyMap(value.getFieldMap());
     }
 
@@ -232,7 +232,7 @@ public class FactType extends ProxyType<Fact> {
     // Returns a read-only list of the fact's field names.  If the
     // fact is ordered the names will be in the same order as the fields.
     private Object _fieldNames(Fact value, Joe joe, Args args) {
-        args.exactArity(0, "fieldNames()");
+        args.arity(0, "fieldNames()");
         return joe.readonlyList(getFieldNames(value));
     }
 
@@ -242,7 +242,7 @@ public class FactType extends ProxyType<Fact> {
     // Returns a read-only list of the field values, if the fact
     // [[method:Fact.isOrdered]].
     private Object _fields(Fact value, Joe joe, Args args) {
-        args.exactArity(0, "fields()");
+        args.arity(0, "fields()");
         if (value.isOrdered()) {
             return joe.readonlyList(value.getFields());
         } else {
@@ -255,7 +255,7 @@ public class FactType extends ProxyType<Fact> {
     // %result Boolean
     // Returns true if the fact has ordered fields, and false otherwise.
     private Object _isOrdered(Fact value, Joe joe, Args args) {
-        args.exactArity(0, "isOrdered()");
+        args.arity(0, "isOrdered()");
         return value.isOrdered();
     }
 
@@ -264,7 +264,7 @@ public class FactType extends ProxyType<Fact> {
     // %result String
     // Returns the Fact's relation name.
     private Object _relation(Fact value, Joe joe, Args args) {
-        args.exactArity(0, "relation()");
+        args.arity(0, "relation()");
         return value.relation();
     }
 
@@ -273,7 +273,7 @@ public class FactType extends ProxyType<Fact> {
     // %result String
     // Returns the value's string representation.
     private Object _toString(Fact value, Joe joe, Args args) {
-        args.exactArity(0, "toString()");
+        args.arity(0, "toString()");
         return stringify(joe, value);
     }
 }

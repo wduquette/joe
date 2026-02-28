@@ -87,7 +87,7 @@ public final class Args {
      * @param signature The signature string.
      * @throws JoeError on failure
      */
-    public void exactArity(int arity, String signature) {
+    public void arity(int arity, String signature) {
         if (size() != arity) {
             throw arityFailure(signature);
         }
@@ -100,7 +100,7 @@ public final class Args {
      * @param signature The signature string.
      * @throws JoeError on failure
      */
-    public void minArity(int minArity, String signature) {
+    public void arityMin(int minArity, String signature) {
         if (size() < minArity) {
             throw arityFailure(signature);
         }

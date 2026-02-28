@@ -52,7 +52,7 @@ class StandardLibrary extends NativePackage {
     // Returns a [[CatchResult]] indicating success or failure and providing
     // the returned result or the error message respectively.
     private Object _catch(Joe joe, Args args) {
-        args.exactArity(1, "catch(callable)");
+        args.arity(1, "catch(callable)");
 
         try {
             var result = joe.call(args.next());
@@ -70,7 +70,7 @@ class StandardLibrary extends NativePackage {
     // Prints its text to standard output (which might be
     // redirected by the application).
     private Object _print(Joe joe, Args args) {
-        args.exactArity(1, "print(text)");
+        args.arity(1, "print(text)");
 
         joe.print(joe.stringify(args.next()));
         return null;
@@ -85,7 +85,7 @@ class StandardLibrary extends NativePackage {
     // See [[topic:String.formatting]] for the format
     // string syntax.
     private Object _printf(Joe joe, Args args) {
-        args.minArity(1, "printf(fmt, [values]...)");
+        args.arityMin(1, "printf(fmt, [values]...)");
         var fmt = joe.toString(args.next());
 
         joe.print(StringFormatter.format(joe, fmt, args.remainderAsList()));

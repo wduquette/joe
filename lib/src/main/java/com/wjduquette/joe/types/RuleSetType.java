@@ -62,7 +62,7 @@ public class RuleSetType extends ProxyType<NeroRuleSet> {
     // %result Boolean
     // Returns whether the rule set is stratified or not.
     private Object _isStratified(NeroRuleSet value, Joe joe, Args args) {
-        args.exactArity(0, "isStratified()");
+        args.arity(0, "isStratified()");
         return value.isStratified();
     }
 
@@ -71,7 +71,7 @@ public class RuleSetType extends ProxyType<NeroRuleSet> {
     // %result String
     // Returns the value's string representation.
     private Object _toString(NeroRuleSet value, Joe joe, Args args) {
-        args.exactArity(0, "toString()");
+        args.arity(0, "toString()");
         return stringify(joe, value);
     }
 }

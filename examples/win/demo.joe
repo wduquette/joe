@@ -1,7 +1,4 @@
 // win_demo.joe: testing `joe win`
-Win.setTitle("joe win: Demo")
-   .setSize(600, 400)
-   ;
 
 // The Page class
 class Page extends VBox {
@@ -44,7 +41,7 @@ function showSelectedPage(page) {
 //-----------------------------------------------------------------------------
 // Build and display the GUI
 
-Win.root()
+var root = VBox()
     .spacing(5)
     .child(MenuBar()
         .menu(Menu().text("File")
@@ -65,4 +62,5 @@ Win.root()
         .setDivider(0, 0.3)
     )
     ;
-
+var scene = Scene(root, 600, 400);
+var stage = Stage().scene(scene).title("joe win: Demo").show();

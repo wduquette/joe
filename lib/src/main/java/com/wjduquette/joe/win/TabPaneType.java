@@ -35,7 +35,7 @@ class TabPaneType extends WidgetType<TabPane> {
         // @property side Side
         // Position for the [[Tab|Tabs]]
         fxProperty("side", TabPane::sideProperty,
-            (joe, value) -> joe.toEnum(value, Side.class));
+            (joe, value) -> joe.toEnum(Side.class, value));
 
         // Methods
         method("tab",  this::_tab);
@@ -50,7 +50,7 @@ class TabPaneType extends WidgetType<TabPane> {
     // %args [text]
     // Returns a `TabPane`.
     private Object _initializer(Joe joe, Args args) {
-        args.exactArity(0, "TabPane()");
+        args.arity(0, "TabPane()");
         return new TabPane();
     }
 
@@ -63,8 +63,8 @@ class TabPaneType extends WidgetType<TabPane> {
     // %result this
     // Adds a [[Tab]] to the pane.
     private Object _tab(TabPane pane, Joe joe, Args args) {
-        args.exactArity(1, "tab(tab)");
-        var tab = joe.toClass(args.next(), Tab.class);
+        args.arity(1, "tab(tab)");
+        var tab = joe.toClass(Tab.class, args.next());
         pane.getTabs().add(tab);
         return pane;
     }
@@ -75,7 +75,7 @@ class TabPaneType extends WidgetType<TabPane> {
     // Gets the list of the pane's tabs, which can be updated freely.
     // All items must be instances of [[Tab]] or a subclass.
     private Object _tabs(TabPane pane, Joe joe, Args args) {
-        args.exactArity(0, "tabs()");
+        args.arity(0, "tabs()");
         return joe.wrapList(pane.getTabs(), Tab.class);
     }
 }

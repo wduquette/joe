@@ -36,7 +36,7 @@ public class FunctionType extends ProxyType<JoeCallable> {
     // Instance Methods Implementations
 
     private Object _toString(JoeCallable func, Joe joe, Args args) {
-        args.exactArity(0, "toString()");
+        args.arity(0, "toString()");
         return func.toString();
     }
 }

@@ -68,7 +68,7 @@ public class MenuItemType extends WidgetType<MenuItem> {
     // @init
     // Returns a `MenuItem`.
     private Object _initializer(Joe joe, Args args) {
-        args.exactArity(0, "MenuItem()");
+        args.arity(0, "MenuItem()");
         return new MenuItem();
     }
 
@@ -82,7 +82,7 @@ public class MenuItemType extends WidgetType<MenuItem> {
     // Adds a *callable/0* to the button as its `#onAction` handler; pressing
     // the button will invoke the callable.
     private Object _action(MenuItem item, Joe joe, Args args) {
-        args.exactArity(1, "action(callable)");
+        args.arity(1, "action(callable)");
         item.setOnAction(evt -> joe.call(args.next()));
         return item;
     }
@@ -107,7 +107,7 @@ public class MenuItemType extends WidgetType<MenuItem> {
     // %result this
     // Sets the item's `#id` property to the given *id* string.
     private Object _id(MenuItem item, Joe joe, Args args) {
-        args.exactArity(1, "id(id)");
+        args.arity(1, "id(id)");
         var id = joe.toString(args.next());
         item.setId(id);
         return item;
@@ -118,7 +118,7 @@ public class MenuItemType extends WidgetType<MenuItem> {
     // %result joe.Boolean
     // Returns `true` if the item has been disabled, and `false` otherwise.
     private Object _isDisabled(MenuItem item, Joe joe, Args args) {
-        args.exactArity(0, "isDisabled()");
+        args.arity(0, "isDisabled()");
         return item.isDisable();
     }
 
@@ -132,7 +132,7 @@ public class MenuItemType extends WidgetType<MenuItem> {
     // so it's often preferable to use [[method:MenuItem.action]], which
     // expects a *callable/0*.
     private Object _onAction(MenuItem btn, Joe joe, Args args) {
-        args.exactArity(1, "onAction(callable)");
+        args.arity(1, "onAction(callable)");
         btn.setOnAction(Win.toAction(joe, args.next()));
         return btn;
     }
@@ -145,7 +145,7 @@ public class MenuItemType extends WidgetType<MenuItem> {
     //
     // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styleClasses(MenuItem item, Joe joe, Args args) {
-        args.exactArity(0, "styleClasses()");
+        args.arity(0, "styleClasses()");
         return joe.wrapList(item.getStyleClass(), String.class);
     }
 
@@ -158,7 +158,7 @@ public class MenuItemType extends WidgetType<MenuItem> {
     //
     // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styles(MenuItem item, Joe joe, Args args) {
-        args.minArity(1, "styles(style, ...)");
+        args.arityMin(1, "styles(style, ...)");
         var styles = args.asList().stream()
             .map(joe::toString)
             .collect(Collectors.joining(";\n"));
@@ -172,7 +172,7 @@ public class MenuItemType extends WidgetType<MenuItem> {
     // %result this
     // Sets the item's text.
     private Object _text(MenuItem item, Joe joe, Args args) {
-        args.exactArity(1, "text(text)");
+        args.arity(1, "text(text)");
         item.setText(joe.stringify(args.next()));
         return item;
     }
