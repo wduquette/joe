@@ -1,4 +1,4 @@
-package com.wjduquette.joe.tools.test;
+package com.wjduquette.joe.runner;
 
 import com.wjduquette.joe.*;
 
@@ -195,7 +195,7 @@ public class TestPackage extends NativePackage {
     // results.
     private Object _skip(Joe joe, Args args) {
         args.exactArity(1, "skip(message)");
-        throw new TestTool.SkipError(joe.stringify(args.next()));
+        throw new TestRunner.SkipError(joe.stringify(args.next()));
     }
 
     //**

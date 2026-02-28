@@ -1,5 +1,7 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.pkg.text.JoeTextPackage;
+
 import java.util.*;
 
 /**
@@ -55,6 +57,9 @@ public class PackageRegistry {
         // as the package's exports.
         exportsMap.put(StandardLibrary.PACKAGE.name(),
             new Environment(joe.engine().getEnvironment()));
+
+        // NEXT, register standard packages
+        joe.registerPackage(JoeTextPackage.PACKAGE);
     }
 
     //-------------------------------------------------------------------------

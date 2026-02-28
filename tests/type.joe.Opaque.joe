@@ -7,9 +7,10 @@ function testName() {
 
 function testJavaName() {
     var name = Joe.typeOf(JoeTest.OPAQUE).javaName();
-    assertEQ(name, "com.wjduquette.joe.tools.test.TestPackage$OpaqueValue");
+    assertEQ(name, "com.wjduquette.joe.runner.TestPackage$OpaqueValue");
 }
+
 function testToString() {
     var string = JoeTest.OPAQUE.toString();
-    assertEQ(string, "com.wjduquette.joe.tools.test.TestPackage$OpaqueValue");
+    assertEQ(string, "com.wjduquette.joe.runner.TestPackage$OpaqueValue");
 }
