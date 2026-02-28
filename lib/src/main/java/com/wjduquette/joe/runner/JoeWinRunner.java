@@ -2,7 +2,6 @@ package com.wjduquette.joe.runner;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.console.ConsolePackage;
-import com.wjduquette.joe.pkg.text.JoeTextPackage;
 import com.wjduquette.joe.win.WinPackage;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -91,7 +90,6 @@ public class JoeWinRunner {
         consolePackage.setScript(scriptPath);
         consolePackage.getArgs().addAll(scriptArgs);
         joe.installPackage(consolePackage);
-        joe.registerPackage(JoeTextPackage.PACKAGE);
         joe.installPackage(new WinPackage(stage, root));
 
         // NEXT, install and register packages requested by the client.

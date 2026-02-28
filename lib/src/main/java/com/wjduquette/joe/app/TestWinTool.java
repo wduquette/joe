@@ -1,8 +1,7 @@
-package com.wjduquette.joe.tools.test;
+package com.wjduquette.joe.app;
 
 import com.wjduquette.joe.*;
-import com.wjduquette.joe.pkg.text.JoeTextPackage;
-import com.wjduquette.joe.app.App;
+import com.wjduquette.joe.runner.TestPackage;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 import com.wjduquette.joe.win.WinPackage;
@@ -166,7 +165,6 @@ public class TestWinTool implements Tool {
         var joe = new Joe(engineType);
         joe.installPackage(new TestPackage(engineType));
         joe.installPackage(new WinPackage(new Stage(), new VBox()));
-        joe.registerPackage(JoeTextPackage.PACKAGE);
         if (finder != null) {
             joe.registerPackages(finder);
         }

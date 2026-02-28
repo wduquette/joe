@@ -2,7 +2,6 @@ package com.wjduquette.joe.runner;
 
 import com.wjduquette.joe.*;
 import com.wjduquette.joe.console.ConsolePackage;
-import com.wjduquette.joe.pkg.text.JoeTextPackage;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -82,7 +81,6 @@ public class JoeRunner {
         consolePackage.setScript(scriptPath);
         consolePackage.getArgs().addAll(scriptArgs);
         joe.installPackage(consolePackage);
-        joe.registerPackage(JoeTextPackage.PACKAGE);
 
         // NEXT, install and register packages requested by the client.
         installed.forEach(joe::installPackage);
