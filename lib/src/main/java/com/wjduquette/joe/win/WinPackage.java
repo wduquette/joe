@@ -61,8 +61,10 @@ public class WinPackage extends NativePackage {
     //
     // Scripts can style widgets using CSS in several different ways.
     //
-    // - The [[static:Win.css]] method associates a CSS stylesheet, passed
-    //   as a text string, with the application as a whole.
+    // - [[Scene]] widgets and [[Parent]] nodes have a `getStylesheets`
+    //   method; clients can add stylesheets to the list.
+    // - The [[static:Win.css2sheet]] method converts a CSS text string to
+    //   an appropriate URL for adding to the `getStylesheets` list.
     // - Each [[Node]] subtype has a [[method:Node.styleClasses]] method that returns
     //   a list of the names of the CSS style classes that apply to the widget;
     //   add any desired style class name to this list.

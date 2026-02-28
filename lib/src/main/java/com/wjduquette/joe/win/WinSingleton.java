@@ -15,6 +15,7 @@ class WinSingleton extends ProxyType<Void> {
     // Constructor
 
     //**
+    // @package joe.win
     // @singleton Win
     // This static type provides access to the application window.
     WinSingleton() {

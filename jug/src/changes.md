@@ -26,21 +26,23 @@ scripts.
     - The `define relation/arity;` syntax now defines an ordered relation with
       field names `a`, `b`, `c`, ...; the arity must be from 1 to 9.
 - Library
-  - Experimental `joe.win` Package
-    - Enhancements and cleanup 
+    - Java API
+      - Added `JoeRunner` to make it easier to write domain-specific `joe run`
+        applications.
+      - Added `TestRunner` to make it easier to write domain-specific `joe test`
+        applications.
   - Nero API
     - Simplified the `Fact`, `Schema`, and `Shape` classes accordingly.
     - Revamped the Java `Nero` and `NeroDatabase` APIs
     - Revamped the Joe `Fact` and `RuleSet` APIs, and replaced the
       `FactBase` API with a new `Database` API.
+  - Experimental `joe.win` Package
+      - Enhancements and cleanup
 - Tools
   - Extended `joe doc` to process standalone Markdown files, translating
     JoeDoc links and inserting content from the scanned JoeDoc comments.
       - JoeDoc link mnemonics are now more readable.
-  - Added `JoeRunner` to make it easier to write domain-specific `joe run`
-    applications.
-  - Added `JoeWinRunner` to make it easier to write domain-specific `joe win`
-    applications.
+      - 
 
 ## Changes in 0.8.0 (30 August 2025)
 

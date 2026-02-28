@@ -309,6 +309,7 @@ public class TestRunner {
 
         /**
          * Sets the runner's output handler.  Defaults to System.out::print.
+         * @param handler The handler.
          * @return The runner
          */
         @SuppressWarnings("unused")
@@ -319,6 +320,7 @@ public class TestRunner {
 
         /**
          * Sets the runner's application name
+         * @param value The application name
          * @return The runner
          */
         public Builder appName(String value) {
@@ -329,6 +331,7 @@ public class TestRunner {
         /**
          * Sets the runner's Joe engine type, which defaults to the
          * default engine type.
+         * @param value The Joe engine type, e.g., Joe.CLARK.
          * @return The runner
          */
         public Builder engineType(String value) {
