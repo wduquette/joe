@@ -53,7 +53,7 @@ public class AssertErrorType extends ProxyType<AssertError> {
     // Creates an `AssertError` with the given *message* and informational
     // trace messages.
     private Object _initializer(Joe joe, Args args) {
-        args.minArity(1, "AssertError(message,[trace, ...])");
+        args.arityMin(1, "AssertError(message,[trace, ...])");
         var error = new AssertError(joe.stringify(args.next()));
 
         while (args.hasNext()) {

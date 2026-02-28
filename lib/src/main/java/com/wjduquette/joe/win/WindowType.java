@@ -118,7 +118,7 @@ public class WindowType extends WidgetType<Window> {
     // %result this
     // Centers the window on the screen.
     private Object _centerOnScreen(Window win, Joe joe, Args args) {
-        args.exactArity(0, "centerOnScreen()");
+        args.arity(0, "centerOnScreen()");
         win.centerOnScreen();
         return win;
     }
@@ -129,7 +129,7 @@ public class WindowType extends WidgetType<Window> {
     // Gets the window's `#height` in pixels.
     // See [[property:Window.height]].
     private Object _getHeight(Window win, Joe joe, Args args) {
-        args.exactArity(0, "getHeight()");
+        args.arity(0, "getHeight()");
         return win.getHeight();
     }
 
@@ -138,7 +138,7 @@ public class WindowType extends WidgetType<Window> {
     // %result Scene
     // Gets the scene displayed in the window.
     private Object _getScene(Window win, Joe joe, Args args) {
-        args.exactArity(0, "getScene()");
+        args.arity(0, "getScene()");
         return win.getScene();
     }
 
@@ -147,7 +147,7 @@ public class WindowType extends WidgetType<Window> {
     // %result value
     // Gets the window's `userData` value.
     private Object _getUserData(Window win, Joe joe, Args args) {
-        args.exactArity(0, "getUserData()");
+        args.arity(0, "getUserData()");
         return win.getUserData();
     }
 
@@ -157,7 +157,7 @@ public class WindowType extends WidgetType<Window> {
     // Gets the window's `#width` in pixels.
     // See [[property:Window.width]].
     private Object _getWidth(Window win, Joe joe, Args args) {
-        args.exactArity(0, "getWidth()");
+        args.arity(0, "getWidth()");
         return win.getWidth();
     }
 
@@ -167,7 +167,7 @@ public class WindowType extends WidgetType<Window> {
     // %result this
     // Sets the height of the widget in pixels.
     private Object _height(Window win, Joe joe, Args args) {
-        args.exactArity(1, "height(pixels)");
+        args.arity(1, "height(pixels)");
         win.setHeight(joe.toDouble(args.next()));
         return win;
     }
@@ -177,7 +177,7 @@ public class WindowType extends WidgetType<Window> {
     // %result this
     // Pops the window down.
     private Object _hide(Window win, Joe joe, Args args) {
-        args.exactArity(0, "hide()");
+        args.arity(0, "hide()");
         win.hide();
         return win;
     }
@@ -188,7 +188,7 @@ public class WindowType extends WidgetType<Window> {
     // Gets whether the window has the input focus or not.
     // See [[property:Window.focused]].
     private Object _isFocused(Window win, Joe joe, Args args) {
-        args.exactArity(0, "isFocused()");
+        args.arity(0, "isFocused()");
         return win.isFocused();
     }
 
@@ -198,7 +198,7 @@ public class WindowType extends WidgetType<Window> {
     // Gets whether the window is showing on the screen.
     // See [[property:Window.showing]].
     private Object _isShowing(Window win, Joe joe, Args args) {
-        args.exactArity(0, "isShowing()");
+        args.arity(0, "isShowing()");
         return win.isShowing();
     }
 
@@ -211,7 +211,7 @@ public class WindowType extends WidgetType<Window> {
     // when the user explicitly closes the window, and can prevent the window
     // from closing by disposing of the event.
     private Object _onCloseRequest(Window win, Joe joe, Args args) {
-        args.exactArity(1, "onCloseRequest(callable)");
+        args.arity(1, "onCloseRequest(callable)");
         win.setOnCloseRequest(Win.toWindowEvent(joe, args.next()));
         return win;
     }
@@ -224,7 +224,7 @@ public class WindowType extends WidgetType<Window> {
     // [[property:Window.onHidden]]` handler.  The callable is called
     // after the window is removed from the screen.
     private Object _onHidden(Window win, Joe joe, Args args) {
-        args.exactArity(1, "onHidden(callable)");
+        args.arity(1, "onHidden(callable)");
         win.setOnHidden(Win.toWindowEvent(joe, args.next()));
         return win;
     }
@@ -238,7 +238,7 @@ public class WindowType extends WidgetType<Window> {
     // [[property:Window.onHiding]]` handler.  The callable is called
     // just before the window is removed from the screen.
     private Object _onHiding(Window win, Joe joe, Args args) {
-        args.exactArity(1, "onHiding(callable)");
+        args.arity(1, "onHiding(callable)");
         win.setOnHiding(Win.toWindowEvent(joe, args.next()));
         return win;
     }
@@ -251,7 +251,7 @@ public class WindowType extends WidgetType<Window> {
     // [[property:Window.onShowing]]` handler.  The callable is called
     // just before the window is displayed on the screen.
     private Object _onShowing(Window win, Joe joe, Args args) {
-        args.exactArity(1, "onShowing(callable)");
+        args.arity(1, "onShowing(callable)");
         win.setOnShowing(Win.toWindowEvent(joe, args.next()));
         return win;
     }
@@ -265,7 +265,7 @@ public class WindowType extends WidgetType<Window> {
     // [[property:Window.onShown]]` handler.  The callable is called
     // just after the window is displayed on the screen.
     private Object _onShown(Window win, Joe joe, Args args) {
-        args.exactArity(1, "onShown(callable)");
+        args.arity(1, "onShown(callable)");
         win.setOnShown(Win.toWindowEvent(joe, args.next()));
         return win;
     }
@@ -275,7 +275,7 @@ public class WindowType extends WidgetType<Window> {
     // %result this
     // Requests the input focus for this window.
     private Object _requestFocus(Window win, Joe joe, Args args) {
-        args.exactArity(0, "requestFocus()");
+        args.arity(0, "requestFocus()");
         win.requestFocus();
         return win;
     }
@@ -285,7 +285,7 @@ public class WindowType extends WidgetType<Window> {
     // %result this
     // Sizes the window to fit the scene.
     private Object _sizeToScene(Window win, Joe joe, Args args) {
-        args.exactArity(0, "sizeToScene()");
+        args.arity(0, "sizeToScene()");
         win.sizeToScene();
         return win;
     }
@@ -296,7 +296,7 @@ public class WindowType extends WidgetType<Window> {
     // %result this
     // Sets the widget's `userData` property.
     private Object _userData(Window win, Joe joe, Args args) {
-        args.exactArity(1, "userData(value)");
+        args.arity(1, "userData(value)");
         win.setUserData(args.next());
         return win;
     }
@@ -307,7 +307,7 @@ public class WindowType extends WidgetType<Window> {
     // %result this
     // Sets the width of the widget in pixels.
     private Object _width(Window win, Joe joe, Args args) {
-        args.exactArity(1, "width(pixels)");
+        args.arity(1, "width(pixels)");
         win.setWidth(joe.toDouble(args.next()));
         return win;
     }
@@ -318,7 +318,7 @@ public class WindowType extends WidgetType<Window> {
     // %result this
     // Sets the horizontal position of the window on the screen.
     private Object _x(Window win, Joe joe, Args args) {
-        args.exactArity(1, "x(pixels)");
+        args.arity(1, "x(pixels)");
         win.setX(joe.toDouble(args.next()));
         return win;
     }
@@ -329,7 +329,7 @@ public class WindowType extends WidgetType<Window> {
     // %result this
     // Sets the vertical position of the window on the screen.
     private Object _y(Window win, Joe joe, Args args) {
-        args.exactArity(1, "y(pixels)");
+        args.arity(1, "y(pixels)");
         win.setY(joe.toDouble(args.next()));
         return win;
     }

@@ -59,7 +59,7 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
     // be passed as a [[RuleSet]] or Nero script that contains only
     // non-transient `define` declarations.
     private Object _check(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(1, "check(validateSchema)");
+        args.arity(1, "check(validateSchema)");
         var rules = joe.toRules(args.next());
         var schema = rules.outputSchema();
         pipeline.check(schema);
@@ -85,7 +85,7 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
     // error if the facts produced by the rule set are not compatible
     // with the database's current content.
     private Object _load(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(0, "load()");
+        args.arity(0, "load()");
         pipeline.load();
         return pipeline.database();
     }
@@ -101,7 +101,7 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
     // as the fields of a `query/...` fact. The `query/...` fact
     // will not appear in the output.
     private Object _queryParm(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(2, "queryParm(name, value)");
+        args.arity(2, "queryParm(name, value)");
         return pipeline.queryParm(joe.toIdentifier(args.next()), args.next());
     }
 
@@ -117,7 +117,7 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
     // as the fields of a `query/...` fact. The `query/...` fact
     // will not appear in the output.
     private Object _queryParms(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(1, "queryParms(map)");
+        args.arity(1, "queryParms(map)");
         var map = joe.toMap(args.next());
         for (var e : map.entrySet()) {
             pipeline.queryParm(joe.toIdentifier(e.getKey()), e.getValue());
@@ -131,7 +131,7 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
     // Executes the rule set on the content of the database, returning
     // the newly inferred facts.  The database will be unchanged.
     private Object _query(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(0, "query()");
+        args.arity(0, "query()");
         var result = pipeline.query();
         return new SetValue(result.all());
     }
@@ -143,7 +143,7 @@ public class DatabasePipelineType extends ProxyType<NeroDatabase.Pipeline> {
     // Throws an error if the rule set is not compatible with the current
     // content of the database.
     private Object _update(NeroDatabase.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(0, "update()");
+        args.arity(0, "update()");
         pipeline.update();
         return pipeline.database();
     }

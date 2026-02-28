@@ -280,7 +280,7 @@ public class WidgetType<W> extends ProxyType<W> {
     // %result value
     // Gets the value of the property with the given *keyword*.
     private Object _get(W widget, Joe joe, Args args) {
-        args.exactArity(1, "get(keyword)");
+        args.arity(1, "get(keyword)");
         return toDef(joe, args.next()).getValue(widget);
     }
 
@@ -290,7 +290,7 @@ public class WidgetType<W> extends ProxyType<W> {
     // Returns a `Map` of the object's property keywords.  Modifying the
     // map will not modify the widget.
     private Object _getProperties(W obj, Joe joe, Args args) {
-        args.exactArity(0, "getProperties()");
+        args.arity(0, "getProperties()");
         var map = new MapValue();
         for (var e : properties.entrySet()) {
             var k = e.getKey();
@@ -306,7 +306,7 @@ public class WidgetType<W> extends ProxyType<W> {
     // %result joe.Set
     // Returns a readonly `Set` of the object's property keywords.
     private Object _getPropertyKeywords(W obj, Joe joe, Args args) {
-        args.exactArity(0, "getPropertyKeywords()");
+        args.arity(0, "getPropertyKeywords()");
         return joe.readonlySet(properties.keySet());
     }
 
@@ -316,7 +316,7 @@ public class WidgetType<W> extends ProxyType<W> {
     // %result joe.Boolean
     // Returns true if the widget has a property with the given keyword.
     private Object _hasProperty(W obj, Joe joe, Args args) {
-        args.exactArity(1, "hasProperty(keyword)");
+        args.arity(1, "hasProperty(keyword)");
 
         var def = properties.get(joe.toKeyword(args.next()));
         return def != null;
@@ -329,7 +329,7 @@ public class WidgetType<W> extends ProxyType<W> {
     // Returns true if the widget has a property with the given keyword and
     // the property's value can be set.
     private Object _isReadWrite(W obj, Joe joe, Args args) {
-        args.exactArity(1, "isReadWrite(keyword)");
+        args.arity(1, "isReadWrite(keyword)");
 
         var def = properties.get(joe.toKeyword(args.next()));
         if (def instanceof WidgetType.RWPropertyDef<W,?>) {
@@ -355,7 +355,7 @@ public class WidgetType<W> extends ProxyType<W> {
     //
     // The *callable* will be called when the property's value changes.
     private Object _listenTo(W obj, Joe joe, Args args) {
-        args.exactArity(2, "listenTo(keyword, callable");
+        args.arity(2, "listenTo(keyword, callable");
         var keyword = joe.toKeyword(args.next());
         var def =  toDef(joe, keyword);
         var prop =  def.getObservable(obj);
@@ -373,7 +373,7 @@ public class WidgetType<W> extends ProxyType<W> {
     // Sets the *value* of the property with the given *keyword*.
     // The *value* must be assignable to the property's value type.
     private Object _set(W obj, Joe joe, Args args) {
-        args.exactArity(2, "set(keyword, value)");
+        args.arity(2, "set(keyword, value)");
 
         var def = toDef(joe, args.next());
         if (def instanceof WidgetType.RWPropertyDef<W,?> rw) {
@@ -390,7 +390,7 @@ public class WidgetType<W> extends ProxyType<W> {
     // %result joe.String
     // Returns the value's string representation.
     private Object _toString(W obj, Joe joe, Args args) {
-        args.exactArity(0, "toString()");
+        args.arity(0, "toString()");
         return stringify(joe, obj);
     }
 

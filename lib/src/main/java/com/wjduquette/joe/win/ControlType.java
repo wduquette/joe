@@ -54,7 +54,7 @@ public class ControlType extends WidgetType<Control> {
     // %result this
     // Gives the control a tooltip with the given *text*.
     private Object _tooltipText(Control node, Joe joe, Args args) {
-        args.exactArity(1, "tooltipText(text)");
+        args.arity(1, "tooltipText(text)");
         node.setTooltip(new Tooltip(joe.stringify(args.next())));
         return node;
     }

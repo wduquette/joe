@@ -42,7 +42,7 @@ class WinSingleton extends ProxyType<Void> {
     //
     // See [[topic:joe.win.css]] for more on using CSS in `joe win` scripts.
     private Object _css2sheet(Joe joe, Args args) {
-        args.exactArity(1, "css2sheet(css)");
+        args.arity(1, "css2sheet(css)");
         var css = joe.toString(args.next());
 
         // %-encode for inclusion in a URL

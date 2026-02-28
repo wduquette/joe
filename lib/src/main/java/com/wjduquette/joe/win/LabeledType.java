@@ -92,7 +92,7 @@ class LabeledType extends WidgetType<Labeled> {
     // %result this
     // Sets the labeled's `#graphic` to the given [[Node]].
     private Object _graphic(Labeled node, Joe joe, Args args) {
-        args.exactArity(1, "graphic(node)");
+        args.arity(1, "graphic(node)");
         node.setGraphic(Win.toNode(joe, args.next()));
         return node;
     }
@@ -103,7 +103,7 @@ class LabeledType extends WidgetType<Labeled> {
     // %result this
     // Sets the labeled's `#text`.
     private Object _text(Labeled node, Joe joe, Args args) {
-        args.exactArity(1, "text(text)");
+        args.arity(1, "text(text)");
         node.setText(joe.stringify(args.next()));
         return node;
     }
@@ -114,7 +114,7 @@ class LabeledType extends WidgetType<Labeled> {
     // %result this
     // Sets the labeled's `#wrapText` flag.
     private Object _wrapText(Labeled node, Joe joe, Args args) {
-        args.exactArity(1, "wrapText(flag)");
+        args.arity(1, "wrapText(flag)");
         node.setWrapText(joe.toBoolean(args.next()));
         return node;
     }

@@ -44,7 +44,7 @@ public class ParentType extends WidgetType<Parent> {
     // as paths to local files, or as `data:` URLs produced by
     // [[static:Win.css2sheet]].
     private Object _getStylesheets(Parent parent, Joe joe, Args args) {
-        args.exactArity(0, "getStylesheets()");
+        args.arity(0, "getStylesheets()");
         return joe.wrapList(parent.getStylesheets(), String.class);
     }
 }

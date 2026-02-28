@@ -64,7 +64,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     // Gets whether the [[Node]] will resize itself to fill its region in
     // its parent `SplitPane`.
     private Object _isResizableWithParent(Joe joe, Args args) {
-        args.exactArity(1, "SplitPane.isResizableWithParent(node)");
+        args.arity(1, "SplitPane.isResizableWithParent(node)");
         return SplitPane.isResizableWithParent(joe.toClass(Node.class, args.next()));
     }
 
@@ -74,7 +74,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     // Sets whether the [[Node]] will resize itself to fill its region in
     // its parent `SplitPane`.
     private Object _setResizableWithParent(Joe joe, Args args) {
-        args.exactArity(2, "SplitPane.setResizableWithParent(node, flag)");
+        args.arity(2, "SplitPane.setResizableWithParent(node, flag)");
         SplitPane.setResizableWithParent(
             joe.toClass(Node.class, args.next()),
             joe.toBoolean(args.next()));
@@ -88,7 +88,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     // @init
     // Returns a `SplitPane`.
     private Object _initializer(Joe joe, Args args) {
-        args.exactArity(0, "SplitPane()");
+        args.arity(0, "SplitPane()");
         return new SplitPane();
     }
 
@@ -101,7 +101,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     // Returns a list of the divider positions, which are fractions
     // between 0.0 and 1.0.
     private Object _getDividers(SplitPane node, Joe joe, Args args) {
-        args.exactArity(0, "getDividers()");
+        args.arity(0, "getDividers()");
         return new ListValue(List.of(node.getDividerPositions()));
     }
 
@@ -110,7 +110,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     // %result this
     // Sets the orientation to horizontal
     private Object _horizontal(SplitPane node, Joe joe, Args args) {
-        args.exactArity(0, "horizontal()");
+        args.arity(0, "horizontal()");
         node.setOrientation(Orientation.HORIZONTAL);
         return node;
     }
@@ -121,7 +121,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     // %result this
     // Adds a value to the widget's list of [[Node]] widgets.
     private Object _item(SplitPane node, Joe joe, Args args) {
-        args.exactArity(1, "item(item)");
+        args.arity(1, "item(item)");
         node.getItems().add(Win.toNode(joe, args.next()));
         return node;
     }
@@ -132,7 +132,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     // Gets the list of the widget's items, which can be updated freely.
     // All items must be [[Node]] widgets.
     private Object _items(SplitPane node, Joe joe, Args args) {
-        args.exactArity(0, "items()");
+        args.arity(0, "items()");
         return joe.wrapList(node.getItems(), Node.class);
     }
 
@@ -143,7 +143,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     // Sets the value of divider with the given *index* to the given
     // position.
     private Object _setDivider(SplitPane node, Joe joe, Args args) {
-        args.exactArity(2, "setDivider(index, fraction)");
+        args.arity(2, "setDivider(index, fraction)");
         var index = joe.toIndex(args.next(), node.getItems().size() - 1);
         var position = toFraction(joe, args.next());
         node.setDividerPosition(index, position);
@@ -156,7 +156,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     // %result this
     // Sets the value of all dividers to the given positions.
     private Object _setDividers(SplitPane node, Joe joe, Args args) {
-        args.minArity(1, "setDividers(positions)");
+        args.arityMin(1, "setDividers(positions)");
         var numbers = new double[args.size()];
         for (int i = 0; i < args.size(); i++) {
             numbers[i] = toFraction(joe, args.get(i));
@@ -178,7 +178,7 @@ class SplitPaneType extends WidgetType<SplitPane> {
     // %result this
     // Sets the orientation to vertical
     private Object _vertical(SplitPane node, Joe joe, Args args) {
-        args.exactArity(0, "vertical()");
+        args.arity(0, "vertical()");
         node.setOrientation(Orientation.VERTICAL);
         return node;
     }

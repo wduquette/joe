@@ -70,7 +70,7 @@ class HBoxClass extends WidgetType<HBox> {
     // Gets how the [[Node]] will resize itself to the height of
     // its parent `HBox`.
     private Object _getHgrow(Joe joe, Args args) {
-        args.exactArity(1, "HBox.getHgrow(node)");
+        args.arity(1, "HBox.getHgrow(node)");
         return HBox.getHgrow(joe.toClass(Node.class, args.next()));
     }
 
@@ -80,7 +80,7 @@ class HBoxClass extends WidgetType<HBox> {
     // %result Insets
     // Gets the [[Node]]'s margin in its parent `HBox`.
     private Object _getMargin(Joe joe, Args args) {
-        args.exactArity(1, "HBox.getMargin(node)");
+        args.arity(1, "HBox.getMargin(node)");
         return HBox.getMargin(joe.toClass(Node.class, args.next()));
     }
 
@@ -90,7 +90,7 @@ class HBoxClass extends WidgetType<HBox> {
     // Sets how the [[Node]] will resize itself to the height of
     // its parent `HBox`, given a [[Priority]] value.
     private Object _setHgrow(Joe joe, Args args) {
-        args.exactArity(2, "HBox.setHgrow(node, priority)");
+        args.arity(2, "HBox.setHgrow(node, priority)");
         HBox.setHgrow(
             joe.toClass(Node.class, args.next()),
             joe.toClass(Priority.class, args.next())
@@ -104,7 +104,7 @@ class HBoxClass extends WidgetType<HBox> {
     // Gets the [[Node]]'s margin in its parent `HBox` given an
     // [[Insets]] object.
     private Object _setMargin(Joe joe, Args args) {
-        args.exactArity(2, "HBox.setMargin(node, insets)");
+        args.arity(2, "HBox.setMargin(node, insets)");
         HBox.setMargin(
             joe.toClass(Node.class, args.next()),
             joe.toClass(Insets.class, args.next())
@@ -120,7 +120,7 @@ class HBoxClass extends WidgetType<HBox> {
     // @init
     // Returns an `HBox`.
     private Object _initializer(Joe joe, Args args) {
-        args.exactArity(0, "HBox()");
+        args.arity(0, "HBox()");
         return make(joe, this);
     }
 
@@ -133,7 +133,7 @@ class HBoxClass extends WidgetType<HBox> {
     // %result this
     // Sets the vertical space in *pixels* between each child.
     private Object _spacing(HBox node, Joe joe, Args args) {
-        args.exactArity(1, "spacing(pixels)");
+        args.arity(1, "spacing(pixels)");
         node.setSpacing(joe.toDouble(args.next()));
         return node;
     }

@@ -71,7 +71,7 @@ public class SceneType extends WidgetType<Scene> {
     // %result Parent
     // Gets the scene's root widget.
     private Object _getRoot(Scene scene, Joe joe, Args args) {
-        args.exactArity(0, "getRoot()");
+        args.arity(0, "getRoot()");
         return scene.getRoot();
     }
 
@@ -82,7 +82,7 @@ public class SceneType extends WidgetType<Scene> {
     // as paths to local files, or as `data:` URLs produced by
     // [[static:Win.css2sheet]].
     private Object _getStylesheets(Scene scene, Joe joe, Args args) {
-        args.exactArity(0, "getStylesheets()");
+        args.arity(0, "getStylesheets()");
         return joe.wrapList(scene.getStylesheets(), String.class);
     }
 }

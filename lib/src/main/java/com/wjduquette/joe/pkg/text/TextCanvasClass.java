@@ -79,7 +79,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     // @init
     // Creates a new, empty TextCanvas of size [0, 0].
     private Object _init(Joe joe, Args args) {
-        args.exactArity(0, "TextCanvas()");
+        args.arity(0, "TextCanvas()");
         return make(joe, this);
     }
 
@@ -91,7 +91,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     // %result String
     // Returns the contents of the canvas as a String.
     private Object _asText(TextCanvas tc, Joe joe, Args args) {
-        args.exactArity(0, "asText()");
+        args.arity(0, "asText()");
         return tc.toString();
     }
 
@@ -102,7 +102,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     // Fills the character cells in the given region with the given
     // character.
     private Object _fill(TextCanvas tc, Joe joe, Args args) {
-        args.exactArity(5, "fill(char, column, row, width, height)");
+        args.arity(5, "fill(char, column, row, width, height)");
         var text = joe.stringify(args.next());
         if (text.length() != 1) {
             throw joe.expected("character", text);
@@ -123,7 +123,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     // %result String
     // Gets the character at (*column*, *row*) as a String
     private Object _get(TextCanvas tc, Joe joe, Args args) {
-        args.exactArity(2, "get(column, row)");
+        args.arity(2, "get(column, row)");
         var c = toCellIndex(joe, args.next());
         var r = toCellIndex(joe, args.next());
 
@@ -135,7 +135,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     // %result Number
     // Returns the height of the canvas in rows.
     private Object _height(TextCanvas tc, Joe joe, Args args) {
-        args.exactArity(0, "height()");
+        args.arity(0, "height()");
         return (double)tc.getHeight();
     }
 
@@ -147,7 +147,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     // and extending to the right. No provision is made for multiline
     // text.
     private Object _put(TextCanvas tc, Joe joe, Args args) {
-        args.exactArity(3, "put(c, r, text)");
+        args.arity(3, "put(c, r, text)");
         var c = toCellIndex(joe, args.next());
         var r = toCellIndex(joe, args.next());
         var text = joe.stringify(args.next());
@@ -165,7 +165,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     // be at (*column*, *row*).  Text that extends to the left of column
     // 0 is clipped.
     private Object _putLeft(TextCanvas tc, Joe joe, Args args) {
-        args.exactArity(3, "putLeft(c, r, text)");
+        args.arity(3, "putLeft(c, r, text)");
         var c = toCellIndex(joe, args.next());
         var r = toCellIndex(joe, args.next());
         var text = joe.stringify(args.next());
@@ -181,7 +181,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     // Writes the *text* to the canvas starting at (*column*, *row*), and
     // extending down.
     private Object _putDown(TextCanvas tc, Joe joe, Args args) {
-        args.exactArity(3, "putDown(c, r, text)");
+        args.arity(3, "putDown(c, r, text)");
         var c = toCellIndex(joe, args.next());
         var r = toCellIndex(joe, args.next());
         var text = joe.stringify(args.next());
@@ -198,7 +198,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     // extending up, i.e., the text's rightmost character will
     // be at (*column*, *row*).  Text that extends above row 0 is clipped.
     private Object _putUp(TextCanvas tc, Joe joe, Args args) {
-        args.exactArity(3, "putUp(c, r, text)");
+        args.arity(3, "putUp(c, r, text)");
         var c = toCellIndex(joe, args.next());
         var r = toCellIndex(joe, args.next());
         var text = joe.stringify(args.next());
@@ -212,7 +212,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     // %result List
     // Returns the size of the canvas as a two-item list, \[*width*, *height*].
     private Object _size(TextCanvas tc, Joe joe, Args args) {
-        args.exactArity(0, "size()");
+        args.arity(0, "size()");
         return ListValue.pair((double)tc.getWidth(), (double)tc.getHeight());
     }
 
@@ -221,7 +221,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     // %result Number
     // Returns the width of the canvas in columns.
     private Object _width(TextCanvas tc, Joe joe, Args args) {
-        args.exactArity(0, "width()");
+        args.arity(0, "width()");
         return (double)tc.getWidth();
     }
 
@@ -231,7 +231,7 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     // Returns the canvas's string representation, which is not its
     // content.
     private Object _toString(TextCanvas tc, Joe joe, Args args) {
-        args.exactArity(0, "toString()");
+        args.arity(0, "toString()");
         return stringify(joe, tc);
     }
 

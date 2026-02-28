@@ -49,7 +49,7 @@ public class TextTableType extends ProxyType<TextTableValue> {
     // @init
     // Creates a new TextTable.
     private Object _init(Joe joe, Args args) {
-        args.exactArity(0, "TextTable()");
+        args.arity(0, "TextTable()");
         return new TextTableValue();
     }
 
@@ -62,7 +62,7 @@ public class TextTableType extends ProxyType<TextTableValue> {
     // %result this
     // Adds a [[TextColumn]] to the table.
     private Object _column(TextTableValue tc, Joe joe, Args args) {
-        args.exactArity(1, "column(column)");
+        args.arity(1, "column(column)");
         tc.getColumns().add(joe.toType(TextColumnValue.class, args.next()));
         return tc;
     }
@@ -73,7 +73,7 @@ public class TextTableType extends ProxyType<TextTableValue> {
     // Returns the list of [[TextColumn|TextColumns]], which can
     // be updated freely.
     private Object _columns(TextTableValue tc, Joe joe, Args args) {
-        args.exactArity(0, "columns()");
+        args.arity(0, "columns()");
         return joe.wrapList(tc.getColumns(), TextColumnValue.class);
     }
 
@@ -84,7 +84,7 @@ public class TextTableType extends ProxyType<TextTableValue> {
     // Given a [[joe.List]] of *values* and the column definitions, returns
     // a table in Markdown format.
     private Object _toMarkdown(TextTableValue tc, Joe joe, Args args) {
-        args.exactArity(1, "toMarkdown(values)");
+        args.arity(1, "toMarkdown(values)");
         return tc.toMarkdown(joe.toList(args.next()));
     }
 
@@ -95,7 +95,7 @@ public class TextTableType extends ProxyType<TextTableValue> {
     // Given a [[joe.List]] of *values* and the column definitions, returns
     // a table suitable for output to a terminal.
     private Object _toTerminal(TextTableValue tc, Joe joe, Args args) {
-        args.exactArity(1, "toTerminal(values)");
+        args.arity(1, "toTerminal(values)");
         return tc.toTerminal(joe.toList(args.next()));
     }
 }

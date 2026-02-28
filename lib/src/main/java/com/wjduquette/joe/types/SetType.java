@@ -97,7 +97,7 @@ public class SetType extends ProxyType<JoeSet> {
     // %result Boolean
     // Adds the *value* to the set, returning true if it wasn't already present.
     private Object _add(JoeSet set, Joe joe, Args args) {
-        args.exactArity(1, "add(value)");
+        args.arity(1, "add(value)");
 
         return set.add(args.next());
     }
@@ -108,7 +108,7 @@ public class SetType extends ProxyType<JoeSet> {
     // %result Boolean
     // Adds the content of the *collection* to this set.
     private Object _addAll(JoeSet set, Joe joe, Args args) {
-        args.exactArity(1, "addAll(collection)");
+        args.arity(1, "addAll(collection)");
         var arg = args.next();
 
         if (arg instanceof Collection<?> other) {
@@ -123,7 +123,7 @@ public class SetType extends ProxyType<JoeSet> {
     // %result this
     // Empties the set.
     private Object _clear(JoeSet set, Joe joe, Args args) {
-        args.exactArity(0, "clear()");
+        args.arity(0, "clear()");
 
         set.clear();
         return set;
@@ -135,7 +135,7 @@ public class SetType extends ProxyType<JoeSet> {
     // %result Boolean
     // Returns `true` if the set contains the *value*, and `false` otherwise.
     private Object _contains(JoeSet set, Joe joe, Args args) {
-        args.exactArity(1, "contains(value)");
+        args.arity(1, "contains(value)");
 
         return set.contains(args.next());
     }
@@ -147,7 +147,7 @@ public class SetType extends ProxyType<JoeSet> {
     // Returns `true` if the set contains the values in the
     // *collection*, and `false` otherwise.
     private Object _containsAll(JoeSet set, Joe joe, Args args) {
-        args.exactArity(1, "contains(collection)");
+        args.arity(1, "contains(collection)");
         var collection = joe.toCollection(args.next());
 
         return set.containsAll(collection);
@@ -158,7 +158,7 @@ public class SetType extends ProxyType<JoeSet> {
     // %result Set
     // Returns a shallow copy of this set.
     private Object _copy(JoeSet set, Joe joe, Args args) {
-        args.exactArity(0, "copy()");
+        args.arity(0, "copy()");
 
         return new SetValue(set);
     }
@@ -170,7 +170,7 @@ public class SetType extends ProxyType<JoeSet> {
     // Returns a list containing the elements for which the filter
     // *predicate* is true.
     private Object _filter(JoeSet set, Joe joe, Args args) {
-        args.exactArity(1, "filter(predicate)");
+        args.arity(1, "filter(predicate)");
         var callable = args.next();
 
         var result = new SetValue();
@@ -187,7 +187,7 @@ public class SetType extends ProxyType<JoeSet> {
     // %result Boolean
     // Returns `true` if the set is empty, and `false` otherwise.
     private Object _isEmpty(JoeSet set, Joe joe, Args args) {
-        args.exactArity(0, "isEmpty()");
+        args.arity(0, "isEmpty()");
 
         return set.isEmpty();
     }
@@ -199,7 +199,7 @@ public class SetType extends ProxyType<JoeSet> {
     // Returns a set containing the items that result from applying
     // function *func* to each item in this set.
     private Object _map(JoeSet set, Joe joe, Args args) {
-        args.exactArity(1, "map(func)");
+        args.arity(1, "map(func)");
         var callable = args.next();
 
         var result = new SetValue();
@@ -217,7 +217,7 @@ public class SetType extends ProxyType<JoeSet> {
     // Removes the value, return `true` if it was present and `false`
     // otherwise.
     private Object _remove(JoeSet set, Joe joe, Args args) {
-        args.exactArity(1, "remove(value)");
+        args.arity(1, "remove(value)");
 
         return set.remove(args.next());
     }
@@ -229,7 +229,7 @@ public class SetType extends ProxyType<JoeSet> {
     // Removes all values in the *collection* from the set, returning `true`
     // if the set changed and `false` otherwise.
     private Object _removeAll(JoeSet set, Joe joe, Args args) {
-        args.exactArity(1, "removeAll(collection)");
+        args.arity(1, "removeAll(collection)");
 
         var arg = args.next();
         if (arg instanceof Collection<?> other) {
@@ -244,7 +244,7 @@ public class SetType extends ProxyType<JoeSet> {
     // %result Number
     // Returns the number of values in the set.
     private Object _size(JoeSet set, Joe joe, Args args) {
-        args.exactArity(0, "size()");
+        args.arity(0, "size()");
 
         return (double)set.size();
     }
@@ -282,7 +282,7 @@ public class SetType extends ProxyType<JoeSet> {
     // %result String
     // Returns the set's string representation.
     private Object _toString(JoeSet set, Joe joe, Args args) {
-        args.exactArity(0, "toString()");
+        args.arity(0, "toString()");
 
         return stringify(joe, set);
     }

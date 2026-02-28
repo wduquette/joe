@@ -68,7 +68,7 @@ public class NeroPipelineType extends ProxyType<Nero.Pipeline> {
     // Executes the rule set given a collection of facts, and returns
     // the newly inferred facts.
     private Object _query(Nero.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(1, "query(facts)");
+        args.arity(1, "query(facts)");
         var facts = joe.toFacts(args.next());
         var result = pipeline.query(new FactSet(facts));
         return new SetValue(result.all());
@@ -85,7 +85,7 @@ public class NeroPipelineType extends ProxyType<Nero.Pipeline> {
     // as the fields of a `query/...` fact. The `query/...` fact
     // will not appear in the output.
     private Object _queryParm(Nero.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(2, "queryParm(name, value)");
+        args.arity(2, "queryParm(name, value)");
         return pipeline.queryParm(joe.toIdentifier(args.next()), args.next());
     }
 
@@ -101,7 +101,7 @@ public class NeroPipelineType extends ProxyType<Nero.Pipeline> {
     // as the fields of a `query/...` fact. The `query/...` fact
     // will not appear in the output.
     private Object _queryParms(Nero.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(1, "queryParms(map)");
+        args.arity(1, "queryParms(map)");
         var map = joe.toMap(args.next());
         for (var e : map.entrySet()) {
             pipeline.queryParm(joe.toIdentifier(e.getKey()), e.getValue());
@@ -115,7 +115,7 @@ public class NeroPipelineType extends ProxyType<Nero.Pipeline> {
     // Executes the rule set and returns a [[Set]] of all inferred
     // [[Fact|Facts]].
     private Object _infer(Nero.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(0, "infer()");
+        args.arity(0, "infer()");
         return new SetValue(pipeline.infer().all());
     }
 
@@ -126,7 +126,7 @@ public class NeroPipelineType extends ProxyType<Nero.Pipeline> {
     // Executes the rule set given a collection of facts, and returns
     // an updated collection.
     private Object _update(Nero.Pipeline pipeline, Joe joe, Args args) {
-        args.exactArity(1, "update(facts)");
+        args.arity(1, "update(facts)");
         var facts = new FactSet(joe.toFacts(args.next()));
         pipeline.update(facts);
         return new SetValue(facts.all());

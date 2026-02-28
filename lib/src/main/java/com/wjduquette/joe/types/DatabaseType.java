@@ -149,7 +149,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Throws an error if the relations being added are incompatible with the
     // current contents of the database.
     private Object _addFacts(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "addFacts(facts)");
+        args.arity(1, "addFacts(facts)");
         var arg = args.next();
 
         if (arg instanceof NeroDatabase other) {
@@ -169,7 +169,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // returning a value of some type B.  If the conversion fails, the
     // *mapper* should return null or throw an error.
     private Object _addMapper(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(2, "addMapper(keyword, mapper)");
+        args.arity(2, "addMapper(keyword, mapper)");
         var k = joe.toKeyword(args.next());
         var f = joe.toCallable(args.next());
         db.addMapper(k.name(), a -> joe.call(f, a));
@@ -183,7 +183,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Adds a collection of `mapsTo/f,a,b` functions, where *map* is a map from
     // keyword to `callable/1`.  See [[method:Database.addMapper]].
     private Object _addMappers(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "addMappers(map)");
+        args.arity(1, "addMappers(map)");
         var input = joe.toMap(args.next());
         var map = new HashMap<Keyword, Mapper>();
         for (var e : input.entrySet()) {
@@ -200,7 +200,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %result Set
     // Returns a read-only [[Set]] of all facts in the database.
     private Object _all(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(0, "all()");
+        args.arity(0, "all()");
         return joe.readonlySet(db.all());
     }
 
@@ -209,7 +209,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %result this
     // Clears the database of its schema and facts.
     private Object _clear(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(0, "clear()");
+        args.arity(0, "clear()");
         db.clear();
         return db;
     }
@@ -232,7 +232,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %result this
     // Drops a relation from the database, removing all its facts.
     private Object _drop(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "drop(name)");
+        args.arity(1, "drop(name)");
         db.drop(joe.toIdentifier(args.next()));
         return db;
     }
@@ -246,7 +246,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Returns a set containing the [[Fact|Facts]] for which the filter
     // *predicate* is true.
     private Object _filter(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "filter(predicate)");
+        args.arity(1, "filter(predicate)");
         var callable = args.next();
 
         var result = new SetValue();
@@ -263,7 +263,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %result Boolean
     // Returns the debug flag.
     private Object _isDebug(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(0, "isDebug()");
+        args.arity(0, "isDebug()");
         return db.isDebug();
     }
 
@@ -272,7 +272,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %result Boolean
     // Returns true if the database is empty, and false otherwise.
     private Object _isEmpty(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(0, "isEmpty()");
+        args.arity(0, "isEmpty()");
         return db.isEmpty();
     }
 
@@ -287,7 +287,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     //
     // Note: `db.load(path)` is equivalent to `db.withFile(path).load()`.
     private Object _load(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "load(path)");
+        args.arity(1, "load(path)");
         var path = joe.toPath(args.next());
         return db.load(path);
     }
@@ -299,7 +299,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Returns a set containing the items that result from applying
     // function *func* to each item in this set.
     private Object _map(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "map(func)");
+        args.arity(1, "map(func)");
         var callable = args.next();
 
         var result = new SetValue();
@@ -319,7 +319,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     //
     // Note: `db.query(rules)` is equivalent to `db.withRules(rules).query()`.
     private Object _query(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "query(rules)");
+        args.arity(1, "query(rules)");
         return new SetValue(db.query(joe.toRules(args.next())).all());
     }
 
@@ -330,7 +330,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Returns a read-only [[Set]] of all facts in the database that
     // have the given *relation*.
     private Object _relation(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "relation(relation)");
+        args.arity(1, "relation(relation)");
         return joe.readonlySet(
             db.relation(joe.toIdentifier(args.next())));
     }
@@ -341,7 +341,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Returns a read-only [[Set]] of the names of the relations
     // of the facts in the database.
     private Object _relations(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(0, "relations()");
+        args.arity(0, "relations()");
         return joe.readonlySet(db.getRelations());
     }
 
@@ -351,7 +351,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %result this
     // Deletes a single [[Fact]] from the database.
     private Object _remove(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "remove(fact)");
+        args.arity(1, "remove(fact)");
         db.remove(joe.toFact(args.next()));
         return db;
     }
@@ -364,7 +364,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // be another [[Database]], or a collection of values
     // to be converted to facts.
     private Object _removeAll(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "removeAll(facts)");
+        args.arity(1, "removeAll(facts)");
         var arg = args.next();
         if (arg instanceof NeroDatabase other) {
             db.removeAll(other.all());
@@ -380,7 +380,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %result this
     // Deletes facts matching the predicate from the database.
     private Object _removeIf(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "removeIf(predicate)");
+        args.arity(1, "removeIf(predicate)");
         var callable = args.next();
 
         var items = new HashSet<Fact>();
@@ -400,7 +400,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Renames a relation, replacing any existing relation that has the new
     // name.
     private Object _rename(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(2, "rename(oldName, newName)");
+        args.arity(2, "rename(oldName, newName)");
         db.rename(
             joe.toIdentifier(args.next()),
             joe.toIdentifier(args.next())
@@ -413,7 +413,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %result Number
     // Returns the number of facts in the database.
     private Object _size(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(0, "size()");
+        args.arity(0, "size()");
         return (double)db.size();
     }
 
@@ -445,7 +445,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // Throws an error if the fact contains a term that cannot be represented
     // in Nero syntax.
     private Object _toNeroAxiom(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "toNeroAxiom(fact)");
+        args.arity(1, "toNeroAxiom(fact)");
         return db.toNeroAxiom(joe.toFact(args.next()));
     }
 
@@ -454,7 +454,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // %result String
     // Returns the value's string representation.
     private Object _toString(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(0, "toString()");
+        args.arity(0, "toString()");
         return stringify(joe, db);
     }
 
@@ -468,7 +468,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     //
     // Note: `db.update(rules)` is equivalent to `db.withRules(rules).update()`.
     private Object _update(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "update(rules)");
+        args.arity(1, "update(rules)");
         var rules = joe.toRules(args.next());
         return db.update(rules);
     }
@@ -481,7 +481,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // on the database content in a variety of ways. The *scriptFile* must be
     // the file's [[Path]].
     private Object _withFile(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "withFile(scriptFile)");
+        args.arity(1, "withFile(scriptFile)");
         var path = joe.toPath(args.next());
         return db.withFile(path);
     }
@@ -494,7 +494,7 @@ public class DatabaseType extends ProxyType<NeroDatabase> {
     // on the database content in a variety of ways.  The
     // *rules* may be passed as a [[RuleSet]] or as a Nero script.
     private Object _withRules(NeroDatabase db, Joe joe, Args args) {
-        args.exactArity(1, "withRules(rules)");
+        args.arity(1, "withRules(rules)");
         var rules = joe.toRules(args.next());
         return db.withRules(rules);
     }

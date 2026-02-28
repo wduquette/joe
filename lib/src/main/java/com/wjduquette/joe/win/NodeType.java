@@ -104,7 +104,7 @@ public class NodeType extends WidgetType<Node> {
     // %result joe.String
     // Gets the value of the node's `#id` property.
     private Object _getId(Node node, Joe joe, Args args) {
-        args.exactArity(0, "getId()");
+        args.arity(0, "getId()");
         return node.getId();
     }
 
@@ -135,7 +135,7 @@ public class NodeType extends WidgetType<Node> {
     // %result this
     // Sets the node's `#id` property to the given *id* string.
     private Object _id(Node node, Joe joe, Args args) {
-        args.exactArity(1, "id(id)");
+        args.arity(1, "id(id)");
         var id = joe.toString(args.next());
         node.setId(id);
         return node;
@@ -148,7 +148,7 @@ public class NodeType extends WidgetType<Node> {
     // Returns `true` if this node's `disable` property has
     // been set, and `false` otherwise.
     private Object _isDisable(Node node, Joe joe, Args args) {
-        args.exactArity(0, "isDisable()");
+        args.arity(0, "isDisable()");
         return node.isDisable();
     }
 
@@ -158,7 +158,7 @@ public class NodeType extends WidgetType<Node> {
     // Returns `true` if this node is disabled because it or a parent
     // node's `disable` property has been set, and `false` otherwise.
     private Object _isDisabled(Node node, Joe joe, Args args) {
-        args.exactArity(0, "isDisabled()");
+        args.arity(0, "isDisabled()");
         return node.isDisabled();
     }
 
@@ -175,7 +175,7 @@ public class NodeType extends WidgetType<Node> {
     // This is equivalent to the
     // [[static:SplitPane.setResizableWithParent]] method.
     private Object _resizeWithSplit(Node node, Joe joe, Args args) {
-        args.exactArity(1, "resizeWithSplit(flag)");
+        args.arity(1, "resizeWithSplit(flag)");
         var flag = args.isEmpty() || Joe.isTruthy(args.next());
         SplitPane.setResizableWithParent(node, flag);
         return node;
@@ -190,7 +190,7 @@ public class NodeType extends WidgetType<Node> {
     //
     // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styleClass(Node node, Joe joe, Args args) {
-        args.exactArity(1, "styleClass(name)");
+        args.arity(1, "styleClass(name)");
         node.getStyleClass().add(joe.stringify(args.next()));
         return node;
     }
@@ -203,7 +203,7 @@ public class NodeType extends WidgetType<Node> {
     //
     // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styleClasses(Node node, Joe joe, Args args) {
-        args.exactArity(0, "styleClasses()");
+        args.arity(0, "styleClasses()");
         return joe.wrapList(node.getStyleClass(), String.class);
     }
 
@@ -216,7 +216,7 @@ public class NodeType extends WidgetType<Node> {
     //
     // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styles(Node node, Joe joe, Args args) {
-        args.minArity(1, "styles(style, ...)");
+        args.arityMin(1, "styles(style, ...)");
         var styles = args.asList().stream()
             .map(joe::toString)
             .collect(Collectors.joining("\n"));

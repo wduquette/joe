@@ -36,7 +36,7 @@ class ListenerType extends ProxyType<Listener> {
     // Cancels the listener; the relevant callback will no longer be
     // called.
     private Object _cancel(Listener listener, Joe joe, Args args) {
-        args.exactArity(0, "cancel()");
+        args.arity(0, "cancel()");
         listener.cancel();
         return null;
     }
@@ -46,7 +46,7 @@ class ListenerType extends ProxyType<Listener> {
     // %result joe.String
     // Gets the listener's string representation.
     private Object _toString(Listener listener, Joe joe, Args args) {
-        args.exactArity(0, "toString()");
+        args.arity(0, "toString()");
         return listener.toString();
     }
 }

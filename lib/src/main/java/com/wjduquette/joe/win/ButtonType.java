@@ -64,7 +64,7 @@ class ButtonType extends WidgetType<Button> {
     // Adds a *callable/0* to the button as its `#onAction` handler; pressing
     // the button will invoke the callable.
     private Object _action(Button btn, Joe joe, Args args) {
-        args.exactArity(1, "action(callable)");
+        args.arity(1, "action(callable)");
         btn.setOnAction(Win.toActionNoArg(joe, args.next()));
         return btn;
     }
@@ -79,7 +79,7 @@ class ButtonType extends WidgetType<Button> {
     // so it's often preferable to use [[method:Button.action]], which
     // expects a *callable/0*.
     private Object _onAction(Button btn, Joe joe, Args args) {
-        args.exactArity(1, "onAction(callable)");
+        args.arity(1, "onAction(callable)");
         btn.setOnAction(Win.toAction(joe, args.next()));
         return btn;
     }

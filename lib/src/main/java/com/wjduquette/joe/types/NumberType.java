@@ -133,7 +133,7 @@ public class NumberType extends ProxyType<Double> {
     // Converts a numeric string to a number.  Supports Joe's numeric
     // literal syntax, including hexadecimals.
     private Object _initializer(Joe joe, Args args) {
-        args.exactArity(1, "Number(string)");
+        args.arity(1, "Number(string)");
         var string = joe.stringify(args.next()).trim();
 
         try {
@@ -157,7 +157,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns the absolute value of the given *number*.
     private Object _abs(Joe joe, Args args) {
-        args.exactArity(1, "Number.abs(num)");
+        args.arity(1, "Number.abs(num)");
         return Math.abs(joe.toDouble(args.next(0)));
     }
 
@@ -167,7 +167,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns the arc cosine of the number
     private Object _acos(Joe joe, Args args) {
-        args.exactArity(1, "Number.acos(num)");
+        args.arity(1, "Number.acos(num)");
         return Math.acos(joe.toDouble(args.next(0)));
     }
 
@@ -177,7 +177,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns the arc sine of the number.
     private Object _asin(Joe joe, Args args) {
-        args.exactArity(1, "Number.asin(num)");
+        args.arity(1, "Number.asin(num)");
         return Math.asin(joe.toDouble(args.next(0)));
     }
 
@@ -187,7 +187,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns the arc tangent of the number.
     private Object _atan(Joe joe, Args args) {
-        args.exactArity(1, "Number.atan(num)");
+        args.arity(1, "Number.atan(num)");
         return Math.atan(joe.toDouble(args.next(0)));
     }
 
@@ -198,7 +198,7 @@ public class NumberType extends ProxyType<Double> {
     // Returns the angle *theta* from the conversion of rectangular coordinates
     // (*x*, *y*) to polar coordinates (*r*, *theta*).
     private Object _atan2(Joe joe, Args args) {
-        args.exactArity(2, "Number.atan2(x, y)");
+        args.arity(2, "Number.atan2(x, y)");
         return Math.atan2(
             joe.toDouble(args.next(0)),
             joe.toDouble(args.next(0))
@@ -212,7 +212,7 @@ public class NumberType extends ProxyType<Double> {
     // Returns the smallest integer number that is greater than or
     // equal to *num*.
     private Object _ceil(Joe joe, Args args) {
-        args.exactArity(1, "Number.ceil(num)");
+        args.arity(1, "Number.ceil(num)");
         return Math.ceil(joe.toDouble(args.next(0)));
     }
 
@@ -222,7 +222,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Clamps *num* to fit between *min* and *max*.
     private Object _clamp(Joe joe, Args args) {
-        args.exactArity(3, "Number.clamp(num, min, max)");
+        args.arity(3, "Number.clamp(num, min, max)");
         return Math.clamp(
             joe.toDouble(args.next(0)),
             joe.toDouble(args.next(0)),
@@ -236,7 +236,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns the cosine of angle *a*.
     private Object _cos(Joe joe, Args args) {
-        args.exactArity(1, "Number.cos(a)");
+        args.arity(1, "Number.cos(a)");
         return Math.cos(joe.toDouble(args.next(0)));
     }
 
@@ -246,7 +246,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns [[constant:Number.E]] raised the *num* power.
     private Object _exp(Joe joe, Args args) {
-        args.exactArity(1, "Number.exp(num)");
+        args.arity(1, "Number.exp(num)");
         return Math.exp(joe.toDouble(args.next(0)));
     }
 
@@ -257,7 +257,7 @@ public class NumberType extends ProxyType<Double> {
     // Returns the largest integer number that is less than or
     // equal to *num*.
     private Object _floor(Joe joe, Args args) {
-        args.exactArity(1, "Number.floor(num)");
+        args.arity(1, "Number.floor(num)");
         return Math.floor(joe.toDouble(args.next(0)));
     }
 
@@ -268,7 +268,7 @@ public class NumberType extends ProxyType<Double> {
     // Returns the length of the hypotenuse of a right triangle with
     // legs of length *x* and *y*.
     private Object _hypot(Joe joe, Args args) {
-        args.exactArity(2, "Number.hypot(x, y)");
+        args.arity(2, "Number.hypot(x, y)");
         return Math.hypot(
             joe.toDouble(args.next(0)),
             joe.toDouble(args.next(0))
@@ -281,7 +281,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns the natural logarithm of the number.
     private Object _log(Joe joe, Args args) {
-        args.exactArity(1, "Number.log(num)");
+        args.arity(1, "Number.log(num)");
         return Math.log(joe.toDouble(args.next(0)));
     }
 
@@ -291,7 +291,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns the base-10 logarithm of the number.
     private Object _log10(Joe joe, Args args) {
-        args.exactArity(1, "Number.log10(num)");
+        args.arity(1, "Number.log10(num)");
         return Math.log10(joe.toDouble(args.next(0)));
     }
 
@@ -303,7 +303,7 @@ public class NumberType extends ProxyType<Double> {
     // The numbers may be passed as individual arguments or as a
     // single [[List]].
     private Object _max(Joe joe, Args args) {
-        args.minArity(1, "Number.max(num...)");
+        args.arityMin(1, "Number.max(num...)");
         List<?> list = (args.remaining() == 1 && args.next(0) instanceof List<?>)
             ? joe.toList(args.next(0))
             : args.asList();
@@ -320,7 +320,7 @@ public class NumberType extends ProxyType<Double> {
     // The numbers may be passed as individual arguments or as a
     // single [[List]].
     private Object _min(Joe joe, Args args) {
-        args.minArity(1, "Number.min(num...)");
+        args.arityMin(1, "Number.min(num...)");
 
         List<?> list = (args.remaining() == 1 && args.next(0) instanceof List<?>)
             ? joe.toList(args.next(0))
@@ -337,7 +337,7 @@ public class NumberType extends ProxyType<Double> {
     // Returns the integer modulus `a % b` as computed in Java.  Both
     // terms are converted to integers.
     private Object _mod(Joe joe, Args args) {
-        args.exactArity(2, "Number.mod(a, b)");
+        args.arity(2, "Number.mod(a, b)");
         var a = joe.toInteger(args.next());
         var b = joe.toInteger(args.next());
         return (double)(a % b);
@@ -349,7 +349,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns *a* raised to the *b* power.
     private Object _pow(Joe joe, Args args) {
-        args.exactArity(2, "Number.pow(a, b)");
+        args.arity(2, "Number.pow(a, b)");
         return Math.pow(
             joe.toDouble(args.next(0)),
             joe.toDouble(args.next(0))
@@ -361,7 +361,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns a random number in the range `0.0 <= x < 1.0`.
     private Object _random(Joe joe, Args args) {
-        args.exactArity(0, "Number.random()");
+        args.arity(0, "Number.random()");
         return Math.random();
     }
 
@@ -372,7 +372,7 @@ public class NumberType extends ProxyType<Double> {
     // Returns the closest integer number to *num*, rounding ties
     // toward positive infinity.
     private Object _round(Joe joe, Args args) {
-        args.exactArity(1, "Number.round(num)");
+        args.arity(1, "Number.round(num)");
         return (double)Math.round(joe.toDouble(args.next(0)));
     }
 
@@ -382,7 +382,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns the sine of the angle.
     private Object _sin(Joe joe, Args args) {
-        args.exactArity(1, "Number.sin(a)");
+        args.arity(1, "Number.sin(a)");
         return Math.sin(joe.toDouble(args.next(0)));
     }
 
@@ -392,7 +392,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns the square root of the number.
     private Object _sqrt(Joe joe, Args args) {
-        args.exactArity(1, "Number.sqrt(num)");
+        args.arity(1, "Number.sqrt(num)");
         return Math.sqrt(joe.toDouble(args.next(0)));
     }
 
@@ -402,7 +402,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Returns the tangent of the angle.
     private Object _tan(Joe joe, Args args) {
-        args.exactArity(1, "Number.tan(a)");
+        args.arity(1, "Number.tan(a)");
         return Math.tan(joe.toDouble(args.next(0)));
     }
 
@@ -412,7 +412,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Converts an angle in radians to an angle in degrees.
     private Object _toDegrees(Joe joe, Args args) {
-        args.exactArity(1, "Number.toDegrees(radians)");
+        args.arity(1, "Number.toDegrees(radians)");
         return Math.toDegrees(joe.toDouble(args.next(0)));
     }
 
@@ -422,7 +422,7 @@ public class NumberType extends ProxyType<Double> {
     // %result Number
     // Converts an angle in degrees to an angle in radians.
     private Object _toRadians(Joe joe, Args args) {
-        args.exactArity(1, "Number.toRadians(degrees)");
+        args.arity(1, "Number.toRadians(degrees)");
         return Math.toRadians(joe.toDouble(args.next(0)));
     }
 }

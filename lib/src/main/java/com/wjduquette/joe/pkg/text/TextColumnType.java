@@ -51,7 +51,7 @@ public class TextColumnType extends ProxyType<TextColumnValue> {
     // @init
     // Creates a new TextColumn.
     private Object _init(Joe joe, Args args) {
-        args.exactArity(0, "TextColumn()");
+        args.arity(0, "TextColumn()");
         return new TextColumnValue();
     }
 
@@ -64,7 +64,7 @@ public class TextColumnType extends ProxyType<TextColumnValue> {
     // %result this
     // Sets the column's alignment.
     private Object _alignment(TextColumnValue tc, Joe joe, Args args) {
-        args.exactArity(1, "alignment(alignment)");
+        args.arity(1, "alignment(alignment)");
         tc.setAlignment(joe.toEnum(TextAlign.class, args.next()));
         return tc;
     }
@@ -74,7 +74,7 @@ public class TextColumnType extends ProxyType<TextColumnValue> {
     // %result [[TextAlign]]
     // Gets the column's alignment.
     private Object _getAlignment(TextColumnValue tc, Joe joe, Args args) {
-        args.exactArity(0, "getAlignment()");
+        args.arity(0, "getAlignment()");
         return tc.getAlignment();
     }
 
@@ -84,7 +84,7 @@ public class TextColumnType extends ProxyType<TextColumnValue> {
     // Gets the *callable/1* used to retrieve the column's value
     // from an input record.
     private Object _getGetter(TextColumnValue tc, Joe joe, Args args) {
-        args.exactArity(0, "getGetter()");
+        args.arity(0, "getGetter()");
         return Joe.unwrapCallable(tc.getValueGetter());
     }
 
@@ -93,7 +93,7 @@ public class TextColumnType extends ProxyType<TextColumnValue> {
     // %result joe.String
     // Gets the column's header text
     private Object _getHeader(TextColumnValue tc, Joe joe, Args args) {
-        args.exactArity(0, "getHeader()");
+        args.arity(0, "getHeader()");
         return tc.getHeader();
     }
 
@@ -104,7 +104,7 @@ public class TextColumnType extends ProxyType<TextColumnValue> {
     // Provides a *callable/1* to retrieve the column's value
     // from an input record.
     private Object _getter(TextColumnValue tc, Joe joe, Args args) {
-        args.exactArity(1, "getter(callable)");
+        args.arity(1, "getter(callable)");
 
         // Wrap using StringFunctionWrapper, so that the result is
         // always stringified.  TextTable itself calls toString(),
@@ -119,7 +119,7 @@ public class TextColumnType extends ProxyType<TextColumnValue> {
     // %result this
     // Sets the column's header text.
     private Object _header(TextColumnValue tc, Joe joe, Args args) {
-        args.exactArity(1, "header(text)");
+        args.arity(1, "header(text)");
         tc.setHeader(joe.toString(args.next()));
         return tc;
     }

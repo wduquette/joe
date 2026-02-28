@@ -80,7 +80,7 @@ class TabClass extends WidgetType<Tab> {
     // @init
     // Returns a `Tab`.
     private Object _initializer(Joe joe, Args args) {
-        args.exactArity(0, "Tab()");
+        args.arity(0, "Tab()");
         return make(joe, this);
     }
 
@@ -93,7 +93,7 @@ class TabClass extends WidgetType<Tab> {
     // %result this
     // Sets the tab's `#content` property to *node*.
     private Object _content(Tab tab, Joe joe, Args args) {
-        args.exactArity(1, "content(node)");
+        args.arity(1, "content(node)");
         var node = joe.toClass(Node.class, args.next());
         tab.setContent(node);
         return tab;
@@ -119,7 +119,7 @@ class TabClass extends WidgetType<Tab> {
     // %result this
     // Sets the tab's `#id` property to the given *id* string.
     private Object _id(Tab tab, Joe joe, Args args) {
-        args.exactArity(1, "id(id)");
+        args.arity(1, "id(id)");
         var id = joe.toString(args.next());
         tab.setId(id);
         return tab;
@@ -130,7 +130,7 @@ class TabClass extends WidgetType<Tab> {
     // %result joe.Boolean
     // Returns `true` if the tab has been disabled, and `false` otherwise.
     private Object _isDisabled(Tab tab, Joe joe, Args args) {
-        args.exactArity(0, "isDisabled()");
+        args.arity(0, "isDisabled()");
         return tab.isDisabled();
     }
 
@@ -139,7 +139,7 @@ class TabClass extends WidgetType<Tab> {
     // %result joe.Boolean
     // Returns `true` if the tab is selected, and `false` otherwise.
     private Object _isSelected(Tab tab, Joe joe, Args args) {
-        args.exactArity(0, "isSelected()");
+        args.arity(0, "isSelected()");
         return tab.isSelected();
     }
 
@@ -151,7 +151,7 @@ class TabClass extends WidgetType<Tab> {
     //
     // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styleClasses(Tab tab, Joe joe, Args args) {
-        args.exactArity(0, "styleClasses()");
+        args.arity(0, "styleClasses()");
         return joe.wrapList(tab.getStyleClass(), String.class);
     }
 
@@ -164,7 +164,7 @@ class TabClass extends WidgetType<Tab> {
     //
     // See [[topic:joe.win.css]] for more on using CSS.
     private Object _styles(Tab tab, Joe joe, Args args) {
-        args.minArity(1, "styles(style, ...)");
+        args.arityMin(1, "styles(style, ...)");
         var styles = args.asList().stream()
             .map(joe::toString)
             .collect(Collectors.joining(";\n"));
@@ -178,7 +178,7 @@ class TabClass extends WidgetType<Tab> {
     // Returns the [[TabPane]] to which this tab belongs, or null if
     // none.
     private Object _tabPane(Tab tab, Joe joe, Args args) {
-        args.exactArity(0, "tabPane()");
+        args.arity(0, "tabPane()");
         return tab.getTabPane();
     }
 
@@ -188,7 +188,7 @@ class TabClass extends WidgetType<Tab> {
     // %result this
     // Sets the label's text.
     private Object _text(Tab tab, Joe joe, Args args) {
-        args.exactArity(1, "text(text)");
+        args.arity(1, "text(text)");
         tab.setText(joe.stringify(args.next()));
         return tab;
     }

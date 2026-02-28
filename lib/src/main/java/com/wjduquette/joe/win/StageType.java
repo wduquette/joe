@@ -95,7 +95,7 @@ public class StageType extends WidgetType<Stage> {
     // Creates a new [[Stage]].  The application will now terminate when
     // the final window is closed.
     private Object _init(Joe joe, Args args) {
-        args.exactArity(0, "Stage()");
+        args.arity(0, "Stage()");
 
         Platform.setImplicitExit(true);
         return new Stage();
@@ -109,7 +109,7 @@ public class StageType extends WidgetType<Stage> {
     // %result Modality
     // Gets the stage's [[Modality]].
     private Object _getModality(Stage stage, Joe joe, Args args) {
-        args.exactArity(0, "getModality()");
+        args.arity(0, "getModality()");
         return stage.getModality();
     }
 
@@ -118,7 +118,7 @@ public class StageType extends WidgetType<Stage> {
     // %result Window
     // Gets the stage's owning window, or null for top-level windows.
     private Object _getOwner(Stage stage, Joe joe, Args args) {
-        args.exactArity(0, "getOwner()");
+        args.arity(0, "getOwner()");
         return stage.getOwner();
     }
 
@@ -127,7 +127,7 @@ public class StageType extends WidgetType<Stage> {
     // %result StageStyle
     // Gets the stage's decoration style.
     private Object _getStyle(Stage stage, Joe joe, Args args) {
-        args.exactArity(0, "getStyle()");
+        args.arity(0, "getStyle()");
         return stage.getStyle();
     }
 
@@ -136,7 +136,7 @@ public class StageType extends WidgetType<Stage> {
     // %result joe.String
     // Gets the stage's window title.
     private Object _getTitle(Stage stage, Joe joe, Args args) {
-        args.exactArity(0, "getTitle()");
+        args.arity(0, "getTitle()");
         return stage.getTitle();
     }
 
@@ -147,7 +147,7 @@ public class StageType extends WidgetType<Stage> {
     // Sets the stage's [[Modality]].  This must be set before the
     // stage is first shown.
     private Object _initModality(Stage stage, Joe joe, Args args) {
-        args.exactArity(1, "initModality(value)");
+        args.arity(1, "initModality(value)");
         stage.initModality(joe.toEnum(Modality.class, args.next()));
         return stage;
     }
@@ -158,7 +158,7 @@ public class StageType extends WidgetType<Stage> {
     // %result this
     // Sets the stage's owning [[Window]] for subordinate windows.
     private Object _initOwner(Stage stage, Joe joe, Args args) {
-        args.exactArity(1, "initOwner(value)");
+        args.arity(1, "initOwner(value)");
         stage.initOwner(joe.toType(Window.class, args.next()));
         return stage;
     }
@@ -169,7 +169,7 @@ public class StageType extends WidgetType<Stage> {
     // %result this
     // Sets the stage's [[StageStyle]].
     private Object _initStyle(Stage stage, Joe joe, Args args) {
-        args.exactArity(1, "initStyle(value)");
+        args.arity(1, "initStyle(value)");
         stage.initStyle(joe.toEnum(StageStyle.class, args.next()));
         return stage;
     }
@@ -179,7 +179,7 @@ public class StageType extends WidgetType<Stage> {
     // %result joe.Boolean
     // Gets whether the stage is resizable by the user or not.
     private Object _isResizable(Stage stage, Joe joe, Args args) {
-        args.exactArity(0, "isResizable()");
+        args.arity(0, "isResizable()");
         return stage.isResizable();
     }
 
@@ -189,7 +189,7 @@ public class StageType extends WidgetType<Stage> {
     // %result this
     // Sets the stage's maximum height in pixels.
     private Object _maxHeight(Stage stage, Joe joe, Args args) {
-        args.exactArity(1, "maxHeight(height)");
+        args.arity(1, "maxHeight(height)");
         stage.setMaxHeight(joe.toDouble(args.next()));
         return stage;
     }
@@ -200,7 +200,7 @@ public class StageType extends WidgetType<Stage> {
     // %result this
     // Sets the stage's maximum width in pixels.
     private Object _maxWidth(Stage stage, Joe joe, Args args) {
-        args.exactArity(1, "maxWidth(width)");
+        args.arity(1, "maxWidth(width)");
         stage.setMaxWidth(joe.toDouble(args.next()));
         return stage;
     }
@@ -211,7 +211,7 @@ public class StageType extends WidgetType<Stage> {
     // %result this
     // Sets the stage's minimum height in pixels.
     private Object _minHeight(Stage stage, Joe joe, Args args) {
-        args.exactArity(1, "minHeight(height)");
+        args.arity(1, "minHeight(height)");
         stage.setMinHeight(joe.toDouble(args.next()));
         return stage;
     }
@@ -222,7 +222,7 @@ public class StageType extends WidgetType<Stage> {
     // %result this
     // Sets the stage's minimum width in pixels.
     private Object _minWidth(Stage stage, Joe joe, Args args) {
-        args.exactArity(1, "minWidth(width)");
+        args.arity(1, "minWidth(width)");
         stage.setMinWidth(joe.toDouble(args.next()));
         return stage;
     }
@@ -232,7 +232,7 @@ public class StageType extends WidgetType<Stage> {
     // %result this
     // Pops up the stage.
     private Object _show(Stage stage, Joe joe, Args args) {
-        args.exactArity(0, "show()");
+        args.arity(0, "show()");
         stage.show();
         return stage;
     }
@@ -242,7 +242,7 @@ public class StageType extends WidgetType<Stage> {
     // %result this
     // Pops up the stage and waits until the user closes it.
     private Object _showAndWait(Stage stage, Joe joe, Args args) {
-        args.exactArity(0, "showAndWait()");
+        args.arity(0, "showAndWait()");
         stage.showAndWait();
         return stage;
     }
@@ -254,7 +254,7 @@ public class StageType extends WidgetType<Stage> {
     // Sets whether the stage is resizable by the user or not.  It is
     // resizable by default.
     private Object _resizable(Stage stage, Joe joe, Args args) {
-        args.exactArity(1, "resizable(flag)");
+        args.arity(1, "resizable(flag)");
         stage.setResizable(joe.toBoolean(args.next()));
         return stage;
     }
@@ -265,7 +265,7 @@ public class StageType extends WidgetType<Stage> {
     // %result this
     // Sets the stage's [[Scene]], which defines the displays GUI.
     private Object _scene(Stage stage, Joe joe, Args args) {
-        args.exactArity(1, "scene(scene)");
+        args.arity(1, "scene(scene)");
         stage.setScene(joe.toType(Scene.class, args.next()));
         return stage;
     }
@@ -276,7 +276,7 @@ public class StageType extends WidgetType<Stage> {
     // %result this
     // Sets the stage's window title.
     private Object _title(Stage stage, Joe joe, Args args) {
-        args.exactArity(1, "title(title)");
+        args.arity(1, "title(title)");
         stage.setTitle(joe.toString(args.next()));
         return stage;
     }
@@ -286,7 +286,7 @@ public class StageType extends WidgetType<Stage> {
     // %result this
     // Moves the stage to the back of the window stack.
     private Object _toBack(Stage stage, Joe joe, Args args) {
-        args.exactArity(0, "toBack()");
+        args.arity(0, "toBack()");
         stage.toBack();
         return stage;
     }
@@ -296,7 +296,7 @@ public class StageType extends WidgetType<Stage> {
     // %result this
     // Moves the stage to the front of the window stack.
     private Object _toFront(Stage stage, Joe joe, Args args) {
-        args.exactArity(0, "toFront()");
+        args.arity(0, "toFront()");
         stage.toFront();
         return stage;
     }

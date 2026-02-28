@@ -63,7 +63,7 @@ class InsetsType extends ProxyType<Insets> {
     // %result Number
     // Gets the width of the margin on the bottom of the node, in pixels.
     private Object _getBottom(Insets insets, Joe joe, Args args) {
-        args.exactArity(0, "getBottom()");
+        args.arity(0, "getBottom()");
         return insets.getBottom();
     }
 
@@ -72,7 +72,7 @@ class InsetsType extends ProxyType<Insets> {
     // %result Number
     // Gets the width of the margin on the left of the node, in pixels.
     private Object _getLeft(Insets insets, Joe joe, Args args) {
-        args.exactArity(0, "getLeft()");
+        args.arity(0, "getLeft()");
         return insets.getLeft();
     }
 
@@ -81,7 +81,7 @@ class InsetsType extends ProxyType<Insets> {
     // %result Number
     // Gets the width of the margin on the right of the node, in pixels.
     private Object _getRight(Insets insets, Joe joe, Args args) {
-        args.exactArity(0, "getRight()");
+        args.arity(0, "getRight()");
         return insets.getRight();
     }
 
@@ -90,7 +90,7 @@ class InsetsType extends ProxyType<Insets> {
     // %result Number
     // Gets the width of the margin on the top of the node, in pixels.
     private Object _getTop(Insets insets, Joe joe, Args args) {
-        args.exactArity(0, "getTop()");
+        args.arity(0, "getTop()");
         return insets.getTop();
     }
 }

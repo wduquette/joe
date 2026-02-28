@@ -73,7 +73,7 @@ public class EnumType<E extends Enum<E>> extends ProxyType<E> {
     // Initializer
 
     private Object _initializer(Joe joe, Args args) {
-        args.exactArity(1, name() + "(value)");
+        args.arity(1, name() + "(value)");
         return joe.toEnum(cls, args.next());
     }
 
@@ -81,7 +81,7 @@ public class EnumType<E extends Enum<E>> extends ProxyType<E> {
     // Static Methods
 
     private Object _values(Joe joe, Args args) {
-        args.exactArity(0, name() + ".values()");
+        args.arity(0, name() + ".values()");
         var list = new ListValue();
         Collections.addAll(list, cls.getEnumConstants());
         return list;
@@ -92,17 +92,17 @@ public class EnumType<E extends Enum<E>> extends ProxyType<E> {
     // Methods
 
     private Object _name(E value, Joe joe, Args args) {
-        args.exactArity(0, "name()");
+        args.arity(0, "name()");
         return value.name();
     }
 
     private Object _ordinal(E value, Joe joe, Args args) {
-        args.exactArity(0, "ordinal()");
+        args.arity(0, "ordinal()");
         return (double)value.ordinal();
     }
 
     private Object _toString(E value, Joe joe, Args args) {
-        args.exactArity(0, "toString()");
+        args.arity(0, "toString()");
         return value.toString();
     }
 }
