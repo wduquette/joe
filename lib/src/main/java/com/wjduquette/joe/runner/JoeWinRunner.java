@@ -74,7 +74,7 @@ public class JoeWinRunner {
     /**
      * Executes the configured script.
      */
-    public void execute() {
+    public void run() {
         // FIRST, create the interpreter
         var joe = new Joe(engineType);
         joe.setDebug(debug);

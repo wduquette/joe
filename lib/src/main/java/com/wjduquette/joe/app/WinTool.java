@@ -109,7 +109,7 @@ public class WinTool implements Tool {
             .scriptArgs(argq)
             .libPath(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH))
             .build();
-        runner.execute();
+        runner.run();
     }
 
     //------------------------------------------------------------------------

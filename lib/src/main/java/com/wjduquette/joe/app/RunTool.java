@@ -98,7 +98,7 @@ public class RunTool implements Tool {
             .scriptArgs(argq)
             .libPath(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH))
             .build();
-        runner.execute();
+        runner.run();
 
         if (measureRuntime) {
             var runTime = runner.getRunTime().toMillis() / 1000.0;

@@ -71,7 +71,7 @@ public class JoeRunner {
     /**
      * Executes the configured script.
      */
-    public void execute() {
+    public void run() {
         // FIRST, create the interpreter
         joe = new Joe(engineType);
         joe.setDebug(debug);
