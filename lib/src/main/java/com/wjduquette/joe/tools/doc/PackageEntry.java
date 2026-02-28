@@ -44,6 +44,7 @@ class PackageEntry extends Entry {
             if (type.initializer() != null) {
                 result.add(type.initializer());
             }
+            result.addAll(type.properties());
             result.addAll(type.methods());
             result.addAll(type.topics());
         }
