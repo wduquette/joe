@@ -1,7 +1,9 @@
 package com.wjduquette.joe.nero;
 
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -9,6 +11,15 @@ import java.util.stream.Collectors;
  * @param terms The literal's terms.
  */
 public record ListTerm(List<Term> terms) implements Term {
+    @Override
+    public Set<String> getVariableNames() {
+        var set = new HashSet<String>();
+        for (var t : terms) {
+            set.addAll(t.getVariableNames());
+        }
+        return set;
+    }
+
     @Override
     public String toString() {
         var content = terms.stream().map(Term::toString)

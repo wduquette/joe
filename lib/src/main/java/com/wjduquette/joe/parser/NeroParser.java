@@ -307,7 +307,7 @@ class NeroParser extends EmbeddedParser {
                 ++count;
                 aggVars.addAll(a.names());
             } else {
-                others.addAll(Term.getVariableNames(term));
+                others.addAll(term.getVariableNames());
             }
         }
 
@@ -393,7 +393,7 @@ class NeroParser extends EmbeddedParser {
                     t = vwd.value();
                 }
 
-                for (var v : Term.getVariableNames(t)) {
+                for (var v : t.getVariableNames()) {
                     if (defaultedVars.contains(v)) {
                         error(pair.token(),
                             "defaulted variable is referenced in body atom(s): '" +

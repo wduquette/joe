@@ -52,7 +52,7 @@ public sealed abstract class Atom permits MapAtom, ListAtom {
      */
     public final Set<String> getVariableNames() {
         var set = new HashSet<String>();
-        for (var t : getAllTerms()) set.addAll(Term.getVariableNames(t));
+        for (var t : getAllTerms()) set.addAll(t.getVariableNames());
         return set;
     }
 

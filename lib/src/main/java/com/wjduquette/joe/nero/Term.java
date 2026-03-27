@@ -1,12 +1,10 @@
 package com.wjduquette.joe.nero;
 
-import com.wjduquette.joe.patterns.Pattern;
 import com.wjduquette.joe.types.ListValue;
 import com.wjduquette.joe.types.MapValue;
 import com.wjduquette.joe.types.SetValue;
 import com.wjduquette.joe.util.Bindings;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /** A Term in a Nero {@link Atom}. */
@@ -66,20 +64,7 @@ public sealed interface Term permits
 
     /**
      * Gets the term's variable names.
-     * @param term The term
-     * @return the set of names.
+     * @return the set of names
      */
-    static Set<String> getVariableNames(Term term) {
-        return switch (term) {
-            case Aggregate a -> new HashSet<>(a.names());
-            case PatternTerm p -> Pattern.getVariableNames(p.pattern());
-            case Variable v -> Set.of(v.name());
-            case VariableWithDefault v -> {
-                var result = new HashSet<>(Term.getVariableNames(v.value()));
-                result.add(v.variable().name());
-                yield result;
-            }
-            default -> Set.of();
-        };
-    }
+    default Set<String> getVariableNames() { return Set.of(); }
 }

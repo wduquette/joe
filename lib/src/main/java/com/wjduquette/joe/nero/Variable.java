@@ -1,11 +1,18 @@
 package com.wjduquette.joe.nero;
 
+import java.util.Set;
+
 /**
  * A Variable in a Nero {@link Atom}.  The Variable's name
  * must be a valid identifier, and must not begin with an underscore.
  * @param name The name
  */
 public record Variable(String name) implements Term {
+    @Override
+    public Set<String> getVariableNames() {
+        return Set.of(name);
+    }
+
     @Override
     public String toString() {
         return name;

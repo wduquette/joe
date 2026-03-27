@@ -1,7 +1,9 @@
 package com.wjduquette.joe.nero;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A map-literal term in a Nero axiom or rule head.
@@ -11,6 +13,16 @@ import java.util.List;
 public record MapTerm(List<Term> pairs)
     implements Term
 {
+    @Override
+    public Set<String> getVariableNames() {
+        assert pairs.size() % 2 == 0;
+        var set = new HashSet<String>();
+        for (var i = 0; i < pairs.size(); i += 2) {
+            set.addAll(pairs.get(i+1).getVariableNames());
+        }
+        return set;
+    }
+
     @Override
     public String toString() {
         if (pairs.isEmpty()) return "{:}";

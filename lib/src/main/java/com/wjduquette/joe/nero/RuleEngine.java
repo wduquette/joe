@@ -706,8 +706,10 @@ public class RuleEngine {
         var term = getAggregate(bc.rule.head());
         if (term == null) return bc.matches;
 
+        System.out.println("Rule " + bc.rule.head());
         // NEXT, remove non-head-vars from the bindings.
         var headVars = bc.rule.head().getVariableNames();
+        System.out.println("  headVars=" + headVars);
         var matches = new ArrayList<Bindings>();
         for (var match : bc.matches) {
             var reduced = new Bindings();
