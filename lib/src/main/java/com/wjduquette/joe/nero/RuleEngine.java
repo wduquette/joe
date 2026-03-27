@@ -228,17 +228,6 @@ public class RuleEngine {
             throw new JoeError("Rule set is not stratified.");
         }
 
-        // NEXT, check for rule/inputs relation collision
-        // TODO: I don't think this really matters.
-        // Leaving it here for a while in case I change my mind.
-//        for (var relation : knownFacts.getRelations()) {
-//            if (ruleMap.containsKey(relation)) {
-//                throw new JoeError(
-//                    "Rule head relation collides with input fact relation: '" +
-//                        relation + "'.");
-//            }
-//        }
-
         // NEXT, only do inference once.
         if (inferenceComplete) return inferredFacts;
         inferenceComplete = true;
