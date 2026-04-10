@@ -1,6 +1,7 @@
 package com.wjduquette.joe.nero;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A collection of axioms and rules, ready for processing by the Nero engine.
@@ -102,5 +103,25 @@ public class NeroRuleSet {
         axioms.forEach(a -> result.add(a.relation()));
         rules.forEach(r -> result.add(r.head().relation()));
         return result;
+    }
+
+    @Override
+    public String toString() {
+        var buff = new StringBuilder();
+
+        buff.append(schema);
+        buff.append("\nAxioms[\n");
+        var ax = axioms.stream()
+            .map(Object::toString)
+            .sorted()
+            .collect(Collectors.joining("\n"));
+        buff.append(ax.indent(2)).append("]\nRules: [\n");
+        var ru = rules.stream()
+            .map(Object::toString)
+            .sorted()
+            .collect(Collectors.joining("\n"));
+        buff.append(ru.indent(2)).append("]");
+
+        return buff.toString();
     }
 }
