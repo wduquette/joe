@@ -30,10 +30,10 @@ public class NeroParserTest extends Ted {
         test("testParse_axiomBuiltIn");
 
         var source = """
-            member(#joe, 90);
+            has(#joe, 90);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'member', found built-in predicate in axiom.");
+            .eq("[line 1] error at 'has', found built-in predicate in axiom.");
     }
 
     @Test public void testParse_axiomUndefined_tooBig() {
@@ -61,10 +61,10 @@ public class NeroParserTest extends Ted {
         test("testParse_headBuiltIn");
 
         var source = """
-            member(x, y) :- Foo(x, y);
+            has(x, y) :- Foo(x, y);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'member', found built-in predicate in rule head.");
+            .eq("[line 1] error at 'has', found built-in predicate in rule head.");
     }
 
     @Test public void testParse_headUndefinedTooBig() {
@@ -115,10 +115,10 @@ public class NeroParserTest extends Ted {
         test("testTransientDeclaration_foundBuiltIn");
 
         var source = """
-            transient member;
+            transient has;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'member', found built-in predicate in 'transient' declaration.");
+            .eq("[line 1] error at 'has', found built-in predicate in 'transient' declaration.");
     }
 
     @Test public void testTransientDeclaration_expectedSemicolon() {
@@ -148,10 +148,10 @@ public class NeroParserTest extends Ted {
         test("testDefineDeclaration_foundBuiltIn");
 
         var source = """
-            define member/2;
+            define has/2;
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'member', found built-in predicate in 'define' declaration.");
+            .eq("[line 1] error at 'has', found built-in predicate in 'define' declaration.");
     }
 
     @Test public void testDefineDeclaration_expectedSlash() {
@@ -441,60 +441,20 @@ public class NeroParserTest extends Ted {
         test("testCheckBuiltIn_shape");
         var source = """
             define Thing/x;
-            Thing(x) :- Foo(list), member(x, list, y);
+            Thing(x) :- Foo(list), has(x, list, y);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'member', expected member/item,collection, got: 'member(x, list, y)'.");
+            .eq("[line 2] error at 'has', expected has/collection,item, got: 'has(x, list, y)'.");
     }
 
-    @Test public void testCheckBuiltIn_memberUnbound() {
-        test("testCheckBuiltIn_memberUnbound");
+    @Test public void testCheckBuiltIn_unbound() {
+        test("testCheckBuiltIn_unbound");
         var source = """
             define Thing/x;
-            Thing(x) :- Foo(list), member(x, items);
+            Thing(x) :- Foo(list), has(items, x);
             """;
         check(parseNero(source))
-            .eq("[line 2] error at 'member', expected bound variable or constant for term 'collection', got: 'items'.");
-    }
-
-    @Test public void testCheckBuiltIn_indexedMemberUnbound() {
-        test("testCheckBuiltIn_indexedMemberUnbound");
-        var source = """
-            define Thing/x;
-            Thing(x) :- Foo(list), indexedMember(i, x, items);
-            """;
-        check(parseNero(source))
-            .eq("[line 2] error at 'indexedMember', expected bound variable or constant for term 'list', got: 'items'.");
-    }
-
-    @Test public void testCheckBuiltIn_keyedMemberUnbound() {
-        test("testCheckBuiltIn_keyedMemberUnbound");
-        var source = """
-            define Thing/x;
-            Thing(x) :- Foo(map), keyedMember(k, v, items);
-            """;
-        check(parseNero(source))
-            .eq("[line 2] error at 'keyedMember', expected bound variable or constant for term 'map', got: 'items'.");
-    }
-
-    @Test public void testCheckBuiltIn_mapsTo_unknownF() {
-        test("testCheckBuiltIn_mapsTo_unknownF");
-        var source = """
-            define Thing/x;
-            Thing(n) :- Foo(s), mapsTo(y, s, n);
-            """;
-        check(parseNero(source))
-            .eq("[line 2] error at 'mapsTo', expected bound variable or constant for term 'f', got: 'y'.");
-    }
-
-    @Test public void testCheckBuiltIn_mapsTo_unknownA() {
-        test("testCheckBuiltIn_mapsTo_unknownA");
-        var source = """
-            define Thing/x;
-            Thing(n) :- Foo(s), mapsTo(#str2num, a, n);
-            """;
-        check(parseNero(source))
-            .eq("[line 2] error at 'mapsTo', expected bound variable or constant for term 'a', got: 'a'.");
+            .eq("[line 2] error at 'has', expected bound variable or constant for term 'collection', got: 'items'.");
     }
 
     //-------------------------------------------------------------------------
