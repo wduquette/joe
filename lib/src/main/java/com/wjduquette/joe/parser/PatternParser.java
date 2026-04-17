@@ -177,19 +177,16 @@ class PatternParser extends EmbeddedParser {
     private Pattern.MapPattern mapPattern(ASTPattern wp) {
         var map = new LinkedHashMap<Pattern,Pattern>();
 
-        if (scanner.match(COLON)) {
-            scanner.consume(RIGHT_BRACE, "expected '}' after empty map pattern.");
-            return new Pattern.MapPattern(map);
-        }
-
         do {
-            if (scanner.check(RIGHT_BRACE)) {
-                break;
-            }
             var key = constantPattern(wp);
+            if (key == null) {
+                throw errorSync(scanner.peek(), "expected map key after '{'.");
+            }
             scanner.consume(COLON, "expected ':' after map key.");
             var value = parsePattern(wp, true);
             map.put(key, value);
+
+            if (scanner.check(RIGHT_BRACE)) break;
         } while (scanner.match(COMMA));
 
         scanner.consume(RIGHT_BRACE, "expected '}' after map pattern items.");

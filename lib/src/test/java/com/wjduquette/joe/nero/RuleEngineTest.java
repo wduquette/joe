@@ -602,55 +602,13 @@ public class RuleEngineTest extends Ted {
     //-------------------------------------------------------------------------
     // Built-in _predicates
 
-    @Test public void testBuiltIn_member_disaggregate() {
-        test("testBuiltIn_member_disaggregate");
-        var source = """
-            define transient Owner/id,list;
-            define Owns/id,item;
-            Owner(#joe, [#hat, #boots, #truck]);
-            Owns(id, item) :- Owner(id, list), member(item, list);
-            """;
-        check(execute(source)).eq("""
-            define Owns/id,item;
-            Owns(#joe, #boots);
-            Owns(#joe, #hat);
-            Owns(#joe, #truck);
-            """);
-    }
-
-    @Test public void testBuiltIn_member_match() {
-        test("testBuiltIn_member_match");
-        var source = """
-            define transient Owner/id,list;
-            define OwnsHat/id;
-            Owner(#joe, [#hat, #boots, #truck]);
-            OwnsHat(id) :- Owner(id, list), member(#hat, list);
-            """;
-        check(execute(source)).eq("""
-            define OwnsHat/id;
-            OwnsHat(#joe);
-            """);
-    }
-
-    @Test public void testBuiltIn_member_noCollection() {
-        test("testBuiltIn_member_noCollection");
-        var source = """
-            define transient Owner/id,list;
-            define Owns/id,item;
-            Owner(#joe, #notCollection);
-            Owns(id, item) :- Owner(id, list), member(item, list);
-            """;
-        check(execute(source)).eq("""
-            """);
-    }
-
-    @Test public void testBuiltIn_indexedMember_disaggregate() {
-        test("testBuiltIn_indexedMember_disaggregate");
+    @Test public void testBuiltIn_at_disaggregate_list() {
+        test("testBuiltIn_at_disaggregate_list");
         var source = """
             define transient Owner/id,list;
             define Owns/id,index,item;
             Owner(#joe, [#hat, #boots, #truck]);
-            Owns(id, i, item) :- Owner(id, list), indexedMember(i, item, list);
+            Owns(id, i, item) :- Owner(id, list), at(list, i, item);
             """;
         check(execute(source)).eq("""
             define Owns/id,index,item;
@@ -660,13 +618,13 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
-    @Test public void testBuiltIn_indexedMember_match() {
-        test("testBuiltIn_indexedMember_match");
+    @Test public void testBuiltIn_at_match_list() {
+        test("testBuiltIn_at_match_list");
         var source = """
             define transient Owner/id,list;
             define OwnsHat/id,index;
             Owner(#joe, [#hat, #boots, #truck]);
-            OwnsHat(id, i) :- Owner(id, list), indexedMember(i, #hat, list);
+            OwnsHat(id, i) :- Owner(id, list), at(list, i, #hat);
             """;
         check(execute(source)).eq("""
             define OwnsHat/id,index;
@@ -674,25 +632,13 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
-    @Test public void testBuiltIn_indexedMember_noCollection() {
-        test("testBuiltIn_indexedMember_noCollection");
-        var source = """
-            define transient Owner/id,list;
-            define Owns/id,index,item;
-            Owner(#joe, #notCollection);
-            Owns(id, i, item) :- Owner(id, list), indexedMember(i, item, list);
-            """;
-        check(execute(source)).eq("""
-            """);
-    }
-
-    @Test public void testBuiltIn_keyedMember_disaggregate() {
-        test("testBuiltIn_keyedMember_disaggregate");
+    @Test public void testBuiltIn_at_disaggregate_map() {
+        test("testBuiltIn_at_disaggregate_map");
         var source = """
             define transient Owner/id,map;
             define Wears/id,k,v;
             Owner(#joe, {#head: #hat, #feet: #boots});
-            Wears(id, k, v) :- Owner(id, map), keyedMember(k, v, map);
+            Wears(id, k, v) :- Owner(id, map), at(map, k, v);
             """;
         check(execute(source)).eq("""
             define Wears/id,k,v;
@@ -701,13 +647,13 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
-    @Test public void testBuiltIn_keyedMember_match() {
-        test("testBuiltIn_keyedMember_match");
+    @Test public void testBuiltIn_at_match_map() {
+        test("testBuiltIn_at_match_map");
         var source = """
             define transient Owner/id,map;
             define WearsHat/id,k;
             Owner(#joe, {#head: #hat, #feet: #boots});
-            WearsHat(id, k) :- Owner(id, map), keyedMember(k, #hat, map);
+            WearsHat(id, k) :- Owner(id, map), at(map, k, #hat);
             """;
         check(execute(source)).eq("""
             define WearsHat/id,k;
@@ -715,13 +661,55 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
-    @Test public void testBuiltIn_keyedMember_noCollection() {
-        test("testBuiltIn_keyedMember_noCollection");
+    @Test public void testBuiltIn_at_noCollection() {
+        test("testBuiltIn_at_noCollection");
         var source = """
-            define transient Owner/id,map;
-            define Wears/id,k,v;
+            define transient Owner/id,list;
+            define Owns/id,index,item;
             Owner(#joe, #notCollection);
-            Wears(id, k, v) :- Owner(id, map), keyedMember(k, v, map);
+            Owns(id, i, item) :- Owner(id, list), at(list, i, item);
+            """;
+        check(execute(source)).eq("""
+            """);
+    }
+
+    @Test public void testBuiltIn_has_disaggregate() {
+        test("testBuiltIn_has_disaggregate");
+        var source = """
+            define transient Owner/id,list;
+            define Owns/id,item;
+            Owner(#joe, [#hat, #boots, #truck]);
+            Owns(id, item) :- Owner(id, list), has(list, item);
+            """;
+        check(execute(source)).eq("""
+            define Owns/id,item;
+            Owns(#joe, #boots);
+            Owns(#joe, #hat);
+            Owns(#joe, #truck);
+            """);
+    }
+
+    @Test public void testBuiltIn_has_match() {
+        test("testBuiltIn_has_match");
+        var source = """
+            define transient Owner/id,list;
+            define OwnsHat/id;
+            Owner(#joe, [#hat, #boots, #truck]);
+            OwnsHat(id) :- Owner(id, list), has(list, #hat);
+            """;
+        check(execute(source)).eq("""
+            define OwnsHat/id;
+            OwnsHat(#joe);
+            """);
+    }
+
+    @Test public void testBuiltIn_has_noCollection() {
+        test("testBuiltIn_has_noCollection");
+        var source = """
+            define transient Owner/id,list;
+            define Owns/id,item;
+            Owner(#joe, #notCollection);
+            Owns(id, item) :- Owner(id, list), has(list, item);
             """;
         check(execute(source)).eq("""
             """);
@@ -787,11 +775,55 @@ public class RuleEngineTest extends Ted {
             Owner(#joe, [#hat, #boots, #truck]);
             
             define NotOwns/owner,item;
-            NotOwns(id, item) :- Owner(id, list), Item(item), not member(item, list);
+            NotOwns(id, item) :- Owner(id, list), Item(item), not has(list, item);
             """;
         check(execute(source)).eq("""
             define NotOwns/owner,item;
             NotOwns(#joe, #car);
+            """);
+    }
+
+    @Test public void testBuiltIn_size_generate() {
+        test("testBuiltIn_size_generate");
+        var source = """
+            define transient Owner/id,list;
+            define Count/id,number;
+            Owner(#joe, [#hat, #boots, #truck]);
+            Owner(#bob, {#desk: #pc, #garage: #corvette});
+            Count(id, number) :- Owner(id, list), size(list, number);
+            """;
+        check(execute(source)).eq("""
+            define Count/id,number;
+            Count(#bob, 2);
+            Count(#joe, 3);
+            """);
+    }
+
+    @Test public void testBuiltIn_size_match() {
+        test("testBuiltIn_size_match");
+        var source = """
+            define transient Owner/id,list;
+            Owner(#joe, [#hat, #boots, #truck]);
+            Owner(#bob, {#desk: #pc, #garage: #corvette});
+            
+            define Has3/id;
+            Has3(id) :- Owner(id, list), size(list, 3);
+            """;
+        check(execute(source)).eq("""
+            define Has3/id;
+            Has3(#joe);
+            """);
+    }
+
+    @Test public void testBuiltIn_size_noCollection() {
+        test("testBuiltIn_size_generate");
+        var source = """
+            define transient Owner/id,list;
+            define Count/id,number;
+            Owner(#joe, #notACollection);
+            Count(id, number) :- Owner(id, list), size(list, number);
+            """;
+        check(execute(source)).eq("""
             """);
     }
 
@@ -1135,7 +1167,7 @@ public class RuleEngineTest extends Ted {
             Event({#b,#e}, 6);
 
             define Min/id,t;
-            Min(id, min(t)) :- Event(ids, t), member(id, ids);
+            Min(id, min(t)) :- Event(ids, t), has(ids, id);
             """;
         check(execute(source)).eq("""
             define Min/id,t;

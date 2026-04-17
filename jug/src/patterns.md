@@ -249,6 +249,15 @@ var ($x: value} = someMap;                   // value = someMap.get(x)
 var {#a: [a, b, c], #b: x} = someMap;
 ```
 
+Map patterns mimic normal map syntax, and so it seems that the empty map,
+`{:}`, should be a valid map pattern. To be consistent with other map patterns,
+`{:}` should match every map, because every key that's present in the pattern
+is present in the target map.  But this is not very useful, and experience
+shows that users expect `{:}` to match the empty map only.  But that is
+inconsistent with other map patterns. `{:}` has therefore
+been excluded as a map pattern in order to prevent confusion.  There are
+other ways to test whether a value is a map and whether a map is empty.
+
 ## Type-Name Patterns
 
 A type-name pattern matches the target value's type by name.  It is

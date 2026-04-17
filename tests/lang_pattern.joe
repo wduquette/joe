@@ -78,11 +78,6 @@ function testList_nestedPattern() {
 //-------------------------------------------------------------------------
 // Map Patterns
 
-function testMap_matchEmptyMap() {
-    // The {} pattern should be "{:}".
-    assertT({:} ~ {:});
-}
-
 // Value isn't a map
 function testMap_noMap() {
     assertF(5 ~ {#abc: a});

@@ -114,15 +114,15 @@ public class PatternParserTest extends Ted {
     //-------------------------------------------------------------------------
     // mapPattern()
 
-    @Test public void testMapPattern_braceAfterEmpty() {
-        test("testMapPattern_braceAfterEmpty");
+    @Test public void testMapPattern_mapKeyAfterBrace() {
+        test("testMapPattern_mapKeyAfterBrace");
 
         var source = """
             var x;
             x ~ {:;
             """;
         check(parse(source))
-            .eq("[line 2] error at ';', expected '}' after empty map pattern.");
+            .eq("[line 2] error at ':', expected map key after '{'.");
     }
 
     @Test public void testMapPattern_expectedColon() {

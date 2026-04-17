@@ -39,49 +39,63 @@ public class RuleEngine {
     }
 
     /**
-     * Information about a built-in, as required by the NeroParser
-     * @param shape The shape
-     * @param modes The mode for each term.
+     * An enum of Nero's built-in predicates.
      */
-    public record BuiltIn(Shape shape, List<TermMode> modes) {}
+    public enum BuiltIn {
+        /** {@code at/collection, key, item} */
+        AT("at", List.of(IN, INOUT, INOUT), List.of("collection", "key", "item")),
 
+        /** {@code has/collection, item} */
+        HAS("has", List.of(IN, INOUT), List.of("collection", "item")),
+
+        /** {@code mapsTo/f, a, b} */
+        MAPS_TO("mapsTo", List.of(IN, IN, INOUT), List.of("f", "a", "b")),
+
+        /** {@code size/collection, number} */
+        SIZE("size", List.of(IN, INOUT), List.of("collection", "number"));
+
+
+        //---------------------------------------------------------------------
+        // Metadata
+
+        private final Shape shape;
+        private final List<TermMode> modes;
+
+        BuiltIn(String name, List<TermMode> modes, List<String> fields) {
+            this.shape = new Shape(name, fields);
+            this.modes = modes;
+        }
+
+        /**
+         * Gets the predicate's name.
+         * @return the name.
+         */
+        public String relation() { return shape.relation(); }
+
+        /**
+         * Gets the predicate's Shape.
+         * @return The shape.
+         */
+        public Shape shape() { return shape; }
+
+        /**
+         * Gets the modes of each of the predicate's terms.
+         * @return the modes.
+         */
+        public List<TermMode> modes() { return modes; }
+    }
+
+    // A map of built-ins for each lookup.
     private static final Map<String,BuiltIn> BUILT_INS = new HashMap<>();
 
-    /** Name of the "member" built-in predicate. */
-    public static final String MEMBER = "member";
-
-    /** Name of the "indexedMember" built-in predicate. */
-    public static final String INDEXED_MEMBER = "indexedMember";
-
-    /** Name of the "keyedMember" built-in predicate. */
-    public static final String KEYED_MEMBER = "keyedMember";
-
-    /** Name of the "mapsTo" built-in predicate. */
-    public static final String MAPS_TO = "mapsTo";
+    static {
+        for (var value : BuiltIn.values()) {
+            BUILT_INS.put(value.relation(), value);
+        }
+    }
 
     /** Name of the "str2num" mapper function. */
     public static final Keyword STR2NUM = new Keyword("str2num");
-
-    static {
-        builtIn(MEMBER,
-            List.of(INOUT, IN), List.of("item", "collection"));
-        builtIn(INDEXED_MEMBER,
-            List.of(INOUT, INOUT, IN), List.of("index", "item", "list"));
-        builtIn(KEYED_MEMBER,
-            List.of(INOUT, INOUT, IN), List.of("key", "value", "map"));
-        builtIn(MAPS_TO,
-            List.of(IN, IN, INOUT), List.of("f", "a", "b"));
-    }
-
-    private static void builtIn(
-        String name,
-        List<TermMode> modes,
-        List<String> fields
-    ) {
-        var shape = new Shape(name, fields);
-        var builtIn = new BuiltIn(shape, modes);
-        BUILT_INS.put(shape.relation(), builtIn);
-    }
 
     /**
      * Returns true if the relation names a built-in predicate, and false
@@ -166,10 +180,10 @@ public class RuleEngine {
         this.ruleset = ruleset;
         this.knownFacts = db;
         this.builtIns = Map.of(
-            MEMBER,         this::_member,
-            INDEXED_MEMBER, this::_indexedMember,
-            KEYED_MEMBER,   this::_keyedMember,
-            MAPS_TO,        this::_mapsTo
+            BuiltIn.AT.relation(),          this::_at,
+            BuiltIn.HAS.relation(),         this::_has,
+            BuiltIn.MAPS_TO.relation(),     this::_mapsTo,
+            BuiltIn.SIZE.relation(),        this::_size
         );
 
         // Define the predefined mapsTo/f,a,b mappers
@@ -605,49 +619,36 @@ public class RuleEngine {
     //-------------------------------------------------------------------------
     // Built-In Predicates
 
-    // member/item,collection
-    private Set<Fact> _member(BindingContext bc, Atom atom) {
-        var names = BUILT_INS.get(MEMBER).shape().names();
-        var coll = extractVar(bc, atom, 1);
-        var facts = new HashSet<Fact>();
-
-        if (coll instanceof Collection<?> c) {
-            for (var item : c) {
-                facts.add(new Fact(MEMBER, names, List.of(item, c)));
-            }
-        }
-
-        return facts;
-    }
-
-    // indexedMember/index,item,list
-    private Set<Fact> _indexedMember(BindingContext bc, Atom atom) {
-        var names = BUILT_INS.get(INDEXED_MEMBER).shape().names();
-        var coll = extractVar(bc, atom, 2);
+    // at/collection,key,item
+    private Set<Fact> _at(BindingContext bc, Atom atom) {
+        var coll = extractVar(bc, atom, 0);
         var facts = new HashSet<Fact>();
 
         if (coll instanceof List<?> list) {
             int index = 0;
             for (var item : list) {
-                facts.add(new Fact(INDEXED_MEMBER, names,
-                    List.of((double)index, item, list)));
+                facts.add(new Fact(BuiltIn.AT.shape(),
+                    List.of(list, (double)index, item)));
                 ++index;
+            }
+        } else if (coll instanceof Map<?,?> map) {
+            for (var e : map.entrySet()) {
+                facts.add(new Fact(BuiltIn.AT.shape(),
+                    List.of(map, e.getKey(), e.getValue())));
             }
         }
 
         return facts;
     }
 
-    // keyedMember/key,value,map
-    private Set<Fact> _keyedMember(BindingContext bc, Atom atom) {
-        var names = BUILT_INS.get(KEYED_MEMBER).shape().names();
-        var coll = extractVar(bc, atom, 2);
+    // has/collection,item
+    private Set<Fact> _has(BindingContext bc, Atom atom) {
+        var coll = extractVar(bc, atom, 0);
         var facts = new HashSet<Fact>();
 
-        if (coll instanceof Map<?,?> map) {
-            for (var e : map.entrySet()) {
-                facts.add(new Fact(KEYED_MEMBER, names,
-                    List.of(e.getKey(), e.getValue(), map)));
+        if (coll instanceof Collection<?> c) {
+            for (var i : c) {
+                facts.add(new Fact(BuiltIn.HAS.shape(), List.of(c, i)));
             }
         }
 
@@ -683,11 +684,24 @@ public class RuleEngine {
         }
         if (b == null) return facts;
 
-        facts.add(new Fact(MAPS_TO,
-            BUILT_INS.get(MAPS_TO).shape().names(),
-            List.of(f, a, b)));
+        facts.add(new Fact(BuiltIn.MAPS_TO.shape(), List.of(f, a, b)));
         return facts;
     }
+
+    // size/collection,number
+    private Set<Fact> _size(BindingContext bc, Atom atom) {
+        var coll = extractVar(bc, atom, 0);
+        var facts = new HashSet<Fact>();
+
+        if (coll instanceof Collection<?> c) {
+            facts.add(new Fact(BuiltIn.SIZE.shape(), List.of(c, (double)c.size())));
+        } else if (coll instanceof Map<?,?> m) {
+            facts.add(new Fact(BuiltIn.SIZE.shape(), List.of(m, (double)m.size())));
+        }
+
+        return facts;
+    }
+
 
     private Object extractVar(BindingContext bc, Atom atom, int index) {
         assert atom instanceof ListAtom;
