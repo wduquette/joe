@@ -95,7 +95,12 @@ public sealed interface Pattern permits
      * {@link com.wjduquette.joe.JoeMap}.  Each key constant in the
      * {@code patterns} map must exist as a key in the target map, and
      * each key's value pattern in the {@code patterns} map must match
-     * the key's value in the target map.
+     * the key's value in the target map.  The pattern need not match
+     * all keys in the map.
+     *
+     * <p>Note: if the {@code patterns} map is empty, this pattern will
+     * match <b>any</b> map, not the <b>empty</b> map.  As this is often
+     * misleading, empty map syntax is disabled for map patterns.</p>
      * @param patterns The key constants and value patterns
      */
     record MapPattern(Map<Pattern,Pattern> patterns)

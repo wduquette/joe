@@ -15,8 +15,12 @@ scripts.
     terminated early and mysteriously.
   - The corruption has been fixed, and such methods work properly.
 - Joe Language
-    - Restored `@` as the property reference operator in instance
+  - Restored `@` as the property reference operator in instance
       methods, replacing `.`, which proved to be highly confusing in practice.
+  - `{:}` is no longer a valid map pattern.
+    - It looks like it should match the empty map only, but to be consistent
+      with other map patterns it matches any map.  This is confusing, and there
+      are better ways to check for empty maps.
 - Nero Language
     - Facts are now simply ordered or unordered.
     - Named atoms used in axioms and rule heads can create ordered facts
