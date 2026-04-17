@@ -15,14 +15,13 @@ of Nero's built-in predicates start with a lowercase letter.
 
 Nero provides the following built-in predicates.
 
-- [`member/item, collection`](#memberitem-collection) (`INOUT`, `IN`)
-- [`indexedMember/index, item, list`](#indexedmemberindex-item-list) (`INOUT`, `INOUT`, `IN`)
-- [`keyedMember/key, value, map`](#keyedmemberkey-value-map) (`INOUT`, `INOUT`, `IN`)
+- [`has/collection, item`](#hascollection-item) (`IN`, `INOUT`)
+- [`at/collection, key, item`](#atcollection-key-item) (`IN`, `INOUT`, `INOUT`)
 - [`mapsTo/f, a, b`](#mapstof-a-b) (`IN`, `IN`, `INOUT`)
 
-## `member/item, collection`
+## `has/collection, item`
 
-The `member/item, collection` predicate matches an *item* (`INOUT`) 
+The `has/collection, item` predicate matches an *item* (`INOUT`) 
 in a *collection* (`IN`), where the *collection* is presumably
 a list or a set. If the *collection* is not a list or set then
 the predicate will not match.
@@ -46,18 +45,18 @@ We want to write a rule that flags whether a person has a hat or not:
 
 ```nero
 define WearsHat/owner;
-WearsHat(id) :- Owner(id, stuff), member(#hat, stuff);
+WearsHat(id) :- Owner(id, stuff), has(stuff, #hat);
 ```
 
-When `id` is `#joe`, the `member` predicate takes the collection, `stuff`, and 
+When `id` is `#joe`, the `has` predicate takes the collection, `stuff`, and 
 breaks it into the following set of temporary facts:
 
-- `member(#hat, stuff)`
-- `member(#boots, stuff)`
-- `member(#truck, stuff)`
+- `has(stuff, #hat)`
+- `has(stuff, #boots)`
+- `has(stuff, #truck)`
 
 The predicate is then matched against these facts in the usual way, and 
-in particular matches the fact `member(#hat, stuff)`.  The rule matches,
+in particular matches the fact `has(stuff, #hat)`.  The rule matches,
 and so we infer `WearsHat(#joe)`.
 
 Alternatively, we might want to disaggregate a person's belongings into
@@ -65,7 +64,7 @@ a new relation, `Owns/id,item`.  We can do that in this way:
 
 ```nero
 define Owns/owner,item;
-Owns(id, item) :- Owner(id, stuff), member(item, stuff);
+Owns(id, item) :- Owner(id, stuff), has(stuff, item);
 ```
 
 Because `item` isn't bound to any previous value, the predicate will match
@@ -78,17 +77,20 @@ and we will end up with these new facts:
 
 In database terms, we have just put Joe's belongings into *normal form*.
 
-## `indexedMember/index, item, list`
+## `at/collection, key, item`
 
-The `indexedMember/index, item, list` predicate matches an *item* (`INOUT`)
-and its *index* (`INOUT`) within a *list* (`IN`).
-If the *list* is something other than a `List` then the predicate
-will not match.
+The `at/collection, key, item` predicate matches an *item* (`INOUT`)
+at its *key* (`INOUT`) within a *collection* (`IN`).  If the *collection*
+is a list, the *key* will be the index of the *item* within the list; if
+the *collection* is a map, the *key* will be the map key.  If the *collection*
+is anything else, the predicate will not match.
 
-Like `member/item, collection`, the predicate can test for membership
-or disaggregate the list into individual facts.  When used for the
-latter purpose, the *index* allows the new facts to preserve the 
-ordering of the items in the original list.
+Like `has/collection, item`, the predicate can test for membership
+or disaggregate the collection into individual facts.  
+
+When used to disaggregate a list, the *key* is the index of the item in
+the list, which allows the individual facts to preserve the ordering of the 
+items in the original list.
 
 For example, this program
 
@@ -97,7 +99,7 @@ define Owner/id, belongings;
 Owner(#joe, [#hat, #boots, #truck]);
 
 define Owns/owner,index,item;
-Owns(id, index, item) :- Owner(id, stuff), indexedMember(index, item, stuff);
+Owns(id, index, item) :- Owner(id, stuff), at(stuff, index, item);
 ```
 
 yields these facts:
@@ -107,27 +109,17 @@ yields these facts:
 - `Owns(#joe, 2, #truck)`
 
 **Note:** the `indexedList(index, item)` 
-[aggregation function](aggregation_functions.md) can reaggregate the times
+[aggregation function](aggregation_functions.md) can than reaggregate the items
 back into the original list.
 
-## `keyedMember/key, value, map`
-
-The `keyedMember/key, value, map` predicate matches a 
-*key* (`INOUT`), *value* (`INOUT`) pair within a *map* (`IN`).
-If the *map* is something other than a `Map` value the predicate will
-not match.
-
-Like `member/item, collection`, the predicate can test for membership
-or disaggregate the map into individual facts.  
-
-For example, this program
+Similar, this program disaggregates a map:
 
 ```nero
 define Owner/id, belongings;
 Owner(#joe, {#head: #hat, #feet: #boots, #body: #duster});
 
 define Owns/owner,place,item;
-Owns(id, place, item) :- Owner(id, stuff), keyedMember(place, item, stuff);
+Owns(id, place, item) :- Owner(id, stuff), at(stuff, place, item);
 ```
 
 yields these facts:

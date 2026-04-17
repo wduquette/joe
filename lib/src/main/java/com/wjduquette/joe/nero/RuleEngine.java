@@ -38,9 +38,17 @@ public class RuleEngine {
         Set<Fact> compute(BindingContext bc, Atom builtIn);
     }
 
+    /**
+     * An enum of Nero's built-in predicates.
+     */
     public enum BuiltIn {
+        /** {@code at/collection, key, item} */
         AT("at", List.of(IN, INOUT, INOUT), List.of("collection", "key", "item")),
+
+        /** {@code has/collection, item} */
         HAS("has", List.of(IN, INOUT), List.of("collection", "item")),
+
+        /** {@code mapsTo/f, a, b} */
         MAPS_TO("mapsTo", List.of(IN, IN, INOUT), List.of("f", "a", "b"));
 
         //---------------------------------------------------------------------
@@ -54,8 +62,22 @@ public class RuleEngine {
             this.modes = modes;
         }
 
-        public String relation()      { return shape.relation(); }
-        public Shape shape()          { return shape; }
+        /**
+         * Gets the predicate's name.
+         * @return the name.
+         */
+        public String relation() { return shape.relation(); }
+
+        /**
+         * Gets the predicate's Shape.
+         * @return The shape.
+         */
+        public Shape shape() { return shape; }
+
+        /**
+         * Gets the modes of each of the predicate's terms.
+         * @return the modes.
+         */
         public List<TermMode> modes() { return modes; }
     }
 
