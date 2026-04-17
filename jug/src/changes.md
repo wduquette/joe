@@ -29,6 +29,11 @@ scripts.
     - Nero variables can have default values, with certain restrictions.
     - The `define relation/arity;` syntax now defines an ordered relation with
       field names `a`, `b`, `c`, ...; the arity must be from 1 to 9.
+    - Replaced `member/index, collection` with `has/collection, index`.  It's
+      shorter and reads better.
+    - Replaced `indexedMember/index,item,collection` and 
+      `keyedMember/index,item,collection` with `at/collection,key,item`.
+    - Added `size/collection,number`. 
 - Library
     - Java API
       - Added `JoeRunner` to make it easier to write domain-specific `joe run`
