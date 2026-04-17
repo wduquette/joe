@@ -39,11 +39,8 @@ public class RuleEngine {
     }
 
     public enum BuiltIn {
-        MEMBER("member", List.of(INOUT, IN), List.of("item", "collection")),
-        INDEXED_MEMBER("indexedMember", List.of(INOUT, INOUT, IN),
-            List.of("index", "item", "list")),
-        KEYED_MEMBER("keyedMember", List.of(INOUT, INOUT, IN),
-            List.of("key", "value", "map")),
+        AT("at", List.of(IN, INOUT, INOUT), List.of("collection", "key", "item")),
+        HAS("has", List.of(IN, INOUT), List.of("collection", "item")),
         MAPS_TO("mapsTo", List.of(IN, IN, INOUT), List.of("f", "a", "b"));
 
         //---------------------------------------------------------------------
@@ -157,9 +154,8 @@ public class RuleEngine {
         this.ruleset = ruleset;
         this.knownFacts = db;
         this.builtIns = Map.of(
-            BuiltIn.MEMBER.relation(),         this::_member,
-            BuiltIn.INDEXED_MEMBER.relation(), this::_indexedMember,
-            BuiltIn.KEYED_MEMBER.relation(),   this::_keyedMember,
+            BuiltIn.AT.relation(),             this::_at,
+            BuiltIn.HAS.relation(),            this::_has,
             BuiltIn.MAPS_TO.relation(),        this::_mapsTo
         );
 
@@ -596,46 +592,36 @@ public class RuleEngine {
     //-------------------------------------------------------------------------
     // Built-In Predicates
 
-    // member/item,collection
-    private Set<Fact> _member(BindingContext bc, Atom atom) {
-        var coll = extractVar(bc, atom, 1);
-        var facts = new HashSet<Fact>();
-
-        if (coll instanceof Collection<?> c) {
-            for (var item : c) {
-                facts.add(new Fact(BuiltIn.MEMBER.shape(), List.of(item, c)));
-            }
-        }
-
-        return facts;
-    }
-
-    // indexedMember/index,item,list
-    private Set<Fact> _indexedMember(BindingContext bc, Atom atom) {
-        var coll = extractVar(bc, atom, 2);
+    // at/collection,key,item
+    private Set<Fact> _at(BindingContext bc, Atom atom) {
+        var coll = extractVar(bc, atom, 0);
         var facts = new HashSet<Fact>();
 
         if (coll instanceof List<?> list) {
             int index = 0;
             for (var item : list) {
-                facts.add(new Fact(BuiltIn.INDEXED_MEMBER.shape(),
-                    List.of((double)index, item, list)));
+                facts.add(new Fact(BuiltIn.AT.shape(),
+                    List.of(list, (double)index, item)));
                 ++index;
+            }
+        } else if (coll instanceof Map<?,?> map) {
+            for (var e : map.entrySet()) {
+                facts.add(new Fact(BuiltIn.AT.shape(),
+                    List.of(map, e.getKey(), e.getValue())));
             }
         }
 
         return facts;
     }
 
-    // keyedMember/key,value,map
-    private Set<Fact> _keyedMember(BindingContext bc, Atom atom) {
-        var coll = extractVar(bc, atom, 2);
+    // has/collection,item
+    private Set<Fact> _has(BindingContext bc, Atom atom) {
+        var coll = extractVar(bc, atom, 0);
         var facts = new HashSet<Fact>();
 
-        if (coll instanceof Map<?,?> map) {
-            for (var e : map.entrySet()) {
-                facts.add(new Fact(BuiltIn.KEYED_MEMBER.shape(),
-                    List.of(e.getKey(), e.getValue(), map)));
+        if (coll instanceof Collection<?> c) {
+            for (var i : c) {
+                facts.add(new Fact(BuiltIn.HAS.shape(), List.of(c, i)));
             }
         }
 
