@@ -26,10 +26,19 @@ public final class Fact {
      * @param fields The field values
      */
     public Fact(String relation, List<String> names, List<Object> fields) {
-        this.shape = new Shape(relation, names);
+        this(new Shape(relation, names), fields);
+    }
+
+    /**
+     * Creates a new ordered fact given the inputs.
+     * @param shape The shape
+     * @param fields The field values
+     */
+    public Fact(Shape shape, List<Object> fields) {
+        this.shape = shape;
         this.fields = Collections.unmodifiableList(new ArrayList<>(fields));
 
-        if (names.size() != fields.size()) {
+        if (shape.names().size() != fields.size()) {
             throw new IllegalArgumentException("names.size != fields.size");
         }
 
