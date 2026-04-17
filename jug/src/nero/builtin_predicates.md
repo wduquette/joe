@@ -18,6 +18,7 @@ Nero provides the following built-in predicates.
 - [`has/collection, item`](#hascollection-item) (`IN`, `INOUT`)
 - [`at/collection, key, item`](#atcollection-key-item) (`IN`, `INOUT`, `INOUT`)
 - [`mapsTo/f, a, b`](#mapstof-a-b) (`IN`, `IN`, `INOUT`)
+- [`size/collection, number`](#sizecollection-number) (`IN`, `INOUT`)
 
 ## `has/collection, item`
 
@@ -178,3 +179,28 @@ functions using Nero's Joe and Java APIs.
 
 - `#str2num`
   - Maps numeric string *a* to number *b*.
+
+## `size/collection, number`
+
+The `size/collection, number` predicate generates or matches the size (`INOUT`)
+of a *collection* (`IN`), where the *collection* is a list, set, or map. 
+If the *collection* is none of the above, the predicate will not match.
+
+For example, the following rule gets the number of items owned by each person.
+
+```nero
+define transient Owner/id,list;
+Owner(#joe, [#hat, #boots, #truck]);
+Owner(#bob, {#desk: #pc, #garage: #corvette});
+
+define Count/id,number;
+Count(id, number) :- Owner(id, list), size(list, number);
+```
+
+This yields
+
+```
+define Count/id,number;
+Count(#bob, 2);
+Count(#joe, 3);
+```

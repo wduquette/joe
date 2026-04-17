@@ -49,7 +49,11 @@ public class RuleEngine {
         HAS("has", List.of(IN, INOUT), List.of("collection", "item")),
 
         /** {@code mapsTo/f, a, b} */
-        MAPS_TO("mapsTo", List.of(IN, IN, INOUT), List.of("f", "a", "b"));
+        MAPS_TO("mapsTo", List.of(IN, IN, INOUT), List.of("f", "a", "b")),
+
+        /** {@code size/collection, number} */
+        SIZE("size", List.of(IN, INOUT), List.of("collection", "number"));
+
 
         //---------------------------------------------------------------------
         // Metadata
@@ -176,9 +180,10 @@ public class RuleEngine {
         this.ruleset = ruleset;
         this.knownFacts = db;
         this.builtIns = Map.of(
-            BuiltIn.AT.relation(),             this::_at,
-            BuiltIn.HAS.relation(),            this::_has,
-            BuiltIn.MAPS_TO.relation(),        this::_mapsTo
+            BuiltIn.AT.relation(),          this::_at,
+            BuiltIn.HAS.relation(),         this::_has,
+            BuiltIn.MAPS_TO.relation(),     this::_mapsTo,
+            BuiltIn.SIZE.relation(),        this::_size
         );
 
         // Define the predefined mapsTo/f,a,b mappers
@@ -682,6 +687,21 @@ public class RuleEngine {
         facts.add(new Fact(BuiltIn.MAPS_TO.shape(), List.of(f, a, b)));
         return facts;
     }
+
+    // size/collection,number
+    private Set<Fact> _size(BindingContext bc, Atom atom) {
+        var coll = extractVar(bc, atom, 0);
+        var facts = new HashSet<Fact>();
+
+        if (coll instanceof Collection<?> c) {
+            facts.add(new Fact(BuiltIn.SIZE.shape(), List.of(c, (double)c.size())));
+        } else if (coll instanceof Map<?,?> m) {
+            facts.add(new Fact(BuiltIn.SIZE.shape(), List.of(m, (double)m.size())));
+        }
+
+        return facts;
+    }
+
 
     private Object extractVar(BindingContext bc, Atom atom, int index) {
         assert atom instanceof ListAtom;

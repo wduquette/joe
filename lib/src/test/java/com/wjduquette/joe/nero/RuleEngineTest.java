@@ -783,6 +783,50 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    @Test public void testBuiltIn_size_generate() {
+        test("testBuiltIn_size_generate");
+        var source = """
+            define transient Owner/id,list;
+            define Count/id,number;
+            Owner(#joe, [#hat, #boots, #truck]);
+            Owner(#bob, {#desk: #pc, #garage: #corvette});
+            Count(id, number) :- Owner(id, list), size(list, number);
+            """;
+        check(execute(source)).eq("""
+            define Count/id,number;
+            Count(#bob, 2);
+            Count(#joe, 3);
+            """);
+    }
+
+    @Test public void testBuiltIn_size_match() {
+        test("testBuiltIn_size_match");
+        var source = """
+            define transient Owner/id,list;
+            Owner(#joe, [#hat, #boots, #truck]);
+            Owner(#bob, {#desk: #pc, #garage: #corvette});
+            
+            define Has3/id;
+            Has3(id) :- Owner(id, list), size(list, 3);
+            """;
+        check(execute(source)).eq("""
+            define Has3/id;
+            Has3(#joe);
+            """);
+    }
+
+    @Test public void testBuiltIn_size_noCollection() {
+        test("testBuiltIn_size_generate");
+        var source = """
+            define transient Owner/id,list;
+            define Count/id,number;
+            Owner(#joe, #notACollection);
+            Count(id, number) :- Owner(id, list), size(list, number);
+            """;
+        check(execute(source)).eq("""
+            """);
+    }
+
     //-------------------------------------------------------------------------
     // Collection Literals
 
