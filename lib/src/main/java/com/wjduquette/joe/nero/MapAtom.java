@@ -60,7 +60,7 @@ public final class MapAtom extends Atom {
             .map(e -> e.getKey() + ": " + e.getValue())
             .sorted()
             .collect(Collectors.joining(", "));
-        return relation() + "(" + termString + ")";
+        return (isNegated() ? "not " : "") + relation() + "(" + termString + ")";
     }
 
     @Override

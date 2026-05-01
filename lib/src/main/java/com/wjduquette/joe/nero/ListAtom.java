@@ -55,7 +55,7 @@ public final class ListAtom extends Atom {
     @Override public String toString() {
         var termString = terms.stream().map(Term::toString)
             .collect(Collectors.joining(", "));
-        return relation() + "(" + termString + ")";
+        return (isNegated() ? "not " : "") + relation() + "(" + termString + ")";
     }
 
     @Override
