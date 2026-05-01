@@ -648,7 +648,10 @@ public class RuleEngine {
 
         if (coll instanceof Collection<?> c) {
             for (var i : c) {
-                facts.add(new Fact(BuiltIn.HAS.shape(), List.of(c, i)));
+                var list = new ArrayList<>();
+                list.add(c);
+                list.add(i);
+                facts.add(new Fact(BuiltIn.HAS.shape(), list));
             }
         }
 
