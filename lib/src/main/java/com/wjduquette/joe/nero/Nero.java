@@ -367,10 +367,10 @@ public class Nero {
     }
 
     /**
-     * Outputs a value as a Nero literal term, if possible.
+     * Outputs a value as a Nero literal term, if possible.  Otherwise,
+     * it shows its "toString" in angle brackets.
      * @param term The term
      * @return The term's literal
-     * @throws JoeError if the term cannot be expressed as a Nero literal.
      */
     public String toNeroTerm(Object term) {
         // This is the easiest way to limit the output to Nero literals.
@@ -403,8 +403,7 @@ public class Nero {
                     .collect(Collectors.joining(", "));
                 yield "{" + list + "}";
             }
-            default -> throw new JoeError(
-                "Non-Nero term: '" + joe.stringify(term));
+            default -> "java {" + term + "}";
         };
     }
 

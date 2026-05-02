@@ -306,9 +306,7 @@ public class NeroTest extends Ted {
         check(nero.toNeroTerm(5.1)).eq("5.1");
         check(nero.toNeroTerm(new Keyword("id"))).eq("#id");
         check(nero.toNeroTerm("abc")).eq("\"abc\"");
-
-        checkThrow(() -> nero.toNeroTerm(this))
-            .containsString("Non-Nero term:");
+        check(nero.toNeroTerm(1)).eq("java {1}");
     }
 
 
