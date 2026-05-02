@@ -95,7 +95,13 @@ public class RuleEngine {
     }
 
     /** Name of the "str2num" mapper function. */
-    public static final Keyword STR2NUM = new Keyword("str2num");
+    public static final Keyword KW_STR2NUM = new Keyword("str2num");
+
+    /** Keyword for the Number type. */
+    public static final Keyword KW_NUMBER = new Keyword("number");
+
+    /** Keyword for the String type. */
+    public static final Keyword KW_STRING = new Keyword("string");
 
     /**
      * Returns true if the relation names a built-in predicate, and false
@@ -143,6 +149,9 @@ public class RuleEngine {
     // The mapsTo/f,a,b mapping functions.
     private final Map<Keyword,Mapper> mappers = new HashMap<>();
 
+    // The comparison functions for specific types.
+    private final Map<Keyword,Comparer> comparers = new HashMap<>();
+
     // Debug Flag
     private boolean debug = false;
 
@@ -187,7 +196,11 @@ public class RuleEngine {
         );
 
         // Define the predefined mapsTo/f,a,b mappers
-        this.mappers.put(STR2NUM, this::str2num);
+        this.mappers.put(KW_STR2NUM, this::str2num);
+
+        // Define the predefined comparers.
+        this.comparers.put(KW_NUMBER, this::compareNumbers);
+        this.comparers.put(KW_STRING, this::compareStrings);
 
         // NEXT, Categorize the rules by head relation
         for (var rule : ruleset.rules()) {
@@ -965,6 +978,24 @@ public class RuleEngine {
             // Nothing to do.
         }
         return null;
+    }
+
+    // Comparer function for numbers
+    private Integer compareNumbers(Object a, Object b) {
+        if (a instanceof Double na && b instanceof Double nb) {
+            return na.compareTo(nb);
+        } else {
+            return null;
+        }
+    }
+
+    // Comparer function for strings
+    private Integer compareStrings(Object a, Object b) {
+        if (a instanceof String sa && b instanceof String sb) {
+            return sa.compareTo(sb);
+        } else {
+            return null;
+        }
     }
 
     // The context for the recursive matchBodyAtom method.
