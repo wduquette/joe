@@ -241,6 +241,15 @@ public class RuleEngine {
         this.mappers.putAll(mappers);
     }
 
+    /**
+     * Adds a collection of type comparers to the
+     * RuleEngine for use during execution.
+     * @param comparers The collection of mappers by keyword.
+     */
+    public void addComparers(Map<Keyword,Comparer> comparers) {
+        this.comparers.putAll(comparers);
+    }
+
     //-------------------------------------------------------------------------
     // Inference
 

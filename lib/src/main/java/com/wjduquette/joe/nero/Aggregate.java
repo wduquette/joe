@@ -8,6 +8,7 @@ import java.util.Set;
 /**
  * An aggregating term.
  * @param aggregator The aggregation function
+ * @param terms The arguments to the function
  */
 public record Aggregate(
     Aggregator aggregator,
