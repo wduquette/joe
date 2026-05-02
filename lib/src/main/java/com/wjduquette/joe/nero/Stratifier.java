@@ -68,7 +68,6 @@ public class Stratifier {
             // Set +1 for each positive dependency, unless the rule
             // aggregates.
             for (var b : rule.normal()) {
-                System.out.println("  normal: " + b);
                 var j = heads.indexOf(b.relation());
                 if (j == -1) continue;         // Skip non-head predicates
                 if (mat[i][j] == -1) continue; // Negative dependencies rule
@@ -78,7 +77,6 @@ public class Stratifier {
             // Set -1 for each negative dependency; this may override a
             // positive dependency.
             for (var b : rule.negated()) {
-                System.out.println("  negative: " + b);
                 var j = heads.indexOf(b.relation());
                 if (j == -1) continue;  // Skip non-head predicates
                 mat[i][j] = -1;
