@@ -1096,6 +1096,41 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+
+    // Verify that we find the minimum and maximum of all matches
+    @Test public void testAggregate_minmaxt_numericMatches() {
+        test("testAggregate_minmaxt");
+        var source = """
+            transient Value;
+            Value(0);
+            Value(1);
+            Value(2);
+            Value("abc");
+            Value("def");
+            Value("xyz");
+            Value(#a);
+            Value(#b);
+            Value(#c);
+            MaxN(maxt(#number, x)) :- Value(x);
+            MaxS(maxt(#string, x)) :- Value(x);
+            MinN(mint(#number, x)) :- Value(x);
+            MinS(mint(#string, x)) :- Value(x);
+            """;
+        check(execute(source)).eq("""
+            define MaxN/a;
+            MaxN(2);
+            
+            define MaxS/a;
+            MaxS("xyz");
+            
+            define MinN/a;
+            MinN(0);
+            
+            define MinS/a;
+            MinS("abc");
+            """);
+    }
+
     // Verify that if there are matches but no numbers to sum, we get a sum
     // of zero.
     @Test public void testAggregate_sum_noNumericMatches() {

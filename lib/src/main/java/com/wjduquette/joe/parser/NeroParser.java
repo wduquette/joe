@@ -641,7 +641,6 @@ class NeroParser extends EmbeddedParser {
                     if (term instanceof Constant) {
                         args.add(term);
                     } else {
-                        // TODO: Test!
                         throw errorSync(scanner.previous(),
                             "expected a constant value for parameter '" +
                             aggregator.parms().get(i) + "' of '" +
