@@ -621,7 +621,7 @@ class NeroParser extends EmbeddedParser {
         // TODO: add a list of field names to Aggregator, and include
         // the field name in the error report.
         for (var i = 0; i < aggregator.arity(); i++) {
-            var argType = aggregator.signature().get(i);
+            var argType = aggregator.types().get(i);
             if (i != 0) {
                 scanner.consume(COMMA, "expected comma before next aggregation function argument.");
             }
@@ -632,15 +632,20 @@ class NeroParser extends EmbeddedParser {
                         args.add(term);
                     } else {
                         throw errorSync(scanner.previous(),
-                            "expected a variable name.");
+                            "expected a variable name for parameter '" +
+                            aggregator.parms().get(i) + "' of '" +
+                            aggregator.signature() + "'.");
                     }
                 }
                 case CONST -> {
                     if (term instanceof Constant) {
                         args.add(term);
                     } else {
+                        // TODO: Test!
                         throw errorSync(scanner.previous(),
-                            "expected a constant value.");
+                            "expected a constant value for parameter '" +
+                            aggregator.parms().get(i) + "' of '" +
+                            aggregator.signature() + "'.");
                     }
                 }
             }

@@ -926,7 +926,7 @@ public class RuleEngine {
 
         if (comparer == null) {
             throw joe.expected(
-                "registered type keyword for 'maxt(type, x)' aggregation function",
+                "type keyword of registered comparer in 'maxt(type, x)'",
                 type);
         }
 
@@ -970,7 +970,7 @@ public class RuleEngine {
 
         if (comparer == null) {
             throw joe.expected(
-                "registered type keyword for 'mint(type, x)' aggregation function",
+                "type keyword of registered comparer in 'mint(type, x)'",
                 type);
         }
 

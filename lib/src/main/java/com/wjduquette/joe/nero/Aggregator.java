@@ -12,72 +12,82 @@ public enum Aggregator {
      * sorting them by their index values.  The order is stable, and will be
      * as expected if the indices are all numbers or all strings.
      */
-    INDEXED_LIST("indexedList", List.of(AggParm.VAR, AggParm.VAR)),
+    INDEXED_LIST("indexedList", List.of("index", "item"), List.of(AggParm.VAR, AggParm.VAR)),
 
     /**
      * {@code list(item)}: Aggregates a list of the matched items.  The order
      * is unpredictable, but all elements will be retained.
      */
-    LIST("list", List.of(AggParm.VAR)),
+    LIST("list", List.of("item"), List.of(AggParm.VAR)),
 
     /**
      * {@code map(key, value)}: Aggregates a map of key/value pairs.  The
      * RuleEngine will throw an error if there are duplicate keys.
      */
-    MAP("map", List.of(AggParm.VAR, AggParm.VAR)),
+    MAP("map", List.of("key", "value"), List.of(AggParm.VAR, AggParm.VAR)),
 
     /**
      * {@code max(x)}: Aggregates the maximum of the values, ignoring
      * non-numeric values. If there are no numeric values, the rule will
      * not fire.
      */
-    MAX("max", List.of(AggParm.VAR)),
+    MAX("max", List.of("x"), List.of(AggParm.VAR)),
 
     /**
      * {@code maxt(type, x)}: Aggregates the maximum of the values, ignoring
      * values not of the given type. If there are no such values, the rule will
      * not fire.
      */
-    MAXT("maxt", List.of(AggParm.CONST, AggParm.VAR)),
+    MAXT("maxt", List.of("type", "x"), List.of(AggParm.CONST, AggParm.VAR)),
 
     /**
      * {@code min(x)}: Aggregates the minimum of the values, ignoring
      * non-numeric values. If there are no numeric values, the rule will
      * not fire.
      */
-    MIN("min", List.of(AggParm.VAR)),
+    MIN("min", List.of("x"), List.of(AggParm.VAR)),
 
     /**
      * {@code mint(type, x)}: Aggregates the minimum of the values, ignoring
      * values not of the given type. If there are no such values, the rule will
      * not fire.
      */
-    MINT("mint", List.of(AggParm.CONST, AggParm.VAR)),
+    MINT("mint", List.of("type", "x"), List.of(AggParm.CONST, AggParm.VAR)),
 
     /**
      * {@code set(x)}: Aggregates a set of the matched items.
      */
-    SET("set", List.of(AggParm.VAR)),
+    SET("set", List.of("x"), List.of(AggParm.VAR)),
 
     /**
      * {@code sum(x)}: Aggregates the sum of the values, ignoring non-numeric
      * values. If there are no numeric values, the sum will be 0.
      */
-    SUM("sum", List.of(AggParm.VAR));
+    SUM("sum", List.of("x"), List.of(AggParm.VAR));
 
     //-------------------------------------------------------------------------
     // Metadata
 
     private final String function;
-    private final List<AggParm> signature;  // The signature
+    private final List<String> parms;
+    private final List<AggParm> types;  // The signature
 
     // The signature is a list of ArgType values indicating whether the
     // argument is a data value (VAL) to be consumed by the aggregator or a
     // variable (VAR) to be aggregated over. By convention, VAL parameters
     // precede VAR parameters.
-    Aggregator(String function, List<AggParm> signature) {
+    Aggregator(String function, List<String> parms, List<AggParm> signature) {
         this.function = function;
-        this.signature = signature;
+        this.parms = parms;
+        this.types = signature;
+    }
+
+    /**
+     * Returns the function's signature.
+     * @return the string
+     */
+    public String signature() {
+        return function + "(" + String.join(",", parms) + ")";
     }
 
     /**
@@ -89,18 +99,26 @@ public enum Aggregator {
     }
 
     /**
-     * Returns the function's signature, as a list of term categories.
+     * Returns the function's parameter names.
      * @return the list
      */
-    public List<AggParm> signature() {
-        return signature;
+    public List<String> parms() {
+        return parms;
+    }
+
+    /**
+     * Returns the function's parameter types.
+     * @return the list
+     */
+    public List<AggParm> types() {
+        return types;
     }
 
     /**
      * The aggregation function's arity
      * @return The arity
      */
-    public int arity() { return signature.size(); }
+    public int arity() { return types.size(); }
 
     /**
      * Finds the aggregator with the given function
