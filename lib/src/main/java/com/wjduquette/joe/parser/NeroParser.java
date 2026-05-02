@@ -305,7 +305,8 @@ class NeroParser extends EmbeddedParser {
         for (var term : head.atom().getAllTerms()) {
             if (term instanceof Aggregate a) {
                 ++count;
-                aggVars.addAll(a.names());
+                aggVars.addAll(a.overNames());
+                others.addAll(a.otherNames());
             } else {
                 others.addAll(term.getVariableNames());
             }
@@ -616,17 +617,40 @@ class NeroParser extends EmbeddedParser {
             throw errorSync(name, "unknown aggregation function.");
         }
 
-        var names = new ArrayList<String>();
-        do {
-            scanner.consume(IDENTIFIER, "expected aggregation variable name.");
-            names.add(scanner.previous().lexeme());
-        } while (scanner.match(COMMA));
-        scanner.consume(RIGHT_PAREN, "expected ')' after aggregation variable name(s).");
-
-        if (names.size() != aggregator.arity()) {
-            error(name, "expected " + aggregator.arity() + " variable name(s).");
+        var args = new ArrayList<Term>();
+        // TODO: add a list of field names to Aggregator, and include
+        // the field name in the error report.
+        for (var i = 0; i < aggregator.arity(); i++) {
+            var argType = aggregator.signature().get(i);
+            if (i != 0) {
+                scanner.consume(COMMA, "expected comma before next aggregation function argument.");
+            }
+            var term = term(Context.HEAD);
+            switch (argType) {
+                case VAR -> {
+                    if (term instanceof Variable) {
+                        args.add(term);
+                    } else {
+                        throw errorSync(scanner.previous(),
+                            "expected a variable name.");
+                    }
+                }
+                case VAL -> {
+                    if (term instanceof Variable ||
+                        term instanceof Constant
+                    ) {
+                        args.add(term);
+                    } else {
+                        throw errorSync(scanner.previous(),
+                            "expected a variable name or constant.");
+                    }
+                }
+            }
         }
-        return new Aggregate(aggregator, names);
+
+        scanner.consume(RIGHT_PAREN, "expected ')' after aggregation function argument(s).");
+
+        return new Aggregate(aggregator, args);
     }
 
     private Term listTerm() {

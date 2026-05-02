@@ -749,13 +749,13 @@ public class RuleEngine {
 
         // NEXT, aggregate using the function
         return switch (term.aggregator()) {
-            case INDEXED_LIST -> aggregateIndexedList(term.names(), matches);
-            case LIST -> aggregateList(term.names(), matches);
-            case MAP -> aggregateMap(term.names(), matches);
-            case MAX -> aggregateMax(term.names(), matches);
-            case MIN -> aggregateMin(term.names(), matches);
-            case SET -> aggregateSet(term.names(), matches);
-            case SUM -> aggregateSum(term.names(), matches);
+            case INDEXED_LIST -> aggregateIndexedList(term.overNames(), matches);
+            case LIST -> aggregateList(term.overNames(), matches);
+            case MAP -> aggregateMap(term.overNames(), matches);
+            case MAX -> aggregateMax(term.overNames(), matches);
+            case MIN -> aggregateMin(term.overNames(), matches);
+            case SET -> aggregateSet(term.overNames(), matches);
+            case SUM -> aggregateSum(term.overNames(), matches);
         };
     }
 

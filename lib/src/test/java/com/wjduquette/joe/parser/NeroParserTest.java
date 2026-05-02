@@ -677,7 +677,7 @@ public class NeroParserTest extends Ted {
             A(sum(1)) :- B(x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at '1', expected aggregation variable name.");
+            .eq("[line 1] error at '1', expected a variable name.");
     }
 
     @Test public void testAggregate_expectedRightParen() {
@@ -687,7 +687,7 @@ public class NeroParserTest extends Ted {
             A(sum(x :- B(x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at ':-', expected ')' after aggregation variable name(s).");
+            .eq("[line 1] error at ':-', expected ')' after aggregation function argument(s).");
     }
 
     @Test public void testAggregate_arity() {
@@ -697,7 +697,7 @@ public class NeroParserTest extends Ted {
             A(sum(x,y) :- B(x);
             """;
         check(parseNero(source))
-            .eq("[line 1] error at 'sum', expected 1 variable name(s).");
+            .eq("[line 1] error at ',', expected ')' after aggregation function argument(s).");
     }
 
     //-------------------------------------------------------------------------
