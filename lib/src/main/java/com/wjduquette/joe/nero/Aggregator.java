@@ -1,5 +1,7 @@
 package com.wjduquette.joe.nero;
 
+import java.util.List;
+
 /**
  * An aggregation function, as used by in rule heads.  The enum symbol
  * provides the function's name and arity.
@@ -10,67 +12,80 @@ public enum Aggregator {
      * sorting them by their index values.  The order is stable, and will be
      * as expected if the indices are all numbers or all strings.
      */
-    INDEXED_LIST("indexedList", 2),
+    INDEXED_LIST("indexedList", List.of(TermCat.BOUND, TermCat.BOUND)),
 
     /**
      * {@code list(item)}: Aggregates a list of the matched items.  The order
      * is unpredictable, but all elements will be retained.
      */
-    LIST("list", 1),
+    LIST("list", List.of(TermCat.BOUND)),
 
     /**
      * {@code map(key, value)}: Aggregates a map of key/value pairs.  The
      * RuleEngine will throw an error if there are duplicate keys.
      */
-    MAP("map", 2),
+    MAP("map", List.of(TermCat.BOUND, TermCat.BOUND)),
 
     /**
      * {@code max(x)}: Aggregates the maximum of the values, ignoring
      * non-numeric values. If there are no numeric values, the rule will
      * not fire.
      */
-    MAX("max", 1),
+    MAX("max", List.of(TermCat.BOUND)),
 
     /**
      * {@code min(x)}: Aggregates the minimum of the values, ignoring
      * non-numeric values. If there are no numeric values, the rule will
      * not fire.
      */
-    MIN("min", 1),
+    MIN("min", List.of(TermCat.BOUND)),
 
     /**
      * {@code set(x)}: Aggregates a set of the matched items.
      */
-    SET("set", 1),
+    SET("set", List.of(TermCat.BOUND)),
 
     /**
      * {@code sum(x)}: Aggregates the sum of the values, ignoring non-numeric
      * values. If there are no numeric values, the sum will be 0.
      */
-    SUM("sum", 1);
+    SUM("sum", List.of(TermCat.BOUND));
 
     //-------------------------------------------------------------------------
     // Metadata
 
     private final String function;
-    private final int arity;
+    private final List<TermCat> signature;  // The signature
 
-    Aggregator(String function, int arity) {
+    // varOnly is an array of flags.  The arity is the number of flags.
+    // If a flag is true, the matching argument must be a variable term.
+    // If a flag is false, it may also be a constant term.
+    Aggregator(String function, List<TermCat> sig) {
         this.function = function;
-        this.arity = arity;
+        this.signature = sig;
     }
 
     /**
      * The aggregation function's name
      * @return the name
      */
-    public String function() { return function; }
+    public String function() {
+        return function;
+    }
+
+    /**
+     * Returns the function's signature, as a list of term categories.
+     * @return the list
+     */
+    public List<TermCat> signature() {
+        return signature;
+    }
 
     /**
      * The aggregation function's arity
      * @return The arity
      */
-    public int arity() { return arity; }
+    public int arity() { return signature.size(); }
 
     /**
      * Finds the aggregator with the given function
