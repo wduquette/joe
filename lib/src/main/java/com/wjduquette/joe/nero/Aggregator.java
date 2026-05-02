@@ -12,57 +12,58 @@ public enum Aggregator {
      * sorting them by their index values.  The order is stable, and will be
      * as expected if the indices are all numbers or all strings.
      */
-    INDEXED_LIST("indexedList", List.of(TermCat.BOUND, TermCat.BOUND)),
+    INDEXED_LIST("indexedList", List.of(AggParm.VAR, AggParm.VAR)),
 
     /**
      * {@code list(item)}: Aggregates a list of the matched items.  The order
      * is unpredictable, but all elements will be retained.
      */
-    LIST("list", List.of(TermCat.BOUND)),
+    LIST("list", List.of(AggParm.VAR)),
 
     /**
      * {@code map(key, value)}: Aggregates a map of key/value pairs.  The
      * RuleEngine will throw an error if there are duplicate keys.
      */
-    MAP("map", List.of(TermCat.BOUND, TermCat.BOUND)),
+    MAP("map", List.of(AggParm.VAR, AggParm.VAR)),
 
     /**
      * {@code max(x)}: Aggregates the maximum of the values, ignoring
      * non-numeric values. If there are no numeric values, the rule will
      * not fire.
      */
-    MAX("max", List.of(TermCat.BOUND)),
+    MAX("max", List.of(AggParm.VAR)),
 
     /**
      * {@code min(x)}: Aggregates the minimum of the values, ignoring
      * non-numeric values. If there are no numeric values, the rule will
      * not fire.
      */
-    MIN("min", List.of(TermCat.BOUND)),
+    MIN("min", List.of(AggParm.VAR)),
 
     /**
      * {@code set(x)}: Aggregates a set of the matched items.
      */
-    SET("set", List.of(TermCat.BOUND)),
+    SET("set", List.of(AggParm.VAR)),
 
     /**
      * {@code sum(x)}: Aggregates the sum of the values, ignoring non-numeric
      * values. If there are no numeric values, the sum will be 0.
      */
-    SUM("sum", List.of(TermCat.BOUND));
+    SUM("sum", List.of(AggParm.VAR));
 
     //-------------------------------------------------------------------------
     // Metadata
 
     private final String function;
-    private final List<TermCat> signature;  // The signature
+    private final List<AggParm> signature;  // The signature
 
-    // varOnly is an array of flags.  The arity is the number of flags.
-    // If a flag is true, the matching argument must be a variable term.
-    // If a flag is false, it may also be a constant term.
-    Aggregator(String function, List<TermCat> sig) {
+    // The signature is a list of ArgType values indicating whether the
+    // argument is a data value (VAL) to be consumed by the aggregator or a
+    // variable (VAR) to be aggregated over. By convention, VAL parameters
+    // precede VAR parameters.
+    Aggregator(String function, List<AggParm> signature) {
         this.function = function;
-        this.signature = sig;
+        this.signature = signature;
     }
 
     /**
@@ -77,7 +78,7 @@ public enum Aggregator {
      * Returns the function's signature, as a list of term categories.
      * @return the list
      */
-    public List<TermCat> signature() {
+    public List<AggParm> signature() {
         return signature;
     }
 
