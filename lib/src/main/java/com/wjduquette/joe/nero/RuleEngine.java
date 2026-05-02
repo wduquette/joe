@@ -733,8 +733,8 @@ public class RuleEngine {
 
     private List<Bindings> aggregate(BindingContext bc) {
         // FIRST, get the Aggregate term, if any.
-        var term = getAggregate(bc.rule.head());
-        if (term == null) return bc.matches;
+        var agg = getAggregate(bc.rule.head());
+        if (agg == null) return bc.matches;
 
         // NEXT, remove non-head-vars from the bindings.
         var headVars = bc.rule.head().getVariableNames();
@@ -748,14 +748,14 @@ public class RuleEngine {
         }
 
         // NEXT, aggregate using the function
-        return switch (term.aggregator()) {
-            case INDEXED_LIST -> aggregateIndexedList(term.overNames(), matches);
-            case LIST -> aggregateList(term.overNames(), matches);
-            case MAP -> aggregateMap(term.overNames(), matches);
-            case MAX -> aggregateMax(term.overNames(), matches);
-            case MIN -> aggregateMin(term.overNames(), matches);
-            case SET -> aggregateSet(term.overNames(), matches);
-            case SUM -> aggregateSum(term.overNames(), matches);
+        return switch (agg.aggregator()) {
+            case INDEXED_LIST -> aggregateIndexedList(agg, matches);
+            case LIST -> aggregateList(agg, matches);
+            case MAP -> aggregateMap(agg, matches);
+            case MAX -> aggregateMax(agg, matches);
+            case MIN -> aggregateMin(agg, matches);
+            case SET -> aggregateSet(agg, matches);
+            case SUM -> aggregateSum(agg, matches);
         };
     }
 
@@ -767,10 +767,11 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateIndexedList(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the lists by group
+        var names = agg.overNames();
         var indexVar = names.get(0);
         var itemVar = names.get(1);
         var groups = new HashMap<Bindings,ArrayList<Pair>>();
@@ -809,10 +810,11 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateList(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the lists by group
+        var names = agg.overNames();
         var varName = names.getFirst();
         var groups = new HashMap<Bindings,ListValue>();
 
@@ -827,10 +829,11 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateMap(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the lists by group
+        var names = agg.overNames();
         var kVar = names.get(0);
         var vVar = names.get(1);
         var groups = new HashMap<Bindings, MapValue>();
@@ -858,11 +861,12 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateMax(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the max by group, ignoring non-numeric values.
         // If there are no non-numeric values then there is no match.
+        var names = agg.overNames();
         var varName = names.getFirst();
         var groups = new HashMap<Bindings,DoubleCell>();
 
@@ -881,11 +885,12 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateMin(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the max by group, ignoring non-numeric values.
         // If there are no non-numeric values then there is no match.
+        var names = agg.overNames();
         var varName = names.getFirst();
         var groups = new HashMap<Bindings,DoubleCell>();
 
@@ -904,10 +909,11 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateSet(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the sets by group
+        var names = agg.overNames();
         var varName = names.getFirst();
         var groups = new HashMap<Bindings, SetValue>();
 
@@ -922,11 +928,12 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateSum(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the sum by group, ignoring non-numeric values.
         // If there are no non-numeric values, the sum is 0.
+        var names = agg.overNames();
         var varName = names.getFirst();
         var groups = new HashMap<Bindings,DoubleCell>();
 
