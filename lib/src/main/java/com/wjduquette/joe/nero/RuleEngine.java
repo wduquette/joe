@@ -753,7 +753,9 @@ public class RuleEngine {
             case LIST -> aggregateList(agg, matches);
             case MAP -> aggregateMap(agg, matches);
             case MAX -> aggregateMax(agg, matches);
+            case MAXT -> aggregateMaxT(agg, matches);
             case MIN -> aggregateMin(agg, matches);
+            case MINT -> aggregateMinT(agg, matches);
             case SET -> aggregateSet(agg, matches);
             case SUM -> aggregateSum(agg, matches);
         };
@@ -908,6 +910,104 @@ public class RuleEngine {
         return aggregates(groups, DoubleCell::value);
     }
 
+    // Aggregate the maximum of a number of values, ignoring all values not of a
+    // registered type.
+    private List<Bindings> aggregateMaxT(
+        Aggregate agg,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the max by group, ignoring invalid values.
+        // If there are no valid values then there is no match.
+        var type = aggConstant(agg, 0);
+        Comparer comparer = null;
+        if (type instanceof Keyword kw) {
+            comparer = comparers.get(kw);
+        }
+
+        if (comparer == null) {
+            throw joe.expected(
+                "registered type keyword for 'maxt(type, x)' aggregation function",
+                type);
+        }
+
+        var names = agg.overNames();
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings,ObjectCell>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+            var cell = groups.get(match);
+            if (cell == null) {
+                // Ensure that the value is comparable.
+                if (comparer.compare(o, o) != null) {
+                    groups.put(match, new ObjectCell(o));
+                }
+            } else {
+                var result = comparer.compare(cell.value, o);
+                if (result != null && result < 0) { // cell.value < o
+                    cell.value = o;
+                }
+            }
+        }
+
+        return aggregates(groups, ObjectCell::value);
+    }
+
+    // Aggregate the minimum of a number of values, ignoring all values not of a
+    // registered type.
+    private List<Bindings> aggregateMinT(
+        Aggregate agg,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the minimum by group, ignoring invalid values.
+        // If there are no valid values then there is no match.
+        var type = aggConstant(agg, 0);
+        Comparer comparer = null;
+        if (type instanceof Keyword kw) {
+            comparer = comparers.get(kw);
+        }
+
+        if (comparer == null) {
+            throw joe.expected(
+                "registered type keyword for 'mint(type, x)' aggregation function",
+                type);
+        }
+
+        var names = agg.overNames();
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings,ObjectCell>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+            var cell = groups.get(match);
+            if (cell == null) {
+                // Ensure that the value is comparable.
+                if (comparer.compare(o, o) != null) {
+                    groups.put(match, new ObjectCell(o));
+                }
+            } else {
+                var result = comparer.compare(cell.value, o);
+                if (result != null && result > 0) { // cell.value > o
+                    cell.value = o;
+                }
+            }
+        }
+
+        return aggregates(groups, ObjectCell::value);
+    }
+
+    // Gets the value of the index'th argument, which must be a constant.
+    private Object aggConstant(Aggregate agg, int index) {
+        var arg = agg.terms().get(index);
+        if (arg instanceof Constant c) {
+            return c.value();
+        } else {
+            throw new IllegalStateException("expected Constant, got: " + arg);
+        }
+    }
+
     private List<Bindings> aggregateSet(
         Aggregate agg,
         List<Bindings> matches
@@ -1021,6 +1121,14 @@ public class RuleEngine {
     // Used when aggregating indexed lists.
     private record Pair(Object index, Object item) {}
 
+    // Used for generic aggregation
+    private static class ObjectCell {
+        Object value;
+        ObjectCell(Object value) { this.value = value; }
+        Object value() { return value; }
+    }
+
+    // used for numeric aggregation
     private static class DoubleCell {
         double value;
         DoubleCell(double value) { this.value = value; }

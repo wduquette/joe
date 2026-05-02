@@ -34,11 +34,25 @@ public enum Aggregator {
     MAX("max", List.of(AggParm.VAR)),
 
     /**
+     * {@code maxt(type, x)}: Aggregates the maximum of the values, ignoring
+     * values not of the given type. If there are no such values, the rule will
+     * not fire.
+     */
+    MAXT("maxt", List.of(AggParm.CONST, AggParm.VAR)),
+
+    /**
      * {@code min(x)}: Aggregates the minimum of the values, ignoring
      * non-numeric values. If there are no numeric values, the rule will
      * not fire.
      */
     MIN("min", List.of(AggParm.VAR)),
+
+    /**
+     * {@code mint(type, x)}: Aggregates the minimum of the values, ignoring
+     * values not of the given type. If there are no such values, the rule will
+     * not fire.
+     */
+    MINT("mint", List.of(AggParm.CONST, AggParm.VAR)),
 
     /**
      * {@code set(x)}: Aggregates a set of the matched items.

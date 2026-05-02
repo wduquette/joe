@@ -635,14 +635,12 @@ class NeroParser extends EmbeddedParser {
                             "expected a variable name.");
                     }
                 }
-                case VAL -> {
-                    if (term instanceof Variable ||
-                        term instanceof Constant
-                    ) {
+                case CONST -> {
+                    if (term instanceof Constant) {
                         args.add(term);
                     } else {
                         throw errorSync(scanner.previous(),
-                            "expected a variable name or constant.");
+                            "expected a constant value.");
                     }
                 }
             }

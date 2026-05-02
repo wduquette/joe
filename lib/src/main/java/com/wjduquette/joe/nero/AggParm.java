@@ -8,8 +8,8 @@ public enum AggParm {
     VAR,
 
     /**
-     * A constant or bound variable whose value is used as data by
+     * A constant value used as an input to
      * the aggregation function.
      */
-    VAL
+    CONST
 }

@@ -39,7 +39,7 @@ public record Aggregate(
         var list = new ArrayList<String>();
         for (var i = 0; i < terms.size(); i++) {
             var term = terms.get(i);
-            if (aggregator.signature().get(i) == AggParm.VAL &&
+            if (aggregator.signature().get(i) == AggParm.CONST &&
                 term instanceof Variable v
             ) {
                 list.add(v.name());
