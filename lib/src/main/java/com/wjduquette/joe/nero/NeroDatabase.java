@@ -90,6 +90,25 @@ public class NeroDatabase {
         return nero.getMappers();
     }
 
+    /**
+     * Adds a single Comparer function to Nero. The name
+     * must be a valid identifier identifying the type; it
+     * will be exposed in Nero scripts as a keyword.
+     * @param name The name
+     * @param comparer The comparer
+     */
+    public void addComparer(String name, Comparer comparer) {
+        nero.addComparer(name, comparer);
+    }
+
+    /**
+     * Gets a read-only map of the defined comparers.
+     * @return the map
+     */
+    public Map<Keyword,Comparer> getComparers() {
+        return nero.getComparers();
+    }
+
     //------------------------------------------------------------------------
     // Operations
 

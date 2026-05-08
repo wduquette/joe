@@ -953,7 +953,7 @@ public class RuleEngine {
                     groups.put(match, new ObjectCell(o));
                 }
             } else {
-                var result = comparer.compare(cell.value, o);
+                var result = compare(comparer, cell.value, o);
                 if (result != null && result < 0) { // cell.value < o
                     cell.value = o;
                 }
@@ -997,7 +997,7 @@ public class RuleEngine {
                     groups.put(match, new ObjectCell(o));
                 }
             } else {
-                var result = comparer.compare(cell.value, o);
+                var result = compare(comparer, cell.value, o);
                 if (result != null && result > 0) { // cell.value > o
                     cell.value = o;
                 }
@@ -1005,6 +1005,11 @@ public class RuleEngine {
         }
 
         return aggregates(groups, ObjectCell::value);
+    }
+
+    private Integer compare(Comparer f, Object a, Object b) {
+        var result = f.compare(a, b);
+        return (result instanceof Double d) ? d.intValue() : null;
     }
 
     // Gets the value of the index'th argument, which must be a constant.
@@ -1097,18 +1102,18 @@ public class RuleEngine {
     }
 
     // Comparer function for numbers
-    private Integer compareNumbers(Object a, Object b) {
+    private Double compareNumbers(Object a, Object b) {
         if (a instanceof Double na && b instanceof Double nb) {
-            return na.compareTo(nb);
+            return (double)na.compareTo(nb);
         } else {
             return null;
         }
     }
 
     // Comparer function for strings
-    private Integer compareStrings(Object a, Object b) {
+    private Double compareStrings(Object a, Object b) {
         if (a instanceof String sa && b instanceof String sb) {
-            return sa.compareTo(sb);
+            return (double)sa.compareTo(sb);
         } else {
             return null;
         }

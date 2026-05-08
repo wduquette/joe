@@ -4,6 +4,7 @@ import com.wjduquette.joe.Args;
 import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.Keyword;
 import com.wjduquette.joe.ProxyType;
+import com.wjduquette.joe.nero.Comparer;
 import com.wjduquette.joe.nero.Mapper;
 import com.wjduquette.joe.nero.Nero;
 
@@ -44,6 +45,8 @@ public class NeroType extends ProxyType<Nero> {
 
         initializer(this::_init);
 
+        method("addComparer",     this::_addComparer);
+        method("addComparers",    this::_addComparers);
         method("addMapper",       this::_addMapper);
         method("addMappers",      this::_addMappers);
         method("toNeroScript",    this::_toNeroScript);
@@ -73,6 +76,46 @@ public class NeroType extends ProxyType<Nero> {
 
     //-------------------------------------------------------------------------
     // Instance Method Implementations
+
+    //**
+    // @method addComparer
+    // %args keyword, comparer
+    // %result this
+    // Adds a type comparison function named by the *keyword*, for use
+    // with the `mint(type, x)` and `maxt(type, x)` aggregation functions.
+    // The *comparer* should a `callable/2`.  Given two values *a* and *b*,
+    // the *comparer* should return:
+    //
+    // - `null` if either of *a* or *b* is not of the particular type.
+    // - a value less than 0 if *a* &lt; *b*
+    // - a value greater than 0 if *a* &gt; *b*
+    // - 0 otherwise.
+    private Object _addComparer(Nero nero, Joe joe, Args args) {
+        args.arity(2, "addComparer(keyword, comparer)");
+        var k = joe.toKeyword(args.next());
+        var f = joe.toCallable(args.next());
+        nero.addComparer(k.name(), (a, b) -> joe.call(f, a, b));
+        return nero;
+    }
+
+    //**
+    // @method addComparers
+    // %args map
+    // %result this
+    // Adds a collection of type comparison functions, where *map* is a map from
+    // keyword to `callable/2`.  See [[method:Nero.addComparer]].
+    private Object _addComparers(Nero nero, Joe joe, Args args) {
+        args.arity(1, "addComparers(map)");
+        var input = joe.toMap(args.next());
+        var map = new HashMap<Keyword, Comparer>();
+        for (var e : input.entrySet()) {
+            var k = joe.toKeyword(e.getKey());
+            var f = joe.toCallable(e.getValue());
+            map.put(k, (a, b) -> joe.call(f, a, b));
+        }
+        map.forEach((k, f) -> nero.addComparer(k.name(), f));
+        return nero;
+    }
 
     //**
     // @method addMapper

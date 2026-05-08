@@ -14,5 +14,5 @@ public interface Comparer {
      * @param b The second value
      * @return -1, 0, 1, or null
      */
-    Integer compare(Object a, Object b);
+    Object compare(Object a, Object b);
 }
