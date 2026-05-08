@@ -37,7 +37,9 @@ Nero provides the following aggregation functions:
 - [`list(item)`](#listitem)
 - [`map(k, v)`](#mapk-v)
 - [`max(x)`](#maxx)
+- [`maxt(type, x)`](#maxttype_x)
 - [`min(x)`](#minx)
+- [`mint(type, x)`](#minttype_x)
 - [`set(item)`](#setitem)
 - [`sum(x)`](#sumx)
 
@@ -134,6 +136,33 @@ MaxValue(id, max(x)) :- Item(id, x);
 yields this fact.
 
 - `MaxValue(#a, 3)`
+ 
+## `maxt(type, x)`
+
+This function computes the maximum value among the aggregated
+*x* values belonging to the given *type*.  If there are no values of the
+given *type* among the aggregated values, *the rule will not trigger*.
+
+For example,
+
+```nero
+define Item/owner,num;
+Item(#a, "abc");
+Item(#a, "def");
+Item(#a, "xyz");
+Item(#b, 0);
+
+define MaxValue/owner,max;
+MaxValue(id, maxt(#string, x)) :- Item(id, x);
+```
+
+yields this fact.
+
+- `MaxValue(#a, "xyz")`
+
+Nero predefines the following types: `#string`, `#number`; additional
+types can be defined by the user. See
+[Aggregation Types](#aggregation_types).
 
 ## `min(x)`
 
@@ -157,6 +186,33 @@ MinValue(id, min(x)) :- Item(id, x);
 yields this fact:
 
 - `MinValue(#a, 1)`
+- 
+## `mint(type, x)`
+
+This function computes the minimum value among the aggregated
+*x* values belonging to the given *type*.  If there are no values of the
+given *type* among the aggregated values, *the rule will not trigger*.
+
+For example,
+
+```nero
+define Item/owner,num;
+Item(#a, "abc");
+Item(#a, "def");
+Item(#a, "xyz");
+Item(#b, 0);
+
+define MinValue/owner,min;
+MaxValue(id, mint(#string, x)) :- Item(id, x);
+```
+
+yields this fact.
+
+- `MinValue(#a, "abc")`
+
+Nero predefines the following types: `#string`, `#number`; additional
+types can be defined by the user. See
+[Aggregation Types](#aggregation_types).
 
 ## `set(item)`
 
@@ -202,4 +258,14 @@ Total(id, sum(x)) :- Item(id, x);
 yields this fact:
 
 - `Total(#a, 6)`
+
+## Aggregation Types
+
+The [`maxt(type, x)`](#maxttype-x) and [`mint(type, x)`](#minttype-x)
+functions allow a Nero rule to find the minimum and maximum values of
+arbitrary types.  The following types are predefined; clients can define
+additional types using Nero's Java or Joe APIs.
+
+- `#number`: Nero's numeric type.
+- `#string`: Nero's string type. Capitals sort before lowercase letters. 
 

@@ -95,7 +95,13 @@ public class RuleEngine {
     }
 
     /** Name of the "str2num" mapper function. */
-    public static final Keyword STR2NUM = new Keyword("str2num");
+    public static final Keyword KW_STR2NUM = new Keyword("str2num");
+
+    /** Keyword for the Number type. */
+    public static final Keyword KW_NUMBER = new Keyword("number");
+
+    /** Keyword for the String type. */
+    public static final Keyword KW_STRING = new Keyword("string");
 
     /**
      * Returns true if the relation names a built-in predicate, and false
@@ -143,6 +149,9 @@ public class RuleEngine {
     // The mapsTo/f,a,b mapping functions.
     private final Map<Keyword,Mapper> mappers = new HashMap<>();
 
+    // The comparison functions for specific types.
+    private final Map<Keyword,Comparer> comparers = new HashMap<>();
+
     // Debug Flag
     private boolean debug = false;
 
@@ -187,7 +196,11 @@ public class RuleEngine {
         );
 
         // Define the predefined mapsTo/f,a,b mappers
-        this.mappers.put(STR2NUM, this::str2num);
+        this.mappers.put(KW_STR2NUM, this::str2num);
+
+        // Define the predefined comparers.
+        this.comparers.put(KW_NUMBER, this::compareNumbers);
+        this.comparers.put(KW_STRING, this::compareStrings);
 
         // NEXT, Categorize the rules by head relation
         for (var rule : ruleset.rules()) {
@@ -226,6 +239,15 @@ public class RuleEngine {
      */
     public void addMappers(Map<Keyword,Mapper> mappers) {
         this.mappers.putAll(mappers);
+    }
+
+    /**
+     * Adds a collection of type comparers to the
+     * RuleEngine for use during execution.
+     * @param comparers The collection of mappers by keyword.
+     */
+    public void addComparers(Map<Keyword,Comparer> comparers) {
+        this.comparers.putAll(comparers);
     }
 
     //-------------------------------------------------------------------------
@@ -720,8 +742,8 @@ public class RuleEngine {
 
     private List<Bindings> aggregate(BindingContext bc) {
         // FIRST, get the Aggregate term, if any.
-        var term = getAggregate(bc.rule.head());
-        if (term == null) return bc.matches;
+        var agg = getAggregate(bc.rule.head());
+        if (agg == null) return bc.matches;
 
         // NEXT, remove non-head-vars from the bindings.
         var headVars = bc.rule.head().getVariableNames();
@@ -735,14 +757,16 @@ public class RuleEngine {
         }
 
         // NEXT, aggregate using the function
-        return switch (term.aggregator()) {
-            case INDEXED_LIST -> aggregateIndexedList(term.names(), matches);
-            case LIST -> aggregateList(term.names(), matches);
-            case MAP -> aggregateMap(term.names(), matches);
-            case MAX -> aggregateMax(term.names(), matches);
-            case MIN -> aggregateMin(term.names(), matches);
-            case SET -> aggregateSet(term.names(), matches);
-            case SUM -> aggregateSum(term.names(), matches);
+        return switch (agg.aggregator()) {
+            case INDEXED_LIST -> aggregateIndexedList(agg, matches);
+            case LIST -> aggregateList(agg, matches);
+            case MAP -> aggregateMap(agg, matches);
+            case MAX -> aggregateMax(agg, matches);
+            case MAXT -> aggregateMaxT(agg, matches);
+            case MIN -> aggregateMin(agg, matches);
+            case MINT -> aggregateMinT(agg, matches);
+            case SET -> aggregateSet(agg, matches);
+            case SUM -> aggregateSum(agg, matches);
         };
     }
 
@@ -754,10 +778,11 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateIndexedList(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the lists by group
+        var names = agg.overNames();
         var indexVar = names.get(0);
         var itemVar = names.get(1);
         var groups = new HashMap<Bindings,ArrayList<Pair>>();
@@ -796,10 +821,11 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateList(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the lists by group
+        var names = agg.overNames();
         var varName = names.getFirst();
         var groups = new HashMap<Bindings,ListValue>();
 
@@ -814,10 +840,11 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateMap(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the lists by group
+        var names = agg.overNames();
         var kVar = names.get(0);
         var vVar = names.get(1);
         var groups = new HashMap<Bindings, MapValue>();
@@ -845,11 +872,12 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateMax(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the max by group, ignoring non-numeric values.
         // If there are no non-numeric values then there is no match.
+        var names = agg.overNames();
         var varName = names.getFirst();
         var groups = new HashMap<Bindings,DoubleCell>();
 
@@ -868,11 +896,12 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateMin(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the max by group, ignoring non-numeric values.
         // If there are no non-numeric values then there is no match.
+        var names = agg.overNames();
         var varName = names.getFirst();
         var groups = new HashMap<Bindings,DoubleCell>();
 
@@ -890,11 +919,115 @@ public class RuleEngine {
         return aggregates(groups, DoubleCell::value);
     }
 
+    // Aggregate the maximum of a number of values, ignoring all values not of a
+    // registered type.
+    private List<Bindings> aggregateMaxT(
+        Aggregate agg,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the max by group, ignoring invalid values.
+        // If there are no valid values then there is no match.
+        var type = aggConstant(agg, 0);
+        Comparer comparer = null;
+        if (type instanceof Keyword kw) {
+            comparer = comparers.get(kw);
+        }
+
+        if (comparer == null) {
+            throw joe.expected(
+                "type keyword of registered comparer in 'maxt(type, x)'",
+                type);
+        }
+
+        var names = agg.overNames();
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings,ObjectCell>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+            var cell = groups.get(match);
+            if (cell == null) {
+                // Ensure that the value is comparable.
+                if (comparer.compare(o, o) != null) {
+                    groups.put(match, new ObjectCell(o));
+                }
+            } else {
+                var result = compare(comparer, cell.value, o);
+                if (result != null && result < 0) { // cell.value < o
+                    cell.value = o;
+                }
+            }
+        }
+
+        return aggregates(groups, ObjectCell::value);
+    }
+
+    // Aggregate the minimum of a number of values, ignoring all values not of a
+    // registered type.
+    private List<Bindings> aggregateMinT(
+        Aggregate agg,
+        List<Bindings> matches
+    ) {
+        // FIRST, aggregate the minimum by group, ignoring invalid values.
+        // If there are no valid values then there is no match.
+        var type = aggConstant(agg, 0);
+        Comparer comparer = null;
+        if (type instanceof Keyword kw) {
+            comparer = comparers.get(kw);
+        }
+
+        if (comparer == null) {
+            throw joe.expected(
+                "type keyword of registered comparer in 'mint(type, x)'",
+                type);
+        }
+
+        var names = agg.overNames();
+        var varName = names.getFirst();
+        var groups = new HashMap<Bindings,ObjectCell>();
+
+        for (var match : matches) {
+            var o = match.get(varName);
+            match.unbindAll(names);
+            var cell = groups.get(match);
+            if (cell == null) {
+                // Ensure that the value is comparable.
+                if (comparer.compare(o, o) != null) {
+                    groups.put(match, new ObjectCell(o));
+                }
+            } else {
+                var result = compare(comparer, cell.value, o);
+                if (result != null && result > 0) { // cell.value > o
+                    cell.value = o;
+                }
+            }
+        }
+
+        return aggregates(groups, ObjectCell::value);
+    }
+
+    private Integer compare(Comparer f, Object a, Object b) {
+        var result = f.compare(a, b);
+        return (result instanceof Number n) ? n.intValue() : null;
+    }
+
+    // Gets the value of the index'th argument, which must be a constant.
+    private Object aggConstant(Aggregate agg, int index) {
+        var arg = agg.terms().get(index);
+        if (arg instanceof Constant c) {
+            return c.value();
+        } else {
+            throw new IllegalStateException("expected Constant, got: " + arg);
+        }
+    }
+
     private List<Bindings> aggregateSet(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the sets by group
+        var names = agg.overNames();
         var varName = names.getFirst();
         var groups = new HashMap<Bindings, SetValue>();
 
@@ -909,11 +1042,12 @@ public class RuleEngine {
     }
 
     private List<Bindings> aggregateSum(
-        List<String> names,
+        Aggregate agg,
         List<Bindings> matches
     ) {
         // FIRST, aggregate the sum by group, ignoring non-numeric values.
         // If there are no non-numeric values, the sum is 0.
+        var names = agg.overNames();
         var varName = names.getFirst();
         var groups = new HashMap<Bindings,DoubleCell>();
 
@@ -967,6 +1101,24 @@ public class RuleEngine {
         return null;
     }
 
+    // Comparer function for numbers
+    private Double compareNumbers(Object a, Object b) {
+        if (a instanceof Double na && b instanceof Double nb) {
+            return (double)na.compareTo(nb);
+        } else {
+            return null;
+        }
+    }
+
+    // Comparer function for strings
+    private Double compareStrings(Object a, Object b) {
+        if (a instanceof String sa && b instanceof String sb) {
+            return (double)sa.compareTo(sb);
+        } else {
+            return null;
+        }
+    }
+
     // The context for the recursive matchBodyAtom method.
     private static class BindingContext {
         private final Rule rule;
@@ -983,6 +1135,14 @@ public class RuleEngine {
     // Used when aggregating indexed lists.
     private record Pair(Object index, Object item) {}
 
+    // Used for generic aggregation
+    private static class ObjectCell {
+        Object value;
+        ObjectCell(Object value) { this.value = value; }
+        Object value() { return value; }
+    }
+
+    // used for numeric aggregation
     private static class DoubleCell {
         double value;
         DoubleCell(double value) { this.value = value; }

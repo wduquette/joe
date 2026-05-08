@@ -25,6 +25,9 @@ public class Nero {
     // The client-defined mapsTo/f,a,b mapping functions.
     private final Map<Keyword,Mapper> mappers = new HashMap<>();
 
+    // The client-defined data type comparator functions
+    private final Map<Keyword,Comparer> comparers = new HashMap<>();
+
     //-------------------------------------------------------------------------
     // Constructor
 
@@ -78,6 +81,29 @@ public class Nero {
      */
     public Map<Keyword,Mapper> getMappers() {
         return Collections.unmodifiableMap(mappers);
+    }
+
+    /**
+     * Adds a single Comparer function to Nero. The name
+     * must be a valid identifier identifying the type; it
+     * will be exposed in Nero scripts as a keyword.
+     * @param name The name
+     * @param comparer The comparer
+     */
+    public void addComparer(String name, Comparer comparer) {
+        if (!Joe.isIdentifier(name)) {
+            throw new IllegalArgumentException(
+                "not an identifier: '" + name + "'.");
+        }
+        comparers.put(new Keyword(name), comparer);
+    }
+
+    /**
+     * Gets a read-only map of the defined comparers.
+     * @return the map
+     */
+    public Map<Keyword,Comparer> getComparers() {
+        return Collections.unmodifiableMap(comparers);
     }
 
     //-------------------------------------------------------------------------
@@ -226,6 +252,7 @@ public class Nero {
             var engine = new RuleEngine(joe, ruleset, db);
             engine.setDebug(debug);
             engine.addMappers(nero.getMappers());
+            engine.addComparers(nero.getComparers());
 
             var query = new Fact(QUERY, parms);
             if (debug) joe.println("Query Parameters: " + query);
@@ -246,6 +273,8 @@ public class Nero {
             var engine = new RuleEngine(joe, ruleset, facts);
             engine.setDebug(debug);
             engine.addMappers(nero.getMappers());
+            engine.addComparers(nero.getComparers());
+
             try {
                 var query = new Fact(QUERY, parms);
                 if (debug) joe.println("Query Parameters: " + query);
@@ -283,6 +312,7 @@ public class Nero {
             var engine = new RuleEngine(joe, ruleset, facts);
             engine.setDebug(debug);
             engine.addMappers(nero.getMappers());
+            engine.addComparers(nero.getComparers());
 
             var query = new Fact(QUERY, parms);
             if (debug) joe.println("Query Parameters: " + query);
