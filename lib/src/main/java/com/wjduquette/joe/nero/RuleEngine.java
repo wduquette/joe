@@ -1009,7 +1009,7 @@ public class RuleEngine {
 
     private Integer compare(Comparer f, Object a, Object b) {
         var result = f.compare(a, b);
-        return (result instanceof Double d) ? d.intValue() : null;
+        return (result instanceof Number n) ? n.intValue() : null;
     }
 
     // Gets the value of the index'th argument, which must be a constant.
