@@ -14,7 +14,7 @@ public class TextColumn<R, V> {
     private Function<R,V> valueGetter = null;
 
     /**
-     * Creats a new text column
+     * Creates a new text column
      */
     public TextColumn() {
         // Nothing to do
@@ -32,8 +32,9 @@ public class TextColumn<R, V> {
      * Sets the header string.
      * @param header The text
      */
-    public void setHeader(String header) {
+    public TextColumn<R,V> header(String header) {
         this.header = header;
+        return this;
     }
 
     /**
@@ -48,8 +49,9 @@ public class TextColumn<R, V> {
      * Sets the text alignment in the column.
      * @param alignment The alignment
      */
-    public void setAlignment(TextAlign alignment) {
+    public TextColumn<R,V> alignment(TextAlign alignment) {
         this.alignment = alignment;
+        return this;
     }
 
     /**
@@ -66,7 +68,8 @@ public class TextColumn<R, V> {
      * a row's record.
      * @param valueGetter The function
      */
-    public void setValueGetter(Function<R, V> valueGetter) {
+    public TextColumn<R,V> valueGetter(Function<R, V> valueGetter) {
         this.valueGetter = valueGetter;
+        return this;
     }
 }

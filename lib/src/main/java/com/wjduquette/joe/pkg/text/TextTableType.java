@@ -28,6 +28,7 @@ public class TextTableType extends ProxyType<TextTableValue> {
 
         method("column",     this::_column);
         method("columns",    this::_columns);
+        method("showIndex",  this::_showIndex);
         method("toMarkdown", this::_toMarkdown);
         method("toTerminal", this::_toTerminal);
     }
@@ -75,6 +76,22 @@ public class TextTableType extends ProxyType<TextTableValue> {
     private Object _columns(TextTableValue tc, Joe joe, Args args) {
         args.arity(0, "columns()");
         return joe.wrapList(tc.getColumns(), TextColumnValue.class);
+    }
+
+    //**
+    // @method showIndex
+    // %args [flag]
+    // %result this
+    // Sets whether to include an initial index column.  If *flag* is omitted,
+    // it defaults to true.
+    private Object _showIndex(TextTableValue tc, Joe joe, Args args) {
+        args.arityRange(0, 1, "showIndex([flag])");
+        if (args.hasNext()) {
+            tc.showIndex(joe.toBoolean(args.next()));
+        } else {
+            tc.showIndex(true);
+        }
+        return tc;
     }
 
     //**

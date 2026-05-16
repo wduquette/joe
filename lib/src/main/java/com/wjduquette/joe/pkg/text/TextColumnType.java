@@ -65,8 +65,7 @@ public class TextColumnType extends ProxyType<TextColumnValue> {
     // Sets the column's alignment.
     private Object _alignment(TextColumnValue tc, Joe joe, Args args) {
         args.arity(1, "alignment(alignment)");
-        tc.setAlignment(joe.toEnum(TextAlign.class, args.next()));
-        return tc;
+        return tc.alignment(joe.toEnum(TextAlign.class, args.next()));
     }
 
     //**
@@ -109,8 +108,7 @@ public class TextColumnType extends ProxyType<TextColumnValue> {
         // Wrap using StringFunctionWrapper, so that the result is
         // always stringified.  TextTable itself calls toString(),
         // which will usually be wrong.
-        tc.setValueGetter(joe.wrapStringFunction(args.next()));
-        return tc;
+        return tc.valueGetter(joe.wrapStringFunction(args.next()));
     }
 
     //**
@@ -120,7 +118,6 @@ public class TextColumnType extends ProxyType<TextColumnValue> {
     // Sets the column's header text.
     private Object _header(TextColumnValue tc, Joe joe, Args args) {
         args.arity(1, "header(text)");
-        tc.setHeader(joe.toString(args.next()));
-        return tc;
+        return tc.header(joe.toString(args.next()));
     }
 }

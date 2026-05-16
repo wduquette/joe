@@ -27,6 +27,10 @@ public class TextTable<R> {
     //-------------------------------------------------------------------------
     // Instance Variables
 
+    // Whether to show an index column
+    private boolean showIndex = false;
+
+    // The client's columns
     private final List<TextColumn<R,?>> columns = new ArrayList<>();
 
     //-------------------------------------------------------------------------
@@ -48,6 +52,43 @@ public class TextTable<R> {
 
     //-------------------------------------------------------------------------
     // Public Methods
+
+    /**
+     * Gets whether the table will include an index column.
+     * @return true or false
+     */
+    public boolean isShowIndex() {
+        return showIndex;
+    }
+
+    /**
+     * Sets the showIndex flag.
+     * @param flag true or false
+     * @return this
+     */
+    public TextTable<R> showIndex(boolean flag) {
+        this.showIndex = flag;
+        return this;
+    }
+
+    /**
+     * Sets the showIndex flag to true.
+     * @return this
+     */
+    public TextTable<R> showIndex() {
+        this.showIndex = true;
+        return this;
+    }
+
+    /**
+     * Adds a column to the table.
+     * @param column The column
+     * @return this
+     */
+    public TextTable<R> column(TextColumn<R,?> column) {
+        columns.add(column);
+        return this;
+    }
 
     /**
      * Gets the list of columns.
@@ -93,6 +134,7 @@ public class TextTable<R> {
     private class Formatter {
         private final Mode mode;
         private final List<R> rows;
+        private final int indexWidth;
         private final int[] widths;
         private final StringBuilder buff = new StringBuilder();
 
@@ -100,6 +142,7 @@ public class TextTable<R> {
             this.mode = mode;
             this.rows = rows;
             this.widths = getColumnWidths(rows);
+            this.indexWidth = Integer.toString(rows.size()).length();
         }
 
         private int[] getColumnWidths(List<R> rows) {
@@ -122,8 +165,8 @@ public class TextTable<R> {
             layoutHeader();
             layoutSeparator();
 
-            for (var row : rows) {
-                layoutRow(row);
+            for (var i = 0; i < rows.size(); i++) {
+                layoutRow(i, rows.get(i));
             }
 
             return buff.toString();
@@ -134,8 +177,13 @@ public class TextTable<R> {
                 buff.append(vLine(mode)).append(" ");
             }
 
+            if (showIndex) {
+                buff.append(padLeft(indexWidth, "#"));
+                buff.append(" ").append(vLine(mode)).append(" ");
+            }
+
             for (var c = 0; c < columns.size(); c++) {
-                pad(c, columns.get(c).getHeader());
+                padCol(c, columns.get(c).getHeader());
 
                 if (c < columns.size() - 1) {
                     buff.append(" ").append(vLine(mode)).append(" ");
@@ -151,6 +199,19 @@ public class TextTable<R> {
         private void layoutSeparator() {
             if (mode == Mode.MARKDOWN) {
                 buff.append(vLine(mode)).append(" ");
+            }
+
+            if (showIndex) {
+                if (mode == Mode.MARKDOWN) {
+                    buff.append("-".repeat(indexWidth-1)).append(":");
+                    buff.append(" ")
+                        .append(cross(mode))
+                        .append(" ");
+                } else {
+                    buff.append(hLine(mode).repeat(indexWidth+1))
+                        .append(cross(mode))
+                        .append(hLine(mode));
+                }
             }
 
             for (var c = 0; c < columns.size(); c++) {
@@ -185,13 +246,18 @@ public class TextTable<R> {
             buff.append("\n");
         }
 
-        private void layoutRow(R row) {
+        private void layoutRow(int index, R row) {
             if (mode == Mode.MARKDOWN) {
                 buff.append(vLine(mode)).append(" ");
             }
 
+            if (showIndex) {
+                buff.append(padLeft(indexWidth, Integer.toString(index + 1)));
+                buff.append(" ").append(vLine(mode)).append(" ");
+            }
+
             for (var c = 0; c < columns.size(); c++) {
-                pad(c, columns.get(c).getValueGetter()
+                padCol(c, columns.get(c).getValueGetter()
                     .apply(row).toString());
 
                 if (c < columns.size() - 1) {
@@ -206,7 +272,14 @@ public class TextTable<R> {
 
         }
 
-        private void pad(int c, String value) {
+        private String padLeft(int width, String value) {
+            var pad = width - value.length();
+            return pad >= 0
+                ? " ".repeat(pad) + value
+                : value;
+        }
+
+        private void padCol(int c, String value) {
             var width = widths[c];
             var delta = width - value.length();
             var left = delta/2;
