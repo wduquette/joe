@@ -79,7 +79,7 @@ public final class Fact {
      */
     public Fact(String relation, Map<String,Object> fieldMap) {
         this.shape = new Shape(relation);
-        this.fieldMap = Map.copyOf(fieldMap);
+        this.fieldMap = new HashMap<>(fieldMap);
         this.fields = null;
     }
 
