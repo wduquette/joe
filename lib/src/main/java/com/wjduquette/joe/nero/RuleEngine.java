@@ -45,8 +45,20 @@ public class RuleEngine {
         /** {@code at/collection, key, item} */
         AT("at", List.of(IN, INOUT, INOUT), List.of("collection", "key", "item")),
 
+        /** {@code ge/type, a, b} */
+        GE("ge", List.of(IN, IN, IN), List.of("type", "a", "b")),
+
+        /** {@code gt/type, a, b} */
+        GT("gt", List.of(IN, IN, IN), List.of("type", "a", "b")),
+
         /** {@code has/collection, item} */
         HAS("has", List.of(IN, INOUT), List.of("collection", "item")),
+
+        /** {@code le/type, a, b} */
+        LE("le", List.of(IN, IN, IN), List.of("type", "a", "b")),
+
+        /** {@code lt/type, a, b} */
+        LT("lt", List.of(IN, IN, IN), List.of("type", "a", "b")),
 
         /** {@code mapsTo/f, a, b} */
         MAPS_TO("mapsTo", List.of(IN, IN, INOUT), List.of("f", "a", "b")),
@@ -190,7 +202,11 @@ public class RuleEngine {
         this.knownFacts = db;
         this.builtIns = Map.of(
             BuiltIn.AT.relation(),          this::_at,
+            BuiltIn.GE.relation(),          this::_ge,
+            BuiltIn.GT.relation(),          this::_gt,
             BuiltIn.HAS.relation(),         this::_has,
+            BuiltIn.LE.relation(),          this::_le,
+            BuiltIn.LT.relation(),          this::_lt,
             BuiltIn.MAPS_TO.relation(),     this::_mapsTo,
             BuiltIn.SIZE.relation(),        this::_size
         );
@@ -663,6 +679,60 @@ public class RuleEngine {
         return facts;
     }
 
+    // ge/type,a,b
+    private Set<Fact> _ge(BindingContext bc, Atom theAtom) {
+        var atom = (ListAtom)theAtom;
+        var type = term2value(atom.terms().get(0), bc);
+        var a = term2value(atom.terms().get(1), bc);
+        var b = term2value(atom.terms().get(2), bc);
+        var facts = new HashSet<Fact>();
+
+        Comparer comparer = null;
+        if (type instanceof Keyword kw) {
+            comparer = comparers.get(kw);
+        }
+
+        if (comparer == null) {
+            throw joe.expected(
+                "type keyword of registered comparer in 'ge(type, a, b)'",
+                type);
+        }
+
+        var result = compare(comparer, a, b);
+        if (result != null && result >= 0) {
+            facts.add(new Fact(BuiltIn.GE.shape(), List.of(type, a, b)));
+        }
+
+        return facts;
+    }
+
+    // gt/type,a,b
+    private Set<Fact> _gt(BindingContext bc, Atom theAtom) {
+        var atom = (ListAtom)theAtom;
+        var type = term2value(atom.terms().get(0), bc);
+        var a = term2value(atom.terms().get(1), bc);
+        var b = term2value(atom.terms().get(2), bc);
+        var facts = new HashSet<Fact>();
+
+        Comparer comparer = null;
+        if (type instanceof Keyword kw) {
+            comparer = comparers.get(kw);
+        }
+
+        if (comparer == null) {
+            throw joe.expected(
+                "type keyword of registered comparer in 'gt(type, a, b)'",
+                type);
+        }
+
+        var result = compare(comparer, a, b);
+        if (result != null && result > 0) {
+            facts.add(new Fact(BuiltIn.GT.shape(), List.of(type, a, b)));
+        }
+
+        return facts;
+    }
+
     // has/collection,item
     private Set<Fact> _has(BindingContext bc, Atom atom) {
         var coll = extractVar(bc, atom, 0);
@@ -675,6 +745,60 @@ public class RuleEngine {
                 list.add(i);
                 facts.add(new Fact(BuiltIn.HAS.shape(), list));
             }
+        }
+
+        return facts;
+    }
+
+    // le/type,a,b
+    private Set<Fact> _le(BindingContext bc, Atom theAtom) {
+        var atom = (ListAtom)theAtom;
+        var type = term2value(atom.terms().get(0), bc);
+        var a = term2value(atom.terms().get(1), bc);
+        var b = term2value(atom.terms().get(2), bc);
+        var facts = new HashSet<Fact>();
+
+        Comparer comparer = null;
+        if (type instanceof Keyword kw) {
+            comparer = comparers.get(kw);
+        }
+
+        if (comparer == null) {
+            throw joe.expected(
+                "type keyword of registered comparer in 'le(type, a, b)'",
+                type);
+        }
+
+        var result = compare(comparer, a, b);
+        if (result != null && result <= 0) {
+            facts.add(new Fact(BuiltIn.LE.shape(), List.of(type, a, b)));
+        }
+
+        return facts;
+    }
+
+    // lt/type,a,b
+    private Set<Fact> _lt(BindingContext bc, Atom theAtom) {
+        var atom = (ListAtom)theAtom;
+        var type = term2value(atom.terms().get(0), bc);
+        var a = term2value(atom.terms().get(1), bc);
+        var b = term2value(atom.terms().get(2), bc);
+        var facts = new HashSet<Fact>();
+
+        Comparer comparer = null;
+        if (type instanceof Keyword kw) {
+            comparer = comparers.get(kw);
+        }
+
+        if (comparer == null) {
+            throw joe.expected(
+                "type keyword of registered comparer in 'lt(type, a, b)'",
+                type);
+        }
+
+        var result = compare(comparer, a, b);
+        if (result != null && result < 0) {
+            facts.add(new Fact(BuiltIn.LT.shape(), List.of(type, a, b)));
         }
 
         return facts;

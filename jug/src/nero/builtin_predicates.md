@@ -17,6 +17,10 @@ Nero provides the following built-in predicates.
 
 - [`has/collection, item`](#hascollection-item) (`IN`, `INOUT`)
 - [`at/collection, key, item`](#atcollection-key-item) (`IN`, `INOUT`, `INOUT`)
+- [`ge/type, a, b`](#getype-a-b) (`IN`, `IN`, `IN`)
+- [`gt/type, a, b`](#gttype-a-b) (`IN`, `IN`, `IN`)
+- [`le/type, a, b`](#letype-a-b) (`IN`, `IN`, `IN`)
+- [`lt/type, a, b`](#lttype-a-b) (`IN`, `IN`, `IN`)
 - [`mapsTo/f, a, b`](#mapstof-a-b) (`IN`, `IN`, `INOUT`)
 - [`size/collection, number`](#sizecollection-number) (`IN`, `INOUT`)
 
@@ -132,6 +136,111 @@ yields these facts:
 **Note:** the `map(k, v)`
 [aggregation function](aggregation_functions.md) can reaggregate the items
 back into the original map.
+
+## `ge/type, a, b`
+
+The `ge/type, a, b` tests whether value *a* (`IN`) is greater than 
+or equal to
+value *b* (`IN`), provided that they are both of type *type* (`IN`).
+If *a* and *b* are not both of the given *type*, the match fails.
+
+The *type* is an aggregation type keyword; see
+[Aggregation Types](aggregation_functions.md#aggregation_types).
+`#string` and `#number` are provided; clients can define additional
+types.
+
+For example, this program
+
+```nero
+Pair(1, 1);
+Pair(1, 2);
+Pair(2, 1);
+
+Result(a, b) :- Pair(a, b), ge(#number, a, b);
+```
+
+yields these facts:
+
+- `Result(1, 1)`
+- `Result(2, 1)`
+ 
+## `gt/type, a, b`
+
+The `gt/type, a, b` tests whether value *a* (`IN`) is greater than
+value *b* (`IN`), provided that they are both of type *type* (`IN`).
+If *a* and *b* are not both of the given *type*, the match fails.
+
+The *type* is an aggregation type keyword; see
+[Aggregation Types](aggregation_functions.md#aggregation_types).
+`#string` and `#number` are provided; clients can define additional
+types.
+
+For example, this program
+
+```nero
+Pair(1, 1);
+Pair(1, 2);
+Pair(2, 1);
+
+Result(a, b) :- Pair(a, b), gt(#number, a, b);
+```
+
+yields these facts:
+
+- `Result(2, 1)`
+ 
+## `le/type, a, b`
+
+The `le/type, a, b` tests whether value *a* (`IN`) is less than
+or equal to
+value *b* (`IN`), provided that they are both of type *type* (`IN`).
+If *a* and *b* are not both of the given *type*, the match fails.
+
+The *type* is an aggregation type keyword; see
+[Aggregation Types](aggregation_functions.md#aggregation_types).
+`#string` and `#number` are provided; clients can define additional
+types.
+
+For example, this program
+
+```nero
+Pair(1, 1);
+Pair(1, 2);
+Pair(2, 1);
+
+Result(a, b) :- Pair(a, b), le(#number, a, b);
+```
+
+yields these facts:
+
+- `Result(1, 1)`
+- `Result(1, 2)`
+
+## `lt/type, a, b`
+
+The `lt/type, a, b` tests whether value *a* (`IN`) is less than
+value *b* (`IN`), provided that they are both of type *type* (`IN`).
+If *a* and *b* are not both of the given *type*, the match fails.
+
+The *type* is an aggregation type keyword; see
+[Aggregation Types](aggregation_functions.md#aggregation_types).
+`#string` and `#number` are provided; clients can define additional
+types.
+
+For example, this program
+
+```nero
+Pair(1, 1);
+Pair(1, 2);
+Pair(2, 1);
+
+Result(a, b) :- Pair(a, b), lt(#number, a, b);
+```
+
+yields these facts:
+
+- `Result(1, 2)`
+
 
 ## `mapsTo/f, a, b`
 
