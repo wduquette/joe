@@ -49,6 +49,13 @@ public class TextCanvas {
     // Accessors
 
     /**
+     * Clears the canvas.
+     */
+    public void clear() {
+        rows.clear();
+    }
+
+    /**
      * Gets a character from the canvas as a string.
      * @param c The column
      * @param r The row
