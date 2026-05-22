@@ -673,6 +673,72 @@ public class RuleEngineTest extends Ted {
             """);
     }
 
+    @Test public void testBuiltIn_ge() {
+        test("testBuiltIn_ge");
+        var source = """
+            transient Foo;
+            Foo(1, 1);
+            Foo(1, 2);
+            Foo(2, 1);
+            Foo(2, "a");
+            Bar(a, b) :- Foo(a, b), ge(#number, a, b);
+            """;
+        check(execute(source)).eq("""
+            define Bar/a,b;
+            Bar(1, 1);
+            Bar(2, 1);
+            """);
+    }
+
+    @Test public void testBuiltIn_gt() {
+        test("testBuiltIn_gt");
+        var source = """
+            transient Foo;
+            Foo(1, 1);
+            Foo(1, 2);
+            Foo(2, 1);
+            Foo(2, "a");
+            Bar(a, b) :- Foo(a, b), gt(#number, a, b);
+            """;
+        check(execute(source)).eq("""
+            define Bar/a,b;
+            Bar(2, 1);
+            """);
+    }
+
+    @Test public void testBuiltIn_le() {
+        test("testBuiltIn_le");
+        var source = """
+            transient Foo;
+            Foo(1, 1);
+            Foo(1, 2);
+            Foo(2, 1);
+            Foo(2, "a");
+            Bar(a, b) :- Foo(a, b), le(#number, a, b);
+            """;
+        check(execute(source)).eq("""
+            define Bar/a,b;
+            Bar(1, 1);
+            Bar(1, 2);
+            """);
+    }
+
+    @Test public void testBuiltIn_lt() {
+        test("testBuiltIn_lt");
+        var source = """
+            transient Foo;
+            Foo(1, 1);
+            Foo(1, 2);
+            Foo(2, 1);
+            Foo(2, "a");
+            Bar(a, b) :- Foo(a, b), lt(#number, a, b);
+            """;
+        check(execute(source)).eq("""
+            define Bar/a,b;
+            Bar(1, 2);
+            """);
+    }
+
     @Test public void testBuiltIn_has_disaggregate() {
         test("testBuiltIn_has_disaggregate");
         var source = """
