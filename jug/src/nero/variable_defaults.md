@@ -48,3 +48,7 @@ In a default value term ***variable** | **value***:
   it can appear in no other body atom.
 - The *value* has mode `IN`; it must be either a constant or a variable
   bound in an atom to the left.
+- A rule set that includes variable defaults must be *stratifiable*.  This is
+  not usually a problem in practice; if Nero rejects a program because it is
+  unstratifiable, see [Stratification](stratification.md) for an explanation
+  of the problem and how to fix it.

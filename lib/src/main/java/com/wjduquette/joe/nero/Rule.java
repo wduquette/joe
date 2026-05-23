@@ -1,5 +1,6 @@
 package com.wjduquette.joe.nero;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,6 +85,25 @@ public class Rule {
      */
     public List<Atom> negated() {
         return negated;
+    }
+
+    /**
+     * Returns a list of the body atoms that contain defaulted variables
+     * @return
+     */
+    public List<Atom> defaulted() {
+        var result = new ArrayList<Atom>();
+
+        for (var a : normal) {
+            for (var t : a.getAllTerms()) {
+                if (t instanceof VariableWithDefault) {
+                    result.add(a);
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
     /**

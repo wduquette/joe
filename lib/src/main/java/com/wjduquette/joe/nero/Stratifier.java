@@ -81,6 +81,12 @@ public class Stratifier {
                 if (j == -1) continue;  // Skip non-head predicates
                 mat[i][j] = -1;
             }
+
+            for (var b : rule.defaulted()) {
+                var j = heads.indexOf(b.relation());
+                if (j == -1) continue;  // Skip non-head predicates
+                mat[i][j] = -1;
+            }
         }
 
         return mat;

@@ -100,3 +100,13 @@ If allowed, this program would produce the following infinite stream of facts:
 - `A(12)`
 - `A(24)`
 - ...
+
+## The Variable Defaults Condition
+
+The [Variable Defaults](variable_defaults.md) condition is as follows:
+
+- If relation A depends on relation B with a defaulted variable, then relation 
+  B must not depend on relation A either directly or indirectly.
+
+A variable default is effectively a specialized form of negation, and so
+must follow the same rules.
