@@ -134,6 +134,19 @@ public class NeroDatabase {
     }
 
     /**
+     * Executes the script in the Nero file given a preamble script,
+     * adding all computed facts to the database.
+     * @param preamble The preamble script.
+     * @param scriptFile The Nero file
+     * @return The database
+     * @throws JoeError if the computed facts are incompatible with the
+     * current database content.
+     */
+    public NeroDatabase loadWithPreamble(String preamble, Path scriptFile) {
+        return withPreambleAndFile(preamble, scriptFile).load();
+    }
+
+    /**
      * Updates the content of the database given the rule set.
      * @param ruleset The rule set
      * @return The database
@@ -202,6 +215,26 @@ public class NeroDatabase {
         }
         return withScript(
             new SourceBuffer(scriptFile.getFileName().toString(), script));
+    }
+
+    /**
+     * Returns a pipeline for processing the Nero rule set found in the
+     * script file given a preamble script.
+     * @param preamble The preamble for the input script
+     * @param scriptFile The path
+     * @return The pipeline
+     */
+    public Pipeline withPreambleAndFile(String preamble, Path scriptFile) {
+        String script;
+        try {
+            script = Files.readString(scriptFile);
+        } catch (IOException ex) {
+            throw new JoeError(
+                "Could not read Nero script file from disk:" + ex.getMessage());
+        }
+        return withScript(
+            new SourceBuffer(scriptFile.getFileName().toString(),
+                preamble + "\n" + script));
     }
 
     /**
