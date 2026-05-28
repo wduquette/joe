@@ -18,14 +18,18 @@ public class TextCanvas {
     // From Unicode Box Drawing, Block Elements, Geometric Figures, 2500-25FF
     /** Unicode character */ public static final String BLACK_DIAMOND = "\u25C6";
     /** Unicode character */ public static final String BLACK_LEFT_POINTING_TRIANGLE = "\u25C0";
+    /** Unicode character */ public static final String DOT_OPERATOR = "\u22C5";
     /** Unicode character */ public static final String LIGHT_DOWN_AND_HORIZONTAL = "\u252C";
     /** Unicode character */ public static final String LIGHT_DOWN_AND_LEFT = "\u2510";
+    /** Unicode character */ public static final String LIGHT_DOWN_AND_RIGHT = "\u250C";
     /** Unicode character */ public static final String LIGHT_HORIZONTAL = "\u2500";
     /** Unicode character */ public static final String LIGHT_RIGHT = "\u2576";
     /** Unicode character */ public static final String LIGHT_UP_AND_HORIZONTAL = "\u2534";
     /** Unicode character */ public static final String LIGHT_UP_AND_LEFT = "\u2518";
+    /** Unicode character */ public static final String LIGHT_UP_AND_RIGHT = "\u2514";
     /** Unicode character */ public static final String LIGHT_VERTICAL = "\u2502";
     /** Unicode character */ public static final String LIGHT_VERTICAL_AND_LEFT = "\u2524";
+    /** Unicode character */ public static final String LIGHT_VERTICAL_AND_RIGHT = "\u251C";
     /** Unicode character */ public static final String WHITE_DIAMOND = "\u25C7";
     /** Unicode character */ public static final String WHITE_DOWN_POINTING_TRIANGLE = "\u25BD";
     /** Unicode character */ public static final String WHITE_UP_POINTING_TRIANGLE = "\u25B3";
