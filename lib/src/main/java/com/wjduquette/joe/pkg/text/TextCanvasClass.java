@@ -35,17 +35,18 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
         // Joe classes can extend the `TextCanvas` class.
         initializer(this::_init);
 
-        method("asText",   this::_asText);
-        method("fill",     this::_fill);
-        method("get",      this::_get);
-        method("height",   this::_height);
-        method("put",      this::_put);
-        method("putDown",  this::_putDown);
-        method("putLeft",  this::_putLeft);
-        method("putUp",    this::_putUp);
-        method("size",     this::_size);
-        method("width",    this::_width);
-        method("toString", this::_toString);
+        method("asText",      this::_asText);
+        method("asTextBlock", this::_asTextBlock);
+        method("fill",        this::_fill);
+        method("get",         this::_get);
+        method("height",      this::_height);
+        method("put",         this::_put);
+        method("putDown",     this::_putDown);
+        method("putLeft",     this::_putLeft);
+        method("putUp",       this::_putUp);
+        method("size",        this::_size);
+        method("width",       this::_width);
+        method("toString",    this::_toString);
     }
 
     //-------------------------------------------------------------------------
@@ -89,10 +90,21 @@ public class TextCanvasClass extends ProxyType<TextCanvas> {
     //**
     // @method asText
     // %result String
-    // Returns the contents of the canvas as a String.
+    // Returns the contents of the canvas as a String. White space
+    // at the end of lines is trimmed.
     private Object _asText(TextCanvas tc, Joe joe, Args args) {
         args.arity(0, "asText()");
         return tc.toString();
+    }
+
+    //**
+    // @method asTextBlock
+    // %result String
+    // Returns the contents of the canvas as a String, with all lines
+    // padded to the same width.
+    private Object _asTextBlock(TextCanvas tc, Joe joe, Args args) {
+        args.arity(0, "asTextBlock()");
+        return tc.toStringBlock();
     }
 
     //**

@@ -6,13 +6,13 @@ import joe.text.TextCanvas;
 
 function testEmpty() {
     var buff = TextCanvas();
-    assertEQ(buff.asText(), "");
+    assertEQ(buff.asTextBlock(), "");
 }
 
 function testFill() {
     var buff = TextCanvas();
     buff.fill("x", 1, 1, 3, 2);
-    assertEQ(buff.asText().lines(), [
+    assertEQ(buff.asTextBlock().lines(), [
         "    ",
         " xxx",
         " xxx"
@@ -39,7 +39,7 @@ function testWidthHeightSize() {
 function testPutDown() {
     var buff = TextCanvas();
     buff.putDown(1, 1, "abc");
-    assertEQ(buff.asText().lines(), [
+    assertEQ(buff.asTextBlock().lines(), [
         "  ",
         " a",
         " b",
@@ -50,7 +50,7 @@ function testPutDown() {
 function testPutLeft() {
     var buff = TextCanvas();
     buff.putLeft(3, 1, "abc");
-    assertEQ(buff.asText().lines(), [
+    assertEQ(buff.asTextBlock().lines(), [
         "    ",
         " abc"
     ]);
@@ -59,7 +59,7 @@ function testPutLeft() {
 function testPutUp() {
     var buff = TextCanvas();
     buff.putUp(1, 3, "abc");
-    assertEQ(buff.asText().lines(), [
+    assertEQ(buff.asTextBlock().lines(), [
         "  ",
         " a",
         " b",

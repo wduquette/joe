@@ -177,10 +177,22 @@ public class TextCanvas {
     }
 
     /**
-     * Returns the content of the canvas as a string.
+     * Returns the content of the canvas as a string. White space at the
+     * end of lines is trimmed.
      * @return The string
      */
     public String toString() {
+        return rows.stream()
+            .map(r -> r.toString().stripTrailing())
+            .collect(Collectors.joining("\n"));
+    }
+
+    /**
+     * Returns the content of the canvas as a string.  All lines
+     * are padded out to the same length.
+     * @return The string
+     */
+    public String toStringBlock() {
         var width = rows.stream()
             .mapToInt(Row::length)
             .max()
