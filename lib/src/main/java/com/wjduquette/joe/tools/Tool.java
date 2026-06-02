@@ -1,6 +1,8 @@
 package com.wjduquette.joe.tools;
 
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 /**
  * Base type for tools.  Provides default methods for standard helpers.
@@ -143,7 +145,7 @@ public interface Tool {
     }
 
     /**
-     * Handles uncaught exceptions for the tool.  By default:
+     * Handles uncaught exceptions for the tool.  By default,
      *
      * <ul>
      * <li>{@link ToolException} results in a nice error message.</li>
@@ -171,4 +173,53 @@ public interface Tool {
             System.exit(1);
         }
     }
+
+    //-------------------------------------------------------------------------
+    // Static API
+
+    /**
+     * Parses a queue of command-line options given one or more option
+     * parsers, gathering and returning a list of non-option arguments.
+     * Option parsers. See {@link OptionParser} for the semantics.
+     * @param argq The argument queue
+     * @param parsers The parsers
+     * @return The list of non-option arguments.
+     */
+    static List<String> parseOpts(
+        Deque<String> argq,
+        OptionParser... parsers
+    ) {
+        var args = new ArrayList<String>();
+
+        while (!argq.isEmpty()) {
+            var opt = argq.poll();
+            if (!opt.startsWith("-")) {
+                args.add(opt);
+                continue;
+            }
+
+            doParse(opt, argq, parsers);
+        }
+
+        return args;
+    }
+
+    private static void doParse(
+        String opt,
+        Deque<String> argq,
+        OptionParser[] parsers
+    ) {
+        for (var p : parsers) {
+            if (p.parse(opt, argq)) return;
+        }
+
+        System.err.println("Unknown option: '" + opt + "'.");
+        System.exit(64);
+        throw new IllegalStateException("Can't reach this.");
+    }
+
+
+    //-------------------------------------------------------------------------
+    // Helper Types
+
 }
