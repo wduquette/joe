@@ -113,7 +113,7 @@ public class Matcher {
                 // NEXT, bind the tail to the tailId
                 if (p.tailVar() != null) {
                     var tail = list.subList(size, list.size());
-                    if (bindings.hasBinding(p.tailVar()) &&
+                    if (bindings.isBound(p.tailVar()) &&
                         !bindings.get(p.tailVar()).equals(tail))
                     {
                         yield false;
@@ -219,7 +219,7 @@ public class Matcher {
             }
 
             case Pattern.Subpattern p -> {
-                if (bindings.hasBinding(p.name()) &&
+                if (bindings.isBound(p.name()) &&
                     !bindings.get(p.name()).equals(value)
                 ) {
                     yield false;
@@ -240,7 +240,7 @@ public class Matcher {
             }
 
             case Pattern.Variable p -> {
-                if (bindings.hasBinding(p.name()) &&
+                if (bindings.isBound(p.name()) &&
                     !bindings.get(p.name()).equals(value)
                 ) {
                     yield false;

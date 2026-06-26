@@ -67,7 +67,7 @@ public class Bindings {
      * @param name The name
      * @return true or false
      */
-    public boolean hasBinding(String name) {
+    public boolean isBound(String name) {
         return map.containsKey(name);
     }
 
