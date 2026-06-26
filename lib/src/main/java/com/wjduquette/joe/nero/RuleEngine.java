@@ -508,23 +508,22 @@ public class RuleEngine {
             case PatternTerm pt ->
                 Matcher.matchWith(joe, pt.pattern(), value, null, bc.bindings);
             case Variable v -> {
-                var bound = bc.bindings.get(v.name());
-
-                if (bound == null) {
+                if (!bc.bindings.isBound(v.name())) {
                     bc.bindings.bind(v.name(), value);
                     yield true;
                 } else {
+                    var bound = bc.bindings.get(v.name());
                     yield Objects.equals(bound, value);
                 }
             }
             case VariableWithDefault vwd -> {
                 var v = vwd.variable();
-                var bound = bc.bindings.get(v.name());
 
-                if (bound == null) {
+                if (!bc.bindings.isBound(v.name())) {
                     bc.bindings.bind(v.name(), value);
                     yield true;
                 } else {
+                    var bound = bc.bindings.get(v.name());
                     yield Objects.equals(bound, value);
                 }
             }
