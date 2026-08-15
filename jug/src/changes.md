@@ -1,6 +1,8 @@
 # Change Log
 
-## Changes in 0.?.? (pending)
+## Changes in 1.0.0 (pending)
+
+The next release will probably be Joe v1.0.0.
 
 - None yet
 
