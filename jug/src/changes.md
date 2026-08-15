@@ -1,6 +1,10 @@
 # Change Log
 
-## Changes in 0.9.0 (in development)
+## Changes in 0.?.? (pending)
+
+- None yet
+
+## Changes in 0.9.0 (15 August 2026)
 
 Most changes in this release involve the experimental `joe.win` package
 and the Nero language, and have been driven by use in applications and
@@ -40,18 +44,25 @@ scripts.
         applications.
       - Added `TestRunner` to make it easier to write domain-specific `joe test`
         applications.
+      - Added option-parsing tools to the `Tool` framework.
   - Nero API
-    - Simplified the `Fact`, `Schema`, and `Shape` classes accordingly.
+    - Simplified the `Fact`, `Schema`, and `Shape` classes. 
     - Revamped the Java `Nero` and `NeroDatabase` APIs
     - Revamped the Joe `Fact` and `RuleSet` APIs, and replaced the
       `FactBase` API with a new `Database` API.
-  - Experimental `joe.win` Package
+    - Added many additional aggregation functions and built-in predicates.
+  - Joe API
+    - `joe` Package
+      - Added `Joe.engine()` and `Joe.version()`. 
+    - New `joe.text` Package
+      - Includes `TextTable`, `TextCanvas`, and `TextGrid` types.
+    - Experimental `joe.win` Package
       - Enhancements and cleanup
 - Tools
   - Extended `joe doc` to process standalone Markdown files, translating
     JoeDoc links and inserting content from the scanned JoeDoc comments.
       - JoeDoc link mnemonics are now more readable.
-      - 
+
 
 ## Changes in 0.8.0 (30 August 2025)
 
