@@ -31,6 +31,7 @@ public class JoeSingleton extends ProxyType<Void> {
 
         staticMethod("compare",           this::_compare);
         staticMethod("currentTimeMillis", this::_currentTimeMillis);
+        staticMethod("engine",            this::_engine);
         staticMethod("getFieldNames",     this::_getFieldNames);
         staticMethod("isOpaque",          this::_isOpaque);
         staticMethod("isFact",            this::_isFact);
@@ -68,6 +69,16 @@ public class JoeSingleton extends ProxyType<Void> {
     private Object _currentTimeMillis(Joe joe, Args args) {
         args.arity(0, "currentTimeMillis()");
         return (double)System.currentTimeMillis();
+    }
+
+    //**
+    // @static engine
+    // %result String
+    //
+    // Returns the name of the configured execution engine.
+    private Object _engine(Joe joe, Args args) {
+        args.arity(0, "engine()");
+        return joe.engineName();
     }
 
     //**

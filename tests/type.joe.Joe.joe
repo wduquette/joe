@@ -39,6 +39,14 @@ function testCompare_mismatch() {
 }
 
 //-----------------------------------------------------------------------------
+// Joe.engine()
+
+function testJoeEngine() {
+    assertT(Joe.engine() in {"clark", "walker"});
+}
+
+
+//-----------------------------------------------------------------------------
 // Joe.getFieldNames()
 
 function testGetFieldNames() {
