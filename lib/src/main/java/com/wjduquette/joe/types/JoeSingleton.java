@@ -42,6 +42,7 @@ public class JoeSingleton extends ProxyType<Void> {
         staticMethod("supertypeOf",       this::_supertypeOf);
         staticMethod("toFact",            this::_toFact);
         staticMethod("typeOf",            this::_typeOf);
+        staticMethod("version",           this::_version);
     }
 
     //-------------------------------------------------------------------------
@@ -210,4 +211,16 @@ public class JoeSingleton extends ProxyType<Void> {
         args.arity(1, "typeOf(value)");
         return joe.asJoeValue(args.next()).type();
     }
+
+    //**
+    // @static version
+    // %result String
+    //
+    // Returns the version number, as built into the Joe jar file, or
+    // "?.?.?" for development builds.
+    private Object _version(Joe joe, Args args) {
+        args.arity(0, "version()");
+        return Joe.getVersion();
+    }
+
 }

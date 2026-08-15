@@ -1,5 +1,6 @@
 package com.wjduquette.joe;
 
+import com.wjduquette.joe.app.App;
 import com.wjduquette.joe.clark.ClarkEngine;
 import com.wjduquette.joe.nero.Fact;
 import com.wjduquette.joe.nero.Nero;
@@ -19,6 +20,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
 /**
@@ -409,6 +412,36 @@ public class Joe {
     @SuppressWarnings("unused")
     public boolean isComplete(String source) {
         return Parser.isComplete(source);
+    }
+
+    //-------------------------------------------------------------------------
+    // The joe.jar manifest
+
+    /**
+     * Gets Joe's version number, or "?.?.?" if unavailable.
+     * @return The version number.
+     */
+    public static String getVersion() {
+        var attrs = getManifestAttributes();
+        if (attrs != null) {
+            var version = attrs.getValue("Implementation-Version");
+            if (version != null) {
+                return version;
+            }
+        }
+        return "?.?.?";
+    }
+
+    /**
+     * Get the manifest attributes, or return null on failure.
+     * @return The attributes, or null.
+     */
+    public static Attributes getManifestAttributes() {
+        try (var stream = App.class.getResourceAsStream("/META-INF/MANIFEST.MF")) {
+            return new Manifest(stream).getMainAttributes();
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     //-------------------------------------------------------------------------

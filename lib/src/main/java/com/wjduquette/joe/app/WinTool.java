@@ -103,7 +103,7 @@ public class WinTool implements Tool {
         }
 
         var runner = JoeRunner.define()
-            .appName("joe win " + App.getVersion())
+            .appName("joe win " + Joe.getVersion())
             .engineType(engineType)
             .debug(debug)
             .install(WinPackage.PACKAGE)

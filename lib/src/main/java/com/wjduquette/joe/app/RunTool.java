@@ -91,7 +91,7 @@ public class RunTool implements Tool {
         }
 
         var runner = JoeRunner.define()
-            .appName("Joe " + App.getVersion())
+            .appName("Joe " + Joe.getVersion())
             .engineType(engineType)
             .debug(debug)
             .scriptPath(argq.poll())

@@ -1,5 +1,6 @@
 package com.wjduquette.joe.app;
 
+import com.wjduquette.joe.Joe;
 import com.wjduquette.joe.tools.Tool;
 import com.wjduquette.joe.tools.ToolInfo;
 
@@ -49,7 +50,7 @@ public class VersionTool implements Tool {
             System.exit(64);
         }
 
-        var attrs = App.getManifestAttributes();
+        var attrs = Joe.getManifestAttributes();
         if (attrs != null) {
             var version = attrs.getValue("Implementation-Version");
             var date = attrs.getValue("Built-Date");

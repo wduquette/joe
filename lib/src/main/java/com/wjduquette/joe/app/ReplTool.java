@@ -118,7 +118,7 @@ public class ReplTool implements Tool {
         joe.registerPackages(found);
 
         try {
-            System.out.println("Joe " + App.getVersion() + " (" +
+            System.out.println("Joe " + Joe.getVersion() + " (" +
                 joe.engineName() + " engine)");
             runPrompt();
         } catch (IOException ex) {

@@ -110,7 +110,7 @@ public class TestWinTool implements Tool {
 
         // NEXT, run the tests.  Note: we are already on the JavaFX thread.
         var runner = TestRunner.define()
-            .appName("joe test " + App.getVersion())
+            .appName("joe test " + Joe.getVersion())
             .engineType(engineType)
             .install(WinPackage.PACKAGE)
             .libPath(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH))

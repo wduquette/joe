@@ -107,7 +107,7 @@ public class TestTool implements Tool {
         }
 
         var runner = TestRunner.define()
-            .appName("joe test " + App.getVersion())
+            .appName("joe test " + Joe.getVersion())
             .engineType(engineType)
             .libPath(libPath != null ? libPath : System.getenv(Joe.JOE_LIB_PATH))
             .testScripts(testScripts)
