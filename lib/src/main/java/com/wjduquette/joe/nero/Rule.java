@@ -89,7 +89,7 @@ public class Rule {
 
     /**
      * Returns a list of the body atoms that contain defaulted variables
-     * @return
+     * @return The list
      */
     public List<Atom> defaulted() {
         var result = new ArrayList<Atom>();

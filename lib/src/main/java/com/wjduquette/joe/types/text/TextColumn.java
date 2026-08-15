@@ -31,6 +31,7 @@ public class TextColumn<R, V> {
     /**
      * Sets the header string.
      * @param header The text
+     * @return The column
      */
     public TextColumn<R,V> header(String header) {
         this.header = header;
@@ -48,6 +49,7 @@ public class TextColumn<R, V> {
     /**
      * Sets the text alignment in the column.
      * @param alignment The alignment
+     * @return The column
      */
     public TextColumn<R,V> alignment(TextAlign alignment) {
         this.alignment = alignment;
@@ -67,6 +69,7 @@ public class TextColumn<R, V> {
      * Sets the function used to extract the column value from
      * a row's record.
      * @param valueGetter The function
+     * @return The column
      */
     public TextColumn<R,V> valueGetter(Function<R, V> valueGetter) {
         this.valueGetter = valueGetter;
